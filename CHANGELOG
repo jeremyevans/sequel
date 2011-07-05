@@ -1,5 +1,9 @@
 === HEAD
 
+* Handle another type of disconnection in the postgres adapter (jeremyevans)
+
+* Handle disconnections in the ado adapter and do postgres subadapter (jeremyevans)
+
 * Recognize disconnections when issuing BEGIN/ROLLBACK/COMMIT statements (jeremyevans) (#368)
 
 === 3.25.0 (2011-07-01)

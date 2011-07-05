@@ -77,6 +77,10 @@ module Sequel
         :do
       end
 
+      def database_error_classes
+        [::ODBC::Error]
+      end
+
       def disconnect_connection(c)
         c.disconnect
       end

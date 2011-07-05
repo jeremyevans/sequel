@@ -213,7 +213,7 @@ module Sequel
                 conn.next_result
                 r = conn.use_result
               rescue Mysql::Error => e
-                raise_error(e)
+                raise_error(e, :disconnect=>true) if MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)
                 break
               end
               yield r if opts[:type] == :select
@@ -230,7 +230,7 @@ module Sequel
                 conn.next_result
                 r = conn.use_result
               rescue Mysql::Error => e
-                raise_error(e)
+                raise_error(e, :disconnect=>true) if MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)
                 break
               end
               r.free if r

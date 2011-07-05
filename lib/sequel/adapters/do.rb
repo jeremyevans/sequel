@@ -36,6 +36,8 @@ module Sequel
     # Sequel::DataObjects::Database object, or hack DataObjects (or Extlib) to
     # use a pool size at least as large as the pool size being used by Sequel.
     class Database < Sequel::Database
+      DISCONNECT_ERROR_RE = /terminating connection due to administrator command/
+
       set_adapter_scheme :do
       
       # Call the DATABASE_SETUP proc directly after initialization,
@@ -145,9 +147,19 @@ module Sequel
         :execute_non_query
       end
       
+      # dataobjects uses the DataObjects::Error class as the main error class.
+      def database_error_classes
+        [::DataObjects::Error]
+      end
+
       # Close the given database connection.
       def disconnect_connection(c)
         c.close
+      end
+
+      # Recognize DataObjects::ConnectionError instances as disconnect errors.
+      def disconnect_error?(e, opts)
+        super || (e.is_a?(::DataObjects::Error) && (e.is_a?(::DataObjects::ConnectionError) || e.message =~ DISCONNECT_ERROR_RE))
       end
       
       # Execute SQL on the connection by creating a command first

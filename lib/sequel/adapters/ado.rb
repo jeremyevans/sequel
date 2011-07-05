@@ -4,6 +4,8 @@ module Sequel
   # The ADO adapter provides connectivity to ADO databases in Windows.
   module ADO
     class Database < Sequel::Database
+      DISCONNECT_ERROR_RE = /Communication link failure/
+
       set_adapter_scheme :ado
 
       def initialize(opts)
@@ -87,8 +89,16 @@ module Sequel
         end
       end
       
+      def database_error_classes
+        [::WIN32OLERuntimeError]
+      end
+
       def disconnect_connection(conn)
         conn.Close
+      end
+
+      def disconnect_error?(e, opts)
+        super || (e.is_a?(::WIN32OLERuntimeError) && e.message =~ DISCONNECT_ERROR_RE)
       end
     end
     

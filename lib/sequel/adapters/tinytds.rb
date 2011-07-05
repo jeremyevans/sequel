@@ -74,12 +74,17 @@ module Sequel
         super
       end
 
+      # tiny_tds uses TinyTds::Error as the base error class.
+      def database_error_classes
+        [TinyTds::Error]
+      end
+
       # Close the TinyTds::Client object.
       def disconnect_connection(c)
         c.close
       end
 
-      def disconnect_error(e, opts)
+      def disconnect_error?(e, opts)
         super || (opts[:conn] && !opts[:conn].active?)
       end
     end
