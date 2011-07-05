@@ -1,5 +1,9 @@
 === HEAD
 
+* Make create_table! only attempt to drop the table if it already exists (jeremyevans)
+
+* Remove custom table_exists? implementations in the oracle and postgres adapters (jeremyevans)
+
 * Handle another type of disconnection in the postgres adapter (jeremyevans)
 
 * Handle disconnections in the ado adapter and do postgres subadapter (jeremyevans)

@@ -555,8 +555,15 @@ describe "DB#create_table!" do
     @db = SchemaDummyDatabase.new
   end
   
-  specify "should drop the table and then create it" do
-    @db.create_table!(:cats) {}
+  specify "should create the table if it does not exist" do
+    @db.meta_def(:table_exists?){|a| false}
+    @db.create_table!(:cats){|*a|}
+    @db.sqls.should == ['CREATE TABLE cats ()']
+  end
+  
+  specify "should drop the table before creating it if it already exists" do
+    @db.meta_def(:table_exists?){|a| true}
+    @db.create_table!(:cats){|*a|}
     @db.sqls.should == ['DROP TABLE cats', 'CREATE TABLE cats ()']
   end
 end

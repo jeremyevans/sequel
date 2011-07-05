@@ -99,17 +99,22 @@ module Sequel
       nil
     end
     
-    # Forcibly creates a table, attempting to drop it unconditionally (and catching any errors), then creating it.
+    # Forcibly create a table, attempting to drop it if it already exists, then creating it.
     # 
     #   DB.create_table!(:a){Integer :a} 
-    #   # DROP TABLE a
+    #   # SELECT * FROM a LIMIT a -- check existence
+    #   # DROP TABLE a -- drop table if already exists
     #   # CREATE TABLE a (a integer)
     def create_table!(name, options={}, &block)
-      drop_table(name) rescue nil
+      drop_table(name) if table_exists?(name)
       create_table(name, options, &block)
     end
     
-    # Creates the table unless the table already exists
+    # Creates the table unless the table already exists.
+    # 
+    #   DB.create_table?(:a){Integer :a} 
+    #   # SELECT * FROM a LIMIT a -- check existence
+    #   # CREATE TABLE a (a integer) -- if it doesn't already exist
     def create_table?(name, options={}, &block)
       if supports_create_table_if_not_exists?
         create_table(name, options.merge(:if_not_exists=>true), &block)
