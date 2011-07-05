@@ -606,12 +606,6 @@ describe "Postgres::Database schema qualified tables" do
     POSTGRES_DB.drop_table(:domains)
   end
   
-  specify "#table_exists? should not include tables from the default non-public schemas" do
-    POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
-    POSTGRES_DB.table_exists?(:schema_test).should == true
-    POSTGRES_DB.table_exists?(:domain_udt_usage).should == false
-  end
-  
   specify "#table_exists? should see if the table is in a given schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
     POSTGRES_DB.table_exists?(:schema_test__schema_test).should == true

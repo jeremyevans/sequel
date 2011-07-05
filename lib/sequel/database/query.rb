@@ -170,12 +170,12 @@ module Sequel
     #
     #   DB.table_exists?(:foo) # => false
     def table_exists?(name)
-      begin 
-        from(name).first
-        true
-      rescue
-        false
-      end
+      sch, table_name = schema_and_table(name)
+      name = SQL::QualifiedIdentifier.new(sch, table_name) if sch
+      from(name).first
+      true
+    rescue
+      false
     end
     
     # Return all tables in the database as an array of symbols.

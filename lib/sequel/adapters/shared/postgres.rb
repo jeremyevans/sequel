@@ -368,18 +368,6 @@ module Sequel
         true
       end
 
-      # Whether the given table exists in the database
-      #
-      # Options:
-      # * :schema - The schema to search (default_schema by default)
-      # * :server - The server to use
-      def table_exists?(table, opts={})
-        im = input_identifier_meth
-        schema, table = schema_and_table(table)
-        opts[:schema] ||= schema
-        tables(opts){|ds| !ds.first(:relname=>im.call(table)).nil?}
-      end
-      
       # Array of symbols specifying table names in the current database.
       # The dataset used is yielded to the block if one is provided,
       # otherwise, an array of symbols of table names is returned.  

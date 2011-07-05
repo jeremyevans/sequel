@@ -26,10 +26,6 @@ module Sequel
         ds.map{|r| ds.send(:output_identifier, r[:tname])}
       end
 
-      def table_exists?(name)
-        from(:tab).filter(:tname =>dataset.send(:input_identifier, name), :tabtype => 'TABLE').count > 0
-      end
-
       def views(opts={}) 
         ds = from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'VIEW') 
         ds.map{|r| ds.send(:output_identifier, r[:tname])} 
