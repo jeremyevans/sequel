@@ -1488,7 +1488,15 @@ module Sequel
           if meths.include?(m)
             send(m, v)
           elsif strict
-            raise Error, "method #{m} doesn't exist or access is restricted to it"
+            if respond_to?(m)
+              if Array(model.primary_key).member?(k) && model.restrict_primary_key?
+                raise Error, "#{k} is a restricted primary key"
+              else
+                raise Error, "#{k} is a restricted column"
+              end
+            else
+              raise Error, "method #{m} doesn't exist"
+            end
           end
         end
         self
