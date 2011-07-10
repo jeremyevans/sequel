@@ -22,10 +22,7 @@ module Sequel
     # Identity maps are thread-local and only persist for the duration of the block,
     # so they should only be considered as a possible performance enhancer.
     #
-    # The identity_map plugin is not compatible with the standard eager loading of
-    # many_to_many and many_through_many associations.  If you want to use the identity_map plugin,
-    # you should use +eager_graph+ instead of +eager+ for those associations. It is also
-    # not compatible with the eager loading in the +rcte_tree+ plugin.
+    # The identity_map plugin is not compatible with the eager loading in the +rcte_tree+ plugin.
     #
     # Usage:
     #
@@ -37,6 +34,115 @@ module Sequel
     #   # would need to do Album.with_identity_map{} to use the identity map
     module IdentityMap
       module ClassMethods
+        # Override the default :eager_loader option for many_*_many associations to work
+        # with an identity_map.  If the :eager_graph association option is used, you'll probably have to use
+        # :uniq=>true on the current association amd :cartesian_product_number=>2 on the association
+        # mentioned by :eager_graph, otherwise you'll end up with duplicates because the row proc will be
+        # getting called multiple times for the same object.  If you do have duplicates and you use :eager_graph,
+        # they'll probably be lost.  Making that work correctly would require changing a lot of the core
+        # architecture, such as how graphing and eager graphing work.
+        def associate(type, name, opts = {}, &block)
+          if opts[:eager_loader]
+            super
+          elsif type == :many_to_many
+            opts = super
+            model = self
+            left_pk = opts[:left_primary_key]
+            uses_lcks = opts[:uses_left_composite_keys]
+            uses_rcks = opts[:uses_right_composite_keys]
+            right = opts[:right_key]
+            join_table = opts[:join_table]
+            left = opts[:left_key]
+            lcks = opts[:left_keys]
+            left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
+            opts[:eager_loader] = proc do |eo|
+              h = eo[:key_hash][left_pk]
+              eo[:rows].each{|object| object.associations[name] = []}
+              r = uses_rcks ? rcks.zip(opts.right_primary_keys) : [[right, opts.right_primary_key]]
+              l = uses_lcks ? [[lcks.map{|k| SQL::QualifiedIdentifier.new(join_table, k)}, h.keys]] : [[left, h.keys]]
+
+              # Replace the row proc to remove the left key alias before calling the previous row proc.
+              # Associate the value of the left key alias with the associated object (through its object_id).
+              # When loading the associated objects, lookup the left key alias value and associate the
+              # associated objects to the main objects if the left key alias value matches the left primary key
+              # value of the main object.
+              # 
+              # The deleting of the left key alias from the hash before calling the previous row proc
+              # is necessary when an identity map is used, otherwise if the same associated object is returned more than
+              # once for the association, it won't know which of current objects to associate it to.
+              #
+              # The indirection through h2 is necessary in order to handle the case where the :eager_graph
+              # option is used for the association.
+              ds = opts.associated_class.inner_join(join_table, r + l)
+              pr = ds.row_proc
+              h2 = {}
+              ds.row_proc = proc do |hash|
+                hash_key = if uses_lcks
+                  left_key_alias.map{|k| hash.delete(k)}
+                else
+                  hash.delete(left_key_alias)
+                end
+                obj = pr.call(hash)
+                (h2[obj.object_id] ||= []) << hash_key
+                obj
+              end
+              model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo).all do |assoc_record|
+                if hash_keys = h2.delete(assoc_record.object_id)
+                  hash_keys.each do |hash_key|
+                    if objects = h[hash_key]
+                      objects.each{|object| object.associations[name].push(assoc_record)}
+                    end
+                  end
+                end
+              end
+            end
+            opts
+          elsif type == :many_through_many
+            opts = super
+            model = self
+            left_pk = opts[:left_primary_key]
+            left_key = opts[:left_key]
+            uses_lcks = opts[:uses_left_composite_keys]
+            left_keys = Array(left_key)
+            left_key_alias = opts[:left_key_alias]
+            opts[:eager_loader] = lambda do |eo|
+              h = eo[:key_hash][left_pk]
+              eo[:rows].each{|object| object.associations[name] = []}
+              ds = opts.associated_class 
+              opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
+              ft = opts[:final_reverse_edge]
+              conds = uses_lcks ? [[left_keys.map{|k| SQL::QualifiedIdentifier.new(ft[:table], k)}, h.keys]] : [[left_key, h.keys]]
+
+              # See above comment in many_to_many eager_loader
+              ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + conds, :table_alias=>ft[:alias])
+              pr = ds.row_proc
+              h2 = {}
+              ds.row_proc = proc do |hash|
+                hash_key = if uses_lcks
+                  left_key_alias.map{|k| hash.delete(k)}
+                else
+                  hash.delete(left_key_alias)
+                end
+                obj = pr.call(hash)
+                (h2[obj.object_id] ||= []) << hash_key
+                obj
+              end
+              model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo).all do |assoc_record|
+                if hash_keys = h2.delete(assoc_record.object_id)
+                  hash_keys.each do |hash_key|
+                    if objects = h[hash_key]
+                      objects.each{|object| object.associations[name].push(assoc_record)}
+                    end
+                  end
+                end
+              end
+            end
+            opts
+          else
+            super
+          end
+        end
+          
         # Returns the current thread-local identity map.  Should be a hash if
         # there is an active identity map, and nil otherwise.
         def identity_map
