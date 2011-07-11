@@ -723,6 +723,29 @@ describe Sequel::Model, "#set" do
     MODEL_DB.sqls.should == []
   end
 
+  it "should raise error if strict_param_setting is true and method does not exist" do
+    @o1.strict_param_setting = true
+    proc{@o1.set('foo' => 1)}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise error if strict_param_setting is true and column is a primary key" do
+    @o1.strict_param_setting = true
+    proc{@o1.set('id' => 1)}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise error if strict_param_setting is true and column is restricted" do
+    @o1.strict_param_setting = true
+    @c.set_restricted_columns :x
+    proc{@o1.set('x' => 1)}.should raise_error(Sequel::Error)
+  end
+
+  it "should not create a symbol if strict_param_setting is true and string is given" do
+    @o1.strict_param_setting = true
+    l = Symbol.all_symbols.length
+    proc{@o1.set('sadojafdso' => 1)}.should raise_error(Sequel::Error)
+    Symbol.all_symbols.length.should == l
+  end
+
   it "#set should correctly handle cases where an instance method is added to the class" do
     @o1.set(:x => 1)
     @o1.values.should == {:x => 1}

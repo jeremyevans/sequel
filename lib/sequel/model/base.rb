@@ -1488,8 +1488,9 @@ module Sequel
           if meths.include?(m)
             send(m, v)
           elsif strict
-            if respond_to?(m)
-              if Array(model.primary_key).member?(k) && model.restrict_primary_key?
+            # Avoid using respond_to? or creating symbols from user input
+            if public_methods.map{|s| s.to_s}.include?(m)
+              if Array(model.primary_key).map{|s| s.to_s}.member?(k.to_s) && model.restrict_primary_key?
                 raise Error, "#{k} is a restricted primary key"
               else
                 raise Error, "#{k} is a restricted column"
