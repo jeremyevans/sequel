@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix handling of nil values with the pure-Java version of nokogiri in the xml_serializer plugin (jeremyevans)
+
 * Make identity_map plugin work with standard eager loading of many_to_many and many_through_many associations (jeremyevans)
 
 * Make create_table! only attempt to drop the table if it already exists (jeremyevans)

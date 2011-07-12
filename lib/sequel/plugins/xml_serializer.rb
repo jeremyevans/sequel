@@ -205,9 +205,9 @@ module Sequel
                 klass.from_xml_node(node)
               end
             elsif cols.include?(k)
-              self[k.to_sym] = node[:nil] ? nil : node.children.first.to_s
+              self[k.to_sym] = node.key?('nil') ? nil : node.children.first.to_s
             elsif meths.include?("#{k}=")
-              send("#{k}=", node[:nil] ? nil : node.children.first.to_s)
+              send("#{k}=", node.key?('nil') ? nil : node.children.first.to_s)
             else
               raise Error, "Entry in XML not an association or column and no setter method exists: #{k}"
             end

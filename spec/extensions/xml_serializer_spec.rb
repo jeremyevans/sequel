@@ -118,13 +118,13 @@ describe "Sequel::Plugins::XmlSerializer" do
   end
 
   it "should support an :encoding option when serializing" do
-    ["<?xml version=\"1.0\" encoding=\"utf-8\"?><artist><id>2</id><name>YJM</name></artist>",
-     "<?xml version=\"1.0\" encoding=\"utf-8\"?><artist><name>YJM</name><id>2</id></artist>"].should include(@artist.to_xml(:encoding=>'utf-8').gsub(/\n */m, ''))
+    ["<?xml version=\"1.0\" encoding=\"UTF-8\"?><artist><id>2</id><name>YJM</name></artist>",
+     "<?xml version=\"1.0\" encoding=\"UTF-8\"?><artist><name>YJM</name><id>2</id></artist>"].should include(@artist.to_xml(:encoding=>'UTF-8').gsub(/\n */m, ''))
   end
 
   it "should support a :builder_opts option when serializing" do
-    ["<?xml version=\"1.0\" encoding=\"utf-8\"?><artist><id>2</id><name>YJM</name></artist>",
-     "<?xml version=\"1.0\" encoding=\"utf-8\"?><artist><name>YJM</name><id>2</id></artist>"].should include(@artist.to_xml(:builder_opts=>{:encoding=>'utf-8'}).gsub(/\n */m, ''))
+    ["<?xml version=\"1.0\" encoding=\"UTF-8\"?><artist><id>2</id><name>YJM</name></artist>",
+     "<?xml version=\"1.0\" encoding=\"UTF-8\"?><artist><name>YJM</name><id>2</id></artist>"].should include(@artist.to_xml(:builder_opts=>{:encoding=>'UTF-8'}).gsub(/\n */m, ''))
   end
 
   it "should support an :types option when serializing" do
