@@ -43,6 +43,17 @@ module Sequel
 
       private
 
+      # Access uses # to quote dates
+      def literal_date(d)
+        d.strftime('#%Y-%m-%d#')
+      end
+
+      # Access uses # to quote datetimes
+      def literal_datetime(t)
+        t.strftime('#%Y-%m-%d %H:%M:%S#')
+      end
+      alias literal_time literal_datetime
+
       # Access uses TOP for limits
       def select_limit_sql(sql)
         sql << " TOP #{@opts[:limit]}" if @opts[:limit]
