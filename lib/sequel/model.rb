@@ -49,10 +49,11 @@ module Sequel
   # called directly on the class.  Model datasets return rows as model instances,
   # which have fairly standard ORM instance behavior.
   #
-  # <tt>Sequel::Model</tt> is built completely out of plugins, the only method not part of a
-  # plugin is the plugin method itself.  Plugins can override any class, instance, or
-  # dataset method defined by a previous plugin and call super to get the default
-  # behavior.
+  # <tt>Sequel::Model</tt> is built completely out of plugins.  Plugins can override any class,
+  # instance, or dataset method defined by a previous plugin and call super to get the default
+  # behavior.  By default, <tt>Sequel::Model</tt> loads two plugins, <tt>Sequel::Model</tt>
+  # (which is itself a plugin) for the base support, and <tt>Sequel::Model::Associations</tt>
+  # for the associations support.
   #
   # You can set the +SEQUEL_NO_ASSOCIATIONS+ constant or environment variable to
   # make Sequel not load the associations plugin by default.
