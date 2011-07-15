@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't treat strings with leading zeros as octal format in the default typecasting (jeremyevans)
+
 * Fix literalization of Date, Time, and DateTime values on Microsoft Access (jeremyevans)
 
 * Fix handling of nil values with the pure-Java version of nokogiri in the xml_serializer plugin (jeremyevans)

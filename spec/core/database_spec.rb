@@ -1332,6 +1332,18 @@ describe "Database#typecast_value" do
     proc{@db.typecast_value(:datetime, 4)}.should raise_error(Sequel::InvalidValue)
   end
 
+  specify "should handle integers with leading 0 as base 10" do
+    @db.typecast_value(:integer, "013").should == 13
+    @db.typecast_value(:integer, "08").should == 8
+    @db.typecast_value(:integer, "000013").should == 13
+    @db.typecast_value(:integer, "000008").should == 8
+  end
+
+  specify "should handle integers with leading 0x as base 16" do
+    @db.typecast_value(:integer, "0x013").should == 19
+    @db.typecast_value(:integer, "0x80").should == 128
+  end
+
   specify "should have an underlying exception class available at wrapped_exception" do
     begin
       @db.typecast_value(:date, 'a')

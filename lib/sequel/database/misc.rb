@@ -255,9 +255,18 @@ module Sequel
       Float(value)
     end
 
-    # Typecast the value to an Integer
-    def typecast_value_integer(value)
-      Integer(value)
+    LEADING_ZERO_RE = /\A0+(\d)/.freeze # :nodoc:
+    if RUBY_VERSION >= '1.9'
+      # Typecast the value to an Integer
+      def typecast_value_integer(value)
+        (value.is_a?(String) && value =~ LEADING_ZERO_RE) ? Integer(value, 10) : Integer(value)
+      end
+    else
+      LEADING_ZERO_REP = "\\1".freeze # :nodoc:
+      # Typecast the value to an Integer
+      def typecast_value_integer(value)
+        Integer(value.is_a?(String) ? value.sub(LEADING_ZERO_RE, LEADING_ZERO_REP) : value)
+      end
     end
 
     # Typecast the value to a String
