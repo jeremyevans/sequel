@@ -1506,7 +1506,7 @@ module Sequel
           ds = ds.eager_graph_associations(ds, r.associated_class, assoc_table_alias, requirements + [assoc_table_alias], *associations) unless associations.empty?
           ds
         end
-      
+
         # Check the associations are valid for the given model.
         # Call eager_graph_association on each association.
         #
@@ -1533,67 +1533,10 @@ module Sequel
           ds
         end
       
-        # Build associations out of the array of returned object graphs.
-        def eager_graph_build_associations(record_graphs)
-          eager_graph = @opts[:eager_graph]
-          master = eager_graph[:master]
-          requirements = eager_graph[:requirements]
-          alias_map = eager_graph[:alias_association_name_map]
-          type_map = eager_graph[:alias_association_type_map]
-          reciprocal_map = eager_graph[:reciprocals]
-      
-          # Make dependency map hash out of requirements array for each association.
-          # This builds a tree of dependencies that will be used for recursion
-          # to ensure that all parts of the object graph are loaded into the
-          # appropriate subordinate association.
-          dependency_map = {}
-          # Sort the associations by requirements length, so that
-          # requirements are added to the dependency hash before their
-          # dependencies.
-          requirements.sort_by{|a| a[1].length}.each do |ta, deps|
-            if deps.empty?
-              dependency_map[ta] = {}
-            else
-              deps = deps.dup
-              hash = dependency_map[deps.shift]
-              deps.each do |dep|
-                hash = hash[dep]
-              end
-              hash[ta] = {}
-            end
-          end
-      
-          # This mapping is used to make sure that duplicate entries in the
-          # result set are mapped to a single record.  For example, using a
-          # single one_to_many association with 10 associated records,
-          # the main object will appear in the object graph 10 times.
-          # We map by primary key, if available, or by the object's entire values,
-          # if not. The mapping must be per table, so create sub maps for each table
-          # alias.
-          records_map = {master=>{}}
-          alias_map.keys.each{|ta| records_map[ta] = {}}
-      
-          # This will hold the final record set that we will be replacing the object graph with.
-          records = []
-          record_graphs.each do |record_graph|
-            primary_record = record_graph[master]
-            key = primary_record.pk_or_nil || primary_record.values.sort_by{|x| x[0].to_s}
-            if cached_pr = records_map[master][key]
-              primary_record = cached_pr
-            else
-              records_map[master][key] = primary_record
-              # Only add it to the list of records to return if it is a new record
-              records.push(primary_record)
-            end
-            # Build all associations for the current object and it's dependencies
-            eager_graph_build_associations_graph(dependency_map, alias_map, type_map, reciprocal_map, records_map, primary_record, record_graph)
-          end
-      
-          # Remove duplicate records from all associations if this graph could possibly be a cartesian product
-          eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map) if eager_graph[:cartesian_product_number] > 1
-          
-          # Replace the array of object graphs with an array of model objects
-          record_graphs.replace(records)
+        # Replace the array of plain hashes with an array of model objects will all eager_graphed
+        # associations set in the associations cache for each object.
+        def eager_graph_build_associations(hashes)
+          hashes.replace(EagerGraphLoader.new(self).load(hashes))
         end
       
         private
@@ -1648,57 +1591,6 @@ module Sequel
           reflection
         end
       
-        # Build associations for the current object.  This is called recursively
-        # to build all dependencies.
-        def eager_graph_build_associations_graph(dependency_map, alias_map, type_map, reciprocal_map, records_map, current, record_graph)
-          return if dependency_map.empty?
-          # Don't clobber the cached association value for one_to_many and many_to_many associations if it has already been setup
-          dependency_map.keys.each do |ta|
-            assoc_name = alias_map[ta]
-            current.associations[assoc_name] = type_map[ta] ? [] : nil unless current.associations.include?(assoc_name)
-          end
-          dependency_map.each do |ta, deps|
-            next unless rec = record_graph[ta]
-            key = rec.pk_or_nil || rec.values.sort_by{|x| x[0].to_s}
-            if cached_rec = records_map[ta][key]
-              rec = cached_rec
-            else
-              records_map[ta][key] = rec
-            end
-            assoc_name = alias_map[ta]
-            if type_map[ta]
-              current.associations[assoc_name].push(rec) 
-              if reciprocal = reciprocal_map[ta]
-                rec.associations[reciprocal] = current
-              end
-            else
-              current.associations[assoc_name] = rec
-            end
-            # Recurse into dependencies of the current object
-            eager_graph_build_associations_graph(deps, alias_map, type_map, reciprocal_map, records_map, rec, record_graph)
-          end
-        end
-      
-        # If the result set is the result of a cartesian product, then it is possible that
-        # there are multiple records for each association when there should only be one.
-        # In that case, for each object in all associations loaded via +eager_graph+, run
-        # uniq! on the association to make sure no duplicate records show up.
-        # Note that this can cause legitimate duplicate records to be removed.
-        def eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map)
-          records.each do |record|
-            dependency_map.each do |ta, deps|
-              list = record.send(alias_map[ta])
-              list = if type_map[ta]
-                list.uniq!
-              else
-                [list] if list
-              end
-              # Recurse into dependencies
-              eager_graph_make_associations_unique(list, deps, alias_map, type_map) if list
-            end
-          end
-        end
-      
         # Eagerly load all specified associations 
         def eager_load(a, eager_assoc=@opts[:eager])
           return if a.empty?
@@ -1742,7 +1634,12 @@ module Sequel
             a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])} unless r[:after_load].empty?
           end 
         end
-      
+
+        # Return plain hashes instead of calling the row_proc if eager_graph is being used.
+        def graph_each(&block)
+          @opts[:eager_graph] ? fetch_rows(select_sql, &block) : super
+        end
+
         # Return a subquery expression for filering by a many_to_many association
         def many_to_many_association_filter_expression(op, ref, obj)
           lpks, lks, rks = ref.values_at(:left_primary_keys, :left_keys, :right_keys)
@@ -1774,6 +1671,264 @@ module Sequel
           eager_graph_build_associations(all_records) if @opts[:eager_graph]
           eager_load(all_records) if @opts[:eager]
           super
+        end
+      end
+
+      # This class is the internal implementation of eager_graph.  It is responsible for taking an array of plain
+      # hashes and returning an array of model objects with all eager_graphed associations already set in the
+      # association cache.
+      class EagerGraphLoader
+        # Hash with table alias symbol keys and association name values
+        attr_reader :alias_map
+        
+        # Hash with table alias symbol keys and subhash values mapping column_alias symbols to the
+        # symbol of the real name of the column
+        attr_reader :column_maps
+        
+        # Recursive hash with table alias symbol keys mapping to hashes with dependent table alias symbol keys.
+        attr_reader :dependency_map
+        
+        # The table alias symbol for the primary model
+        attr_reader :master
+        
+        # Hash with table alias symbol keys and primary key symbol values (or arrays of primary key symbols for
+        # composite key tables)
+        attr_reader :primary_keys
+
+        # Hash with table alias symbol keys and reciprocal association symbol values,
+        # used for setting reciprocals for one_to_many associations.
+        attr_reader :reciprocal_map
+        
+        # Hash with table alias symbol keys and subhash values mapping primary key symbols (or array of symbols)
+        # to model instances.  Used so that only a single model instance is created for each object.
+        attr_reader :records_map
+        
+        # Hash with table alias symbol keys and callable values used to create model instances
+        attr_reader :row_procs
+        
+        # Hash with table alias symbol keys and true/false values, where true means the
+        # association represented by the table alias uses an array of values instead of
+        # a single value (i.e. true => *_many, false => *_to_one).
+        attr_reader :type_map
+
+        # Initialize all of the data structures used during loading.
+        def initialize(dataset)
+          opts = dataset.opts
+          eager_graph = opts[:eager_graph]
+          @master =  eager_graph[:master]
+          requirements = eager_graph[:requirements]
+          alias_map = @alias_map = eager_graph[:alias_association_name_map]
+          type_map = @type_map = eager_graph[:alias_association_type_map]
+          reciprocal_map = @reciprocal_map = eager_graph[:reciprocals]
+          @unique = eager_graph[:cartesian_product_number] > 1
+      
+          # Make dependency map hash out of requirements array for each association.
+          # This builds a tree of dependencies that will be used for recursion
+          # to ensure that all parts of the object graph are loaded into the
+          # appropriate subordinate association.
+          @dependency_map = {}
+          # Sort the associations by requirements length, so that
+          # requirements are added to the dependency hash before their
+          # dependencies.
+          requirements.sort_by{|a| a[1].length}.each do |ta, deps|
+            if deps.empty?
+              dependency_map[ta] = {}
+            else
+              deps = deps.dup
+              hash = dependency_map[deps.shift]
+              deps.each do |dep|
+                hash = hash[dep]
+              end
+              hash[ta] = {}
+            end
+          end
+      
+          # This mapping is used to make sure that duplicate entries in the
+          # result set are mapped to a single record.  For example, using a
+          # single one_to_many association with 10 associated records,
+          # the main object column values appear in the object graph 10 times.
+          # We map by primary key, if available, or by the object's entire values,
+          # if not. The mapping must be per table, so create sub maps for each table
+          # alias.
+          records_map = {@master=>{}}
+          alias_map.keys.each{|ta| records_map[ta] = {}}
+          @records_map = records_map
+
+          datasets = opts[:graph][:table_aliases].to_a.reject{|ta,ds| ds.nil?}
+          column_aliases = opts[:graph_aliases] || opts[:graph][:column_aliases]
+          primary_keys = {}
+          column_maps = {}
+          models = {}
+          row_procs = {}
+          datasets.each do |ta, ds|
+            models[ta] = ds.model
+            primary_keys[ta] = []
+            column_maps[ta] = {}
+            row_procs[ta] = ds.row_proc
+          end
+          column_aliases.each do |col_alias, tc|
+            ta, column = tc
+            column_maps[ta][col_alias] = column
+          end
+          column_maps.each do |ta, h|
+            pk = models[ta].primary_key
+            if pk.is_a?(Array)
+              primary_keys[ta] = []
+              h.select{|ca, c| primary_keys[ta] << ca if pk.include?(c)}
+            else
+              h.select{|ca, c| primary_keys[ta] = ca if pk == c}
+            end
+          end
+          @column_maps = column_maps
+          @primary_keys = primary_keys
+          @row_procs = row_procs
+
+          # For performance, create two special maps for the master table,
+          # so you can skip a hash lookup.
+          @master_column_map = column_maps[master]
+          @master_primary_keys = primary_keys[master]
+
+          # Add a special hash mapping table alias symbols to 5 element arrays that just
+          # contain the data in other data structures for that table alias.  This is
+          # used for performance, to get all values in one hash lookup instead of
+          # separate hash lookups for each data structure.
+          ta_map = {}
+          alias_map.keys.each do |ta|
+            ta_map[ta] = [records_map[ta], row_procs[ta], alias_map[ta], type_map[ta], reciprocal_map[ta]]
+          end
+          @ta_map = ta_map
+        end
+
+        # Return an array of primary model instances with the associations cache prepopulated
+        # for all model objects (both primary and associated).
+        def load(hashes)
+          master = master()
+      
+          # Assign to local variables for speed increase
+          rp = row_procs[master]
+          rm = records_map[master]
+          dm = dependency_map
+
+          # This will hold the final record set that we will be replacing the object graph with.
+          records = []
+
+          hashes.each do |h|
+            unless key = master_pk(h)
+              key = hkey(master_hfor(h))
+            end
+            unless primary_record = rm[key]
+              primary_record = rm[key] = rp.call(master_hfor(h))
+              # Only add it to the list of records to return if it is a new record
+              records.push(primary_record)
+            end
+            # Build all associations for the current object and it's dependencies
+            _load(dm, primary_record, h)
+          end
+      
+          # Remove duplicate records from all associations if this graph could possibly be a cartesian product
+          unique(records, dm) if @unique
+          
+          records
+        end
+      
+        private
+
+        # Recursive method that creates associated model objects and associates them to the current model object.
+        def _load(dependency_map, current, h)
+          dependency_map.each do |ta, deps|
+            unless key = pk(ta, h)
+              ta_h = hfor(ta, h)
+              unless ta_h.values.any?
+                assoc_name = alias_map[ta]
+                unless (assoc = current.associations).has_key?(assoc_name)
+                  assoc[assoc_name] = type_map[ta] ? [] : nil
+                end
+                next
+              end
+              key = hkey(ta_h)
+            end
+            rm, rp, assoc_name, tm, rcm = @ta_map[ta]
+            unless rec = rm[key]
+              rec = rm[key] = rp.call(hfor(ta, h))
+            end
+
+            if tm
+              unless (assoc = current.associations).has_key?(assoc_name)
+                assoc[assoc_name] = []
+              end
+              assoc[assoc_name].push(rec) 
+              rec.associations[rcm] = current if rcm
+            else
+              current.associations[assoc_name] = rec
+            end
+            # Recurse into dependencies of the current object
+            _load(deps, rec, h) unless deps.empty?
+          end
+        end
+      
+        # Return the subhash for the specific table alias +ta+ by parsing the values out of the main hash +h+
+        def hfor(ta, h)
+          out = {}
+          @column_maps[ta].each{|ca, c| out[c] = h[ca]}
+          out
+        end
+
+        # Return a suitable hash key for any subhash +h+, which is an array of values by column order.
+        # This is only used if the primary key cannot be used.
+        def hkey(h)
+          h.sort_by{|x| x[0].to_s}
+        end
+
+        # Return the subhash for the master table by parsing the values out of the main hash +h+
+        def master_hfor(h)
+          out = {}
+          @master_column_map.each{|ca, c| out[c] = h[ca]}
+          out
+        end
+
+        # Return a primary key value for the master table by parsing it out of the main hash +h+.
+        def master_pk(h)
+          x = @master_primary_keys
+          if x.is_a?(Array)
+            unless x == []
+              x = x.map{|ca| h[ca]}
+              x if x.all?
+            end
+          else
+            h[x]
+          end
+        end
+
+        # Return a primary key value for the given table alias by parsing it out of the main hash +h+.
+        def pk(ta, h)
+          x = primary_keys[ta]
+          if x.is_a?(Array)
+            unless x == []
+              x = x.map{|ca| h[ca]}
+              x if x.all?
+            end
+          else
+            h[x]
+          end
+        end
+
+        # If the result set is the result of a cartesian product, then it is possible that
+        # there are multiple records for each association when there should only be one.
+        # In that case, for each object in all associations loaded via +eager_graph+, run
+        # uniq! on the association to make sure no duplicate records show up.
+        # Note that this can cause legitimate duplicate records to be removed.
+        def unique(records, dependency_map)
+          records.each do |record|
+            dependency_map.each do |ta, deps|
+              list = record.send(alias_map[ta])
+              list = if type_map[ta]
+                list.uniq!
+                unique(list, deps) if !list.empty? && !deps.empty?
+              elsif list
+                unique([list], deps) unless deps.empty?
+              end
+            end
+          end
         end
       end
     end

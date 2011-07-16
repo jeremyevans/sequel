@@ -106,6 +106,9 @@ describe Sequel::Model, "#eager" do
       end
     })
   end
+  after do
+    [:EagerAlbum, :EagerBand, :EagerTrack, :EagerGenre, :EagerBandMember].each{|x| Object.send(:remove_const, x)}
+  end
   
   it "should raise an error if called without a symbol or hash" do
     proc{EagerAlbum.eager(Object.new)}.should raise_error(Sequel::Error)
@@ -1077,13 +1080,13 @@ describe Sequel::Model, "#eager_graph" do
     a.members.first.values.should == {:id => 5}
   end
 
-  it "should give you a graph of tables when called without .all" do 
+  it "should give you a plain hash when called without .all" do 
     ds = GraphAlbum.eager_graph(:band)
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
     def ds.fetch_rows(sql, &block)
       yield({:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>3})
     end
-    ds.first.should == {:albums=>GraphAlbum.load(:id => 1, :band_id => 2), :band=>GraphBand.load(:id => 2, :vocalist_id=>3)}
+    ds.first.should == {:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>3}
   end
 
   it "should not drop any associated objects if the graph could not be a cartesian product" do

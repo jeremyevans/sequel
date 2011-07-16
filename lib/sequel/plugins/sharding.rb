@@ -40,6 +40,18 @@ module Sequel
         def new_using_server(s, values={}, &block)
           new(values, &block).set_server(s)
         end
+
+        private
+
+        # Set the server for each graphed dataset to the current server
+        # unless the graphed dataset already has a server set.
+        def eager_graph_dataset(opts, eager_options)
+          ds = super
+          if s = eager_options[:self].opts[:server]
+            ds = ds.server(s) unless ds.opts[:server]
+          end
+          ds
+        end
       end
 
       module InstanceMethods
@@ -108,26 +120,6 @@ module Sequel
             ds.row_proc = proc{|r| rp.call(r).set_server(s)}
           end
           ds
-        end
-
-        private
-
-        # Set the shard of all retrieved objects to the shard of
-        # the table's dataset, or the current shard if the table's
-        # dataset does not have a shard.
-        def graph_each
-          ta = @opts[:graph][:table_aliases]
-          s = @opts[:server]
-          super do |r|
-            r.each do |k, v|
-              if ds = ta[k]
-                dss = ds.opts[:server]
-              end
-              vs = dss || s
-              v.set_server(vs) if vs && v.respond_to?(:set_server)
-            end
-            yield r
-          end
         end
       end
     end
