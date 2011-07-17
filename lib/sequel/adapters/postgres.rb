@@ -187,7 +187,7 @@ module Sequel
         begin
           block_given? ? yield(q) : q.cmd_tuples
         ensure
-          q.clear
+          q.clear if q
         end
       end
 
