@@ -1,11 +1,6 @@
 require "rake"
 require "rake/clean"
 require "rake/gempackagetask"
-begin
-  require "hanna/rdoctask"
-rescue LoadError
-  require "rake/rdoctask"
-end
 
 NAME = 'sequel'
 VERS = lambda do
@@ -13,8 +8,6 @@ VERS = lambda do
   Sequel.version
 end
 CLEAN.include ["**/.*.sw?", "sequel-*.gem", ".config", "rdoc", "coverage", "www/public/*.html", "www/public/rdoc*", '**/*.rbc']
-RDOC_DEFAULT_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', 'Sequel: The Database Toolkit for Ruby']
-RDOC_OPTS = RDOC_DEFAULT_OPTS + ['--main', 'README.rdoc']
 
 # Gem Packaging and Release
 
@@ -40,7 +33,20 @@ end
 
 ### RDoc
 
-Rake::RDocTask.new do |rdoc|
+RDOC_DEFAULT_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', 'Sequel: The Database Toolkit for Ruby']
+
+rdoc_task_class = begin
+  require "rdoc/task"
+  RDOC_DEFAULT_OPTS.concat(['-f', 'hanna'])
+  RDoc::Task
+rescue LoadError
+  require "rake/rdoctask"
+  Rake::RDocTask
+end
+
+RDOC_OPTS = RDOC_DEFAULT_OPTS + ['--main', 'README.rdoc']
+
+rdoc_task_class.new do |rdoc|
   rdoc.rdoc_dir = "rdoc"
   rdoc.options += RDOC_OPTS
   rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/**/*.rb doc/*.rdoc doc/release_notes/*.txt"
@@ -56,19 +62,19 @@ end
 desc "Make rdoc for website"
 task :website_rdoc=>[:website_rdoc_main, :website_rdoc_adapters, :website_rdoc_plugins]
 
-Rake::RDocTask.new(:website_rdoc_main) do |rdoc|
+rdoc_task_class.new(:website_rdoc_main) do |rdoc|
   rdoc.rdoc_dir = "www/public/rdoc"
   rdoc.options += RDOC_OPTS
   rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/*.rb lib/sequel/*.rb lib/sequel/{connection_pool,dataset,database,model}/*.rb doc/*.rdoc doc/release_notes/*.txt lib/sequel/extensions/migration.rb"
 end
 
-Rake::RDocTask.new(:website_rdoc_adapters) do |rdoc|
+rdoc_task_class.new(:website_rdoc_adapters) do |rdoc|
   rdoc.rdoc_dir = "www/public/rdoc-adapters"
   rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel'
   rdoc.rdoc_files.add %w"lib/sequel/adapters/**/*.rb"
 end
 
-Rake::RDocTask.new(:website_rdoc_plugins) do |rdoc|
+rdoc_task_class.new(:website_rdoc_plugins) do |rdoc|
   rdoc.rdoc_dir = "www/public/rdoc-plugins"
   rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel'
   rdoc.rdoc_files.add %w"lib/sequel/{extensions,plugins}/**/*.rb"
