@@ -27,13 +27,9 @@ module Sequel
     # the Database#dataset method return an instance of that subclass.
     def initialize(db, opts = nil)
       @db = db
-      @quote_identifiers = db.quote_identifiers? if db.respond_to?(:quote_identifiers?)
-      @identifier_input_method = db.identifier_input_method if db.respond_to?(:identifier_input_method)
-      @identifier_output_method = db.identifier_output_method if db.respond_to?(:identifier_output_method)
       @opts = opts || {}
-      @row_proc = nil
     end
-    
+
     # Define a hash value such that datasets with the same DB, opts, and SQL
     # will be consider equal.
     def ==(o)
@@ -112,6 +108,30 @@ module Sequel
     # will have the same hash value
     def hash
       [db, opts.sort_by{|k| k.to_s}, sql].hash
+    end
+    
+    # The String instance method to call on identifiers before sending them to
+    # the database.
+    def identifier_input_method
+      if defined?(@identifier_input_method)
+        @identifier_input_method
+      elsif db.respond_to?(:identifier_input_method)
+        @identifier_input_method = db.identifier_input_method
+      else
+        @identifier_input_method = nil
+      end
+    end
+    
+    # The String instance method to call on identifiers before sending them to
+    # the database.
+    def identifier_output_method
+      if defined?(@identifier_output_method)
+        @identifier_output_method
+      elsif db.respond_to?(:identifier_output_method)
+        @identifier_output_method = db.identifier_output_method
+      else
+        @identifier_output_method = nil
+      end
     end
     
     # Returns a string representation of the dataset including the class name 

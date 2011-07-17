@@ -1,5 +1,7 @@
 === HEAD
 
+* Major speedup in dataset creation (jeremyevans)
+
 * Replace internal implementation of eager_graph with much faster version (jeremyevans)
 
 * Don't treat strings with leading zeros as octal format in the default typecasting (jeremyevans)

@@ -11,7 +11,13 @@ module Sequel
     
     # Whether this dataset quotes identifiers.
     def quote_identifiers?
-      @quote_identifiers
+      if defined?(@quote_identifiers)
+        @quote_identifiers
+      elsif db.respond_to?(:quote_identifiers?)
+        @quote_identifiers = db.quote_identifiers?
+      else
+        @quote_identifiers = false
+      end
     end
     
     # Whether this dataset will provide accurate number of rows matched for
