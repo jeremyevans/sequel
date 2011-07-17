@@ -1,7 +1,7 @@
 module Sequel
   class Dataset
     # ---------------------
-    # :section: Methods that return modified datasets
+    # :section: 1 - Methods that return modified datasets
     # These methods all return modified copies of the receiver.
     # ---------------------
 

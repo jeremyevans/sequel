@@ -1,7 +1,7 @@
 module Sequel
   class Database
     # ---------------------
-    # :section: Methods that modify the database schema
+    # :section: 2 - Methods that modify the database schema
     # These methods execute code on the database that modifies the database's schema.
     # ---------------------
 

@@ -1,7 +1,7 @@
 module Sequel
   class Database
     # ---------------------
-    # :section: Miscellaneous methods
+    # :section: 7 - Miscellaneous methods
     # These methods don't fit neatly into another category.
     # ---------------------
 

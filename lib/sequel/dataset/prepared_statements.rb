@@ -1,7 +1,7 @@
 module Sequel 
   class Dataset
     # ---------------------
-    # :section: Methods related to prepared statements or bound variables
+    # :section: 8 - Methods related to prepared statements or bound variables
     # On some adapters, these use native prepared statements and bound variables, on others
     # support is emulated.  For details, see the {"Prepared Statements/Bound Variables" guide}[link:files/doc/prepared_statements_rdoc.html].
     # ---------------------

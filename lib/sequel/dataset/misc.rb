@@ -1,7 +1,7 @@
 module Sequel
   class Dataset
     # ---------------------
-    # :section: Miscellaneous methods
+    # :section: 6 - Miscellaneous methods
     # These methods don't fit cleanly into another section.
     # ---------------------
     

@@ -1,7 +1,7 @@
 module Sequel
   class Dataset
     # ---------------------
-    # :section: Methods that describe what the dataset supports
+    # :section: 4 - Methods that describe what the dataset supports
     # These methods all return booleans, with most describing whether or not the
     # dataset supports a feature.
     # ---------------------

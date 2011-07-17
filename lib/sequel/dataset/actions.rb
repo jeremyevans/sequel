@@ -1,7 +1,7 @@
 module Sequel
   class Dataset
     # ---------------------
-    # :section: Methods that execute code on the database
+    # :section: 2 - Methods that execute code on the database
     # These methods all execute the dataset's SQL on the database.
     # They don't return modified datasets, so if used in a method chain
     # they should be the last method called.

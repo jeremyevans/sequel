@@ -1,7 +1,7 @@
 module Sequel
   class Dataset
     # ---------------------
-    # :section: Mutation methods
+    # :section: 7 - Mutation methods
     # These methods modify the receiving dataset and should be used with care.
     # ---------------------
     

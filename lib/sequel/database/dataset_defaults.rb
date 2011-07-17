@@ -1,7 +1,7 @@
 module Sequel
   class Database
     # ---------------------
-    # :section: Methods that set defaults for created datasets
+    # :section: 5 - Methods that set defaults for created datasets
     # This methods change the default behavior of this database's datasets.
     # ---------------------
 

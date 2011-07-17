@@ -1,7 +1,7 @@
 module Sequel
   class Database
     # ---------------------
-    # :section: Methods that create datasets
+    # :section: 3 - Methods that create datasets
     # These methods all return instances of this database's dataset class.
     # ---------------------
 

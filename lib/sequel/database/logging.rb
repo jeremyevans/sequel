@@ -1,7 +1,7 @@
 module Sequel
   class Database
     # ---------------------
-    # :section: Methods relating to logging
+    # :section: 6 - Methods relating to logging
     # This methods affect relating to the logging of executed SQL.
     # ---------------------
 

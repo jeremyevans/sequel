@@ -1,7 +1,7 @@
 module Sequel
   class Database
     # ---------------------
-    # :section: Methods that execute queries and/or return results
+    # :section: 1 - Methods that execute queries and/or return results
     # This methods generally execute SQL code on the database server.
     # ---------------------
 

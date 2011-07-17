@@ -1,7 +1,7 @@
 module Sequel
   class Dataset
     # ---------------------
-    # :section: Methods related to dataset graphing
+    # :section: 5 - Methods related to dataset graphing
     # Dataset graphing changes the dataset to yield hashes where keys are table
     # name symbols and values are hashes representing the columns related to
     # that table.  All of these methods return modified copies of the receiver.
