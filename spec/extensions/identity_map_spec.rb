@@ -312,44 +312,6 @@ describe "Sequel::Plugins::IdentityMap" do
     end
   end
 
-  it "should work correctly when eagerly loading many_to_many associations with the :eager_graph option" do
-    @c1.columns :id
-    @c2.columns :id
-    @c2.many_to_many :albums, :class=>@c1, :left_key=>:artist_id, :right_key=>:artist_id, :join_table=>:bb, :cartesian_product_number=>2
-    @c1.many_to_many :artists, :class=>@c2, :left_key=>:album_id, :right_key=>:artist_id, :join_table=>:aa, :eager_graph=>:albums, :uniq=>true
-    ds = @c1.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1})
-      yield({:id=>2})
-      yield({:id=>3})
-    end
-    ds = @c2.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1, :albums_id=>1, :x_foreign_key_x=>1})
-      yield({:id=>1, :albums_id=>2, :x_foreign_key_x=>1})
-      yield({:id=>2, :albums_id=>3, :x_foreign_key_x=>1})
-      yield({:id=>1, :albums_id=>1, :x_foreign_key_x=>2})
-      yield({:id=>1, :albums_id=>2, :x_foreign_key_x=>2})
-      yield({:id=>2, :albums_id=>3, :x_foreign_key_x=>2})
-      yield({:id=>3, :albums_id=>nil, :x_foreign_key_x=>1})
-    end
-    def ds.columns
-      [:id]
-    end
-
-    @c.with_identity_map do
-      MODEL_DB.sqls.length.should == 0
-      a = @c1.eager(:artists).all
-      MODEL_DB.sqls.length.should == 2
-      a.should == [@c1.load(:id=>1), @c1.load(:id=>2), @c1.load(:id=>3)]
-      a.map{|x| x.artists}.should == [[@c2.load(:id=>1), @c2.load(:id=>2), @c2.load(:id=>3)], [@c2.load(:id=>1), @c2.load(:id=>2)], []]
-      a.map{|x| x.artists.map{|y| y.albums}}.should == [[[@c1.load(:id=>1), @c1.load(:id=>2)], [@c1.load(:id=>3)], []], [[@c1.load(:id=>1), @c1.load(:id=>2)], [@c1.load(:id=>3)]], []]
-      MODEL_DB.sqls.length.should == 2
-    end
-  end
-
   it "should work correctly when eagerly loading many_through_many associations" do
     @c1.columns :id
     @c2.columns :id
@@ -416,44 +378,4 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 2
     end
   end
-
-  it "should work correctly when eagerly loading many_through_many associations with the :eager_graph option" do
-    @c1.columns :id
-    @c2.columns :id
-    @c1.plugin :many_through_many
-    @c1.many_through_many :artists, [[:aa, :album_id, :artist_id]], :class=>@c2, :eager_graph=>:albums, :uniq=>true
-    @c2.many_to_many :albums, :class=>@c1, :left_key=>:artist_id, :right_key=>:artist_id, :join_table=>:bb, :cartesian_product_number=>2
-    ds = @c1.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1})
-      yield({:id=>2})
-      yield({:id=>3})
-    end
-    ds = @c2.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1, :albums_id=>1, :x_foreign_key_x=>1})
-      yield({:id=>1, :albums_id=>2, :x_foreign_key_x=>1})
-      yield({:id=>2, :albums_id=>3, :x_foreign_key_x=>1})
-      yield({:id=>1, :albums_id=>1, :x_foreign_key_x=>2})
-      yield({:id=>1, :albums_id=>2, :x_foreign_key_x=>2})
-      yield({:id=>2, :albums_id=>3, :x_foreign_key_x=>2})
-      yield({:id=>3, :albums_id=>nil, :x_foreign_key_x=>1})
-    end
-    def ds.columns
-      [:id]
-    end
-
-    @c.with_identity_map do
-      MODEL_DB.sqls.length.should == 0
-      a = @c1.eager(:artists).all
-      MODEL_DB.sqls.length.should == 2
-      a.should == [@c1.load(:id=>1), @c1.load(:id=>2), @c1.load(:id=>3)]
-      a.map{|x| x.artists}.should == [[@c2.load(:id=>1), @c2.load(:id=>2), @c2.load(:id=>3)], [@c2.load(:id=>1), @c2.load(:id=>2)], []]
-      a.map{|x| x.artists.map{|y| y.albums}}.should == [[[@c1.load(:id=>1), @c1.load(:id=>2)], [@c1.load(:id=>3)], []], [[@c1.load(:id=>1), @c1.load(:id=>2)], [@c1.load(:id=>3)]], []]
-      MODEL_DB.sqls.length.should == 2
-    end
-  end
-
 end

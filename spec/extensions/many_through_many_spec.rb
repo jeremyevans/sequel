@@ -558,24 +558,8 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   end
   
   it "should cascade eagerly loading when the :eager_graph association option is used" do
-    Tag.dataset.extend(Module.new {
-      def columns
-        [:id]
-      end
-      def fetch_rows(sql)
-        @db << sql
-        yield({:id=>2, :tracks_id=>4, :x_foreign_key_x=>1})
-      end
-    })
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_graph=>:tracks
-    a = @c1.eager(:tags).all
-    a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
-      'SELECT tags.id, tracks.id AS tracks_id, albums_artists.artist_id AS x_foreign_key_x FROM (SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))) AS tags LEFT OUTER JOIN albums_tags AS albums_tags_0 ON (albums_tags_0.tag_id = tags.id) LEFT OUTER JOIN albums ON (albums.id = albums_tags_0.album_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)']
-    a = a.first
-    a.tags.should == [Tag.load(:id=>2)]
-    a.tags.first.tracks.should == [Track.load(:id=>4)]
-    MODEL_DB.sqls.length.should == 2
+    proc{@c1.eager(:tags).all}.should raise_error(Sequel::Error)
   end
   
   it "should respect :eager_graph when lazily loading an association" do

@@ -1,5 +1,7 @@
 === HEAD
 
+* Disallow eager loading via eager of many_*_many associations with :eager_graph option (jeremyevans)
+
 * Major speedup in dataset creation (jeremyevans)
 
 * Replace internal implementation of eager_graph with much faster version (jeremyevans)

@@ -75,22 +75,17 @@ module Sequel
               ds = opts.associated_class.inner_join(join_table, r + l)
               pr = ds.row_proc
               h2 = {}
-              ds = if opts[:eager_graph]
-                model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo).clone(:eager_graph_map=>[left_key_alias, h2])
-              else
-                ds.row_proc = proc do |hash|
-                  hash_key = if uses_lcks
-                    left_key_alias.map{|k| hash.delete(k)}
-                  else
-                    hash.delete(left_key_alias)
-                  end
-                  obj = pr.call(hash)
-                  (h2[obj.object_id] ||= []) << hash_key
-                  obj
+              ds.row_proc = proc do |hash|
+                hash_key = if uses_lcks
+                  left_key_alias.map{|k| hash.delete(k)}
+                else
+                  hash.delete(left_key_alias)
                 end
-                model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo)
+                obj = pr.call(hash)
+                (h2[obj.object_id] ||= []) << hash_key
+                obj
               end
-              ds.all do |assoc_record|
+              model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo) .all do |assoc_record|
                 if hash_keys = h2.delete(assoc_record.object_id)
                   hash_keys.each do |hash_key|
                     if objects = h[hash_key]
@@ -123,22 +118,17 @@ module Sequel
               ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + conds, :table_alias=>ft[:alias])
               pr = ds.row_proc
               h2 = {}
-              ds = if opts[:eager_graph]
-                model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo).clone(:eager_graph_map=>[left_key_alias, h2])
-              else
-                ds.row_proc = proc do |hash|
-                  hash_key = if uses_lcks
-                    left_key_alias.map{|k| hash.delete(k)}
-                  else
-                    hash.delete(left_key_alias)
-                  end
-                  obj = pr.call(hash)
-                  (h2[obj.object_id] ||= []) << hash_key
-                  obj
+              ds.row_proc = proc do |hash|
+                hash_key = if uses_lcks
+                  left_key_alias.map{|k| hash.delete(k)}
+                else
+                  hash.delete(left_key_alias)
                 end
-                model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo)
+                obj = pr.call(hash)
+                (h2[obj.object_id] ||= []) << hash_key
+                obj
               end
-              ds.all do |assoc_record|
+              model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo).all do |assoc_record|
                 if hash_keys = h2.delete(assoc_record.object_id)
                   hash_keys.each do |hash_key|
                     if objects = h[hash_key]
@@ -246,70 +236,6 @@ module Sequel
           else
             super
           end
-        end
-      end
-
-      module DatasetMethods
-        # If eagerly loading via +eager+ a many_*_many association that
-        # has an :eager_graph option, and there is a current identity_map,
-        # use the custom EagerGraphLoader that works with that case.
-        def eager_graph_build_associations(hashes)
-          if opts[:eager_graph_map] && model.identity_map
-            hashes.replace(EagerGraphLoader.new(self).load(hashes))
-          else
-            super
-          end
-        end
-      end
-
-      # Specialized EagerGraphLoader that updates the map used by the identity_map's
-      # many_*_many eager loaders to associate the current model object to
-      # the associated model objects.  Only used when you use the :eager_graph
-      # option a many_*_many association that you are eager loading via +eager+.
-      class EagerGraphLoader < Sequel::Model::Associations::EagerGraphLoader
-        # Save the key alias and hash used to map associated records to primary records
-        # in the custom identity_map eager_loaders.
-        def initialize(dataset)
-          super
-          @key_alias, @map = dataset.opts[:eager_graph_map]
-          # Don't include the key aliases in the primary model data
-          Array(@key_alias).each{|k| @master_column_map.delete(k)}
-        end
-
-        # Create associated model objects without the key aliases used to map them to the current objects,
-        # updating the hash used by the custom identity_map eager loader with the values of the key aliases.
-        def load(hashes)
-          master = master()
-          rp = row_procs[master]
-          rm = records_map[master]
-          dm = dependency_map
-          records = []
-
-          key_alias = @key_alias
-          uses_lcks = key_alias.is_a?(Array)
-          hashes.each do |h|
-            # Delete the key aliases from the hash before creating the primary model
-            key_alias_value = if uses_lcks
-              key_alias.map{|k| h.delete(k)}
-            else
-              h.delete(key_alias)
-            end
-
-            unless key = master_pk(h)
-              key = hkey(master_hfor(h))
-            end
-            unless primary_record = rm[key]
-              primary_record = rm[key] = rp.call(master_hfor(h))
-              records.push(primary_record)
-            end
-            # Update the map with the key alias value
-            (@map[primary_record.object_id] ||= []) << key_alias_value
-
-            _load(dm, primary_record, h)
-          end
-      
-          unique(records, dm) if @unique
-          records
         end
       end
     end

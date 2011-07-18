@@ -529,6 +529,7 @@ module Sequel
         #                 eagerly loading.  To not use a block when eager loading (when one is used normally),
         #                 set to nil.
         # :eager_graph :: The associations to eagerly load via +eager_graph+ when loading the associated object(s).
+        #                 many_to_many associations with this option cannot be eagerly loaded via +eager+.
         # :eager_grapher :: A proc to use to implement eager loading via +eager_graph+, overriding the default.
         #                   Takes one or three arguments. If three arguments, they are a dataset, an alias to use for
         #                   the table to graph for this association, and the alias that was used for the current table
@@ -684,13 +685,13 @@ module Sequel
           ds = ds.eager(opts[:eager]) if opts[:eager]
           ds = ds.distinct if opts[:distinct]
           if opts[:eager_graph]
+            raise(Error, "cannot eagerly load a #{opts[:type]} association that uses :eager_graph") if opts.eager_loading_use_associated_key?
             ds = ds.eager_graph(opts[:eager_graph])
-            ds = ds.add_graph_aliases(opts.associated_key_alias=>[opts.associated_class.table_name, opts.associated_key_alias, SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column)]) if opts.eager_loading_use_associated_key?
           end
           ds = ds.eager(associations) unless Array(associations).empty?
           ds = opts[:eager_block].call(ds) if opts[:eager_block]
           ds = eager_options[:eager_block].call(ds) if eager_options[:eager_block]
-          if !opts[:eager_graph] && opts.eager_loading_use_associated_key?
+          if opts.eager_loading_use_associated_key?
             ds = if opts[:uses_left_composite_keys]
               t = opts.associated_key_table
               ds.select_append(*opts.associated_key_alias.zip(opts.associated_key_column).map{|a, c| SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, c), a)})
