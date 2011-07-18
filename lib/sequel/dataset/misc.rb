@@ -23,7 +23,7 @@ module Sequel
     #   DB[:posts]
     #
     # Sequel::Dataset is an abstract class that is not useful by itself. Each
-    # database adaptor provides a subclass of Sequel::Dataset, and has
+    # database adapter provides a subclass of Sequel::Dataset, and has
     # the Database#dataset method return an instance of that subclass.
     def initialize(db, opts = nil)
       @db = db
@@ -83,10 +83,10 @@ module Sequel
     # have a table, raises an error.  If the table is aliased, returns the original
     # table, not the alias
     #
-    #   DB[:table].first_source_alias
+    #   DB[:table].first_source_table
     #   # => :table
     #
-    #   DB[:table___t].first_source_alias
+    #   DB[:table___t].first_source_table
     #   # => :table
     def first_source_table
       source = @opts[:from]

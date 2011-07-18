@@ -230,7 +230,7 @@ module Sequel
 
   # Converts the given +string+ into a +Time+ object.
   #
-  #   Sequel.string_to_datetime('10:20:30') # Time.parse('10:20:30')
+  #   Sequel.string_to_time('10:20:30') # Time.parse('10:20:30')
   def self.string_to_time(string)
     begin
       Time.parse(string)

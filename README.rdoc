@@ -573,7 +573,7 @@ You can execute custom code when creating, updating, or deleting records by defi
 
 Note the use of +super+ if you define your own hook methods.  Almost all <tt>Sequel::Model</tt> class and instance methods (not just hook methods) can be overridden safely, but you have to make sure to call +super+ when doing so, otherwise you risk breaking things.
 
-For the example above, you should probably use a database trigger if you can.  Hooks can be used for data integrity, but they will only enforce that integrity when you are modifying the database through model instances.  If you plan on allowing any other access to the database, it's best to use database triggers for data integrity.
+For the example above, you should probably use a database trigger if you can.  Hooks can be used for data integrity, but they will only enforce that integrity when you are modifying the database through model instances.  If you plan on allowing any other access to the database, it's best to use database triggers and constraints for data integrity.
 
 === Deleting records
 
@@ -681,9 +681,9 @@ Associations can be eagerly loaded via +eager+ and the <tt>:eager</tt> associati
   # Loads all people, their posts, their posts' tags, replies to those posts,
   # the person for each reply, the tag for each reply, and all posts and
   # replies that have that tag.  Uses a total of 8 queries.
-  Person.eager(:posts=>{:replies=>[:person, {:tags=>{:posts, :replies}}]}).all
+  Person.eager(:posts=>{:replies=>[:person, {:tags=>[:posts, :replies]}]}).all
 
-In addition to using +eager+, you can also use +eager_graph+, which will use a single query to get the object and all associated objects.  This may be necessary if you want to filter or order the result set based on columns in associated tables.  It works with cascading as well, the syntax is exactly the same.  Note that using eager_graph to eagerly load multiple *_to_many associations will cause the result set to be a cartesian product, so you should be very careful with your filters when using it in that case.
+In addition to using +eager+, you can also use +eager_graph+, which will use a single query to get the object and all associated objects.  This may be necessary if you want to filter or order the result set based on columns in associated tables.  It works with cascading as well, the API is very similar.  Note that using +eager_graph+ to eagerly load multiple <tt>*_to_many</tt> associations will cause the result set to be a cartesian product, so you should be very careful with your filters when using it in that case.
 
 You can dynamically customize the eagerly loaded dataset by using using a proc.  This proc is passed the dataset used for eager loading, and should return a modified copy of that dataset:
 

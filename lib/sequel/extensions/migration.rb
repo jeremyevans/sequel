@@ -2,6 +2,7 @@
 # the user to easily group schema changes and migrate the database
 # to a newer version or revert to a previous version.
 
+#
 module Sequel
   # Sequel's older migration class, available for backward compatibility.
   # Uses subclasses with up and down instance methods for each migration:

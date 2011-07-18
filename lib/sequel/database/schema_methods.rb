@@ -29,7 +29,7 @@ module Sequel
     #   DB.add_column :items, :name, :text, :unique => true, :null => false
     #   DB.add_column :items, :category, :text, :default => 'ruby'
     #
-    # See alter_table.
+    # See <tt>alter_table</tt>.
     def add_column(table, *args)
       alter_table(table) {add_column(*args)}
     end
@@ -40,9 +40,9 @@ module Sequel
     #   DB.add_index :posts, [:author, :title], :unique => true
     #
     # Options:
-    # * :ignore_errors - Ignore any DatabaseErrors that are raised
+    # :ignore_errors :: Ignore any DatabaseErrors that are raised
     #
-    # See alter_table.
+    # See <tt>alter_table</tt>.
     def add_index(table, columns, options={})
       e = options[:ignore_errors]
       begin
@@ -65,10 +65,10 @@ module Sequel
     #   end
     #
     # Note that +add_column+ accepts all the options available for column
-    # definitions using create_table, and +add_index+ accepts all the options
+    # definitions using <tt>create_table</tt>, and +add_index+ accepts all the options
     # available for index definition.
     #
-    # See Schema::AlterTableGenerator and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
+    # See <tt>Schema::AlterTableGenerator</tt> and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
     def alter_table(name, generator=nil, &block)
       generator ||= Schema::AlterTableGenerator.new(self, &block)
       alter_table_sql_list(name, generator.operations).flatten.each {|sql| execute_ddl(sql)}
@@ -89,7 +89,7 @@ module Sequel
     # :temp :: Create the table as a temporary table.
     # :ignore_index_errors :: Ignore any errors when creating indexes.
     #
-    # See Schema::Generator and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
+    # See <tt>Schema::Generator</tt> and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
     def create_table(name, options={}, &block)
       remove_cached_schema(name)
       options = {:generator=>options} if options.is_a?(Schema::Generator)
@@ -147,7 +147,7 @@ module Sequel
     #
     #   DB.drop_column :items, :category
     #
-    # See alter_table.
+    # See <tt>alter_table</tt>.
     def drop_column(table, *args)
       alter_table(table) {drop_column(*args)}
     end
@@ -157,7 +157,7 @@ module Sequel
     #   DB.drop_index :posts, :title
     #   DB.drop_index :posts, [:author, :title]
     #
-    # See alter_table.
+    # See <tt>alter_table</tt>.
     def drop_index(table, columns, options={})
       alter_table(table){drop_index(columns, options)}
     end
@@ -206,7 +206,7 @@ module Sequel
     #
     #   DB.rename_column :items, :cntr, :counter
     #
-    # See alter_table.
+    # See <tt>alter_table</tt>.
     def rename_column(table, *args)
       alter_table(table) {rename_column(*args)}
     end
@@ -215,7 +215,7 @@ module Sequel
     #
     #   DB.set_column_default :items, :category, 'perl!'
     #
-    # See alter_table.
+    # See <tt>alter_table</tt>.
     def set_column_default(table, *args)
       alter_table(table) {set_column_default(*args)}
     end
@@ -224,7 +224,7 @@ module Sequel
     #
     #   DB.set_column_type :items, :price, :float
     #
-    # See alter_table.
+    # See <tt>alter_table</tt>.
     def set_column_type(table, *args)
       alter_table(table) {set_column_type(*args)}
     end

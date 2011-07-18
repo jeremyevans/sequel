@@ -7,7 +7,7 @@ module Sequel
 
     # Converts a uri to an options hash. These options are then passed
     # to a newly created database object. 
-    def self.uri_to_options(uri) # :nodoc:
+    def self.uri_to_options(uri)
       { :user => uri.user,
         :password => uri.password,
         :host => uri.host,
@@ -255,14 +255,17 @@ module Sequel
       Float(value)
     end
 
-    LEADING_ZERO_RE = /\A0+(\d)/.freeze # :nodoc:
+    # Used for checking/removing leading zeroes from strings so they don't get
+    # interpreted as octal.
+    LEADING_ZERO_RE = /\A0+(\d)/.freeze
     if RUBY_VERSION >= '1.9'
       # Typecast the value to an Integer
       def typecast_value_integer(value)
         (value.is_a?(String) && value =~ LEADING_ZERO_RE) ? Integer(value, 10) : Integer(value)
       end
     else
-      LEADING_ZERO_REP = "\\1".freeze # :nodoc:
+      # Replacement string when replacing leading zeroes.
+      LEADING_ZERO_REP = "\\1".freeze 
       # Typecast the value to an Integer
       def typecast_value_integer(value)
         Integer(value.is_a?(String) ? value.sub(LEADING_ZERO_RE, LEADING_ZERO_REP) : value)

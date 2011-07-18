@@ -199,11 +199,9 @@ module Sequel
       clone(:bind_vars=>@opts[:bind_vars] ? @opts[:bind_vars].merge(bind_vars) : bind_vars)
     end
     
-    # For the given type (:select, :insert, :update, or :delete),
-    # run the sql with the bind variables
-    # specified in the hash.  values is a hash of passed to
-    # insert or update (if one of those types is used),
-    # which may contain placeholders.
+    # For the given type (:select, :first, :insert, :insert_select, :update, or :delete),
+    # run the sql with the bind variables specified in the hash.  +values+ is a hash passed to
+    # insert or update (if one of those types is used), which may contain placeholders.
     #
     #   DB[:table].filter(:id=>:$id).call(:first, :id=>1)
     #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
@@ -212,11 +210,13 @@ module Sequel
       prepare(type, nil, *values).call(bind_variables, &block)
     end
     
-    # Prepare an SQL statement for later execution. This returns
-    # a clone of the dataset extended with PreparedStatementMethods,
-    # on which you can call call with the hash of bind variables to
-    # do substitution.  The prepared statement is also stored in
-    # the associated database.  The following usage is identical:
+    # Prepare an SQL statement for later execution.  Takes a type similar to #call,
+    # and the name symbol of the prepared statement.
+    # This returns a clone of the dataset extended with PreparedStatementMethods,
+    # which you can +call+ with the hash of bind variables to use.
+    # The prepared statement is also stored in
+    # the associated database, where it can be called by name.
+    # The following usage is identical:
     #
     #   ps = DB[:table].filter(:name=>:$name).prepare(:first, :select_by_name)
     #

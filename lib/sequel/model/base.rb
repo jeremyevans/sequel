@@ -11,7 +11,7 @@ module Sequel
     #   the Model's dataset with the method of the same name with the given arguments.
     module ClassMethods
       # Which columns should be the only columns allowed in a call to a mass assignment method (e.g. set)
-      # (default: not set, so all columns not otherwise restricted).
+      # (default: not set, so all columns not otherwise restricted are allowed).
       attr_reader :allowed_columns
   
       # Array of modules that extend this model's dataset.  Stored
@@ -390,8 +390,8 @@ module Sequel
       # setter methods (methods that end in =) that you want to be used during
       # mass assignment, they need to be listed here as well (without the =).
       #
-      # It may be better to use a method such as +set_only+ instead of this in places where
-      # only certain columns may be allowed.
+      # It may be better to use a method such as +set_only+ or +set_fields+ that lets you specify
+      # the allowed fields per call.
       #
       #   Artist.set_allowed_columns(:name, :hometown)
       #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
@@ -445,7 +445,8 @@ module Sequel
     
       # Sets the primary key for this model. You can use either a regular 
       # or a composite primary key.  To not use a primary key, set to nil
-      # or use +no_primary_key+.
+      # or use +no_primary_key+.  On most adapters, Sequel can automatically
+      # determine the primary key to use, so this method is not needed often.
       #
       #   class Person < Sequel::Model
       #     # regular key
@@ -469,10 +470,9 @@ module Sequel
       # If you have any virtual setter methods (methods that end in =) that you
       # want not to be used during mass assignment, they need to be listed here as well (without the =).
       #
-      # It may be better to use a method such as +set_except+ instead of this in places where
-      # certain columns are restricted.  In general, it's better to have a whitelist approach
-      # where you specify only what is allowed, as opposed to a blacklist approach that this
-      # method uses, where everything is allowed other than what you restrict.
+      # It's generally a bad idea to rely on a blacklist approach for security.  Using a whitelist
+      # approach such as set_allowed_columns or the instance level set_only or set_fields methods
+      # is usually a better choice.  So use of this method is generally a bad idea.
       #
       #   Artist.set_restricted_column(:records_sold)
       #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
@@ -512,6 +512,9 @@ module Sequel
       # 7 days ago.
       #
       # Both the args given and the block are passed to <tt>Dataset#filter</tt>.
+      #
+      # This method creates dataset methods that do not accept arguments.  To create
+      # dataset methods that accept arguments, you have to use def_dataset_method.
       def subset(name, *args, &block)
         def_dataset_method(name){filter(*args, &block)}
       end
@@ -527,6 +530,7 @@ module Sequel
       end
   
       # Allow the setting of the primary key(s) when using the mass assignment methods.
+      # Using this method can open up security issues, be very careful before using it.
       #
       #   Artist.set(:id=>1) # Error
       #   Artist.unrestrict_primary_key
@@ -777,7 +781,7 @@ module Sequel
   
       # Sets the value for the given column.  If typecasting is enabled for
       # this object, typecast the value based on the column's type.
-      # If this a a new record or the typecasted value isn't the same
+      # If this is a new record or the typecasted value isn't the same
       # as the current value for the column, mark the column as changed.
       #
       #   a = Artist.new
@@ -885,7 +889,7 @@ module Sequel
 
       # Returns true when current instance exists, false otherwise.
       # Generally an object that isn't new will exist unless it has
-      # been deleted.
+      # been deleted.  Uses a database query to check for existence.
       #
       #   Artist[1].exists? # SELECT 1 FROM artists WHERE (id = 1)
       #   # => true
@@ -982,7 +986,7 @@ module Sequel
       end
       
       # Returns the primary key value identifying the model instance.
-      # Raises an error if this model does not have a primary key.
+      # Raises an +Error+ if this model does not have a primary key.
       # If the model has a composite primary key, returns an array of values.
       #
       #   Artist[1].pk # => 1
@@ -1032,16 +1036,16 @@ module Sequel
       # If it succeeds, it returns self.
       #
       # You can provide an optional list of columns to update, in which
-      # case it only updates those columns.
+      # case it only updates those columns, or a options hash.
       #
       # Takes the following options:
       #
-      # * :changed - save all changed columns, instead of all columns or the columns given
-      # * :transaction - set to true or false to override the current
-      #   use_transactions setting
-      # * :validate - set to false to skip validation
-      # * :raise_on_failure - set to true or false to override the current
-      #   raise_on_save_failure setting
+      # :changed :: save all changed columns, instead of all columns or the columns given
+      # :transaction :: set to true or false to override the current
+      #                 +use_transactions+ setting
+      # :validate :: set to false to skip validation
+      # :raise_on_failure :: set to true or false to override the current
+      #                      +raise_on_save_failure+ setting
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
         if opts[:validate] != false
@@ -1088,7 +1092,8 @@ module Sequel
       end
   
       # Set all values using the entries in the hash, except for the keys
-      # given in except.
+      # given in except.  You should probably use +set_fields+ or +set_only+
+      # instead of this method, as blacklist approaches to security are a bad idea.
       #
       #   artist.set_except({:name=>'Jim'}, :hometown)
       #   artist.name # => 'Jim'
@@ -1111,12 +1116,13 @@ module Sequel
       end
   
       # Set the values using the entries in the hash, only if the key
-      # is included in only.
+      # is included in only.  It may be a better idea to use +set_fields+
+      # instead of this method.
       #
       #   artist.set_only({:name=>'Jim'}, :name)
       #   artist.name # => 'Jim'
       #
-      #   artist.set_only({:hometown=>'LA'}, :name) # Raise error
+      #   artist.set_only({:hometown=>'LA'}, :name) # Raise Error
       def set_only(hash, *only)
         set_restricted(hash, only.flatten, false)
       end
@@ -1135,7 +1141,7 @@ module Sequel
         @this ||= model.dataset.filter(pk_hash).limit(1).naked
       end
       
-      # Runs set with the passed hash and then runs save_changes.
+      # Runs #set with the passed hash and then runs save_changes.
       #
       #   artist.update(:name=>'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update(hash)
@@ -1143,7 +1149,7 @@ module Sequel
       end
   
       # Update all values using the entries in the hash, ignoring any setting of
-      # allowed_columns or restricted columns in the model.
+      # +allowed_columns+ or +restricted_columns+ in the model.
       #
       #   Artist.set_restricted_columns(:name)
       #   artist.update_all(:name=>'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
@@ -1152,7 +1158,8 @@ module Sequel
       end
   
       # Update all values using the entries in the hash, except for the keys
-      # given in except.
+      # given in except.  You should probably use +update_fields+ or +update_only+
+      # instead of this method, as blacklist approaches to security are a bad idea.
       #
       #   artist.update_except({:name=>'Jim'}, :hometown) # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update_except(hash, *except)
@@ -1173,7 +1180,8 @@ module Sequel
       end
 
       # Update the values using the entries in the hash, only if the key
-      # is included in only.
+      # is included in only.  It may be a better idea to use +update_fields+
+      # instead of this method.
       #
       #   artist.update_only({:name=>'Jim'}, :name)
       #   # UPDATE artists SET name = 'Jim' WHERE (id = 1)

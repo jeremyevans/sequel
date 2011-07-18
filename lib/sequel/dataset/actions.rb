@@ -248,14 +248,16 @@ module Sequel
     # the value of the primary key for the inserted row, but that is adapter dependent.
     #
     # +insert+ handles a number of different argument formats:
-    # * No arguments, single empty hash - Uses DEFAULT VALUES
-    # * Single hash - Most common format, treats keys as columns an values as values
-    # * Single array - Treats entries as values, with no columns
-    # * Two arrays - Treats first array as columns, second array as values
-    # * Single Dataset - Treats as an insert based on a selection from the dataset given,
-    #   with no columns
-    # * Array and dataset - Treats as an insert based on a selection from the dataset
-    #   given, with the columns given by the array.
+    # no arguments or single empty hash :: Uses DEFAULT VALUES
+    # single hash :: Most common format, treats keys as columns an values as values
+    # single array :: Treats entries as values, with no columns
+    # two arrays :: Treats first array as columns, second array as values
+    # single Dataset :: Treats as an insert based on a selection from the dataset given,
+    #                   with no columns
+    # array and dataset :: Treats as an insert based on a selection from the dataset
+    #                      given, with the columns given by the array.
+    #
+    # Examples:
     #
     #   DB[:items].insert
     #   # INSERT INTO items DEFAULT VALUES
@@ -310,7 +312,7 @@ module Sequel
       aggregate_dataset.get{max(column) - min(column)}
     end
 
-    # Reverses the order and then runs first.  Note that this
+    # Reverses the order and then runs #first with the given arguments and block.  Note that this
     # will not necessarily give you the last record in the dataset,
     # unless you have an unambiguous order.  If there is not
     # currently an order for this dataset, raises an +Error+.
@@ -400,13 +402,14 @@ module Sequel
     # Selects the column given (either as an argument or as a block), and
     # returns an array of all values of that column in the dataset.  If you
     # give a block argument that returns an array with multiple entries,
-    # the contents of the resulting array are undefined.
+    # the contents of the resulting array are undefined.  Raises an Error
+    # if called with both an argument and a block.
     #
     #   DB[:table].select_map(:id) # SELECT id FROM table
     #   # => [3, 5, 8, 1, ...]
     #
-    #   DB[:table].select_map{abs(id)} # SELECT abs(id) FROM table
-    #   # => [3, 5, 8, 1, ...]
+    #   DB[:table].select_map{id * 2} # SELECT (id * 2) FROM table
+    #   # => [6, 10, 16, 2, ...]
     def select_map(column=nil, &block)
       ds = naked.ungraphed
       ds = if column
@@ -423,8 +426,8 @@ module Sequel
     #   DB[:table].select_order_map(:id) # SELECT id FROM table ORDER BY id
     #   # => [1, 2, 3, 4, ...]
     #
-    #   DB[:table].select_order_map{abs(id)} # SELECT abs(id) FROM table ORDER BY abs(id)
-    #   # => [1, 2, 3, 4, ...]
+    #   DB[:table].select_order_map{abs(id)} # SELECT (id * 2) FROM table ORDER BY (id * 2)
+    #   # => [2, 4, 6, 8, ...]
     def select_order_map(column=nil, &block)
       ds = naked.ungraphed
       ds = if column
@@ -522,7 +525,7 @@ module Sequel
     #   DB[:table].update(:x=>nil) # UPDATE table SET x = NULL
     #   # => 10
     #
-    #   DB[:table].update(:x=>:x+1, :y=>0) # UPDATE table SET x = (x + 1), :y = 0
+    #   DB[:table].update(:x=>:x+1, :y=>0) # UPDATE table SET x = (x + 1), y = 0
     #   # => 10
     def update(values={})
       execute_dui(update_sql(values))

@@ -82,12 +82,12 @@ module Sequel
     #
     #   DB.get(1) # SELECT 1
     #   # => 1
-    #   DB.get{version{}} # SELECT server_version()
+    #   DB.get{server_version{}} # SELECT server_version()
     def get(*args, &block)
       dataset.get(*args, &block)
     end
     
-    # Return a hash containing index information. Hash keys are index name symbols.
+    # Return a hash containing index information for the table. Hash keys are index name symbols.
     # Values are subhashes with two keys, :columns and :unique.  The value of :columns
     # is an array of symbols of column names.  The value of :unique is true or false
     # depending on if the index is unique.
@@ -110,7 +110,6 @@ module Sequel
       nil
     end
     
-    # Parse the schema from the database.
     # Returns the schema for the given table as an array with all members being arrays of length 2,
     # the first member being the column name, and the second member being a hash of column information.
     # Available options are:
@@ -129,7 +128,8 @@ module Sequel
     #                 it means that primary key information is unavailable, not that the column
     #                 is not a primary key.
     # :ruby_default :: The database default for the column, as a ruby object.  In many cases, complex
-    #                  database defaults cannot be parsed into ruby objects.
+    #                  database defaults cannot be parsed into ruby objects, in which case nil will be
+    #                  used as the value.
     # :type :: A symbol specifying the type, such as :integer or :string.
     #
     # Example:
@@ -169,6 +169,7 @@ module Sequel
     # to the database.
     #
     #   DB.table_exists?(:foo) # => false
+    #   # SELECT * FROM foo LIMIT 1
     def table_exists?(name)
       sch, table_name = schema_and_table(name)
       name = SQL::QualifiedIdentifier.new(sch, table_name) if sch

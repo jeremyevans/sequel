@@ -80,7 +80,7 @@ module Sequel
     # :from_self :: Set to false to not wrap the returned dataset in a from_self, use with care.
     #
     #   DB[:items].except(DB[:other_items])
-    #   # SELECT * FROM items EXCEPT SELECT * FROM other_items
+    #   # SELECT * FROM (SELECT * FROM items EXCEPT SELECT * FROM other_items) AS t1
     #
     #   DB[:items].except(DB[:other_items], :all=>true, :from_self=>false)
     #   # SELECT * FROM items EXCEPT ALL SELECT * FROM other_items
@@ -381,7 +381,11 @@ module Sequel
       inner_join(*args, &block)
     end
 
-    # Returns a joined dataset.  Uses the following arguments:
+    # Returns a joined dataset.  Not usually called directly, users should use the
+    # appropriate join method (e.g. join, left_join, natural_join, cross_join) which fills
+    # in the +type+ argument.
+    #
+    # Takes the following arguments:
     #
     # * type - The type of join to do (e.g. :inner)
     # * table - Depends on type:
@@ -411,6 +415,23 @@ module Sequel
     #   in which case it yields the table alias/name for the table currently being joined,
     #   the table alias/name for the last joined (or first table), and an array of previous
     #   SQL::JoinClause. Unlike +filter+, this block is not treated as a virtual row block.
+    #
+    # Examples:
+    #
+    #   DB[:a].join_table(:cross, :b)
+    #   # SELECT * FROM a CROSS JOIN b
+    #
+    #   DB[:a].join_table(:inner, DB[:b], :c=>d)
+    #   # SELECT * FROM a INNER JOIN (SELECT * FROM b) AS t1 ON (t1.c = a.d)
+    #
+    #   DB[:a].join_table(:left, :b___c, [:d])
+    #   # SELECT * FROM a LEFT JOIN b AS c USING (d)
+    #
+    #   DB[:a].natural_join(:b).join_table(:inner, :c) do |ta, jta, js|
+    #     (:d.qualify(ta) > :e.qualify(jta)) & {:f.qualify(ta)=>DB.from(js.first.table).select(:g)}
+    #   end
+    #   # SELECT * FROM a NATURAL JOIN b INNER JOIN c
+    #   #   ON ((c.d > b.e) AND (c.f IN (SELECT g FROM b)))
     def join_table(type, table, expr=nil, options={}, &block)
       using_join = expr.is_a?(Array) && !expr.empty? && expr.all?{|x| x.is_a?(Symbol)}
       if using_join && !supports_join_using?
@@ -591,7 +612,7 @@ module Sequel
       @opts[:order] ? ds.order_more(*@opts[:order]) : ds
     end
     
-    # Qualify to the given table, or first source if not table is given.
+    # Qualify to the given table, or first source if no table is given.
     #
     #   DB[:items].filter(:id=>1).qualify
     #   # SELECT items.* FROM items WHERE (items.id = 1)
@@ -718,7 +739,7 @@ module Sequel
     end
     
     # Set the server for this dataset to use.  Used to pick a specific database
-    # shard to run a query against, or to override the default (which is SELECT uses
+    # shard to run a query against, or to override the default (where SELECT uses
     # :read_only database and all other queries use the :default database).  This
     # method is always available but is only useful when database sharding is being
     # used.
@@ -790,8 +811,8 @@ module Sequel
     # :all :: Set to true to use UNION ALL instead of UNION, so duplicate rows can occur
     # :from_self :: Set to false to not wrap the returned dataset in a from_self, use with care.
     #
-    #   DB[:items].union(DB[:other_items]).sql
-    #   #=> "SELECT * FROM items UNION SELECT * FROM other_items"
+    #   DB[:items].union(DB[:other_items])
+    #   # SELECT * FROM (SELECT * FROM items UNION SELECT * FROM other_items) AS t1
     #
     #   DB[:items].union(DB[:other_items], :all=>true, :from_self=>false)
     #   # SELECT * FROM items UNION ALL SELECT * FROM other_items
