@@ -56,7 +56,7 @@ module Sequel
             left = opts[:left_key]
             lcks = opts[:left_keys]
             left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
-            opts[:eager_loader] = proc do |eo|
+            opts[:eager_loader] = lambda do |eo|
               return el.call(eo) unless model.identity_map
               h = eo[:key_hash][left_pk]
               eo[:rows].each{|object| object.associations[name] = []}
