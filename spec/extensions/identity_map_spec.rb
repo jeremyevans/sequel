@@ -13,6 +13,11 @@ describe "Sequel::Plugins::IdentityMap" do
         execute(sql)
         yield h
       end
+      def self.waw_identity_map(&block) # with and without
+        with_identity_map(&block)
+        db.reset
+        yield
+      end
     end
     class ::IdentityMapAlbum < ::IdentityMapModel
       columns :artist_id
@@ -232,7 +237,7 @@ describe "Sequel::Plugins::IdentityMap" do
       yield({:id=>3})
     end
 
-    @c.with_identity_map do
+    @c.waw_identity_map do
       MODEL_DB.sqls.length.should == 0
       a = @c1.eager(:artists).all
       MODEL_DB.sqls.length.should == 1
@@ -264,7 +269,7 @@ describe "Sequel::Plugins::IdentityMap" do
       yield({:id=>3, :x_foreign_key_x=>1})
     end
 
-    @c.with_identity_map do
+    @c.waw_identity_map do
       MODEL_DB.sqls.length.should == 0
       a = @c1.eager(:artists).all
       MODEL_DB.sqls.length.should == 2
@@ -297,7 +302,7 @@ describe "Sequel::Plugins::IdentityMap" do
       yield({:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4})
     end
 
-    @c.with_identity_map do
+    @c.waw_identity_map do
       MODEL_DB.sqls.length.should == 0
       a = @c1.eager(:artists).all
       MODEL_DB.sqls.length.should == 2
@@ -368,7 +373,7 @@ describe "Sequel::Plugins::IdentityMap" do
       yield({:id=>3, :x_foreign_key_x=>1})
     end
 
-    @c.with_identity_map do
+    @c.waw_identity_map do
       MODEL_DB.sqls.length.should == 0
       a = @c1.eager(:artists).all
       MODEL_DB.sqls.length.should == 2
@@ -402,7 +407,7 @@ describe "Sequel::Plugins::IdentityMap" do
       yield({:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4})
     end
 
-    @c.with_identity_map do
+    @c.waw_identity_map do
       MODEL_DB.sqls.length.should == 0
       a = @c1.eager(:artists).all
       MODEL_DB.sqls.length.should == 2
