@@ -53,7 +53,7 @@ class Sequel::ConnectionPool
     
     # Return a connection pool class based on the given options.
     def connection_pool_class(opts)
-      opts[:pool_class] || CONNECTION_POOL_MAP[[!!opts[:single_threaded], !!opts[:servers]]]
+      CONNECTION_POOL_MAP[opts[:pool_class]] || opts[:pool_class] || CONNECTION_POOL_MAP[[!!opts[:single_threaded], !!opts[:servers]]]
     end
   end
   extend ClassMethods
