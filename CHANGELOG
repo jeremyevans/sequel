@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix bug in default connection pool if a disconnect error is raised and the disconnection_proc also raises an error (jeremyevans)
+
 * Disallow eager loading via eager of many_*_many associations with :eager_graph option (jeremyevans)
 
 * Major speedup in dataset creation (jeremyevans)

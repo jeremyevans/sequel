@@ -245,6 +245,12 @@ shared_examples_for "A threaded connection pool" do
     t.join
   end
   
+  it "should not add a disconnected connection back to the pool if the disconnection_proc raises an error" do
+    pool = Sequel::ConnectionPool.get_pool(@cp_opts.merge(:max_connections=>1, :pool_timeout=>0, :disconnection_proc=>proc{|c| raise Sequel::Error})) {@invoked_count += 1}
+    proc{pool.hold{raise Sequel::DatabaseDisconnectError}}.should raise_error(Sequel::Error)
+    pool.available_connections.length.should == 0
+  end
+
   specify "should let five threads simultaneously access separate connections" do
     cc = {}
     threads = []

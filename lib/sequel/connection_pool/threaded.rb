@@ -83,9 +83,10 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
       end
       yield conn
     rescue Sequel::DatabaseDisconnectError
-      @disconnection_proc.call(conn) if @disconnection_proc && conn
-      @allocated.delete(t)
+      oconn = conn
       conn = nil
+      @disconnection_proc.call(oconn) if @disconnection_proc && oconn
+      @allocated.delete(t)
       raise
     ensure
       sync{release(t)} if conn
