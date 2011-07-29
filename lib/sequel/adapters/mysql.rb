@@ -139,7 +139,7 @@ module Sequel
           opts[:user],
           opts[:password],
           opts[:database],
-          opts[:port],
+          (opts[:port].to_i if opts[:port]),
           opts[:socket],
           Mysql::CLIENT_MULTI_RESULTS +
           Mysql::CLIENT_MULTI_STATEMENTS +
