@@ -1,0 +1,88 @@
+= Performance Enhancements
+
+* The internal implementation of eager_graph has been made 75% to
+  225% faster than before, with greater benefits to more complex
+  graphs.
+
+* Dataset creation has been made much faster (2.5x on 1.8 and 4.4x on
+  1.9), and dataset cloning has been made significantly faster (40%
+  on 1.8 and 20% on 1.9).
+
+= Other Improvements
+
+* Strings passed to setter methods for integer columns are no longer
+  considered to be in octal format if they include leading zeroes.
+  The previous behavior was never intended, but was a side effect of
+  using Kernel#Integer.  Strings with leading zeroes are now treated
+  as decimal, and you can still use the 0x prefix to treat them as
+  hexidecimal.  If anyone was relying on the old octal behavior, let
+  me know and I'll add an extension that restores the octal behavior.
+  
+* The identity_map plugin now works with the standard eager loading
+  of many_to_many and many_through_many associations.
+  
+* Database#create_table! now only attempts to drop the table if it
+  already exists.  Previously, it attempted to drop the table
+  unconditionally ignoring any errors, which resulted in misleading
+  error messages if dropping the table raised an error caused by
+  permissions or referential integrity issues.
+
+* The default connection pool now correctly handles the case where a
+  disconnect error is raised and an exception is raised while
+  running the disconnection proc.
+  
+* Disconnection errors are now detected when issuing transaction
+  statements such as BEGIN/ROLLBACK/COMMIT.  Previously, these
+  statements did not handle disconnect errors on most adapters.
+  
+* More disconnection errors are now detected.  Specifically, the ado
+  adapter and do postgres subadapter now handle disconnect errors,
+  and the postgres adapter handles more types of disconnect errors.
+  
+* Database#table_exists? now always issues a query to select from the
+  table, it no longer attempts to parse the schema to determine the
+  information on PostgreSQL and Oracle.
+
+* Date, DateTime, and Time values are now literalized correctly on
+  Microsoft Access.
+
+* Connecting with the mysql adapter with an options hash now works if
+  the :port option is a string, which makes it easier to use when the
+  connection information is stored in YAML.
+
+* The xml_serializer plugin now works around a bug in pure-Java
+  nokogiri regarding the handling of nil values.
+
+* Nicer error messages are now used if there is an attempt to call
+  an invalid or restricted setter method.
+
+* The RDocs are now formatted with hanna-nouveau, which allows for
+  section ordering, so the Database and Dataset RDoc pages are
+  more friendly.
+
+= Backwards Compatibility
+
+* If you call a Dataset method such as #each on an eager_graphed
+  dataset, you now get plain hashes that have column alias symbol
+  keys and their values. Previously, you got a graphed response with
+  table alias keys and model values.  It's not wise to depend on the
+  behavior, the only supported way of returning records when eager
+  loading is to use #all.
+
+* An error is now raised if you attempt to eager load via
+  Dataset#eager a many_to_many association that includes an
+  :eager_graph option.  Previously, incorrect SQL would have been
+  generated and an error raised by the database.
+  
+* Datasets are no longer guaranteed to have @row_proc,
+  @indentifier_input_method, and @identifier_output_method defined
+  as instance variables.  You should be be using methods to access
+  them anyway.
+
+* Database#table_exists? on PostgreSQL no longer accepts an options
+  hash.  Previously, you could use a :schema option.  You must now
+  provide the schema inside the table argument (e.g. :schema__table).
+
+* If you want to use the rdoc tasks in Sequel's Rakefile, and you are
+  still using the hanna RDoc template with RDoc 2.3, you need to
+  upgrade to using hanna-nouveau with RDoc 3.8+.
