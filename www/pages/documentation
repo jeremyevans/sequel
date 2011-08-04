@@ -21,6 +21,7 @@
   <li><a href="rdoc/files/doc/reflection_rdoc.html">Reflection</a></li>
   <li><a href="rdoc/files/doc/sql_rdoc.html">Sequel for SQL Users</a></li>
   <li><a href="rdoc/files/doc/active_record_rdoc.html">Sequel for ActiveRecord Users</a></li>
+  <li><a href="rdoc/files/doc/testing_rdoc.html">Testing With Sequel</a></li>
 </ul>
 
 <h3>RDoc</h3>

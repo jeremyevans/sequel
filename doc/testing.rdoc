@@ -1,0 +1,64 @@
+= Testing with Sequel
+
+Whether or not you use Sequel in your application, you are usually going to want to have tests that ensure that your code works.  When you are using Sequel, it's helpful to integrate it into your testing framework, and it's generally best to run each test in its own transaction if possible.  That keeps all tests isolated from each other, and it's simple as it handles all of the cleanup for you.  Sequel doesn't ship with helpers for common libraries, as the exact code you need is often application-specific, but this page offers some examples that you can either use directly or build on.
+
+== Transactional tests
+
+These run each test in its own transaction, the recommended way to test.
+
+=== RSpec 1
+
+  class Spec::Example::ExampleGroup
+    def execute(*args, &block)
+      x = nil
+      Sequel::Model.db.transaction{x = super(*args, &block); raise Sequel::Rollback}
+      x
+    end
+  end
+
+=== RSpec 2
+
+  class Spec::Example::ExampleGroup
+    around do |example|
+      Sequel::Model.db.transaction{example.call; raise Sequel::Rollback}
+    end
+  end
+
+=== Test::Unit
+
+  # Must use this class as the base class for your tests
+  class SequelTestCase < Test::Unit::TestCase
+    def run(*args, &block)
+      Sequel::Model.db.transaction do
+        super
+        raise Sequel::Rollback
+      end
+    end
+  end
+
+== Nontransactional tests
+
+In some cases, it is not possible to use transactions.  For example, if you are testing a web application that is running in a separate process, you don't have access to that process's database connections, so you can't run your examples in transactions.  In that case, the best way to handle things is to cleanup after each test by deleting or truncating the database tables used in the test.
+
+The order in which you delete/truncate the tables is important if you are using referential integrity in your database (which you probably should be doing).  If you are using referential integrity, you need to make sure to delete in tables referencing other tables before the tables that are being referenced.  For example, if you have an +albums+ table with an +artist_id+ field referencing the +artists+ table, you want to delete/truncate the +albums+ table before the +artists+ table.  Note that if you have cyclic references in your database, you will probably need to write your own custom cleaning code.
+
+=== RSpec
+
+  class Spec::Example::ExampleGroup
+    after do
+      [:table1, :table2].each{|x| Sequel::Model.db.from(x).truncate}
+      # or
+      [:table1, :table2].each{|x| Sequel::Model.db.from(x).delete}
+    end
+  end
+
+=== Test::Unit
+
+  # Must use this class as the base class for your tests
+  class SequelTestCase < Test::Unit::TestCase
+    def teardown
+      [:table1, :table2].each{|x| Sequel::Model.db.from(x).truncate}
+      # or
+      [:table1, :table2].each{|x| Sequel::Model.db.from(x).delete}
+    end
+  end
