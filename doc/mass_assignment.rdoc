@@ -1,0 +1,54 @@
+= Sequel::Model Mass Assignment
+
+Most Model methods that take a hash of attribute keys and values, including <tt>Model.new</tt>, <tt>Model.create</tt>, <tt>Model#set</tt> and <tt>Model#update</tt> are subject to Sequel's mass assignment rules.
+When you pass a hash to these methods, each key has an <tt>=</tt> appended to it (the setter method), and if the setter method exists and access to it is not restricted, Sequel will call the setter method with the hash value.
+By default, there are two types of setter methods that are restricted.  
+The first is methods like <tt>typecast_on_assignment=</tt> and <tt>==</tt>, which don't affect columns.
+These methods cannot be enabled for mass assignment.
+The second is primary key setters.
+To enable use of primary key setters, you need to call +unrestrict_primary_key+ for that model:
+
+  Post.unrestrict_primary_key
+
+Since mass assignment by default allows modification of all column values except for primary key columns, it can be a security risk in some cases.
+Sequel has multiple ways of securing mass assignment.
+The first way is using +set_allowed_columns+:
+
+  Post.set_allowed_columns :title, :body, :category
+
+This explicitly sets which methods are allowed (<tt>title=</tt>, <tt>body=</tt>, and <tt>category=</tt>), all other methods will not be allowed.
+This method is useful in simple applications where the same columns are allowed in all cases, but not appropriate when different columns are allowed in different scenarios (e.g. admin access vs. user access).
+To handle cases where different columns are allowed in different cases, you can use +set_only+ or +update_only+:
+
+  # user case
+  post.set_only(params[:post], :title, :body)
+  # admin case
+  post.set_only(params[:post], :title, :body, :deleted)
+
+In this case, only the <tt>title=</tt> and <tt>body=</tt> methods will be allowed in the mass assignment.
+
+By default, if an invalid setter method call is attempted, Sequel raises a <tt>Sequel::Error</tt> exception.  You can have Sequel silently ignore invalid calls by doing:
+
+  # Global default
+  Sequel::Model.strict_param_setting = false
+  # Class level
+  Post.strict_param_setting = false
+  # Instance level
+  post.strict_param_setting = false
+
+These mass assignment methods have been around a long time, but starting in Sequel 3.12.0, the +set_fields+ or +update_fields+ methods were added, and these may be a better mass assignment choice for most users.
+These methods take two arguments, the attributes hash as the first argument, and a single array of valid field names as the second argument:
+
+  post.set_fields(params[:post], [:title, :body])
+
++set_fields+ and +update_fields+ differ in implementation from +set_only+ and +update_only+.
+With +set_only+ and +update_only+, the hash is iterated over and it checks each method call attempt to see if it is valid.
+With +set_fields+ and +update_fields+, the array is iterated over, and it just looks up the value in the hash and calls the appropriate setter method.
+
++set_fields+ and +update_fields+ are designed for the case where you are expecting specific fields in the input, and want to ignore the other fields.
+They work great for things like HTML forms where the form fields are static.
++set_only+ and +update_only+ are designed for cases where you are not sure what fields are going to be present in the input, but still want to make sure only certain setter methods can be called.
+They work great for flexible APIs.
+
+In all of the mass assignment cases, methods starting with +set+ will set the attributes without saving the object, while methods starting with +update+ will set the attributes and then save the changes to the object.
+

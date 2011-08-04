@@ -9,6 +9,7 @@
   <li><a href="rdoc/files/doc/dataset_basics_rdoc.html">Dataset Basics</a></li>
   <li><a href="rdoc/files/doc/querying_rdoc.html">Querying in Sequel</a></li>
   <li><a href="rdoc/files/doc/dataset_filtering_rdoc.html">Dataset Filtering</a></li>
+  <li><a href="rdoc/files/doc/mass_assignment_rdoc.html">Model Mass Assignment</a></li>
   <li><a href="rdoc/files/doc/validations_rdoc.html">Model Validations</a></li>
   <li><a href="rdoc/files/doc/model_hooks_rdoc.html">Model Hooks</a></li>
   <li><a href="rdoc/files/doc/association_basics_rdoc.html">Model Associations Basics</a></li>
