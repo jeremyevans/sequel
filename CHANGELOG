@@ -1,3 +1,7 @@
+=== HEAD
+
+* Model#exists? now returns false without issuing a query for new model objects (jeremyevans)
+
 === 3.26.0 (2011-08-01)
 
 * Fix bug in default connection pool if a disconnect error is raised and the disconnection_proc also raises an error (jeremyevans)

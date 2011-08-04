@@ -1027,6 +1027,11 @@ describe Sequel::Model, "#exists?" do
     @model.load(:id=>2).exists?.should be_false
     MODEL_DB.sqls.should == ['SELECT 1 FROM items WHERE (id = 2) LIMIT 1']
   end
+
+  it "should return false without issuing a query if the model object is new" do
+    @model.new.exists?.should be_false
+    MODEL_DB.sqls.should == []
+  end
 end
 
 describe Sequel::Model, "#each" do

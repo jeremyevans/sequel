@@ -889,12 +889,16 @@ module Sequel
 
       # Returns true when current instance exists, false otherwise.
       # Generally an object that isn't new will exist unless it has
-      # been deleted.  Uses a database query to check for existence.
+      # been deleted.  Uses a database query to check for existence,
+      # unless the model object is new, in which case this is always
+      # false.
       #
       #   Artist[1].exists? # SELECT 1 FROM artists WHERE (id = 1)
       #   # => true
+      #   Artist.new.exists?
+      #   # => false
       def exists?
-        !this.get(1).nil?
+        new? ? false : !this.get(1).nil?
       end
       
       # Value that should be unique for objects with the same class and pk (if pk is not nil), or
