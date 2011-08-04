@@ -769,6 +769,32 @@ describe Sequel::Model, "#set" do
     @o1.set(:x => 2, :z => 3)
     @o1.values.should == {:x => 2, :z=>3}
   end
+
+  it "#set should correctly handle cases where a module with a setter method is included in the class" do
+    @o1.set(:x => 1)
+    @o1.values.should == {:x => 1}
+
+    @c.send(:include, Module.new do
+      def z=(v)
+        self[:z] = v
+      end
+    end)
+    @o1.set(:x => 2, :z => 3)
+    @o1.values.should == {:x => 2, :z=>3}
+  end
+
+  it "#set should correctly handle cases where the object extends a module with a setter method " do
+    @o1.set(:x => 1)
+    @o1.values.should == {:x => 1}
+
+    @o1.extend(Module.new do
+      def z=(v)
+        self[:z] = v
+      end
+    end)
+    @o1.set(:x => 2, :z => 3)
+    @o1.values.should == {:x => 2, :z=>3}
+  end
 end
 
 describe Sequel::Model, "#update" do

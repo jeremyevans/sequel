@@ -248,6 +248,13 @@ module Sequel
         find(cond) || create(cond, &block)
       end
     
+      # Clear the setter_methods cache when a module is included, as it
+      # may contain setter methods.
+      def include(mod)
+        clear_setter_methods_cache
+        super
+      end
+  
       # If possible, set the dataset for the model subclass as soon as it
       # is created.  Also, make sure the inherited class instance variables
       # are copied into the subclass.
@@ -901,6 +908,13 @@ module Sequel
         new? ? false : !this.get(1).nil?
       end
       
+      # Ignore the model's setter method cache when this instances extends a module, as the
+      # module may contain setter methods.
+      def extend(mod)
+        @singleton_setter_added = true
+        super
+      end
+  
       # Value that should be unique for objects with the same class and pk (if pk is not nil), or
       # the same class and values (if pk is nil).
       #
