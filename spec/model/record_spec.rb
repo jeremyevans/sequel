@@ -1129,13 +1129,10 @@ describe Sequel::Model, "#hash" do
     y = Class.new(Sequel::Model)
     y.columns :id, :x
     a = z.load(:id => 1, :x => 3)
-    b = z.load(:id => 1, :x => 4)
-    c = z.load(:id => 2, :x => 3)
-    d = y.load(:id => 1, :x => 3)
     
-    a.hash.should == b.hash
-    a.hash.should_not == c.hash
-    a.hash.should_not == d.hash
+    a.hash.should == z.load(:id => 1, :x => 4).hash
+    a.hash.should_not == z.load(:id => 2, :x => 3).hash
+    a.hash.should_not == y.load(:id => 1, :x => 3).hash
   end
 
   specify "should be the same only for objects with the same class and values if the pk is nil" do
@@ -1144,14 +1141,71 @@ describe Sequel::Model, "#hash" do
     y = Class.new(Sequel::Model)
     y.columns :id, :x
     a = z.new(:x => 3)
-    b = z.new(:x => 4)
-    c = z.new(:x => 3)
-    d = y.new(:x => 3)
     
-    a.hash.should_not == b.hash
-    a.hash.should == c.hash
-    a.hash.should_not == d.hash
+    a.hash.should_not == z.new(:x => 4).hash
+    a.hash.should == z.new(:x => 3).hash
+    a.hash.should_not == y.new(:x => 3).hash
   end
+
+  specify "should be the same only for objects with the same class and pk if pk is composite and all values are non-NULL" do
+    z = Class.new(Sequel::Model)
+    z.columns :id, :id2, :x
+    z.set_primary_key(:id, :id2)
+    y = Class.new(Sequel::Model)
+    y.columns :id, :id2, :x
+    y.set_primary_key(:id, :id2)
+    a = z.load(:id => 1, :id2=>2, :x => 3)
+    
+    a.hash.should == z.load(:id => 1, :id2=>2, :x => 4).hash
+    a.hash.should_not == z.load(:id => 2, :id2=>1, :x => 3).hash
+    a.hash.should_not == y.load(:id => 1, :id2=>1, :x => 3).hash
+  end
+
+  specify "should be the same only for objects with the same class and value if pk is composite and one values is NULL" do
+    z = Class.new(Sequel::Model)
+    z.columns :id, :id2, :x
+    z.set_primary_key(:id, :id2)
+    y = Class.new(Sequel::Model)
+    y.columns :id, :id2, :x
+    y.set_primary_key(:id, :id2)
+
+    a = z.load(:id => 1, :id2 => nil, :x => 3)
+    a.hash.should == z.load(:id => 1, :id2=>nil, :x => 3).hash
+    a.hash.should_not == z.load(:id => 1, :id2=>nil, :x => 4).hash
+    a.hash.should_not == y.load(:id => 1, :id2=>nil, :x => 3).hash
+
+    a = z.load(:id =>nil, :id2 => nil, :x => 3)
+    a.hash.should == z.load(:id => nil, :id2=>nil, :x => 3).hash
+    a.hash.should_not == z.load(:id => nil, :id2=>nil, :x => 4).hash
+    a.hash.should_not == y.load(:id => nil, :id2=>nil, :x => 3).hash
+
+    a = z.load(:id => 1, :x => 3)
+    a.hash.should == z.load(:id => 1, :x => 3).hash
+    a.hash.should_not == z.load(:id => 1, :id2=>nil, :x => 3).hash
+    a.hash.should_not == z.load(:id => 1, :x => 4).hash
+    a.hash.should_not == y.load(:id => 1, :x => 3).hash
+
+    a = z.load(:x => 3)
+    a.hash.should == z.load(:x => 3).hash
+    a.hash.should_not == z.load(:id => nil, :id2=>nil, :x => 3).hash
+    a.hash.should_not == z.load(:x => 4).hash
+    a.hash.should_not == y.load(:x => 3).hash
+  end
+
+  specify "should be the same only for objects with the same class and values if the no primary key" do
+    z = Class.new(Sequel::Model)
+    z.columns :id, :x
+    z.no_primary_key
+    y = Class.new(Sequel::Model)
+    y.columns :id, :x
+    y.no_primary_key
+    a = z.new(:x => 3)
+    
+    a.hash.should_not == z.new(:x => 4).hash
+    a.hash.should == z.new(:x => 3).hash
+    a.hash.should_not == y.new(:x => 3).hash
+  end
+
 end
 
 describe Sequel::Model, "#initialize" do

@@ -909,7 +909,14 @@ module Sequel
       #   Artist.new.hash == Artist.new.hash # true
       #   Artist.new(:name=>'Bob').hash == Artist.new.hash # false
       def hash
-        [model, pk.nil? ? @values.sort_by{|k,v| k.to_s} : pk].hash
+        case primary_key
+        when Array
+          [model, !pk.all? ? @values.sort_by{|k,v| k.to_s} : pk].hash
+        when Symbol
+          [model, pk.nil? ? @values.sort_by{|k,v| k.to_s} : pk].hash
+        else
+          [model, @values.sort_by{|k,v| k.to_s}].hash
+        end
       end
   
       # Returns value for the :id attribute, even if the primary key is

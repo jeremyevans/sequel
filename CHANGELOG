@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Model#hash to work correctly with composite primary keys and with no primary key (jeremyevans)
+
 * Model#exists? now returns false without issuing a query for new model objects (jeremyevans)
 
 === 3.26.0 (2011-08-01)
