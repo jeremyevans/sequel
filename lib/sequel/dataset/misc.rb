@@ -107,7 +107,7 @@ module Sequel
     # Define a hash value such that datasets with the same DB, opts, and SQL
     # will have the same hash value
     def hash
-      [db, opts.sort_by{|k| k.to_s}, sql].hash
+      [db, opts.sort_by{|k, v| k.to_s}, sql].hash
     end
     
     # The String instance method to call on identifiers before sending them to

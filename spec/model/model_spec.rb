@@ -40,6 +40,13 @@ describe "Sequel::Model()" do
     c.table_name.should == :boo
   end
 
+  it "should return a model subclass with the given dataset if given a dataset using an SQL::Identifier" do
+    ds = @db[:blah.identifier]
+    c = Sequel::Model(ds)
+    c.superclass.should == Sequel::Model
+    c.dataset.should == ds
+  end
+
   it "should return a model subclass associated to the given database if given a database" do
     db = Sequel::Database.new
     c = Sequel::Model(db)
@@ -96,6 +103,13 @@ describe "Sequel::Model()" do
       proc do
         class ::Album < Sequel::Model(@db[:table]); end
         class ::Album < Sequel::Model(@db[:table]); end
+      end.should_not raise_error
+    end
+
+    it "should work without raising an exception with a dataset with an SQL::Identifier" do
+      proc do
+        class ::Album < Sequel::Model(@db[:table.identifier]); end
+        class ::Album < Sequel::Model(@db[:table.identifier]); end
       end.should_not raise_error
     end
   end

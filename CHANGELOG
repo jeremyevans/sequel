@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#hash work correctly when referencing SQL::Expression instances (jeremyevans)
+
 * Handle allowed mass assignment methods correctly when including modules in classes or extending instances with modules (jeremyevans)
 
 * Fix Model#hash to work correctly with composite primary keys and with no primary key (jeremyevans)
