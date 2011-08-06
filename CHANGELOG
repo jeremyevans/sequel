@@ -1,5 +1,7 @@
 === HEAD
 
+* Make prepared_statements_safe plugin work on classes without datasets (jeremyevans)
+
 * Make Dataset#hash work correctly when referencing SQL::Expression instances (jeremyevans)
 
 * Handle allowed mass assignment methods correctly when including modules in classes or extending instances with modules (jeremyevans)

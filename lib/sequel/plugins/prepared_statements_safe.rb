@@ -33,10 +33,16 @@ module Sequel
         # that can be created is 2^N (where N is the number of free columns).
         attr_reader :prepared_statements_column_defaults
         
-        # Set the column defaults to use when creating on the subclass.
         def inherited(subclass)
           super
-          subclass.send(:set_prepared_statements_column_defaults)
+          subclass.instance_variable_set(:@prepared_statements_column_defaults, @prepared_statements_column_defaults) if @prepared_statements_column_defaults && !subclass.prepared_statements_column_defaults
+        end
+
+        # Set the column defaults to use when creating on the subclass.
+        def set_dataset(*)
+          x = super
+          set_prepared_statements_column_defaults
+          x
         end
 
         private
@@ -45,11 +51,13 @@ module Sequel
         # are set to a default value unless they are a primary key column or
         # they don't have a parseable default.
         def set_prepared_statements_column_defaults
-          h = {}
-          db_schema.each do |k, v|
-            h[k] = v[:ruby_default] if (v[:ruby_default] || !v[:default]) && !v[:primary_key]
+          if db_schema
+            h = {}
+            db_schema.each do |k, v|
+              h[k] = v[:ruby_default] if (v[:ruby_default] || !v[:default]) && !v[:primary_key]
+            end
+            @prepared_statements_column_defaults = h
           end
-          @prepared_statements_column_defaults = h
         end
       end
 
@@ -57,7 +65,9 @@ module Sequel
         # Merge the current values into the default values to reduce the number
         # of free columns.
         def before_create
-          set_values(model.prepared_statements_column_defaults.merge(values))
+          if v = model.prepared_statements_column_defaults
+            set_values(v.merge(values))
+          end
           super
         end
 
