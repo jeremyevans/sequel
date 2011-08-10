@@ -148,6 +148,26 @@ module Sequel
       def dataset=(ds)
         set_dataset(ds)
       end
+
+      # Extend the dataset with an anonymous module, similar to adding
+      # a plugin with the methods defined in DatasetMethods.  If a block
+      # is given, it is module_evaled.
+      #
+      #   Artist.dataset_module do
+      #     def foo
+      #       :bar
+      #     end
+      #   end
+      #   Artist.dataset.foo
+      #   # => :bar
+      #   Artist.foo
+      #   # => :bar
+      def dataset_module
+        @dataset_module ||= Module.new
+        @dataset_module.module_eval(&Proc.new) if block_given?
+        dataset_extend(@dataset_module)
+        @dataset_module
+      end
     
       # Returns the database associated with the Model class.
       # If this model doesn't have a database associated with it,
@@ -335,12 +355,7 @@ module Sequel
           m.apply(self, *args, &blk) if m.respond_to?(:apply)
           include(m::InstanceMethods) if plugin_module_defined?(m, :InstanceMethods)
           extend(m::ClassMethods)if plugin_module_defined?(m, :ClassMethods)
-          if plugin_module_defined?(m, :DatasetMethods)
-            dataset.extend(m::DatasetMethods) if @dataset
-            dataset_method_modules << m::DatasetMethods
-            meths = m::DatasetMethods.public_instance_methods.reject{|x| NORMAL_METHOD_NAME_REGEXP !~ x.to_s}
-            def_dataset_method(*meths) unless meths.empty?
-          end
+          dataset_extend(m::DatasetMethods) if plugin_module_defined?(m, :DatasetMethods)
         end
         m.configure(self, *args, &blk) if m.respond_to?(:configure)
       end
@@ -558,6 +573,16 @@ module Sequel
         rescue
           nil
         end
+      end
+
+      # Add the module to the class's dataset_method_modules.  Extend the dataset with the
+      # module if the model has a dataset.  Add dataset methods to the class for all
+      # public dataset methods.
+      def dataset_extend(mod)
+        dataset.extend(mod) if @dataset
+        dataset_method_modules << mod
+        meths = mod.public_instance_methods.reject{|x| NORMAL_METHOD_NAME_REGEXP !~ x.to_s}
+        def_dataset_method(*meths) unless meths.empty?
       end
 
       # Create a column accessor for a column with a method name that is hard to use in ruby code.

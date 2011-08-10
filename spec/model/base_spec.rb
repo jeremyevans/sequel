@@ -131,6 +131,50 @@ describe Sequel::Model, ".def_dataset_method" do
   end
 end
 
+describe Sequel::Model, ".dataset_module" do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+  end
+  
+  it "should extend the dataset with the module if the model has a dataset" do
+    @c.instance_eval{dataset_module{def return_3() 3 end}}
+    @c.dataset.return_3.should == 3
+  end
+
+  it "should add methods defined in the module to the class" do
+    @c.instance_eval{dataset_module{def return_3() 3 end}}
+    @c.return_3.should == 3
+  end
+
+  it "should cache calls and readd methods if set_dataset is used" do
+    @c.instance_eval{dataset_module{def return_3() 3 end}}
+    @c.set_dataset :items
+    @c.return_3.should == 3
+    @c.dataset.return_3.should == 3
+  end
+
+  it "should readd methods to subclasses, if set_dataset is used in a subclass" do
+    @c.instance_eval{dataset_module{def return_3() 3 end}}
+    c = Class.new(@c)
+    c.set_dataset :items
+    c.return_3.should == 3
+    c.dataset.return_3.should == 3
+  end
+
+  it "should only have a single dataset_module per class" do
+    @c.instance_eval{dataset_module{def return_3() 3 end}}
+    @c.instance_eval{dataset_module{def return_3() 3 + (begin; super; rescue NoMethodError; 1; end) end}}
+    @c.return_3.should == 4
+  end
+
+  it "should not have subclasses share the dataset_module" do
+    @c.instance_eval{dataset_module{def return_3() 3 end}}
+    c = Class.new(@c)
+    c.instance_eval{dataset_module{def return_3() 3 + (begin; super; rescue NoMethodError; 1; end) end}}
+    c.return_3.should == 6
+  end
+end
+
 describe "A model class with implicit table name" do
   before do
     class Donkey < Sequel::Model

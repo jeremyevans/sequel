@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.dataset_module for simplifying many def_dataset_method calls (jeremyevans)
+
 * Make prepared_statements_safe plugin work on classes without datasets (jeremyevans)
 
 * Make Dataset#hash work correctly when referencing SQL::Expression instances (jeremyevans)
