@@ -1,5 +1,7 @@
 === HEAD
 
+* Support dropping primary key, foreign key, and unique constraints on MySQL via the drop_constraint :type option (jeremyevans)
+
 * Add Sequel::SQLTime class for handling SQL time columns (jeremyevans)
 
 * Typecast DateTime objects to Date for date columns (jeremyevans)

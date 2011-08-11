@@ -154,6 +154,18 @@ module Sequel
           "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(op.merge(opts))}"
         when :drop_index
           "#{drop_index_sql(table, op)} ON #{quote_schema_table(table)}"
+        when :drop_constraint
+          type = case op[:type]
+          when :primary_key
+            return "ALTER TABLE #{quote_schema_table(table)} DROP PRIMARY KEY"
+          when :foreign_key
+            'FOREIGN KEY'
+          when :unique
+            'INDEX'
+          else
+            raise(Error, "must specify constraint type via :type=>(:foreign_key|:primary_key|:unique) when dropping constraints on MySQL")
+          end
+          "ALTER TABLE #{quote_schema_table(table)} DROP #{type} #{quote_identifier(op[:name])}"
         else
           super(table, op)
         end

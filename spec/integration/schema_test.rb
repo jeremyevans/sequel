@@ -246,6 +246,15 @@ describe "Database schema modifiers" do
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :id]
     @ds.columns!.should == [:number, :id]
     @ds.map(:number).should == [10]
+    proc{@ds.insert(:id=>@ds.map(:id).first)}.should raise_error
+  end
+
+  cspecify "should drop primary key constraints from tables correctly", :sqlite do
+    @db.create_table!(:items){Integer :number; primary_key [:number], :name=>:items_pk}
+    @ds.insert(:number=>10)
+    @db.alter_table(:items){drop_constraint :items_pk, :type=>:primary_key}
+    @ds.map(:number).should == [10]
+    proc{@ds.insert(10)}.should_not raise_error
   end
 
   specify "should add foreign key columns to tables correctly" do
@@ -320,13 +329,33 @@ describe "Database schema modifiers" do
   end
 
   cspecify "should add unique constraints and foreign key table constraints correctly", :sqlite do
-    @db.create_table!(:items){Integer :id; Integer :item_id}
+    @db.create_table!(:items, :engine=>:InnoDB){Integer :id; Integer :item_id}
     @db.alter_table(:items) do
       add_unique_constraint [:item_id, :id]
       add_foreign_key [:id, :item_id], :items, :key=>[:item_id, :id]
     end
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :item_id]
     @ds.columns!.should == [:id, :item_id]
+    proc{@ds.insert(1, 1)}.should_not raise_error
+    proc{@ds.insert(1, 1)}.should raise_error
+    proc{@ds.insert(1, 2)}.should raise_error
+  end
+
+  cspecify "should drop unique constraints and foreign key table constraints correctly", :sqlite do
+    @db.create_table!(:items) do
+      Integer :id
+      Integer :item_id
+      unique [:item_id, :id], :name=>:items_uk
+      foreign_key [:id, :item_id], :items, :key=>[:item_id, :id], :name=>:items_fk
+    end
+    @db.alter_table(:items) do
+      drop_constraint(:items_fk, :type=>:foreign_key)
+      drop_constraint(:items_uk, :type=>:unique)
+    end
+    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :item_id]
+    @ds.columns!.should == [:id, :item_id]
+    proc{@ds.insert(1, 2)}.should_not raise_error
+    proc{@ds.insert(1, 2)}.should_not raise_error
   end
 
   cspecify "should remove columns from tables correctly", :h2, :mssql do
