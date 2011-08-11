@@ -630,6 +630,40 @@ describe "Model#pk" do
   end
 end
 
+describe "Model#pk_or_nil" do
+  before(:each) do
+    @m = Class.new(Sequel::Model)
+    @m.columns :id, :x, :y
+  end
+  
+  it "should be default return the value of the :id column" do
+    m = @m.load(:id => 111, :x => 2, :y => 3)
+    m.pk_or_nil.should == 111
+  end
+
+  it "should be return the primary key value for custom primary key" do
+    @m.set_primary_key :x
+    m = @m.load(:id => 111, :x => 2, :y => 3)
+    m.pk_or_nil.should == 2
+  end
+
+  it "should be return the primary key value for composite primary key" do
+    @m.set_primary_key [:y, :x]
+    m = @m.load(:id => 111, :x => 2, :y => 3)
+    m.pk_or_nil.should == [3, 2]
+  end
+
+  it "should raise if no primary key" do
+    @m.set_primary_key nil
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pk_or_nil.should be_nil
+
+    @m.no_primary_key
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pk_or_nil.should be_nil
+  end
+end
+
 describe "Model#pk_hash" do
   before(:each) do
     @m = Class.new(Sequel::Model)

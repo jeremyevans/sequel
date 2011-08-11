@@ -1037,8 +1037,8 @@ module Sequel
           @associations ||= {}
         end
       
-        # Used internally by the associations code, like pk but doesn't raise
-        # an Error if the model has no primary key.
+        # Formally used internally by the associations code, like pk but doesn't raise
+        # an Error if the model has no primary key.  Not used any longer, deprecated.
         def pk_or_nil
           key = primary_key
           key.is_a?(Array) ? key.map{|k| @values[k]} : @values[key]
