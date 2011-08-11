@@ -215,10 +215,10 @@ module Sequel
     # Typecast the value to a Date
     def typecast_value_date(value)
       case value
-      when Date
-        value
       when DateTime, Time
         Date.new(value.year, value.month, value.day)
+      when Date
+        value
       when String
         Sequel.string_to_date(value)
       when Hash
@@ -230,12 +230,7 @@ module Sequel
 
     # Typecast the value to a DateTime or Time depending on Sequel.datetime_class
     def typecast_value_datetime(value)
-      klass = Sequel.datetime_class
-      if value.is_a?(Hash)
-        klass.send(klass == Time ? :mktime : :new, *[:year, :month, :day, :hour, :minute, :second].map{|x| (value[x] || value[x.to_s]).to_i})
-      else
-        Sequel.typecast_to_application_timestamp(value)
-      end
+      Sequel.typecast_to_application_timestamp(value)
     end
 
     # Typecast the value to a BigDecimal

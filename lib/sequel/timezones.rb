@@ -109,6 +109,8 @@ module Sequel
         else
           Time.send(input_timezone == :utc ? :utc : :local, y, mo, d, h, mi, s)
         end
+      when Hash
+        convert_input_timestamp([:year, :month, :day, :hour, :minute, :second].map{|x| (v[x] || v[x.to_s]).to_i}, input_timezone)
       when Time
         if datetime_class == DateTime
           v.respond_to?(:to_datetime) ? v.to_datetime : string_to_datetime(v.iso8601)
@@ -121,8 +123,6 @@ module Sequel
         else
           v.respond_to?(:to_time) ? v.to_time : string_to_datetime(v.to_s)
         end
-      when Date
-        convert_input_timestamp(v.to_s, input_timezone)
       else
         raise InvalidValue, "Invalid convert_input_timestamp type: #{v.inspect}"
       end
@@ -160,7 +160,16 @@ module Sequel
     # +convert_output_timestamp+.
     def convert_timestamp(v, input_timezone)
       begin
-        convert_output_timestamp(convert_input_timestamp(v, input_timezone), Sequel.application_timezone)
+        if v.is_a?(Date) && !v.is_a?(DateTime)
+          # Dates handled specially as they are assumed to already be in the application_timezone
+          if datetime_class == DateTime
+            DateTime.civil(v.year, v.month, v.day, 0, 0, 0, application_timezone == :local ? (defined?(Rational) ? Rational(Time.local(v.year, v.month, v.day).utc_offset, 86400) : Time.local(v.year, v.month, v.day).utc_offset/86400.0) : 0)
+          else
+            Time.send(application_timezone == :utc ? :utc : :local, v.year, v.month, v.day)
+          end
+        else
+          convert_output_timestamp(convert_input_timestamp(v, input_timezone), application_timezone)
+        end
       rescue InvalidValue
         raise
       rescue => e

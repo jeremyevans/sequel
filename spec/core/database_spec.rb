@@ -1344,6 +1344,194 @@ describe "Database#typecast_value" do
     @db.typecast_value(:integer, "0x80").should == 128
   end
 
+  specify "should typecast blobs as as Sequel::SQL::Blob" do
+    v = @db.typecast_value(:blob, "0x013")
+    v.should be_a_kind_of(Sequel::SQL::Blob)
+    v.should == Sequel::SQL::Blob.new("0x013")
+    @db.typecast_value(:blob, v).object_id.should == v.object_id
+  end
+
+  specify "should typecast boolean values to true, false, or nil" do
+    @db.typecast_value(:boolean, false).should be_false
+    @db.typecast_value(:boolean, 0).should be_false
+    @db.typecast_value(:boolean, "0").should be_false
+    @db.typecast_value(:boolean, 'f').should be_false
+    @db.typecast_value(:boolean, 'false').should be_false
+    @db.typecast_value(:boolean, true).should be_true
+    @db.typecast_value(:boolean, 1).should be_true
+    @db.typecast_value(:boolean, '1').should be_true
+    @db.typecast_value(:boolean, 't').should be_true
+    @db.typecast_value(:boolean, 'true').should be_true
+    @db.typecast_value(:boolean, '').should be_nil
+  end
+
+  specify "should typecast date values to Date" do
+    @db.typecast_value(:date, Date.today).should == Date.today
+    @db.typecast_value(:date, DateTime.now).should == Date.today
+    @db.typecast_value(:date, Time.now).should == Date.today
+    @db.typecast_value(:date, Date.today.to_s).should == Date.today
+    @db.typecast_value(:date, :year=>Date.today.year, :month=>Date.today.month, :day=>Date.today.day).should == Date.today
+  end
+
+  specify "should typecast datetime values to Sequel.datetime_class with correct timezone handling" do
+    t = Time.utc(2011, 1, 2, 3, 4, 5) # UTC Time
+    t2 = Time.mktime(2011, 1, 2, 3, 4, 5) # Local Time
+    t3 = Time.utc(2011, 1, 2, 3, 4, 5) - (t - t2) # Local Time in UTC Time
+    t4 = Time.mktime(2011, 1, 2, 3, 4, 5) + (t - t2) # UTC Time in Local Time
+    dt = DateTime.civil(2011, 1, 2, 3, 4, 5)
+    dt2 = DateTime.civil(2011, 1, 2, 3, 4, 5, Rational(t2.utc_offset, 86400))
+    dt3 = DateTime.civil(2011, 1, 2, 3, 4, 5) - Rational((t - t2).to_i, 86400)
+    dt4 = DateTime.civil(2011, 1, 2, 3, 4, 5, Rational(t2.utc_offset, 86400)) + Rational((t - t2).to_i, 86400)
+
+    t.should == t4
+    t2.should == t3
+    dt.should == dt4
+    dt2.should == dt3
+
+    check = proc do |i, o| 
+      v = @db.typecast_value(:datetime, i)
+      v.should == o
+      if o.is_a?(Time)
+        v.utc_offset.should == o.utc_offset
+      else
+        v.offset.should == o.offset
+      end
+    end
+    begin
+      @db.typecast_value(:datetime, dt).should == t
+      @db.typecast_value(:datetime, dt2).should == t2
+      @db.typecast_value(:datetime, t).should == t
+      @db.typecast_value(:datetime, t2).should == t2
+      @db.typecast_value(:datetime, dt.to_s).should == t
+      @db.typecast_value(:datetime, dt.strftime('%F %T')).should == t2
+      @db.typecast_value(:datetime, Date.civil(2011, 1, 2)).should == Time.mktime(2011, 1, 2, 0, 0, 0)
+      @db.typecast_value(:datetime, :year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec).should == t2
+
+      Sequel.datetime_class = DateTime
+      @db.typecast_value(:datetime, dt).should == dt
+      @db.typecast_value(:datetime, dt2).should == dt2
+      @db.typecast_value(:datetime, t).should == dt
+      @db.typecast_value(:datetime, t2).should == dt2
+      @db.typecast_value(:datetime, dt.to_s).should == dt
+      @db.typecast_value(:datetime, dt.strftime('%F %T')).should == dt
+      @db.typecast_value(:datetime, Date.civil(2011, 1, 2)).should == DateTime.civil(2011, 1, 2, 0, 0, 0)
+      @db.typecast_value(:datetime, :year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec).should == dt
+
+      Sequel.application_timezone = :utc
+      Sequel.typecast_timezone = :local
+      Sequel.datetime_class = Time
+      check[dt, t]
+      check[dt2, t3]
+      check[t, t]
+      check[t2, t3]
+      check[dt.to_s, t]
+      check[dt.strftime('%F %T'), t3]
+      check[Date.civil(2011, 1, 2), Time.utc(2011, 1, 2, 0, 0, 0)]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, t3]
+
+      Sequel.datetime_class = DateTime
+      check[dt, dt]
+      check[dt2, dt3]
+      check[t, dt]
+      check[t2, dt3]
+      check[dt.to_s, dt]
+      check[dt.strftime('%F %T'), dt3]
+      check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0)]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, dt3]
+
+      Sequel.typecast_timezone = :utc
+      Sequel.datetime_class = Time
+      check[dt, t]
+      check[dt2, t3]
+      check[t, t]
+      check[t2, t3]
+      check[dt.to_s, t]
+      check[dt.strftime('%F %T'), t]
+      check[Date.civil(2011, 1, 2), Time.utc(2011, 1, 2, 0, 0, 0)]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, t]
+
+      Sequel.datetime_class = DateTime
+      check[dt, dt]
+      check[dt2, dt3]
+      check[t, dt]
+      check[t2, dt3]
+      check[dt.to_s, dt]
+      check[dt.strftime('%F %T'), dt]
+      check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0)]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, dt]
+
+      Sequel.application_timezone = :local
+      Sequel.datetime_class = Time
+      check[dt, t4]
+      check[dt2, t2]
+      check[t, t4]
+      check[t2, t2]
+      check[dt.to_s, t4]
+      check[dt.strftime('%F %T'), t4]
+      check[Date.civil(2011, 1, 2), Time.local(2011, 1, 2, 0, 0, 0)]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, t4]
+
+      Sequel.datetime_class = DateTime
+      check[dt, dt4]
+      check[dt2, dt2]
+      check[t, dt4]
+      check[t2, dt2]
+      check[dt.to_s, dt4]
+      check[dt.strftime('%F %T'), dt4]
+      check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0, Rational(t2.utc_offset, 86400))]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, dt4]
+
+      Sequel.typecast_timezone = :local
+      Sequel.datetime_class = Time
+      check[dt, t4]
+      check[dt2, t2]
+      check[t, t4]
+      check[t2, t2]
+      check[dt.to_s, t4]
+      check[dt.strftime('%F %T'), t2]
+      check[Date.civil(2011, 1, 2), Time.local(2011, 1, 2, 0, 0, 0)]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, t2]
+
+      Sequel.datetime_class = DateTime
+      check[dt, dt4]
+      check[dt2, dt2]
+      check[t, dt4]
+      check[t2, dt2]
+      check[dt.to_s, dt4]
+      check[dt.strftime('%F %T'), dt2]
+      check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0, Rational(t2.utc_offset, 86400))]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, dt2]
+
+    ensure
+      Sequel.default_timezone = nil
+      Sequel.datetime_class = Time
+    end
+  end
+
+  specify "should typecast decimal values to BigDecimal" do
+    [1.0, 1, '1.0', BigDecimal('1.0')].each do |i|
+      v = @db.typecast_value(:decimal, i)
+      v.should be_a_kind_of(BigDecimal)
+      v.should == BigDecimal.new('1.0')
+    end
+  end
+
+  specify "should typecast float values to Float" do
+    [1.0, 1, '1.0', BigDecimal('1.0')].each do |i|
+      v = @db.typecast_value(:float, i)
+      v.should be_a_kind_of(Float)
+      v.should == 1.0
+    end
+  end
+
+  specify "should typecast string values to String" do
+    [1.0, '1.0', '1.0'.to_sequel_blob].each do |i|
+      v = @db.typecast_value(:string, i)
+      v.should be_an_instance_of(String)
+      v.should == "1.0"
+    end
+  end
+
   specify "should have an underlying exception class available at wrapped_exception" do
     begin
       @db.typecast_value(:date, 'a')
