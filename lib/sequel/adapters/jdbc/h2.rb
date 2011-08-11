@@ -151,11 +151,7 @@ module Sequel
 
         private
       
-        # H2 expects hexadecimal strings for blob values
-        def literal_blob(v)
-          literal_string v.unpack("H*").first
-        end
-        
+        # Handle H2 specific clobs as strings.
         def convert_type(v)
           case v
           when Java::OrgH2Jdbc::JdbcClob
@@ -165,6 +161,16 @@ module Sequel
           end
         end
         
+        # H2 expects hexadecimal strings for blob values
+        def literal_blob(v)
+          literal_string v.unpack("H*").first
+        end
+        
+        # H2 handles fractional seconds in timestamps, but not in times
+        def literal_sqltime(v)
+          v.strftime("'%H:%M:%S'")
+        end
+
         def select_clause_methods
           SELECT_CLAUSE_METHODS
         end

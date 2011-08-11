@@ -31,6 +31,10 @@ module Sequel
       def datetime(s)
         Sequel.database_to_application_timestamp(s)
       end
+
+      def time(s)
+        Sequel.string_to_time(s)
+      end
       
       # Don't raise an error if the value is a string and the declared
       # type doesn't match a known type, just return the value.

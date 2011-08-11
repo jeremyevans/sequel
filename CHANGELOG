@@ -1,5 +1,11 @@
 === HEAD
 
+* Add Sequel::SQLTime class for handling SQL time columns (jeremyevans)
+
+* Typecast DateTime objects to Date for date columns (jeremyevans)
+
+* When typecasting Date objects to timestamps, make the resulting objects always have no fractional date components (jeremyevans)
+
 * Add Model.dataset_module for simplifying many def_dataset_method calls (jeremyevans)
 
 * Make prepared_statements_safe plugin work on classes without datasets (jeremyevans)

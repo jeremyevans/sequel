@@ -38,6 +38,11 @@ module Sequel
   class LiteralString < ::String
   end
 
+  # Time subclass that gets literalized with only the time value, so it operates
+  # like a standard SQL time type.
+  class SQLTime < ::Time
+  end
+
   # The SQL module holds classes whose instances represent SQL fragments.
   # It also holds modules that are included in core ruby classes that
   # make Sequel a friendly DSL.

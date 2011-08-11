@@ -1020,6 +1020,12 @@ describe "Dataset#literal" do
     d.literal(d).should == "(#{d.sql})"
   end
   
+  specify "should literalize Sequel::SQLTime properly" do
+    t = Sequel::SQLTime.now
+    s = t.strftime("'%H:%M:%S")
+    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.usec)}'"
+  end
+  
   specify "should literalize Time properly" do
     t = Time.now
     s = t.strftime("'%Y-%m-%d %H:%M:%S")

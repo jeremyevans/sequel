@@ -1532,6 +1532,16 @@ describe "Database#typecast_value" do
     end
   end
 
+  specify "should typecast time values to SQLTime" do
+    t = Time.now
+    st = Sequel::SQLTime.local(t.year, t.month, t.day, 1, 2, 3)
+    [st, Time.utc(t.year, t.month, t.day, 1, 2, 3), Time.local(t.year, t.month, t.day, 1, 2, 3), '01:02:03', {:hour=>1, :minute=>2, :second=>3}].each do |i|
+      v = @db.typecast_value(:time, i)
+      v.should be_an_instance_of(Sequel::SQLTime)
+      v.should == st
+    end
+  end
+
   specify "should have an underlying exception class available at wrapped_exception" do
     begin
       @db.typecast_value(:date, 'a')

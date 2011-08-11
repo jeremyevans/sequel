@@ -228,12 +228,13 @@ module Sequel
     end
   end
 
-  # Converts the given +string+ into a +Time+ object.
+  # Converts the given +string+ into a <tt>Sequel::SQLTime</tt> object.
   #
-  #   Sequel.string_to_time('10:20:30') # Time.parse('10:20:30')
+  #   v = Sequel.string_to_time('10:20:30') # Sequel::SQLTime.parse('10:20:30')
+  #   DB.literal(v) # => '10:20:30'
   def self.string_to_time(string)
     begin
-      Time.parse(string)
+      SQLTime.parse(string)
     rescue => e
       raise convert_exception_class(e, InvalidValue)
     end

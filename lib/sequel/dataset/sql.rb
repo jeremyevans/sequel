@@ -100,6 +100,8 @@ module Sequel
         literal_false
       when Array
         literal_array(v)
+      when SQLTime
+        literal_sqltime(v)
       when Time
         literal_time(v)
       when DateTime
@@ -721,6 +723,11 @@ module Sequel
       else
         raise Error, "can't express #{v.inspect} as a SQL literal"
       end
+    end
+
+    # SQL fragment for Sequel::SQLTime, containing just the time part
+    def literal_sqltime(v)
+      v.strftime("'%H:%M:%S#{format_timestamp_usec(v.usec) if supports_timestamp_usecs?}'")
     end
 
     # SQL fragment for String.  Doubles \ and ' by default.
