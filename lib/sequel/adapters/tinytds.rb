@@ -32,9 +32,32 @@ module Sequel
           begin
             m = opts[:return]
             r = nil
-            log_yield(sql) do
-              r = c.execute(sql)
-              return r.send(m) if m
+            if (args = opts[:arguments]) && !args.empty?
+              types = []
+              values = []
+              args.each_with_index do |(k, v), i|
+                v, type = ps_arg_type(v)
+                types << "@#{k} #{type}"
+                values << "@#{k} = #{v}"
+              end
+              case m
+              when :do
+                sql = "#{sql}; SELECT @@ROWCOUNT AS AffectedRows"
+                single_value = true
+              when :insert
+                sql = "#{sql}; SELECT CAST(SCOPE_IDENTITY() AS bigint) AS Ident"
+                single_value = true
+              end
+              sql = "EXEC sp_executesql N'#{c.escape(sql)}', N'#{c.escape(types.join(', '))}', #{values.join(', ')}"
+              log_yield(sql) do
+                r = c.execute(sql)
+                r.each{|row| return row.values.first} if single_value
+              end
+            else
+              log_yield(sql) do
+                r = c.execute(sql)
+                return r.send(m) if m
+              end
             end
             yield(r) if block_given?
           rescue TinyTds::Error => e
@@ -84,13 +107,97 @@ module Sequel
         c.close
       end
 
+      # Return true if the :conn argument is present and not active.
       def disconnect_error?(e, opts)
         super || (opts[:conn] && !opts[:conn].active?)
+      end
+
+      # Return a 2 element array with the literal value and type to use
+      # in the prepared statement call for the given value and connection.
+      def ps_arg_type(v)
+        case v
+        when Fixnum
+          [v, 'int']
+        when Bignum
+          [v, 'bigint']
+        when Float
+          [v, 'double precision']
+        when Numeric
+          [v, 'numeric']
+        when SQLTime
+          [literal(v), 'time']
+        when DateTime, Time
+          [literal(v), 'datetime']
+        when Date
+          [literal(v), 'date']
+        when nil
+          ['NULL', 'nvarchar(max)']
+        when true
+          ['1', 'int']
+        when false
+          ['0', 'int']
+        when SQL::Blob
+          [literal(v), 'varbinary(max)']
+        else
+          [literal(v), 'nvarchar(max)']
+        end
       end
     end
     
     class Dataset < Sequel::Dataset
       include Sequel::MSSQL::DatasetMethods
+      
+      # SQLite already supports named bind arguments, so use directly.
+      module ArgumentMapper
+        include Sequel::Dataset::ArgumentMapper
+        
+        protected
+        
+        # Return a hash with the same values as the given hash,
+        # but with the keys converted to strings.
+        def map_to_prepared_args(hash)
+          args = {}
+          hash.each{|k,v| args[k.to_s.gsub('.', '__')] = v}
+          args
+        end
+        
+        private
+        
+        # SQLite uses a : before the name of the argument for named
+        # arguments.
+        def prepared_arg(k)
+          LiteralString.new("@#{k.to_s.gsub('.', '__')}")
+        end
+
+        # Always assume a prepared argument.
+        def prepared_arg?(k)
+          true
+        end
+      end
+      
+      # SQLite prepared statement uses a new prepared statement each time
+      # it is called, but it does use the bind arguments.
+      module PreparedStatementMethods
+        include ArgumentMapper
+        
+        private
+        
+        # Run execute_select on the database with the given SQL and the stored
+        # bind arguments.
+        def execute(sql, opts={}, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+        end
+        
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts={}, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+        end
+        
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_insert(sql, opts={}, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+        end
+      end
       
       # Yield hashes with symbol keys, attempting to optimize for
       # various cases.
@@ -121,6 +228,18 @@ module Sequel
           end
         end
         self
+      end
+      
+      # Create a named prepared statement that is stored in the
+      # database (and connection) for reuse.
+      def prepare(type, name=nil, *values)
+        ps = to_prepared_statement(type, values)
+        ps.extend(PreparedStatementMethods)
+        if name
+          ps.prepared_statement_name = name
+          db.prepared_statements[name] = ps
+        end
+        ps
       end
       
       private

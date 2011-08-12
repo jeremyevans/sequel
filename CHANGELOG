@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for native prepared statements to the tinytds adapter (jeremyevans)
+
 * Add support for native prepared statements and stored procedures to the mysql2 adapter (jeremyevans)
 
 * Support dropping primary key, foreign key, and unique constraints on MySQL via the drop_constraint :type option (jeremyevans)
