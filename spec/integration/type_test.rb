@@ -73,7 +73,6 @@ describe "Supported types" do
     t = Sequel::SQLTime.now
     ds.insert(:tim => t)
     v = ds.first[:tim]
-    p v.class
     ds.literal(v).should == ds.literal(t)
     v.should be_a_kind_of(Sequel::SQLTime)
     ds.delete
