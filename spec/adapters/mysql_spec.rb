@@ -956,7 +956,7 @@ describe "MySQL::Dataset#calc_found_rows" do
   end
 end
 
-if MYSQL_DB.adapter_scheme == :mysql or MYSQL_DB.adapter_scheme == :jdbc
+if MYSQL_DB.adapter_scheme == :mysql or MYSQL_DB.adapter_scheme == :jdbc or MYSQL_DB.adapter_scheme == :mysql2
   describe "MySQL Stored Procedures" do
     before do
       MYSQL_DB.create_table(:items){Integer :id; Integer :value}
@@ -977,26 +977,30 @@ if MYSQL_DB.adapter_scheme == :mysql or MYSQL_DB.adapter_scheme == :jdbc
       MYSQL_DB[:items].count.should == 0
     end
     
-    specify "should be callable on the dataset object" do
-      MYSQL_DB.execute_ddl('CREATE PROCEDURE test_sproc(a INTEGER) BEGIN SELECT *, a AS b FROM items; END')
-      MYSQL_DB[:items].delete
-      @d = MYSQL_DB[:items]
-      @d.call_sproc(:select, :test_sproc, 3).should == []
-      @d.insert(:value=>1)
-      @d.call_sproc(:select, :test_sproc, 4).should == [{:id=>nil, :value=>1, :b=>4}]
-      @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
-      @d.call_sproc(:select, :test_sproc, 3).should == [{:id=>nil, :value=>2, :b=>6}]
-    end
-    
-    specify "should be callable on the dataset object with multiple arguments" do
-      MYSQL_DB.execute_ddl('CREATE PROCEDURE test_sproc(a INTEGER, c INTEGER) BEGIN SELECT *, a AS b, c AS d FROM items; END')
-      MYSQL_DB[:items].delete
-      @d = MYSQL_DB[:items]
-      @d.call_sproc(:select, :test_sproc, 3, 4).should == []
-      @d.insert(:value=>1)
-      @d.call_sproc(:select, :test_sproc, 4, 5).should == [{:id=>nil, :value=>1, :b=>4, :d=>5}]
-      @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
-      @d.call_sproc(:select, :test_sproc, 3, 4).should == [{:id=>nil, :value=>2, :b=>6, :d => 8}]
+    # Mysql2 doesn't support stored procedures that return result sets, probably because
+    # CLIENT_MULTI_RESULTS is not set.
+    unless MYSQL_DB.adapter_scheme == :mysql2
+      specify "should be callable on the dataset object" do
+        MYSQL_DB.execute_ddl('CREATE PROCEDURE test_sproc(a INTEGER) BEGIN SELECT *, a AS b FROM items; END')
+        MYSQL_DB[:items].delete
+        @d = MYSQL_DB[:items]
+        @d.call_sproc(:select, :test_sproc, 3).should == []
+        @d.insert(:value=>1)
+        @d.call_sproc(:select, :test_sproc, 4).should == [{:id=>nil, :value=>1, :b=>4}]
+        @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
+        @d.call_sproc(:select, :test_sproc, 3).should == [{:id=>nil, :value=>2, :b=>6}]
+      end
+      
+      specify "should be callable on the dataset object with multiple arguments" do
+        MYSQL_DB.execute_ddl('CREATE PROCEDURE test_sproc(a INTEGER, c INTEGER) BEGIN SELECT *, a AS b, c AS d FROM items; END')
+        MYSQL_DB[:items].delete
+        @d = MYSQL_DB[:items]
+        @d.call_sproc(:select, :test_sproc, 3, 4).should == []
+        @d.insert(:value=>1)
+        @d.call_sproc(:select, :test_sproc, 4, 5).should == [{:id=>nil, :value=>1, :b=>4, :d=>5}]
+        @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
+        @d.call_sproc(:select, :test_sproc, 3, 4).should == [{:id=>nil, :value=>2, :b=>6, :d => 8}]
+      end
     end
 
     specify "should deal with nil values" do

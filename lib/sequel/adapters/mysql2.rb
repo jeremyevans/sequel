@@ -1,6 +1,5 @@
 require 'mysql2' unless defined? Mysql2
-
-Sequel.require %w'shared/mysql', 'adapters'
+Sequel.require %w'shared/mysql_prepared_statements', 'adapters'
 
 module Sequel
   # Module for holding all Mysql2-related classes and modules for Sequel.
@@ -8,6 +7,7 @@ module Sequel
     # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
+      include Sequel::MySQL::PreparedStatements::DatabaseMethods
 
       # Mysql::Error messages that indicate the current connection should be disconnected
       MYSQL_DATABASE_DISCONNECT_ERRORS = /\A(Commands out of sync; you can't run this command now|Can't connect to local MySQL server through socket|MySQL server has gone away)/
@@ -21,7 +21,6 @@ module Sequel
       #   a filter for an autoincrement column equals NULL to return the last
       #   inserted row.
       # * :charset - Same as :encoding (:encoding takes precendence)
-      # * :compress - Set to false to not compress results from the server
       # * :config_default_group - The default group to read from the in
       #   the MySQL config file.
       # * :config_local_infile - If provided, sets the Mysql::OPT_LOCAL_INFILE
@@ -57,22 +56,13 @@ module Sequel
 
         sqls.each{|sql| log_yield(sql){conn.query(sql)}}
 
+        add_prepared_statements_cache(conn)
         conn
       end
 
       # Returns instance of Sequel::MySQL::Dataset with the given options.
       def dataset(opts = nil)
         Mysql2::Dataset.new(self, opts)
-      end
-
-      # Executes the given SQL using an available connection, yielding the
-      # connection if the block is given.
-      def execute(sql, opts={}, &block)
-        if opts[:sproc]
-          call_sproc(sql, opts, &block)
-        else
-          synchronize(opts[:server]){|conn| _execute(conn, sql, opts, &block)}
-        end
       end
 
       # Return the version of the MySQL server two which we are connecting.
@@ -132,6 +122,7 @@ module Sequel
     # Dataset class for MySQL datasets accessed via the native driver.
     class Dataset < Sequel::Dataset
       include Sequel::MySQL::DatasetMethods
+      include Sequel::MySQL::PreparedStatements::DatasetMethods
 
       # Delete rows matching this dataset
       def delete

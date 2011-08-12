@@ -3,15 +3,15 @@
 Sequel has support for prepared statements and bound variables.  No matter which
 database you are using, the Sequel prepared statement/bound variable API remains
 the same.  There is native support for prepared statements/bound variables on
-the following databases:
+the following adapters:
 
-* PostgreSQL (using the pg driver, may require type specifiers)
-* MySQL (prepared statements only, as the ruby mysql driver doesn't support
-  bound variables)
-* SQLite
-* JDBC
+* jdbc
+* mysql (prepared statements only)
+* mysql2 (prepared statements only)
+* postgres (when using the pg driver, may require type specifiers)
+* sqlite
 
-Support on other databases is emulated via string interpolation.
+Support on other adapters is emulated via string interpolation.
 
 You can use the prepared_statements model plugin to automatically use prepared
 statements for some common model actions such as saving or deleting a model
