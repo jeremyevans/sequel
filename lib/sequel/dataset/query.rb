@@ -675,6 +675,7 @@ module Sequel
     #   DB[:items].select(:a) # SELECT a FROM items
     #   DB[:items].select(:a, :b) # SELECT a, b FROM items
     #   DB[:items].select{[a, sum(b)]} # SELECT a, sum(b) FROM items
+    #   DB[:items].select(:a => :x, :b => :y) # SELECT a AS x, b AS y FROM items
     def select(*columns, &block)
       virtual_row_columns(columns, block)
       m = []
