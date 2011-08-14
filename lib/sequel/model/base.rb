@@ -764,7 +764,7 @@ module Sequel
 
       private_class_method :class_attr_overridable, :class_attr_reader
 
-      class_attr_reader :columns, :db, :primary_key, :db_schema
+      class_attr_reader :columns, :dataset, :db, :primary_key, :db_schema
       class_attr_overridable *BOOLEAN_SETTINGS
 
       # The hash of attribute values.  Keys are symbols with the names of the
