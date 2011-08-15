@@ -737,7 +737,7 @@ module Sequel
     #   a model object, Sequel will call +around_destory+, which will call +before_destroy+, do
     #   the destroy, and then call +after_destroy+.
     # * The following instance_methods all call the class method of the same
-    #   name: columns, dataset, db, primary_key, db_schema.
+    #   name: columns, db, primary_key, db_schema.
     # * All of the methods in +BOOLEAN_SETTINGS+ create attr_writers allowing you
     #   to set values for the attribute.  It also creates instnace getters returning
     #   the value of the setting.  If the value has not yet been set, it
