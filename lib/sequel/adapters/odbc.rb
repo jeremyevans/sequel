@@ -19,6 +19,9 @@ module Sequel
         when 'progress'
           Sequel.ts_require 'adapters/shared/progress'
           extend Sequel::Progress::DatabaseMethods
+        when 'db2'
+          Sequel.ts_require 'adapters/odbc/db2'
+          extend Sequel::ODBC::DB2::DatabaseMethods
         end
       end
 
