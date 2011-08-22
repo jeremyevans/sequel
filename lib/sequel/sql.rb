@@ -149,10 +149,10 @@ module Sequel
       # Operator symbols that take exactly two arguments
       TWO_ARITY_OPERATORS = [:'=', :'!=', :LIKE, :'NOT LIKE', \
         :~, :'!~', :'~*', :'!~*', :ILIKE, :'NOT ILIKE'] + \
-        INEQUALITY_OPERATORS + BITWISE_OPERATORS + IS_OPERATORS + IN_OPERATORS
+        INEQUALITY_OPERATORS + IS_OPERATORS + IN_OPERATORS
 
       # Operator symbols that take one or more arguments
-      N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS
+      N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS + BITWISE_OPERATORS
 
       # Operator symbols that take only a single argument
       ONE_ARITY_OPERATORS = [:NOT, :NOOP, :'B~']
@@ -229,14 +229,7 @@ module Sequel
     #   ~:a.sql_number # ~"a"
     module BitwiseMethods
       ComplexExpression::BITWISE_OPERATORS.each do |o|
-        define_method(o) do |ce|
-          case ce
-          when BooleanExpression, StringExpression
-            raise(Sequel::Error, "cannot apply #{o} to a non-numeric expression")
-          else  
-            NumericExpression.new(o, self, ce)
-          end
-        end
+        module_eval("def #{o}(o) NumericExpression.new(#{o.inspect}, self, o) end", __FILE__, __LINE__)
       end
 
       # Do the bitwise compliment of the self
@@ -254,16 +247,24 @@ module Sequel
     #   :a & :b # "a" AND "b"
     #   :a | :b # "a" OR "b"
     #   ~:a # NOT "a"
+    #
+    # One exception to this is when a NumericExpression or Integer is the argument
+    # to & or |, in which case a bitwise method will be used:
+    #
+    #   :a & 1 # "a" & 1 
+    #   :a | (:b + 1) # "a" | ("b" + 1)
     module BooleanMethods
       ComplexExpression::BOOLEAN_OPERATOR_METHODS.each do |m, o|
-        define_method(m) do |ce|
-          case ce
-          when NumericExpression, StringExpression
-            raise(Sequel::Error, "cannot apply #{o} to a non-boolean expression")
-          else  
-            BooleanExpression.new(o, self, ce)
+        module_eval(<<-END, __FILE__, __LINE__+1)
+          def #{m}(o)
+            case o
+            when NumericExpression, Integer
+              NumericExpression.new(#{m.inspect}, self, o)
+            else  
+              BooleanExpression.new(#{o.inspect}, self, o)
+            end
           end
-        end
+        END
       end
       
       # Create a new BooleanExpression with NOT, representing the inversion of whatever self represents.
@@ -377,34 +378,12 @@ module Sequel
     #   'a'.lit <= :b # a <= "b"
     module InequalityMethods
       ComplexExpression::INEQUALITY_OPERATORS.each do |o|
-        define_method(o) do |ce|
-          case ce
-          when BooleanExpression, TrueClass, FalseClass, NilClass, Hash, ::Array
-            raise(Error, "cannot apply #{o} to a boolean expression")
-          else  
-            BooleanExpression.new(o, self, ce)
-          end
-        end
+        module_eval("def #{o}(o) BooleanExpression.new(#{o.inspect}, self, o) end", __FILE__, __LINE__)
       end
     end
 
-    # This module augments the default initalize method for the 
-    # +ComplexExpression+ subclass it is included in, so that
-    # attempting to use boolean input when initializing a +NumericExpression+
-    # or +StringExpression+ results in an error.  It is not expected to be
-    # used directly.
+    # Only exists for backwards compatibility, ignore it.
     module NoBooleanInputMethods
-      # Raise an +Error+ if one of the args would be boolean in an SQL
-      # context, otherwise call super.
-      def initialize(op, *args)
-        args.each do |a|
-          case a
-          when BooleanExpression, TrueClass, FalseClass, NilClass, Hash, ::Array
-            raise(Error, "cannot apply #{op} to a boolean expression")
-          end
-        end
-        super
-      end
     end
 
     # This module includes the standard mathematical methods (+, -, *, and /)
@@ -415,15 +394,26 @@ module Sequel
     #   :a - :b # "a" - "b"
     #   :a * :b # "a" * "b"
     #   :a / :b # "a" / "b"
+    #
+    # One exception to this is if + is called with a +String+ or +StringExpression+,
+    # in which case the || operator is used instead of the + operator:
+    #
+    #   :a + 'b' # "a" || 'b'
     module NumericMethods
       ComplexExpression::MATHEMATICAL_OPERATORS.each do |o|
-        define_method(o) do |ce|
-          case ce
-          when BooleanExpression, StringExpression
-            raise(Sequel::Error, "cannot apply #{o} to a non-numeric expression")
-          else  
-            NumericExpression.new(o, self, ce)
-          end
+        module_eval("def #{o}(o) NumericExpression.new(#{o.inspect}, self, o) end", __FILE__, __LINE__) unless o == :+
+      end
+
+      # Use || as the operator when called with StringExpression and String instances,
+      # and the + operator for LiteralStrings and all other types.
+      def +(ce)
+        case ce
+        when LiteralString
+          NumericExpression.new(:+, self, ce)
+        when StringExpression, String
+          StringExpression.new(:'||', self, ce)
+        else
+          NumericExpression.new(:+, self, ce)
         end
       end
     end
@@ -611,6 +601,21 @@ module Sequel
           BooleanExpression.new(:NOT, ce)
         end
       end
+
+      # Always use an AND operator for & on BooleanExpressions
+      def &(ce)
+        BooleanExpression.new(:AND, self, ce)
+      end
+
+      # Always use an OR operator for | on BooleanExpressions
+      def |(ce)
+        BooleanExpression.new(:OR, self, ce)
+      end
+
+      # Return self instead of creating a new object to save on memory.
+      def sql_boolean
+        self
+      end
     end
 
     # Represents an SQL CASE expression, used for conditional branching in SQL.
@@ -678,6 +683,21 @@ module Sequel
       include CastMethods
       include OrderMethods
       include SubscriptMethods
+
+      # Return a BooleanExpression with the same op and args.
+      def sql_boolean
+        BooleanExpression.new(self.op, *self.args)
+      end
+
+      # Return a NumericExpression with the same op and args.
+      def sql_number
+        NumericExpression.new(self.op, *self.args)
+      end
+
+      # Return a StringExpression with the same op and args.
+      def sql_string
+        StringExpression.new(self.op, *self.args)
+      end
     end
 
     # Represents constants or psuedo-constants (e.g. +CURRENT_DATE+) in SQL.
@@ -852,7 +872,16 @@ module Sequel
       include BitwiseMethods 
       include NumericMethods
       include InequalityMethods
-      include NoBooleanInputMethods
+
+      # Always use + for + operator for NumericExpressions.
+      def +(ce)
+        NumericExpression.new(:+, self, ce)
+      end
+
+      # Return self instead of creating a new object to save on memory.
+      def sql_number
+        self
+      end
     end
 
     # Represents a column/expression to order the result set by.
@@ -918,7 +947,6 @@ module Sequel
       include StringMethods
       include StringConcatenationMethods
       include InequalityMethods
-      include NoBooleanInputMethods
 
       # Map of [regexp, case_insenstive] to +ComplexExpression+ operator symbol
       LIKE_MAP = {[true, true]=>:'~*', [true, false]=>:~, [false, true]=>:ILIKE, [false, false]=>:LIKE}
@@ -967,6 +995,11 @@ module Sequel
         end
       end
       private_class_method :like_element
+
+      # Return self instead of creating a new object to save on memory.
+      def sql_string
+        self
+      end
     end
 
     # Represents an SQL array access, with multiple possible arguments.
