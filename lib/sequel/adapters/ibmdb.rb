@@ -10,6 +10,11 @@ module Sequel
         @prepared_statements = {}
       end
 
+      def autocommit=(value)
+        state = value ? IBM_DB::SQL_AUTOCOMMIT_ON : IBM_DB::SQL_AUTOCOMMIT_OFF 
+        IBM_DB.autocommit(@conn, state)
+      end
+
       def close
         IBM_DB.close(@conn)
       end
@@ -29,15 +34,20 @@ module Sequel
       end
 
       def execute_prepared(ps_name, *values)
-        @stmt = @prepared_statements[ps_name].last
-        res = @stmt.execute(*values)
+        stmt = @prepared_statements[ps_name].last
+        res = stmt.execute(*values)
         raise Sequel::DatabaseError, "Error executing statement #{ps_name} " unless res
-        @stmt
+        stmt
       end
 
       def get_error_msg
         IBM_DB.getErrormsg(@conn, IBM_DB::DB_CONN)
       end
+
+      def reorg(table)
+        execute("CALL ADMIN_CMD('REORG TABLE #{table}')")
+      end
+
     end
 
     class Statement
@@ -82,8 +92,9 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :ibmdb
 
-      PRIMARY_KEY = ' NOT NULL PRIMARY KEY'.freeze
+      PRIMARY_KEY   = ' NOT NULL PRIMARY KEY'.freeze
       AUTOINCREMENT = 'GENERATED ALWAYS AS IDENTITY'.freeze
+      NULL          = ''.freeze
 
       def connect(server)
         opts = server_opts(server)
@@ -100,6 +111,10 @@ module Sequel
         )
 
         Connection.new(connection_string)
+      end
+
+      def database_type
+        :db2
       end
       
       def dataset(opts = nil)
@@ -136,9 +151,36 @@ module Sequel
         end
       end
 
+      def schema_parse_table(table, opts = {})
+        m = output_identifier_meth
+        im = input_identifier_meth
+        metadata_dataset.with_sql("select * from SYSIBM.SYSCOLUMNS where TBNAME = '#{im.call(table)}'").
+          collect do |column| 
+            column[:db_type]     = column.delete(:typename)
+            column[:allow_null]  = column.delete(:nulls) == 'Y'
+            column[:primary_key] = column.delete(:identity) == 'Y' || !column[:keyseq].nil?
+            column[:type]        = schema_column_type(column[:db_type])
+            [ m.call(column.delete(:name)), column]
+          end
+      end
+
       def tables
         metadata_dataset.with_sql("select TABNAME from SYSCAT.TABLES where type='T'").
           all.map{|h| h[:tabname].downcase.to_sym }
+      end
+
+      def table_exists?(name)
+        sch, table_name = schema_and_table(name)
+        name = SQL::QualifiedIdentifier.new(sch, table_name) if sch
+        from(name).first
+        true
+      rescue Exception => e
+        # table needs reorg
+        if e.to_s =~ /Operation not allowed for reason code "7" on table/
+          reorg(name)
+          retry
+        end
+        false
       end
 
       def views
@@ -190,15 +232,34 @@ module Sequel
         sql << PRIMARY_KEY if column[:primary_key]
       end
 
+      def disconnect_connection(conn)
+        conn.close
+      end
+
+      def rename_table_sql(name, new_name)
+        "RENAME TABLE #{quote_schema_table(name)} TO #{quote_schema_table(new_name)}"
+      end
+
+      def reorg(table)
+        synchronize(opts[:server]){|c| c.reorg(table)}
+      end
+
+      def begin_transaction(conn, opts={})
+        log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
+        conn
+      end
+      
+      def remove_transaction(conn)
+        conn.autocommit = true if conn
+        super
+      end
+
       def _execute(conn, sql, opts)
         stmt = log_yield(sql){ conn.execute(sql) }
         raise Sequel::DatabaseError, conn.get_error_msg if stmt.fail?
         block_given? ? yield(stmt) : stmt.affected
       end
       
-      def disconnect_connection(conn)
-        conn.close
-      end
     end
     
     class Dataset < Sequel::Dataset
@@ -266,6 +327,7 @@ module Sequel
         end
         self
       end
+
       # Store the given type of prepared statement in the associated database
       # with the given name.
       def prepare(type, name=nil, *values)
@@ -277,6 +339,7 @@ module Sequel
         end
         ps
       end
+
       def supports_timestamp_usecs?
         false
       end
@@ -294,6 +357,7 @@ module Sequel
           sql << " FETCH FIRST #{l == 1 ? 'ROW' : "#{literal(l)} ROWS"} ONLY"
         end
       end
+
       def hash_row(sth)
         row = {}
         sth.each do |k, v|
@@ -316,6 +380,10 @@ module Sequel
         else;
           v
         end
+      end
+
+      def _truncate_sql(table)
+        "TRUNCATE #{table} IMMEDIATE"
       end
     end
   end
