@@ -12,6 +12,47 @@ if IBMDB_DB.table_exists?(:test)
 end
 INTEGRATION_DB = IBMDB_DB unless defined?(INTEGRATION_DB)
 
+describe Sequel::Database do
+  before do
+    @db = IBMDB_DB
+    @db.create_table(:escapetest){String :a}
+    @ds = @db[:escapetest]
+  end
+  after do
+    @db.drop_table(:escapetest)
+  end
+  
+  specify "should correctly escape strings" do
+    @ds.get("\\dingo".as(:a)) == "\\dingo"
+  end
+
+  specify "should correctly escape strings with quotes" do
+    @ds.get("\\'dingo".as(:a)) == "\\'dingo"
+  end
+
+  specify "should properly escape binary data" do
+    @ds.get("\1\2\3".to_sequel_blob.as(:a)) == "\1\2\3"
+  end
+end
+
+describe Sequel::Database do
+  before do
+    @db = IBMDB_DB
+    @db.create_table(:test){String :a}
+    @ds = @db[:test]
+  end
+
+  after do
+    @db.drop_table(:test)
+  end
+  
+  specify "should provide disconnect functionality after preparing a connection" do
+    @ds.prepare(:first, :a).call
+    @db.disconnect
+    @db.pool.size.should == 0
+  end
+end
+
 describe "Sequel::IBMDB.convert_smallint_to_bool" do
   before do
     @db = IBMDB_DB

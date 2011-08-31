@@ -1,11 +1,16 @@
 require 'ibm_db'
 
 module Sequel
+
+  @database_timezone = :utc   # db2 only supports utc
+
   module IBMDB
     @convert_smallint_to_bool = true
+    @use_clob_as_blob = true
 
     class << self
       attr_accessor :convert_smallint_to_bool
+      attr_accessor :use_clob_as_blob
     end
 
     class Connection
@@ -31,7 +36,7 @@ module Sequel
           stmt = Statement.new(stmt)
           @prepared_statements[ps_name] = [sql, stmt]
         else
-          raise Sequel::DatabaseError, get_error_msg
+          raise get_error_msg
         end
       end
 
@@ -42,7 +47,7 @@ module Sequel
       def execute_prepared(ps_name, *values)
         stmt = @prepared_statements[ps_name].last
         res = stmt.execute(*values)
-        raise Sequel::DatabaseError, "Error executing statement #{ps_name} " unless res
+        raise "Error executing statement #{ps_name} " unless res
         stmt
       end
 
@@ -143,6 +148,8 @@ module Sequel
         else
           synchronize(opts[:server]){|c| _execute(c, sql, opts, &block)}
         end
+      rescue Exception => e
+        raise_error(e)
       end
 
       def execute_dui(sql, opts={}, &block)
@@ -151,6 +158,8 @@ module Sequel
         else
           synchronize(opts[:server]){|c| _execute(c, sql, opts, &block)}
         end
+      rescue Exception => e
+        raise_error(e)
       end
 
       def execute_prepared_statement(ps_name, opts)
@@ -169,7 +178,11 @@ module Sequel
 
       # Convert smallint type to boolean if convert_smallint_to_bool is true
       def schema_column_type(db_type)
-        Sequel::IBMDB.convert_smallint_to_bool && db_type =~ /smallint/i ?  :boolean : super
+        if Sequel::IBMDB.convert_smallint_to_bool && db_type =~ /smallint/i 
+          :boolean
+        else
+          db_type =~ /[bc]lob/i ? :blob : super
+        end
       end
 
       def schema_parse_table(table, opts = {})
@@ -275,12 +288,20 @@ module Sequel
         conn.close
       end
 
-      def type_literal_generic_trueclass(column)
-        :smallint
-      end
-
       def type_literal_generic_falseclass(column)
         type_literal_generic_trueclass(column)
+      end
+
+      # We uses the clob type by default for Files.
+      # Note: if user select to use blob, then insert statement should use 
+      # use this for blob value:
+      #     cast(X'fffefdfcfbfa' as blob(2G))
+      def type_literal_generic_file(column)
+        IBMDB::use_clob_as_blob ? :clob : :blob
+      end
+
+      def type_literal_generic_trueclass(column)
+        :smallint
       end
 
       # DB2 does not have a special type for text
@@ -308,7 +329,7 @@ module Sequel
 
       def _execute(conn, sql, opts)
         stmt = log_yield(sql){ conn.execute(sql) }
-        raise Sequel::DatabaseError, conn.get_error_msg if stmt.fail?
+        raise conn.get_error_msg if stmt.fail?
         block_given? ? yield(stmt) : stmt.affected
       end
       
@@ -358,6 +379,9 @@ module Sequel
         ps.extend(CallableStatementMethods)
         ps.call(bind_arguments, &block)
       end
+      def cast_sql(expr, type)
+        type == String ?  "RTRIM(CHAR(#{literal(expr)}))" : super
+      end
 
       def fetch_rows(sql)
         execute(sql) do |stmt|
@@ -397,6 +421,9 @@ module Sequel
         end
         ps
       end
+      def supports_is_true?
+        false
+      end
 
       def supports_timestamp_usecs?
         false
@@ -412,15 +439,19 @@ module Sequel
       def convert_type(v, type)
         case type
         when :time;
-          Sequel::SQLTime.parse(v)
+          Sequel::string_to_time v
         when :date;
-          Date.parse(v)
+          Sequel::string_to_date v
         when :timestamp;
-          DateTime.parse(v)
+          Sequel::database_to_application_timestamp v
         when :int;
           v.to_i
         when :boolean;
           v.to_i.zero? ? false : true
+        when :blob;
+          v.to_sequel_blob
+        when :clob;
+          v.to_sequel_blob
         else;
           v
         end
@@ -458,7 +489,9 @@ module Sequel
       end
       
       def _truncate_sql(table)
-        "TRUNCATE #{table} IMMEDIATE"
+        # "TRUNCATE #{table} IMMEDIATE" is only for newer version of db2, so we
+        # use the following one
+        "ALTER TABLE #{table} ACTIVATE NOT LOGGED INITIALLY WITH EMPTY TABLE"
       end
     end
   end
