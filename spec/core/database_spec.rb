@@ -1379,9 +1379,11 @@ describe "Database#typecast_value" do
     t3 = Time.utc(2011, 1, 2, 3, 4, 5) - (t - t2) # Local Time in UTC Time
     t4 = Time.mktime(2011, 1, 2, 3, 4, 5) + (t - t2) # UTC Time in Local Time
     dt = DateTime.civil(2011, 1, 2, 3, 4, 5)
-    dt2 = DateTime.civil(2011, 1, 2, 3, 4, 5, Rational(t2.utc_offset, 86400))
-    dt3 = DateTime.civil(2011, 1, 2, 3, 4, 5) - Rational((t - t2).to_i, 86400)
-    dt4 = DateTime.civil(2011, 1, 2, 3, 4, 5, Rational(t2.utc_offset, 86400)) + Rational((t - t2).to_i, 86400)
+    r1 = defined?(Rational) ? Rational(t2.utc_offset, 86400) : t2.utc_offset/86400.0
+    r2 = defined?(Rational) ? Rational((t - t2).to_i, 86400) : (t - t2).to_i/86400.0
+    dt2 = DateTime.civil(2011, 1, 2, 3, 4, 5, r1)
+    dt3 = DateTime.civil(2011, 1, 2, 3, 4, 5) - r2
+    dt4 = DateTime.civil(2011, 1, 2, 3, 4, 5, r1) + r2
 
     t.should == t4
     t2.should == t3
@@ -1478,7 +1480,7 @@ describe "Database#typecast_value" do
       check[t2, dt2]
       check[dt.to_s, dt4]
       check[dt.strftime('%F %T'), dt4]
-      check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0, Rational(t2.utc_offset, 86400))]
+      check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0, r1)]
       check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, dt4]
 
       Sequel.typecast_timezone = :local
@@ -1499,7 +1501,7 @@ describe "Database#typecast_value" do
       check[t2, dt2]
       check[dt.to_s, dt4]
       check[dt.strftime('%F %T'), dt2]
-      check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0, Rational(t2.utc_offset, 86400))]
+      check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0, r1)]
       check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, dt2]
 
     ensure
