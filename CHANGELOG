@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.27.0 (2011-09-01)
 
 * Add support for native prepared statements to the tinytds adapter (jeremyevans)
 
