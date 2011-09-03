@@ -1,6 +1,5 @@
 require "rake"
 require "rake/clean"
-require "rake/gempackagetask"
 
 NAME = 'sequel'
 VERS = lambda do

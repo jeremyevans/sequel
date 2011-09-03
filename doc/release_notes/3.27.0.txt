@@ -1,0 +1,82 @@
+= New Features
+
+* Model.dataset_module has been added for easily adding methods to
+  a model's dataset:
+  
+    Album.dataset_module do
+      def with_name_like(x)
+        filter(:name.like(x))
+      end
+      def selling_at_least(x)
+        filter{copies_sold > x}
+      end
+    end
+    Album.with_name_like('Foo%').selling_at_least(100000).all
+    
+  Previously, you could use def_dataset_method to accomplish the
+  same thing.  dataset_module is generally cleaner, plus you are
+  using actual methods instead of blocks, so calling the methods
+  is faster on some ruby implementations.
+
+* Sequel now uses a Sequel::SQLTime class (a subclass of Time) when
+  dealing with values for SQL time columns (which don't have a date
+  component).  These values are handled correctly when used in
+  filters or insert/update statements (using only the time
+  component), so Sequel can now successfully round trip values for
+  time columns.  Not all adapters support returning time column
+  values as SQLTime instances, but the most common ones do.
+
+* You can now drop foreign key, primary key, and unique constraints
+  on MySQL by passing the :type=>(:foreign_key|:primary_key|:unique)
+  option to Database#drop_constraint.
+
+* The ODBC adapter now has initial support for the DB2 database, use
+  the :db_type=>'db2' option to load the support.
+
+= Other Improvements
+
+* The mysql2 adapter now uses native prepared statements.
+
+* The tinytds adapter now uses uses sp_executesql for prepared
+  statements.
+
+* DateTime and Time objects are now converted to Date objects when
+  they are assigned to a date column in a Model instance.
+  
+* When converting a Date object to a DateTime object, the resulting
+  DateTime object now has no fractional day components.  Previously,
+  depending on your timezone settings, it could have had fractional
+  day components.
+
+* The mysql2 adapter now supports stored procedures, as long as they
+  don't return results.
+  
+* Mass assignment protection now handles including modules in model
+  classes and extending model instances with modules.  Previously, if
+  you defined a setter method in a module, access to it may have been
+  restricted.
+  
+* The prepared_statements_safe plugin now works on classes without
+  datasets, so you can now do the following to load it for all models:
+  
+    Sequel::Model.plugin :prepared_statements_safe
+    
+* Dataset#hash now works correctly when handling SQL::Expression
+  instances.
+  
+* Model#hash now correctly handles classes with no primary key or with
+  a composite primary key.
+  
+* Model#exists? now always returns false for new model objects.
+
+= Backwards Compatibility
+
+* If you were previously setting primary key values manually for new
+  model objects and then calling exists? to see if the instance is
+  already in the database, you need to change your code from:
+  
+    model.exists?
+    
+  to:
+  
+    model.this.get(1).nil?
