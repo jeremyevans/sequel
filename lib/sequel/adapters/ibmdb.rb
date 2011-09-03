@@ -4,6 +4,14 @@ module Sequel
 
   @database_timezone = :utc   # db2 only supports utc
 
+  module SQL
+    class GenericExpression
+      def extract(datetime_part)
+        Function.new(datetime_part.to_sym, self).sql_number
+      end
+    end
+  end
+
   module IBMDB
     @convert_smallint_to_bool = true
     @use_clob_as_blob = true
@@ -41,6 +49,7 @@ module Sequel
       end
 
       def execute(sql)
+        puts sql
         Statement.new(IBM_DB.exec(@conn, sql))
       end
 
@@ -338,6 +347,7 @@ module Sequel
     class Dataset < Sequel::Dataset
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
+      BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
       
       module CallableStatementMethods
         # Extend given dataset with this module so subselects inside subselects in
@@ -379,8 +389,28 @@ module Sequel
         ps.extend(CallableStatementMethods)
         ps.call(bind_arguments, &block)
       end
+
       def cast_sql(expr, type)
         type == String ?  "RTRIM(CHAR(#{literal(expr)}))" : super
+      end
+
+      # Work around DB2's lack of a case insensitive LIKE operator
+      def complex_expression_sql(op, args)
+        case op
+        when :ILIKE
+          super(:LIKE, [SQL::PlaceholderLiteralString.new("UPPER(?)", [args.at(0)]), SQL::PlaceholderLiteralString.new("UPPER(?)", [args.at(1)]) ])
+        when :"NOT ILIKE"
+          super(:"NOT LIKE", [SQL::PlaceholderLiteralString.new("UPPER(?)", [args.at(0)]), SQL::PlaceholderLiteralString.new("UPPER(?)", [args.at(1)]) ])
+        when :&, :|, :^
+          # only works after db2 v9.5
+          literal(SQL::Function.new(BITWISE_METHOD_MAP[op], *args))
+        when :<<
+          "(#{literal(args[0])} * POWER(2, #{literal(args[1])}))"
+        when :>>
+          "(#{literal(args[0])} / POWER(2, #{literal(args[1])}))"
+        else
+          super(op, args)
+        end
       end
 
       def fetch_rows(sql)
@@ -472,6 +502,15 @@ module Sequel
       end
 
       # Modify the sql to limit the number of rows returned
+      # Note: 
+      #
+      #     After db2 v9.7, MySQL flavored "LIMIT X OFFSET Y" can be enabled using
+      #
+      #     db2set DB2_COMPATIBILITY_VECTOR=MYS
+      #     db2stop
+      #     db2start
+      #
+      #     Support for this feature is not used in this adapter however.
       def select_limit_sql(sql)
         if l = @opts[:limit]
           sql << " FETCH FIRST #{l == 1 ? 'ROW' : "#{literal(l)} ROWS"} ONLY"

@@ -53,6 +53,25 @@ describe Sequel::Database do
   end
 end
 
+describe "Simple Dataset operations" do
+  before do
+    IBMDB_DB.create_table!(:items) do
+      Integer :id, :primary_key => true
+      Integer :number
+    end
+    @ds = IBMDB_DB[:items]
+    @ds.insert(:number=>10, :id => 1 )
+  end
+  after do
+    IBMDB_DB.drop_table(:items)
+  end
+  cspecify "should insert with a primary key specified", :mssql do
+    @ds.insert(:id=>100, :number=>20)
+    @ds.count.should == 2
+    @ds.order(:id).all.should == [{:id=>1, :number=>10}, {:id=>100, :number=>20}]
+  end
+end
+
 describe "Sequel::IBMDB.convert_smallint_to_bool" do
   before do
     @db = IBMDB_DB
