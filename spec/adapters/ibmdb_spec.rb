@@ -51,6 +51,10 @@ describe Sequel::Database do
     @db.disconnect
     @db.pool.size.should == 0
   end
+
+  specify "should return version correct" do
+    @db.db2_version.should match(/DB2 v/i)
+  end
 end
 
 describe "Simple Dataset operations" do

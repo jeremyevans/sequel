@@ -44,23 +44,24 @@ module Sequel
           stmt = Statement.new(stmt)
           @prepared_statements[ps_name] = [sql, stmt]
         else
-          raise get_error_msg
+          raise error_msg
         end
       end
 
       def execute(sql)
-        puts sql
         Statement.new(IBM_DB.exec(@conn, sql))
       end
 
       def execute_prepared(ps_name, *values)
         stmt = @prepared_statements[ps_name].last
         res = stmt.execute(*values)
-        raise "Error executing statement #{ps_name} " unless res
+        unless res
+          raise "Error executing statement #{ps_name}: #{stmt.error_msg} "
+        end
         stmt
       end
 
-      def get_error_msg
+      def error_msg
         IBM_DB.getErrormsg(@conn, IBM_DB::DB_CONN)
       end
 
@@ -81,6 +82,10 @@ module Sequel
 
       def execute(*values)    # values are for prepared statement
         IBM_DB.execute(@stmt, values)
+      end
+
+      def error_msg
+        IBM_DB.getErrormsg(@stmt, 0)
       end
 
       def fail?
@@ -150,7 +155,22 @@ module Sequel
       def dataset(opts = nil)
         IBMDB::Dataset.new(self, opts)
       end
-      
+
+      def db2_version
+        metadata_dataset.with_sql("select service_level from sysibmadm.env_inst_info").first[:service_level]
+      end
+      alias_method :server_version, :db2_version
+
+      def drop_table(*names)
+        # disconnect first because if there is any prepared statements having
+        # something to do with the tables to drop, the tables could not be
+        # successfully dropped. Disconnecting is the easiest workaround.
+        # Considering table dropping is not a frequent event, it would not
+        # affect performance a lot.
+        disconnect
+        super
+      end
+
       def execute(sql, opts={}, &block)
         if sql.is_a?(Symbol)
           execute_prepared_statement(sql, opts, &block)
@@ -179,6 +199,9 @@ module Sequel
           unless conn.prepared_statements[ps_name] == sql
             conn.prepare(sql, ps_name)
           end
+          # use eval to remote outer-most quotes for strings and convert float
+          # and ingteger back to their ruby types
+          args.map!{|v| v.nil? ? nil : eval(literal(v))}
           stmt = conn.execute_prepared(ps_name, *args)
 
           block_given? ? yield(stmt): stmt.affected
@@ -338,7 +361,7 @@ module Sequel
 
       def _execute(conn, sql, opts)
         stmt = log_yield(sql){ conn.execute(sql) }
-        raise conn.get_error_msg if stmt.fail?
+        raise conn.error_msg if stmt.fail?
         block_given? ? yield(stmt) : stmt.affected
       end
       
@@ -398,11 +421,11 @@ module Sequel
       def complex_expression_sql(op, args)
         case op
         when :ILIKE
-          super(:LIKE, [SQL::PlaceholderLiteralString.new("UPPER(?)", [args.at(0)]), SQL::PlaceholderLiteralString.new("UPPER(?)", [args.at(1)]) ])
+          super(:LIKE, [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
         when :"NOT ILIKE"
-          super(:"NOT LIKE", [SQL::PlaceholderLiteralString.new("UPPER(?)", [args.at(0)]), SQL::PlaceholderLiteralString.new("UPPER(?)", [args.at(1)]) ])
+          super(:"NOT LIKE", [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
         when :&, :|, :^
-          # only works after db2 v9.5
+          # works with db2 v9.5 and after
           literal(SQL::Function.new(BITWISE_METHOD_MAP[op], *args))
         when :<<
           "(#{literal(args[0])} * POWER(2, #{literal(args[1])}))"
