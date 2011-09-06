@@ -76,6 +76,24 @@ describe "Simple Dataset operations" do
   end
 end
 
+# schema parsing
+describe Sequel::Database do
+  before do
+    @db = IBMDB_DB
+  end
+  after do
+    @db.drop_table(:items)
+  end
+  specify "should parse primary keys from the schema properly" do
+    @db.create_table!(:items){Integer :number}
+    @db.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == []
+    @db.create_table!(:items){primary_key :number}
+    @db.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == [:number]
+    @db.create_table!(:items){Integer :number1, :null => false; Integer :number2, :null => false; primary_key [:number1, :number2]}
+    @db.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == [:number1, :number2]
+  end
+end
+
 describe "Sequel::IBMDB.convert_smallint_to_bool" do
   before do
     @db = IBMDB_DB

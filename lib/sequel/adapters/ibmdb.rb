@@ -3,6 +3,7 @@ require 'ibm_db'
 module Sequel
 
   @database_timezone = :utc   # db2 only supports utc
+  @application_timezone = :local
 
   module SQL
     class GenericExpression
@@ -27,6 +28,10 @@ module Sequel
       def initialize(connection_string)
         @conn = IBM_DB.connect(connection_string, '', '')
         @prepared_statements = {}
+      end
+
+      def autocommit
+        IBM_DB.autocommit(@conn) == 1
       end
 
       def autocommit=(value)
@@ -121,7 +126,6 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :ibmdb
 
-      PRIMARY_KEY   = ' NOT NULL PRIMARY KEY'.freeze
       AUTOINCREMENT = 'GENERATED ALWAYS AS IDENTITY'.freeze
       NULL          = ''.freeze
 
@@ -157,7 +161,8 @@ module Sequel
       end
 
       def db2_version
-        metadata_dataset.with_sql("select service_level from sysibmadm.env_inst_info").first[:service_level]
+        return @db2_version if @db2_version
+        @db2_version = metadata_dataset.with_sql("select service_level from sysibmadm.env_inst_info").first[:service_level]
       end
       alias_method :server_version, :db2_version
 
@@ -293,16 +298,11 @@ module Sequel
       # Add null/not null SQL fragment to column creation SQL.
       def column_definition_null_sql(sql, column)
         # bypass null/not null fragment if primary_key is set
-        return  if column[:primary_key]
+        null = column.fetch(:null, column[:allow_null]) 
+        null = false  if column[:primary_key]
 
-        null = column.fetch(:null, column[:allow_null])
         sql << NOT_NULL if null == false
         sql << NULL if null == true
-      end
-
-      # Add primary key SQL fragment to column creation SQL.
-      def column_definition_primary_key_sql(sql, column)
-        sql << PRIMARY_KEY if column[:primary_key]
       end
 
       # Here we use DGTT which has most backward compatibility, which uses
@@ -364,7 +364,7 @@ module Sequel
         raise conn.error_msg if stmt.fail?
         block_given? ? yield(stmt) : stmt.affected
       end
-      
+
     end
     
     class Dataset < Sequel::Dataset
