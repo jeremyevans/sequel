@@ -5,14 +5,6 @@ module Sequel
   @database_timezone = :utc   # db2 only supports utc
   @application_timezone = :local
 
-  module SQL
-    class GenericExpression
-      def extract(datetime_part)
-        Function.new(datetime_part.to_sym, self).sql_number
-      end
-    end
-  end
-
   module IBMDB
     @convert_smallint_to_bool = true
     @use_clob_as_blob = true
@@ -44,6 +36,7 @@ module Sequel
       end
 
       def prepare(sql, ps_name)
+        p [ps_name, sql]
         if stmt = IBM_DB.prepare(@conn, sql)
           ps_name = ps_name.to_sym
           stmt = Statement.new(stmt)
@@ -86,6 +79,7 @@ module Sequel
       end
 
       def execute(*values)    # values are for prepared statement
+        p values
         IBM_DB.execute(@stmt, values)
       end
 
@@ -166,16 +160,6 @@ module Sequel
       end
       alias_method :server_version, :db2_version
 
-      def drop_table(*names)
-        # disconnect first because if there is any prepared statements having
-        # something to do with the tables to drop, the tables could not be
-        # successfully dropped. Disconnecting is the easiest workaround.
-        # Considering table dropping is not a frequent event, it would not
-        # affect performance a lot.
-        disconnect
-        super
-      end
-
       def execute(sql, opts={}, &block)
         if sql.is_a?(Symbol)
           execute_prepared_statement(sql, opts, &block)
@@ -187,13 +171,12 @@ module Sequel
       end
 
       def execute_dui(sql, opts={}, &block)
-        if sql.is_a?(Symbol)
-          execute_prepared_statement(sql, opts, &block)
-        else
-          synchronize(opts[:server]){|c| _execute(c, sql, opts, &block)}
-        end
-      rescue Exception => e
-        raise_error(e)
+        execute(sql, opts, &block)
+      end
+
+      def execute_insert(sql, opts={}, &block)
+        execute_dui(sql, opts, &block)
+        metadata_dataset.with_sql("SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1").get
       end
 
       def execute_prepared_statement(ps_name, opts)
@@ -225,7 +208,7 @@ module Sequel
       def schema_parse_table(table, opts = {})
         m = output_identifier_meth
         im = input_identifier_meth
-        metadata_dataset.with_sql("select * from SYSIBM.SYSCOLUMNS where TBNAME = '#{im.call(table)}'").
+        metadata_dataset.with_sql("SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = '#{im.call(table)}'").
           collect do |column| 
             column[:db_type]     = column.delete(:typename)
             if column[:db_type]  == "DECIMAL"
@@ -241,8 +224,8 @@ module Sequel
       end
 
       def tables
-        metadata_dataset.with_sql("select TABNAME from SYSCAT.TABLES where type='T'").
-          all.map{|h| h[:tabname].downcase.to_sym }
+        metadata_dataset.with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='T' AND OWNER = '#{opts[:user].upcase}'").
+          all.map{|h| output_identifier_meth.call(h[:tabname]) }
       end
 
       def table_exists?(name)
@@ -260,8 +243,8 @@ module Sequel
       end
 
       def views
-        metadata_dataset.with_sql("select TABNAME from SYSCAT.TABLES where type='V'").
-          all.map{|h| h[:tabname].downcase.to_sym }
+        metadata_dataset.with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='V' AND OWNER = '#{opts[:user].upcase}'").
+          all.map{|h| output_identifier_meth.call(h[:tabname]) }
       end
 
       def indexes(table, opts = {})
@@ -295,14 +278,26 @@ module Sequel
         AUTOINCREMENT
       end
 
+      def begin_transaction(conn, opts={})
+        log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
+        conn
+      end
+
       # Add null/not null SQL fragment to column creation SQL.
       def column_definition_null_sql(sql, column)
-        # bypass null/not null fragment if primary_key is set
         null = column.fetch(:null, column[:allow_null]) 
         null = false  if column[:primary_key]
 
         sql << NOT_NULL if null == false
         sql << NULL if null == true
+      end
+
+      # Supply columns with NOT NULL if they are part of a composite primary key
+      def column_list_sql(g)
+        pks = []
+        g.constraints.each{|c| pks = c[:columns] if c[:type] == :primary_key} 
+        g.columns.each{|c| c[:null] = false if pks.include?(c[:name]) }
+        super
       end
 
       # Here we use DGTT which has most backward compatibility, which uses
@@ -319,6 +314,12 @@ module Sequel
       def disconnect_connection(conn)
         conn.close
       end
+      # DB2 has issues with quoted identifiers, so
+      # turn off database quoting by default.
+      def quote_identifiers_default
+        false
+      end
+
 
       def type_literal_generic_falseclass(column)
         type_literal_generic_trueclass(column)
@@ -340,6 +341,11 @@ module Sequel
       def type_literal_specific(column)
         column[:type] == :text ? "varchar(#{column[:size]||255})" : super
       end
+      
+      def remove_transaction(conn)
+        conn.autocommit = true if conn
+        super
+      end
     
       def rename_table_sql(name, new_name)
         "RENAME TABLE #{quote_schema_table(name)} TO #{quote_schema_table(new_name)}"
@@ -347,16 +353,6 @@ module Sequel
 
       def reorg(table)
         synchronize(opts[:server]){|c| c.reorg(table)}
-      end
-
-      def begin_transaction(conn, opts={})
-        log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
-        conn
-      end
-      
-      def remove_transaction(conn)
-        conn.autocommit = true if conn
-        super
       end
 
       def _execute(conn, sql, opts)
@@ -371,6 +367,8 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
+      # db2 supplies CURRENT_TIMESTAMP in local time instead of utc
+      CONSTANT_MAP = {:CURRENT_TIMESTAMP=>"CURRENT_TIMESTAMP - CURRENT_TIMEZONE".freeze}
       
       module CallableStatementMethods
         # Extend given dataset with this module so subselects inside subselects in
@@ -435,23 +433,29 @@ module Sequel
           super(op, args)
         end
       end
+      def constant_sql(constant)
+        CONSTANT_MAP[constant] || super
+      end
 
       def fetch_rows(sql)
         execute(sql) do |stmt|
           break if stmt.fail?
           unless @columns and @column_info
-            @column_info = {}
-            @columns = []
+            columns = []
+            column_info = {}
             stmt.num_fields.times do |i|
               k = stmt.field_name i
               key = output_identifier(k)
-              @column_info[key] = output_identifier(stmt.field_type k)
-              if IBMDB::convert_smallint_to_bool and @column_info[key] == :int
+              column_info[key] = output_identifier(stmt.field_type k)
+              if IBMDB::convert_smallint_to_bool and column_info[key] == :int
+                # decide if it is a smallint from precision
                 precision = stmt.field_precision k
-                @column_info[key] = :boolean  if precision < 8
+                column_info[key] = :boolean  if precision < 8
               end
-              @columns << key
+              columns << key
             end
+            @column_info = column_info
+            @columns = columns
           end
 
           while res = stmt.fetch_assoc
@@ -461,6 +465,11 @@ module Sequel
           stmt.free
         end
         self
+      end
+
+      # Add a fallback table for empty from situation
+      def get(*args)
+        @opts[:from] ? super : from(:sysibm__sysdummy1).get(*args)
       end
 
       # Store the given type of prepared statement in the associated database
@@ -474,6 +483,7 @@ module Sequel
         end
         ps
       end
+
       def supports_is_true?
         false
       end
@@ -501,9 +511,7 @@ module Sequel
           v.to_i
         when :boolean;
           v.to_i.zero? ? false : true
-        when :blob;
-          v.to_sequel_blob
-        when :clob;
+        when :blob, :clob;
           v.to_sequel_blob
         else;
           v
@@ -524,6 +532,16 @@ module Sequel
         opts[:values].empty? ? sql << " VALUES DEFAULT" : super
       end
 
+      # Use 0 for false on DB2
+      def literal_false
+        BOOL_FALSE
+      end
+
+      # Use 1 for true on DB2
+      def literal_true
+        BOOL_TRUE
+      end
+
       # Modify the sql to limit the number of rows returned
       # Note: 
       #
@@ -539,15 +557,20 @@ module Sequel
           sql << " FETCH FIRST #{l == 1 ? 'ROW' : "#{literal(l)} ROWS"} ONLY"
         end
       end
-
-      # Use 0 for false on DB2
-      def literal_false
-        BOOL_FALSE
-      end
-
-      # Use 1 for true on DB2
-      def literal_true
-        BOOL_TRUE
+      # Modify the sql to limit the number of rows returned
+      # Note: 
+      #
+      #     After db2 v9.7, MySQL flavored "LIMIT X OFFSET Y" can be enabled using
+      #
+      #     db2set DB2_COMPATIBILITY_VECTOR=MYS
+      #     db2stop
+      #     db2start
+      #
+      #     Support for this feature is not used in this adapter however.
+      def select_limit_sql(sql)
+        if l = @opts[:limit]
+          sql << " FETCH FIRST #{l == 1 ? 'ROW' : "#{literal(l)} ROWS"} ONLY"
+        end
       end
       
       def _truncate_sql(table)

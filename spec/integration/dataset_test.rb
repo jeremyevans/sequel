@@ -23,7 +23,7 @@ describe "Simple Dataset operations" do
       {:id => 3, :number=>30} ]   
   end 
 
-  cspecify "should insert with a primary key specified", :mssql do
+  cspecify "should insert with a primary key specified", [:ibmdb], :mssql do
     @ds.insert(:id=>100, :number=>20)
     @ds.count.should == 2
     @ds.order(:id).all.should == [{:id=>1, :number=>10}, {:id=>100, :number=>20}]
@@ -70,7 +70,7 @@ describe "Simple Dataset operations" do
     @ds.order(:id).limit(2).all.should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
   end
   
-  specify "should fetch correctly with a limit and offset" do
+  cspecify "should fetch correctly with a limit and offset", :db2 do
     @ds.order(:id).limit(2, 0).all.should == [{:id=>1, :number=>10}]
     @ds.order(:id).limit(2, 1).all.should == []
     @ds.insert(:number=>20)
@@ -79,7 +79,7 @@ describe "Simple Dataset operations" do
     @ds.order(:id).limit(2, 1).all.should == [{:id=>2, :number=>20}]
   end
   
-  cspecify "should fetch correctly with a limit and offset without an order", :mssql do
+  cspecify "should fetch correctly with a limit and offset without an order", :db2, :mssql do
     @ds.limit(2, 1).all.should == []
   end
 
@@ -87,7 +87,7 @@ describe "Simple Dataset operations" do
     @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
   end
 
-  specify "should handle true/false properly" do
+  cspecify "should handle true/false properly", :db2 do
     @ds.filter(Sequel::TRUE).select_map(:number).should == [10]
     @ds.filter(Sequel::FALSE).select_map(:number).should == []
     @ds.filter(true).select_map(:number).should == [10]
@@ -802,7 +802,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.filter({15=>20}.case(0, :a) > 0).all.should == []
   end
   
-  it "should work with multiple value arrays" do
+  cspecify "should work with multiple value arrays", [:ibmdb] do
     @ds.insert(20, 10)
     @ds.quote_identifiers = false
     @ds.filter([:a, :b]=>[[20, 10]].sql_array).all.should == [{:a=>20, :b=>10}]
@@ -871,7 +871,7 @@ describe "SQL Extract Function" do
     @db.drop_table(:a)
   end
   
-  cspecify "should return the part of the datetime asked for", :sqlite, :mssql do
+  cspecify "should return the part of the datetime asked for", :sqlite, :mssql, :db2 do
     t = Time.now
     @ds.insert(t)
     @ds.get{a.extract(:year)}.should == t.year

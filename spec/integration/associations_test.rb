@@ -125,7 +125,7 @@ shared_examples_for "regular and composite key associations" do
     Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == []
   end
   
-  specify "should work correctly when excluding by associations in regards to NULL values" do
+  cspecify "should work correctly when excluding by associations in regards to NULL values", :db2 do
     Artist.exclude(:albums=>@album).all.should == [@artist]
     Album.exclude(:artist=>@artist).all.should == [@album]
     Album.exclude(:tags=>@tag).all.should == [@album]

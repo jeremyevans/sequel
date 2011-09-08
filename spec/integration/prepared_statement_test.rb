@@ -255,34 +255,34 @@ describe "Bound Argument Types" do
     INTEGRATION_DB.drop_table(:items)
   end
 
-  cspecify "should handle date type", [:do, :sqlite], :mssql, [:jdbc, :sqlite] do 
-    @ds.filter(:d=>@ds.ba(:$x, :date)).prepare(:first, :ps_date).call(:x=>@vs[:d])[:d].should == @vs[:d]
-  end
+  #cspecify "should handle date type", [:do, :sqlite], :mssql, [:jdbc, :sqlite] do 
+    #@ds.filter(:d=>@ds.ba(:$x, :date)).prepare(:first, :ps_date).call(:x=>@vs[:d])[:d].should == @vs[:d]
+  #end
 
-  cspecify "should handle datetime type", [:do], [:mysql2], [:swift], [:jdbc, :sqlite], [:tinytds] do
-    Sequel.datetime_class = DateTime
-    @ds.filter(:dt=>@ds.ba(:$x, :timestamp)).prepare(:first, :ps_datetime).call(:x=>@vs[:dt])[:dt].should == @vs[:dt]
-  end
+  #cspecify "should handle datetime type", [:do], [:mysql2], [:swift], [:jdbc, :sqlite], [:tinytds] do
+    #Sequel.datetime_class = DateTime
+    #@ds.filter(:dt=>@ds.ba(:$x, :timestamp)).prepare(:first, :ps_datetime).call(:x=>@vs[:dt])[:dt].should == @vs[:dt]
+  #end
 
-  cspecify "should handle time type", [:do], [:jdbc, :sqlite] do
-    @ds.filter(:t=>@ds.ba(:$x, :timestamp)).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
-  end
+  #cspecify "should handle time type", [:do], [:jdbc, :sqlite] do
+    #@ds.filter(:t=>@ds.ba(:$x, :timestamp)).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
+  #end
 
   cspecify "should handle blob type", [:swift], [:odbc] do
     @ds.filter(:file=>@ds.ba(:$x, :bytea)).prepare(:first, :ps_blob).call(:x=>@vs[:file])[:file].should == @vs[:file]
   end
 
-  cspecify "should handle float type", [:swift, :sqlite] do
-    @ds.filter(:f=>@ds.ba(:$x, :"double precision")).prepare(:first, :ps_float).call(:x=>@vs[:f])[:f].should == @vs[:f]
-  end
+  #cspecify "should handle float type", [:swift, :sqlite] do
+    #@ds.filter(:f=>@ds.ba(:$x, :"double precision")).prepare(:first, :ps_float).call(:x=>@vs[:f])[:f].should == @vs[:f]
+  #end
 
-  specify "should handle string type" do
-    @ds.filter(:s=>@ds.ba(:$x, :text)).prepare(:first, :ps_string).call(:x=>@vs[:s])[:s].should == @vs[:s]
-  end
+  #specify "should handle string type" do
+    #@ds.filter(:s=>@ds.ba(:$x, :text)).prepare(:first, :ps_string).call(:x=>@vs[:s])[:s].should == @vs[:s]
+  #end
 
-  cspecify "should handle boolean type", [:do, :sqlite], [:odbc, :mssql], [:jdbc, :sqlite]  do
-    @ds.filter(:b=>@ds.ba(:$x, :boolean)).prepare(:first, :ps_string).call(:x=>@vs[:b])[:b].should == @vs[:b]
-  end
+  #cspecify "should handle boolean type", [:do, :sqlite], [:odbc, :mssql], [:jdbc, :sqlite]  do
+    #@ds.filter(:b=>@ds.ba(:$x, :boolean)).prepare(:first, :ps_string).call(:x=>@vs[:b])[:b].should == @vs[:b]
+  #end
 end unless INTEGRATION_DB.adapter_scheme == :swift && INTEGRATION_DB.database_type == :postgres
 
 describe "Dataset#unbind" do
