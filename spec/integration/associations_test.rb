@@ -61,7 +61,7 @@ shared_examples_for "regular and composite key associations" do
     Album.exclude(:artist=>@artist, :tags=>@tag).all.should == [album]
   end
   
-  specify "should work correctly when filtering by multiple associations" do
+  cspecify "should work correctly when filtering by multiple associations", :db2 do
     album, artist, tag = @pr.call
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
@@ -90,7 +90,7 @@ shared_examples_for "regular and composite key associations" do
     Album.filter(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
   end
 
-  specify "should work correctly when excluding by multiple associations" do
+  cspecify "should work correctly when excluding by multiple associations", :db2 do
     album, artist, tag = @pr.call
 
     Artist.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
@@ -222,7 +222,7 @@ shared_examples_for "regular and composite key associations" do
     @tag.albums.should == []
   end
   
-  specify "should eager load via eager correctly" do
+  cspecify "should eager load via eager correctly", :db2 do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
     
@@ -252,7 +252,7 @@ shared_examples_for "regular and composite key associations" do
     a.first.albums.first.artist.should == @artist
   end
   
-  specify "should work with a many_through_many association" do
+  cspecify "should work with a many_through_many association", :db2 do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
 
