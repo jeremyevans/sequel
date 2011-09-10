@@ -29,7 +29,7 @@ describe Sequel::Database do
     @db.pool.size.should == 0
   end
 
-  specify "should return version correct" do
+  specify "should return version correctly" do
     @db.db2_version.should match(/DB2 v/i)
   end
 end
@@ -53,7 +53,6 @@ describe "Simple Dataset operations" do
   end
 end
 
-# schema parsing
 describe Sequel::Database do
   before do
     @db = IBMDB_DB
@@ -118,5 +117,26 @@ describe "Sequel::IBMDB.convert_smallint_to_bool" do
     @ds.delete
     @ds << {:b=>0, :i=>0}
     @ds.all.should == [{:b=>0, :i=>0}]
+  end
+end
+
+describe "Simple Dataset operations in transactions" do
+  before do
+    IBMDB_DB.create_table!(:items_insert_in_transaction) do
+      Integer :id, :primary_key => true
+      integer :number
+    end
+    @ds = IBMDB_DB[:items_insert_in_transaction]
+  end
+  after do
+    IBMDB_DB.drop_table(:items_insert_in_transaction)
+  end
+
+  specify "should insert correctly with a primary key specified inside a transaction" do
+    IBMDB_DB.transaction do
+      @ds.insert(:id=>100, :number=>20)
+      @ds.count.should == 1
+      @ds.order(:id).all.should == [{:id=>100, :number=>20}]
+    end
   end
 end

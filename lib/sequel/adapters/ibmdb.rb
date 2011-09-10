@@ -36,7 +36,6 @@ module Sequel
       end
 
       def prepare(sql, ps_name)
-        p [ps_name, sql]
         if stmt = IBM_DB.prepare(@conn, sql)
           ps_name = ps_name.to_sym
           stmt = Statement.new(stmt)
@@ -79,7 +78,6 @@ module Sequel
       end
 
       def execute(*values)    # values are for prepared statement
-        p values
         IBM_DB.execute(@stmt, values)
       end
 
@@ -176,7 +174,7 @@ module Sequel
 
       def execute_insert(sql, opts={}, &block)
         execute_dui(sql, opts, &block)
-        metadata_dataset.with_sql("SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1").get
+        metadata_dataset.get(:'IDENTITY_VAL_LOCAL()')
       end
 
       def execute_prepared_statement(ps_name, opts)
@@ -292,11 +290,12 @@ module Sequel
         sql << NULL if null == true
       end
 
-      # Supply columns with NOT NULL if they are part of a composite primary key
+      # Supply columns with NOT NULL if they are part of a composite
+      # primary/foreign key
       def column_list_sql(g)
-        pks = []
-        g.constraints.each{|c| pks = c[:columns] if c[:type] == :primary_key} 
-        g.columns.each{|c| c[:null] = false if pks.include?(c[:name]) }
+        ks = []
+        g.constraints.each{|c| ks = c[:columns] if [:primary_key, :foreign_key].include? c[:type]} 
+        g.columns.each{|c| c[:null] = false if ks.include?(c[:name]) }
         super
       end
 

@@ -2,9 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Supported types" do
   def create_items_table_with_column(name, type, opts={})
-    INTEGRATION_DB.disconnect
-    INTEGRATION_DB.drop_table :items
-    INTEGRATION_DB.create_table(:items){column name, type, opts}
+    INTEGRATION_DB.create_table!(:items){column name, type, opts}
     INTEGRATION_DB[:items]
   end
 

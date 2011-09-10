@@ -239,7 +239,7 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:number=>10, :name=>nil}]
   end
 
-  cspecify "should add primary key columns to tables correctly", :h2 do
+  cspecify "should add primary key columns to tables correctly", [:ibmdb], :h2 do
     @db.create_table!(:items){Integer :number}
     @ds.insert(:number=>10)
     @db.alter_table(:items){add_primary_key :id}
@@ -328,7 +328,7 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:id=>"10"}, {:id=>"20"}]
   end
 
-  cspecify "should add unique constraints and foreign key table constraints correctly", :sqlite do
+  cspecify "should add unique constraints and foreign key table constraints correctly", [:ibmdb], :sqlite do
     @db.create_table!(:items, :engine=>:InnoDB){Integer :id; Integer :item_id}
     @db.alter_table(:items) do
       add_unique_constraint [:item_id, :id]
