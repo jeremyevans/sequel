@@ -340,23 +340,6 @@ module Sequel
       COMMA_SEPARATOR = ', '.freeze
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
 
-      # Ugly hack.  Really, SQLite uses 0 for false and 1 for true
-      # but then you can't differentiate between integers and booleans.
-      # In filters, SQL::BooleanConstants are used more, while in other places
-      # the ruby true/false values are used more, so use 1/0 for SQL::BooleanConstants.
-      # The correct fix for this would require separate literalization paths for
-      # filters compared to other values, but that's more work than I want to do right now.
-      def boolean_constant_sql(constant)
-        case constant
-        when true
-          '1'
-        when false
-          '0'
-        else
-          super
-        end
-      end
-
       # SQLite does not support pattern matching via regular expressions.
       # SQLite is case insensitive (depending on pragma), so use LIKE for
       # ILIKE.
@@ -423,28 +406,17 @@ module Sequel
         true
       end
 
+      # SQLite cannot use WHERE 't'.
+      def supports_where_true?
+        false
+      end
+      
       private
       
       # SQLite uses string literals instead of identifiers in AS clauses.
       def as_sql(expression, aliaz)
         aliaz = aliaz.value if aliaz.is_a?(SQL::Identifier)
         "#{expression} AS #{literal(aliaz.to_s)}"
-      end
-      
-      # Special case when true or false is provided directly to filter.
-      def filter_expr(expr)
-        if block_given?
-          super
-        else
-          case expr
-          when true
-            1
-          when false
-            0
-          else
-            super
-          end
-        end
       end
       
       # SQL fragment specifying a list of identifiers

@@ -214,7 +214,11 @@ module Sequel
 
     # SQL fragment for BooleanConstants
     def boolean_constant_sql(constant)
-      literal(constant)
+      if (constant == true || constant == false) && !supports_where_true?
+        constant == true ? '(1 = 1)' : '(1 = 0)'
+      else
+        literal(constant)
+      end
     end
 
     # SQL fragment for CaseExpression

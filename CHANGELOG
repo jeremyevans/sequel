@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#supports_where_true? for checking if the database supports WHERE true (or WHERE 1 if 1 is true) (jeremyevans)
+
 * Fix eager loading via eager of one_to_one associations that match multiple associated objects and use order to pick the first one (jeremyevans)
 
 === 3.27.0 (2011-09-01)
