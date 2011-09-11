@@ -1,3 +1,7 @@
+=== HEAD
+
+* Fix eager loading via eager of one_to_one associations that match multiple associated objects and use order to pick the first one (jeremyevans)
+
 === 3.27.0 (2011-09-01)
 
 * Add support for native prepared statements to the tinytds adapter (jeremyevans)

@@ -254,6 +254,20 @@ shared_examples_for "regular and composite key associations" do
     a.first.albums.first.artist.should == @artist
   end
   
+  specify "should eager load one_to_one associations with multiple matching objects correctly" do
+    @album.update(:artist => @artist)
+    diff_album = @diff_album.call
+    
+    a = Artist.eager(:first_album).all
+    a.should == [@artist]
+    a.first.first_album.should == @album
+
+    same_album = @same_album.call
+    a = Artist.eager(:first_album).all
+    a.should == [@artist]
+    [@album, same_album].should include(a.first.first_album)
+  end
+  
   specify "should eager load via eager_graph correctly" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
@@ -336,8 +350,8 @@ describe "Sequel::Model Simple Associations" do
     @album = Album.create(:name=>'Al')
     @artist = Artist.create(:name=>'Ar')
     @tag = Tag.create(:name=>'T')
-    @same_album = lambda{Album.create(:name=>'Al')}
-    @diff_album = lambda{Album.create(:name=>'lA')}
+    @same_album = lambda{Album.create(:name=>'Al', :artist_id=>@artist.id)}
+    @diff_album = lambda{Album.create(:name=>'lA', :artist_id=>@artist.id)}
     @pr = lambda{[Album.create(:name=>'Al2'),Artist.create(:name=>'Ar2'),Tag.create(:name=>'T2')]}
     @ins = lambda{@db[:albums_tags].insert(:tag_id=>@tag.id)}
   end

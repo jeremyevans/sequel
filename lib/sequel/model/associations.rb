@@ -940,8 +940,10 @@ module Sequel
               next unless objects = h[hash_key]
               if one_to_one
                 objects.each do |object| 
-                  object.associations[name] = assoc_record
-                  assoc_record.associations[reciprocal] = object if reciprocal
+                  unless object.associations[name]
+                    object.associations[name] = assoc_record
+                    assoc_record.associations[reciprocal] = object if reciprocal
+                  end
                 end
               else
                 objects.each do |object| 
