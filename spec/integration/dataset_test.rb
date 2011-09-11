@@ -709,7 +709,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.get{~b.sql_number}.to_i.should == -4
   end
   
-  cspecify "should work with the bitwise xor operator", :sqlite do
+  specify "should work with the bitwise xor operator" do
     @ds.insert(3, 5)
     @ds.get{a.sql_number ^ b}.to_i.should == 6
   end

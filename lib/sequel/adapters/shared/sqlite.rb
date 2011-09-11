@@ -350,6 +350,10 @@ module Sequel
         when :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'
           # SQLite is case insensitive for ASCII, and non case sensitive for other character sets
           "#{'NOT ' if [:'NOT LIKE', :'NOT ILIKE'].include?(op)}(#{literal(args.at(0))} LIKE #{literal(args.at(1))})"
+        when :^
+          a = literal(args.at(0))
+          b = literal(args.at(1))
+          "((~(#{a} & #{b})) & (#{a} | #{b}))"
         else
           super(op, args)
         end
