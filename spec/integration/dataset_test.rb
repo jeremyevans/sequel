@@ -871,12 +871,16 @@ describe "SQL Extract Function" do
     @db.drop_table(:a)
   end
   
-  cspecify "should return the part of the datetime asked for", :sqlite, :mssql do
+  specify "should return the part of the datetime asked for", :mssql do
     t = Time.now
+    def @ds.supports_timestamp_timezones?() false end
     @ds.insert(t)
     @ds.get{a.extract(:year)}.should == t.year
     @ds.get{a.extract(:month)}.should == t.month
     @ds.get{a.extract(:day)}.should == t.day
+    @ds.get{a.extract(:hour)}.should == t.hour
+    @ds.get{a.extract(:minute)}.should == t.min
+    @ds.get{a.extract(:second)}.should == t.sec
   end
 end
 

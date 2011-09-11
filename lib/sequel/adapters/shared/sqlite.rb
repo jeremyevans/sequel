@@ -339,6 +339,7 @@ module Sequel
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct columns from join where group having compounds order limit')
       COMMA_SEPARATOR = ', '.freeze
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
+      EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%S'"}
 
       # SQLite does not support pattern matching via regular expressions.
       # SQLite is case insensitive (depending on pragma), so use LIKE for
@@ -354,6 +355,10 @@ module Sequel
           a = literal(args.at(0))
           b = literal(args.at(1))
           "((~(#{a} & #{b})) & (#{a} | #{b}))"
+        when :extract
+          part = args.at(0)
+          expr = args.at(1)
+          "CAST(strftime(#{EXTRACT_MAP[part]}, #{literal(expr)}) AS INTEGER)"
         else
           super(op, args)
         end
