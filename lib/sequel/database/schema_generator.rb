@@ -86,7 +86,8 @@ module Sequel
       # :index :: Create an index on this column.
       # :key :: For foreign key columns, the column in the associated table
       #         that this column references.  Unnecessary if this column
-      #         references the primary key of the associated table.
+      #         references the primary key of the associated table, except if you are
+      #         using MySQL.
       # :null :: Mark the column as allowing NULL values (if true),
       #          or not allowing NULL values (if false).  If unspecified, will default
       #          to whatever the database default is.
