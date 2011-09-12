@@ -871,7 +871,7 @@ describe "SQL Extract Function" do
     @db.drop_table(:a)
   end
   
-  specify "should return the part of the datetime asked for", :mssql do
+  specify "should return the part of the datetime asked for" do
     t = Time.now
     def @ds.supports_timestamp_timezones?() false end
     @ds.insert(t)
@@ -880,7 +880,7 @@ describe "SQL Extract Function" do
     @ds.get{a.extract(:day)}.should == t.day
     @ds.get{a.extract(:hour)}.should == t.hour
     @ds.get{a.extract(:minute)}.should == t.min
-    @ds.get{a.extract(:second)}.should == t.sec
+    @ds.get{a.extract(:second)}.to_i.should == t.sec
   end
 end
 
