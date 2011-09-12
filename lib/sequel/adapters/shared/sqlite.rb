@@ -10,7 +10,7 @@ module Sequel
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'".freeze
       TEMP_STORE = [:default, :file, :memory].freeze
       VIEWS_FILTER = "type = 'view'".freeze
-      
+
       # Run all alter_table commands in a transaction.  This is technically only
       # needed for drop column.
       def alter_table(name, generator=nil, &block)
@@ -105,6 +105,19 @@ module Sequel
       # SQLite 3.6.8+ supports savepoints. 
       def supports_savepoints?
         sqlite_version >= 30608
+      end
+
+      # Override the default setting for whether to use timezones in timestamps.
+      # For backwards compatibility, it is set to +true+ by default.
+      # Anyone wanting to use SQLite's datetime functions should set it to +false+
+      # using this method.  It's possible that the default will change in a future version,
+      # so anyone relying on timezones in timestamps should set this to +true+.
+      attr_writer :use_timestamp_timezones
+
+      # SQLite supports timezones in timestamps, since it just stores them as strings,
+      # but it breaks the usage of SQLite's datetime functions.
+      def use_timestamp_timezones?
+        defined?(@use_timestamp_timezones) ? @use_timestamp_timezones : (@use_timestamp_timezones = true)
       end
 
       # A symbol signifying the value of the synchronous PRAGMA.
@@ -411,9 +424,10 @@ module Sequel
       end
       
       # SQLite supports timezones in literal timestamps, since it stores them
-      # as text.
+      # as text.  But using timezones in timestamps breaks SQLite datetime
+      # functions, so we allow the user to override the default per database.
       def supports_timestamp_timezones?
-        true
+        db.use_timestamp_timezones?
       end
 
       # SQLite cannot use WHERE 't'.

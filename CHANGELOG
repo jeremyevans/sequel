@@ -2,7 +2,7 @@
 
 * Emulate handling of extract on MSSQL, using datepart (jeremyevans)
 
-* Emulate handling of extract on SQLite, but you need to set Dataset#supports_timestamp_timezones? to false (jeremyevans)
+* Emulate handling of extract on SQLite, but you need to set Database#use_timestamp_timezones = false (jeremyevans)
 
 * Abstract handling of ComplexExpressionMethods#extract so that it can work on databases that don't implement extract (jeremyevans)
 
