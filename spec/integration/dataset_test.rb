@@ -584,7 +584,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.group_and_count(:a___c).order(:count).all.each{|h| h[:count] = h[:count].to_i}.should == [{:c=>30, :count=>1}, {:c=>20, :count=>2}]
   end
   
-  cspecify "#range should return the range between the maximum and minimum values", :sqlite do
+  specify "#range should return the range between the maximum and minimum values" do
     @ds = @ds.unordered
     @ds.insert(20, 10)
     @ds.insert(30, 10)

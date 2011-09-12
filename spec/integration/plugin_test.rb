@@ -110,13 +110,13 @@ describe "Class Table Inheritance Plugin" do
     @db[:executives][:id=>@i4].should == {:id=>@i4, :num_managers=>8}
   end
   
-  cspecify "should handle many_to_one relationships", :sqlite do
+  specify "should handle many_to_one relationships" do
     m = Staff.first.manager
     m.should == Manager[@i4]
     m.should be_a_kind_of(Executive)
   end
   
-  cspecify "should handle eagerly loading many_to_one relationships", :sqlite do
+  specify "should handle eagerly loading many_to_one relationships" do
     Staff.limit(1).eager(:manager).all.map{|x| x.manager}.should == [Manager[@i4]]
   end
   
