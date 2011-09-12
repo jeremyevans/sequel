@@ -1,5 +1,7 @@
 === HEAD
 
+* Association :after_load hooks in lazy loading are now called after the associated objects have been cached (jeremyevans)
+ 
 * Emulate handling of extract on MSSQL, using datepart (jeremyevans)
 
 * Emulate handling of extract on SQLite, but you need to set Database#use_timestamp_timezones = false (jeremyevans)

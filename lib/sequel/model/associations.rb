@@ -1172,7 +1172,6 @@ module Sequel
             associations[name]
           else
             objs = _load_associated_objects(opts, dynamic_opts)
-            run_association_callbacks(opts, :after_load, objs)
             if opts.set_reciprocal_to_self?
               if opts.returns_array?
                 objs.each{|o| add_reciprocal_object(opts, o)}
@@ -1181,6 +1180,8 @@ module Sequel
               end
             end
             associations[name] = objs
+            run_association_callbacks(opts, :after_load, objs)
+            associations[name]
           end
         end
 
