@@ -242,6 +242,7 @@ module Sequel
       UPDLOCK = ' WITH (UPDLOCK)'.freeze
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
+      EXTRACT_MAP = {:year=>"yy", :month=>"m", :day=>"d", :hour=>"hh", :minute=>"n", :second=>"s"}
 
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
       attr_accessor :mssql_unicode_strings
@@ -265,6 +266,13 @@ module Sequel
           "(#{literal(args[0])} * POWER(2, #{literal(args[1])}))"
         when :>>
           "(#{literal(args[0])} / POWER(2, #{literal(args[1])}))"
+        when :extract
+          part = args.at(0)
+          raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
+          expr = literal(args.at(1))
+          s = "datepart(#{format}, #{expr})"
+          s = "CAST((#{s} + datepart(ns, #{expr})/1000000000.0) AS double precision)" if part == :second
+          s
         else
           super(op, args)
         end
