@@ -116,7 +116,7 @@ module Sequel
     end
 
     module DatasetMethods
-      BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
+      BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}
       # db2 supplies CURRENT_TIMESTAMP in local time instead of utc
       CONSTANT_MAP = {:CURRENT_TIMESTAMP=>"CURRENT_TIMESTAMP - CURRENT_TIMEZONE".freeze}
       
@@ -131,7 +131,7 @@ module Sequel
           super(:LIKE, [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
         when :"NOT ILIKE"
           super(:"NOT LIKE", [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
-        when :&, :|, :^
+        when :&, :|, :^, :'B~'
           # works with db2 v9.5 and after
           literal(SQL::Function.new(BITWISE_METHOD_MAP[op], *args))
         when :<<
@@ -156,6 +156,10 @@ module Sequel
         false
       end
 
+      def supports_multiple_column_in?
+        false
+      end
+
       def supports_timestamp_usecs?
         false
       end
@@ -163,6 +167,10 @@ module Sequel
       # DB2 supports window functions
       def supports_window_functions?
         true
+      end
+
+      def supports_where_true?
+        false
       end
 
       private
