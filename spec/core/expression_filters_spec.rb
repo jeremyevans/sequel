@@ -605,7 +605,7 @@ describe Sequel::SQL::VirtualRow do
   end
 
   it "should support :frame=>:rows option for window function calls" do
-    @d.l{rank(:over, :frame=>:rows){}}.should == 'rank() OVER (ROWS UNBOUNDED PRECEDING)'
+    @d.l{rank(:over, :frame=>:rows){}}.should == 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
   end
 
   it "should support :frame=>'some string' option for window function calls" do
@@ -617,7 +617,7 @@ describe Sequel::SQL::VirtualRow do
   end
 
   it "should support all these options together" do
-    @d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.should == 'count(*) OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS UNBOUNDED PRECEDING)'
+    @d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.should == 'count(*) OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
   end
 
   it "should raise an error if window functions are not supported" do
