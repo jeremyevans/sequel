@@ -11,9 +11,9 @@ module Sequel
   #             with the +Database+ in +source+ to create the
   #             dataset to use) 
   # Dataset :: Sets the dataset for this model to +source+. 
-  # Symbol :: Sets the table name for this model to +source+. The
-  #           class will use the default database for model
-  #           classes in order to create the dataset.
+  # other :: Sets the table name for this model to +source+. The
+  #          class will use the default database for model
+  #          classes in order to create the dataset.
   #
   # The purpose of this method is to set the dataset/database automatically
   # for a model class, if the table name doesn't match the implicit

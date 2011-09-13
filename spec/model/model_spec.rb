@@ -12,11 +12,18 @@ describe "Sequel::Model()" do
     c.dataset.should == ds
   end
 
-  it "should return a model subclass with a dataset with the default database and given table name if given a symbol" do
+  it "should return a model subclass with a dataset with the default database and given table name if given a Symbol" do
     c = Sequel::Model(:blah)
     c.superclass.should == Sequel::Model
     c.db.should == @db
     c.table_name.should == :blah
+  end
+
+  it "should return a model subclass with a dataset with the default database and given table name if given a LiteralString" do
+    c = Sequel::Model('blah'.lit)
+    c.superclass.should == Sequel::Model
+    c.db.should == @db
+    c.table_name.should == 'blah'.lit
   end
 
   it "should return a model subclass with a dataset with the default database and given table name if given an SQL::Identifier" do
@@ -162,10 +169,16 @@ describe Sequel::Model, "dataset & schema" do
     @model.table_name.should == :foo
   end
 
-  it "set_dataset should take a symbol" do
+  it "set_dataset should take a Symbol" do
     @model.db = MODEL_DB
     @model.set_dataset(:foo)
     @model.table_name.should == :foo
+  end
+
+  it "set_dataset should take a LiteralString" do
+    @model.db = MODEL_DB
+    @model.set_dataset('foo'.lit)
+    @model.table_name.should == 'foo'.lit
   end
 
   it "set_dataset should take an SQL::Identifier" do

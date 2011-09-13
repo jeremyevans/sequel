@@ -423,10 +423,12 @@ module Sequel
         @allowed_columns = cols
       end
   
-      # Sets the dataset associated with the Model class. +ds+ can be a +Symbol+
-      # (specifying a table name in the current database), or a +Dataset+.
+      # Sets the dataset associated with the Model class. +ds+ can be a +Symbol+,
+      # +LiteralString+, <tt>SQL::Identifier</tt>, <tt>SQL::QualifiedIdentifier</tt>,
+      # <tt>SQL::AliasedExpression</tt>
+      # (all specifying a table name in the current database), or a +Dataset+.
       # If a dataset is used, the model's database is changed to the database of the given
-      # dataset.  If a symbol is used, a dataset is created from the current
+      # dataset.  If a dataset is not used, a dataset is created from the current
       # database with the table name given. Other arguments raise an +Error+.
       # Returns self.
       #
@@ -441,15 +443,15 @@ module Sequel
       def set_dataset(ds, opts={})
         inherited = opts[:inherited]
         @dataset = case ds
-        when Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression
+        when Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, LiteralString
           @simple_table = db.literal(ds)
-          db[ds]
+          db.from(ds)
         when Dataset
           @simple_table = nil
           @db = ds.db
           ds
         else
-          raise(Error, "Model.set_dataset takes one of the following classes as an argument: Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, Dataset")
+          raise(Error, "Model.set_dataset takes one of the following classes as an argument: Symbol, LiteralString, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, Dataset")
         end
         @dataset.row_proc = Proc.new{|r| load(r)}
         @require_modification = Sequel::Model.require_modification.nil? ? @dataset.provides_accurate_rows_matched? : Sequel::Model.require_modification

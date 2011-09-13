@@ -433,6 +433,11 @@ module Sequel
     #   # SELECT * FROM a NATURAL JOIN b INNER JOIN c
     #   #   ON ((c.d > b.e) AND (c.f IN (SELECT g FROM b)))
     def join_table(type, table, expr=nil, options={}, &block)
+      if table.is_a?(Dataset) && table.opts[:with] && !supports_cte_in_subqueries?
+        s, ds = hoist_cte(table)
+        return s.join_table(type, ds, expr, options, &block)
+      end
+
       using_join = expr.is_a?(Array) && !expr.empty? && expr.all?{|x| x.is_a?(Symbol)}
       if using_join && !supports_join_using?
         h = {}
@@ -926,12 +931,6 @@ module Sequel
       _filter_or_exclude(false, clause, *cond, &block)
     end
 
-    # Treat the +block+ as a virtual_row block if not +nil+ and
-    # add the resulting columns to the +columns+ array (modifies +columns+).
-    def virtual_row_columns(columns, block)
-      columns.concat(Array(Sequel.virtual_row(&block))) if block
-    end
-    
     # Add the dataset to the list of compounds
     def compound_clone(type, dataset, opts)
       ds = compound_from_self.clone(:compounds=>Array(@opts[:compounds]).map{|x| x.dup} + [[type, dataset.compound_from_self, opts[:all]]])
@@ -978,6 +977,13 @@ module Sequel
       end
     end
     
+    # Return two datasets, the first a clone of the receiver with the WITH
+    # clause from the given dataset added to it, and the second a clone of
+    # the given dataset with the WITH clause removed.
+    def hoist_cte(ds)
+      [clone(:with => (opts[:with] || []) + ds.opts[:with]), ds.clone(:with => nil)]
+    end
+
     # Inverts the given order by breaking it into a list of column references
     # and inverting them.
     #
@@ -994,6 +1000,12 @@ module Sequel
           SQL::OrderedExpression.new(f)
         end
       end
+    end
+
+    # Treat the +block+ as a virtual_row block if not +nil+ and
+    # add the resulting columns to the +columns+ array (modifies +columns+).
+    def virtual_row_columns(columns, block)
+      columns.concat(Array(Sequel.virtual_row(&block))) if block
     end
   end
 end
