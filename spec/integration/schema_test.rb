@@ -236,7 +236,7 @@ describe "Database schema modifiers" do
   specify "should add columns to tables correctly" do
     @db.create_table!(:items){Integer :number}
     @ds.insert(:number=>10)
-    @db.alter_table(:items){add_column :name, :text}
+    @db.alter_table(:items){add_column :name, String}
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :name]
     @ds.columns!.should == [:number, :name]
     @ds.all.should == [{:number=>10, :name=>nil}]

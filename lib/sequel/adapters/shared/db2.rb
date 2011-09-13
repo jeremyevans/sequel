@@ -18,7 +18,7 @@ module Sequel
       def schema_parse_table(table, opts = {})
         m = output_identifier_meth
         im = input_identifier_meth
-        metadata_dataset.with_sql("SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = #{im.call(literal(table))} ORDER BY COLNO").
+        metadata_dataset.with_sql("SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = #{literal(im.call(table))} ORDER BY COLNO").
           collect do |column| 
             column[:db_type]     = column.delete(:typename)
             if column[:db_type]  == "DECIMAL"

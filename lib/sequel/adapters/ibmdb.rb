@@ -270,9 +270,15 @@ module Sequel
       def _execute(conn, sql, opts)
         stmt = log_yield(sql){ conn.execute(sql) }
         raise Connection::Error, conn.error_msg if stmt.fail?
-        block_given? ? yield(stmt) : stmt.affected
-      ensure
-        stmt.free
+        if block_given?
+          begin
+            yield(stmt)
+          ensure
+            stmt.free
+          end
+        else  
+          stmt.affected
+        end
       end
 
     end
