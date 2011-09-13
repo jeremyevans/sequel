@@ -5,7 +5,11 @@
 
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-IBMDB_DB = Sequel.connect(IBMDB_URL)
+require ENV['SEQUEL_DB2_SPEC_REQUIRE'] if ENV['SEQUEL_DB2_SPEC_REQUIRE']
+
+unless defined?(IBMDB_DB)
+  IBMDB_DB = Sequel.connect(ENV['SEQUEL_DB2_SPEC_DB']||IBMDB_URL)
+end
 
 if IBMDB_DB.table_exists?(:test)
   IBMDB_DB.drop_table :test
