@@ -41,7 +41,7 @@ module Sequel
       # Create the underlying IBM_DB connection.
       def initialize(connection_string)
         @conn = IBM_DB.connect(connection_string, '', '')
-        @conn.autocommit = true
+        self.autocommit = true
         @prepared_statements = {}
       end
 
@@ -73,7 +73,9 @@ module Sequel
       # Execute the given SQL on the database, and return a Statement instance
       # holding the results.
       def execute(sql)
-        Statement.new(IBM_DB.exec(@conn, sql))
+        stmt = IBM_DB.exec(@conn, sql)
+        raise Error, error_msg unless stmt
+        Statement.new(stmt)
       end
 
       # Execute the related prepared statement on the database with the given
@@ -123,11 +125,6 @@ module Sequel
       # with the given values.
       def execute(*values)
         IBM_DB.execute(@stmt, values)
-      end
-
-      # Return true if there is no underlying statement.
-      def fail?
-        !@stmt
       end
 
       # Return the results of a query as an array of values.
@@ -281,7 +278,6 @@ module Sequel
       # Execute the given SQL on the database.
       def _execute(conn, sql, opts)
         stmt = log_yield(sql){conn.execute(sql)}
-        raise Connection::Error, conn.error_msg if stmt.fail?
         if block_given?
           begin
             yield(stmt)
@@ -401,7 +397,6 @@ module Sequel
       # Fetch the rows from the database and yield plain hashes.
       def fetch_rows(sql)
         execute(sql) do |stmt|
-          break if stmt.fail?
           offset = @opts[:offset]
           columns = []
           convert = convert_smallint_to_bool
