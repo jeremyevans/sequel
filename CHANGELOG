@@ -1,5 +1,11 @@
 === HEAD
 
+* Fix the db2 adapter so it actually works (jeremyevans)
+
+* Add ibmdb adapter for accessing DB2 (roylez, jeremyevans)
+
+* Add much better support for DB2 databases (roylez, jeremyevans)
+
 * Handle SQL::AliasedExpressions and SQL::JoinClauses in Dataset#select_all (jeremyevans)
 
 * Speed up type translation slightly in mysql, postgres, and sqlite adapters (jeremyevans)
