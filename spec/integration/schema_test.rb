@@ -6,18 +6,21 @@ describe "Database schema parser" do
     @iom = INTEGRATION_DB.identifier_output_method
     @iim = INTEGRATION_DB.identifier_input_method
     @defsch = INTEGRATION_DB.default_schema
+    @qi = INTEGRATION_DB.quote_identifiers?
     clear_sqls
   end
   after do
     INTEGRATION_DB.identifier_output_method = @iom
     INTEGRATION_DB.identifier_input_method = @iim
     INTEGRATION_DB.default_schema = @defsch
+    INTEGRATION_DB.quote_identifiers = @qi
     INTEGRATION_DB.drop_table(:items) if INTEGRATION_DB.table_exists?(:items)
   end
 
   specify "should handle a database with a identifier_output_method" do
     INTEGRATION_DB.identifier_output_method = :reverse
     INTEGRATION_DB.identifier_input_method = :reverse
+    INTEGRATION_DB.quote_identifiers = true
     INTEGRATION_DB.default_schema = nil if INTEGRATION_DB.default_schema
     INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items, :reload=>true).should be_a_kind_of(Array)
@@ -328,11 +331,24 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:id=>"10"}, {:id=>"20"}]
   end
 
-  cspecify "should add unique constraints and foreign key table constraints correctly", :db2, :sqlite do
+  cspecify "should add unnamed unique constraints and foreign key table constraints correctly", :sqlite do
     @db.create_table!(:items, :engine=>:InnoDB){Integer :id; Integer :item_id}
     @db.alter_table(:items) do
       add_unique_constraint [:item_id, :id]
       add_foreign_key [:id, :item_id], :items, :key=>[:item_id, :id]
+    end
+    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :item_id]
+    @ds.columns!.should == [:id, :item_id]
+    proc{@ds.insert(1, 1)}.should_not raise_error
+    proc{@ds.insert(1, 1)}.should raise_error
+    proc{@ds.insert(1, 2)}.should raise_error
+  end
+
+  cspecify "should add named unique constraints and foreign key table constraints correctly", :sqlite do
+    @db.create_table!(:items, :engine=>:InnoDB){Integer :id, :null=>false; Integer :item_id, :null=>false}
+    @db.alter_table(:items) do
+      add_unique_constraint [:item_id, :id], :name=>:unique_iii
+      add_foreign_key [:id, :item_id], :items, :key=>[:item_id, :id], :name=>:fk_iii
     end
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :item_id]
     @ds.columns!.should == [:id, :item_id]

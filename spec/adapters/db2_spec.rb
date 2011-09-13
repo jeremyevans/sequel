@@ -7,18 +7,18 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 require ENV['SEQUEL_DB2_SPEC_REQUIRE'] if ENV['SEQUEL_DB2_SPEC_REQUIRE']
 
-unless defined?(IBMDB_DB)
-  IBMDB_DB = Sequel.connect(ENV['SEQUEL_DB2_SPEC_DB']||IBMDB_URL)
+unless defined?(DB2_DB)
+  DB2_DB = Sequel.connect(ENV['SEQUEL_DB2_SPEC_DB']||DB2_URL)
 end
 
-if IBMDB_DB.table_exists?(:test)
-  IBMDB_DB.drop_table :test
+if DB2_DB.table_exists?(:test)
+  DB2_DB.drop_table :test
 end
-INTEGRATION_DB = IBMDB_DB unless defined?(INTEGRATION_DB)
+INTEGRATION_DB = DB2_DB unless defined?(INTEGRATION_DB)
 
 describe Sequel::Database do
   before do
-    @db = IBMDB_DB
+    @db = DB2_DB
     @db.create_table(:test){String :a}
     @ds = @db[:test]
   end
@@ -40,15 +40,15 @@ end
 
 describe "Simple Dataset operations" do
   before do
-    IBMDB_DB.create_table!(:items) do
+    DB2_DB.create_table!(:items) do
       Integer :id, :primary_key => true
       Integer :number
     end
-    @ds = IBMDB_DB[:items]
+    @ds = DB2_DB[:items]
     @ds.insert(:number=>10, :id => 1 )
   end
   after do
-    IBMDB_DB.drop_table(:items)
+    DB2_DB.drop_table(:items)
   end
   cspecify "should insert with a primary key specified", :mssql do
     @ds.insert(:id=>100, :number=>20)
@@ -59,7 +59,7 @@ end
 
 describe Sequel::Database do
   before do
-    @db = IBMDB_DB
+    @db = DB2_DB
   end
   after do
     @db.drop_table(:items)
@@ -76,7 +76,7 @@ end
 
 describe "Sequel::IBMDB.convert_smallint_to_bool" do
   before do
-    @db = IBMDB_DB
+    @db = DB2_DB
     @db.create_table(:booltest){column :b, 'smallint'; column :i, 'integer'}
     @ds = @db[:booltest]
   end
@@ -126,18 +126,18 @@ end
 
 describe "Simple Dataset operations in transactions" do
   before do
-    IBMDB_DB.create_table!(:items_insert_in_transaction) do
+    DB2_DB.create_table!(:items_insert_in_transaction) do
       Integer :id, :primary_key => true
       integer :number
     end
-    @ds = IBMDB_DB[:items_insert_in_transaction]
+    @ds = DB2_DB[:items_insert_in_transaction]
   end
   after do
-    IBMDB_DB.drop_table(:items_insert_in_transaction)
+    DB2_DB.drop_table(:items_insert_in_transaction)
   end
 
   specify "should insert correctly with a primary key specified inside a transaction" do
-    IBMDB_DB.transaction do
+    DB2_DB.transaction do
       @ds.insert(:id=>100, :number=>20)
       @ds.count.should == 1
       @ds.order(:id).all.should == [{:id=>100, :number=>20}]

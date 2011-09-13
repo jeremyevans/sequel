@@ -18,13 +18,11 @@ module Sequel
       def schema_parse_table(table, opts = {})
         m = output_identifier_meth
         im = input_identifier_meth
-        metadata_dataset.with_sql("SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = #{im.call(literal(table))}").
+        metadata_dataset.with_sql("SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = #{im.call(literal(table))} ORDER BY COLNO").
           collect do |column| 
             column[:db_type]     = column.delete(:typename)
             if column[:db_type]  == "DECIMAL"
-              # Cannot tell from :scale the actual scale number, but should be
-              # sufficient to identify integers
-              column[:db_type] << "(#{column[:longlength]},#{column[:scale] ? 1 : 0})"
+              column[:db_type] << "(#{column[:longlength]},#{column[:scale]})"
             end
             column[:allow_null]  = column.delete(:nulls) == 'Y'
             column[:primary_key] = column.delete(:identity) == 'Y' || !column[:keyseq].nil?
@@ -35,19 +33,19 @@ module Sequel
 
       def tables
         metadata_dataset.
-          with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='T' AND OWNER = #{input_identifier_meth.call(literal(opts[:user]))}").
+          with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='T' AND OWNER = #{literal(input_identifier_meth.call(opts[:user]))}").
           all.map{|h| output_identifier_meth.call(h[:tabname]) }
       end
 
       def views
         metadata_dataset.
-          with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='V' AND OWNER = #{input_identifier_meth.call(literal(opts[:user]))}").
+          with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='V' AND OWNER = #{literal(input_identifier_meth.call(opts[:user]))}").
           all.map{|h| output_identifier_meth.call(h[:tabname]) }
       end
 
       def indexes(table, opts = {})
         metadata_dataset.
-          with_sql("SELECT INDNAME,UNIQUERULE,MADE_UNIQUE,SYSTEM_REQUIRED FROM SYSCAT.INDEXES WHERE TABNAME = #{input_identifier_meth.call(literal(table))}").
+          with_sql("SELECT INDNAME,UNIQUERULE,MADE_UNIQUE,SYSTEM_REQUIRED FROM SYSCAT.INDEXES WHERE TABNAME = #{literal(input_identifier_meth.call(table))}").
           all.map{|h| Hash[ h.map{|k,v| [k.to_sym, v]} ] }
       end
 
@@ -57,7 +55,15 @@ module Sequel
       def alter_table_sql(table, op)
         case op[:op]
         when :add_column
-          "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op)}"
+          if op[:primary_key] && op[:auto_increment] && op[:type] == Integer
+            [
+            "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op.merge(:auto_increment=>false, :primary_key=>false, :default=>0, :null=>false))}",
+            "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{literal(op[:name])} DROP DEFAULT",
+            "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{literal(op[:name])} SET #{AUTOINCREMENT}"
+            ]
+          else
+            "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op)}"
+          end
         when :drop_column
           "ALTER TABLE #{quote_schema_table(table)} DROP #{column_definition_sql(op)}"
         when :rename_column       # renaming is only possible after db2 v9.7
@@ -66,8 +72,16 @@ module Sequel
           "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} SET DATA TYPE #{type_literal(op)}"
         when :set_column_default
           "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} SET DEFAULT #{literal(op[:default])}"
+        when :add_constraint
+          if op[:type] == :unique
+            sqls = op[:columns].map{|c| ["ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(c)} SET NOT NULL", "CALL ADMIN_CMD(#{literal("REORG TABLE #{table}")})"]}
+            sqls << super
+            sqls.flatten
+          else
+            super
+          end
         else
-          super(table, op)
+          super
         end
       end
 
@@ -121,8 +135,6 @@ module Sequel
       BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
-      # db2 supplies CURRENT_TIMESTAMP in local time instead of utc
-      CONSTANT_MAP = {:CURRENT_TIMESTAMP=>"CURRENT_TIMESTAMP - CURRENT_TIMEZONE".freeze}
       
       def cast_sql(expr, type)
         type == String ?  "RTRIM(CHAR(#{literal(expr)}))" : super
@@ -149,8 +161,22 @@ module Sequel
         end
       end
 
-      def constant_sql(constant)
-        CONSTANT_MAP[constant] || super
+      def fetch_rows(sql, &block)
+        @opts[:offset] ? super(sql){|r| r.delete(row_number_column); yield r} : super(sql, &block)
+      end
+
+      def select_sql
+        return super unless o = @opts[:offset]
+        raise(Error, 'DB2 requires an order be provided if using an offset') unless order = @opts[:order]
+        dsa1 = dataset_alias(1)
+        rn = row_number_column
+        ds = unlimited.unordered
+        ds = ds.select_all(*@opts[:from]) if @opts[:select] == nil || @opts[:select].empty?
+        subselect_sql(ds.
+          select_append{ROW_NUMBER(:over, :order=>order){}.as(rn)}.
+          from_self(:alias=>dsa1).
+          limit(@opts[:limit]).
+          where(SQL::Identifier.new(rn) > o))
       end
 
       def supports_is_true?
@@ -189,6 +215,10 @@ module Sequel
       # Use 1 for true on DB2
       def literal_true
         BOOL_TRUE
+      end
+
+      def row_number_column
+        :x_sequel_row_number_x
       end
 
       # Add a fallback table for empty from situation

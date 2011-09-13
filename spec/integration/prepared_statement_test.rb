@@ -80,7 +80,7 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:id=>:$i).filter(:number=>@ds.select(:number).filter(:number=>@ds.select(:number).filter(:number=>@ds.ba(:$n)))).filter(:id=>:$j).call(:select, :n=>10, :i=>1, :j=>1).should == [{:id=>1, :number=>10}]
   end
   
-  cspecify "should support using a bound variable for a limit and offset", :db2 do
+  specify "should support using a bound variable for a limit and offset" do
     @ds.insert(:number=>20)
     ds = @ds.limit(@ds.ba(:$n), @ds.ba(:$n2)).order(:id)
     ds.call(:select, :n=>1, :n2=>0).should == [{:id=>1, :number=>10}]

@@ -443,7 +443,7 @@ module Sequel
         when :all
           "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING"
         when :rows
-          "ROWS UNBOUNDED PRECEDING"
+          "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"
         when String
           opts[:frame]
         else

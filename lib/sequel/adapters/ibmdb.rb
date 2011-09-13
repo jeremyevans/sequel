@@ -15,6 +15,10 @@ module Sequel
     class Connection
       attr_accessor :prepared_statements
 
+      # Error class for exceptions raised by the connection.
+      class Error < StandardError
+      end
+
       def initialize(connection_string)
         @conn = IBM_DB.connect(connection_string, '', '')
         @prepared_statements = {}
@@ -39,7 +43,9 @@ module Sequel
           stmt = Statement.new(stmt)
           @prepared_statements[ps_name] = [sql, stmt]
         else
-          raise Sequel::DatabaseError, error_msg
+          err = error_msg
+          err = "Error preparing #{ps_name} with SQL: #{sql}" if error_msg.nil? || error_msg.empty?
+          raise Error, err
         end
       end
 
@@ -51,7 +57,7 @@ module Sequel
         stmt = @prepared_statements[ps_name].last
         res = stmt.execute(*values)
         unless res
-          raise Sequel::DatabaseError, "Error executing statement #{ps_name}: #{stmt.error_msg} "
+          raise Error, "Error executing statement #{ps_name}: #{error_msg}"
         end
         stmt
       end
@@ -77,10 +83,6 @@ module Sequel
 
       def execute(*values)    # values are for prepared statement
         IBM_DB.execute(@stmt, values)
-      end
-
-      def error_msg
-        IBM_DB.getErrormsg(@stmt, 0)
       end
 
       def fail?
@@ -151,13 +153,21 @@ module Sequel
         else
           synchronize(opts[:server]){|c| _execute(c, sql, opts, &block)}
         end
-      rescue RuntimeError => e
+      rescue Connection::Error => e
         raise_error(e)
       end
 
-      def execute_insert(sql, opts={}, &block)
-        execute_dui(sql, opts, &block)
-        metadata_dataset.with_sql("SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1").get
+      def execute_insert(sql, opts={})
+        synchronize(opts[:server]) do |c|
+          if sql.is_a?(Symbol)
+            execute_prepared_statement(sql, opts)
+          else
+            _execute(c, sql, opts)
+          end
+          _execute(c, "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1", opts){|stmt| stmt.fetch_array.first}
+        end
+      rescue Connection::Error => e
+        raise_error(e)
       end
 
       def execute_prepared_statement(ps_name, opts)
@@ -166,15 +176,21 @@ module Sequel
         sql = ps.prepared_sql
         synchronize(opts[:server]) do |conn|
           unless conn.prepared_statements.fetch(ps_name, []).first == sql
-            conn.prepare(sql, ps_name)
+            log_yield("Preparing #{ps_name}: #{sql}"){conn.prepare(sql, ps_name)}
           end
           # use eval to remote outer-most quotes for strings and convert float
           # and ingteger back to their ruby types
-          args.map!{|v| v.nil? ? nil : eval(literal(v))}
-          stmt = conn.execute_prepared(ps_name, *args)
+          args = args.map{|v| v.nil? ? nil : eval(literal(v))}
+          stmt = log_yield("Executing #{ps_name}: #{args.inspect}"){conn.execute_prepared(ps_name, *args)}
 
           block_given? ? yield(stmt): stmt.affected
         end
+      end
+
+      def metadata_dataset
+        ds = super
+        ds.convert_smallint_to_bool = false
+        ds
       end
 
       # Convert smallint type to boolean if convert_smallint_to_bool is true
@@ -187,15 +203,17 @@ module Sequel
       end
 
       def table_exists?(name)
+        v ||= false
         sch, table_name = schema_and_table(name)
         name = SQL::QualifiedIdentifier.new(sch, table_name) if sch
         from(name).first
         true
-      rescue Exception => e
+      rescue DatabaseError => e
         # table needs reorg
         if e.to_s =~ /Operation not allowed for reason code "7" on table/
           reorg(name)
-          retry
+          v = true
+          retry 
         end
         false
       end
@@ -240,7 +258,7 @@ module Sequel
 
       def _execute(conn, sql, opts)
         stmt = log_yield(sql){ conn.execute(sql) }
-        raise Sequel::DatabaseError, conn.error_msg if stmt.fail?
+        raise Connection::Error, conn.error_msg if stmt.fail?
         block_given? ? yield(stmt) : stmt.affected
       end
 
@@ -290,25 +308,33 @@ module Sequel
         ps.call(bind_arguments, &block)
       end
 
+      def convert_smallint_to_bool
+        defined?(@convert_smallint_to_bool) ? @convert_smallint_to_bool : (@convert_smallint_to_bool = IBMDB.convert_smallint_to_bool)
+      end
+      attr_writer :convert_smallint_to_bool
+
       def fetch_rows(sql)
         execute(sql) do |stmt|
           break if stmt.fail?
           columns = []
+          convert = convert_smallint_to_bool
           stmt.num_fields.times do |i|
             k = stmt.field_name i
             key = output_identifier(k)
             type = stmt.field_type(k).downcase.to_sym
             # decide if it is a smallint from precision
-            type = :boolean  if type ==:int && IBMDB.convert_smallint_to_bool && stmt.field_precision(k) < 8
+            type = :boolean  if type ==:int && convert && stmt.field_precision(k) < 8
             columns << [key, type]
           end
           @columns = columns.map{|c| c.at(0)}
+          @columns.delete(row_number_column) if @opts[:offset]
 
           while res = stmt.fetch_array
             row = {}
             res.zip(columns).each do |v, (k, t)|
               row[k] = v.nil? ? v : convert_type(v, t)
             end
+            row.delete(row_number_column) if @opts[:offset]
             yield row
           end
           stmt.free
