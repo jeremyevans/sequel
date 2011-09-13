@@ -87,8 +87,8 @@ module Sequel
         ! @stmt
       end
 
-      def fetch_assoc
-        IBM_DB.fetch_assoc(@stmt)   if @stmt
+      def fetch_array
+        IBM_DB.fetch_array(@stmt)   if @stmt
       end
 
       def field_name(ind)
@@ -294,23 +294,20 @@ module Sequel
         execute(sql) do |stmt|
           break if stmt.fail?
           columns = []
-          column_info = {}
           stmt.num_fields.times do |i|
             k = stmt.field_name i
             key = output_identifier(k)
-            column_info[key] = output_identifier(stmt.field_type k)
+            type = stmt.field_type(k).downcase.to_sym
             # decide if it is a smallint from precision
-            column_info[key] = :boolean  if IBMDB::convert_smallint_to_bool and column_info[key] == :int and stmt.field_precision(k) < 8
-            columns << key
+            type = :boolean  if type ==:int && IBMDB.convert_smallint_to_bool && stmt.field_precision(k) < 8
+            columns << [key, type]
           end
-          @columns = columns
+          @columns = columns.map{|c| c.at(0)}
 
-          while res = stmt.fetch_assoc
-            #yield res
+          while res = stmt.fetch_array
             row = {}
-            res.each do |k, v|
-              key = output_identifier(k)
-              row[key] = v.nil? ? v : convert_type(v, column_info[key])
+            res.zip(columns).each do |v, (k, t)|
+              row[k] = v.nil? ? v : convert_type(v, t)
             end
             yield row
           end
