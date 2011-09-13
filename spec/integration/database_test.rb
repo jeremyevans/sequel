@@ -8,10 +8,12 @@ describe Sequel::Database do
     INTEGRATION_DB.pool.size.should == 0
   end
 
-  cspecify "should provide disconnect functionality after preparing a statement", :db2 do
-    INTEGRATION_DB['SELECT 1'].prepare(:first, :a).call
+  specify "should provide disconnect functionality after preparing a statement" do
+    INTEGRATION_DB.create_table!(:items){Integer :i}
+    INTEGRATION_DB[:items].prepare(:first, :a).call
     INTEGRATION_DB.disconnect
     INTEGRATION_DB.pool.size.should == 0
+    INTEGRATION_DB.drop_table(:items) rescue nil
   end
 
   specify "should raise Sequel::DatabaseError on invalid SQL" do
