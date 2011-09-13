@@ -94,5 +94,11 @@ module Sequel
     def supports_window_functions?
       false
     end
+    
+    # Whether the dataset supports WHERE TRUE (or WHERE 1 for databases that
+    # that use 1 for true).
+    def supports_where_true?
+      true
+    end
   end
 end

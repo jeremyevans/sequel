@@ -622,10 +622,18 @@ describe "Dataset#where" do
   end
 
   specify "should accept true and false as arguments" do
-    @dataset.filter(true).sql.should ==
-      "SELECT * FROM test WHERE 't'"
-    @dataset.filter(false).sql.should ==
-      "SELECT * FROM test WHERE 'f'"
+    @dataset.filter(true).sql.should == "SELECT * FROM test WHERE 't'"
+    @dataset.filter(Sequel::SQLTRUE).sql.should == "SELECT * FROM test WHERE 't'"
+    @dataset.filter(false).sql.should == "SELECT * FROM test WHERE 'f'"
+    @dataset.filter(Sequel::SQLFALSE).sql.should == "SELECT * FROM test WHERE 'f'"
+  end
+
+  specify "should use boolean expression if dataset does not support where true/false" do
+    def @dataset.supports_where_true?() false end
+    @dataset.filter(true).sql.should == "SELECT * FROM test WHERE (1 = 1)"
+    @dataset.filter(Sequel::SQLTRUE).sql.should == "SELECT * FROM test WHERE (1 = 1)"
+    @dataset.filter(false).sql.should == "SELECT * FROM test WHERE (1 = 0)"
+    @dataset.filter(Sequel::SQLFALSE).sql.should == "SELECT * FROM test WHERE (1 = 0)"
   end
 
   specify "should allow the use of multiple arguments" do

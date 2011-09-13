@@ -36,6 +36,7 @@ end
   end
 
   def self.cspecify(message, *checked, &block)
+    return specify(message, &block) if ENV['SEQUEL_NO_PENDING']
     pending = false
     checked.each do |c|
       case c

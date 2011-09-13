@@ -214,7 +214,11 @@ module Sequel
 
     # SQL fragment for BooleanConstants
     def boolean_constant_sql(constant)
-      literal(constant)
+      if (constant == true || constant == false) && !supports_where_true?
+        constant == true ? '(1 = 1)' : '(1 = 0)'
+      else
+        literal(constant)
+      end
     end
 
     # SQL fragment for CaseExpression
@@ -303,6 +307,8 @@ module Sequel
         literal(args.at(0))
       when :'B~'
         "~#{literal(args.at(0))}"
+      when :extract
+        "extract(#{args.at(0)} FROM #{literal(args.at(1))})"
       else
         raise(InvalidOperation, "invalid operator #{op}")
       end
