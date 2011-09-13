@@ -12,6 +12,20 @@ module Sequel
       attr_accessor :use_clob_as_blob
     end
 
+    tt = Class.new do
+      def boolean(s) !s.to_i.zero? end
+      def int(s) s.to_i end
+    end.new
+    DB2_TYPES = {
+      :boolean => tt.method(:boolean),
+      :int => tt.method(:int),
+      :blob => ::Sequel::SQL::Blob.method(:new),
+      :time => ::Sequel.method(:string_to_time),
+      :date => ::Sequel.method(:string_to_date),
+      :timestamp => ::Sequel.method(:database_to_application_timestamp)
+    }
+    DB2_TYPES[:clob] = DB2_TYPES[:blob]
+
     class Connection
       attr_accessor :prepared_statements
 
@@ -165,7 +179,7 @@ module Sequel
           else
             _execute(c, sql, opts)
           end
-          _execute(c, "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1", opts){|stmt| stmt.fetch_array.first}
+          _execute(c, "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1", opts){|stmt| stmt.fetch_array.first.to_i}
         end
       rescue Connection::Error => e
         raise_error(e)
@@ -257,6 +271,8 @@ module Sequel
         stmt = log_yield(sql){ conn.execute(sql) }
         raise Connection::Error, conn.error_msg if stmt.fail?
         block_given? ? yield(stmt) : stmt.affected
+      ensure
+        stmt.free
       end
 
     end
@@ -313,6 +329,7 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |stmt|
           break if stmt.fail?
+          offset = @opts[:offset]
           columns = []
           convert = convert_smallint_to_bool
           stmt.num_fields.times do |i|
@@ -321,20 +338,20 @@ module Sequel
             type = stmt.field_type(k).downcase.to_sym
             # decide if it is a smallint from precision
             type = :boolean  if type ==:int && convert && stmt.field_precision(k) < 8
-            columns << [key, type]
+            columns << [key, DB2_TYPES[type]]
           end
-          @columns = columns.map{|c| c.at(0)}
-          @columns.delete(row_number_column) if @opts[:offset]
+          cols = columns.map{|c| c.at(0)}
+          cols.delete(row_number_column) if offset
+          @columns = cols
 
           while res = stmt.fetch_array
             row = {}
-            res.zip(columns).each do |v, (k, t)|
-              row[k] = v.nil? ? v : convert_type(v, t)
+            res.zip(columns).each do |v, (k, pr)|
+              row[k] = ((pr ? pr.call(v) : v) if v)
             end
-            row.delete(row_number_column) if @opts[:offset]
+            row.delete(row_number_column) if offset
             yield row
           end
-          stmt.free
         end
         self
       end
@@ -350,28 +367,6 @@ module Sequel
         end
         ps
       end
-
-      private
-
-      def convert_type(v, type)
-        case type
-        when :time;
-          Sequel::string_to_time v
-        when :date;
-          Sequel::string_to_date v
-        when :timestamp;
-          Sequel::database_to_application_timestamp v
-        when :int;
-          v.to_i
-        when :boolean;
-          v.to_i.zero? ? false : true
-        when :blob, :clob;
-          v.to_sequel_blob
-        else;
-          v
-        end
-      end
-
     end
   end
 end
