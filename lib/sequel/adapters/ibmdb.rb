@@ -65,11 +65,6 @@ module Sequel
       def error_msg
         IBM_DB.getErrormsg(@conn, IBM_DB::DB_CONN)
       end
-
-      def reorg(table)
-        execute("CALL ADMIN_CMD('REORG TABLE #{table}')")
-      end
-
     end
 
     class Statement
@@ -122,7 +117,7 @@ module Sequel
 
       def alter_table(name, generator=nil, &block)
         res = super
-        reorg(name)   # db2 needs to reorg
+        reorg(name)
         res
       end
     
@@ -214,14 +209,14 @@ module Sequel
       end
 
       def table_exists?(name)
-        v ||= false
+        v ||= false # only retry once
         sch, table_name = schema_and_table(name)
         name = SQL::QualifiedIdentifier.new(sch, table_name) if sch
         from(name).first
         true
       rescue DatabaseError => e
-        # table needs reorg
-        if e.to_s =~ /Operation not allowed for reason code "7" on table/
+        if e.to_s =~ /Operation not allowed for reason code "7" on table/ && v == false
+          # table probably needs reorg
           reorg(name)
           v = true
           retry 
@@ -263,10 +258,6 @@ module Sequel
         super
       end
     
-      def reorg(table)
-        synchronize(opts[:server]){|c| c.reorg(table)}
-      end
-
       def _execute(conn, sql, opts)
         stmt = log_yield(sql){ conn.execute(sql) }
         raise Connection::Error, conn.error_msg if stmt.fail?

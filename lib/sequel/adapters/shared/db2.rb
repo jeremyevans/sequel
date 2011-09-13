@@ -74,7 +74,7 @@ module Sequel
           "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} SET DEFAULT #{literal(op[:default])}"
         when :add_constraint
           if op[:type] == :unique
-            sqls = op[:columns].map{|c| ["ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(c)} SET NOT NULL", "CALL ADMIN_CMD(#{literal("REORG TABLE #{table}")})"]}
+            sqls = op[:columns].map{|c| ["ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(c)} SET NOT NULL", reorg_sql(table)]}
             sqls << super
             sqls.flatten
           else
@@ -127,6 +127,14 @@ module Sequel
 
       def rename_table_sql(name, new_name)
         "RENAME TABLE #{quote_schema_table(name)} TO #{quote_schema_table(new_name)}"
+      end
+
+      def reorg(table)
+        synchronize(opts[:server]){|c| c.execute(reorg_sql(table))}
+      end
+
+      def reorg_sql(table)
+        "CALL ADMIN_CMD(#{literal("REORG TABLE #{table}")})"
       end
 
     end
