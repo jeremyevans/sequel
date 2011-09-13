@@ -23,7 +23,7 @@ describe "Simple Dataset operations" do
       {:id => 3, :number=>30} ]   
   end 
 
-  cspecify "should insert with a primary key specified", [:ibmdb], :mssql do
+  cspecify "should insert with a primary key specified", :db2, :mssql do
     @ds.insert(:id=>100, :number=>20)
     @ds.count.should == 2
     @ds.order(:id).all.should == [{:id=>1, :number=>10}, {:id=>100, :number=>20}]
@@ -269,7 +269,7 @@ describe "Simple Dataset operations in transactions" do
     INTEGRATION_DB.drop_table(:items_insert_in_transaction)
   end
 
-  cspecify "should insert correctly with a primary key specified inside a transaction", [:ibmdb] ,:mssql do
+  cspecify "should insert correctly with a primary key specified inside a transaction", :db2, :mssql do
     INTEGRATION_DB.transaction do
       @ds.insert(:id=>100, :number=>20)
       @ds.count.should == 1
@@ -385,7 +385,7 @@ if INTEGRATION_DB.dataset.supports_cte?
       @db[:t].with(:t, @ds.filter(:parent_id=>nil).select(:id)).order(:id).map(:id).should == [1, 2]
     end
     
-    cspecify "should give correct results for recursive WITH", [:ibmdb] do
+    cspecify "should give correct results for recursive WITH", :db2 do
       ds = @db[:t].select(:i___id, :pi___parent_id).with_recursive(:t, @ds.filter(:parent_id=>nil), @ds.join(:t, :i=>:parent_id).select(:i1__id, :i1__parent_id), :args=>[:i, :pi])
       ds.all.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>nil, :id=>2}, {:parent_id=>1, :id=>3}, {:parent_id=>1, :id=>4}, {:parent_id=>3, :id=>5}, {:parent_id=>5, :id=>6}]
       ps = @db[:t].select(:i___id, :pi___parent_id).with_recursive(:t, @ds.filter(:parent_id=>:$n), @ds.join(:t, :i=>:parent_id).filter(:t__i=>:parent_id).select(:i1__id, :i1__parent_id), :args=>[:i, :pi]).prepare(:select, :cte_sel)
@@ -394,7 +394,7 @@ if INTEGRATION_DB.dataset.supports_cte?
       ps.call(:n=>5).should == [{:id=>6, :parent_id=>5}]
     end
 
-    cspecify "should support joining a dataset with a CTE", [:ibmdb] do
+    specify "should support joining a dataset with a CTE" do
       @ds.inner_join(@db[:t].with(:t, @ds.filter(:parent_id=>nil)), :id => :id).select(:i1__id).order(:i1__id).map(:id).should == [1,2]
       @db[:t].with(:t, @ds).inner_join(@db[:s].with(:s, @ds.filter(:parent_id=>nil)), :id => :id).select(:t__id).order(:t__id).map(:id).should == [1,2]
     end
