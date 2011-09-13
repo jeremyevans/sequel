@@ -33,6 +33,12 @@ module Sequel
         IBM_DB.autocommit(@conn, state)
       end
 
+      def commit
+        IBM_DB.commit(@conn)
+      end
+      def rollback
+        IBM_DB.rollback(@conn)
+      end
       def close
         IBM_DB.close(@conn)
       end
@@ -81,11 +87,11 @@ module Sequel
       end
 
       def fail?
-        ! @stmt
+        !@stmt
       end
 
       def fetch_array
-        IBM_DB.fetch_array(@stmt)   if @stmt
+        IBM_DB.fetch_array(@stmt) if @stmt
       end
 
       def field_name(ind)
@@ -182,23 +188,6 @@ module Sequel
         end
       end
 
-      def prepared_statement_arg(v)
-        case v
-        when Numeric
-          v.to_s
-        when Date, Time
-          literal(v).gsub("'", '')
-        else
-          v
-        end
-      end
-
-      def metadata_dataset
-        ds = super
-        ds.convert_smallint_to_bool = false
-        ds
-      end
-
       # Convert smallint type to boolean if convert_smallint_to_bool is true
       def schema_column_type(db_type)
         if Sequel::IBMDB.convert_smallint_to_bool && db_type =~ /smallint/i 
@@ -231,8 +220,37 @@ module Sequel
         conn
       end
 
+      def rollback_transaction(conn, opts={})
+        log_yield(TRANSACTION_ROLLBACK){conn.rollback} if conn
+      ensure
+        conn.autocommit = true if conn
+      end
+
+      def commit_transaction(conn, opts={})
+        log_yield(TRANSACTION_COMMIT){conn.commit} if conn
+      ensure
+        conn.autocommit = true if conn
+      end
+    
       def disconnect_connection(conn)
         conn.close
+      end
+
+      def prepared_statement_arg(v)
+        case v
+        when Numeric
+          v.to_s
+        when Date, Time
+          literal(v).gsub("'", '')
+        else
+          v
+        end
+      end
+
+      def metadata_dataset
+        ds = super
+        ds.convert_smallint_to_bool = false
+        ds
       end
 
       # We uses the clob type by default for Files.
@@ -253,11 +271,6 @@ module Sequel
         column[:type] == :text ? "varchar(#{column[:size]||255})" : super
       end
       
-      def remove_transaction(conn)
-        conn.autocommit = true if conn
-        super
-      end
-    
       def _execute(conn, sql, opts)
         stmt = log_yield(sql){ conn.execute(sql) }
         raise Connection::Error, conn.error_msg if stmt.fail?
