@@ -180,10 +180,21 @@ module Sequel
           end
           # use eval to remote outer-most quotes for strings and convert float
           # and ingteger back to their ruby types
-          args = args.map{|v| v.nil? ? nil : eval(literal(v))}
+          args = args.map{|v| v.nil? ? nil : prepared_statement_arg(v)}
           stmt = log_yield("Executing #{ps_name}: #{args.inspect}"){conn.execute_prepared(ps_name, *args)}
 
           block_given? ? yield(stmt): stmt.affected
+        end
+      end
+
+      def prepared_statement_arg(v)
+        case v
+        when Numeric
+          v.to_s
+        when Date, Time
+          literal(v).gsub("'", '')
+        else
+          v
         end
       end
 
