@@ -89,8 +89,8 @@ module Sequel
         stmt
       end
 
-      # Prepare a statement with the given +sql+ on the database, and store
-      # the cache the prepared statement value by name.
+      # Prepare a statement with the given +sql+ on the database, and
+      # cache the prepared statement value by name.
       def prepare(sql, ps_name)
         if stmt = IBM_DB.prepare(@conn, sql)
           ps_name = ps_name.to_sym
@@ -215,7 +215,7 @@ module Sequel
           else
             _execute(c, sql, opts)
           end
-          _execute(c, "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1", opts){|stmt| stmt.fetch_array.first.to_i}
+          _execute(c, "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1", opts){|stmt| i = stmt.fetch_array.first.to_i; stmt.free; i}
         end
       rescue Connection::Error => e
         raise_error(e)
