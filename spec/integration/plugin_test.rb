@@ -1,7 +1,9 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 # H2 and MSSQL don't support USING joins
-unless [:h2, :mssql].include?(INTEGRATION_DB.database_type)
+# DB2 does not seem to support USING joins in every version; it seems to be
+# valid expression in DB2 iSeries UDB though.
+unless [:h2, :mssql, :db2].include?(INTEGRATION_DB.database_type)
 describe "Class Table Inheritance Plugin" do
   before do
     @db = INTEGRATION_DB
@@ -597,7 +599,8 @@ describe "Composition plugin" do
       composition :date, :mapping=>[:year, :month, :day]
     end
     @e1 = Event.create(:year=>2010, :month=>2, :day=>15)
-    @e2 = Event.create({})
+    # db2 fails when using "VALUES DEFAULT" to populate a record full of NULLs
+    @e2 = Event.create(:year=>nil)
   end
   after do
     @db.drop_table(:events)
@@ -627,7 +630,8 @@ describe "Composition plugin" do
   end
 end
 
-if INTEGRATION_DB.dataset.supports_cte?
+# DB2's implemention of CTE is too limited to use this plugin
+if INTEGRATION_DB.dataset.supports_cte? and INTEGRATION_DB.database_type != :db2
   describe "RcteTree Plugin" do
     before do
       @db = INTEGRATION_DB

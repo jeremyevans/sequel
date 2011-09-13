@@ -7,6 +7,7 @@ describe Sequel::Migrator do
     @m = Sequel::Migrator
   end
   after do
+    @db.disconnect
     [:schema_info, :schema_migrations, :sm1111, :sm1122, :sm2222, :sm2233, :sm3333, :sm11111, :sm22222].each{|n| @db.drop_table(n) rescue nil}
   end
   

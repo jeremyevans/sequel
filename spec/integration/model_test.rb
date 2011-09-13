@@ -11,6 +11,7 @@ describe "Sequel::Model basic support" do
     end
   end
   after do
+    @db.disconnect
     @db.drop_table(:items)
     Object.send(:remove_const, :Item)
   end

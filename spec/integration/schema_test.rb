@@ -328,7 +328,7 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:id=>"10"}, {:id=>"20"}]
   end
 
-  cspecify "should add unique constraints and foreign key table constraints correctly", :sqlite do
+  cspecify "should add unique constraints and foreign key table constraints correctly", :db2, :sqlite do
     @db.create_table!(:items, :engine=>:InnoDB){Integer :id; Integer :item_id}
     @db.alter_table(:items) do
       add_unique_constraint [:item_id, :id]
