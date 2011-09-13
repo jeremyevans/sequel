@@ -124,17 +124,6 @@ module Sequel
       # db2 supplies CURRENT_TIMESTAMP in local time instead of utc
       CONSTANT_MAP = {:CURRENT_TIMESTAMP=>"CURRENT_TIMESTAMP - CURRENT_TIMEZONE".freeze}
       
-      def boolean_constant_sql(constant)
-        case constant
-        when true
-          '(1 = 1)'
-        when false
-          '(1 = 0)'
-        else
-          super
-        end
-      end
-
       def cast_sql(expr, type)
         type == String ?  "RTRIM(CHAR(#{literal(expr)}))" : super
       end
@@ -156,7 +145,7 @@ module Sequel
         when :extract
           "#{args.at(0)}(#{literal(args.at(1))})"
         else
-          super(op, args)
+          super
         end
       end
 
@@ -165,10 +154,6 @@ module Sequel
       end
 
       def supports_is_true?
-        false
-      end
-
-      def supports_multiple_column_in?
         false
       end
 
@@ -191,22 +176,6 @@ module Sequel
 
       private
 
-      # Special case when true or false is provided directly to filter.
-      def filter_expr(expr)
-        if block_given?
-          super
-        else
-          case expr
-          when true
-            Sequel::TRUE
-          when false
-            Sequel::FALSE
-          else
-            super
-          end
-        end
-      end
-      
       # DB2 uses "INSERT INTO "ITEMS" VALUES DEFAULT" for a record with default values to be inserted
       def insert_values_sql(sql)
         opts[:values].empty? ? sql << " VALUES DEFAULT" : super
@@ -224,8 +193,7 @@ module Sequel
 
       # Add a fallback table for empty from situation
       def select_from_sql(sql)
-        @opts[:from] ||= [:sysibm__sysdummy1]
-        super
+        @opts[:from] ? super : (sql << ' FROM "SYSIBM"."SYSDUMMY1"')
       end
 
       # Modify the sql to limit the number of rows returned
