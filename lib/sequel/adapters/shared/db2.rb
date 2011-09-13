@@ -137,6 +137,19 @@ module Sequel
         "CALL ADMIN_CMD(#{literal("REORG TABLE #{table}")})"
       end
 
+      # We uses the clob type by default for Files.
+      # Note: if user select to use blob, then insert statement should use 
+      # use this for blob value:
+      #     cast(X'fffefdfcfbfa' as blob(2G))
+      def type_literal_generic_file(column)
+        IBMDB::use_clob_as_blob ? :clob : :blob
+      end
+
+      def type_literal_generic_trueclass(column)
+        :smallint
+      end
+      alias_method :type_literal_generic_falseclass, :type_literal_generic_trueclass
+
     end
 
     module DatasetMethods

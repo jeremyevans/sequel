@@ -253,24 +253,6 @@ module Sequel
         ds
       end
 
-      # We uses the clob type by default for Files.
-      # Note: if user select to use blob, then insert statement should use 
-      # use this for blob value:
-      #     cast(X'fffefdfcfbfa' as blob(2G))
-      def type_literal_generic_file(column)
-        IBMDB::use_clob_as_blob ? :clob : :blob
-      end
-
-      def type_literal_generic_trueclass(column)
-        :smallint
-      end
-      alias_method :type_literal_generic_falseclass, :type_literal_generic_trueclass
-
-      # DB2 does not have a special type for text
-      def type_literal_specific(column)
-        column[:type] == :text ? "varchar(#{column[:size]||255})" : super
-      end
-      
       def _execute(conn, sql, opts)
         stmt = log_yield(sql){ conn.execute(sql) }
         raise Connection::Error, conn.error_msg if stmt.fail?
