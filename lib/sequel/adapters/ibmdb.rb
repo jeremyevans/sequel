@@ -3,9 +3,6 @@ Sequel.require 'adapters/shared/db2'
 
 module Sequel
 
-  @database_timezone = :utc   # db2 only supports utc
-  @application_timezone = :local
-
   module IBMDB
     @convert_smallint_to_bool = true
     @use_clob_as_blob = true
@@ -42,7 +39,7 @@ module Sequel
           stmt = Statement.new(stmt)
           @prepared_statements[ps_name] = [sql, stmt]
         else
-          raise error_msg
+          raise Sequel::DatabaseError, error_msg
         end
       end
 
@@ -54,7 +51,7 @@ module Sequel
         stmt = @prepared_statements[ps_name].last
         res = stmt.execute(*values)
         unless res
-          raise "Error executing statement #{ps_name}: #{stmt.error_msg} "
+          raise Sequel::DatabaseError, "Error executing statement #{ps_name}: #{stmt.error_msg} "
         end
         stmt
       end
@@ -87,13 +84,13 @@ module Sequel
       end
 
       def fail?
-        return true   unless @stmt
+        ! @stmt
       end
 
       def fetch_assoc
-        return nil  unless @stmt
-        IBM_DB.fetch_assoc(@stmt)
+        IBM_DB.fetch_assoc(@stmt)   if @stmt
       end
+
       def field_name(ind)
         IBM_DB.field_name(@stmt, ind)
       end
@@ -122,9 +119,9 @@ module Sequel
       set_adapter_scheme :ibmdb
 
       def alter_table(name, generator=nil, &block)
-        super
+        res = super
         reorg(name)   # db2 needs to reorg
-        nil
+        res
       end
     
       def connect(server)
@@ -154,17 +151,13 @@ module Sequel
         else
           synchronize(opts[:server]){|c| _execute(c, sql, opts, &block)}
         end
-      rescue Exception => e
+      rescue RuntimeError => e
         raise_error(e)
-      end
-
-      def execute_dui(sql, opts={}, &block)
-        execute(sql, opts, &block)
       end
 
       def execute_insert(sql, opts={}, &block)
         execute_dui(sql, opts, &block)
-        metadata_dataset.get(:'IDENTITY_VAL_LOCAL()')
+        metadata_dataset.with_sql("SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1").get
       end
 
       def execute_prepared_statement(ps_name, opts)
@@ -172,7 +165,7 @@ module Sequel
         ps = prepared_statements[ps_name]
         sql = ps.prepared_sql
         synchronize(opts[:server]) do |conn|
-          unless conn.prepared_statements[ps_name] == sql
+          unless conn.prepared_statements.fetch(ps_name, []).first == sql
             conn.prepare(sql, ps_name)
           end
           # use eval to remote outer-most quotes for strings and convert float
@@ -218,10 +211,6 @@ module Sequel
         conn.close
       end
 
-      def type_literal_generic_falseclass(column)
-        type_literal_generic_trueclass(column)
-      end
-
       # We uses the clob type by default for Files.
       # Note: if user select to use blob, then insert statement should use 
       # use this for blob value:
@@ -233,6 +222,7 @@ module Sequel
       def type_literal_generic_trueclass(column)
         :smallint
       end
+      alias_method :type_literal_generic_falseclass, :type_literal_generic_trueclass
 
       # DB2 does not have a special type for text
       def type_literal_specific(column)
@@ -250,7 +240,7 @@ module Sequel
 
       def _execute(conn, sql, opts)
         stmt = log_yield(sql){ conn.execute(sql) }
-        raise conn.error_msg if stmt.fail?
+        raise Sequel::DatabaseError, conn.error_msg if stmt.fail?
         block_given? ? yield(stmt) : stmt.affected
       end
 
@@ -259,12 +249,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       include Sequel::DB2::DatasetMethods
 
-      BOOL_TRUE = '1'.freeze
-      BOOL_FALSE = '0'.freeze
-      BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
-      # db2 supplies CURRENT_TIMESTAMP in local time instead of utc
-      CONSTANT_MAP = {:CURRENT_TIMESTAMP=>"CURRENT_TIMESTAMP - CURRENT_TIMEZONE".freeze}
-      
       module CallableStatementMethods
         # Extend given dataset with this module so subselects inside subselects in
         # prepared statements work.
@@ -309,27 +293,26 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |stmt|
           break if stmt.fail?
-          unless @columns and @column_info
-            columns = []
-            column_info = {}
-            stmt.num_fields.times do |i|
-              k = stmt.field_name i
-              key = output_identifier(k)
-              column_info[key] = output_identifier(stmt.field_type k)
-              if IBMDB::convert_smallint_to_bool and column_info[key] == :int
-                # decide if it is a smallint from precision
-                precision = stmt.field_precision k
-                column_info[key] = :boolean  if precision < 8
-              end
-              columns << key
-            end
-            @column_info = column_info
-            @columns = columns
+          columns = []
+          column_info = {}
+          stmt.num_fields.times do |i|
+            k = stmt.field_name i
+            key = output_identifier(k)
+            column_info[key] = output_identifier(stmt.field_type k)
+            # decide if it is a smallint from precision
+            column_info[key] = :boolean  if IBMDB::convert_smallint_to_bool and column_info[key] == :int and stmt.field_precision(k) < 8
+            columns << key
           end
+          @columns = columns
 
           while res = stmt.fetch_assoc
             #yield res
-            yield hash_row(res)
+            row = {}
+            res.each do |k, v|
+              key = output_identifier(k)
+              row[key] = v.nil? ? v : convert_type(v, column_info[key])
+            end
+            yield row
           end
           stmt.free
         end
@@ -350,23 +333,23 @@ module Sequel
 
       private
 
-      def hash_row(sth)
-        row = {}
-        sth.each do |k, v|
-            key = output_identifier(k)
-            row[key] = v.nil? ? v : convert_type(v, @column_info[key])
+      def convert_type(v, type)
+        case type
+        when :time;
+          Sequel::string_to_time v
+        when :date;
+          Sequel::string_to_date v
+        when :timestamp;
+          Sequel::database_to_application_timestamp v
+        when :int;
+          v.to_i
+        when :boolean;
+          v.to_i.zero? ? false : true
+        when :blob, :clob;
+          v.to_sequel_blob
+        else;
+          v
         end
-        row
-      end
-      
-      # Use 0 for false on DB2
-      def literal_false
-        BOOL_FALSE
-      end
-
-      # Use 1 for true on DB2
-      def literal_true
-        BOOL_TRUE
       end
 
     end

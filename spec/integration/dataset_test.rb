@@ -87,7 +87,7 @@ describe "Simple Dataset operations" do
     @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
   end
 
-  cspecify "should handle true/false properly", :db2 do
+  specify "should handle true/false properly" do
     @ds.filter(Sequel::TRUE).select_map(:number).should == [10]
     @ds.filter(Sequel::FALSE).select_map(:number).should == []
     @ds.filter(true).select_map(:number).should == [10]
@@ -802,7 +802,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.filter({15=>20}.case(0, :a) > 0).all.should == []
   end
   
-  cspecify "should work with multiple value arrays", [:ibmdb] do
+  specify "should work with multiple value arrays" do
     @ds.insert(20, 10)
     @ds.quote_identifiers = false
     @ds.filter([:a, :b]=>[[20, 10]].sql_array).all.should == [{:a=>20, :b=>10}]
