@@ -43,7 +43,6 @@ module Sequel
         when DB2CLI::SQL_SUCCESS, DB2CLI::SQL_SUCCESS_WITH_INFO
           nil
         else
-          p [:check_error, rc, msg]
           raise DatabaseError, msg
         end
       end
