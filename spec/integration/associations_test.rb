@@ -3,6 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 shared_examples_for "regular and composite key associations" do  
   specify "should return no objects if none are associated" do
     @album.artist.should == nil
+    @artist.first_album.should == nil
     @artist.albums.should == []
     @album.tags.should == []
     @tag.albums.should == []
@@ -17,6 +18,7 @@ shared_examples_for "regular and composite key associations" do
     @tag.reload
     
     @album.artist.should == @artist
+    @artist.first_album.should == @album
     @artist.albums.should == [@album]
     @album.tags.should == [@tag]
     @tag.albums.should == [@album]
@@ -32,6 +34,7 @@ shared_examples_for "regular and composite key associations" do
     
     [Tag, Album, Artist].each{|x| x.plugin :prepared_statements_associations}
     @album.artist.should == @artist
+    @artist.first_album.should == @album
     @artist.albums.should == [@album]
     @album.tags.should == [@tag]
     @tag.albums.should == [@album]
@@ -42,6 +45,7 @@ shared_examples_for "regular and composite key associations" do
     @album.add_tag(@tag)
     
     Artist.filter(:albums=>@album).all.should == [@artist]
+    Artist.filter(:first_album=>@album).all.should == [@artist]
     Album.filter(:artist=>@artist).all.should == [@album]
     Album.filter(:tags=>@tag).all.should == [@album]
     Tag.filter(:albums=>@album).all.should == [@tag]
@@ -55,18 +59,20 @@ shared_examples_for "regular and composite key associations" do
     album, artist, tag = @pr.call
 
     Artist.exclude(:albums=>@album).all.should == [artist]
+    Artist.exclude(:first_album=>@album).all.should == [artist]
     Album.exclude(:artist=>@artist).all.should == [album]
     Album.exclude(:tags=>@tag).all.should == [album]
     Tag.exclude(:albums=>@album).all.should == [tag]
     Album.exclude(:artist=>@artist, :tags=>@tag).all.should == [album]
   end
   
-  cspecify "should work correctly when filtering by multiple associations", :db2 do
+  specify "should work correctly when filtering by multiple associations" do
     album, artist, tag = @pr.call
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
     
     Artist.filter(:albums=>[@album, album]).all.should == [@artist]
+    Artist.filter(:first_album=>[@album, album]).all.should == [@artist]
     Album.filter(:artist=>[@artist, artist]).all.should == [@album]
     Album.filter(:tags=>[@tag, tag]).all.should == [@album]
     Tag.filter(:albums=>[@album, album]).all.should == [@tag]
@@ -76,6 +82,7 @@ shared_examples_for "regular and composite key associations" do
     album.add_tag(tag)
 
     Artist.filter(:albums=>[@album, album]).all.should == [@artist]
+    Artist.filter(:first_album=>[@album, album]).all.should == [@artist]
     Album.filter(:artist=>[@artist, artist]).all.should == [@album]
     Album.filter(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
     Tag.filter(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
@@ -84,16 +91,18 @@ shared_examples_for "regular and composite key associations" do
     album.update(:artist => artist)
 
     Artist.filter(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    Artist.filter(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
     Album.filter(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [@album, album]
     Album.filter(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
     Tag.filter(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
     Album.filter(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
   end
 
-  cspecify "should work correctly when excluding by multiple associations", :db2 do
+  specify "should work correctly when excluding by multiple associations" do
     album, artist, tag = @pr.call
 
     Artist.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    Artist.exclude(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
     Album.exclude(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [@album, album]
     Album.exclude(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
     Tag.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
@@ -103,6 +112,7 @@ shared_examples_for "regular and composite key associations" do
     @album.add_tag(@tag)
 
     Artist.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [artist]
+    Artist.exclude(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [artist]
     Album.exclude(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [album]
     Album.exclude(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [album]
     Tag.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [tag]
@@ -111,6 +121,7 @@ shared_examples_for "regular and composite key associations" do
     album.add_tag(tag)
 
     Artist.exclude(:albums=>[@album, album]).all.should == [artist]
+    Artist.exclude(:first_album=>[@album, album]).all.should == [artist]
     Album.exclude(:artist=>[@artist, artist]).all.should == [album]
     Album.exclude(:tags=>[@tag, tag]).all.should == []
     Tag.exclude(:albums=>[@album, album]).all.should == []
@@ -119,14 +130,16 @@ shared_examples_for "regular and composite key associations" do
     album.update(:artist => artist)
 
     Artist.exclude(:albums=>[@album, album]).all.should == []
+    Artist.exclude(:first_album=>[@album, album]).all.should == []
     Album.exclude(:artist=>[@artist, artist]).all.should == []
     Album.exclude(:tags=>[@tag, tag]).all.should == []
     Tag.exclude(:albums=>[@album, album]).all.should == []
     Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == []
   end
   
-  cspecify "should work correctly when excluding by associations in regards to NULL values", :db2 do
+  specify "should work correctly when excluding by associations in regards to NULL values" do
     Artist.exclude(:albums=>@album).all.should == [@artist]
+    Artist.exclude(:first_album=>@album).all.should == [@artist]
     Album.exclude(:artist=>@artist).all.should == [@album]
     Album.exclude(:tags=>@tag).all.should == [@album]
     Tag.exclude(:albums=>@album).all.should == [@tag]
@@ -156,6 +169,9 @@ shared_examples_for "regular and composite key associations" do
     Artist.filter(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == [@artist, artist]
     Artist.filter(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [artist]
     Artist.filter(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+    Artist.filter(:first_album=>Album.dataset).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    Artist.filter(:first_album=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [artist]
+    Artist.filter(:first_album=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
     Album.filter(:artist=>Artist.dataset).all.sort_by{|x| x.pk}.should == [@album, album]
     Album.filter(:artist=>Artist.dataset.filter(Array(Artist.primary_key).zip(Array(artist.pk)))).all.sort_by{|x| x.pk}.should == [album]
     Album.filter(:artist=>Artist.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
@@ -222,13 +238,14 @@ shared_examples_for "regular and composite key associations" do
     @tag.albums.should == []
   end
   
-  cspecify "should eager load via eager correctly", :db2 do
+  specify "should eager load via eager correctly" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
     
-    a = Artist.eager(:albums=>:tags).all
+    a = Artist.eager(:albums=>:tags).eager(:first_album).all
     a.should == [@artist]
     a.first.albums.should == [@album]
+    a.first.first_album.should == @album
     a.first.albums.first.tags.should == [@tag]
     
     a = Tag.eager(:albums=>:artist).all
@@ -237,13 +254,28 @@ shared_examples_for "regular and composite key associations" do
     a.first.albums.first.artist.should == @artist
   end
   
+  specify "should eager load one_to_one associations with multiple matching objects correctly" do
+    @album.update(:artist => @artist)
+    diff_album = @diff_album.call
+    
+    a = Artist.eager(:first_album).all
+    a.should == [@artist]
+    a.first.first_album.should == @album
+
+    same_album = @same_album.call
+    a = Artist.eager(:first_album).all
+    a.should == [@artist]
+    [@album, same_album].should include(a.first.first_album)
+  end
+  
   specify "should eager load via eager_graph correctly" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
     
-    a = Artist.eager_graph(:albums=>:tags).all
+    a = Artist.eager_graph(:albums=>:tags).eager_graph(:first_album).all
     a.should == [@artist]
     a.first.albums.should == [@album]
+    a.first.first_album.should == @album
     a.first.albums.first.tags.should == [@tag]
     
     a = Tag.eager_graph(:albums=>:artist).all
@@ -252,7 +284,7 @@ shared_examples_for "regular and composite key associations" do
     a.first.albums.first.artist.should == @artist
   end
   
-  cspecify "should work with a many_through_many association", :db2 do
+  specify "should work with a many_through_many association" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
 
@@ -304,8 +336,9 @@ describe "Sequel::Model Simple Associations" do
     end
     class ::Artist < Sequel::Model(@db)
       one_to_many :albums
+      one_to_one :first_album, :class=>:Album, :order=>:name
       plugin :many_through_many
-      Artist.many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]]
+      many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]]
     end
     class ::Album < Sequel::Model(@db)
       many_to_one :artist
@@ -317,6 +350,8 @@ describe "Sequel::Model Simple Associations" do
     @album = Album.create(:name=>'Al')
     @artist = Artist.create(:name=>'Ar')
     @tag = Tag.create(:name=>'T')
+    @same_album = lambda{Album.create(:name=>'Al', :artist_id=>@artist.id)}
+    @diff_album = lambda{Album.create(:name=>'lA', :artist_id=>@artist.id)}
     @pr = lambda{[Album.create(:name=>'Al2'),Artist.create(:name=>'Ar2'),Tag.create(:name=>'T2')]}
     @ins = lambda{@db[:albums_tags].insert(:tag_id=>@tag.id)}
   end
@@ -325,6 +360,8 @@ describe "Sequel::Model Simple Associations" do
     [:Tag, :Album, :Artist].each{|x| Object.send(:remove_const, x)}
   end
   
+  it_should_behave_like "regular and composite key associations"
+
   specify "should handle aliased tables when eager_graphing" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
@@ -348,8 +385,6 @@ describe "Sequel::Model Simple Associations" do
     a.first.balbums.first.bartist.should == @artist
   end
   
-  it_should_behave_like "regular and composite key associations"
-
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums
     Album.delete
@@ -468,8 +503,9 @@ describe "Sequel::Model Composite Key Associations" do
       set_primary_key :id1, :id2
       unrestrict_primary_key
       one_to_many :albums, :key=>[:artist_id1, :artist_id2]
+      one_to_one :first_album, :key=>[:artist_id1, :artist_id2], :class=>:Album, :order=>:name
       plugin :many_through_many
-      Artist.many_through_many :tags, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]]
+      many_through_many :tags, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]]
     end
     class ::Album < Sequel::Model(@db)
       set_primary_key :id1, :id2
@@ -485,6 +521,8 @@ describe "Sequel::Model Composite Key Associations" do
     @album = Album.create(:name=>'Al', :id1=>1, :id2=>2)
     @artist = Artist.create(:name=>'Ar', :id1=>3, :id2=>4)
     @tag = Tag.create(:name=>'T', :id1=>5, :id2=>6)
+    @same_album = lambda{Album.create(:name=>'Al', :id1=>7, :id2=>8, :artist_id1=>3, :artist_id2=>4)}
+    @diff_album = lambda{Album.create(:name=>'lA', :id1=>9, :id2=>10, :artist_id1=>3, :artist_id2=>4)}
     @pr = lambda{[Album.create(:name=>'Al2', :id1=>11, :id2=>12),Artist.create(:name=>'Ar2', :id1=>13, :id2=>14),Tag.create(:name=>'T2', :id1=>15, :id2=>16)]}
     @ins = lambda{@db[:albums_tags].insert(:tag_id1=>@tag.id1, :tag_id2=>@tag.id2)}
   end

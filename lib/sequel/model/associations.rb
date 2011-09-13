@@ -940,8 +940,10 @@ module Sequel
               next unless objects = h[hash_key]
               if one_to_one
                 objects.each do |object| 
-                  object.associations[name] = assoc_record
-                  assoc_record.associations[reciprocal] = object if reciprocal
+                  unless object.associations[name]
+                    object.associations[name] = assoc_record
+                    assoc_record.associations[reciprocal] = object if reciprocal
+                  end
                 end
               else
                 objects.each do |object| 
@@ -1170,7 +1172,6 @@ module Sequel
             associations[name]
           else
             objs = _load_associated_objects(opts, dynamic_opts)
-            run_association_callbacks(opts, :after_load, objs)
             if opts.set_reciprocal_to_self?
               if opts.returns_array?
                 objs.each{|o| add_reciprocal_object(opts, o)}
@@ -1179,6 +1180,8 @@ module Sequel
               end
             end
             associations[name] = objs
+            run_association_callbacks(opts, :after_load, objs)
+            associations[name]
           end
         end
 

@@ -10,7 +10,7 @@ module Sequel
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'".freeze
       TEMP_STORE = [:default, :file, :memory].freeze
       VIEWS_FILTER = "type = 'view'".freeze
-      
+
       # Run all alter_table commands in a transaction.  This is technically only
       # needed for drop column.
       def alter_table(name, generator=nil, &block)
@@ -105,6 +105,19 @@ module Sequel
       # SQLite 3.6.8+ supports savepoints. 
       def supports_savepoints?
         sqlite_version >= 30608
+      end
+
+      # Override the default setting for whether to use timezones in timestamps.
+      # For backwards compatibility, it is set to +true+ by default.
+      # Anyone wanting to use SQLite's datetime functions should set it to +false+
+      # using this method.  It's possible that the default will change in a future version,
+      # so anyone relying on timezones in timestamps should set this to +true+.
+      attr_writer :use_timestamp_timezones
+
+      # SQLite supports timezones in timestamps, since it just stores them as strings,
+      # but it breaks the usage of SQLite's datetime functions.
+      def use_timestamp_timezones?
+        defined?(@use_timestamp_timezones) ? @use_timestamp_timezones : (@use_timestamp_timezones = true)
       end
 
       # A symbol signifying the value of the synchronous PRAGMA.
@@ -339,23 +352,7 @@ module Sequel
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct columns from join where group having compounds order limit')
       COMMA_SEPARATOR = ', '.freeze
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
-
-      # Ugly hack.  Really, SQLite uses 0 for false and 1 for true
-      # but then you can't differentiate between integers and booleans.
-      # In filters, SQL::BooleanConstants are used more, while in other places
-      # the ruby true/false values are used more, so use 1/0 for SQL::BooleanConstants.
-      # The correct fix for this would require separate literalization paths for
-      # filters compared to other values, but that's more work than I want to do right now.
-      def boolean_constant_sql(constant)
-        case constant
-        when true
-          '1'
-        when false
-          '0'
-        else
-          super
-        end
-      end
+      EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%f'"}
 
       # SQLite does not support pattern matching via regular expressions.
       # SQLite is case insensitive (depending on pragma), so use LIKE for
@@ -367,6 +364,15 @@ module Sequel
         when :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'
           # SQLite is case insensitive for ASCII, and non case sensitive for other character sets
           "#{'NOT ' if [:'NOT LIKE', :'NOT ILIKE'].include?(op)}(#{literal(args.at(0))} LIKE #{literal(args.at(1))})"
+        when :^
+          a = literal(args.at(0))
+          b = literal(args.at(1))
+          "((~(#{a} & #{b})) & (#{a} | #{b}))"
+        when :extract
+          part = args.at(0)
+          raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
+          expr = args.at(1)
+          "CAST(strftime(#{format}, #{literal(expr)}) AS #{part == :second ? 'NUMERIC' : 'INTEGER'})"
         else
           super(op, args)
         end
@@ -418,33 +424,23 @@ module Sequel
       end
       
       # SQLite supports timezones in literal timestamps, since it stores them
-      # as text.
+      # as text.  But using timezones in timestamps breaks SQLite datetime
+      # functions, so we allow the user to override the default per database.
       def supports_timestamp_timezones?
-        true
+        db.use_timestamp_timezones?
       end
 
+      # SQLite cannot use WHERE 't'.
+      def supports_where_true?
+        false
+      end
+      
       private
       
       # SQLite uses string literals instead of identifiers in AS clauses.
       def as_sql(expression, aliaz)
         aliaz = aliaz.value if aliaz.is_a?(SQL::Identifier)
         "#{expression} AS #{literal(aliaz.to_s)}"
-      end
-      
-      # Special case when true or false is provided directly to filter.
-      def filter_expr(expr)
-        if block_given?
-          super
-        else
-          case expr
-          when true
-            1
-          when false
-            0
-          else
-            super
-          end
-        end
       end
       
       # SQL fragment specifying a list of identifiers

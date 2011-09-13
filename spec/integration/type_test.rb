@@ -6,7 +6,7 @@ describe "Supported types" do
     INTEGRATION_DB[:items]
   end
 
-  cspecify "should support casting correctly", [:sqlite, :sqlite] do
+  specify "should support casting correctly" do
     ds = create_items_table_with_column(:number, Integer)
     ds.insert(:number => 1)
     ds.select(:number.cast_string.as(:n)).map(:n).should == %w'1'

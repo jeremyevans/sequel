@@ -242,6 +242,7 @@ module Sequel
       UPDLOCK = ' WITH (UPDLOCK)'.freeze
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
+      EXTRACT_MAP = {:year=>"yy", :month=>"m", :day=>"d", :hour=>"hh", :minute=>"n", :second=>"s"}
 
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
       attr_accessor :mssql_unicode_strings
@@ -250,29 +251,6 @@ module Sequel
       def initialize(db, opts={})
         super
         @mssql_unicode_strings = db.mssql_unicode_strings
-      end
-
-      # Ugly hack.  While MSSQL supports TRUE and FALSE values, you can't
-      # actually specify them directly in SQL.  Unfortunately, you also cannot
-      # use an integer value when a boolean is required.  Also unforunately, you
-      # cannot use an expression that yields a boolean type in cases where in an
-      # integer type is needed, such as inserting into a bit field (the closest thing
-      # MSSQL has to a boolean).
-      #
-      # In filters, SQL::BooleanConstants are used more, while in other places
-      # the ruby true/false values are used more, so use expressions that return booleans
-      # for SQL::BooleanConstants, and 1/0 for other places.
-      # The correct fix for this would require separate literalization paths for
-      # filters compared to other values, but that's more work than I want to do right now.
-      def boolean_constant_sql(constant)
-        case constant
-        when true
-          '(1 = 1)'
-        when false
-          '(1 = 0)'
-        else
-          super
-        end
       end
 
       # MSSQL uses + for string concatenation, and LIKE is case insensitive by default.
@@ -288,6 +266,13 @@ module Sequel
           "(#{literal(args[0])} * POWER(2, #{literal(args[1])}))"
         when :>>
           "(#{literal(args[0])} / POWER(2, #{literal(args[1])}))"
+        when :extract
+          part = args.at(0)
+          raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
+          expr = literal(args.at(1))
+          s = "datepart(#{format}, #{expr})"
+          s = "CAST((#{s} + datepart(ns, #{expr})/1000000000.0) AS double precision)" if part == :second
+          s
         else
           super(op, args)
         end
@@ -450,6 +435,11 @@ module Sequel
       def supports_window_functions?
         true
       end
+
+      # MSSQL cannot use WHERE 1.
+      def supports_where_true?
+        false
+      end
       
       protected
       # MSSQL does not allow ordering in sub-clauses unless 'top' (limit) is specified
@@ -458,6 +448,7 @@ module Sequel
       end
 
       private
+
       def is_2005_or_later?
         server_version >= 9000000
       end
@@ -489,22 +480,6 @@ module Sequel
       end
       alias insert_with_sql delete_with_sql
       alias update_with_sql delete_with_sql
-      
-      # Special case when true or false is provided directly to filter.
-      def filter_expr(expr)
-        if block_given?
-          super
-        else
-          case expr
-          when true
-            Sequel::TRUE
-          when false
-            Sequel::FALSE
-          else
-            super
-          end
-        end
-      end
       
       # MSSQL raises an error if you try to provide more than 3 decimal places
       # for a fractional timestamp.  This probably doesn't work for smalldatetime

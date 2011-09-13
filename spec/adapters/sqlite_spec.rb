@@ -66,6 +66,17 @@ describe "An SQLite database" do
     @db[:fk].all.should == [{:id=>1, :parent_id=>2}]
   end
   
+  specify "should support a use_timestamp_timezones setting" do
+    @db.create_table!(:time){Time :time}
+    @db[:time].insert(Time.now)
+    @db[:time].get(:time.cast_string).should =~ /[-+]\d\d\d\d\z/
+    @db.use_timestamp_timezones = false
+    @db[:time].delete
+    @db[:time].insert(Time.now)
+    @db[:time].get(:time.cast_string).should_not =~ /[-+]\d\d\d\d\z/
+    @db.use_timestamp_timezones = true
+  end
+  
   specify "should provide a list of existing tables" do
     @db.drop_table(:testing) rescue nil
     @db.tables.should be_a_kind_of(Array)

@@ -560,6 +560,19 @@ describe Sequel::Model, "many_to_one" do
     parent.pk.should == 20
   end
 
+  it "should support after_load association callback that changes the cached object" do
+    h = []
+    @c2.many_to_one :parent, :class => @c2, :after_load=>:al
+    @c2.class_eval do
+      def al(v)
+        associations[:parent] = :foo
+      end
+    end
+    p = @c2.load(:id=>10, :parent_id=>20)
+    p.parent.should == :foo
+    p.associations[:parent].should == :foo
+  end
+
   it "should raise error and not call internal add or remove method if before callback returns false, even if raise_on_save_failure is false" do
     # The reason for this is that assignment in ruby always returns the argument instead of the result
     # of the method, so we can't return nil to signal that the association callback prevented the modification

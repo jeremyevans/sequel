@@ -964,7 +964,13 @@ module Sequel
       when Symbol, SQL::Expression
         expr
       when TrueClass, FalseClass
-        SQL::BooleanExpression.new(:NOOP, expr)
+        if supports_where_true?
+          SQL::BooleanExpression.new(:NOOP, expr)
+        elsif expr
+          SQL::Constants::SQLTRUE
+        else
+          SQL::Constants::SQLFALSE
+        end
       when String
         LiteralString.new("(#{expr})")
       else

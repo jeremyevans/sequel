@@ -87,7 +87,7 @@ describe "Simple Dataset operations" do
     @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
   end
 
-  cspecify "should handle true/false properly", :db2 do
+  specify "should handle true/false properly" do
     @ds.filter(Sequel::TRUE).select_map(:number).should == [10]
     @ds.filter(Sequel::FALSE).select_map(:number).should == []
     @ds.filter(true).select_map(:number).should == [10]
@@ -584,7 +584,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.group_and_count(:a___c).order(:count).all.each{|h| h[:count] = h[:count].to_i}.should == [{:c=>30, :count=>1}, {:c=>20, :count=>2}]
   end
   
-  cspecify "#range should return the range between the maximum and minimum values", :sqlite do
+  specify "#range should return the range between the maximum and minimum values" do
     @ds = @ds.unordered
     @ds.insert(20, 10)
     @ds.insert(30, 10)
@@ -709,7 +709,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.get{~b.sql_number}.to_i.should == -4
   end
   
-  cspecify "should work with the bitwise xor operator", :sqlite do
+  specify "should work with the bitwise xor operator" do
     @ds.insert(3, 5)
     @ds.get{a.sql_number ^ b}.to_i.should == 6
   end
@@ -802,7 +802,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.filter({15=>20}.case(0, :a) > 0).all.should == []
   end
   
-  cspecify "should work with multiple value arrays", [:ibmdb] do
+  specify "should work with multiple value arrays" do
     @ds.insert(20, 10)
     @ds.quote_identifiers = false
     @ds.filter([:a, :b]=>[[20, 10]].sql_array).all.should == [{:a=>20, :b=>10}]
@@ -871,12 +871,16 @@ describe "SQL Extract Function" do
     @db.drop_table(:a)
   end
   
-  cspecify "should return the part of the datetime asked for", :sqlite, :mssql, :db2 do
+  specify "should return the part of the datetime asked for" do
     t = Time.now
+    def @ds.supports_timestamp_timezones?() false end
     @ds.insert(t)
     @ds.get{a.extract(:year)}.should == t.year
     @ds.get{a.extract(:month)}.should == t.month
     @ds.get{a.extract(:day)}.should == t.day
+    @ds.get{a.extract(:hour)}.should == t.hour
+    @ds.get{a.extract(:minute)}.should == t.min
+    @ds.get{a.extract(:second)}.to_i.should == t.sec
   end
 end
 

@@ -18,7 +18,7 @@ module Sequel
       def schema_parse_table(table, opts = {})
         m = output_identifier_meth
         im = input_identifier_meth
-        metadata_dataset.with_sql("SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = '#{im.call(table)}'").
+        metadata_dataset.with_sql("SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = #{im.call(literal(table))}").
           collect do |column| 
             column[:db_type]     = column.delete(:typename)
             if column[:db_type]  == "DECIMAL"
@@ -34,18 +34,20 @@ module Sequel
       end
 
       def tables
-        metadata_dataset.with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='T' AND OWNER = '#{opts[:user].upcase}'").
+        metadata_dataset.
+          with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='T' AND OWNER = #{input_identifier_meth.call(literal(opts[:user]))}").
           all.map{|h| output_identifier_meth.call(h[:tabname]) }
       end
 
       def views
-        metadata_dataset.with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='V' AND OWNER = '#{opts[:user].upcase}'").
+        metadata_dataset.
+          with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='V' AND OWNER = #{input_identifier_meth.call(literal(opts[:user]))}").
           all.map{|h| output_identifier_meth.call(h[:tabname]) }
       end
 
       def indexes(table, opts = {})
         metadata_dataset.
-          with_sql("select indname, uniquerule, made_unique, system_required from SYSCAT.INDEXES where TABNAME = '#{table.to_s.upcase}'").
+          with_sql("SELECT INDNAME,UNIQUERULE,MADE_UNIQUE,SYSTEM_REQUIRED FROM SYSCAT.INDEXES WHERE TABNAME = #{input_identifier_meth.call(literal(table))}").
           all.map{|h| Hash[ h.map{|k,v| [k.to_sym, v]} ] }
       end
 
@@ -117,9 +119,22 @@ module Sequel
 
     module DatasetMethods
       BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}
+      BOOL_TRUE = '1'.freeze
+      BOOL_FALSE = '0'.freeze
       # db2 supplies CURRENT_TIMESTAMP in local time instead of utc
       CONSTANT_MAP = {:CURRENT_TIMESTAMP=>"CURRENT_TIMESTAMP - CURRENT_TIMEZONE".freeze}
       
+      def boolean_constant_sql(constant)
+        case constant
+        when true
+          '(1 = 1)'
+        when false
+          '(1 = 0)'
+        else
+          super
+        end
+      end
+
       def cast_sql(expr, type)
         type == String ?  "RTRIM(CHAR(#{literal(expr)}))" : super
       end
@@ -138,6 +153,8 @@ module Sequel
           "(#{literal(args[0])} * POWER(2, #{literal(args[1])}))"
         when :>>
           "(#{literal(args[0])} / POWER(2, #{literal(args[1])}))"
+        when :extract
+          "#{args.at(0)}(#{literal(args.at(1))})"
         else
           super(op, args)
         end
@@ -147,12 +164,11 @@ module Sequel
         CONSTANT_MAP[constant] || super
       end
 
-      # Add a fallback table for empty from situation
-      def get(*args)
-        @opts[:from] ? super : from(:sysibm__sysdummy1).get(*args)
+      def supports_is_true?
+        false
       end
 
-      def supports_is_true?
+      def supports_multiple_column_in?
         false
       end
 
@@ -175,44 +191,41 @@ module Sequel
 
       private
 
-      def convert_type(v, type)
-        case type
-        when :time;
-          Sequel::string_to_time v
-        when :date;
-          Sequel::string_to_date v
-        when :timestamp;
-          Sequel::database_to_application_timestamp v
-        when :int;
-          v.to_i
-        when :boolean;
-          v.to_i.zero? ? false : true
-        when :blob, :clob;
-          v.to_sequel_blob
-        else;
-          v
+      # Special case when true or false is provided directly to filter.
+      def filter_expr(expr)
+        if block_given?
+          super
+        else
+          case expr
+          when true
+            Sequel::TRUE
+          when false
+            Sequel::FALSE
+          else
+            super
+          end
         end
       end
-
+      
       # DB2 uses "INSERT INTO "ITEMS" VALUES DEFAULT" for a record with default values to be inserted
       def insert_values_sql(sql)
         opts[:values].empty? ? sql << " VALUES DEFAULT" : super
       end
 
-      # Modify the sql to limit the number of rows returned
-      # Note: 
-      #
-      #     After db2 v9.7, MySQL flavored "LIMIT X OFFSET Y" can be enabled using
-      #
-      #     db2set DB2_COMPATIBILITY_VECTOR=MYS
-      #     db2stop
-      #     db2start
-      #
-      #     Support for this feature is not used in this adapter however.
-      def select_limit_sql(sql)
-        if l = @opts[:limit]
-          sql << " FETCH FIRST #{l == 1 ? 'ROW' : "#{literal(l)} ROWS"} ONLY"
-        end
+      # Use 0 for false on DB2
+      def literal_false
+        BOOL_FALSE
+      end
+
+      # Use 1 for true on DB2
+      def literal_true
+        BOOL_TRUE
+      end
+
+      # Add a fallback table for empty from situation
+      def select_from_sql(sql)
+        @opts[:from] ||= [:sysibm__sysdummy1]
+        super
       end
 
       # Modify the sql to limit the number of rows returned
@@ -220,7 +233,7 @@ module Sequel
       #
       #     After db2 v9.7, MySQL flavored "LIMIT X OFFSET Y" can be enabled using
       #
-      #     db2set DB2_COMPATIBILITY_VECTOR=MYS
+      #     db2set DB2_COMPATIBILITY_VECTOR=MYSQL
       #     db2stop
       #     db2start
       #
@@ -234,7 +247,7 @@ module Sequel
       def _truncate_sql(table)
         # "TRUNCATE #{table} IMMEDIATE" is only for newer version of db2, so we
         # use the following one
-        "ALTER TABLE #{table} ACTIVATE NOT LOGGED INITIALLY WITH EMPTY TABLE"
+        "ALTER TABLE #{quote_schema_table(table)} ACTIVATE NOT LOGGED INITIALLY WITH EMPTY TABLE"
       end
     end
   end
