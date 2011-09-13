@@ -16,6 +16,8 @@ module Sequel
       def boolean(s) !s.to_i.zero? end
       def int(s) s.to_i end
     end.new
+
+    # Hash holding type translation methods, used by Dataset#fetch_rows.
     DB2_TYPES = {
       :boolean => tt.method(:boolean),
       :int => tt.method(:int),
@@ -26,37 +28,67 @@ module Sequel
     }
     DB2_TYPES[:clob] = DB2_TYPES[:blob]
 
+    # Wraps an underlying connection to DB2 using IBM_DB.
     class Connection
+      # A hash with prepared statement name symbol keys, where each value is 
+      # a two element array with an sql string and cached Statement value.
       attr_accessor :prepared_statements
 
       # Error class for exceptions raised by the connection.
       class Error < StandardError
       end
 
+      # Create the underlying IBM_DB connection.
       def initialize(connection_string)
         @conn = IBM_DB.connect(connection_string, '', '')
+        @conn.autocommit = true
         @prepared_statements = {}
       end
 
+      # Check whether the connection is in autocommit state or not.
       def autocommit
         IBM_DB.autocommit(@conn) == 1
       end
 
+      # Turn autocommit on or off for the connection.
       def autocommit=(value)
-        state = value ? IBM_DB::SQL_AUTOCOMMIT_ON : IBM_DB::SQL_AUTOCOMMIT_OFF 
-        IBM_DB.autocommit(@conn, state)
+        IBM_DB.autocommit(@conn, value ? IBM_DB::SQL_AUTOCOMMIT_ON : IBM_DB::SQL_AUTOCOMMIT_OFF)
       end
 
-      def commit
-        IBM_DB.commit(@conn)
-      end
-      def rollback
-        IBM_DB.rollback(@conn)
-      end
+      # Close the connection, disconnecting from DB2.
       def close
         IBM_DB.close(@conn)
       end
 
+      # Commit the currently outstanding transaction on this connection.
+      def commit
+        IBM_DB.commit(@conn)
+      end
+
+      # Return the related error message for the connection.
+      def error_msg
+        IBM_DB.getErrormsg(@conn, IBM_DB::DB_CONN)
+      end
+
+      # Execute the given SQL on the database, and return a Statement instance
+      # holding the results.
+      def execute(sql)
+        Statement.new(IBM_DB.exec(@conn, sql))
+      end
+
+      # Execute the related prepared statement on the database with the given
+      # arguments.
+      def execute_prepared(ps_name, *values)
+        stmt = @prepared_statements[ps_name].last
+        res = stmt.execute(*values)
+        unless res
+          raise Error, "Error executing statement #{ps_name}: #{error_msg}"
+        end
+        stmt
+      end
+
+      # Prepare a statement with the given +sql+ on the database, and store
+      # the cache the prepared statement value by name.
       def prepare(sql, ps_name)
         if stmt = IBM_DB.prepare(@conn, sql)
           ps_name = ps_name.to_sym
@@ -69,62 +101,61 @@ module Sequel
         end
       end
 
-      def execute(sql)
-        Statement.new(IBM_DB.exec(@conn, sql))
-      end
-
-      def execute_prepared(ps_name, *values)
-        stmt = @prepared_statements[ps_name].last
-        res = stmt.execute(*values)
-        unless res
-          raise Error, "Error executing statement #{ps_name}: #{error_msg}"
-        end
-        stmt
-      end
-
-      def error_msg
-        IBM_DB.getErrormsg(@conn, IBM_DB::DB_CONN)
+      # Rollback the currently outstanding transaction on this connection.
+      def rollback
+        IBM_DB.rollback(@conn)
       end
     end
 
+    # Wraps results returned by queries on IBM_DB.
     class Statement
+      # Hold the given statement.
       def initialize(stmt)
         @stmt = stmt
       end
 
+      # Return the number of rows affected.
       def affected
         IBM_DB.num_rows(@stmt)
       end
 
-      def execute(*values)    # values are for prepared statement
+      # If this statement is a prepared statement, execute it on the database
+      # with the given values.
+      def execute(*values)
         IBM_DB.execute(@stmt, values)
       end
 
+      # Return true if there is no underlying statement.
       def fail?
         !@stmt
       end
 
+      # Return the results of a query as an array of values.
       def fetch_array
         IBM_DB.fetch_array(@stmt) if @stmt
       end
 
+      # Return the field name at the given column in the result set.
       def field_name(ind)
         IBM_DB.field_name(@stmt, ind)
       end
 
+      # Return the field type for the given field name in the result set.
       def field_type(key)
         IBM_DB.field_type(@stmt, key)
       end
 
-      # use this one to determine if is a smallint
+      # Return the field precision for the given field name in the result set.
       def field_precision(key)
         IBM_DB.field_precision(@stmt, key)
       end
 
+      # Free the memory related to this result set.
       def free
         IBM_DB.free_result(@stmt)
       end
 
+      # Return the number of fields in the result set.
       def num_fields
         IBM_DB.num_fields(@stmt)
       end
@@ -135,12 +166,16 @@ module Sequel
 
       set_adapter_scheme :ibmdb
 
+      # REORG the related table whenever it is altered.  This is not always
+      # required, but it is necessary for compatibilty with other Sequel
+      # code in many cases.
       def alter_table(name, generator=nil, &block)
         res = super
         reorg(name)
         res
       end
     
+      # Create a new connection object for the given server.
       def connect(server)
         opts = server_opts(server)
         
@@ -158,10 +193,12 @@ module Sequel
         Connection.new(connection_string)
       end
 
+      # Return a related IBMDB::Dataset instance with the given options.
       def dataset(opts = nil)
         IBMDB::Dataset.new(self, opts)
       end
 
+      # Execute the given SQL on the database.
       def execute(sql, opts={}, &block)
         if sql.is_a?(Symbol)
           execute_prepared_statement(sql, opts, &block)
@@ -172,6 +209,8 @@ module Sequel
         raise_error(e)
       end
 
+      # Execute the given SQL on the database, returning the last inserted
+      # identity value.
       def execute_insert(sql, opts={})
         synchronize(opts[:server]) do |c|
           if sql.is_a?(Symbol)
@@ -185,6 +224,7 @@ module Sequel
         raise_error(e)
       end
 
+      # Execute a prepared statement named by name on the database.
       def execute_prepared_statement(ps_name, opts)
         args = opts[:arguments]
         ps = prepared_statements[ps_name]
@@ -193,12 +233,18 @@ module Sequel
           unless conn.prepared_statements.fetch(ps_name, []).first == sql
             log_yield("Preparing #{ps_name}: #{sql}"){conn.prepare(sql, ps_name)}
           end
-          # use eval to remote outer-most quotes for strings and convert float
-          # and ingteger back to their ruby types
           args = args.map{|v| v.nil? ? nil : prepared_statement_arg(v)}
           stmt = log_yield("Executing #{ps_name}: #{args.inspect}"){conn.execute_prepared(ps_name, *args)}
 
-          block_given? ? yield(stmt): stmt.affected
+          if block_given?
+            begin
+              yield(stmt)
+            ensure
+              stmt.free
+            end
+          else  
+            stmt.affected
+          end
         end
       end
 
@@ -211,6 +257,9 @@ module Sequel
         end
       end
 
+      # On DB2, a table might need to be REORGed if you are testing existence
+      # of it.  This REORGs automatically if the database raises a specific
+      # error that indicates it should be REORGed.
       def table_exists?(name)
         v ||= false # only retry once
         sch, table_name = schema_and_table(name)
@@ -229,46 +278,9 @@ module Sequel
 
       private
 
-      def begin_transaction(conn, opts={})
-        log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
-        conn
-      end
-
-      def rollback_transaction(conn, opts={})
-        log_yield(TRANSACTION_ROLLBACK){conn.rollback} if conn
-      ensure
-        conn.autocommit = true if conn
-      end
-
-      def commit_transaction(conn, opts={})
-        log_yield(TRANSACTION_COMMIT){conn.commit} if conn
-      ensure
-        conn.autocommit = true if conn
-      end
-    
-      def disconnect_connection(conn)
-        conn.close
-      end
-
-      def prepared_statement_arg(v)
-        case v
-        when Numeric
-          v.to_s
-        when Date, Time
-          literal(v).gsub("'", '')
-        else
-          v
-        end
-      end
-
-      def metadata_dataset
-        ds = super
-        ds.convert_smallint_to_bool = false
-        ds
-      end
-
+      # Execute the given SQL on the database.
       def _execute(conn, sql, opts)
-        stmt = log_yield(sql){ conn.execute(sql) }
+        stmt = log_yield(sql){conn.execute(sql)}
         raise Connection::Error, conn.error_msg if stmt.fail?
         if block_given?
           begin
@@ -281,6 +293,56 @@ module Sequel
         end
       end
 
+      # IBM_DB uses an autocommit setting instead of sending SQL queries.
+      # So starting a transaction just turns autocommit off.
+      def begin_transaction(conn, opts={})
+        log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
+        conn
+      end
+
+      # This commits transaction in progress on the
+      # connection and sets autocommit back on.
+      def commit_transaction(conn, opts={})
+        log_yield(TRANSACTION_COMMIT){conn.commit} if conn
+      ensure
+        conn.autocommit = true if conn
+      end
+    
+      # Close the given connection.
+      def disconnect_connection(conn)
+        conn.close
+      end
+
+      # Don't convert smallint to boolean for the metadata
+      # dataset, since the DB2 metadata does not use
+      # boolean columns, and some smallint columns are
+      # accidently treated as booleans.
+      def metadata_dataset
+        ds = super
+        ds.convert_smallint_to_bool = false
+        ds
+      end
+
+      # Format Numeric, Date, and Time types specially for use
+      # as IBM_DB prepared statements argument vlaues.
+      def prepared_statement_arg(v)
+        case v
+        when Numeric
+          v.to_s
+        when Date, Time
+          literal(v).gsub("'", '')
+        else
+          v
+        end
+      end
+
+      # This rolls back the transaction in progress on the
+      # connection and sets autocommit back on.
+      def rollback_transaction(conn, opts={})
+        log_yield(TRANSACTION_ROLLBACK){conn.rollback} if conn
+      ensure
+        conn.autocommit = true if conn
+      end
     end
     
     class Dataset < Sequel::Dataset
@@ -303,35 +365,40 @@ module Sequel
         include Sequel::Dataset::UnnumberedArgumentMapper
         
         private
-        # Execute the prepared statement with the bind arguments instead of
-        # the given SQL.
+        # Execute the prepared statement with arguments instead of the given SQL.
         def execute(sql, opts={}, &block)
           super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
+        # Execute the prepared statment with arguments instead of the given SQL.
         def execute_dui(sql, opts={}, &block)
           super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
         end
 
-        # Execute the given SQL on the database using execute_insert.
+        # Execute the prepared statement with arguments instead of the given SQL.
         def execute_insert(sql, opts={}, &block)
           super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
         end
 
       end
       
-      # emulate level of support of bind arguments same to MySQL
+      # Emulate support of bind arguments in called statements.
       def call(type, bind_arguments={}, *values, &block)
         ps = to_prepared_statement(type, values)
         ps.extend(CallableStatementMethods)
         ps.call(bind_arguments, &block)
       end
 
+      # Whether to convert smallint to boolean arguments for this dataset.
+      # Defaults to the IBMDB module setting.
       def convert_smallint_to_bool
         defined?(@convert_smallint_to_bool) ? @convert_smallint_to_bool : (@convert_smallint_to_bool = IBMDB.convert_smallint_to_bool)
       end
+
+      # Override the default IBMDB.convert_smallint_to_bool setting for this dataset.
       attr_writer :convert_smallint_to_bool
 
+      # Fetch the rows from the database and yield plain hashes.
       def fetch_rows(sql)
         execute(sql) do |stmt|
           break if stmt.fail?

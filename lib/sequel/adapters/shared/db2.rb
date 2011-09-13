@@ -5,16 +5,20 @@ module Sequel
       NOT_NULL      = ' NOT NULL'.freeze
       NULL          = ''.freeze
 
+      # DB2 always uses :db2 as it's database type
       def database_type
         :db2
       end
       
+      # Return the database version as a string.  Don't rely on this,
+      # it may return an integer in the future.
       def db2_version
         return @db2_version if @db2_version
         @db2_version = metadata_dataset.with_sql("select service_level from sysibmadm.env_inst_info").first[:service_level]
       end
       alias_method :server_version, :db2_version
 
+      # Use SYSIBM.SYSCOLUMNS to get the information on the tables.
       def schema_parse_table(table, opts = {})
         m = output_identifier_meth
         im = input_identifier_meth
@@ -31,18 +35,21 @@ module Sequel
           end
       end
 
+      # Use SYSCAT.TABLES to get the tables for the database
       def tables
         metadata_dataset.
           with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='T' AND OWNER = #{literal(input_identifier_meth.call(opts[:user]))}").
           all.map{|h| output_identifier_meth.call(h[:tabname]) }
       end
 
+      # Use SYSCAT.TABLES to get the views for the database
       def views
         metadata_dataset.
           with_sql("SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE='V' AND OWNER = #{literal(input_identifier_meth.call(opts[:user]))}").
           all.map{|h| output_identifier_meth.call(h[:tabname]) }
       end
 
+      # Use SYSCAT.INDEXES to get the indexes for the table
       def indexes(table, opts = {})
         metadata_dataset.
           with_sql("SELECT INDNAME,UNIQUERULE,MADE_UNIQUE,SYSTEM_REQUIRED FROM SYSCAT.INDEXES WHERE TABNAME = #{literal(input_identifier_meth.call(table))}").
@@ -51,7 +58,7 @@ module Sequel
 
       private
 
-      # db2 specific alter table
+      # Handle DB2 specific alter table operations.
       def alter_table_sql(table, op)
         case op[:op]
         when :add_column
@@ -85,7 +92,7 @@ module Sequel
         end
       end
 
-      # db2 specific autoincrement
+      # DB2 uses an identity column for autoincrement.
       def auto_increment_sql
         AUTOINCREMENT
       end
@@ -113,7 +120,7 @@ module Sequel
       # http://www.ibm.com/developerworks/data/library/techarticle/dm-0912globaltemptable/
       def create_table_sql(name, generator, options)
         if options[:temp]
-          "DECLARE GLOBAL TEMPORARY TABLE #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)} (#{column_list_sql(generator)})"
+          "DECLARE GLOBAL TEMPORARY TABLE #{quote_identifier(name)} (#{column_list_sql(generator)})"
         else
           super
         end
@@ -125,14 +132,18 @@ module Sequel
         false
       end
 
+      # DB2 uses RENAME TABLE to rename tables.
       def rename_table_sql(name, new_name)
         "RENAME TABLE #{quote_schema_table(name)} TO #{quote_schema_table(new_name)}"
       end
 
+      # Run the REORG TABLE command for the table, necessary when
+      # the table has been altered.
       def reorg(table)
         synchronize(opts[:server]){|c| c.execute(reorg_sql(table))}
       end
 
+      # The SQL to use for REORGing a table.
       def reorg_sql(table)
         "CALL ADMIN_CMD(#{literal("REORG TABLE #{table}")})"
       end
@@ -145,11 +156,11 @@ module Sequel
         IBMDB::use_clob_as_blob ? :clob : :blob
       end
 
+      # DB2 uses smallint to store booleans.
       def type_literal_generic_trueclass(column)
         :smallint
       end
-      alias_method :type_literal_generic_falseclass, :type_literal_generic_trueclass
-
+      alias type_literal_generic_falseclass type_literal_generic_trueclass
     end
 
     module DatasetMethods
@@ -157,11 +168,13 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       
+      # DB2 casts strings using RTRIM and CHAR instead of VARCHAR.
       def cast_sql(expr, type)
         type == String ?  "RTRIM(CHAR(#{literal(expr)}))" : super
       end
 
-      # Work around DB2's lack of a case insensitive LIKE operator
+      # Handle DB2 specific LIKE and bitwise operator support, and
+      # emulate the extract method, which DB2 doesn't natively support.
       def complex_expression_sql(op, args)
         case op
         when :ILIKE
@@ -182,16 +195,21 @@ module Sequel
         end
       end
 
+      # Delete the row_number_column if offsets are being emulated with
+      # ROW_NUMBER.
       def fetch_rows(sql, &block)
         @opts[:offset] ? super(sql){|r| r.delete(row_number_column); yield r} : super(sql, &block)
       end
 
+      # Emulate OFFSET support with ROW_NUMBER
       def select_sql
         return super unless o = @opts[:offset]
         raise(Error, 'DB2 requires an order be provided if using an offset') unless order = @opts[:order]
         dsa1 = dataset_alias(1)
         rn = row_number_column
         ds = unlimited.unordered
+        # DB2 doesn't seem to like *, ROW_NUMBER in select, but selecting from all FROM
+        # tables seems to work.  TODO: Should probably handle JOIN tables as well.
         ds = ds.select_all(*@opts[:from]) if @opts[:select] == nil || @opts[:select].empty?
         subselect_sql(ds.
           select_append{ROW_NUMBER(:over, :order=>order){}.as(rn)}.
@@ -200,14 +218,17 @@ module Sequel
           where(SQL::Identifier.new(rn) > o))
       end
 
+      # DB2 does not support IS TRUE.
       def supports_is_true?
         false
       end
 
+      # DB2 does not support multiple columns in IN.
       def supports_multiple_column_in?
         false
       end
 
+      # DB2 does not support fractional seconds in timestamps.
       def supports_timestamp_usecs?
         false
       end
@@ -217,6 +238,7 @@ module Sequel
         true
       end
 
+      # DB2 does not support WHERE 1.
       def supports_where_true?
         false
       end
@@ -238,6 +260,7 @@ module Sequel
         BOOL_TRUE
       end
 
+      # Holds the ROW_NUMBER value, used in offset emulation.
       def row_number_column
         :x_sequel_row_number_x
       end
