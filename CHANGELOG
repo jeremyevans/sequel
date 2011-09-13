@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Model.set_dataset to accept Sequel::LiteralString arguments as table names (jeremyevans)
+
 * Association :after_load hooks in lazy loading are now called after the associated objects have been cached (jeremyevans)
  
 * Emulate handling of extract on MSSQL, using datepart (jeremyevans)
