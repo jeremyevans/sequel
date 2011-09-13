@@ -2185,6 +2185,12 @@ describe "Dataset#join_table" do
     @d.join(:categories, [:id]).sql.should == 'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."id" = "items"."id")'
   end
 
+  specify "should hoist WITH clauses from subqueries if the dataset doesn't support CTEs in subselects" do
+    @d.meta_def(:supports_cte?){true}
+    @d.meta_def(:supports_cte_in_subselect?){false}
+    @d.join(Sequel::Dataset.new(nil).from(:categories).with(:a, Sequel::Dataset.new(nil).from(:b)), [:id]).sql.should == 'WITH "a" AS (SELECT * FROM b) SELECT * FROM "items" INNER JOIN (SELECT * FROM categories) AS "t1" USING ("id")'
+  end
+
   specify "should raise an error if using an array of symbols with a block" do
     proc{@d.join(:categories, [:id]){|j,lj,js|}}.should raise_error(Sequel::Error)
   end
@@ -2258,7 +2264,6 @@ describe "Dataset#join_table" do
     @d.from(:items.as(:i)).join(:categories.as(:c), {:category_id => :id}, {:table_alias=>:c2, :implicit_qualifier=>:i2}).sql.should ==
       'SELECT * FROM "items" AS "i" INNER JOIN "categories" AS "c2" ON ("c2"."category_id" = "i2"."id")'
   end
-  
   
   specify "should not allow insert, update, delete, or truncate" do
     proc{@d.join(:categories, :a=>:d).insert_sql}.should raise_error(Sequel::InvalidOperation)

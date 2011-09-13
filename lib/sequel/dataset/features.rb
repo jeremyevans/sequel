@@ -38,6 +38,13 @@ module Sequel
       select_clause_methods.include?(WITH_SUPPORTED)
     end
 
+    # Whether the dataset supports common table expressions (the WITH clause)
+    # in subqueries.  If false, applies the WITH clause to the main query, which can cause issues
+    # if multiple WITH clauses use the same name.
+    def supports_cte_in_subqueries?
+      false
+    end
+
     # Whether the dataset supports the DISTINCT ON clause, false by default.
     def supports_distinct_on?
       false

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#supports_cte_in_subqueries? for checking whether database supports WITH in subqueries (jeremyevans)
+
 * Allow Model.set_dataset to accept Sequel::LiteralString arguments as table names (jeremyevans)
 
 * Association :after_load hooks in lazy loading are now called after the associated objects have been cached (jeremyevans)
