@@ -131,11 +131,6 @@ describe "Prepared Statements and Bound Arguments" do
     INTEGRATION_DB.call(:select_n, :n=>10).should == [{:id=>1, :number=>10}]
     @ds.filter(:number=>@ds.ba(:$n)).prepare(:first, :select_n)
     INTEGRATION_DB.call(:select_n, :n=>10).should == {:id=>1, :number=>10}
-    if INTEGRATION_DB.adapter_scheme == :jdbc and INTEGRATION_DB.database_type == :sqlite
-      # Work around for open prepared statements on a table not allowing the
-      # dropping of a table when using SQLite over JDBC
-      INTEGRATION_DB.synchronize{|c| c.prepared_statements[:select_n][1].close}
-    end
   end
 
   specify "should support placeholder literal strings with prepare" do
@@ -225,17 +220,13 @@ describe "Prepared Statements and Bound Arguments" do
     INTEGRATION_DB.call(:select_n, :n=>10).should == [@c.load(:id=>1, :number=>10)]
     @c.filter(:number=>@ds.ba(:$n)).prepare(:first, :select_n)
     INTEGRATION_DB.call(:select_n, :n=>10).should == @c.load(:id=>1, :number=>10)
-    if INTEGRATION_DB.adapter_scheme == :jdbc and INTEGRATION_DB.database_type == :sqlite
-      # Work around for open prepared statements on a table not allowing the
-      # dropping of a table when using SQLite over JDBC
-      INTEGRATION_DB.synchronize{|c| c.prepared_statements[:select_n][1].close}
-    end
   end
 end
 
 describe "Bound Argument Types" do
   before do
-    INTEGRATION_DB.create_table!(:items) do
+    @db = INTEGRATION_DB
+    @db.create_table!(:items) do
       primary_key :id
       Date :d
       DateTime :dt
@@ -245,7 +236,7 @@ describe "Bound Argument Types" do
       Float :f
       TrueClass :b
     end
-    @ds = INTEGRATION_DB[:items]
+    @ds = @db[:items]
     @vs = {:d=>Date.civil(2010, 10, 11), :dt=>DateTime.civil(2010, 10, 12, 13, 14, 15), :f=>1.0, :s=>'str', :t=>Time.at(20101010), :file=>Sequel::SQL::Blob.new('blob'), :b=>true}
     @ds.insert(@vs)
     @ds.meta_def(:ba) do |sym, type|
@@ -254,41 +245,43 @@ describe "Bound Argument Types" do
   end
   after do
     Sequel.datetime_class = Time
-    if INTEGRATION_DB.adapter_scheme == :jdbc && INTEGRATION_DB.database_type == :sqlite
-      INTEGRATION_DB.synchronize{|c| c.prepared_statements.each{|k, ps| ps[1].close}.clear}
+    begin
+      @db.drop_table(:items)
+    rescue
+      # some databases don't like dropping tables if connections have used them
+      @db.disconnect 
+      @db.drop_table(:items)
     end
-    INTEGRATION_DB.disconnect
-    INTEGRATION_DB.drop_table(:items)
   end
 
-  #cspecify "should handle date type", [:do, :sqlite], :mssql, [:jdbc, :sqlite] do 
-    #@ds.filter(:d=>@ds.ba(:$x, :date)).prepare(:first, :ps_date).call(:x=>@vs[:d])[:d].should == @vs[:d]
-  #end
+  cspecify "should handle date type", [:do, :sqlite], :mssql, [:jdbc, :sqlite] do 
+    @ds.filter(:d=>@ds.ba(:$x, :date)).prepare(:first, :ps_date).call(:x=>@vs[:d])[:d].should == @vs[:d]
+  end
 
-  #cspecify "should handle datetime type", [:do], [:mysql2], [:swift], [:jdbc, :sqlite], [:tinytds] do
-    #Sequel.datetime_class = DateTime
-    #@ds.filter(:dt=>@ds.ba(:$x, :timestamp)).prepare(:first, :ps_datetime).call(:x=>@vs[:dt])[:dt].should == @vs[:dt]
-  #end
+  cspecify "should handle datetime type", [:do], [:mysql2], [:swift], [:jdbc, :sqlite], [:tinytds] do
+    Sequel.datetime_class = DateTime
+    @ds.filter(:dt=>@ds.ba(:$x, :timestamp)).prepare(:first, :ps_datetime).call(:x=>@vs[:dt])[:dt].should == @vs[:dt]
+  end
 
-  #cspecify "should handle time type", [:do], [:jdbc, :sqlite] do
-    #@ds.filter(:t=>@ds.ba(:$x, :timestamp)).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
-  #end
+  cspecify "should handle time type", [:do], [:jdbc, :sqlite] do
+    @ds.filter(:t=>@ds.ba(:$x, :timestamp)).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
+  end
 
   cspecify "should handle blob type", [:swift], [:odbc] do
     @ds.filter(:file=>@ds.ba(:$x, :bytea)).prepare(:first, :ps_blob).call(:x=>@vs[:file])[:file].should == @vs[:file]
   end
 
-  #cspecify "should handle float type", [:swift, :sqlite] do
-    #@ds.filter(:f=>@ds.ba(:$x, :"double precision")).prepare(:first, :ps_float).call(:x=>@vs[:f])[:f].should == @vs[:f]
-  #end
+  cspecify "should handle float type", [:swift, :sqlite] do
+    @ds.filter(:f=>@ds.ba(:$x, :"double precision")).prepare(:first, :ps_float).call(:x=>@vs[:f])[:f].should == @vs[:f]
+  end
 
-  #specify "should handle string type" do
-    #@ds.filter(:s=>@ds.ba(:$x, :text)).prepare(:first, :ps_string).call(:x=>@vs[:s])[:s].should == @vs[:s]
-  #end
+  specify "should handle string type" do
+    @ds.filter(:s=>@ds.ba(:$x, :text)).prepare(:first, :ps_string).call(:x=>@vs[:s])[:s].should == @vs[:s]
+  end
 
-  #cspecify "should handle boolean type", [:do, :sqlite], [:odbc, :mssql], [:jdbc, :sqlite]  do
-    #@ds.filter(:b=>@ds.ba(:$x, :boolean)).prepare(:first, :ps_string).call(:x=>@vs[:b])[:b].should == @vs[:b]
-  #end
+  cspecify "should handle boolean type", [:do, :sqlite], [:odbc, :mssql], [:jdbc, :sqlite]  do
+    @ds.filter(:b=>@ds.ba(:$x, :boolean)).prepare(:first, :ps_string).call(:x=>@vs[:b])[:b].should == @vs[:b]
+  end
 end unless INTEGRATION_DB.adapter_scheme == :swift && INTEGRATION_DB.database_type == :postgres
 
 describe "Dataset#unbind" do
