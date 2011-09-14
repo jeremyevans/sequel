@@ -209,8 +209,8 @@ module Sequel
         rn = row_number_column
         ds = unlimited.unordered
         # DB2 doesn't seem to like *, ROW_NUMBER in select, but selecting from all FROM
-        # tables seems to work.  TODO: Should probably handle JOIN tables as well.
-        ds = ds.select_all(*@opts[:from]) if @opts[:select] == nil || @opts[:select].empty?
+        # tables seems to work.
+        ds = ds.select_all(*(Array(@opts[:from]) + Array(@opts[:join]))) if @opts[:select] == nil || @opts[:select].empty?
         subselect_sql(ds.
           select_append{ROW_NUMBER(:over, :order=>order){}.as(rn)}.
           from_self(:alias=>dsa1).

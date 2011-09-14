@@ -89,6 +89,23 @@ describe "Simple Dataset operations" do
     @ds.order(:id).limit(2, 1).all.should == [{:id=>2, :number=>20}]
   end
   
+  specify "should fetch correctly with a limit and offset for different combinations of from and join tables" do
+    @db.create_table(:items2){primary_key :id2; Integer :number2}
+    @db[:items2].insert(1, 10)
+    @ds.from(:items, :items2).order(:id).limit(2, 0).all.should == [{:id=>1, :number=>10, :id2=>1, :number2=>10}]
+    @ds.from(:items___i, :items2___i2).order(:id).limit(2, 0).all.should == [{:id=>1, :number=>10, :id2=>1, :number2=>10}]
+    @ds.cross_join(:items2).order(:id).limit(2, 0).all.should ==[{:id=>1, :number=>10, :id2=>1, :number2=>10}]
+    @ds.from(:items___i).cross_join(:items2___i).order(:id).limit(2, 0).all.should == [{:id=>1, :number=>10, :id2=>1, :number2=>10}]
+    @ds.cross_join(:items2___i).cross_join(@db[:items2].select(:id2___id3, :number2___number3)).order(:id).limit(2, 0).all.should == [{:id=>1, :number=>10, :id2=>1, :number2=>10, :id3=>1, :number3=>10}]
+
+    @ds.from(:items, :items2).order(:id).limit(2, 1).all.should == []
+    @ds.from(:items___i, :items2___i2).order(:id).limit(2, 1).all.should == []
+    @ds.cross_join(:items2).order(:id).limit(2, 1).all.should == []
+    @ds.from(:items___i).cross_join(:items2___i).order(:id).limit(2, 1).all.should == []
+    @ds.cross_join(:items2___i).cross_join(@db[:items2].select(:id2___id3, :number2___number3)).order(:id).limit(2, 1).all.should == []
+    @db.drop_table(:items2)
+  end
+  
   cspecify "should fetch correctly with a limit and offset without an order", :db2, :mssql do
     @ds.limit(2, 1).all.should == []
   end
