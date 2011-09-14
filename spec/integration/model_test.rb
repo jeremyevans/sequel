@@ -11,13 +11,7 @@ describe "Sequel::Model basic support" do
     end
   end
   after do
-    begin
-      @db.drop_table(:items)
-    rescue
-      # some databases don't like dropping tables if connections have used them
-      @db.disconnect 
-      @db.drop_table(:items)
-    end
+    @db.drop_table(:items)
     Object.send(:remove_const, :Item)
   end
 

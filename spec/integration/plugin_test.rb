@@ -599,7 +599,6 @@ describe "Composition plugin" do
       composition :date, :mapping=>[:year, :month, :day]
     end
     @e1 = Event.create(:year=>2010, :month=>2, :day=>15)
-    # db2 fails when using "VALUES DEFAULT" to populate a record full of NULLs
     @e2 = Event.create(:year=>nil)
   end
   after do

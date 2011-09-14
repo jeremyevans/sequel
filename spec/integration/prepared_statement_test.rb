@@ -15,13 +15,7 @@ describe "Prepared Statements and Bound Arguments" do
     end
   end
   after do
-    begin
-      @db.drop_table(:items)
-    rescue
-      # some databases don't like dropping tables if connections have used them
-      @db.disconnect 
-      @db.drop_table(:items)
-    end
+    @db.drop_table(:items)
   end
   
   specify "should support bound variables with select, all, and first" do
@@ -245,13 +239,7 @@ describe "Bound Argument Types" do
   end
   after do
     Sequel.datetime_class = Time
-    begin
-      @db.drop_table(:items)
-    rescue
-      # some databases don't like dropping tables if connections have used them
-      @db.disconnect 
-      @db.drop_table(:items)
-    end
+    @db.drop_table(:items)
   end
 
   cspecify "should handle date type", [:do, :sqlite], :mssql, [:jdbc, :sqlite] do 
@@ -296,7 +284,6 @@ describe "Dataset#unbind" do
     @u = proc{|ds| ds, bv = ds.unbind; ds.call(:first, bv)}
   end
   after do
-    INTEGRATION_DB.disconnect
     INTEGRATION_DB.drop_table(:items) rescue nil
   end
   

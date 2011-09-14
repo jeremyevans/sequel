@@ -8,7 +8,7 @@ describe Sequel::Database do
     INTEGRATION_DB.pool.size.should == 0
   end
 
-  cspecify "should provide disconnect functionality after preparing a connection", :db2 do
+  cspecify "should provide disconnect functionality after preparing a statement", :db2 do
     INTEGRATION_DB['SELECT 1'].prepare(:first, :a).call
     INTEGRATION_DB.disconnect
     INTEGRATION_DB.pool.size.should == 0

@@ -2,16 +2,17 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Simple Dataset operations" do
   before do
-    INTEGRATION_DB.create_table!(:items) do
+    @db = INTEGRATION_DB
+    @db.create_table!(:items) do
       primary_key :id
       Integer :number
     end
-    @ds = INTEGRATION_DB[:items]
+    @ds = @db[:items]
     @ds.insert(:number=>10)
     clear_sqls
   end
   after do
-    INTEGRATION_DB.drop_table(:items)
+    @db.drop_table(:items)
   end
 
   specify "should support sequential primary keys" do
@@ -32,6 +33,15 @@ describe "Simple Dataset operations" do
   specify "should have insert return primary key value" do
     @ds.insert(:number=>20).should == 2
     @ds.filter(:id=>2).first[:number].should == 20
+  end
+
+  cspecify "should have insert work correctly when inserting a row with all NULL values", :db2 do
+    @db.create_table!(:items) do
+      String :name
+      Integer :number
+    end
+    proc{@ds.insert}.should_not raise_error
+    @ds.all.should == [{:name=>nil, :number=>nil}]
   end
 
   specify "should delete correctly" do
