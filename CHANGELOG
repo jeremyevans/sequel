@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up type translation slightly in mysql, postgres, and sqlite adapters (jeremyevans)
+
 * Add Dataset#supports_cte_in_subqueries? for checking whether database supports WITH in subqueries (jeremyevans)
 
 * Allow Model.set_dataset to accept Sequel::LiteralString arguments as table names (jeremyevans)
