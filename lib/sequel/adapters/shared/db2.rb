@@ -1,5 +1,12 @@
 module Sequel
   module DB2
+    @use_clob_as_blob = true
+
+    class << self
+      # Whether to use clob as the generic File type, true by default.
+      attr_accessor :use_clob_as_blob
+    end
+
     module DatabaseMethods
       AUTOINCREMENT = 'GENERATED ALWAYS AS IDENTITY'.freeze
       NOT_NULL      = ' NOT NULL'.freeze
@@ -153,7 +160,7 @@ module Sequel
       # use this for blob value:
       #     cast(X'fffefdfcfbfa' as blob(2G))
       def type_literal_generic_file(column)
-        IBMDB::use_clob_as_blob ? :clob : :blob
+        ::Sequel::DB2::use_clob_as_blob ? :clob : :blob
       end
 
       # DB2 uses smallint to store booleans.

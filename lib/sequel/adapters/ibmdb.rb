@@ -5,11 +5,11 @@ module Sequel
 
   module IBMDB
     @convert_smallint_to_bool = true
-    @use_clob_as_blob = true
 
     class << self
+      # Whether to convert smallint values to bool, true by default.
+      # Can also be overridden per dataset.
       attr_accessor :convert_smallint_to_bool
-      attr_accessor :use_clob_as_blob
     end
 
     tt = Class.new do
