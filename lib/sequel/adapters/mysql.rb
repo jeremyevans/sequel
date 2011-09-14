@@ -12,25 +12,20 @@ module Sequel
   module MySQL
     TYPE_TRANSLATOR = tt = Class.new do
       def boolean(s) s.to_i != 0 end
-      def blob(s) ::Sequel::SQL::Blob.new(s) end
       def integer(s) s.to_i end
       def float(s) s.to_f end
-      def decimal(s) ::BigDecimal.new(s) end
-      def date(s) ::Sequel.string_to_date(s) end
-      def time(s) ::Sequel.string_to_time(s) end
-      def timestamp(s) ::Sequel.database_to_application_timestamp(s) end
-      def date_conv(s) ::Sequel::MySQL.convert_date_time(:string_to_date, s) end
-      def time_conv(s) ::Sequel::MySQL.convert_date_time(:string_to_time, s) end
-      def timestamp_conv(s) ::Sequel::MySQL.convert_date_time(:database_to_application_timestamp, s) end
+      def date(s) ::Sequel::MySQL.convert_date_time(:string_to_date, s) end
+      def time(s) ::Sequel::MySQL.convert_date_time(:string_to_time, s) end
+      def timestamp(s) ::Sequel::MySQL.convert_date_time(:database_to_application_timestamp, s) end
     end.new
 
     # Hash with integer keys and callable values for converting MySQL types.
     MYSQL_TYPES = {}
     {
-      [0, 246]  => tt.method(:decimal),
-      [2, 3, 8, 9, 13, 247, 248]  => tt.method(:integer),
-      [4, 5]  => tt.method(:float),
-      [249, 250, 251, 252]  => tt.method(:blob)
+      [0, 246] => ::BigDecimal.method(:new),
+      [2, 3, 8, 9, 13, 247, 248] => tt.method(:integer),
+      [4, 5] => tt.method(:float),
+      [249, 250, 251, 252] => ::Sequel::SQL::Blob.method(:new)
     }.each do |k,v|
       k.each{|n| MYSQL_TYPES[n] = v}
     end
@@ -54,10 +49,10 @@ module Sequel
     # Modify the type translators for the date, time, and timestamp types
     # depending on the value given.
     def self.convert_invalid_date_time=(v)
-      MYSQL_TYPES[11] = TYPE_TRANSLATOR.method(v == false ? :time : :time_conv)
-      m = TYPE_TRANSLATOR.method(v == false ? :date : :date_conv)
+      MYSQL_TYPES[11] = (v != false) ?  TYPE_TRANSLATOR.method(:time) : ::Sequel.method(:string_to_time)
+      m = (v != false) ? TYPE_TRANSLATOR.method(:date) : ::Sequel.method(:string_to_date)
       [10, 14].each{|i| MYSQL_TYPES[i] = m}
-      m = TYPE_TRANSLATOR.method(v == false ? :timestamp : :timestamp_conv)
+      m = (v != false) ? TYPE_TRANSLATOR.method(:timestamp) : ::Sequel.method(:database_to_application_timestamp)
       [7, 12].each{|i| MYSQL_TYPES[i] = m}
       @convert_invalid_date_time = v
     end
