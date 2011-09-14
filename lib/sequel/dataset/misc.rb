@@ -140,7 +140,7 @@ module Sequel
       "#<#{self.class}: #{sql.inspect}>"
     end
     
-    # Splits a possible implicit alias in C, handling both SQL::AliasedExpressions
+    # Splits a possible implicit alias in +c+, handling both SQL::AliasedExpressions
     # and Symbols.  Returns an array of two elements, with the first being the
     # main expression, and the second being the alias.
     def split_alias(c)
@@ -150,6 +150,8 @@ module Sequel
         [c_table ? SQL::QualifiedIdentifier.new(c_table, column.to_sym) : column.to_sym, aliaz]
       when SQL::AliasedExpression
         [c.expression, c.aliaz]
+      when SQL::JoinClause
+        [c.table, c.table_alias]
       else
         [c, nil]
       end

@@ -1308,6 +1308,32 @@ describe "Dataset#select_all" do
   specify "should select all columns all tables if given a multiple arguments" do
     @d.select_all(:test, :foo).sql.should == 'SELECT test.*, foo.* FROM test'
   end
+  
+  specify "should work correctly with qualified symbols" do
+    @d.select_all(:sch__test).sql.should == 'SELECT sch.test.* FROM test'
+  end
+  
+  specify "should work correctly with aliased symbols" do
+    @d.select_all(:test___al).sql.should == 'SELECT al.* FROM test'
+    @d.select_all(:sch__test___al).sql.should == 'SELECT al.* FROM test'
+  end
+  
+  specify "should work correctly with SQL::Identifiers" do
+    @d.select_all(:test.identifier).sql.should == 'SELECT test.* FROM test'
+  end
+  
+  specify "should work correctly with SQL::QualifiedIdentifier" do
+    @d.select_all(:test.qualify(:sch)).sql.should == 'SELECT sch.test.* FROM test'
+  end
+  
+  specify "should work correctly with SQL::AliasedExpressions" do
+    @d.select_all(:test.as(:al)).sql.should == 'SELECT al.* FROM test'
+  end
+  
+  specify "should work correctly with SQL::JoinClauses" do
+    d = @d.cross_join(:foo).cross_join(:test___al)
+    @d.select_all(*d.opts[:join]).sql.should == 'SELECT foo.*, al.* FROM test'
+  end
 end
 
 describe "Dataset#select_more" do

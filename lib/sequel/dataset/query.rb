@@ -700,7 +700,7 @@ module Sequel
       if tables.empty?
         clone(:select => nil)
       else
-        select(*tables.map{|t| SQL::ColumnAll.new(t)})
+        select(*tables.map{|t| i, a = split_alias(t); a || i}.map{|t| SQL::ColumnAll.new(t)})
       end
     end
     
