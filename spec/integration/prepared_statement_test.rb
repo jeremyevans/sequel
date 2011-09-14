@@ -2,20 +2,26 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Prepared Statements and Bound Arguments" do
   before do
-    INTEGRATION_DB.create_table!(:items) do
+    @db = INTEGRATION_DB
+    @db.create_table!(:items) do
       primary_key :id
       integer :number
     end
     @c = Class.new(Sequel::Model(:items))
-    @ds = INTEGRATION_DB[:items]
+    @ds = @db[:items]
     @ds.insert(:number=>10)
     @ds.meta_def(:ba) do |sym|
       prepared_arg_placeholder == '$' ? :"#{sym}__int" : sym
     end
   end
   after do
-    INTEGRATION_DB.disconnect
-    INTEGRATION_DB.drop_table(:items)
+    begin
+      @db.drop_table(:items)
+    rescue
+      # some databases don't like dropping tables if connections have used them
+      @db.disconnect 
+      @db.drop_table(:items)
+    end
   end
   
   specify "should support bound variables with select, all, and first" do
