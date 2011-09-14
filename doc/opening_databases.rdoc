@@ -46,6 +46,13 @@ unless the first argument is a hash. So the following statements are equivalent 
   DB = Sequel.postgres('blog', :host=>'localhost', :user=>'user', :password=>'password')
   DB = Sequel.postgres(:host=>'localhost', :user=>'user', :password=>'password', :database=>'blog')
 
+Note that using an adapter method forces the use of the specified adapter, not a database type, even
+though some adapters have the same name as the database type.  So if you
+want to connect to SQLite, for example, you can do so using the sqlite, do, dbi, jdbc, odbc, and swift adapters.
+If you want to connect to SQLite on JRuby using the jdbc adapter, you should not use <tt>Sequel.sqlite</tt>
+for example, as that uses the C-based sqlite3 gem. Instead, the <tt>Sequel.jdbc</tt> would be appropriate (though
+as mentioned below, using <tt>Sequel.connect</tt> is recommended instead of <tt>Sequel.jdbc</tt>). 
+
 == Passing a block to either method
 
 Both the Sequel.connect method and the specialized adapter methods take a block.  If you
@@ -201,6 +208,8 @@ Does not support the :port option.
 
 === ibmdb
 
+requires 'ibm_db'
+
 This connects to DB2 using IBM_DB.  This is the recommended adapter if you are
 using a C-based ruby to connect to DB2.
 
@@ -265,6 +274,8 @@ The following additional options are supported:
 
 === mysql 
 
+Requires: mysqlplus (or mysql if mysqlplus is not available)
+
 The MySQL adapter does not support the pure-ruby MySQL adapter that used to ship with
 ActiveRecord, it requires the native adapter.
 
@@ -325,6 +336,8 @@ The following additional options are supported:
 
 === sqlite
 
+Requires: sqlite3
+
 As SQLite is a file-based database, the :host and :port options are ignored, and
 the :database option should be a path to the file.
 
@@ -361,6 +374,8 @@ Examples:
   swift://root:root@localhost/test?db_type=postgres
 
 === tinytds
+
+Requires: tiny_tds
 
 Because the underscore is not a valid character in a URI schema, the adapter
 is named tinytds instead of tiny_tds.  The connection options are passed directly
