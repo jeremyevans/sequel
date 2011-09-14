@@ -47,10 +47,6 @@ module Sequel
         end
       end
 
-      def supports_savepoints?
-        false
-      end
-
       private
 
       def begin_transaction(conn, opts={})
