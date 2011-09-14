@@ -471,7 +471,7 @@ module Sequel
         :float
       when /\A(?:(?:(?:num(?:ber|eric)?|decimal)(?:\(\d+,\s*(\d+)\))?)|(?:small)?money)\z/io
         $1 && $1 == '0' ? :integer : :decimal
-      when /bytea|blob|image|(var)?binary/io
+      when /bytea|[bc]lob|image|(var)?binary/io
         :blob
       when /\Aenum/io
         :enum
