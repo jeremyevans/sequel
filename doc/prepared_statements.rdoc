@@ -5,6 +5,7 @@ database you are using, the Sequel prepared statement/bound variable API remains
 the same.  There is native support for prepared statements/bound variables on
 the following adapters:
 
+* ibmdb (prepared statements only)
 * jdbc
 * mysql (prepared statements only)
 * mysql2 (prepared statements only)
