@@ -600,6 +600,8 @@ module Sequel
           Sequel::SQL::Blob.new(String.from_java_bytes(v))
         when Java::JavaSQL::Blob
           convert_type(v.getBytes(1, v.length))
+        when Java::JavaSQL::Clob
+          Sequel::SQL::Blob.new(v.getSubString(1, v.length))
         else
           v
         end
