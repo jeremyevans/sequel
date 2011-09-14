@@ -12,8 +12,8 @@ toolkit for Ruby.
   two-phase commit, transaction isolation, master/slave
   configurations, and database sharding.
 * Sequel currently has adapters for ADO, Amalgalite, DataObjects,
-  DB2, DBI, Firebird, Informix, JDBC, MySQL, Mysql2, ODBC, OpenBase,
-  Oracle, PostgreSQL, SQLite3, Swift, and TinyTDS.
+  DB2, DBI, Firebird, IBM_DB, Informix, JDBC, MySQL, Mysql2, ODBC,
+  OpenBase, Oracle, PostgreSQL, SQLite3, Swift, and TinyTDS.
 
 == Resources
 
