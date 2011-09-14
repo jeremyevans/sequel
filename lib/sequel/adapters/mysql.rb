@@ -49,10 +49,10 @@ module Sequel
     # Modify the type translators for the date, time, and timestamp types
     # depending on the value given.
     def self.convert_invalid_date_time=(v)
-      MYSQL_TYPES[11] = v ?  TYPE_TRANSLATOR.method(:time) : ::Sequel.method(:string_to_time)
-      m = v ? TYPE_TRANSLATOR.method(:date) : ::Sequel.method(:string_to_date)
+      MYSQL_TYPES[11] = (v != false) ?  TYPE_TRANSLATOR.method(:time) : ::Sequel.method(:string_to_time)
+      m = (v != false) ? TYPE_TRANSLATOR.method(:date) : ::Sequel.method(:string_to_date)
       [10, 14].each{|i| MYSQL_TYPES[i] = m}
-      m = v ? TYPE_TRANSLATOR.method(:timestamp) : ::Sequel.method(:database_to_application_timestamp)
+      m = (v != false) ? TYPE_TRANSLATOR.method(:timestamp) : ::Sequel.method(:database_to_application_timestamp)
       [7, 12].each{|i| MYSQL_TYPES[i] = m}
       @convert_invalid_date_time = v
     end
