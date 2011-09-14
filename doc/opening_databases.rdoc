@@ -145,10 +145,8 @@ the sqlite section below for details.
 
 Requires: db2/db2cli
 
-I'm not even sure exactly how this works, or if it works at all (I've never heard from
-anyone who attempted to use it).  It uses the SQL_HANDLE_DBC constant to
-get a handle, and respects the :database, :user, and :password options.  It doesn't
-appear to respect the :host or :port options.
+This is the older DB2 adapter.  It's recommended you try the ibmdb adapter
+instead for new DB2 work, as it is better supported.
 
 === dbi 
 
@@ -201,6 +199,11 @@ Requires: fb (using code at http://github.com/wishdev/fb)
 
 Does not support the :port option.
 
+=== ibmdb
+
+This connects to DB2 using IBM_DB.  This is the recommended adapter if you are
+using a C-based ruby to connect to DB2.
+
 === informix 
 
 Does not support the :host or :port options.  Depending on the configuration of your server
@@ -221,7 +224,7 @@ Requires: java
 Houses Sequel's JDBC support when running on JRuby.
 Support for individual database types is done using sub adapters.
 There are currently subadapters for PostgreSQL, MySQL, SQLite, H2,
-Oracle, MSSQL, JTDS, and AS400.  All except Oracle, MSSQL, and AS400 can load the
+Oracle, MSSQL, JTDS, AS400, D2.  All except Oracle, MSSQL, AS400, and DB2 can load the
 jdbc-* gem, for those you need to have the .jar in your CLASSPATH
 or load the Java class manually before calling Sequel.connect.
 
@@ -277,6 +280,12 @@ The following additional options are supported:
 * :timeout - Sets the wait_timeout for the connection, defaults to 1 month.
 * :read_timeout - Set the timeout in seconds for reading back results to a query.
 * :connect_timeout - Set the timeout in seconds before a connection attempt is abandoned.
+
+=== mysql2
+
+This is a newer MySQL adapter that does typecasting in C, so it is often faster than the
+mysql adapter.  Supports the same additional options as the mysql adapter, except for :compress, and uses
+:timeout instead of :read_timeout and :connect_timeout.
 
 === odbc 
 
