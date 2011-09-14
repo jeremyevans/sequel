@@ -1,5 +1,7 @@
 === HEAD
 
+* Add db2 jdbc subadapter (jeremyevans)
+
 * Fix the db2 adapter so it actually works (jeremyevans)
 
 * Add ibmdb adapter for accessing DB2 (roylez, jeremyevans)

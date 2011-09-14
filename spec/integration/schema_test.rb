@@ -88,7 +88,7 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == 'blah'
   end
 
-  specify "should parse types from the schema properly" do
+  cspecify "should parse types from the schema properly", [:jdbc, :db2] do
     INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
     INTEGRATION_DB.create_table!(:items){Fixnum :number}
@@ -299,7 +299,7 @@ describe "Database schema modifiers" do
     proc{@ds.insert(:n=>nil)}.should raise_error(Sequel::DatabaseError)
   end
 
-  specify "should set column NULL/NOT NULL correctly" do
+  cspecify "should set column NULL/NOT NULL correctly", [:jdbc, :db2] do
     @db.create_table!(:items, :engine=>:InnoDB){Integer :id}
     @ds.insert(:id=>10)
     @db.alter_table(:items){set_column_allow_null :id, false}
@@ -321,7 +321,7 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:id=>10}, {:id=>20}]
   end
 
-  specify "should set column types correctly" do
+  cspecify "should set column types correctly", [:jdbc, :db2] do
     @db.create_table!(:items){Integer :id}
     @ds.insert(:id=>10)
     @db.alter_table(:items){set_column_type :id, String}
@@ -374,7 +374,7 @@ describe "Database schema modifiers" do
     proc{@ds.insert(1, 2)}.should_not raise_error
   end
 
-  cspecify "should remove columns from tables correctly", :h2, :mssql do
+  cspecify "should remove columns from tables correctly", :h2, :mssql, [:jdbc, :db2] do
     @db.create_table!(:items) do
       primary_key :id
       String :name
@@ -395,7 +395,7 @@ describe "Database schema modifiers" do
     @ds.columns!.should == [:id]
   end
 
-  specify "should remove multiple columns in a single alter_table block" do
+  cspecify "should remove multiple columns in a single alter_table block", [:jdbc, :db2] do
     @db.create_table!(:items) do
       primary_key :id
       String :name

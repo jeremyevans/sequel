@@ -77,7 +77,7 @@ end
 describe "Sequel::IBMDB.convert_smallint_to_bool" do
   before do
     @db = DB2_DB
-    @db.create_table(:booltest){column :b, 'smallint'; column :i, 'integer'}
+    @db.create_table!(:booltest){column :b, 'smallint'; column :i, 'integer'}
     @ds = @db[:booltest]
   end
   after do
@@ -122,7 +122,7 @@ describe "Sequel::IBMDB.convert_smallint_to_bool" do
     @ds << {:b=>0, :i=>0}
     @ds.all.should == [{:b=>0, :i=>0}]
   end
-end
+end if DB2_DB.adapter_scheme == :ibmdb
 
 describe "Simple Dataset operations in transactions" do
   before do

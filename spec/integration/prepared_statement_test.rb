@@ -80,7 +80,7 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:id=>:$i).filter(:number=>@ds.select(:number).filter(:number=>@ds.select(:number).filter(:number=>@ds.ba(:$n)))).filter(:id=>:$j).call(:select, :n=>10, :i=>1, :j=>1).should == [{:id=>1, :number=>10}]
   end
   
-  specify "should support using a bound variable for a limit and offset" do
+  cspecify "should support using a bound variable for a limit and offset", [:jdbc, :db2] do
     @ds.insert(:number=>20)
     ds = @ds.limit(@ds.ba(:$n), @ds.ba(:$n2)).order(:id)
     ds.call(:select, :n=>1, :n2=>0).should == [{:id=>1, :number=>10}]
@@ -255,7 +255,7 @@ describe "Bound Argument Types" do
     @ds.filter(:t=>@ds.ba(:$x, :timestamp)).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
   end
 
-  cspecify "should handle blob type", [:swift], [:odbc] do
+  cspecify "should handle blob type", [:swift], [:odbc], [:jdbc, :db2] do
     @ds.filter(:file=>@ds.ba(:$x, :bytea)).prepare(:first, :ps_blob).call(:x=>@vs[:file])[:file].should == @vs[:file]
   end
 
@@ -267,7 +267,7 @@ describe "Bound Argument Types" do
     @ds.filter(:s=>@ds.ba(:$x, :text)).prepare(:first, :ps_string).call(:x=>@vs[:s])[:s].should == @vs[:s]
   end
 
-  cspecify "should handle boolean type", [:do, :sqlite], [:odbc, :mssql], [:jdbc, :sqlite]  do
+  cspecify "should handle boolean type", [:do, :sqlite], [:odbc, :mssql], [:jdbc, :sqlite], [:jdbc, :db2]  do
     @ds.filter(:b=>@ds.ba(:$x, :boolean)).prepare(:first, :ps_string).call(:x=>@vs[:b])[:b].should == @vs[:b]
   end
 end unless INTEGRATION_DB.adapter_scheme == :swift && INTEGRATION_DB.database_type == :postgres

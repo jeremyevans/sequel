@@ -100,7 +100,7 @@ describe "Supported types" do
     ds.first[:name].should be_a_kind_of(::Sequel::SQL::Blob)
   end
   
-  cspecify "should support generic boolean type", [:do, :sqlite], [:jdbc, :sqlite], [:odbc, :mssql] do
+  cspecify "should support generic boolean type", [:do, :sqlite], [:jdbc, :sqlite], [:jdbc, :db2], [:odbc, :mssql] do
     ds = create_items_table_with_column(:number, TrueClass)
     ds.insert(:number => true)
     ds.all.should == [{:number=>true}]
