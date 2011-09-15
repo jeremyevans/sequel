@@ -163,12 +163,12 @@ module Sequel
       set_adapter_scheme :ibmdb
 
       # Hash of connection procs for converting
-      attr_reader :connection_procs
+      attr_reader :conversion_procs
 
       def initialize(opts={})
         super
-        @connection_procs = DB2_TYPES.dup
-        @connection_procs[:timestamp] = method(:to_application_timestamp)
+        @conversion_procs = DB2_TYPES.dup
+        @conversion_procs[:timestamp] = method(:to_application_timestamp)
       end
 
       # REORG the related table whenever it is altered.  This is not always
@@ -415,7 +415,7 @@ module Sequel
             type = stmt.field_type(k).downcase.to_sym
             # decide if it is a smallint from precision
             type = :boolean  if type ==:int && convert && stmt.field_precision(k) < 8
-            columns << [key, cps.call(type)]
+            columns << [key, cps[type]]
           end
           cols = columns.map{|c| c.at(0)}
           cols.delete(row_number_column) if offset
