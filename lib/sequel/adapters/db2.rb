@@ -36,7 +36,27 @@ module Sequel
       def execute(sql, opts={}, &block)
         synchronize(opts[:server]){|conn| log_connection_execute(conn, sql, &block)}
       end
-      alias_method :do, :execute
+      alias do execute
+
+      def execute_insert(sql, opts={})
+        synchronize(opts[:server]) do |conn|
+          log_connection_execute(conn, sql)
+          sql = "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1"
+          log_connection_execute(conn, sql) do |sth|
+            rc, name, buflen, datatype, size, digits, nullable = DB2CLI.SQLDescribeCol(sth, 1, 256)
+            check_error(rc, "Could not describe column")
+            if (rc = DB2CLI.SQLFetch(sth)) != DB2CLI::SQL_NO_DATA_FOUND
+              rc, v = DB2CLI.SQLGetData(sth, 1, datatype, size)
+              check_error(rc, "Could not get data")
+              if v.is_a?(String) 
+                return v.to_i
+              else
+                return nil
+              end
+            end
+          end
+        end
+      end
       
       def check_error(rc, msg)
         case rc
@@ -101,62 +121,51 @@ module Sequel
       
       def fetch_rows(sql)
         execute(sql) do |sth|
-          @column_info = get_column_info(sth)
-          @columns = @column_info.map {|c| output_identifier(c[:name])}
+          offset = @opts[:offset]
+          db = @db
+          i = 1
+          column_info = get_column_info(sth)
+          cols = column_info.map{|c| c.at(1)}
+          cols.delete(row_number_column) if offset
+          @columns = cols
           while (rc = DB2CLI.SQLFetch(sth)) != DB2CLI::SQL_NO_DATA_FOUND
-            @db.check_error(rc, "Could not fetch row")
-            yield hash_row(sth)
+            db.check_error(rc, "Could not fetch row")
+            row = {}
+            column_info.each do |i, c, t, s|
+              rc, v = DB2CLI.SQLGetData(sth, i, t, s) 
+              db.check_error(rc, "Could not get data")
+              row[c] = convert_type(v)
+            end
+            row.delete(row_number_column) if offset
+            yield row
           end
         end
         self
       end
       
-      # DB2 supports window functions
-      def supports_window_functions?
-        true
-      end
-
       private
 
-      # Modify the sql to limit the number of rows returned
-      def select_limit_sql(sql)
-        if l = @opts[:limit]
-          sql << " FETCH FIRST #{l == 1 ? 'ROW' : "#{literal(l)} ROWS"} ONLY"
-        end
-      end
-      
       def get_column_info(sth)
+        db = @db
         rc, column_count = DB2CLI.SQLNumResultCols(sth)
-        @db.check_error(rc, "Could not get number of result columns")
+        db.check_error(rc, "Could not get number of result columns")
 
         (1..column_count).map do |i| 
           rc, name, buflen, datatype, size, digits, nullable = DB2CLI.SQLDescribeCol(sth, i, MAX_COL_SIZE)
-          @db.check_error(rc, "Could not describe column")
-          
-          {:name => name, :db2_type => datatype, :precision => size}
+          db.check_error(rc, "Could not describe column")
+          [i, output_identifier(name), datatype, size]
         end 
-      end
-      
-      def hash_row(sth)
-        row = {}
-        @column_info.each_with_index do |c, i|
-          rc, v = DB2CLI.SQLGetData(sth, i+1, c[:db2_type], c[:precision]) 
-          @db.check_error(rc, "Could not get data")
-          
-          row[output_identifier(c[:name])] = convert_type(v)
-        end
-        row
       end
       
       def convert_type(v)
         case v
         when DB2CLI::Date 
-          DBI::Date.new(v.year, v.month, v.day)
+          Date.new(v.year, v.month, v.day)
         when DB2CLI::Time
-          DBI::Time.new(v.hour, v.minute, v.second)
+          t = Time.now
+          Sequel::SQLTime.local(t.year, t.month, t.day, v.hour, v.minute, v.second)
         when DB2CLI::Timestamp 
-          DBI::Timestamp.new(v.year, v.month, v.day,
-            v.hour, v.minute, v.second, v.fraction)
+          Sequel.database_to_application_timestamp(v.to_s)
         when DB2CLI::Null
           nil
         else  
