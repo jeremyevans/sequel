@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#supports_ordered_distinct_on? for checking if the dataset can use distinct on while respecting order (jeremyevans)
+
 * Add support for the association :limit option when eager loading via .eager for *_many associations (jeremyevans)
 
 * Add db2 jdbc subadapter (jeremyevans)

@@ -45,7 +45,7 @@ module Sequel
       false
     end
 
-    # Whether the dataset supports the DISTINCT ON clause, false by default.
+    # Whether the dataset supports or can emulate the DISTINCT ON clause, false by default.
     def supports_distinct_on?
       false
     end
@@ -85,6 +85,12 @@ module Sequel
     # array of values is given.
     def supports_multiple_column_in?
       true
+    end
+
+    # Whether the dataset supports or can fully emulate the DISTINCT ON clause,
+    # including respecting the ORDER BY clause, false by default
+    def supports_ordered_distinct_on?
+      supports_distinct_on?
     end
     
     # Whether the dataset supports timezones in literal timestamps

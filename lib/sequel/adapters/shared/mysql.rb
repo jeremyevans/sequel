@@ -481,6 +481,12 @@ module Sequel
         true
       end
 
+      # MySQL's DISTINCT ON emulation using GROUP BY does not respect the
+      # queries ORDER BY clause.
+      def supports_ordered_distinct_on?
+        false
+      end
+    
       # MySQL does support fractional timestamps in literal timestamps, but it
       # ignores them.  Also, using them seems to cause problems on 1.9.  Since
       # they are ignored anyway, not using them is probably best.
