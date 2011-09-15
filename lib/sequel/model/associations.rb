@@ -112,7 +112,7 @@ module Sequel
           if (v = self[:limit]).is_a?(Array)
             v
           else
-            [v, 0]
+            [v, nil]
           end
         end
 
@@ -875,7 +875,7 @@ module Sequel
             end
             if opts.eager_limit_strategy == :ruby
               limit, offset = opts.limit_and_offset
-              rows.each{|o| o.associations[name] = o.associations[name].slice(offset, limit) || []}
+              rows.each{|o| o.associations[name] = o.associations[name].slice(offset||0, limit) || []}
             end
           end
           
@@ -1020,7 +1020,7 @@ module Sequel
             end
             if opts.eager_limit_strategy == :ruby
               limit, offset = opts.limit_and_offset
-              rows.each{|o| o.associations[name] = o.associations[name].slice(offset, limit) || []}
+              rows.each{|o| o.associations[name] = o.associations[name].slice(offset||0, limit) || []}
             end
           end
           
