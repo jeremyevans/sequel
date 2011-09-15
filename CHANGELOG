@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix inserting all default values into a table on DB2 (jeremyevans)
+
 * Add :qualify option to many_to_one associations for whether to qualify the primary key column with the associated table (jeremyevans)
 
 * Modify rcte_tree plugin to use column aliases if recursive CTEs require them (jeremyevans)

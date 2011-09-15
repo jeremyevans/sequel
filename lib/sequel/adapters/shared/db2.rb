@@ -241,9 +241,10 @@ module Sequel
 
       private
 
-      # DB2 uses "INSERT INTO "ITEMS" VALUES DEFAULT" for a record with default values to be inserted
-      def insert_values_sql(sql)
-        opts[:values].empty? ? sql << " VALUES DEFAULT" : super
+      # DB2 needs the standard workaround to insert all default values into
+      # a table with more than one column.
+      def insert_supports_empty_values?
+        false
       end
 
       # Use 0 for false on DB2
