@@ -564,6 +564,38 @@ describe Sequel::Model, "#eager" do
     as.first.special_genres.should == [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
   end
 
+  it "should respect the :limit option on a one_to_many association" do
+    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :limit=>2
+    EagerTrack.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:album_id=>1, :id=>2})
+        yield({:album_id=>1, :id=>3})
+        yield({:album_id=>1, :id=>4})
+      end
+    })
+    as = EagerAlbum.eager(:first_two_tracks).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM tracks WHERE (tracks.album_id IN (1))"]
+    as.length.should == 1
+    as.first.first_two_tracks.should == [EagerTrack.load(:album_id=>1, :id=>2), EagerTrack.load(:album_id=>1, :id=>3)]
+  end
+
+  it "should respect the :limit option with an offset on a one_to_many association" do
+    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :limit=>[2,1]
+    EagerTrack.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:album_id=>1, :id=>2})
+        yield({:album_id=>1, :id=>3})
+        yield({:album_id=>1, :id=>4})
+      end
+    })
+    as = EagerAlbum.eager(:first_two_tracks).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM tracks WHERE (tracks.album_id IN (1))"]
+    as.length.should == 1
+    as.first.first_two_tracks.should == [EagerTrack.load(:album_id=>1, :id=>3), EagerTrack.load(:album_id=>1, :id=>4)]
+  end
+
   it "should use the :eager_loader association option when eager loading" do
     EagerAlbum.many_to_one :special_band, :eager_loader=>(proc do |key_hash, records, assocs| 
       item = EagerBand.filter(:album_id=>records.collect{|r| [r.pk, r.pk*2]}.flatten).order(:name).first

@@ -922,16 +922,28 @@ module Sequel
           cpks = opts[:primary_keys] = Array(primary_key)
           raise(Error, "mismatched number of composite keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
+          unless one_to_one
+            if limit = opts[:limit] 
+              if limit.is_a?(Array)
+                limit, offset = limit
+              else
+                offset = 0
+              end
+              eager_limit = to_many_eager_limit_strategy(opts)
+              eager_limit_ruby = eager_limit == :ruby
+            end
+          end
           opts[:dataset] ||= proc do
             klass = opts.associated_class
             klass.filter(cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}.zip(cpks.map{|k| send(k)}))
           end
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:key_hash][primary_key]
+            rows = eo[:rows]
             if one_to_one
-              eo[:rows].each{|object| object.associations[name] = nil}
+              rows.each{|object| object.associations[name] = nil}
             else
-              eo[:rows].each{|object| object.associations[name] = []}
+              rows.each{|object| object.associations[name] = []}
             end
             reciprocal = opts.reciprocal
             klass = opts.associated_class
@@ -951,6 +963,9 @@ module Sequel
                   assoc_record.associations[reciprocal] = object if reciprocal
                 end
               end
+            end
+            if eager_limit_ruby
+              rows.each{|o| o.associations[name] = o.associations[name].slice(offset, limit) || []}
             end
           end
           
@@ -1027,6 +1042,11 @@ module Sequel
             ds = cb.call(ds)
           end
           ds
+        end
+
+        # The strategy to use for setting limits on datasets used for eager loading.
+        def to_many_eager_limit_strategy(opts)
+          opts[:eager_limit_strategy] || :ruby
         end
       end
 
