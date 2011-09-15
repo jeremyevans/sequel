@@ -48,20 +48,7 @@ module Sequel
         end
       end
 
-      def tables(opts={})
-        tables_or_views(0, opts)
-      end
-
-      def views(opts={})
-        tables_or_views(1, opts)
-      end
-
       private
-
-      def tables_or_views(type, opts)
-        ds = self[:"rdb$relations"].server(opts[:server]).filter(:"rdb$relation_type" => type, Sequel::SQL::Function.new(:COALESCE, :"rdb$system_flag", 0) => 0).select(:"rdb$relation_name")
-        ds.map{|r| ds.send(:output_identifier, r[:"rdb$relation_name"].rstrip)}
-      end
 
       def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN) do

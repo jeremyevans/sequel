@@ -43,6 +43,14 @@ module Sequel
         block_given? ? yield(ds) : ds.map{|r| ds.send(:output_identifier, r[:"rdb$generator_name"])}
       end
 
+      def tables(opts={})
+        tables_or_views(0, opts)
+      end
+
+      def views(opts={})
+        tables_or_views(1, opts)
+      end
+
       private
 
       # Use Firebird specific syntax for add column
@@ -126,6 +134,11 @@ module Sequel
       def restart_sequence_sql(name, opts={})
         seq_name = quote_identifier(name)
         "ALTER SEQUENCE #{seq_name} RESTART WITH #{opts[:restart_position]}"
+      end
+
+      def tables_or_views(type, opts)
+        ds = self[:"rdb$relations"].server(opts[:server]).filter(:"rdb$relation_type" => type, Sequel::SQL::Function.new(:COALESCE, :"rdb$system_flag", 0) => 0).select(:"rdb$relation_name")
+        ds.map{|r| ds.send(:output_identifier, r[:"rdb$relation_name"].rstrip)}
       end
 
       def type_literal_generic_string(column)
