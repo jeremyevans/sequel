@@ -596,6 +596,38 @@ describe Sequel::Model, "#eager" do
     as.first.first_two_tracks.should == [EagerTrack.load(:album_id=>1, :id=>3), EagerTrack.load(:album_id=>1, :id=>4)]
   end
 
+  it "should respect the limit option on a many_to_many association" do
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>2
+    EagerGenre.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:x_foreign_key_x=>2, :id=>5})
+        yield({:x_foreign_key_x=>2, :id=>6})
+        yield({:x_foreign_key_x=>2, :id=>7})
+      end
+    })
+    as = EagerAlbum.eager(:first_two_genres).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (2)))"]
+    as.length.should == 1
+    as.first.first_two_genres.should == [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
+  end
+
+  it "should respect the limit option with an offset on a many_to_many association" do
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[2, 1]
+    EagerGenre.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:x_foreign_key_x=>2, :id=>5})
+        yield({:x_foreign_key_x=>2, :id=>6})
+        yield({:x_foreign_key_x=>2, :id=>7})
+      end
+    })
+    as = EagerAlbum.eager(:first_two_genres).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (2)))"]
+    as.length.should == 1
+    as.first.first_two_genres.should == [EagerGenre.load(:id=>6), EagerGenre.load(:id=>7)]
+  end
+
   it "should use the :eager_loader association option when eager loading" do
     EagerAlbum.many_to_one :special_band, :eager_loader=>(proc do |key_hash, records, assocs| 
       item = EagerBand.filter(:album_id=>records.collect{|r| [r.pk, r.pk*2]}.flatten).order(:name).first

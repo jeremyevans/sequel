@@ -805,9 +805,19 @@ module Sequel
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
           opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, rcks.zip(opts.right_primary_keys) + lcks.zip(lcpks.map{|k| send(k)}))}
 
+          if limit = opts[:limit] 
+            if limit.is_a?(Array)
+              limit, offset = limit
+            else
+              offset = 0
+            end
+            eager_limit = to_many_eager_limit_strategy(opts)
+            eager_limit_ruby = eager_limit == :ruby
+          end
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:key_hash][left_pk]
-            eo[:rows].each{|object| object.associations[name] = []}
+            rows = eo[:rows]
+            rows.each{|object| object.associations[name] = []}
             r = uses_rcks ? rcks.zip(opts.right_primary_keys) : [[right, opts.right_primary_key]]
             l = uses_lcks ? [[lcks.map{|k| SQL::QualifiedIdentifier.new(join_table, k)}, h.keys]] : [[left, h.keys]]
             model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), Array(opts.select), eo[:associations], eo).all do |assoc_record|
@@ -818,6 +828,9 @@ module Sequel
               end
               next unless objects = h[hash_key]
               objects.each{|object| object.associations[name].push(assoc_record)}
+            end
+            if eager_limit_ruby
+              rows.each{|o| o.associations[name] = o.associations[name].slice(offset, limit) || []}
             end
           end
           

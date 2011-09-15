@@ -24,7 +24,7 @@ shared_examples_for "regular and composite key associations" do
     @tag.albums.should == [@album]
   end
   
-  specify "should correctly handle limits when eager loading one_to_many associations" do
+  specify "should correctly handle limits and offsets when eager loading one_to_many associations" do
     @album.update(:artist => @artist)
     middle_album = @middle_album.call
     diff_album = @diff_album.call
@@ -36,6 +36,18 @@ shared_examples_for "regular and composite key associations" do
     ars.first.second_two_albums.should == [middle_album, diff_album]
     ars.last.first_two_albums.should == []
     ars.last.second_two_albums.should == []
+  end
+  
+  specify "should correctly handle limits and offsets when eager loading one_to_many associations" do
+    tu, tv = @other_tags.call
+    al, ar, t = @pr.call
+    
+    als = Album.eager(:first_two_tags, :second_two_tags).order(:name).all
+    als.should == [@album, al]
+    als.first.first_two_tags.should == [@tag, tu]
+    als.first.second_two_tags.should == [tu, tv]
+    als.last.first_two_tags.should == []
+    als.last.second_two_tags.should == []
   end
   
   specify "should work correctly with prepared_statements_association plugin" do
@@ -358,7 +370,9 @@ describe "Sequel::Model Simple Associations" do
     end
     class ::Album < Sequel::Model(@db)
       many_to_one :artist
-      many_to_many :tags
+      many_to_many :tags, :right_key=>:tag_id
+      many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
+      many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
     end
     class ::Tag < Sequel::Model(@db)
       many_to_many :albums
@@ -369,6 +383,7 @@ describe "Sequel::Model Simple Associations" do
     @same_album = lambda{Album.create(:name=>'Al', :artist_id=>@artist.id)}
     @diff_album = lambda{Album.create(:name=>'lA', :artist_id=>@artist.id)}
     @middle_album = lambda{Album.create(:name=>'Bl', :artist_id=>@artist.id)}
+    @other_tags = lambda{t = [Tag.create(:name=>'U'), Tag.create(:name=>'V')]; @db[:albums_tags].insert([:album_id, :tag_id], Tag.select(@album.id, :id)); t}
     @pr = lambda{[Album.create(:name=>'Al2'),Artist.create(:name=>'Ar2'),Tag.create(:name=>'T2')]}
     @ins = lambda{@db[:albums_tags].insert(:tag_id=>@tag.id)}
   end
@@ -531,6 +546,8 @@ describe "Sequel::Model Composite Key Associations" do
       unrestrict_primary_key
       many_to_one :artist, :key=>[:artist_id1, :artist_id2]
       many_to_many :tags, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2]
+      many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
+      many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
     end
     class ::Tag < Sequel::Model(@db)
       set_primary_key :id1, :id2
@@ -543,6 +560,7 @@ describe "Sequel::Model Composite Key Associations" do
     @same_album = lambda{Album.create(:name=>'Al', :id1=>7, :id2=>8, :artist_id1=>3, :artist_id2=>4)}
     @diff_album = lambda{Album.create(:name=>'lA', :id1=>9, :id2=>10, :artist_id1=>3, :artist_id2=>4)}
     @middle_album = lambda{Album.create(:name=>'Bl', :id1=>13, :id2=>14, :artist_id1=>3, :artist_id2=>4)}
+    @other_tags = lambda{t = [Tag.create(:name=>'U', :id1=>17, :id2=>18), Tag.create(:name=>'V', :id1=>19, :id2=>20)]; @db[:albums_tags].insert([:album_id1, :album_id2, :tag_id1, :tag_id2], Tag.select(1, 2, :id1, :id2)); t}
     @pr = lambda{[Album.create(:name=>'Al2', :id1=>11, :id2=>12),Artist.create(:name=>'Ar2', :id1=>13, :id2=>14),Tag.create(:name=>'T2', :id1=>15, :id2=>16)]}
     @ins = lambda{@db[:albums_tags].insert(:tag_id1=>@tag.id1, :tag_id2=>@tag.id2)}
   end
