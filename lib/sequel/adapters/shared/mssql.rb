@@ -519,11 +519,6 @@ module Sequel
         BOOL_TRUE
       end
       
-      # The alias to use for the row_number column when emulating OFFSET
-      def row_number_column
-        :x_sequel_row_number_x
-      end
-
       # MSSQL adds the limit before the columns
       def select_clause_methods
         SELECT_CLAUSE_METHODS

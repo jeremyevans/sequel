@@ -267,11 +267,6 @@ module Sequel
         BOOL_TRUE
       end
 
-      # Holds the ROW_NUMBER value, used in offset emulation.
-      def row_number_column
-        :x_sequel_row_number_x
-      end
-
       # Add a fallback table for empty from situation
       def select_from_sql(sql)
         @opts[:from] ? super : (sql << ' FROM "SYSIBM"."SYSDUMMY1"')
