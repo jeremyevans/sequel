@@ -62,16 +62,11 @@ describe "An Oracle database" do
   end
   
   specify "should create a temporary table" do
-    ORACLE_DB.create_table :test_tmp, :temporary => true do
+    ORACLE_DB.create_table! :test_tmp, :temp => true do
+      varchar2 :name, :size => 50
       primary_key :id, :integer, :null => false
-      column :name, :text
       index :name, :unique => true
     end
-    
-    ORACLE_DB.sqls.should == [
-      'CREATE GLOBAL TEMPORARY TABLE test_tmp (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
-      'CREATE UNIQUE INDEX test_tmp_name_index ON test_tmp (name)'
-    ]
   end
 end
 
