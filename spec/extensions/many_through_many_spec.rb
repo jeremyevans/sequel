@@ -621,6 +621,42 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     MODEL_DB.sqls.length.should == 2
   end
 
+  it "should respect the :limit option on a many_to_many association" do
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2
+    Tag.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:x_foreign_key_x=>1, :id=>5})
+        yield({:x_foreign_key_x=>1, :id=>6})
+        yield({:x_foreign_key_x=>1, :id=>7})
+      end
+    })
+    a = @c1.eager(:first_two_tags).all
+    a.should == [@c1.load(:id=>1)]
+    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+      'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
+    a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
+    MODEL_DB.sqls.length.should == 2
+  end
+
+  it "should respect the :limit option with an offset on a many_to_many association" do
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[2,1]
+    Tag.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:x_foreign_key_x=>1, :id=>5})
+        yield({:x_foreign_key_x=>1, :id=>6})
+        yield({:x_foreign_key_x=>1, :id=>7})
+      end
+    })
+    a = @c1.eager(:first_two_tags).all
+    a.should == [@c1.load(:id=>1)]
+    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+      'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
+    a.first.first_two_tags.should == [Tag.load(:id=>6), Tag.load(:id=>7)]
+    MODEL_DB.sqls.length.should == 2
+  end
+
   it "should raise an error when attempting to eagerly load an association with the :allow_eager option set to false" do
     proc{@c1.eager(:tags).all}.should_not raise_error
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :allow_eager=>false

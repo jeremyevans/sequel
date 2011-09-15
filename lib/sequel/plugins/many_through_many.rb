@@ -180,9 +180,19 @@ module Sequel
           end
 
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
+          if limit = opts[:limit] 
+            if limit.is_a?(Array)
+              limit, offset = limit
+            else
+              offset = 0
+            end
+            eager_limit = to_many_eager_limit_strategy(opts)
+            eager_limit_ruby = eager_limit == :ruby
+          end
           opts[:eager_loader] ||= lambda do |eo|
             h = eo[:key_hash][left_pk]
-            eo[:rows].each{|object| object.associations[name] = []}
+            rows = eo[:rows]
+            rows.each{|object| object.associations[name] = []}
             ds = opts.associated_class 
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
             ft = opts[:final_reverse_edge]
@@ -196,6 +206,9 @@ module Sequel
               end
               next unless objects = h[hash_key]
               objects.each{|object| object.associations[name].push(assoc_record)}
+            end
+            if eager_limit_ruby
+              rows.each{|o| o.associations[name] = o.associations[name].slice(offset, limit) || []}
             end
           end
 

@@ -38,7 +38,7 @@ shared_examples_for "regular and composite key associations" do
     ars.last.second_two_albums.should == []
   end
   
-  specify "should correctly handle limits and offsets when eager loading one_to_many associations" do
+  specify "should correctly handle limits and offsets when eager loading many_to_many associations" do
     tu, tv = @other_tags.call
     al, ar, t = @pr.call
     
@@ -48,6 +48,19 @@ shared_examples_for "regular and composite key associations" do
     als.first.second_two_tags.should == [tu, tv]
     als.last.first_two_tags.should == []
     als.last.second_two_tags.should == []
+  end
+  
+  specify "should correctly handle limits and offsets when eager loading many_through_many associations" do
+    @album.update(:artist => @artist)
+    tu, tv = @other_tags.call
+    al, ar, t = @pr.call
+    
+    ars = Artist.eager(:first_two_tags, :second_two_tags).order(:name).all
+    ars.should == [@artist, ar]
+    ars.first.first_two_tags.should == [@tag, tu]
+    ars.first.second_two_tags.should == [tu, tv]
+    ars.last.first_two_tags.should == []
+    ars.last.second_two_tags.should == []
   end
   
   specify "should work correctly with prepared_statements_association plugin" do
@@ -367,6 +380,8 @@ describe "Sequel::Model Simple Associations" do
       one_to_many :second_two_albums, :class=>:Album, :order=>:name, :limit=>[2, 1]
       plugin :many_through_many
       many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]]
+      many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2
+      many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1]
     end
     class ::Album < Sequel::Model(@db)
       many_to_one :artist
@@ -540,6 +555,8 @@ describe "Sequel::Model Composite Key Associations" do
       one_to_many :second_two_albums, :clone=>:albums, :order=>:name, :limit=>[2, 1]
       plugin :many_through_many
       many_through_many :tags, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]]
+      many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2
+      many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1]
     end
     class ::Album < Sequel::Model(@db)
       set_primary_key :id1, :id2
