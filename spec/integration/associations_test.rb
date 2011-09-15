@@ -30,24 +30,28 @@ shared_examples_for "regular and composite key associations" do
     diff_album = @diff_album.call
     al, ar, t = @pr.call
     
-    ars = Artist.eager(:first_two_albums, :second_two_albums).order(:name).all
+    ars = Artist.eager(:first_two_albums, :second_two_albums, :last_two_albums).order(:name).all
     ars.should == [@artist, ar]
     ars.first.first_two_albums.should == [@album, middle_album]
     ars.first.second_two_albums.should == [middle_album, diff_album]
+    ars.first.last_two_albums.should == [diff_album, middle_album]
     ars.last.first_two_albums.should == []
     ars.last.second_two_albums.should == []
+    ars.last.last_two_albums.should == []
   end
   
   specify "should correctly handle limits and offsets when eager loading many_to_many associations" do
     tu, tv = @other_tags.call
     al, ar, t = @pr.call
     
-    als = Album.eager(:first_two_tags, :second_two_tags).order(:name).all
+    als = Album.eager(:first_two_tags, :second_two_tags, :last_two_tags).order(:name).all
     als.should == [@album, al]
     als.first.first_two_tags.should == [@tag, tu]
     als.first.second_two_tags.should == [tu, tv]
+    als.first.last_two_tags.should == [tv, tu]
     als.last.first_two_tags.should == []
     als.last.second_two_tags.should == []
+    als.last.last_two_tags.should == []
   end
   
   specify "should correctly handle limits and offsets when eager loading many_through_many associations" do
@@ -55,12 +59,14 @@ shared_examples_for "regular and composite key associations" do
     tu, tv = @other_tags.call
     al, ar, t = @pr.call
     
-    ars = Artist.eager(:first_two_tags, :second_two_tags).order(:name).all
+    ars = Artist.eager(:first_two_tags, :second_two_tags, :last_two_tags).order(:name).all
     ars.should == [@artist, ar]
     ars.first.first_two_tags.should == [@tag, tu]
     ars.first.second_two_tags.should == [tu, tv]
+    ars.first.last_two_tags.should == [tv, tu]
     ars.last.first_two_tags.should == []
     ars.last.second_two_tags.should == []
+    ars.last.last_two_tags.should == []
   end
   
   specify "should work correctly with prepared_statements_association plugin" do
@@ -297,9 +303,10 @@ shared_examples_for "regular and composite key associations" do
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
     
-    a = Artist.eager(:first_album).all
+    a = Artist.eager(:first_album, :last_album).all
     a.should == [@artist]
     a.first.first_album.should == @album
+    a.first.last_album.should == diff_album
 
     same_album = @same_album.call
     a = Artist.eager(:first_album).all
@@ -376,18 +383,22 @@ describe "Sequel::Model Simple Associations" do
     class ::Artist < Sequel::Model(@db)
       one_to_many :albums
       one_to_one :first_album, :class=>:Album, :order=>:name
+      one_to_one :last_album, :class=>:Album, :order=>:name.desc
       one_to_many :first_two_albums, :class=>:Album, :order=>:name, :limit=>2
       one_to_many :second_two_albums, :class=>:Album, :order=>:name, :limit=>[2, 1]
+      one_to_many :last_two_albums, :class=>:Album, :order=>:name.desc, :limit=>2
       plugin :many_through_many
       many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]]
       many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2
       many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1]
+      many_through_many :last_two_tags, :clone=>:tags, :order=>:tags__name.desc, :limit=>2
     end
     class ::Album < Sequel::Model(@db)
       many_to_one :artist
       many_to_many :tags, :right_key=>:tag_id
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
       many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
+      many_to_many :last_two_tags, :clone=>:tags, :order=>:name.desc, :limit=>2
     end
     class ::Tag < Sequel::Model(@db)
       many_to_many :albums
@@ -550,13 +561,16 @@ describe "Sequel::Model Composite Key Associations" do
       set_primary_key :id1, :id2
       unrestrict_primary_key
       one_to_many :albums, :key=>[:artist_id1, :artist_id2]
-      one_to_one :first_album, :key=>[:artist_id1, :artist_id2], :class=>:Album, :order=>:name
+      one_to_one :first_album, :clone=>:albums, :order=>:name
+      one_to_one :last_album, :clone=>:albums, :order=>:name.desc
       one_to_many :first_two_albums, :clone=>:albums, :order=>:name, :limit=>2
       one_to_many :second_two_albums, :clone=>:albums, :order=>:name, :limit=>[2, 1]
+      one_to_many :last_two_albums, :clone=>:albums, :order=>:name.desc, :limit=>2
       plugin :many_through_many
       many_through_many :tags, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]]
       many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2
       many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1]
+      many_through_many :last_two_tags, :clone=>:tags, :order=>:tags__name.desc, :limit=>2
     end
     class ::Album < Sequel::Model(@db)
       set_primary_key :id1, :id2
@@ -565,6 +579,7 @@ describe "Sequel::Model Composite Key Associations" do
       many_to_many :tags, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2]
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
       many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
+      many_to_many :last_two_tags, :clone=>:tags, :order=>:name.desc, :limit=>2
     end
     class ::Tag < Sequel::Model(@db)
       set_primary_key :id1, :id2
