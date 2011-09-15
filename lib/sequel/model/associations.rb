@@ -83,10 +83,16 @@ module Sequel
         def eager_limit_strategy
           fetch(:_eager_limit_strategy) do
             self[:_eager_limit_strategy] = if self[:limit]
-              if s = self[:eager_limit_strategy]
-                s
+              case s = self.fetch(:eager_limit_strategy, :ruby)
+              when true
+                ds = associated_class.dataset
+                if ds.supports_window_functions?
+                  :window_function
+                else
+                  :ruby
+                end
               else
-                :ruby
+                s
               end
             else
               nil
@@ -288,6 +294,11 @@ module Sequel
         def eager_loader_key
           self[:eager_loader_key] ||= primary_key
         end
+
+        # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
+        def eager_loading_predicate_key
+          self[:eager_loading_predicate_key] ||= self[:uses_composite_keys] ? self[:keys].map{|k| SQL::QualifiedIdentifier.new(associated_class.table_name, k)} : SQL::QualifiedIdentifier.new(associated_class.table_name, self[:key])
+        end
     
         # The column in the current table that the key in the associated table references.
         def primary_key
@@ -333,13 +344,21 @@ module Sequel
             when Symbol
               s
             when true
-              if associated_class.dataset.supports_ordered_distinct_on?
+              ds = associated_class.dataset
+              if ds.supports_ordered_distinct_on?
                 :distinct_on
+              elsif ds.supports_window_functions?
+                :window_function
               end
             else
               nil
             end
           end
+        end
+
+        # The limit and offset for this association (returned as a two element array).
+        def limit_and_offset
+          [1, nil]
         end
 
         # one_to_one associations return a single object, not an array
@@ -405,6 +424,11 @@ module Sequel
         # The key to use for the key hash when eager loading
         def eager_loader_key
           self[:eager_loader_key] ||= self[:left_primary_key]
+        end
+    
+        # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
+        def eager_loading_predicate_key
+          self[:eager_loading_predicate_key] ||= self[:uses_left_composite_keys] ? self[:left_keys].map{|k| SQL::QualifiedIdentifier.new(self[:join_table], k)} : SQL::QualifiedIdentifier.new(self[:join_table], self[:left_key])
         end
     
         # many_to_many associations need to select a key in an associated table to eagerly load
@@ -589,7 +613,8 @@ module Sequel
         #                          all records but slices the resulting array after the association is retrieved.  You
         #                          can pass a +true+ value for this option to have Sequel pick what it thinks is the best
         #                          choice for the database, or specify a specific symbol to manually select a strategy.
-        #                          one_to_one supports :distinct_on.
+        #                          one_to_one associations support :distinct_on and :window_function.
+        #                          *_many associations support :window_function and :ruby.
         #                          Other strategies will be added in the future.
         # :eager_loader :: A proc to use to implement eager loading, overriding the default.  Takes one or three arguments.
         #                  If three arguments, the first should be a key hash (used solely to enhance performance), the
@@ -783,6 +808,21 @@ module Sequel
         
         private
       
+        # Use a window function to limit the results of the eager loading dataset.
+        def apply_window_function_eager_limit_strategy(ds, opts)
+          rn = ds.row_number_column 
+          limit, offset = opts.limit_and_offset
+          ds = ds.unordered.select_append{row_number(:over, :partition=>opts.eager_loading_predicate_key, :order=>ds.opts[:order]){}.as(rn)}.from_self
+          ds = if opts[:type] == :one_to_one
+            ds.where(rn => 1)
+          elsif offset
+            offset += 1
+            ds.where(rn => (offset...(offset+limit))) 
+          else
+            ds.where{rn.identifier <= limit} 
+          end
+        end
+
         # The module to use for the association's methods.  Defaults to
         # the overridable_methods_module.
         def association_module(opts={})
@@ -864,7 +904,15 @@ module Sequel
             rows.each{|object| object.associations[name] = []}
             r = uses_rcks ? rcks.zip(opts.right_primary_keys) : [[right, opts.right_primary_key]]
             l = uses_lcks ? [[lcks.map{|k| SQL::QualifiedIdentifier.new(join_table, k)}, h.keys]] : [[left, h.keys]]
-            model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), Array(opts.select), eo[:associations], eo).all do |assoc_record|
+            ds = model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), Array(opts.select), eo[:associations], eo)
+            case opts.eager_limit_strategy
+            when :window_function
+              delete_rn = true
+              rn = ds.row_number_column
+              ds = apply_window_function_eager_limit_strategy(ds, opts)
+            end
+            ds.all do |assoc_record|
+              assoc_record.values.delete(rn) if delete_rn
               hash_key = if uses_lcks
                 left_key_alias.map{|k| assoc_record.values.delete(k)}
               else
@@ -994,14 +1042,18 @@ module Sequel
             end
             reciprocal = opts.reciprocal
             klass = opts.associated_class
-            filter_keys = uses_cks ? cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)} : SQL::QualifiedIdentifier.new(klass.table_name, key)
+            filter_keys = opts.eager_loading_predicate_key
             ds = model.eager_loading_dataset(opts, klass.filter(filter_keys=>h.keys), opts.select, eo[:associations], eo)
             case opts.eager_limit_strategy
             when :distinct_on
-              filter_keys = Array(filter_keys)
               ds = ds.distinct(*filter_keys).order_prepend(*filter_keys)
+            when :window_function
+              delete_rn = true
+              rn = ds.row_number_column
+              ds = apply_window_function_eager_limit_strategy(ds, opts)
             end
             ds.all do |assoc_record|
+              assoc_record.values.delete(rn) if delete_rn
               hash_key = uses_cks ? cks.map{|k| assoc_record.send(k)} : assoc_record.send(key)
               next unless objects = h[hash_key]
               if one_to_one

@@ -58,6 +58,19 @@ module Sequel
           self[:uses_left_composite_keys] ? (0...self[:through].first[:left].length).map{|i| :"x_foreign_key_#{i}_x"} : :x_foreign_key_x
         end
 
+        # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
+        def eager_loading_predicate_key
+          self[:eager_loading_predicate_key] ||= begin
+            calculate_edges
+            e = self[:edges].first
+            if self[:uses_left_composite_keys]
+              e[:right].map{|k| SQL::QualifiedIdentifier.new(e[:table], k)}
+            else
+              SQL::QualifiedIdentifier.new(e[:table], e[:right])
+            end
+          end
+        end
+    
         # The list of joins to use when eager graphing
         def edges
           self[:edges] || calculate_edges || self[:edges]
@@ -189,7 +202,15 @@ module Sequel
             ft = opts[:final_reverse_edge]
             conds = uses_lcks ? [[left_keys.map{|k| SQL::QualifiedIdentifier.new(ft[:table], k)}, h.keys]] : [[left_key, h.keys]]
             ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + conds, :table_alias=>ft[:alias])
-            model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo).all do |assoc_record|
+            ds = model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo)
+            case opts.eager_limit_strategy
+            when :window_function
+              delete_rn = true
+              rn = ds.row_number_column
+              ds = apply_window_function_eager_limit_strategy(ds, opts)
+            end
+            ds.all do |assoc_record|
+              assoc_record.values.delete(rn) if delete_rn
               hash_key = if uses_lcks
                 left_key_alias.map{|k| assoc_record.values.delete(k)}
               else

@@ -637,23 +637,41 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
     a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
     MODEL_DB.sqls.length.should == 2
-  end
 
-  it "should respect the :limit option with an offset on a many_to_many association" do
+    MODEL_DB.reset
     @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[2,1]
-    Tag.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        MODEL_DB.sqls << sql
-        yield({:x_foreign_key_x=>1, :id=>5})
-        yield({:x_foreign_key_x=>1, :id=>6})
-        yield({:x_foreign_key_x=>1, :id=>7})
-      end
-    })
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
     MODEL_DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
     a.first.first_two_tags.should == [Tag.load(:id=>6), Tag.load(:id=>7)]
+    MODEL_DB.sqls.length.should == 2
+  end
+
+  it "should respect the :limit option on a many_to_many association using a :window_function strategy" do
+    Tag.dataset.meta_def(:supports_window_functions?){true}
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :eager_limit_strategy=>true, :order=>:name
+    Tag.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:x_foreign_key_x=>1, :id=>5})
+        yield({:x_foreign_key_x=>1, :id=>6})
+      end
+    })
+    a = @c1.eager(:first_two_tags).all
+    a.should == [@c1.load(:id=>1)]
+    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+      'SELECT * FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x, row_number() OVER (PARTITION BY albums_artists.artist_id ORDER BY name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))) AS t1 WHERE (x_sequel_row_number_x <= 2)']
+    a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
+    MODEL_DB.sqls.length.should == 2
+
+    MODEL_DB.reset
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[2,1], :eager_limit_strategy=>true, :order=>:name
+    a = @c1.eager(:first_two_tags).all
+    a.should == [@c1.load(:id=>1)]
+    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+      'SELECT * FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x, row_number() OVER (PARTITION BY albums_artists.artist_id ORDER BY name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))) AS t1 WHERE ((x_sequel_row_number_x >= 2) AND (x_sequel_row_number_x < 4))']
+    a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
     MODEL_DB.sqls.length.should == 2
   end
 

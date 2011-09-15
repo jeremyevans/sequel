@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for an :eager_limit_strategy => :window_function value for limiting using window functions (jeremyevans)
+
 * Add support for an :eager_limit_strategy => :distinct_on value for one_to_one associations for using DISTINCT ON (jeremyevans)
 
 * Add support for an :eager_limit_strategy association option, for manual control over how limiting is done (jeremyevans)

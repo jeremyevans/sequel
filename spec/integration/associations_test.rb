@@ -1,7 +1,9 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-shared_examples_for "eager loading one_to_one associations" do
+shared_examples_for "eager limit strategies" do
   specify "eager loading one_to_one associations should work correctly" do
+    Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els) if @els
+    Artist.one_to_one  :last_album, {:clone=>:last_album}.merge(@els) if @els
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
     al, ar, t = @pr.call
@@ -13,11 +15,84 @@ shared_examples_for "eager loading one_to_one associations" do
     a.last.first_album.should == nil
     a.last.last_album.should == nil
 
+    # Check that no extra columns got added by the eager loading
+    a.first.first_album.values.should == @album.values
+    a.first.last_album.values.should == diff_album.values
+
     same_album = @same_album.call
     a = Artist.eager(:first_album).all
     a.should == [@artist, ar]
     [@album, same_album].should include(a.first.first_album)
     a.last.first_album.should == nil
+  end
+
+  specify "should correctly handle limits and offsets when eager loading one_to_many associations" do
+    Artist.one_to_many :first_two_albums, {:clone=>:first_two_albums}.merge(@els) if @els
+    Artist.one_to_many :second_two_albums, {:clone=>:second_two_albums}.merge(@els) if @els
+    Artist.one_to_many :last_two_albums, {:clone=>:last_two_albums}.merge(@els) if @els
+    @album.update(:artist => @artist)
+    middle_album = @middle_album.call
+    diff_album = @diff_album.call
+    al, ar, t = @pr.call
+    
+    ars = Artist.eager(:first_two_albums, :second_two_albums, :last_two_albums).order(:name).all
+    ars.should == [@artist, ar]
+    ars.first.first_two_albums.should == [@album, middle_album]
+    ars.first.second_two_albums.should == [middle_album, diff_album]
+    ars.first.last_two_albums.should == [diff_album, middle_album]
+    ars.last.first_two_albums.should == []
+    ars.last.second_two_albums.should == []
+    ars.last.last_two_albums.should == []
+    
+    # Check that no extra columns got added by the eager loading
+    ars.first.first_two_albums.map{|x| x.values}.should == [@album, middle_album].map{|x| x.values}
+    ars.first.second_two_albums.map{|x| x.values}.should == [middle_album, diff_album].map{|x| x.values}
+    ars.first.last_two_albums.map{|x| x.values}.should == [diff_album, middle_album].map{|x| x.values}
+  end
+  
+  specify "should correctly handle limits and offsets when eager loading many_to_many associations" do
+    Album.many_to_many :first_two_tags, {:clone=>:first_two_tags}.merge(@els) if @els
+    Album.many_to_many :second_two_tags, {:clone=>:second_two_tags}.merge(@els) if @els
+    Album.many_to_many :last_two_tags, {:clone=>:last_two_tags}.merge(@els) if @els
+    tu, tv = @other_tags.call
+    al, ar, t = @pr.call
+    
+    als = Album.eager(:first_two_tags, :second_two_tags, :last_two_tags).order(:name).all
+    als.should == [@album, al]
+    als.first.first_two_tags.should == [@tag, tu]
+    als.first.second_two_tags.should == [tu, tv]
+    als.first.last_two_tags.should == [tv, tu]
+    als.last.first_two_tags.should == []
+    als.last.second_two_tags.should == []
+    als.last.last_two_tags.should == []
+    
+    # Check that no extra columns got added by the eager loading
+    als.first.first_two_tags.map{|x| x.values}.should == [@tag, tu].map{|x| x.values}
+    als.first.second_two_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
+    als.first.last_two_tags.map{|x| x.values}.should == [tv, tu].map{|x| x.values}
+  end
+  
+  specify "should correctly handle limits and offsets when eager loading many_through_many associations" do
+    Artist.many_through_many :first_two_tags, {:clone=>:first_two_tags}.merge(@els) if @els
+    Artist.many_through_many :second_two_tags, {:clone=>:second_two_tags}.merge(@els) if @els
+    Artist.many_through_many :last_two_tags, {:clone=>:last_two_tags}.merge(@els) if @els
+    @album.update(:artist => @artist)
+    tu, tv = @other_tags.call
+    al, ar, t = @pr.call
+    
+    ars = Artist.eager(:first_two_tags, :second_two_tags, :last_two_tags).order(:name).all
+    ars.should == [@artist, ar]
+    ars.first.first_two_tags.should == [@tag, tu]
+    ars.first.second_two_tags.should == [tu, tv]
+    ars.first.last_two_tags.should == [tv, tu]
+    ars.last.first_two_tags.should == []
+    ars.last.second_two_tags.should == []
+    ars.last.last_two_tags.should == []
+    
+    # Check that no extra columns got added by the eager loading
+    ars.first.first_two_tags.map{|x| x.values}.should == [@tag, tu].map{|x| x.values}
+    ars.first.second_two_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
+    ars.first.last_two_tags.map{|x| x.values}.should == [tv, tu].map{|x| x.values}
   end
 end
 
@@ -43,51 +118,6 @@ shared_examples_for "regular and composite key associations" do
     @artist.albums.should == [@album]
     @album.tags.should == [@tag]
     @tag.albums.should == [@album]
-  end
-  
-  specify "should correctly handle limits and offsets when eager loading one_to_many associations" do
-    @album.update(:artist => @artist)
-    middle_album = @middle_album.call
-    diff_album = @diff_album.call
-    al, ar, t = @pr.call
-    
-    ars = Artist.eager(:first_two_albums, :second_two_albums, :last_two_albums).order(:name).all
-    ars.should == [@artist, ar]
-    ars.first.first_two_albums.should == [@album, middle_album]
-    ars.first.second_two_albums.should == [middle_album, diff_album]
-    ars.first.last_two_albums.should == [diff_album, middle_album]
-    ars.last.first_two_albums.should == []
-    ars.last.second_two_albums.should == []
-    ars.last.last_two_albums.should == []
-  end
-  
-  specify "should correctly handle limits and offsets when eager loading many_to_many associations" do
-    tu, tv = @other_tags.call
-    al, ar, t = @pr.call
-    
-    als = Album.eager(:first_two_tags, :second_two_tags, :last_two_tags).order(:name).all
-    als.should == [@album, al]
-    als.first.first_two_tags.should == [@tag, tu]
-    als.first.second_two_tags.should == [tu, tv]
-    als.first.last_two_tags.should == [tv, tu]
-    als.last.first_two_tags.should == []
-    als.last.second_two_tags.should == []
-    als.last.last_two_tags.should == []
-  end
-  
-  specify "should correctly handle limits and offsets when eager loading many_through_many associations" do
-    @album.update(:artist => @artist)
-    tu, tv = @other_tags.call
-    al, ar, t = @pr.call
-    
-    ars = Artist.eager(:first_two_tags, :second_two_tags, :last_two_tags).order(:name).all
-    ars.should == [@artist, ar]
-    ars.first.first_two_tags.should == [@tag, tu]
-    ars.first.second_two_tags.should == [tu, tv]
-    ars.first.last_two_tags.should == [tv, tu]
-    ars.last.first_two_tags.should == []
-    ars.last.second_two_tags.should == []
-    ars.last.last_two_tags.should == []
   end
   
   specify "should work correctly with prepared_statements_association plugin" do
@@ -320,17 +350,22 @@ shared_examples_for "regular and composite key associations" do
     a.first.albums.first.artist.should == @artist
   end
   
-  describe "with no :eager_load_strategy" do
-    it_should_behave_like "eager loading one_to_one associations"
+  describe "with no :eager_limit_strategy" do
+    it_should_behave_like "eager limit strategies"
   end
-  describe "with :eager_load_strategy=>true" do
+  describe "with :eager_limit_strategy=>true" do
     before do
-      Artist.one_to_one :first_album, :clone=>:first_album, :eager_limit_strategy=>true
-      Artist.one_to_one :last_album, :clone=>:last_album, :eager_limit_strategy=>true
+      @els = {:eager_limit_strategy=>true}
     end
-    it_should_behave_like "eager loading one_to_one associations"
+    it_should_behave_like "eager limit strategies"
   end
-  
+  describe "with :eager_limit_strategy=>:window_function" do
+    before do
+      @els = {:eager_limit_strategy=>:window_function}
+    end
+    it_should_behave_like "eager limit strategies"
+  end if INTEGRATION_DB.dataset.supports_window_functions?
+
   specify "should eager load via eager_graph correctly" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)

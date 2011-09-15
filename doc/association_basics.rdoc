@@ -1551,5 +1551,8 @@ strategies are:
 :distinct_on :: Uses DISTINCT ON to ensure only the first matching record
                 is loaded (one_to_one associations only). This is used by
                 default on PostgreSQL.
+:window_function :: Uses window functions if the database supports it.
+                    This is used by default on databases that support window
+                    functions.
 :ruby :: Uses ruby array slicing to emulate database limiting (*_many
          associations only).
