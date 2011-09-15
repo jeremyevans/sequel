@@ -43,21 +43,21 @@ describe "An Oracle database" do
   
   specify "should provide schema information" do
     books_schema = [
-      [:id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)"}], 
-      [:title, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)"}], 
-      [:category_id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)"}]]
+      [:id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)", :ruby_default => nil}], 
+      [:title, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)", :ruby_default => nil}], 
+      [:category_id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)", :ruby_default => nil}]]
     categories_schema = [
-      [:id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)"}], 
-      [:cat_name, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)"}]]
+      [:id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)", :ruby_default => nil}], 
+      [:cat_name, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)", :ruby_default => nil}]]
     items_schema = [
-      [:name, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)"}], 
-      [:value, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)"}],
-      [:date_created, {:charset_form=>nil, :type=>:date, :type_string=>"DATE", :fsprecision=>0, :data_size=>7, :lfprecision=>0, :precision=>0, :db_type=>"DATE", :char_used=>false, :char_size=>0, :scale=>0, :allow_null=>true}]]
+      [:name, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)", :ruby_default => nil}], 
+      [:value, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)", :ruby_default => nil}],
+      [:date_created, {:charset_form=>nil, :type=>:date, :type_string=>"DATE", :fsprecision=>0, :data_size=>7, :lfprecision=>0, :precision=>0, :db_type=>"DATE", :char_used=>false, :char_size=>0, :scale=>0, :allow_null=>true, :ruby_default => nil}]]
      
     {:books => books_schema, :categories => categories_schema, :items => items_schema}.each_pair do |table, expected_schema|
       schema = ORACLE_DB.schema(table)
       schema.should_not be_nil
-      expected_schema.should == schema
+      schema.should == expected_schema
     end
   end
   
