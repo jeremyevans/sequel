@@ -9,25 +9,22 @@ module Sequel
 
       AUTO_INCREMENT = ''.freeze
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
+      DISCONNECT_ERRORS = /Unsuccessful execution caused by a system error that precludes successful execution of subsequent statements/
 
-      # Add the primary_keys and primary_key_sequences instance variables,
+      # Add the primary_keys instance variables.
       # so we can get the correct return values for inserted rows.
       def initialize(*args)
         super
         @primary_keys = {}
-        @primary_key_sequences = {}
       end
 
       def connect(server)
         opts = server_opts(server)
 
-        db = Fb::Database.new(
+        Fb::Database.new(
           :database => "#{opts[:host]}:#{opts[:database]}",
           :username => opts[:user],
-          :password => opts[:password])
-        conn = db.connect
-        conn.downcase_names = true
-        conn
+          :password => opts[:password]).connect
       end
 
       def create_trigger(*args)
@@ -45,25 +42,35 @@ module Sequel
       def execute(sql, opts={})
         begin
           synchronize(opts[:server]) do |conn|
+            if conn.transaction_started && !@transactions.include?(Thread.current)
+              conn.rollback
+              raise DatabaseDisconnectError, "transaction accidently left open, rolling back and disconnecting"
+            end
             r = log_yield(sql){conn.execute(sql)}
             yield(r) if block_given?
             r
           end
-        rescue => e
-          raise_error(e, :classes=>[Fb::Error])
+        rescue Fb::Error => e
+          raise_error(e, :disconnect=>DISCONNECT_ERRORS.match(e.message))
         end
       end
 
       # Return primary key for the given table.
-      def primary_key(table, server=nil)
-        synchronize(server){|conn| primary_key_for_table(conn, table)}
+      def primary_key(table)
+        t = dataset.send(:input_identifier, table)
+        @primary_keys.fetch(t) do
+          pk = fetch("SELECT RDB$FIELD_NAME FROM RDB$INDEX_SEGMENTS NATURAL JOIN RDB$RELATION_CONSTRAINTS WHERE RDB$CONSTRAINT_TYPE = 'PRIMARY KEY' AND RDB$RELATION_NAME = ?", t).single_value
+          @primary_keys[t] = dataset.send(:output_identifier, pk.rstrip) if pk
+        end
       end
 
-      # Returns primary key for the given table.  This information is
-      # cached, and if the primary key for a table is changed, the
-      # @primary_keys instance variable should be reset manually.
-      def primary_key_for_table(conn, table)
-        @primary_keys[quote_identifier(table)] ||= conn.table_primary_key(quote_identifier(table))
+      def drop_table(*names)
+        clear_primary_key(*names)
+        super
+      end
+
+      def clear_primary_key(*tables)
+        tables.each{|t| @primary_keys.delete(dataset.send(:input_identifier, t))}
       end
 
       def restart_sequence(*args)
@@ -76,11 +83,19 @@ module Sequel
       end
 
       def tables(opts={})
-        ds = self[:"rdb$relations"].server(opts[:server]).filter(:"rdb$view_blr" => nil, Sequel::SQL::Function.new(:COALESCE, :"rdb$system_flag", 0) => 0).select(:"rdb$relation_name")
-        block_given? ? yield(ds) : ds.map{|r| ds.send(:output_identifier, r[:"rdb$relation_name"])}
+        tables_or_views(0, opts)
+      end
+
+      def views(opts={})
+        tables_or_views(1, opts)
       end
 
       private
+
+      def tables_or_views(type, opts)
+        ds = self[:"rdb$relations"].server(opts[:server]).filter(:"rdb$relation_type" => type, Sequel::SQL::Function.new(:COALESCE, :"rdb$system_flag", 0) => 0).select(:"rdb$relation_name")
+        ds.map{|r| ds.send(:output_identifier, r[:"rdb$relation_name"].rstrip)}
+      end
 
       # Use Firebird specific syntax for add column
       def alter_table_sql(table, op)
@@ -103,7 +118,14 @@ module Sequel
       end
       
       def begin_transaction(conn, opts={})
-        log_yield(TRANSACTION_BEGIN){conn.transaction}
+        log_yield(TRANSACTION_BEGIN) do
+          begin
+            conn.transaction
+          rescue Fb::Error => e
+            conn.rollback
+            raise_error(e, :disconnect=>true) 
+          end
+        end
         conn
       end
 
@@ -205,10 +227,10 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |s|
           begin
-            @columns = s.fields.map{|c| output_identifier(c.name)}
-            s.fetchall(:symbols_hash).each do |r|
+            @columns = columns = s.fields.map{|c| output_identifier(c.name)}
+            s.fetchall.each do |r|
               h = {}
-              r.each{|k,v| h[output_identifier(k)] = v}
+              r.zip(columns).each{|v, c| h[c] = v}
               yield h
             end
           ensure
@@ -224,8 +246,6 @@ module Sequel
           super
         elsif supports_insert_select?
           returning(insert_pk).insert(*values){|r| return r.values.first}
-        else
-          execute_insert(insert_sql(*values), :table=>opts[:from].first, :values=>values.size == 1 ? values.first : values)
         end
       end
 
@@ -258,13 +278,6 @@ module Sequel
         pk ? Sequel::SQL::Identifier.new(pk) : NULL
       end
 
-      def hash_row(stmt, row)
-        @columns.inject({}) do |m, c|
-          m[c] = row.shift
-          m
-        end
-      end
-
       def literal_false
         BOOL_FALSE
       end
@@ -282,7 +295,6 @@ module Sequel
         sql << " FIRST #{@opts[:limit]}" if @opts[:limit]
         sql << " SKIP #{@opts[:offset]}" if @opts[:offset]
       end
-
     end
   end
 end
