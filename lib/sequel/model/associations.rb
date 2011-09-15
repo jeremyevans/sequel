@@ -79,6 +79,21 @@ module Sequel
           true
         end
     
+        # The eager limit strategy to use for this dataset.
+        def eager_limit_strategy
+          fetch(:_eager_limit_strategy) do
+            self[:_eager_limit_strategy] = if self[:limit]
+              if s = self[:eager_limit_strategy]
+                s
+              else
+                :ruby
+              end
+            else
+              nil
+            end
+          end
+        end
+
         # By default associations do not need to select a key in an associated table
         # to eagerly load.
         def eager_loading_use_associated_key?
@@ -92,6 +107,15 @@ module Sequel
           true
         end
     
+        # The limit and offset for this association (returned as a two element array).
+        def limit_and_offset
+          if (v = self[:limit]).is_a?(Array)
+            v
+          else
+            [v, 0]
+          end
+        end
+
         # Whether the associated object needs a primary key to be added/removed,
         # false by default.
         def need_associated_primary_key?
@@ -193,6 +217,11 @@ module Sequel
           self[:key].nil?
         end
     
+        # many_to_one associations don't need an eager limit strategy
+        def eager_limit_strategy
+          nil
+        end
+
         # The key to use for the key hash when eager loading
         def eager_loader_key
           self[:eager_loader_key] ||= self[:key]
@@ -297,6 +326,11 @@ module Sequel
       class OneToOneAssociationReflection < OneToManyAssociationReflection
         ASSOCIATION_TYPES[:one_to_one] = self
         
+        # one_to_one associations don't need an eager limit strategy
+        def eager_limit_strategy
+          nil
+        end
+
         # one_to_one associations return a single object, not an array
         def returns_array?
           false
@@ -805,15 +839,6 @@ module Sequel
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
           opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, rcks.zip(opts.right_primary_keys) + lcks.zip(lcpks.map{|k| send(k)}))}
 
-          if limit = opts[:limit] 
-            if limit.is_a?(Array)
-              limit, offset = limit
-            else
-              offset = 0
-            end
-            eager_limit = to_many_eager_limit_strategy(opts)
-            eager_limit_ruby = eager_limit == :ruby
-          end
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:key_hash][left_pk]
             rows = eo[:rows]
@@ -829,7 +854,8 @@ module Sequel
               next unless objects = h[hash_key]
               objects.each{|object| object.associations[name].push(assoc_record)}
             end
-            if eager_limit_ruby
+            if opts.eager_limit_strategy == :ruby
+              limit, offset = opts.limit_and_offset
               rows.each{|o| o.associations[name] = o.associations[name].slice(offset, limit) || []}
             end
           end
@@ -935,17 +961,6 @@ module Sequel
           cpks = opts[:primary_keys] = Array(primary_key)
           raise(Error, "mismatched number of composite keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
-          unless one_to_one
-            if limit = opts[:limit] 
-              if limit.is_a?(Array)
-                limit, offset = limit
-              else
-                offset = 0
-              end
-              eager_limit = to_many_eager_limit_strategy(opts)
-              eager_limit_ruby = eager_limit == :ruby
-            end
-          end
           opts[:dataset] ||= proc do
             klass = opts.associated_class
             klass.filter(cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}.zip(cpks.map{|k| send(k)}))
@@ -977,7 +992,8 @@ module Sequel
                 end
               end
             end
-            if eager_limit_ruby
+            if opts.eager_limit_strategy == :ruby
+              limit, offset = opts.limit_and_offset
               rows.each{|o| o.associations[name] = o.associations[name].slice(offset, limit) || []}
             end
           end
@@ -1055,11 +1071,6 @@ module Sequel
             ds = cb.call(ds)
           end
           ds
-        end
-
-        # The strategy to use for setting limits on datasets used for eager loading.
-        def to_many_eager_limit_strategy(opts)
-          opts[:eager_limit_strategy] || :ruby
         end
       end
 

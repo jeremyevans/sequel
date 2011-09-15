@@ -180,15 +180,6 @@ module Sequel
           end
 
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
-          if limit = opts[:limit] 
-            if limit.is_a?(Array)
-              limit, offset = limit
-            else
-              offset = 0
-            end
-            eager_limit = to_many_eager_limit_strategy(opts)
-            eager_limit_ruby = eager_limit == :ruby
-          end
           opts[:eager_loader] ||= lambda do |eo|
             h = eo[:key_hash][left_pk]
             rows = eo[:rows]
@@ -207,7 +198,8 @@ module Sequel
               next unless objects = h[hash_key]
               objects.each{|object| object.associations[name].push(assoc_record)}
             end
-            if eager_limit_ruby
+            if opts.eager_limit_strategy == :ruby
+              limit, offset = opts.limit_and_offset
               rows.each{|o| o.associations[name] = o.associations[name].slice(offset, limit) || []}
             end
           end
