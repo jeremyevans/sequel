@@ -328,7 +328,18 @@ module Sequel
         
         # one_to_one associations don't need an eager limit strategy
         def eager_limit_strategy
-          nil
+          fetch(:_eager_limit_strategy) do
+            self[:_eager_limit_strategy] = case s = self[:eager_limit_strategy]
+            when Symbol
+              s
+            when true
+              if associated_class.dataset.supports_ordered_distinct_on?
+                :distinct_on
+              end
+            else
+              nil
+            end
+          end
         end
 
         # one_to_one associations return a single object, not an array
@@ -572,6 +583,14 @@ module Sequel
         #                   additional key :eager_block, a callback accepting one argument, the associated dataset. This
         #                   is used to customize the association at query time.
         #                   Should return a copy of the dataset with the association graphed into it.
+        # :eager_limit_strategy :: Determines the strategy used for enforcing limits when eager loading associations via
+        #                          the +eager+ method.  For one_to_one associations, no strategy is used by default, and
+        #                          for *_many associations, the :ruby strategy is used by default, which still retrieves
+        #                          all records but slices the resulting array after the association is retrieved.  You
+        #                          can pass a +true+ value for this option to have Sequel pick what it thinks is the best
+        #                          choice for the database, or specify a specific symbol to manually select a strategy.
+        #                          one_to_one supports :distinct_on.
+        #                          Other strategies will be added in the future.
         # :eager_loader :: A proc to use to implement eager loading, overriding the default.  Takes one or three arguments.
         #                  If three arguments, the first should be a key hash (used solely to enhance performance), the
         #                  second an array of records, and the third a hash of dependent associations. If one argument, is
@@ -975,7 +994,14 @@ module Sequel
             end
             reciprocal = opts.reciprocal
             klass = opts.associated_class
-            model.eager_loading_dataset(opts, klass.filter(uses_cks ? {cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>h.keys} : {SQL::QualifiedIdentifier.new(klass.table_name, key)=>h.keys}), opts.select, eo[:associations], eo).all do |assoc_record|
+            filter_keys = uses_cks ? cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)} : SQL::QualifiedIdentifier.new(klass.table_name, key)
+            ds = model.eager_loading_dataset(opts, klass.filter(filter_keys=>h.keys), opts.select, eo[:associations], eo)
+            case opts.eager_limit_strategy
+            when :distinct_on
+              filter_keys = Array(filter_keys)
+              ds = ds.distinct(*filter_keys).order_prepend(*filter_keys)
+            end
+            ds.all do |assoc_record|
               hash_key = uses_cks ? cks.map{|k| assoc_record.send(k)} : assoc_record.send(key)
               next unless objects = h[hash_key]
               if one_to_one

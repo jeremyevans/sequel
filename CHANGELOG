@@ -1,5 +1,9 @@
 === HEAD
 
+* Add support for an :eager_limit_strategy => :distinct_on value for one_to_one associations for using DISTINCT ON (jeremyevans)
+
+* Add support for an :eager_limit_strategy association option, for manual control over how limiting is done (jeremyevans)
+
 * Add Dataset#supports_ordered_distinct_on? for checking if the dataset can use distinct on while respecting order (jeremyevans)
 
 * Add support for the association :limit option when eager loading via .eager for *_many associations (jeremyevans)

@@ -1,5 +1,26 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
+shared_examples_for "eager loading one_to_one associations" do
+  specify "eager loading one_to_one associations should work correctly" do
+    @album.update(:artist => @artist)
+    diff_album = @diff_album.call
+    al, ar, t = @pr.call
+    
+    a = Artist.eager(:first_album, :last_album).all
+    a.should == [@artist, ar]
+    a.first.first_album.should == @album
+    a.first.last_album.should == diff_album
+    a.last.first_album.should == nil
+    a.last.last_album.should == nil
+
+    same_album = @same_album.call
+    a = Artist.eager(:first_album).all
+    a.should == [@artist, ar]
+    [@album, same_album].should include(a.first.first_album)
+    a.last.first_album.should == nil
+  end
+end
+
 shared_examples_for "regular and composite key associations" do  
   specify "should return no objects if none are associated" do
     @album.artist.should == nil
@@ -299,19 +320,15 @@ shared_examples_for "regular and composite key associations" do
     a.first.albums.first.artist.should == @artist
   end
   
-  specify "should eager load one_to_one associations with multiple matching objects correctly" do
-    @album.update(:artist => @artist)
-    diff_album = @diff_album.call
-    
-    a = Artist.eager(:first_album, :last_album).all
-    a.should == [@artist]
-    a.first.first_album.should == @album
-    a.first.last_album.should == diff_album
-
-    same_album = @same_album.call
-    a = Artist.eager(:first_album).all
-    a.should == [@artist]
-    [@album, same_album].should include(a.first.first_album)
+  describe "with no :eager_load_strategy" do
+    it_should_behave_like "eager loading one_to_one associations"
+  end
+  describe "with :eager_load_strategy=>true" do
+    before do
+      Artist.one_to_one :first_album, :clone=>:first_album, :eager_limit_strategy=>true
+      Artist.one_to_one :last_album, :clone=>:last_album, :eager_limit_strategy=>true
+    end
+    it_should_behave_like "eager loading one_to_one associations"
   end
   
   specify "should eager load via eager_graph correctly" do

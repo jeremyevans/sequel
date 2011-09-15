@@ -1518,3 +1518,38 @@ associations depends on another plugin that defines instance methods of
 the same name.  In that case, the instance methods of the dependent
 plugin would override the association methods created by the main
 plugin.
+
+==== :eager_limit_strategy
+
+This setting determines what strategy to use for loading the associations
+that use the :limit setting to limit the number of returned records. You
+can't use LIMIT directly, since you want a limit for each associated
+record, not a LIMIT on the number of records returned by the dataset.
+
+By default, no strategy is used for one_to_one associations, and
+the :ruby strategy is used for *_many associations, which does a simple
+array slice after loading the associated records.  That doesn't provide
+a performance advantage, since all records are still loaded from the
+database, but it at least makes sure the cached records are accurately
+limited as they would be in the lazy load case.
+
+The reason no strategy is used by default for one_to_one associations
+is that none is needed for a true one_to_one association (since there
+is only one associated record per current record).  However, if you are
+using a one_to_one association where the relationship is really one_to_many,
+and using an order to pick the first matching row, then if you don't
+specify an :eager_limit_strategy option, you'll be loading all related
+rows just to have Sequel ignore all rows after the first.  By using a
+strategy to change the query to only return one associated record per
+current record, you can get much better database performance.
+
+You can set a value of +true+ for this option to have Sequel select what
+it thinks is the best way of limiting the records for your database.  You
+can also specify a symbol to manually choose a strategy.  The available
+strategies are:
+
+:distinct_on :: Uses DISTINCT ON to ensure only the first matching record
+                is loaded (one_to_one associations only). This is used by
+                default on PostgreSQL.
+:ruby :: Uses ruby array slicing to emulate database limiting (*_many
+         associations only).

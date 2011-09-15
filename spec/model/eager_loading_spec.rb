@@ -136,6 +136,16 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.length.should == 2
   end
   
+  it "should eagerly load a single one_to_one association using the :distinct_on strategy" do
+    EagerTrack.dataset.meta_def(:supports_distinct_on?){true}
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>true
+    a = EagerAlbum.eager(:track).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT DISTINCT ON (tracks.album_id) * FROM tracks WHERE (tracks.album_id IN (1)) ORDER BY tracks.album_id']
+    a.first.track.should == EagerTrack.load(:id => 3, :album_id=>1)
+    MODEL_DB.sqls.length.should == 2
+  end
+  
   it "should eagerly load a single one_to_many association" do
     a = EagerAlbum.eager(:tracks).all
     a.should be_a_kind_of(Array)
