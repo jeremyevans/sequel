@@ -415,20 +415,21 @@ end
 describe "Sequel::Model Simple Associations" do
   before do
     @db = INTEGRATION_DB
-    @db.create_table!(:artists) do
+    [:albums_tags, :tags, :albums, :artists].each{|t| @db.drop_table(t) rescue nil}
+    @db.create_table(:artists) do
       primary_key :id
       String :name
     end
-    @db.create_table!(:albums) do
+    @db.create_table(:albums) do
       primary_key :id
       String :name
       foreign_key :artist_id, :artists
     end
-    @db.create_table!(:tags) do
+    @db.create_table(:tags) do
       primary_key :id
       String :name
     end
-    @db.create_table!(:albums_tags) do
+    @db.create_table(:albums_tags) do
       foreign_key :album_id, :albums
       foreign_key :tag_id, :tags
     end
@@ -580,13 +581,14 @@ end
 describe "Sequel::Model Composite Key Associations" do
   before do
     @db = INTEGRATION_DB
-    @db.create_table!(:artists) do
+    [:albums_tags, :tags, :albums, :artists].each{|t| @db.drop_table(t) rescue nil}
+    @db.create_table(:artists) do
       Integer :id1
       Integer :id2
       String :name
       primary_key [:id1, :id2]
     end
-    @db.create_table!(:albums) do
+    @db.create_table(:albums) do
       Integer :id1
       Integer :id2
       String :name
@@ -595,13 +597,13 @@ describe "Sequel::Model Composite Key Associations" do
       foreign_key [:artist_id1, :artist_id2], :artists
       primary_key [:id1, :id2]
     end
-    @db.create_table!(:tags) do
+    @db.create_table(:tags) do
       Integer :id1
       Integer :id2
       String :name
       primary_key [:id1, :id2]
     end
-    @db.create_table!(:albums_tags) do
+    @db.create_table(:albums_tags) do
       Integer :album_id1
       Integer :album_id2
       Integer :tag_id1
