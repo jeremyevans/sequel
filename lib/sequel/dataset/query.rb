@@ -713,7 +713,12 @@ module Sequel
     #   DB[:items].select_append(:b) # SELECT *, b FROM items
     def select_append(*columns, &block)
       cur_sel = @opts[:select]
-      cur_sel = [WILDCARD] if !cur_sel || cur_sel.empty?
+      if !cur_sel || cur_sel.empty?
+        unless supports_select_all_and_column?
+          return select_all(*(Array(@opts[:from]) + Array(@opts[:join]))).select_more(*columns, &block)
+        end
+        cur_sel = [WILDCARD]
+      end
       select(*(cur_sel + columns), &block)
     end
 

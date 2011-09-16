@@ -1378,6 +1378,14 @@ describe "Dataset#select_append" do
     @d.select(:a).select_append{|o| o.b}.sql.should == 'SELECT a, b FROM test'
     @d.select(:a.*).select_append(:b.*){b(1)}.sql.should == 'SELECT a.*, b.*, b(1) FROM test'
   end
+
+  specify "should select from all from and join tables if SELECT *, column not supported" do
+    @d.meta_def(:supports_select_all_and_column?){false}
+    @d.select_append(:b).sql.should == 'SELECT test.*, b FROM test'
+    @d.from(:test, :c).select_append(:b).sql.should == 'SELECT test.*, c.*, b FROM test, c'
+    @d.cross_join(:c).select_append(:b).sql.should == 'SELECT test.*, c.*, b FROM test CROSS JOIN c'
+    @d.cross_join(:c).cross_join(:d).select_append(:b).sql.should == 'SELECT test.*, c.*, d.*, b FROM test CROSS JOIN c CROSS JOIN d'
+  end
 end
 
 describe "Dataset#order" do

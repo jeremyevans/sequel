@@ -1,5 +1,9 @@
 === HEAD
 
+* Have Dataset#select_append check supports_select_all_and_column? and select all from all FROM and JOIN tables if no columns selected (jeremyevans)
+
+* Add Dataset#supports_select_all_and_column? for checking if you can do SELECT *, column (jeremyevans)
+
 * Add support for an :eager_limit_strategy => :window_function value for limiting using window functions (jeremyevans)
 
 * Add support for an :eager_limit_strategy => :distinct_on value for one_to_one associations for using DISTINCT ON (jeremyevans)

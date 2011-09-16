@@ -93,6 +93,11 @@ module Sequel
       supports_distinct_on?
     end
     
+    # Whether the database supports SELECT *, column FROM table
+    def supports_select_all_and_column?
+      true
+    end
+
     # Whether the dataset supports timezones in literal timestamps
     def supports_timestamp_timezones?
       false

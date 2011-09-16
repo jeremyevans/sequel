@@ -214,11 +214,8 @@ module Sequel
         raise(Error, 'DB2 requires an order be provided if using an offset') unless order = @opts[:order]
         dsa1 = dataset_alias(1)
         rn = row_number_column
-        ds = unlimited.unordered
-        # DB2 doesn't seem to like *, ROW_NUMBER in select, but selecting from all FROM
-        # tables seems to work.
-        ds = ds.select_all(*(Array(@opts[:from]) + Array(@opts[:join]))) if @opts[:select] == nil || @opts[:select].empty?
-        subselect_sql(ds.
+        subselect_sql(unlimited.
+          unordered.
           select_append{ROW_NUMBER(:over, :order=>order){}.as(rn)}.
           from_self(:alias=>dsa1).
           limit(@opts[:limit]).
@@ -232,6 +229,11 @@ module Sequel
 
       # DB2 does not support multiple columns in IN.
       def supports_multiple_column_in?
+        false
+      end
+
+      # DB2 only allows * in SELECT if it is the only thing being selected.
+      def supports_select_all_and_column?
         false
       end
 
