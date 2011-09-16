@@ -526,6 +526,12 @@ module Sequel
       #   Project.association_reflection(:portfolio)
       #   => {:type => :many_to_one, :name => :portfolio, ...}
       #
+      # Associations should not have the same names as any of the columns in the
+      # model's current table they reference. If you are dealing with an existing schema that
+      # has a column named status, you can't name the association status, you'd
+      # have to name it foo_status or something else.  If you give an association the same name
+      # as a column, you will probably end up with an association that doesn't work, or a SystemStackError.
+      #
       # For a more in depth general overview, as well as a reference guide,
       # see the {Association Basics guide}[link:files/doc/association_basics_rdoc.html].
       # For examples of advanced usage, see the {Advanced Associations guide}[link:files/doc/advanced_associations_rdoc.html].
