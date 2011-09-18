@@ -20,6 +20,7 @@
   <li><a href="rdoc/files/doc/migration_rdoc.html">Migrations</a></li>
   <li><a href="rdoc/files/doc/virtual_rows_rdoc.html">Virtual Row Blocks</a></li>
   <li><a href="rdoc/files/doc/reflection_rdoc.html">Reflection</a></li>
+  <li><a href="rdoc/files/doc/transactions_rdoc.html">Database Transactions</a></li>
   <li><a href="rdoc/files/doc/sql_rdoc.html">Sequel for SQL Users</a></li>
   <li><a href="rdoc/files/doc/active_record_rdoc.html">Sequel for ActiveRecord Users</a></li>
   <li><a href="rdoc/files/doc/testing_rdoc.html">Testing With Sequel</a></li>
