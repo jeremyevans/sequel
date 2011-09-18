@@ -1544,6 +1544,13 @@ describe "Database#typecast_value" do
     end
   end
 
+  specify "should correctly handle time value conversion to SQLTime with fractional seconds" do
+    t = Time.now
+    st = Sequel::SQLTime.local(t.year, t.month, t.day, 1, 2, 3, 500000)
+    t = Time.local(t.year, t.month, t.day, 1, 2, 3, 500000)
+    @db.typecast_value(:time, t).should == st
+  end
+
   specify "should have an underlying exception class available at wrapped_exception" do
     begin
       @db.typecast_value(:date, 'a')

@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix :time typecasting from Time to SQLTime for fractional seconds on ruby 1.9 (jeremyevans)
+
 * Have Dataset#select_append check supports_select_all_and_column? and select all from all FROM and JOIN tables if no columns selected (jeremyevans)
 
 * Add Dataset#supports_select_all_and_column? for checking if you can do SELECT *, column (jeremyevans)

@@ -278,7 +278,7 @@ module Sequel
       when SQLTime
         value
       when Time
-        SQLTime.local(value.year, value.month, value.day, value.hour, value.min, value.sec, value.respond_to?(:nsec) ? value.nsec : value.usec)
+        SQLTime.local(value.year, value.month, value.day, value.hour, value.min, value.sec, value.respond_to?(:nsec) ? value.nsec/1000.0 : value.usec)
       when String
         Sequel.string_to_time(value)
       when Hash
