@@ -337,7 +337,8 @@ module Sequel
       class OneToOneAssociationReflection < OneToManyAssociationReflection
         ASSOCIATION_TYPES[:one_to_one] = self
         
-        # one_to_one associations don't need an eager limit strategy
+        # one_to_one associations don't use an eager limit strategy by default, but
+        # support both DISTINCT ON and window functions as strategies.
         def eager_limit_strategy
           fetch(:_eager_limit_strategy) do
             self[:_eager_limit_strategy] = case s = self[:eager_limit_strategy]

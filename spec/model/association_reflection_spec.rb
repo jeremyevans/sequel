@@ -184,11 +184,69 @@ describe Sequel::Model::Associations::AssociationReflection, "#remove_before_des
     @c.many_to_many :cs, :class=>@c
     @c.association_reflection(:cs).remove_before_destroy?.should be_true
   end
+
   it "should be false for one_to_one and one_to_many associations" do
     @c.one_to_one :c, :class=>@c
     @c.association_reflection(:c).remove_before_destroy?.should be_false
     @c.one_to_many :cs, :class=>@c
     @c.association_reflection(:cs).remove_before_destroy?.should be_false
+  end
+end
+
+describe Sequel::Model::Associations::AssociationReflection, "#eager_limit_strategy" do
+  before do
+    @c = Class.new(Sequel::Model(:a))
+  end
+
+  it "should be nil by default for *_one associations" do
+    @c.many_to_one :c, :class=>@c
+    @c.association_reflection(:c).eager_limit_strategy.should be_nil
+    @c.one_to_one :c, :class=>@c
+    @c.association_reflection(:c).eager_limit_strategy.should be_nil
+  end
+
+  it "should be :ruby by default for *_many associations" do
+    @c.one_to_many :cs, :class=>@c, :limit=>1
+    @c.association_reflection(:cs).eager_limit_strategy.should == :ruby
+    @c.many_to_many :cs, :class=>@c, :limit=>1
+    @c.association_reflection(:cs).eager_limit_strategy.should == :ruby
+  end
+
+  it "should be nil for many_to_one associations" do
+    @c.many_to_one :c, :class=>@c, :eager_limit_strategy=>true
+    @c.association_reflection(:c).eager_limit_strategy.should be_nil
+    @c.many_to_one :c, :class=>@c, :eager_limit_strategy=>:distinct_on
+    @c.association_reflection(:c).eager_limit_strategy.should be_nil
+  end
+
+  it "should be a symbol for other associations if given a symbol" do
+    @c.one_to_one :c, :class=>@c, :eager_limit_strategy=>:distinct_on
+    @c.association_reflection(:c).eager_limit_strategy.should == :distinct_on
+    @c.one_to_many :cs, :class=>@c, :eager_limit_strategy=>:window_function, :limit=>1
+    @c.association_reflection(:cs).eager_limit_strategy.should == :window_function
+  end
+
+  it "should use :distinct_on for one_to_one associations if picking and the association dataset supports ordered distinct on" do
+    @c.dataset.meta_def(:supports_ordered_distinct_on?){true}
+    @c.one_to_one :c, :class=>@c, :eager_limit_strategy=>true
+    @c.association_reflection(:c).eager_limit_strategy.should == :distinct_on
+  end
+
+  it "should use :window_function for associations if picking and the association dataset supports window functions" do
+    @c.dataset.meta_def(:supports_window_functions?){true}
+    @c.one_to_one :c, :class=>@c, :eager_limit_strategy=>true
+    @c.association_reflection(:c).eager_limit_strategy.should == :window_function
+    @c.one_to_many :cs, :class=>@c, :eager_limit_strategy=>true, :limit=>1
+    @c.association_reflection(:cs).eager_limit_strategy.should == :window_function
+    @c.many_to_many :cs, :class=>@c, :eager_limit_strategy=>true, :limit=>1
+    @c.association_reflection(:cs).eager_limit_strategy.should == :window_function
+  end
+
+  it "should use :ruby for *_many associations if picking and the association dataset doesn't window functions" do
+    @c.one_to_many :cs, :class=>@c, :eager_limit_strategy=>true, :limit=>1
+    @c.association_reflection(:cs).eager_limit_strategy.should == :ruby
+    @c.many_to_many :cs, :class=>@c, :eager_limit_strategy=>true, :limit=>1
+    @c.association_reflection(:cs).eager_limit_strategy.should == :ruby
   end
 end
 
