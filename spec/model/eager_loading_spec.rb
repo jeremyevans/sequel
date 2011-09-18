@@ -1442,6 +1442,27 @@ describe Sequel::Model, "#eager_graph" do
     as.first.inner_genres.should == [GraphGenre.load(:id=>5), GraphGenre.load(:id=>6)]
   end
 
+  it "should respect composite primary keys for classes when eager loading" do 
+    c1 = Class.new(GraphAlbum)
+    c2 = Class.new(GraphBand)
+    c1.set_primary_key [:band_id, :id]
+    c2.set_primary_key [:vocalist_id, :id]
+    c1.many_to_many :sbands, :class=>c2, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :join_table=>:b
+    c2.one_to_many :salbums, :class=>c1, :key=>[:band_id, :id]
+    ds = c1.eager_graph(:sbands=>:salbums)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, sbands.id AS sbands_id, sbands.vocalist_id, salbums.id AS salbums_id, salbums.band_id AS salbums_band_id FROM albums LEFT OUTER JOIN b ON ((b.l1 = albums.band_id) AND (b.l2 = albums.id)) LEFT OUTER JOIN bands AS sbands ON ((sbands.vocalist_id = b.r1) AND (sbands.id = b.r2)) LEFT OUTER JOIN albums AS salbums ON ((salbums.band_id = sbands.vocalist_id) AND (salbums.id = sbands.id))'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>3, :band_id=>2, :sbands_id=>5, :vocalist_id=>6, :salbums_id=>7, :salbums_band_id=>8})
+      yield({:id=>3, :band_id=>2, :sbands_id=>5, :vocalist_id=>6, :salbums_id=>9, :salbums_band_id=>10})
+      yield({:id=>3, :band_id=>2, :sbands_id=>6, :vocalist_id=>22, :salbums_id=>nil, :salbums_band_id=>nil})
+      yield({:id=>7, :band_id=>8, :sbands_id=>nil, :vocalist_id=>nil, :salbums_id=>nil, :salbums_band_id=>nil})
+    end
+    as = ds.all
+    as.should == [c1.load(:id=>3, :band_id=>2), c1.load(:id=>7, :band_id=>8)]
+    as.map{|x| x.sbands}.should == [[c2.load(:id=>5, :vocalist_id=>6), c2.load(:id=>6, :vocalist_id=>22)], []]
+    as.map{|x| x.sbands.map{|y| y.salbums}}.should == [[[c1.load(:id=>7, :band_id=>8), c1.load(:id=>9, :band_id=>10)], []], []]
+  end
+
   it "should respect the association's :graph_select option" do 
     GraphAlbum.many_to_one :inner_band, :class=>'GraphBand', :key=>:band_id, :graph_select=>:vocalist_id
     GraphAlbum.eager_graph(:inner_band).sql.should == 'SELECT albums.id, albums.band_id, inner_band.vocalist_id FROM albums LEFT OUTER JOIN bands AS inner_band ON (inner_band.id = albums.band_id)'
