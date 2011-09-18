@@ -750,9 +750,10 @@ module Sequel
         [insert_sql(columns, LiteralString.new('VALUES ' + values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)))]
       end
       
-      # PostgreSQL supports using the WITH clause in subqueries.
+      # PostgreSQL supports using the WITH clause in subqueries if it
+      # supports using WITH at all (i.e. on PostgreSQL 8.4+).
       def supports_cte_in_subqueries?
-        true
+        supports_cte?
       end
 
       # DISTINCT ON is a PostgreSQL extension
