@@ -1,5 +1,7 @@
 === HEAD
 
+* Work around serious ActiveSupport bug in Time.=== that breaks literalization of Time values (jeremyevans)
+
 * Speed up SQL operator methods by using module_eval instead of define_method (jeremyevans)
 
 * Support sql_(boolean,number,string) methods on ComplexExpressions, allowing you do to (x + 1).sql_string + 'a' for (x + 1) || 'a' (jeremyevans)

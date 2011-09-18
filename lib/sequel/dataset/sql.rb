@@ -100,10 +100,8 @@ module Sequel
         literal_false
       when Array
         literal_array(v)
-      when SQLTime
-        literal_sqltime(v)
       when Time
-        literal_time(v)
+        v.is_a?(SQLTime) ? literal_sqltime(v) : literal_time(v)
       when DateTime
         literal_datetime(v)
       when Date

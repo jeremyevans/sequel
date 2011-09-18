@@ -275,10 +275,12 @@ module Sequel
     # Typecast the value to a Time
     def typecast_value_time(value)
       case value
-      when SQLTime
-        value
       when Time
-        SQLTime.local(value.year, value.month, value.day, value.hour, value.min, value.sec, value.respond_to?(:nsec) ? value.nsec/1000.0 : value.usec)
+        if value.is_a?(SQLTime)
+          value
+        else
+          SQLTime.local(value.year, value.month, value.day, value.hour, value.min, value.sec, value.respond_to?(:nsec) ? value.nsec/1000.0 : value.usec)
+        end
       when String
         Sequel.string_to_time(value)
       when Hash
