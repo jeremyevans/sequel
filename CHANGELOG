@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for an :eager_limit_strategy => :correlated_subquery value for limiting using correlated subqueries (jeremyevans)
+
 * Allow use of a dataset that uses the emulated offset support on MSSQL and DB2 in an IN subquery by using a nested subquery (jeremyevans)
 
 * Allow use of a dataset that uses LIMIT in an IN subquery on MySQL by using a nested subquery (jeremyevans)

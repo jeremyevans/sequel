@@ -353,12 +353,14 @@ shared_examples_for "regular and composite key associations" do
   describe "with no :eager_limit_strategy" do
     it_should_behave_like "eager limit strategies"
   end
+
   describe "with :eager_limit_strategy=>true" do
     before do
       @els = {:eager_limit_strategy=>true}
     end
     it_should_behave_like "eager limit strategies"
   end
+
   describe "with :eager_limit_strategy=>:window_function" do
     before do
       @els = {:eager_limit_strategy=>:window_function}
@@ -472,6 +474,13 @@ describe "Sequel::Model Simple Associations" do
   end
   
   it_should_behave_like "regular and composite key associations"
+
+  describe "with :eager_limit_strategy=>:correlated_subquery" do
+    before do
+      @els = {:eager_limit_strategy=>:correlated_subquery}
+    end
+    it_should_behave_like "eager limit strategies"
+  end unless [:mysql, :db2].include?(INTEGRATION_DB.database_type)
 
   specify "should handle aliased tables when eager_graphing" do
     @album.update(:artist => @artist)
@@ -656,6 +665,13 @@ describe "Sequel::Model Composite Key Associations" do
   end
 
   it_should_behave_like "regular and composite key associations"
+
+  describe "with :eager_limit_strategy=>:correlated_subquery" do
+    before do
+      @els = {:eager_limit_strategy=>:correlated_subquery}
+    end
+    it_should_behave_like "eager limit strategies"
+  end if INTEGRATION_DB.dataset.supports_multiple_column_in? && ![:mysql, :db2].include?(INTEGRATION_DB.database_type)
 
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums

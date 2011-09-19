@@ -1554,5 +1554,15 @@ strategies are:
 :window_function :: Uses window functions if the database supports it.
                     This is used by default on databases that support window
                     functions.
+:correlated_subquery :: Uses a correlated subquery to get the information.
+                        This is never used by default as if you aren't careful,
+                        it can result in pathologically long running times
+                        This will not work correctly for association where
+                        the associated table has a composite primary key if
+                        the database doesn't support using IN
+                        with multiple columns.  This will also not work on MySQL
+                        because MySQL has problems using IN with a correlated
+                        subquery that contains a limit.
 :ruby :: Uses ruby array slicing to emulate database limiting (*_many
-         associations only).
+         associations only).  This is the default if the database doesn't
+         support window functions.

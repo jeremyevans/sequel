@@ -283,7 +283,7 @@ module Sequel
         def can_have_associated_objects?(obj)
           !self[:primary_keys].any?{|k| obj.send(k).nil?}
         end
-    
+
         # Default foreign key name symbol for key in associated table that points to
         # current table's primary key.
         def default_key
@@ -620,9 +620,8 @@ module Sequel
         #                          all records but slices the resulting array after the association is retrieved.  You
         #                          can pass a +true+ value for this option to have Sequel pick what it thinks is the best
         #                          choice for the database, or specify a specific symbol to manually select a strategy.
-        #                          one_to_one associations support :distinct_on and :window_function.
-        #                          *_many associations support :window_function and :ruby.
-        #                          Other strategies will be added in the future.
+        #                          one_to_one associations support :distinct_on, :window_function, and :correlated_subquery.
+        #                          *_many associations support :ruby, :window_function, and :correlated_subquery.
         # :eager_loader :: A proc to use to implement eager loading, overriding the default.  Takes one or three arguments.
         #                  If three arguments, the first should be a key hash (used solely to enhance performance), the
         #                  second an array of records, and the third a hash of dependent associations. If one argument, is
@@ -815,6 +814,58 @@ module Sequel
         
         private
       
+        # Use a correlated subquery to limit the results of the eager loading dataset.
+        def apply_correlated_subquery_eager_limit_strategy(ds, opts)
+          klass = opts.associated_class
+          kds = klass.dataset
+          dsa = ds.send(:dataset_alias, 1)
+          raise Error, "can't use a correlated subquery if the associated class (#{opts.associated_class.inspect}) does not have a primary key" unless pk = klass.primary_key
+          pka = Array(pk)
+          raise Error, "can't use a correlated subquery if the associated class (#{opts.associated_class.inspect}) has a composite primary key and the database does not support multiple column IN" if pka.length > 1 && !ds.supports_multiple_column_in?
+          table = kds.opts[:from]
+          raise Error, "can't use a correlated subquery unless the associated class (#{opts.associated_class.inspect}) uses a single FROM table" unless table && table.length == 1
+          table = table.first
+          if order = ds.opts[:order]
+            oproc = lambda do |x|
+              case x
+              when Symbol
+                t, c, a = ds.send(:split_symbol, x)
+                if t && t.to_sym == table
+                  SQL::QualifiedIdentifier.new(dsa, c)
+                else
+                  x
+                end
+              when SQL::QualifiedIdentifier
+                if x.table == table
+                  SQL::QualifiedIdentifier.new(dsa, x.column)
+                else
+                  x
+                end
+              when SQL::OrderedExpression
+                SQL::OrderedExpression.new(oproc.call(x.expression), x.descending, :nulls=>x.nulls)
+              else
+                x
+              end
+            end
+            order = order.map(&oproc) 
+          end
+          limit, offset = opts.limit_and_offset
+
+          subquery = yield kds.
+            unlimited.
+            from(SQL::AliasedExpression.new(table, dsa)).
+            select(*pka.map{|k| SQL::QualifiedIdentifier.new(dsa, k)}).
+            order(*order).
+            limit(limit, offset)
+
+          pk = if pk.is_a?(Array)
+            pk.map{|k| SQL::QualifiedIdentifier.new(table, k)}
+          else
+            SQL::QualifiedIdentifier.new(table, pk)
+          end
+          ds.filter(pk=>subquery)
+        end
+
         # Use a window function to limit the results of the eager loading dataset.
         def apply_window_function_eager_limit_strategy(ds, opts)
           rn = ds.row_number_column 
@@ -826,7 +877,7 @@ module Sequel
             offset += 1
             ds.where(rn => (offset...(offset+limit))) 
           else
-            ds.where{rn.identifier <= limit} 
+            ds.where{SQL::Identifier.new(rn) <= limit} 
           end
         end
 
@@ -917,6 +968,11 @@ module Sequel
               delete_rn = true
               rn = ds.row_number_column
               ds = apply_window_function_eager_limit_strategy(ds, opts)
+            when :correlated_subquery
+              ds = apply_correlated_subquery_eager_limit_strategy(ds, opts) do |xds|
+                dsa = ds.send(:dataset_alias, 2)
+                xds.inner_join(join_table, r + lcks.map{|k| [k, SQL::QualifiedIdentifier.new(join_table, k)]}, :table_alias=>dsa)
+              end
             end
             ds.all do |assoc_record|
               assoc_record.values.delete(rn) if delete_rn
@@ -1058,6 +1114,10 @@ module Sequel
               delete_rn = true
               rn = ds.row_number_column
               ds = apply_window_function_eager_limit_strategy(ds, opts)
+            when :correlated_subquery
+              ds = apply_correlated_subquery_eager_limit_strategy(ds, opts) do |xds|
+                xds.where(opts.associated_object_keys.map{|k| [SQL::QualifiedIdentifier.new(xds.first_source_alias, k), SQL::QualifiedIdentifier.new(xds.first_source_table, k)]})
+              end
             end
             ds.all do |assoc_record|
               assoc_record.values.delete(rn) if delete_rn
