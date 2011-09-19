@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow use of a dataset that uses the emulated offset support on MSSQL and DB2 in an IN subquery by using a nested subquery (jeremyevans)
+
+* Allow use of a dataset that uses LIMIT in an IN subquery on MySQL by using a nested subquery (jeremyevans)
+
 * Work around serious ActiveSupport bug in Time.=== that breaks literalization of Time values (jeremyevans)
 
 * Speed up SQL operator methods by using module_eval instead of define_method (jeremyevans)

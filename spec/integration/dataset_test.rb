@@ -110,6 +110,22 @@ describe "Simple Dataset operations" do
     @ds.limit(2, 1).all.should == []
   end
 
+  specify "should fetch correctly with a limit in an IN subselect" do
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2)).all.should == [{:id=>1, :number=>10}]
+    @ds.insert(:number=>20)
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(1)).all.should == [{:id=>1, :number=>10}]
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2)).order(:id).all.should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
+  end
+  
+  specify "should fetch correctly with a limit and offset in an IN subselect" do
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 0)).all.should == [{:id=>1, :number=>10}]
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 1)).all.should == []
+    @ds.insert(:number=>20)
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(1, 1)).all.should == [{:id=>2, :number=>20}]
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 0)).order(:id).all.should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 1)).all.should == [{:id=>2, :number=>20}]
+  end
+  
   specify "should alias columns correctly" do
     @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
   end

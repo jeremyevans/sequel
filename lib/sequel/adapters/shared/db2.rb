@@ -1,3 +1,5 @@
+Sequel.require 'adapters/utils/emulate_offset_with_row_number'
+
 module Sequel
   module DB2
     @use_clob_as_blob = true
@@ -171,6 +173,8 @@ module Sequel
     end
 
     module DatasetMethods
+      include EmulateOffsetWithRowNumber
+
       BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
@@ -206,20 +210,6 @@ module Sequel
       # ROW_NUMBER.
       def fetch_rows(sql, &block)
         @opts[:offset] ? super(sql){|r| r.delete(row_number_column); yield r} : super(sql, &block)
-      end
-
-      # Emulate OFFSET support with ROW_NUMBER
-      def select_sql
-        return super unless o = @opts[:offset]
-        raise(Error, 'DB2 requires an order be provided if using an offset') unless order = @opts[:order]
-        dsa1 = dataset_alias(1)
-        rn = row_number_column
-        subselect_sql(unlimited.
-          unordered.
-          select_append{ROW_NUMBER(:over, :order=>order){}.as(rn)}.
-          from_self(:alias=>dsa1).
-          limit(@opts[:limit]).
-          where(SQL::Identifier.new(rn) > o))
       end
 
       # DB2 does not support IS TRUE.

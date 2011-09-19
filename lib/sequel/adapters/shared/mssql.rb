@@ -1,3 +1,5 @@
+Sequel.require 'adapters/utils/emulate_offset_with_row_number'
+
 module Sequel
   Dataset::NON_SQL_OPTIONS << :disable_insert_output
   module MSSQL
@@ -231,6 +233,8 @@ module Sequel
     end
   
     module DatasetMethods
+      include EmulateOffsetWithRowNumber
+
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
@@ -360,29 +364,6 @@ module Sequel
         "[#{name}]"
       end
       
-      # MSSQL Requires the use of the ROW_NUMBER window function to emulate
-      # an offset.  This implementation requires MSSQL 2005 or greater (offset
-      # can't be emulated well in MSSQL 2000).
-      # 
-      # The implementation is ugly, cloning the current dataset and modifying
-      # the clone to add a ROW_NUMBER window function (and some other things),
-      # then using the modified clone in a subselect which is selected from.
-      #
-      # If offset is used, an order must be provided, because the use of ROW_NUMBER
-      # requires an order.
-      def select_sql
-        return super unless o = @opts[:offset]
-        raise(Error, 'MSSQL requires an order be provided if using an offset') unless order = @opts[:order]
-        dsa1 = dataset_alias(1)
-        rn = row_number_column
-        subselect_sql(unlimited.
-          unordered.
-          select_append{ROW_NUMBER(:over, :order=>order){}.as(rn)}.
-          from_self(:alias=>dsa1).
-          limit(@opts[:limit]).
-          where(SQL::Identifier.new(rn) > o))
-      end
-
       # The version of the database server.
       def server_version
         db.server_version(@opts[:server])
