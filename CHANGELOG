@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#copy_table for PostgreSQL COPY support when using the postgres adapter with pg (jeremyevans)
+
 * Support CREATE TABLE IF NOT EXISTS on PostgreSQL 9.1+ (jeremyevans)
 
 * Add support for Sequel::Model.default_eager_limit_strategy to set the default :eager_limit_strategy for *_many associations (jeremyevans)

@@ -976,7 +976,7 @@ if POSTGRES_DB.adapter_scheme == :postgres
       @db.transaction{1001.times{|i| @ds.insert(i)}}
     end
     after(:all) do
-      @db.drop_table(:test) rescue nil
+      @db.drop_table(:test_cursor) rescue nil
     end
   
     specify "should return the same results as the non-cursor use" do
@@ -1025,4 +1025,77 @@ if POSTGRES_DB.adapter_scheme == :postgres
       @db[:foo].get(:bar).should == 'syad 12'
     end
   end
+end
+
+if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRES_DB.server_version >= 90000
+  describe "Postgres::Database#copy_table" do
+    before(:all) do
+      @db = POSTGRES_DB
+      @db.create_table!(:test_copy){Integer :x; Integer :y}
+      ds = @db[:test_copy]
+      ds.insert(1, 2)
+      ds.insert(3, 4)
+    end
+    after(:all) do
+      @db.drop_table(:test_copy) rescue nil
+    end
+  
+    specify "without a block or options should return a text version of the table as a single string" do
+      @db.copy_table(:test_copy).should == "1\t2\n3\t4\n"
+    end
+
+    specify "without a block and with :format=>:csv should return a csv version of the table as a single string" do
+      @db.copy_table(:test_copy, :format=>:csv).should == "1,2\n3,4\n"
+    end
+  
+    specify "should treat string as SQL code" do
+      @db.copy_table('COPY "test_copy" TO STDOUT').should == "1\t2\n3\t4\n"
+    end
+  
+    specify "should respect given :options options" do
+      @db.copy_table(:test_copy, :options=>"FORMAT csv, HEADER TRUE").should == "x,y\n1,2\n3,4\n"
+    end
+  
+    specify "should respect given :options options when :format is used" do
+      @db.copy_table(:test_copy, :format=>:csv, :options=>"QUOTE '''', FORCE_QUOTE *").should == "'1','2'\n'3','4'\n"
+    end
+  
+    specify "should accept dataset as first argument" do
+      @db.copy_table(@db[:test_copy].cross_join(:test_copy___tc).order(1, 2, 3, 4)).should == "1\t2\t1\t2\n1\t2\t3\t4\n3\t4\t1\t2\n3\t4\t3\t4\n"
+    end
+  
+    specify "with a block and no options should yield each row as a string in text format" do
+      buf = []
+      @db.copy_table(:test_copy){|b| buf << b}
+      buf.should == ["1\t2\n", "3\t4\n"]
+    end
+  
+    specify "with a block and :format=>:csv should yield each row as a string in csv format" do
+      buf = []
+      @db.copy_table(:test_copy, :format=>:csv){|b| buf << b}
+      buf.should == ["1,2\n", "3,4\n"]
+    end
+  
+    specify "should work fine when using a block that is terminated early with a following copy_table" do
+      buf = []
+      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; break}}.should raise_error(Sequel::DatabaseDisconnectError)
+      buf.should == ["1,2\n"]
+      buf.clear
+      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; raise ArgumentError}}.should raise_error(Sequel::DatabaseDisconnectError)
+      buf.should == ["1,2\n"]
+      buf.clear
+      @db.copy_table(:test_copy){|b| buf << b}
+      buf.should == ["1\t2\n", "3\t4\n"]
+    end
+  
+    specify "should work fine when using a block that is terminated early with a following regular query" do
+      buf = []
+      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; break}}.should raise_error(Sequel::DatabaseDisconnectError)
+      buf.should == ["1,2\n"]
+      buf.clear
+      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; raise ArgumentError}}.should raise_error(Sequel::DatabaseDisconnectError)
+      buf.should == ["1,2\n"]
+      @db[:test_copy].select_order_map(:x).should == [1, 3]
+    end
+  end  
 end
