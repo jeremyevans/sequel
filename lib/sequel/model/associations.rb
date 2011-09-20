@@ -83,7 +83,7 @@ module Sequel
         def eager_limit_strategy
           fetch(:_eager_limit_strategy) do
             self[:_eager_limit_strategy] = if self[:limit]
-              case s = self.fetch(:eager_limit_strategy, :ruby)
+              case s = self.fetch(:eager_limit_strategy){self[:model].default_eager_limit_strategy || :ruby}
               when true
                 ds = associated_class.dataset
                 if ds.supports_window_functions?
@@ -540,6 +540,9 @@ module Sequel
         # All association reflections defined for this model (default: {}).
         attr_reader :association_reflections
 
+        # The default :eager_limit_strategy option to use for *_many associations (default: nil)
+        attr_accessor :default_eager_limit_strategy
+
         # Array of all association reflections for this model class
         def all_association_reflections
           association_reflections.values
@@ -789,7 +792,8 @@ module Sequel
         # Copy the association reflections to the subclass
         def inherited(subclass)
           super
-          subclass.instance_variable_set(:@association_reflections, @association_reflections.dup)
+          subclass.instance_variable_set(:@association_reflections, association_reflections.dup)
+          subclass.default_eager_limit_strategy =  default_eager_limit_strategy
         end
       
         # Shortcut for adding a many_to_many association, see #associate

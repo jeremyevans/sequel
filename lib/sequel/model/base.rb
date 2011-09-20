@@ -23,7 +23,7 @@ module Sequel
       # stored so when the dataset changes, methods defined with def_dataset_method
       # will be applied to the new dataset.
       attr_reader :dataset_methods
-      #
+
       # Array of plugin modules loaded by this class
       #
       #   Sequel::Model.plugins

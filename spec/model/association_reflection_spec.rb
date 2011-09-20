@@ -197,6 +197,9 @@ describe Sequel::Model::Associations::AssociationReflection, "#eager_limit_strat
   before do
     @c = Class.new(Sequel::Model(:a))
   end
+  after do
+    Sequel::Model.default_eager_limit_strategy = nil
+  end
 
   it "should be nil by default for *_one associations" do
     @c.many_to_one :c, :class=>@c
@@ -248,5 +251,35 @@ describe Sequel::Model::Associations::AssociationReflection, "#eager_limit_strat
     @c.many_to_many :cs, :class=>@c, :eager_limit_strategy=>true, :limit=>1
     @c.association_reflection(:cs).eager_limit_strategy.should == :ruby
   end
-end
 
+  it "should respect Model.default_eager_limit_strategy to *_many associations" do
+    Sequel::Model.default_eager_limit_strategy = :window_function
+    Sequel::Model.default_eager_limit_strategy.should == :window_function
+    c = Class.new(Sequel::Model)
+    c.dataset = :a
+    c.default_eager_limit_strategy.should == :window_function
+    c.one_to_many :cs, :class=>c, :limit=>1
+    c.association_reflection(:cs).eager_limit_strategy.should == :window_function
+    c.many_to_many :cs, :class=>c, :limit=>1
+    c.association_reflection(:cs).eager_limit_strategy.should == :window_function
+
+    Sequel::Model.default_eager_limit_strategy = true
+    c = Class.new(Sequel::Model)
+    c.dataset = :a
+    c.one_to_many :cs, :class=>c, :limit=>1
+    c.association_reflection(:cs).eager_limit_strategy.should == :ruby
+    c.dataset.meta_def(:supports_window_functions?){true}
+    c.many_to_many :cs, :class=>c, :limit=>1
+    c.association_reflection(:cs).eager_limit_strategy.should == :window_function
+
+    c.default_eager_limit_strategy = :correlated_subquery
+    c.many_to_many :cs, :class=>c, :limit=>1
+    c.association_reflection(:cs).eager_limit_strategy.should == :correlated_subquery
+  end
+
+  it "should ignore Model.default_eager_limit_strategy for one_to_one associations" do
+    @c.default_eager_limit_strategy = :correlated_subquery
+    @c.one_to_one :c, :class=>@c
+    @c.association_reflection(:c).eager_limit_strategy.should be_nil
+  end
+end
