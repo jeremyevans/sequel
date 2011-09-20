@@ -358,6 +358,11 @@ module Sequel
         @supports_prepared_transactions = self['SHOW max_prepared_transactions'].get.to_i > 0
       end
 
+      # PostgreSQL supports CREATE TABLE IF NOT EXISTS on 9.1+
+      def supports_create_table_if_not_exists?
+        server_version >= 90100
+      end
+
       # PostgreSQL supports savepoints
       def supports_savepoints?
         true

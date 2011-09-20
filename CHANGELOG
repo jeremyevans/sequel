@@ -1,5 +1,7 @@
 === HEAD
 
+* Support CREATE TABLE IF NOT EXISTS on PostgreSQL 9.1+ (jeremyevans)
+
 * Add support for Sequel::Model.default_eager_limit_strategy to set the default :eager_limit_strategy for *_many associations (jeremyevans)
 
 * Add support for an :eager_limit_strategy => :correlated_subquery value for limiting using correlated subqueries (jeremyevans)
