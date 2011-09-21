@@ -6,9 +6,6 @@ module Sequel
     # dataset supports a feature.
     # ---------------------
     
-    # Method used to check if WITH is supported
-    WITH_SUPPORTED=:select_with_sql
-    
     # Whether this dataset quotes identifiers.
     def quote_identifiers?
       if defined?(@quote_identifiers)
@@ -34,8 +31,10 @@ module Sequel
     end
 
     # Whether the dataset supports common table expressions (the WITH clause).
-    def supports_cte?
-      select_clause_methods.include?(WITH_SUPPORTED)
+    # If given, +type+ can be :select, :insert, :update, or :delete, in which case it
+    # determines whether WITH is supported for the respective statement type.
+    def supports_cte?(type=:select)
+      send(:"#{type}_clause_methods").include?(:"#{type}_with_sql")
     end
 
     # Whether the dataset supports common table expressions (the WITH clause)
@@ -53,7 +52,7 @@ module Sequel
     # Whether this dataset supports the +insert_select+ method for returning all columns values
     # directly from an insert query.
     def supports_insert_select?
-      false
+      supports_returning?(:insert)
     end
 
     # Whether the dataset supports the INTERSECT and EXCEPT compound operations, true by default.
@@ -93,6 +92,12 @@ module Sequel
       supports_distinct_on?
     end
     
+    # Whether the RETURNING clause is supported for the given type of query.
+    # +type+ can be :insert, :update, or :delete.
+    def supports_returning?(type)
+      send(:"#{type}_clause_methods").include?(:"#{type}_returning_sql")
+    end
+
     # Whether the database supports SELECT *, column FROM table
     def supports_select_all_and_column?
       true
@@ -117,6 +122,14 @@ module Sequel
     # that use 1 for true).
     def supports_where_true?
       true
+    end
+
+    private
+
+    # Whether the RETURNING clause is used for the given dataset.
+    # +type+ can be :insert, :update, or :delete.
+    def uses_returning?(type)
+      opts[:returning] && !@opts[:sql] && supports_returning?(type)
     end
   end
 end

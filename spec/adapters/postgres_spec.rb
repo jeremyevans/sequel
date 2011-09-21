@@ -514,11 +514,6 @@ describe "Postgres::Dataset#insert" do
     @db.sqls.last.should == 'INSERT INTO test5 (value) VALUES (10) RETURNING xid'
   end
 
-  specify "should have insert_returning_sql use the RETURNING keyword" do
-    @ds.insert_returning_sql(:xid, :value=>10).should == "INSERT INTO test5 (value) VALUES (10) RETURNING xid"
-    @ds.insert_returning_sql('*'.lit, :value=>10).should == "INSERT INTO test5 (value) VALUES (10) RETURNING *"
-  end
-
   specify "should have insert_select return nil if server_version < 80200" do
     @ds.meta_def(:server_version){80100}
     @ds.insert_select(:value=>10).should == nil

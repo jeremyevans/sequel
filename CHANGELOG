@@ -1,5 +1,11 @@
 === HEAD
 
+* Make Dataset #delete, #insert, #update yield plain hashes to a block if Dataset#returning is used (jeremyevans)
+
+* Add Dataset#returning for setting the columns to return in INSERT/UPDATE/DELETE statements, used by PostgreSQL 9.1 (jeremyevans)
+
+* Support WITH clause in INSERT/UPDATE/DELETE on PostgreSQL 9.1+ (jeremyevans)
+
 * Add Database#copy_table for PostgreSQL COPY support when using the postgres adapter with pg (jeremyevans)
 
 * Support CREATE TABLE IF NOT EXISTS on PostgreSQL 9.1+ (jeremyevans)

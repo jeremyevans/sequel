@@ -198,7 +198,7 @@ module Sequel
       NULL = LiteralString.new('NULL').freeze
       COMMA_SEPARATOR = ', '.freeze
       SELECT_CLAUSE_METHODS = clause_methods(:select, %w'with distinct limit columns from join where group having compounds order')
-      INSERT_CLAUSE_METHODS = clause_methods(:insert, %w'into columns values returning_select')
+      INSERT_CLAUSE_METHODS = clause_methods(:insert, %w'into columns values returning')
 
       # Yield all rows returned by executing the given SQL and converting
       # the types.
@@ -220,28 +220,18 @@ module Sequel
 
       # Insert given values into the database.
       def insert(*values)
-        if !@opts[:sql]
-          clone(default_server_opts(:sql=>insert_returning_pk_sql(*values))).single_value
+        if @opts[:sql] || @opts[:returning]
+          super
+        elsif supports_insert_select?
+          returning(insert_pk).insert(*values){|r| return r.values.first}
         else
-          execute_insert(insert_sql(*values), :table=>opts[:from].first,
-            :values=>values.size == 1 ? values.first : values)
+          execute_insert(insert_sql(*values), :table=>opts[:from].first, :values=>values.size == 1 ? values.first : values)
         end
-      end
-
-      # Use the RETURNING clause to return the primary key of the inserted record, if it exists
-      def insert_returning_pk_sql(*values)
-        pk = db.primary_key(opts[:from].first)
-        insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : NULL, *values)
-      end
-
-      # Use the RETURNING clause to return the columns listed in returning.
-      def insert_returning_sql(returning, *values)
-        "#{insert_sql(*values)} RETURNING #{column_list(Array(returning))}"
       end
 
       # Insert a record returning the record inserted
       def insert_select(*values)
-        naked.clone(default_server_opts(:sql=>insert_returning_sql(nil, *values))).single_record
+        returning.insert(*values){|r| return r}
       end
 
       def requires_sql_standard_datetimes?
@@ -263,12 +253,11 @@ module Sequel
         INSERT_CLAUSE_METHODS
       end
 
-      def insert_returning_select_sql(sql)
-        if opts.has_key?(:returning)
-          sql << " RETURNING #{column_list(Array(opts[:returning]))}"
-        end
+      def insert_pk(*values)
+        pk = db.primary_key(opts[:from].first)
+        pk ? Sequel::SQL::Identifier.new(pk) : NULL
       end
-      
+
       def hash_row(stmt, row)
         @columns.inject({}) do |m, c|
           m[c] = row.shift

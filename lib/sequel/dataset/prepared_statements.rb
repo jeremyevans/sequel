@@ -80,9 +80,9 @@ module Sequel
         when :select, :all
           select_sql
         when :first
-          clone(:limit=>1).select_sql
+          limit(1).select_sql
         when :insert_select
-          clone(:returning=>nil).insert_sql(*@prepared_modify_values)
+          returning.insert_sql(*@prepared_modify_values)
         when :insert
           insert_sql(*@prepared_modify_values)
         when :update

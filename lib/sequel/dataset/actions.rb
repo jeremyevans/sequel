@@ -101,8 +101,13 @@ module Sequel
     #
     #   DB[:table].delete # DELETE * FROM table
     #   # => 3
-    def delete
-      execute_dui(delete_sql)
+    def delete(&block)
+      sql = delete_sql
+      if uses_returning?(:delete)
+        default_server.fetch_rows(sql, &block)
+      else
+        execute_dui(sql)
+      end
     end
     
     # Iterates over the records in the dataset as they are yielded from the
@@ -279,8 +284,13 @@ module Sequel
     #
     #   DB[:items].insert([:a, :b], DB[:old_items])
     #   # INSERT INTO items (a, b) SELECT * FROM old_items
-    def insert(*values)
-      execute_insert(insert_sql(*values))
+    def insert(*values, &block)
+      sql = insert_sql(*values)
+      if uses_returning?(:insert)
+        default_server.fetch_rows(sql, &block)
+      else
+        execute_insert(sql)
+      end
     end
     
     # Inserts multiple values. If a block is given it is invoked for each
@@ -527,8 +537,13 @@ module Sequel
     #
     #   DB[:table].update(:x=>:x+1, :y=>0) # UPDATE table SET x = (x + 1), y = 0
     #   # => 10
-    def update(values={})
-      execute_dui(update_sql(values))
+    def update(values={}, &block)
+      sql = update_sql(values)
+      if uses_returning?(:update)
+        default_server.fetch_rows(sql, &block)
+      else
+        execute_dui(sql)
+      end
     end
 
     private

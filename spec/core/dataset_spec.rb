@@ -3852,6 +3852,15 @@ describe "Sequel::Dataset #with and #with_recursive" do
     proc{@ds.with(:t, @db[:x], :args=>[:b])}.should raise_error(Sequel::Error)
     proc{@ds.with_recursive(:t, @db[:x], @db[:t], :args=>[:b, :c])}.should raise_error(Sequel::Error)
   end
+
+  specify "#with should work on insert, update, and delete statements if they support it" do
+    [:insert, :update, :delete].each do |m|
+      @ds.meta_def(:"#{m}_clause_methods"){super() + [:"#{m}_with_sql"]}
+    end
+    @ds.with(:t, @db[:x]).insert_sql(1).should == 'WITH t AS (SELECT * FROM x) INSERT INTO t VALUES (1)'
+    @ds.with(:t, @db[:x]).update_sql(:foo=>1).should == 'WITH t AS (SELECT * FROM x) UPDATE t SET foo = 1'
+    @ds.with(:t, @db[:x]).delete_sql.should == 'WITH t AS (SELECT * FROM x) DELETE FROM t'
+  end
 end
 
 describe Sequel::SQL::Constants do
@@ -4208,5 +4217,43 @@ describe "Custom ASTTransformer" do
     ds.sql.should == 'SELECT * FROM t CROSS JOIN a AS g INNER JOIN b AS h USING (c) INNER JOIN d AS i ON (i.e = h.f)'
     ds.clone(:from=>c.transform(ds.opts[:from]), :join=>c.transform(ds.opts[:join])).sql.should ==
       'SELECT * FROM tt CROSS JOIN aa AS gg INNER JOIN bb AS hh USING (cc) INNER JOIN dd AS ii ON (ii.ee = hh.ff)'
+  end
+end
+
+describe "Dataset#returning" do
+  before do
+    @ds = Sequel::Database.new[:t].returning(:foo)
+    @pr = proc do
+      [:insert, :update, :delete].each do |m|
+        @ds.meta_def(:"#{m}_clause_methods"){super() + [:"#{m}_returning_sql"]}
+      end
+    end
+  end
+  
+  specify "should use RETURNING clause in the SQL if the dataset supports it" do
+    @pr.call
+    @ds.delete_sql.should == "DELETE FROM t RETURNING foo"
+    @ds.insert_sql(1).should == "INSERT INTO t VALUES (1) RETURNING foo"
+    @ds.update_sql(:foo=>1).should == "UPDATE t SET foo = 1 RETURNING foo"
+  end
+  
+  specify "should not use RETURNING clause in the SQL if the dataset does not support it" do
+    @ds.delete_sql.should == "DELETE FROM t"
+    @ds.insert_sql(1).should == "INSERT INTO t VALUES (1)"
+    @ds.update_sql(:foo=>1).should == "UPDATE t SET foo = 1"
+  end
+
+  specify "should have insert, update, and delete yield to blocks if RETURNING is used" do
+    @pr.call
+    def @ds.fetch_rows(sql)
+      yield(:foo=>sql)
+    end
+    h = {}
+    @ds.delete{|r| h = r}
+    h.should == {:foo=>"DELETE FROM t RETURNING foo"}
+    @ds.insert(1){|r| h = r}
+    h.should == {:foo=>"INSERT INTO t VALUES (1) RETURNING foo"}
+    @ds.update(:foo=>1){|r| h = r}
+    h.should == {:foo=>"UPDATE t SET foo = 1 RETURNING foo"}
   end
 end

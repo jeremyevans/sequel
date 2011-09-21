@@ -444,6 +444,92 @@ if INTEGRATION_DB.dataset.supports_cte?
   end
 end
 
+if INTEGRATION_DB.dataset.supports_cte?(:update) # Assume INSERT and DELETE support as well
+  describe "Common Table Expressions in INSERT/UPDATE/DELETE" do
+    before do
+      @db = INTEGRATION_DB
+      @db.create_table!(:i1){Integer :id}
+      @ds = @db[:i1]
+      @ds2 = @ds.with(:t, @ds)
+      @ds.insert(:id=>1)
+      @ds.insert(:id=>2)
+    end
+    after do
+      @db.drop_table(:i1)
+    end
+    
+    specify "should give correct results for WITH" do
+      @ds2.insert(@db[:t])
+      @ds.select_order_map(:id).should == [1, 1, 2, 2]
+      @ds2.filter(:id=>@db[:t].select{max(id)}).update(:id=>:id+1)
+      @ds.select_order_map(:id).should == [1, 1, 3, 3]
+      @ds2.filter(:id=>@db[:t].select{max(id)}).delete
+      @ds.select_order_map(:id).should == [1, 1]
+    end
+  end
+end
+
+if INTEGRATION_DB.dataset.supports_returning?(:insert)
+  describe "RETURNING clauses in INSERT" do
+    before do
+      @db = INTEGRATION_DB
+      @db.create_table!(:i1){Integer :id; Integer :foo}
+      @ds = @db[:i1]
+    end
+    after do
+      @db.drop_table(:i1)
+    end
+    
+    specify "should give correct results" do
+      h = {}
+      @ds.returning(:foo).insert(1, 2){|r| h = r}
+      h.should == {:foo=>2}
+      @ds.returning(:id).insert(3, 4){|r| h = r}
+      h.should == {:id=>3}
+      @ds.returning.insert(5, 6){|r| h = r}
+      h.should == {:id=>5, :foo=>6}
+      @ds.returning(:id___foo, :foo___id).insert(7, 8){|r| h = r}
+      h.should == {:id=>8, :foo=>7}
+    end
+  end
+end
+
+if INTEGRATION_DB.dataset.supports_returning?(:update) # Assume DELETE support as well
+  describe "RETURNING clauses in UPDATE/DELETE" do
+    before do
+      @db = INTEGRATION_DB
+      @db.create_table!(:i1){Integer :id; Integer :foo}
+      @ds = @db[:i1]
+      @ds.insert(1, 2)
+    end
+    after do
+      @db.drop_table(:i1)
+    end
+    
+    specify "should give correct results" do
+      h = []
+      @ds.returning(:foo).update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      h.should == [{:foo=>4}]
+      h.clear
+      @ds.returning(:id).update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      h.should == [{:id=>3}]
+      h.clear
+      @ds.returning.update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      h.should == [{:id=>4, :foo=>16}]
+      h.clear
+      @ds.returning(:id___foo, :foo___id).update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      h.should == [{:id=>32, :foo=>5}]
+      h.clear
+
+      @ds.returning.delete{|r| h << r}
+      h.should == [{:id=>5, :foo=>32}]
+      h.clear
+      @ds.returning.delete{|r| h << r}
+      h.should == []
+    end
+  end
+end
+
 if INTEGRATION_DB.dataset.supports_window_functions?
   describe "Window Functions" do
     before do

@@ -471,6 +471,7 @@ module Sequel
         # Allow use of bind arguments for PostgreSQL using the pg driver.
         module BindArgumentMethods
           include ArgumentMapper
+          include ::Sequel::Postgres::DatasetMethods::PreparedStatementMethods
           
           private
           
@@ -494,7 +495,6 @@ module Sequel
         # pg driver.
         module PreparedStatementMethods
           include BindArgumentMethods
-          include ::Sequel::Postgres::DatasetMethods::PreparedStatementMethods
           
           private
           

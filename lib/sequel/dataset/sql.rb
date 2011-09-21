@@ -643,6 +643,15 @@ module Sequel
       end
     end
 
+    # SQL fragment specifying the values to return.
+    def insert_returning_sql(sql)
+      if opts.has_key?(:returning)
+        sql << " RETURNING #{column_list(Array(opts[:returning]))}"
+      end
+    end
+    alias delete_returning_sql insert_returning_sql
+    alias update_returning_sql insert_returning_sql
+
     # SQL fragment specifying a JOIN type, converts underscores to
     # spaces and upcases.
     def join_type_sql(join_type)
@@ -874,6 +883,10 @@ module Sequel
       return if !ws || ws.empty?
       sql.replace("#{select_with_sql_base}#{ws.map{|w| "#{quote_identifier(w[:name])}#{"(#{argument_list(w[:args])})" if w[:args]} AS #{literal_dataset(w[:dataset])}"}.join(COMMA_SEPARATOR)} #{sql}")
     end
+    alias delete_with_sql select_with_sql
+    alias insert_with_sql select_with_sql
+    alias update_with_sql select_with_sql
+
     
     # The base keyword to use for the SQL WITH clause
     def select_with_sql_base
