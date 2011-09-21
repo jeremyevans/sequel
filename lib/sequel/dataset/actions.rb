@@ -346,10 +346,19 @@ module Sequel
     #
     #   DB[:table].map{|r| r[:id] * 2} # SELECT * FROM table
     #   # => [2, 4, 6, ...]
+    #
+    # You can also provide an array of column names:
+    #
+    #   DB[:table].map([:id, :name]) # SELECT * FROM table
+    #   # => [[1, 'A'], [2, 'B'], [3, 'C'], ...]
     def map(column=nil, &block)
       if column
         raise(Error, ARG_BLOCK_ERROR_MSG) if block
-        super(){|r| r[column]}
+        if column.is_a?(Array)
+          super(){|r| column.map{|c| r[c]}}
+        else
+          super(){|r| r[column]}
+        end
       else
         super(&block)
       end
@@ -405,8 +414,24 @@ module Sequel
     #
     #   DB[:table].select_hash(:id, :name) # SELECT id, name FROM table
     #   # => {1=>'a', 2=>'b', ...}
+    #
+    # You can also provide an array of column names for either the key_column,
+    # the value column, or both:
+    #
+    #   DB[:table].select_hash([:id, :foo], [:name, :bar]) # SELECT * FROM table
+    #   # {[1, 3]=>['a', 'c'], [2, 4]=>['b', 'd'], ...}
     def select_hash(key_column, value_column)
-      select(key_column, value_column).to_hash(hash_key_symbol(key_column), hash_key_symbol(value_column))
+      if key_column.is_a?(Array)
+        if value_column.is_a?(Array)
+          select(*(key_column + value_column)).to_hash(key_column.map{|c| hash_key_symbol(c)}, value_column.map{|c| hash_key_symbol(c)})
+        else
+          select(*(key_column + [value_column])).to_hash(key_column.map{|c| hash_key_symbol(c)}, hash_key_symbol(value_column))
+        end
+      elsif value_column.is_a?(Array)
+        select(key_column, *value_column).to_hash(hash_key_symbol(key_column), value_column.map{|c| hash_key_symbol(c)})
+      else
+        select(key_column, value_column).to_hash(hash_key_symbol(key_column), hash_key_symbol(value_column))
+      end
     end
     
     # Selects the column given (either as an argument or as a block), and
@@ -420,35 +445,32 @@ module Sequel
     #
     #   DB[:table].select_map{id * 2} # SELECT (id * 2) FROM table
     #   # => [6, 10, 16, 2, ...]
+    #
+    # You can also provide an array of column names:
+    #
+    #   DB[:table].select_map([:id, :name]) # SELECT id, name FROM table
+    #   # => [[1, 'A'], [2, 'B'], [3, 'C'], ...]
     def select_map(column=nil, &block)
-      ds = naked.ungraphed
-      ds = if column
-        raise(Error, ARG_BLOCK_ERROR_MSG) if block
-        ds.select(column)
-      else
-        ds.select(&block)
-      end
-      ds.map{|r| r.values.first}
+      _select_map(column, false, &block)
     end
+
     
     # The same as select_map, but in addition orders the array by the column.
     #
     #   DB[:table].select_order_map(:id) # SELECT id FROM table ORDER BY id
     #   # => [1, 2, 3, 4, ...]
     #
-    #   DB[:table].select_order_map{abs(id)} # SELECT (id * 2) FROM table ORDER BY (id * 2)
+    #   DB[:table].select_order_map{id * 2} # SELECT (id * 2) FROM table ORDER BY (id * 2)
     #   # => [2, 4, 6, 8, ...]
+    #
+    # You can also provide an array of column names:
+    #
+    #   DB[:table].select_order_map([:id, :name]) # SELECT id, name FROM table ORDER BY id, name
+    #   # => [[1, 'A'], [2, 'B'], [3, 'C'], ...]
     def select_order_map(column=nil, &block)
-      ds = naked.ungraphed
-      ds = if column
-        raise(Error, ARG_BLOCK_ERROR_MSG) if block
-        ds.select(column).order(unaliased_identifier(column))
-      else
-        ds.select(&block).order(&block)
-      end
-      ds.map{|r| r.values.first}
+      _select_map(column, true, &block)
     end
-  
+
     # Alias for update, but not aliased directly so subclasses
     # don't have to override both methods.
     def set(*args)
@@ -512,11 +534,37 @@ module Sequel
     #
     #   DB[:table].to_hash(:id) # SELECT * FROM table
     #   # {1=>{:id=>1, :name=>'Jim'}, 2=>{:id=>2, :name=>'Bob'}, ...}
+    #
+    # You can also provide an array of column names for either the key_column,
+    # the value column, or both:
+    #
+    #   DB[:table].to_hash([:id, :foo], [:name, :bar]) # SELECT * FROM table
+    #   # {[1, 3]=>['Jim', 'bo'], [2, 4]=>['Bob', 'be'], ...}
+    #
+    #   DB[:table].to_hash([:id, :name]) # SELECT * FROM table
+    #   # {[1, 'Jim']=>{:id=>1, :name=>'Jim'}, [2, 'Bob'=>{:id=>2, :name=>'Bob'}, ...}
     def to_hash(key_column, value_column = nil)
-      inject({}) do |m, r|
-        m[r[key_column]] = value_column ? r[value_column] : r
-        m
+      h = {}
+      if value_column
+        if value_column.is_a?(Array)
+          if key_column.is_a?(Array)
+            each{|r| h[key_column.map{|c| r[c]}] = value_column.map{|c| r[c]}}
+          else
+            each{|r| h[r[key_column]] = value_column.map{|c| r[c]}}
+          end
+        else
+          if key_column.is_a?(Array)
+            each{|r| h[key_column.map{|c| r[c]}] = r[value_column]}
+          else
+            each{|r| h[r[key_column]] = r[value_column]}
+          end
+        end
+      elsif key_column.is_a?(Array)
+        each{|r| h[key_column.map{|c| r[c]}] = r}
+      else
+        each{|r| h[r[key_column]] = r}
       end
+      h
     end
 
     # Truncates the dataset.  Returns nil.
@@ -548,6 +596,27 @@ module Sequel
 
     private
     
+    # Internals of +select_map+ and +select_order_map+
+    def _select_map(column, order, &block)
+      ds = naked.ungraphed
+      if column
+        raise(Error, ARG_BLOCK_ERROR_MSG) if block
+        columns = Array(column)
+        select_cols = order ? columns.map{|c| c.is_a?(SQL::OrderedExpression) ? c.expression : c} : columns
+        ds = ds.select(*select_cols)
+        ds = ds.order(*columns.map{|c| unaliased_identifier(c)}) if order
+      else
+        ds = ds.select(&block)
+        ds = ds.order(&block) if order
+      end
+      if ds.opts[:select].length > 1
+        ret_cols = select_cols.map{|c| hash_key_symbol(c)}
+        ds.map{|r| ret_cols.map{|c| r[c]}}
+      else
+        ds.map{|r| r.values.first}
+      end
+    end
+  
     # Set the server to use to :default unless it is already set in the passed opts
     def default_server_opts(opts)
       {:server=>@opts[:server] || :default}.merge(opts)
@@ -579,9 +648,19 @@ module Sequel
     # specifying the symbol that is likely to be used as the hash key
     # for the column when records are returned.
     def hash_key_symbol(s)
-      raise(Error, "#{s.inspect} is not a symbol") unless s.is_a?(Symbol)
-      _, c, a = split_symbol(s)
-      (a || c).to_sym
+      case s
+      when Symbol
+        _, c, a = split_symbol(s)
+        (a || c).to_sym
+      when SQL::Identifier
+        hash_key_symbol(s.value)
+      when SQL::QualifiedIdentifier
+        hash_key_symbol(s.column)
+      when SQL::AliasedExpression
+        hash_key_symbol(s.aliaz)
+      else
+        raise(Error, "#{s.inspect} is not supported, should be a Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression") 
+      end
     end
     
     # Modify the identifier returned from the database based on the
@@ -608,6 +687,14 @@ module Sequel
         c_table ? SQL::QualifiedIdentifier.new(c_table, column.to_sym) : column.to_sym
       when SQL::AliasedExpression
         c.expression
+      when SQL::OrderedExpression
+        expr = c.expression
+        if expr.is_a?(Symbol)
+          expr = unaliased_identifier(expr)
+          SQL::OrderedExpression.new(unaliased_identifier(c.expression), c.descending, :nulls=>c.nulls)
+        else
+          c
+        end
       else
         c
       end

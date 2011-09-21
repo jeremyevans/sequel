@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Dataset #map, #to_hash, #select_map, #select_order_map, and #select_hash to take arrays of columns instead of single columns (jeremyevans)
+
 * Make Dataset #delete, #insert, #update yield plain hashes to a block if Dataset#returning is used (jeremyevans)
 
 * Add Dataset#returning for setting the columns to return in INSERT/UPDATE/DELETE statements, used by PostgreSQL 9.1 (jeremyevans)

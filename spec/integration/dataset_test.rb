@@ -790,6 +790,77 @@ describe "Sequel::Dataset main SQL methods" do
   end
 end
 
+describe "Sequel::Dataset convenience methods" do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:a){Integer :a; Integer :b; Integer :c; Integer :d}
+    @ds = @db[:a].order(:a)
+    @ds.insert(1, 2, 3, 4)
+    @ds.insert(5, 6, 7, 8)
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  specify "should have working #map" do
+    @ds.map(:a).should == [1, 5]
+    @ds.map(:b).should == [2, 6]
+    @ds.map([:a, :b]).should == [[1, 2], [5, 6]]
+  end
+  
+  specify "should have working #to_hash" do
+    @ds.to_hash(:a).should == {1=>{:a=>1, :b=>2, :c=>3, :d=>4}, 5=>{:a=>5, :b=>6, :c=>7, :d=>8}}
+    @ds.to_hash(:b).should == {2=>{:a=>1, :b=>2, :c=>3, :d=>4}, 6=>{:a=>5, :b=>6, :c=>7, :d=>8}}
+    @ds.to_hash([:a, :b]).should == {[1, 2]=>{:a=>1, :b=>2, :c=>3, :d=>4}, [5, 6]=>{:a=>5, :b=>6, :c=>7, :d=>8}}
+
+    @ds.to_hash(:a, :b).should == {1=>2, 5=>6}
+    @ds.to_hash([:a, :c], :b).should == {[1, 3]=>2, [5, 7]=>6}
+    @ds.to_hash(:a, [:b, :c]).should == {1=>[2, 3], 5=>[6, 7]}
+    @ds.to_hash([:a, :c], [:b, :d]).should == {[1, 3]=>[2, 4], [5, 7]=>[6, 8]}
+  end
+
+  specify "should have working #select_map" do
+    @ds.select_map(:a).should == [1, 5]
+    @ds.select_map(:b).should == [2, 6]
+    @ds.select_map([:a, :b]).should == [[1, 2], [5, 6]]
+
+    @ds.select_map(:a___e).should == [1, 5]
+    @ds.select_map(:b___e).should == [2, 6]
+    @ds.select_map([:a___e, :b___f]).should == [[1, 2], [5, 6]]
+    @ds.select_map([:a__a___e, :a__b___f]).should == [[1, 2], [5, 6]]
+    @ds.select_map([:a__a.as(:e), :a__b.as(:f)]).should == [[1, 2], [5, 6]]
+    @ds.select_map([:a.qualify(:a).as(:e), :b.qualify(:a).as(:f)]).should == [[1, 2], [5, 6]]
+    @ds.select_map([:a.identifier.qualify(:a).as(:e), :b.qualify(:a).as(:f)]).should == [[1, 2], [5, 6]]
+  end
+  
+  specify "should have working #select_order_map" do
+    @ds.select_order_map(:a).should == [1, 5]
+    @ds.select_order_map(:a__b.desc).should == [6, 2]
+    @ds.select_order_map(:a__b___e.desc).should == [6, 2]
+    @ds.select_order_map(:b.qualify(:a).as(:e)).should == [2, 6]
+    @ds.select_order_map([:a.desc, :b]).should == [[5, 6], [1, 2]]
+
+    @ds.select_order_map(:a___e).should == [1, 5]
+    @ds.select_order_map(:b___e).should == [2, 6]
+    @ds.select_order_map([:a___e.desc, :b___f]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([:a__a___e.desc, :a__b___f]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([:a__a.desc, :a__b.as(:f)]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([:a.qualify(:a).desc, :b.qualify(:a).as(:f)]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([:a.identifier.qualify(:a).desc, :b.qualify(:a).as(:f)]).should == [[5, 6], [1, 2]]
+  end
+
+  specify "should have working #select_hash" do
+    @ds.select_hash(:a, :b).should == {1=>2, 5=>6}
+    @ds.select_hash(:a__a___e, :b).should == {1=>2, 5=>6}
+    @ds.select_hash(:a__a.as(:e), :b).should == {1=>2, 5=>6}
+    @ds.select_hash(:a.qualify(:a).as(:e), :b).should == {1=>2, 5=>6}
+    @ds.select_hash(:a.identifier.qualify(:a).as(:e), :b).should == {1=>2, 5=>6}
+    @ds.select_hash([:a, :c], :b).should == {[1, 3]=>2, [5, 7]=>6}
+    @ds.select_hash(:a, [:b, :c]).should == {1=>[2, 3], 5=>[6, 7]}
+    @ds.select_hash([:a, :c], [:b, :d]).should == {[1, 3]=>[2, 4], [5, 7]=>[6, 8]}
+  end
+end
+
 describe "Sequel::Dataset DSL support" do
   before do
     @db = INTEGRATION_DB

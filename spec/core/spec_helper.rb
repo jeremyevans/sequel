@@ -89,3 +89,14 @@ class Dummy2Database < Sequel::Database
   def transaction; yield; end
 end
 
+class DummyDataset < Sequel::Dataset
+  VALUES = [
+    {:a => 1, :b => 2},
+    {:a => 3, :b => 4},
+    {:a => 5, :b => 6}
+  ]
+  def fetch_rows(sql, &block)
+    VALUES.each(&block)
+  end
+end
+
