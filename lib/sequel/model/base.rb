@@ -1686,15 +1686,7 @@ module Sequel
       #   Artist.dataset.with_pk([1, 2]) # SELECT * FROM artists
       #                                  # WHERE ((id1 = 1) AND (id2 = 2)) LIMIT 1
       def with_pk(pk)
-        case primary_key = model.primary_key
-        when Array
-          raise(Error, "single primary key given (#{pk.inspect}) when a composite primary key is expected (#{primary_key.inspect})") unless pk.is_a?(Array)
-          raise(Error, "composite primary key given (#{pk.inspect}) does not match composite primary key length (#{primary_key.inspect})") if pk.length != primary_key.length
-          first(primary_key.zip(pk))
-        else
-          raise(Error, "composite primary key given (#{pk.inspect}) when a single primary key is expected (#{primary_key.inspect})") if pk.is_a?(Array)
-          first(primary_key=>pk)
-        end
+        first(model.qualified_primary_key_hash(pk))
       end
     end
 

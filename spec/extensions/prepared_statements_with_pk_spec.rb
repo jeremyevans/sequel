@@ -23,16 +23,16 @@ describe "prepared_statements_with_pk plugin" do
 
   specify "should correctly lookup by primary key from dataset" do
     @c.dataset.filter(:name=>'foo')[1].should == @p
-    @sqls.should == [:read_only, "SELECT * FROM people WHERE ((name = 'foo') AND (id = 1)) LIMIT 1"]
+    @sqls.should == [:read_only, "SELECT * FROM people WHERE ((name = 'foo') AND (people.id = 1)) LIMIT 1"]
   end
 
   specify "should still work correctly if there are multiple conflicting variables" do
     @c.dataset.filter(:name=>'foo').or(:name=>'bar')[1].should == @p
-    @sqls.should == [:read_only, "SELECT * FROM people WHERE (((name = 'foo') OR (name = 'bar')) AND (id = 1)) LIMIT 1"]
+    @sqls.should == [:read_only, "SELECT * FROM people WHERE (((name = 'foo') OR (name = 'bar')) AND (people.id = 1)) LIMIT 1"]
   end
 
   specify "should still work correctly if the primary key is used elsewhere in the query" do
     @c.dataset.filter{id > 2}[1].should == @p
-    @sqls.should == [:read_only, "SELECT * FROM people WHERE ((id > 2) AND (id = 1)) LIMIT 1"]
+    @sqls.should == [:read_only, "SELECT * FROM people WHERE ((id > 2) AND (people.id = 1)) LIMIT 1"]
   end
 end

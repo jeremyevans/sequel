@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#with_pk use a qualified primary key, so it works correctly on joined datasets (jeremyevans)
+
 * Support the :limit association option when using eager_graph (jeremyevans)
 
 * Fix eager loading via eager_graph of one_to_one associations that match multiple associated objects and use order to pick the first one (jeremyevans)
