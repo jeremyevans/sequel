@@ -574,8 +574,7 @@ module Sequel
         # :after_add :: Symbol, Proc, or array of both/either specifying a callback to call
         #               after a new item is added to the association.
         # :after_load :: Symbol, Proc, or array of both/either specifying a callback to call
-        #                after the associated record(s) have been retrieved from the database.  Not called
-        #                when eager loading via eager_graph, but called when eager loading via eager.
+        #                after the associated record(s) have been retrieved from the database.
         # :after_remove :: Symbol, Proc, or array of both/either specifying a callback to call
         #                  after an item is removed from the association.
         # :after_set :: Symbol, Proc, or array of both/either specifying a callback to call
@@ -1649,10 +1648,9 @@ module Sequel
           else
             # Each of the following have a symbol key for the table alias, with the following values: 
             # :reciprocals - the reciprocal instance variable to use for this association
+            # :reflections - AssociationReflection instance related to this association
             # :requirements - array of requirements for this association
-            # :alias_association_type_map - the type of association for this association
-            # :alias_association_name_map - the name of the association for this association
-            clone(:eager_graph=>{:requirements=>{}, :master=>alias_symbol(first_source), :alias_association_type_map=>{}, :alias_association_name_map=>{}, :reciprocals=>{}, :cartesian_product_number=>0})
+            clone(:eager_graph=>{:requirements=>{}, :master=>alias_symbol(first_source), :reflections=>{}, :reciprocals=>{}, :cartesian_product_number=>0})
           end
           ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations)
         end
@@ -1700,8 +1698,7 @@ module Sequel
           ds = ds.order_more(*qualified_expression(r[:order], assoc_table_alias)) if r[:order] and r[:order_eager_graph]
           eager_graph = ds.opts[:eager_graph]
           eager_graph[:requirements][assoc_table_alias] = requirements.dup
-          eager_graph[:alias_association_name_map][assoc_table_alias] = assoc_name
-          eager_graph[:alias_association_type_map][assoc_table_alias] = r.returns_array?
+          eager_graph[:reflections][assoc_table_alias] = r
           eager_graph[:cartesian_product_number] += r[:cartesian_product_number] || 2
           ds = ds.eager_graph_associations(ds, r.associated_class, assoc_table_alias, requirements + [assoc_table_alias], *associations) unless associations.empty?
           ds
@@ -1878,6 +1875,9 @@ module Sequel
       # hashes and returning an array of model objects with all eager_graphed associations already set in the
       # association cache.
       class EagerGraphLoader
+        # Hash with table alias symbol keys and after_load hook values
+        attr_reader :after_load_map
+        
         # Hash with table alias symbol keys and association name values
         attr_reader :alias_map
         
@@ -1903,6 +1903,9 @@ module Sequel
         # to model instances.  Used so that only a single model instance is created for each object.
         attr_reader :records_map
         
+        # Hash with table alias symbol keys and AssociationReflection values
+        attr_reader :reflection_map
+        
         # Hash with table alias symbol keys and callable values used to create model instances
         attr_reader :row_procs
         
@@ -1917,11 +1920,19 @@ module Sequel
           eager_graph = opts[:eager_graph]
           @master =  eager_graph[:master]
           requirements = eager_graph[:requirements]
-          alias_map = @alias_map = eager_graph[:alias_association_name_map]
-          type_map = @type_map = eager_graph[:alias_association_type_map]
+          reflection_map = @reflection_map = eager_graph[:reflections]
           reciprocal_map = @reciprocal_map = eager_graph[:reciprocals]
           @unique = eager_graph[:cartesian_product_number] > 1
       
+          alias_map = @alias_map = {}
+          type_map = @type_map = {}
+          after_load_map = @after_load_map = {}
+          reflection_map.each do |k, v|
+            alias_map[k] = v[:name]
+            type_map[k] = v.returns_array?
+            after_load_map[k] = v[:after_load] unless v[:after_load].empty?
+          end
+
           # Make dependency map hash out of requirements array for each association.
           # This builds a tree of dependencies that will be used for recursion
           # to ensure that all parts of the object graph are loaded into the
@@ -2026,8 +2037,9 @@ module Sequel
           end
       
           # Remove duplicate records from all associations if this graph could possibly be a cartesian product
-          unique(records, dm) if @unique
-          
+          # Run after_load procs if there are any
+          post_process(records, dm) if @unique || !after_load_map.empty?
+
           records
         end
       
@@ -2117,16 +2129,21 @@ module Sequel
         # In that case, for each object in all associations loaded via +eager_graph+, run
         # uniq! on the association to make sure no duplicate records show up.
         # Note that this can cause legitimate duplicate records to be removed.
-        def unique(records, dependency_map)
+        def post_process(records, dependency_map)
           records.each do |record|
             dependency_map.each do |ta, deps|
-              list = record.send(alias_map[ta])
-              list = if type_map[ta]
+              assoc_name = alias_map[ta]
+              list = record.send(assoc_name)
+              rec_list = if type_map[ta]
                 list.uniq!
-                unique(list, deps) if !list.empty? && !deps.empty?
+                list
               elsif list
-                unique([list], deps) unless deps.empty?
+                [list]
+              else
+                []
               end
+              record.send(:run_association_callbacks, reflection_map[ta], :after_load, list) if after_load_map[ta]
+              post_process(rec_list, deps) if !rec_list.empty? && !deps.empty?
             end
           end
         end

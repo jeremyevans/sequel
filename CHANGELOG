@@ -1,5 +1,7 @@
 === HEAD
 
+* Make after_load association hooks apply when using eager_graph (jeremyevans)
+
 * Make Dataset#with_sql treat a symbol as a first argument as a method name to call to get the SQL (jeremyevans)
 
 * Make Dataset #delete, #insert, #update return array of plain hashes if block not given and Dataset#returning is used (jeremyevans)
