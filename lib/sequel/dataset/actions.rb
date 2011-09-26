@@ -104,12 +104,12 @@ module Sequel
     def delete(&block)
       sql = delete_sql
       if uses_returning?(:delete)
-        default_server.fetch_rows(sql, &block)
+        returning_fetch_rows(sql, &block)
       else
         execute_dui(sql)
       end
     end
-    
+
     # Iterates over the records in the dataset as they are yielded from the
     # database adapter, and returns self.
     #
@@ -287,7 +287,7 @@ module Sequel
     def insert(*values, &block)
       sql = insert_sql(*values)
       if uses_returning?(:insert)
-        default_server.fetch_rows(sql, &block)
+        returning_fetch_rows(sql, &block)
       else
         execute_insert(sql)
       end
@@ -588,7 +588,7 @@ module Sequel
     def update(values={}, &block)
       sql = update_sql(values)
       if uses_returning?(:update)
-        default_server.fetch_rows(sql, &block)
+        returning_fetch_rows(sql, &block)
       else
         execute_dui(sql)
       end
@@ -677,6 +677,20 @@ module Sequel
     def post_load(all_records)
     end
 
+    # Called by insert/update/delete when returning is used.
+    # Yields each row as a plain hash to the block if one is given, or returns
+    # an array of plain hashes for all rows if a block is not given
+    def returning_fetch_rows(sql, &block)
+      if block
+        default_server.fetch_rows(sql, &block)
+        nil
+      else
+        rows = []
+        default_server.fetch_rows(sql){|r| rows << r}
+        rows
+      end
+    end
+    
     # Return the unaliased part of the identifier.  Handles both
     # implicit aliases in symbols, as well as SQL::AliasedExpression
     # objects.  Other objects are returned as is.

@@ -4307,4 +4307,15 @@ describe "Dataset#returning" do
     @ds.update(:foo=>1){|r| h = r}
     h.should == {:foo=>"UPDATE t SET foo = 1 RETURNING foo"}
   end
+
+  specify "should have insert, update, and delete return arrays of hashes if RETURNING is used and a block is not given" do
+    @pr.call
+    def @ds.fetch_rows(sql)
+      yield(:foo=>sql)
+    end
+    h = {}
+    @ds.delete.should == [{:foo=>"DELETE FROM t RETURNING foo"}]
+    @ds.insert(1).should == [{:foo=>"INSERT INTO t VALUES (1) RETURNING foo"}]
+    @ds.update(:foo=>1).should == [{:foo=>"UPDATE t SET foo = 1 RETURNING foo"}]
+  end
 end
