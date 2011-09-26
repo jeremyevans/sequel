@@ -1888,6 +1888,10 @@ module Sequel
         # Recursive hash with table alias symbol keys mapping to hashes with dependent table alias symbol keys.
         attr_reader :dependency_map
         
+        # Hash with table alias symbol keys and [limit, offset] values
+        attr_reader :limit_map
+        
+        # Hash with table alias symbol keys and callable values used to create model instances
         # The table alias symbol for the primary model
         attr_reader :master
         
@@ -1927,10 +1931,12 @@ module Sequel
           alias_map = @alias_map = {}
           type_map = @type_map = {}
           after_load_map = @after_load_map = {}
+          limit_map = @limit_map = {}
           reflection_map.each do |k, v|
             alias_map[k] = v[:name]
             type_map[k] = v.returns_array?
             after_load_map[k] = v[:after_load] unless v[:after_load].empty?
+            limit_map[k] = v.limit_and_offset if v[:limit]
           end
 
           # Make dependency map hash out of requirements array for each association.
@@ -2038,7 +2044,7 @@ module Sequel
       
           # Remove duplicate records from all associations if this graph could possibly be a cartesian product
           # Run after_load procs if there are any
-          post_process(records, dm) if @unique || !after_load_map.empty?
+          post_process(records, dm) if @unique || !after_load_map.empty? || !limit_map.empty?
 
           records
         end
@@ -2071,7 +2077,7 @@ module Sequel
               assoc[assoc_name].push(rec) 
               rec.associations[rcm] = current if rcm
             else
-              current.associations[assoc_name] = rec
+              current.associations[assoc_name] ||= rec
             end
             # Recurse into dependencies of the current object
             _load(deps, rec, h) unless deps.empty?
@@ -2136,6 +2142,10 @@ module Sequel
               list = record.send(assoc_name)
               rec_list = if type_map[ta]
                 list.uniq!
+                if lo = limit_map[ta]
+                  limit, offset = lo
+                  list.replace(list[offset||0, limit])
+                end
                 list
               elsif list
                 [list]

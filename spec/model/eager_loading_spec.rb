@@ -1754,6 +1754,24 @@ describe Sequel::Model, "#eager_graph" do
     a.al_genres.should == [GraphGenre.load(:id=>14)]
   end
 
+  it "should respect limits on associations when eager graphing" do
+    GraphAlbum.many_to_one :al_band, :class=>GraphBand, :key=>:band_id
+    GraphAlbum.one_to_many :al_tracks, :class=>GraphTrack, :key=>:album_id, :limit=>2
+    GraphAlbum.many_to_many :al_genres, :class=>GraphGenre, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>2
+    ds = GraphAlbum.eager_graph(:al_band, :al_tracks, :al_genres)
+    ds.sql.should == "SELECT albums.id, albums.band_id, al_band.id AS al_band_id, al_band.vocalist_id, al_tracks.id AS al_tracks_id, al_tracks.album_id, al_genres.id AS al_genres_id FROM albums LEFT OUTER JOIN bands AS al_band ON (al_band.id = albums.band_id) LEFT OUTER JOIN tracks AS al_tracks ON (al_tracks.album_id = albums.id) LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS al_genres ON (al_genres.id = ag.genre_id)"
+    def ds.fetch_rows(sql)
+      yield({:id=>1, :band_id=>2, :al_band_id=>3, :vocalist_id=>4, :al_tracks_id=>5, :album_id=>6, :al_genres_id=>7})
+      yield({:id=>1, :band_id=>2, :al_band_id=>8, :vocalist_id=>9, :al_tracks_id=>10, :album_id=>11, :al_genres_id=>12})
+      yield({:id=>1, :band_id=>2, :al_band_id=>13, :vocalist_id=>14, :al_tracks_id=>15, :album_id=>16, :al_genres_id=>17})
+    end
+    a = ds.all.first
+    a.should == GraphAlbum.load(:id => 1, :band_id => 2)
+    a.al_band.should == GraphBand.load(:id=>3, :vocalist_id=>4)
+    a.al_tracks.should == [GraphTrack.load(:id=>5, :album_id=>6), GraphTrack.load(:id=>10, :album_id=>11)]
+    a.al_genres.should == [GraphGenre.load(:id=>7), GraphGenre.load(:id=>12)]
+  end
+
   it "should eagerly load a many_to_one association with a custom callback" do
     ds = GraphAlbum.eager_graph(:band => proc {|ds| ds.select_columns(:id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0 FROM albums LEFT OUTER JOIN (SELECT id FROM bands) AS band ON (band.id = albums.band_id)'

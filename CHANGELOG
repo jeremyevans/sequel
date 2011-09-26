@@ -1,5 +1,9 @@
 === HEAD
 
+* Support the :limit association option when using eager_graph (jeremyevans)
+
+* Fix eager loading via eager_graph of one_to_one associations that match multiple associated objects and use order to pick the first one (jeremyevans)
+
 * Make after_load association hooks apply when using eager_graph (jeremyevans)
 
 * Make Dataset#with_sql treat a symbol as a first argument as a method name to call to get the SQL (jeremyevans)
