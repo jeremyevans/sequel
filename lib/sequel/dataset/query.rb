@@ -910,8 +910,20 @@ module Sequel
     # to keep the same row_proc/graph, but change the SQL used to custom SQL.
     #
     #   DB[:items].with_sql('SELECT * FROM foo') # SELECT * FROM foo
+    #
+    # You can use placeholders in your SQL and provide arguments for those placeholders:
+    #
+    #   DB[:items].with_sql('SELECT ? FROM foo', 1) # SELECT 1 FROM foo
+    #
+    # You can also provide a method name and arguments to call to get the SQL:
+    #
+    #   DB[:items].with_sql(:insert_sql, :b=>1) # INSERT INTO items (b) VALUES (1)
     def with_sql(sql, *args)
-      sql = SQL::PlaceholderLiteralString.new(sql, args) unless args.empty?
+      if sql.is_a?(Symbol)
+        sql = send(sql, *args)
+      else
+        sql = SQL::PlaceholderLiteralString.new(sql, args) unless args.empty?
+      end
       clone(:sql=>sql)
     end
     

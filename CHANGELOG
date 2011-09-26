@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#with_sql treat a symbol as a first argument as a method name to call to get the SQL (jeremyevans)
+
 * Make Dataset #delete, #insert, #update return array of plain hashes if block not given and Dataset#returning is used (jeremyevans)
 
 * Allow Dataset #map, #to_hash, #select_map, #select_order_map, and #select_hash to take arrays of columns instead of single columns (jeremyevans)

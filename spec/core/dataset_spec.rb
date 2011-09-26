@@ -1487,6 +1487,13 @@ describe "Dataset#with_sql" do
   specify "should keep row_proc" do
     @dataset.with_sql('SELECT 1 FROM test').row_proc.should == @dataset.row_proc
   end
+
+  specify "should work with method symbols and arguments" do
+    @dataset.with_sql(:delete_sql).sql.should == 'DELETE FROM test'
+    @dataset.with_sql(:insert_sql, :b=>1).sql.should == 'INSERT INTO test (b) VALUES (1)'
+    @dataset.with_sql(:update_sql, :b=>1).sql.should == 'UPDATE test SET b = 1'
+  end
+  
 end
 
 describe "Dataset#order_by" do
