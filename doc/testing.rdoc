@@ -62,3 +62,45 @@ The order in which you delete/truncate the tables is important if you are using 
       [:table1, :table2].each{|x| Sequel::Model.db.from(x).delete}
     end
   end
+
+= Testing Sequel Itself
+
+Sequel has multiple separate test suites.  All test suites run under either RSpec 1 or RSpec 2.
+
+== rake spec
+
+The +spec+ rake task (which is also the default rake task) runs Sequel's core and model specs.  These specs use a mocked database connection, and test for specific SQL used and for generally correct behavior.
+
+== rake spec_plugin
+
+The +spec_plugin+ rake task runs the specs for the plugins and extensions that ship with Sequel.  These also use a mocked database connection, and operate very similarly to the general Sequel core and model specs.
+
+== rake spec_<i>adapter</i> (e.g. rake spec_postgres)
+
+The <tt>spec_<i>adapter</i></tt> specs run against a real database connection with nothing mocked, and test for correct results.  They are much slower than the standard specs, but they will catch errors that are mocked out by the default specs, as well show issues that only occur on a certain database, adapter, interpreter, or some combination of those.
+
+These specs are broken down into two parts.  For each database, there are specific specs that only apply to that database, and these are called the adapter specs.  There are also shared specs that apply to all (or almost all) databases, these are called the integration specs.
+
+== Environment variables
+
+Sequel often uses environment variables when testing to specify either the database to be tested or specify how testing should be done.
+
+=== Connection Strings
+
+The following environment variables specify Database connection URL strings:
+
+* SEQUEL_INTEGRATION_URL: integration specs
+* SEQUEL_FB_SPEC_DB: firebird adapter specs
+* SEQUEL_MSSQL_SPEC_DB: mssql adapter specs
+* SEQUEL_PG_SPEC_DB: postgres adapter specs
+* SEQUEL_SQLITE_SPEC_DB: sqlite adapter specs
+* SEQUEL_MY_SPEC_DB: mysql adapter specs
+* SEQUEL_DB2_SPEC_DB: db2 adapter specs
+
+=== Other
+
+* SEQUEL_MSSQL_SPEC_REQUIRE: Separate file to require when running mssql adapter specs
+* SEQUEL_DB2_SPEC_REQUIRE: Separate file to require when running db2 adapter specs
+* SEQUEL_COLUMNS_INTROSPECTION: Whehter to run the specs with the columns_introspection extension loaded by default
+* SEQUEL_NO_PENDING: Don't mark any specs as pending, try running all specs
+* SKIPPED_TEST_WARN: Warn when skipping any tests because libraries aren't available
