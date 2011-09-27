@@ -1,5 +1,7 @@
 === HEAD
 
+* Add SQLTime.create method for easier creation of SQLTime instances (jeremyevans)
+
 * Make Dataset#with_pk use a qualified primary key, so it works correctly on joined datasets (jeremyevans)
 
 * Support the :limit association option when using eager_graph (jeremyevans)

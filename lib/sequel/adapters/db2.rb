@@ -162,8 +162,7 @@ module Sequel
         when DB2CLI::Date 
           Date.new(v.year, v.month, v.day)
         when DB2CLI::Time
-          t = Time.now
-          Sequel::SQLTime.local(t.year, t.month, t.day, v.hour, v.minute, v.second)
+          Sequel::SQLTime.create(v.hour, v.minute, v.second)
         when DB2CLI::Timestamp 
           Sequel.database_to_application_timestamp(v.to_s)
         when DB2CLI::Null

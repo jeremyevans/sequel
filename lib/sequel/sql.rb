@@ -41,6 +41,11 @@ module Sequel
   # Time subclass that gets literalized with only the time value, so it operates
   # like a standard SQL time type.
   class SQLTime < ::Time
+    # Create a new SQLTime instance given an hour, minute, and second.
+    def self.create(hour, minute, second, usec = 0)
+      t = now
+      local(t.year, t.month, t.day, hour, minute, second, usec)
+    end
   end
 
   # The SQL module holds classes whose instances represent SQL fragments.
