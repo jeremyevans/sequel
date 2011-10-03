@@ -189,7 +189,7 @@ describe "An Oracle dataset" do
   specify "should translate values correctly" do
     @d << {:name => 'abc', :value => 456}
     @d << {:name => 'def', :value => 789}
-    @d.filter(:value > 500).update(:date_created => "to_timestamp('2009-09-09', 'YYYY-MM-DD')".lit)
+    @d.filter('value > 500').update(:date_created => "to_timestamp('2009-09-09', 'YYYY-MM-DD')".lit)
     
     @d[:name => 'def'][:date_created].should == Time.parse('2009-09-09')
   end
