@@ -1,0 +1,304 @@
+= New Adapter Support
+
+* Sequel now has much better support for the DB2 database.
+
+* An ibmdb adapter has been added, and is the recommended adapter to
+  to use if you want to connect to DB2 from MRI.
+
+* A jdbc db2 subadapter has been added, allowing good DB2 support on
+  JRuby.
+
+* The db2 adapter has been cleaned up substantially, and now works
+  well, but it is still recommended that you switch to ibmdb if you
+  are using the db2 adapter.
+
+* The firebird adapter has been split into shared and specific parts,
+  and quite a few fixes were made to it.
+
+* A jdbc firebird subadapter has been added, allowing connection to
+  firebird databases from JRuby.
+
+= New PostgreSQL 9.1 Features
+
+* Dataset#returning has been added for using the RETURNING clause on
+  INSERT/UPDATE/DELETE queries.  RETURNING allows such queries to
+  return results in much the same way as a SELECT query works.
+  When Dataset#returning is used, Dataset #insert, #update, and
+  #delete now accept a block that is passed to Dataset #fetch_rows 
+  which is yielded plain ruby hashes for each row inserted, updated,
+  or deleted.  If Dataset#returning is used and a block is not given
+  to those methods, those methods will return an array of plain hashes
+  for all rows inserted, updated, and deleted.
+
+* Dataset#with_sql now treats a symbol as a first argument as a method
+  name to call to get the SQL.  The expected use case for this is with
+  Dataset#returning and insert/update/delete:
+    
+    DB[:items].
+     returning(:id).
+     with_sql(:update_sql, :b => :b + 1).
+     map(:id)
+    
+  Basically, it makes it more easily to statically set the
+  insert/update/delete SQL, and then be able to use the full
+  dataset API for returning results.  As mentioned above, using
+  Dataset#returning with #insert, #update, and #delete yields plain
+  hashes, so if you want to have the row_proc applied (e.g. you are
+  using models), you need to use this method instead, since you can
+  then call #each or #all to make sure the row_proc is called on all
+  returned rows.
+
+* Dataset#with (common table expressions) now affects
+  INSERT/UPDATE/DELETE queries.
+
+* Database#create_table? now uses CREATE TABLE IF NOT EXISTS on
+  PostgreSQL 9.1.
+
+= Other New Features
+
+* The :limit option is now respected when eager loading via either
+  eager or eager_graph.  By default, Sequel will just do an array
+  slice of the resulting ruby array, which gets the correct answer,
+  but does not offer any performance improvements.  Sequel also
+  offers a new :eager_limit_strategy option for using more advanced
+  query types that only load the related records from the database.
+  The available values for the :eager_limit_strategy option are:
+
+    :window_function: This uses the row_number window function
+      partitioned by the related key fields.  It can only be used
+      on databases that support window functions (PostgreSQL 8.4+,
+      Microsoft SQL Server 2005+, DB2).
+    :correlated_subquery: This uses a correlated subquery that is
+      limited.  It works on most databases except MySQL and DB2.
+
+  You can provide a value of true as the option to have Sequel
+  pick a strategy to use. Sequel will never use a correlated
+  subquery for true, since in some cases it can perform worse than
+  loading all related records and doing the array slice in ruby.
+
+  If you want to enable an eager_limit_strategy globally, you can
+  set Sequel::Model.default_eager_limit_strategy to a value, and
+  all associations that use :limit will default to using that
+  strategy.
+
+* one_to_one associations that do not represent true one-to-one
+  database relationships, but represent one-to-many relationships
+  where you are only returning the first object based on a given
+  order are also now handled correctly when eager loading.
+  Previously, eager loading such associations resulted in the last
+  matching object being associated instead of the first matching
+  object being associated.
+
+  You can also use an :eager_limit_strategy for one_to_one
+  associations.  In addition to the :window_function and
+  :correlated_subquery values, there is also a :distinct_on value
+  that is available on PostgreSQL for using DISTINCT ON, which is
+  the fastest strategy if you are using PostgreSQL.
+
+* Dataset#map, #to_hash, #select_map, #select_order_map, and
+  #select_hash now accept arrays of symbols, and if given arrays
+  of symbols, use arrays of results.  For example:
+
+    DB[:items].map([:id, :name])
+    # => [[1, 'foo'], [2, 'bar'], ...]
+    DB[:items].to_hash([:id, :foo_id], [:name, :bar_id])
+    # => {[1, 3]=>['foo', 5], [2, 4]=>['bar', 6], ...}
+
+* For SQL expression objects where Sequel cannot deduce the type
+  of the object, it now will consider the type of the argument
+  when a &, |, or + operator is used.  For example:
+
+    :x & 1
+
+  Previously, this did "x AND 1", now it does "x & 1".  Using a
+  logical operator on an integer doesn't make sense, but it's
+  possible people did so if the database uses 1/0 for true/false.
+  Likewise:
+
+    :x + 'foo'
+
+  Previously, this did "x + 'foo'" (addition), now it does
+  "x || 'foo'" (string concatenation).
+
+* The sql_string, sql_number, and sql_boolean methods are now
+  available on SQL::ComplexExpressions, so you can do:
+
+    (:x + 1).sql_string + ' foos'
+    # (x + 1) || ' foos'
+
+  Previously, there was not an easy way to generate such SQL
+  expressions.
+
+* :after_load association hooks are now applied when using
+  eager_graph.  Previously, they were only applied when using
+  eager, not when using eager_graph.
+
+* Database#copy_table has been added to the postgres adapter if pg
+  is used as the underlying driver.  It allows you to get very
+  fast exports of table data in text or CSV format.  It also
+  accepts datasets, allowing fast exports of arbitrary queries
+  in text or CSV format.
+
+* SQL extract support (:timestamp.extract(:year)) is now emulated
+  on the databases that don't natively support it, such as SQLite,
+  Microsoft SQL Server, and DB2.  At least the following values are
+  supported for extraction: :year, :month, :day, :hour, :minute,
+  and :second.
+
+* The bitwise XOR operator is now emulated on SQLite.  Previously,
+  attempting to use it would cause the database to raise an error.
+
+* A Database#use_timestamp_timezones accessor has been added on
+  SQLite.  This allows you to turn off the use of timezones in
+  timestamps by setting the value to false.  This is necessary if you
+  want you want to use the SQLite datetime functions, or the new
+  ability to emulate extract.
+    
+  Note that this setting does not affect the current database
+  content.  To convert old databases to the new format, you'll
+  have to resave all rows that have timestamps.
+
+  At some point in the future, Sequel may default to not using
+  timezones in timestamps by default on SQLite, so if you would
+  like to rely on the current behavior, you should set this
+  accessor to true now.
+
+* Sequel now works around bugs in MySQL when using a subselect with
+  a LIMIT by using a nested subselect.
+
+* Sequel now works around issues in Microsoft SQL Server and DB2 when
+  using a subselect with IN/NOT IN that uses the emulated offset
+  support.
+
+* The jdbc adapter now returns java.sql.Clob objects as
+  Sequel::SQL::Blobs.
+
+* Sequel now considers database clob types as the :blob schema type.
+
+* Sequel::SQLTime.create has been added for more easily creating
+  instances:
+
+    Sequel::SQLTime.create(hour, minute, second, usec)
+
+* Dataset#select_all now accepts SQL::AliasedExpression and
+  SQL::JoinClause arguments and returns the appropriate
+  SQL::ColumnAll value that selects all columns from the related
+  table.
+
+* Model.set_dataset now accepts Sequel::LiteralString objects that
+  represent table names.  This usage is not encouraged except in
+  rare cases such as using a set returning function in PostgreSQL.
+
+* Dataset#supports_cte? now takes an optional argument specifying the
+  type of query (:insert, :update, :delete, :select).  It defaults to
+  :select.
+
+* Dataset#supports_returning? has been added.  It requires an
+  argument specifying the type of query (:insert, :update, or
+  :delete).
+
+* Dataset#supports_cte_in_subqueries? has been added for checking
+  for support for this ability.  Apparently, only PostgreSQL
+  currently supports this.  For other adapters that support CTEs but
+  not in subqueries, if a subquery with a CTE is used in a JOIN, the
+  CTE is moved from the subquery to the main query.
+
+* Dataset#supports_select_all_and_column has been added for seeing
+  if "SELECT *, foo ..." style queries are supported.  This is false
+  on DB2, which doesn't allow such queries.  When it is false, using
+  select_append on a dataset that doesn't specifically select columns
+  will now change the query to do "SELECT table.*, foo ..." instead,
+  working around the limitation on DB2.
+
+* Dataset#supports_ordered_distinct_on? has been added.  Currently,
+  this is only true on PostgreSQL.  MySQL can emulate DISTINCT ON
+  using GROUP BY, but it doesn't respect ORDER BY, so it some
+  cases it cannot be used equivalently.
+
+* Dataset#supports_where_true? has been added for checking for support
+  of WHERE TRUE (or WHERE 1 if 1 is true).  Not all databases support
+  using such a construct, and on the databases that do not, you have
+  to use WHERE (1 = 1) or something similar.
+
+= Other Improvements
+
+* Sequel 3.27.0 was negatively affected by a serious bug in
+  ActiveSupport's Time.=== that has still not been fixed, which
+  broke the literalization of Time objects.  In spite of the bad
+  precedent it sets, Sequel now avoids using Time.=== on a
+  subclass of Time to work around this ActiveSupport bug.
+
+* Dataset#with_pk now uses a qualified primary key instead of an
+  unqualified primary key, which means it can now be used correctly
+  after joining to a separate table.
+
+* Association after_load hooks when lazy loading are now called
+  after the association has been loaded, which allows them to change
+  which records are cached.  This makes the lazy load case more
+  similar to the eager load case.
+
+* The metaprogrammatically created methods that implement Sequel's
+  DSL support have been made significantly faster by using
+  module_eval instead of define_method.
+
+* The type translation in the postgres, mysql, and sqlite adapters
+  has been made faster by using Method objects that result in more
+  direct processing.
+
+* Typecasting values for time columns from Time values to
+  Sequel::SQLTime values now correctly handles fractional seconds on
+  ruby 1.9.
+
+= Backwards Compatibility
+
+* Dataset#insert_returning_sql has been changed to a private method
+  in the PostgreSQL and Firebird adapters, and it operates
+  differently than it did previously.  The private
+  #insert_returning_pk_sql and #insert_returning_select_sql methods
+  have been removed.
+
+* Dataset#with_pk no longer does some defensive checking for misuse of
+  primary keys (e.g. providing a composite key when the model uses
+  a single key).  Previously, Sequel would raise an Error
+  immediately, now such behavior is undefined, with the most likely
+  behavior being the database raising an Error.
+
+* The :alias_association_type_map and :alias_association_name_map
+  settings have been removed from the :eager_graph dataset option,
+  in favor of just storing the related association reflection.
+
+* The internals of the db2 adapter have changed substantially, if you
+  were relying on some of the private methods defined in it, you will
+  probably have to modify your code.
+
+* The firebird adapter was substanially modified, specifically parts
+  related to insert returning autogenerated primary key values, so if
+  you were previously using the adapter you should probably take more
+  care than usual when testing your upgrade.  
+
+* The Dataset::WITH_SUPPORTED constant has been removed.
+
+* The Dataset#supports_cte? method now accepts an optional argument.
+  If you overrode this method, your overridden method now must
+  accept an optional argument.
+
+* If you were previously doing:
+
+    :x & 1
+
+  and wanting "x AND 1", you have to switch to:
+
+    :x.sql_boolean & 1
+
+  Likewise, if you were previously doing:
+
+    :x + 'foo'
+
+  and wanting "x + 'foo'", you need to switch to:
+
+    :x.sql_number + 'foo'
+
+* Sequel no longer does defensive type checking in the SQL expression
+  support, as it was often more strict than the database and would
+  not allow the creation of expressions that were valid for the
+  database.
