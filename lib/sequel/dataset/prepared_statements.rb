@@ -211,7 +211,10 @@ module Sequel
     end
     
     # Prepare an SQL statement for later execution.  Takes a type similar to #call,
-    # and the name symbol of the prepared statement.
+    # and the +name+ symbol of the prepared statement.  While +name+ defaults to +nil+,
+    # it should always be provided as a symbol for the name of the prepared statement,
+    # as some databases require that prepared statements have names.
+    #
     # This returns a clone of the dataset extended with PreparedStatementMethods,
     # which you can +call+ with the hash of bind variables to use.
     # The prepared statement is also stored in
