@@ -580,7 +580,7 @@ module Sequel
     # database supports them), and override %z to always use a numeric offset
     # of hours and minutes.
     def format_timestamp(v)
-      v2 = Sequel.application_to_database_timestamp(v)
+      v2 = db.from_application_timestamp(v)
       fmt = default_timestamp_format.gsub(/%[Nz]/) do |m|
         if m == '%N'
           format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(RUBY_VERSION < '1.9.0' ? 86400000000 : 1000000) : v.usec) if supports_timestamp_usecs?

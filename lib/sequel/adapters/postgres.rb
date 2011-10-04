@@ -110,7 +110,6 @@ module Sequel
       [700, 701] => tt.method(:float),
       [790, 1700] => ::BigDecimal.method(:new),
       [1083, 1266] => ::Sequel.method(:string_to_time),
-      [1114, 1184] => ::Sequel.method(:database_to_application_timestamp)
     }.each do |k,v|
       k.each{|n| PG_TYPES[n] = v}
     end
@@ -385,6 +384,8 @@ module Sequel
       # Return the conversion procs hash to use for this database
       def get_conversion_procs(conn)
         procs = PG_TYPES.dup
+        procs[1114] = method(:to_application_timestamp)
+        procs[1184] = method(:to_application_timestamp)
         conn.execute("SELECT oid, typname FROM pg_type where typtype = 'b'") do |res|
           res.ntuples.times do |recnum|
             if pr = PG_NAMED_TYPES[res.getvalue(recnum, 1).to_sym]

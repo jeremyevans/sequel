@@ -164,7 +164,7 @@ module Sequel
         when DB2CLI::Time
           Sequel::SQLTime.create(v.hour, v.minute, v.second)
         when DB2CLI::Timestamp 
-          Sequel.database_to_application_timestamp(v.to_s)
+          db.to_application_timestamp(v.to_s)
         when DB2CLI::Null
           nil
         else  

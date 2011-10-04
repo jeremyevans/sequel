@@ -13,6 +13,15 @@ module Sequel
       MYSQL_DATABASE_DISCONNECT_ERRORS = /\A(Commands out of sync; you can't run this command now|Can't connect to local MySQL server through socket|MySQL server has gone away)/
 
       set_adapter_scheme :mysql2
+      
+      # Whether to convert tinyint columns to bool for this database
+      attr_accessor :convert_tinyint_to_bool
+
+      # Set the convert_tinyint_to_bool setting based on the default value.
+      def initialize(opts={})
+        super
+        self.convert_tinyint_to_bool = Sequel::MySQL.convert_tinyint_to_bool
+      end
 
       # Connect to the database.  In addition to the usual database options,
       # the following options have effect:
@@ -77,7 +86,7 @@ module Sequel
       # yield the connection if a block is given.
       def _execute(conn, sql, opts)
         begin
-          r = log_yield(sql){conn.query(sql, :symbolize_keys => true, :database_timezone => Sequel.database_timezone, :application_timezone => Sequel.application_timezone)}
+          r = log_yield(sql){conn.query(sql, :symbolize_keys => true, :database_timezone => timezone, :application_timezone => Sequel.application_timezone)}
           if opts[:type] == :select
             yield r if r
           elsif block_given?
@@ -115,7 +124,7 @@ module Sequel
 
       # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true
       def schema_column_type(db_type)
-        Sequel::MySQL.convert_tinyint_to_bool && db_type == 'tinyint(1)' ? :boolean : super
+        convert_tinyint_to_bool && db_type == 'tinyint(1)' ? :boolean : super
       end
     end
 
@@ -133,7 +142,7 @@ module Sequel
       def fetch_rows(sql, &block)
         execute(sql) do |r|
           @columns = r.fields
-          r.each(:cast_booleans => Sequel::MySQL.convert_tinyint_to_bool, &block)
+          r.each(:cast_booleans => db.convert_tinyint_to_bool, &block)
         end
         self
       end

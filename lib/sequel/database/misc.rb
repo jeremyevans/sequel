@@ -19,6 +19,9 @@ module Sequel
     # The options hash for this database
     attr_reader :opts
     
+    # Set the timezone to use for this database, overridding <tt>Sequel.database_timezone</tt>.
+    attr_writer :timezone
+    
     # Constructs a new instance of a database connection with the specified
     # options hash.
     #
@@ -54,6 +57,7 @@ module Sequel
       @identifier_input_method = nil
       @identifier_output_method = nil
       @quote_identifiers = nil
+      @timezone = nil
       self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
       @pool = ConnectionPool.get_pool(@opts, &block)
 
@@ -66,6 +70,13 @@ module Sequel
     #   DB.cast_type_literal(:foo) # foo
     def cast_type_literal(type)
       type_literal(:type=>type)
+    end
+
+    # Convert the given timestamp from the application's timezone,
+    # to the databases's timezone or the default database timezone if
+    # the database does not have a timezone.
+    def from_application_timestamp(v)
+      Sequel.convert_output_timestamp(v, timezone)
     end
 
     # Returns a string representation of the database object including the
@@ -110,6 +121,18 @@ module Sequel
     # Whether the database and adapter support transaction isolation levels, false by default.
     def supports_transaction_isolation_levels?
       false
+    end
+
+    # The timezone to use for this database, defaulting to <tt>Sequel.database_timezone</tt>.
+    def timezone
+      @timezone || Sequel.database_timezone
+    end
+
+    # Convert the given timestamp to the application's timezone,
+    # from the databases's timezone or the default database timezone if
+    # the database does not have a timezone.
+    def to_application_timestamp(v)
+      Sequel.convert_timestamp(v, timezone)
     end
 
     # Typecast the value to the given column_type. Calls

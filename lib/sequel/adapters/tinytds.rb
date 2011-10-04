@@ -208,7 +208,7 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |result|
           each_opts = {:cache_rows=>false}
-          each_opts[:timezone] = :utc if Sequel.database_timezone == :utc
+          each_opts[:timezone] = :utc if db.timezone == :utc
           offset = @opts[:offset]
           @columns = cols = result.fields.map{|c| output_identifier(c)}
           if identifier_output_method

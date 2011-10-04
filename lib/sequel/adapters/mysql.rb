@@ -14,9 +14,6 @@ module Sequel
       def boolean(s) s.to_i != 0 end
       def integer(s) s.to_i end
       def float(s) s.to_f end
-      def date(s) ::Sequel::MySQL.convert_date_time(:string_to_date, s) end
-      def time(s) ::Sequel::MySQL.convert_date_time(:string_to_time, s) end
-      def timestamp(s) ::Sequel::MySQL.convert_date_time(:database_to_application_timestamp, s) end
     end.new
 
     # Hash with integer keys and callable values for converting MySQL types.
@@ -30,52 +27,12 @@ module Sequel
       k.each{|n| MYSQL_TYPES[n] = v}
     end
 
-    # Modify the type translator used for the tinyint type based
-    # on the value given.
-    def self.convert_tinyint_to_bool=(v)
-      MYSQL_TYPES[1] = TYPE_TRANSLATOR.method(v ? :boolean : :integer)
-      @convert_tinyint_to_bool = v
-    end
-    self.convert_tinyint_to_bool = convert_tinyint_to_bool
-
     class << self
-      # By default, Sequel raises an exception if in invalid date or time is used.
-      # However, if this is set to nil or :nil, the adapter treats dates
-      # like 0000-00-00 and times like 838:00:00 as nil values.  If set to :string,
-      # it returns the strings as is.  
-      attr_reader :convert_invalid_date_time
-    end
-
-    # Modify the type translators for the date, time, and timestamp types
-    # depending on the value given.
-    def self.convert_invalid_date_time=(v)
-      MYSQL_TYPES[11] = (v != false) ?  TYPE_TRANSLATOR.method(:time) : ::Sequel.method(:string_to_time)
-      m = (v != false) ? TYPE_TRANSLATOR.method(:date) : ::Sequel.method(:string_to_date)
-      [10, 14].each{|i| MYSQL_TYPES[i] = m}
-      m = (v != false) ? TYPE_TRANSLATOR.method(:timestamp) : ::Sequel.method(:database_to_application_timestamp)
-      [7, 12].each{|i| MYSQL_TYPES[i] = m}
-      @convert_invalid_date_time = v
+      # Whether to convert invalid date time values by default.
+      attr_accessor :convert_invalid_date_time
     end
     self.convert_invalid_date_time = false
 
-    # If convert_invalid_date_time is nil, :nil, or :string and
-    # the conversion raises an InvalidValue exception, return v
-    # if :string and nil otherwise.
-    def self.convert_date_time(meth, v)
-      begin
-        Sequel.send(meth, v)
-      rescue InvalidValue
-        case @convert_invalid_date_time
-        when nil, :nil
-          nil
-        when :string
-          v
-        else 
-          raise
-        end
-      end
-    end
-  
     # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
@@ -85,7 +42,26 @@ module Sequel
       MYSQL_DATABASE_DISCONNECT_ERRORS = /\A(Commands out of sync; you can't run this command now|Can't connect to local MySQL server through socket|MySQL server has gone away|Lost connection to MySQL server during query)/
       
       set_adapter_scheme :mysql
+
+      # Hash of conversion procs for the current database
+      attr_reader :conversion_procs
+      #
+      # Whether to convert tinyint columns to bool for the current database
+      attr_reader :convert_tinyint_to_bool
+
+      # By default, Sequel raises an exception if in invalid date or time is used.
+      # However, if this is set to nil or :nil, the adapter treats dates
+      # like 0000-00-00 and times like 838:00:00 as nil values.  If set to :string,
+      # it returns the strings as is.
+      attr_reader :convert_invalid_date_time
       
+      def initialize(opts={})
+        super
+        @conversion_procs = MYSQL_TYPES.dup
+        self.convert_tinyint_to_bool = Sequel::MySQL.convert_tinyint_to_bool
+        self.convert_invalid_date_time = Sequel::MySQL.convert_invalid_date_time
+      end
+
       # Connect to the database.  In addition to the usual database options,
       # the following options have effect:
       #
@@ -155,6 +131,27 @@ module Sequel
         conn
       end
       
+      # Modify the type translators for the date, time, and timestamp types
+      # depending on the value given.
+      def convert_invalid_date_time=(v)
+        m0 = ::Sequel.method(:string_to_time)
+        @conversion_procs[11] = (v != false) ?  lambda{|v| convert_date_time(v, &m0)} : m0
+        m1 = ::Sequel.method(:string_to_date) 
+        m = (v != false) ? lambda{|v| convert_date_time(v, &m1)} : m1
+        [10, 14].each{|i| @conversion_procs[i] = m}
+        m2 = method(:to_application_timestamp)
+        m = (v != false) ? lambda{|v| convert_date_time(v, &m2)} : m2
+        [7, 12].each{|i| @conversion_procs[i] = m}
+        @convert_invalid_date_time = v
+      end
+
+      # Modify the type translator used for the tinyint type based
+      # on the value given.
+      def convert_tinyint_to_bool=(v)
+        @conversion_procs[1] = TYPE_TRANSLATOR.method(v ? :boolean : :integer)
+        @convert_tinyint_to_bool = v
+      end
+
       # Returns instance of Sequel::MySQL::Dataset with the given options.
       def dataset(opts = nil)
         MySQL::Dataset.new(self, opts)
@@ -219,6 +216,24 @@ module Sequel
         :query
       end
       
+      # If convert_invalid_date_time is nil, :nil, or :string and
+      # the conversion raises an InvalidValue exception, return v
+      # if :string and nil otherwise.
+      def convert_date_time(v)
+        begin
+          yield v
+        rescue InvalidValue
+          case @convert_invalid_date_time
+          when nil, :nil
+            nil
+          when :string
+            v
+          else 
+            raise
+          end
+        end
+      end
+    
       # The MySQL adapter main error class is Mysql::Error
       def database_error_classes
         [Mysql::Error]
@@ -245,7 +260,7 @@ module Sequel
       
       # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true
       def schema_column_type(db_type)
-        Sequel::MySQL.convert_tinyint_to_bool && db_type == 'tinyint(1)' ? :boolean : super
+        convert_tinyint_to_bool && db_type == 'tinyint(1)' ? :boolean : super
       end
     end
     
@@ -265,11 +280,12 @@ module Sequel
       def fetch_rows(sql, &block)
         execute(sql) do |r|
           i = -1
+          cps = db.conversion_procs
           cols = r.fetch_fields.map do |f| 
             # Pretend tinyint is another integer type if its length is not 1, to
             # avoid casting to boolean if Sequel::MySQL.convert_tinyint_to_bool
             # is set.
-            type_proc = f.type == 1 && f.length != 1 ? MYSQL_TYPES[2] : MYSQL_TYPES[f.type]
+            type_proc = f.type == 1 && f.length != 1 ? cps[2] : cps[f.type]
             [output_identifier(f.name), type_proc, i+=1]
           end
           @columns = cols.map{|c| c.first}

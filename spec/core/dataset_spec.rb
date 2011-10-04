@@ -969,7 +969,8 @@ end
 
 describe "Dataset#literal" do
   before do
-    @dataset = Sequel::Dataset.new(nil).from(:test)
+    db = Sequel::Database.new
+    @dataset = Sequel::Dataset.new(db).from(:test)
   end
   
   specify "should escape strings properly" do
@@ -3942,6 +3943,30 @@ describe "Sequel timezone support" do
   
   specify "should handle an database timezone of :local when literalizing values" do
     Sequel.database_timezone = :local
+
+    t = Time.now.utc
+    s = t.getlocal.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}#{@offset}'"
+
+    t = DateTime.now.new_offset(0)
+    s = t.new_offset(DateTime.now.offset).strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}#{@offset}'"
+  end
+  
+  specify "should have Database#timezone override Sequel.database_timezone" do
+    Sequel.database_timezone = :local
+    @db.timezone = :utc
+
+    t = Time.now
+    s = t.getutc.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}+0000'"
+
+    t = DateTime.now
+    s = t.new_offset(0).strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}+0000'"
+
+    Sequel.database_timezone = :utc
+    @db.timezone = :local
 
     t = Time.now.utc
     s = t.getlocal.strftime("'%Y-%m-%d %H:%M:%S")

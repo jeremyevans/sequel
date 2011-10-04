@@ -112,18 +112,18 @@ if MYSQL_DB.adapter_scheme == :mysql
       @ds = @db[:booltest]
     end
     after do
-      Sequel::MySQL.convert_tinyint_to_bool = true
+      @db.convert_tinyint_to_bool = true
       @db.drop_table(:booltest)
     end
     
     specify "should consider tinyint(1) datatypes as boolean if set, but not larger tinyints" do
       @db.schema(:booltest, :reload=>true).should == [[:b, {:type=>:boolean, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(1)"}, ], [:i, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(4)"}, ]]
-      Sequel::MySQL.convert_tinyint_to_bool = false
+      @db.convert_tinyint_to_bool = false
       @db.schema(:booltest, :reload=>true).should == [[:b, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(1)"}, ], [:i, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(4)"}, ]]
     end
     
     specify "should return tinyint(1)s as bools and tinyint(4)s as integers when set" do
-      Sequel::MySQL.convert_tinyint_to_bool = true
+      @db.convert_tinyint_to_bool = true
       @ds.delete
       @ds << {:b=>true, :i=>10}
       @ds.all.should == [{:b=>true, :i=>10}]
@@ -136,7 +136,7 @@ if MYSQL_DB.adapter_scheme == :mysql
     end
 
     specify "should return all tinyints as integers when unset" do
-      Sequel::MySQL.convert_tinyint_to_bool = false
+      @db.convert_tinyint_to_bool = false
       @ds.delete
       @ds << {:b=>true, :i=>10}
       @ds.all.should == [{:b=>1, :i=>10}]
@@ -1015,29 +1015,29 @@ end
 if MYSQL_DB.adapter_scheme == :mysql
   describe "MySQL bad date/time conversions" do
     after do
-      Sequel::MySQL.convert_invalid_date_time = false
+      MYSQL_DB.convert_invalid_date_time = false
     end
   
     specify "should raise an exception when a bad date/time is used and convert_invalid_date_time is false" do
-      Sequel::MySQL.convert_invalid_date_time = false
+      MYSQL_DB.convert_invalid_date_time = false
       proc{MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value}.should raise_error(Sequel::InvalidValue)
       proc{MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value}.should raise_error(Sequel::InvalidValue)
       proc{MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value}.should raise_error(Sequel::InvalidValue)
     end
   
     specify "should not use a nil value bad date/time is used and convert_invalid_date_time is nil or :nil" do
-      Sequel::MySQL.convert_invalid_date_time = nil
+      MYSQL_DB.convert_invalid_date_time = nil
       MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == nil
       MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == nil
       MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == nil
-      Sequel::MySQL.convert_invalid_date_time = :nil
+      MYSQL_DB.convert_invalid_date_time = :nil
       MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == nil
       MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == nil
       MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == nil
     end
   
     specify "should not use a nil value bad date/time is used and convert_invalid_date_time is :string" do
-      Sequel::MySQL.convert_invalid_date_time = :string
+      MYSQL_DB.convert_invalid_date_time = :string
       MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == '0000-00-00'
       MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == '0000-00-00 00:00:00'
       MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == '25:00:00'

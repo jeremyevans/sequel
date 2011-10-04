@@ -23,8 +23,7 @@ module Sequel
       :int => tt.method(:int),
       :blob => ::Sequel::SQL::Blob.method(:new),
       :time => ::Sequel.method(:string_to_time),
-      :date => ::Sequel.method(:string_to_date),
-      :timestamp => ::Sequel.method(:database_to_application_timestamp)
+      :date => ::Sequel.method(:string_to_date)
     }
     DB2_TYPES[:clob] = DB2_TYPES[:blob]
 
@@ -162,6 +161,15 @@ module Sequel
       include Sequel::DB2::DatabaseMethods
 
       set_adapter_scheme :ibmdb
+
+      # Hash of connection procs for converting
+      attr_reader :connection_procs
+
+      def initialize(opts={})
+        super
+        @connection_procs = DB2_TYPES.dup
+        @connection_procs[:timestamp] = method(:to_application_timestamp)
+      end
 
       # REORG the related table whenever it is altered.  This is not always
       # required, but it is necessary for compatibilty with other Sequel
@@ -400,13 +408,14 @@ module Sequel
           offset = @opts[:offset]
           columns = []
           convert = convert_smallint_to_bool
+          cps = db.conversion_procs
           stmt.num_fields.times do |i|
             k = stmt.field_name i
             key = output_identifier(k)
             type = stmt.field_type(k).downcase.to_sym
             # decide if it is a smallint from precision
             type = :boolean  if type ==:int && convert && stmt.field_precision(k) < 8
-            columns << [key, DB2_TYPES[type]]
+            columns << [key, cps.call(type)]
           end
           cols = columns.map{|c| c.at(0)}
           cols.delete(row_number_column) if offset

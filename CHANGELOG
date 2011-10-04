@@ -1,3 +1,13 @@
+=== HEAD
+
+* Allow convert_invalid_date_time to be set on a per-Database basis in the mysql adapter (jeremyevans)
+
+* Allow convert_tinyint_to_bool to be set on a per-Database basis in the mysql and mysql2 adapters (jeremyevans)
+
+* Allow per-Database override of the typeconversion procs on the mysql, sqlite, and ibmdb adapters (jeremyevans)
+
+* Add Database#timezone accessor, for overriding Sequel.database_timezone per Database object (jeremyevans)
+
 === 3.28.0 (2011-10-03)
 
 * Add firebird jdbc subadapter (jeremyevans)

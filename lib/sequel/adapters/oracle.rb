@@ -139,7 +139,7 @@ module Sequel
       def literal_other(v)
         case v
         when OraDate
-          literal(Sequel.database_to_application_timestamp(v))
+          literal(db.to_application_timestamp(v))
         when OCI8::CLOB
           v.rewind
           literal(v.read)

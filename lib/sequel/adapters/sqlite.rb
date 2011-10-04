@@ -21,7 +21,6 @@ module Sequel
     # Hash with string keys and callable values for converting SQLite types.
     SQLITE_TYPES = {}
     {
-      %w'timestamp datetime' => ::Sequel.method(:database_to_application_timestamp),
       %w'date' => ::Sequel.method(:string_to_date),
       %w'time' => ::Sequel.method(:string_to_time),
       %w'bit bool boolean' => tt.method(:boolean),
@@ -47,6 +46,16 @@ module Sequel
       end
       
       private_class_method :uri_to_options
+
+      # The conversion procs to use for this database
+      attr_reader :conversion_procs
+
+      def initialize(opts={})
+        super
+        @conversion_procs = SQLITE_TYPES.dup
+        @conversion_procs['timestamp'] = method(:to_application_timestamp)
+        @conversion_procs['datetime'] = method(:to_application_timestamp)
+      end
       
       # Connect to the database.  Since SQLite is a file based database,
       # the only options available are :database (to specify the database
@@ -288,7 +297,8 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |result|
           i = -1
-          type_procs = result.types.map{|t| SQLITE_TYPES[base_type_name(t)]}
+          cps = db.conversion_procs
+          type_procs = result.types.map{|t| cps[base_type_name(t)]}
           cols = result.columns.map{|c| i+=1; [output_identifier(c), i, type_procs[i]]}
           @columns = cols.map{|c| c.first}
           result.each do |values|

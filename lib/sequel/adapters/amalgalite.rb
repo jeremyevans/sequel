@@ -14,6 +14,12 @@ module Sequel
         'float' => ['float', 'double', 'real', 'double precision'],
         'decimal' => %w'numeric decimal money'
       )
+
+      # Store the related database object, in order to be able to correctly
+      # handle the database timezone.
+      def initialize(db)
+        @db = db
+      end
       
       # Return blobs as instances of Sequel::SQL::Blob instead of
       # Amalgamite::Blob
@@ -29,7 +35,7 @@ module Sequel
       
       # Return datetime types as instances of Sequel.datetime_class
       def datetime(s)
-        Sequel.database_to_application_timestamp(s)
+        @db.to_application_timestamp(s)
       end
 
       def time(s)
@@ -72,7 +78,7 @@ module Sequel
         opts[:database] = ':memory:' if blank_object?(opts[:database])
         db = ::Amalgalite::Database.new(opts[:database])
         db.busy_handler(::Amalgalite::BusyTimeout.new(opts.fetch(:timeout, 5000)/50, 50))
-        db.type_map = SequelTypeMap.new
+        db.type_map = SequelTypeMap.new(self)
         db
       end
       
