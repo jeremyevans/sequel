@@ -240,6 +240,70 @@ module Sequel
         conn
       end
       
+      if SEQUEL_POSTGRES_USES_PG
+        # +copy_table+ uses PostgreSQL's +COPY+ SQL statement to return formatted
+        # results directly to the caller.  This method is only support if pg is the
+        # underlying ruby driver.  This method should only be called if you want
+        # results returned to the client.  If you are using +COPY FROM+ or +COPY TO+
+        # with a filename, you should just use +run+ instead of this method.  This
+        # method does not currently support +COPY FROM STDIN+, but that may be supported
+        # in the future.
+        #
+        # The table argument supports the following types:
+        #
+        # String :: Uses the first argument directly as literal SQL. If you are using
+        #           a version of PostgreSQL before 9.0, you will probably want to
+        #           use a string if you are using any options at all, as the syntax
+        #           Sequel uses for options is only compatible with PostgreSQL 9.0+.
+        # Dataset :: Uses a query instead of a table name when copying.
+        # other :: Uses a table name (usually a symbol) when copying.
+        # 
+        # The following options are respected:
+        #
+        # :format :: The format to use.  text is the default, so this should be :csv or :binary.
+        # :options :: An options SQL string to use, which should contain comma separated options.
+        # :server :: The server on which to run the query.
+        #
+        # If a block is provided, the method continually yields to the block, one yield
+        # per row.  If a block is not provided, a single string is returned with all
+        # of the data.
+        def copy_table(table, opts={})
+          sql = if table.is_a?(String)
+            sql = table
+          else
+            if opts[:options] || opts[:format]
+              options = " ("
+              options << "FORMAT #{opts[:format]}" if opts[:format]
+              options << "#{', ' if opts[:format]}#{opts[:options]}" if opts[:options]
+              options << ')'
+            end
+            table = if table.is_a?(::Sequel::Dataset)
+              "(#{table.sql})"
+            else
+              literal(table)
+            end
+           sql = "COPY #{table} TO STDOUT#{options}"
+          end
+          synchronize(opts[:server]) do |conn| 
+            conn.execute(sql)
+            begin
+              if block_given?
+                while buf = conn.get_copy_data
+                  yield buf
+                end
+                nil
+              else
+                b = ''
+                b << buf while buf = conn.get_copy_data
+                b
+              end
+            ensure
+              raise DatabaseDisconnectError, "disconnecting as a partial COPY may leave the connection in an unusable state" if buf
+            end
+          end 
+        end
+      end
+        
       # Return instance of Sequel::Postgres::Dataset with the given options.
       def dataset(opts = nil)
         Postgres::Dataset.new(self, opts)
@@ -407,6 +471,7 @@ module Sequel
         # Allow use of bind arguments for PostgreSQL using the pg driver.
         module BindArgumentMethods
           include ArgumentMapper
+          include ::Sequel::Postgres::DatasetMethods::PreparedStatementMethods
           
           private
           
@@ -430,7 +495,6 @@ module Sequel
         # pg driver.
         module PreparedStatementMethods
           include BindArgumentMethods
-          include ::Sequel::Postgres::DatasetMethods::PreparedStatementMethods
           
           private
           
@@ -457,7 +521,7 @@ module Sequel
           ps.extend(BindArgumentMethods)
           ps.call(bind_vars, &block)
         end
-        
+
         # Prepare the given type of statement with the given name, and store
         # it in the database to be called later.
         def prepare(type, name=nil, *values)

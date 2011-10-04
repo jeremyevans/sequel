@@ -342,6 +342,13 @@ module Sequel
       # string concatenation.
       def complex_expression_sql(op, args)
         case op
+        when :IN, :"NOT IN"
+          ds = args.at(1)
+          if ds.is_a?(Sequel::Dataset) && ds.opts[:limit]
+            super(op, [args.at(0), ds.from_self])
+          else
+            super
+          end
         when :~, :'!~', :'~*', :'!~*', :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'
           "(#{literal(args.at(0))} #{'NOT ' if [:'NOT LIKE', :'NOT ILIKE', :'!~', :'!~*'].include?(op)}#{[:~, :'!~', :'~*', :'!~*'].include?(op) ? 'REGEXP' : 'LIKE'} #{'BINARY ' if [:~, :'!~', :LIKE, :'NOT LIKE'].include?(op)}#{literal(args.at(1))})"
         when :'||'
@@ -481,6 +488,12 @@ module Sequel
         true
       end
 
+      # MySQL's DISTINCT ON emulation using GROUP BY does not respect the
+      # queries ORDER BY clause.
+      def supports_ordered_distinct_on?
+        false
+      end
+    
       # MySQL does support fractional timestamps in literal timestamps, but it
       # ignores them.  Also, using them seems to cause problems on 1.9.  Since
       # they are ignored anyway, not using them is probably best.

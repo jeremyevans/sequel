@@ -186,31 +186,26 @@ describe "Blockless Ruby Filters" do
     @d.l(~((((:x - :y)/(:x + :y))*:z) <= 100)).should == '((((x - y) / (x + y)) * z) > 100)'
   end
   
-  it "should not allow negation of string expressions" do
-    proc{~:x.sql_string}.should raise_error
-    proc{~([:x, :y].sql_string_join)}.should raise_error
+  it "should not add ~ method to string expressions" do
+    proc{~:x.sql_string}.should raise_error(NoMethodError) 
   end
 
-  it "should not allow mathematical or string operations on true, false, or nil" do
-    proc{:x + 1}.should_not raise_error
-    proc{:x - true}.should raise_error(Sequel::Error)
-    proc{:x / false}.should raise_error(Sequel::Error)
-    proc{:x * nil}.should raise_error(Sequel::Error)
-    proc{[:x, nil].sql_string_join}.should raise_error(Sequel::Error)
+  it "should allow mathematical or string operations on true, false, or nil" do
+    @d.lit(:x + 1).should == '(x + 1)'
+    @d.lit(:x - true).should == "(x - 't')"
+    @d.lit(:x / false).should == "(x / 'f')"
+    @d.lit(:x * nil).should == '(x * NULL)'
+    @d.lit([:x, nil].sql_string_join).should == '(x || NULL)'
   end
 
-  it "should not allow mathematical or string operations on boolean complex expressions" do
-    proc{:x + (:y + 1)}.should_not raise_error
-    proc{:x - (~:y)}.should raise_error(Sequel::Error)
-    proc{:x / (:y & :z)}.should raise_error(Sequel::Error)
-    proc{:x * (:y | :z)}.should raise_error(Sequel::Error)
-    proc{:x + :y.like('a')}.should raise_error(Sequel::Error)
-    proc{:x - :y.like(/a/)}.should raise_error(Sequel::Error)
-    proc{:x * :y.like(/a/i)}.should raise_error(Sequel::Error)
-    proc{:x + ~:y.like('a')}.should raise_error(Sequel::Error)
-    proc{:x - ~:y.like(/a/)}.should raise_error(Sequel::Error)
-    proc{:x * ~:y.like(/a/i)}.should raise_error(Sequel::Error)
-    proc{[:x, ~:y.like(/a/i)].sql_string_join}.should raise_error(Sequel::Error)
+  it "should allow mathematical or string operations on boolean complex expressions" do
+    @d.lit(:x + (:y + 1)).should == '(x + y + 1)'
+    @d.lit(:x - ~:y).should == '(x - NOT y)'
+    @d.lit(:x / (:y & :z)).should == '(x / (y AND z))'
+    @d.lit(:x * (:y | :z)).should == '(x * (y OR z))'
+    @d.lit(:x + :y.like('a')).should == "(x + (y LIKE 'a'))"
+    @d.lit(:x - ~:y.like('a')).should == "(x - (y NOT LIKE 'a'))"
+    @d.lit([:x, ~:y.like('a')].sql_string_join).should == "(x || (y NOT LIKE 'a'))"
   end
 
   it "should support AND conditions via &" do
@@ -382,12 +377,12 @@ describe "Blockless Ruby Filters" do
     @d.l((:x + 1) & (:x + 2) > 100).should == '(((x + 1) & (x + 2)) > 100)'
   end
 
-  it "should raise an error if use a Bitwise method on a ComplexExpression that isn't a NumericExpression" do
-    proc{(:x + 1) & (:x & 2)}.should raise_error(Sequel::Error)
+  it "should allow using a Bitwise method on a ComplexExpression that isn't a NumericExpression" do
+    @d.lit((:x + 1) & (:x + '2')).should == "((x + 1) & (x || '2'))"
   end
 
-  it "should raise an error if use a Boolean method on a ComplexExpression that isn't a BooleanExpression" do
-    proc{:x & (:x + 2)}.should raise_error(Sequel::Error)
+  it "should allow using a Boolean method on a ComplexExpression that isn't a BooleanExpression" do
+    @d.l(:x & (:x + '2')).should == "(x AND (x || '2'))"
   end
 
   it "should raise an error if attempting to invert a ComplexExpression that isn't a BooleanExpression" do
@@ -439,6 +434,77 @@ describe "Blockless Ruby Filters" do
 
   it "should raise an error if trying to create an invalid complex expression" do
     proc{Sequel::SQL::ComplexExpression.new(:BANG, 1, 2)}.should raise_error(Sequel::Error)
+  end
+
+  it "should use a string concatentation for + if given a string" do
+    @d.lit(:x + '1').should == "(x || '1')"
+    @d.lit(:x + '1' + '1').should == "(x || '1' || '1')"
+  end
+
+  it "should use an addition for + if given a literal string" do
+    @d.lit(:x + '1'.lit).should == "(x + 1)"
+    @d.lit(:x + '1'.lit + '1'.lit).should == "(x + 1 + 1)"
+  end
+
+  it "should use a bitwise operator for & and | if given an integer" do
+    @d.lit(:x & 1).should == "(x & 1)"
+    @d.lit(:x | 1).should == "(x | 1)"
+    @d.lit(:x & 1 & 1).should == "(x & 1 & 1)"
+    @d.lit(:x | 1 | 1).should == "(x | 1 | 1)"
+  end
+  
+  it "should allow adding a string to an integer expression" do
+    @d.lit(:x + 1 + 'a').should == "(x + 1 + 'a')"
+  end
+
+  it "should allow adding an integer to an string expression" do
+    @d.lit(:x + 'a' + 1).should == "(x || 'a' || 1)"
+  end
+
+  it "should allow adding a boolean to an integer expression" do
+    @d.lit(:x + 1 + true).should == "(x + 1 + 't')"
+  end
+
+  it "should allow adding a boolean to an string expression" do
+    @d.lit(:x + 'a' + true).should == "(x || 'a' || 't')"
+  end
+
+  it "should allow using a boolean operation with an integer on an boolean expression" do
+    @d.lit(:x & :a & 1).should == "(x AND a AND 1)"
+  end
+
+  it "should allow using a boolean operation with a string on an boolean expression" do
+    @d.lit(:x & :a & 'a').should == "(x AND a AND 'a')"
+  end
+
+  it "should allowing AND of boolean expression and literal string" do
+   @d.lit(:x & :a & 'a'.lit).should == "(x AND a AND a)"
+  end
+
+  it "should allowing + of integer expression and literal string" do
+   @d.lit(:x + :a + 'a'.lit).should == "(x + a + a)"
+  end
+
+  it "should allowing + of string expression and literal string" do
+   @d.lit(:x + 'a' + 'a'.lit).should == "(x || 'a' || a)"
+  end
+
+  it "should allow sql_{string,boolean,number} methods on numeric expressions" do
+   @d.lit((:x + 1).sql_string + 'a').should == "((x + 1) || 'a')"
+   @d.lit((:x + 1).sql_boolean & 1).should == "((x + 1) AND 1)"
+   @d.lit((:x + 1).sql_number + 'a').should == "(x + 1 + 'a')"
+  end
+
+  it "should allow sql_{string,boolean,number} methods on string expressions" do
+   @d.lit((:x + 'a').sql_string + 'a').should == "(x || 'a' || 'a')"
+   @d.lit((:x + 'a').sql_boolean & 1).should == "((x || 'a') AND 1)"
+   @d.lit((:x + 'a').sql_number + 'a').should == "((x || 'a') + 'a')"
+  end
+
+  it "should allow sql_{string,boolean,number} methods on boolean expressions" do
+   @d.lit((:x & :y).sql_string + 'a').should == "((x AND y) || 'a')"
+   @d.lit((:x & :y).sql_boolean & 1).should == "(x AND y AND 1)"
+   @d.lit((:x & :y).sql_number + 'a').should == "((x AND y) + 'a')"
   end
 
   it "should raise an error if trying to literalize an invalid complex expression" do
@@ -494,23 +560,23 @@ describe "Blockless Ruby Filters" do
   
   if RUBY_VERSION < '1.9.0'
     it "should not allow inequality operations on true, false, or nil" do
-      proc{:x > 1}.should_not raise_error
-      proc{:x < true}.should raise_error(Sequel::Error)
-      proc{:x >= false}.should raise_error(Sequel::Error)
-      proc{:x <= nil}.should raise_error(Sequel::Error)
+      @d.lit(:x > 1).should == "(x > 1)"
+      @d.lit(:x < true).should == "(x < 't')"
+      @d.lit(:x >= false).should == "(x >= 'f')"
+      @d.lit(:x <= nil).should == "(x <= NULL)"
     end
 
     it "should not allow inequality operations on boolean complex expressions" do
-      proc{:x > (:y > 5)}.should raise_error(Sequel::Error)
-      proc{:x < (:y < 5)}.should raise_error(Sequel::Error)
-      proc{:x >= (:y >= 5)}.should raise_error(Sequel::Error)
-      proc{:x <= (:y <= 5)}.should raise_error(Sequel::Error)
-      proc{:x > {:y => nil}}.should raise_error(Sequel::Error)
-      proc{:x < ~{:y => nil}}.should raise_error(Sequel::Error)
-      proc{:x >= {:y => 5}}.should raise_error(Sequel::Error)
-      proc{:x <= ~{:y => 5}}.should raise_error(Sequel::Error)
-      proc{:x >= {:y => [1,2,3]}}.should raise_error(Sequel::Error)
-      proc{:x <= ~{:y => [1,2,3]}}.should raise_error(Sequel::Error)
+      @d.lit(:x > (:y > 5)).should == "(x > (y > 5))"
+      @d.lit(:x < (:y < 5)).should == "(x < (y < 5))"
+      @d.lit(:x >= (:y >= 5)).should == "(x >= (y >= 5))"
+      @d.lit(:x <= (:y <= 5)).should == "(x <= (y <= 5))"
+      @d.lit(:x > {:y => nil}).should == "(x > (y IS NULL))"
+      @d.lit(:x < ~{:y => nil}).should == "(x < (y IS NOT NULL))"
+      @d.lit(:x >= {:y => 5}).should == "(x >= (y = 5))"
+      @d.lit(:x <= ~{:y => 5}).should == "(x <= (y != 5))"
+      @d.lit(:x >= {:y => [1,2,3]}).should == "(x >= (y IN (1, 2, 3)))"
+      @d.lit(:x <= ~{:y => [1,2,3]}).should == "(x <= (y NOT IN (1, 2, 3)))"
     end
     
     it "should support >, <, >=, and <= via Symbol#>,<,>=,<=" do

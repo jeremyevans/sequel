@@ -188,7 +188,7 @@ module Sequel
   # This is used to ensure that the files loaded are from the same version of
   # Sequel as this file.
   def self.require(files, subdir=nil)
-    Array(files).each{|f| super("#{File.dirname(__FILE__)}/#{"#{subdir}/" if subdir}#{f}")}
+    Array(files).each{|f| super("#{File.dirname(__FILE__).untaint}/#{"#{subdir}/" if subdir}#{f}")}
   end
   
   # Set whether to set the single threaded mode for all databases by default. By default,

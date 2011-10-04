@@ -31,7 +31,7 @@ module Sequel
         # Return a prepared statement that can be used to lookup a row given a dataset for the row matching
         # the primary key.
         def prepared_lookup_dataset(ds)
-          @prepared_statements[:lookup_sql][ds.sql] ||= prepare_statement(ds.filter(prepared_statement_key_array(primary_key)), :first)
+          @prepared_statements[:lookup_sql][ds.sql] ||= prepare_statement(ds.filter(prepared_statement_key_array(primary_key).map{|k, v| [SQL::QualifiedIdentifier.new(ds.model.table_name, k), v]}), :first)
         end
       end
 

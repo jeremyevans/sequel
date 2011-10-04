@@ -433,10 +433,10 @@ describe "Database#tables" do
     clear_sqls
   end
   after do
-    @db.drop_view :sequel_test_view
-    @db.drop_table :sequel_test_table
     @db.identifier_output_method = @iom
     @db.identifier_input_method = @iim
+    @db.drop_view :sequel_test_view
+    @db.drop_table :sequel_test_table
   end
 
   specify "should return an array of symbols" do
@@ -475,10 +475,10 @@ describe "Database#views" do
     clear_sqls
   end
   after do
-    @db.drop_view :sequel_test_view
-    @db.drop_table :sequel_test_table
     @db.identifier_output_method = @iom
     @db.identifier_input_method = @iim
+    @db.drop_view :sequel_test_view
+    @db.drop_table :sequel_test_table
   end
 
   specify "should return an array of symbols" do

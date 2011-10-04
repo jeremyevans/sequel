@@ -140,6 +140,12 @@ module Sequel
       "#<#{self.class}: #{sql.inspect}>"
     end
     
+    # The alias to use for the row_number column, used when emulating OFFSET
+    # support and for eager limit strategies
+    def row_number_column
+      :x_sequel_row_number_x
+    end
+
     # Splits a possible implicit alias in +c+, handling both SQL::AliasedExpressions
     # and Symbols.  Returns an array of two elements, with the first being the
     # main expression, and the second being the alias.

@@ -302,7 +302,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
   before do
     @c = Class.new(Sequel::Model(:blahblah)) do
       columns :x, :y, :z
-      def _refresh(ds)
+      def _save_refresh
         self
       end
     end
@@ -544,47 +544,34 @@ describe "Model datasets #with_pk" do
 
   it "should return the first record where the primary key matches" do
     @ds.with_pk(1).should == @c.load(:id=>1)
-    @sqls.should == ["SELECT * FROM a WHERE (id = 1) LIMIT 1"]
+    @sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
   end
 
   it "should handle existing filters" do
     @ds.filter(:a=>2).with_pk(1)
-    @sqls.should == ["SELECT * FROM a WHERE ((a = 2) AND (id = 1)) LIMIT 1"]
+    @sqls.should == ["SELECT * FROM a WHERE ((a = 2) AND (a.id = 1)) LIMIT 1"]
   end
 
   it "should work with string values" do
     @ds.with_pk("foo")
-    @sqls.should == ["SELECT * FROM a WHERE (id = 'foo') LIMIT 1"]
+    @sqls.should == ["SELECT * FROM a WHERE (a.id = 'foo') LIMIT 1"]
   end
 
   it "should handle an array for composite primary keys" do
     @c.set_primary_key :id1, :id2
     @ds.with_pk([1, 2])
-    @sqls.should == ["SELECT * FROM a WHERE ((id1 = 1) AND (id2 = 2)) LIMIT 1"]
-  end
-
-  it "should raise an error if a single primary key is given when a composite primary key should be used" do
-    @c.set_primary_key :id1, :id2
-    proc{@ds.with_pk(1)}.should raise_error(Sequel::Error)
-  end
-
-  it "should raise an error if a composite primary key is given when a single primary key should be used" do
-    proc{@ds.with_pk([1, 2])}.should raise_error(Sequel::Error)
-  end
-
-  it "should raise an error if the wrong number of composite keys is given" do
-    @c.set_primary_key :id1, :id2
-    proc{@ds.with_pk([1, 2, 3])}.should raise_error(Sequel::Error)
+    ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1",
+    "SELECT * FROM a WHERE ((a.id2 = 2) AND (a.id1 = 1)) LIMIT 1"].should include(@sqls.first)
+    @sqls.length.should == 1
   end
 
   it "should have #[] consider an integer as a primary key lookup" do
     @ds[1].should == @c.load(:id=>1)
-    @sqls.should == ["SELECT * FROM a WHERE (id = 1) LIMIT 1"]
+    @sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
   end
 
   it "should not have #[] consider a string as a primary key lookup" do
     @ds['foo'].should == @c.load(:id=>1)
     @sqls.should == ["SELECT * FROM a WHERE (foo) LIMIT 1"]
   end
-
 end

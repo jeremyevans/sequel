@@ -110,6 +110,22 @@ describe "Simple Dataset operations" do
     @ds.limit(2, 1).all.should == []
   end
 
+  specify "should fetch correctly with a limit in an IN subselect" do
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2)).all.should == [{:id=>1, :number=>10}]
+    @ds.insert(:number=>20)
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(1)).all.should == [{:id=>1, :number=>10}]
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2)).order(:id).all.should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
+  end
+  
+  specify "should fetch correctly with a limit and offset in an IN subselect" do
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 0)).all.should == [{:id=>1, :number=>10}]
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 1)).all.should == []
+    @ds.insert(:number=>20)
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(1, 1)).all.should == [{:id=>2, :number=>20}]
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 0)).order(:id).all.should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
+    @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 1)).all.should == [{:id=>2, :number=>20}]
+  end
+  
   specify "should alias columns correctly" do
     @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
   end
@@ -428,6 +444,92 @@ if INTEGRATION_DB.dataset.supports_cte?
   end
 end
 
+if INTEGRATION_DB.dataset.supports_cte?(:update) # Assume INSERT and DELETE support as well
+  describe "Common Table Expressions in INSERT/UPDATE/DELETE" do
+    before do
+      @db = INTEGRATION_DB
+      @db.create_table!(:i1){Integer :id}
+      @ds = @db[:i1]
+      @ds2 = @ds.with(:t, @ds)
+      @ds.insert(:id=>1)
+      @ds.insert(:id=>2)
+    end
+    after do
+      @db.drop_table(:i1)
+    end
+    
+    specify "should give correct results for WITH" do
+      @ds2.insert(@db[:t])
+      @ds.select_order_map(:id).should == [1, 1, 2, 2]
+      @ds2.filter(:id=>@db[:t].select{max(id)}).update(:id=>:id+1)
+      @ds.select_order_map(:id).should == [1, 1, 3, 3]
+      @ds2.filter(:id=>@db[:t].select{max(id)}).delete
+      @ds.select_order_map(:id).should == [1, 1]
+    end
+  end
+end
+
+if INTEGRATION_DB.dataset.supports_returning?(:insert)
+  describe "RETURNING clauses in INSERT" do
+    before do
+      @db = INTEGRATION_DB
+      @db.create_table!(:i1){Integer :id; Integer :foo}
+      @ds = @db[:i1]
+    end
+    after do
+      @db.drop_table(:i1)
+    end
+    
+    specify "should give correct results" do
+      h = {}
+      @ds.returning(:foo).insert(1, 2){|r| h = r}
+      h.should == {:foo=>2}
+      @ds.returning(:id).insert(3, 4){|r| h = r}
+      h.should == {:id=>3}
+      @ds.returning.insert(5, 6){|r| h = r}
+      h.should == {:id=>5, :foo=>6}
+      @ds.returning(:id___foo, :foo___id).insert(7, 8){|r| h = r}
+      h.should == {:id=>8, :foo=>7}
+    end
+  end
+end
+
+if INTEGRATION_DB.dataset.supports_returning?(:update) # Assume DELETE support as well
+  describe "RETURNING clauses in UPDATE/DELETE" do
+    before do
+      @db = INTEGRATION_DB
+      @db.create_table!(:i1){Integer :id; Integer :foo}
+      @ds = @db[:i1]
+      @ds.insert(1, 2)
+    end
+    after do
+      @db.drop_table(:i1)
+    end
+    
+    specify "should give correct results" do
+      h = []
+      @ds.returning(:foo).update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      h.should == [{:foo=>4}]
+      h.clear
+      @ds.returning(:id).update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      h.should == [{:id=>3}]
+      h.clear
+      @ds.returning.update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      h.should == [{:id=>4, :foo=>16}]
+      h.clear
+      @ds.returning(:id___foo, :foo___id).update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      h.should == [{:id=>32, :foo=>5}]
+      h.clear
+
+      @ds.returning.delete{|r| h << r}
+      h.should == [{:id=>5, :foo=>32}]
+      h.clear
+      @ds.returning.delete{|r| h << r}
+      h.should == []
+    end
+  end
+end
+
 if INTEGRATION_DB.dataset.supports_window_functions?
   describe "Window Functions" do
     before do
@@ -685,6 +787,77 @@ describe "Sequel::Dataset main SQL methods" do
     @ds.select{max(a).as(c)}.having{max(a) > 30}.all.should == []
     @ds.insert(40, 20)
     @ds.select{max(a).as(c)}.having{max(a) > 30}.all.each{|h| h[:c] = h[:c].to_i}.should == [{:c=>40}]
+  end
+end
+
+describe "Sequel::Dataset convenience methods" do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:a){Integer :a; Integer :b; Integer :c; Integer :d}
+    @ds = @db[:a].order(:a)
+    @ds.insert(1, 2, 3, 4)
+    @ds.insert(5, 6, 7, 8)
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  specify "should have working #map" do
+    @ds.map(:a).should == [1, 5]
+    @ds.map(:b).should == [2, 6]
+    @ds.map([:a, :b]).should == [[1, 2], [5, 6]]
+  end
+  
+  specify "should have working #to_hash" do
+    @ds.to_hash(:a).should == {1=>{:a=>1, :b=>2, :c=>3, :d=>4}, 5=>{:a=>5, :b=>6, :c=>7, :d=>8}}
+    @ds.to_hash(:b).should == {2=>{:a=>1, :b=>2, :c=>3, :d=>4}, 6=>{:a=>5, :b=>6, :c=>7, :d=>8}}
+    @ds.to_hash([:a, :b]).should == {[1, 2]=>{:a=>1, :b=>2, :c=>3, :d=>4}, [5, 6]=>{:a=>5, :b=>6, :c=>7, :d=>8}}
+
+    @ds.to_hash(:a, :b).should == {1=>2, 5=>6}
+    @ds.to_hash([:a, :c], :b).should == {[1, 3]=>2, [5, 7]=>6}
+    @ds.to_hash(:a, [:b, :c]).should == {1=>[2, 3], 5=>[6, 7]}
+    @ds.to_hash([:a, :c], [:b, :d]).should == {[1, 3]=>[2, 4], [5, 7]=>[6, 8]}
+  end
+
+  specify "should have working #select_map" do
+    @ds.select_map(:a).should == [1, 5]
+    @ds.select_map(:b).should == [2, 6]
+    @ds.select_map([:a, :b]).should == [[1, 2], [5, 6]]
+
+    @ds.select_map(:a___e).should == [1, 5]
+    @ds.select_map(:b___e).should == [2, 6]
+    @ds.select_map([:a___e, :b___f]).should == [[1, 2], [5, 6]]
+    @ds.select_map([:a__a___e, :a__b___f]).should == [[1, 2], [5, 6]]
+    @ds.select_map([:a__a.as(:e), :a__b.as(:f)]).should == [[1, 2], [5, 6]]
+    @ds.select_map([:a.qualify(:a).as(:e), :b.qualify(:a).as(:f)]).should == [[1, 2], [5, 6]]
+    @ds.select_map([:a.identifier.qualify(:a).as(:e), :b.qualify(:a).as(:f)]).should == [[1, 2], [5, 6]]
+  end
+  
+  specify "should have working #select_order_map" do
+    @ds.select_order_map(:a).should == [1, 5]
+    @ds.select_order_map(:a__b.desc).should == [6, 2]
+    @ds.select_order_map(:a__b___e.desc).should == [6, 2]
+    @ds.select_order_map(:b.qualify(:a).as(:e)).should == [2, 6]
+    @ds.select_order_map([:a.desc, :b]).should == [[5, 6], [1, 2]]
+
+    @ds.select_order_map(:a___e).should == [1, 5]
+    @ds.select_order_map(:b___e).should == [2, 6]
+    @ds.select_order_map([:a___e.desc, :b___f]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([:a__a___e.desc, :a__b___f]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([:a__a.desc, :a__b.as(:f)]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([:a.qualify(:a).desc, :b.qualify(:a).as(:f)]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([:a.identifier.qualify(:a).desc, :b.qualify(:a).as(:f)]).should == [[5, 6], [1, 2]]
+  end
+
+  specify "should have working #select_hash" do
+    @ds.select_hash(:a, :b).should == {1=>2, 5=>6}
+    @ds.select_hash(:a__a___e, :b).should == {1=>2, 5=>6}
+    @ds.select_hash(:a__a.as(:e), :b).should == {1=>2, 5=>6}
+    @ds.select_hash(:a.qualify(:a).as(:e), :b).should == {1=>2, 5=>6}
+    @ds.select_hash(:a.identifier.qualify(:a).as(:e), :b).should == {1=>2, 5=>6}
+    @ds.select_hash([:a, :c], :b).should == {[1, 3]=>2, [5, 7]=>6}
+    @ds.select_hash(:a, [:b, :c]).should == {1=>[2, 3], 5=>[6, 7]}
+    @ds.select_hash([:a, :c], [:b, :d]).should == {[1, 3]=>[2, 4], [5, 7]=>[6, 8]}
   end
 end
 

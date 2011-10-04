@@ -85,6 +85,11 @@ module Sequel
         Sequel.ts_require 'adapters/jdbc/db2'
         db.extend(Sequel::JDBC::DB2::DatabaseMethods)
         com.ibm.db2.jcc.DB2Driver
+      end,
+      :firebirdsql=>proc do |db|
+        Sequel.ts_require 'adapters/jdbc/firebird'
+        db.extend(Sequel::JDBC::Firebird::DatabaseMethods)
+        org.firebirdsql.jdbc.FBDriver
       end
     }
     

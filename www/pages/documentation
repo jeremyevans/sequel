@@ -20,6 +20,7 @@
   <li><a href="rdoc/files/doc/migration_rdoc.html">Migrations</a></li>
   <li><a href="rdoc/files/doc/virtual_rows_rdoc.html">Virtual Row Blocks</a></li>
   <li><a href="rdoc/files/doc/reflection_rdoc.html">Reflection</a></li>
+  <li><a href="rdoc/files/doc/transactions_rdoc.html">Database Transactions</a></li>
   <li><a href="rdoc/files/doc/sql_rdoc.html">Sequel for SQL Users</a></li>
   <li><a href="rdoc/files/doc/active_record_rdoc.html">Sequel for ActiveRecord Users</a></li>
   <li><a href="rdoc/files/doc/testing_rdoc.html">Testing With Sequel</a></li>
@@ -51,6 +52,7 @@
 <h3>Presentations</h3>
 
 <ul>
+<li><a href="http://jeremyevans-pres.heroku.com/pgwest2011/index.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at PostgreSQL Conference West 2011</a></li>
 <li><a href="http://jeremyevans-pres.heroku.com/lsrc2009_presentation/sequel-lsrc2009.html">Jeremy Evans's &quot;Sequel: SQL in Ruby&quot; Presentation at Lone Star Ruby Conference 2009</a></li>
 <li><a href="http://jeremyevans-pres.heroku.com/rk2009_presentation/sequel-rubykaigi2009.html">Jeremy Evans's &quot;Sequel: SQL in Ruby&quot; Presentation at RubyKaigi 2009</a> (<a href="http://www.ustream.tv/recorded/1825816">Video</a>)</li>
 <li><a href="http://jeremyevans-pres.heroku.com/larc2009_presentation/sequel-larc2009-pres.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at LA Ruby Conf 2009</a> (<a href="http://larubyconf2009.confreaks.com/04-apr-2009-11-20-sequel-jeremy-evans.html">Video</a>)</li>

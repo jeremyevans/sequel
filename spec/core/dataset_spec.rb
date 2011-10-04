@@ -1378,6 +1378,14 @@ describe "Dataset#select_append" do
     @d.select(:a).select_append{|o| o.b}.sql.should == 'SELECT a, b FROM test'
     @d.select(:a.*).select_append(:b.*){b(1)}.sql.should == 'SELECT a.*, b.*, b(1) FROM test'
   end
+
+  specify "should select from all from and join tables if SELECT *, column not supported" do
+    @d.meta_def(:supports_select_all_and_column?){false}
+    @d.select_append(:b).sql.should == 'SELECT test.*, b FROM test'
+    @d.from(:test, :c).select_append(:b).sql.should == 'SELECT test.*, c.*, b FROM test, c'
+    @d.cross_join(:c).select_append(:b).sql.should == 'SELECT test.*, c.*, b FROM test CROSS JOIN c'
+    @d.cross_join(:c).cross_join(:d).select_append(:b).sql.should == 'SELECT test.*, c.*, d.*, b FROM test CROSS JOIN c CROSS JOIN d'
+  end
 end
 
 describe "Dataset#order" do
@@ -1479,6 +1487,13 @@ describe "Dataset#with_sql" do
   specify "should keep row_proc" do
     @dataset.with_sql('SELECT 1 FROM test').row_proc.should == @dataset.row_proc
   end
+
+  specify "should work with method symbols and arguments" do
+    @dataset.with_sql(:delete_sql).sql.should == 'DELETE FROM test'
+    @dataset.with_sql(:insert_sql, :b=>1).sql.should == 'INSERT INTO test (b) VALUES (1)'
+    @dataset.with_sql(:update_sql, :b=>1).sql.should == 'UPDATE test SET b = 1'
+  end
+  
 end
 
 describe "Dataset#order_by" do
@@ -1695,17 +1710,6 @@ describe "Dataset#qualified_column_name" do
   end
 end
 
-class DummyDataset < Sequel::Dataset
-  VALUES = [
-    {:a => 1, :b => 2},
-    {:a => 3, :b => 4},
-    {:a => 5, :b => 6}
-  ]
-  def fetch_rows(sql, &block)
-    VALUES.each(&block)
-  end
-end
-
 describe "Dataset#map" do
   before do
     @d = DummyDataset.new(nil).from(:items)
@@ -1717,6 +1721,10 @@ describe "Dataset#map" do
   
   specify "should map using #[column name] if column name is given" do
     @d.map(:a).should == [1, 3, 5]
+  end
+  
+  specify "should support multiple column names if an array of column names is given" do
+    @d.map([:a, :b]).should == [[1, 2], [3, 4], [5, 6]]
   end
   
   specify "should return the complete dataset values if nothing is given" do
@@ -1737,6 +1745,13 @@ describe "Dataset#to_hash" do
   specify "should provide a hash with the first column as key and the entire hash as value if the value column is blank or nil" do
     @d.to_hash(:a).should == {1 => {:a => 1, :b => 2}, 3 => {:a => 3, :b => 4}, 5 => {:a => 5, :b => 6}}
     @d.to_hash(:b).should == {2 => {:a => 1, :b => 2}, 4 => {:a => 3, :b => 4}, 6 => {:a => 5, :b => 6}}
+  end
+
+  specify "should support using an array of columns as either the key or the value" do
+    @d.to_hash([:a, :b], :b).should == {[1, 2] => 2, [3, 4] => 4, [5, 6] => 6}
+    @d.to_hash(:b, [:a, :b]).should == {2 => [1, 2], 4 => [3, 4], 6 => [5, 6]}
+    @d.to_hash([:b, :a], [:a, :b]).should == {[2, 1] => [1, 2], [4, 3] => [3, 4], [6, 5] => [5, 6]}
+    @d.to_hash([:a, :b]).should == {[1, 2] => {:a => 1, :b => 2}, [3, 4] => {:a => 3, :b => 4}, [5, 6] => {:a => 5, :b => 6}}
   end
 end
 
@@ -3844,6 +3859,15 @@ describe "Sequel::Dataset #with and #with_recursive" do
     proc{@ds.with(:t, @db[:x], :args=>[:b])}.should raise_error(Sequel::Error)
     proc{@ds.with_recursive(:t, @db[:x], @db[:t], :args=>[:b, :c])}.should raise_error(Sequel::Error)
   end
+
+  specify "#with should work on insert, update, and delete statements if they support it" do
+    [:insert, :update, :delete].each do |m|
+      @ds.meta_def(:"#{m}_clause_methods"){super() + [:"#{m}_with_sql"]}
+    end
+    @ds.with(:t, @db[:x]).insert_sql(1).should == 'WITH t AS (SELECT * FROM x) INSERT INTO t VALUES (1)'
+    @ds.with(:t, @db[:x]).update_sql(:foo=>1).should == 'WITH t AS (SELECT * FROM x) UPDATE t SET foo = 1'
+    @ds.with(:t, @db[:x]).delete_sql.should == 'WITH t AS (SELECT * FROM x) DELETE FROM t'
+  end
 end
 
 describe Sequel::SQL::Constants do
@@ -4071,6 +4095,14 @@ describe "Sequel::Dataset#select_map" do
     @ds.select_map{a(t__c)}.should == [1, 2]
     @ds.db.sqls.should == ['SELECT a(t.c) FROM t']
   end
+
+  specify "should handle an array of columns" do
+    @ds.select_map([:c, :c]).should == [[1, 1], [2, 2]]
+    @ds.db.sqls.should == ['SELECT c, c FROM t']
+    @ds.db.reset
+    @ds.select_order_map([:d.as(:c), :c.qualify(:b), :c.identifier, :c.identifier.qualify(:b), :a__c, :a__d___c]).should == [[1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2]]
+    @ds.db.sqls.should == ['SELECT d AS c, b.c, c, b.c, a.c, a.d AS c FROM t ORDER BY d, b.c, c, b.c, a.c, a.d']
+  end
 end
 
 describe "Sequel::Dataset#select_order_map" do
@@ -4109,9 +4141,22 @@ describe "Sequel::Dataset#select_order_map" do
     @ds.db.sqls.should == ['SELECT a AS b FROM t ORDER BY a']
   end
   
+  specify "should handle OrderedExpressions" do
+    @ds.select_order_map(:a.desc).should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a FROM t ORDER BY a DESC']
+  end
+  
   specify "should accept a block" do
     @ds.select_order_map{a(t__c)}.should == [1, 2]
     @ds.db.sqls.should == ['SELECT a(t.c) FROM t ORDER BY a(t.c)']
+  end
+
+  specify "should handle an array of columns" do
+    @ds.select_order_map([:c, :c]).should == [[1, 1], [2, 2]]
+    @ds.db.sqls.should == ['SELECT c, c FROM t ORDER BY c, c']
+    @ds.db.reset
+    @ds.select_order_map([:d.as(:c), :c.qualify(:b), :c.identifier, :c.identifier.qualify(:b), :c.identifier.qualify(:b).desc, :a__c, :a__d___c.desc]).should == [[1, 1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2, 2]]
+    @ds.db.sqls.should == ['SELECT d AS c, b.c, c, b.c, b.c, a.c, a.d AS c FROM t ORDER BY d, b.c, c, b.c, b.c DESC, a.c, a.d DESC']
   end
 end
 
@@ -4128,7 +4173,7 @@ describe "Sequel::Dataset#select_hash" do
     @ds.db.reset
   end
 
-  specify "should do select and map in one step" do
+  specify "should do select and to_hash in one step" do
     @ds.set_fr_yield([{:a=>1, :b=>2}, {:a=>3, :b=>4}])
     @ds.select_hash(:a, :b).should == {1=>2, 3=>4}
     @ds.db.sqls.should == ['SELECT a, b FROM t']
@@ -4150,6 +4195,36 @@ describe "Sequel::Dataset#select_hash" do
     @ds.set_fr_yield([{:a=>1, :b=>2}, {:a=>3, :b=>4}])
     @ds.select_hash(:t__c___a, :t__d___b).should == {1=>2, 3=>4}
     @ds.db.sqls.should == ['SELECT t.c AS a, t.d AS b FROM t']
+  end
+
+  specify "should handle SQL::Identifiers in arguments" do
+    @ds.set_fr_yield([{:a=>1, :b=>2}, {:a=>3, :b=>4}])
+    @ds.select_hash(:a.identifier, :b.identifier).should == {1=>2, 3=>4}
+    @ds.db.sqls.should == ['SELECT a, b FROM t']
+  end
+
+  specify "should handle SQL::QualifiedIdentifiers in arguments" do
+    @ds.set_fr_yield([{:a=>1, :b=>2}, {:a=>3, :b=>4}])
+    @ds.select_hash(:a.qualify(:t), :b.identifier.qualify(:t)).should == {1=>2, 3=>4}
+    @ds.db.sqls.should == ['SELECT t.a, t.b FROM t']
+  end
+
+  specify "should handle SQL::AliasedExpressions in arguments" do
+    @ds.set_fr_yield([{:a=>1, :b=>2}, {:a=>3, :b=>4}])
+    @ds.select_hash(:c.as(:a), :t.as(:b)).should == {1=>2, 3=>4}
+    @ds.db.sqls.should == ['SELECT c AS a, t AS b FROM t']
+  end
+
+  specify "should work with arrays of columns" do
+    @ds.set_fr_yield([{:a=>1, :b=>2, :c=>3}, {:a=>4, :b=>5, :c=>6}])
+    @ds.select_hash([:a, :c], :b).should == {[1, 3]=>2, [4, 6]=>5}
+    @ds.db.sqls.should == ['SELECT a, c, b FROM t']
+    @ds.select_hash(:a, [:b, :c]).should == {1=>[2, 3], 4=>[5, 6]}
+    @ds.select_hash([:a, :b], [:b, :c]).should == {[1, 2]=>[2, 3], [4, 5]=>[5, 6]}
+  end
+
+  specify "should raise an error if the resulting symbol cannot be determined" do
+    proc{@ds.select_hash(:c.as(:a), 'foo')}.should raise_error(Sequel::Error)
   end
 end
 
@@ -4200,5 +4275,54 @@ describe "Custom ASTTransformer" do
     ds.sql.should == 'SELECT * FROM t CROSS JOIN a AS g INNER JOIN b AS h USING (c) INNER JOIN d AS i ON (i.e = h.f)'
     ds.clone(:from=>c.transform(ds.opts[:from]), :join=>c.transform(ds.opts[:join])).sql.should ==
       'SELECT * FROM tt CROSS JOIN aa AS gg INNER JOIN bb AS hh USING (cc) INNER JOIN dd AS ii ON (ii.ee = hh.ff)'
+  end
+end
+
+describe "Dataset#returning" do
+  before do
+    @ds = Sequel::Database.new[:t].returning(:foo)
+    @pr = proc do
+      [:insert, :update, :delete].each do |m|
+        @ds.meta_def(:"#{m}_clause_methods"){super() + [:"#{m}_returning_sql"]}
+      end
+    end
+  end
+  
+  specify "should use RETURNING clause in the SQL if the dataset supports it" do
+    @pr.call
+    @ds.delete_sql.should == "DELETE FROM t RETURNING foo"
+    @ds.insert_sql(1).should == "INSERT INTO t VALUES (1) RETURNING foo"
+    @ds.update_sql(:foo=>1).should == "UPDATE t SET foo = 1 RETURNING foo"
+  end
+  
+  specify "should not use RETURNING clause in the SQL if the dataset does not support it" do
+    @ds.delete_sql.should == "DELETE FROM t"
+    @ds.insert_sql(1).should == "INSERT INTO t VALUES (1)"
+    @ds.update_sql(:foo=>1).should == "UPDATE t SET foo = 1"
+  end
+
+  specify "should have insert, update, and delete yield to blocks if RETURNING is used" do
+    @pr.call
+    def @ds.fetch_rows(sql)
+      yield(:foo=>sql)
+    end
+    h = {}
+    @ds.delete{|r| h = r}
+    h.should == {:foo=>"DELETE FROM t RETURNING foo"}
+    @ds.insert(1){|r| h = r}
+    h.should == {:foo=>"INSERT INTO t VALUES (1) RETURNING foo"}
+    @ds.update(:foo=>1){|r| h = r}
+    h.should == {:foo=>"UPDATE t SET foo = 1 RETURNING foo"}
+  end
+
+  specify "should have insert, update, and delete return arrays of hashes if RETURNING is used and a block is not given" do
+    @pr.call
+    def @ds.fetch_rows(sql)
+      yield(:foo=>sql)
+    end
+    h = {}
+    @ds.delete.should == [{:foo=>"DELETE FROM t RETURNING foo"}]
+    @ds.insert(1).should == [{:foo=>"INSERT INTO t VALUES (1) RETURNING foo"}]
+    @ds.update(:foo=>1).should == [{:foo=>"UPDATE t SET foo = 1 RETURNING foo"}]
   end
 end

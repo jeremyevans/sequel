@@ -128,8 +128,7 @@ module Sequel
         when ::ODBC::TimeStamp
           Sequel.database_to_application_timestamp([v.year, v.month, v.day, v.hour, v.minute, v.second])
         when ::ODBC::Time
-          now = ::Time.now
-          Sequel::SQLTime.local(now.year, now.month, now.day, v.hour, v.minute, v.second)
+          Sequel::SQLTime.create(v.hour, v.minute, v.second)
         when ::ODBC::Date
           Date.new(v.year, v.month, v.day)
         else

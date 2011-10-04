@@ -79,6 +79,27 @@ module Sequel
           true
         end
     
+        # The eager limit strategy to use for this dataset.
+        def eager_limit_strategy
+          fetch(:_eager_limit_strategy) do
+            self[:_eager_limit_strategy] = if self[:limit]
+              case s = self.fetch(:eager_limit_strategy){self[:model].default_eager_limit_strategy || :ruby}
+              when true
+                ds = associated_class.dataset
+                if ds.supports_window_functions?
+                  :window_function
+                else
+                  :ruby
+                end
+              else
+                s
+              end
+            else
+              nil
+            end
+          end
+        end
+
         # By default associations do not need to select a key in an associated table
         # to eagerly load.
         def eager_loading_use_associated_key?
@@ -92,6 +113,15 @@ module Sequel
           true
         end
     
+        # The limit and offset for this association (returned as a two element array).
+        def limit_and_offset
+          if (v = self[:limit]).is_a?(Array)
+            v
+          else
+            [v, nil]
+          end
+        end
+
         # Whether the associated object needs a primary key to be added/removed,
         # false by default.
         def need_associated_primary_key?
@@ -193,6 +223,11 @@ module Sequel
           self[:key].nil?
         end
     
+        # many_to_one associations don't need an eager limit strategy
+        def eager_limit_strategy
+          nil
+        end
+
         # The key to use for the key hash when eager loading
         def eager_loader_key
           self[:eager_loader_key] ||= self[:key]
@@ -248,7 +283,7 @@ module Sequel
         def can_have_associated_objects?(obj)
           !self[:primary_keys].any?{|k| obj.send(k).nil?}
         end
-    
+
         # Default foreign key name symbol for key in associated table that points to
         # current table's primary key.
         def default_key
@@ -258,6 +293,11 @@ module Sequel
         # The key to use for the key hash when eager loading
         def eager_loader_key
           self[:eager_loader_key] ||= primary_key
+        end
+
+        # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
+        def eager_loading_predicate_key
+          self[:eager_loading_predicate_key] ||= self[:uses_composite_keys] ? self[:keys].map{|k| SQL::QualifiedIdentifier.new(associated_class.table_name, k)} : SQL::QualifiedIdentifier.new(associated_class.table_name, self[:key])
         end
     
         # The column in the current table that the key in the associated table references.
@@ -297,6 +337,31 @@ module Sequel
       class OneToOneAssociationReflection < OneToManyAssociationReflection
         ASSOCIATION_TYPES[:one_to_one] = self
         
+        # one_to_one associations don't use an eager limit strategy by default, but
+        # support both DISTINCT ON and window functions as strategies.
+        def eager_limit_strategy
+          fetch(:_eager_limit_strategy) do
+            self[:_eager_limit_strategy] = case s = self[:eager_limit_strategy]
+            when Symbol
+              s
+            when true
+              ds = associated_class.dataset
+              if ds.supports_ordered_distinct_on?
+                :distinct_on
+              elsif ds.supports_window_functions?
+                :window_function
+              end
+            else
+              nil
+            end
+          end
+        end
+
+        # The limit and offset for this association (returned as a two element array).
+        def limit_and_offset
+          [1, nil]
+        end
+
         # one_to_one associations return a single object, not an array
         def returns_array?
           false
@@ -360,6 +425,11 @@ module Sequel
         # The key to use for the key hash when eager loading
         def eager_loader_key
           self[:eager_loader_key] ||= self[:left_primary_key]
+        end
+    
+        # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
+        def eager_loading_predicate_key
+          self[:eager_loading_predicate_key] ||= self[:uses_left_composite_keys] ? self[:left_keys].map{|k| SQL::QualifiedIdentifier.new(self[:join_table], k)} : SQL::QualifiedIdentifier.new(self[:join_table], self[:left_key])
         end
     
         # many_to_many associations need to select a key in an associated table to eagerly load
@@ -457,12 +527,21 @@ module Sequel
       #   Project.association_reflection(:portfolio)
       #   => {:type => :many_to_one, :name => :portfolio, ...}
       #
+      # Associations should not have the same names as any of the columns in the
+      # model's current table they reference. If you are dealing with an existing schema that
+      # has a column named status, you can't name the association status, you'd
+      # have to name it foo_status or something else.  If you give an association the same name
+      # as a column, you will probably end up with an association that doesn't work, or a SystemStackError.
+      #
       # For a more in depth general overview, as well as a reference guide,
       # see the {Association Basics guide}[link:files/doc/association_basics_rdoc.html].
       # For examples of advanced usage, see the {Advanced Associations guide}[link:files/doc/advanced_associations_rdoc.html].
       module ClassMethods
         # All association reflections defined for this model (default: {}).
         attr_reader :association_reflections
+
+        # The default :eager_limit_strategy option to use for *_many associations (default: nil)
+        attr_accessor :default_eager_limit_strategy
 
         # Array of all association reflections for this model class
         def all_association_reflections
@@ -495,8 +574,7 @@ module Sequel
         # :after_add :: Symbol, Proc, or array of both/either specifying a callback to call
         #               after a new item is added to the association.
         # :after_load :: Symbol, Proc, or array of both/either specifying a callback to call
-        #                after the associated record(s) have been retrieved from the database.  Not called
-        #                when eager loading via eager_graph, but called when eager loading via eager.
+        #                after the associated record(s) have been retrieved from the database.
         # :after_remove :: Symbol, Proc, or array of both/either specifying a callback to call
         #                  after an item is removed from the association.
         # :after_set :: Symbol, Proc, or array of both/either specifying a callback to call
@@ -538,6 +616,14 @@ module Sequel
         #                   additional key :eager_block, a callback accepting one argument, the associated dataset. This
         #                   is used to customize the association at query time.
         #                   Should return a copy of the dataset with the association graphed into it.
+        # :eager_limit_strategy :: Determines the strategy used for enforcing limits when eager loading associations via
+        #                          the +eager+ method.  For one_to_one associations, no strategy is used by default, and
+        #                          for *_many associations, the :ruby strategy is used by default, which still retrieves
+        #                          all records but slices the resulting array after the association is retrieved.  You
+        #                          can pass a +true+ value for this option to have Sequel pick what it thinks is the best
+        #                          choice for the database, or specify a specific symbol to manually select a strategy.
+        #                          one_to_one associations support :distinct_on, :window_function, and :correlated_subquery.
+        #                          *_many associations support :ruby, :window_function, and :correlated_subquery.
         # :eager_loader :: A proc to use to implement eager loading, overriding the default.  Takes one or three arguments.
         #                  If three arguments, the first should be a key hash (used solely to enhance performance), the
         #                  second an array of records, and the third a hash of dependent associations. If one argument, is
@@ -705,7 +791,8 @@ module Sequel
         # Copy the association reflections to the subclass
         def inherited(subclass)
           super
-          subclass.instance_variable_set(:@association_reflections, @association_reflections.dup)
+          subclass.instance_variable_set(:@association_reflections, association_reflections.dup)
+          subclass.default_eager_limit_strategy =  default_eager_limit_strategy
         end
       
         # Shortcut for adding a many_to_many association, see #associate
@@ -730,6 +817,73 @@ module Sequel
         
         private
       
+        # Use a correlated subquery to limit the results of the eager loading dataset.
+        def apply_correlated_subquery_eager_limit_strategy(ds, opts)
+          klass = opts.associated_class
+          kds = klass.dataset
+          dsa = ds.send(:dataset_alias, 1)
+          raise Error, "can't use a correlated subquery if the associated class (#{opts.associated_class.inspect}) does not have a primary key" unless pk = klass.primary_key
+          pka = Array(pk)
+          raise Error, "can't use a correlated subquery if the associated class (#{opts.associated_class.inspect}) has a composite primary key and the database does not support multiple column IN" if pka.length > 1 && !ds.supports_multiple_column_in?
+          table = kds.opts[:from]
+          raise Error, "can't use a correlated subquery unless the associated class (#{opts.associated_class.inspect}) uses a single FROM table" unless table && table.length == 1
+          table = table.first
+          if order = ds.opts[:order]
+            oproc = lambda do |x|
+              case x
+              when Symbol
+                t, c, a = ds.send(:split_symbol, x)
+                if t && t.to_sym == table
+                  SQL::QualifiedIdentifier.new(dsa, c)
+                else
+                  x
+                end
+              when SQL::QualifiedIdentifier
+                if x.table == table
+                  SQL::QualifiedIdentifier.new(dsa, x.column)
+                else
+                  x
+                end
+              when SQL::OrderedExpression
+                SQL::OrderedExpression.new(oproc.call(x.expression), x.descending, :nulls=>x.nulls)
+              else
+                x
+              end
+            end
+            order = order.map(&oproc) 
+          end
+          limit, offset = opts.limit_and_offset
+
+          subquery = yield kds.
+            unlimited.
+            from(SQL::AliasedExpression.new(table, dsa)).
+            select(*pka.map{|k| SQL::QualifiedIdentifier.new(dsa, k)}).
+            order(*order).
+            limit(limit, offset)
+
+          pk = if pk.is_a?(Array)
+            pk.map{|k| SQL::QualifiedIdentifier.new(table, k)}
+          else
+            SQL::QualifiedIdentifier.new(table, pk)
+          end
+          ds.filter(pk=>subquery)
+        end
+
+        # Use a window function to limit the results of the eager loading dataset.
+        def apply_window_function_eager_limit_strategy(ds, opts)
+          rn = ds.row_number_column 
+          limit, offset = opts.limit_and_offset
+          ds = ds.unordered.select_append{row_number(:over, :partition=>opts.eager_loading_predicate_key, :order=>ds.opts[:order]){}.as(rn)}.from_self
+          ds = if opts[:type] == :one_to_one
+            ds.where(rn => 1)
+          elsif offset
+            offset += 1
+            ds.where(rn => (offset...(offset+limit))) 
+          else
+            ds.where{SQL::Identifier.new(rn) <= limit} 
+          end
+        end
+
         # The module to use for the association's methods.  Defaults to
         # the overridable_methods_module.
         def association_module(opts={})
@@ -807,10 +961,24 @@ module Sequel
 
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:key_hash][left_pk]
-            eo[:rows].each{|object| object.associations[name] = []}
+            rows = eo[:rows]
+            rows.each{|object| object.associations[name] = []}
             r = uses_rcks ? rcks.zip(opts.right_primary_keys) : [[right, opts.right_primary_key]]
             l = uses_lcks ? [[lcks.map{|k| SQL::QualifiedIdentifier.new(join_table, k)}, h.keys]] : [[left, h.keys]]
-            model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), Array(opts.select), eo[:associations], eo).all do |assoc_record|
+            ds = model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), Array(opts.select), eo[:associations], eo)
+            case opts.eager_limit_strategy
+            when :window_function
+              delete_rn = true
+              rn = ds.row_number_column
+              ds = apply_window_function_eager_limit_strategy(ds, opts)
+            when :correlated_subquery
+              ds = apply_correlated_subquery_eager_limit_strategy(ds, opts) do |xds|
+                dsa = ds.send(:dataset_alias, 2)
+                xds.inner_join(join_table, r + lcks.map{|k| [k, SQL::QualifiedIdentifier.new(join_table, k)]}, :table_alias=>dsa)
+              end
+            end
+            ds.all do |assoc_record|
+              assoc_record.values.delete(rn) if delete_rn
               hash_key = if uses_lcks
                 left_key_alias.map{|k| assoc_record.values.delete(k)}
               else
@@ -818,6 +986,10 @@ module Sequel
               end
               next unless objects = h[hash_key]
               objects.each{|object| object.associations[name].push(assoc_record)}
+            end
+            if opts.eager_limit_strategy == :ruby
+              limit, offset = opts.limit_and_offset
+              rows.each{|o| o.associations[name] = o.associations[name].slice(offset||0, limit) || []}
             end
           end
           
@@ -928,14 +1100,30 @@ module Sequel
           end
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:key_hash][primary_key]
+            rows = eo[:rows]
             if one_to_one
-              eo[:rows].each{|object| object.associations[name] = nil}
+              rows.each{|object| object.associations[name] = nil}
             else
-              eo[:rows].each{|object| object.associations[name] = []}
+              rows.each{|object| object.associations[name] = []}
             end
             reciprocal = opts.reciprocal
             klass = opts.associated_class
-            model.eager_loading_dataset(opts, klass.filter(uses_cks ? {cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>h.keys} : {SQL::QualifiedIdentifier.new(klass.table_name, key)=>h.keys}), opts.select, eo[:associations], eo).all do |assoc_record|
+            filter_keys = opts.eager_loading_predicate_key
+            ds = model.eager_loading_dataset(opts, klass.filter(filter_keys=>h.keys), opts.select, eo[:associations], eo)
+            case opts.eager_limit_strategy
+            when :distinct_on
+              ds = ds.distinct(*filter_keys).order_prepend(*filter_keys)
+            when :window_function
+              delete_rn = true
+              rn = ds.row_number_column
+              ds = apply_window_function_eager_limit_strategy(ds, opts)
+            when :correlated_subquery
+              ds = apply_correlated_subquery_eager_limit_strategy(ds, opts) do |xds|
+                xds.where(opts.associated_object_keys.map{|k| [SQL::QualifiedIdentifier.new(xds.first_source_alias, k), SQL::QualifiedIdentifier.new(xds.first_source_table, k)]})
+              end
+            end
+            ds.all do |assoc_record|
+              assoc_record.values.delete(rn) if delete_rn
               hash_key = uses_cks ? cks.map{|k| assoc_record.send(k)} : assoc_record.send(key)
               next unless objects = h[hash_key]
               if one_to_one
@@ -951,6 +1139,10 @@ module Sequel
                   assoc_record.associations[reciprocal] = object if reciprocal
                 end
               end
+            end
+            if opts.eager_limit_strategy == :ruby
+              limit, offset = opts.limit_and_offset
+              rows.each{|o| o.associations[name] = o.associations[name].slice(offset||0, limit) || []}
             end
           end
           
@@ -1456,10 +1648,9 @@ module Sequel
           else
             # Each of the following have a symbol key for the table alias, with the following values: 
             # :reciprocals - the reciprocal instance variable to use for this association
+            # :reflections - AssociationReflection instance related to this association
             # :requirements - array of requirements for this association
-            # :alias_association_type_map - the type of association for this association
-            # :alias_association_name_map - the name of the association for this association
-            clone(:eager_graph=>{:requirements=>{}, :master=>alias_symbol(first_source), :alias_association_type_map=>{}, :alias_association_name_map=>{}, :reciprocals=>{}, :cartesian_product_number=>0})
+            clone(:eager_graph=>{:requirements=>{}, :master=>alias_symbol(first_source), :reflections=>{}, :reciprocals=>{}, :cartesian_product_number=>0})
           end
           ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations)
         end
@@ -1507,8 +1698,7 @@ module Sequel
           ds = ds.order_more(*qualified_expression(r[:order], assoc_table_alias)) if r[:order] and r[:order_eager_graph]
           eager_graph = ds.opts[:eager_graph]
           eager_graph[:requirements][assoc_table_alias] = requirements.dup
-          eager_graph[:alias_association_name_map][assoc_table_alias] = assoc_name
-          eager_graph[:alias_association_type_map][assoc_table_alias] = r.returns_array?
+          eager_graph[:reflections][assoc_table_alias] = r
           eager_graph[:cartesian_product_number] += r[:cartesian_product_number] || 2
           ds = ds.eager_graph_associations(ds, r.associated_class, assoc_table_alias, requirements + [assoc_table_alias], *associations) unless associations.empty?
           ds
@@ -1685,6 +1875,9 @@ module Sequel
       # hashes and returning an array of model objects with all eager_graphed associations already set in the
       # association cache.
       class EagerGraphLoader
+        # Hash with table alias symbol keys and after_load hook values
+        attr_reader :after_load_map
+        
         # Hash with table alias symbol keys and association name values
         attr_reader :alias_map
         
@@ -1695,6 +1888,10 @@ module Sequel
         # Recursive hash with table alias symbol keys mapping to hashes with dependent table alias symbol keys.
         attr_reader :dependency_map
         
+        # Hash with table alias symbol keys and [limit, offset] values
+        attr_reader :limit_map
+        
+        # Hash with table alias symbol keys and callable values used to create model instances
         # The table alias symbol for the primary model
         attr_reader :master
         
@@ -1710,6 +1907,9 @@ module Sequel
         # to model instances.  Used so that only a single model instance is created for each object.
         attr_reader :records_map
         
+        # Hash with table alias symbol keys and AssociationReflection values
+        attr_reader :reflection_map
+        
         # Hash with table alias symbol keys and callable values used to create model instances
         attr_reader :row_procs
         
@@ -1724,11 +1924,21 @@ module Sequel
           eager_graph = opts[:eager_graph]
           @master =  eager_graph[:master]
           requirements = eager_graph[:requirements]
-          alias_map = @alias_map = eager_graph[:alias_association_name_map]
-          type_map = @type_map = eager_graph[:alias_association_type_map]
+          reflection_map = @reflection_map = eager_graph[:reflections]
           reciprocal_map = @reciprocal_map = eager_graph[:reciprocals]
           @unique = eager_graph[:cartesian_product_number] > 1
       
+          alias_map = @alias_map = {}
+          type_map = @type_map = {}
+          after_load_map = @after_load_map = {}
+          limit_map = @limit_map = {}
+          reflection_map.each do |k, v|
+            alias_map[k] = v[:name]
+            type_map[k] = v.returns_array?
+            after_load_map[k] = v[:after_load] unless v[:after_load].empty?
+            limit_map[k] = v.limit_and_offset if v[:limit]
+          end
+
           # Make dependency map hash out of requirements array for each association.
           # This builds a tree of dependencies that will be used for recursion
           # to ensure that all parts of the object graph are loaded into the
@@ -1833,8 +2043,9 @@ module Sequel
           end
       
           # Remove duplicate records from all associations if this graph could possibly be a cartesian product
-          unique(records, dm) if @unique
-          
+          # Run after_load procs if there are any
+          post_process(records, dm) if @unique || !after_load_map.empty? || !limit_map.empty?
+
           records
         end
       
@@ -1866,7 +2077,7 @@ module Sequel
               assoc[assoc_name].push(rec) 
               rec.associations[rcm] = current if rcm
             else
-              current.associations[assoc_name] = rec
+              current.associations[assoc_name] ||= rec
             end
             # Recurse into dependencies of the current object
             _load(deps, rec, h) unless deps.empty?
@@ -1924,16 +2135,25 @@ module Sequel
         # In that case, for each object in all associations loaded via +eager_graph+, run
         # uniq! on the association to make sure no duplicate records show up.
         # Note that this can cause legitimate duplicate records to be removed.
-        def unique(records, dependency_map)
+        def post_process(records, dependency_map)
           records.each do |record|
             dependency_map.each do |ta, deps|
-              list = record.send(alias_map[ta])
-              list = if type_map[ta]
+              assoc_name = alias_map[ta]
+              list = record.send(assoc_name)
+              rec_list = if type_map[ta]
                 list.uniq!
-                unique(list, deps) if !list.empty? && !deps.empty?
+                if lo = limit_map[ta]
+                  limit, offset = lo
+                  list.replace(list[offset||0, limit])
+                end
+                list
               elsif list
-                unique([list], deps) unless deps.empty?
+                [list]
+              else
+                []
               end
+              record.send(:run_association_callbacks, reflection_map[ta], :after_load, list) if after_load_map[ta]
+              post_process(rec_list, deps) if !rec_list.empty? && !deps.empty?
             end
           end
         end

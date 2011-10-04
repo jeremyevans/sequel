@@ -88,13 +88,6 @@ module Sequel
         def supports_window_functions?
           true
         end
-          
-        private
-        
-        # The alias to use for the row_number column when emulating LIMIT and OFFSET
-        def row_number_column
-          :x_sequel_row_number_x
-        end
       end
     end
   end

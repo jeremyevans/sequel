@@ -124,9 +124,13 @@ module Sequel
           [v, 'double precision']
         when Numeric
           [v, 'numeric']
-        when SQLTime
-          [literal(v), 'time']
-        when DateTime, Time
+        when Time
+          if v.is_a?(SQLTime)
+            [literal(v), 'time']
+          else
+            [literal(v), 'datetime']
+          end
+        when DateTime
           [literal(v), 'datetime']
         when Date
           [literal(v), 'date']

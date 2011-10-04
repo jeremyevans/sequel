@@ -358,6 +358,11 @@ module Sequel
         @supports_prepared_transactions = self['SHOW max_prepared_transactions'].get.to_i > 0
       end
 
+      # PostgreSQL supports CREATE TABLE IF NOT EXISTS on 9.1+
+      def supports_create_table_if_not_exists?
+        server_version >= 90100
+      end
+
       # PostgreSQL supports savepoints
       def supports_savepoints?
         true
@@ -625,11 +630,14 @@ module Sequel
       BOOL_TRUE = 'true'.freeze
       COMMA_SEPARATOR = ', '.freeze
       DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'from using where')
+      DELETE_CLAUSE_METHODS_91 = Dataset.clause_methods(:delete, %w'with from using where returning')
       EXCLUSIVE = 'EXCLUSIVE'.freeze
       EXPLAIN = 'EXPLAIN '.freeze
       EXPLAIN_ANALYZE = 'EXPLAIN ANALYZE '.freeze
       FOR_SHARE = ' FOR SHARE'.freeze
-      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'into columns values returning_select')
+      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'into columns values')
+      INSERT_CLAUSE_METHODS_82 = Dataset.clause_methods(:insert, %w'into columns values returning')
+      INSERT_CLAUSE_METHODS_91 = Dataset.clause_methods(:insert, %w'with into columns values returning')
       LOCK = 'LOCK TABLE %s IN %s MODE'.freeze
       NULL = LiteralString.new('NULL').freeze
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
@@ -643,17 +651,23 @@ module Sequel
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
       SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'table set from where')
+      UPDATE_CLAUSE_METHODS_91 = Dataset.clause_methods(:update, %w'with table set from where returning')
       
       # Shared methods for prepared statements when used with PostgreSQL databases.
       module PreparedStatementMethods
         # Override insert action to use RETURNING if the server supports it.
+        def run(&block)
+          if @prepared_type == :insert && supports_insert_select?
+            fetch_rows(prepared_sql){|r| return r.values.first}
+          else
+            super
+          end
+        end
+
         def prepared_sql
           return @prepared_sql if @prepared_sql
+          @opts[:returning] = insert_pk if @prepared_type == :insert && supports_insert_select?
           super
-          if @prepared_type == :insert and !@opts[:disable_insert_returning] and server_version >= 80200
-            @prepared_sql = insert_returning_pk_sql(*@prepared_modify_values)
-            meta_def(:insert_returning_pk_sql){|*args| prepared_sql}
-          end
           @prepared_sql
         end
       end
@@ -707,25 +721,20 @@ module Sequel
       end
       
       # Insert given values into the database.
-      def insert(*values)
-        if @opts[:sql]
-          execute_insert(insert_sql(*values))
-        elsif @opts[:disable_insert_returning] || server_version < 80200
-          execute_insert(insert_sql(*values), :table=>opts[:from].first, :values=>values.size == 1 ? values.first : values)
+      def insert(*values, &block)
+        if @opts[:sql] || @opts[:returning]
+          super
+        elsif supports_insert_select?
+          returning(insert_pk).insert(*values){|r| return r.values.first}
         else
-          clone(default_server_opts(:sql=>insert_returning_pk_sql(*values))).single_value
+          execute_insert(insert_sql(*values), :table=>opts[:from].first, :values=>values.size == 1 ? values.first : values)
         end
-      end
-
-      # Use the RETURNING clause to return the columns listed in returning.
-      def insert_returning_sql(returning, *values)
-        "#{insert_sql(*values)} RETURNING #{column_list(Array(returning))}"
       end
 
       # Insert a record returning the record inserted
       def insert_select(*values)
         return unless supports_insert_select?
-        naked.clone(default_server_opts(:sql=>insert_returning_sql(nil, *values))).single_record
+        returning.insert(*values){|r| return r}
       end
 
       # Locks all tables in the dataset's FROM clause (but not in JOINs) with
@@ -750,9 +759,10 @@ module Sequel
         [insert_sql(columns, LiteralString.new('VALUES ' + values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)))]
       end
       
-      # PostgreSQL supports using the WITH clause in subqueries.
+      # PostgreSQL supports using the WITH clause in subqueries if it
+      # supports using WITH at all (i.e. on PostgreSQL 8.4+).
       def supports_cte_in_subqueries?
-        true
+        supports_cte?
       end
 
       # DISTINCT ON is a PostgreSQL extension
@@ -760,14 +770,17 @@ module Sequel
         true
       end
       
-      # PostgreSQL support insert_select using the RETURNING clause.
-      def supports_insert_select?
-        server_version >= 80200 && !opts[:disable_insert_returning]
-      end
-
       # PostgreSQL supports modifying joined datasets
       def supports_modifying_joins?
         true
+      end
+
+      def supports_returning?(type)
+        if type == :insert
+          server_version >= 80200 && !opts[:disable_insert_returning]
+        else
+          server_version >= 90100
+        end
       end
 
       # PostgreSQL supports timezones in literal timestamps
@@ -789,7 +802,7 @@ module Sequel
       
       # PostgreSQL allows deleting from joined datasets
       def delete_clause_methods
-        DELETE_CLAUSE_METHODS
+        server_version >= 90100 ? DELETE_CLAUSE_METHODS_91 : DELETE_CLAUSE_METHODS
       end 
 
       # Only include the primary table in the main delete clause
@@ -804,23 +817,21 @@ module Sequel
 
       # PostgreSQL allows a RETURNING clause.
       def insert_clause_methods
-        INSERT_CLAUSE_METHODS
-      end
-
-      # Use the RETURNING clause to return the primary key of the inserted record, if it exists
-      def insert_returning_pk_sql(*values)
-        pk = db.primary_key(opts[:from].first) if opts[:from] && !opts[:from].empty?
-        insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : NULL, *values)
-      end
-
-      # Add a RETURNING clause if it is set and the database supports it and
-      # this dataset hasn't disabled it.
-      def insert_returning_select_sql(sql)
-        if supports_insert_select? && opts.has_key?(:returning)
-          sql << " RETURNING #{column_list(Array(opts[:returning]))}"
+        if server_version >= 90100
+          INSERT_CLAUSE_METHODS_91
+        elsif server_version >= 80200
+          INSERT_CLAUSE_METHODS_82
+        else
+          INSERT_CLAUSE_METHODS
         end
       end
-      
+
+      # Return the primary key to use for RETURNING in an INSERT statement
+      def insert_pk
+        pk = db.primary_key(opts[:from].first) if opts[:from] && !opts[:from].empty?
+        pk ? Sequel::SQL::Identifier.new(pk) : NULL
+      end
+
       # For multiple table support, PostgreSQL requires at least
       # two from tables, with joins allowed.
       def join_from_sql(type, sql)
@@ -887,7 +898,7 @@ module Sequel
 
       # PostgreSQL splits the main table from the joined tables
       def update_clause_methods
-        UPDATE_CLAUSE_METHODS
+        server_version >= 90100 ? UPDATE_CLAUSE_METHODS_91 : UPDATE_CLAUSE_METHODS
       end
 
       # Use FROM to specify additional tables in an update query

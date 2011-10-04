@@ -1,4 +1,68 @@
-=== HEAD
+=== 3.28.0 (2011-10-03)
+
+* Add firebird jdbc subadapter (jeremyevans)
+
+* Add SQLTime.create method for easier creation of SQLTime instances (jeremyevans)
+
+* Make Dataset#with_pk use a qualified primary key, so it works correctly on joined datasets (jeremyevans)
+
+* Support the :limit association option when using eager_graph (jeremyevans)
+
+* Fix eager loading via eager_graph of one_to_one associations that match multiple associated objects and use order to pick the first one (jeremyevans)
+
+* Make after_load association hooks apply when using eager_graph (jeremyevans)
+
+* Make Dataset#with_sql treat a symbol as a first argument as a method name to call to get the SQL (jeremyevans)
+
+* Make Dataset #delete, #insert, #update return array of plain hashes if block not given and Dataset#returning is used (jeremyevans)
+
+* Allow Dataset #map, #to_hash, #select_map, #select_order_map, and #select_hash to take arrays of columns instead of single columns (jeremyevans)
+
+* Make Dataset #delete, #insert, #update yield plain hashes to a block if Dataset#returning is used (jeremyevans)
+
+* Add Dataset#returning for setting the columns to return in INSERT/UPDATE/DELETE statements, used by PostgreSQL 9.1 (jeremyevans)
+
+* Support WITH clause in INSERT/UPDATE/DELETE on PostgreSQL 9.1+ (jeremyevans)
+
+* Add Database#copy_table for PostgreSQL COPY support when using the postgres adapter with pg (jeremyevans)
+
+* Support CREATE TABLE IF NOT EXISTS on PostgreSQL 9.1+ (jeremyevans)
+
+* Add support for Sequel::Model.default_eager_limit_strategy to set the default :eager_limit_strategy for *_many associations (jeremyevans)
+
+* Add support for an :eager_limit_strategy => :correlated_subquery value for limiting using correlated subqueries (jeremyevans)
+
+* Allow use of a dataset that uses the emulated offset support on MSSQL and DB2 in an IN subquery by using a nested subquery (jeremyevans)
+
+* Allow use of a dataset that uses LIMIT in an IN subquery on MySQL by using a nested subquery (jeremyevans)
+
+* Work around serious ActiveSupport bug in Time.=== that breaks literalization of Time values (jeremyevans)
+
+* Speed up SQL operator methods by using module_eval instead of define_method (jeremyevans)
+
+* Support sql_(boolean,number,string) methods on ComplexExpressions, allowing you do to (x + 1).sql_string + 'a' for (x + 1) || 'a' (jeremyevans)
+
+* Don't disallow SQL expression creation based on types, leave that to the database server (jeremyevans)
+
+* Make :column [&|] 1 use an SQL bitwise [&|] expression instead of a logical (AND|OR) expression (jeremyevans)
+
+* Make :column + 'a' use an SQL string concatenation expression instead of an addition expression (jeremyevans)
+
+* Fix :time typecasting from Time to SQLTime for fractional seconds on ruby 1.9 (jeremyevans)
+
+* Have Dataset#select_append check supports_select_all_and_column? and select all from all FROM and JOIN tables if no columns selected (jeremyevans)
+
+* Add Dataset#supports_select_all_and_column? for checking if you can do SELECT *, column (jeremyevans)
+
+* Add support for an :eager_limit_strategy => :window_function value for limiting using window functions (jeremyevans)
+
+* Add support for an :eager_limit_strategy => :distinct_on value for one_to_one associations for using DISTINCT ON (jeremyevans)
+
+* Add support for an :eager_limit_strategy association option, for manual control over how limiting is done (jeremyevans)
+
+* Add Dataset#supports_ordered_distinct_on? for checking if the dataset can use distinct on while respecting order (jeremyevans)
+
+* Add support for the association :limit option when eager loading via .eager for *_many associations (jeremyevans)
 
 * Add db2 jdbc subadapter (jeremyevans)
 

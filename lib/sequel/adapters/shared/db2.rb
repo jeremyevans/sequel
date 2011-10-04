@@ -1,3 +1,5 @@
+Sequel.require 'adapters/utils/emulate_offset_with_row_number'
+
 module Sequel
   module DB2
     @use_clob_as_blob = true
@@ -171,6 +173,8 @@ module Sequel
     end
 
     module DatasetMethods
+      include EmulateOffsetWithRowNumber
+
       BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
@@ -208,23 +212,6 @@ module Sequel
         @opts[:offset] ? super(sql){|r| r.delete(row_number_column); yield r} : super(sql, &block)
       end
 
-      # Emulate OFFSET support with ROW_NUMBER
-      def select_sql
-        return super unless o = @opts[:offset]
-        raise(Error, 'DB2 requires an order be provided if using an offset') unless order = @opts[:order]
-        dsa1 = dataset_alias(1)
-        rn = row_number_column
-        ds = unlimited.unordered
-        # DB2 doesn't seem to like *, ROW_NUMBER in select, but selecting from all FROM
-        # tables seems to work.
-        ds = ds.select_all(*(Array(@opts[:from]) + Array(@opts[:join]))) if @opts[:select] == nil || @opts[:select].empty?
-        subselect_sql(ds.
-          select_append{ROW_NUMBER(:over, :order=>order){}.as(rn)}.
-          from_self(:alias=>dsa1).
-          limit(@opts[:limit]).
-          where(SQL::Identifier.new(rn) > o))
-      end
-
       # DB2 does not support IS TRUE.
       def supports_is_true?
         false
@@ -232,6 +219,11 @@ module Sequel
 
       # DB2 does not support multiple columns in IN.
       def supports_multiple_column_in?
+        false
+      end
+
+      # DB2 only allows * in SELECT if it is the only thing being selected.
+      def supports_select_all_and_column?
         false
       end
 
@@ -265,11 +257,6 @@ module Sequel
       # Use 1 for true on DB2
       def literal_true
         BOOL_TRUE
-      end
-
-      # Holds the ROW_NUMBER value, used in offset emulation.
-      def row_number_column
-        :x_sequel_row_number_x
       end
 
       # Add a fallback table for empty from situation
