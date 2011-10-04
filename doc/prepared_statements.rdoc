@@ -91,9 +91,9 @@ in the SQL).  Prepared statements are always server side.
 SQLite supports both prepared statements and bound variables.  Prepared
 statements are cached per connection.
 
-=== MySQL
+=== MySQL/Mysql2
 
-The MySQL ruby driver does not support bound variables, so the bound
+The MySQL/Mysql2 ruby drivers do not support bound variables, so the bound
 variable methods fall back to string interpolation.  It uses server side
 prepared statements.
 
@@ -104,6 +104,16 @@ are server side or client side depends on the JDBC driver.  For PostgreSQL
 over JDBC, you can add the prepareThreshold=N parameter to the connection
 string, which will use a server side prepared statement after N calls to
 the prepared statement.
+
+=== TinyTDS
+
+Uses the sp_executesql stored procedure with bound variables, since
+Microsoft SQL Server doesn't support true prepared statements.
+
+=== IBM_DB
+
+DB2 supports both prepared statements and bound variables.  Prepared
+statement objects are cached per connection.
 
 === All Others
 
