@@ -1,4 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
+require 'yaml'
 
 describe "serialization_modification_detection plugin" do
   before do
