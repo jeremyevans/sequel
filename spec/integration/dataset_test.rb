@@ -301,15 +301,15 @@ end
 
 describe "Simple Dataset operations in transactions" do
   before do
-    INTEGRATION_DB.create_table!(:items_insert_in_transaction) do
+    INTEGRATION_DB.create_table!(:items) do
       primary_key :id
       integer :number
     end
-    @ds = INTEGRATION_DB[:items_insert_in_transaction]
+    @ds = INTEGRATION_DB[:items]
     clear_sqls
   end
   after do
-    INTEGRATION_DB.drop_table(:items_insert_in_transaction)
+    INTEGRATION_DB.drop_table(:items)
   end
 
   cspecify "should insert correctly with a primary key specified inside a transaction", :db2, :mssql do
