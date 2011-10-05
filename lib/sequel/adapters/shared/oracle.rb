@@ -242,6 +242,11 @@ module Sequel
         sprintf("%+03i:%02i", hour, minute)
       end
 
+      # Oracle doesn't support empty values when inserting.
+      def insert_supports_empty_values?
+        false
+      end
+
       # Oracle uses 'N' for false values.
       def literal_false
         "'N'"

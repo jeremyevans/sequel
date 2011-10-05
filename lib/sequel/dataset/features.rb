@@ -126,6 +126,12 @@ module Sequel
 
     private
 
+    # Whether insert(nil) or insert({}) must be emulated by
+    # using at least one value, false by default.
+    def insert_supports_empty_values?
+      true
+    end
+
     # Whether the RETURNING clause is used for the given dataset.
     # +type+ can be :insert, :update, or :delete.
     def uses_returning?(type)

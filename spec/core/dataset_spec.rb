@@ -232,6 +232,12 @@ describe "A simple dataset" do
     @dataset.insert_sql.should == 'INSERT INTO test DEFAULT VALUES'
   end
   
+  specify "should use a single column with a default value when the dataset doesn't support using insert statement with default values" do
+    @dataset.meta_def(:insert_supports_empty_values?){false}
+    @dataset.meta_def(:columns){[:a, :b]}
+    @dataset.insert_sql.should == 'INSERT INTO test (b) VALUES (DEFAULT)'
+  end
+  
   specify "should format an insert statement with hash" do
     @dataset.insert_sql(:name => 'wxyz', :price => 342).
       should match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)

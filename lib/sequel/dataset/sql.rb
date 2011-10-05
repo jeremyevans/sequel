@@ -62,6 +62,10 @@ module Sequel
       end
 
       columns = columns.map{|k| literal(String === k ? k.to_sym : k)}
+      if values.is_a?(Array) && values.empty? && !insert_supports_empty_values? 
+        columns = [literal(columns().last)]
+        values = ['DEFAULT'.lit]
+      end
       clone(:columns=>columns, :values=>values)._insert_sql
     end
     
