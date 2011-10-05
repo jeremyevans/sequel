@@ -112,6 +112,14 @@ module Sequel
         "DROP SEQUENCE #{quote_identifier(name)}"
       end
 
+      # Oracle doesn't have a time type, so use timestamp for all
+      # time columns.
+      def type_literal_generic_time(column)
+        :timestamp
+      end
+
+      # Oracle doesn't have a boolean type or even a reasonable
+      # facsimile.  Using a char(1) seems to be the recommended way.
       def type_literal_generic_trueclass(column)
         :'char(1)'
       end
@@ -149,6 +157,17 @@ module Sequel
         when :ILIKE, :'NOT ILIKE'
           a, b = args
           "(UPPER(#{literal(a)}) #{op == :ILIKE ? :LIKE : :'NOT LIKE'} UPPER(#{literal(b)}))"
+        else
+          super
+        end
+      end
+
+      # Oracle doesn't support CURRENT_TIME, as it doesn't have
+      # a type for storing just time values without a date, so
+      # use CURRENT_TIMESTAMP in its place.
+      def constant_sql(c)
+        if c == :CURRENT_TIME
+          super(:CURRENT_TIMESTAMP)
         else
           super
         end
