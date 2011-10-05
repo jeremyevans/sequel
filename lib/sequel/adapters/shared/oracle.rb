@@ -120,6 +120,9 @@ module Sequel
         when :>>
           a, b = args
           "(#{literal(a)} / power(2, #{literal b}))"
+        when :ILIKE, :'NOT ILIKE'
+          a, b = args
+          "(UPPER(#{literal(a)}) #{op == :ILIKE ? :LIKE : :'NOT LIKE'} UPPER(#{literal(b)}))"
         else
           super
         end
