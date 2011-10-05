@@ -13,10 +13,16 @@ module Sequel
       # ORA-03114: not connected to ORACLE
       CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ]      
       
+      ORACLE_TYPES = {}
+
+      # Hash of conversion procs for this database.
+      attr_reader :conversion_procs
+
       def initialize(opts={})
         super
         @autosequence = opts[:autosequence]
         @primary_key_sequences = {}
+        @conversion_procs = ORACLE_TYPES.dup
       end
 
       def connect(server)
@@ -175,12 +181,15 @@ module Sequel
           begin
             offset = @opts[:offset]
             rn = row_number_column
+            cps = db.conversion_procs
             cols = columns = cursor.get_col_names.map{|c| output_identifier(c)}
+            metadata = cursor.column_metadata
+            cm = cols.zip(metadata).map{|c, m| [c, cps[m.data_type]]}
             columns = cols.reject{|x| x == rn} if offset
             @columns = columns
             while r = cursor.fetch
               row = {}
-              r.zip(cols).each{|v, c| row[c] = v}
+              r.zip(cm).each{|v, (c, cp)| row[c] = ((v && cp) ? cp.call(v) : v)}
               row.delete(rn) if offset
               yield row
             end
