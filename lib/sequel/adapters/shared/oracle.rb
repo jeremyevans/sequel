@@ -156,7 +156,7 @@ module Sequel
       end
 
       def empty?
-        db[:dual].where(exists).get(1) == nil
+        db[:dual].where(unordered.exists).get(1) == nil
       end
 
       # If this dataset is associated with a sequence, return the most recently
