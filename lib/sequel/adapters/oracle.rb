@@ -13,6 +13,12 @@ module Sequel
       # ORA-03114: not connected to ORACLE
       CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ]      
       
+      def initialize(opts={})
+        super
+        @autosequence = opts[:autosequence]
+        @primary_key_sequences = {}
+      end
+
       def connect(server)
         opts = server_opts(server)
         if opts[:database]
@@ -90,7 +96,34 @@ module Sequel
           end
         end
       end
-      alias_method :do, :execute
+      alias do execute
+
+      def execute_insert(sql, opts={})
+        synchronize(opts[:server]) do |conn|
+          begin
+            log_yield(sql){conn.exec(sql)}
+            unless sequence = opts[:sequence]
+              if t = opts[:table]
+                sequence = sequence_for_table(t)
+              end
+            end
+            if sequence
+              sql = "SELECT #{literal(sequence)}.currval FROM dual"
+              begin
+                cursor = log_yield(sql){conn.exec(sql)}
+                row = cursor.fetch
+                row.each{|v| return (v.to_i if v)}
+              rescue OCIError
+                nil
+              ensure
+                cursor.close if cursor
+              end
+            end
+          rescue OCIException => e
+            raise_error(e)
+          end
+        end
+      end
 
       private
       
@@ -120,6 +153,17 @@ module Sequel
       
       def rollback_transaction(conn, opts={})
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
+      end
+
+      def sequence_for_table(table)
+        return nil unless autosequence
+        @primary_key_sequences.fetch(table) do |key|
+          pk = schema(table).select{|k, v| v[:primary_key]}
+          seq = if pk.length == 1
+            :"seq_#{table}_#{pk.first.first}"
+          end
+          @primary_key_sequences[table] = seq
+        end
       end
     end
     

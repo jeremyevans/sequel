@@ -4,6 +4,8 @@ module Sequel
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
       AUTOINCREMENT = ''.freeze
 
+      attr_accessor :autosequence
+
       def create_sequence(name, opts={})
         self << create_sequence_sql(name, opts)
       end
@@ -114,12 +116,11 @@ module Sequel
 
       # If this dataset is associated with a sequence, return the most recently
       # inserted sequence value.
-      def insert(*args)
-        r = super
-        if s = opts[:sequence]
-          with_sql("SELECT #{literal(s)}.currval FROM dual").single_value.to_i
+      def insert(*values)
+        if opts[:sql]
+          super
         else
-          r
+          execute_insert(insert_sql(*values), :table=>opts[:from].first, :sequence=>opts[:sequence])
         end
       end
 
