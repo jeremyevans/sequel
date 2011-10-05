@@ -173,10 +173,15 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |cursor|
           begin
-            @columns = cursor.get_col_names.map{|c| output_identifier(c)}
+            offset = @opts[:offset]
+            rn = row_number_column
+            cols = columns = cursor.get_col_names.map{|c| output_identifier(c)}
+            columns = cols.reject{|x| x == rn} if offset
+            @columns = columns
             while r = cursor.fetch
               row = {}
-              r.each_with_index {|v, i| row[@columns[i]] = v unless @columns[i] == :raw_rnum_}
+              r.zip(cols).each{|v, c| row[c] = v}
+              row.delete(rn) if offset
               yield row
             end
           ensure

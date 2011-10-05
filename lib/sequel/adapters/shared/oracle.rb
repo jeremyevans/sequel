@@ -1,3 +1,5 @@
+Sequel.require 'adapters/utils/emulate_offset_with_row_number'
+
 module Sequel
   module Oracle
     module DatabaseMethods
@@ -121,8 +123,12 @@ module Sequel
     end
 
     module DatasetMethods
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with distinct columns from join where group having compounds order limit lock')
+      include EmulateOffsetWithRowNumber
 
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with distinct columns from join where group having compounds order lock')
+      ROW_NUMBER_EXPRESSION = 'ROWNUM'.lit.freeze
+
+      # Oracle needs to emulate bitwise operators and ILIKE/NOT ILIKE operators.
       def complex_expression_sql(op, args)
         case op
         when :&
@@ -186,7 +192,13 @@ module Sequel
         false
       end
 
+      # Oracle does not support IS TRUE.
       def supports_is_true?
+        false
+      end
+      
+      # Oracle does not support SELECT *, column
+      def supports_select_all_and_column?
         false
       end
       
@@ -195,6 +207,7 @@ module Sequel
         true
       end
       
+      # Oracle does not support WHERE 'Y' for WHERE TRUE.
       def supports_where_true?
         false
       end
@@ -217,11 +230,19 @@ module Sequel
         "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'".freeze
       end
 
+      # Oracle shouldn't have the order removed when emulating offsets,
+      # since it uses ROWNUM instead of the ROW_NUMBER window function
+      # in the emulation.
+      def emulate_offset_remove_order
+        false
+      end
+
       # Use a colon for the timestamp offset, since Oracle appears to require it.
       def format_timestamp_offset(hour, minute)
         sprintf("%+03i:%02i", hour, minute)
       end
 
+      # Oracle uses 'N' for false values.
       def literal_false
         "'N'"
       end
@@ -231,12 +252,20 @@ module Sequel
         "'#{v.gsub("'", "''")}'"
       end
 
+      # Oracle uses 'Y' for true values.
       def literal_true
         "'Y'"
       end
 
+      # Use the Oracle-specific SQL clauses (no limit, since it is emulated).
       def select_clause_methods
         SELECT_CLAUSE_METHODS
+      end
+
+      # Oracle always uses ROWNUM for the row number expression, instead of a window
+      # function, since ROWNUM should be faster.
+      def row_number_expression(order)
+        ROW_NUMBER_EXPRESSION
       end
 
       # Modify the SQL to add the list of tables to select FROM
@@ -247,14 +276,12 @@ module Sequel
         sql << " FROM #{source_list(@opts[:from] || ['DUAL'])}"
       end
 
-      # Oracle requires a subselect to do limit and offset
-      def select_limit_sql(sql)
+      # Handle LIMIT by using a unlimited subselect filtered with ROWNUM.
+      def select_sql
         if limit = @opts[:limit]
-          if (offset = @opts[:offset]) && (offset > 0)
-            sql.replace("SELECT * FROM (SELECT raw_sql_.*, ROWNUM raw_rnum_ FROM(#{sql}) raw_sql_ WHERE ROWNUM <= #{limit + offset}) WHERE raw_rnum_ > #{offset}")
-          else
-            sql.replace("SELECT * FROM (#{sql}) WHERE ROWNUM <= #{limit}")
-          end
+          subselect_sql(clone(:limit=>nil).from_self.where(SQL::ComplexExpression.new(:<=, ROW_NUMBER_EXPRESSION, limit)))
+        else
+          super
         end
       end
     end

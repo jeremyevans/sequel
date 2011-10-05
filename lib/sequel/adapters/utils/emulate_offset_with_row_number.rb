@@ -37,19 +37,35 @@ module Sequel
     # the clone to add a ROW_NUMBER window function (and some other things),
     # then using the modified clone in a subselect which is selected from.
     #
-    # If offset is used, an order must be provided, because the use of ROW_NUMBER
+    # If offset is used, an order must be provided on some databases, because the use of ROW_NUMBER
     # requires an order.
     def select_sql
       return super unless o = @opts[:offset]
-      raise(Error, "#{db.database_type} requires an order be provided if using an offset") unless order = @opts[:order]
+      rne = row_number_expression(@opts[:order])
       dsa1 = dataset_alias(1)
       rn = row_number_column
-      subselect_sql(unlimited.
-        unordered.
-        select_append{ROW_NUMBER(:over, :order=>order){}.as(rn)}.
+      ds = emulate_offset_remove_order ? unordered : self
+      subselect_sql(ds.unlimited.
+        select_append{rne.as(rn)}.
         from_self(:alias=>dsa1).
         limit(@opts[:limit]).
         where(SQL::Identifier.new(rn) > o))
+    end
+
+    private
+
+    # Whether the emulated offset support should remove the ORDER clause in
+    # the subselect.  True by default as the window function handles the
+    # ordering.
+    def emulate_offset_remove_order
+      true
+    end
+
+    # Use the ROW_NUMBER window function with the given order as the row
+    # number expression.
+    def row_number_expression(order)
+      raise(Error, "#{db.database_type} requires an order be provided if using an offset") unless order
+      SQL::WindowFunction.new(SQL::Function.new(:ROW_NUMBER), SQL::Window.new(:order=>order))
     end
   end
 end
