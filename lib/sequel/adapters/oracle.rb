@@ -44,15 +44,23 @@ module Sequel
       end
 
       def schema_parse_table(table, opts={})
-        ds = dataset
-        ds.identifier_output_method = :downcase
+        schema, table = schema_and_table(table)
+        schema ||= opts[:schema]
         schema_and_table = "#{"#{quote_identifier(opts[:schema])}." if opts[:schema]}#{quote_identifier(table)}"
         table_schema = []
-        metadata = transaction(opts){|conn| conn.describe_table(schema_and_table)}
+        m = output_identifier_meth
+        im = input_identifier_meth
+        ds = metadata_dataset.from(:all_constraints___cons, :all_cons_columns___cols).
+          where(:cols__table_name=>im.call(table), :cons__constraint_type=>'P',
+                :cons__constraint_name=>:cols__constraint_name, :cons__owner=>:cols__owner)
+        ds = ds.where(:cons__owner=>im.call(opts[:schema])) if opts[:schema]
+        pks = ds.select_map(:cols__column_name)
+        metadata = transaction(opts){|conn| log_yield("Connection.describe_table"){conn.describe_table(schema_and_table)}}
         metadata.columns.each do |column|
           table_schema << [
-            column.name.downcase.to_sym,
+            m.call(column.name),
             {
+              :primary_key => pks.include?(column.name),
               :type => column.data_type,
               :db_type => column.type_string.split(' ')[0],
               :type_string => column.type_string,
