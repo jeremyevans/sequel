@@ -103,6 +103,28 @@ module Sequel
     module DatasetMethods
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with distinct columns from join where group having compounds order limit lock')
 
+      def complex_expression_sql(op, args)
+        case op
+        when :&
+          "CAST(BITAND#{literal(args)} AS INTEGER)"
+        when :|
+          a, b = args
+          "(#{literal(a)} - #{complex_expression_sql(:&, args)} + #{literal(b)})"
+        when :^
+          "(#{complex_expression_sql(:|, args)} - #{complex_expression_sql(:&, args)})"
+        when :'B~'
+          "((0 - #{literal(args.at(0))}) - 1)"
+        when :<<
+          a, b = args
+          "(#{literal(a)} * power(2, #{literal b}))"
+        when :>>
+          a, b = args
+          "(#{literal(a)} / power(2, #{literal b}))"
+        else
+          super
+        end
+      end
+
       # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
       def except(dataset, opts={})
         opts = {:all=>opts} unless opts.is_a?(Hash)
