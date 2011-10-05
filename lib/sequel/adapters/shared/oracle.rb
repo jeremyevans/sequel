@@ -43,9 +43,20 @@ module Sequel
         AUTOINCREMENT
       end
 
-      # SQL fragment for showing a table is temporary
-      def temporary_table_sql
-        TEMPORARY
+      def column_definition_order
+        super + [:check]
+      end
+
+      def column_definition_sql(column)
+        if (column[:type] == FalseClass || column[:type] == TrueClass)
+          super({:check=>{column[:name]=>%w[Y N]}}.merge(column))
+        else
+          super
+        end
+      end
+
+      def column_definition_check_sql(sql, column)
+        sql << " CHECK #{literal(column[:check])}" if column[:check]
       end
 
       def create_sequence_sql(name, opts={})
@@ -97,6 +108,15 @@ module Sequel
 
       def drop_sequence_sql(name)
         "DROP SEQUENCE #{quote_identifier(name)}"
+      end
+
+      def type_literal_generic_trueclass(column)
+        :'char(1)'
+      end
+
+      # SQL fragment for showing a table is temporary
+      def temporary_table_sql
+        TEMPORARY
       end
     end
 
@@ -165,12 +185,20 @@ module Sequel
       def supports_intersect_except_all?
         false
       end
+
+      def supports_is_true?
+        false
+      end
       
       # Oracle supports timezones in literal timestamps.
       def supports_timestamp_timezones?
         true
       end
       
+      def supports_where_true?
+        false
+      end
+
       # Oracle supports window functions
       def supports_window_functions?
         true
@@ -194,9 +222,17 @@ module Sequel
         sprintf("%+03i:%02i", hour, minute)
       end
 
+      def literal_false
+        "'N'"
+      end
+
       # Oracle uses the SQL standard of only doubling ' inside strings.
       def literal_string(v)
         "'#{v.gsub("'", "''")}'"
+      end
+
+      def literal_true
+        "'Y'"
       end
 
       def select_clause_methods
