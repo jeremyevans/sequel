@@ -76,6 +76,12 @@ module Sequel
         module PreparedStatementMethods
           include Sequel::Dataset::UnnumberedArgumentMapper
           
+          # Raise a more obvious error if you attempt to call a unnamed prepared statement.
+          def call(*)
+            raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
+            super
+          end
+          
           private
           
           # Execute the prepared statement with the bind arguments instead of

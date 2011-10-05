@@ -496,6 +496,12 @@ module Sequel
         # pg driver.
         module PreparedStatementMethods
           include BindArgumentMethods
+
+          # Raise a more obvious error if you attempt to call a unnamed prepared statement.
+          def call(*)
+            raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
+            super
+          end
           
           private
           
