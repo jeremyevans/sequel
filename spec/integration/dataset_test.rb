@@ -1102,15 +1102,15 @@ describe "Dataset string methods" do
   end
   
   it "#grep should work with :all_patterns and :all_columns options" do
-    @ds.insert('foo bar', '')
+    @ds.insert('foo bar', ' ')
     @ds.insert('foo d', 'bar')
-    @ds.insert('foo e', '')
-    @ds.insert('', 'bar')
+    @ds.insert('foo e', ' ')
+    @ds.insert(' ', 'bar')
     @ds.insert('foo f', 'baz')
     @ds.insert('foo baz', 'bar baz')
     @ds.insert('foo boo', 'boo foo')
 
-    @ds.grep([:a, :b], %w'%foo% %bar%', :all_patterns=>true).all.should == [{:a=>'foo bar', :b=>''}, {:a=>'foo baz', :b=>'bar baz'}, {:a=>'foo d', :b=>'bar'}]
+    @ds.grep([:a, :b], %w'%foo% %bar%', :all_patterns=>true).all.should == [{:a=>'foo bar', :b=>' '}, {:a=>'foo baz', :b=>'bar baz'}, {:a=>'foo d', :b=>'bar'}]
     @ds.grep([:a, :b], %w'%foo% %bar% %blob%', :all_patterns=>true).all.should == []
 
     @ds.grep([:a, :b], %w'%bar% %foo%', :all_columns=>true).all.should == [{:a=>"foo baz", :b=>"bar baz"}, {:a=>"foo boo", :b=>"boo foo"}, {:a=>"foo d", :b=>"bar"}]
