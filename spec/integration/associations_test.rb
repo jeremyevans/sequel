@@ -480,7 +480,7 @@ describe "Sequel::Model Simple Associations" do
       @els = {:eager_limit_strategy=>:correlated_subquery}
     end
     it_should_behave_like "eager limit strategies"
-  end unless [:mysql, :db2].include?(INTEGRATION_DB.database_type)
+  end unless [:mysql, :db2, :oracle].include?(INTEGRATION_DB.database_type)
 
   specify "should handle aliased tables when eager_graphing" do
     @album.update(:artist => @artist)
@@ -671,7 +671,7 @@ describe "Sequel::Model Composite Key Associations" do
       @els = {:eager_limit_strategy=>:correlated_subquery}
     end
     it_should_behave_like "eager limit strategies"
-  end if INTEGRATION_DB.dataset.supports_multiple_column_in? && ![:mysql, :db2].include?(INTEGRATION_DB.database_type)
+  end if INTEGRATION_DB.dataset.supports_multiple_column_in? && ![:mysql, :db2, :oracle].include?(INTEGRATION_DB.database_type)
 
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums
