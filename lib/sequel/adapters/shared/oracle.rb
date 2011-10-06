@@ -348,7 +348,10 @@ module Sequel
       # Handle LIMIT by using a unlimited subselect filtered with ROWNUM.
       def select_sql
         if limit = @opts[:limit]
-          subselect_sql(clone(:limit=>nil).from_self.where(SQL::ComplexExpression.new(:<=, ROW_NUMBER_EXPRESSION, limit)))
+          # Lock doesn't work in subselects, so don't use a subselect when locking.
+          ds = clone(:limit=>nil)
+          ds = ds.from_self unless @opts[:lock]
+          subselect_sql(ds.where(SQL::ComplexExpression.new(:<=, ROW_NUMBER_EXPRESSION, limit)))
         else
           super
         end
