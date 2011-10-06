@@ -60,7 +60,7 @@ describe "Supported types" do
     ds.all.should == [{:name=>'Test User'}]
   end
   
-  cspecify "should support generic date type", [:do, :sqlite], [:jdbc, :sqlite], :mssql do
+  cspecify "should support generic date type", [:do, :sqlite], [:jdbc, :sqlite], :mssql, :oracle do
     ds = create_items_table_with_column(:dat, Date)
     d = Date.today
     ds.insert(:dat => d)
@@ -68,7 +68,7 @@ describe "Supported types" do
     ds.first[:dat].to_s.should == d.to_s
   end
   
-  cspecify "should support generic time type", [:do], [:swift], [:odbc], [:jdbc, :mssql], [:jdbc, :postgres], [:mysql2], [:tinytds] do
+  cspecify "should support generic time type", [:do], [:swift], [:odbc], [:jdbc, :mssql], [:jdbc, :postgres], [:mysql2], [:tinytds], :oracle do
     ds = create_items_table_with_column(:tim, Time, :only_time=>true)
     t = Sequel::SQLTime.now
     ds.insert(:tim => t)
@@ -100,7 +100,7 @@ describe "Supported types" do
     ds.first[:name].should be_a_kind_of(::Sequel::SQL::Blob)
   end
   
-  cspecify "should support generic boolean type", [:do, :sqlite], [:jdbc, :sqlite], [:jdbc, :db2], [:odbc, :mssql] do
+  cspecify "should support generic boolean type", [:do, :sqlite], [:jdbc, :sqlite], [:jdbc, :db2], [:odbc, :mssql], [:oracle] do
     ds = create_items_table_with_column(:number, TrueClass)
     ds.insert(:number => true)
     ds.all.should == [{:number=>true}]

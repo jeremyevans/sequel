@@ -303,6 +303,14 @@ module Sequel
         false
       end
 
+      # Use string in hex format for blob data.
+      def literal_blob(v)
+        blob = "'"
+        v.each_byte{|x| blob << sprintf('%02x', x)}
+        blob << "'"
+        blob
+      end
+
       # Oracle uses 'N' for false values.
       def literal_false
         "'N'"
