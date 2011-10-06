@@ -181,6 +181,12 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 567) LIMIT 1"]
   end
 
+  it "should respect :qualify => false option" do
+    @c2.many_to_one :parent, :class => @c2, :key => :blah, :qualify=>false
+    @c2.new(:id => 1, :blah => 567).parent
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (id = 567) LIMIT 1"]
+  end
+  
   it "should use :primary_key option if given" do
     @c2.many_to_one :parent, :class => @c2, :key => :blah, :primary_key => :pk
     @c2.new(:id => 1, :blah => 567).parent

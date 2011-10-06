@@ -530,6 +530,19 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT id, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
   end
 
+  it "should respect many_to_one association's :qualify option" do
+    EagerAlbum.many_to_one :special_band, :class=>:EagerBand, :qualify=>false, :key=>:band_id
+    EagerBand.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:id=>2})
+      end
+    })
+    as = EagerAlbum.eager(:special_band).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM bands WHERE (id IN (2))"]
+    as.map{|a| a.special_band}.should == [EagerBand.load(:id=>2)]
+  end
+
   it "should respect the association's :primary_key option" do
     EagerAlbum.many_to_one :special_band, :class=>:EagerBand, :primary_key=>:p_k, :key=>:band_id
     EagerBand.dataset.extend(Module.new {

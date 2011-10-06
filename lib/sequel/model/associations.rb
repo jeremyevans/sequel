@@ -676,6 +676,10 @@ module Sequel
         # :primary_key :: column in the associated table that :key option references, as a symbol.
         #                 Defaults to the primary key of the associated table. Can use an
         #                 array of symbols for a composite key association.
+        # :qualify :: Whether to use qualifier primary keys when loading the association.  The default
+        #             is true, so you must set to false to not qualify.  Qualification rarely causes
+        #             problems, but it's necessary to disable in some cases, such as when you are doing
+        #             a JOIN USING operation on the column on Oracle.
         # === :one_to_many and :one_to_one
         # :key :: foreign key in associated model's table that references
         #         current model's primary key, as a symbol.  Defaults to
@@ -1042,10 +1046,11 @@ module Sequel
             raise(Error, "mismatched number of composite keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           end
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
+          qualify = opts[:qualify] != false
           opts[:cartesian_product_number] ||= 0
           opts[:dataset] ||= proc do
             klass = opts.associated_class
-            klass.filter(opts.primary_keys.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}.zip(cks.map{|k| send(k)}))
+            klass.filter(opts.primary_keys.map{|k| qualify ? SQL::QualifiedIdentifier.new(klass.table_name, k) : k}.zip(cks.map{|k| send(k)}))
           end
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:key_hash][key]
@@ -1056,7 +1061,7 @@ module Sequel
             # Skip eager loading if no objects have a foreign key for this association
             unless keys.empty?
               klass = opts.associated_class
-              model.eager_loading_dataset(opts, klass.filter(uses_cks ? {opts.primary_keys.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>keys} : {SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>keys}), opts.select, eo[:associations], eo).all do |assoc_record|
+              model.eager_loading_dataset(opts, klass.filter(uses_cks ? {opts.primary_keys.map{|k| qualify ? SQL::QualifiedIdentifier.new(klass.table_name, k) :k}=>keys} : {(qualify ? SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key) : opts.primary_key)=>keys}), opts.select, eo[:associations], eo).all do |assoc_record|
                 hash_key = uses_cks ? opts.primary_keys.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key)
                 next unless objects = h[hash_key]
                 objects.each{|object| object.associations[name] = assoc_record}
