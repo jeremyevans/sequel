@@ -24,6 +24,12 @@ module Sequel
       true
     end
     
+    # Whether you must use a column alias list for recursive CTEs (false by
+    # default).
+    def recursive_cte_requires_column_aliases?
+      false
+    end
+
     # Whether the dataset requires SQL standard datetimes (false by default,
     # as most allow strings with ISO 8601 format).
     def requires_sql_standard_datetimes?

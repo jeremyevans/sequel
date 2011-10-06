@@ -109,7 +109,15 @@ module Sequel
         ka = opts[:key_alias] ||= :x_root_x
         t = opts[:cte_name] ||= :t
         opts[:reciprocal] = nil
-        c_all = SQL::ColumnAll.new(model.table_name)
+        c_all = if model.dataset.recursive_cte_requires_column_aliases?
+          # Work around Oracle/ruby-oci8 bug that returns integers as BigDecimals in recursive queries.
+          conv_bd = model.db.database_type == :oracle
+          col_aliases = model.dataset.columns
+          model_table = model.table_name
+          col_aliases.map{|c| SQL::QualifiedIdentifier.new(model_table, c)}
+        else
+          [SQL::ColumnAll.new(model.table_name)]
+        end
         
         a = opts.merge(opts.fetch(:ancestors, {}))
         ancestors = a.fetch(:name, :ancestors)
@@ -125,9 +133,9 @@ module Sequel
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           model.from(t => table_alias).
-           with_recursive(t, base_ds.select_all,
-            recursive_ds.
-            select(c_all))
+           with_recursive(t, col_aliases ? base_ds.select(*col_aliases) : base_ds.select_all,
+            recursive_ds.select(*c_all),
+            :args=>col_aliases)
         end
         aal = Array(a[:after_load])
         aal << proc do |m, ancs|
@@ -163,9 +171,9 @@ module Sequel
           end
           r = model.association_reflection(ancestors)
           base_case = model.filter(prkey=>id_map.keys).
-           select(SQL::AliasedExpression.new(prkey, ka), c_all)
+           select(SQL::AliasedExpression.new(prkey, ka), *c_all)
           recursive_case = model.join(t, key=>prkey).
-           select(SQL::QualifiedIdentifier.new(t, ka), c_all)
+           select(SQL::QualifiedIdentifier.new(t, ka), *c_all)
           if c = r[:conditions]
             (base_case, recursive_case) = [base_case, recursive_case].collect do |ds|
               (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
@@ -175,7 +183,8 @@ module Sequel
           elds = model.eager_loading_dataset(r,
            model.from(t => table_alias).
             with_recursive(t, base_case,
-             recursive_case),
+             recursive_case,
+             :args=>(([ka] + col_aliases) if col_aliases)),
            r.select,
            eo[:associations], eo)
           elds = elds.select_append(ka) unless elds.opts[:select] == nil
@@ -192,7 +201,9 @@ module Sequel
               (children_map[obj[key]] ||= []) << obj
             end
             
-            if roots = id_map[obj.values.delete(ka)]
+            kv = obj.values.delete(ka)
+            kv = kv.to_i if conv_bd && kv.is_a?(BigDecimal)
+            if roots = id_map[kv]
               roots.each do |root|
                 root.associations[ancestors] << obj
               end
@@ -222,9 +233,9 @@ module Sequel
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           model.from(t => table_alias).
-           with_recursive(t, base_ds.select_all,
-            recursive_ds.
-            select(SQL::ColumnAll.new(model.table_name)))
+           with_recursive(t, col_aliases ? base_ds.select(*col_aliases) : base_ds.select_all,
+            recursive_ds.select(*c_all),
+            :args=>col_aliases)
           end
         dal = Array(d[:after_load])
         dal << proc do |m, descs|
@@ -259,9 +270,9 @@ module Sequel
           end
           r = model.association_reflection(descendants)
           base_case = model.filter(key=>id_map.keys).
-           select(SQL::AliasedExpression.new(key, ka), c_all)
+           select(SQL::AliasedExpression.new(key, ka), *c_all)
           recursive_case = model.join(t, prkey=>key).
-           select(SQL::QualifiedIdentifier.new(t, ka), c_all)
+           select(SQL::QualifiedIdentifier.new(t, ka), *c_all)
           if c = r[:conditions]
             (base_case, recursive_case) = [base_case, recursive_case].collect do |ds|
               (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
@@ -276,7 +287,8 @@ module Sequel
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           elds = model.eager_loading_dataset(r,
-           model.from(t => table_alias).with_recursive(t, base_case, recursive_case),
+           model.from(t => table_alias).with_recursive(t, base_case, recursive_case,
+            :args=>(([ka] + col_aliases + (level ? [la] : [])) if col_aliases)),
            r.select,
            associations, eo)
           elds = elds.select_append(ka) unless elds.opts[:select] == nil
@@ -296,7 +308,9 @@ module Sequel
               parent_map[opk] = obj
             end
             
-            if root = id_map[obj.values.delete(ka)].first
+            kv = obj.values.delete(ka)
+            kv = kv.to_i if conv_bd && kv.is_a?(BigDecimal)
+            if root = id_map[kv].first
               root.associations[descendants] << obj
             end
             

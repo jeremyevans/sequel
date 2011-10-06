@@ -243,6 +243,11 @@ module Sequel
         clone(:sequence=>s)
       end
 
+      # Oracle requires recursive CTEs to have column aliases.
+      def recursive_cte_requires_column_aliases?
+        true
+      end
+
       # Oracle does not support INTERSECT ALL or EXCEPT ALL
       def supports_intersect_except_all?
         false
