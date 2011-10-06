@@ -554,6 +554,23 @@ module Sequel
       (columns.nil? || columns.empty?) ? WILDCARD : expression_list(columns)
     end
     
+    # Yield each two pair of arguments to the block, which should
+    # return a string representing the SQL code for those
+    # two arguments.  If more than 2 arguments are provided, all
+    # calls to the block # after the first will have a LiteralString
+    # as the first argument, representing the application of the block to
+    # the previous arguments.
+    def complex_expression_arg_pairs(args)
+      case args.length
+      when 1
+        literal(args.at(0))
+      when 2
+        yield args.at(0), args.at(1)
+      else
+        args.inject{|m, a| LiteralString.new(yield(m, a))}
+      end
+    end
+
     # The alias to use for datasets, takes a number to make sure the name is unique.
     def dataset_alias(number)
       :"#{DATASET_ALIAS_BASE_NAME}#{number}"

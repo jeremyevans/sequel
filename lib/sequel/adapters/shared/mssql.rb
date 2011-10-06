@@ -267,9 +267,9 @@ module Sequel
         when :"NOT ILIKE"
           super(:"NOT LIKE", args)
         when :<<
-          "(#{literal(args[0])} * POWER(2, #{literal(args[1])}))"
+          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
         when :>>
-          "(#{literal(args[0])} / POWER(2, #{literal(args[1])}))"
+          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
         when :extract
           part = args.at(0)
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]

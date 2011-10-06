@@ -692,7 +692,7 @@ module Sequel
       def complex_expression_sql(op, args)
         case op
         when :^
-          "(#{literal(args.at(0))} # #{literal(args.at(1))})"
+          "(#{args.collect{|a| literal(a)}.join(" # ")})"
         else
           super
         end

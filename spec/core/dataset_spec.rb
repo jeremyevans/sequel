@@ -4351,3 +4351,19 @@ describe "Dataset#returning" do
     @ds.update(:foo=>1).should == [{:foo=>"UPDATE t SET foo = 1 RETURNING foo"}]
   end
 end
+
+describe "Dataset emulating bitwise operator support" do
+  before do
+    @ds = Sequel::Database.new.dataset
+    @ds.quote_identifiers = true
+    def @ds.complex_expression_sql(op, args)
+      complex_expression_arg_pairs(args){|a, b| "bitand(#{literal(a)}, #{literal(b)})"}
+    end
+  end
+
+  it "should work with any numbers of arguments for operators" do
+    @ds.select(Sequel::SQL::ComplexExpression.new(:&, :x)).sql.should == 'SELECT "x"'
+    @ds.select(:x & 1).sql.should == 'SELECT bitand("x", 1)'
+    @ds.select(:x & 1 & 2).sql.should == 'SELECT bitand(bitand("x", 1), 2)'
+  end
+end

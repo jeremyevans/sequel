@@ -883,16 +883,20 @@ describe "Sequel::Dataset DSL support" do
     @ds.insert(3, 2)
     @ds.get{a.sql_number << b}.to_i.should == 12
     @ds.get{a.sql_number >> b}.to_i.should == 0
+    @ds.get{a.sql_number << b << 1}.to_i.should == 24
     @ds.delete
     @ds.insert(3, 1)
     @ds.get{a.sql_number << b}.to_i.should == 6
     @ds.get{a.sql_number >> b}.to_i.should == 1
+    @ds.get{a.sql_number >> b >> 1}.to_i.should == 0
   end
 
   specify "should work with bitwise AND and OR operators" do
     @ds.insert(3, 5)
     @ds.get{a.sql_number | b}.to_i.should == 7
     @ds.get{a.sql_number & b}.to_i.should == 1
+    @ds.get{a.sql_number | b | 8}.to_i.should == 15
+    @ds.get{a.sql_number & b & 8}.to_i.should == 0
   end
   
   cspecify "should work with the bitwise compliment operator", :h2 do
@@ -904,6 +908,7 @@ describe "Sequel::Dataset DSL support" do
   specify "should work with the bitwise xor operator" do
     @ds.insert(3, 5)
     @ds.get{a.sql_number ^ b}.to_i.should == 6
+    @ds.get{a.sql_number ^ b ^ 1}.to_i.should == 7
   end
   
   specify "should work with inequality operators" do

@@ -119,11 +119,11 @@ module Sequel
           when :"NOT ILIKE"
             super(:"NOT LIKE", [SQL::PlaceholderLiteralString.new("CAST(? AS VARCHAR_IGNORECASE)", [args.at(0)]), args.at(1)])
           when :&, :|, :^
-            literal(SQL::Function.new(BITWISE_METHOD_MAP[op], *args))
+            complex_expression_arg_pairs(args){|a, b| literal(SQL::Function.new(BITWISE_METHOD_MAP[op], a, b))}
           when :<<
-            "(#{literal(args[0])} * POWER(2, #{literal(args[1])}))"
+            complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
           when :>>
-            "(#{literal(args[0])} / POWER(2, #{literal(args[1])}))"
+            complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
           else
             super(op, args)
           end

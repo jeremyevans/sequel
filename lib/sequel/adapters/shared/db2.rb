@@ -192,13 +192,16 @@ module Sequel
           super(:LIKE, [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
         when :"NOT ILIKE"
           super(:"NOT LIKE", [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
-        when :&, :|, :^, :'B~'
+        when :&, :|, :^
           # works with db2 v9.5 and after
-          literal(SQL::Function.new(BITWISE_METHOD_MAP[op], *args))
+          op = BITWISE_METHOD_MAP[op]
+          complex_expression_arg_pairs(args){|a, b| literal(SQL::Function.new(op, a, b))}
         when :<<
-          "(#{literal(args[0])} * POWER(2, #{literal(args[1])}))"
+          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
         when :>>
-          "(#{literal(args[0])} / POWER(2, #{literal(args[1])}))"
+          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
+        when :'B~'
+          literal(SQL::Function.new(:BITNOT, *args))
         when :extract
           "#{args.at(0)}(#{literal(args.at(1))})"
         else

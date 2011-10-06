@@ -365,9 +365,11 @@ module Sequel
           # SQLite is case insensitive for ASCII, and non case sensitive for other character sets
           "#{'NOT ' if [:'NOT LIKE', :'NOT ILIKE'].include?(op)}(#{literal(args.at(0))} LIKE #{literal(args.at(1))})"
         when :^
-          a = literal(args.at(0))
-          b = literal(args.at(1))
-          "((~(#{a} & #{b})) & (#{a} | #{b}))"
+          complex_expression_arg_pairs(args) do |a, b|
+            a = literal(a)
+            b = literal(b)
+            "((~(#{a} & #{b})) & (#{a} | #{b}))"
+          end
         when :extract
           part = args.at(0)
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
