@@ -62,18 +62,31 @@ module Sequel
         table_schema = []
         m = output_identifier_meth
         im = input_identifier_meth
+
+        # Primary Keys
         ds = metadata_dataset.from(:all_constraints___cons, :all_cons_columns___cols).
           where(:cols__table_name=>im.call(table), :cons__constraint_type=>'P',
                 :cons__constraint_name=>:cols__constraint_name, :cons__owner=>:cols__owner)
         ds = ds.where(:cons__owner=>im.call(opts[:schema])) if opts[:schema]
         pks = ds.select_map(:cols__column_name)
-        metadata = transaction(opts){|conn| log_yield("Connection.describe_table"){conn.describe_table(schema_and_table)}}
+
+        # Default values
+        defaults =  metadata_dataset.from(:dba_tab_cols).
+          where(:table_name=>im.call(table)).
+          to_hash(:column_name, :data_default)
+
+        metadata = synchronize(opts[:server]) do |conn|
+          begin
+          log_yield("Connection.describe_table"){conn.describe_table(schema_and_table)}
+          rescue OCIError => e
+            raise_error(e)
+          end
+        end
         metadata.columns.each do |column|
-          table_schema << [
-            m.call(column.name),
-            {
+          h = {
               :primary_key => pks.include?(column.name),
-              :type => column.data_type,
+              :default => defaults[column.name],
+              :oci8_type => column.data_type,
               :db_type => column.type_string.split(' ')[0],
               :type_string => column.type_string,
               :charset_form => column.charset_form,
@@ -85,10 +98,27 @@ module Sequel
               :fsprecision => column.fsprecision,
               :lfprecision => column.lfprecision,
               :allow_null => column.nullable?
-            }
-          ]
+          }
+          h[:type] = oracle_column_type(h)
+          table_schema << [m.call(column.name), h]
         end
         table_schema
+      end
+      
+      def oracle_column_type(h)
+        case h[:oci8_type]
+        when :number
+          case h[:scale]
+          when 0
+            :integer
+          when -127
+            :float
+          else
+            :decimal
+          end
+        else
+          schema_column_type(h[:db_type])
+        end
       end
 
       def execute(sql, opts={})

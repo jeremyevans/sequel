@@ -41,6 +41,35 @@ module Sequel
 
       private
 
+      # Handle Oracle specific ALTER TABLE SQL
+      def alter_table_sql(table, op)
+        case op[:op]
+        when :add_column
+          if op[:primary_key]
+            sqls = []
+            sqls << alter_table_sql(table, op.merge(:primary_key=>nil))
+            if op[:auto_increment]
+              seq_name = default_sequence_name(table, op[:name])
+              sqls << drop_sequence_sql(seq_name)
+              sqls << create_sequence_sql(seq_name, op)
+              sqls << "UPDATE #{quote_schema_table(table)} SET #{quote_identifier(op[:name])} = #{seq_name}.nextval"
+            end
+            sqls << "ALTER TABLE #{quote_schema_table(table)} ADD PRIMARY KEY (#{quote_identifier(op[:name])})"
+            sqls
+          else
+             "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op)}"
+          end
+        when :set_column_null
+          "ALTER TABLE #{quote_schema_table(table)} MODIFY #{quote_identifier(op[:name])} #{op[:null] ? 'NULL' : 'NOT NULL'}"
+        when :set_column_type
+          "ALTER TABLE #{quote_schema_table(table)} MODIFY #{quote_identifier(op[:name])} #{type_literal(op)}"
+        when :set_column_default
+          "ALTER TABLE #{quote_schema_table(table)} MODIFY #{quote_identifier(op[:name])} DEFAULT #{literal(op[:default])}"
+        else
+          super(table, op)
+        end
+      end
+
       def auto_increment_sql
         AUTOINCREMENT
       end
@@ -76,7 +105,7 @@ module Sequel
         drop_seq_statement = nil
         generator.columns.each do |c|
           if c[:auto_increment]
-            c[:sequence_name] ||= "seq_#{name}_#{c[:name]}"
+            c[:sequence_name] ||= default_sequence_name(name, c[:name])
             unless c[:create_sequence] == false
               drop_seq_statement = drop_sequence_sql(c[:sequence_name])
               statements << create_sequence_sql(c[:sequence_name], c)
@@ -108,8 +137,19 @@ module Sequel
         sql
       end
 
+      def default_sequence_name(table, column)
+        "seq_#{table}_#{column}"
+      end
+
       def drop_sequence_sql(name)
         "DROP SEQUENCE #{quote_identifier(name)}"
+      end
+
+      # Oracle's integer/:number type handles larger values than
+      # most other databases's bigint types, so it should be
+      # safe to use for Bignum.
+      def type_literal_generic_bignum(column)
+        :integer
       end
 
       # Oracle doesn't have a time type, so use timestamp for all

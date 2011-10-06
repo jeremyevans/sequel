@@ -88,7 +88,7 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == 'blah'
   end
 
-  cspecify "should parse types from the schema properly", [:jdbc, :db2] do
+  cspecify "should parse types from the schema properly", [:jdbc, :db2], :oracle do
     INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
     INTEGRATION_DB.create_table!(:items){Fixnum :number}
@@ -262,7 +262,8 @@ describe "Database schema modifiers" do
 
   specify "should add foreign key columns to tables correctly" do
     @db.create_table!(:items){primary_key :id}
-    i = @ds.insert
+    @ds.insert
+    i = @ds.get(:id)
     @db.alter_table(:items){add_foreign_key :item_id, :items}
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :item_id]
     @ds.columns!.should == [:id, :item_id]
@@ -321,7 +322,7 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:id=>10}, {:id=>20}]
   end
 
-  cspecify "should set column types correctly", [:jdbc, :db2] do
+  cspecify "should set column types correctly", [:jdbc, :db2], :oracle do
     @db.create_table!(:items){Integer :id}
     @ds.insert(:id=>10)
     @db.alter_table(:items){set_column_type :id, String}
