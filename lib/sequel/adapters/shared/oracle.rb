@@ -140,20 +140,17 @@ module Sequel
       def complex_expression_sql(op, args)
         case op
         when :&
-          "CAST(BITAND#{literal(args)} AS INTEGER)"
+          complex_expression_arg_pairs(args){|a, b| "CAST(BITAND(#{literal(a)}, #{literal(b)}) AS INTEGER)"}
         when :|
-          a, b = args
-          "(#{literal(a)} - #{complex_expression_sql(:&, args)} + #{literal(b)})"
+          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} - #{complex_expression_sql(:&, [a, b])} + #{literal(b)})"}
         when :^
-          "(#{complex_expression_sql(:|, args)} - #{complex_expression_sql(:&, args)})"
+          complex_expression_arg_pairs(args){|*x| "(#{complex_expression_sql(:|, x)} - #{complex_expression_sql(:&, x)})"}
         when :'B~'
           "((0 - #{literal(args.at(0))}) - 1)"
         when :<<
-          a, b = args
-          "(#{literal(a)} * power(2, #{literal b}))"
+          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * power(2, #{literal b}))"}
         when :>>
-          a, b = args
-          "(#{literal(a)} / power(2, #{literal b}))"
+          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / power(2, #{literal b}))"}
         when :ILIKE, :'NOT ILIKE'
           a, b = args
           "(UPPER(#{literal(a)}) #{op == :ILIKE ? :LIKE : :'NOT LIKE'} UPPER(#{literal(b)}))"
