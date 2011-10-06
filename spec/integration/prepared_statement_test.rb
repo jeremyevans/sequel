@@ -246,11 +246,11 @@ describe "Bound Argument Types" do
     @db.drop_table(:items)
   end
 
-  cspecify "should handle date type", [:do, :sqlite], :mssql, [:jdbc, :sqlite] do 
+  cspecify "should handle date type", [:do, :sqlite], :mssql, [:jdbc, :sqlite], :oracle do 
     @ds.filter(:d=>:$x).prepare(:first, :ps_date).call(:x=>@vs[:d])[:d].should == @vs[:d]
   end
 
-  cspecify "should handle datetime type", [:do], [:mysql2], [:swift], [:jdbc, :sqlite], [:tinytds] do
+  cspecify "should handle datetime type", [:do], [:mysql2], [:swift], [:jdbc, :sqlite], [:tinytds], [:oracle] do
     Sequel.datetime_class = DateTime
     @ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>@vs[:dt])[:dt].should == @vs[:dt]
   end
@@ -259,7 +259,7 @@ describe "Bound Argument Types" do
     @ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
   end
 
-  cspecify "should handle blob type", [:swift], [:odbc], [:jdbc, :db2] do
+  cspecify "should handle blob type", [:swift], [:odbc], [:jdbc, :db2], :oracle do
     @ds.filter(:file=>:$x).prepare(:first, :ps_blob).call(:x=>@vs[:file])[:file].should == @vs[:file]
   end
 
@@ -271,7 +271,7 @@ describe "Bound Argument Types" do
     @ds.filter(:s=>:$x).prepare(:first, :ps_string).call(:x=>@vs[:s])[:s].should == @vs[:s]
   end
 
-  cspecify "should handle boolean type", [:do, :sqlite], [:odbc, :mssql], [:jdbc, :sqlite], [:jdbc, :db2]  do
+  cspecify "should handle boolean type", [:do, :sqlite], [:odbc, :mssql], [:jdbc, :sqlite], [:jdbc, :db2], :oracle do
     @ds.filter(:b=>:$x).prepare(:first, :ps_string).call(:x=>@vs[:b])[:b].should == @vs[:b]
   end
 end unless INTEGRATION_DB.adapter_scheme == :swift && INTEGRATION_DB.database_type == :postgres
@@ -316,7 +316,7 @@ describe "Dataset#unbind" do
     @u[@ds.filter{c > 0}].should == {:c=>BigDecimal.new('1.1')}
   end
 
-  cspecify "should handle dates and times", [:sqlite], [:do], [:jdbc, :mssql], [:tinytds] do
+  cspecify "should handle dates and times", [:sqlite], [:do], [:jdbc, :mssql], [:tinytds], :oracle do
     @ct[Date, Date.today]
     @u[@ds.filter(:c=>Date.today)].should == {:c=>Date.today}
     t = Time.now
