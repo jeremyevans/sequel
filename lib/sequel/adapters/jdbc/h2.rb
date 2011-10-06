@@ -111,7 +111,7 @@ module Sequel
         SELECT_CLAUSE_METHODS = clause_methods(:select, %w'distinct columns from join where group having compounds order limit')
         BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
         
-        # Work around H2's lack of a case insensitive LIKE operator
+        # Emulate the case insensitive LIKE operator and the bitwise operators.
         def complex_expression_sql(op, args)
           case op
           when :ILIKE
@@ -124,6 +124,8 @@ module Sequel
             complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
           when :>>
             complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
+          when :'B~'
+            "((0 - #{literal(args.at(0))}) - 1)"
           else
             super(op, args)
           end

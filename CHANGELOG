@@ -1,5 +1,7 @@
 === HEAD
 
+* Emulate the bitwise compliment operator on h2 (jeremyevans)
+
 * Fix improper handling of emulated bitwise operators with more than two arguments (jeremyevans)
 
 * Allow convert_invalid_date_time to be set on a per-Database basis in the mysql adapter (jeremyevans)

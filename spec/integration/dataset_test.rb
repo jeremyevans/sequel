@@ -899,7 +899,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.get{a.sql_number & b & 8}.to_i.should == 0
   end
   
-  cspecify "should work with the bitwise compliment operator", :h2 do
+  specify "should work with the bitwise compliment operator" do
     @ds.insert(-3, 3)
     @ds.get{~a.sql_number}.to_i.should == 2
     @ds.get{~b.sql_number}.to_i.should == -4
