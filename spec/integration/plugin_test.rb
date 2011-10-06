@@ -8,20 +8,21 @@ describe "Class Table Inheritance Plugin" do
   before do
     @db = INTEGRATION_DB
     @db.instance_variable_set(:@schemas, {})
-    @db.create_table!(:employees) do
+    [:staff, :executives, :managers, :employees].each{|t| @db.drop_table(t) if @db.table_exists?(t)}
+    @db.create_table(:employees) do
       primary_key :id
       String :name
       String :kind
     end
-    @db.create_table!(:managers) do
+    @db.create_table(:managers) do
       foreign_key :id, :employees, :primary_key=>true
       Integer :num_staff
     end
-    @db.create_table!(:executives) do
+    @db.create_table(:executives) do
       foreign_key :id, :managers, :primary_key=>true
       Integer :num_managers
     end
-    @db.create_table!(:staff) do
+    @db.create_table(:staff) do
       foreign_key :id, :employees, :primary_key=>true
       foreign_key :manager_id, :managers
     end
@@ -34,7 +35,7 @@ describe "Class Table Inheritance Plugin" do
     class ::Executive < Manager
     end 
     class ::Staff < Employee
-      many_to_one :manager
+      many_to_one :manager, :qualify=>false
     end 
     
     @i1 =@db[:employees].insert(:name=>'E', :kind=>'Employee')
