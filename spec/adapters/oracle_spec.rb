@@ -4,7 +4,6 @@ unless defined?(ORACLE_DB)
   ORACLE_DB = Sequel.connect('oracle://hr:hr@localhost/XE')
 end
 INTEGRATION_DB = ORACLE_DB unless defined?(INTEGRATION_DB)
-ORACLE_DB.quote_identifiers = true
 
 ORACLE_DB.create_table!(:items) do
   String :name, :size => 50
