@@ -97,11 +97,13 @@ begin
     require "spec/rake/spectask"
     spec_class = Spec::Rake::SpecTask
     spec_files_meth = :spec_files=
+    spec_opts_meth = :spec_opts=
   rescue LoadError
     # RSpec 2
     require "rspec/core/rake_task"
     spec_class = RSpec::Core::RakeTask
     spec_files_meth = :pattern=
+    spec_opts_meth = :rspec_opts=
   end
 
   spec = lambda do |name, files, d|
@@ -110,7 +112,7 @@ begin
     desc d
     spec_class.new(name) do |t|
       t.send spec_files_meth, files
-      t.spec_opts = ENV['SEQUEL_SPEC_OPTS'].split if ENV['SEQUEL_SPEC_OPTS']
+      t.send spec_opts_meth, ENV['SEQUEL_SPEC_OPTS'].split if ENV['SEQUEL_SPEC_OPTS']
     end
   end
 
