@@ -106,7 +106,7 @@ describe "Simple Dataset operations" do
     @db.drop_table(:items2)
   end
   
-  cspecify "should fetch correctly with a limit and offset without an order", :db2, :mssql do
+  cspecify "should fetch correctly with a limit and offset without an order", :db2, :mssql, :oracle do
     @ds.limit(2, 1).all.should == []
   end
 

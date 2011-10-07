@@ -291,13 +291,6 @@ module Sequel
         "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'".freeze
       end
 
-      # Oracle shouldn't have the order removed when emulating offsets,
-      # since it uses ROWNUM instead of the ROW_NUMBER window function
-      # in the emulation.
-      def emulate_offset_remove_order
-        false
-      end
-
       # Use a colon for the timestamp offset, since Oracle appears to require it.
       def format_timestamp_offset(hour, minute)
         sprintf("%+03i:%02i", hour, minute)
@@ -334,12 +327,6 @@ module Sequel
       # Use the Oracle-specific SQL clauses (no limit, since it is emulated).
       def select_clause_methods
         SELECT_CLAUSE_METHODS
-      end
-
-      # Oracle always uses ROWNUM for the row number expression, instead of a window
-      # function, since ROWNUM should be faster.
-      def row_number_expression(order)
-        ROW_NUMBER_EXPRESSION
       end
 
       # Modify the SQL to add the list of tables to select FROM
