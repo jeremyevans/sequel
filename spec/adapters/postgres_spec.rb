@@ -351,17 +351,17 @@ describe "A PostgreSQL database" do
   specify "should support opclass specification" do
     @db.create_table(:posts){text :title; text :body; integer :user_id; index(:user_id, :opclass => :int4_ops, :type => :btree)}
     @db.sqls.should == [
-    "CREATE TABLE posts (title text, body text, user_id integer)",
-    "CREATE INDEX posts_user_id_index ON posts USING btree (user_id int4_ops)"
+    'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer)',
+    'CREATE INDEX "posts_user_id_index" ON "posts" USING btree ("user_id" int4_ops)'
     ]
   end
 
   specify "should support fulltext indexes and searching" do
     @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french'}
     @db.sqls.should == [
-      "CREATE TABLE posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))",
-      "CREATE INDEX posts_title_index ON posts USING gin (to_tsvector('french', (COALESCE(title, ''))))"
+      %{CREATE TABLE "posts" ("title" text, "body" text)},
+      %{CREATE INDEX "posts_title_body_index" ON "posts" USING gin (to_tsvector('simple', (COALESCE("title", '') || ' ' || COALESCE("body", ''))))},
+      %{CREATE INDEX "posts_title_index" ON "posts" USING gin (to_tsvector('french', (COALESCE("title", ''))))}
     ]
 
     @db[:posts].insert(:title=>'ruby rails', :body=>'yowsa')
@@ -373,48 +373,48 @@ describe "A PostgreSQL database" do
     @db[:posts].full_text_search([:title, :body], ['yowsa', 'rails']).all.should == [:title=>'ruby rails', :body=>'yowsa']
     @db[:posts].full_text_search(:title, 'scooby', :language => 'french').all.should == [{:title=>'ruby scooby', :body=>'x'}]
     @db.sqls.should == [
-      "SELECT * FROM posts WHERE (to_tsvector('simple', (COALESCE(title, ''))) @@ to_tsquery('simple', 'rails'))",
-      "SELECT * FROM posts WHERE (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))) @@ to_tsquery('simple', 'yowsa | rails'))",
-      "SELECT * FROM posts WHERE (to_tsvector('french', (COALESCE(title, ''))) @@ to_tsquery('french', 'scooby'))"]
+      %{SELECT * FROM "posts" WHERE (to_tsvector('simple', (COALESCE("title", ''))) @@ to_tsquery('simple', 'rails'))},
+      %{SELECT * FROM "posts" WHERE (to_tsvector('simple', (COALESCE("title", '') || ' ' || COALESCE("body", ''))) @@ to_tsquery('simple', 'yowsa | rails'))},
+      %{SELECT * FROM "posts" WHERE (to_tsvector('french', (COALESCE("title", ''))) @@ to_tsquery('french', 'scooby'))}]
   end
 
   specify "should support spatial indexes" do
     @db.create_table(:posts){box :geom; spatial_index [:geom]}
     @db.sqls.should == [
-      "CREATE TABLE posts (geom box)",
-      "CREATE INDEX posts_geom_index ON posts USING gist (geom)"
+      'CREATE TABLE "posts" ("geom" box)',
+      'CREATE INDEX "posts_geom_index" ON "posts" USING gist ("geom")'
     ]
   end
   
   specify "should support indexes with index type" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'hash'}
     @db.sqls.should == [
-      "CREATE TABLE posts (title varchar(5))",
-      "CREATE INDEX posts_title_index ON posts USING hash (title)"
+      'CREATE TABLE "posts" ("title" varchar(5))',
+      'CREATE INDEX "posts_title_index" ON "posts" USING hash ("title")'
     ]
   end
   
   specify "should support unique indexes with index type" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'btree', :unique => true}
     @db.sqls.should == [
-      "CREATE TABLE posts (title varchar(5))",
-      "CREATE UNIQUE INDEX posts_title_index ON posts USING btree (title)"
+      'CREATE TABLE "posts" ("title" varchar(5))',
+      'CREATE UNIQUE INDEX "posts_title_index" ON "posts" USING btree ("title")'
     ]
   end
   
   specify "should support partial indexes" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
     @db.sqls.should == [
-      "CREATE TABLE posts (title varchar(5))",
-      "CREATE INDEX posts_title_index ON posts (title) WHERE (title = '5')"
+      'CREATE TABLE "posts" ("title" varchar(5))',
+      'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
     ]
   end
   
   specify "should support identifiers for table names in indicies" do
     @db.create_table(Sequel::SQL::Identifier.new(:posts)){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
     @db.sqls.should == [
-      "CREATE TABLE posts (title varchar(5))",
-      "CREATE INDEX posts_title_index ON posts (title) WHERE (title = '5')"
+      'CREATE TABLE "posts" ("title" varchar(5))',
+      'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
     ]
   end
   
@@ -442,8 +442,8 @@ describe "Postgres::Dataset#import" do
     
     @db.sqls.should == [
       'BEGIN',
-      'INSERT INTO test (x, y) VALUES (1, 2)',
-      'INSERT INTO test (x, y) VALUES (3, 4)',
+      'INSERT INTO "test" ("x", "y") VALUES (1, 2)',
+      'INSERT INTO "test" ("x", "y") VALUES (3, 4)',
       'COMMIT'
     ]
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
@@ -456,7 +456,7 @@ describe "Postgres::Dataset#import" do
     
     @db.sqls.should == [
       'BEGIN',
-      'INSERT INTO test (x, y) VALUES (1, 2), (3, 4)',
+      'INSERT INTO "test" ("x", "y") VALUES (1, 2), (3, 4)',
       'COMMIT'
     ]
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
@@ -487,10 +487,10 @@ describe "Postgres::Dataset#insert" do
     @ds.insert(:value=>13).should == 3
     
     @db.sqls.reject{|x| x =~ /pg_class/}.should == [
-      'INSERT INTO test5 (value) VALUES (10) RETURNING xid',
-      'INSERT INTO test5 (value) VALUES (20)',
+      'INSERT INTO "test5" ("value") VALUES (10) RETURNING "xid"',
+      'INSERT INTO "test5" ("value") VALUES (20)',
       "SELECT currval('\"public\".test5_xid_seq')",
-      'INSERT INTO test5 (value) VALUES (13)',
+      'INSERT INTO "test5" ("value") VALUES (13)',
       "SELECT currval('\"public\".test5_xid_seq')"
     ]
     @ds.all.should == [{:xid=>1, :value=>10}, {:xid=>2, :value=>20}, {:xid=>3, :value=>13}]
@@ -498,20 +498,20 @@ describe "Postgres::Dataset#insert" do
   
   specify "should call execute_insert if server_version < 80200" do
     @ds.meta_def(:server_version){80100}
-    @ds.should_receive(:execute_insert).once.with('INSERT INTO test5 (value) VALUES (10)', :table=>:test5, :values=>{:value=>10})
+    @ds.should_receive(:execute_insert).once.with('INSERT INTO "test5" ("value") VALUES (10)', :table=>:test5, :values=>{:value=>10})
     @ds.insert(:value=>10)
   end
 
   specify "should call execute_insert if disabling insert returning" do
     @ds.disable_insert_returning!
-    @ds.should_receive(:execute_insert).once.with('INSERT INTO test5 (value) VALUES (10)', :table=>:test5, :values=>{:value=>10})
+    @ds.should_receive(:execute_insert).once.with('INSERT INTO "test5" ("value") VALUES (10)', :table=>:test5, :values=>{:value=>10})
     @ds.insert(:value=>10)
   end
 
   specify "should use INSERT RETURNING if server_version >= 80200" do
     @ds.meta_def(:server_version){80201}
     @ds.insert(:value=>10)
-    @db.sqls.last.should == 'INSERT INTO test5 (value) VALUES (10) RETURNING xid'
+    @db.sqls.last.should == 'INSERT INTO "test5" ("value") VALUES (10) RETURNING "xid"'
   end
 
   specify "should have insert_select return nil if server_version < 80200" do

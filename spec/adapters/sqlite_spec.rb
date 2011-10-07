@@ -145,10 +145,10 @@ describe "An SQLite dataset" do
   end
   
   specify "should handle string pattern matches correctly" do
-    @d.literal(:x.like('a')).should == "(x LIKE 'a')"
-    @d.literal(~:x.like('a')).should == "NOT (x LIKE 'a')"
-    @d.literal(:x.ilike('a')).should == "(x LIKE 'a')"
-    @d.literal(~:x.ilike('a')).should == "NOT (x LIKE 'a')"
+    @d.literal(:x.like('a')).should == "(`x` LIKE 'a')"
+    @d.literal(~:x.like('a')).should == "NOT (`x` LIKE 'a')"
+    @d.literal(:x.ilike('a')).should == "(`x` LIKE 'a')"
+    @d.literal(~:x.ilike('a')).should == "NOT (`x` LIKE 'a')"
   end
 
   specify "should raise errors if given a regexp pattern match" do
@@ -175,27 +175,27 @@ end
 
 describe "An SQLite dataset AS clause" do
   specify "should use a string literal for :col___alias" do
-    SQLITE_DB.literal(:c___a).should == "c AS 'a'"
+    SQLITE_DB.literal(:c___a).should == "`c` AS 'a'"
   end
 
   specify "should use a string literal for :table__col___alias" do
-    SQLITE_DB.literal(:t__c___a).should == "t.c AS 'a'"
+    SQLITE_DB.literal(:t__c___a).should == "`t`.`c` AS 'a'"
   end
 
   specify "should use a string literal for :column.as(:alias)" do
-    SQLITE_DB.literal(:c.as(:a)).should == "c AS 'a'"
+    SQLITE_DB.literal(:c.as(:a)).should == "`c` AS 'a'"
   end
 
   specify "should use a string literal in the SELECT clause" do
-    SQLITE_DB[:t].select(:c___a).sql.should == "SELECT c AS 'a' FROM t"
+    SQLITE_DB[:t].select(:c___a).sql.should == "SELECT `c` AS 'a' FROM `t`"
   end
 
   specify "should use a string literal in the FROM clause" do
-    SQLITE_DB[:t___a].sql.should == "SELECT * FROM t AS 'a'"
+    SQLITE_DB[:t___a].sql.should == "SELECT * FROM `t` AS 'a'"
   end
 
   specify "should use a string literal in the JOIN clause" do
-    SQLITE_DB[:t].join_table(:natural, :j, nil, :a).sql.should == "SELECT * FROM t NATURAL JOIN j AS 'a'"
+    SQLITE_DB[:t].join_table(:natural, :j, nil, :a).sql.should == "SELECT * FROM `t` NATURAL JOIN `j` AS 'a'"
   end
 end
 

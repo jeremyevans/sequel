@@ -63,12 +63,12 @@ end
 describe "MSSQL Dataset#join_table" do
   specify "should emulate the USING clause with ON" do
     MSSQL_DB[:items].join(:categories, [:id]).sql.should ==
-      'SELECT * FROM ITEMS INNER JOIN CATEGORIES ON (CATEGORIES.ID = ITEMS.ID)'
-    ['SELECT * FROM ITEMS INNER JOIN CATEGORIES ON ((CATEGORIES.ID1 = ITEMS.ID1) AND (CATEGORIES.ID2 = ITEMS.ID2))',
-     'SELECT * FROM ITEMS INNER JOIN CATEGORIES ON ((CATEGORIES.ID2 = ITEMS.ID2) AND (CATEGORIES.ID1 = ITEMS.ID1))'].
+      'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON ([CATEGORIES].[ID] = [ITEMS].[ID])'
+    ['SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID1] = [ITEMS].[ID1]) AND ([CATEGORIES].[ID2] = [ITEMS].[ID2]))',
+     'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID2] = [ITEMS].[ID2]) AND ([CATEGORIES].[ID1] = [ITEMS].[ID1]))'].
     should include(MSSQL_DB[:items].join(:categories, [:id1, :id2]).sql)
     MSSQL_DB[:items___i].join(:categories___c, [:id]).sql.should ==
-      'SELECT * FROM ITEMS AS I INNER JOIN CATEGORIES AS C ON (C.ID = I.ID)'
+      'SELECT * FROM [ITEMS] AS [I] INNER JOIN [CATEGORIES] AS [C] ON ([C].[ID] = [I].[ID])'
   end
 end
 
@@ -86,44 +86,44 @@ describe "MSSQL Dataset#output" do
 
   specify "should format OUTPUT clauses without INTO for DELETE statements" do
     @ds.output(nil, [:deleted__name, :deleted__value]).delete_sql.should =~
-      /DELETE FROM ITEMS OUTPUT DELETED.(NAME|VALUE), DELETED.(NAME|VALUE)/
+      /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\]/
     @ds.output(nil, [:deleted.*]).delete_sql.should =~
-      /DELETE FROM ITEMS OUTPUT DELETED.*/
+      /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].*/
   end
   
   specify "should format OUTPUT clauses with INTO for DELETE statements" do
     @ds.output(:out, [:deleted__name, :deleted__value]).delete_sql.should =~
-      /DELETE FROM ITEMS OUTPUT DELETED.(NAME|VALUE), DELETED.(NAME|VALUE) INTO OUT/
+      /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\]/
     @ds.output(:out, {:name => :deleted__name, :value => :deleted__value}).delete_sql.should =~
-      /DELETE FROM ITEMS OUTPUT DELETED.(NAME|VALUE), DELETED.(NAME|VALUE) INTO OUT \((NAME|VALUE), (NAME|VALUE)\)/
+      /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/
   end
 
   specify "should format OUTPUT clauses without INTO for INSERT statements" do
     @ds.output(nil, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).should =~
-      /INSERT INTO ITEMS \((NAME|VALUE), (NAME|VALUE)\) OUTPUT INSERTED.(NAME|VALUE), INSERTED.(NAME|VALUE) VALUES \((N'name'|1), (N'name'|1)\)/
+      /INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] VALUES \((N'name'|1), (N'name'|1)\)/
     @ds.output(nil, [:inserted.*]).insert_sql(:name => "name", :value => 1).should =~
-      /INSERT INTO ITEMS \((NAME|VALUE), (NAME|VALUE)\) OUTPUT INSERTED.* VALUES \((N'name'|1), (N'name'|1)\)/
+      /INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].* VALUES \((N'name'|1), (N'name'|1)\)/
   end
 
   specify "should format OUTPUT clauses with INTO for INSERT statements" do
     @ds.output(:out, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).should =~
-      /INSERT INTO ITEMS \((NAME|VALUE), (NAME|VALUE)\) OUTPUT INSERTED.(NAME|VALUE), INSERTED.(NAME|VALUE) INTO OUT VALUES \((N'name'|1), (N'name'|1)\)/
+      /INSERT INTO \[ITEMS\] \((\[NAME\]|\[VALUE\]), (\[NAME\]|\[VALUE\])\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] VALUES \((N'name'|1), (N'name'|1)\)/
     @ds.output(:out, {:name => :inserted__name, :value => :inserted__value}).insert_sql(:name => "name", :value => 1).should =~
-      /INSERT INTO ITEMS \((NAME|VALUE), (NAME|VALUE)\) OUTPUT INSERTED.(NAME|VALUE), INSERTED.(NAME|VALUE) INTO OUT \((NAME|VALUE), (NAME|VALUE)\) VALUES \((N'name'|1), (N'name'|1)\)/
+      /INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) VALUES \((N'name'|1), (N'name'|1)\)/
   end
 
   specify "should format OUTPUT clauses without INTO for UPDATE statements" do
     @ds.output(nil, [:inserted__name, :deleted__value]).update_sql(:value => 2).should =~
-      /UPDATE ITEMS SET VALUE = 2 OUTPUT (INSERTED.NAME|DELETED.VALUE), (INSERTED.NAME|DELETED.VALUE)/
+      /UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\]/
     @ds.output(nil, [:inserted.*]).update_sql(:value => 2).should =~
-      /UPDATE ITEMS SET VALUE = 2 OUTPUT INSERTED.*/
+      /UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[INSERTED\].*/
   end
 
   specify "should format OUTPUT clauses with INTO for UPDATE statements" do
     @ds.output(:out, [:inserted__name, :deleted__value]).update_sql(:value => 2).should =~
-      /UPDATE ITEMS SET VALUE = 2 OUTPUT (INSERTED.NAME|DELETED.VALUE), (INSERTED.NAME|DELETED.VALUE) INTO OUT/
+      /UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\]/
     @ds.output(:out, {:name => :inserted__name, :value => :deleted__value}).update_sql(:value => 2).should =~
-      /UPDATE ITEMS SET VALUE = 2 OUTPUT (INSERTED.NAME|DELETED.VALUE), (INSERTED.NAME|DELETED.VALUE) INTO OUT \((NAME|VALUE), (NAME|VALUE)\)/
+      /UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/
   end
 
   specify "should execute OUTPUT clauses in DELETE statements" do
@@ -164,23 +164,23 @@ describe "MSSQL dataset" do
     end
 
     specify "should prepend UPDATE statements with WITH clause" do
-      @ds1.update_sql(:x => :y).should == 'WITH T AS (SELECT * FROM X) UPDATE T SET X = Y'
-      @ds2.update_sql(:x => :y).should == 'WITH T AS (SELECT * FROM X UNION ALL SELECT * FROM T) UPDATE T SET X = Y'
+      @ds1.update_sql(:x => :y).should == 'WITH [T] AS (SELECT * FROM [X]) UPDATE [T] SET [X] = [Y]'
+      @ds2.update_sql(:x => :y).should == 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) UPDATE [T] SET [X] = [Y]'
     end
 
     specify "should prepend DELETE statements with WITH clause" do
-      @ds1.filter(:y => 1).delete_sql.should == 'WITH T AS (SELECT * FROM X) DELETE FROM T WHERE (Y = 1)'
-      @ds2.filter(:y => 1).delete_sql.should == 'WITH T AS (SELECT * FROM X UNION ALL SELECT * FROM T) DELETE FROM T WHERE (Y = 1)'
+      @ds1.filter(:y => 1).delete_sql.should == 'WITH [T] AS (SELECT * FROM [X]) DELETE FROM [T] WHERE ([Y] = 1)'
+      @ds2.filter(:y => 1).delete_sql.should == 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) DELETE FROM [T] WHERE ([Y] = 1)'
     end
 
     specify "should prepend INSERT statements with WITH clause" do
-      @ds1.insert_sql(@db[:t]).should == 'WITH T AS (SELECT * FROM X) INSERT INTO T SELECT * FROM T'
-      @ds2.insert_sql(@db[:t]).should == 'WITH T AS (SELECT * FROM X UNION ALL SELECT * FROM T) INSERT INTO T SELECT * FROM T'
+      @ds1.insert_sql(@db[:t]).should == 'WITH [T] AS (SELECT * FROM [X]) INSERT INTO [T] SELECT * FROM [T]'
+      @ds2.insert_sql(@db[:t]).should == 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) INSERT INTO [T] SELECT * FROM [T]'
     end
 
     specify "should move WITH clause on joined dataset to top level" do
-      @db[:s].inner_join(@ds1).sql.should == "WITH T AS (SELECT * FROM X) SELECT * FROM S INNER JOIN (SELECT * FROM T) AS T1"
-      @ds1.inner_join(@db[:s].with(:s, @db[:y])).sql.should == "WITH T AS (SELECT * FROM X), S AS (SELECT * FROM Y) SELECT * FROM T INNER JOIN (SELECT * FROM S) AS T1"
+      @db[:s].inner_join(@ds1).sql.should == "WITH [T] AS (SELECT * FROM [X]) SELECT * FROM [S] INNER JOIN (SELECT * FROM [T]) AS [T1]"
+      @ds1.inner_join(@db[:s].with(:s, @db[:y])).sql.should == "WITH [T] AS (SELECT * FROM [X]), [S] AS (SELECT * FROM [Y]) SELECT * FROM [T] INNER JOIN (SELECT * FROM [S]) AS [T1]"
     end
 
     describe "on #import" do
@@ -208,10 +208,10 @@ describe "MSSQL dataset" do
         @db[:items].with(:items, @db[:inventory].group(:type)).import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
         @db.import_sqls.should == [
           'BEGIN',
-          "WITH ITEMS AS (SELECT * FROM INVENTORY GROUP BY TYPE) INSERT INTO ITEMS (X, Y) SELECT 1, 2 UNION ALL SELECT 3, 4",
+          "WITH [ITEMS] AS (SELECT * FROM [INVENTORY] GROUP BY [TYPE]) INSERT INTO [ITEMS] ([X], [Y]) SELECT 1, 2 UNION ALL SELECT 3, 4",
           'COMMIT',
           'BEGIN',
-          "WITH ITEMS AS (SELECT * FROM INVENTORY GROUP BY TYPE) INSERT INTO ITEMS (X, Y) SELECT 5, 6",
+          "WITH [ITEMS] AS (SELECT * FROM [INVENTORY] GROUP BY [TYPE]) INSERT INTO [ITEMS] ([X], [Y]) SELECT 5, 6",
           'COMMIT'
         ]
       end
@@ -226,12 +226,12 @@ describe "MSSQL joined datasets" do
 
   specify "should format DELETE statements" do
     @db[:t1].inner_join(:t2, :t1__pk => :t2__pk).delete_sql.should ==
-      "DELETE FROM T1 FROM T1 INNER JOIN T2 ON (T1.PK = T2.PK)"
+      "DELETE FROM [T1] FROM [T1] INNER JOIN [T2] ON ([T1].[PK] = [T2].[PK])"
   end
 
   specify "should format UPDATE statements" do
     @db[:t1].inner_join(:t2, :t1__pk => :t2__pk).update_sql(:pk => :t2__pk).should ==
-      "UPDATE T1 SET PK = T2.PK FROM T1 INNER JOIN T2 ON (T1.PK = T2.PK)"
+      "UPDATE [T1] SET [PK] = [T2].[PK] FROM [T1] INNER JOIN [T2] ON ([T1].[PK] = [T2].[PK])"
   end
 end
 
@@ -370,7 +370,7 @@ describe "MSSSQL::Dataset#into" do
   end
 
   specify "should format SELECT statement" do
-    @db[:t].into(:new).select_sql.should == "SELECT * INTO NEW FROM T"
+    @db[:t].into(:new).select_sql.should == "SELECT * INTO [NEW] FROM [T]"
   end
 
   specify "should select rows into a new table" do
