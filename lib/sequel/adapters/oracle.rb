@@ -181,7 +181,7 @@ module Sequel
       end
 
       def disconnect_error?(e, opts)
-        super || (e.is_a?(::OCIException) && CONNECTION_ERROR_CODES.include?(e.code))
+        super || (e.is_a?(::OCIError) && CONNECTION_ERROR_CODES.include?(e.code))
       end
       
       def remove_transaction(conn)
