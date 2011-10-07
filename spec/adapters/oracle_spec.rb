@@ -1,36 +1,27 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
-require "timeout"
 
 unless defined?(ORACLE_DB)
   ORACLE_DB = Sequel.connect('oracle://hr:hr@localhost/XE')
 end
 INTEGRATION_DB = ORACLE_DB unless defined?(INTEGRATION_DB)
+ORACLE_DB.quote_identifiers = true
 
-if ORACLE_DB.table_exists?(:items)
-  ORACLE_DB.drop_table :items
-end
-ORACLE_DB.create_table :items do
-  varchar2 :name, :size => 50
-  number :value, :size => 38
-  date :date_created
+ORACLE_DB.create_table!(:items) do
+  String :name, :size => 50
+  Integer :value
+  Date :date_created
   index :value
 end
 
-if ORACLE_DB.table_exists?(:books)
-  ORACLE_DB.drop_table :books
-end
-ORACLE_DB.create_table :books do
-  number :id, :size => 38
-  varchar2 :title, :size => 50
-  number :category_id, :size => 38
+ORACLE_DB.create_table!(:books) do
+  Integer :id
+  String :title, :size => 50
+  Integer :category_id
 end
 
-if ORACLE_DB.table_exists?(:categories)
-  ORACLE_DB.drop_table :categories
-end
-ORACLE_DB.create_table :categories do
-  number :id, :size => 38
-  varchar2 :cat_name, :size => 50
+ORACLE_DB.create_table!(:categories) do
+  Integer :id
+  String :cat_name, :size => 50
 end
 
 describe "An Oracle database" do
@@ -42,22 +33,19 @@ describe "An Oracle database" do
   end
   
   specify "should provide schema information" do
-    books_schema = [
-      [:id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)", :ruby_default => nil}], 
-      [:title, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)", :ruby_default => nil}], 
-      [:category_id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)", :ruby_default => nil}]]
-    categories_schema = [
-      [:id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)", :ruby_default => nil}], 
-      [:cat_name, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)", :ruby_default => nil}]]
-    items_schema = [
-      [:name, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)", :ruby_default => nil}], 
-      [:value, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)", :ruby_default => nil}],
-      [:date_created, {:charset_form=>nil, :type=>:date, :type_string=>"DATE", :fsprecision=>0, :data_size=>7, :lfprecision=>0, :precision=>0, :db_type=>"DATE", :char_used=>false, :char_size=>0, :scale=>0, :allow_null=>true, :ruby_default => nil}]]
+    books_schema = [[:id, [:integer, false, true, nil]],
+      [:title, [:string, false, true, nil]],
+      [:category_id, [:integer, false, true, nil]]]
+    categories_schema = [[:id, [:integer, false, true, nil]],
+      [:cat_name, [:string, false, true, nil]]]
+    items_schema = [[:name, [:string, false, true, nil]],
+      [:value, [:integer, false, true, nil]],
+      [:date_created, [:datetime, false, true, nil]]]
      
     {:books => books_schema, :categories => categories_schema, :items => items_schema}.each_pair do |table, expected_schema|
       schema = ORACLE_DB.schema(table)
       schema.should_not be_nil
-      schema.should == expected_schema
+      schema.map{|c, s| [c, s.values_at(:type, :primary_key, :allow_null, :ruby_default)]}.should == expected_schema
     end
   end
   
@@ -143,27 +131,27 @@ describe "An Oracle dataset" do
     
     @d.max(:value).to_i.should == 789
     
-    @d.select(:name, :AVG.sql_function(:value)).filter(:name => 'abc').group(:name).to_a.should == [
-      {:name => 'abc', :"avg(value)" => (456+123)/2.0}
+    @d.select(:name, :AVG.sql_function(:value).as(:avg)).filter(:name => 'abc').group(:name).to_a.should == [
+      {:name => 'abc', :avg => (456+123)/2.0}
     ]
 
-    @d.select(:AVG.sql_function(:value)).group(:name).order(:name).limit(1).to_a.should == [
-      {:"avg(value)" => (456+123)/2.0}
+    @d.select(:AVG.sql_function(:value).as(:avg)).group(:name).order(:name).limit(1).to_a.should == [
+      {:avg => (456+123)/2.0}
     ]
         
-    @d.select(:name, :AVG.sql_function(:value)).group(:name).order(:name).to_a.should == [
-      {:name => 'abc', :"avg(value)" => (456+123)/2.0},
-      {:name => 'def', :"avg(value)" => 789*1.0}
+    @d.select(:name, :AVG.sql_function(:value).as(:avg)).group(:name).order(:name).to_a.should == [
+      {:name => 'abc', :avg => (456+123)/2.0},
+      {:name => 'def', :avg => 789*1.0}
     ]
     
-    @d.select(:name, :AVG.sql_function(:value)).group(:name).order(:name).to_a.should == [
-      {:name => 'abc', :"avg(value)" => (456+123)/2.0},
-      {:name => 'def', :"avg(value)" => 789*1.0}
+    @d.select(:name, :AVG.sql_function(:value).as(:avg)).group(:name).order(:name).to_a.should == [
+      {:name => 'abc', :avg => (456+123)/2.0},
+      {:name => 'def', :avg => 789*1.0}
     ]
 
-    @d.select(:name, :AVG.sql_function(:value)).group(:name).having(:name => ['abc', 'def']).order(:name).to_a.should == [
-      {:name => 'abc', :"avg(value)" => (456+123)/2.0},
-      {:name => 'def', :"avg(value)" => 789*1.0}
+    @d.select(:name, :AVG.sql_function(:value).as(:avg)).group(:name).having(:name => ['abc', 'def']).order(:name).to_a.should == [
+      {:name => 'abc', :avg => (456+123)/2.0},
+      {:name => 'def', :avg => 789*1.0}
     ]
     
     @d.select(:name, :value).filter(:name => 'abc').union(@d.select(:name, :value).filter(:name => 'def')).order(:value).to_a.should == [
@@ -284,34 +272,15 @@ end
 describe "Row locks in Oracle" do
   before do
     @d1 = ORACLE_DB[:books]
-    @d1.delete # remove all records
+    @d1.delete
     @d1 << {:id => 1, :title => 'aaa'}
   end
 
   specify "#for_update should use FOR UPDATE" do
-    @d1.for_update.sql.should == "SELECT * FROM BOOKS FOR UPDATE"
+    @d1.for_update.sql.should == 'SELECT * FROM "BOOKS" FOR UPDATE'
   end
 
   specify "#lock_style should accept symbols" do
-    @d1.lock_style(:update).sql.should == "SELECT * FROM BOOKS FOR UPDATE"
-  end
-
-  specify "should not update during row lock" do
-    ORACLE_DB.transaction do
-      @d1.filter(:id => 1).for_update.to_a
-      proc do
-        t1 = Thread.start do
-          # wait for unlock
-          Timeout::timeout(0.02) do
-            ORACLE_DB[:books].filter(:id => 1).update(:title => "bbb")
-          end
-        end
-        t1.join
-      end.should raise_error
-      @d1.filter(:id => 1).first[:title].should == "aaa"
-    end
-    t2 = Thread.start { ORACLE_DB[:books].filter(:id => 1).update(:title => "bbb") }
-    t2.join
-    @d1.filter(:id => 1).first[:title].should == "bbb"
+    @d1.lock_style(:update).sql.should == 'SELECT * FROM "BOOKS" FOR UPDATE'
   end
 end
