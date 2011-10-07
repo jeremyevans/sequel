@@ -241,16 +241,6 @@ module Sequel
         self << drop_language_sql(name, opts)
       end
       
-      # Remove the cached entries for primary keys and sequences when dropping a table.
-      def drop_table(*names)
-        names.each do |name|
-          name = quote_schema_table(name)
-          @primary_keys.delete(name)
-          @primary_key_sequences.delete(name)
-        end
-        super
-      end
-
       # Drops a trigger from the database.  Arguments:
       # * table : table from which to drop the trigger
       # * name : name of the trigger to drop
@@ -558,6 +548,15 @@ module Sequel
         PREPARED_ARG_PLACEHOLDER
       end
       
+      # Remove the cached entries for primary keys and sequences when a table is
+      # changed.
+      def remove_cached_schema(table)
+        table = quote_schema_table(table)
+        @primary_keys.delete(table)
+        @primary_key_sequences.delete(table)
+        super
+      end
+
       # SQL DDL statement for renaming a table. PostgreSQL doesn't allow you to change a table's schema in
       # a rename table operation, so speciying a new schema in new_name will not have an effect.
       def rename_table_sql(name, new_name)

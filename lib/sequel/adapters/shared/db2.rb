@@ -209,12 +209,6 @@ module Sequel
         end
       end
 
-      # Delete the row_number_column if offsets are being emulated with
-      # ROW_NUMBER.
-      def fetch_rows(sql, &block)
-        @opts[:offset] ? super(sql){|r| r.delete(row_number_column); yield r} : super(sql, &block)
-      end
-
       # DB2 does not support IS TRUE.
       def supports_is_true?
         false

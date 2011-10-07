@@ -297,12 +297,6 @@ module Sequel
         mutation_method(:disable_insert_output)
       end
 
-      # When returning all rows, if an offset is used, delete the row_number column
-      # before yielding the row.
-      def fetch_rows(sql, &block)
-        @opts[:offset] ? super(sql){|r| r.delete(row_number_column); yield r} : super(sql, &block)
-      end
-      
       # MSSQL uses the CONTAINS keyword for full text search
       def full_text_search(cols, terms, opts = {})
         filter("CONTAINS (#{literal(cols)}, #{literal(terms)})")

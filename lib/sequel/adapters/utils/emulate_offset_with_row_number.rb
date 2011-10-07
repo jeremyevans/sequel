@@ -51,5 +51,13 @@ module Sequel
         limit(@opts[:limit]).
         where(SQL::Identifier.new(rn) > o))
     end
+
+    private
+
+    # This emulation adds an extra row number column that should be
+    # eliminated.
+    def offset_returns_row_number_column?
+      true
+    end
   end
 end

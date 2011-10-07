@@ -91,22 +91,24 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |s|
           begin
-            @columns = s.column_names.map{|c| output_identifier(c)}
-            s.fetch{|r| yield hash_row(s, r)}
+            columns = cols = s.column_names.map{|c| output_identifier(c)}
+            if opts[:offset] && offset_returns_row_number_column?
+              rn = row_number_column
+              columns = columns.dup
+              columns.delete(rn)
+            end
+            @columns = columns
+            s.fetch do |r|
+              row = {}
+              cols.each{|c| row[c] = r.shift}
+              row.delete(rn) if rn
+              yield row
+            end
           ensure
             s.finish rescue nil
           end
         end
         self
-      end
-      
-      private
-      
-      def hash_row(stmt, row)
-        @columns.inject({}) do |m, c|
-          m[c] = row.shift
-          m
-        end
       end
     end
   end
