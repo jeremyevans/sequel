@@ -50,77 +50,9 @@ module Sequel
         
         conn
       end
-      
+
       def dataset(opts = nil)
         Oracle::Dataset.new(self, opts)
-      end
-
-      def schema_parse_table(table, opts={})
-        schema, table = schema_and_table(table)
-        schema ||= opts[:schema]
-        schema_and_table = "#{"#{quote_identifier(opts[:schema])}." if opts[:schema]}#{quote_identifier(table)}"
-        table_schema = []
-        m = output_identifier_meth
-        im = input_identifier_meth
-
-        # Primary Keys
-        ds = metadata_dataset.from(:all_constraints___cons, :all_cons_columns___cols).
-          where(:cols__table_name=>im.call(table), :cons__constraint_type=>'P',
-                :cons__constraint_name=>:cols__constraint_name, :cons__owner=>:cols__owner)
-        ds = ds.where(:cons__owner=>im.call(opts[:schema])) if opts[:schema]
-        pks = ds.select_map(:cols__column_name)
-
-        # Default values
-        defaults =  metadata_dataset.from(:dba_tab_cols).
-          where(:table_name=>im.call(table)).
-          to_hash(:column_name, :data_default)
-
-        metadata = synchronize(opts[:server]) do |conn|
-          begin
-          log_yield("Connection.describe_table"){conn.describe_table(schema_and_table)}
-          rescue OCIError => e
-            raise_error(e)
-          end
-        end
-        metadata.columns.each do |column|
-          h = {
-              :primary_key => pks.include?(column.name),
-              :default => defaults[column.name],
-              :oci8_type => column.data_type,
-              :db_type => column.type_string.split(' ')[0],
-              :type_string => column.type_string,
-              :charset_form => column.charset_form,
-              :char_used => column.char_used?,
-              :char_size => column.char_size,
-              :data_size => column.data_size,
-              :precision => column.precision,
-              :scale => column.scale,
-              :fsprecision => column.fsprecision,
-              :lfprecision => column.lfprecision,
-              :allow_null => column.nullable?
-          }
-          h[:type] = oracle_column_type(h)
-          table_schema << [m.call(column.name), h]
-        end
-        table_schema
-      end
-      
-      def oracle_column_type(h)
-        case h[:oci8_type]
-        when :number
-          case h[:scale]
-          when 0
-            :integer
-          when -127
-            :float
-          else
-            :decimal
-          end
-        when :date
-          :datetime
-        else
-          schema_column_type(h[:db_type])
-        end
       end
 
       def execute(sql, opts={})
@@ -184,6 +116,29 @@ module Sequel
         super || (e.is_a?(::OCIError) && CONNECTION_ERROR_CODES.include?(e.code))
       end
       
+      def oracle_column_type(h)
+        case h[:oci8_type]
+        when :number
+          case h[:scale]
+          when 0
+            :integer
+          when -127
+            :float
+          else
+            :decimal
+          end
+        when :date
+          :datetime
+        else
+          schema_column_type(h[:db_type])
+        end
+      end
+
+      def remove_cached_schema(table)
+        @primary_key_sequences.delete(table)
+        super
+      end
+      
       def remove_transaction(conn)
         conn.autocommit = true if conn
         super
@@ -193,6 +148,56 @@ module Sequel
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
 
+      def schema_parse_table(table, opts={})
+        schema, table = schema_and_table(table)
+        schema ||= opts[:schema]
+        schema_and_table = "#{"#{quote_identifier(opts[:schema])}." if opts[:schema]}#{quote_identifier(table)}"
+        table_schema = []
+        m = output_identifier_meth
+        im = input_identifier_meth
+
+        # Primary Keys
+        ds = metadata_dataset.from(:all_constraints___cons, :all_cons_columns___cols).
+          where(:cols__table_name=>im.call(table), :cons__constraint_type=>'P',
+                :cons__constraint_name=>:cols__constraint_name, :cons__owner=>:cols__owner)
+        ds = ds.where(:cons__owner=>im.call(opts[:schema])) if opts[:schema]
+        pks = ds.select_map(:cols__column_name)
+
+        # Default values
+        defaults =  metadata_dataset.from(:dba_tab_cols).
+          where(:table_name=>im.call(table)).
+          to_hash(:column_name, :data_default)
+
+        metadata = synchronize(opts[:server]) do |conn|
+          begin
+          log_yield("Connection.describe_table"){conn.describe_table(schema_and_table)}
+          rescue OCIError => e
+            raise_error(e)
+          end
+        end
+        metadata.columns.each do |column|
+          h = {
+              :primary_key => pks.include?(column.name),
+              :default => defaults[column.name],
+              :oci8_type => column.data_type,
+              :db_type => column.type_string.split(' ')[0],
+              :type_string => column.type_string,
+              :charset_form => column.charset_form,
+              :char_used => column.char_used?,
+              :char_size => column.char_size,
+              :data_size => column.data_size,
+              :precision => column.precision,
+              :scale => column.scale,
+              :fsprecision => column.fsprecision,
+              :lfprecision => column.lfprecision,
+              :allow_null => column.nullable?
+          }
+          h[:type] = oracle_column_type(h)
+          table_schema << [m.call(column.name), h]
+        end
+        table_schema
+      end
+      
       def sequence_for_table(table)
         return nil unless autosequence
         @primary_key_sequences.fetch(table) do |key|
