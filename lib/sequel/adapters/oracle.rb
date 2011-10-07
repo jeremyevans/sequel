@@ -116,6 +116,8 @@ module Sequel
           else
             :decimal
           end
+        when :date
+          :datetime
         else
           schema_column_type(h[:db_type])
         end
