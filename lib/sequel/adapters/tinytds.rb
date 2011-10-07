@@ -209,21 +209,27 @@ module Sequel
         execute(sql) do |result|
           each_opts = {:cache_rows=>false}
           each_opts[:timezone] = :utc if db.timezone == :utc
-          offset = @opts[:offset]
-          @columns = cols = result.fields.map{|c| output_identifier(c)}
+          rn = row_number_column if @opts[:offset]
+          columns = cols = result.fields.map{|c| output_identifier(c)}
+          if opts[:offset]
+            rn = row_number_column
+            columns = columns.dup
+            columns.delete(rn)
+          end
+          @columns = columns
           if identifier_output_method
             each_opts[:as] = :array
             result.each(each_opts) do |r|
               h = {}
               cols.zip(r).each{|k, v| h[k] = v}
-              h.delete(row_number_column) if offset
+              h.delete(rn) if rn
               yield h
             end
           else
             each_opts[:symbolize_keys] = true
             if offset
               result.each(each_opts) do |r|
-                r.delete(row_number_column) if offset
+                r.delete(rn) if rn
                 yield r
               end
             else

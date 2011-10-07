@@ -126,6 +126,12 @@ module Sequel
 
     private
 
+    # Whether using an offset returns an extra row number column that should be
+    # eliminated, false by default.
+    def offset_returns_row_number_column?
+      false
+    end
+
     # Whether the RETURNING clause is used for the given dataset.
     # +type+ can be :insert, :update, or :delete.
     def uses_returning?(type)

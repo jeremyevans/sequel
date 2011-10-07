@@ -72,7 +72,7 @@ module Sequel
     #   # => [:id, :name]
     def columns
       return @columns if @columns
-      ds = unfiltered.unordered.clone(:distinct => nil, :limit => 1)
+      ds = unfiltered.unordered.clone(:distinct => nil, :limit => 1, :offset=>nil)
       ds.each{break}
       @columns = ds.instance_variable_get(:@columns)
       @columns || []

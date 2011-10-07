@@ -89,6 +89,13 @@ describe "Simple Dataset operations" do
     @ds.order(:id).limit(2, 1).all.should == [{:id=>2, :number=>20}]
   end
   
+  specify "should provide correct columns when using a limit and offset" do
+    ds = @ds.order(:id).limit(1, 1)
+    ds.all
+    ds.columns.should == [:id, :number]
+    @ds.order(:id).limit(1, 1).columns.should == [:id, :number]
+  end
+
   specify "should fetch correctly with a limit and offset for different combinations of from and join tables" do
     @db.create_table!(:items2){primary_key :id2; Integer :number2}
     @db[:items2].insert(:number2=>10)

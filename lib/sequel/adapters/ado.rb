@@ -105,8 +105,19 @@ module Sequel
     class Dataset < Sequel::Dataset
       def fetch_rows(sql)
         execute(sql) do |s|
-          @columns = cols = s.Fields.extend(Enumerable).map{|column| output_identifier(column.Name)}
-          s.getRows.transpose.each{|r| yield cols.inject({}){|m,c| m[c] = r.shift; m}} unless s.eof
+          columns = cols = s.Fields.extend(Enumerable).map{|column| output_identifier(column.Name)}
+          if opts[:offset] && offset_returns_row_number_column?
+            rn = row_number_column
+            columns = columns.dup
+            columns.delete(rn)
+          end
+          @columns = columns
+          s.getRows.transpose.each do |r|
+            row = {}
+            cols.each{|c| row[c] = r.shift}
+            row.delete(rn) if rn
+            yield row
+          end unless s.eof
         end
       end
       

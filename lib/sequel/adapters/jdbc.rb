@@ -625,7 +625,12 @@ module Sequel
         cols = []
         i = 0
         meta.getColumnCount.times{cols << [output_identifier(meta.getColumnLabel(i+=1)), i]}
-        @columns = cols.map{|c| c.at(0)}
+        columns = cols.map{|c| c.at(0)}
+        if opts[:offset] && offset_returns_row_number_column?
+          rn = row_number_column
+          columns.delete(rn)
+        end
+        @columns = columns
         blk = result_set_object_getter
         # get rows
         while result.next
@@ -633,6 +638,7 @@ module Sequel
           cols.each do |n, i|
             row[n] = blk.call(result, n, i)
           end
+          row.delete(rn) if rn
           yield row
         end
       end
