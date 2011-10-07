@@ -20,11 +20,6 @@ module Sequel
         self << drop_sequence_sql(name)
       end
 
-      def drop_table(*names)
-        clear_primary_key(*names)
-        super
-      end
-
       # Return primary key for the given table.
       def primary_key(table)
         t = dataset.send(:input_identifier, table)
@@ -129,6 +124,11 @@ module Sequel
       
       def drop_sequence_sql(name)
         "DROP SEQUENCE #{quote_identifier(name)}"
+      end
+
+      def remove_cached_schema(table)
+        clear_primary_key(table)
+        super
       end
 
       def restart_sequence_sql(name, opts={})
