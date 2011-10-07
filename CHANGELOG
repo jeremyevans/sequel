@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#listen and #notify to the postgres adapter, for LISTEN and NOTIFY support (jeremyevans)
+
 * Emulate the bitwise compliment operator on h2 (jeremyevans)
 
 * Fix improper handling of emulated bitwise operators with more than two arguments (jeremyevans)

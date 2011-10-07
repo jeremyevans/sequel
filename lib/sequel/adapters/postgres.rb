@@ -239,9 +239,34 @@ module Sequel
         conn
       end
       
+      # Return instance of Sequel::Postgres::Dataset with the given options.
+      def dataset(opts = nil)
+        Postgres::Dataset.new(self, opts)
+      end
+      
+      # Execute the given SQL with the given args on an available connection.
+      def execute(sql, opts={}, &block)
+        check_database_errors do
+          return execute_prepared_statement(sql, opts, &block) if Symbol === sql
+          synchronize(opts[:server]){|conn| conn.execute(sql, opts[:arguments], &block)}
+        end
+      end
+      
+      # Insert the values into the table and return the primary key (if
+      # automatically generated).
+      def execute_insert(sql, opts={})
+        return execute(sql, opts) if Symbol === sql
+        check_database_errors do
+          synchronize(opts[:server]) do |conn|
+            conn.execute(sql, opts[:arguments])
+            insert_result(conn, opts[:table], opts[:values])
+          end
+        end
+      end
+      
       if SEQUEL_POSTGRES_USES_PG
         # +copy_table+ uses PostgreSQL's +COPY+ SQL statement to return formatted
-        # results directly to the caller.  This method is only support if pg is the
+        # results directly to the caller.  This method is only supported if pg is the
         # underlying ruby driver.  This method should only be called if you want
         # results returned to the client.  If you are using +COPY FROM+ or +COPY TO+
         # with a filename, you should just use +run+ instead of this method.  This
@@ -301,33 +326,57 @@ module Sequel
             end
           end 
         end
-      end
-        
-      # Return instance of Sequel::Postgres::Dataset with the given options.
-      def dataset(opts = nil)
-        Postgres::Dataset.new(self, opts)
-      end
-      
-      # Execute the given SQL with the given args on an available connection.
-      def execute(sql, opts={}, &block)
-        check_database_errors do
-          return execute_prepared_statement(sql, opts, &block) if Symbol === sql
-          synchronize(opts[:server]){|conn| conn.execute(sql, opts[:arguments], &block)}
-        end
-      end
-      
-      # Insert the values into the table and return the primary key (if
-      # automatically generated).
-      def execute_insert(sql, opts={})
-        return execute(sql, opts) if Symbol === sql
-        check_database_errors do
-          synchronize(opts[:server]) do |conn|
-            conn.execute(sql, opts[:arguments])
-            insert_result(conn, opts[:table], opts[:values])
+
+        # Listens on the given channel (or multiple channels if channel is an array), waiting for notifications.
+        # After a notification is received, or the timeout has passed, stops listening to the channel. Options:
+        #
+        # :after_listen :: An object that responds to +call+ that is called with the underlying connection after the LISTEN
+        #                  statement is sent, but before the connection starts waiting for notifications.
+        # :loop :: Whether to continually wait for notifications, instead of just waiting for a single
+        #          notification. If this option is given, a block must be provided.  If this object responds to call, it is
+        #          called with the underlying connection after each notification is received (after the block is called).
+        #          If a :timeout option is used, and a callable object is given, the object will also be called if the
+        #          timeout expires.  If :loop is used and you want to stop listening, you can either break from inside the
+        #          block given to #listen, or you can throw :stop from inside the :loop object's call method or the block.
+        # :server :: The server on which to listen, if the sharding support is being used.
+        # :timeout :: How long to wait for a notification, in seconds (can provide a float value for
+        #             fractional seconds).  If not given or nil, waits indefinitely.
+        #
+        # This method is only supported if pg is used as the underlying ruby driver.  It returns the
+        # channel the notification was sent to (as a string), unless :loop was used, in which case it returns nil.
+        # If a block is given, it is yielded 3 arguments:
+        # * the channel the notification was sent to (as a string)
+        # * the backend pid of the notifier (as an integer),
+        # * and the payload of the notification (as a string or nil).
+        def listen(channels, opts={}, &block)
+          check_database_errors do
+            synchronize(opts[:server]) do |conn|
+              begin
+                channels = Array(channels)
+                channels.each{|channel| conn.execute("LISTEN #{channel}")}
+                opts[:after_listen].call(conn) if opts[:after_listen]
+                timeout = opts[:timeout] ? [opts[:timeout]] : []
+                if l = opts[:loop]
+                  raise Error, 'calling #listen with :loop requires a block' unless block
+                  loop_call = l.respond_to?(:call)
+                  catch(:stop) do
+                    loop do
+                      conn.wait_for_notify(*timeout, &block)
+                      l.call(conn) if loop_call
+                    end
+                  end
+                  nil
+                else
+                  conn.wait_for_notify(*timeout, &block)
+                end
+              ensure
+                conn.execute("UNLISTEN *")
+              end
+            end
           end
         end
       end
-      
+        
       private
       
       # Convert exceptions raised from the block into DatabaseErrors.

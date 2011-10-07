@@ -1093,4 +1093,65 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
       @db[:test_copy].select_order_map(:x).should == [1, 3]
     end
   end  
+
+  describe "Postgres::Database LISTEN/NOTIFY" do
+    before(:all) do
+      @db = POSTGRES_DB
+    end
+  
+    specify "should support listen and notify" do
+      notify_pid = @db.synchronize{|conn| conn.backend_pid}
+
+      called = false
+      @db.listen('foo', :after_listen=>proc{@db.notify('foo')}) do |ev, pid, payload|
+        ev.should == 'foo'
+        pid.should == notify_pid
+        ['', nil].should include(payload)
+        called = true
+      end.should == 'foo'
+      called.should be_true
+
+      called = false
+      @db.listen('foo', :after_listen=>proc{@db.notify('foo', :payload=>'bar')}) do |ev, pid, payload|
+        ev.should == 'foo'
+        pid.should == notify_pid
+        payload.should == 'bar'
+        called = true
+      end.should == 'foo'
+      called.should be_true
+
+      @db.listen('foo', :after_listen=>proc{@db.notify('foo')}).should == 'foo'
+
+      called = false
+      called2 = false
+      i = 0
+      @db.listen(['foo', 'bar'], :after_listen=>proc{@db.notify('foo', :payload=>'bar'); @db.notify('bar', :payload=>'foo')}, :loop=>proc{i+=1}) do |ev, pid, payload|
+        if !called
+          ev.should == 'foo'
+          pid.should == notify_pid
+          payload.should == 'bar'
+          called = true
+        else
+          ev.should == 'bar'
+          pid.should == notify_pid
+          payload.should == 'foo'
+          called2 = true
+          break
+        end
+      end.should be_nil
+      called.should be_true
+      called2.should be_true
+      i.should == 1
+    end
+
+    specify "should accept a :timeout option in listen" do
+      @db.listen('foo2', :timeout=>0.001).should == nil
+      called = false
+      @db.listen('foo2', :timeout=>0.001){|ev, pid, payload| called = true}.should == nil
+      called.should be_false
+      i = 0
+      @db.listen('foo2', :timeout=>0.001, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.should == nil
+      i.should == 4
+    end
+  end
 end

@@ -294,6 +294,16 @@ module Sequel
         dataset.from(:pg_class).join(:pg_locks, :relation=>:relfilenode).select(:pg_class__relname, Sequel::SQL::ColumnAll.new(:pg_locks))
       end
       
+      # Notifies the given channel.  See the PostgreSQL NOTIFY documentation. Options:
+      #
+      # :payload :: The payload string to use for the NOTIFY statement.  Only supported
+      #             in PostgreSQL 9.0+.
+      # :server :: The server to which to send the NOTIFY statement, if the sharding support
+      #            is being used.
+      def notify(channel, opts={})
+        execute_ddl("NOTIFY #{channel}#{", #{literal(opts[:payload].to_s)}" if opts[:payload]}", opts)
+      end
+
       # Return primary key for the given table.
       def primary_key(table, opts={})
         quoted_table = quote_schema_table(table)
