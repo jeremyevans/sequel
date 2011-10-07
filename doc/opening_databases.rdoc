@@ -260,7 +260,10 @@ Example connection strings:
   jdbc:h2:mem:
   jdbc:sqlserver://localhost;database=sequel_test;integratedSecurity=true
   jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test
-  
+  jdbc:oracle:thin:user/password@localhost:1521:database
+  jdbc:db2://localhost:3700/database:user=user;password=password;
+  jdbc:firebirdsql:localhost/3050:/path/to/database.fdb
+
 You can also use JNDI connection strings:
 
   jdbc:jndi:java:comp/env/jndi_resource_name
