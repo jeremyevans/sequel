@@ -594,6 +594,18 @@ module Sequel
       end
     end
 
+    protected
+
+    # Return an array of arrays of values given by the symbols in ret_cols.
+    def _select_map_multiple(ret_cols)
+      map{|r| ret_cols.map{|c| r[c]}}
+    end
+  
+    # Returns an array of the first value in each row.
+    def _select_map_single
+      map{|r| r.values.first}
+    end
+  
     private
     
     # Internals of +select_map+ and +select_order_map+
@@ -609,14 +621,13 @@ module Sequel
         ds = ds.select(&block)
         ds = ds.order(&block) if order
       end
-      if ds.opts[:select].length > 1
-        ret_cols = select_cols.map{|c| hash_key_symbol(c)}
-        ds.map{|r| ret_cols.map{|c| r[c]}}
+      if column.is_a?(Array)
+        ds._select_map_multiple(select_cols.map{|c| hash_key_symbol(c)})
       else
-        ds.map{|r| r.values.first}
+        ds._select_map_single
       end
     end
-  
+
     # Set the server to use to :default unless it is already set in the passed opts
     def default_server_opts(opts)
       {:server=>@opts[:server] || :default}.merge(opts)

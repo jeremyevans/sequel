@@ -4128,6 +4128,11 @@ describe "Sequel::Dataset#select_map" do
     @ds.select_order_map([:d.as(:c), :c.qualify(:b), :c.identifier, :c.identifier.qualify(:b), :a__c, :a__d___c]).should == [[1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2]]
     @ds.db.sqls.should == ['SELECT d AS c, b.c, c, b.c, a.c, a.d AS c FROM t ORDER BY d, b.c, c, b.c, a.c, a.d']
   end
+
+  specify "should handle an array with a single element" do
+    @ds.select_map([:c]).should == [[1], [2]]
+    @ds.db.sqls.should == ['SELECT c FROM t']
+  end
 end
 
 describe "Sequel::Dataset#select_order_map" do
@@ -4182,6 +4187,11 @@ describe "Sequel::Dataset#select_order_map" do
     @ds.db.reset
     @ds.select_order_map([:d.as(:c), :c.qualify(:b), :c.identifier, :c.identifier.qualify(:b), :c.identifier.qualify(:b).desc, :a__c, :a__d___c.desc]).should == [[1, 1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2, 2]]
     @ds.db.sqls.should == ['SELECT d AS c, b.c, c, b.c, b.c, a.c, a.d AS c FROM t ORDER BY d, b.c, c, b.c, b.c DESC, a.c, a.d DESC']
+  end
+
+  specify "should handle an array with a single element" do
+    @ds.select_order_map([:c]).should == [[1], [2]]
+    @ds.db.sqls.should == ['SELECT c FROM t ORDER BY c']
   end
 end
 

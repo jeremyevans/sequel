@@ -829,6 +829,7 @@ describe "Sequel::Dataset convenience methods" do
   specify "should have working #select_map" do
     @ds.select_map(:a).should == [1, 5]
     @ds.select_map(:b).should == [2, 6]
+    @ds.select_map([:a]).should == [[1], [5]]
     @ds.select_map([:a, :b]).should == [[1, 2], [5, 6]]
 
     @ds.select_map(:a___e).should == [1, 5]
@@ -845,6 +846,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.select_order_map(:a__b.desc).should == [6, 2]
     @ds.select_order_map(:a__b___e.desc).should == [6, 2]
     @ds.select_order_map(:b.qualify(:a).as(:e)).should == [2, 6]
+    @ds.select_order_map([:a]).should == [[1], [5]]
     @ds.select_order_map([:a.desc, :b]).should == [[5, 6], [1, 2]]
 
     @ds.select_order_map(:a___e).should == [1, 5]
