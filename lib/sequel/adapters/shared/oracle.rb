@@ -16,6 +16,10 @@ module Sequel
         self << create_trigger_sql(*args)
       end
 
+      def current_user
+        @current_user ||= get{sys_context('USERENV', 'CURRENT_USER')}
+      end
+
       def drop_sequence(name)
         self << drop_sequence_sql(name)
       end
