@@ -149,6 +149,11 @@ module Sequel
         "DROP SEQUENCE #{quote_identifier(name)}"
       end
 
+      def remove_cached_schema(table)
+        @primary_key_sequences.delete(table)
+        super
+      end
+      
       def sequence_for_table(table)
         return nil unless autosequence
         @primary_key_sequences.fetch(table) do |key|

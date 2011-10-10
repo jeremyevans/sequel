@@ -134,11 +134,6 @@ module Sequel
         end
       end
 
-      def remove_cached_schema(table)
-        @primary_key_sequences.delete(table)
-        super
-      end
-      
       def remove_transaction(conn)
         conn.autocommit = true if conn
         super
