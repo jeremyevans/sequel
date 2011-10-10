@@ -9,6 +9,13 @@ module Sequel
       module DatabaseMethods
         include Sequel::Oracle::DatabaseMethods
         include Sequel::JDBC::Transactions
+
+        def self.extended(db)
+          db.instance_eval do
+            @autosequence = opts[:autosequence]
+            @primary_key_sequences = {}
+          end
+        end
         
         # Return Sequel::JDBC::Oracle::Dataset object with the given opts.
         def dataset(opts=nil)
@@ -16,6 +23,26 @@ module Sequel
         end
         
         private
+
+        def last_insert_id(conn, opts)
+          unless sequence = opts[:sequence]
+            if t = opts[:table]
+              sequence = sequence_for_table(t)
+            end
+          end
+          if sequence
+            sql = "SELECT #{literal(sequence)}.currval FROM dual"
+            statement(conn) do |stmt|
+              begin
+                rs = log_yield(sql){stmt.executeQuery(sql)}
+                rs.next
+                rs.getInt(1)
+              rescue java.sql.SQLException
+                nil
+              end
+            end
+          end
+        end
 
         def schema_parse_table(*)
           sch = super

@@ -149,6 +149,17 @@ module Sequel
         "DROP SEQUENCE #{quote_identifier(name)}"
       end
 
+      def sequence_for_table(table)
+        return nil unless autosequence
+        @primary_key_sequences.fetch(table) do |key|
+          pk = schema(table).select{|k, v| v[:primary_key]}
+          @primary_key_sequences[table] = if pk.length == 1
+            seq = "seq_#{table}_#{pk.first.first}"
+            seq.to_sym unless from(:user_sequences).filter(:sequence_name=>input_identifier_meth.call(seq)).empty?
+          end
+        end
+      end
+
       # Oracle's integer/:number type handles larger values than
       # most other databases's bigint types, so it should be
       # safe to use for Bignum.

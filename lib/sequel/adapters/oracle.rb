@@ -197,17 +197,6 @@ module Sequel
         end
         table_schema
       end
-      
-      def sequence_for_table(table)
-        return nil unless autosequence
-        @primary_key_sequences.fetch(table) do |key|
-          pk = schema(table).select{|k, v| v[:primary_key]}
-          seq = if pk.length == 1
-            :"seq_#{table}_#{pk.first.first}"
-          end
-          @primary_key_sequences[table] = seq
-        end
-      end
     end
     
     class Dataset < Sequel::Dataset
