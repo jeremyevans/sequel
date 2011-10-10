@@ -70,7 +70,16 @@ module Sequel
         def convert_type(v)
           case v
           when Java::JavaMath::BigDecimal
-            v.scale == 0 ? v.int_value : super
+            if v.scale == 0
+              i = v.long_value
+              if v.equals(Java::JavaMath::BigDecimal.new(i))
+                i
+              else
+                super
+              end
+            else
+              super
+            end
           when Java::OracleSql::TIMESTAMP
             db.to_application_timestamp(v.to_string)
           else
