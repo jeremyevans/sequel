@@ -64,6 +64,19 @@ module Sequel
       # Dataset class for Oracle datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Oracle::DatasetMethods
+
+        private
+
+        def convert_type(v)
+          case v
+          when Java::JavaMath::BigDecimal
+            v.scale == 0 ? v.int_value : super
+          when Java::OracleSql::TIMESTAMP
+            db.to_application_timestamp(v.to_string)
+          else
+            super
+          end
+        end
       end
     end
   end
