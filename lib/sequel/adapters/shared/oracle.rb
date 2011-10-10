@@ -258,6 +258,18 @@ module Sequel
         clone(:sequence=>s)
       end
 
+      # Handle LIMIT by using a unlimited subselect filtered with ROWNUM.
+      def select_sql
+        if limit = @opts[:limit]
+          # Lock doesn't work in subselects, so don't use a subselect when locking.
+          ds = clone(:limit=>nil)
+          ds = ds.from_self unless @opts[:lock]
+          subselect_sql(ds.where(SQL::ComplexExpression.new(:<=, ROW_NUMBER_EXPRESSION, limit)))
+        else
+          super
+        end
+      end
+
       # Oracle requires recursive CTEs to have column aliases.
       def recursive_cte_requires_column_aliases?
         true
@@ -350,18 +362,6 @@ module Sequel
       # from a table.
       def select_from_sql(sql)
         sql << " FROM #{source_list(@opts[:from] || ['DUAL'])}"
-      end
-
-      # Handle LIMIT by using a unlimited subselect filtered with ROWNUM.
-      def select_sql
-        if limit = @opts[:limit]
-          # Lock doesn't work in subselects, so don't use a subselect when locking.
-          ds = clone(:limit=>nil)
-          ds = ds.from_self unless @opts[:lock]
-          subselect_sql(ds.where(SQL::ComplexExpression.new(:<=, ROW_NUMBER_EXPRESSION, limit)))
-        else
-          super
-        end
       end
     end
   end
