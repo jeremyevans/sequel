@@ -354,6 +354,7 @@ module Sequel
     def map(column=nil, &block)
       if column
         raise(Error, ARG_BLOCK_ERROR_MSG) if block
+        return naked.map(column) if row_proc
         if column.is_a?(Array)
           super(){|r| column.map{|c| r[c]}}
         else
@@ -546,6 +547,7 @@ module Sequel
     def to_hash(key_column, value_column = nil)
       h = {}
       if value_column
+        return naked.to_hash(key_column, value_column) if row_proc
         if value_column.is_a?(Array)
           if key_column.is_a?(Array)
             each{|r| h[key_column.map{|c| r[c]}] = value_column.map{|c| r[c]}}

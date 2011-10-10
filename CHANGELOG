@@ -1,5 +1,9 @@
 === HEAD
 
+* Change Dataset#to_hash to not call the row_proc if 2 arguments are given (jeremyevans)
+
+* Change Dataset#map to not call the row_proc if an argument is given (jeremyevans)
+
 * Make Dataset#select_map and #select_order_map return an array of single element arrays if given an array with a single symbol (jeremyevans)
 
 * Make Dataset#columns work correctly on jdbc, odbc, ado, and dbi adapters when using an emulated offset on MSSQL and DB2 (jeremyevans)

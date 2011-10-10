@@ -1717,7 +1717,7 @@ describe "Dataset#map" do
   end
   
   specify "should provide the usual functionality if no argument is given" do
-    @d.map {|n| n[:a] + n[:b]}.should == [3, 7, 11]
+    @d.map{|n| n[:a] + n[:b]}.should == [3, 7, 11]
   end
   
   specify "should map using #[column name] if column name is given" do
@@ -1726,6 +1726,17 @@ describe "Dataset#map" do
   
   specify "should support multiple column names if an array of column names is given" do
     @d.map([:a, :b]).should == [[1, 2], [3, 4], [5, 6]]
+  end
+  
+  specify "should not call the row_proc if an argument is given" do
+    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d.map(:a).should == [1, 3, 5]
+    @d.map([:a, :b]).should == [[1, 2], [3, 4], [5, 6]]
+  end
+
+  specify "should call the row_proc if no argument is given" do
+    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d.map{|n| n[:a] + n[:b]}.should == [6, 14, 22]
   end
   
   specify "should return the complete dataset values if nothing is given" do
@@ -1754,6 +1765,23 @@ describe "Dataset#to_hash" do
     @d.to_hash([:b, :a], [:a, :b]).should == {[2, 1] => [1, 2], [4, 3] => [3, 4], [6, 5] => [5, 6]}
     @d.to_hash([:a, :b]).should == {[1, 2] => {:a => 1, :b => 2}, [3, 4] => {:a => 3, :b => 4}, [5, 6] => {:a => 5, :b => 6}}
   end
+
+  specify "should not call the row_proc if two arguments are given" do
+    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d.to_hash(:a, :b).should == {1 => 2, 3 => 4, 5 => 6}
+    @d.to_hash(:b, :a).should == {2 => 1, 4 => 3, 6 => 5}
+    @d.to_hash([:a, :b], :b).should == {[1, 2] => 2, [3, 4] => 4, [5, 6] => 6}
+    @d.to_hash(:b, [:a, :b]).should == {2 => [1, 2], 4 => [3, 4], 6 => [5, 6]}
+    @d.to_hash([:b, :a], [:a, :b]).should == {[2, 1] => [1, 2], [4, 3] => [3, 4], [6, 5] => [5, 6]}
+  end
+
+  specify "should call the row_proc if only a single argument is given" do
+    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d.to_hash(:a).should == {2 => {:a => 2, :b => 4}, 6 => {:a => 6, :b => 8}, 10 => {:a => 10, :b => 12}}
+    @d.to_hash(:b).should == {4 => {:a => 2, :b => 4}, 8 => {:a => 6, :b => 8}, 12 => {:a => 10, :b => 12}}
+    @d.to_hash([:a, :b]).should == {[2, 4] => {:a => 2, :b => 4}, [6, 8] => {:a => 6, :b => 8}, [10, 12] => {:a => 10, :b => 12}}
+  end
+  
 end
 
 describe "Dataset#distinct" do
