@@ -471,11 +471,11 @@ module Sequel
         table = im.call(table)
         pks, ts = [], []
         metadata(:getPrimaryKeys, nil, schema, table) do |h|
-          next if h[:table_schem] == 'INFORMATION_SCHEMA'
+          next if schema_parse_table_skip?(h, schema)
           pks << h[:column_name]
         end
         metadata(:getColumns, nil, schema, table, nil) do |h|
-          next if h[:table_schem] == 'INFORMATION_SCHEMA'
+          next if schema_parse_table_skip?(h, schema)
           s = {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name]), :column_size=>h[:column_size], :scale=>h[:decimal_digits]}
           if s[:db_type] =~ DECIMAL_TYPE_RE && s[:scale] == 0
             s[:type] = :integer
@@ -485,6 +485,12 @@ module Sequel
         ts
       end
       
+      # Whether schema_parse_table should skip the given row when
+      # parsing the schema.
+      def schema_parse_table_skip?(h, schema)
+        h[:table_schem] == 'INFORMATION_SCHEMA'
+      end
+
       # Yield a new statement object, and ensure that it is closed before returning.
       def statement(conn)
         stmt = conn.createStatement
