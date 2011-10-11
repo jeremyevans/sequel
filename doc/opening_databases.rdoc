@@ -258,6 +258,7 @@ Example connection strings:
   jdbc:postgresql://localhost/database?user=username
   jdbc:mysql://localhost/test?user=root&password=root
   jdbc:h2:mem:
+  jdbc:hsqldb:mem:mymemdb
   jdbc:sqlserver://localhost;database=sequel_test;integratedSecurity=true
   jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test
   jdbc:oracle:thin:user/password@localhost:1521:database

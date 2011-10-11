@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for connecting to HSQLDB using the jdbc adapter (jeremyevans)
+
 * Fix inserting all default values into a table on DB2 (jeremyevans)
 
 * Add :qualify option to many_to_one associations for whether to qualify the primary key column with the associated table (jeremyevans)

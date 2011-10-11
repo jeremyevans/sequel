@@ -308,7 +308,7 @@ describe "Database schema modifiers" do
     @ds.columns!.should == [:id]
     proc{@ds.insert(:id=>nil)}.should raise_error(Sequel::DatabaseError)
     @db.alter_table(:items){set_column_allow_null :id, true}
-    @ds.insert
+    @ds.insert(:id=>nil)
     @ds.all.should == [{:id=>10}, {:id=>nil}]
   end
 
@@ -375,7 +375,7 @@ describe "Database schema modifiers" do
     proc{@ds.insert(1, 2)}.should_not raise_error
   end
 
-  cspecify "should remove columns from tables correctly", :h2, :mssql, [:jdbc, :db2] do
+  cspecify "should remove columns from tables correctly", :h2, :mssql, [:jdbc, :db2], :hsqldb do
     @db.create_table!(:items) do
       primary_key :id
       String :name

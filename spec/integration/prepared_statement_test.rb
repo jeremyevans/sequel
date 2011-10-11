@@ -212,12 +212,12 @@ describe "Prepared Statements and Bound Arguments" do
   end
   
   specify "model datasets should return model instances when using select, all, and first with prepared statements" do
-    @c.filter(:numb=>:$n).prepare(:select, :select_n)
-    @db.call(:select_n, :n=>10).should == [@c.load(:id=>1, :numb=>10)]
-    @c.filter(:numb=>:$n).prepare(:all, :select_n)
-    @db.call(:select_n, :n=>10).should == [@c.load(:id=>1, :numb=>10)]
-    @c.filter(:numb=>:$n).prepare(:first, :select_n)
-    @db.call(:select_n, :n=>10).should == @c.load(:id=>1, :numb=>10)
+    @c.filter(:numb=>:$n).prepare(:select, :select_n1)
+    @db.call(:select_n1, :n=>10).should == [@c.load(:id=>1, :numb=>10)]
+    @c.filter(:numb=>:$n).prepare(:all, :select_n1)
+    @db.call(:select_n1, :n=>10).should == [@c.load(:id=>1, :numb=>10)]
+    @c.filter(:numb=>:$n).prepare(:first, :select_n1)
+    @db.call(:select_n1, :n=>10).should == @c.load(:id=>1, :numb=>10)
   end
 end
 

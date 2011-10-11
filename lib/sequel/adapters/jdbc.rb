@@ -71,6 +71,12 @@ module Sequel
         JDBC.load_gem('h2')
         org.h2.Driver
       end,
+      :hsqldb=>proc do |db|
+        Sequel.ts_require 'adapters/jdbc/hsqldb'
+        db.extend(Sequel::JDBC::HSQLDB::DatabaseMethods)
+        # Current gem is 1.8.1.3, but Sequel supports 2.2.5
+        org.hsqldb.jdbcDriver
+      end,
       :as400=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/as400'
         db.extend(Sequel::JDBC::AS400::DatabaseMethods)

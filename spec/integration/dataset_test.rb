@@ -35,7 +35,7 @@ describe "Simple Dataset operations" do
     @ds.filter(:id=>2).first[:number].should == 20
   end
 
-  specify "should have insert work correctly when inserting a row with all NULL values" do
+  cspecify "should have insert work correctly when inserting a row with all NULL values", :hsqldb do
     @db.create_table!(:items) do
       String :name
       Integer :number
