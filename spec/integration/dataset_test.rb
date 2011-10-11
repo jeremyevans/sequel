@@ -448,6 +448,24 @@ if INTEGRATION_DB.dataset.supports_cte?
       @ds.inner_join(@db[:t].with(:t, @ds.filter(:parent_id=>nil)), :id => :id).select(:i1__id).order(:i1__id).map(:id).should == [1,2]
       @db[:t].with(:t, @ds).inner_join(@db[:s].with(:s, @ds.filter(:parent_id=>nil)), :id => :id).select(:t__id).order(:t__id).map(:id).should == [1,2]
     end
+
+    specify "should support a subselect in the FROM clause with a CTE" do
+      @ds.from(@db[:t].with(:t, @ds)).select_order_map(:id).should == [1,2,3,4,5,6]
+      @db[:t].with(:t, @ds).from_self.select_order_map(:id).should == [1,2,3,4,5,6]
+    end
+
+    specify "should support using a CTE inside a CTE" do
+      @db[:s].with(:s, @db[:t].with(:t, @ds)).select_order_map(:id).should == [1,2,3,4,5,6]
+      @db[:s].with_recursive(:s, @db[:t].with(:t, @ds), @db[:t2].with(:t2, @ds)).select_order_map(:id).should == [1,1,2,2,3,3,4,4,5,5,6,6]
+    end
+
+    specify "should support using a CTE inside UNION/EXCEPT/INTERSECT" do
+      @ds.union(@db[:t].with(:t, @ds)).select_order_map(:id).should == [1,2,3,4,5,6]
+      if @ds.supports_intersect_except?
+        @ds.intersect(@db[:t].with(:t, @ds)).select_order_map(:id).should == [1,2,3,4,5,6]
+        @ds.except(@db[:t].with(:t, @ds)).select_order_map(:id).should == []
+      end
+    end
   end
 end
 

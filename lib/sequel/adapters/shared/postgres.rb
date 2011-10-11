@@ -877,6 +877,12 @@ module Sequel
         server_version >= 80400 ? SELECT_CLAUSE_METHODS_84 : SELECT_CLAUSE_METHODS
       end
       
+      # PostgreSQL requires parentheses around compound datasets if they use
+      # CTEs, and using them in other places doesn't hurt.
+      def compound_dataset_sql(ds)
+        "(#{super})"
+      end
+
       # Support FOR SHARE locking when using the :share lock style.
       def select_lock_sql(sql)
         @opts[:lock] == :share ? (sql << FOR_SHARE) : super

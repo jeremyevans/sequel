@@ -201,11 +201,17 @@ module Sequel
     def from(*source)
       table_alias_num = 0
       sources = []
+      ctes = nil
       source.each do |s|
         case s
         when Hash
           s.each{|k,v| sources << SQL::AliasedExpression.new(k,v)}
         when Dataset
+          if hoist_cte?(s)
+            ctes ||= []
+            ctes += s.opts[:with]
+            s = s.clone(:with=>nil)
+          end
           sources << SQL::AliasedExpression.new(s, dataset_alias(table_alias_num+=1))
         when Symbol
           sch, table, aliaz = split_symbol(s)
@@ -220,6 +226,7 @@ module Sequel
         end
       end
       o = {:from=>sources.empty? ? nil : sources}
+      o[:with] = (opts[:with] || []) + ctes if ctes
       o[:num_dataset_sources] = table_alias_num if table_alias_num > 0
       clone(o)
     end
@@ -433,7 +440,7 @@ module Sequel
     #   # SELECT * FROM a NATURAL JOIN b INNER JOIN c
     #   #   ON ((c.d > b.e) AND (c.f IN (SELECT g FROM b)))
     def join_table(type, table, expr=nil, options={}, &block)
-      if table.is_a?(Dataset) && table.opts[:with] && !supports_cte_in_subqueries?
+      if hoist_cte?(table)
         s, ds = hoist_cte(table)
         return s.join_table(type, ds, expr, options, &block)
       end
@@ -881,7 +888,12 @@ module Sequel
     #   # WITH items AS (SELECT * FROM syx WHERE (name LIKE 'A%')) SELECT * FROM items
     def with(name, dataset, opts={})
       raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
-      clone(:with=>(@opts[:with]||[]) + [opts.merge(:name=>name, :dataset=>dataset)])
+      if hoist_cte?(dataset)
+        s, ds = hoist_cte(dataset)
+        s.with(name, ds, opts)
+      else
+        clone(:with=>(@opts[:with]||[]) + [opts.merge(:name=>name, :dataset=>dataset)])
+      end
     end
 
     # Add a recursive common table expression (CTE) with the given name, a dataset that
@@ -903,7 +915,15 @@ module Sequel
     #   # SELECT i AS id, pi AS parent_id FROM t
     def with_recursive(name, nonrecursive, recursive, opts={})
       raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
-      clone(:with=>(@opts[:with]||[]) + [opts.merge(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))])
+      if hoist_cte?(nonrecursive)
+        s, ds = hoist_cte(nonrecursive)
+        s.with_recursive(name, ds, recursive, opts)
+      elsif hoist_cte?(recursive)
+        s, ds = hoist_cte(recursive)
+        s.with_recursive(name, nonrecursive, ds, opts)
+      else
+        clone(:with=>(@opts[:with]||[]) + [opts.merge(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))])
+      end
     end
     
     # Returns a copy of the dataset with the static SQL used.  This is useful if you want
@@ -928,6 +948,16 @@ module Sequel
     end
     
     protected
+
+    # Add the dataset to the list of compounds
+    def compound_clone(type, dataset, opts)
+      if hoist_cte?(dataset)
+        s, ds = hoist_cte(dataset)
+        return s.compound_clone(type, ds, opts)
+      end
+      ds = compound_from_self.clone(:compounds=>Array(@opts[:compounds]).map{|x| x.dup} + [[type, dataset.compound_from_self, opts[:all]]])
+      opts[:from_self] == false ? ds : ds.from_self(opts)
+    end
 
     # Return true if the dataset has a non-nil value for any key in opts.
     def options_overlap(opts)
@@ -958,12 +988,6 @@ module Sequel
     # Internal filter method so it works on either the having or where clauses.
     def _filter(clause, *cond, &block)
       _filter_or_exclude(false, clause, *cond, &block)
-    end
-
-    # Add the dataset to the list of compounds
-    def compound_clone(type, dataset, opts)
-      ds = compound_from_self.clone(:compounds=>Array(@opts[:compounds]).map{|x| x.dup} + [[type, dataset.compound_from_self, opts[:all]]])
-      opts[:from_self] == false ? ds : ds.from_self(opts)
     end
 
     # SQL expression object based on the expr type.  See +filter+.
@@ -1011,6 +1035,11 @@ module Sequel
     # the given dataset with the WITH clause removed.
     def hoist_cte(ds)
       [clone(:with => (opts[:with] || []) + ds.opts[:with]), ds.clone(:with => nil)]
+    end
+
+    # Whether CTEs need to be hoisted from the given ds into the current ds.
+    def hoist_cte?(ds)
+      ds.is_a?(Dataset) && ds.opts[:with] && !supports_cte_in_subqueries?
     end
 
     # Inverts the given order by breaking it into a list of column references

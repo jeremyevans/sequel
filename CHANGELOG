@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle CTEs in subselects in more places on databases that don't natively support CTEs in subselects (jeremyevans)
+
 * Change Dataset#to_hash to not call the row_proc if 2 arguments are given (jeremyevans)
 
 * Change Dataset#map to not call the row_proc if an argument is given (jeremyevans)

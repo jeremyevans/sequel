@@ -575,6 +575,11 @@ module Sequel
       end
     end
 
+    # The SQL to use for the dataset used in a UNION/INTERSECT/EXCEPT clause. 
+    def compound_dataset_sql(ds)
+      subselect_sql(ds)
+    end
+
     # The alias to use for datasets, takes a number to make sure the name is unique.
     def dataset_alias(number)
       :"#{DATASET_ALIAS_BASE_NAME}#{number}"
@@ -842,8 +847,7 @@ module Sequel
     def select_compounds_sql(sql)
       return unless @opts[:compounds]
       @opts[:compounds].each do |type, dataset, all|
-        compound_sql = subselect_sql(dataset)
-        sql << " #{type.to_s.upcase}#{' ALL' if all} #{compound_sql}"
+        sql << " #{type.to_s.upcase}#{' ALL' if all} #{compound_dataset_sql(dataset)}"
       end
     end
 
@@ -907,7 +911,6 @@ module Sequel
     alias delete_with_sql select_with_sql
     alias insert_with_sql select_with_sql
     alias update_with_sql select_with_sql
-
     
     # The base keyword to use for the SQL WITH clause
     def select_with_sql_base

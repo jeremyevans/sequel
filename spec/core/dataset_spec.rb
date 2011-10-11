@@ -1208,6 +1208,13 @@ describe "Dataset#from" do
     @dataset.from(:'#___#').select_sql.should ==
       'SELECT * FROM # AS #'
   end
+
+  specify "should hoist WITH clauses from subqueries if the dataset doesn't support CTEs in subselects" do
+    @dataset.meta_def(:supports_cte?){true}
+    @dataset.meta_def(:supports_cte_in_subselect?){false}
+    @dataset.from(@dataset.from(:a).with(:a, @dataset.from(:b))).sql.should == 'WITH a AS (SELECT * FROM b) SELECT * FROM (SELECT * FROM a) AS t1'
+    @dataset.from(@dataset.from(:a).with(:a, @dataset.from(:b)), @dataset.from(:c).with(:c, @dataset.from(:d))).sql.should == 'WITH a AS (SELECT * FROM b), c AS (SELECT * FROM d) SELECT * FROM (SELECT * FROM a) AS t1, (SELECT * FROM c) AS t2'
+  end
 end
 
 describe "Dataset#select" do
@@ -2033,6 +2040,13 @@ describe "Dataset#from_self" do
     @ds.server(:blah).from_self(:alias=>:some_name).opts[:server].should == :blah
   end
 
+  specify "should hoist WITH clauses in current dataset if dataset doesn't support WITH in subselect" do
+    ds = Sequel::Dataset.new(nil)
+    ds.meta_def(:supports_cte?){true}
+    ds.meta_def(:supports_cte_in_subselect?){false}
+    ds.from(:a).with(:a, ds.from(:b)).from_self.sql.should == 'WITH a AS (SELECT * FROM b) SELECT * FROM (SELECT * FROM a) AS t1'
+    ds.from(:a, :c).with(:a, ds.from(:b)).with(:c, ds.from(:d)).from_self.sql.should == 'WITH a AS (SELECT * FROM b), c AS (SELECT * FROM d) SELECT * FROM (SELECT * FROM a, c) AS t1'
+  end
 end
 
 describe "Dataset#join_table" do
@@ -2702,6 +2716,14 @@ describe "Dataset compound operations" do
       "SELECT * FROM (SELECT * FROM (SELECT * FROM test ORDER BY a LIMIT 2) AS t1 UNION SELECT * FROM (SELECT * FROM test ORDER BY b LIMIT 3) AS t1) AS t1 ORDER BY c LIMIT 4"
   end
 
+  specify "should hoist WITH clauses in given dataset if dataset doesn't support WITH in subselect" do
+    ds = Sequel::Dataset.new(nil)
+    ds.meta_def(:supports_cte?){true}
+    ds.meta_def(:supports_cte_in_subselect?){false}
+    ds.from(:a).union(ds.from(:c).with(:c, ds.from(:d)), :from_self=>false).sql.should == 'WITH c AS (SELECT * FROM d) SELECT * FROM a UNION SELECT * FROM c'
+    ds.from(:a).except(ds.from(:c).with(:c, ds.from(:d))).sql.should == 'WITH c AS (SELECT * FROM d) SELECT * FROM (SELECT * FROM a EXCEPT SELECT * FROM c) AS t1'
+    ds.from(:a).with(:a, ds.from(:b)).intersect(ds.from(:c).with(:c, ds.from(:d)), :from_self=>false).sql.should == 'WITH a AS (SELECT * FROM b), c AS (SELECT * FROM d) SELECT * FROM a INTERSECT SELECT * FROM c'
+  end
 end
 
 describe "Dataset#[]" do
@@ -3902,6 +3924,13 @@ describe "Sequel::Dataset #with and #with_recursive" do
     @ds.with(:t, @db[:x]).insert_sql(1).should == 'WITH t AS (SELECT * FROM x) INSERT INTO t VALUES (1)'
     @ds.with(:t, @db[:x]).update_sql(:foo=>1).should == 'WITH t AS (SELECT * FROM x) UPDATE t SET foo = 1'
     @ds.with(:t, @db[:x]).delete_sql.should == 'WITH t AS (SELECT * FROM x) DELETE FROM t'
+  end
+
+  specify "should hoist WITH clauses in given dataset(s) if dataset doesn't support WITH in subselect" do
+    @ds.meta_def(:supports_cte?){true}
+    @ds.meta_def(:supports_cte_in_subselect?){false}
+    @ds.with(:t, @ds.from(:s).with(:s, @ds.from(:r))).sql.should == 'WITH s AS (SELECT * FROM r), t AS (SELECT * FROM s) SELECT * FROM t'
+    @ds.with_recursive(:t, @ds.from(:s).with(:s, @ds.from(:r)), @ds.from(:q).with(:q, @ds.from(:p))).sql.should == 'WITH s AS (SELECT * FROM r), q AS (SELECT * FROM p), t AS (SELECT * FROM s UNION ALL SELECT * FROM q) SELECT * FROM t'
   end
 end
 
