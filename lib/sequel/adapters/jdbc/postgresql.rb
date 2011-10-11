@@ -52,12 +52,6 @@ module Sequel
           Sequel::JDBC::Postgres::Dataset.new(self, opts)
         end
         
-        # Run the INSERT sql on the database and return the primary key
-        # for the record.
-        def execute_insert(sql, opts={})
-          super(sql, {:type=>:insert}.merge(opts))
-        end
-        
         private
         
         # Use setNull for nil arguments as the default behavior of setString
