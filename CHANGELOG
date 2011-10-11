@@ -1,5 +1,13 @@
 === HEAD
 
+* Add :qualify option to many_to_one associations for whether to qualify the primary key column with the associated table (jeremyevans)
+
+* Modify rcte_tree plugin to use column aliases if recursive CTEs require them (jeremyevans)
+
+* Add Dataset#recursive_cte_requires_column_aliases? method to check if you must provide an argument list for a recursive CTE (jeremyevans)
+
+* Much better support for Oracle in both the oci8-based oracle adapter and the jdbc oracle subadapter (jeremyevans)
+
 * Handle CTEs in subselects in more places on databases that don't natively support CTEs in subselects (jeremyevans)
 
 * Change Dataset#to_hash to not call the row_proc if 2 arguments are given (jeremyevans)
