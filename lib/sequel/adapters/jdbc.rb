@@ -77,6 +77,12 @@ module Sequel
         # Current gem is 1.8.1.3, but Sequel supports 2.2.5
         org.hsqldb.jdbcDriver
       end,
+      :derby=>proc do |db|
+        Sequel.ts_require 'adapters/jdbc/derby'
+        db.extend(Sequel::JDBC::Derby::DatabaseMethods)
+        JDBC.load_gem('derby')
+        org.apache.derby.jdbc.EmbeddedDriver
+      end,
       :as400=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/as400'
         db.extend(Sequel::JDBC::AS400::DatabaseMethods)

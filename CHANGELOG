@@ -1,6 +1,8 @@
 === HEAD
 
-* Add support for connecting to HSQLDB using the jdbc adapter (jeremyevans)
+* Add support for connecting to Apache Derby databases using the jdbc adapter (jeremyevans)
+
+* Add support for connecting to HSQLDB databases using the jdbc adapter (jeremyevans)
 
 * Fix inserting all default values into a table on DB2 (jeremyevans)
 

@@ -910,7 +910,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.get{a / b}.to_i.should == 2
   end
   
-  specify "should work with bitwise shift operators" do
+  cspecify "should work with bitwise shift operators", :derby do
     @ds.insert(3, 2)
     @ds.get{a.sql_number << b}.to_i.should == 12
     @ds.get{a.sql_number >> b}.to_i.should == 0
@@ -922,7 +922,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.get{a.sql_number >> b >> 1}.to_i.should == 0
   end
 
-  specify "should work with bitwise AND and OR operators" do
+  cspecify "should work with bitwise AND and OR operators", :derby do
     @ds.insert(3, 5)
     @ds.get{a.sql_number | b}.to_i.should == 7
     @ds.get{a.sql_number & b}.to_i.should == 1
@@ -936,7 +936,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.get{~b.sql_number}.to_i.should == -4
   end
   
-  specify "should work with the bitwise xor operator" do
+  cspecify "should work with the bitwise xor operator", :derby do
     @ds.insert(3, 5)
     @ds.get{a.sql_number ^ b}.to_i.should == 6
     @ds.get{a.sql_number ^ b ^ 1}.to_i.should == 7

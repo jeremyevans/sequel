@@ -259,7 +259,7 @@ describe "Bound Argument Types" do
     @ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
   end
 
-  cspecify "should handle blob type", [:swift], [:odbc], [:jdbc, :db2], :oracle do
+  cspecify "should handle blob type", [:swift], [:odbc], [:jdbc, :db2], :oracle, :derby do
     @ds.filter(:file=>:$x).prepare(:first, :ps_blob).call(:x=>@vs[:file])[:file].should == @vs[:file]
   end
 

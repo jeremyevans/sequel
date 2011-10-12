@@ -246,7 +246,7 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:number=>10, :name=>nil}]
   end
 
-  cspecify "should add primary key columns to tables correctly", :h2 do
+  cspecify "should add primary key columns to tables correctly", :h2, :derby do
     @db.create_table!(:items){Integer :number}
     @ds.insert(:number=>10)
     @db.alter_table(:items){add_primary_key :id}
@@ -332,7 +332,7 @@ describe "Database schema modifiers" do
     @db.alter_table(:items){set_column_type :id, String}
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id]
     @ds.columns!.should == [:id]
-    @ds.insert(:id=>20)
+    @ds.insert(:id=>'20')
     @ds.all.should == [{:id=>"10"}, {:id=>"20"}]
   end
 
