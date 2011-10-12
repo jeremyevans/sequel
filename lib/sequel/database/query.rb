@@ -492,7 +492,7 @@ module Sequel
 
     # Raise a database error unless the exception is an Rollback.
     def transaction_error(e, opts={})
-      raise_error(e, opts.merge(:classes=>database_error_classes)) unless e.is_a?(Rollback)
+      e.is_a?(Rollback) ? e : raise_error(e, opts.merge(:classes=>database_error_classes))
     end
   end
 end

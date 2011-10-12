@@ -548,6 +548,10 @@ describe "Database#transaction" do
     @db.sql.should == ['BEGIN', 'DROP TABLE a', 'ROLLBACK']
   end
   
+  specify "should return the Sequel::Rollback exception if Sequel::Rollback is called in the transaction" do
+    @db.transaction{raise Sequel::Rollback}.should be_a_kind_of(Sequel::Rollback)
+  end
+  
   specify "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
     @db.meta_def(:commit_transaction){raise ArgumentError}
     lambda{@db.transaction{}}.should raise_error(ArgumentError)

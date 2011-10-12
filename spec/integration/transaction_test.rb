@@ -29,12 +29,10 @@ describe "Database transactions" do
       end
     end.should raise_error(Interrupt)
 
-    proc do
-      @db.transaction do
-        @d << {:name => 'abc', :value => 1}
-        raise Sequel::Rollback
-      end
-    end.should_not raise_error
+    @db.transaction do
+      @d << {:name => 'abc', :value => 1}
+      raise Sequel::Rollback
+    end.should be_a_kind_of(Sequel::Rollback)
 
     @d.count.should == 0
   end
