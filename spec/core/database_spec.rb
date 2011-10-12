@@ -624,6 +624,50 @@ describe "Database#transaction" do
   end
 end
 
+describe "Sequel.transaction" do
+  before do
+    @logger = Object.new
+    def @logger.db_info(db, sql)
+      (@sqls ||= []) << db << sql
+    end
+    def @logger.sqls
+      @sqls
+    end
+    mod = Module.new do
+      def execute(sql, *)
+        loggers.each{|l| l.db_info(self, sql)}
+      end
+      def log_connection_execute(conn, sql)
+        execute(sql)
+      end
+      def connect(*)
+        Object.new
+      end
+    end
+    @db1 = Sequel::Database.new(:host=>'1', :logger=>@logger)
+    @db2 = Sequel::Database.new(:host=>'2', :logger=>@logger)
+    @db3 = Sequel::Database.new(:host=>'3', :logger=>@logger)
+    @db1.extend(mod)
+    @db2.extend(mod)
+    @db3.extend(mod)
+  end
+  
+  specify "should run the block inside transacitons on all three databases" do
+    Sequel.transaction([@db1, @db2, @db3]){1}.should == 1
+    @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN', @db3, 'COMMIT', @db2, 'COMMIT', @db1, 'COMMIT']
+  end
+  
+  specify "should pass options to all the blocks" do
+    Sequel.transaction([@db1, @db2, @db3], :rollback=>:always){1}.should be_a_kind_of(Sequel::Rollback)
+    @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN', @db3, 'ROLLBACK', @db2, 'ROLLBACK', @db1, 'ROLLBACK']
+  end
+  
+  specify "should handle Sequel::Rollback exceptions raised by the block to rollback on all databases" do
+    Sequel.transaction([@db1, @db2, @db3]){raise Sequel::Rollback}.should be_a_kind_of(Sequel::Rollback)
+    @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN', @db3, 'ROLLBACK', @db2, 'ROLLBACK', @db1, 'ROLLBACK']
+  end
+end
+  
 describe "Database#transaction with savepoints" do
   before do
     @db = Dummy3Database.new{Dummy3Database::DummyConnection.new(@db)}

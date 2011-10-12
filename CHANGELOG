@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel.transaction for running transactions on multiple databases at the same time (jeremyevans)
+
 * Support :rollback => :always option in Database#transaction to always rollback the transaction (jeremyevans)
 
 * Support :rollback => :reraise option in Database#transaction to reraise the Sequel::Rollback exception (jeremyevans)

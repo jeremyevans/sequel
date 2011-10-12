@@ -240,6 +240,46 @@ module Sequel
     end
   end
 
+  # Uses a transaction on all given databases with the given options. This:
+  #
+  #   Sequel.transaction([DB1, DB2, DB3]){...}
+  #
+  # is equivalent to:
+  #
+  #   DB1.transaction do
+  #     DB2.transaction do
+  #       DB3.transaction do
+  #         ...
+  #       end
+  #     end
+  #   end
+  #
+  # except that if Sequel::Rollback is raised by the block, the transaction is
+  # rolled back on all databases instead of just the last one.
+  #
+  # Note that this method cannot guarantee that all databases will commit or
+  # rollback.  For example, if DB3 commits but attempting to commit on DB2
+  # fails (maybe because foreign key checks are deferred), there is no way
+  # to uncommit the changes on DB3.  For that kind of support, you need to
+  # have two-phase commit/prepared transactions (which Sequel supports on
+  # some databases).
+  def self.transaction(dbs, opts={}, &block)
+    unless opts[:rollback]
+      rescue_rollback = true
+      opts = opts.merge(:rollback=>:reraise)
+    end
+    pr = dbs.reverse.inject(block){|bl, db| proc{db.transaction(opts, &bl)}}
+    if rescue_rollback
+      begin
+        pr.call
+      rescue Sequel::Rollback => e
+        e
+      end
+    else
+      pr.call
+    end
+  end
+
   # Same as Sequel.require, but wrapped in a mutex in order to be thread safe.
   def self.ts_require(*args)
     check_requiring_thread{require(*args)}
