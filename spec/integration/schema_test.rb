@@ -23,8 +23,12 @@ describe "Database schema parser" do
     INTEGRATION_DB.quote_identifiers = true
     INTEGRATION_DB.default_schema = nil if INTEGRATION_DB.default_schema
     INTEGRATION_DB.create_table!(:items){Integer :number}
-    INTEGRATION_DB.schema(:items, :reload=>true).should be_a_kind_of(Array)
-    INTEGRATION_DB.schema(:items, :reload=>true).first.first.should == :number
+    begin
+      INTEGRATION_DB.schema(:items, :reload=>true).should be_a_kind_of(Array)
+      INTEGRATION_DB.schema(:items, :reload=>true).first.first.should == :number
+    ensure 
+      INTEGRATION_DB.drop_table(:items)
+    end
   end
 
   specify "should not issue an sql query if the schema has been loaded unless :reload is true" do

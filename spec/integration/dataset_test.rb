@@ -244,7 +244,11 @@ describe Sequel::Database do
     INTEGRATION_DB.drop_table(t) rescue nil
     INTEGRATION_DB.table_exists?(t).should == false
     INTEGRATION_DB.create_table(t){Integer :a}
-    INTEGRATION_DB.table_exists?(t).should == true
+    begin
+      INTEGRATION_DB.table_exists?(t).should == true
+    ensure
+      INTEGRATION_DB.drop_table(t)
+    end
   end
 end
 
