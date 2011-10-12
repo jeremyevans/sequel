@@ -653,6 +653,8 @@ module Sequel
           row.delete(rn) if rn
           yield row
         end
+      ensure
+        result.close
       end
 
       # Proc that takes the ResultSet and an integer field number and returns
