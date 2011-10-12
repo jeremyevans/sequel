@@ -199,6 +199,9 @@ module Sequel
     # :prepare :: A string to use as the transaction identifier for a
     #             prepared transaction (two-phase commit), if the database/adapter
     #             supports prepared transactions.
+    # :rollback :: Can the set to :reraise to reraise any Sequel::Rollback exceptions
+    #              raised, or :always to always rollback even if no exceptions occur
+    #              (useful for testing).
     # :server :: The server to use for the transaction.
     # :savepoint :: Whether to create a new savepoint for this transaction,
     #               only respected if the database/adapter supports savepoints.  By
@@ -225,13 +228,24 @@ module Sequel
     # not a Sequel::Rollback, the error will be reraised. If no exception occurs
     # inside the block, the transaction is commited.
     def _transaction(conn, opts={})
+      rollback = opts[:rollback]
       begin
         add_transaction
         t = begin_transaction(conn, opts)
-        yield(conn)
+        if rollback == :always
+          begin
+            yield(conn)
+          rescue Exception => e1
+            raise e1
+          ensure
+            raise ::Sequel::Rollback unless e1
+          end
+        else
+          yield(conn)
+        end
       rescue Exception => e
         rollback_transaction(t, opts) if t
-        transaction_error(e, :conn=>conn)
+        transaction_error(e, :conn=>conn, :rollback=>rollback)
       ensure
         begin
           commit_or_rollback_transaction(e, t, opts)
@@ -492,7 +506,12 @@ module Sequel
 
     # Raise a database error unless the exception is an Rollback.
     def transaction_error(e, opts={})
-      e.is_a?(Rollback) ? e : raise_error(e, opts.merge(:classes=>database_error_classes))
+      if e.is_a?(Rollback)
+        raise e if opts[:rollback] == :reraise
+        e
+      else
+        raise_error(e, opts.merge(:classes=>database_error_classes))
+      end
     end
   end
 end

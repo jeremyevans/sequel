@@ -34,6 +34,18 @@ describe "Database transactions" do
       raise Sequel::Rollback
     end.should be_a_kind_of(Sequel::Rollback)
 
+    proc do
+      @db.transaction(:rollback=>:reraise) do
+        @d << {:name => 'abc', :value => 1}
+        raise Sequel::Rollback
+      end
+    end.should raise_error(Sequel::Rollback)
+
+    @db.transaction(:rollback=>:always) do
+      @d << {:name => 'abc', :value => 1}
+      2
+    end.should be_a_kind_of(Sequel::Rollback)
+
     @d.count.should == 0
   end
 

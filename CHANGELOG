@@ -1,5 +1,9 @@
 === HEAD
 
+* Support :rollback => :always option in Database#transaction to always rollback the transaction (jeremyevans)
+
+* Support :rollback => :reraise option in Database#transaction to reraise the Sequel::Rollback exception (jeremyevans)
+
 * Raising Sequel::Rollback inside a transaction causes the transaction to return the exception (jeremyevans)
 
 * Add support for connecting to Apache Derby databases using the jdbc adapter (jeremyevans)

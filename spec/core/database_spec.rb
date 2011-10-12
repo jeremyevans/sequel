@@ -552,6 +552,33 @@ describe "Database#transaction" do
     @db.transaction{raise Sequel::Rollback}.should be_a_kind_of(Sequel::Rollback)
   end
   
+  specify "should reraise Sequel::Rollback errors when using :rollback=>:reraise option is given" do
+    proc {@db.transaction(:rollback=>:reraise){raise Sequel::Rollback}}.should raise_error(Sequel::Rollback)
+    @db.sql.should == ['BEGIN', 'ROLLBACK']
+    @db.sql.clear
+    proc {@db.transaction(:rollback=>:reraise){raise ArgumentError}}.should raise_error(ArgumentError)
+    @db.sql.should == ['BEGIN', 'ROLLBACK']
+    @db.sql.clear
+    @db.transaction(:rollback=>:reraise){1}.should == 1
+    @db.sql.should == ['BEGIN', 'COMMIT']
+  end
+  
+  specify "should always rollback if :rollback=>:always option is given" do
+    proc {@db.transaction(:rollback=>:always){raise ArgumentError}}.should raise_error(ArgumentError)
+    @db.sql.should == ['BEGIN', 'ROLLBACK']
+    @db.sql.clear
+    @db.transaction(:rollback=>:always){raise Sequel::Rollback}.should be_a_kind_of(Sequel::Rollback)
+    @db.sql.should == ['BEGIN', 'ROLLBACK']
+    @db.sql.clear
+    @db.transaction(:rollback=>:always){1}.should be_a_kind_of(Sequel::Rollback)
+    @db.sql.should == ['BEGIN', 'ROLLBACK']
+    @db.sql.clear
+    catch (:foo) do
+      @db.transaction(:rollback=>:always){throw :foo}
+    end
+    @db.sql.should == ['BEGIN', 'ROLLBACK']
+  end
+  
   specify "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
     @db.meta_def(:commit_transaction){raise ArgumentError}
     lambda{@db.transaction{}}.should raise_error(ArgumentError)

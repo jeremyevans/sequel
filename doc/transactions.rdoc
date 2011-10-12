@@ -33,6 +33,19 @@ If any other exception is raised, the transaction is rolled back, and the except
   end # ROLLBACK
   # ArgumentError raised
 
+If you want Sequel::Rollback exceptions to be reraised, use the <tt>:rollback => :reraise</tt> option:
+
+  DB.transaction(:rollback => :reraise) do # BEGIN
+    raise Sequel::Rollback
+  end # ROLLBACK
+  # Sequel::Rollback raised
+
+If you always want to rollback (useful for testing), use the <tt>:rollback => :always</tt> option:
+
+  DB.transaction(:rollback => :always) do # BEGIN
+    DB[:foo].insert(1) # INSERT
+  end # ROLLBACK
+
 == Nested Transaction Calls / Savepoints
 
 You can nest calls to transaction, which by default just reuses the existing transaction:
