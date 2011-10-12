@@ -89,6 +89,16 @@ class Dummy2Database < Sequel::Database
   def transaction; yield; end
 end
 
+class Dummy3Database < Sequel::Database
+  attr_reader :sql, :transactions
+  def execute(sql, opts={}); @sql ||= []; @sql << sql; end
+
+  class DummyConnection
+    def initialize(db); @db = db; end
+    def execute(sql); @db.execute(sql); end
+  end
+end
+
 class DummyDataset < Sequel::Dataset
   VALUES = [
     {:a => 1, :b => 2},
