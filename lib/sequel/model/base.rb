@@ -1286,7 +1286,8 @@ module Sequel
       # Internal destroy method, separted from destroy to
       # allow running inside a transaction
       def _destroy(opts)
-        db.after_rollback{after_destroy_rollback}
+        sh = {:server=>this_server}
+        db.after_rollback(sh){after_destroy_rollback}
         called = false
         around_destroy do
           called = true
@@ -1296,7 +1297,7 @@ module Sequel
           true
         end
         raise_hook_failure(:destroy) unless called
-        db.after_commit{after_destroy_commit}
+        db.after_commit(sh){after_destroy_commit}
         self
       end
       
@@ -1357,7 +1358,8 @@ module Sequel
       # Internal version of save, split from save to allow running inside
       # it's own transaction.
       def _save(columns, opts)
-        db.after_rollback{after_rollback}
+        sh = {:server=>this_server}
+        db.after_rollback(sh){after_rollback}
         was_new = false
         pk = nil
         called_save = false
@@ -1411,7 +1413,7 @@ module Sequel
           @columns_updated = nil
         end
         @modified = false
-        db.after_commit{after_commit}
+        db.after_commit(sh){after_commit}
         self
       end
 
@@ -1510,7 +1512,7 @@ module Sequel
       
       # If transactions should be used, wrap the yield in a transaction block.
       def checked_transaction(opts={})
-        use_transaction?(opts) ? db.transaction(opts){yield} : yield
+        use_transaction?(opts) ? db.transaction({:server=>this_server}.merge(opts)){yield} : yield
       end
 
       # Set the columns with the given hash.  By default, the same as +set+, but
@@ -1599,6 +1601,12 @@ module Sequel
           meths -= except.map{|x| "#{x}="} if except
           meths
         end
+      end
+
+      # The server/shard that the model object's dataset uses, or :default if the
+      # model object's dataset does not have an associated shard.
+      def this_server
+        primary_key ? (this.opts[:server] || :default) : (model.dataset.opts[:server] || :default)
       end
   
       # Typecast the value to the column's type if typecasting.  Calls the database's

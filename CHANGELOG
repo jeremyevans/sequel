@@ -1,5 +1,7 @@
 === HEAD
 
+* Support sharding correctly by default when using transactions in model saving/destroying (jeremyevans)
+
 * Add Database#in_transaction? method for checking if you are already in a transaction (jeremyevans)
 
 * Add after_commit, after_rollback, after_destroy_commit, and after_destroy_rollback hooks to Model objects (jeremyevans)

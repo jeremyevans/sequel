@@ -199,7 +199,7 @@ describe "InstanceHooks plugin with transactions" do
       end
     end.new(:loggers=>[@logger])
     pr = proc{|x| r(x)}
-    @c = Class.new(Sequel::Model(@db)) do
+    @c = Class.new(Sequel::Model(@db[:items])) do
       attr_accessor :rb
       def _delete
       end

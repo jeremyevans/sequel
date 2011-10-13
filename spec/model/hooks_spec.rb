@@ -27,7 +27,11 @@ describe "Model#before_create && Model#after_create" do
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval do
       columns :x
-      no_primary_key
+      set_primary_key :x
+      unrestrict_primary_key
+       
+      def _save_refresh
+      end
       
       def after_create
         MODEL_DB << "BLAH after"
@@ -47,9 +51,9 @@ describe "Model#before_create && Model#after_create" do
 
   specify ".create should cancel the save and raise an error if before_create returns false and raise_on_save_failure is true" do
     @c.send(:define_method, :before_create){false}
-    proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.create(:x => 2)}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
+    proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
   end
 
   specify ".create should cancel the save and return nil if before_create returns false and raise_on_save_failure is false" do
@@ -129,7 +133,9 @@ describe "Model#before_save && Model#after_save" do
   
   specify "should be called around record creation" do
     @c.send(:define_method, :before_save){MODEL_DB << "BLAH before"}
-    @c.no_primary_key
+    @c.send(:define_method, :_save_refresh){}
+    @c.set_primary_key :x
+    @c.unrestrict_primary_key
     @c.create(:x => 2)
     MODEL_DB.sqls.should == [
       'BLAH before',
@@ -449,8 +455,8 @@ describe "Model#after_commit and #after_rollback" do
       def execute(sql, opts={})
         @loggers.each{|l| l.info(sql)}
       end
-    end.new(:loggers=>[@logger])
-    @m = Class.new(Sequel::Model(@db)) do
+    end.new(:loggers=>[@logger], :servers=>{:test=>{}})
+    @m = Class.new(Sequel::Model(@db[:items])) do
       attr_accessor :rb
       def _delete
       end
@@ -476,6 +482,7 @@ describe "Model#after_commit and #after_rollback" do
       end
     end
     @m.use_transactions = true
+    @m.set_primary_key :id
     @o = @m.load({})
   end
 
@@ -507,6 +514,23 @@ describe "Model#after_commit and #after_rollback" do
     @logger.sqls.clear
   end
 
+  specify "should have after_commit work with surrounding transactions and sharding" do
+    @db.transaction(:server=>:test) do
+      @o.save
+    end
+    @logger.sqls.should == ['BEGIN', 'BEGIN', 'as', 'COMMIT', 'ac', 'COMMIT']
+    @logger.sqls.clear
+  end
+
+  specify "should have after_rollback work with surrounding transactions and sharding" do
+    @db.transaction(:server=>:test) do
+      @o.rb = true
+      @o.save
+    end
+    @logger.sqls.should == ['BEGIN', 'BEGIN', 'as', 'ROLLBACK', 'ar', 'COMMIT']
+    @logger.sqls.clear
+  end
+
   specify "should call after_destroy_commit for destroy after the transaction commits if it commits" do
     @o.destroy
     @logger.sqls.should == ['BEGIN', 'ad', 'COMMIT', 'adc']
@@ -534,4 +558,22 @@ describe "Model#after_commit and #after_rollback" do
     @logger.sqls.should == ['BEGIN', 'ad', 'ROLLBACK', 'adr']
     @logger.sqls.clear
   end
+
+  specify "should have after_destroy commit work with surrounding transactions and sharding" do
+    @db.transaction(:server=>:test) do
+      @o.destroy
+    end
+    @logger.sqls.should == ['BEGIN', 'BEGIN', 'ad', 'COMMIT', 'adc', 'COMMIT']
+    @logger.sqls.clear
+  end
+
+  specify "should have after_destroy_rollback work with surrounding transactions and sharding" do
+    @db.transaction(:server=>:test) do
+      @o.rb = true
+      @o.destroy
+    end
+    @logger.sqls.should == ['BEGIN', 'BEGIN', 'ad', 'ROLLBACK', 'adr', 'COMMIT']
+    @logger.sqls.clear
+  end
+
 end

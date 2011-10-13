@@ -90,11 +90,6 @@ module Sequel
           use_server(super)
         end
 
-        # Make sure to use the correct shard when using a transaction
-        def checked_transaction(opts={}, &block)
-          super(@server ? {:server=>@server}.merge(opts) : opts, &block)
-        end
-
         # If creating the object by doing <tt>add_association</tt> for a
         # +many_to_many+ association, make sure the associated object is created on the
         # current object's shard, unless the passed object already has an assigned shard.

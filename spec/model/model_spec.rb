@@ -392,8 +392,10 @@ describe Sequel::Model, ".find_or_create" do
   before(:each) do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
-      no_primary_key
+      set_primary_key :id
       columns :x
+      def _save_refresh
+      end
     end
   end
 
