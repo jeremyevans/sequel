@@ -99,7 +99,6 @@ module Sequel
       
       def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
-        conn
       end
       
       def commit_transaction(conn, opts={})
@@ -134,10 +133,10 @@ module Sequel
         end
       end
 
-      def remove_transaction(conn)
-        super
+      def remove_transaction(conn, committed)
+        conn.autocommit = true
       ensure
-        conn.autocommit = true if conn
+        super
       end
       
       def rollback_transaction(conn, opts={})

@@ -301,13 +301,12 @@ module Sequel
       # So starting a transaction just turns autocommit off.
       def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
-        conn
       end
 
       # This commits transaction in progress on the
       # connection and sets autocommit back on.
       def commit_transaction(conn, opts={})
-        log_yield(TRANSACTION_COMMIT){conn.commit} if conn
+        log_yield(TRANSACTION_COMMIT){conn.commit}
       end
     
       # Close the given connection.
@@ -340,9 +339,9 @@ module Sequel
 
       # Set autocommit back on
       def remove_transaction(conn)
-        super
+        conn.autocommit = true
       ensure
-        conn.autocommit = true if conn
+        super
       end
 
       # This rolls back the transaction in progress on the

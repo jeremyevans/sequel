@@ -63,6 +63,34 @@ module Sequel
 
       ::Sequel::DATABASES.push(self)
     end
+
+    # If a transaction is not currently in process, yield to the block immediately.
+    # Otherwise, add the block to the list of blocks to call after the currently
+    # in progress transaction commits (and only if it commits).
+    def after_commit(opts={}, &block)
+      raise Error, "must provide block to after_commit" unless block
+      synchronize(opts) do |conn|
+        if h = @transactions[conn]
+          raise Error, "cannot call after_commit in a prepared transaction" if h[:prepare]
+          (h[:after_commit] ||= []) << block
+        else
+          yield
+        end
+      end
+    end
+    
+    # If a transaction is not currently in progress, ignore the block.
+    # Otherwise, add the block to the list of the blocks to call after the currently
+    # in progress transaction rolls back (and only if it rolls back).
+    def after_rollback(opts={}, &block)
+      raise Error, "must provide block to after_rollback" unless block
+      synchronize(opts) do |conn|
+        if h = @transactions[conn]
+          raise Error, "cannot call after_rollback in a prepared transaction" if h[:prepare]
+          (h[:after_rollback] ||= []) << block
+        end
+      end
+    end
     
     # Cast the given type to a literal type
     #

@@ -59,7 +59,6 @@ module Sequel
             raise_error(e, :disconnect=>true) 
           end
         end
-        conn
       end
 
       def commit_transaction(conn, opts={})

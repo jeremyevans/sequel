@@ -74,46 +74,46 @@ describe "A new Database" do
     Sequel.identifier_input_method = nil
     Sequel::Database.identifier_input_method.should == ""
     db = Sequel::Database.new(:identifier_input_method=>nil)
-    db.identifier_input_method.should == nil
+    db.identifier_input_method.should be_nil
     db.identifier_input_method = :downcase
     db.identifier_input_method.should == :downcase
     db = Sequel::Database.new(:identifier_input_method=>:upcase)
     db.identifier_input_method.should == :upcase
     db.identifier_input_method = nil
-    db.identifier_input_method.should == nil
+    db.identifier_input_method.should be_nil
     Sequel.identifier_input_method = :downcase
     Sequel::Database.identifier_input_method.should == :downcase
     db = Sequel::Database.new(:identifier_input_method=>nil)
-    db.identifier_input_method.should == nil
+    db.identifier_input_method.should be_nil
     db.identifier_input_method = :upcase
     db.identifier_input_method.should == :upcase
     db = Sequel::Database.new(:identifier_input_method=>:upcase)
     db.identifier_input_method.should == :upcase
     db.identifier_input_method = nil
-    db.identifier_input_method.should == nil
+    db.identifier_input_method.should be_nil
   end
   
   specify "should respect the :identifier_output_method option" do
     Sequel.identifier_output_method = nil
     Sequel::Database.identifier_output_method.should == ""
     db = Sequel::Database.new(:identifier_output_method=>nil)
-    db.identifier_output_method.should == nil
+    db.identifier_output_method.should be_nil
     db.identifier_output_method = :downcase
     db.identifier_output_method.should == :downcase
     db = Sequel::Database.new(:identifier_output_method=>:upcase)
     db.identifier_output_method.should == :upcase
     db.identifier_output_method = nil
-    db.identifier_output_method.should == nil
+    db.identifier_output_method.should be_nil
     Sequel.identifier_output_method = :downcase
     Sequel::Database.identifier_output_method.should == :downcase
     db = Sequel::Database.new(:identifier_output_method=>nil)
-    db.identifier_output_method.should == nil
+    db.identifier_output_method.should be_nil
     db.identifier_output_method = :upcase
     db.identifier_output_method.should == :upcase
     db = Sequel::Database.new(:identifier_output_method=>:upcase)
     db.identifier_output_method.should == :upcase
     db.identifier_output_method = nil
-    db.identifier_output_method.should == nil
+    db.identifier_output_method.should be_nil
   end
 
   specify "should use the default Sequel.quote_identifiers value" do
@@ -426,8 +426,8 @@ describe "Database#<< and run" do
   end
   
   specify "should return nil" do
-    (@db << "DELETE FROM items").should == nil
-    @db.run("DELETE FROM items").should == nil
+    (@db << "DELETE FROM items").should be_nil
+    @db.run("DELETE FROM items").should be_nil
   end
   
   specify "should accept options passed to execute_ddl" do
@@ -632,6 +632,108 @@ describe "Database#transaction" do
       t.join
       @db.sql.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
     end
+  end
+
+  specify "should raise an Error if after_commit or after_rollback is called without a block" do
+    proc{@db.after_commit}.should raise_error(Sequel::Error)
+    proc{@db.after_rollback}.should raise_error(Sequel::Error)
+  end
+
+  specify "should execute after_commit outside transactions" do
+    @db.after_commit{@db.execute('foo')}
+    @db.sql.should == ['foo']
+  end
+
+  specify "should ignore after_rollback outside transactions" do
+    @db.after_rollback{@db.execute('foo')}
+    @db.sql.should be_nil
+  end
+
+  specify "should support after_commit inside transactions" do
+    @db.transaction{@db.after_commit{@db.execute('foo')}}
+    @db.sql.should == ['BEGIN', 'COMMIT', 'foo']
+  end
+
+  specify "should support after_rollback inside transactions" do
+    @db.transaction{@db.after_rollback{@db.execute('foo')}}
+    @db.sql.should == ['BEGIN', 'COMMIT']
+  end
+
+  specify "should not call after_commit if the transaction rolls back" do
+    @db.transaction{@db.after_commit{@db.execute('foo')}; raise Sequel::Rollback}
+    @db.sql.should == ['BEGIN', 'ROLLBACK']
+  end
+
+  specify "should call after_rollback if the transaction rolls back" do
+    @db.transaction{@db.after_rollback{@db.execute('foo')}; raise Sequel::Rollback}
+    @db.sql.should == ['BEGIN', 'ROLLBACK', 'foo']
+  end
+
+  specify "should call multiple after_commit blocks in order if called inside transactions" do
+    @db.transaction{@db.after_commit{@db.execute('foo')}; @db.after_commit{@db.execute('bar')}}
+    @db.sql.should == ['BEGIN', 'COMMIT', 'foo', 'bar']
+  end
+
+  specify "should call multiple after_rollback blocks in order if called inside transactions" do
+    @db.transaction{@db.after_rollback{@db.execute('foo')}; @db.after_rollback{@db.execute('bar')}; raise Sequel::Rollback}
+    @db.sql.should == ['BEGIN', 'ROLLBACK', 'foo', 'bar']
+  end
+
+  specify "should support after_commit inside nested transactions" do
+    @db.transaction{@db.transaction{@db.after_commit{@db.execute('foo')}}}
+    @db.sql.should == ['BEGIN', 'COMMIT', 'foo']
+  end
+
+  specify "should support after_rollback inside nested transactions" do
+    @db.transaction{@db.transaction{@db.after_rollback{@db.execute('foo')}}; raise Sequel::Rollback}
+    @db.sql.should == ['BEGIN', 'ROLLBACK', 'foo']
+  end
+
+  specify "should support after_commit inside savepoints" do
+    @db.meta_def(:supports_savepoints?){true}
+    @db.transaction do
+      @db.after_commit{@db.execute('foo')}
+      @db.transaction(:savepoint=>true){@db.after_commit{@db.execute('bar')}}
+      @db.after_commit{@db.execute('baz')}
+    end
+    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT', 'foo', 'bar', 'baz']
+  end
+
+  specify "should support after_rollback inside savepoints" do
+    @db.meta_def(:supports_savepoints?){true}
+    @db.transaction do
+      @db.after_rollback{@db.execute('foo')}
+      @db.transaction(:savepoint=>true){@db.after_rollback{@db.execute('bar')}}
+      @db.after_rollback{@db.execute('baz')}
+      raise Sequel::Rollback
+    end
+    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'ROLLBACK', 'foo', 'bar', 'baz']
+  end
+
+  specify "should raise an error if you attempt to use after_commit inside a prepared transaction" do
+    @db.meta_def(:supports_prepared_transactions?){true}
+    proc{@db.transaction(:prepare=>'XYZ'){@db.after_commit{@db.execute('foo')}}}.should raise_error(Sequel::Error)
+    @db.sql.should == ['BEGIN', 'ROLLBACK']
+  end
+
+  specify "should raise an error if you attempt to use after_rollback inside a prepared transaction" do
+    @db.meta_def(:supports_prepared_transactions?){true}
+    proc{@db.transaction(:prepare=>'XYZ'){@db.after_rollback{@db.execute('foo')}}}.should raise_error(Sequel::Error)
+    @db.sql.should == ['BEGIN', 'ROLLBACK']
+  end
+
+  specify "should raise an error if you attempt to use after_commit inside a savepoint in a prepared transaction" do
+    @db.meta_def(:supports_savepoints?){true}
+    @db.meta_def(:supports_prepared_transactions?){true}
+    proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_commit{@db.execute('foo')}}}}.should raise_error(Sequel::Error)
+    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
+  end
+
+  specify "should raise an error if you attempt to use after_rollback inside a savepoint in a prepared transaction" do
+    @db.meta_def(:supports_savepoints?){true}
+    @db.meta_def(:supports_prepared_transactions?){true}
+    proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_rollback{@db.execute('foo')}}}}.should raise_error(Sequel::Error)
+    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
   end
 end
 
@@ -1744,7 +1846,7 @@ describe "Database#column_schema_to_ruby_default" do
     db = Sequel::Database.new
     m = db.method(:column_schema_to_ruby_default)
     p = lambda{|d,t| m.call(d,t)}
-    p[nil, :integer].should == nil
+    p[nil, :integer].should be_nil
     p['1', :integer].should == 1
     p['-1', :integer].should == -1
     p['1.0', :float].should == 1.0
@@ -1764,12 +1866,12 @@ describe "Database#column_schema_to_ruby_default" do
     p["'\\a''b'", :string].should == "\\a'b"
     p["'NULL'", :string].should == "NULL"
     p["'2009-10-29'", :date].should == Date.new(2009,10,29)
-    p["CURRENT_TIMESTAMP", :date].should == nil
-    p["today()", :date].should == nil
+    p["CURRENT_TIMESTAMP", :date].should be_nil
+    p["today()", :date].should be_nil
     p["'2009-10-29T10:20:30-07:00'", :datetime].should == DateTime.parse('2009-10-29T10:20:30-07:00')
     p["'2009-10-29 10:20:30'", :datetime].should == DateTime.parse('2009-10-29 10:20:30')
     p["'10:20:30'", :time].should == Time.parse('10:20:30')
-    p["NaN", :float].should == nil
+    p["NaN", :float].should be_nil
 
     db.meta_def(:database_type){:postgres}
     p["''::text", :string].should == ""
@@ -1793,8 +1895,8 @@ describe "Database#column_schema_to_ruby_default" do
     p["2009-10-29", :date].should == Date.new(2009,10,29)
     p["2009-10-29 10:20:30", :datetime].should == DateTime.parse('2009-10-29 10:20:30')
     p["10:20:30", :time].should == Time.parse('10:20:30')
-    p["CURRENT_DATE", :date].should == nil
-    p["CURRENT_TIMESTAMP", :datetime].should == nil
+    p["CURRENT_DATE", :date].should be_nil
+    p["CURRENT_TIMESTAMP", :datetime].should be_nil
     p["a", :enum].should == "a"
     
     db.meta_def(:database_type){:mssql}

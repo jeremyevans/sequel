@@ -191,5 +191,93 @@ if INTEGRATION_DB.supports_savepoints?
     @d.count.should == 0
   end
 end
+
+  specify "should support after_commit outside transactions" do
+    c = nil
+    @db.after_commit{c = 1}
+    c.should == 1
+  end
+
+  specify "should support after_rollback outside transactions" do
+    c = nil
+    @db.after_rollback{c = 1}
+    c.should be_nil
+  end
+
+  specify "should support after_commit inside transactions" do
+    c = nil
+    @db.transaction{@db.after_commit{c = 1}; c.should be_nil}
+    c.should == 1
+  end
+
+  specify "should support after_rollback inside transactions" do
+    c = nil
+    @db.transaction{@db.after_rollback{c = 1}; c.should be_nil}
+    c.should be_nil
+  end
+
+  specify "should not call after_commit if the transaction rolls back" do
+    c = nil
+    @db.transaction{@db.after_commit{c = 1}; c.should be_nil; raise Sequel::Rollback}
+    c.should be_nil
+  end
+
+  specify "should call after_rollback if the transaction rolls back" do
+    c = nil
+    @db.transaction{@db.after_rollback{c = 1}; c.should be_nil; raise Sequel::Rollback}
+    c.should == 1
+  end
+
+  specify "should support multiple after_commit blocks inside transactions" do
+    c = []
+    @db.transaction{@db.after_commit{c << 1}; @db.after_commit{c << 2}; c.should == []}
+    c.should == [1, 2]
+  end
+
+  specify "should support multiple after_rollback blocks inside transactions" do
+    c = []
+    @db.transaction{@db.after_rollback{c << 1}; @db.after_rollback{c << 2}; c.should == []; raise Sequel::Rollback}
+    c.should == [1, 2]
+  end
+
+  specify "should support after_commit inside nested transactions" do
+    c = nil
+    @db.transaction{@db.transaction{@db.after_commit{c = 1}}; c.should be_nil}
+    c.should == 1
+  end
+
+  specify "should support after_rollback inside nested transactions" do
+    c = nil
+    @db.transaction{@db.transaction{@db.after_rollback{c = 1}}; c.should be_nil; raise Sequel::Rollback}
+    c.should == 1
+  end
+
+  if INTEGRATION_DB.supports_savepoints?
+    specify "should support after_commit inside savepoints" do
+      c = nil
+      @db.transaction{@db.transaction(:savepoint=>true){@db.after_commit{c = 1}}; c.should be_nil}
+      c.should == 1
+    end
+
+    specify "should support after_rollback inside savepoints" do
+      c = nil
+      @db.transaction{@db.transaction(:savepoint=>true){@db.after_rollback{c = 1}}; c.should be_nil; raise Sequel::Rollback}
+      c.should == 1
+    end
+  end
+
+  if INTEGRATION_DB.supports_prepared_transactions?
+    specify "should raise an error if you attempt to use after_commit or after_rollback inside a prepared transaction" do
+      proc{@db.transaction(:prepare=>'XYZ'){@db.after_commit{}}}.should raise_error(Sequel::Error)
+      proc{@db.transaction(:prepare=>'XYZ'){@db.after_rollback{}}}.should raise_error(Sequel::Error)
+    end
+
+    if INTEGRATION_DB.supports_savepoints?
+      specify "should raise an error if you attempt to use after_commit or after rollback inside a savepoint in a prepared transaction" do
+        proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_commit{}}}}.should raise_error(Sequel::Error)
+        proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_rollback{}}}}.should raise_error(Sequel::Error)
+      end
+    end
+  end
 end
 end

@@ -188,7 +188,6 @@ module Sequel
         if (s = opts[:prepare]) && (th = @transactions[conn])[:savepoint_level] == 0
           log_connection_execute(conn, "XA START #{literal(s)}")
           th[:savepoint_level] += 1
-          conn
         else
           super
         end

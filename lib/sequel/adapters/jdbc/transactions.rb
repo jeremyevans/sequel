@@ -10,7 +10,6 @@ module Sequel
       # Use JDBC connection's setAutoCommit to false to start transactions
       def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN){conn.setAutoCommit(false)}
-        conn
       end
       
       # Use JDBC connection's commit method to commit transactions
@@ -19,8 +18,9 @@ module Sequel
       end
       
       # Use JDBC connection's setAutoCommit to true to enable non-transactional behavior
-      def remove_transaction(conn)
-        conn.setAutoCommit(true) if conn
+      def remove_transaction(conn, committed)
+        conn.setAutoCommit(true)
+      ensure
         super
       end
       

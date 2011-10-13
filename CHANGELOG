@@ -1,5 +1,7 @@
 === HEAD
 
+* Add after_commit and after_rollback hooks to Database objects (jeremyevans)
+
 * Support savepoints inside prepared transactions on MySQL (jeremyevans)
 
 * Support opening transactions to multiple shards of the same Database object in the same Thread (jeremyevans)

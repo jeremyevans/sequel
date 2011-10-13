@@ -230,8 +230,8 @@ module Sequel
     def _transaction(conn, opts={})
       rollback = opts[:rollback]
       begin
-        add_transaction(conn)
-        t = begin_transaction(conn, opts)
+        add_transaction(conn, opts)
+        begin_transaction(conn, opts)
         if rollback == :always
           begin
             yield(conn)
@@ -244,27 +244,45 @@ module Sequel
           yield(conn)
         end
       rescue Exception => e
-        rollback_transaction(t, opts) if t
+        rollback_transaction(conn, opts)
         transaction_error(e, :conn=>conn, :rollback=>rollback)
       ensure
         begin
-          commit_or_rollback_transaction(e, t, opts)
-        rescue Exception => e
-          raise_error(e, :classes=>database_error_classes, :conn=>conn)
+          committed = commit_or_rollback_transaction(e, conn, opts)
+        rescue Exception => e2
+          raise_error(e2, :classes=>database_error_classes, :conn=>conn)
         ensure
-          remove_transaction(t)
+          remove_transaction(conn, committed)
         end
       end
     end
 
     # Add the current thread to the list of active transactions
-    def add_transaction(conn)
+    def add_transaction(conn, opts)
       if supports_savepoints?
-        @transactions[conn] ||= {:savepoint_level=>0}
+        unless @transactions[conn]
+          @transactions[conn] = {:savepoint_level=>0}
+          @transactions[conn][:prepare] = opts[:prepare] if supports_prepared_transactions?
+        end
       else
         @transactions[conn] = {}
+        @transactions[conn][:prepare] = opts[:prepare] if supports_prepared_transactions?
       end
     end    
+
+    # Call all stored after_commit blocks for the given transaction
+    def after_transaction_commit(conn)
+      if ary = @transactions[conn][:after_commit]
+        ary.each{|b| b.call}
+      end
+    end
+
+    # Call all stored after_rollback blocks for the given transaction
+    def after_transaction_rollback(conn)
+      if ary = @transactions[conn][:after_rollback]
+        ary.each{|b| b.call}
+      end
+    end
 
     # Whether the current thread/connection is already inside a transaction
     def already_in_transaction?(conn, opts)
@@ -295,7 +313,6 @@ module Sequel
       else
         begin_new_transaction(conn, opts)
       end
-      conn
     end
     
     # SQL to BEGIN a transaction.
@@ -358,12 +375,16 @@ module Sequel
       # Thread.current.status is checked because Thread#kill skips rescue
       # blocks (so exception would be nil), but the transaction should
       # still be rolled back.
-      def commit_or_rollback_transaction(exception, thread, opts)
-        unless exception
+      def commit_or_rollback_transaction(exception, conn, opts)
+        if exception
+          false
+        else
           if Thread.current.status == 'aborting'
-            rollback_transaction(thread, opts)
+            rollback_transaction(conn, opts)
+            false
           else
-            commit_transaction(thread, opts)
+            commit_transaction(conn, opts)
+            true
           end
         end
       end
@@ -371,8 +392,13 @@ module Sequel
       # Whether to commit the current transaction.  On ruby 1.9 and JRuby,
       # transactions will be committed if Thread#kill is used on an thread
       # that has a transaction open, and there isn't a work around.
-      def commit_or_rollback_transaction(exception, thread, opts)
-        commit_transaction(thread, opts) unless exception
+      def commit_or_rollback_transaction(exception, conn, opts)
+        if exception
+          false
+        else
+          commit_transaction(conn, opts)
+          true
+        end
       end
     end
     
@@ -433,8 +459,18 @@ module Sequel
     end
     
     # Remove the current thread from the list of active transactions
-    def remove_transaction(conn)
-      @transactions.delete(conn) if !supports_savepoints? || ((@transactions[conn][:savepoint_level] -= 1) <= 0)
+    def remove_transaction(conn, committed)
+      if !supports_savepoints? || ((@transactions[conn][:savepoint_level] -= 1) <= 0)
+        begin
+          if committed
+            after_transaction_commit(conn)
+          else
+            after_transaction_rollback(conn)
+          end
+        ensure
+          @transactions.delete(conn)
+        end
+      end
     end
 
     # SQL to rollback to a savepoint

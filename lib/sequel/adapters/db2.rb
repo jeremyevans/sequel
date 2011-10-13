@@ -71,13 +71,12 @@ module Sequel
 
       def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN){DB2CLI.SQLSetConnectAttr(conn, DB2CLI::SQL_ATTR_AUTOCOMMIT, DB2CLI::SQL_AUTOCOMMIT_OFF)}
-        conn
       end
 
-      def remove_transaction(conn)
-        super
+      def remove_transaction(conn, committed)
+        DB2CLI.SQLSetConnectAttr(conn, DB2CLI::SQL_ATTR_AUTOCOMMIT, DB2CLI::SQL_AUTOCOMMIT_ON)
       ensure
-        DB2CLI.SQLSetConnectAttr(conn, DB2CLI::SQL_ATTR_AUTOCOMMIT, DB2CLI::SQL_AUTOCOMMIT_ON) if conn
+        super
       end
 
       def rollback_transaction(conn, opts={})
