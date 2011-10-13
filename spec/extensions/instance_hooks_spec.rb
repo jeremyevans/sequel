@@ -177,3 +177,74 @@ describe "InstanceHooks plugin" do
     @r.should == [2, 1, 4, 3]
   end
 end
+
+describe "InstanceHooks plugin with transactions" do
+  before do
+    @logger = Object.new
+    def @logger.method_missing(meth, sql)
+      (@sqls ||= []) << sql
+    end
+    def @logger.sqls
+      @sqls
+    end
+    @db = Class.new(Sequel::Database) do
+      def connect(*)
+        Object.new
+      end
+      def log_connection_execute(conn, sql)
+        execute(sql)
+      end
+      def execute(sql, opts={})
+        @loggers.each{|l| l.info(sql)}
+      end
+    end.new(:loggers=>[@logger])
+    pr = proc{|x| r(x)}
+    @c = Class.new(Sequel::Model(@db)) do
+      attr_accessor :rb
+      def _delete
+      end
+      def after_save
+        db.execute('as')
+        raise Sequel::Rollback if rb
+      end
+      def after_destroy
+        db.execute('ad')
+        raise Sequel::Rollback if rb
+      end
+    end
+    @c.use_transactions = true
+    @c.plugin :instance_hooks
+    @o = @c.load({:id=>1})
+    @or = @c.load({:id=>1})
+    @or.rb = true
+    @r = []
+  end
+  
+  it "should support after_commit_hook" do
+    @o.after_commit_hook{@db.execute('ac1')}
+    @o.after_commit_hook{@db.execute('ac2')}
+    @o.save.should_not be_nil
+    @logger.sqls.should == ['BEGIN', 'as', 'COMMIT', 'ac1', 'ac2']
+  end
+  
+  it "should support after_rollback_hook" do
+    @or.after_rollback_hook{@db.execute('ar1')}
+    @or.after_rollback_hook{@db.execute('ar2')}
+    @or.save.should be_nil
+    @logger.sqls.should == ['BEGIN', 'as', 'ROLLBACK', 'ar1', 'ar2']
+  end
+  
+  it "should support after_commit_hook" do
+    @o.after_destroy_commit_hook{@db.execute('adc1')}
+    @o.after_destroy_commit_hook{@db.execute('adc2')}
+    @o.destroy.should_not be_nil
+    @logger.sqls.should == ['BEGIN', 'ad', 'COMMIT', 'adc1', 'adc2']
+  end
+  
+  it "should support after_rollback_hook" do
+    @or.after_destroy_rollback_hook{@db.execute('adr1')}
+    @or.after_destroy_rollback_hook{@db.execute('adr2')}
+    @or.destroy.should be_nil
+    @logger.sqls.should == ['BEGIN', 'ad', 'ROLLBACK', 'adr1', 'adr2']
+  end
+end

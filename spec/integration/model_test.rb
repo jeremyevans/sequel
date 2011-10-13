@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 describe "Sequel::Model basic support" do 
   before do
     @db = INTEGRATION_DB
-    @db.create_table!(:items) do
+    @db.create_table!(:items, :engine=>:InnoDB) do
       primary_key :id
       String :name
     end
@@ -59,6 +59,59 @@ describe "Sequel::Model basic support" do
       raise Sequel::Rollback
     end
     i.save.should be_nil
+  end
+
+  specify "#should respect after_commit, after_rollback, after_destroy_commit, and after_destroy_rollback hooks" do
+    i = Item.create(:name=>'J')
+    i.use_transactions = true
+    def i.hooks
+      @hooks
+    end
+    def i.rb=(x)
+      @hooks = []
+      @rb = x
+    end
+    def i.after_save
+      @hooks << :as
+      raise Sequel::Rollback if @rb
+    end
+    def i.after_destroy
+      @hooks << :ad
+      raise Sequel::Rollback if @rb
+    end
+    def i.after_commit
+      @hooks << :ac
+    end
+    def i.after_rollback
+      @hooks << :ar
+    end
+    def i.after_destroy_commit
+      @hooks << :adc
+    end
+    def i.after_destroy_rollback
+      @hooks << :adr
+    end
+    i.name = 'K'
+    i.rb = true
+    i.save.should be_nil
+    i.reload.name.should == 'J'
+    i.hooks.should == [:as, :ar]
+
+    i.rb = true
+    i.destroy.should be_nil
+    i.exists?.should be_true
+    i.hooks.should == [:ad, :adr]
+
+    i.name = 'K'
+    i.rb = false
+    i.save.should_not be_nil
+    i.reload.name.should == 'K'
+    i.hooks.should == [:as, :ac]
+
+    i.rb = false
+    i.destroy.should_not be_nil
+    i.exists?.should be_false
+    i.hooks.should == [:ad, :adc]
   end
 
   specify "#exists? should return whether the item is still in the database" do

@@ -29,6 +29,9 @@ describe "NestedAttributes plugin" do
       end
     end
     db = Sequel::Database.new({})
+    def db.connect(opts)
+      Object.new
+    end
     db.meta_def(:dataset) do |*a|
       x = super(*a)
       x.extend(ds_mod)

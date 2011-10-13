@@ -48,6 +48,10 @@ class MockDatabase < Sequel::Database
   self.identifier_input_method = nil
   self.identifier_output_method = nil
   attr_reader :sqls
+
+  def connect(opts)
+    Object.new
+  end
   
   def execute(sql, opts={})
     @sqls ||= []

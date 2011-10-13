@@ -428,5 +428,110 @@ describe "Model around filters" do
     o.meta_def(:around_validation){}
     o.save.should == nil
   end
+end
 
+describe "Model#after_commit and #after_rollback" do
+  before do
+    @logger = Object.new
+    def @logger.method_missing(meth, sql, args=nil)
+      (@sqls ||= []) << sql
+    end
+    def @logger.sqls
+      @sqls
+    end
+    @db = Class.new(Sequel::Database) do
+      def connect(*)
+        Object.new
+      end
+      def log_connection_execute(conn, sql)
+        execute(sql)
+      end
+      def execute(sql, opts={})
+        @loggers.each{|l| l.info(sql)}
+      end
+    end.new(:loggers=>[@logger])
+    @m = Class.new(Sequel::Model(@db)) do
+      attr_accessor :rb
+      def _delete
+      end
+      def after_save
+        db.execute('as')
+        raise Sequel::Rollback if rb
+      end
+      def after_commit
+        db.execute('ac')
+      end
+      def after_rollback
+        db.execute('ar')
+      end
+      def after_destroy
+        db.execute('ad')
+        raise Sequel::Rollback if rb
+      end
+      def after_destroy_commit
+        db.execute('adc')
+      end
+      def after_destroy_rollback
+        db.execute('adr')
+      end
+    end
+    @m.use_transactions = true
+    @o = @m.load({})
+  end
+
+  specify "should call after_commit for save after the transaction commits if it commits" do
+    @o.save
+    @logger.sqls.should == ['BEGIN', 'as', 'COMMIT', 'ac']
+  end
+
+  specify "should call after_rollback for save after the transaction rolls back if it rolls back" do
+    @o.rb = true
+    @o.save
+    @logger.sqls.should == ['BEGIN', 'as', 'ROLLBACK', 'ar']
+  end
+
+  specify "should have after_commit respect any surrounding transactions" do
+    @db.transaction do
+      @o.save
+    end
+    @logger.sqls.should == ['BEGIN', 'as', 'COMMIT', 'ac']
+    @logger.sqls.clear
+  end
+
+  specify "should have after_rollback respect any surrounding transactions" do
+    @db.transaction do
+      @o.rb = true
+      @o.save
+    end
+    @logger.sqls.should == ['BEGIN', 'as', 'ROLLBACK', 'ar']
+    @logger.sqls.clear
+  end
+
+  specify "should call after_destroy_commit for destroy after the transaction commits if it commits" do
+    @o.destroy
+    @logger.sqls.should == ['BEGIN', 'ad', 'COMMIT', 'adc']
+  end
+
+  specify "should call after_destroy_rollback for destroy after the transaction rolls back if it rolls back" do
+    @o.rb = true
+    @o.destroy
+    @logger.sqls.should == ['BEGIN', 'ad', 'ROLLBACK', 'adr']
+  end
+
+  specify "should have after_destroy_commit respect any surrounding transactions" do
+    @db.transaction do
+      @o.destroy
+    end
+    @logger.sqls.should == ['BEGIN', 'ad', 'COMMIT', 'adc']
+    @logger.sqls.clear
+  end
+
+  specify "should have after_destroy_rollback respect any surrounding transactions" do
+    @db.transaction do
+      @o.rb = true
+      @o.destroy
+    end
+    @logger.sqls.should == ['BEGIN', 'ad', 'ROLLBACK', 'adr']
+    @logger.sqls.clear
+  end
 end

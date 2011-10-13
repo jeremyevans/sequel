@@ -1286,6 +1286,7 @@ module Sequel
       # Internal destroy method, separted from destroy to
       # allow running inside a transaction
       def _destroy(opts)
+        db.after_rollback{after_destroy_rollback}
         called = false
         around_destroy do
           called = true
@@ -1295,6 +1296,7 @@ module Sequel
           true
         end
         raise_hook_failure(:destroy) unless called
+        db.after_commit{after_destroy_commit}
         self
       end
       
@@ -1355,6 +1357,7 @@ module Sequel
       # Internal version of save, split from save to allow running inside
       # it's own transaction.
       def _save(columns, opts)
+        db.after_rollback{after_rollback}
         was_new = false
         pk = nil
         called_save = false
@@ -1408,6 +1411,7 @@ module Sequel
           @columns_updated = nil
         end
         @modified = false
+        db.after_commit{after_commit}
         self
       end
 

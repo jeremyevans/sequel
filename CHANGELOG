@@ -1,5 +1,7 @@
 === HEAD
 
+* Add after_commit, after_rollback, after_destroy_commit, and after_destroy_rollback hooks to Model objects (jeremyevans)
+
 * Add after_commit and after_rollback hooks to Database objects (jeremyevans)
 
 * Support savepoints inside prepared transactions on MySQL (jeremyevans)
