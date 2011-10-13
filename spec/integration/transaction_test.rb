@@ -21,6 +21,13 @@ describe "Database transactions" do
     @db.transaction{|conn| conn.should_not == nil}
   end
 
+  specify "should have #in_transaction? work correctly" do
+    @db.in_transaction?.should be_false
+    c = nil
+    @db.transaction{c = @db.in_transaction?}
+    c.should be_true
+  end
+
   specify "should correctly rollback transactions" do
     proc do
       @db.transaction do

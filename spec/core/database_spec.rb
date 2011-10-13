@@ -548,6 +548,24 @@ describe "Database#transaction" do
     @db.sql.should == ['BEGIN', 'DROP TABLE a', 'ROLLBACK']
   end
   
+  specify "should have in_transaction? return true if inside a transaction" do
+    c = nil
+    @db.transaction{c = @db.in_transaction?}
+    c.should be_true
+  end
+  
+  specify "should have in_transaction? handle sharding correctly" do
+    @db = Dummy3Database.new(:servers=>{:test=>{}}){Dummy3Database::DummyConnection.new(@db)}
+    c = []
+    @db.transaction(:server=>:test){c << @db.in_transaction?}
+    @db.transaction(:server=>:test){c << @db.in_transaction?(:server=>:test)}
+    c.should == [false, true]
+  end
+  
+  specify "should have in_transaction? return false if not in a transaction" do
+    @db.in_transaction?.should be_false
+  end
+  
   specify "should return nil if Sequel::Rollback is called in the transaction" do
     @db.transaction{raise Sequel::Rollback}.should be_nil
   end

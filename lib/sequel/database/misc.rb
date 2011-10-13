@@ -107,6 +107,13 @@ module Sequel
       Sequel.convert_output_timestamp(v, timezone)
     end
 
+    # Return true if already in a transaction given the options,
+    # false otherwise.  Respects the :server option for selecting
+    # a shard.
+    def in_transaction?(opts={})
+      synchronize(opts[:server]){|conn| !!@transactions[conn]}
+    end
+
     # Returns a string representation of the database object including the
     # class name and the connection URI (or the opts if the URI
     # cannot be constructed).
