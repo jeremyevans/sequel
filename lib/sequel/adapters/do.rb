@@ -116,31 +116,6 @@ module Sequel
 
       private
       
-      # DataObjects uses a special transaction object to keep track of
-      # transactions.  Unfortunately, it tries to create a new connection
-      # to do a transaction.  So we close the connection created and
-      # substitute our own.
-      def begin_transaction(conn, opts={})
-        return super if supports_savepoints?
-        log_yield(TRANSACTION_BEGIN) do
-          t = ::DataObjects::Transaction.create_for_uri(uri)
-          t.instance_variable_get(:@connection).close
-          t.instance_variable_set(:@connection, conn)
-          t.begin
-          t
-        end
-      end
-      
-      # DataObjects requires transactions be prepared before being
-      # committed, so we do that.
-      def commit_transaction(t, opts={})
-        return super if supports_savepoints?
-        log_yield(TRANSACTION_ROLLBACK) do
-          t.prepare
-          t.commit 
-        end
-      end
-      
       # Method to call on a statement object to execute SQL that does
       # not return any rows.
       def connection_execute_method
@@ -165,12 +140,6 @@ module Sequel
       # Execute SQL on the connection by creating a command first
       def log_connection_execute(conn, sql)
         log_yield(sql){conn.create_command(sql).execute_non_query}
-      end
-      
-      # We use the transactions rollback method to rollback.
-      def rollback_transaction(t, opts={})
-        return super if supports_savepoints?
-        log_yield(TRANSACTION_COMMIT){t.rollback}
       end
       
       # Allow extending the given connection when it is first created.
