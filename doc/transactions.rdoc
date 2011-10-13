@@ -84,7 +84,7 @@ Other exceptions, unless rescued inside the outer transaction block, will rollba
 
 == Prepared Transactions / Two-Phase Commit
 
-Sequel supports database prepared transactions on PostreSQL, MySQL, and H2.  With prepared transactions, at the end of the transaction, the transaction is not immediately committed (it acts like a rollback).  Later, you can call +commit_prepared_transaction+ to commit the transaction or +rollback_prepared_transaction+ to roll the transaction back.  Prepared transactions are usually used with distributed databases to make sure all databases commit the same transaction or none of them do.
+Sequel supports database prepared transactions on PostgreSQL, MySQL, and H2.  With prepared transactions, at the end of the transaction, the transaction is not immediately committed (it acts like a rollback).  Later, you can call +commit_prepared_transaction+ to commit the transaction or +rollback_prepared_transaction+ to roll the transaction back.  Prepared transactions are usually used with distributed databases to make sure all databases commit the same transaction or none of them do.
 
 To use prepared transactions in Sequel, you provide a string as the value of the :prepare option:
 
