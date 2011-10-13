@@ -539,7 +539,6 @@ module Sequel
     def transaction_error(e, opts={})
       if e.is_a?(Rollback)
         raise e if opts[:rollback] == :reraise
-        e
       else
         raise_error(e, opts.merge(:classes=>database_error_classes))
       end

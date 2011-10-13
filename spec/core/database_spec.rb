@@ -548,8 +548,8 @@ describe "Database#transaction" do
     @db.sql.should == ['BEGIN', 'DROP TABLE a', 'ROLLBACK']
   end
   
-  specify "should return the Sequel::Rollback exception if Sequel::Rollback is called in the transaction" do
-    @db.transaction{raise Sequel::Rollback}.should be_a_kind_of(Sequel::Rollback)
+  specify "should return nil if Sequel::Rollback is called in the transaction" do
+    @db.transaction{raise Sequel::Rollback}.should be_nil
   end
   
   specify "should reraise Sequel::Rollback errors when using :rollback=>:reraise option is given" do
@@ -567,10 +567,10 @@ describe "Database#transaction" do
     proc {@db.transaction(:rollback=>:always){raise ArgumentError}}.should raise_error(ArgumentError)
     @db.sql.should == ['BEGIN', 'ROLLBACK']
     @db.sql.clear
-    @db.transaction(:rollback=>:always){raise Sequel::Rollback}.should be_a_kind_of(Sequel::Rollback)
+    @db.transaction(:rollback=>:always){raise Sequel::Rollback}.should be_nil
     @db.sql.should == ['BEGIN', 'ROLLBACK']
     @db.sql.clear
-    @db.transaction(:rollback=>:always){1}.should be_a_kind_of(Sequel::Rollback)
+    @db.transaction(:rollback=>:always){1}.should be_nil
     @db.sql.should == ['BEGIN', 'ROLLBACK']
     @db.sql.clear
     catch (:foo) do
@@ -774,12 +774,12 @@ describe "Sequel.transaction" do
   end
   
   specify "should pass options to all the blocks" do
-    Sequel.transaction([@db1, @db2, @db3], :rollback=>:always){1}.should be_a_kind_of(Sequel::Rollback)
+    Sequel.transaction([@db1, @db2, @db3], :rollback=>:always){1}.should be_nil
     @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN', @db3, 'ROLLBACK', @db2, 'ROLLBACK', @db1, 'ROLLBACK']
   end
   
   specify "should handle Sequel::Rollback exceptions raised by the block to rollback on all databases" do
-    Sequel.transaction([@db1, @db2, @db3]){raise Sequel::Rollback}.should be_a_kind_of(Sequel::Rollback)
+    Sequel.transaction([@db1, @db2, @db3]){raise Sequel::Rollback}.should be_nil
     @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN', @db3, 'ROLLBACK', @db2, 'ROLLBACK', @db1, 'ROLLBACK']
   end
   

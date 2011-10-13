@@ -12,8 +12,6 @@
 
 * Support :rollback => :reraise option in Database#transaction to reraise the Sequel::Rollback exception (jeremyevans)
 
-* Raising Sequel::Rollback inside a transaction causes the transaction to return the exception (jeremyevans)
-
 * Add support for connecting to Apache Derby databases using the jdbc adapter (jeremyevans)
 
 * Add support for connecting to HSQLDB databases using the jdbc adapter (jeremyevans)

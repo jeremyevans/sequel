@@ -52,6 +52,15 @@ describe "Sequel::Model basic support" do
     Item.count.should == 0
   end
 
+  specify "#save should return nil if raise_on_save_failure is false and save isn't successful" do
+    i = Item.new(:name=>'J')
+    i.use_transactions = true
+    def i.after_save
+      raise Sequel::Rollback
+    end
+    i.save.should be_nil
+  end
+
   specify "#exists? should return whether the item is still in the database" do
     i = Item.create(:name=>'J')
     i.exists?.should == true

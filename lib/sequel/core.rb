@@ -273,7 +273,7 @@ module Sequel
       begin
         pr.call
       rescue Sequel::Rollback => e
-        e
+        nil
       end
     else
       pr.call
