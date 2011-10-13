@@ -135,8 +135,9 @@ module Sequel
       end
 
       def remove_transaction(conn)
-        conn.autocommit = true if conn
         super
+      ensure
+        conn.autocommit = true if conn
       end
       
       def rollback_transaction(conn, opts={})

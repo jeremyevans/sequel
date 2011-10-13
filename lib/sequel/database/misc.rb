@@ -53,7 +53,7 @@ module Sequel
       @schemas = {}
       @default_schema = @opts.fetch(:default_schema, default_schema_default)
       @prepared_statements = {}
-      @transactions = []
+      @transactions = {}
       @identifier_input_method = nil
       @identifier_output_method = nil
       @quote_identifiers = nil

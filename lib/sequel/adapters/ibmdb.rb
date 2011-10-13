@@ -308,8 +308,6 @@ module Sequel
       # connection and sets autocommit back on.
       def commit_transaction(conn, opts={})
         log_yield(TRANSACTION_COMMIT){conn.commit} if conn
-      ensure
-        conn.autocommit = true if conn
       end
     
       # Close the given connection.
@@ -340,12 +338,17 @@ module Sequel
         end
       end
 
+      # Set autocommit back on
+      def remove_transaction(conn)
+        super
+      ensure
+        conn.autocommit = true if conn
+      end
+
       # This rolls back the transaction in progress on the
       # connection and sets autocommit back on.
       def rollback_transaction(conn, opts={})
         log_yield(TRANSACTION_ROLLBACK){conn.rollback} if conn
-      ensure
-        conn.autocommit = true if conn
       end
     end
     

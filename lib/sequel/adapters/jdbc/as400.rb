@@ -1,9 +1,13 @@
+Sequel.require 'adapters/jdbc/transactions'
+
 module Sequel
   module JDBC
     # Database and Dataset support for AS400 databases accessed via JDBC.
     module AS400
       # Instance methods for AS400 Database objects accessed via JDBC.
       module DatabaseMethods
+        include Sequel::JDBC::Transactions
+
         TRANSACTION_BEGIN = 'Transaction.begin'.freeze
         TRANSACTION_COMMIT = 'Transaction.commit'.freeze
         TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
@@ -33,25 +37,7 @@ module Sequel
         # Use JDBC connection's setAutoCommit to false to start transactions
         def begin_transaction(conn, opts={})
           set_transaction_isolation(conn, opts)
-          log_yield(TRANSACTION_BEGIN){conn.setAutoCommit(false)}
-          conn
-        end
-
-        # Use JDBC connection's commit method to commit transactions
-        def commit_transaction(conn, opts={})
-          log_yield(TRANSACTION_COMMIT){conn.commit}
-        end
-
-        # Use JDBC connection's setAutoCommit to true to enable default
-        # auto-commit mode
-        def remove_transaction(conn)
-          conn.setAutoCommit(true) if conn
-          @transactions.delete(Thread.current)
-        end
-
-        # Use JDBC connection's rollback method to rollback transactions
-        def rollback_transaction(conn, opts={})
-          log_yield(TRANSACTION_ROLLBACK){conn.rollback}
+          super
         end
       end
       

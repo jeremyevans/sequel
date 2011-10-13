@@ -598,12 +598,23 @@ describe "Database#transaction" do
     end
     while cc.nil?; sleep 0.1; end
     cc.should be_a_kind_of(Dummy3Database::DummyConnection)
-    @db.transactions.should == [t]
+    @db.transactions.should == {cc=>{}}
     stop = true
     t.join
     @db.transactions.should be_empty
   end
 
+  specify "should correctly handle nested transacation use with separate shards" do
+    @db = Dummy3Database.new(:servers=>{:test=>{}}){Dummy3Database::DummyConnection.new(@db)}
+    @db.transaction do |c1|
+      @db.transaction(:server=>:test) do |c2|
+        c1.should_not == c2
+        @db.execute 'DROP TABLE test;'
+      end
+    end
+    @db.sql.should == ['BEGIN', 'BEGIN', 'DROP TABLE test;', 'COMMIT', 'COMMIT']
+  end
+  
   if (!defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or RUBY_ENGINE == 'rbx') and RUBY_VERSION < '1.9'
     specify "should handle Thread#kill for transactions inside threads" do
       q = Queue.new
@@ -643,6 +654,9 @@ describe "Sequel.transaction" do
       def connect(*)
         Object.new
       end
+      def supports_savepoints?
+        true
+      end
     end
     @db1 = Sequel::Database.new(:host=>'1', :logger=>@logger)
     @db2 = Sequel::Database.new(:host=>'2', :logger=>@logger)
@@ -665,6 +679,19 @@ describe "Sequel.transaction" do
   specify "should handle Sequel::Rollback exceptions raised by the block to rollback on all databases" do
     Sequel.transaction([@db1, @db2, @db3]){raise Sequel::Rollback}.should be_a_kind_of(Sequel::Rollback)
     @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN', @db3, 'ROLLBACK', @db2, 'ROLLBACK', @db1, 'ROLLBACK']
+  end
+  
+  specify "should handle nested transactions" do
+    Sequel.transaction([@db1, @db2, @db3]){Sequel.transaction([@db1, @db2, @db3]){1}}.should == 1
+    @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN', @db3, 'COMMIT', @db2, 'COMMIT', @db1, 'COMMIT']
+  end
+  
+  specify "should handle savepoints" do
+    Sequel.transaction([@db1, @db2, @db3]){Sequel.transaction([@db1, @db2, @db3], :savepoint=>true){1}}.should == 1
+    @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN',
+      @db1, 'SAVEPOINT autopoint_1', @db2, 'SAVEPOINT autopoint_1', @db3, 'SAVEPOINT autopoint_1',
+      @db3, 'RELEASE SAVEPOINT autopoint_1', @db2, 'RELEASE SAVEPOINT autopoint_1', @db1, 'RELEASE SAVEPOINT autopoint_1',
+      @db3, 'COMMIT', @db2, 'COMMIT', @db1, 'COMMIT']
   end
 end
   

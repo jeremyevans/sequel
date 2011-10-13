@@ -77,18 +77,14 @@ module Sequel
       # The ADO adapter's default provider doesn't support transactions, since it 
       # creates a new native connection for each query.  So Sequel only attempts
       # to use transactions if an explicit :provider is given.
-      def _transaction(conn, o={})
-        return super if opts[:provider]
-        th = Thread.current
-        begin
-          @transactions << th
-          yield conn
-        rescue Sequel::Rollback
-        ensure
-          @transactions.delete(th)
-        end
+      def begin_transaction(conn, opts={})
+        super if @opts[:provider]
       end
-      
+
+      def commit_transaction(conn, opts={})
+        super if @opts[:provider]
+      end
+
       def database_error_classes
         [::WIN32OLERuntimeError]
       end
@@ -99,6 +95,10 @@ module Sequel
 
       def disconnect_error?(e, opts)
         super || (e.is_a?(::WIN32OLERuntimeError) && e.message =~ DISCONNECT_ERROR_RE)
+      end
+
+      def rollback_transaction(conn, opts={})
+        super if @opts[:provider]
       end
     end
     

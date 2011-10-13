@@ -1,5 +1,7 @@
 === HEAD
 
+* Support opening transactions to multiple shards of the same Database object in the same Thread (jeremyevans)
+
 * Add Sequel.transaction for running transactions on multiple databases at the same time (jeremyevans)
 
 * Support :rollback => :always option in Database#transaction to always rollback the transaction (jeremyevans)

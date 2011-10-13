@@ -230,7 +230,7 @@ module Sequel
     def _transaction(conn, opts={})
       rollback = opts[:rollback]
       begin
-        add_transaction
+        add_transaction(conn)
         t = begin_transaction(conn, opts)
         if rollback == :always
           begin
@@ -258,21 +258,17 @@ module Sequel
     end
 
     # Add the current thread to the list of active transactions
-    def add_transaction
-      th = Thread.current
+    def add_transaction(conn)
       if supports_savepoints?
-        unless @transactions.include?(th)
-          th[:sequel_transaction_depth] = 0
-          @transactions << th
-        end
+        @transactions[conn] ||= {:savepoint_level=>0}
       else
-        @transactions << th
+        @transactions[conn] = {}
       end
     end    
 
     # Whether the current thread/connection is already inside a transaction
     def already_in_transaction?(conn, opts)
-      @transactions.include?(Thread.current) && (!supports_savepoints? || !opts[:savepoint])
+      @transactions.has_key?(conn) && (!supports_savepoints? || !opts[:savepoint])
     end
     
     # SQL to start a new savepoint
@@ -289,13 +285,13 @@ module Sequel
     # Start a new database transaction or a new savepoint on the given connection.
     def begin_transaction(conn, opts={})
       if supports_savepoints?
-        th = Thread.current
-        if (depth = th[:sequel_transaction_depth]) > 0
+        th = @transactions[conn]
+        if (depth = th[:savepoint_level]) > 0
           log_connection_execute(conn, begin_savepoint_sql(depth))
         else
           begin_new_transaction(conn, opts)
         end
-        th[:sequel_transaction_depth] += 1
+        th[:savepoint_level] += 1
       else
         begin_new_transaction(conn, opts)
       end
@@ -388,7 +384,7 @@ module Sequel
     # Commit the active transaction on the connection
     def commit_transaction(conn, opts={})
       if supports_savepoints?
-        depth = Thread.current[:sequel_transaction_depth]
+        depth = @transactions[conn][:savepoint_level]
         log_connection_execute(conn, depth > 1 ? commit_savepoint_sql(depth-1) : commit_transaction_sql)
       else
         log_connection_execute(conn, commit_transaction_sql)
@@ -431,11 +427,6 @@ module Sequel
       dataset.method(:output_identifier)
     end
 
-    # SQL to ROLLBACK a transaction.
-    def rollback_transaction_sql
-      SQL_ROLLBACK
-    end
-    
     # Remove the cached schema for the given schema name
     def remove_cached_schema(table)
       @schemas.delete(quote_schema_table(table)) if @schemas
@@ -443,8 +434,7 @@ module Sequel
     
     # Remove the current thread from the list of active transactions
     def remove_transaction(conn)
-      th = Thread.current
-      @transactions.delete(th) if !supports_savepoints? || ((th[:sequel_transaction_depth] -= 1) <= 0)
+      @transactions.delete(conn) if !supports_savepoints? || ((@transactions[conn][:savepoint_level] -= 1) <= 0)
     end
 
     # SQL to rollback to a savepoint
@@ -455,13 +445,18 @@ module Sequel
     # Rollback the active transaction on the connection
     def rollback_transaction(conn, opts={})
       if supports_savepoints?
-        depth = Thread.current[:sequel_transaction_depth]
+        depth = @transactions[conn][:savepoint_level]
         log_connection_execute(conn, depth > 1 ? rollback_savepoint_sql(depth-1) : rollback_transaction_sql)
       else
         log_connection_execute(conn, rollback_transaction_sql)
       end
     end
 
+    # SQL to ROLLBACK a transaction.
+    def rollback_transaction_sql
+      SQL_ROLLBACK
+    end
+    
     # Match the database's column type to a ruby type via a
     # regular expression, and return the ruby type as a symbol
     # such as :integer or :string.

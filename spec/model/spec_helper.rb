@@ -63,10 +63,10 @@ class MockDatabase < Sequel::Database
   end
 
    def transaction(opts={})
-    return yield if @transactions.include?(Thread.current)
+    return yield if @transactions.has_key?(Thread.current)
     execute('BEGIN')
     begin
-      @transactions << Thread.current
+      @transactions[Thread.current] = {}
       yield
     rescue Exception => e
       execute('ROLLBACK')
