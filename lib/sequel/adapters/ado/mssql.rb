@@ -37,6 +37,23 @@ module Sequel
             end
           end
         end
+
+        private
+
+        # The ADO adapter's default provider doesn't support transactions, since it 
+        # creates a new native connection for each query.  So Sequel only attempts
+        # to use transactions if an explicit :provider is given.
+        def begin_transaction(conn, opts={})
+          super if @opts[:provider]
+        end
+
+        def commit_transaction(conn, opts={})
+          super if @opts[:provider]
+        end
+
+        def rollback_transaction(conn, opts={})
+          super if @opts[:provider]
+        end
       end
       
       class Dataset < ADO::Dataset
