@@ -136,6 +136,14 @@ describe "Database transactions" do
       @db.rollback_prepared_transaction('XYZ')
       @d.select_order_map(:name).should == []
     end
+
+    if INTEGRATION_DB.supports_savepoints?
+      specify "should support savepoints when using prepared transactions" do
+        @db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@d << {:name => '1'}}}
+        @db.commit_prepared_transaction('XYZ')
+        @d.select_order_map(:name).should == ['1']
+      end
+    end
   end
 
   specify "should support all transaction isolation levels" do

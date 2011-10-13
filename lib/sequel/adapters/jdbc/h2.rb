@@ -53,8 +53,8 @@ module Sequel
         # If the :prepare option is given and we aren't in a savepoint,
         # prepare the transaction for a two-phase commit.
         def commit_transaction(conn, opts={})
-          if opts[:prepare] && @transactions[conn][:savepoint_level] <= 1
-            log_connection_execute(conn, "PREPARE COMMIT #{opts[:prepare]}")
+          if (s = opts[:prepare]) && @transactions[conn][:savepoint_level] <= 1
+            log_connection_execute(conn, "PREPARE COMMIT #{s}")
           else
             super
           end
