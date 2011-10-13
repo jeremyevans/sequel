@@ -338,7 +338,7 @@ module Sequel
       end
 
       # Set autocommit back on
-      def remove_transaction(conn)
+      def remove_transaction(conn, committed)
         conn.autocommit = true
       ensure
         super
@@ -347,7 +347,7 @@ module Sequel
       # This rolls back the transaction in progress on the
       # connection and sets autocommit back on.
       def rollback_transaction(conn, opts={})
-        log_yield(TRANSACTION_ROLLBACK){conn.rollback} if conn
+        log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
     end
     
