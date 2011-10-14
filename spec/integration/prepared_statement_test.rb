@@ -10,6 +10,7 @@ describe "Prepared Statements and Bound Arguments" do
     @c = Class.new(Sequel::Model(:items))
     @ds = @db[:items]
     @ds.insert(:numb=>10)
+    @pr = @ds.requires_placeholder_type_specifiers? ? proc{|i| :"#{i}__integer"} : proc{|i| i}
   end
   after do
     @db.drop_table(:items)
@@ -95,7 +96,7 @@ describe "Prepared Statements and Bound Arguments" do
 
   specify "should support bound variables with NULL values" do
     @ds.delete
-    @ds.call(:insert, {:n=>nil}, :numb=>:$n)
+    @ds.call(:insert, {:n=>nil}, :numb=>@pr[:$n])
     @ds.count.should == 1
     @ds.map(:numb).should == [nil]
   end
@@ -181,7 +182,7 @@ describe "Prepared Statements and Bound Arguments" do
 
   specify "should support prepared statements with NULL values" do
     @ds.delete
-    @ds.prepare(:insert, :insert_n, :numb=>:$n)
+    @ds.prepare(:insert, :insert_n, :numb=>@pr[:$n])
     @db.call(:insert_n, :n=>nil)
     @ds.count.should == 1
     @ds.map(:numb).should == [nil]

@@ -36,6 +36,12 @@ module Sequel
       false
     end
 
+    # Whether type specifiers are required for prepared statement/bound
+    # variable argument placeholders (i.e. :bv__integer)
+    def requires_placeholder_type_specifiers?
+      false
+    end
+
     # Whether the dataset supports common table expressions (the WITH clause).
     # If given, +type+ can be :select, :insert, :update, or :delete, in which case it
     # determines whether WITH is supported for the respective statement type.
