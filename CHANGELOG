@@ -1,5 +1,7 @@
 === HEAD
 
+* Add savepoint support to the generic JDBC transaction support (used by 6 jdbc subadapters) (jeremyevans)
+
 * Add native prepared statement support to the oracle adapter (jeremyevans)
 
 * Support sharding correctly by default when using transactions in model saving/destroying (jeremyevans)

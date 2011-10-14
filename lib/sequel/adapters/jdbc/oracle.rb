@@ -59,6 +59,11 @@ module Sequel
         def schema_parse_table_skip?(h, schema)
           super || (h[:table_schem] != current_user unless schema)
         end
+
+        # As of Oracle 9.2, releasing savepoints is no longer supported.
+        def supports_releasing_savepoints?
+          false
+        end
       end
       
       # Dataset class for Oracle datasets accessed via JDBC.
