@@ -263,7 +263,7 @@ module Sequel
     # Typecast the value to true, false, or nil
     def typecast_value_boolean(value)
       case value
-      when false, 0, "0", /\Af(alse)?\z/i
+      when false, 0, "0", /\Af(alse)?\z/i, /\Ano?\z/i
         false
       else
         blank_object?(value) ? nil : true
