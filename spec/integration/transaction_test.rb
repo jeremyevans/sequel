@@ -160,44 +160,45 @@ describe "Database transactions" do
     end
   end
 
-if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or (RUBY_ENGINE == 'rbx' && ![[:do, :sqlite], [:tinytds, :mssql]].include?([INTEGRATION_DB.adapter_scheme, INTEGRATION_DB.database_type]))) and RUBY_VERSION < '1.9'
-  specify "should handle Thread#kill for transactions inside threads" do
-    q = Queue.new
-    q1 = Queue.new
-    t = Thread.new do
-      @db.transaction do
-        @d << {:name => 'abc', :value => 1}
-        q1.push nil
-        q.pop
-        @d << {:name => 'def', :value => 2}
-      end
-    end
-    q1.pop
-    t.kill
-    @d.count.should == 0
-  end
-
-if INTEGRATION_DB.supports_savepoints?
-  specify "should handle Thread#kill for transactions with savepoints inside threads" do
-    q = Queue.new
-    q1 = Queue.new
-    t = Thread.new do
-      @db.transaction do
-        @d << {:name => 'abc', :value => 1}
-        @db.transaction(:savepoint=>true) do
-          @d << {:name => 'def', :value => 2}
+  if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or (RUBY_ENGINE == 'rbx' && ![[:do, :sqlite], [:tinytds, :mssql]].include?([INTEGRATION_DB.adapter_scheme, INTEGRATION_DB.database_type]))) and RUBY_VERSION < '1.9'
+    specify "should handle Thread#kill for transactions inside threads" do
+      q = Queue.new
+      q1 = Queue.new
+      t = Thread.new do
+        @db.transaction do
+          @d << {:name => 'abc', :value => 1}
           q1.push nil
           q.pop
-          @d << {:name => 'ghi', :value => 3}
+          @d << {:name => 'def', :value => 2}
         end
-        @d << {:name => 'jkl', :value => 4}
+      end
+      q1.pop
+      t.kill
+      @d.count.should == 0
+    end
+
+    if INTEGRATION_DB.supports_savepoints?
+      specify "should handle Thread#kill for transactions with savepoints inside threads" do
+        q = Queue.new
+        q1 = Queue.new
+        t = Thread.new do
+          @db.transaction do
+            @d << {:name => 'abc', :value => 1}
+            @db.transaction(:savepoint=>true) do
+              @d << {:name => 'def', :value => 2}
+              q1.push nil
+              q.pop
+              @d << {:name => 'ghi', :value => 3}
+            end
+            @d << {:name => 'jkl', :value => 4}
+          end
+        end
+        q1.pop
+        t.kill
+        @d.count.should == 0
       end
     end
-    q1.pop
-    t.kill
-    @d.count.should == 0
   end
-end
 
   specify "should support after_commit outside transactions" do
     c = nil
@@ -286,5 +287,4 @@ end
       end
     end
   end
-end
 end
