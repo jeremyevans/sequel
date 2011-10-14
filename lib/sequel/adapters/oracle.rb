@@ -48,6 +48,11 @@ module Sequel
           conn.exec("ALTER SESSION SET TIME_ZONE='-00:00'")
         end
         
+        class << conn
+          attr_reader :prepared_statements
+        end
+        conn.instance_variable_set(:@prepared_statements, {})
+        
         conn
       end
 
@@ -55,48 +60,119 @@ module Sequel
         Oracle::Dataset.new(self, opts)
       end
 
-      def execute(sql, opts={})
-        synchronize(opts[:server]) do |conn|
-          begin
-            r = log_yield(sql){conn.exec(sql)}
-            yield(r) if block_given?
-            r
-          rescue OCIException => e
-            raise_error(e)
-          end
-        end
+      def execute(sql, opts={}, &block)
+        _execute(nil, sql, opts, &block)
       end
       alias do execute
 
       def execute_insert(sql, opts={})
+        _execute(:insert, sql, opts)
+      end
+
+      private
+
+      def _execute(type, sql, opts={}, &block)
         synchronize(opts[:server]) do |conn|
           begin
-            log_yield(sql){conn.exec(sql)}
-            unless sequence = opts[:sequence]
-              if t = opts[:table]
-                sequence = sequence_for_table(t)
-              end
+            return execute_prepared_statement(conn, type, sql, opts, &block) if sql.is_a?(Symbol)
+            if args = opts[:arguments]
+              r = conn.parse(sql)
+              args = cursor_bind_params(conn, r, args)
+              nr = log_yield(sql, args){r.exec}
+              r = nr unless block_given?
+            else
+              r = log_yield(sql){conn.exec(sql)}
             end
-            if sequence
-              sql = "SELECT #{literal(sequence)}.currval FROM dual"
+            if block_given?
               begin
-                cursor = log_yield(sql){conn.exec(sql)}
-                row = cursor.fetch
-                row.each{|v| return (v.to_i if v)}
-              rescue OCIError
-                nil
+                yield(r)
               ensure
-                cursor.close if cursor
+                r.close
               end
+            elsif type == :insert
+              last_insert_id(conn, opts)
+            else
+              r
             end
-          rescue OCIException => e
+          rescue OCIException, RuntimeError => e
+            # ruby-oci8 is naughty and raises strings in some places
             raise_error(e)
           end
         end
       end
 
-      private
-      
+      PS_TYPES = {'string'.freeze=>String, 'integer'.freeze=>Integer, 'float'.freeze=>Float,
+        'decimal'.freeze=>Float, 'date'.freeze=>Time, 'datetime'.freeze=>Time,
+        'time'.freeze=>Time, 'boolean'.freeze=>String, 'blob'.freeze=>OCI8::BLOB}
+      def cursor_bind_params(conn, cursor, args)
+        cursor
+        i = 0
+        args.map do |arg, type|
+          i += 1
+          case arg
+          when true
+            arg = 'Y'
+          when false
+            arg = 'N'
+          when BigDecimal
+            arg = arg.to_f
+          when ::Sequel::SQL::Blob
+            raise Error, "Sequel's oracle adapter does not currently support using a blob in a bound variable"
+          end
+          if t = PS_TYPES[type]
+            cursor.bind_param(i, arg, t)
+          else
+            cursor.bind_param(i, arg, arg.class)
+          end
+          arg
+        end
+      end
+
+      def execute_prepared_statement(conn, type, name, opts)
+        ps = prepared_statements[name]
+        sql = ps.prepared_sql
+        if cursora = conn.prepared_statements[name]
+          cursor, cursor_sql = cursora
+          if cursor_sql != sql
+            cursor.close
+            cursor = nil
+          end
+        end
+        unless cursor
+          cursor = log_yield("Preparing #{name}: #{sql}"){conn.parse(sql)}
+          conn.prepared_statements[name] = [cursor, sql]
+        end
+        args = cursor_bind_params(conn, cursor, opts[:arguments])
+        r = log_yield("Executing #{name}", args){cursor.exec}
+        if block_given?
+          yield(cursor)
+        elsif type == :insert
+          last_insert_id(conn, opts)
+        else
+          r
+        end
+      end
+
+      def last_insert_id(conn, opts)
+        unless sequence = opts[:sequence]
+          if t = opts[:table]
+            sequence = sequence_for_table(t)
+          end
+        end
+        if sequence
+          sql = "SELECT #{literal(sequence)}.currval FROM dual"
+          begin
+            cursor = log_yield(sql){conn.exec(sql)}
+            row = cursor.fetch
+            row.each{|v| return (v.to_i if v)}
+          rescue OCIError
+            nil
+          ensure
+            cursor.close if cursor
+          end
+        end
+      end
+
       def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
       end
@@ -197,28 +273,141 @@ module Sequel
     class Dataset < Sequel::Dataset
       include DatasetMethods
 
+      PREPARED_ARG_PLACEHOLDER = ':'.freeze
+      
+      # Oracle already supports named bind arguments, so use directly.
+      module ArgumentMapper
+        include Sequel::Dataset::ArgumentMapper
+        
+        protected
+        
+        # Return a hash with the same values as the given hash,
+        # but with the keys converted to strings.
+        def map_to_prepared_args(bind_vars)
+          prepared_args.map{|v, t| [bind_vars[v], t]}
+        end
+        
+        private
+        
+        # Oracle uses a : before the name of the argument for named
+        # arguments.
+        def prepared_arg(k)
+          y, type = k.to_s.split("__", 2)
+          prepared_args << [y.to_sym, type]
+          i = prepared_args.length
+          LiteralString.new(":#{i}")
+        end
+
+        # Always assume a prepared argument.
+        def prepared_arg?(k)
+          true
+        end
+      end
+      
+      # Oracle prepared statement uses a new prepared statement each time
+      # it is called, but it does use the bind arguments.
+      module BindArgumentMethods
+        include ArgumentMapper
+
+        private
+        
+        # Run execute_select on the database with the given SQL and the stored
+        # bind arguments.
+        def execute(sql, opts={}, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+        end
+        
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts={}, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+        end
+        
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_insert(sql, opts={}, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+        end
+      end
+
+      module PreparedStatementMethods
+        include BindArgumentMethods
+          
+        private
+          
+        # Execute the stored prepared statement name and the stored bind
+        # arguments instead of the SQL given.
+        def execute(sql, opts={}, &block)
+          super(prepared_statement_name, opts, &block)
+        end
+         
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts={}, &block)
+          super(prepared_statement_name, opts, &block)
+        end
+          
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_insert(sql, opts={}, &block)
+          super(prepared_statement_name, opts, &block)
+        end
+      end
+        
+      # Execute the given type of statement with the hash of values.
+      def call(type, bind_vars={}, *values, &block)
+        ps = to_prepared_statement(type, values)
+        ps.extend(BindArgumentMethods)
+        ps.call(bind_vars, &block)
+      end
+      
+      # Prepare the given type of query with the given name and store
+      # it in the database.  Note that a new native prepared statement is
+      # created on each call to this prepared statement.
+      def prepare(type, name=nil, *values)
+        ps = to_prepared_statement(type, values)
+        ps.extend(PreparedStatementMethods)
+        if name
+          ps.prepared_statement_name = name
+          db.prepared_statements[name] = ps
+        end
+        ps.prepared_sql
+        ps
+      end
+      
       def fetch_rows(sql)
         execute(sql) do |cursor|
-          begin
-            offset = @opts[:offset]
-            rn = row_number_column
-            cps = db.conversion_procs
-            cols = columns = cursor.get_col_names.map{|c| output_identifier(c)}
-            metadata = cursor.column_metadata
-            cm = cols.zip(metadata).map{|c, m| [c, cps[m.data_type]]}
-            columns = cols.reject{|x| x == rn} if offset
-            @columns = columns
-            while r = cursor.fetch
-              row = {}
-              r.zip(cm).each{|v, (c, cp)| row[c] = ((v && cp) ? cp.call(v) : v)}
-              row.delete(rn) if offset
-              yield row
-            end
-          ensure
-            cursor.close
+          offset = @opts[:offset]
+          rn = row_number_column
+          cps = db.conversion_procs
+          cols = columns = cursor.get_col_names.map{|c| output_identifier(c)}
+          metadata = cursor.column_metadata
+          cm = cols.zip(metadata).map{|c, m| [c, cps[m.data_type]]}
+          columns = cols.reject{|x| x == rn} if offset
+          @columns = columns
+          while r = cursor.fetch
+            row = {}
+            r.zip(cm).each{|v, (c, cp)| row[c] = ((v && cp) ? cp.call(v) : v)}
+            row.delete(rn) if offset
+            yield row
           end
         end
         self
+      end
+
+      # Create a named prepared statement that is stored in the
+      # database (and connection) for reuse.
+      def prepare(type, name=nil, *values)
+        ps = to_prepared_statement(type, values)
+        ps.extend(PreparedStatementMethods)
+        if name
+          ps.prepared_statement_name = name
+          db.prepared_statements[name] = ps
+        end
+        ps
+      end
+      
+      # Oracle requires type specifiers for placeholders, at least
+      # if you ever want to use a nil/NULL value as the value for
+      # the placeholder.
+      def requires_placeholder_type_specifiers?
+        true
       end
 
       private
@@ -233,6 +422,10 @@ module Sequel
         else
           super
         end
+      end
+
+      def prepared_arg_placeholder
+        PREPARED_ARG_PLACEHOLDER
       end
     end
   end

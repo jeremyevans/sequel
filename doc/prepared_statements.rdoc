@@ -9,6 +9,7 @@ the following adapters:
 * jdbc
 * mysql (prepared statements only)
 * mysql2 (prepared statements only)
+* oracle (requires type specifiers for nil/NULL values)
 * postgres (when using the pg driver, may require type specifiers)
 * sqlite
 * tinytds
@@ -80,11 +81,11 @@ and update queries, the hash to insert/update is passed to +prepare+:
 
 If you are using the ruby-postgres or postgres-pr driver, PostgreSQL uses the
 default emulated support.  If you are using ruby-pg, there is native support,
-but it may require type specifiers.  This is easy if you have
+but it may require type specifiers on some old versions (generally not anymore).
 direct control over the SQL string, but since Sequel abstracts that, the types
-can be specified another way.  This is done by adding a __* suffix to the
-placeholder symbol (e.g. :$name__text, which will be compiled to "$1::text"
-in the SQL).  Prepared statements are always server side.
+You can add a __* suffix to the placeholder symbol to specify a type, which
+casts to that type in the SQL (e.g.  :$name__text, which will be compiled to
+"$1::text" in the SQL).  Prepared statements are always server side.
 
 === SQLite
 
@@ -114,6 +115,16 @@ Microsoft SQL Server doesn't support true prepared statements.
 
 DB2 supports both prepared statements and bound variables.  Prepared
 statement objects are cached per connection.
+
+=== Oracle
+
+Oracle supports both prepared statements and bound variables.  Prepared
+statements (OCI8::Cursor objects) are cached per connection.  If you
+ever plan to use a nil/NULL value as a bound variable/prepared statement
+value, you must specify the type in the placeholder using a __* suffix.
+You can use any of the schema types that Sequel supports, such as
+:$name__string or :$num__integer.  Using blobs as bound variables is
+not currently supported.
 
 === All Others
 

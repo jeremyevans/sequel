@@ -1,5 +1,7 @@
 === HEAD
 
+* Add native prepared statement support to the oracle adapter (jeremyevans)
+
 * Support sharding correctly by default when using transactions in model saving/destroying (jeremyevans)
 
 * Add Database#in_transaction? method for checking if you are already in a transaction (jeremyevans)
