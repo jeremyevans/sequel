@@ -1404,19 +1404,23 @@ describe "Sequel::Plugins::PreparedStatements" do
     @c[@foo.id].should == @foo
     @c[@bar.id].should == @bar
     @c[0].should == nil
+    @c[nil].should == nil
   end
 
   it "should work with looking up using Dataset#with_pk" do 
     @c.dataset.with_pk(@foo.id).should == @foo
     @c.dataset.with_pk(@bar.id).should == @bar
     @c.dataset.with_pk(0).should == nil
+    @c.dataset.with_pk(nil).should == nil
 
     @c.dataset.filter(:i=>0).with_pk(@foo.id).should == nil
     @c.dataset.filter(:i=>10).with_pk(@foo.id).should == @foo
     @c.dataset.filter(:i=>20).with_pk(@bar.id).should == @bar
+    @c.dataset.filter(:i=>10).with_pk(nil).should == nil
     @c.dataset.filter(:name=>'foo').with_pk(@foo.id).should == @foo
     @c.dataset.filter(:name=>'bar').with_pk(@bar.id).should == @bar
     @c.dataset.filter(:name=>'baz').with_pk(@bar.id).should == nil
+    @c.dataset.filter(:name=>'bar').with_pk(nil).should == nil
   end
 
   it "should work with Model#destroy" do 
@@ -1433,6 +1437,8 @@ describe "Sequel::Plugins::PreparedStatements" do
     @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo3', :i=>30)
     @foo.update(:i=>40)
     @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo3', :i=>40)
+    @foo.update(:i=>nil)
+    @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo3', :i=>nil)
   end
 
   it "should work with Model#create" do 
@@ -1442,5 +1448,7 @@ describe "Sequel::Plugins::PreparedStatements" do
     @c[o.id].should == @c.load(:id=>o.id, :name=>'foo2', :i=>nil)
     o = @c.create(:i=>30)
     @c[o.id].should == @c.load(:id=>o.id, :name=>nil, :i=>30)
+    o = @c.create(:name=>nil, :i=>40)
+    @c[o.id].should == @c.load(:id=>o.id, :name=>nil, :i=>40)
   end
 end

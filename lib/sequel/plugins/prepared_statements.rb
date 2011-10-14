@@ -85,7 +85,18 @@ module Sequel
         # Return an array of two element arrays with the column symbol as the first entry and the
         # placeholder symbol as the second entry.
         def prepared_statement_key_array(keys)
-          Array(keys).map{|k| [k, :"$#{k}"]}
+          if dataset.requires_placeholder_type_specifiers?
+            sch = db_schema
+            Array(keys).map do |k|
+              if (s = sch[k]) && (t = s[:type])
+                [k, :"$#{k}__#{t}"]
+              else
+                [k, :"$#{k}"]
+              end
+            end
+          else
+            Array(keys).map{|k| [k, :"$#{k}"]}
+          end
         end
 
         # Return a hash mapping column symbols to placeholder symbols.
