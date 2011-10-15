@@ -58,12 +58,18 @@ module Sequel
         end
       end
       
+      ERROR_MAP = {}
+      %w'SQL_INVALID_HANDLE SQL_STILL_EXECUTING SQL_ERROR'.each do |s|
+        ERROR_MAP[DB2CLI.const_get(s)] = s
+      end
       def check_error(rc, msg)
         case rc
-        when DB2CLI::SQL_SUCCESS, DB2CLI::SQL_SUCCESS_WITH_INFO
+        when DB2CLI::SQL_SUCCESS, DB2CLI::SQL_SUCCESS_WITH_INFO, DB2CLI::SQL_NO_DATA_FOUND
           nil
+        when DB2CLI::SQL_INVALID_HANDLE, DB2CLI::SQL_STILL_EXECUTING
+          raise DatabaseDisconnectError, "#{ERROR_MAP[rc]}: #{msg}"
         else
-          raise DatabaseError, msg
+          raise DatabaseError, "#{ERROR_MAP[rc] || "Error code #{rc}"}: #{msg}"
         end
       end
 
