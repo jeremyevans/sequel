@@ -258,7 +258,7 @@ module Sequel
         if Sequel::IBMDB.convert_smallint_to_bool && db_type =~ /smallint/i 
           :boolean
         else
-          db_type =~ /[bc]lob/i ? :blob : super
+          super
         end
       end
 
