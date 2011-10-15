@@ -1,5 +1,7 @@
 === HEAD
 
+* Significant improvements to the db2 adapter (jeremyevans)
+
 * Handle methods with names that can't be called directly in Model.def_dataset_method (jeremyevans)
 
 * Add dataset_associations plugin for making dataset methods that return datasets of associated objects (jeremyevans)

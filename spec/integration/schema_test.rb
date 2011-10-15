@@ -299,7 +299,7 @@ describe "Database schema modifiers" do
     proc{@ds.insert(:n=>nil)}.should raise_error(Sequel::DatabaseError)
   end
 
-  cspecify "should set column NULL/NOT NULL correctly", [:jdbc, :db2] do
+  cspecify "should set column NULL/NOT NULL correctly", [:jdbc, :db2], [:db2] do
     @db.create_table!(:items, :engine=>:InnoDB){Integer :id}
     @ds.insert(:id=>10)
     @db.alter_table(:items){set_column_allow_null :id, false}
@@ -321,7 +321,7 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:id=>10}, {:id=>20}]
   end
 
-  cspecify "should set column types correctly", [:jdbc, :db2], :oracle do
+  cspecify "should set column types correctly", [:jdbc, :db2], [:db2], :oracle do
     @db.create_table!(:items){Integer :id}
     @ds.insert(:id=>10)
     @db.alter_table(:items){set_column_type :id, String}

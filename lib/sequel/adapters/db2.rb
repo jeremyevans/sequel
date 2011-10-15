@@ -3,6 +3,31 @@ Sequel.require %w'shared/db2', 'adapters'
 
 module Sequel
   module DB2
+
+    @convert_smallint_to_bool = true
+
+    class << self
+      # Whether to convert smallint values to bool, true by default.
+      # Can also be overridden per dataset.
+      attr_accessor :convert_smallint_to_bool
+    end
+
+    tt = Class.new do
+      def boolean(s) !s.to_i.zero? end
+      def date(s) Date.new(s.year, s.month, s.day) end
+      def time(s) Sequel::SQLTime.create(s.hour, s.minute, s.second) end
+    end.new
+
+    # Hash holding type translation methods, used by Dataset#fetch_rows.
+    DB2_TYPES = {
+      :boolean  => tt.method(:boolean),
+      DB2CLI::SQL_BLOB => ::Sequel::SQL::Blob.method(:new),
+      DB2CLI::SQL_TYPE_DATE => tt.method(:date),
+      DB2CLI::SQL_TYPE_TIME => tt.method(:time),
+      DB2CLI::SQL_DECIMAL => ::BigDecimal.method(:new)
+    }
+    DB2_TYPES[DB2CLI::SQL_CLOB] = DB2_TYPES[DB2CLI::SQL_BLOB]
+
     class Database < Sequel::Database
       include DatabaseMethods
 
@@ -11,6 +36,14 @@ module Sequel
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
       rc, NullHandle = DB2CLI.SQLAllocHandle(DB2CLI::SQL_HANDLE_ENV, DB2CLI::SQL_NULL_HANDLE)
       
+      # Hash of connection procs for converting
+      attr_reader :conversion_procs
+
+      def initialize(opts={})
+        super
+        @conversion_procs = DB2_TYPES.dup
+        @conversion_procs[DB2CLI::SQL_TYPE_TIMESTAMP] = method(:to_application_timestamp_db2)
+      end
 
       def connect(server)
         opts = server_opts(server)
@@ -67,6 +100,10 @@ module Sequel
         ary.length <= 1 ? ary.first : ary
       end
 
+      def to_application_timestamp_db2(v)
+        to_application_timestamp(v.to_s)
+      end
+
       private
 
       def begin_transaction(conn, opts={})
@@ -103,6 +140,15 @@ module Sequel
         end
       end
 
+      # Convert smallint type to boolean if convert_smallint_to_bool is true
+      def schema_column_type(db_type)
+        if DB2.convert_smallint_to_bool && db_type =~ /smallint/i 
+          :boolean
+        else
+          super
+        end
+      end
+
       def disconnect_connection(conn)
         checked_error("Could not disconnect from database"){DB2CLI.SQLDisconnect(conn)}
         checked_error("Could not free Database handle"){DB2CLI.SQLFreeHandle(DB2CLI::SQL_HANDLE_DBC, conn)}
@@ -114,6 +160,15 @@ module Sequel
 
       MAX_COL_SIZE = 256
       
+      # Whether to convert smallint to boolean arguments for this dataset.
+      # Defaults to the DB2 module setting.
+      def convert_smallint_to_bool
+        defined?(@convert_smallint_to_bool) ? @convert_smallint_to_bool : (@convert_smallint_to_bool = DB2.convert_smallint_to_bool)
+      end
+
+      # Override the default DB2.convert_smallint_to_bool setting for this dataset.
+      attr_writer :convert_smallint_to_bool
+
       def fetch_rows(sql)
         execute(sql) do |sth|
           offset = @opts[:offset]
@@ -123,12 +178,19 @@ module Sequel
           cols = column_info.map{|c| c.at(1)}
           cols.delete(row_number_column) if offset
           @columns = cols
-          while (rc = DB2CLI.SQLFetch(sth)) != DB2CLI::SQL_NO_DATA_FOUND
+          errors = [DB2CLI::SQL_NO_DATA_FOUND, DB2CLI::SQL_ERROR]
+          until errors.include?(rc = DB2CLI.SQLFetch(sth))
             db.check_error(rc, "Could not fetch row")
             row = {}
-            column_info.each do |i, c, t, s|
+            column_info.each do |i, c, t, s, pr|
               v, _ = db.checked_error("Could not get data"){DB2CLI.SQLGetData(sth, i, t, s)}
-              row[c] = convert_type(v)
+              row[c] = if v == DB2CLI::Null
+                nil
+              elsif pr
+                pr.call(v)
+              else
+                v
+              end
             end
             row.delete(row_number_column) if offset
             yield row
@@ -142,26 +204,18 @@ module Sequel
       def get_column_info(sth)
         db = @db
         column_count = db.checked_error("Could not get number of result columns"){DB2CLI.SQLNumResultCols(sth)}
+        convert = convert_smallint_to_bool
+        cps = db.conversion_procs
 
         (1..column_count).map do |i| 
           name, buflen, datatype, size, digits, nullable = db.checked_error("Could not describe column"){DB2CLI.SQLDescribeCol(sth, i, MAX_COL_SIZE)}
-          [i, output_identifier(name), datatype, size]
+          pr = if datatype == DB2CLI::SQL_SMALLINT && convert && size <= 5 && digits <= 1
+            cps[:boolean]
+          else
+            cps[datatype]
+          end
+          [i, output_identifier(name), datatype, size, pr]
         end 
-      end
-      
-      def convert_type(v)
-        case v
-        when DB2CLI::Date 
-          Date.new(v.year, v.month, v.day)
-        when DB2CLI::Time
-          Sequel::SQLTime.create(v.hour, v.minute, v.second)
-        when DB2CLI::Timestamp 
-          db.to_application_timestamp(v.to_s)
-        when DB2CLI::Null
-          nil
-        else  
-          v
-        end
       end
     end
   end
