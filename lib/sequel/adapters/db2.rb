@@ -6,6 +6,11 @@ module Sequel
 
     @convert_smallint_to_bool = true
 
+    # Underlying error raised by Sequel, since ruby-db2 doesn't
+    # use exceptions.
+    class DB2Error < StandardError
+    end
+
     class << self
       # Whether to convert smallint values to bool, true by default.
       # Can also be overridden per dataset.
@@ -88,9 +93,13 @@ module Sequel
         when DB2CLI::SQL_SUCCESS, DB2CLI::SQL_SUCCESS_WITH_INFO, DB2CLI::SQL_NO_DATA_FOUND
           nil
         when DB2CLI::SQL_INVALID_HANDLE, DB2CLI::SQL_STILL_EXECUTING
-          raise DatabaseDisconnectError, "#{ERROR_MAP[rc]}: #{msg}"
+          e = DB2Error.new("#{ERROR_MAP[rc]}: #{msg}")
+          e.set_backtrace(caller)
+          raise_error(e, :disconnect=>true)
         else
-          raise DatabaseError, "#{ERROR_MAP[rc] || "Error code #{rc}"}: #{msg}"
+          e = DB2Error.new("#{ERROR_MAP[rc] || "Error code #{rc}"}: #{msg}")
+          e.set_backtrace(caller)
+          raise_error(e, :disconnect=>true)
         end
       end
 
