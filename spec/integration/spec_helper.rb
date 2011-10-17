@@ -88,7 +88,7 @@ if defined?(INTEGRATION_DB) || defined?(INTEGRATION_URL) || ENV['SEQUEL_INTEGRAT
     #INTEGRATION_DB.instance_variable_set(:@server_version, 80100)
   end
 else
-  INTEGRATION_DB = Sequel.sqlite('', :quote_identifiers=>false)
+  INTEGRATION_DB = Sequel.sqlite
 end
 
 if INTEGRATION_DB.adapter_scheme == :ibmdb
