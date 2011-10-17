@@ -1585,6 +1585,23 @@ describe "Database#typecast_value" do
     @db.typecast_value(:date, :year=>Date.today.year, :month=>Date.today.month, :day=>Date.today.day).should == Date.today
   end
 
+  specify "should have Sequel.application_to_database_timestamp convert to Sequel.database_timezone" do
+    begin
+      t = Time.utc(2011, 1, 2, 3, 4, 5) # UTC Time
+      t2 = Time.mktime(2011, 1, 2, 3, 4, 5) # Local Time
+      t3 = Time.utc(2011, 1, 2, 3, 4, 5) - (t - t2) # Local Time in UTC Time
+      t4 = Time.mktime(2011, 1, 2, 3, 4, 5) + (t - t2) # UTC Time in Local Time
+      Sequel.application_timezone = :utc
+      Sequel.database_timezone = :local
+      Sequel.application_to_database_timestamp(t).should == t4
+      Sequel.application_timezone = :local
+      Sequel.database_timezone = :utc
+      Sequel.application_to_database_timestamp(t2).should == t3
+    ensure
+      Sequel.default_timezone = nil
+    end
+  end
+
   specify "should have Database#to_application_timestamp convert values using the database's timezone" do
     begin
       t = Time.utc(2011, 1, 2, 3, 4, 5) # UTC Time
