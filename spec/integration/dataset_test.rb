@@ -35,6 +35,18 @@ describe "Simple Dataset operations" do
     @ds.filter(:id=>2).first[:number].should == 20
   end
 
+  specify "should join correctly" do
+    @ds.join(:items___b, :id=>:id).select_all(:items).all.should == [{:id=>1, :number=>10}]
+  end
+
+  specify "should graph correctly" do
+    @ds.graph(:items, {:id=>:id}, :table_alias=>:b).all.should == [{:items=>{:id=>1, :number=>10}, :b=>{:id=>1, :number=>10}}]
+  end
+
+  specify "should graph correctly with a subselect" do
+    @ds.from_self(:alias=>:items).graph(@ds.from_self, {:id=>:id}, :table_alias=>:b).all.should == [{:items=>{:id=>1, :number=>10}, :b=>{:id=>1, :number=>10}}]
+  end
+
   cspecify "should have insert work correctly when inserting a row with all NULL values", :hsqldb do
     @db.create_table!(:items) do
       String :name

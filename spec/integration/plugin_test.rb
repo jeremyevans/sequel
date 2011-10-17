@@ -123,7 +123,7 @@ describe "Class Table Inheritance Plugin" do
     Staff.limit(1).eager(:manager).all.map{|x| x.manager}.should == [Manager[@i4]]
   end
   
-  cspecify "should handle eagerly graphing many_to_one relationships", :sqlite do
+  specify "should handle eagerly graphing many_to_one relationships" do
     ss = Staff.eager_graph(:manager).all
     ss.should == [Staff[@i2]]
     ss.map{|x| x.manager}.should == [Manager[@i4]]

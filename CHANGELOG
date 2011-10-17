@@ -1,5 +1,7 @@
 === HEAD
 
+* Work around SQLite column naming bug when using subselects by always aliasing when graphing (jeremyevans)
+
 * Make prepared_statements plugin work with adapters that require type specifiers for variable placeholders, such as oracle (jeremyevans)
 
 * Add savepoint support to the generic JDBC transaction support (used by 6 jdbc subadapters) (jeremyevans)

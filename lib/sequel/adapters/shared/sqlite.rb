@@ -466,6 +466,14 @@ module Sequel
       def select_lock_sql(sql)
         super unless @opts[:lock] == :update
       end
+
+      # When a qualified column is selected on SQLite and the qualifier
+      # is a subselect, the column name used is the full qualified name
+      # (including the qualifier) instead of just the column name.  To
+      # get correct column names, you must use an alias.
+      def subselect_columns_require_aliases?
+        true
+      end
       
       # SQLite treats a DELETE with no WHERE clause as a TRUNCATE
       def _truncate_sql(table)

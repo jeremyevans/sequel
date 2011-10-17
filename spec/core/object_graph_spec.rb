@@ -44,6 +44,13 @@ describe Sequel::Dataset, " graphing" do
     ds.sql.should == 'SELECT t1.id, t1.x, t1.y, t3.id AS t3_id, t3.x AS t3_x, t3.y AS t3_y, t3.graph_id FROM (SELECT * FROM (SELECT * FROM points) AS t1, (SELECT * FROM graphs) AS t2) AS t1 LEFT OUTER JOIN (SELECT * FROM (SELECT * FROM lines) AS t1) AS t3 ON (t3.x = t1.id)'
   end
 
+  it "#graph should add column aliases for all columns if subselects require column aliases" do
+    ds = @ds1.from_self
+    ds.meta_def(:subselect_columns_require_aliases?){true}
+    ds = ds.graph(@ds2, :x=>:id)
+    ds.sql.should == 'SELECT t1.id AS id, t1.x AS x, t1.y AS y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id AS graph_id FROM (SELECT * FROM points) AS t1 LEFT OUTER JOIN lines ON (lines.x = t1.id)'
+  end
+
   it "#graph should accept a symbol table name as the dataset" do
     ds = @ds1.graph(:lines, :x=>:id)
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
@@ -151,6 +158,11 @@ describe Sequel::Dataset, " graphing" do
 
   it "#add_graph_aliases should add columns to the graph mapping" do
     @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :q]).add_graph_aliases(:y=>[:lines, :r]).sql.should == 'SELECT points.q AS x, lines.r AS y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+  end
+
+  it "#set_graph_aliases and #add_graph_aliases should use column aliases for all columns if required" do
+    @ds1.meta_def(:subselect_columns_require_aliases?){true}
+    @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>:points).add_graph_aliases(:y=>:lines).sql.should == 'SELECT points.x AS x, lines.y AS y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
   end
 
   it "#set_graph_aliases should allow a third entry to specify an expression to use other than the default" do

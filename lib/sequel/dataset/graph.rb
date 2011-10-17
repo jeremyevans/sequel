@@ -133,7 +133,9 @@ module Sequel
           select = opts[:select] = []
           columns.each do |column|
             column_aliases[column] = [master, column]
-            select.push(SQL::QualifiedIdentifier.new(master, column))
+            ident = SQL::QualifiedIdentifier.new(master, column)
+            ident = SQL::AliasedExpression.new(ident, column) if subselect_columns_require_aliases?
+            select.push(ident)
           end
         end
       end
@@ -165,9 +167,11 @@ module Sequel
               column_alias = :"#{column_alias}_#{column_alias_num}" 
               ca_num[column_alias] += 1
             end
-            [column_alias, SQL::QualifiedIdentifier.new(table_alias, column).as(column_alias)]
+            [column_alias, SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(table_alias, column), column_alias)]
           else
-            [column, SQL::QualifiedIdentifier.new(table_alias, column)]
+            ident = SQL::QualifiedIdentifier.new(table_alias, column)
+            ident = SQL::AliasedExpression.new(ident, column) if subselect_columns_require_aliases?
+            [column, ident]
           end
           column_aliases[col_alias] = [table_alias, column]
           select.push(identifier)
@@ -225,7 +229,7 @@ module Sequel
         column ||= col_alias
         gas[col_alias] = [table, column]
         identifier = value || SQL::QualifiedIdentifier.new(table, column)
-        identifier = SQL::AliasedExpression.new(identifier, col_alias) if value or column != col_alias
+        identifier = SQL::AliasedExpression.new(identifier, col_alias) if value || subselect_columns_require_aliases? || column != col_alias
         identifier
       end
       [identifiers, gas]
