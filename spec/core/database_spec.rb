@@ -1585,6 +1585,32 @@ describe "Database#typecast_value" do
     @db.typecast_value(:date, :year=>Date.today.year, :month=>Date.today.month, :day=>Date.today.day).should == Date.today
   end
 
+  specify "should have Database#to_application_timestamp convert values using the database's timezone" do
+    begin
+      t = Time.utc(2011, 1, 2, 3, 4, 5) # UTC Time
+      t2 = Time.mktime(2011, 1, 2, 3, 4, 5) # Local Time
+      t3 = Time.utc(2011, 1, 2, 3, 4, 5) - (t - t2) # Local Time in UTC Time
+      t4 = Time.mktime(2011, 1, 2, 3, 4, 5) + (t - t2) # UTC Time in Local Time
+      Sequel.default_timezone = :utc
+      @db.to_application_timestamp('2011-01-02 03:04:05').should == t
+      Sequel.database_timezone = :local
+      @db.to_application_timestamp('2011-01-02 03:04:05').should == t3
+      Sequel.default_timezone = :local
+      @db.to_application_timestamp('2011-01-02 03:04:05').should == t2
+      Sequel.database_timezone = :utc
+      @db.to_application_timestamp('2011-01-02 03:04:05').should == t4
+
+      Sequel.default_timezone = :utc
+      @db.timezone = :local
+      @db.to_application_timestamp('2011-01-02 03:04:05').should == t3
+      Sequel.default_timezone = :local
+      @db.timezone = :utc
+      @db.to_application_timestamp('2011-01-02 03:04:05').should == t4
+    ensure
+      Sequel.default_timezone = nil
+    end
+  end
+
   specify "should typecast datetime values to Sequel.datetime_class with correct timezone handling" do
     t = Time.utc(2011, 1, 2, 3, 4, 5) # UTC Time
     t2 = Time.mktime(2011, 1, 2, 3, 4, 5) # Local Time
