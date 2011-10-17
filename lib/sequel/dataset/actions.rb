@@ -8,10 +8,12 @@ module Sequel
     # ---------------------
     
     # Action methods defined by Sequel that execute code on the database.
-    ACTION_METHODS = %w'<< [] []= all avg count columns columns! delete each
-    empty? fetch_rows first get import insert insert_multiple interval last
-    map max min multi_insert range select_hash select_map select_order_map
-    set single_record single_value sum to_csv to_hash truncate update'.map{|x| x.to_sym}
+    ACTION_METHODS = (<<-METHS).split.map{|x| x.to_sym}
+      << [] []= all avg count columns columns! delete each
+      empty? fetch_rows first get import insert insert_multiple interval last
+      map max min multi_insert range select_hash select_map select_order_map
+      set single_record single_value sum to_csv to_hash truncate update
+    METHS
 
     # Alias for insert, but not aliased directly so subclasses
     # don't have to override both methods.

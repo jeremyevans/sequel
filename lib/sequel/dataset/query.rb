@@ -28,12 +28,14 @@ module Sequel
     JOIN_METHODS = (CONDITIONED_JOIN_TYPES + UNCONDITIONED_JOIN_TYPES).map{|x| "#{x}_join".to_sym} + [:join, :join_table]
     
     # Methods that return modified datasets
-    QUERY_METHODS = %w'add_graph_aliases and distinct except exclude exclude_having exclude_where
-    filter for_update from from_self graph grep group group_and_count group_by having intersect invert
-    limit lock_style naked or order order_append order_by order_more order_prepend paginate qualify query
-    reverse reverse_order select select_all select_append select_group select_more server
-    set_defaults set_graph_aliases set_overrides unfiltered ungraphed ungrouped union
-    unlimited unordered where with with_recursive with_sql'.collect{|x| x.to_sym} + JOIN_METHODS
+    QUERY_METHODS = (<<-METHS).split.map{|x| x.to_sym} + JOIN_METHODS
+      add_graph_aliases and distinct except exclude exclude_having exclude_where
+      filter for_update from from_self graph grep group group_and_count group_by having intersect invert
+      limit lock_style naked or order order_append order_by order_more order_prepend paginate qualify query
+      reverse reverse_order select select_all select_append select_group select_more server
+      set_defaults set_graph_aliases set_overrides unfiltered ungraphed ungrouped union
+      unlimited unordered where with with_recursive with_sql
+    METHS
 
     # Adds an further filter to an existing filter using AND. If no filter 
     # exists an error is raised. This method is identical to #filter except
