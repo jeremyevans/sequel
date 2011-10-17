@@ -30,6 +30,15 @@ describe "An Oracle database" do
     ORACLE_DB.disconnect
     ORACLE_DB.pool.size.should == 0
   end
+
+  specify "should be able to get current sequence value with SQL" do
+    begin
+      ORACLE_DB.create_table!(:foo){primary_key :id}
+      ORACLE_DB.fetch('SELECT seq_foo_id.nextval FROM DUAL').single_value.should == 1
+    ensure
+      ORACLE_DB.drop_table(:foo)
+    end
+  end
   
   specify "should provide schema information" do
     books_schema = [[:id, [:integer, false, true, nil]],
