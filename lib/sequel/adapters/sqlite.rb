@@ -122,7 +122,8 @@ module Sequel
           synchronize(opts[:server]) do |conn|
             return execute_prepared_statement(conn, type, sql, opts, &block) if sql.is_a?(Symbol)
             log_args = opts[:arguments]
-            args = opts.fetch(:arguments, [])
+            args = {}
+            opts.fetch(:arguments, {}).each{|k, v| args[k] = prepared_statement_argument(v)}
             case type
             when :select
               log_yield(sql, log_args){conn.query(sql, args, &block)}
