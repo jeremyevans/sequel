@@ -8,7 +8,7 @@ shared_examples_for "eager limit strategies" do
     diff_album = @diff_album.call
     al, ar, t = @pr.call
     
-    a = Artist.eager(:first_album, :last_album).all
+    a = Artist.eager(:first_album, :last_album).order(:name).all
     a.should == [@artist, ar]
     a.first.first_album.should == @album
     a.first.last_album.should == diff_album
@@ -20,7 +20,7 @@ shared_examples_for "eager limit strategies" do
     a.first.last_album.values.should == diff_album.values
 
     same_album = @same_album.call
-    a = Artist.eager(:first_album).all
+    a = Artist.eager(:first_album).order(:name).all
     a.should == [@artist, ar]
     [@album, same_album].should include(a.first.first_album)
     a.last.first_album.should == nil
@@ -445,7 +445,7 @@ describe "Sequel::Model Simple Associations" do
   before do
     [:albums_tags, :tags, :albums, :artists].each{|t| @db[t].delete}
     class ::Artist < Sequel::Model(@db)
-      one_to_many :albums
+      one_to_many :albums, :order=>:name
       one_to_one :first_album, :class=>:Album, :order=>:name
       one_to_one :last_album, :class=>:Album, :order=>:name.desc
       one_to_many :first_two_albums, :class=>:Album, :order=>:name, :limit=>2
@@ -637,7 +637,7 @@ describe "Sequel::Model Composite Key Associations" do
     class ::Artist < Sequel::Model(@db)
       set_primary_key :id1, :id2
       unrestrict_primary_key
-      one_to_many :albums, :key=>[:artist_id1, :artist_id2]
+      one_to_many :albums, :key=>[:artist_id1, :artist_id2], :order=>:name
       one_to_one :first_album, :clone=>:albums, :order=>:name
       one_to_one :last_album, :clone=>:albums, :order=>:name.desc
       one_to_many :first_two_albums, :clone=>:albums, :order=>:name, :limit=>2
