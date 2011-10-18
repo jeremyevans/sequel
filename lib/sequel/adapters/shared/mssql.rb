@@ -168,20 +168,31 @@ module Sequel
         end
       end
 
-      # MSSQL uses the INFORMATION_SCHEMA to hold column information.  This method does
-      # not support the parsing of primary key information.
+      # MSSQL uses the INFORMATION_SCHEMA to hold column information, and
+      # parses primary key information from the sysindexes, sysindexkeys,
+      # and syscolumns system tables.
       def schema_parse_table(table_name, opts)
         m = output_identifier_meth
         m2 = input_identifier_meth
+        tn = m2.call(table_name.to_s)
+        table_id = get{object_id(tn)}
+        pk_index_id = metadata_dataset.from(:sysindexes).
+          where(:id=>table_id, :indid=>1..254){{(status & 2048)=>2048}}.
+          get(:indid)
+        pk_cols = metadata_dataset.from(:sysindexkeys___sik).
+          join(:syscolumns___sc, :id=>:id, :colid=>:colid).
+          where(:sik__id=>table_id, :sik__indid=>pk_index_id).
+          select_order_map(:sc__name)
         ds = metadata_dataset.from(:information_schema__tables___t).
          join(:information_schema__columns___c, :table_catalog=>:table_catalog,
               :table_schema => :table_schema, :table_name => :table_name).
          select(:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, :column_default___default, :is_nullable___allow_null, :numeric_precision___column_size, :numeric_scale___scale).
-         filter(:c__table_name=>m2.call(table_name.to_s))
+         filter(:c__table_name=>tn)
         if schema = opts[:schema] || default_schema
           ds.filter!(:c__table_schema=>schema)
         end
         ds.map do |row|
+          row[:primary_key] = pk_cols.include?(row[:column])
           row[:allow_null] = row[:allow_null] == 'YES' ? true : false
           row[:default] = nil if blank_object?(row[:default])
           row[:type] = if row[:db_type] =~ DECIMAL_TYPE_RE && row[:scale] == 0

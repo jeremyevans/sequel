@@ -1,5 +1,7 @@
 === HEAD
 
+* Parsing primary key information from system tables in the shared MSSQL adapter (jeremyevans)
+
 * Fix handling of composite primary keys when emulating alter table operations on SQLite (jeremyevans)
 
 * Emulate add_constraint and drop_constraint alter table operations on SQLite (jeremyevans)
