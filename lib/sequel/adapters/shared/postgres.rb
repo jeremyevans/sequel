@@ -551,9 +551,9 @@ module Sequel
       # Remove the cached entries for primary keys and sequences when a table is
       # changed.
       def remove_cached_schema(table)
-        table = quote_schema_table(table)
-        @primary_keys.delete(table)
-        @primary_key_sequences.delete(table)
+        tab = quote_schema_table(table)
+        @primary_keys.delete(tab)
+        @primary_key_sequences.delete(tab)
         super
       end
 
