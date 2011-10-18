@@ -410,6 +410,18 @@ module Sequel
         "`#{c}`"
       end
       
+      # When a qualified column is selected on SQLite and the qualifier
+      # is a subselect, the column name used is the full qualified name
+      # (including the qualifier) instead of just the column name.  To
+      # get correct column names, you must use an alias.
+      def select(*cols)
+        if ((f = @opts[:from]) && f.any?{|t| t.is_a?(Dataset) || (t.is_a?(SQL::AliasedExpression) && t.expression.is_a?(Dataset))}) || ((j = @opts[:join]) && j.any?{|t| t.table.is_a?(Dataset)})
+          super(*cols.map{|c| alias_qualified_column(c)})
+        else
+          super
+        end
+      end
+      
       # SQLite does not support INTERSECT ALL or EXCEPT ALL
       def supports_intersect_except_all?
         false
@@ -444,6 +456,23 @@ module Sequel
         aliaz = aliaz.value if aliaz.is_a?(SQL::Identifier)
         "#{expression} AS #{literal(aliaz.to_s)}"
       end
+
+      # If col is a qualified column, alias it to the same as the column name
+      def alias_qualified_column(col)
+        case col
+        when Symbol
+          t, c, a = split_symbol(col)
+          if t && !a
+            alias_qualified_column(SQL::QualifiedIdentifier.new(t, c))
+          else
+            col
+          end
+        when SQL::QualifiedIdentifier
+          SQL::AliasedExpression.new(col, col.column)
+        else
+          col
+        end
+      end
       
       # SQL fragment specifying a list of identifiers
       def identifier_list(columns)
@@ -467,14 +496,6 @@ module Sequel
         super unless @opts[:lock] == :update
       end
 
-      # When a qualified column is selected on SQLite and the qualifier
-      # is a subselect, the column name used is the full qualified name
-      # (including the qualifier) instead of just the column name.  To
-      # get correct column names, you must use an alias.
-      def subselect_columns_require_aliases?
-        true
-      end
-      
       # SQLite treats a DELETE with no WHERE clause as a TRUNCATE
       def _truncate_sql(table)
         "DELETE FROM #{table}"

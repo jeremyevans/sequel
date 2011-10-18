@@ -150,12 +150,6 @@ module Sequel
       false
     end
 
-    # Whether columns derived from a subselect require column aliases, false
-    # by default.
-    def subselect_columns_require_aliases?
-      false
-    end
-
     # Whether the RETURNING clause is used for the given dataset.
     # +type+ can be :insert, :update, or :delete.
     def uses_returning?(type)

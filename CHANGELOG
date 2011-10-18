@@ -2,7 +2,7 @@
 
 * Fix bound variable usage for some types (e.g. Date) when used outside of prepared statements on SQLite (jeremyevans)
 
-* Work around SQLite column naming bug when using subselects by always aliasing when graphing (jeremyevans)
+* Work around SQLite column naming bug when using subselects (jeremyevans)
 
 * Make prepared_statements plugin work with adapters that require type specifiers for variable placeholders, such as oracle (jeremyevans)
 

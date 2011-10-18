@@ -113,6 +113,8 @@ module Sequel
       add_table = options[:select] == false ? false : true
       # Whether to add the columns to the list of column aliases
       add_columns = !ds.opts.include?(:graph_aliases)
+      # columns to select
+      select = (opts[:select] || []).dup
 
       # Setup the initial graph data structure if it doesn't exist
       unless graph = opts[:graph]
@@ -130,12 +132,9 @@ module Sequel
         # aliased, but are not included if set_graph_aliases
         # has been used.
         if add_columns
-          select = opts[:select] = []
           columns.each do |column|
             column_aliases[column] = [master, column]
-            ident = SQL::QualifiedIdentifier.new(master, column)
-            ident = SQL::AliasedExpression.new(ident, column) if subselect_columns_require_aliases?
-            select.push(ident)
+            select.push(SQL::QualifiedIdentifier.new(master, column))
           end
         end
       end
@@ -149,7 +148,6 @@ module Sequel
 
       # Add the columns to the selection unless we are ignoring them
       if add_table && add_columns
-        select = opts[:select]
         column_aliases = graph[:column_aliases]
         ca_num = graph[:column_alias_num]
         # Which columns to add to the result set
@@ -170,14 +168,13 @@ module Sequel
             [column_alias, SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(table_alias, column), column_alias)]
           else
             ident = SQL::QualifiedIdentifier.new(table_alias, column)
-            ident = SQL::AliasedExpression.new(ident, column) if subselect_columns_require_aliases?
             [column, ident]
           end
           column_aliases[col_alias] = [table_alias, column]
           select.push(identifier)
         end
       end
-      ds
+      ds.select(*select)
     end
 
     # This allows you to manually specify the graph aliases to use
@@ -229,7 +226,7 @@ module Sequel
         column ||= col_alias
         gas[col_alias] = [table, column]
         identifier = value || SQL::QualifiedIdentifier.new(table, column)
-        identifier = SQL::AliasedExpression.new(identifier, col_alias) if value || subselect_columns_require_aliases? || column != col_alias
+        identifier = SQL::AliasedExpression.new(identifier, col_alias) if value || column != col_alias
         identifier
       end
       [identifiers, gas]
