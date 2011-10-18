@@ -79,6 +79,7 @@ module Sequel
         db = ::Amalgalite::Database.new(opts[:database])
         db.busy_handler(::Amalgalite::BusyTimeout.new(opts.fetch(:timeout, 5000)/50, 50))
         db.type_map = SequelTypeMap.new(self)
+        connection_pragmas.each{|s| log_yield(s){db.execute_batch(s)}}
         db
       end
       
