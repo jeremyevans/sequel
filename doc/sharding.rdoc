@@ -10,7 +10,13 @@ that ship with Sequel.
 
 Both features use the :servers Database option.  The :servers option should
 be a hash with symbol keys and values that are either hashes or procs that
-return hashes.  Note that all servers should have the same schema for all
+return hashes. These hashes are merged into the Database object's default
+options hash to get the connection options for the shard, so you don't need
+to override all options, just the ones that need to be modified.  For example,
+if you are using the same user, password, and database name and just the
+host is changing, you only need a :host entry in each shard's hash.
+
+Note that all servers should have the same schema for all
 tables you are accessing, unless you really know what you are doing.
 
 == Master and Slave Database Configurations
