@@ -324,6 +324,15 @@ describe "A SQLite database" do
     @db[:test2].first.should == {:name => 'mmm'}
   end
 
+  specify "should keep a composite primary key when dropping columns" do
+    @db.create_table!(:test2){Integer :a; Integer :b; Integer :c; primary_key [:a, :b]}
+    @db.drop_column :test2, :c
+    @db[:test2].columns.should == [:a, :b]
+    @db[:test2] << {:a=>1, :b=>2}
+    @db[:test2] << {:a=>2, :b=>3}
+    proc{@db[:test2] << {:a=>2, :b=>3}}.should raise_error(Sequel::Error)
+  end
+
   specify "should keep column attributes when dropping a column" do
     @db.create_table! :test3 do
       primary_key :id
@@ -439,8 +448,8 @@ describe "A SQLite database" do
     @db[:test3_backup1].columns.should == [:k]
     sqls.clear
     @db.drop_column(:test3, :i)
-    sqls.any?{|x| x =~ /\ACREATE TABLE.*test3_backup2/}.should == true
-    sqls.any?{|x| x =~ /\ACREATE TABLE.*test3_backup[01]/}.should == false
+    sqls.any?{|x| x =~ /\AALTER TABLE.*test3.*RENAME TO.*test3_backup2/}.should == true
+    sqls.any?{|x| x =~ /\AALTER TABLE.*test3.*RENAME TO.*test3_backup[01]/}.should == false
     @db[:test3].columns.should == [:h]
     @db[:test3_backup0].columns.should == [:j]
     @db[:test3_backup1].columns.should == [:k]
@@ -451,8 +460,8 @@ describe "A SQLite database" do
 
     sqls.clear
     @db.rename_column(:test3, :h, :i)
-    sqls.any?{|x| x =~ /\ACREATE TABLE.*test3_backup3/}.should == true
-    sqls.any?{|x| x =~ /\ACREATE TABLE.*test3_backup[012]/}.should == false
+    sqls.any?{|x| x =~ /\AALTER TABLE.*test3.*RENAME TO.*test3_backup3/}.should == true
+    sqls.any?{|x| x =~ /\AALTER TABLE.*test3.*RENAME TO.*test3_backup[012]/}.should == false
     @db[:test3].columns.should == [:i]
     @db[:test3_backup0].columns.should == [:j]
     @db[:test3_backup1].columns.should == [:k]

@@ -11,14 +11,6 @@ module Sequel
       TEMP_STORE = [:default, :file, :memory].freeze
       VIEWS_FILTER = "type = 'view'".freeze
 
-      # Run all alter_table commands in a transaction.  This is technically only
-      # needed for drop column.
-      def alter_table(name, generator=nil, &block)
-        remove_cached_schema(name)
-        generator ||= Schema::AlterTableGenerator.new(self, &block)
-        transaction{generator.operations.each{|op| alter_table_sql_list(name, [op]).flatten.each{|sql| execute_ddl(sql)}}}
-      end
-
       # A symbol signifying the value of the auto_vacuum PRAGMA.
       def auto_vacuum
         AUTO_VACUUM[pragma_get(:auto_vacuum).to_i]
@@ -162,6 +154,22 @@ module Sequel
 
       private
 
+      # Run all alter_table commands in a transaction.  This is technically only
+      # needed for drop column.
+      def apply_alter_table(table, ops)
+        transaction do 
+          if ops.length > 1 && ops.all?{|op| op[:op] == :add_constraint}
+            # If you are just doing constraints, apply all of them at the same time,
+            # as otherwise all but the last one get lost.
+            alter_table_sql_list(table, [{:op=>:add_constraints, :ops=>ops}]).flatten.each{|sql| execute_ddl(sql)}
+          else
+            # Run each operation separately, as later operations may depend on the
+            # results of earlier operations.
+            ops.each{|op| alter_table_sql_list(table, [op]).flatten.each{|sql| execute_ddl(sql)}}
+          end
+        end
+      end
+
       # SQLite supports limited table modification.  You can add a column
       # or an index.  Dropping columns is supported by copying the table into
       # a temporary table, dropping the table, and creating a new table without
@@ -188,11 +196,26 @@ module Sequel
           duplicate_table(table){|columns| columns.each{|s| s[:null] = op[:null] if s[:name].to_s == op[:name].to_s}}
         when :set_column_type
           duplicate_table(table){|columns| columns.each{|s| s[:type] = op[:type] if s[:name].to_s == op[:name].to_s}}
+        when :drop_constraint
+          case op[:type]
+          when :primary_key
+            duplicate_table(table){|columns| columns.each{|s| s[:primary_key] = nil}}
+          when :foreign_key
+            duplicate_table(table){|columns| columns.each{|s| s[:table] = nil}}
+          when :unique
+            duplicate_table(table)
+          else
+            raise Error, "Unsupported :type option for drop_constraint: #{op[:type].inspect}"
+          end
+        when :add_constraint
+          duplicate_table(table, :constraints=>[op])
+        when :add_constraints
+          duplicate_table(table, :constraints=>op[:ops])
         else
-          raise Error, "Unsupported ALTER TABLE operation"
+          raise Error, "Unsupported ALTER TABLE operation: #{op[:op].inspect}"
         end
       end
-      
+
       # The array of column symbols in the table, except for ones given in opts[:except]
       def backup_table_name(table, opts={})
         table = table.gsub('`', '')
@@ -200,11 +223,6 @@ module Sequel
           table_name = "#{table}_backup#{i}"
           return table_name unless table_exists?(table_name)
         end
-      end
-
-      # Allow use without a generator, needed for the alter table hackery that Sequel allows.
-      def column_list_sql(generator)
-        generator.is_a?(Schema::Generator) ? super : generator.map{|c| column_definition_sql(c)}.join(', ')
       end
 
       # Array of PRAGMA SQL statements based on the Database options that should be applied to
@@ -257,17 +275,26 @@ module Sequel
         opts[:old_columns_proc].call(old_columns) if opts[:old_columns_proc]
 
         yield def_columns if block_given?
-        def_columns_str = column_list_sql(def_columns)
+
+        constraints = (opts[:constraints] || []).dup
+        pks = []
+        def_columns.each{|c| pks << c[:name] if c[:primary_key]}
+        if pks.length > 1
+          constraints << {:type=>:primary_key, :columns=>pks}
+          def_columns.each{|c| c[:primary_key] = false if c[:primary_key]}
+        end
+
+        def_columns_str = (def_columns.map{|c| column_definition_sql(c)} + constraints.map{|c| constraint_definition_sql(c)}).join(', ')
         new_columns = old_columns.dup
         opts[:new_columns_proc].call(new_columns) if opts[:new_columns_proc]
 
         qt = quote_schema_table(table)
         bt = quote_identifier(backup_table_name(qt))
         a = [
-           "CREATE TABLE #{bt}(#{def_columns_str})",
-           "INSERT INTO #{bt}(#{dataset.send(:identifier_list, new_columns)}) SELECT #{dataset.send(:identifier_list, old_columns)} FROM #{qt}",
-           "DROP TABLE #{qt}",
-           "ALTER TABLE #{bt} RENAME TO #{qt}"
+           "ALTER TABLE #{qt} RENAME TO #{bt}",
+           "CREATE TABLE #{qt}(#{def_columns_str})",
+           "INSERT INTO #{qt}(#{dataset.send(:identifier_list, new_columns)}) SELECT #{dataset.send(:identifier_list, old_columns)} FROM #{bt}",
+           "DROP TABLE #{bt}"
         ]
         indexes(table).each do |name, h|
           if (h[:columns].map{|x| x.to_s} - new_columns).empty?

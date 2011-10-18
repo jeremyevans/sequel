@@ -1,5 +1,9 @@
 === HEAD
 
+* Fix handling of composite primary keys when emulating alter table operations on SQLite (jeremyevans)
+
+* Emulate add_constraint and drop_constraint alter table operations on SQLite (jeremyevans)
+
 * Apply the correct pragmas when connecting to SQLite via the Amalgalite and Swift adapters (jeremyevans)
 
 * Fix bound variable usage for some types (e.g. Date) when used outside of prepared statements on SQLite (jeremyevans)

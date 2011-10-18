@@ -251,7 +251,7 @@ describe "Database schema modifiers" do
     proc{@ds.insert(:id=>@ds.map(:id).first)}.should raise_error
   end
 
-  cspecify "should drop primary key constraints from tables correctly", :sqlite do
+  specify "should drop primary key constraints from tables correctly" do
     @db.create_table!(:items){Integer :number; primary_key [:number], :name=>:items_pk}
     @ds.insert(:number=>10)
     @db.alter_table(:items){drop_constraint :items_pk, :type=>:primary_key}
@@ -331,7 +331,7 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:id=>"10"}, {:id=>"20"}]
   end
 
-  cspecify "should add unnamed unique constraints and foreign key table constraints correctly", :sqlite do
+  specify "should add unnamed unique constraints and foreign key table constraints correctly" do
     @db.create_table!(:items, :engine=>:InnoDB){Integer :id; Integer :item_id}
     @db.alter_table(:items) do
       add_unique_constraint [:item_id, :id]
@@ -344,7 +344,7 @@ describe "Database schema modifiers" do
     proc{@ds.insert(1, 2)}.should raise_error
   end
 
-  cspecify "should add named unique constraints and foreign key table constraints correctly", :sqlite do
+  specify "should add named unique constraints and foreign key table constraints correctly" do
     @db.create_table!(:items, :engine=>:InnoDB){Integer :id, :null=>false; Integer :item_id, :null=>false}
     @db.alter_table(:items) do
       add_unique_constraint [:item_id, :id], :name=>:unique_iii
@@ -357,7 +357,7 @@ describe "Database schema modifiers" do
     proc{@ds.insert(1, 2)}.should raise_error
   end
 
-  cspecify "should drop unique constraints and foreign key table constraints correctly", :sqlite do
+  specify "should drop unique constraints and foreign key table constraints correctly" do
     @db.create_table!(:items) do
       Integer :id
       Integer :item_id
