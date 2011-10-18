@@ -71,11 +71,11 @@ module Sequel
     # See <tt>Schema::AlterTableGenerator</tt> and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
     def alter_table(name, generator=nil, &block)
       generator ||= Schema::AlterTableGenerator.new(self, &block)
-      alter_table_sql_list(name, generator.operations).flatten.each {|sql| execute_ddl(sql)}
       remove_cached_schema(name)
+      apply_alter_table(name, generator.operations)
       nil
     end
-    
+
     # Creates a table with the columns given in the provided block:
     #
     #   DB.create_table :posts do
@@ -231,6 +231,11 @@ module Sequel
 
     private
 
+    # Apply the changes in the given alter table ops to the table given by name.
+    def apply_alter_table(name, ops)
+      alter_table_sql_list(name, ops).flatten.each{|sql| execute_ddl(sql)}
+    end
+    
     # The SQL to execute to modify the DDL for the given table name.  op
     # should be one of the operations returned by the AlterTableGenerator.
     def alter_table_sql(table, op)
