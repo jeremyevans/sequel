@@ -162,46 +162,6 @@ describe "Database transactions" do
     end
   end
 
-  if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or (RUBY_ENGINE == 'rbx' && ![[:do, :sqlite], [:tinytds, :mssql]].include?([INTEGRATION_DB.adapter_scheme, INTEGRATION_DB.database_type]))) and RUBY_VERSION < '1.9'
-    specify "should handle Thread#kill for transactions inside threads" do
-      q = Queue.new
-      q1 = Queue.new
-      t = Thread.new do
-        @db.transaction do
-          @d << {:name => 'abc', :value => 1}
-          q1.push nil
-          q.pop
-          @d << {:name => 'def', :value => 2}
-        end
-      end
-      q1.pop
-      t.kill
-      @d.count.should == 0
-    end
-
-    if INTEGRATION_DB.supports_savepoints?
-      specify "should handle Thread#kill for transactions with savepoints inside threads" do
-        q = Queue.new
-        q1 = Queue.new
-        t = Thread.new do
-          @db.transaction do
-            @d << {:name => 'abc', :value => 1}
-            @db.transaction(:savepoint=>true) do
-              @d << {:name => 'def', :value => 2}
-              q1.push nil
-              q.pop
-              @d << {:name => 'ghi', :value => 3}
-            end
-            @d << {:name => 'jkl', :value => 4}
-          end
-        end
-        q1.pop
-        t.kill
-        @d.count.should == 0
-      end
-    end
-  end
-
   specify "should support after_commit outside transactions" do
     c = nil
     @db.after_commit{c = 1}
@@ -286,6 +246,58 @@ describe "Database transactions" do
       specify "should raise an error if you attempt to use after_commit or after rollback inside a savepoint in a prepared transaction" do
         proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_commit{}}}}.should raise_error(Sequel::Error)
         proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_rollback{}}}}.should raise_error(Sequel::Error)
+      end
+    end
+  end
+end
+
+if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or (RUBY_ENGINE == 'rbx' && ![[:do, :sqlite], [:tinytds, :mssql]].include?([INTEGRATION_DB.adapter_scheme, INTEGRATION_DB.database_type]))) and RUBY_VERSION < '1.9'
+  describe "Database transactions and Thread#kill" do
+    before do
+      @db = INTEGRATION_DB
+      @db.drop_table(:items) if @db.table_exists?(:items)
+      @db.create_table(:items, :engine=>'InnoDB'){String :name; Integer :value}
+      @d = @db[:items]
+    end
+    after do
+      @db.drop_table(:items) if @db.table_exists?(:items)
+    end
+
+    specify "should handle transactions inside threads" do
+      q = Queue.new
+      q1 = Queue.new
+      t = Thread.new do
+        @db.transaction do
+          @d << {:name => 'abc', :value => 1}
+          q1.push nil
+          q.pop
+          @d << {:name => 'def', :value => 2}
+        end
+      end
+      q1.pop
+      t.kill
+      @d.count.should == 0
+    end
+
+    if INTEGRATION_DB.supports_savepoints?
+      specify "should handle transactions with savepoints inside threads" do
+        q = Queue.new
+        q1 = Queue.new
+        t = Thread.new do
+          @db.transaction do
+            @d << {:name => 'abc', :value => 1}
+            @db.transaction(:savepoint=>true) do
+              @d << {:name => 'def', :value => 2}
+              q1.push nil
+              q.pop
+              @d << {:name => 'ghi', :value => 3}
+            end
+            @d << {:name => 'jkl', :value => 4}
+          end
+        end
+        q1.pop
+        t.kill
+        @d.count.should == 0
       end
     end
   end
