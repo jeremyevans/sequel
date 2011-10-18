@@ -63,7 +63,7 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items)
   end
 
-  cspecify "should parse primary keys from the schema properly", [proc{|db| db.adapter_scheme != :jdbc}, :mssql] do
+  specify "should parse primary keys from the schema properly" do
     INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == []
     INTEGRATION_DB.create_table!(:items){primary_key :number}

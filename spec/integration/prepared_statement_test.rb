@@ -275,7 +275,7 @@ describe "Bound Argument Types" do
   cspecify "should handle boolean type", [:do, :sqlite], [:odbc, :mssql], [:jdbc, :sqlite], [:jdbc, :db2], :oracle do
     @ds.filter(:b=>:$x).prepare(:first, :ps_string).call(:x=>@vs[:b])[:b].should == @vs[:b]
   end
-end unless INTEGRATION_DB.adapter_scheme == :swift && INTEGRATION_DB.database_type == :postgres
+end unless Sequel.guarded?([:swift, :postgres])
 
 describe "Dataset#unbind" do
   before do

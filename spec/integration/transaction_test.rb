@@ -251,7 +251,7 @@ describe "Database transactions" do
   end
 end
 
-if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or (RUBY_ENGINE == 'rbx' && ![[:do, :sqlite], [:tinytds, :mssql]].include?([INTEGRATION_DB.adapter_scheme, INTEGRATION_DB.database_type]))) and RUBY_VERSION < '1.9'
+if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or (RUBY_ENGINE == 'rbx' && !Sequel.guarded?([:do, :sqlite], [:tinytds, :mssql]))) and RUBY_VERSION < '1.9'
   describe "Database transactions and Thread#kill" do
     before do
       @db = INTEGRATION_DB

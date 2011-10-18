@@ -29,6 +29,33 @@ unless defined?(RSpec)
   end
 end
 
+def Sequel.guarded?(*checked)
+  unless ENV['SEQUEL_NO_PENDING']
+    checked.each do |c|
+      case c
+      when INTEGRATION_DB.database_type
+        return c
+      when Array
+        case c.length
+        when 1
+          return c if c.first == INTEGRATION_DB.adapter_scheme
+        when 2
+          if c.first.is_a?(Proc)
+            return c if c.first.call(INTEGRATION_DB) && c.last == INTEGRATION_DB.database_type
+          elsif c.last.is_a?(Proc)
+            return c if c.first == INTEGRATION_DB.adapter_scheme && c.last.call(INTEGRATION_DB)
+          else
+            return c if c.first == INTEGRATION_DB.adapter_scheme && c.last == INTEGRATION_DB.database_type
+          end
+        when 3
+          return c if c[0] == INTEGRATION_DB.adapter_scheme && c[1] == INTEGRATION_DB.database_type && c[2].call(INTEGRATION_DB)
+        end          
+      end
+    end
+  end
+  false
+end
+
 (defined?(RSpec) ? RSpec::Core::ExampleGroup : Spec::Example::ExampleGroup).class_eval do
   def log
     begin
@@ -39,36 +66,8 @@ end
     end
   end
   
-  def self.log_specify(message, &block)
-    specify(message){log{instance_eval(&block)}}
-  end
-
   def self.cspecify(message, *checked, &block)
-    return specify(message, &block) if ENV['SEQUEL_NO_PENDING']
-    pending = false
-    checked.each do |c|
-      case c
-      when INTEGRATION_DB.database_type
-        pending = c
-      when Array
-        case c.length
-        when 1
-          pending = c if c.first == INTEGRATION_DB.adapter_scheme
-        when 2
-          if c.first.is_a?(Proc)
-            pending = c if c.first.call(INTEGRATION_DB) && c.last == INTEGRATION_DB.database_type
-          elsif c.last.is_a?(Proc)
-            pending = c if c.first == INTEGRATION_DB.adapter_scheme && c.last.call(INTEGRATION_DB)
-          else
-            pending = c if c.first == INTEGRATION_DB.adapter_scheme && c.last == INTEGRATION_DB.database_type
-          end
-        when 3
-          pending = c if c[0] == INTEGRATION_DB.adapter_scheme && c[1] == INTEGRATION_DB.database_type && c[2].call(INTEGRATION_DB)
-        end          
-      end
-      break if pending
-    end
-    if pending
+    if pending = Sequel.guarded?(*checked)
       specify(message){pending("Not yet working on #{Array(pending).join(', ')}", &block)}
     else
       specify(message, &block)

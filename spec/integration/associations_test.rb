@@ -51,7 +51,7 @@ shared_examples_for "eager limit strategies" do
   end
   
   specify "should correctly handle limits and offsets when eager loading many_to_many associations" do
-    if @els == {:eager_limit_strategy=>:correlated_subquery} && Album.db.database_type == :derby
+    if @els == {:eager_limit_strategy=>:correlated_subquery} && Sequel.guarded?(:derby)
       pending("Derby errors with correlated subqueries on many_to_many associations")
     end
     Album.many_to_many :first_two_tags, {:clone=>:first_two_tags}.merge(@els) if @els
@@ -76,7 +76,7 @@ shared_examples_for "eager limit strategies" do
   end
   
   specify "should correctly handle limits and offsets when eager loading many_through_many associations" do
-    if @els == {:eager_limit_strategy=>:correlated_subquery} && Album.db.database_type == :derby
+    if @els == {:eager_limit_strategy=>:correlated_subquery} && Sequel.guarded?(:derby)
       pending("Derby errors with correlated subqueries on many_through_many associations")
     end
     Artist.many_through_many :first_two_tags, {:clone=>:first_two_tags}.merge(@els) if @els
@@ -491,7 +491,7 @@ describe "Sequel::Model Simple Associations" do
       @els = {:eager_limit_strategy=>:correlated_subquery}
     end
     it_should_behave_like "eager limit strategies"
-  end unless [:mysql, :db2, :oracle].include?(INTEGRATION_DB.database_type)
+  end unless Sequel.guarded?(:mysql, :db2, :oracle)
 
   specify "should handle aliased tables when eager_graphing" do
     @album.update(:artist => @artist)
@@ -687,7 +687,7 @@ describe "Sequel::Model Composite Key Associations" do
       @els = {:eager_limit_strategy=>:correlated_subquery}
     end
     it_should_behave_like "eager limit strategies"
-  end if INTEGRATION_DB.dataset.supports_multiple_column_in? && ![:mysql, :db2, :oracle].include?(INTEGRATION_DB.database_type)
+  end if INTEGRATION_DB.dataset.supports_multiple_column_in? && !Sequel.guarded?(:mysql, :db2, :oracle)
 
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums

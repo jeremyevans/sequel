@@ -30,10 +30,6 @@ end
     end 
   end 
 
-  def self.log_specify(message, &block)
-    specify(message){log{instance_eval(&block)}}
-  end
-
   def self.cspecify(message, *checked, &block)
     return specify(message, &block) if ENV['SEQUEL_NO_PENDING']
     pending = false

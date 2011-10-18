@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 # H2 and MSSQL don't support USING joins
 # DB2 does not seem to support USING joins in every version; it seems to be
 # valid expression in DB2 iSeries UDB though.
-unless [:h2, :mssql, :db2].include?(INTEGRATION_DB.database_type)
+unless Sequel.guarded?(:h2, :mssql, :db2)
 describe "Class Table Inheritance Plugin" do
   before(:all) do
     @db = INTEGRATION_DB
@@ -652,7 +652,7 @@ describe "Composition plugin" do
 end
 
 # DB2's implemention of CTE is too limited to use this plugin
-if INTEGRATION_DB.dataset.supports_cte? and INTEGRATION_DB.database_type != :db2
+if INTEGRATION_DB.dataset.supports_cte? and Sequel.guarded?(:db2)
   describe "RcteTree Plugin" do
     before(:all) do
       @db = INTEGRATION_DB
