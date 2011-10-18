@@ -5,7 +5,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 # valid expression in DB2 iSeries UDB though.
 unless [:h2, :mssql, :db2].include?(INTEGRATION_DB.database_type)
 describe "Class Table Inheritance Plugin" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.instance_variable_set(:@schemas, {})
     [:staff, :executives, :managers, :employees].each{|t| @db.drop_table(t) if @db.table_exists?(t)}
@@ -26,6 +26,9 @@ describe "Class Table Inheritance Plugin" do
       foreign_key :id, :employees, :primary_key=>true
       foreign_key :manager_id, :managers
     end
+  end
+  before do
+    [:staff, :executives, :managers, :employees].each{|t| @db[t].delete}
     class ::Employee < Sequel::Model(@db)
       plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
     end 
@@ -46,12 +49,12 @@ describe "Class Table Inheritance Plugin" do
     @db[:managers].insert(:id=>@i4, :num_staff=>5)
     @db[:executives].insert(:id=>@i4, :num_managers=>6)
     @db[:staff].insert(:id=>@i2, :manager_id=>@i4)
-    
-    clear_sqls
   end
   after do
-    @db.drop_table :staff, :executives, :managers, :employees
     [:Executive, :Manager, :Staff, :Employee].each{|s| Object.send(:remove_const, s)}
+  end
+  after(:all) do
+    @db.drop_table :staff, :executives, :managers, :employees
   end
 
   specify "should return rows as subclass instances" do
@@ -146,21 +149,25 @@ end
 end
 
 describe "Many Through Many Plugin" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.instance_variable_set(:@schemas, {})
-    @db.create_table!(:albums) do
+    [:albums_artists, :albums, :artists].each{|t| @db.drop_table(t) if @db.table_exists?(t)}
+    @db.create_table(:albums) do
       primary_key :id
       String :name
     end
-    @db.create_table!(:artists) do
+    @db.create_table(:artists) do
       primary_key :id
       String :name
     end
-    @db.create_table!(:albums_artists) do
+    @db.create_table(:albums_artists) do
       foreign_key :album_id, :albums
       foreign_key :artist_id, :artists
     end
+  end
+  before do
+    [:albums_artists, :albums, :artists].each{|t| @db[t].delete}
     class ::Album < Sequel::Model(@db)
       many_to_many :artists
     end 
@@ -184,26 +191,26 @@ describe "Many Through Many Plugin" do
     @album4 = Album.create(:name=>'D')
     @album4.add_artist(@artist1)
     @album4.add_artist(@artist4)
-    
-    clear_sqls
   end
   after do
-    @db.drop_table :albums_artists, :albums, :artists
     [:Album, :Artist].each{|s| Object.send(:remove_const, s)}
+  end
+  after(:all) do
+    @db.drop_table :albums_artists, :albums, :artists
   end
   
   specify "should handle super simple case with 1 join table" do
     Artist.many_through_many :albums, [[:albums_artists, :artist_id, :album_id]]
-    Artist[1].albums.map{|x| x.name}.sort.should == %w'A D'
-    Artist[2].albums.map{|x| x.name}.sort.should == %w'A C'
-    Artist[3].albums.map{|x| x.name}.sort.should == %w'B C'
-    Artist[4].albums.map{|x| x.name}.sort.should == %w'B D'
+    Artist[@artist1.id].albums.map{|x| x.name}.sort.should == %w'A D'
+    Artist[@artist2.id].albums.map{|x| x.name}.sort.should == %w'A C'
+    Artist[@artist3.id].albums.map{|x| x.name}.sort.should == %w'B C'
+    Artist[@artist4.id].albums.map{|x| x.name}.sort.should == %w'B D'
     
     Artist.plugin :prepared_statements_associations
-    Artist[1].albums.map{|x| x.name}.sort.should == %w'A D'
-    Artist[2].albums.map{|x| x.name}.sort.should == %w'A C'
-    Artist[3].albums.map{|x| x.name}.sort.should == %w'B C'
-    Artist[4].albums.map{|x| x.name}.sort.should == %w'B D'
+    Artist[@artist1.id].albums.map{|x| x.name}.sort.should == %w'A D'
+    Artist[@artist2.id].albums.map{|x| x.name}.sort.should == %w'A C'
+    Artist[@artist3.id].albums.map{|x| x.name}.sort.should == %w'B C'
+    Artist[@artist4.id].albums.map{|x| x.name}.sort.should == %w'B D'
 
     Artist.filter(:id=>1).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A D'
     Artist.filter(:id=>2).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A C'
@@ -237,26 +244,26 @@ describe "Many Through Many Plugin" do
 
   specify "should handle typical case with 3 join tables" do
     Artist.many_through_many :related_artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]], :class=>Artist, :distinct=>true
-    Artist[1].related_artists.map{|x| x.name}.sort.should == %w'1 2 4'
-    Artist[2].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'
-    Artist[3].related_artists.map{|x| x.name}.sort.should == %w'2 3 4'
-    Artist[4].related_artists.map{|x| x.name}.sort.should == %w'1 3 4'
+    Artist[@artist1.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 4'
+    Artist[@artist2.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'
+    Artist[@artist3.id].related_artists.map{|x| x.name}.sort.should == %w'2 3 4'
+    Artist[@artist4.id].related_artists.map{|x| x.name}.sort.should == %w'1 3 4'
     
     Artist.plugin :prepared_statements_associations
-    Artist[1].related_artists.map{|x| x.name}.sort.should == %w'1 2 4'
-    Artist[2].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'
-    Artist[3].related_artists.map{|x| x.name}.sort.should == %w'2 3 4'
-    Artist[4].related_artists.map{|x| x.name}.sort.should == %w'1 3 4'
+    Artist[@artist1.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 4'
+    Artist[@artist2.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'
+    Artist[@artist3.id].related_artists.map{|x| x.name}.sort.should == %w'2 3 4'
+    Artist[@artist4.id].related_artists.map{|x| x.name}.sort.should == %w'1 3 4'
     
-    Artist.filter(:id=>1).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 4'
-    Artist.filter(:id=>2).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 3'
-    Artist.filter(:id=>3).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'2 3 4'
-    Artist.filter(:id=>4).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 3 4'
+    Artist.filter(:id=>@artist1.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 4'
+    Artist.filter(:id=>@artist2.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 3'
+    Artist.filter(:id=>@artist3.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'2 3 4'
+    Artist.filter(:id=>@artist4.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 3 4'
     
-    Artist.filter(:artists__id=>1).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 4'
-    Artist.filter(:artists__id=>2).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 3'
-    Artist.filter(:artists__id=>3).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'2 3 4'
-    Artist.filter(:artists__id=>4).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 3 4'
+    Artist.filter(:artists__id=>@artist1.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 4'
+    Artist.filter(:artists__id=>@artist2.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 3'
+    Artist.filter(:artists__id=>@artist3.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'2 3 4'
+    Artist.filter(:artists__id=>@artist4.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 3 4'
 
     Artist.filter(:related_artists=>@artist1).all.map{|a| a.name}.sort.should == %w'1 2 4'
     Artist.filter(:related_artists=>@artist2).all.map{|a| a.name}.sort.should == %w'1 2 3'
@@ -286,26 +293,26 @@ describe "Many Through Many Plugin" do
     @album4.add_artist(@artist3)
     @album4.add_artist(@artist4)
     
-    Artist[1].related_albums.map{|x| x.name}.sort.should == %w'A B C'
-    Artist[2].related_albums.map{|x| x.name}.sort.should == %w'A B C D'
-    Artist[3].related_albums.map{|x| x.name}.sort.should == %w'A B D'
-    Artist[4].related_albums.map{|x| x.name}.sort.should == %w'B D'
+    Artist[@artist1.id].related_albums.map{|x| x.name}.sort.should == %w'A B C'
+    Artist[@artist2.id].related_albums.map{|x| x.name}.sort.should == %w'A B C D'
+    Artist[@artist3.id].related_albums.map{|x| x.name}.sort.should == %w'A B D'
+    Artist[@artist4.id].related_albums.map{|x| x.name}.sort.should == %w'B D'
     
     Artist.plugin :prepared_statements_associations
-    Artist[1].related_albums.map{|x| x.name}.sort.should == %w'A B C'
-    Artist[2].related_albums.map{|x| x.name}.sort.should == %w'A B C D'
-    Artist[3].related_albums.map{|x| x.name}.sort.should == %w'A B D'
-    Artist[4].related_albums.map{|x| x.name}.sort.should == %w'B D'
+    Artist[@artist1.id].related_albums.map{|x| x.name}.sort.should == %w'A B C'
+    Artist[@artist2.id].related_albums.map{|x| x.name}.sort.should == %w'A B C D'
+    Artist[@artist3.id].related_albums.map{|x| x.name}.sort.should == %w'A B D'
+    Artist[@artist4.id].related_albums.map{|x| x.name}.sort.should == %w'B D'
     
-    Artist.filter(:id=>1).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C'
-    Artist.filter(:id=>2).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C D'
-    Artist.filter(:id=>3).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B D'
-    Artist.filter(:id=>4).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+    Artist.filter(:id=>@artist1.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C'
+    Artist.filter(:id=>@artist2.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C D'
+    Artist.filter(:id=>@artist3.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B D'
+    Artist.filter(:id=>@artist4.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
     
-    Artist.filter(:artists__id=>1).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C'
-    Artist.filter(:artists__id=>2).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C D'
-    Artist.filter(:artists__id=>3).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B D'
-    Artist.filter(:artists__id=>4).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+    Artist.filter(:artists__id=>@artist1.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C'
+    Artist.filter(:artists__id=>@artist2.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C D'
+    Artist.filter(:artists__id=>@artist3.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B D'
+    Artist.filter(:artists__id=>@artist4.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
 
     Artist.filter(:related_albums=>@album1).all.map{|a| a.name}.sort.should == %w'1 2 3'
     Artist.filter(:related_albums=>@album2).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
@@ -329,19 +336,20 @@ describe "Many Through Many Plugin" do
 end
 
 describe "Lazy Attributes plugin" do 
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:items) do
       primary_key :id
       String :name
       Integer :num
     end
+    @db[:items].delete
     class ::Item < Sequel::Model(@db)
       plugin :lazy_attributes, :num
     end
     Item.create(:name=>'J', :num=>1)
   end
-  after do
+  after(:all) do
     @db.drop_table(:items)
     Object.send(:remove_const, :Item)
   end
@@ -374,7 +382,7 @@ describe "Lazy Attributes plugin" do
 end
 
 describe "Tactical Eager Loading Plugin" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.instance_variable_set(:@schemas, {})
     @db.create_table!(:artists) do
@@ -386,6 +394,10 @@ describe "Tactical Eager Loading Plugin" do
       String :name
       foreign_key :artist_id, :artists
     end
+  end
+  before do
+    @db[:albums].delete
+    @db[:artists].delete
     class ::Album < Sequel::Model(@db)
       plugin :tactical_eager_loading
       many_to_one :artist
@@ -403,12 +415,12 @@ describe "Tactical Eager Loading Plugin" do
     @album2 = Album.create(:name=>'B', :artist=>@artist1)
     @album3 = Album.create(:name=>'C', :artist=>@artist2)
     @album4 = Album.create(:name=>'D', :artist=>@artist3)
-    
-    clear_sqls
   end
   after do
-    @db.drop_table :albums, :artists
     [:Album, :Artist].each{|s| Object.send(:remove_const, s)}
+  end
+  after(:all) do
+    @db.drop_table :albums, :artists
   end
 
   specify "should eagerly load associations for all items when accessing any item" do
@@ -457,7 +469,7 @@ describe "Identity Map plugin" do
 end
 
 describe "Touch plugin" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.instance_variable_set(:@schemas, {})
     @db.create_table!(:artists) do
@@ -471,6 +483,10 @@ describe "Touch plugin" do
       foreign_key :artist_id, :artists
       DateTime :updated_at
     end
+  end
+  before do
+    @db[:albums].delete
+    @db[:artists].delete
     class ::Album < Sequel::Model(@db)
       many_to_one :artist
       plugin :touch, :associations=>:artist
@@ -482,8 +498,10 @@ describe "Touch plugin" do
     @album = Album.create(:name=>'A', :artist=>@artist)
   end
   after do
-    @db.drop_table :albums, :artists
     [:Album, :Artist].each{|s| Object.send(:remove_const, s)}
+  end
+  after(:all) do
+    @db.drop_table :albums, :artists
   end
 
   specify "should update the timestamp column when touching the record" do
@@ -539,7 +557,7 @@ describe "Serialization plugin" do
 end
 
 describe "OptimisticLocking plugin" do 
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:people) do
       primary_key :id
@@ -548,30 +566,33 @@ describe "OptimisticLocking plugin" do
     end
     class ::Person < Sequel::Model(@db)
       plugin :optimistic_locking
-      create(:name=>'John')
     end
   end
-  after do
+  before do
+    @db[:people].delete
+    @p = Person.create(:name=>'John')
+  end
+  after(:all) do
     @db.drop_table(:people)
     Object.send(:remove_const, :Person)
   end
 
   specify "should raise an error when updating a stale record" do
-    p1 = Person[1]
-    p2 = Person[1]
+    p1 = Person[@p.id]
+    p2 = Person[@p.id]
     p1.update(:name=>'Jim')
     proc{p2.update(:name=>'Bob')}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
   end
 
   specify "should raise an error when destroying a stale record" do
-    p1 = Person[1]
-    p2 = Person[1]
+    p1 = Person[@p.id]
+    p2 = Person[@p.id]
     p1.update(:name=>'Jim')
     proc{p2.destroy}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
   end
 
   specify "should not raise an error when updating the same record twice" do
-    p1 = Person[1]
+    p1 = Person[@p.id]
     p1.update(:name=>'Jim')
     proc{p1.update(:name=>'Bob')}.should_not raise_error
   end
@@ -633,7 +654,7 @@ end
 # DB2's implemention of CTE is too limited to use this plugin
 if INTEGRATION_DB.dataset.supports_cte? and INTEGRATION_DB.database_type != :db2
   describe "RcteTree Plugin" do
-    before do
+    before(:all) do
       @db = INTEGRATION_DB
       @db.create_table!(:nodes) do
         primary_key :id
@@ -644,21 +665,25 @@ if INTEGRATION_DB.dataset.supports_cte? and INTEGRATION_DB.database_type != :db2
         plugin :rcte_tree, :order=>:name
       end
       
-      @a = Node.create(:name=>'a')
-      @b = Node.create(:name=>'b')
-      @aa = Node.create(:name=>'aa', :parent=>@a)
-      @ab = Node.create(:name=>'ab', :parent=>@a)
-      @ba = Node.create(:name=>'ba', :parent=>@b)
-      @bb = Node.create(:name=>'bb', :parent=>@b)
-      @aaa = Node.create(:name=>'aaa', :parent=>@aa)
-      @aab = Node.create(:name=>'aab', :parent=>@aa)
-      @aba = Node.create(:name=>'aba', :parent=>@ab)
-      @abb = Node.create(:name=>'abb', :parent=>@ab)
-      @aaaa = Node.create(:name=>'aaaa', :parent=>@aaa)
-      @aaab = Node.create(:name=>'aaab', :parent=>@aaa)
-      @aaaaa = Node.create(:name=>'aaaaa', :parent=>@aaaa)
+      @nodes = []
+      @nodes << @a = Node.create(:name=>'a')
+      @nodes << @b = Node.create(:name=>'b')
+      @nodes << @aa = Node.create(:name=>'aa', :parent=>@a)
+      @nodes << @ab = Node.create(:name=>'ab', :parent=>@a)
+      @nodes << @ba = Node.create(:name=>'ba', :parent=>@b)
+      @nodes << @bb = Node.create(:name=>'bb', :parent=>@b)
+      @nodes << @aaa = Node.create(:name=>'aaa', :parent=>@aa)
+      @nodes << @aab = Node.create(:name=>'aab', :parent=>@aa)
+      @nodes << @aba = Node.create(:name=>'aba', :parent=>@ab)
+      @nodes << @abb = Node.create(:name=>'abb', :parent=>@ab)
+      @nodes << @aaaa = Node.create(:name=>'aaaa', :parent=>@aaa)
+      @nodes << @aaab = Node.create(:name=>'aaab', :parent=>@aaa)
+      @nodes << @aaaaa = Node.create(:name=>'aaaaa', :parent=>@aaaa)
     end
-    after do
+    before do
+      @nodes.each{|n| n.associations.clear}
+    end
+    after(:all) do
       @db.drop_table :nodes
       Object.send(:remove_const, :Node)
     end
@@ -735,13 +760,15 @@ if INTEGRATION_DB.dataset.supports_cte? and INTEGRATION_DB.database_type != :db2
     end
 
     specify "should work correctly if not all columns are selected" do
-      Node.plugin :lazy_attributes, :name
-      @aaaa.descendants.should == [Node.load(:parent_id=>11, :id=>13)]
-      @aa.ancestors.should == [Node.load(:parent_id=>nil, :id=>1)]
-      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:ancestors, :descendants).all
-      nodes.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>3, :id=>7}, {:parent_id=>nil, :id=>2}].map{|x| Node.load(x)}
-      nodes[2].descendants.should == [{:parent_id=>2, :id=>5}, {:parent_id=>2, :id=>6}].map{|x| Node.load(x)}
-      nodes[1].ancestors.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>1, :id=>3}].map{|x| Node.load(x)}
+      c = Class.new(Sequel::Model(@db[:nodes]))
+      c.plugin :rcte_tree, :order=>:name
+      c.plugin :lazy_attributes, :name
+      c[:name=>'aaaa'].descendants.should == [c.load(:parent_id=>11, :id=>13)]
+      c[:name=>'aa'].ancestors.should == [c.load(:parent_id=>nil, :id=>1)]
+      nodes = c.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:ancestors, :descendants).all
+      nodes.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>3, :id=>7}, {:parent_id=>nil, :id=>2}].map{|x| c.load(x)}
+      nodes[2].descendants.should == [{:parent_id=>2, :id=>5}, {:parent_id=>2, :id=>6}].map{|x| c.load(x)}
+      nodes[1].ancestors.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>1, :id=>3}].map{|x| c.load(x)}
     end
     
     specify "should eagerly load descendants to a given level" do
@@ -859,7 +886,7 @@ if INTEGRATION_DB.dataset.supports_cte? and INTEGRATION_DB.database_type != :db2
 end
 
 describe "Instance Filters plugin" do 
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:items) do
       primary_key :id
@@ -870,11 +897,14 @@ describe "Instance Filters plugin" do
     class ::Item < Sequel::Model(@db)
       plugin :instance_filters
     end
+  end
+  before do
+    @db[:items].delete
     @i = Item.create(:name=>'J', :number=>1, :cost=>2)
     @i.instance_filter(:number=>1)
     @i.set(:name=>'K')
   end
-  after do
+  after(:all) do
     @db.drop_table(:items)
     Object.send(:remove_const, :Item)
   end
@@ -919,20 +949,23 @@ describe "Instance Filters plugin" do
 end
 
 describe "UpdatePrimaryKey plugin" do 
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:t) do
       Integer :a, :primary_key=>true
       Integer :b
     end
     @ds = @db[:t]
-    @ds.insert(:a=>1, :b=>3)
     @c = Class.new(Sequel::Model(@ds))
     @c.set_primary_key(:a)
     @c.unrestrict_primary_key
     @c.plugin :update_primary_key
   end
-  after do
+  before do
+    @ds.delete
+    @ds.insert(:a=>1, :b=>3)
+  end
+  after(:all) do
     @db.drop_table(:t)
   end
 
@@ -974,22 +1007,23 @@ describe "UpdatePrimaryKey plugin" do
 end
 
 describe "AssociationPks plugin" do 
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
-    @db.create_table!(:artists) do
+    [:albums_tags, :tags, :albums, :artists].each{|t| @db.drop_table(t) if @db.table_exists?(t)}
+    @db.create_table(:artists) do
       primary_key :id
       String :name
     end
-    @db.create_table!(:albums) do
+    @db.create_table(:albums) do
       primary_key :id
       String :name
       foreign_key :artist_id, :artists
     end
-    @db.create_table!(:tags) do
+    @db.create_table(:tags) do
       primary_key :id
       String :name
     end
-    @db.create_table!(:albums_tags) do
+    @db.create_table(:albums_tags) do
       foreign_key :album_id, :albums
       foreign_key :tag_id, :tags
     end
@@ -1003,7 +1037,9 @@ describe "AssociationPks plugin" do
     end 
     class ::Tag < Sequel::Model
     end 
-    
+  end
+  before do
+    [:albums_tags, :tags, :albums, :artists].each{|t| @db[t].delete}
     @ar1 =@db[:artists].insert(:name=>'YJM')
     @ar2 =@db[:artists].insert(:name=>'AS')
     @al1 =@db[:albums].insert(:name=>'RF', :artist_id=>@ar1)
@@ -1016,7 +1052,7 @@ describe "AssociationPks plugin" do
       tids.each{|tid| @db[:albums_tags].insert([aid, tid])}
     end
   end
-  after do
+  after(:all) do
     @db.drop_table :albums_tags, :tags, :albums, :artists
     [:Artist, :Album, :Tag].each{|s| Object.send(:remove_const, s)}
   end
@@ -1070,9 +1106,9 @@ end
 
 
 describe "List plugin without a scope" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
-    @db.create_table :sites do
+    @db.create_table!(:sites) do
       primary_key :id
       String :name
       Integer :position
@@ -1080,13 +1116,14 @@ describe "List plugin without a scope" do
 
     @c = Class.new(Sequel::Model(@db[:sites]))
     @c.plugin :list
+  end
+  before do
     @c.delete
     @c.create :name => "hig", :position => 3
     @c.create :name => "def", :position => 2
     @c.create :name => "abc", :position => 1
   end
-
-  after do
+  after(:all) do
     @db.drop_table(:sites)
   end
 
@@ -1143,9 +1180,9 @@ describe "List plugin without a scope" do
 end
 
 describe "List plugin with a scope" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
-    @db.create_table :pages do
+    @db.create_table!(:pages) do
       primary_key :id
       String :name
       Integer :pos
@@ -1154,6 +1191,9 @@ describe "List plugin with a scope" do
 
     @c = Class.new(Sequel::Model(@db[:pages]))
     @c.plugin :list, :field => :pos, :scope => :parent_id
+  end
+  before do
+    @c.delete
     p1 = @c.create :name => "Hm", :pos => 1, :parent_id => 0
     p2 = @c.create :name => "Ps", :pos => 1, :parent_id => p1.id
     @c.create :name => "P1", :pos => 1, :parent_id => p2.id
@@ -1161,8 +1201,7 @@ describe "List plugin with a scope" do
     @c.create :name => "P3", :pos => 3, :parent_id => p2.id
     @c.create :name => "Au", :pos => 2, :parent_id => p1.id
   end
-
-  after do
+  after(:all) do
     @db.drop_table(:pages)
   end
 
@@ -1219,12 +1258,12 @@ describe "List plugin with a scope" do
 end
 
 describe "Sequel::Plugins::Tree" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
   end
 
   describe "with natural database order" do
-    before do
+    before(:all) do
       @db.create_table!(:nodes) do
         Integer :id, :primary_key=>true
         String :name
@@ -1250,7 +1289,7 @@ describe "Sequel::Plugins::Tree" do
         plugin :tree
       end
     end
-    after do
+    after(:all) do
       @db.drop_table(:nodes)
       Object.send(:remove_const, :Node)
     end
@@ -1325,12 +1364,12 @@ describe "Sequel::Plugins::Tree" do
     end
 
     describe "Nodes in specified order" do
-      before do
+      before(:all) do
         class ::OrderedNode < Sequel::Model(:nodes)
           plugin :tree, :order => :position
         end
       end
-      after do
+      after(:all) do
         Object.send(:remove_const, :OrderedNode)
       end
 
@@ -1348,7 +1387,7 @@ describe "Sequel::Plugins::Tree" do
   end
 
   describe "Lorems in specified order" do
-    before do
+    before(:all) do
       @db.create_table!(:lorems) do
         Integer :id, :primary_key=>true
         String :name
@@ -1366,7 +1405,7 @@ describe "Sequel::Plugins::Tree" do
         plugin :tree, :key => :ipsum_id, :order => :neque
       end
     end
-    after do
+    after(:all) do
       @db.drop_table(:lorems)
       Object.send(:remove_const, :Lorem)
     end
@@ -1384,7 +1423,7 @@ describe "Sequel::Plugins::Tree" do
 end
 
 describe "Sequel::Plugins::PreparedStatements" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:ps_test) do
       primary_key :id
@@ -1392,11 +1431,14 @@ describe "Sequel::Plugins::PreparedStatements" do
       Integer :i
     end
     @c = Class.new(Sequel::Model(@db[:ps_test]))
-    @foo = @c.create(:name=>'foo', :i=>10)
-    @bar = @c.create(:name=>'bar', :i=>20)
     @c.plugin :prepared_statements_with_pk
   end
-  after do
+  before do
+    @c.delete
+    @foo = @c.create(:name=>'foo', :i=>10)
+    @bar = @c.create(:name=>'bar', :i=>20)
+  end
+  after(:all) do
     @db.drop_table(:ps_test)
   end
 

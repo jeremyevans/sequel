@@ -1,14 +1,16 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Database transactions" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.drop_table(:items) if @db.table_exists?(:items)
     @db.create_table(:items, :engine=>'InnoDB'){String :name; Integer :value}
     @d = @db[:items]
-    clear_sqls
   end
-  after do
+  before do
+    @d.delete
+  end
+  after(:all) do
     @db.drop_table(:items) if @db.table_exists?(:items)
   end
 

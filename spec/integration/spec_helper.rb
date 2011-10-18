@@ -16,11 +16,6 @@ end
 
 Sequel::Model.use_transactions = false
 
-$sqls = []
-def clear_sqls
-  $sqls.clear
-end 
-
 unless defined?(RSpec)
   module Spec::Matchers
     class BeWithin

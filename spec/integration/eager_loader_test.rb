@@ -1,7 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Eagerly loading a tree structure" do
-  before do
+  before(:all) do
     INTEGRATION_DB.instance_variable_set(:@schemas, {})
     INTEGRATION_DB.create_table!(:nodes) do
       primary_key :id
@@ -66,9 +66,8 @@ describe "Eagerly loading a tree structure" do
     Node.insert(:parent_id=>4)
     Node.insert(:parent_id=>5)
     Node.insert(:parent_id=>6)
-    clear_sqls
   end
-  after do
+  after(:all) do
     INTEGRATION_DB.drop_table :nodes
     Object.send(:remove_const, :Node)
   end
@@ -145,7 +144,6 @@ describe "Association Extensions" do
       many_to_one :author
     end
     @author = Author.create
-    clear_sqls
   end
   after do
     INTEGRATION_DB.drop_table :authorships, :authors
@@ -172,7 +170,7 @@ describe "Association Extensions" do
 end
 
 describe "has_many :through has_many and has_one :through belongs_to" do
-  before do
+  before(:all) do
     INTEGRATION_DB.instance_variable_set(:@schemas, {})
     INTEGRATION_DB.create_table!(:firms) do
       primary_key :id
@@ -251,9 +249,8 @@ describe "has_many :through has_many and has_one :through belongs_to" do
     @invoice3 = Invoice.create(:client => @client2)
     @invoice4 = Invoice.create(:client => @client3)
     @invoice5 = Invoice.create(:client => @client3)
-    clear_sqls
   end
-  after do
+  after(:all) do
     INTEGRATION_DB.drop_table :invoices, :clients, :firms
     Object.send(:remove_const, :Firm)
     Object.send(:remove_const, :Client)
@@ -324,7 +321,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
 end
 
 describe "Polymorphic Associations" do
-  before do
+  before(:all) do
     INTEGRATION_DB.instance_variable_set(:@schemas, {})
     INTEGRATION_DB.create_table!(:assets) do
       primary_key :id
@@ -413,6 +410,9 @@ describe "Polymorphic Associations" do
           .update(:attachable_id=>nil, :attachable_type=>nil)
       end
     end
+  end
+  before do
+    [:assets, :posts, :notes].each{|t| INTEGRATION_DB[t].delete}
     @post = Post.create
     Note.create
     @note = Note.create
@@ -420,9 +420,8 @@ describe "Polymorphic Associations" do
     @asset2 = Asset.create(:attachable=>@note)
     @asset1.associations.clear
     @asset2.associations.clear
-    clear_sqls
   end
-  after do
+  after(:all) do
     INTEGRATION_DB.drop_table :assets, :posts, :notes
     Object.send(:remove_const, :Asset)
     Object.send(:remove_const, :Post)
@@ -483,7 +482,7 @@ describe "Polymorphic Associations" do
 end
 
 describe "many_to_one/one_to_many not referencing primary key" do
-  before do
+  before(:all) do
     INTEGRATION_DB.instance_variable_set(:@schemas, {})
     INTEGRATION_DB.create_table!(:clients) do
       primary_key :id
@@ -540,14 +539,16 @@ describe "many_to_one/one_to_many not referencing primary key" do
         self.client_name = (client.name if client)
       end
     end
-
+  end
+  before do
+    Client.delete
+    Invoice.delete
     @client1 = Client.create(:name=>'X')
     @client2 = Client.create(:name=>'Y')
     @invoice1 = Invoice.create(:client_name=>'X')
     @invoice2 = Invoice.create(:client_name=>'X')
-    clear_sqls
   end
-  after do
+  after(:all) do
     INTEGRATION_DB.drop_table :invoices, :clients
     Object.send(:remove_const, :Client)
     Object.send(:remove_const, :Invoice)
@@ -618,7 +619,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
 end
 
 describe "statistics associations" do
-  before do
+  before(:all) do
     INTEGRATION_DB.create_table!(:projects) do
       primary_key :id
       String :name
@@ -658,9 +659,8 @@ describe "statistics associations" do
     @ticket2 = Ticket.create(:project=>@project1, :hours=>10)
     @ticket3 = Ticket.create(:project=>@project2, :hours=>2)
     @ticket4 = Ticket.create(:project=>@project2, :hours=>20)
-    clear_sqls
   end
-  after do
+  after(:all) do
     INTEGRATION_DB.drop_table :tickets, :projects
     Object.send(:remove_const, :Project)
     Object.send(:remove_const, :Ticket)
@@ -679,7 +679,7 @@ describe "statistics associations" do
 end
 
 describe "one to one associations" do
-  before do
+  before(:all) do
     INTEGRATION_DB.create_table!(:books) do
       primary_key :id
     end
@@ -703,10 +703,8 @@ describe "one to one associations" do
     @page2 = Page.create(:book=>@book1, :page_number=>2)
     @page3 = Page.create(:book=>@book2, :page_number=>1)
     @page4 = Page.create(:book=>@book2, :page_number=>2)
-    clear_sqls
   end
-
-  after do
+  after(:all) do
     INTEGRATION_DB.drop_table :pages, :books
     Object.send(:remove_const, :Book)
     Object.send(:remove_const, :Page)

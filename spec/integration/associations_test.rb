@@ -421,7 +421,7 @@ shared_examples_for "regular and composite key associations" do
 end
 
 describe "Sequel::Model Simple Associations" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     [:albums_tags, :tags, :albums, :artists].each{|t| @db.drop_table(t) rescue nil}
     @db.create_table(:artists) do
@@ -441,6 +441,9 @@ describe "Sequel::Model Simple Associations" do
       foreign_key :album_id, :albums
       foreign_key :tag_id, :tags
     end
+  end
+  before do
+    [:albums_tags, :tags, :albums, :artists].each{|t| @db[t].delete}
     class ::Artist < Sequel::Model(@db)
       one_to_many :albums
       one_to_one :first_album, :class=>:Album, :order=>:name
@@ -475,8 +478,10 @@ describe "Sequel::Model Simple Associations" do
     @ins = lambda{@db[:albums_tags].insert(:tag_id=>@tag.id)}
   end
   after do
-    @db.drop_table(:albums_tags, :tags, :albums, :artists)
     [:Tag, :Album, :Artist].each{|x| Object.send(:remove_const, x)}
+  end
+  after(:all) do
+    @db.drop_table(:albums_tags, :tags, :albums, :artists)
   end
   
   it_should_behave_like "regular and composite key associations"
@@ -594,7 +599,7 @@ describe "Sequel::Model Simple Associations" do
 end
 
 describe "Sequel::Model Composite Key Associations" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     [:albums_tags, :tags, :albums, :artists].each{|t| @db.drop_table(t) rescue nil}
     @db.create_table(:artists) do
@@ -626,6 +631,9 @@ describe "Sequel::Model Composite Key Associations" do
       foreign_key [:album_id1, :album_id2], :albums
       foreign_key [:tag_id1, :tag_id2], :tags
     end
+  end
+  before do
+    [:albums_tags, :tags, :albums, :artists].each{|t| @db[t].delete}
     class ::Artist < Sequel::Model(@db)
       set_primary_key :id1, :id2
       unrestrict_primary_key
@@ -666,8 +674,10 @@ describe "Sequel::Model Composite Key Associations" do
     @ins = lambda{@db[:albums_tags].insert(:tag_id1=>@tag.id1, :tag_id2=>@tag.id2)}
   end
   after do
-    @db.drop_table(:albums_tags, :tags, :albums, :artists)
     [:Tag, :Album, :Artist].each{|x| Object.send(:remove_const, x)}
+  end
+  after(:all) do
+    @db.drop_table(:albums_tags, :tags, :albums, :artists)
   end
 
   it_should_behave_like "regular and composite key associations"

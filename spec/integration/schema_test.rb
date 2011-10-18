@@ -7,7 +7,6 @@ describe "Database schema parser" do
     @iim = INTEGRATION_DB.identifier_input_method
     @defsch = INTEGRATION_DB.default_schema
     @qi = INTEGRATION_DB.quote_identifiers?
-    clear_sqls
   end
   after do
     INTEGRATION_DB.identifier_output_method = @iom
@@ -34,9 +33,7 @@ describe "Database schema parser" do
   specify "should not issue an sql query if the schema has been loaded unless :reload is true" do
     INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items, :reload=>true)
-    clear_sqls
     INTEGRATION_DB.schema(:items)
-    clear_sqls
     INTEGRATION_DB.schema(:items, :reload=>true)
   end
 
@@ -63,7 +60,6 @@ describe "Database schema parser" do
     col_info = col.last
     col_info.should be_a_kind_of(Hash)
     col_info[:type].should == :integer
-    clear_sqls
     INTEGRATION_DB.schema(:items)
   end
 
@@ -163,7 +159,6 @@ describe "Database schema modifiers" do
   before do
     @db = INTEGRATION_DB
     @ds = @db[:items]
-    clear_sqls
   end
   after do
     @db.drop_table(:items) if @db.table_exists?(:items)
@@ -435,7 +430,6 @@ describe "Database#tables" do
     @db.create_view :sequel_test_view, @db[:sequel_test_table]
     @iom = @db.identifier_output_method
     @iim = @db.identifier_input_method
-    clear_sqls
   end
   after do
     @db.identifier_output_method = @iom
@@ -477,7 +471,6 @@ describe "Database#views" do
     @db.create_view :sequel_test_view, @db[:sequel_test_table]
     @iom = @db.identifier_output_method
     @iim = @db.identifier_input_method
-    clear_sqls
   end
   after do
     @db.identifier_output_method = @iom

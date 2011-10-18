@@ -9,7 +9,6 @@ describe "Simple Dataset operations" do
     end
     @ds = @db[:items]
     @ds.insert(:number=>10)
-    clear_sqls
   end
   after do
     @db.drop_table(:items)
@@ -169,7 +168,6 @@ describe Sequel::Dataset do
       Integer :value
     end
     @d = INTEGRATION_DB[:test]
-    clear_sqls
   end
   after do
     INTEGRATION_DB.drop_table(:test)
@@ -334,7 +332,6 @@ describe "Simple Dataset operations in transactions" do
       integer :number
     end
     @ds = INTEGRATION_DB[:items]
-    clear_sqls
   end
   after do
     INTEGRATION_DB.drop_table(:items)
@@ -371,7 +368,6 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
     @ds2 = INTEGRATION_DB[:i2]
     @ds2.insert(:number=>10)
     @ds2.insert(:number=>30)
-    clear_sqls
   end
   
   specify "should give the correct results for simple UNION, EXCEPT, and INTERSECT" do
@@ -437,7 +433,7 @@ end
 
 if INTEGRATION_DB.dataset.supports_cte?
   describe "Common Table Expressions" do
-    before do
+    before(:all) do
       @db = INTEGRATION_DB
       @db.create_table!(:i1){Integer :id; Integer :parent_id}
       @ds = @db[:i1]
@@ -448,7 +444,7 @@ if INTEGRATION_DB.dataset.supports_cte?
       @ds.insert(:id=>5, :parent_id=>3)
       @ds.insert(:id=>6, :parent_id=>5)
     end
-    after do
+    after(:all) do
       @db.drop_table(:i1)
     end
     
@@ -578,7 +574,7 @@ end
 
 if INTEGRATION_DB.dataset.supports_window_functions?
   describe "Window Functions" do
-    before do
+    before(:all) do
       @db = INTEGRATION_DB
       @db.create_table!(:i1){Integer :id; Integer :group_id; Integer :amount}
       @ds = @db[:i1].order(:id)
@@ -589,7 +585,7 @@ if INTEGRATION_DB.dataset.supports_window_functions?
       @ds.insert(:id=>5, :group_id=>2, :amount=>10000)
       @ds.insert(:id=>6, :group_id=>2, :amount=>100000)
     end
-    after do
+    after(:all) do
       @db.drop_table(:i1)
     end
     
@@ -670,15 +666,16 @@ describe Sequel::SQL::Constants do
 end
 
 describe "Sequel::Dataset#import and #multi_insert" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:imp){Integer :i}
-    @db.create_table!(:exp2){Integer :i}
     @ids = @db[:imp].order(:i)
-    @eds = @db[:exp2]
   end
-  after do
-    @db.drop_table(:imp, :exp2)
+  before do
+    @ids.delete
+  end
+  after(:all) do
+    @db.drop_table(:imp)
   end
 
   it "should import with multi_insert and an array of hashes" do
@@ -692,9 +689,11 @@ describe "Sequel::Dataset#import and #multi_insert" do
   end
 
   it "should import with a dataset" do
-    @eds.import([:i], [[10], [20]])
-    @ids.import([:i], @eds)
+    @db.create_table!(:exp2){Integer :i}
+    @db[:exp2].import([:i], [[10], [20]])
+    @ids.import([:i], @db[:exp2])
     @ids.all.should == [{:i=>10}, {:i=>20}]
+    @db.drop_table(:exp2)
   end
   
   it "should have import work with the :slice_size option" do
@@ -710,12 +709,15 @@ describe "Sequel::Dataset#import and #multi_insert" do
 end
 
 describe "Sequel::Dataset convenience methods" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:a){Integer :a; Integer :b}
     @ds = @db[:a].order(:a)
   end
-  after do
+  before do
+    @ds.delete
+  end
+  after(:all) do
     @db.drop_table(:a)
   end
   
@@ -769,12 +771,15 @@ describe "Sequel::Dataset convenience methods" do
 end
   
 describe "Sequel::Dataset main SQL methods" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:a){Integer :a; Integer :b}
     @ds = @db[:a].order(:a)
   end
-  after do
+  before do
+    @ds.delete
+  end
+  after(:all) do
     @db.drop_table(:a)
   end
   
@@ -837,14 +842,17 @@ describe "Sequel::Dataset main SQL methods" do
 end
 
 describe "Sequel::Dataset convenience methods" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:a){Integer :a; Integer :b; Integer :c; Integer :d}
     @ds = @db[:a].order(:a)
+  end
+  before do
+    @ds.delete
     @ds.insert(1, 2, 3, 4)
     @ds.insert(5, 6, 7, 8)
   end
-  after do
+  after(:all) do
     @db.drop_table(:a)
   end
   
@@ -910,12 +918,15 @@ describe "Sequel::Dataset convenience methods" do
 end
 
 describe "Sequel::Dataset DSL support" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:a){Integer :a; Integer :b}
     @ds = @db[:a].order(:a)
   end
-  after do
+  before do
+    @ds.delete
+  end
+  after(:all) do
     @db.drop_table(:a)
   end
   
@@ -1130,12 +1141,15 @@ describe "SQL Extract Function" do
 end
 
 describe "Dataset string methods" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:a){String :a; String :b}
     @ds = @db[:a].order(:a)
   end
-  after do
+  before do
+    @ds.delete
+  end
+  after(:all) do
     @db.drop_table(:a)
   end
   
@@ -1190,7 +1204,7 @@ describe "Dataset string methods" do
 end
 
 describe "Dataset identifier methods" do
-  before do
+  before(:all) do
     class ::String
       def uprev
         upcase.reverse
@@ -1198,10 +1212,12 @@ describe "Dataset identifier methods" do
     end
     @db = INTEGRATION_DB
     @db.create_table!(:a){Integer :ab}
-    @ds = @db[:a].order(:ab)
-    @ds.insert(1)
+    @db[:a].insert(1)
   end
-  after do
+  before do
+    @ds = @db[:a].order(:ab)
+  end
+  after(:all) do
     @db.drop_table(:a)
   end
   
@@ -1219,12 +1235,15 @@ describe "Dataset identifier methods" do
 end
 
 describe "Dataset defaults and overrides" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:a){Integer :a}
     @ds = @db[:a].order(:a)
   end
-  after do
+  before do
+    @ds.delete
+  end
+  after(:all) do
     @db.drop_table(:a)
   end
   
