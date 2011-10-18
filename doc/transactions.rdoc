@@ -46,6 +46,33 @@ If you always want to rollback (useful for testing), use the <tt>:rollback => :a
     DB[:foo].insert(1) # INSERT
   end # ROLLBACK
 
+If you want to check whether you are currently in a transaction, use the Database#in_transaction? method:
+
+  DB.in_transaction? # false
+  DB.transaction do
+    DB.in_transaction? # true
+  end
+
+== Transaction Hooks
+
+You can add hooks to an in progress transaction that are called after the transaction commits or rolls back:
+
+  x = nil
+  DB.transaction do
+    DB.after_commit{x = 1}
+    DB.after_rollback{x = 2}
+    x # nil
+  end
+  x # 1
+  
+  x = nil
+  DB.transaction do
+    DB.after_commit{x = 1}
+    DB.after_rollback{x = 2}
+    raise Sequel::Rollback
+  end
+  x # 2
+
 == Nested Transaction Calls / Savepoints
 
 You can nest calls to transaction, which by default just reuses the existing transaction:
