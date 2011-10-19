@@ -21,6 +21,11 @@
 # Then, before data is stored in the database, it is converted to New
 # York time.  When data is retrieved from the database, it is
 # converted to Los Angeles time.
+#
+# Note that typecasting from the database timezone to the application
+# timezone when fetching rows is dependent on the database adapter,
+# and only works on adapters where Sequel itself does the conversion.
+# It should work on mysql, postgres, sqlite, ibmdb, and jdbc.
 
 require 'tzinfo'
 
