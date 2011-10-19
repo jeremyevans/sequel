@@ -55,7 +55,7 @@ end
 
 desc "Make local version of website"
 task :website do
-  sh %{#{RUBY} www/make_www.rb}
+  sh %{#{FileUtils::RUBY} www/make_www.rb}
 end
 
 desc "Make rdoc for website"
@@ -161,5 +161,5 @@ end
 
 desc "Check syntax of all .rb files"
 task :check_syntax do
-  Dir['**/*.rb'].each{|file| print `#{RUBY} -c #{file} | fgrep -v "Syntax OK"`}
+  Dir['**/*.rb'].each{|file| print `#{FileUtils::RUBY} -c #{file} | fgrep -v "Syntax OK"`}
 end
