@@ -652,7 +652,7 @@ describe "Composition plugin" do
 end
 
 # DB2's implemention of CTE is too limited to use this plugin
-if INTEGRATION_DB.dataset.supports_cte? and Sequel.guarded?(:db2)
+if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
   describe "RcteTree Plugin" do
     before(:all) do
       @db = INTEGRATION_DB
