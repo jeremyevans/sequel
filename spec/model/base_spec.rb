@@ -85,8 +85,7 @@ end
 
 describe Sequel::Model, ".def_dataset_method" do
   before do
-    @c = Class.new(Sequel::Model(:items)) do
-    end
+    @c = Class.new(Sequel::Model(:items))
   end
   
   it "should add a method to the dataset and model if called with a block argument" do
@@ -95,6 +94,27 @@ describe Sequel::Model, ".def_dataset_method" do
     end
     @c.return_3.should == 3
     @c.dataset.return_3.should == 3
+  end
+
+  it "should not add a model method if the model already responds to the method" do
+    @c.instance_eval do
+      def foo
+        1
+      end
+
+      private
+
+      def bar
+        2
+      end
+
+      def_dataset_method(:foo){3}
+      def_dataset_method(:bar){4}
+    end
+    @c.foo.should == 1
+    @c.dataset.foo.should == 3
+    @c.send(:bar).should == 2
+    @c.dataset.bar.should == 4
   end
 
   it "should add all passed methods to the model if called without a block argument" do

@@ -237,7 +237,7 @@ module Sequel
           @dataset_methods[meth] = block
           dataset.meta_def(meth, &block) if @dataset
         end
-        args.each{|arg| instance_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__) unless respond_to?(arg)}
+        args.each{|arg| instance_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__) unless respond_to?(arg, true)}
       end
       
       # Finds a single record according to the supplied filter.

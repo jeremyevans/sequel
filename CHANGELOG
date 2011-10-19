@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't allow Model.def_dataset_method to override private model methods (jeremyevans)
+
 * Parsing primary key information from system tables in the shared MSSQL adapter (jeremyevans)
 
 * Fix handling of composite primary keys when emulating alter table operations on SQLite (jeremyevans)
