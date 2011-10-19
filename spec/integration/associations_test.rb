@@ -306,6 +306,49 @@ shared_examples_for "regular and composite key associations" do
     Tag.exclude(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@tag, tag]
   end
 
+  specify "should have working dataset associations" do
+    album, artist, tag = @pr.call
+
+    Tag.albums.all.should == []
+    Album.artists.all.should == []
+    Album.tags.all.should == []
+    Artist.albums.all.should == []
+    Artist.tags.all.should == []
+    Artist.albums.tags.all.should == []
+
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+
+    Tag.albums.all.should == [@album]
+    Album.artists.all.should == [@artist]
+    Album.tags.all.should == [@tag]
+    Artist.albums.all.should == [@album]
+    Artist.tags.all.should == [@tag]
+    Artist.albums.tags.all.should == [@tag]
+
+    album.add_tag(tag)
+    album.update(:artist => artist)
+
+    Tag.albums.order(:name).all.should == [@album, album]
+    Album.artists.order(:name).all.should == [@artist, artist]
+    Album.tags.order(:name).all.should == [@tag, tag]
+    Artist.albums.order(:name).all.should == [@album, album]
+    Artist.tags.order(:name).all.should == [@tag, tag]
+    Artist.albums.tags.order(:name).all.should == [@tag, tag]
+
+    Tag.filter(Tag.qualified_primary_key_hash(tag.pk)).albums.all.should == [album]
+    Album.filter(Album.qualified_primary_key_hash(album.pk)).artists.all.should == [artist]
+    Album.filter(Album.qualified_primary_key_hash(album.pk)).tags.all.should == [tag]
+    Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).albums.all.should == [album]
+    Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).tags.all.should == [tag]
+    Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).albums.tags.all.should == [tag]
+
+    Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).albums.filter(Album.qualified_primary_key_hash(album.pk)).tags.all.should == [tag]
+    Artist.filter(Artist.qualified_primary_key_hash(@artist.pk)).albums.filter(Album.qualified_primary_key_hash(@album.pk)).tags.all.should == [@tag]
+    Artist.filter(Artist.qualified_primary_key_hash(@artist.pk)).albums.filter(Album.qualified_primary_key_hash(album.pk)).tags.all.should == []
+    Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).albums.filter(Album.qualified_primary_key_hash(@album.pk)).tags.all.should == []
+  end
+
   specify "should have remove methods work" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
@@ -445,6 +488,7 @@ describe "Sequel::Model Simple Associations" do
   before do
     [:albums_tags, :tags, :albums, :artists].each{|t| @db[t].delete}
     class ::Artist < Sequel::Model(@db)
+      plugin :dataset_associations
       one_to_many :albums, :order=>:name
       one_to_one :first_album, :class=>:Album, :order=>:name
       one_to_one :last_album, :class=>:Album, :order=>:name.desc
@@ -458,6 +502,7 @@ describe "Sequel::Model Simple Associations" do
       many_through_many :last_two_tags, :clone=>:tags, :order=>:tags__name.desc, :limit=>2
     end
     class ::Album < Sequel::Model(@db)
+      plugin :dataset_associations
       many_to_one :artist
       many_to_many :tags, :right_key=>:tag_id
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
@@ -465,6 +510,7 @@ describe "Sequel::Model Simple Associations" do
       many_to_many :last_two_tags, :clone=>:tags, :order=>:name.desc, :limit=>2
     end
     class ::Tag < Sequel::Model(@db)
+      plugin :dataset_associations
       many_to_many :albums
     end
     @album = Album.create(:name=>'Al')
@@ -635,6 +681,7 @@ describe "Sequel::Model Composite Key Associations" do
   before do
     [:albums_tags, :tags, :albums, :artists].each{|t| @db[t].delete}
     class ::Artist < Sequel::Model(@db)
+      plugin :dataset_associations
       set_primary_key :id1, :id2
       unrestrict_primary_key
       one_to_many :albums, :key=>[:artist_id1, :artist_id2], :order=>:name
@@ -650,6 +697,7 @@ describe "Sequel::Model Composite Key Associations" do
       many_through_many :last_two_tags, :clone=>:tags, :order=>:tags__name.desc, :limit=>2
     end
     class ::Album < Sequel::Model(@db)
+      plugin :dataset_associations
       set_primary_key :id1, :id2
       unrestrict_primary_key
       many_to_one :artist, :key=>[:artist_id1, :artist_id2]
@@ -659,6 +707,7 @@ describe "Sequel::Model Composite Key Associations" do
       many_to_many :last_two_tags, :clone=>:tags, :order=>:name.desc, :limit=>2
     end
     class ::Tag < Sequel::Model(@db)
+      plugin :dataset_associations
       set_primary_key :id1, :id2
       unrestrict_primary_key
       many_to_many :albums, :right_key=>[:album_id1, :album_id2], :left_key=>[:tag_id1, :tag_id2]
