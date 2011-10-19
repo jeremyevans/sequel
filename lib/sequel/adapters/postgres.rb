@@ -437,7 +437,7 @@ module Sequel
         procs[1184] = method(:to_application_timestamp)
         conn.execute("SELECT oid, typname FROM pg_type where typtype = 'b'") do |res|
           res.ntuples.times do |recnum|
-            if pr = PG_NAMED_TYPES[res.getvalue(recnum, 1).to_sym]
+            if pr = PG_NAMED_TYPES[res.getvalue(recnum, 1).untaint.to_sym]
               procs[res.getvalue(recnum, 0).to_i] ||= pr
             end
           end
