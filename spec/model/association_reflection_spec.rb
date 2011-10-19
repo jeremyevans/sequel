@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe Sequel::Model::Associations::AssociationReflection, "#associated_class" do
   before do
-    @c = Class.new(Sequel::Model)
+    @c = Class.new(Sequel::Model(:foo))
     class ::ParParent < Sequel::Model; end
   end
 
@@ -20,7 +20,7 @@ end
 
 describe Sequel::Model::Associations::AssociationReflection, "#primary_key" do
   before do
-    @c = Class.new(Sequel::Model)
+    @c = Class.new(Sequel::Model(:foo))
     class ::ParParent < Sequel::Model; end
   end
 
@@ -49,8 +49,8 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
   end
 
   it "should use the :reciprocal value if present" do
-    @c = Class.new(Sequel::Model)
-    @d = Class.new(Sequel::Model)
+    @c = Class.new(Sequel::Model(:foo))
+    @d = Class.new(Sequel::Model(:foo))
     @c.many_to_one :c, :class=>@d, :reciprocal=>:xx
     @c.association_reflection(:c).keys.should include(:reciprocal)
     @c.association_reflection(:c).reciprocal.should == :xx
@@ -111,7 +111,7 @@ end
 
 describe Sequel::Model::Associations::AssociationReflection, "#select" do
   before do
-    @c = Class.new(Sequel::Model)
+    @c = Class.new(Sequel::Model(:foo))
     class ::ParParent < Sequel::Model; end
   end
 
@@ -143,7 +143,7 @@ end
 
 describe Sequel::Model::Associations::AssociationReflection, "#associated_object_keys" do
   before do
-    @c = Class.new(Sequel::Model)
+    @c = Class.new(Sequel::Model(:foo))
     class ::ParParent < Sequel::Model; end
   end
 
@@ -175,7 +175,7 @@ end
 
 describe Sequel::Model::Associations::AssociationReflection, "#remove_before_destroy?" do
   before do
-    @c = Class.new(Sequel::Model)
+    @c = Class.new(Sequel::Model(:foo))
   end
 
   it "should be true for many_to_one and many_to_many associations" do

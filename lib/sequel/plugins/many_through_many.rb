@@ -63,11 +63,7 @@ module Sequel
           self[:eager_loading_predicate_key] ||= begin
             calculate_edges
             e = self[:edges].first
-            if self[:uses_left_composite_keys]
-              e[:right].map{|k| SQL::QualifiedIdentifier.new(e[:table], k)}
-            else
-              SQL::QualifiedIdentifier.new(e[:table], e[:right])
-            end
+            qualify(e[:table], e[:right])
           end
         end
     
@@ -200,9 +196,8 @@ module Sequel
             ds = opts.associated_class 
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
             ft = opts[:final_reverse_edge]
-            conds = uses_lcks ? [[left_keys.map{|k| SQL::QualifiedIdentifier.new(ft[:table], k)}, h.keys]] : [[left_key, h.keys]]
-            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + conds, :table_alias=>ft[:alias])
-            ds = model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo)
+            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.qualify(ft[:alias], left_key), h.keys]], :table_alias=>ft[:alias])
+            ds = model.eager_loading_dataset(opts, ds, nil, eo[:associations], eo)
             case opts.eager_limit_strategy
             when :window_function
               delete_rn = true
@@ -262,7 +257,7 @@ module Sequel
           edges = ref.edges
           first, rest = edges.first, edges[1..-1]
           last = edges.last
-          ds = model.db[first[:table]].select(*Array(first[:right]).map{|x| ::Sequel::SQL::QualifiedIdentifier.new(first[:table], x)})
+          ds = model.db[first[:table]].select(*Array(ref.qualify(first[:table], first[:right])))
           rest.each{|e| ds = ds.join(e[:table], e.fetch(:only_conditions, (Array(e[:right]).zip(Array(e[:left])) + e[:conditions])), :table_alias=>ds.unused_table_alias(e[:table]), &e[:block])}
           last_alias = if rest.empty?
             first[:table]
@@ -270,7 +265,7 @@ module Sequel
             last_join = ds.opts[:join].last
             last_join.table_alias || last_join.table
           end
-          exp = association_filter_key_expression(Array(ref[:final_edge][:left]).map{|x| ::Sequel::SQL::QualifiedIdentifier.new(last_alias, x)}, ref.right_primary_keys, obj)
+          exp = association_filter_key_expression(ref.qualify(last_alias, Array(ref[:final_edge][:left])), ref.right_primary_keys, obj)
           if exp == SQL::Constants::FALSE
             association_filter_handle_inversion(op, exp, Array(lpks))
           else

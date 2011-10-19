@@ -127,6 +127,22 @@ module Sequel
         def need_associated_primary_key?
           false
         end
+
+        # Qualify +col+ with the given table name.  If +col+ is an array of columns,
+        # return an array of qualified columns.
+        def qualify(table, col)
+          transform(col){|k| SQL::QualifiedIdentifier.new(table, k)}
+        end
+
+        # Qualify col with the associated model's table name.
+        def qualify_assoc(col)
+          qualify(associated_class.table_name, col)
+        end
+        
+        # Qualify col with the current model's table name.
+        def qualify_cur(col)
+          qualify(self[:model].table_name, col)
+        end
         
         # Returns the reciprocal association variable, if one exists. The reciprocal
         # association is the association in the associated class that is the opposite
@@ -195,6 +211,14 @@ module Sequel
         def setter_method
           :"#{self[:name]}="
         end
+        
+        private
+
+        # If +s+ is an array, map +s+ over the block.  Otherwise, just call the
+        # block with +s+.
+        def transform(s)
+          s.is_a?(Array) ? s.map(&Proc.new) : (yield s)
+        end
       end
     
       class ManyToOneAssociationReflection < AssociationReflection
@@ -243,6 +267,11 @@ module Sequel
          self[:primary_keys] ||= Array(primary_key)
         end
         alias associated_object_keys primary_keys
+
+        # #primary_key qualified by the associated table
+        def qualified_primary_key
+          self[:qualified_primary_key] ||= self[:qualify] == false ? primary_key : qualify_assoc(primary_key)
+        end
         
         # True only if the reciprocal is a one_to_many association.
         def reciprocal_array?
@@ -297,12 +326,18 @@ module Sequel
 
         # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
         def eager_loading_predicate_key
-          self[:eager_loading_predicate_key] ||= self[:uses_composite_keys] ? self[:keys].map{|k| SQL::QualifiedIdentifier.new(associated_class.table_name, k)} : SQL::QualifiedIdentifier.new(associated_class.table_name, self[:key])
+          self[:eager_loading_predicate_key] ||= qualify_assoc(self[:key])
         end
+        alias qualified_key eager_loading_predicate_key
     
         # The column in the current table that the key in the associated table references.
         def primary_key
-         self[:primary_key] ||= self[:model].primary_key
+         self[:primary_key]
+        end
+
+        # #primary_key qualified by the current table
+        def qualified_primary_key
+          self[:qualified_primary_key] ||= qualify_cur(primary_key)
         end
       
         # Whether the reciprocal of this association returns an array of objects instead of a single object,
@@ -429,8 +464,9 @@ module Sequel
     
         # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
         def eager_loading_predicate_key
-          self[:eager_loading_predicate_key] ||= self[:uses_left_composite_keys] ? self[:left_keys].map{|k| SQL::QualifiedIdentifier.new(self[:join_table], k)} : SQL::QualifiedIdentifier.new(self[:join_table], self[:left_key])
+          self[:eager_loading_predicate_key] ||= qualify(self[:join_table], self[:left_key])
         end
+        alias qualified_left_key eager_loading_predicate_key
     
         # many_to_many associations need to select a key in an associated table to eagerly load
         def eager_loading_use_associated_key?
@@ -457,6 +493,11 @@ module Sequel
             end
           end
           self[:reciprocal] = nil
+        end
+
+        # #right_primary_key qualified by the associated table
+        def qualified_right_primary_key
+          self[:qualified_right_primary_key] ||= qualify_assoc(right_primary_key)
         end
     
         # The primary key column(s) to use in the associated table (can be symbol or array).
@@ -548,6 +589,22 @@ module Sequel
           association_reflections.values
         end
         
+        # Given an association reflection and a dataset, apply the
+        # :select, :conditions, :order, :eager, :distinct, and :eager_block
+        # association options to the given dataset and return the dataset
+        # or a modified copy of it.
+        def apply_association_dataset_opts(opts, ds)
+          ds = ds.select(*opts.select) if opts.select
+          if c = opts[:conditions]
+            ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+          end
+          ds = ds.order(*opts[:order]) if opts[:order]
+          ds = ds.eager(opts[:eager]) if opts[:eager]
+          ds = ds.distinct if opts[:distinct]
+          ds = opts[:eager_block].call(ds) if opts[:eager_block]
+          ds
+        end
+
         # Associates a related model with the current model. The following types are
         # supported:
         #
@@ -767,19 +824,13 @@ module Sequel
 
         # Modify and return eager loading dataset based on association options.
         def eager_loading_dataset(opts, ds, select, associations, eager_options={})
+          ds = apply_association_dataset_opts(opts, ds)
           ds = ds.select(*select) if select
-          if c = opts[:conditions]
-            ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
-          end
-          ds = ds.order(*opts[:order]) if opts[:order]
-          ds = ds.eager(opts[:eager]) if opts[:eager]
-          ds = ds.distinct if opts[:distinct]
           if opts[:eager_graph]
             raise(Error, "cannot eagerly load a #{opts[:type]} association that uses :eager_graph") if opts.eager_loading_use_associated_key?
             ds = ds.eager_graph(opts[:eager_graph])
           end
           ds = ds.eager(associations) unless Array(associations).empty?
-          ds = opts[:eager_block].call(ds) if opts[:eager_block]
           ds = eager_options[:eager_block].call(ds) if eager_options[:eager_block]
           if opts.eager_loading_use_associated_key?
             ds = if opts[:uses_left_composite_keys]
@@ -957,6 +1008,7 @@ module Sequel
           uses_rcks = opts[:uses_right_composite_keys] = rcks.length > 1
           opts[:cartesian_product_number] ||= 1
           join_table = (opts[:join_table] ||= opts.default_join_table)
+          opts[:qualified_right_key] = opts.qualify(opts[:join_table], right)
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
           graph_jt_conds = opts[:graph_join_table_conditions] = opts.fetch(:graph_join_table_conditions, []).to_a
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
@@ -967,9 +1019,9 @@ module Sequel
             h = eo[:key_hash][left_pk]
             rows = eo[:rows]
             rows.each{|object| object.associations[name] = []}
-            r = uses_rcks ? rcks.zip(opts.right_primary_keys) : [[right, opts.right_primary_key]]
-            l = uses_lcks ? [[lcks.map{|k| SQL::QualifiedIdentifier.new(join_table, k)}, h.keys]] : [[left, h.keys]]
-            ds = model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), Array(opts.select), eo[:associations], eo)
+            r = rcks.zip(opts.right_primary_keys)
+            l = [[opts.qualify(join_table, left), h.keys]]
+            ds = model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), nil, eo[:associations], eo)
             case opts.eager_limit_strategy
             when :window_function
               delete_rn = true
@@ -1041,6 +1093,7 @@ module Sequel
           opts[:key] = opts.default_key unless opts.include?(:key)
           key = opts[:key]
           cks = opts[:keys] = Array(opts[:key])
+          opts[:qualified_key] = opts.qualify_cur(key)
           if opts[:primary_key]
             cpks = Array(opts[:primary_key])
             raise(Error, "mismatched number of composite keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
@@ -1050,7 +1103,7 @@ module Sequel
           opts[:cartesian_product_number] ||= 0
           opts[:dataset] ||= proc do
             klass = opts.associated_class
-            klass.filter(opts.primary_keys.map{|k| qualify ? SQL::QualifiedIdentifier.new(klass.table_name, k) : k}.zip(cks.map{|k| send(k)}))
+            klass.filter(Array(opts.qualified_primary_key).zip(cks.map{|k| send(k)}))
           end
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:key_hash][key]
@@ -1061,7 +1114,7 @@ module Sequel
             # Skip eager loading if no objects have a foreign key for this association
             unless keys.empty?
               klass = opts.associated_class
-              model.eager_loading_dataset(opts, klass.filter(uses_cks ? {opts.primary_keys.map{|k| qualify ? SQL::QualifiedIdentifier.new(klass.table_name, k) :k}=>keys} : {(qualify ? SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key) : opts.primary_key)=>keys}), opts.select, eo[:associations], eo).all do |assoc_record|
+              model.eager_loading_dataset(opts, klass.filter(opts.qualified_primary_key=>keys), nil, eo[:associations], eo).all do |assoc_record|
                 hash_key = uses_cks ? opts.primary_keys.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key)
                 next unless objects = h[hash_key]
                 objects.each{|object| object.associations[name] = assoc_record}
@@ -1100,8 +1153,7 @@ module Sequel
           raise(Error, "mismatched number of composite keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
           opts[:dataset] ||= proc do
-            klass = opts.associated_class
-            klass.filter(cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}.zip(cpks.map{|k| send(k)}))
+            opts.associated_class.filter(Array(opts.qualified_key).zip(cpks.map{|k| send(k)}))
           end
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:key_hash][primary_key]
@@ -1114,7 +1166,7 @@ module Sequel
             reciprocal = opts.reciprocal
             klass = opts.associated_class
             filter_keys = opts.eager_loading_predicate_key
-            ds = model.eager_loading_dataset(opts, klass.filter(filter_keys=>h.keys), opts.select, eo[:associations], eo)
+            ds = model.eager_loading_dataset(opts, klass.filter(filter_keys=>h.keys), nil, eo[:associations], eo)
             case opts.eager_limit_strategy
             when :distinct_on
               ds = ds.distinct(*filter_keys).order_prepend(*filter_keys)
