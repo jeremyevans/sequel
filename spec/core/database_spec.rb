@@ -442,19 +442,19 @@ describe "Database#synchronize" do
   end
   
   specify "should wrap the supplied block in pool.hold" do
-    stop = false
+    q, q1, q2, q3 = Queue.new, Queue.new, Queue.new, Queue.new
     c1, c2 = nil
-    t1 = Thread.new {@db.synchronize {|c| c1 = c; while !stop;sleep 0.1;end}}
-    while !c1;end
+    t1 = Thread.new{@db.synchronize{|c| c1 = c; q.push nil; q1.pop}; q.push nil}
+    q.pop
     c1.should == 12345
-    t2 = Thread.new {@db.synchronize {|c| c2 = c}}
-    sleep 0.2
+    t2 = Thread.new{@db.synchronize{|c| c2 = c; q2.push nil}}
     @db.pool.available_connections.should be_empty
     c2.should be_nil
-    stop = true
-    t1.join
-    sleep 0.1
+    q1.push nil
+    q.pop
+    q2.pop
     c2.should == 12345
+    t1.join
     t2.join
   end
 end
@@ -606,18 +606,21 @@ describe "Database#transaction" do
   end
   
   specify "should be re-entrant" do
-    stop = false
+    q, q1 = Queue.new, Queue.new
     cc = nil
     t = Thread.new do
       @db.transaction {@db.transaction {@db.transaction {|c|
         cc = c
-        while !stop; sleep 0.1; end
+        q.pop
+        q1.push nil
+        q.pop
       }}}
     end
-    while cc.nil?; sleep 0.1; end
+    q.push nil
+    q1.pop
     cc.should be_a_kind_of(Dummy3Database::DummyConnection)
     @db.transactions.should == {cc=>{}}
-    stop = true
+    q.push nil
     t.join
     @db.transactions.should be_empty
   end

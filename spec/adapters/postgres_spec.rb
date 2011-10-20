@@ -197,35 +197,39 @@ if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
     
     specify "should handle FOR UPDATE" do
       @ds.insert(:number=>20)
-      c = nil
-      t = nil
+      c, t = nil, nil
+      q = Queue.new
       POSTGRES_DB.transaction do
         @ds.for_update.first(:id=>1)
         t = Thread.new do
           POSTGRES_DB.transaction do
+            q.push nil
             @ds.filter(:id=>1).update(:name=>'Jim')
             c = @ds.first(:id=>1)
+            q.push nil
           end
         end
-        sleep 0.01
+        q.pop
         @ds.filter(:id=>1).update(:number=>30)
       end
+      q.pop
       t.join
       c.should == {:id=>1, :number=>30, :name=>'Jim'}
     end
   
     specify "should handle FOR SHARE" do
       @ds.insert(:number=>20)
-      c = nil
-      t = nil
+      c, t = nil
+      q = Queue.new
       POSTGRES_DB.transaction do
         @ds.for_share.first(:id=>1)
         t = Thread.new do
           POSTGRES_DB.transaction do
             c = @ds.for_share.filter(:id=>1).first
+            q.push nil
           end
         end
-        sleep 0.1
+        q.pop
         @ds.filter(:id=>1).update(:name=>'Jim')
         c.should == {:id=>1, :number=>20, :name=>nil}
       end

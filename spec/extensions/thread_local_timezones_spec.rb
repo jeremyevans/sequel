@@ -39,7 +39,27 @@ describe "Sequel thread_local_timezones extension" do
   end
     
   it "should be thread safe" do
-    [Thread.new{Sequel.thread_application_timezone = :utc; sleep 0.03; Sequel.application_timezone.should == :utc},
-     Thread.new{sleep 0.01; Sequel.thread_application_timezone = :local; sleep 0.01; Sequel.application_timezone.should == :local}].each{|x| x.join}
+    q, q1, q2 = Queue.new, Queue.new, Queue.new
+    tz1, tz2 = nil, nil
+    t1 = Thread.new do
+      Sequel.thread_application_timezone = :utc
+      q2.push nil
+      q.pop
+      tz1 = Sequel.application_timezone
+    end
+    t2 = Thread.new do
+      Sequel.thread_application_timezone = :local
+      q2.push nil
+      q1.pop
+      tz2 = Sequel.application_timezone
+    end
+    q2.pop
+    q2.pop
+    q.push nil
+    q1.push nil
+    t1.join
+    t2.join
+    tz1.should == :utc
+    tz2.should == :local
   end
 end
