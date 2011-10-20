@@ -60,12 +60,6 @@ describe "Dataset" do
     db = Sequel::Database.new(:identifier_output_method=>:downcase)
     db[:a].identifier_output_method.should == :downcase
   end
-end
-
-describe "Dataset" do
-  before do
-    @dataset = Sequel::Dataset.new("db")
-  end
   
   specify "should have quote_identifiers= method which changes literalization of identifiers" do
     @dataset.quote_identifiers = true
@@ -111,27 +105,25 @@ describe "Dataset#clone" do
   
   specify "should create an exact copy of the dataset" do
     @dataset.row_proc = Proc.new{|r| r}
-    @clone = @dataset.clone
+    clone = @dataset.clone
 
-    @clone.object_id.should_not === @dataset.object_id
-    @clone.class.should == @dataset.class
-    @clone.opts.should == @dataset.opts
-    @clone.row_proc.should == @dataset.row_proc
-  end
-  
-  specify "should deep-copy the dataset opts" do
-    @clone = @dataset.clone
-
-    @clone.opts.should_not equal(@dataset.opts)
-    @dataset.filter!(:a => 'b')
-    @clone.opts[:filter].should be_nil
-  end
-  
-  specify "should return a clone self" do
-    clone = @dataset.clone({})
+    clone.object_id.should_not === @dataset.object_id
     clone.class.should == @dataset.class
     clone.db.should == @dataset.db
     clone.opts.should == @dataset.opts
+    clone.row_proc.should == @dataset.row_proc
+  end
+  
+  specify "should deep-copy the dataset opts" do
+    clone = @dataset.clone
+
+    clone.opts.should_not equal(@dataset.opts)
+    @dataset.filter!(:a => 'b')
+    clone.opts[:filter].should be_nil
+
+    clone = @dataset.clone(:from => [:other])
+    @dataset.opts[:from].should == [:items]
+    clone.opts[:from].should == [:other]
   end
   
   specify "should merge the specified options" do
@@ -142,12 +134,6 @@ describe "Dataset#clone" do
   specify "should overwrite existing options" do
     clone = @dataset.clone(:from => [:other])
     clone.opts.should == {:from => [:other]}
-  end
-  
-  specify "should create a clone with a deep copy of options" do
-    clone = @dataset.clone(:from => [:other])
-    @dataset.opts[:from].should == [:items]
-    clone.opts[:from].should == [:other]
   end
   
   specify "should return an object with the same modules included" do
@@ -424,7 +410,7 @@ describe "Dataset#where" do
     b.should == a
   end
 
-  specify "should not replace named placeholders that don't existin in the hash" do
+  specify "should not replace named placeholders that don't exist in the hash" do
     @dataset.where('price < :price AND id in :ids', :price=>100).select_sql.should ==
       "SELECT * FROM test WHERE (price < 100 AND id in :ids)"
   end
@@ -856,9 +842,6 @@ describe "Dataset#having" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
     @grouped = @dataset.group(:region).select(:region, :sum.sql_function(:population), :avg.sql_function(:gdp))
-    @d1 = @grouped.having('sum(population) > 10')
-    @d2 = @grouped.having(:region => 'Asia')
-    @columns = "region, sum(population), avg(gdp)"
   end
 
   specify "should just clone if given an empty argument" do
@@ -868,18 +851,18 @@ describe "Dataset#having" do
   end
   
   specify "should affect select statements" do
-    @d1.select_sql.should ==
-      "SELECT #{@columns} FROM test GROUP BY region HAVING (sum(population) > 10)"
+    @grouped.having('sum(population) > 10').select_sql.should ==
+      "SELECT region, sum(population), avg(gdp) FROM test GROUP BY region HAVING (sum(population) > 10)"
   end
 
   specify "should support proc expressions" do
     @grouped.having {:sum.sql_function(:population) > 10}.sql.should == 
-      "SELECT #{@columns} FROM test GROUP BY region HAVING (sum(population) > 10)"
+      "SELECT region, sum(population), avg(gdp) FROM test GROUP BY region HAVING (sum(population) > 10)"
   end
 
   specify "should work with and on the having clause" do
     @grouped.having( :a.sql_number > 1 ).and( :b.sql_number < 2 ).sql.should ==
-      "SELECT #{@columns} FROM test GROUP BY region HAVING ((a > 1) AND (b < 2))"
+      "SELECT region, sum(population), avg(gdp) FROM test GROUP BY region HAVING ((a > 1) AND (b < 2))"
   end
 end
 
@@ -1253,7 +1236,7 @@ describe "Dataset#select" do
       /SELECT ((name AS n, __ggh AS age)|(__ggh AS age, name AS n)) FROM test/
   end
 
-  specify "should overrun the previous select option" do
+  specify "should override the previous select option" do
     @d.select!(:a, :b, :c).select.sql.should == 'SELECT * FROM test'
     @d.select!(:price).select(:name).sql.should == 'SELECT name FROM test'
   end
@@ -1311,7 +1294,7 @@ describe "Dataset#select_all" do
     @d.select_all.sql.should == 'SELECT * FROM test'
   end
   
-  specify "should overrun the previous select option" do
+  specify "should override the previous select option" do
     @d.select!(:a, :b, :c).select_all.sql.should == 'SELECT * FROM test'
   end
 
@@ -1422,7 +1405,7 @@ describe "Dataset#order" do
       'SELECT * FROM test ORDER BY name ASC NULLS LAST, price DESC NULLS FIRST'
   end
   
-  specify "should overrun a previous ordering" do
+  specify "should override a previous ordering" do
     @dataset.order(:name).order(:stamp).sql.should ==
       'SELECT * FROM test ORDER BY stamp'
   end
@@ -1525,7 +1508,7 @@ describe "Dataset#order_by" do
       'SELECT * FROM test ORDER BY name, price DESC'
   end
   
-  specify "should overrun a previous ordering" do
+  specify "should override a previous ordering" do
     @dataset.order_by(:name).order(:stamp).sql.should ==
       'SELECT * FROM test ORDER BY stamp'
   end
@@ -1688,15 +1671,10 @@ describe "Dataset#limit" do
 end
 
 describe "Dataset#naked" do
-  before do
-    @d1 = Sequel::Dataset.new(nil, {1 => 2, 3 => 4})
-    @d2 = @d1.clone
-    @d2.row_proc = Proc.new{|r| r}
-  end
-  
   specify "should remove any existing row_proc" do
-    naked = @d2.naked
-    naked.row_proc.should be_nil
+    d = Sequel::Dataset.new(nil)
+    d.row_proc = Proc.new{|r| r}
+    d.naked.row_proc.should be_nil
   end
 end
 
@@ -1885,20 +1863,9 @@ describe "Dataset#count" do
   end
 end
 
-
 describe "Dataset#group_and_count" do
   before do
-    @c = Class.new(Sequel::Dataset) do
-      def self.sql
-        @@sql
-      end
-      
-      def fetch_rows(sql)
-        @@sql = sql
-        yield({1 => 1})
-      end
-    end
-    @ds = @c.new(nil).from(:test)
+    @ds = Sequel::Dataset.new(nil).from(:test)
   end
   
   specify "should format SQL properly" do
@@ -2036,7 +2003,7 @@ describe "Dataset#from_self" do
       'SELECT * FROM (SELECT name FROM test LIMIT 1) AS some_name INNER JOIN posts ON (posts.alias = some_name.name)'
   end
   
-  specify "should not options such as server" do
+  specify "should not remove non-SQL options such as :server" do
     @ds.server(:blah).from_self(:alias=>:some_name).opts[:server].should == :blah
   end
 
@@ -2239,7 +2206,7 @@ describe "Dataset#join_table" do
       'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."item_id" = "items"."id")'
   end
   
-  specify "should support using a SQL String as the join condition" do
+  specify "should support using an SQL String as the join condition" do
     @d.join(:categories, %{c.item_id = items.id}, :c).sql.should ==
       'SELECT * FROM "items" INNER JOIN "categories" AS "c" ON (c.item_id = items.id)'
   end
@@ -2254,7 +2221,7 @@ describe "Dataset#join_table" do
       'SELECT * FROM "items" INNER JOIN "categories" ON ("number" > 10)'
   end
 
-  specify "should support natural and cross joins using nil" do
+  specify "should support natural and cross joins" do
     @d.join_table(:natural, :categories).sql.should ==
       'SELECT * FROM "items" NATURAL JOIN "categories"'
     @d.join_table(:cross, :categories, nil).sql.should ==
@@ -2523,16 +2490,12 @@ describe "Dataset#interval" do
     @d = c.new(nil).from(:test)
   end
   
-  specify "should generate a correct SQL statement" do
+  specify "should generate the correct SQL statement" do
     @d.interval(:stamp)
     @d.last_sql.should == "SELECT (max(stamp) - min(stamp)) FROM test LIMIT 1"
 
     @d.filter(:price.sql_number > 100).interval(:stamp)
     @d.last_sql.should == "SELECT (max(stamp) - min(stamp)) FROM test WHERE (price > 100) LIMIT 1"
-  end
-  
-  specify "should return an integer" do
-    @d.interval(:tryme).should == 1234
   end
   
   specify "should use a subselect for the same conditions as count" do
@@ -2990,7 +2953,7 @@ describe "Dataset#import" do
       'COMMIT',
     ]
   end
-  specify "should accept a columns array and a values array with slice option" do
+  specify "should accept a columns array and a values array with :slice option" do
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
     @db.sqls.should == [
       'BEGIN',
@@ -3158,9 +3121,7 @@ describe "Dataset" do
   end
   
   specify "should support chaining of bang methods" do
-      @d.order!(:y)
-      @d.filter!(:y => 1)
-      @d.sql.should == "SELECT * FROM x WHERE (y = 1) ORDER BY y"
+      @d.order!(:y).filter!(:y => 1).sql.should == "SELECT * FROM x WHERE (y = 1) ORDER BY y"
   end
 end
 
@@ -3287,28 +3248,6 @@ describe "Dataset#insert_sql" do
     o = Date.civil(2000, 1, 1)
     def o.values; self; end
     @ds.insert_sql(o).should == "INSERT INTO items VALUES ('2000-01-01')"
-  end
-end
-
-class DummyMummyDataset < Sequel::Dataset
-  def first
-    raise if @opts[:from] == [:a]
-    true
-  end
-end
-
-class DummyMummyDatabase < Sequel::Database
-  attr_reader :sqls
-  
-  def execute(sql)
-    @sqls ||= []
-    @sqls << sql
-  end
-  
-  def transaction; yield; end
-
-  def dataset
-    DummyMummyDataset.new(self)
   end
 end
 

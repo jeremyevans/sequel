@@ -884,7 +884,7 @@ describe "Database#transaction with savepoints" do
     proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
   end
   
-  specify "should issue ROLLBACK if Sequel::Rollback is called in the transaction" do
+  specify "should issue ROLLBACK if Sequel::Rollback is raised in the transaction" do
     @db.transaction do
       @db.drop_table(:a)
       raise Sequel::Rollback
@@ -894,7 +894,7 @@ describe "Database#transaction with savepoints" do
     @db.sql.should == ['BEGIN', 'DROP TABLE a', 'ROLLBACK']
   end
   
-  specify "should issue ROLLBACK SAVEPOINT if Sequel::Rollback is called in a savepoint" do
+  specify "should issue ROLLBACK SAVEPOINT if Sequel::Rollback is raised in a savepoint" do
     @db.transaction do
       @db.transaction(:savepoint=>true) do
         @db.drop_table(:a)
@@ -1519,7 +1519,7 @@ describe "Database#raise_error" do
     proc{MockDatabase.new.send(:raise_error, e.new(''), :classes=>[])}.should raise_error(e)
   end
 
-  specify "should convert the exception to a DatabaseError if the exception class is not in opts[:classes]" do
+  specify "should convert the exception to a DatabaseError if the exception class is in opts[:classes]" do
     proc{MockDatabase.new.send(:raise_error, Interrupt.new(''), :classes=>[Interrupt])}.should raise_error(Sequel::DatabaseError)
   end
 

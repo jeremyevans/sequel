@@ -66,6 +66,15 @@ class DummyDataset < Sequel::Dataset
     raise if @opts[:from] == [:a]
     true
   end
+
+  VALUES = [
+    {:a => 1, :b => 2},
+    {:a => 3, :b => 4},
+    {:a => 5, :b => 6}
+  ]
+  def fetch_rows(sql, &block)
+    VALUES.each(&block)
+  end
 end
 
 class DummyDatabase < Sequel::Database
@@ -83,12 +92,6 @@ class DummyDatabase < Sequel::Database
   end
 end
 
-class Dummy2Database < Sequel::Database
-  attr_reader :sql
-  def execute(sql); @sql = sql; end
-  def transaction; yield; end
-end
-
 class Dummy3Database < Sequel::Database
   attr_reader :sql, :transactions
   def execute(sql, opts={}); @sql ||= []; @sql << sql; end
@@ -98,15 +101,3 @@ class Dummy3Database < Sequel::Database
     def execute(sql); @db.execute(sql); end
   end
 end
-
-class DummyDataset < Sequel::Dataset
-  VALUES = [
-    {:a => 1, :b => 2},
-    {:a => 3, :b => 4},
-    {:a => 5, :b => 6}
-  ]
-  def fetch_rows(sql, &block)
-    VALUES.each(&block)
-  end
-end
-
