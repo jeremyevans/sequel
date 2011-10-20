@@ -96,6 +96,14 @@ describe Sequel::Model, ".def_dataset_method" do
     @c.dataset.return_3.should == 3
   end
 
+  it "should handle weird method names" do
+    @c.instance_eval do
+      def_dataset_method(:"return 3"){3}
+    end
+    @c.send(:"return 3").should == 3
+    @c.dataset.send(:"return 3").should == 3
+  end
+
   it "should not add a model method if the model already responds to the method" do
     @c.instance_eval do
       def foo

@@ -237,9 +237,30 @@ module Sequel
           @dataset_methods[meth] = block
           dataset.meta_def(meth, &block) if @dataset
         end
-        args.each{|arg| instance_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__) unless respond_to?(arg, true)}
+        args.each do |arg|
+          if arg.to_s =~ NORMAL_METHOD_NAME_REGEXP
+            instance_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__) unless respond_to?(arg, true)
+          else
+            def_model_dataset_method_block(arg)
+          end
+        end
       end
-      
+
+      module_eval(if RUBY_VERSION < '1.8.7'
+        <<-END
+          def def_model_dataset_method_block(arg)
+            meta_def(arg){|*args| dataset.send(arg, *args)}
+          end
+        END
+      else
+        <<-END
+          def def_model_dataset_method_block(arg)
+            meta_def(arg){|*args, &block| dataset.send(arg, *args, &block)}
+          end
+        END
+      end, __FILE__, __LINE__ - 4)
+      private :def_model_dataset_method_block
+
       # Finds a single record according to the supplied filter.
       # You are encouraged to use Model.[] or Model.first instead of this method.
       #

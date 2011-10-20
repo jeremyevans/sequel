@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle methods with names that can't be called directly in Model.def_dataset_method (jeremyevans)
+
 * Add dataset_associations plugin for making dataset methods that return datasets of associated objects (jeremyevans)
 
 * Don't allow Model.def_dataset_method to override private model methods (jeremyevans)
