@@ -32,7 +32,7 @@ module Sequel
   module ThreadLocalTimezones
     %w'application database typecast'.each do |t|
       class_eval("def thread_#{t}_timezone=(tz); Thread.current[:#{t}_timezone] = convert_timezone_setter_arg(tz); end", __FILE__, __LINE__)
-      class_eval(<<END, __FILE__, __LINE__)
+      class_eval(<<END, __FILE__, __LINE__ + 1)
         def #{t}_timezone
           if tz = Thread.current[:#{t}_timezone]
             tz unless tz == :nil
