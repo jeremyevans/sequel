@@ -112,11 +112,7 @@ end
 
 connect_proc = lambda do |database|
   db = if database.nil? || database.empty?
-    db = Sequel::Database.new(:quote_identifiers=>false)
-    def db.connect(*args); Object.new; end
-    db.identifier_input_method = nil
-    db.identifier_output_method = nil
-    db
+    Sequel.connect('mock:///', db_opts)
   elsif File.exist?(database)
     require 'yaml'
     env ||= "development"

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add mock adapter for better mocking of a database connection (jeremyevans)
+
 * Have models pass their dataset instead of table name to Database#schema (jeremyevans)
 
 * Allow Database#schema to take a dataset as the table argument, and use its identifier input/output methods (jeremyevans)
