@@ -190,3 +190,12 @@ describe "Sequel::Model basic support" do
     end
   end
 end
+
+describe "Sequel::Model with no existing table" do 
+  specify "should not raise an error when setting the dataset" do
+    db = INTEGRATION_DB
+    db.drop_table(:items) if db.table_exists?(:items)
+    proc{class ::Item < Sequel::Model(db); end}.should_not raise_error
+    proc{c = Class.new(Sequel::Model); c.set_dataset(db[:items])}.should_not raise_error
+  end
+end

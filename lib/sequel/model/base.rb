@@ -638,10 +638,9 @@ module Sequel
         return nil unless @dataset
         schema_hash = {}
         ds_opts = dataset.opts
-        single_table = ds_opts[:from] && (ds_opts[:from].length == 1) \
-          && !ds_opts.include?(:join) && !ds_opts.include?(:sql)
         get_columns = proc{check_non_connection_error{columns} || []}
-        if single_table && (schema_array = (db.schema(dataset.first_source_table, :reload=>reload) rescue nil))
+        schema_array = check_non_connection_error{db.schema(dataset, :reload=>reload)}
+        if schema_array
           schema_array.each{|k,v| schema_hash[k] = v}
           if ds_opts.include?(:select)
             # We don't remove the columns from the schema_hash,

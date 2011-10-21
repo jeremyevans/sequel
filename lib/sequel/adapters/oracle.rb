@@ -224,8 +224,8 @@ module Sequel
         schema ||= opts[:schema]
         schema_and_table = "#{"#{quote_identifier(opts[:schema])}." if opts[:schema]}#{quote_identifier(table)}"
         table_schema = []
-        m = output_identifier_meth
-        im = input_identifier_meth
+        m = output_identifier_meth(opts[:dataset])
+        im = input_identifier_meth(opts[:dataset])
 
         # Primary Keys
         ds = metadata_dataset.from(:all_constraints___cons, :all_cons_columns___cols).

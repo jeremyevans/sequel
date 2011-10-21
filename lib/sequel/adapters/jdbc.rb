@@ -474,8 +474,8 @@ module Sequel
       
       # Parse the table schema for the given table.
       def schema_parse_table(table, opts={})
-        m = output_identifier_meth
-        im = input_identifier_meth
+        m = output_identifier_meth(opts[:dataset])
+        im = input_identifier_meth(opts[:dataset])
         ds = dataset
         schema, table = schema_and_table(table)
         schema ||= opts[:schema]

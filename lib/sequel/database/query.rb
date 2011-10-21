@@ -112,14 +112,15 @@ module Sequel
     
     # Returns the schema for the given table as an array with all members being arrays of length 2,
     # the first member being the column name, and the second member being a hash of column information.
+    # The table argument can also be a dataset, as long as it only has one table.
     # Available options are:
     #
     # :reload :: Ignore any cached results, and get fresh information from the database.
     # :schema :: An explicit schema to use.  It may also be implicitly provided
     #            via the table name.
     #
-    # If schema parsing is supported by the database, the column information should at least contain the
-    # following columns:
+    # If schema parsing is supported by the database, the column information should hash at least contain the
+    # following entries:
     #
     # :allow_null :: Whether NULL is an allowed value for the column.
     # :db_type :: The database type for the column, as a database specific string.
@@ -152,9 +153,20 @@ module Sequel
     def schema(table, opts={})
       raise(Error, 'schema parsing is not implemented on this database') unless respond_to?(:schema_parse_table, true)
 
-      sch, table_name = schema_and_table(table)
-      quoted_name = quote_schema_table(table)
-      opts = opts.merge(:schema=>sch) if sch && !opts.include?(:schema)
+      opts = opts.dup
+      if table.is_a?(Dataset)
+        o = table.opts
+        from = o[:from]
+        raise(Error, "can only parse the schema for a dataset with a single from table") unless from && from.length == 1 && !o.include?(:join) && !o.include?(:sql)
+        tab = table.first_source_table
+        sch, table_name = schema_and_table(tab)
+        quoted_name = table.literal(tab)
+        opts[:dataset] = table
+      else
+        sch, table_name = schema_and_table(table)
+        quoted_name = quote_schema_table(table)
+      end
+      opts[:schema] = sch if sch && !opts.include?(:schema)
 
       @schemas.delete(quoted_name) if opts[:reload]
       return @schemas[quoted_name] if @schemas[quoted_name]
@@ -431,8 +443,8 @@ module Sequel
     # Return a Method object for the dataset's output_identifier_method.
     # Used in metadata parsing to make sure the returned information is in the
     # correct format.
-    def input_identifier_meth
-      dataset.method(:input_identifier)
+    def input_identifier_meth(ds=nil)
+      (ds || dataset).method(:input_identifier)
     end
     
     # Return a dataset that uses the default identifier input and output methods
@@ -449,8 +461,8 @@ module Sequel
     # Return a Method object for the dataset's output_identifier_method.
     # Used in metadata parsing to make sure the returned information is in the
     # correct format.
-    def output_identifier_meth
-      dataset.method(:output_identifier)
+    def output_identifier_meth(ds=nil)
+      (ds || dataset).method(:output_identifier)
     end
 
     # Remove the cached schema for the given schema name

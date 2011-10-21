@@ -172,8 +172,8 @@ module Sequel
       # parses primary key information from the sysindexes, sysindexkeys,
       # and syscolumns system tables.
       def schema_parse_table(table_name, opts)
-        m = output_identifier_meth
-        m2 = input_identifier_meth
+        m = output_identifier_meth(opts[:dataset])
+        m2 = input_identifier_meth(opts[:dataset])
         tn = m2.call(table_name.to_s)
         table_id = get{object_id(tn)}
         pk_index_id = metadata_dataset.from(:sysindexes).

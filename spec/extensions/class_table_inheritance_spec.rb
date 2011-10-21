@@ -8,7 +8,7 @@ describe "class_table_inheritance plugin" do
        :managers=>[[:id, {:type=>:integer}], [:num_staff, {:type=>:integer}]],
        :executives=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}]],
        :staff=>[[:id, {:type=>:integer}], [:manager_id, {:type=>:integer}]],
-       }[table]
+       }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
      end
     def db.dataset(*args)
       ds = super(*args)

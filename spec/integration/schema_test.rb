@@ -16,7 +16,7 @@ describe "Database schema parser" do
     INTEGRATION_DB.drop_table(:items) if INTEGRATION_DB.table_exists?(:items)
   end
 
-  specify "should handle a database with a identifier_output_method" do
+  specify "should handle a database with a identifier methods" do
     INTEGRATION_DB.identifier_output_method = :reverse
     INTEGRATION_DB.identifier_input_method = :reverse
     INTEGRATION_DB.quote_identifiers = true
@@ -26,6 +26,27 @@ describe "Database schema parser" do
       INTEGRATION_DB.schema(:items, :reload=>true).should be_a_kind_of(Array)
       INTEGRATION_DB.schema(:items, :reload=>true).first.first.should == :number
     ensure 
+      INTEGRATION_DB.drop_table(:items)
+    end
+  end
+
+  specify "should handle a dataset with identifier methods different than the database's" do
+    INTEGRATION_DB.identifier_output_method = :reverse
+    INTEGRATION_DB.identifier_input_method = :reverse
+    INTEGRATION_DB.quote_identifiers = true
+    INTEGRATION_DB.default_schema = nil if INTEGRATION_DB.default_schema
+    INTEGRATION_DB.create_table!(:items){Integer :number}
+    INTEGRATION_DB.identifier_output_method = @iom
+    INTEGRATION_DB.identifier_input_method = @iim
+    ds = INTEGRATION_DB[:items]
+    ds.identifier_output_method = :reverse
+    ds.identifier_input_method = :reverse
+    begin
+      INTEGRATION_DB.schema(ds, :reload=>true).should be_a_kind_of(Array)
+      INTEGRATION_DB.schema(ds, :reload=>true).first.first.should == :number
+    ensure 
+      INTEGRATION_DB.identifier_output_method = :reverse
+      INTEGRATION_DB.identifier_input_method = :reverse
       INTEGRATION_DB.drop_table(:items)
     end
   end

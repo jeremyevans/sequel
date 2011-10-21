@@ -333,7 +333,7 @@ module Sequel
 
       # Parse the output of the table_info pragma
       def parse_pragma(table_name, opts)
-        metadata_dataset.with_sql("PRAGMA table_info(?)", input_identifier_meth.call(table_name)).map do |row|
+        metadata_dataset.with_sql("PRAGMA table_info(?)", input_identifier_meth(opts[:dataset]).call(table_name)).map do |row|
           row.delete(:cid)
           row[:allow_null] = row.delete(:notnull).to_i == 0
           row[:default] = row.delete(:dflt_value)
@@ -353,7 +353,7 @@ module Sequel
       # SQLite supports schema parsing using the table_info PRAGMA, so
       # parse the output of that into the format Sequel expects.
       def schema_parse_table(table_name, opts)
-        m = output_identifier_meth
+        m = output_identifier_meth(opts[:dataset])
         parse_pragma(table_name, opts).map do |row|
           [m.call(row.delete(:name)), row]
         end

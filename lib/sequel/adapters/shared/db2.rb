@@ -29,8 +29,8 @@ module Sequel
 
       # Use SYSIBM.SYSCOLUMNS to get the information on the tables.
       def schema_parse_table(table, opts = {})
-        m = output_identifier_meth
-        im = input_identifier_meth
+        m = output_identifier_meth(opts[:dataset])
+        im = input_identifier_meth(opts[:dataset])
         metadata_dataset.with_sql("SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = #{literal(im.call(table))} ORDER BY COLNO").
           collect do |column| 
             column[:db_type]     = column.delete(:typename)

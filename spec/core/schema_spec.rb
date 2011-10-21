@@ -1100,6 +1100,21 @@ describe "Schema Parser" do
     proc{@db.schema(:x)}.should raise_error(Sequel::Error)
   end
 
+  specify "should provide options if given a table name" do
+    c = nil
+    @db.meta_def(:schema_parse_table) do |t, opts|
+      c = [t, opts]
+      [[:a, {:db_type=>t.to_s}]]
+    end
+    @db.schema(:x)
+    c.should == ["x", {}]
+    @db.schema(:s__x)
+    c.should == ["x", {:schema=>"s"}]
+    ds = @db[:s__y]
+    @db.schema(ds)
+    c.should == ["y", {:schema=>"s", :dataset=>ds}]
+  end
+
   specify "should parse the schema correctly for a single table" do
     sqls = @sqls
     proc{@db.schema(:x)}.should raise_error(Sequel::Error)

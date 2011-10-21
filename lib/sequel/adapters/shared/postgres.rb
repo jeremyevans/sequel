@@ -571,8 +571,8 @@ module Sequel
 
       # The dataset used for parsing table schemas, using the pg_* system catalogs.
       def schema_parse_table(table_name, opts)
-        m = output_identifier_meth
-        m2 = input_identifier_meth
+        m = output_identifier_meth(opts[:dataset])
+        m2 = input_identifier_meth(opts[:dataset])
         ds = metadata_dataset.select(:pg_attribute__attname___name,
             SQL::Function.new(:format_type, :pg_type__oid, :pg_attribute__atttypmod).as(:db_type),
             SQL::Function.new(:pg_get_expr, :pg_attrdef__adbin, :pg_class__oid).as(:default),
