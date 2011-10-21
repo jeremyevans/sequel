@@ -222,16 +222,20 @@ module Sequel
       def schema_parse_table(table, opts={})
         schema, table = schema_and_table(table)
         schema ||= opts[:schema]
-        schema_and_table = "#{"#{quote_identifier(opts[:schema])}." if opts[:schema]}#{quote_identifier(table)}"
+        schema_and_table = if ds = opts[:dataset]
+          ds.literal(schema ? SQL::QualifiedIdentifier.new(schema, table) : SQL::Identifier.new(table))
+        else
+          "#{"#{quote_identifier(schema)}." if schema}#{quote_identifier(table)}"
+        end
         table_schema = []
-        m = output_identifier_meth(opts[:dataset])
-        im = input_identifier_meth(opts[:dataset])
+        m = output_identifier_meth(ds)
+        im = input_identifier_meth(ds)
 
         # Primary Keys
         ds = metadata_dataset.from(:all_constraints___cons, :all_cons_columns___cols).
           where(:cols__table_name=>im.call(table), :cons__constraint_type=>'P',
                 :cons__constraint_name=>:cols__constraint_name, :cons__owner=>:cols__owner)
-        ds = ds.where(:cons__owner=>im.call(opts[:schema])) if opts[:schema]
+        ds = ds.where(:cons__owner=>im.call(schema)) if schema
         pks = ds.select_map(:cols__column_name)
 
         # Default values
