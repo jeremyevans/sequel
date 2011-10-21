@@ -411,18 +411,14 @@ end
 
 describe "Database#<< and run" do
   before do
-    sqls = @sqls = []
-    @c = Class.new(Sequel::Database) do
-      define_method(:execute_ddl){|sql, *opts| sqls.clear; sqls << sql; sqls.concat(opts)}
-    end
-    @db = @c.new({})
+    @db = Sequel.mock(:servers=>{:s1=>{}})
   end
   
-  specify "should pass the supplied sql to #execute_ddl" do
+  specify "should execute the code on the database" do
     (@db << "DELETE FROM items")
-    @sqls.should == ["DELETE FROM items", {}]
+    @db.sqls.should == ["DELETE FROM items"]
     @db.run("DELETE FROM items2")
-    @sqls.should == ["DELETE FROM items2", {}]
+    @db.sqls.should == ["DELETE FROM items2"]
   end
   
   specify "should return nil" do
@@ -432,7 +428,7 @@ describe "Database#<< and run" do
   
   specify "should accept options passed to execute_ddl" do
     @db.run("DELETE FROM items", :server=>:s1)
-    @sqls.should == ["DELETE FROM items", {:server=>:s1}]
+    @db.sqls.should == ["DELETE FROM items -- s1"]
   end
 end
 
@@ -464,7 +460,7 @@ describe "Database#test_connection" do
     @db = Sequel::Database.new{@test = rand(100)}
   end
   
-  specify "should pool#hold" do
+  specify "should attempt to get a connection" do
     @db.test_connection
     @test.should_not be_nil
   end
@@ -480,20 +476,21 @@ end
 
 describe "Database#table_exists?" do
   specify "should try to select the first record from the table's dataset" do
-    db2 = DummyDatabase.new
-    db2.table_exists?(:a).should be_false
-    db2.table_exists?(:b).should be_true
+    db = Sequel.mock(:fetch=>[Sequel::Error, [], [{:a=>1}]])
+    db.table_exists?(:a).should be_false
+    db.table_exists?(:b).should be_true
+    db.table_exists?(:c).should be_true
   end
 end
 
 describe "Database#transaction" do
   before do
-    @db = Dummy3Database.new{Dummy3Database::DummyConnection.new(@db)}
+    @db = Sequel.mock(:servers=>{:test=>{}})
   end
   
   specify "should wrap the supplied block with BEGIN + COMMIT statements" do
     @db.transaction{@db.execute 'DROP TABLE test;'}
-    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
   end
   
   specify "should support transaction isolation levels" do
@@ -501,7 +498,7 @@ describe "Database#transaction" do
     [:uncommitted, :committed, :repeatable, :serializable].each do |l|
       @db.transaction(:isolation=>l){@db.run "DROP TABLE #{l}"}
     end
-    @db.sql.should == ['BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED', 'DROP TABLE uncommitted', 'COMMIT',
+    @db.sqls.should == ['BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED', 'DROP TABLE uncommitted', 'COMMIT',
                        'BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED', 'DROP TABLE committed', 'COMMIT',
                        'BEGIN', 'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ', 'DROP TABLE repeatable', 'COMMIT',
                        'BEGIN', 'SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', 'DROP TABLE serializable', 'COMMIT']
@@ -513,7 +510,7 @@ describe "Database#transaction" do
       @db.transaction_isolation_level = l
       @db.transaction{@db.run "DROP TABLE #{l}"}
     end
-    @db.sql.should == ['BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED', 'DROP TABLE uncommitted', 'COMMIT',
+    @db.sqls.should == ['BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED', 'DROP TABLE uncommitted', 'COMMIT',
                        'BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED', 'DROP TABLE committed', 'COMMIT',
                        'BEGIN', 'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ', 'DROP TABLE repeatable', 'COMMIT',
                        'BEGIN', 'SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', 'DROP TABLE serializable', 'COMMIT']
@@ -528,12 +525,12 @@ describe "Database#transaction" do
       end
     end
     @db.ret_commit
-    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
   end
   
   specify "should issue ROLLBACK if an exception is raised, and re-raise" do
     @db.transaction {@db.execute 'DROP TABLE test'; raise RuntimeError} rescue nil
-    @db.sql.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
+    @db.sqls.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
     
     proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
   end
@@ -545,7 +542,7 @@ describe "Database#transaction" do
       @db.drop_table(:b)
     end
     
-    @db.sql.should == ['BEGIN', 'DROP TABLE a', 'ROLLBACK']
+    @db.sqls.should == ['BEGIN', 'DROP TABLE a', 'ROLLBACK']
   end
   
   specify "should have in_transaction? return true if inside a transaction" do
@@ -555,7 +552,6 @@ describe "Database#transaction" do
   end
   
   specify "should have in_transaction? handle sharding correctly" do
-    @db = Dummy3Database.new(:servers=>{:test=>{}}){Dummy3Database::DummyConnection.new(@db)}
     c = []
     @db.transaction(:server=>:test){c << @db.in_transaction?}
     @db.transaction(:server=>:test){c << @db.in_transaction?(:server=>:test)}
@@ -572,29 +568,24 @@ describe "Database#transaction" do
   
   specify "should reraise Sequel::Rollback errors when using :rollback=>:reraise option is given" do
     proc {@db.transaction(:rollback=>:reraise){raise Sequel::Rollback}}.should raise_error(Sequel::Rollback)
-    @db.sql.should == ['BEGIN', 'ROLLBACK']
-    @db.sql.clear
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
     proc {@db.transaction(:rollback=>:reraise){raise ArgumentError}}.should raise_error(ArgumentError)
-    @db.sql.should == ['BEGIN', 'ROLLBACK']
-    @db.sql.clear
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
     @db.transaction(:rollback=>:reraise){1}.should == 1
-    @db.sql.should == ['BEGIN', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'COMMIT']
   end
   
   specify "should always rollback if :rollback=>:always option is given" do
     proc {@db.transaction(:rollback=>:always){raise ArgumentError}}.should raise_error(ArgumentError)
-    @db.sql.should == ['BEGIN', 'ROLLBACK']
-    @db.sql.clear
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
     @db.transaction(:rollback=>:always){raise Sequel::Rollback}.should be_nil
-    @db.sql.should == ['BEGIN', 'ROLLBACK']
-    @db.sql.clear
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
     @db.transaction(:rollback=>:always){1}.should be_nil
-    @db.sql.should == ['BEGIN', 'ROLLBACK']
-    @db.sql.clear
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
     catch (:foo) do
       @db.transaction(:rollback=>:always){throw :foo}
     end
-    @db.sql.should == ['BEGIN', 'ROLLBACK']
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
   end
   
   specify "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
@@ -618,22 +609,22 @@ describe "Database#transaction" do
     end
     q.push nil
     q1.pop
-    cc.should be_a_kind_of(Dummy3Database::DummyConnection)
-    @db.transactions.should == {cc=>{}}
+    cc.should be_a_kind_of(Sequel::Mock::Connection)
+    tr = @db.instance_variable_get(:@transactions)
+    tr.should == {cc=>{:savepoint_level=>1}}
     q.push nil
     t.join
-    @db.transactions.should be_empty
+    tr.should be_empty
   end
 
   specify "should correctly handle nested transacation use with separate shards" do
-    @db = Dummy3Database.new(:servers=>{:test=>{}}){Dummy3Database::DummyConnection.new(@db)}
     @db.transaction do |c1|
       @db.transaction(:server=>:test) do |c2|
         c1.should_not == c2
         @db.execute 'DROP TABLE test;'
       end
     end
-    @db.sql.should == ['BEGIN', 'BEGIN', 'DROP TABLE test;', 'COMMIT', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'BEGIN -- test', 'DROP TABLE test;', 'COMMIT -- test', 'COMMIT']
   end
   
   if (!defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or RUBY_ENGINE == 'rbx') and RUBY_VERSION < '1.9'
@@ -651,7 +642,7 @@ describe "Database#transaction" do
       q1.pop
       t.kill
       t.join
-      @db.sql.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
+      @db.sqls.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
     end
   end
 
@@ -662,52 +653,52 @@ describe "Database#transaction" do
 
   specify "should execute after_commit outside transactions" do
     @db.after_commit{@db.execute('foo')}
-    @db.sql.should == ['foo']
+    @db.sqls.should == ['foo']
   end
 
   specify "should ignore after_rollback outside transactions" do
     @db.after_rollback{@db.execute('foo')}
-    @db.sql.should be_nil
+    @db.sqls.should == []
   end
 
   specify "should support after_commit inside transactions" do
     @db.transaction{@db.after_commit{@db.execute('foo')}}
-    @db.sql.should == ['BEGIN', 'COMMIT', 'foo']
+    @db.sqls.should == ['BEGIN', 'COMMIT', 'foo']
   end
 
   specify "should support after_rollback inside transactions" do
     @db.transaction{@db.after_rollback{@db.execute('foo')}}
-    @db.sql.should == ['BEGIN', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'COMMIT']
   end
 
   specify "should not call after_commit if the transaction rolls back" do
     @db.transaction{@db.after_commit{@db.execute('foo')}; raise Sequel::Rollback}
-    @db.sql.should == ['BEGIN', 'ROLLBACK']
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
   end
 
   specify "should call after_rollback if the transaction rolls back" do
     @db.transaction{@db.after_rollback{@db.execute('foo')}; raise Sequel::Rollback}
-    @db.sql.should == ['BEGIN', 'ROLLBACK', 'foo']
+    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'foo']
   end
 
   specify "should call multiple after_commit blocks in order if called inside transactions" do
     @db.transaction{@db.after_commit{@db.execute('foo')}; @db.after_commit{@db.execute('bar')}}
-    @db.sql.should == ['BEGIN', 'COMMIT', 'foo', 'bar']
+    @db.sqls.should == ['BEGIN', 'COMMIT', 'foo', 'bar']
   end
 
   specify "should call multiple after_rollback blocks in order if called inside transactions" do
     @db.transaction{@db.after_rollback{@db.execute('foo')}; @db.after_rollback{@db.execute('bar')}; raise Sequel::Rollback}
-    @db.sql.should == ['BEGIN', 'ROLLBACK', 'foo', 'bar']
+    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'foo', 'bar']
   end
 
   specify "should support after_commit inside nested transactions" do
     @db.transaction{@db.transaction{@db.after_commit{@db.execute('foo')}}}
-    @db.sql.should == ['BEGIN', 'COMMIT', 'foo']
+    @db.sqls.should == ['BEGIN', 'COMMIT', 'foo']
   end
 
   specify "should support after_rollback inside nested transactions" do
     @db.transaction{@db.transaction{@db.after_rollback{@db.execute('foo')}}; raise Sequel::Rollback}
-    @db.sql.should == ['BEGIN', 'ROLLBACK', 'foo']
+    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'foo']
   end
 
   specify "should support after_commit inside savepoints" do
@@ -717,7 +708,7 @@ describe "Database#transaction" do
       @db.transaction(:savepoint=>true){@db.after_commit{@db.execute('bar')}}
       @db.after_commit{@db.execute('baz')}
     end
-    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT', 'foo', 'bar', 'baz']
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT', 'foo', 'bar', 'baz']
   end
 
   specify "should support after_rollback inside savepoints" do
@@ -728,33 +719,33 @@ describe "Database#transaction" do
       @db.after_rollback{@db.execute('baz')}
       raise Sequel::Rollback
     end
-    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'ROLLBACK', 'foo', 'bar', 'baz']
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'ROLLBACK', 'foo', 'bar', 'baz']
   end
 
   specify "should raise an error if you attempt to use after_commit inside a prepared transaction" do
     @db.meta_def(:supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.after_commit{@db.execute('foo')}}}.should raise_error(Sequel::Error)
-    @db.sql.should == ['BEGIN', 'ROLLBACK']
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
   end
 
   specify "should raise an error if you attempt to use after_rollback inside a prepared transaction" do
     @db.meta_def(:supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.after_rollback{@db.execute('foo')}}}.should raise_error(Sequel::Error)
-    @db.sql.should == ['BEGIN', 'ROLLBACK']
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
   end
 
   specify "should raise an error if you attempt to use after_commit inside a savepoint in a prepared transaction" do
     @db.meta_def(:supports_savepoints?){true}
     @db.meta_def(:supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_commit{@db.execute('foo')}}}}.should raise_error(Sequel::Error)
-    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
   end
 
   specify "should raise an error if you attempt to use after_rollback inside a savepoint in a prepared transaction" do
     @db.meta_def(:supports_savepoints?){true}
     @db.meta_def(:supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_rollback{@db.execute('foo')}}}}.should raise_error(Sequel::Error)
-    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
   end
 end
 
@@ -820,28 +811,27 @@ end
   
 describe "Database#transaction with savepoints" do
   before do
-    @db = Dummy3Database.new{Dummy3Database::DummyConnection.new(@db)}
-    @db.meta_def(:supports_savepoints?){true}
+    @db = Sequel.mock
   end
   
   specify "should wrap the supplied block with BEGIN + COMMIT statements" do
     @db.transaction {@db.execute 'DROP TABLE test;'}
-    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
   end
   
   specify "should use savepoints if given the :savepoint option" do
     @db.transaction{@db.transaction(:savepoint=>true){@db.execute 'DROP TABLE test;'}}
-    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
   end
   
   specify "should not use a savepoints if no transaction is in progress" do
     @db.transaction(:savepoint=>true){@db.execute 'DROP TABLE test;'}
-    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
   end
   
   specify "should reuse the current transaction if no :savepoint option is given" do
     @db.transaction{@db.transaction{@db.execute 'DROP TABLE test;'}}
-    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
   end
   
   specify "should handle returning inside of the block by committing" do
@@ -853,7 +843,7 @@ describe "Database#transaction with savepoints" do
       end
     end
     @db.ret_commit
-    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
   end
   
   specify "should handle returning inside of a savepoint by committing" do
@@ -867,19 +857,19 @@ describe "Database#transaction with savepoints" do
       end
     end
     @db.ret_commit
-    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
   end
   
   specify "should issue ROLLBACK if an exception is raised, and re-raise" do
     @db.transaction {@db.execute 'DROP TABLE test'; raise RuntimeError} rescue nil
-    @db.sql.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
+    @db.sqls.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
     
     proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
   end
   
   specify "should issue ROLLBACK SAVEPOINT if an exception is raised inside a savepoint, and re-raise" do
     @db.transaction{@db.transaction(:savepoint=>true){@db.execute 'DROP TABLE test'; raise RuntimeError}} rescue nil
-    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test', 'ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test', 'ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
     
     proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
   end
@@ -891,7 +881,7 @@ describe "Database#transaction with savepoints" do
       @db.drop_table(:b)
     end
     
-    @db.sql.should == ['BEGIN', 'DROP TABLE a', 'ROLLBACK']
+    @db.sqls.should == ['BEGIN', 'DROP TABLE a', 'ROLLBACK']
   end
   
   specify "should issue ROLLBACK SAVEPOINT if Sequel::Rollback is raised in a savepoint" do
@@ -903,7 +893,7 @@ describe "Database#transaction with savepoints" do
       @db.drop_table(:b)
     end
     
-    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE a', 'ROLLBACK TO SAVEPOINT autopoint_1', 'DROP TABLE b', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE a', 'ROLLBACK TO SAVEPOINT autopoint_1', 'DROP TABLE b', 'COMMIT']
   end
   
   specify "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
