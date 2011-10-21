@@ -751,61 +751,38 @@ end
 
 describe "Sequel.transaction" do
   before do
-    @logger = Object.new
-    def @logger.db_info(db, sql)
-      (@sqls ||= []) << db << sql
-    end
-    def @logger.sqls
-      @sqls
-    end
-    mod = Module.new do
-      def execute(sql, *)
-        loggers.each{|l| l.db_info(self, sql)}
-      end
-      def log_connection_execute(conn, sql)
-        execute(sql)
-      end
-      def connect(*)
-        Object.new
-      end
-      def supports_savepoints?
-        true
-      end
-    end
-    @db1 = Sequel::Database.new(:host=>'1', :logger=>@logger)
-    @db2 = Sequel::Database.new(:host=>'2', :logger=>@logger)
-    @db3 = Sequel::Database.new(:host=>'3', :logger=>@logger)
-    @db1.extend(mod)
-    @db2.extend(mod)
-    @db3.extend(mod)
+    @sqls = []
+    @db1 = Sequel.mock(:host=>'1', :sqls=>@sqls)
+    @db2 = Sequel.mock(:host=>'2', :sqls=>@sqls)
+    @db3 = Sequel.mock(:host=>'3', :sqls=>@sqls)
   end
   
   specify "should run the block inside transacitons on all three databases" do
     Sequel.transaction([@db1, @db2, @db3]){1}.should == 1
-    @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN', @db3, 'COMMIT', @db2, 'COMMIT', @db1, 'COMMIT']
+    @sqls.should == ['BEGIN -- 1', 'BEGIN -- 2', 'BEGIN -- 3', 'COMMIT -- 3', 'COMMIT -- 2', 'COMMIT -- 1']
   end
   
   specify "should pass options to all the blocks" do
     Sequel.transaction([@db1, @db2, @db3], :rollback=>:always){1}.should be_nil
-    @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN', @db3, 'ROLLBACK', @db2, 'ROLLBACK', @db1, 'ROLLBACK']
+    @sqls.should == ['BEGIN -- 1', 'BEGIN -- 2', 'BEGIN -- 3', 'ROLLBACK -- 3', 'ROLLBACK -- 2', 'ROLLBACK -- 1']
   end
   
   specify "should handle Sequel::Rollback exceptions raised by the block to rollback on all databases" do
     Sequel.transaction([@db1, @db2, @db3]){raise Sequel::Rollback}.should be_nil
-    @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN', @db3, 'ROLLBACK', @db2, 'ROLLBACK', @db1, 'ROLLBACK']
+    @sqls.should == ['BEGIN -- 1', 'BEGIN -- 2', 'BEGIN -- 3', 'ROLLBACK -- 3', 'ROLLBACK -- 2', 'ROLLBACK -- 1']
   end
   
   specify "should handle nested transactions" do
     Sequel.transaction([@db1, @db2, @db3]){Sequel.transaction([@db1, @db2, @db3]){1}}.should == 1
-    @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN', @db3, 'COMMIT', @db2, 'COMMIT', @db1, 'COMMIT']
+    @sqls.should == ['BEGIN -- 1', 'BEGIN -- 2', 'BEGIN -- 3', 'COMMIT -- 3', 'COMMIT -- 2', 'COMMIT -- 1']
   end
   
   specify "should handle savepoints" do
     Sequel.transaction([@db1, @db2, @db3]){Sequel.transaction([@db1, @db2, @db3], :savepoint=>true){1}}.should == 1
-    @logger.sqls.should == [@db1, 'BEGIN', @db2, 'BEGIN', @db3, 'BEGIN',
-      @db1, 'SAVEPOINT autopoint_1', @db2, 'SAVEPOINT autopoint_1', @db3, 'SAVEPOINT autopoint_1',
-      @db3, 'RELEASE SAVEPOINT autopoint_1', @db2, 'RELEASE SAVEPOINT autopoint_1', @db1, 'RELEASE SAVEPOINT autopoint_1',
-      @db3, 'COMMIT', @db2, 'COMMIT', @db1, 'COMMIT']
+    @sqls.should == ['BEGIN -- 1', 'BEGIN -- 2', 'BEGIN -- 3',
+      'SAVEPOINT autopoint_1 -- 1', 'SAVEPOINT autopoint_1 -- 2', 'SAVEPOINT autopoint_1 -- 3',
+      'RELEASE SAVEPOINT autopoint_1 -- 3', 'RELEASE SAVEPOINT autopoint_1 -- 2', 'RELEASE SAVEPOINT autopoint_1 -- 1',
+      'COMMIT -- 3', 'COMMIT -- 2', 'COMMIT -- 1']
   end
 end
   
