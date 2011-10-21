@@ -263,11 +263,26 @@ describe "Sequel Mock Adapter" do
     c2.server.should == :test
   end
 
+  specify "should accept :extend option for extending the object with a module" do
+    Sequel.mock(:extend=>Module.new{def foo(v) v * 2 end}).foo(3).should == 6
+  end
+
+  specify "should accept :sqls option for where to store the SQL queries" do
+    a = []
+    Sequel.mock(:sqls=>a)[:t].all
+    a.should == ['SELECT * FROM t']
+  end
+
+  specify "should include :host option in SQL if it is given" do
+    db = Sequel.mock(:host=>'a')
+    db[:t].all
+    db.sqls.should == ['SELECT * FROM t -- a']
+  end
+
   specify "should have Dataset#columns take columns to set and return self" do
     db = Sequel.mock
     ds = db[:t].columns(:id, :a, :b)
     ds.should be_a_kind_of(Sequel::Mock::Dataset)
     ds.columns.should == [:id, :a, :b]
   end
-
 end

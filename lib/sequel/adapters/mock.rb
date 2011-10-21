@@ -74,14 +74,20 @@ module Sequel
       #          instance an raise it wrapped in a DatabaseError.
       attr_writer :numrows
 
-      # Recognize the :autoid, :fetch, and :numrows options
-      # in the hash, and call the appropriate setters.
+      # Additional options supported:
+      #
+      # :autoid :: Call #autoid= with the value
+      # :fetch ::  Call #fetch= with the value
+      # :numrows :: Call #numrows= with the value
+      # :extend :: A module the object is extended with.
+      # :sqls :: The array to store the SQL queries in.
       def initialize(opts=nil)
         super
         self.autoid = opts[:autoid]
         self.fetch = opts[:fetch]
         self.numrows = opts[:numrows]
-        @sqls = []
+        extend(opts[:extend]) if opts[:extend]
+        @sqls = opts[:sqls] || []
       end
 
       # Return a related Connection option connecting to the given shard.
@@ -128,6 +134,7 @@ module Sequel
       private
 
       def _execute(c, sql, opts={}, &block)
+        sql += " -- #{@opts[:host]}" if @opts[:host]
         sql += " -- #{c.server}" if c.server != :default
         log_info(sql)
         @sqls << sql 
