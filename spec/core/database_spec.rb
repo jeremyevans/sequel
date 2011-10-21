@@ -752,9 +752,9 @@ end
 describe "Sequel.transaction" do
   before do
     @sqls = []
-    @db1 = Sequel.mock(:host=>'1', :sqls=>@sqls)
-    @db2 = Sequel.mock(:host=>'2', :sqls=>@sqls)
-    @db3 = Sequel.mock(:host=>'3', :sqls=>@sqls)
+    @db1 = Sequel.mock(:append=>'1', :sqls=>@sqls)
+    @db2 = Sequel.mock(:append=>'2', :sqls=>@sqls)
+    @db3 = Sequel.mock(:append=>'3', :sqls=>@sqls)
   end
   
   specify "should run the block inside transacitons on all three databases" do

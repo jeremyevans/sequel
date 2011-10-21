@@ -134,7 +134,7 @@ module Sequel
       private
 
       def _execute(c, sql, opts={}, &block)
-        sql += " -- #{@opts[:host]}" if @opts[:host]
+        sql += " -- #{@opts[:append]}" if @opts[:append]
         sql += " -- #{c.server}" if c.server != :default
         log_info(sql)
         @sqls << sql 

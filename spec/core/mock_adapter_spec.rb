@@ -273,8 +273,8 @@ describe "Sequel Mock Adapter" do
     a.should == ['SELECT * FROM t']
   end
 
-  specify "should include :host option in SQL if it is given" do
-    db = Sequel.mock(:host=>'a')
+  specify "should include :append option in SQL if it is given" do
+    db = Sequel.mock(:append=>'a')
     db[:t].all
     db.sqls.should == ['SELECT * FROM t -- a']
   end
