@@ -30,7 +30,7 @@ class MockDataset < Sequel::Dataset
 end
 
 class MockDatabase < Sequel::Database
-  set_adapter_scheme :mock
+  set_adapter_scheme :mock_old
   @@quote_identifiers = false
   self.identifier_input_method = nil
   self.identifier_output_method = nil

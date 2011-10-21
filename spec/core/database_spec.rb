@@ -1478,7 +1478,7 @@ end
 
 describe "Database#each_server" do
   before do
-    @db = Sequel.connect(:adapter=>:mock, :host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
+    @db = Sequel.connect(:adapter=>:mock_old, :host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
     def @db.connect(server)
       server_opts(server)
     end
@@ -1491,7 +1491,7 @@ describe "Database#each_server" do
     @db.each_server do |db|
       db.should be_a_kind_of(Sequel::Database)
       db.should_not == @db
-      db.opts[:adapter].should == :mock
+      db.opts[:adapter].should == :mock_old
       db.opts[:database].should == 2
       hosts << db.opts[:host]
     end
