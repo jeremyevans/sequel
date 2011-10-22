@@ -263,6 +263,12 @@ describe "Sequel Mock Adapter" do
     c2.server.should == :test
   end
 
+  specify "should disconnect correctly" do
+    db = Sequel.mock
+    db.test_connection
+    proc{db.disconnect}.should_not raise_error
+  end
+
   specify "should accept :extend option for extending the object with a module" do
     Sequel.mock(:extend=>Module.new{def foo(v) v * 2 end}).foo(3).should == 6
   end

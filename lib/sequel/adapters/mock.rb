@@ -211,6 +211,9 @@ module Sequel
         end
       end
 
+      def disconnect_connection(c)
+      end
+
       def numrows(sql)
         _nextres(@numrows, sql, 0)
       end
