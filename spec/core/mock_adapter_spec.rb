@@ -83,11 +83,13 @@ describe "Sequel Mock Adapter" do
 
   specify "should be able to set separate kinds of results for fetch using an array" do
     rs = []
-    db = Sequel.mock(:fetch=>[{:a=>1}, [{:a=>2}, {:a=>3}], proc{|s| {:a=>4}}, nil, ArgumentError])
+    db = Sequel.mock(:fetch=>[{:a=>1}, [{:a=>2}, {:a=>3}], proc{|s| {:a=>4}}, proc{|s| }, nil, ArgumentError])
     db[:t].each{|r| rs << r}
     rs.should == [{:a=>1}]
     db[:t].each{|r| rs << r}
     rs.should == [{:a=>1}, {:a=>2}, {:a=>3}]
+    db[:t].each{|r| rs << r}
+    rs.should == [{:a=>1}, {:a=>2}, {:a=>3}, {:a=>4}]
     db[:t].each{|r| rs << r}
     rs.should == [{:a=>1}, {:a=>2}, {:a=>3}, {:a=>4}]
     db[:t].each{|r| rs << r}

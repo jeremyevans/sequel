@@ -164,7 +164,7 @@ module Sequel
           h = f.call(sql)
           if h.is_a?(Hash)
             yield h
-          else
+          elsif h
             h.each{|h1| yield h1}
           end
         when Class
