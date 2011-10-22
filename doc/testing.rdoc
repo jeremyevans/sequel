@@ -6,12 +6,14 @@ Whether or not you use Sequel in your application, you are usually going to want
 
 These run each test in its own transaction, the recommended way to test.
 
+Make sure you are using Sequel 3.29.0 or above when using these examples, as older versions don't support the <tt>:rollback=>:always</tt> option.
+
 === RSpec 1
 
   class Spec::Example::ExampleGroup
     def execute(*args, &block)
       x = nil
-      Sequel::Model.db.transaction{x = super(*args, &block); raise Sequel::Rollback}
+      Sequel::Model.db.transaction(:rollback=>:always){x = super(*args, &block)}
       x
     end
   end
@@ -20,7 +22,7 @@ These run each test in its own transaction, the recommended way to test.
 
   class Spec::Example::ExampleGroup
     around do |example|
-      Sequel::Model.db.transaction{example.call; raise Sequel::Rollback}
+      Sequel::Model.db.transaction(:rollback=>:always){example.call}
     end
   end
 
@@ -29,12 +31,19 @@ These run each test in its own transaction, the recommended way to test.
   # Must use this class as the base class for your tests
   class SequelTestCase < Test::Unit::TestCase
     def run(*args, &block)
-      Sequel::Model.db.transaction do
-        super
-        raise Sequel::Rollback
-      end
+      Sequel::Model.db.transaction(:rollback=>:always){super}
     end
   end
+
+== Transactional testing with multiple databases
+
+You can use the Sequel.transaction method to run a transaction on multiple databases, rolling all of them back.  Instead of:
+
+  Sequel::Model.db.transaction(:rollback=>:always)
+
+Use Sequel.transaction with an array of databases:
+
+  Sequel.transaction([DB1, DB2, DB3], :rollback=>:always)
 
 == Nontransactional tests
 
@@ -77,13 +86,13 @@ The +spec_plugin+ rake task runs the specs for the plugins and extensions that s
 
 == rake spec_<i>adapter</i> (e.g. rake spec_postgres)
 
-The <tt>spec_<i>adapter</i></tt> specs run against a real database connection with nothing mocked, and test for correct results.  They are much slower than the standard specs, but they will catch errors that are mocked out by the default specs, as well show issues that only occur on a certain database, adapter, interpreter, or some combination of those.
+The <tt>spec_<i>adapter</i></tt> specs run against a real database connection with nothing mocked, and test for correct results.  They are slower than the standard specs, but they will catch errors that are mocked out by the default specs, as well as show issues that only occur on a certain database, adapter, or a combination of the two.
 
 These specs are broken down into two parts.  For each database, there are specific specs that only apply to that database, and these are called the adapter specs.  There are also shared specs that apply to all (or almost all) databases, these are called the integration specs.
 
 == Environment variables
 
-Sequel often uses environment variables when testing to specify either the database to be tested or specify how testing should be done.
+Sequel often uses environment variables when testing to specify either the database to be tested or specify how testing should be done.  You can also specify the databases to test by copying spec/spec_config.rb.example to spec/spec_config.rb and modifying it.  See that file for details.  It may be necessary to use spec_config.rb as opposed to an environment variable if you database connection cannot be specified by a connection string.
 
 === Connection Strings
 
@@ -101,6 +110,6 @@ The following environment variables specify Database connection URL strings:
 
 * SEQUEL_MSSQL_SPEC_REQUIRE: Separate file to require when running mssql adapter specs
 * SEQUEL_DB2_SPEC_REQUIRE: Separate file to require when running db2 adapter specs
-* SEQUEL_COLUMNS_INTROSPECTION: Whehter to run the specs with the columns_introspection extension loaded by default
+* SEQUEL_COLUMNS_INTROSPECTION: Whether to run the specs with the columns_introspection extension loaded by default
 * SEQUEL_NO_PENDING: Don't mark any specs as pending, try running all specs
 * SKIPPED_TEST_WARN: Warn when skipping any tests because libraries aren't available
