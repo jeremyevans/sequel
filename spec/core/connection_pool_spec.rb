@@ -124,36 +124,36 @@ describe "A connection pool handling connection errors" do
   end
 end
 
-class DummyConnection
-  @@value = 0
-  def initialize
-    @@value += 1
-  end
-  
-  def value
-    @@value
-  end
-end
-
 describe "ConnectionPool#hold" do
   before do
-    @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS) {DummyConnection.new}
+    @c = Class.new do
+      @@value = 0
+      def initialize
+        @@value += 1
+      end
+      
+      def value
+        @@value
+      end
+    end
+
+    @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS){@c.new}
   end
   
   specify "should pass the result of the connection maker proc to the supplied block" do
     res = nil
     @pool.hold {|c| res = c}
-    res.should be_a_kind_of(DummyConnection)
+    res.should be_a_kind_of(@c)
     res.value.should == 1
     @pool.hold {|c| res = c}
-    res.should be_a_kind_of(DummyConnection)
+    res.should be_a_kind_of(@c)
     res.value.should == 1 # the connection maker is invoked only once
   end
   
   specify "should be re-entrant by the same thread" do
     cc = nil
     @pool.hold {|c| @pool.hold {|c| @pool.hold {|c| cc = c}}}
-    cc.should be_a_kind_of(DummyConnection)
+    cc.should be_a_kind_of(@c)
   end
   
   specify "should catch exceptions and reraise them" do
