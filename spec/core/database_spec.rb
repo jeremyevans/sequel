@@ -886,37 +886,28 @@ end
 
 describe "A Database adapter with a scheme" do
   before do
-    class CCC < Sequel::Database
-      if defined?(DISCONNECTS)
-        DISCONNECTS.clear
-      else
-        DISCONNECTS = []
-      end
-      set_adapter_scheme :ccc
-      def disconnect
-        DISCONNECTS << self
-      end
-    end
+    @ccc = Class.new(Sequel::Database)
+    @ccc.send(:set_adapter_scheme, :ccc)
   end
 
   specify "should be registered in the ADAPTER_MAP" do
-    Sequel::ADAPTER_MAP[:ccc].should == CCC
+    Sequel::ADAPTER_MAP[:ccc].should == @ccc
   end
   
   specify "should give the database_type as the adapter scheme by default" do
-    CCC.new.database_type.should == :ccc
+    @ccc.new.database_type.should == :ccc
   end
   
   specify "should be instantiated when its scheme is specified" do
     c = Sequel::Database.connect('ccc://localhost/db')
-    c.should be_a_kind_of(CCC)
+    c.should be_a_kind_of(@ccc)
     c.opts[:host].should == 'localhost'
     c.opts[:database].should == 'db'
   end
   
   specify "should be accessible through Sequel.connect" do
     c = Sequel.connect 'ccc://localhost/db'
-    c.should be_a_kind_of(CCC)
+    c.should be_a_kind_of(@ccc)
     c.opts[:host].should == 'localhost'
     c.opts[:database].should == 'db'
   end
@@ -928,7 +919,7 @@ describe "A Database adapter with a scheme" do
     returnValue = 'anything'
 
     p = proc do |c|
-      c.should be_a_kind_of(CCC)
+      c.should be_a_kind_of(@ccc)
       c.opts[:host].should == 'localhost'
       c.opts[:database].should == 'db'
       z = y
@@ -936,15 +927,22 @@ describe "A Database adapter with a scheme" do
       x = c
       returnValue
     end
+
+    @ccc.class_eval do
+      self::DISCONNECTS = []
+      def disconnect
+        self.class::DISCONNECTS << self
+      end
+    end
     Sequel::Database.connect('ccc://localhost/db', &p).should == returnValue
-    CCC::DISCONNECTS.should == [x]
+    @ccc::DISCONNECTS.should == [x]
 
     Sequel.connect('ccc://localhost/db', &p).should == returnValue
-    CCC::DISCONNECTS.should == [y, x]
+    @ccc::DISCONNECTS.should == [y, x]
 
     Sequel.send(:def_adapter_method, :ccc)
     Sequel.ccc('db', :host=>'localhost', &p).should == returnValue
-    CCC::DISCONNECTS.should == [z, y, x]
+    @ccc::DISCONNECTS.should == [z, y, x]
   end
 
   specify "should be accessible through Sequel.<adapter>" do
@@ -955,31 +953,31 @@ describe "A Database adapter with a scheme" do
     
     c = Sequel.ccc('mydb')
     p = proc{c.opts.delete_if{|k,v| k == :disconnection_proc || k == :single_threaded}}
-    c.should be_a_kind_of(CCC)
-    p.call.should == {:adapter=>:ccc, :database => 'mydb', :adapter_class=>CCC}
+    c.should be_a_kind_of(@ccc)
+    p.call.should == {:adapter=>:ccc, :database => 'mydb', :adapter_class=>@ccc}
     
     c = Sequel.ccc('mydb', :host => 'localhost')
-    c.should be_a_kind_of(CCC)
-    p.call.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost', :adapter_class=>CCC}
+    c.should be_a_kind_of(@ccc)
+    p.call.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost', :adapter_class=>@ccc}
     
     c = Sequel.ccc
-    c.should be_a_kind_of(CCC)
-    p.call.should == {:adapter=>:ccc, :adapter_class=>CCC}
+    c.should be_a_kind_of(@ccc)
+    p.call.should == {:adapter=>:ccc, :adapter_class=>@ccc}
     
     c = Sequel.ccc(:database => 'mydb', :host => 'localhost')
-    c.should be_a_kind_of(CCC)
-    p.call.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost', :adapter_class=>CCC}
+    c.should be_a_kind_of(@ccc)
+    p.call.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost', :adapter_class=>@ccc}
   end
   
   specify "should be accessible through Sequel.connect with options" do
     c = Sequel.connect(:adapter => :ccc, :database => 'mydb')
-    c.should be_a_kind_of(CCC)
+    c.should be_a_kind_of(@ccc)
     c.opts[:adapter].should == :ccc
   end
 
   specify "should be accessible through Sequel.connect with URL parameters" do
     c = Sequel.connect 'ccc:///db?host=/tmp&user=test'
-    c.should be_a_kind_of(CCC)
+    c.should be_a_kind_of(@ccc)
     c.opts[:host].should == '/tmp'
     c.opts[:database].should == 'db'
     c.opts[:user].should == 'test'
@@ -987,14 +985,14 @@ describe "A Database adapter with a scheme" do
   
   specify "should have URL parameters take precedence over fixed URL parts" do
     c = Sequel.connect 'ccc://localhost/db?host=a&database=b'
-    c.should be_a_kind_of(CCC)
+    c.should be_a_kind_of(@ccc)
     c.opts[:host].should == 'a'
     c.opts[:database].should == 'b'
   end
   
   specify "should have hash options take predence over URL parameters or parts" do
     c = Sequel.connect 'ccc://localhost/db?host=/tmp', :host=>'a', :database=>'b', :user=>'c'
-    c.should be_a_kind_of(CCC)
+    c.should be_a_kind_of(@ccc)
     c.opts[:host].should == 'a'
     c.opts[:database].should == 'b'
     c.opts[:user].should == 'c'
@@ -1002,7 +1000,7 @@ describe "A Database adapter with a scheme" do
 
   specify "should unescape values of URL parameters and parts" do
     c = Sequel.connect 'ccc:///d%5bb%5d?host=domain%5cinstance'
-    c.should be_a_kind_of(CCC)
+    c.should be_a_kind_of(@ccc)
     c.opts[:database].should == 'd[b]'
     c.opts[:host].should == 'domain\\instance'
   end
@@ -1117,10 +1115,6 @@ describe "A single threaded database" do
 end
 
 describe "A database" do
-  before do
-    Sequel::Database.single_threaded = false
-  end
-  
   after do
     Sequel::Database.single_threaded = false
   end
@@ -1165,11 +1159,7 @@ end
 
 describe "Database#fetch" do
   before do
-    @db = Sequel::Database.new
-    c = Class.new(Sequel::Dataset) do
-      def fetch_rows(sql); yield({:sql => sql}); end
-    end
-    @db.meta_def(:dataset) {c.new(self)}
+    @db = Sequel.mock(:fetch=>proc{|sql| {:sql => sql}})
   end
   
   specify "should create a dataset and invoke its fetch_rows method with the given sql" do
@@ -1216,21 +1206,17 @@ end
 
 describe "Database#[]" do
   before do
-    @db = Sequel::Database.new
+    @db = Sequel.mock
   end
   
   specify "should return a dataset when symbols are given" do
     ds = @db[:items]
-    ds.class.should == Sequel::Dataset
+    ds.should be_a_kind_of(Sequel::Dataset)
     ds.opts[:from].should == [:items]
   end
   
   specify "should return a dataset when a string is given" do
-    c = Class.new(Sequel::Dataset) do
-      def fetch_rows(sql); yield({:sql => sql}); end
-    end
-    @db.meta_def(:dataset) {c.new(self)}
-
+    @db.fetch = proc{|sql| {:sql=>sql}}
     sql = nil
     @db['select * from xyz where x = ? and y = ?', 15, 'abc'].each {|r| sql = r[:sql]}
     sql.should == "select * from xyz where x = 15 and y = 'abc'"
@@ -1238,53 +1224,36 @@ describe "Database#[]" do
 end
 
 describe "Database#inspect" do
-  before do
-    @db = DummyDatabase.new
-    
-    @db.meta_def(:uri) {'blah://blahblah/blah'}
-  end
-  
   specify "should include the class name and the connection url" do
-    @db.inspect.should == '#<DummyDatabase: "blah://blahblah/blah">'
+    Sequel.connect('mock://foo/bar').inspect.should == '#<Sequel::Mock::Database: "mock://foo/bar">'
   end
 end
 
 describe "Database#get" do
   before do
-    @c = Class.new(DummyDatabase) do
-      def dataset
-        ds = super
-        def ds.get(*args, &block)
-          @db.execute select(*args, &block).sql
-          args
-        end
-        ds
-      end
-    end
-    
-    @db = @c.new
+    @db = Sequel.mock(:fetch=>{:a=>1})
   end
   
   specify "should use Dataset#get to get a single value" do
-    @db.get(1).should == [1]
-    @db.sqls.last.should == 'SELECT 1'
+    @db.get(1).should == 1
+    @db.sqls.should == ['SELECT 1 LIMIT 1']
     
     @db.get(:version.sql_function)
-    @db.sqls.last.should == 'SELECT version()'
+    @db.sqls.should == ['SELECT version() LIMIT 1']
   end
 
   specify "should accept a block" do
     @db.get{1}
-    @db.sqls.last.should == 'SELECT 1'
+    @db.sqls.should == ['SELECT 1 LIMIT 1']
     
     @db.get{version(1)}
-    @db.sqls.last.should == 'SELECT version(1)'
+    @db.sqls.should == ['SELECT version(1) LIMIT 1']
   end
 end
 
 describe "Database#call" do
   specify "should call the prepared statement with the given name" do
-    db = MockDatabase.new
+    db = Sequel.mock(:fetch=>{:id => 1, :x => 1})
     db[:items].prepare(:select, :select_all)
     db.call(:select_all).should == [{:id => 1, :x => 1}]
     db[:items].filter(:n=>:$n).prepare(:select, :select_n)
@@ -1296,146 +1265,129 @@ end
 describe "Database#server_opts" do
   specify "should return the general opts if no :servers option is used" do
     opts = {:host=>1, :database=>2}
-    MockDatabase.new(opts).send(:server_opts, :server1)[:host].should == 1
+    Sequel::Database.new(opts).send(:server_opts, :server1)[:host].should == 1
   end
   
   specify "should return the general opts if entry for the server is present in the :servers option" do
     opts = {:host=>1, :database=>2, :servers=>{}}
-    MockDatabase.new(opts).send(:server_opts, :server1)[:host].should == 1
+    Sequel::Database.new(opts).send(:server_opts, :server1)[:host].should == 1
   end
   
   specify "should return the general opts merged with the specific opts if given as a hash" do
     opts = {:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}}}
-    MockDatabase.new(opts).send(:server_opts, :server1)[:host].should == 3
+    Sequel::Database.new(opts).send(:server_opts, :server1)[:host].should == 3
   end
   
   specify "should return the sgeneral opts merged with the specific opts if given as a proc" do
     opts = {:host=>1, :database=>2, :servers=>{:server1=>proc{|db| {:host=>4}}}}
-    MockDatabase.new(opts).send(:server_opts, :server1)[:host].should == 4
+    Sequel::Database.new(opts).send(:server_opts, :server1)[:host].should == 4
   end
   
   specify "should raise an error if the specific opts is not a proc or hash" do
     opts = {:host=>1, :database=>2, :servers=>{:server1=>2}}
-    proc{MockDatabase.new(opts).send(:server_opts, :server1)}.should raise_error(Sequel::Error)
+    proc{Sequel::Database.new(opts).send(:server_opts, :server1)}.should raise_error(Sequel::Error)
   end
 end
 
 describe "Database#add_servers" do
   before do
-    @db = MockDatabase.new(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}})
-    def @db.connect(server)
-      server_opts(server)
-    end
-    def @db.disconnect_connection(c)
-    end
+    @db = Sequel.mock(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}})
   end
 
   specify "should add new servers to the connection pool" do
-    @db.synchronize{|c| c[:host].should == 1}
-    @db.synchronize(:server1){|c| c[:host].should == 3}
-    @db.synchronize(:server2){|c| c[:host].should == 1}
+    @db.synchronize{|c| c.opts[:host].should == 1}
+    @db.synchronize(:server1){|c| c.opts[:host].should == 3}
+    @db.synchronize(:server2){|c| c.opts[:host].should == 1}
 
     @db.add_servers(:server2=>{:host=>6})
-    @db.synchronize{|c| c[:host].should == 1}
-    @db.synchronize(:server1){|c| c[:host].should == 3}
-    @db.synchronize(:server2){|c| c[:host].should == 6}
+    @db.synchronize{|c| c.opts[:host].should == 1}
+    @db.synchronize(:server1){|c| c.opts[:host].should == 3}
+    @db.synchronize(:server2){|c| c.opts[:host].should == 6}
 
     @db.disconnect
-    @db.synchronize{|c| c[:host].should == 1}
-    @db.synchronize(:server1){|c| c[:host].should == 3}
-    @db.synchronize(:server2){|c| c[:host].should == 6}
+    @db.synchronize{|c| c.opts[:host].should == 1}
+    @db.synchronize(:server1){|c| c.opts[:host].should == 3}
+    @db.synchronize(:server2){|c| c.opts[:host].should == 6}
   end
 
   specify "should replace options for future connections to existing servers" do
-    @db.synchronize{|c| c[:host].should == 1}
-    @db.synchronize(:server1){|c| c[:host].should == 3}
-    @db.synchronize(:server2){|c| c[:host].should == 1}
+    @db.synchronize{|c| c.opts[:host].should == 1}
+    @db.synchronize(:server1){|c| c.opts[:host].should == 3}
+    @db.synchronize(:server2){|c| c.opts[:host].should == 1}
 
     @db.add_servers(:default=>proc{{:host=>4}}, :server1=>{:host=>8})
-    @db.synchronize{|c| c[:host].should == 1}
-    @db.synchronize(:server1){|c| c[:host].should == 3}
-    @db.synchronize(:server2){|c| c[:host].should == 1}
+    @db.synchronize{|c| c.opts[:host].should == 1}
+    @db.synchronize(:server1){|c| c.opts[:host].should == 3}
+    @db.synchronize(:server2){|c| c.opts[:host].should == 1}
 
     @db.disconnect
-    @db.synchronize{|c| c[:host].should == 4}
-    @db.synchronize(:server1){|c| c[:host].should == 8}
-    @db.synchronize(:server2){|c| c[:host].should == 4}
+    @db.synchronize{|c| c.opts[:host].should == 4}
+    @db.synchronize(:server1){|c| c.opts[:host].should == 8}
+    @db.synchronize(:server2){|c| c.opts[:host].should == 4}
   end
 end
 
 describe "Database#remove_servers" do
   before do
-    @db = MockDatabase.new(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
-    def @db.connect(server)
-      server_opts(server)
-    end
-    def @db.disconnect_connection(c)
-    end
+    @db = Sequel.mock(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
   end
 
   specify "should remove servers from the connection pool" do
-    @db.synchronize{|c| c[:host].should == 1}
-    @db.synchronize(:server1){|c| c[:host].should == 3}
-    @db.synchronize(:server2){|c| c[:host].should == 4}
+    @db.synchronize{|c| c.opts[:host].should == 1}
+    @db.synchronize(:server1){|c| c.opts[:host].should == 3}
+    @db.synchronize(:server2){|c| c.opts[:host].should == 4}
 
     @db.remove_servers(:server1, :server2)
-    @db.synchronize{|c| c[:host].should == 1}
-    @db.synchronize(:server1){|c| c[:host].should == 1}
-    @db.synchronize(:server2){|c| c[:host].should == 1}
+    @db.synchronize{|c| c.opts[:host].should == 1}
+    @db.synchronize(:server1){|c| c.opts[:host].should == 1}
+    @db.synchronize(:server2){|c| c.opts[:host].should == 1}
   end
   
   specify "should accept arrays of symbols" do
     @db.remove_servers([:server1, :server2])
-    @db.synchronize{|c| c[:host].should == 1}
-    @db.synchronize(:server1){|c| c[:host].should == 1}
-    @db.synchronize(:server2){|c| c[:host].should == 1}
+    @db.synchronize{|c| c.opts[:host].should == 1}
+    @db.synchronize(:server1){|c| c.opts[:host].should == 1}
+    @db.synchronize(:server2){|c| c.opts[:host].should == 1}
   end
 
   specify "should allow removal while connections are still open" do
     @db.synchronize do |c1|
-      c1[:host].should == 1
+      c1.opts[:host].should == 1
       @db.synchronize(:server1) do |c2|
-        c2[:host].should == 3
+        c2.opts[:host].should == 3
         @db.synchronize(:server2) do |c3|
-          c3[:host].should == 4
+          c3.opts[:host].should == 4
           @db.remove_servers(:server1, :server2)
             @db.synchronize(:server1) do |c4|
               c4.should_not == c2
               c4.should == c1
-              c4[:host].should == 1
+              c4.opts[:host].should == 1
               @db.synchronize(:server2) do |c5|
                 c5.should_not == c3
                 c5.should == c1
-                c5[:host].should == 1
+                c5.opts[:host].should == 1
               end
             end
-          c3[:host].should == 4
+          c3.opts[:host].should == 4
          end
-        c2[:host].should == 3
+        c2.opts[:host].should == 3
       end
-      c1[:host].should == 1
+      c1.opts[:host].should == 1
     end
   end
 end
 
 describe "Database#each_server with do/jdbc adapter connection string without :adapter option" do
-  before do
-    klass = Class.new(Sequel::Database)
-    klass.should_receive(:adapter_class).once.with(:jdbc).and_return(MockDatabase)
-    @db = klass.connect('jdbc:blah:', :host=>1, :database=>2, :servers=>{:server1=>{:host=>3}})
-    def @db.connect(server)
-      server_opts(server)
-    end
-    def @db.disconnect_connection(c)
-    end
-  end
-
   specify "should yield a separate database object for each server" do
+    klass = Class.new(Sequel::Database)
+    klass.should_receive(:adapter_class).once.with(:jdbc).and_return(Sequel::Mock::Database)
+    @db = klass.connect('jdbc:blah:', :host=>1, :database=>2, :servers=>{:server1=>{:host=>3}})
+
     hosts = []
     @db.each_server do |db|
       db.should be_a_kind_of(Sequel::Database)
       db.should_not == @db
-      db.opts[:adapter_class].should == MockDatabase
+      db.opts[:adapter_class].should == Sequel::Mock::Database
       db.opts[:database].should == 2
       hosts << db.opts[:host]
     end
@@ -1445,12 +1397,7 @@ end
 
 describe "Database#each_server" do
   before do
-    @db = Sequel.connect(:adapter=>:mock_old, :host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
-    def @db.connect(server)
-      server_opts(server)
-    end
-    def @db.disconnect_connection(c)
-    end
+    @db = Sequel.mock(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
   end
 
   specify "should yield a separate database object for each server" do
@@ -1458,7 +1405,7 @@ describe "Database#each_server" do
     @db.each_server do |db|
       db.should be_a_kind_of(Sequel::Database)
       db.should_not == @db
-      db.opts[:adapter].should == :mock_old
+      db.opts[:adapter].should == :mock
       db.opts[:database].should == 2
       hosts << db.opts[:host]
     end
@@ -1481,21 +1428,25 @@ describe "Database#each_server" do
 end
   
 describe "Database#raise_error" do
+  before do
+    @db = Sequel.mock
+  end
+
   specify "should reraise if the exception class is not in opts[:classes]" do
     e = Class.new(StandardError)
-    proc{MockDatabase.new.send(:raise_error, e.new(''), :classes=>[])}.should raise_error(e)
+    proc{@db.send(:raise_error, e.new(''), :classes=>[])}.should raise_error(e)
   end
 
   specify "should convert the exception to a DatabaseError if the exception class is in opts[:classes]" do
-    proc{MockDatabase.new.send(:raise_error, Interrupt.new(''), :classes=>[Interrupt])}.should raise_error(Sequel::DatabaseError)
+    proc{@db.send(:raise_error, Interrupt.new(''), :classes=>[Interrupt])}.should raise_error(Sequel::DatabaseError)
   end
 
   specify "should convert the exception to a DatabaseError if opts[:classes] if not present" do
-    proc{MockDatabase.new.send(:raise_error, Interrupt.new(''))}.should raise_error(Sequel::DatabaseError)
+    proc{@db.send(:raise_error, Interrupt.new(''))}.should raise_error(Sequel::DatabaseError)
   end
   
   specify "should convert the exception to a DatabaseDisconnectError if opts[:disconnect] is true" do
-    proc{MockDatabase.new.send(:raise_error, Interrupt.new(''), :disconnect=>true)}.should raise_error(Sequel::DatabaseDisconnectError)
+    proc{@db.send(:raise_error, Interrupt.new(''), :disconnect=>true)}.should raise_error(Sequel::DatabaseDisconnectError)
   end
 end
 
@@ -1821,7 +1772,7 @@ describe "Database#blank_object?" do
 end
 
 describe "Database#schema_autoincrementing_primary_key?" do
-  specify "should whether the parsed schema row indicates a primary key" do
+  specify "should indicate whether the parsed schema row indicates a primary key" do
     m = Sequel::Database.new.method(:schema_autoincrementing_primary_key?)
     m.call(:primary_key=>true).should == true
     m.call(:primary_key=>false).should == false
