@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
 describe Sequel::Schema::Generator do
   before do
-    @generator = Sequel::Schema::Generator.new(SchemaDummyDatabase.new) do
+    @generator = Sequel::Schema::Generator.new(Sequel.mock) do
       string :title
       column :body, :text
       foreign_key :parent_id
@@ -97,7 +97,7 @@ end
 
 describe Sequel::Schema::AlterTableGenerator do
   before do
-    @generator = Sequel::Schema::AlterTableGenerator.new(SchemaDummyDatabase.new) do
+    @generator = Sequel::Schema::AlterTableGenerator.new(Sequel.mock) do
       add_column :aaa, :text
       drop_column :bbb
       rename_column :ccc, :ho
@@ -147,7 +147,7 @@ end
 
 describe "Sequel::Schema::Generator generic type methods" do
   it "should store the type class in :type for each column" do
-    Sequel::Schema::Generator.new(SchemaDummyDatabase.new) do
+    Sequel::Schema::Generator.new(Sequel.mock) do
       String :a
       Integer :b
       Fixnum :c

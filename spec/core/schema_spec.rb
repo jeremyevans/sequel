@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
 describe "DB#create_table" do
   before do
-    @db = SchemaDummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should accept the table name" do
@@ -552,7 +552,7 @@ end
 
 describe "DB#create_table!" do
   before do
-    @db = SchemaDummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should create the table if it does not exist" do
@@ -570,13 +570,13 @@ end
 
 describe "DB#create_table?" do
   before do
-    @db = SchemaDummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should not create the table if the table already exists" do
     @db.meta_def(:table_exists?){|a| true}
     @db.create_table?(:cats){|*a|}
-    @db.sqls.should == nil
+    @db.sqls.should == []
   end
   
   specify "should create the table if the table doesn't already exist" do
@@ -594,7 +594,7 @@ end
 
 describe "DB#drop_table" do
   before do
-    @db = SchemaDummyDatabase.new
+    @db = Sequel.mock
   end
 
   specify "should generate a DROP TABLE statement" do
@@ -615,7 +615,7 @@ end
 
 describe "DB#alter_table" do
   before do
-    @db = SchemaDummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should allow adding not null constraint" do
@@ -709,7 +709,7 @@ describe "DB#alter_table" do
     @db.meta_def(:execute_ddl){|*a| raise Sequel::DatabaseError}
     lambda{@db.add_index(:cats, :id)}.should raise_error(Sequel::DatabaseError)
     lambda{@db.add_index(:cats, :id, :ignore_errors=>true)}.should_not raise_error(Sequel::DatabaseError)
-    @db.sqls.should == nil
+    @db.sqls.should == []
   end
 
   specify "should support add_primary_key" do
@@ -809,7 +809,7 @@ end
 
 describe "Database#create_table" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL" do
@@ -818,10 +818,8 @@ describe "Database#create_table" do
       column :name, :text
       index :name, :unique => true
     end
-    @db.sqls.should == [
-      'CREATE TABLE test (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
-      'CREATE UNIQUE INDEX test_name_index ON test (name)'
-    ]
+    @db.sqls.should == ['CREATE TABLE test (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
+      'CREATE UNIQUE INDEX test_name_index ON test (name)']
   end
   
   specify "should create a temporary table" do
@@ -831,10 +829,8 @@ describe "Database#create_table" do
       index :name, :unique => true
     end
     
-    @db.sqls.should == [
-      'CREATE TEMPORARY TABLE test_tmp (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
-      'CREATE UNIQUE INDEX test_tmp_name_index ON test_tmp (name)'
-    ]
+    @db.sqls.should == ['CREATE TEMPORARY TABLE test_tmp (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
+      'CREATE UNIQUE INDEX test_tmp_name_index ON test_tmp (name)']
   end
 
   specify "should not use default schema when creating a temporary table" do
@@ -848,7 +844,7 @@ end
 
 describe "Database#alter_table" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL" do
@@ -858,40 +854,31 @@ describe "Database#alter_table" do
       rename_column :ccc, :ddd
       set_column_type :eee, :integer
       set_column_default :hhh, 'abcd'
-      
       add_index :fff, :unique => true
       drop_index :ggg
     end
     
-    @db.sqls.should == [
-      'ALTER TABLE xyz ADD COLUMN aaa text NOT NULL UNIQUE',
+    @db.sqls.should == ['ALTER TABLE xyz ADD COLUMN aaa text NOT NULL UNIQUE',
       'ALTER TABLE xyz DROP COLUMN bbb',
       'ALTER TABLE xyz RENAME COLUMN ccc TO ddd',
       'ALTER TABLE xyz ALTER COLUMN eee TYPE integer',
       "ALTER TABLE xyz ALTER COLUMN hhh SET DEFAULT 'abcd'",
-      
       'CREATE UNIQUE INDEX xyz_fff_index ON xyz (fff)',
-      'DROP INDEX xyz_ggg_index'
-    ]
+      'DROP INDEX xyz_ggg_index']
   end
 end
 
 describe "Database#add_column" do
-  before do
-    @db = DummyDatabase.new
-  end
-  
   specify "should construct proper SQL" do
-    @db.add_column :test, :name, :text, :unique => true
-    @db.sqls.should == [
-      'ALTER TABLE test ADD COLUMN name text UNIQUE'
-    ]
+    db = Sequel.mock
+    db.add_column :test, :name, :text, :unique => true
+    db.sqls.should == ['ALTER TABLE test ADD COLUMN name text UNIQUE']
   end
 end
 
 describe "Database#drop_column" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL" do
@@ -907,80 +894,68 @@ end
 
 describe "Database#rename_column" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL" do
     @db.rename_column :test, :abc, :def
-    @db.sqls.should == [
-      'ALTER TABLE test RENAME COLUMN abc TO def'
-    ]
+    @db.sqls.should == ['ALTER TABLE test RENAME COLUMN abc TO def']
   end
 end
 
 describe "Database#set_column_type" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL" do
     @db.set_column_type :test, :name, :integer
-    @db.sqls.should == [
-      'ALTER TABLE test ALTER COLUMN name TYPE integer'
-    ]
+    @db.sqls.should == ['ALTER TABLE test ALTER COLUMN name TYPE integer']
   end
 end
 
 describe "Database#set_column_default" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL" do
     @db.set_column_default :test, :name, 'zyx'
-    @db.sqls.should == [
-      "ALTER TABLE test ALTER COLUMN name SET DEFAULT 'zyx'"
-    ]
+    @db.sqls.should == ["ALTER TABLE test ALTER COLUMN name SET DEFAULT 'zyx'"]
   end
 end
 
 describe "Database#add_index" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL" do
     @db.add_index :test, :name, :unique => true
-    @db.sqls.should == [
-      'CREATE UNIQUE INDEX test_name_index ON test (name)'
-    ]
+    @db.sqls.should == ['CREATE UNIQUE INDEX test_name_index ON test (name)']
   end
   
   specify "should accept multiple columns" do
     @db.add_index :test, [:one, :two]
-    @db.sqls.should == [
-      'CREATE INDEX test_one_two_index ON test (one, two)'
-    ]
+    @db.sqls.should == ['CREATE INDEX test_one_two_index ON test (one, two)']
   end
 end
 
 describe "Database#drop_index" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL" do
     @db.drop_index :test, :name
-    @db.sqls.should == [
-      'DROP INDEX test_name_index'
-    ]
+    @db.sqls.should == ['DROP INDEX test_name_index']
   end
   
 end
 
 describe "Database#drop_table" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL" do
@@ -990,17 +965,13 @@ describe "Database#drop_table" do
   
   specify "should accept multiple table names" do
     @db.drop_table :a, :bb, :ccc
-    @db.sqls.should == [
-      'DROP TABLE a',
-      'DROP TABLE bb',
-      'DROP TABLE ccc'
-    ]
+    @db.sqls.should == ['DROP TABLE a', 'DROP TABLE bb', 'DROP TABLE ccc']
   end
 end
 
 describe "Database#rename_table" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL" do
@@ -1011,7 +982,7 @@ end
 
 describe "Database#create_view" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL with raw SQL" do
@@ -1033,7 +1004,7 @@ end
 
 describe "Database#create_or_replace_view" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL with raw SQL" do
@@ -1055,7 +1026,7 @@ end
 
 describe "Database#drop_view" do
   before do
-    @db = DummyDatabase.new
+    @db = Sequel.mock
   end
   
   specify "should construct proper SQL" do
@@ -1078,12 +1049,8 @@ describe "Database#drop_view" do
 end
 
 describe "Database#alter_table_sql" do
-  before do
-    @db = DummyDatabase.new
-  end
-  
   specify "should raise error for an invalid op" do
-    proc {@db.send(:alter_table_sql, :mau, :op => :blah)}.should raise_error(Sequel::Error)
+    proc {Sequel.mock.send(:alter_table_sql, :mau, :op => :blah)}.should raise_error(Sequel::Error)
   end
 end
 
