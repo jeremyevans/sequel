@@ -648,6 +648,7 @@ module Sequel
             # even if they are not selected.
             cols = get_columns.call
             cols.each{|c| schema_hash[c] ||= {}}
+            def_column_accessor(*schema_hash.keys)
           else
             # Dataset is for a single table with all columns,
             # so set the columns based on the order they were

@@ -441,24 +441,17 @@ describe Sequel::Model, "A model class without a primary key" do
     o.save
     MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (2)']
   end
-
 end
 
 describe Sequel::Model, "attribute accessors" do
   before do
-    MODEL_DB.reset
-    @dataset = Sequel::Dataset.new(MODEL_DB)
-    def @dataset.columns; [:x, :y]; end
-    @c = Class.new(Sequel::Model) do
-      def self.db_schema
-         set_columns(Array(@columns))
-        @db_schema = {:x=>{:type=>:integer}, :y=>{:type=>:integer}}
-      end
-      def self.set_dataset(ds, opts={}) 
-        @columns = ds.columns
-        db_schema
-      end
+    db = Sequel.mock
+    def db.schema(*)
+      [[:x, {:type=>:integer}], [:y, {:type=>:integer}]]
     end
+    @dataset = db[:items].columns(:x, :y)
+    @c = Class.new(Sequel::Model)
+    MODEL_DB.reset
   end
 
   it "should be created on set_dataset" do
@@ -490,7 +483,7 @@ describe Sequel::Model, "attribute accessors" do
   end
 
   it "should have a working typecasting setter even if the column is not selected" do
-    @c.set_dataset(@dataset.select(:y))
+    @c.set_dataset(@dataset.select(:y).columns(:y))
     o = @c.new
 
     o.x = '34'
@@ -498,7 +491,7 @@ describe Sequel::Model, "attribute accessors" do
   end
 
   it "should typecast if the new value is the same as the existing but has a different class" do
-    @c.set_dataset(@dataset.select(:y))
+    @c.set_dataset(@dataset.select(:y).columns(:y))
     o = @c.new
 
     o.x = 34

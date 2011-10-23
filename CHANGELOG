@@ -1,5 +1,7 @@
 === HEAD
 
+* Create accessor methods for all columns in a model's table, even if the dataset doesn't select the columns (jeremyevans)
+
 * Add mock adapter for better mocking of a database connection (jeremyevans)
 
 * Have models pass their dataset instead of table name to Database#schema (jeremyevans)

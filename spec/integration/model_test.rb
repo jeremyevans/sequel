@@ -38,6 +38,14 @@ describe "Sequel::Model basic support" do
     Item::Thing.first.should == Item::Thing.load(:id=>1, :name=>'J')
   end
 
+  specify "should create accessors for all table columns even if all dataset columns aren't selected" do
+    c = Class.new(Sequel::Model(@db[:items].select(:id)))
+    o = c.new
+    o.name = 'A'
+    o.save.should == c.load(:id=>1)
+    c.select_map(:name).should == ['A']
+  end
+
   specify "should work correctly when a dataset restricts the colums it selects" do
     class ::Item::Thing < Sequel::Model(@db[:items].select(:name))
     end
