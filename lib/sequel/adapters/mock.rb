@@ -145,6 +145,20 @@ module Sequel
 
       private
 
+      def _autoid(sql, v, ds=nil)
+        case v
+        when Integer
+          if ds
+            ds.autoid += 1 if ds.autoid.is_a?(Integer)
+          else
+            @autoid += 1
+          end
+          v
+        else
+          _nextres(v, sql, nil)
+        end
+      end
+
       def _execute(c, sql, opts={}, &block)
         sql += " -- args: #{opts[:arguments].inspect}" if opts[:arguments]
         sql += " -- #{@opts[:append]}" if @opts[:append]
@@ -152,21 +166,25 @@ module Sequel
         log_info(sql)
         @sqls << sql 
 
+        ds = opts[:dataset]
         begin
           if block
-            if ds = opts[:dataset]
-              columns(ds, sql)
-            end
-            _fetch(sql, &block)
+            columns(ds, sql) if ds
+            _fetch(sql, ds._fetch || @fetch, &block)
           elsif meth = opts[:meth]
-            send(meth, sql)
+            if meth == :numrows
+              _numrows(sql, ds.numrows || @numrows)
+            else
+              v = ds.autoid
+              _autoid(sql, v || @autoid, (ds if v))
+            end
           end
         rescue => e
           raise_error(e)
         end
       end
 
-      def _fetch(sql, f=@fetch, &block)
+      def _fetch(sql, f, &block)
         case f
         when Hash
           yield f
@@ -217,14 +235,8 @@ module Sequel
         end
       end
 
-      def autoid(sql)
-        case v = @autoid
-        when Integer
-          @autoid += 1
-          v
-        else
-          _nextres(v, sql, nil)
-        end
+      def _numrows(sql, v)
+        _nextres(v, sql, 0)
       end
 
       def columns(ds, sql, cs=@columns)
@@ -249,10 +261,6 @@ module Sequel
       def disconnect_connection(c)
       end
 
-      def numrows(sql)
-        _nextres(@numrows, sql, 0)
-      end
-
       def quote_identifiers_default
         false
       end
@@ -267,6 +275,15 @@ module Sequel
     end
 
     class Dataset < Sequel::Dataset
+      # Override the databases's autoid setting for this dataset
+      attr_accessor :autoid
+
+      # Override the databases's fetch setting for this dataset
+      attr_accessor :_fetch
+
+      # Override the databases's numrows setting for this dataset
+      attr_accessor :numrows
+
       # If arguments are provided, use them to set the columns
       # for this dataset and return self.  Otherwise, use the
       # default Sequel behavior and return the columns.
@@ -286,6 +303,14 @@ module Sequel
       private
 
       def execute(sql, opts={}, &block)
+        super(sql, opts.merge(:dataset=>self), &block)
+      end
+
+      def execute_dui(sql, opts={}, &block)
+        super(sql, opts.merge(:dataset=>self), &block)
+      end
+
+      def execute_insert(sql, opts={}, &block)
         super(sql, opts.merge(:dataset=>self), &block)
       end
     end
