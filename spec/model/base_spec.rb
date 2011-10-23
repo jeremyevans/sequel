@@ -1,8 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Model attribute setters" do
-
-  before(:each) do
+  before do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do

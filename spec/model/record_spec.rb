@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Model#save server use" do
   
-  before(:each) do
+  before do
     @db = Sequel.mock(:autoid=>proc{|sql| 10}, :fetch=>{:x=>1, :id=>10}, :servers=>{:blah=>{}, :read_only=>{}})
     @c = Class.new(Sequel::Model(@db[:items]))
     @c.columns :id, :x, :y
@@ -495,7 +495,7 @@ end
 
 describe "Model#new?" do
   
-  before(:each) do
+  before do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
@@ -584,7 +584,7 @@ describe Sequel::Model, "with this" do
 end
 
 describe "Model#pk" do
-  before(:each) do
+  before do
     @m = Class.new(Sequel::Model)
     @m.columns :id, :x, :y
   end
@@ -618,7 +618,7 @@ describe "Model#pk" do
 end
 
 describe "Model#pk_or_nil" do
-  before(:each) do
+  before do
     @m = Class.new(Sequel::Model)
     @m.columns :id, :x, :y
   end
@@ -652,7 +652,7 @@ describe "Model#pk_or_nil" do
 end
 
 describe "Model#pk_hash" do
-  before(:each) do
+  before do
     @m = Class.new(Sequel::Model)
     @m.columns :id, :x, :y
   end
@@ -1054,7 +1054,7 @@ describe Sequel::Model, "#destroy" do
 end
 
 describe Sequel::Model, "#exists?" do
-  before(:each) do
+  before do
     @model = Class.new(Sequel::Model(:items))
     @ds = @model.dataset
     def @ds.fetch_rows(sql)
@@ -1322,7 +1322,7 @@ end
 
 describe Sequel::Model, ".create" do
 
-  before(:each) do
+  before do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
       unrestrict_primary_key
