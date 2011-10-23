@@ -318,6 +318,12 @@ describe "Sequel Mock Adapter" do
     db.sqls.should == ['SELECT * FROM t -- a']
   end
 
+  specify "should append :arguments option to execute to the SQL if present" do
+    db = Sequel.mock
+    db.execute('SELECT * FROM t', :arguments=>[1, 2])
+    db.sqls.should == ['SELECT * FROM t -- args: [1, 2]']
+  end
+
   specify "should have Dataset#columns take columns to set and return self" do
     db = Sequel.mock
     ds = db[:t].columns(:id, :a, :b)

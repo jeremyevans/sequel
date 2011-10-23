@@ -146,6 +146,7 @@ module Sequel
       private
 
       def _execute(c, sql, opts={}, &block)
+        sql += " -- args: #{opts[:arguments].inspect}" if opts[:arguments]
         sql += " -- #{@opts[:append]}" if @opts[:append]
         sql += " -- #{c.server}" if c.server != :default
         log_info(sql)
@@ -278,13 +279,15 @@ module Sequel
         end
       end
 
+      def fetch_rows(sql, &block)
+        execute(sql, &block)
+      end
+
       private
 
       def execute(sql, opts={}, &block)
         super(sql, opts.merge(:dataset=>self), &block)
       end
-      alias fetch_rows execute
-      public :fetch_rows
     end
   end
 end
