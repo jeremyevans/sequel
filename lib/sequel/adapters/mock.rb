@@ -46,6 +46,16 @@ module Sequel
       #          instance an raise it wrapped in a DatabaseError.
       attr_writer :autoid
 
+      # Set the columns to set in the dataset when the dataset fetches
+      # rows.  Argument types supported:
+      # nil :: Set no columns
+      # Array of Symbols: Used for all datasets
+      # Array (otherwise): First retrieval gets the first value in the
+      #                    array, second gets the second value, etc.
+      # Proc :: Called with the select SQL query, uses the value
+      #         returned, which should be an array of symbols
+      attr_writer :columns
+
       # Set the hashes to yield by execute when retrieving rows.
       # Argument types supported:
       #
@@ -77,6 +87,7 @@ module Sequel
       # Additional options supported:
       #
       # :autoid :: Call #autoid= with the value
+      # :columns :: Call #columns= with the value
       # :fetch ::  Call #fetch= with the value
       # :numrows :: Call #numrows= with the value
       # :extend :: A module the object is extended with.
@@ -84,6 +95,7 @@ module Sequel
       def initialize(opts=nil)
         super
         self.autoid = opts[:autoid]
+        self.columns = opts[:columns]
         self.fetch = opts[:fetch]
         self.numrows = opts[:numrows]
         extend(opts[:extend]) if opts[:extend]
@@ -141,6 +153,9 @@ module Sequel
 
         begin
           if block
+            if ds = opts[:dataset]
+              columns(ds, sql)
+            end
             _fetch(sql, &block)
           elsif meth = opts[:meth]
             send(meth, sql)
@@ -150,8 +165,8 @@ module Sequel
         end
       end
 
-      def _fetch(sql, f=(v=false; nil), &block)
-        case (v.nil? ? f : (f ||= @fetch))
+      def _fetch(sql, f=@fetch, &block)
+        case f
         when Hash
           yield f
         when Array
@@ -211,6 +226,25 @@ module Sequel
         end
       end
 
+      def columns(ds, sql, cs=@columns)
+        case cs
+        when Array
+          unless cs.empty?
+            if cs.all?{|c| c.is_a?(Symbol)}
+              ds.columns(*cs)
+            else
+              columns(ds, sql, cs.shift)
+            end
+          end
+        when Proc
+          ds.columns(*cs.call(sql))
+        when nil
+          # nothing
+        else
+          raise Error, "Invalid @columns attribute: #{cs.inspect}"
+        end
+      end
+
       def disconnect_connection(c)
       end
 
@@ -244,7 +278,13 @@ module Sequel
         end
       end
 
+      private
+
+      def execute(sql, opts={}, &block)
+        super(sql, opts.merge(:dataset=>self), &block)
+      end
       alias fetch_rows execute
+      public :fetch_rows
     end
   end
 end

@@ -70,7 +70,7 @@ describe "Sequel Mock Adapter" do
     rs.should == [{:a=>1}] * 2
   end
 
-  specify "should be able to set an exception to raise by setting the :numrows option to an exception class " do
+  specify "should be able to set an exception to raise by setting the :fetch option to an exception class " do
     db = Sequel.mock(:fetch=>ArgumentError)
     proc{db[:t].all}.should raise_error(Sequel::DatabaseError)
     begin
@@ -197,6 +197,37 @@ describe "Sequel Mock Adapter" do
     db[:t].insert(:a=>1).should == 1
     db[:t].insert(:a=>1).should == 2
     db[:t].insert(:a=>1).should == 3
+  end
+
+  specify "should be able to set the columns to set in the dataset as an array of symbols" do
+    db = Sequel.mock(:columns=>[:a, :b])
+    db[:t].columns.should == [:a, :b]
+    db.sqls.should == ["SELECT * FROM t LIMIT 1"]
+    ds = db[:t]
+    ds.all
+    db.sqls.should == ["SELECT * FROM t"]
+    ds.columns.should == [:a, :b]
+    db.sqls.should == []
+    db[:t].columns.should == [:a, :b]
+  end
+
+  specify "should be able to set the columns to set in the dataset as an array of arrays of symbols" do
+    db = Sequel.mock(:columns=>[[:a, :b], [:c, :d]])
+    db[:t].columns.should == [:a, :b]
+    db[:t].columns.should == [:c, :d]
+  end
+
+  specify "should be able to set the columns to set in the dataset as a proc" do
+    db = Sequel.mock(:columns=>proc{|sql| (sql =~ / t/) ? [:a, :b] : [:c, :d]})
+    db[:b].columns.should == [:c, :d]
+    db[:t].columns.should == [:a, :b]
+  end
+
+  specify "should have a columns= method to set the columns to set after the fact" do
+    db = Sequel.mock
+    db.columns = [[:a, :b], [:c, :d]]
+    db[:t].columns.should == [:a, :b]
+    db[:t].columns.should == [:c, :d]
   end
 
   specify "should keep a record of all executed SQL in #sqls" do
