@@ -300,29 +300,27 @@ end
 
 describe "Model.db=" do
   before do
-    $db1 = MockDatabase.new
-    $db2 = MockDatabase.new
+    @db1 = Sequel.mock
+    @db2 = Sequel.mock
     
-    class BlueBlue < Sequel::Model(:items)
-      set_dataset $db1[:blue].filter(:x=>1)
-    end
+    @m = Class.new(Sequel::Model(@db1[:blue].filter(:x=>1)))
   end
   
   specify "should affect the underlying dataset" do
-    BlueBlue.db = $db2
+    @m.db = @db2
     
-    BlueBlue.dataset.db.should === $db2
-    BlueBlue.dataset.db.should_not === $db1
+    @m.dataset.db.should === @db2
+    @m.dataset.db.should_not === @db1
   end
 
   specify "should keep the same dataset options" do
-    BlueBlue.db = $db2
-    BlueBlue.dataset.sql.should == 'SELECT * FROM blue WHERE (x = 1)'
+    @m.db = @db2
+    @m.dataset.sql.should == 'SELECT * FROM blue WHERE (x = 1)'
   end
 
   specify "should use the database for subclasses" do
-    BlueBlue.db = $db2
-    Class.new(BlueBlue).db.should === $db2
+    @m.db = @db2
+    Class.new(@m).db.should === @db2
   end
 end
 
@@ -566,40 +564,40 @@ describe "Model datasets #with_pk" do
       db << sql
       yield(:id=>1)
     end
-    @sqls = MODEL_DB.sqls
-    @sqls.clear
+    MODEL_DB.reset
   end
 
   it "should return the first record where the primary key matches" do
     @ds.with_pk(1).should == @c.load(:id=>1)
-    @sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
   end
 
   it "should handle existing filters" do
     @ds.filter(:a=>2).with_pk(1)
-    @sqls.should == ["SELECT * FROM a WHERE ((a = 2) AND (a.id = 1)) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE ((a = 2) AND (a.id = 1)) LIMIT 1"]
   end
 
   it "should work with string values" do
     @ds.with_pk("foo")
-    @sqls.should == ["SELECT * FROM a WHERE (a.id = 'foo') LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 'foo') LIMIT 1"]
   end
 
   it "should handle an array for composite primary keys" do
     @c.set_primary_key :id1, :id2
     @ds.with_pk([1, 2])
+    sqls = MODEL_DB.sqls
     ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1",
-    "SELECT * FROM a WHERE ((a.id2 = 2) AND (a.id1 = 1)) LIMIT 1"].should include(@sqls.first)
-    @sqls.length.should == 1
+    "SELECT * FROM a WHERE ((a.id2 = 2) AND (a.id1 = 1)) LIMIT 1"].should include(sqls.first)
+    sqls.length.should == 1
   end
 
   it "should have #[] consider an integer as a primary key lookup" do
     @ds[1].should == @c.load(:id=>1)
-    @sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
   end
 
   it "should not have #[] consider a string as a primary key lookup" do
     @ds['foo'].should == @c.load(:id=>1)
-    @sqls.should == ["SELECT * FROM a WHERE (foo) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (foo) LIMIT 1"]
   end
 end

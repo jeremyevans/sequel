@@ -3,34 +3,22 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "Model#save server use" do
   
   before(:each) do
-    @c = Class.new(Sequel::Model(:items)) do
-      columns :id, :x, :y
-    end
-    @c.db = MockDatabase.new
-    db2 = @db2 = MockDatabase.new
-    @c.class_eval do
-      define_method(:after_save) do
-        model.db = db2
-        ds = model.dataset
-        def ds.fetch_rows(sql)
-          yield @db.execute(sql, @opts[:server])
-        end
-        @this = nil
-      end
-    end
+    @db = Sequel.mock(:autoid=>proc{|sql| 10}, :fetch=>{:x=>1, :id=>10}, :servers=>{:blah=>{}, :read_only=>{}})
+    @c = Class.new(Sequel::Model(@db[:items]))
+    @c.columns :id, :x, :y
+    @c.dataset.columns(:id, :x, :y)
+    @db.sqls
   end
 
   it "should use the :default server if the model doesn't have one already specified" do
-    @c.db.should_receive(:execute).with("INSERT INTO items (x) VALUES (1)").and_return(10)
-    @db2.should_receive(:execute).with('SELECT * FROM items WHERE (id = 10) LIMIT 1', :default).and_return(:x=>1, :id=>10)
-    @c.new(:x=>1).save
+    @c.new(:x=>1).save.should == @c.load(:x=>1, :id=>10)
+    @db.sqls.should == ["INSERT INTO items (x) VALUES (1)", 'SELECT * FROM items WHERE (id = 10) LIMIT 1']
   end
 
   it "should use the model's server if the model has one already specified" do
     @c.dataset = @c.dataset.server(:blah)
-    @c.db.should_receive(:execute).with("INSERT INTO items (x) VALUES (1)").and_return(10)
-    @db2.should_receive(:execute).with('SELECT * FROM items WHERE (id = 10) LIMIT 1', :blah).and_return(:x=>1, :id=>10)
-    @c.new(:x=>1).save
+    @c.new(:x=>1).save.should == @c.load(:x=>1, :id=>10)
+    @db.sqls.should == ["INSERT INTO items (x) VALUES (1) -- blah", 'SELECT * FROM items WHERE (id = 10) LIMIT 1 -- blah']
   end
 end
 
@@ -100,9 +88,10 @@ describe "Model#save" do
     o = @c.new(:x => 11)
     o.meta_def(:autoincrementing_primary_key){:y}
     o.save
-    MODEL_DB.sqls.length.should == 2
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (11)"
-    MODEL_DB.sqls.last.should =~ %r{SELECT \* FROM items WHERE \(\([xy] = 1[13]\) AND \([xy] = 1[13]\)\) LIMIT 1}
+    sqls = MODEL_DB.sqls
+    sqls.length.should == 2
+    sqls.first.should == "INSERT INTO items (x) VALUES (11)"
+    sqls.last.should =~ %r{SELECT \* FROM items WHERE \(\([xy] = 1[13]\) AND \([xy] = 1[13]\)\) LIMIT 1}
   end
 
   it "should update a record for an existing model instance" do
@@ -433,15 +422,14 @@ describe "Model#save_changes" do
     MODEL_DB.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 3)"]
     o.save_changes
     o.save_changes
-    MODEL_DB.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 3)"]
-    MODEL_DB.reset
+    MODEL_DB.sqls.should == []
 
     o.y = 4
     o.save_changes
     MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
     o.save_changes
     o.save_changes
-    MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
+    MODEL_DB.sqls.should == []
   end
   
   it "should not consider columns changed if the values did not change" do
@@ -453,7 +441,6 @@ describe "Model#save_changes" do
     o.x = 3
     o.save_changes
     MODEL_DB.sqls.should == ["UPDATE items SET x = 3 WHERE (id = 3)"]
-    MODEL_DB.reset
 
     o[:y] = nil
     o.save_changes
@@ -907,14 +894,13 @@ describe Sequel::Model, "#update_fields" do
   it "should set only the given fields, and then save the changes to the record" do
     @o1.update_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y])
     @o1.values.should == {:x => 1, :y => 2, :id=>1}
-    MODEL_DB.sqls.first.should =~ /UPDATE items SET [xy] = [12], [xy] = [12] WHERE \(id = 1\)/
-    MODEL_DB.sqls.length.should == 1
-    MODEL_DB.reset
+    sqls = MODEL_DB.sqls
+    sqls.first.should =~ /UPDATE items SET [xy] = [12], [xy] = [12] WHERE \(id = 1\)/
+    sqls.length.should == 1
 
     @o1.update_fields({:x => 1, :y => 5, :z=>6, :id=>7}, [:x, :y])
     @o1.values.should == {:x => 1, :y => 5, :id=>1}
     MODEL_DB.sqls.should == ["UPDATE items SET y = 5 WHERE (id = 1)"]
-    MODEL_DB.reset
   end
 end
 
@@ -1347,13 +1333,13 @@ describe Sequel::Model, ".create" do
   it "should be able to create rows in the associated table" do
     o = @c.create(:x => 1)
     o.class.should == @c
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)',  "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (1)')) LIMIT 1"]
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)',  "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   it "should be able to create rows without any values specified" do
     o = @c.create
     o.class.should == @c
-    MODEL_DB.sqls.should == ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE (id IN ('INSERT INTO items DEFAULT VALUES')) LIMIT 1"]
+    MODEL_DB.sqls.should == ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   it "should accept a block and run it" do
@@ -1363,7 +1349,7 @@ describe Sequel::Model, ".create" do
     o1.should === o
     o3.should === o
     o2.should == :blah
-    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (333)')) LIMIT 1"]
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
   
   it "should create a row for a model with custom primary key" do

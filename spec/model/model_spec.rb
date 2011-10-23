@@ -133,12 +133,12 @@ describe Sequel::Model do
   it "should be associated with a dataset" do
     model_a = Class.new(Sequel::Model) { set_dataset MODEL_DB[:as] }
 
-    model_a.dataset.should be_a_kind_of(MockDataset)
+    model_a.dataset.should be_a_kind_of(Sequel::Mock::Dataset)
     model_a.dataset.opts[:from].should == [:as]
 
     model_b = Class.new(Sequel::Model) { set_dataset MODEL_DB[:bs] }
 
-    model_b.dataset.should be_a_kind_of(MockDataset)
+    model_b.dataset.should be_a_kind_of(Sequel::Mock::Dataset)
     model_b.dataset.opts[:from].should == [:bs]
 
     model_a.dataset.opts[:from].should == [:as]

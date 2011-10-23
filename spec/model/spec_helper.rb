@@ -13,83 +13,14 @@ if ENV['SEQUEL_COLUMNS_INTROSPECTION']
   Sequel::Dataset.introspect_all_columns
 end
 
-class MockDataset < Sequel::Dataset
-  def insert(*args)
-    @db.execute insert_sql(*args)
-  end
-  
-  def update(*args)
-    @db.execute update_sql(*args)
-    1
-  end
-  
-  def delete(*args)
-    @db.execute delete_sql(*args)
-    1
-  end
-  
-  def fetch_rows(sql)
-    return if sql =~ /information_schema/
-    @db.execute(sql)
-    yield({:id => 1, :x => 1})
-  end
-
-  def quoted_identifier(c)
-    "\"#{c}\""
-  end
-end
-
-class MockDatabase < Sequel::Database
-  @@quote_identifiers = false
-  self.identifier_input_method = nil
-  self.identifier_output_method = nil
-  attr_reader :sqls
-
-  def connect(opts)
-    Object.new
-  end
-  
-  def execute(sql, opts={})
-    @sqls ||= []
-    @sqls << sql
-  end
-
-  def reset
-    @sqls = []
-  end
-
-  def schema(table_name, opts)
-    if table_name
-      [[:id, {:primary_key=>true}]]
-    else
-      {table_name=>[[:id, {:primary_key=>true}]]}
-    end
-  end
-
-   def transaction(opts={})
-    return yield if @transactions.has_key?(Thread.current)
-    execute('BEGIN')
-    begin
-      @transactions[Thread.current] = {}
-      yield
-    rescue Exception => e
-      execute('ROLLBACK')
-      transaction_error(e)
-    ensure
-      unless e
-        execute('COMMIT')
-      end
-      @transactions.delete(Thread.current)
-    end
-  end
-
-  def dataset(opts=nil); MockDataset.new(self, opts); end
-end
+Sequel.quote_identifiers = false
+Sequel.identifier_input_method = nil
+Sequel.identifier_output_method = nil
 
 class << Sequel::Model
   alias orig_columns columns
   def columns(*cols)
-    return if cols.empty?
+    return super if cols.empty?
     define_method(:columns){cols}
     @dataset.instance_variable_set(:@columns, cols) if @dataset
     def_column_accessor(*cols)
@@ -103,4 +34,20 @@ class << Sequel::Model
 end
 
 Sequel::Model.use_transactions = false
-Sequel::Model.db = MODEL_DB = MockDatabase.new
+
+db = Sequel.mock(:fetch=>{:id => 1, :x => 1}, :numrows=>1, :autoid=>proc{|sql| 10})
+def db.schema(*) [[:id, {:primary_key=>true}]] end
+def db.reset() sqls end
+class Sequel::Mock::Dataset
+  def select_columns(*a) select(*a).columns(*a) end
+  def copy_columns
+    @copy_columns = true
+    self
+  end
+  def clone(*)
+    ds = super
+    ds.columns(*@columns) if @copy_columns && @columns
+    ds
+  end
+end
+Sequel::Model.db = MODEL_DB = db
