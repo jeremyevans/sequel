@@ -2,16 +2,21 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
 describe Sequel::Dataset, " graphing" do
   before do
-    dbc = Class.new
-    @db = dbc.new
-    @ds1 = Sequel::Dataset.new(@db).from(:points)
-    @ds2 = Sequel::Dataset.new(@db).from(:lines)
-    @ds3 = Sequel::Dataset.new(@db).from(:graphs)
-    dss = {:points=>@ds1, :lines=>@ds2, :graphs=>@ds3}
-    dbc.send(:define_method, :[]){|ds| dss[ds]} 
-    def @ds1.columns; [:id, :x, :y] end
-    def @ds2.columns; [:id, :x, :y, :graph_id] end
-    def @ds3.columns; [:id, :name, :x, :y, :lines_x] end
+    @db = Sequel.mock(:columns=>proc do |sql|
+      case sql
+      when /points/
+        [:id, :x, :y]
+      when /lines/
+        [:id, :x, :y, :graph_id]
+      else
+        [:id, :name, :x, :y, :lines_x]
+      end
+    end)
+    @ds1 = @db.from(:points)
+    @ds2 = @db.from(:lines)
+    @ds3 = @db.from(:graphs)
+    [@ds1, @ds2, @ds3].each{|ds| ds.columns}
+    @db.sqls
   end
 
   it "#graph should not modify the current dataset's opts" do
@@ -187,144 +192,73 @@ describe Sequel::Dataset, " graphing" do
   end
 
   it "#graph_each should split the result set into component tables" do
-    ds = @ds1.graph(@ds2, :x=>:id)
-    def ds.fetch_rows(sql, &block)
-      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7})
-    end
-    results = ds.all
-    results.length.should == 1
-    results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}}
+    @db.fetch = [[{:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7}],
+      [{:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graphs_id=>8, :name=>9, :graphs_x=>10, :graphs_y=>11, :graphs_lines_x=>12}],
+      [{:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graph_id_0=>8, :graph_x=>9, :graph_y=>10, :graph_graph_id=>11}]]
 
-    ds = @ds1.graph(@ds2, :x=>:id).graph(@ds3, :id=>:graph_id)
-    def ds.fetch_rows(sql, &block)
-      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graphs_id=>8, :name=>9, :graphs_x=>10, :graphs_y=>11, :graphs_lines_x=>12})
-    end
-    results = ds.all
-    results.length.should == 1
-    results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graphs=>{:id=>8, :name=>9, :x=>10, :y=>11, :lines_x=>12}}
-
-    ds = @ds1.graph(@ds2, :x=>:id).graph(@ds2, {:y=>:points__id}, :table_alias=>:graph)
-    def ds.fetch_rows(sql, &block)
-      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graph_id_0=>8, :graph_x=>9, :graph_y=>10, :graph_graph_id=>11})
-    end
-    results = ds.all
-    results.length.should == 1
-    results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graph=>{:id=>8, :x=>9, :y=>10, :graph_id=>11}}
+    @ds1.graph(@ds2, :x=>:id).all.should == [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}}]
+    @ds1.graph(@ds2, :x=>:id).graph(@ds3, :id=>:graph_id).all.should == [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graphs=>{:id=>8, :name=>9, :x=>10, :y=>11, :lines_x=>12}}]
+    @ds1.graph(@ds2, :x=>:id).graph(@ds2, {:y=>:points__id}, :table_alias=>:graph).all.should == [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graph=>{:id=>8, :x=>9, :y=>10, :graph_id=>11}}]
   end
 
   it "#ungraphed should remove the splitting of result sets into component tables" do
-    ds = @ds1.graph(@ds2, :x=>:id).ungraphed
-    def ds.fetch_rows(sql, &block)
-      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7})
-    end
-    ds.all.should == [{:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7}]
+    @db.fetch = {:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7}
+    @ds1.graph(@ds2, :x=>:id).ungraphed.all.should == [{:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7}]
   end
 
   it "#graph_each should give a nil value instead of a hash when all values for a table are nil" do
-    ds = @ds1.graph(@ds2, :x=>:id)
-    def ds.fetch_rows(sql, &block)
-      yield({:id=>1,:x=>2,:y=>3,:lines_id=>nil,:lines_x=>nil,:lines_y=>nil,:graph_id=>nil})
-    end
-    results = ds.all
-    results.length.should == 1
-    results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>nil}
+    @db.fetch = [[{:id=>1,:x=>2,:y=>3,:lines_id=>nil,:lines_x=>nil,:lines_y=>nil,:graph_id=>nil}],
+      [{:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graphs_id=>nil, :name=>nil, :graphs_x=>nil, :graphs_y=>nil, :graphs_lines_x=>nil},
+      {:id=>2,:x=>4,:y=>5,:lines_id=>nil,:lines_x=>nil,:lines_y=>nil,:graph_id=>nil, :graphs_id=>nil, :name=>nil, :graphs_x=>nil, :graphs_y=>nil, :graphs_lines_x=>nil},
+      {:id=>3,:x=>5,:y=>6,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graphs_id=>7, :name=>8, :graphs_x=>9, :graphs_y=>10, :graphs_lines_x=>11},
+      {:id=>3,:x=>5,:y=>6,:lines_id=>7,:lines_x=>5,:lines_y=>8,:graph_id=>9, :graphs_id=>9, :name=>10, :graphs_x=>10, :graphs_y=>11, :graphs_lines_x=>12}]]
 
-    ds = @ds1.graph(@ds2, :x=>:id).graph(@ds3, :id=>:graph_id)
-    def ds.fetch_rows(sql, &block)
-      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graphs_id=>nil, :name=>nil, :graphs_x=>nil, :graphs_y=>nil, :graphs_lines_x=>nil})
-      yield({:id=>2,:x=>4,:y=>5,:lines_id=>nil,:lines_x=>nil,:lines_y=>nil,:graph_id=>nil, :graphs_id=>nil, :name=>nil, :graphs_x=>nil, :graphs_y=>nil, :graphs_lines_x=>nil})
-      yield({:id=>3,:x=>5,:y=>6,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graphs_id=>7, :name=>8, :graphs_x=>9, :graphs_y=>10, :graphs_lines_x=>11})
-      yield({:id=>3,:x=>5,:y=>6,:lines_id=>7,:lines_x=>5,:lines_y=>8,:graph_id=>9, :graphs_id=>9, :name=>10, :graphs_x=>10, :graphs_y=>11, :graphs_lines_x=>12})
-    end
-    results = ds.all
-    results.length.should == 4
-    results[0].should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graphs=>nil}
-    results[1].should == {:points=>{:id=>2, :x=>4, :y=>5}, :lines=>nil, :graphs=>nil}
-    results[2].should == {:points=>{:id=>3, :x=>5, :y=>6}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graphs=>{:id=>7, :name=>8, :x=>9, :y=>10, :lines_x=>11}}
-    results[3].should == {:points=>{:id=>3, :x=>5, :y=>6}, :lines=>{:id=>7, :x=>5, :y=>8, :graph_id=>9}, :graphs=>{:id=>9, :name=>10, :x=>10, :y=>11, :lines_x=>12}}
+    @ds1.graph(@ds2, :x=>:id).all.should == [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>nil}]
+    @ds1.graph(@ds2, :x=>:id).graph(@ds3, :id=>:graph_id).all.should == [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graphs=>nil},
+      {:points=>{:id=>2, :x=>4, :y=>5}, :lines=>nil, :graphs=>nil},
+      {:points=>{:id=>3, :x=>5, :y=>6}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graphs=>{:id=>7, :name=>8, :x=>9, :y=>10, :lines_x=>11}},
+      {:points=>{:id=>3, :x=>5, :y=>6}, :lines=>{:id=>7, :x=>5, :y=>8, :graph_id=>9}, :graphs=>{:id=>9, :name=>10, :x=>10, :y=>11, :lines_x=>12}}]
   end
 
   it "#graph_each should not give a nil value instead of a hash when any value for a table is false" do
-    ds = @ds1.graph(@ds2, :x=>:id)
-    def ds.fetch_rows(sql, &block)
-      block.call(:id=>1,:x=>2,:y=>3,:lines_id=>nil,:lines_x=>false,:lines_y=>nil,:graph_id=>nil)
-    end
-    ds.all.should == [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>nil, :x=>false, :y=>nil, :graph_id=>nil}}]
+    @db.fetch = {:id=>1,:x=>2,:y=>3,:lines_id=>nil,:lines_x=>false,:lines_y=>nil,:graph_id=>nil}
+    @ds1.graph(@ds2, :x=>:id).all.should == [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>nil, :x=>false, :y=>nil, :graph_id=>nil}}]
   end
 
   it "#graph_each should not included tables graphed with the :select => false option in the result set" do
-    ds = @ds1.graph(:lines, {:x=>:id}, :select=>false).graph(:graphs, :id=>:graph_id)
-    def ds.fetch_rows(sql, &block)
-      yield({:id=>1,:x=>2,:y=>3,:graphs_id=>8, :name=>9, :graphs_x=>10, :graphs_y=>11, :lines_x=>12})
-    end
-    results = ds.all
-    results.length.should == 1
-    results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :graphs=>{:id=>8, :name=>9, :x=>10, :y=>11, :lines_x=>12}}
+    @db.fetch = {:id=>1,:x=>2,:y=>3,:graphs_id=>8, :name=>9, :graphs_x=>10, :graphs_y=>11, :lines_x=>12}
+    @ds1.graph(:lines, {:x=>:id}, :select=>false).graph(:graphs, :id=>:graph_id).all.should == [{:points=>{:id=>1, :x=>2, :y=>3}, :graphs=>{:id=>8, :name=>9, :x=>10, :y=>11, :lines_x=>12}}]
   end
 
   it "#graph_each should only include the columns selected with #set_graph_aliases and #add_graph_aliases, if called" do
-    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
-    def ds.fetch_rows(sql, &block)
-      yield({:x=>2,:y=>3})
-    end
-    results = ds.all
-    results.length.should == 1
-    results.first.should == {:points=>{:x=>2}, :lines=>{:y=>3}}
+    @db.fetch = [nil, [{:x=>2,:y=>3}], nil, [{:x=>2}], [{:x=>2, :q=>18}]]
 
+    @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y]).all.should == [{:points=>{:x=>2}, :lines=>{:y=>3}}]
     ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x])
-    def ds.fetch_rows(sql, &block)
-      yield({:x=>2})
-    end
-    results = ds.all
-    results.length.should == 1
-    results.first.should == {:points=>{:x=>2}, :lines=>nil}
-
+    ds.all.should == [{:points=>{:x=>2}, :lines=>nil}]
     ds = ds.add_graph_aliases(:q=>[:points, :r, 18])
-    def ds.fetch_rows(sql, &block)
-      yield({:x=>2, :q=>18})
-    end
     ds.all.should == [{:points=>{:x=>2, :r=>18}, :lines=>nil}]
   end
 
   it "#graph_each should correctly map values when #set_graph_aliases is used with a third argument for each entry" do
-    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :z1, 2], :y=>[:lines, :z2, :random.sql_function])
-    def ds.fetch_rows(sql, &block)
-      yield({:x=>2,:y=>3})
-    end
-    results = ds.all
-    results.length.should == 1
-    results.first.should == {:points=>{:z1=>2}, :lines=>{:z2=>3}}
+    @db.fetch = [nil, {:x=>2,:y=>3}]
+    @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :z1, 2], :y=>[:lines, :z2, :random.sql_function]).all.should == [{:points=>{:z1=>2}, :lines=>{:z2=>3}}]
   end
 
   it "#graph_each should correctly map values when #set_graph_aliases is used with a single argument for each entry" do
-    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points], :y=>[:lines])
-    def ds.fetch_rows(sql, &block)
-      yield({:x=>2,:y=>3})
-    end
-    results = ds.all
-    results.length.should == 1
-    results.first.should == {:points=>{:x=>2}, :lines=>{:y=>3}}
+    @db.fetch = [nil, {:x=>2,:y=>3}]
+    @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points], :y=>[:lines]).all.should == [{:points=>{:x=>2}, :lines=>{:y=>3}}]
   end
 
   it "#graph_each should correctly map values when #set_graph_aliases is used with a symbol for each entry" do
-    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>:points, :y=>:lines)
-    def ds.fetch_rows(sql, &block)
-      yield({:x=>2,:y=>3})
-    end
-    results = ds.all
-    results.length.should == 1
-    results.first.should == {:points=>{:x=>2}, :lines=>{:y=>3}}
+    @db.fetch = [nil, {:x=>2,:y=>3}]
+    @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>:points, :y=>:lines).all.should == [{:points=>{:x=>2}, :lines=>{:y=>3}}]
   end
 
   it "#graph_each should run the row_proc for graphed datasets" do
     @ds1.row_proc = proc{|h| h.keys.each{|k| h[k] *= 2}; h}
     @ds2.row_proc = proc{|h| h.keys.each{|k| h[k] *= 3}; h}
-    ds = @ds1.graph(@ds2, :x=>:id)
-    def ds.fetch_rows(sql, &block)
-      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7})
-    end
-    results = ds.all
-    results.length.should == 1
-    results.first.should == {:points=>{:id=>2, :x=>4, :y=>6}, :lines=>{:id=>12, :x=>15, :y=>18, :graph_id=>21}}
+    @db.fetch = {:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7}
+    @ds1.graph(@ds2, :x=>:id).all.should == [{:points=>{:id=>2, :x=>4, :y=>6}, :lines=>{:id=>12, :x=>15, :y=>18, :graph_id=>21}}]
   end
 end
