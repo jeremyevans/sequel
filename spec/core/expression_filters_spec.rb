@@ -6,7 +6,6 @@ String.send(:include, Sequel::SQL::StringMethods)
 describe "Blockless Ruby Filters" do
   before do
     db = Sequel::Database.new
-    db.quote_identifiers = false
     @d = db[:items]
     def @d.l(*args, &block)
       literal(filter_expr(*args, &block))
