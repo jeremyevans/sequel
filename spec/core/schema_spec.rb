@@ -88,13 +88,11 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ['CREATE TABLE cats (id integer PRIMARY KEY AUTOINCREMENT)']
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       primary_key :id, :serial, :auto_increment => false
     end
     @db.sqls.should == ['CREATE TABLE cats (id serial PRIMARY KEY)']
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       primary_key :id, :type => :serial, :auto_increment => false
     end
@@ -154,7 +152,6 @@ describe "DB#create_table" do
       varchar :name
     end
     @db.sqls.should == ["CREATE TABLE cats (name varchar(255))"]
-    @db.sqls.clear
     @db.create_table(:cats) do
       varchar :name, :size => 51
     end
@@ -199,7 +196,6 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects(id))"]
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :key => :zzz
     end
@@ -212,32 +208,25 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON DELETE RESTRICT)"]
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_delete => :cascade
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON DELETE CASCADE)"]
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_delete => :no_action
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON DELETE NO ACTION)"]
-    @db.sqls.clear
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_delete => :set_null
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON DELETE SET NULL)"]
-    @db.sqls.clear
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_delete => :set_default
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON DELETE SET DEFAULT)"]
-    @db.sqls.clear
   end
 
   specify "should accept foreign keys with ON UPDATE clause" do
@@ -246,32 +235,25 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE RESTRICT)"]
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_update => :cascade
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE CASCADE)"]
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_update => :no_action
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE NO ACTION)"]
-    @db.sqls.clear
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_update => :set_null
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE SET NULL)"]
-    @db.sqls.clear
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_update => :set_default
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE SET DEFAULT)"]
-    @db.sqls.clear
   end
   
   specify "should accept foreign keys with deferrable option" do
@@ -368,7 +350,6 @@ describe "DB#create_table" do
     @db.meta_def(:execute_ddl){|*a| raise Sequel::DatabaseError if /blah/.match(a.first); super(*a)}
     lambda{@db.create_table(:cats){Integer :id; index :blah; index :id}}.should raise_error(Sequel::DatabaseError)
     @db.sqls.should == ['CREATE TABLE cats (id integer)']
-    @db.sqls.clear
     lambda{@db.create_table(:cats, :ignore_index_errors=>true){Integer :id; index :blah; index :id}}.should_not raise_error(Sequel::DatabaseError)
     @db.sqls.should == ['CREATE TABLE cats (id integer)', 'CREATE INDEX cats_id_index ON cats (id)']
   end
@@ -506,7 +487,6 @@ describe "DB#create_table" do
       foreign_key [:a, :b], :abc, :key => [:real_a, :real_b]
     end
     @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc(real_a, real_b))"]
-    @db.sqls.clear
 
     @db.create_table(:cats) do
       integer :a
@@ -524,7 +504,6 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc ON DELETE CASCADE)"]
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       integer :a
       integer :b
@@ -532,7 +511,6 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc ON UPDATE NO ACTION)"]
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       integer :a
       integer :b
@@ -540,7 +518,6 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc ON DELETE RESTRICT ON UPDATE SET DEFAULT)"]
 
-    @db.sqls.clear
     @db.create_table(:cats) do
       integer :a
       integer :b
@@ -659,7 +636,6 @@ describe "DB#alter_table" do
     end
     @db.sqls.should == ["ALTER TABLE cats ADD UNIQUE (a, b)"]
 
-    @db.sqls.clear
     @db.alter_table(:cats) do
       add_unique_constraint [:a, :b], :name => :ab_uniq
     end
@@ -679,19 +655,16 @@ describe "DB#alter_table" do
     end
     @db.sqls.should == ["ALTER TABLE cats ADD FOREIGN KEY (node_id, prop_id) REFERENCES nodes_props"]
 
-    @db.sqls.clear
     @db.alter_table(:cats) do
       add_foreign_key [:node_id, :prop_id], :nodes_props, :name => :cfk
     end
     @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT cfk FOREIGN KEY (node_id, prop_id) REFERENCES nodes_props"]
 
-    @db.sqls.clear
     @db.alter_table(:cats) do
       add_foreign_key [:node_id, :prop_id], :nodes_props, :key => [:nid, :pid]
     end
     @db.sqls.should == ["ALTER TABLE cats ADD FOREIGN KEY (node_id, prop_id) REFERENCES nodes_props(nid, pid)"]
 
-    @db.sqls.clear
     @db.alter_table(:cats) do
       add_foreign_key [:node_id, :prop_id], :nodes_props, :on_delete => :restrict, :on_update => :cascade
     end
@@ -725,7 +698,6 @@ describe "DB#alter_table" do
     end
     @db.sqls.should == ["ALTER TABLE cats ADD PRIMARY KEY (id, type)"]
 
-    @db.sqls.clear
     @db.alter_table(:cats) do
       add_primary_key [:id, :type], :name => :cpk
     end
@@ -988,7 +960,6 @@ describe "Database#create_view" do
   specify "should construct proper SQL with raw SQL" do
     @db.create_view :test, "SELECT * FROM xyz"
     @db.sqls.should == ['CREATE VIEW test AS SELECT * FROM xyz']
-    @db.sqls.clear
     @db.create_view :test.identifier, "SELECT * FROM xyz"
     @db.sqls.should == ['CREATE VIEW test AS SELECT * FROM xyz']
   end
@@ -996,21 +967,6 @@ describe "Database#create_view" do
   specify "should construct proper SQL with dataset" do
     @db.create_view :test, @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
-    @db.sqls.clear
-    @db.create_view :test.qualify(:sch), @db[:items].select(:a, :b).order(:c)
-    @db.sqls.should == ['CREATE VIEW sch.test AS SELECT a, b FROM items ORDER BY c']
-  end
-end
-
-describe "Database#create_or_replace_view" do
-  before do
-    @db = Sequel.mock
-  end
-  
-  specify "should construct proper SQL with raw SQL" do
-    @db.create_or_replace_view :test, "SELECT * FROM xyz"
-    @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT * FROM xyz']
-    @db.sqls.clear
     @db.create_or_replace_view :sch__test, "SELECT * FROM xyz"
     @db.sqls.should == ['CREATE OR REPLACE VIEW sch.test AS SELECT * FROM xyz']
   end
@@ -1018,7 +974,6 @@ describe "Database#create_or_replace_view" do
   specify "should construct proper SQL with dataset" do
     @db.create_or_replace_view :test, @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT a, b FROM items ORDER BY c']
-    @db.sqls.clear
     @db.create_or_replace_view :test.identifier, @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT a, b FROM items ORDER BY c']
   end
