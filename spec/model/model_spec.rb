@@ -99,6 +99,13 @@ describe "Sequel::Model()" do
       end.should_not raise_error
     end
 
+    it "should work without raising an exception with an LiteralString" do
+      proc do
+        class ::Album < Sequel::Model('table'.lit); end
+        class ::Album < Sequel::Model('table'.lit); end
+      end.should_not raise_error
+    end
+
     it "should work without raising an exception with a database" do
       proc do
         class ::Album < Sequel::Model(@db); end
@@ -143,7 +150,6 @@ describe Sequel::Model do
 
     model_a.dataset.opts[:from].should == [:as]
   end
-
 end
 
 describe Sequel::Model, "dataset & schema" do
@@ -237,8 +243,7 @@ describe Sequel::Model, "dataset & schema" do
 end
 
 describe Sequel::Model, "constructor" do
-  
-  before(:each) do
+  before do
     @m = Class.new(Sequel::Model)
     @m.columns :a, :b
   end
@@ -256,12 +261,10 @@ describe Sequel::Model, "constructor" do
     block_called.should be_true
     m.values[:a].should == 1
   end
-  
 end
 
 describe Sequel::Model, "new" do
-
-  before(:each) do
+  before do
     @m = Class.new(Sequel::Model) do
       set_dataset MODEL_DB[:items]
       columns :x, :id
@@ -281,15 +284,8 @@ describe Sequel::Model, "new" do
   end
 
   it "should use the last inserted id as primary key if not in values" do
-    d = @m.dataset
-    def d.insert(*args)
-      super
-      1234
-    end
-
-    def d.first
-      {:x => 1, :id => 1234}
-    end
+    @m.dataset._fetch = {:x => 1, :id => 1234}
+    @m.dataset.autoid = 1234
 
     o = @m.new(:x => 1)
     o.save
@@ -299,14 +295,12 @@ describe Sequel::Model, "new" do
     o.save
     o.id.should == 333
   end
-
 end
 
 describe Sequel::Model, ".subset" do
   before do
-    MODEL_DB.reset
-
     @c = Class.new(Sequel::Model(:items))
+    MODEL_DB.reset
   end
 
   specify "should create a filter on the underlying dataset" do
@@ -334,44 +328,31 @@ describe Sequel::Model, ".subset" do
 end
 
 describe Sequel::Model, ".find" do
-
-  before(:each) do
-    MODEL_DB.reset
-    
+  before do
     @c = Class.new(Sequel::Model(:items))
-    
-    $cache_dataset_row = {:name => 'sharon', :id => 1}
-    @dataset = @c.dataset
-    $sqls = []
-    @dataset.extend(Module.new {
-      def fetch_rows(sql)
-        $sqls << sql
-        yield $cache_dataset_row
-      end
-    })
+    @c.dataset._fetch = {:name => 'sharon', :id => 1}
+    MODEL_DB.reset
   end
   
   it "should return the first record matching the given filter" do
     @c.find(:name => 'sharon').should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"]
 
     @c.find(:name.like('abc%')).should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (name LIKE 'abc%') LIMIT 1"
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (name LIKE 'abc%') LIMIT 1"]
   end
   
   specify "should accept filter blocks" do
     @c.find{:id.sql_number > 1}.should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (id > 1) LIMIT 1"
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id > 1) LIMIT 1"]
 
     @c.find {(:x.sql_number > 1) & (:y.sql_number < 2)}.should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE ((x > 1) AND (y < 2)) LIMIT 1"
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE ((x > 1) AND (y < 2)) LIMIT 1"]
   end
-
 end
 
 describe Sequel::Model, ".fetch" do
-
-  before(:each) do
+  before do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items))
   end
@@ -388,82 +369,53 @@ describe Sequel::Model, ".fetch" do
 end
 
 describe Sequel::Model, ".find_or_create" do
-
-  before(:each) do
-    MODEL_DB.reset
+  before do
     @c = Class.new(Sequel::Model(:items)) do
       set_primary_key :id
       columns :x
-      def _save_refresh
-      end
     end
+    MODEL_DB.reset
   end
 
   it "should find the record" do
-    @c.find_or_create(:x => 1)
+    @c.find_or_create(:x => 1).should == @c.load(:x=>1, :id=>1)
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1"]
-    
-    MODEL_DB.reset
   end
   
   it "should create the record if not found" do
-    @c.meta_def(:find) do |*args|
-      dataset.filter(*args).first
-      nil
-    end
-    
-    @c.find_or_create(:x => 1)
-    MODEL_DB.sqls.should == [
-      "SELECT * FROM items WHERE (x = 1) LIMIT 1",
-      "INSERT INTO items (x) VALUES (1)"
-    ]
+    @c.dataset._fetch = [[], {:x=>1, :id=>1}]
+    @c.dataset.autoid = 1
+    @c.find_or_create(:x => 1).should == @c.load(:x=>1, :id=>1)
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1",
+      "INSERT INTO items (x) VALUES (1)",
+      "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
   end
 
   it "should pass the new record to be created to the block if no record is found" do
-    @c.meta_def(:find){|*|} 
-    @c.find_or_create(:x => 1){|x| x[:y] = 2}
-    ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].should include(MODEL_DB.sqls.first)
+    @c.dataset._fetch = [[], {:x=>1, :id=>1}]
+    @c.dataset.autoid = 1
+    @c.find_or_create(:x => 1){|x| x[:y] = 2}.should == @c.load(:x=>1, :id=>1)
+    sqls = MODEL_DB.sqls
+    sqls.first.should == "SELECT * FROM items WHERE (x = 1) LIMIT 1"
+    ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].should include(sqls[1])
+    sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
   end
 end
 
 describe Sequel::Model, ".all" do
-  
-  before(:each) do
-    MODEL_DB.reset
-    @c = Class.new(Sequel::Model(:items)) do
-      no_primary_key
-    end
-    
-    @c.dataset.meta_def(:all) {1234}
-  end
-  
   it "should return all records in the dataset" do
-    @c.all.should == 1234
+    c = Class.new(Sequel::Model(:items))
+    c.all.should == [c.load(:x=>1, :id=>1)]
   end
-  
-end
-
-class DummyModelBased < Sequel::Model(:blog)
-end
-
-describe Sequel::Model, "(:tablename)" do
-
-  it "should allow reopening of descendant classes" do
-    proc do
-      eval "class DummyModelBased < Sequel::Model(:blog); end"
-    end.should_not raise_error
-  end
-
 end
 
 describe Sequel::Model, "A model class without a primary key" do
-
-  before(:each) do
-    MODEL_DB.reset
+  before do
     @c = Class.new(Sequel::Model(:items)) do
       columns :x
       no_primary_key
     end
+    MODEL_DB.reset
   end
 
   it "should be able to insert records without selecting them back" do
@@ -476,8 +428,11 @@ describe Sequel::Model, "A model class without a primary key" do
   end
 
   it "should raise when deleting" do
-    o = @c.new
-    proc {o.delete}.should raise_error
+    proc{@c.load(:x=>1).delete}.should raise_error
+  end
+
+  it "should raise when updating" do
+    proc{@c.load(:x=>1).update(:x=>2)}.should raise_error
   end
 
   it "should insert a record when saving" do
@@ -556,47 +511,39 @@ end
 
 describe Sequel::Model, ".[]" do
 
-  before(:each) do
-    MODEL_DB.reset
-
+  before do
     @c = Class.new(Sequel::Model(:items))
-
-    $cache_dataset_row = {:name => 'sharon', :id => 1}
-    @dataset = @c.dataset
-    $sqls = []
-    @dataset.extend(Module.new {
-      def fetch_rows(sql)
-        $sqls << sql
-        yield $cache_dataset_row
-      end
-    })
+    @c.dataset._fetch = {:name => 'sharon', :id => 1}
+    MODEL_DB.reset
   end
 
   it "should return the first record for the given pk" do
     @c[1].should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 1) LIMIT 1"]
     @c[9999].should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (id = 9999) LIMIT 1"
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 9999) LIMIT 1"]
   end
 
   it "should work correctly for custom primary key" do
     @c.set_primary_key :name
     @c['sharon'].should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"]
   end
 
   it "should work correctly for composite primary key specified as array" do
     @c.set_primary_key [:node_id, :kind]
     @c[3921, 201].should be_a_kind_of(@c)
-    $sqls.last.should =~ \
-    /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
+    sqls = MODEL_DB.sqls
+    sqls.length.should == 1
+    sqls.first.should =~ /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
   end
   
   it "should work correctly for composite primary key specified as separate arguments" do
     @c.set_primary_key :node_id, :kind
     @c[3921, 201].should be_a_kind_of(@c)
-    $sqls.last.should =~ \
-    /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
+    sqls = MODEL_DB.sqls
+    sqls.length.should == 1
+    sqls.first.should =~ /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
   end
 end
 
