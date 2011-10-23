@@ -366,7 +366,8 @@ describe Sequel::Model, "#eager" do
   end
   
   it "should respect :eager_graph when lazily loading a many_to_many association" do
-    ds = EagerBandMember.dataset.columns(:id).copy_columns
+    ds = EagerBandMember.dataset
+    def ds.columns() [:id] end
     ds._fetch = [{:id=>5, :bands_id=>2, :p_k=>6}, {:id=>5, :bands_id=>3, :p_k=>6}]
     a = EagerBand.load(:id=>2)
     a.graph_members.should == [EagerBandMember.load(:id=>5)]
@@ -1542,7 +1543,8 @@ describe Sequel::Model, "#eager_graph" do
   it "should eagerly load schema qualified tables correctly with joins" do
     c1 = Class.new(GraphAlbum)
     c2 = Class.new(GraphGenre)
-    c1.dataset = c1.dataset.from(:s__a).copy_columns
+    ds = c1.dataset = c1.dataset.from(:s__a)
+    def ds.columns() [:id] end
     c2.dataset = c2.dataset.from(:s__g)
     c1.many_to_many :a_genres, :class=>c2, :left_primary_key=>:id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:s__ag
     ds = c1.join(:s__t, [:b_id]).eager_graph(:a_genres)
@@ -1580,7 +1582,7 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should eagerly load a many_to_one association with a custom callback" do
-    ds = GraphAlbum.eager_graph(:band => proc {|ds| ds.select_columns(:id)})
+    ds = GraphAlbum.eager_graph(:band => proc {|ds| ds.select(:id).columns(:id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0 FROM albums LEFT OUTER JOIN (SELECT id FROM bands) AS band ON (band.id = albums.band_id)'
     ds._fetch = {:id=>1, :band_id=>2, :band_id_0=>2}
     a = ds.all
@@ -1595,7 +1597,7 @@ describe Sequel::Model, "#eager_graph" do
 
   it "should eagerly load a one_to_one association with a custom callback" do
     GraphAlbum.one_to_one :track, :class=>'GraphTrack', :key=>:album_id
-    ds = GraphAlbum.eager_graph(:track => proc {|ds| ds.select_columns(:album_id)})
+    ds = GraphAlbum.eager_graph(:track => proc {|ds| ds.select(:album_id).columns(:album_id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, track.album_id FROM albums LEFT OUTER JOIN (SELECT album_id FROM tracks) AS track ON (track.album_id = albums.id)'
     ds._fetch = {:id=>1, :band_id=>2, :album_id=>1}
     a = ds.all
@@ -1604,7 +1606,7 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should eagerly load a one_to_many association with a custom callback" do
-    ds = GraphAlbum.eager_graph(:tracks => proc {|ds| ds.select_columns(:album_id)})
+    ds = GraphAlbum.eager_graph(:tracks => proc {|ds| ds.select(:album_id).columns(:album_id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, tracks.album_id FROM albums LEFT OUTER JOIN (SELECT album_id FROM tracks) AS tracks ON (tracks.album_id = albums.id)'
     ds._fetch = {:id=>1, :band_id=>2, :album_id=>1}
     a = ds.all
@@ -1620,7 +1622,7 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should eagerly load a many_to_many association with a custom callback" do
-    ds = GraphAlbum.eager_graph(:genres => proc {|ds| ds.select_columns(:id)})
+    ds = GraphAlbum.eager_graph(:genres => proc {|ds| ds.select(:id).columns(:id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN (SELECT id FROM genres) AS genres ON (genres.id = ag.genre_id)'
     ds._fetch = {:id=>1, :band_id=>2, :genres_id=>4}
     a = ds.all
@@ -1636,7 +1638,7 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should allow cascading of eager loading with a custom callback with hash value" do
-    ds = GraphTrack.eager_graph(:album=>{proc{|ds| ds.select_columns(:id, :band_id)}=>{:band=>:members}})
+    ds = GraphTrack.eager_graph(:album=>{proc{|ds| ds.select(:id, :band_id).columns(:id, :band_id)}=>{:band=>:members}})
     ds.sql.should == 'SELECT tracks.id, tracks.album_id, album.id AS album_id_0, album.band_id, band.id AS band_id_0, band.vocalist_id, members.id AS members_id FROM tracks LEFT OUTER JOIN (SELECT id, band_id FROM albums) AS album ON (album.id = tracks.album_id) LEFT OUTER JOIN bands AS band ON (band.id = album.band_id) LEFT OUTER JOIN bm ON (bm.band_id = band.id) LEFT OUTER JOIN members ON (members.id = bm.member_id)'
     ds._fetch = {:id=>3, :album_id=>1, :album_id_0=>1, :band_id=>2, :members_id=>5, :band_id_0=>2, :vocalist_id=>6}
     a = ds.all
@@ -1656,7 +1658,7 @@ describe Sequel::Model, "#eager_graph" do
   end
   
   it "should allow cascading of eager loading with a custom callback with array value" do
-    ds = GraphTrack.eager_graph(:album=>{proc{|ds| ds.select_columns(:id, :band_id)}=>[:band, :tracks]})
+    ds = GraphTrack.eager_graph(:album=>{proc{|ds| ds.select(:id, :band_id).columns(:id, :band_id)}=>[:band, :tracks]})
     ds.sql.should == 'SELECT tracks.id, tracks.album_id, album.id AS album_id_0, album.band_id, band.id AS band_id_0, band.vocalist_id, tracks_0.id AS tracks_0_id, tracks_0.album_id AS tracks_0_album_id FROM tracks LEFT OUTER JOIN (SELECT id, band_id FROM albums) AS album ON (album.id = tracks.album_id) LEFT OUTER JOIN bands AS band ON (band.id = album.band_id) LEFT OUTER JOIN tracks AS tracks_0 ON (tracks_0.album_id = album.id)'
     ds._fetch = {:id=>3, :album_id=>1, :album_id_0=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>6, :tracks_0_id=>3, :tracks_0_album_id=>1}
     a = ds.all

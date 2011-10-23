@@ -38,16 +38,4 @@ Sequel::Model.use_transactions = false
 db = Sequel.mock(:fetch=>{:id => 1, :x => 1}, :numrows=>1, :autoid=>proc{|sql| 10})
 def db.schema(*) [[:id, {:primary_key=>true}]] end
 def db.reset() sqls end
-class Sequel::Mock::Dataset
-  def select_columns(*a) select(*a).columns(*a) end
-  def copy_columns
-    @copy_columns = true
-    self
-  end
-  def clone(*)
-    ds = super
-    ds.columns(*@columns) if @copy_columns && @columns
-    ds
-  end
-end
 Sequel::Model.db = MODEL_DB = db
