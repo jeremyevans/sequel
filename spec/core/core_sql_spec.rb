@@ -75,16 +75,16 @@ end
 
 describe "String#lit" do
   before do
-    @ds = ds = MockDatabase.new.dataset
+    @ds = ds = Sequel::Database.new[:t]
   end
+
   specify "should return an LiteralString object" do
     'xyz'.lit.should be_a_kind_of(Sequel::LiteralString)
     'xyz'.lit.to_s.should == 'xyz'
   end
   
   specify "should inhibit string literalization" do
-    Sequel::Database.new[:t].update_sql(:stamp => "NOW()".lit).should == \
-      "UPDATE t SET stamp = NOW()"
+    @ds.update_sql(:stamp => "NOW()".lit).should == "UPDATE t SET stamp = NOW()"
   end
 
   specify "should return a PlaceholderLiteralString object if args are given" do
@@ -176,10 +176,8 @@ end
 
 describe "Column references" do
   before do
-    @c = Class.new(Sequel::Dataset) do
-      def quoted_identifier(c); "`#{c}`"; end
-    end
-    @ds = @c.new(MockDatabase.new)
+    @ds = Sequel::Database.new.dataset
+    def @ds.quoted_identifier(c); "`#{c}`"; end
     @ds.quote_identifiers = true
   end
   
@@ -289,7 +287,7 @@ end
 
 describe "Dataset#literal" do
   before do
-    @ds = MockDataset.new(nil)
+    @ds = Sequel::Database.new.dataset
   end
   
   specify "should convert qualified symbol notation into dot notation" do
@@ -325,17 +323,12 @@ end
 
 describe "Symbol" do
   before do
-    @ds = Sequel::Dataset.new(MockDatabase.new)
+    @ds = Sequel::Database.new.dataset
   end
   
-  specify "should support upper case outer functions" do
+  specify "should support sql_function method" do
     :COUNT.sql_function('1').to_s(@ds).should == "COUNT('1')"
-  end
-  
-  specify "should inhibit string literalization" do
-    db = Sequel::Database.new
-    ds = db[:t]
-    ds.select(:COUNT.sql_function('1')).sql.should == "SELECT COUNT('1') FROM t"
+    @ds.select(:COUNT.sql_function('1')).sql.should == "SELECT COUNT('1')"
   end
   
   specify "should support cast method" do
@@ -367,22 +360,18 @@ describe "Symbol" do
   end
   
   specify "should allow database independent types when casting" do
-    m = MockDatabase.new
-    m.instance_eval do
-       def cast_type_literal(type)
-         return :foo if type == Integer
-         return :bar if type == String
-         type
-       end
+    db = @ds.db
+    def db.cast_type_literal(type)
+      return :foo if type == Integer
+      return :bar if type == String
+      type
     end
-    @ds2 = Sequel::Dataset.new(m)
-    :abc.cast(String).to_s(@ds).should == "CAST(abc AS varchar(255))"
-    :abc.cast(String).to_s(@ds2).should == "CAST(abc AS bar)"
-    :abc.cast(String).to_s(@ds2).should == "CAST(abc AS bar)"
-    :abc.cast_string.to_s(@ds2).should == "CAST(abc AS bar)"
-    :abc.cast_string(Integer).to_s(@ds2).should == "CAST(abc AS foo)"
-    :abc.cast_numeric.to_s(@ds2).should == "CAST(abc AS foo)"
-    :abc.cast_numeric(String).to_s(@ds2).should == "CAST(abc AS bar)"
+    :abc.cast(String).to_s(@ds).should == "CAST(abc AS bar)"
+    :abc.cast(String).to_s(@ds).should == "CAST(abc AS bar)"
+    :abc.cast_string.to_s(@ds).should == "CAST(abc AS bar)"
+    :abc.cast_string(Integer).to_s(@ds).should == "CAST(abc AS foo)"
+    :abc.cast_numeric.to_s(@ds).should == "CAST(abc AS foo)"
+    :abc.cast_numeric(String).to_s(@ds).should == "CAST(abc AS bar)"
   end
 
   specify "should support SQL EXTRACT function via #extract " do
