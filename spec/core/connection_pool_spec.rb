@@ -126,17 +126,11 @@ end
 
 describe "ConnectionPool#hold" do
   before do
+    value = 0
     @c = Class.new do
-      @@value = 0
-      def initialize
-        @@value += 1
-      end
-      
-      def value
-        @@value
-      end
+      define_method(:initialize){value += 1}
+      define_method(:value){value}
     end
-
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS){@c.new}
   end
   
