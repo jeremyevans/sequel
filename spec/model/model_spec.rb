@@ -242,7 +242,7 @@ describe Sequel::Model, "dataset & schema" do
   end
 end
 
-describe Sequel::Model, "constructor" do
+describe Sequel::Model, "constructors" do
   before do
     @m = Class.new(Sequel::Model)
     @m.columns :a, :b
@@ -260,6 +260,35 @@ describe Sequel::Model, "constructor" do
     
     block_called.should be_true
     m.values[:a].should == 1
+  end
+  
+  it "should have dataset row_proc create an existing object" do
+    @m.dataset = Sequel::Dataset.new(nil)
+    o = @m.dataset.row_proc.call(:a=>1)
+    o.should be_a_kind_of(@m)
+    o.values.should == {:a=>1}
+    o.new?.should be_false
+  end
+  
+  it "should have .call create an existing object" do
+    o = @m.call(:a=>1)
+    o.should be_a_kind_of(@m)
+    o.values.should == {:a=>1}
+    o.new?.should be_false
+  end
+  
+  it "should have .load create an existing object" do
+    o = @m.load(:a=>1)
+    o.should be_a_kind_of(@m)
+    o.values.should == {:a=>1}
+    o.new?.should be_false
+  end
+  
+  it "should have .new with a second true argument create an existing object" do
+    o = @m.new({:a=>1}, true)
+    o.should be_a_kind_of(@m)
+    o.values.should == {:a=>1}
+    o.new?.should be_false
   end
 end
 
