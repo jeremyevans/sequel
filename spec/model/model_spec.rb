@@ -503,7 +503,6 @@ describe Sequel::Model, "attribute accessors" do
 end
 
 describe Sequel::Model, ".[]" do
-
   before do
     @c = Class.new(Sequel::Model(:items))
     @c.dataset._fetch = {:name => 'sharon', :id => 1}
@@ -541,12 +540,8 @@ describe Sequel::Model, ".[]" do
 end
 
 describe "Model#inspect" do
-  before do
-    @o = Sequel::Model.load(:x => 333)
-  end
-  
   specify "should include the class name and the values" do
-    @o.inspect.should == '#<Sequel::Model @values={:x=>333}>'
+    Sequel::Model.load(:x => 333).inspect.should == '#<Sequel::Model @values={:x=>333}>'
   end
 end
 
@@ -555,16 +550,13 @@ describe "Model.db_schema" do
     @c = Class.new(Sequel::Model(:items)) do
       def self.columns; orig_columns; end
     end
-    @dataset = Sequel::Dataset.new(nil).from(:items)
-    @dataset.meta_def(:db){@db ||= Sequel::Database.new}
-    def @dataset.naked; self; end
-    def @dataset.columns; []; end
-    def @dataset.def_mutation_method(*names);  end
+    @db = Sequel.mock
+    @dataset = @db[:items]
   end
   
   specify "should use the database's schema_for_table and set the columns and dataset columns" do
     d = @dataset.db
-    def d.schema(table, opts = {})
+    def @db.schema(table, opts = {})
       [[:x, {:type=>:integer}], [:y, {:type=>:string}]]
     end
     @c.dataset = @dataset
@@ -574,36 +566,20 @@ describe "Model.db_schema" do
   end
 
   specify "should not restrict the schema for datasets with a :select option" do
-    ds = @dataset.select(:x, :y___z)
-    d = ds.db
-    def d.schema(table, opts = {})
+    def @c.columns; [:x, :z]; end
+    def @db.schema(table, opts = {})
       [[:x, {:type=>:integer}], [:y, {:type=>:string}]]
     end
-    def @c.columns; [:x, :z]; end
-    @c.dataset = ds
+    @c.dataset = @dataset.select(:x, :y___z)
     @c.db_schema.should == {:x=>{:type=>:integer}, :z=>{}, :y=>{:type=>:string}}
   end
 
-  specify "should not use schema if the dataset uses multiple tables or custom sql" do
-    ds = @dataset.join(:x, :id)
-    d = ds.db
-    e = false
-    d.meta_def(:schema){|table, opts| e = true; super(table, opts)}
-    def @c.columns; [:x]; end
-    @c.dataset = ds
-    e.should == true
-    @c.db_schema.should == {:x=>{}}
-  end
-
   specify "should fallback to fetching records if schema raises an error" do
-    ds = @dataset.join(:x, :id)
-    d = ds.db
-    def d.schema(table, opts={})
+    def @db.schema(table, opts={})
       raise Sequel::Error
     end
-    def @c.columns; [:x]; end
-    @c.dataset = ds
-    @c.db_schema.should == {:x=>{}}
+    @c.dataset = @dataset.join(:x, :id).columns(:id, :x)
+    @c.db_schema.should == {:x=>{}, :id=>{}}
   end
   
   specify "should automatically set a singular primary key based on the schema" do

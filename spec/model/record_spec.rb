@@ -1,7 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Model#save server use" do
-  
   before do
     @db = Sequel.mock(:autoid=>proc{|sql| 10}, :fetch=>{:x=>1, :id=>10}, :servers=>{:blah=>{}, :read_only=>{}})
     @c = Class.new(Sequel::Model(@db[:items]))
@@ -27,29 +26,28 @@ describe "Model#save" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :id, :x, :y
     end
-    @c.dataset.meta_def(:insert){|h| super(h); 1}
+    @c.dataset.autoid = 13
     MODEL_DB.reset
   end
   
   it "should insert a record for a new model instance" do
     o = @c.new(:x => 1)
     o.save
-    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)",
-      "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 13) LIMIT 1"]
   end
 
   it "should use dataset's insert_select method if present" do
     ds = @c.dataset = @c.dataset.clone
+    ds._fetch = {:y=>2}
     def ds.supports_insert_select?() true end
     def ds.insert_select(hash)
-      execute("INSERT INTO items (y) VALUES (2)")
-      {:y=>2}
+      execute("INSERT INTO items (y) VALUES (2) RETURNING *"){|r| return r}
     end
     o = @c.new(:x => 1)
     o.save
     
     o.values.should == {:y=>2}
-    MODEL_DB.sqls.should == ["INSERT INTO items (y) VALUES (2)"]
+    MODEL_DB.sqls.should == ["INSERT INTO items (y) VALUES (2) RETURNING *"]
   end
 
   it "should not use dataset's insert_select method if specific columns are selected" do
@@ -59,7 +57,6 @@ describe "Model#save" do
   end
 
   it "should use value returned by insert as the primary key and refresh the object" do
-    @c.dataset.meta_def(:insert){|h| super(h); 13}
     o = @c.new(:x => 11)
     o.save
     MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (11)",
@@ -67,14 +64,12 @@ describe "Model#save" do
   end
 
   it "should allow you to skip refreshing by overridding _save_refresh" do
-    @c.dataset.meta_def(:insert){|h| super(h); 13}
     @c.send(:define_method, :_save_refresh){}
     @c.create(:x => 11)
     MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (11)"]
   end
 
   it "should work correctly for inserting a record without a primary key" do
-    @c.dataset.meta_def(:insert){|h| super(h); 13}
     @c.no_primary_key
     o = @c.new(:x => 11)
     o.save
@@ -82,7 +77,6 @@ describe "Model#save" do
   end
 
   it "should set the autoincrementing_primary_key value to the value returned by insert" do
-    @c.dataset.meta_def(:insert){|h| super(h); 13}
     @c.unrestrict_primary_key
     @c.set_primary_key [:x, :y]
     o = @c.new(:x => 11)
@@ -102,17 +96,18 @@ describe "Model#save" do
   
   it "should raise a NoExistingObject exception if the dataset update call doesn't return 1, unless require_modification is false" do
     o = @c.load(:id => 3, :x => 1)
-    o.this.meta_def(:update){|*a| 0}
+    t = o.this
+    t.numrows = 0
     proc{o.save}.should raise_error(Sequel::NoExistingObject)
-    o.this.meta_def(:update){|*a| 2}
+    t.numrows = 2
     proc{o.save}.should raise_error(Sequel::NoExistingObject)
-    o.this.meta_def(:update){|*a| 1}
+    t.numrows = 1
     proc{o.save}.should_not raise_error
     
     o.require_modification = false
-    o.this.meta_def(:update){|*a| 0}
+    t.numrows = 0
     proc{o.save}.should_not raise_error
-    o.this.meta_def(:update){|*a| 2}
+    t.numrows = 2
     proc{o.save}.should_not raise_error
   end
   
@@ -181,22 +176,18 @@ describe "Model#save" do
     @c.use_transactions = true
     @c.load(:id => 3, :x => 1, :y => nil).save(:y)
     MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
-    MODEL_DB.reset
     @c.use_transactions = false
     @c.load(:id => 3, :x => 1, :y => nil).save(:y)
     MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
-    MODEL_DB.reset
   end
 
   it "should inherit Model's use_transactions setting" do
     @c.use_transactions = true
     Class.new(@c).load(:id => 3, :x => 1, :y => nil).save(:y)
     MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
-    MODEL_DB.reset
     @c.use_transactions = false
     Class.new(@c).load(:id => 3, :x => 1, :y => nil).save(:y)
     MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
-    MODEL_DB.reset
   end
 
   it "should use object's use_transactions setting" do
@@ -205,13 +196,11 @@ describe "Model#save" do
     @c.use_transactions = true
     o.save(:y)
     MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
-    MODEL_DB.reset
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
     @c.use_transactions = false 
     o.save(:y)
     MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
-    MODEL_DB.reset
   end
 
   it "should use :transaction option if given" do
@@ -219,12 +208,10 @@ describe "Model#save" do
     o.use_transactions = true
     o.save(:y, :transaction=>false)
     MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
-    MODEL_DB.reset
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = false
     o.save(:y, :transaction=>true)
     MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
-    MODEL_DB.reset
   end
 
   it "should rollback if before_save returns false and raise_on_save_failure = true" do
@@ -236,7 +223,6 @@ describe "Model#save" do
     end
     proc { o.save(:y) }.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == ["BEGIN", "ROLLBACK"]
-    MODEL_DB.reset
   end
 
   it "should rollback if before_save returns false and :raise_on_failure option is true" do
@@ -248,7 +234,6 @@ describe "Model#save" do
     end
     proc { o.save(:y, :raise_on_failure => true) }.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == ["BEGIN", "ROLLBACK"]
-    MODEL_DB.reset
   end
 
   it "should not rollback outer transactions if before_save returns false and raise_on_save_failure = false" do
@@ -263,7 +248,6 @@ describe "Model#save" do
       MODEL_DB.run "BLAH"
     end
     MODEL_DB.sqls.should == ["BEGIN", "BLAH", "COMMIT"]
-    MODEL_DB.reset
   end
 
   it "should rollback if before_save returns false and raise_on_save_failure = false" do
@@ -275,7 +259,6 @@ describe "Model#save" do
     end
     o.save(:y).should == nil
     MODEL_DB.sqls.should == ["BEGIN", "ROLLBACK"]
-    MODEL_DB.reset
   end
 
   it "should not rollback if before_save throws Rollback and use_transactions = false" do
@@ -286,7 +269,6 @@ describe "Model#save" do
     end
     proc { o.save(:y) }.should raise_error(Sequel::Rollback)
     MODEL_DB.sqls.should == []
-    MODEL_DB.reset
   end
 end
 
@@ -295,7 +277,6 @@ describe "Model#marshallable" do
     class ::Album < Sequel::Model
       columns :id, :x
     end
-    Album.dataset.meta_def(:insert){|h| super(h); 1}
   end
   after do
     Object.send(:remove_const, :Album)
@@ -377,7 +358,6 @@ describe "Model#modified[!?]" do
 end
 
 describe "Model#save_changes" do
-  
   before do
     @c = Class.new(Sequel::Model(:items)) do
       unrestrict_primary_key
@@ -466,13 +446,11 @@ describe "Model#save_changes" do
     o.x = 2
     o.save_changes
     MODEL_DB.sqls.should == ["UPDATE items SET x = 3 WHERE (id = 3)"]
-    MODEL_DB.reset
     o.save_changes
     MODEL_DB.sqls.should == []
     o.x = 4
     o.save_changes
     MODEL_DB.sqls.should == ["UPDATE items SET x = 5 WHERE (id = 3)"]
-    MODEL_DB.reset
   end
 
   it "should update columns changed in a before_save hook" do
@@ -483,25 +461,21 @@ describe "Model#save_changes" do
     o.x = 2
     o.save_changes
     MODEL_DB.sqls.should == ["UPDATE items SET x = 3 WHERE (id = 3)"]
-    MODEL_DB.reset
     o.save_changes
     MODEL_DB.sqls.should == []
     o.x = 4
     o.save_changes
     MODEL_DB.sqls.should == ["UPDATE items SET x = 5 WHERE (id = 3)"]
-    MODEL_DB.reset
   end
 end
 
 describe "Model#new?" do
-  
   before do
-    MODEL_DB.reset
-
     @c = Class.new(Sequel::Model(:items)) do
       unrestrict_primary_key
       columns :x
     end
+    MODEL_DB.reset
   end
   
   it "should be true for a new instance" do
@@ -517,70 +491,61 @@ describe "Model#new?" do
 end
 
 describe Sequel::Model, "w/ primary key" do
-  
   it "should default to ':id'" do
     model_a = Class.new Sequel::Model
-    model_a.primary_key.should be_equal(:id)
+    model_a.primary_key.should == :id
   end
 
   it "should be changed through 'set_primary_key'" do
-    model_a = Class.new(Sequel::Model) { set_primary_key :a }
-    model_a.primary_key.should be_equal(:a)
+    model_a = Class.new(Sequel::Model){ set_primary_key :a }
+    model_a.primary_key.should == :a
   end
 
   it "should support multi argument composite keys" do
-    model_a = Class.new(Sequel::Model) { set_primary_key :a, :b }
-    model_a.primary_key.should be_eql([:a, :b])
+    model_a = Class.new(Sequel::Model){ set_primary_key :a, :b }
+    model_a.primary_key.should == [:a, :b]
   end
 
   it "should accept single argument composite keys" do
-    model_a = Class.new(Sequel::Model) { set_primary_key [:a, :b] }
-    model_a.primary_key.should be_eql([:a, :b])
+    model_a = Class.new(Sequel::Model){ set_primary_key [:a, :b] }
+    model_a.primary_key.should == [:a, :b]
   end
-  
 end
 
 describe Sequel::Model, "w/o primary key" do
   it "should return nil for primary key" do
-    Class.new(Sequel::Model) { no_primary_key }.primary_key.should be_nil
+    Class.new(Sequel::Model){no_primary_key}.primary_key.should be_nil
   end
 
   it "should raise a Sequel::Error on 'this'" do
-    instance = Class.new(Sequel::Model) { no_primary_key }.new
-    proc { instance.this }.should raise_error(Sequel::Error)
+    instance = Class.new(Sequel::Model){no_primary_key}.new
+    proc{instance.this}.should raise_error(Sequel::Error)
   end
 end
 
 describe Sequel::Model, "with this" do
-
-  before { @example = Class.new Sequel::Model(:examples); @example.columns :id, :a, :x, :y }
+  before do
+    @example = Class.new(Sequel::Model(:examples))
+    @example.columns :id, :a, :x, :y
+  end
 
   it "should return a dataset identifying the record" do
-    instance = @example.load :id => 3
-    instance.this.sql.should be_eql("SELECT * FROM examples WHERE (id = 3) LIMIT 1")
+    instance = @example.load(:id => 3)
+    instance.this.sql.should == "SELECT * FROM examples WHERE (id = 3) LIMIT 1"
   end
 
   it "should support arbitary primary keys" do
     @example.set_primary_key :a
 
-    instance = @example.load :a => 3
-    instance.this.sql.should be_eql("SELECT * FROM examples WHERE (a = 3) LIMIT 1")
+    instance = @example.load(:a => 3)
+    instance.this.sql.should == "SELECT * FROM examples WHERE (a = 3) LIMIT 1"
   end
 
   it "should support composite primary keys" do
     @example.set_primary_key :x, :y
-    instance = @example.load :x => 4, :y => 5
-
-    parts = [
-      'SELECT * FROM examples WHERE %s LIMIT 1',
-      '((x = 4) AND (y = 5))', 
-      '((y = 5) AND (x = 4))'
-    ].map { |expr| Regexp.escape expr }
-    regexp = Regexp.new parts.first % "(?:#{parts[1]}|#{parts[2]})"
-
-    instance.this.sql.should match(regexp)
+    instance = @example.load(:x => 4, :y => 5)
+    instance.this.sql.should =~ /SELECT \* FROM examples WHERE \(\([xy] = [45]\) AND \([xy] = [45]\)\) LIMIT 1/
   end
-
 end
 
 describe "Model#pk" do
