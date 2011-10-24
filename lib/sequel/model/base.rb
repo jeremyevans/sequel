@@ -826,7 +826,6 @@ module Sequel
       #   end
       def initialize(values = {}, from_db = false)
         if from_db
-          @new = false
           set_values(values)
         else
           @values = {}
@@ -1067,7 +1066,7 @@ module Sequel
       #   Artist.new.new? # => true
       #   Artist[1].new? # => false
       def new?
-        @new
+        defined?(@new) ? @new : (@new = false)
       end
       
       # Returns the primary key value identifying the model instance.
