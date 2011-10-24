@@ -28,7 +28,11 @@ describe "Sequel Mock Adapter" do
     db[:t].each{|r| rs << r}
     rs.should == [{:a=>1}]
     db[:t].each{|r| rs << r}
-    rs.should == [{:a=>1}] * 2
+    rs.should == [{:a=>1}, {:a=>1}]
+    db[:t].each{|r| r[:a] = 2; rs << r}
+    rs.should == [{:a=>1}, {:a=>1}, {:a=>2}]
+    db[:t].each{|r| rs << r}
+    rs.should == [{:a=>1}, {:a=>1}, {:a=>2}, {:a=>1}]
   end
 
   specify "should be able to set the rows returned by each using :fetch option with an array of hashes" do
@@ -37,7 +41,11 @@ describe "Sequel Mock Adapter" do
     db[:t].each{|r| rs << r}
     rs.should == [{:a=>1}, {:a=>2}]
     db[:t].each{|r| rs << r}
-    rs.should == [{:a=>1}, {:a=>2}] * 2
+    rs.should == [{:a=>1}, {:a=>2}, {:a=>1}, {:a=>2}]
+    db[:t].each{|r| r[:a] += 2; rs << r}
+    rs.should == [{:a=>1}, {:a=>2}, {:a=>1}, {:a=>2}, {:a=>3}, {:a=>4}]
+    db[:t].each{|r| rs << r}
+    rs.should == [{:a=>1}, {:a=>2}, {:a=>1}, {:a=>2}, {:a=>3}, {:a=>4}, {:a=>1}, {:a=>2}]
   end
 
   specify "should be able to set the rows returned by each using :fetch option with an array or arrays of hashes" do
@@ -58,6 +66,12 @@ describe "Sequel Mock Adapter" do
     rs.should == [{:b=>1}]
     db[:b].each{|r| rs << r}
     rs.should == [{:b=>1}, {:a=>1}, {:a=>2}]
+    db[:t].each{|r| r[:b] += 1; rs << r}
+    db[:b].each{|r| r[:a] += 2; rs << r}
+    rs.should == [{:b=>1}, {:a=>1}, {:a=>2}, {:b=>2}, {:a=>3}, {:a=>4}]
+    db[:t].each{|r| rs << r}
+    db[:b].each{|r| rs << r}
+    rs.should == [{:b=>1}, {:a=>1}, {:a=>2}, {:b=>2}, {:a=>3}, {:a=>4}, {:b=>1}, {:a=>1}, {:a=>2}]
   end
 
   specify "should have a fetch= method for setting rows returned by each after the fact" do

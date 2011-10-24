@@ -187,19 +187,19 @@ module Sequel
       def _fetch(sql, f, &block)
         case f
         when Hash
-          yield f
+          yield f.dup
         when Array
           if f.all?{|h| h.is_a?(Hash)}
-            f.each{|h| yield h}
+            f.each{|h| yield h.dup}
           else
             _fetch(sql, f.shift, &block)
           end
         when Proc
           h = f.call(sql)
           if h.is_a?(Hash)
-            yield h
+            yield h.dup
           elsif h
-            h.each{|h1| yield h1}
+            h.each{|h1| yield h1.dup}
           end
         when Class
           if f < Exception
