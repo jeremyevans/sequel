@@ -33,11 +33,6 @@ module Sequel
     #   Album.plugin :identity_map
     #   # would need to do Album.with_identity_map{} to use the identity map
     module IdentityMap
-      # Reset the row_proc since the load class method is being modified.
-      def self.configure(model)
-        model.reset_row_proc
-      end
-
       module ClassMethods
         # Override the default :eager_loader option for many_*_many associations to work
         # with an identity_map.  If the :eager_graph association option is used, you'll probably have to use
@@ -168,7 +163,7 @@ module Sequel
         # certain fields in an initial query, make modifications to some of those
         # fields and request other, potentially overlapping fields in a new query,
         # and not have the second query override fields you modified.
-        def load(row)
+        def call(row)
           return super unless idm = identity_map
           if o = idm[identity_map_key(Array(primary_key).map{|x| row[x]})]
             o.merge_db_update(row)

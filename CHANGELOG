@@ -1,8 +1,8 @@
 === HEAD
 
-* Plugins that override Model#load now need to call Model.reset_row_proc in their configure method (jeremyevans)
+* Plugins that override Model.load should be modified to override Model.call instead (jeremyevans)
 
-* Speed up loading model objects from the database by up to 2-10% (jeremyevans)
+* Speed up loading model objects from the database by up to 7-16% (jeremyevans)
 
 * Create accessor methods for all columns in a model's table, even if the dataset doesn't select the columns (jeremyevans)
 

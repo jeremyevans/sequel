@@ -124,7 +124,7 @@ module Sequel
         # Return an instance of the class specified by sti_key,
         # used by the row_proc.
         def sti_load(r)
-          sti_class(sti_model_map[r[sti_key]]).load(r)
+          sti_class(sti_model_map[r[sti_key]]).call(r)
         end
 
         # Make sure that all subclasses of the parent class correctly include 

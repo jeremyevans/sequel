@@ -8,7 +8,7 @@ module Sequel
     # attribute, the resulting value is forced to a given encoding if the
     # value is a string.  There are two ways to specify the encoding.  You
     # can either do so in the plugin call itself, or via the
-    # forced_encoding class accessor:
+    # forced_encoding class accessor.
     #
     # Usage:
     #
@@ -46,6 +46,11 @@ module Sequel
           super(force_hash_encoding(row))
         end
         
+        # Force the encoding of all string values when setting the instance's values.
+        def set_values(row)
+          super(force_hash_encoding(row))
+        end
+        
         private
         
         # Force the encoding for all string values in the given row hash.
@@ -53,11 +58,6 @@ module Sequel
           fe = model.forced_encoding
           row.values.each{|v| v.force_encoding(fe) if v.is_a?(String)} if fe
           row
-        end
-        
-        # Force the encoding of all string values when setting the instance's values.
-        def set_values(row)
-          super(force_hash_encoding(row))
         end
         
         # Force the encoding of all returned strings to the model's forced_encoding.

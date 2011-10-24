@@ -110,7 +110,7 @@ module Sequel
         attr_reader :deserialized_values
 
         # Set @deserialized_values to the empty hash
-        def initialize(*args, &block)
+        def initialize_set(values)
           @deserialized_values = {}
           super
         end
@@ -124,6 +124,11 @@ module Sequel
         # Empty the deserialized values when refreshing.
         def refresh
           @deserialized_values = {}
+          super
+        end
+
+        def set_values(*)
+          @deserialized_values ||= {}
           super
         end
 

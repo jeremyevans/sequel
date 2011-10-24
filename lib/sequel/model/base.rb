@@ -105,6 +105,17 @@ module Sequel
         args = args.first if (args.size == 1)
         args.is_a?(Hash) ? dataset[args] : primary_key_lookup(args)
       end
+
+      # Initializes a model instance as an existing record. This constructor is
+      # used by Sequel to initialize model instances when fetching records.
+      # Requires that values be a hash where all keys are symbols. It
+      # probably should not be used by external code.
+      def call(values)
+        o = allocate
+        o.set_values(values)
+        o.after_initialize
+        o
+      end
       
       # Clear the setter_methods cache
       def clear_setter_methods_cache
@@ -339,12 +350,9 @@ module Sequel
         pluralize(underscore(demodulize(name))).to_sym
       end
   
-      # Initializes a model instance as an existing record. This constructor is
-      # used by Sequel to initialize model instances when fetching records.
-      # +load+ requires that values be a hash where all keys are symbols. It
-      # probably should not be used by external code.
+      # Calls #call with the values hash.  Only for backwards compatibility.
       def load(values)
-        new(values, true)
+        call(values)
       end
 
       # Clear the setter_methods cache when a setter method is added
@@ -414,12 +422,6 @@ module Sequel
         h
       end
   
-      # Reset the dataset's row proc.  This needs to be called by plugins if they
-      # override the load class method.
-      def reset_row_proc
-        @dataset.row_proc = method(:load) if @dataset && defined?(RUBY_ENGINE)
-      end
-
       # Restrict the setting of the primary key(s) when using mass assignment (e.g. +set+).  Because
       # this is the default, this only make sense to use in a subclass where the
       # parent class has used +unrestrict_primary_key+.
@@ -480,7 +482,7 @@ module Sequel
         else
           raise(Error, "Model.set_dataset takes one of the following classes as an argument: Symbol, LiteralString, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, Dataset")
         end
-        @dataset.row_proc = method(defined?(RUBY_ENGINE) ? :load : :_load)
+        @dataset.row_proc = self
         @require_modification = Sequel::Model.require_modification.nil? ? @dataset.provides_accurate_rows_matched? : Sequel::Model.require_modification
         if inherited
           @simple_table = superclass.simple_table
@@ -593,12 +595,6 @@ module Sequel
   
       private
       
-      # Call load, should not be overridden by subclasses.  Only necessary on ruby 1.8,
-      # because it doesn't handle Method objects in modules that call super.
-      def _load(row)
-        load(row)
-      end
-    
       # Yield to the passed block and swallow all errors other than DatabaseConnectionErrors.
       def check_non_connection_error
         begin
@@ -817,7 +813,7 @@ module Sequel
       #
       # Arguments:
       # values :: should be a hash to pass to set. 
-      # from_db :: should only be set by <tt>Model.load</tt>, forget it exists.
+      # from_db :: only for backwards compatibility, forget it exists.
       #
       #   Artist.new(:name=>'Bob')
       #
@@ -1211,6 +1207,13 @@ module Sequel
         set_restricted(hash, only.flatten, false)
       end
   
+      # Replace the current values with hash.  Should definitely not be
+      # used with untrusted input, and should probably not be called
+      # directly by user code.
+      def set_values(hash)
+        @values = hash
+      end
+      
       # Clear the setter_methods cache when a method is added
       def singleton_method_added(meth)
         @singleton_setter_added = true if meth.to_s =~ SETTER_METHOD_REGEXP
@@ -1599,11 +1602,6 @@ module Sequel
           end
         end
         self
-      end
-      
-      # Replace the current values with hash.
-      def set_values(hash)
-        @values = hash
       end
       
       # Returns all methods that can be used for attribute

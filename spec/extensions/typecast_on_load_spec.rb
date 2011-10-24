@@ -2,21 +2,16 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe Sequel::Model, "TypecastOnLoad plugin" do
   before do
-    @db = Sequel::Database.new({})
+    @db = Sequel.mock(:fetch=>{:id=>1, :b=>"1", :y=>"0"}, :columns=>[:id, :b, :y])
     def @db.schema(*args)
       [[:id, {}], [:y, {:type=>:boolean, :db_type=>'tinyint(1)'}], [:b, {:type=>:integer, :db_type=>'integer'}]]
     end
     @c = Class.new(Sequel::Model(@db[:items])) do
-      include(Module.new{def _refresh(ds); values[:b] = b.to_s; self; end})
       attr_accessor :bset
       def b=(x)
         self.bset = true
         super
       end
-    end
-    @c.instance_eval do
-      @columns = [:id, :b, :y]
-      def columns; @columns; end
     end
   end 
 

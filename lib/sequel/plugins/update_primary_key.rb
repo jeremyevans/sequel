@@ -20,14 +20,9 @@ module Sequel
     #   # Make the Album class support primary key updates
     #   Album.plugin :update_primary_key
     module UpdatePrimaryKey
-      # Reset the row_proc since the load class method is being modified.
-      def self.configure(model)
-        model.reset_row_proc
-      end
-
       module ClassMethods
         # Cache the pk_hash when loading records
-        def load(h)
+        def call(h)
           r = super(h)
           r.pk_hash
           r

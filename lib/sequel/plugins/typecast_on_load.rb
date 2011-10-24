@@ -5,7 +5,7 @@ module Sequel
     # typecast correctly (with correct being defined as how the model object
     # would typecast the same column values).
     #
-    # This plugin modifies Model.load to call the setter methods (which typecast
+    # This plugin modifies Model#set_values to call the setter methods (which typecast
     # by default) for all columns given.  You can either specify the columns to
     # typecast on load in the plugin call itself, or afterwards using 
     # add_typecast_on_load_columns:
@@ -20,12 +20,10 @@ module Sequel
     # the model object, you'll get Date objects instead of strings.
     module TypecastOnLoad
       # Call add_typecast_on_load_columns on the passed column arguments.
-      # Reset the row_proc since the load class method is being modified.
       def self.configure(model, *columns)
         model.instance_eval do
           @typecast_on_load_columns ||= []
           add_typecast_on_load_columns(*columns)
-          reset_row_proc
         end
       end
 
@@ -43,16 +41,11 @@ module Sequel
           super
           subclass.instance_variable_set(:@typecast_on_load_columns, typecast_on_load_columns.dup)
         end
-
-        # Call the setter method for each of the typecast on load columns,
-        # ensuring the model object will have the correct typecasting even
-        # if the database doesn't typecast the columns correctly.
-        def load(values)
-          super.load_typecast
-        end
       end
 
       module InstanceMethods
+        # Call the setter method for each of the model's typecast_on_load_columns
+        # with the current value, so it can be typecasted correctly.
         def load_typecast
           model.typecast_on_load_columns.each do |c|
             if v = values[c]
@@ -63,10 +56,12 @@ module Sequel
           self
         end
 
-        private
-
-        def _refresh(dataset)
-          super.load_typecast
+        # Typecast values using #load_typecast when the values are retrieved from
+        # the database.
+        def set_values(values)
+          ret = super
+          load_typecast
+          ret
         end
       end
     end
