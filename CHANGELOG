@@ -1,5 +1,9 @@
 === HEAD
 
+* Plugins that override Model#load now need to call Model.reset_row_proc in their configure method (jeremyevans)
+
+* Speed up model object instantiation by up to 1-5% (jeremyevans)
+
 * Create accessor methods for all columns in a model's table, even if the dataset doesn't select the columns (jeremyevans)
 
 * Add mock adapter for better mocking of a database connection (jeremyevans)

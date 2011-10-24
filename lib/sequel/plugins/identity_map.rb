@@ -33,6 +33,11 @@ module Sequel
     #   Album.plugin :identity_map
     #   # would need to do Album.with_identity_map{} to use the identity map
     module IdentityMap
+      # Reset the row_proc since the load class method is being modified.
+      def self.configure(model)
+        model.reset_row_proc
+      end
+
       module ClassMethods
         # Override the default :eager_loader option for many_*_many associations to work
         # with an identity_map.  If the :eager_graph association option is used, you'll probably have to use

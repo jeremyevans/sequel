@@ -414,6 +414,12 @@ module Sequel
         h
       end
   
+      # Reset the dataset's row proc.  This needs to be called by plugins if they
+      # override the load class method.
+      def reset_row_proc
+        @dataset.row_proc = method(:load) if @dataset && defined?(RUBY_ENGINE)
+      end
+
       # Restrict the setting of the primary key(s) when using mass assignment (e.g. +set+).  Because
       # this is the default, this only make sense to use in a subclass where the
       # parent class has used +unrestrict_primary_key+.
@@ -474,7 +480,7 @@ module Sequel
         else
           raise(Error, "Model.set_dataset takes one of the following classes as an argument: Symbol, LiteralString, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, Dataset")
         end
-        @dataset.row_proc = Proc.new{|r| load(r)}
+        @dataset.row_proc = method(defined?(RUBY_ENGINE) ? :load : :_load)
         @require_modification = Sequel::Model.require_modification.nil? ? @dataset.provides_accurate_rows_matched? : Sequel::Model.require_modification
         if inherited
           @simple_table = superclass.simple_table
@@ -487,7 +493,7 @@ module Sequel
         check_non_connection_error{@db_schema = (inherited ? superclass.db_schema : get_db_schema)}
         self
       end
-    
+
       # Sets the primary key for this model. You can use either a regular 
       # or a composite primary key.  To not use a primary key, set to nil
       # or use +no_primary_key+.  On most adapters, Sequel can automatically
@@ -587,6 +593,12 @@ module Sequel
   
       private
       
+      # Call load, should not be overridden by subclasses.  Only necessary on ruby 1.8,
+      # because it doesn't handle Method objects in modules that call super.
+      def _load(row)
+        load(row)
+      end
+    
       # Yield to the passed block and swallow all errors other than DatabaseConnectionErrors.
       def check_non_connection_error
         begin

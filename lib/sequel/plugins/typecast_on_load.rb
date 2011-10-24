@@ -20,10 +20,12 @@ module Sequel
     # the model object, you'll get Date objects instead of strings.
     module TypecastOnLoad
       # Call add_typecast_on_load_columns on the passed column arguments.
+      # Reset the row_proc since the load class method is being modified.
       def self.configure(model, *columns)
         model.instance_eval do
           @typecast_on_load_columns ||= []
           add_typecast_on_load_columns(*columns)
+          reset_row_proc
         end
       end
 
