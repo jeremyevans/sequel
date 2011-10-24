@@ -17,11 +17,6 @@ module Sequel
           end
         end
         
-        # Return Sequel::JDBC::Oracle::Dataset object with the given opts.
-        def dataset(opts=nil)
-          Sequel::JDBC::Oracle::Dataset.new(self, opts)
-        end
-        
         private
 
         def last_insert_id(conn, opts)

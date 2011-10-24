@@ -15,10 +15,6 @@ module Sequel
         )
       end
       
-      def dataset(opts = nil)
-        OpenBase::Dataset.new(self, opts)
-      end
-    
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
           r = log_yield(sql){conn.execute(sql)}
@@ -37,6 +33,8 @@ module Sequel
     
     class Dataset < Sequel::Dataset
       SELECT_CLAUSE_METHODS = clause_methods(:select, %w'distinct columns from join where group having compounds order limit')
+
+      Database::DatasetClass = self
       
       def fetch_rows(sql)
         execute(sql) do |result|

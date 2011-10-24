@@ -8,11 +8,6 @@ module Sequel
       # Database instance methods for JTDS databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::JDBC::MSSQL::DatabaseMethods
-        
-        # Return instance of Sequel::JDBC::JTDS::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::JDBC::JTDS::Dataset.new(self, opts)
-        end
       end
       
       # Dataset class for JTDS datasets accessed via JDBC.

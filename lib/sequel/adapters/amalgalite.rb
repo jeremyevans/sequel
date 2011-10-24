@@ -88,11 +88,6 @@ module Sequel
         :sqlite
       end
 
-      # Return instance of Sequel::Amalgalite::Dataset with the given options.
-      def dataset(opts = nil)
-        Amalgalite::Dataset.new(self, opts)
-      end
-      
       # Run the given SQL with the given arguments. Returns nil.
       def execute_ddl(sql, opts={})
         _execute(sql, opts){|conn| log_yield(sql){conn.execute_batch(sql)}}
@@ -162,6 +157,8 @@ module Sequel
     # Dataset class for SQLite datasets that use the amalgalite driver.
     class Dataset < Sequel::Dataset
       include ::Sequel::SQLite::DatasetMethods
+
+      Database::DatasetClass = self
       
       # Yield a hash for each row in the dataset.
       def fetch_rows(sql)

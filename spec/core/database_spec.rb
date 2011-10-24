@@ -384,6 +384,27 @@ describe "Database#dataset" do
   end
 end
 
+describe "Database#dataset_class" do
+  before do
+    @db = Sequel::Database.new
+    @dsc = Class.new(Sequel::Dataset)
+  end
+  
+  specify "should have setter set the class to use to create datasets" do
+    @db.dataset_class = @dsc
+    ds = @db.dataset
+    ds.should be_a_kind_of(@dsc)
+    ds.opts.should == {}
+    ds.db.should be(@db)
+  end
+
+  specify "should have getter return the class to use to create datasets" do
+    @db.dataset_class.should == Sequel::Dataset
+    @db.dataset_class = @dsc
+    @db.dataset_class.should == @dsc
+  end
+end
+  
 describe "Database#execute" do
   specify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.execute('blah blah')}.should raise_error(Sequel::NotImplemented)

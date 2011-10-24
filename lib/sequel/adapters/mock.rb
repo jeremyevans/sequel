@@ -107,11 +107,6 @@ module Sequel
         Connection.new(self, server, server_opts(server))
       end
 
-      # Return a Dataset with the given options.
-      def dataset(opts={})
-        Dataset.new(self, opts)
-      end
-
       # Store the sql used for later retrieval with #sqls, and return
       # the appropriate value using either the #autoid, #fetch, or
       # #numrows methods.
@@ -275,6 +270,8 @@ module Sequel
     end
 
     class Dataset < Sequel::Dataset
+      Database::DatasetClass = self
+
       # Override the databases's autoid setting for this dataset
       attr_accessor :autoid
 

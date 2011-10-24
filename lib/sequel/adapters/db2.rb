@@ -57,10 +57,6 @@ module Sequel
         dbc
       end
       
-      def dataset(opts = nil)
-        DB2::Dataset.new(self, opts)
-      end
-      
       def execute(sql, opts={}, &block)
         synchronize(opts[:server]){|conn| log_connection_execute(conn, sql, &block)}
       end
@@ -167,6 +163,7 @@ module Sequel
     class Dataset < Sequel::Dataset
       include DatasetMethods
 
+      Database::DatasetClass = self
       MAX_COL_SIZE = 256
       
       # Whether to convert smallint to boolean arguments for this dataset.

@@ -20,6 +20,7 @@ module Sequel
           when 'SQL Server'
             Sequel.ts_require 'adapters/ado/mssql'
             extend Sequel::ADO::MSSQL::DatabaseMethods
+            @dataset_class = ADO::MSSQL::Dataset
             set_mssql_unicode_strings
           end
         end
@@ -55,10 +56,6 @@ module Sequel
         handle
       end
       
-      def dataset(opts = nil)
-        ADO::Dataset.new(self, opts)
-      end
-    
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
           begin
@@ -103,6 +100,8 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
+      Database::DatasetClass = self
+
       def fetch_rows(sql)
         execute(sql) do |s|
           columns = cols = s.Fields.extend(Enumerable).map{|column| output_identifier(column.Name)}

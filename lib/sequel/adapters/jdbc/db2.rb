@@ -19,11 +19,6 @@ module Sequel
         include Sequel::DB2::DatabaseMethods
         include Sequel::JDBC::Transactions
         
-        # Return instance of Sequel::JDBC::DB2::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::JDBC::DB2::Dataset.new(self, opts)
-        end
-        
         %w'schema_parse_table tables views indexes'.each do |s|
           class_eval("def #{s}(*a) jdbc_#{s}(*a) end", __FILE__, __LINE__)
         end

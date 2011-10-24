@@ -56,10 +56,6 @@ module Sequel
         conn
       end
 
-      def dataset(opts = nil)
-        Oracle::Dataset.new(self, opts)
-      end
-
       def execute(sql, opts={}, &block)
         _execute(nil, sql, opts, &block)
       end
@@ -276,6 +272,8 @@ module Sequel
     
     class Dataset < Sequel::Dataset
       include DatasetMethods
+
+      Database::DatasetClass = self
 
       PREPARED_ARG_PLACEHOLDER = ':'.freeze
       

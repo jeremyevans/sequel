@@ -17,16 +17,19 @@ module Sequel
         Sequel.tsk_require 'do_postgres'
         Sequel.ts_require 'adapters/do/postgres'
         db.extend(Sequel::DataObjects::Postgres::DatabaseMethods)
+        db.dataset_class = Sequel::DataObjects::Postgres::Dataset
       end,
       :mysql=>proc do |db|
         Sequel.tsk_require 'do_mysql'
         Sequel.ts_require 'adapters/do/mysql'
         db.extend(Sequel::DataObjects::MySQL::DatabaseMethods)
+        db.dataset_class = Sequel::DataObjects::MySQL::Dataset
       end,
       :sqlite3=>proc do |db|
         Sequel.tsk_require 'do_sqlite3'
         Sequel.ts_require 'adapters/do/sqlite'
         db.extend(Sequel::DataObjects::SQLite::DatabaseMethods)
+        db.dataset_class = Sequel::DataObjects::SQLite::Dataset
       end
     }
       
@@ -57,11 +60,6 @@ module Sequel
         setup_connection(::DataObjects::Connection.new(uri(server_opts(server))))
       end
       
-      # Return a Sequel::DataObjects::Dataset object for this database.
-      def dataset(opts = nil)
-        DataObjects::Dataset.new(self, opts)
-      end
-    
       # Execute the given SQL.  If a block is given, the DataObjects::Reader
       # created is yielded to it. A block should not be provided unless a
       # a SELECT statement is being used (or something else that returns rows).
@@ -151,6 +149,8 @@ module Sequel
     
     # Dataset class for Sequel::DataObjects::Database objects.
     class Dataset < Sequel::Dataset
+      Database::DatasetClass = self
+
       # Execute the SQL on the database and yield the rows as hashes
       # with symbol keys.
       def fetch_rows(sql)

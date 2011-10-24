@@ -9,11 +9,6 @@ module Sequel
       module DatabaseMethods
         include Sequel::Informix::DatabaseMethods
         
-        # Return instance of Sequel::JDBC::Informix::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::JDBC::Informix::Dataset.new(self, opts)
-        end
-        
         private
         
         # TODO: implement

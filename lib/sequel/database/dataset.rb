@@ -24,10 +24,10 @@ module Sequel
     #
     #   DB.dataset # SELECT *
     #   DB.dataset.from(:items) # SELECT * FROM items
-    def dataset
-      ds = Sequel::Dataset.new(self)
+    def dataset(opts=nil)
+      @dataset_class.new(self, opts)
     end
-    
+
     # Fetches records for an arbitrary SQL statement. If a block is given,
     # it is used to iterate over the records:
     #

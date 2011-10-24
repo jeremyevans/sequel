@@ -7,9 +7,7 @@ module Sequel
       end
 
       def dataset(opts = nil)
-        ds = super
-        ds.extend(DatasetMethods)
-        ds
+        super.extend(DatasetMethods)
       end
 
       # Doesn't work, due to security restrictions on MSysObjects

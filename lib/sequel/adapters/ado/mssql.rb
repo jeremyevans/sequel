@@ -11,11 +11,6 @@ module Sequel
         # delete query.
         ROWS_AFFECTED = "SELECT @@ROWCOUNT AS AffectedRows"
         
-        # Return instance of Sequel::ADO::MSSQL::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::ADO::MSSQL::Dataset.new(self, opts)
-        end
-        
         # Just execute so it doesn't attempt to return the number of rows modified.
         def execute_ddl(sql, opts={})
           execute(sql, opts)
@@ -58,7 +53,7 @@ module Sequel
       
       class Dataset < ADO::Dataset
         include Sequel::MSSQL::DatasetMethods
-        
+
         # Use a nasty hack of multiple SQL statements in the same call and
         # having the last one return the most recently inserted id.  This
         # is necessary as ADO's default :provider uses a separate native

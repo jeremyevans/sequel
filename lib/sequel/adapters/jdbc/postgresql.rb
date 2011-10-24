@@ -47,11 +47,6 @@ module Sequel
           end
         end
         
-        # Return instance of Sequel::JDBC::Postgres::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::JDBC::Postgres::Dataset.new(self, opts)
-        end
-        
         private
         
         # Use setNull for nil arguments as the default behavior of setString

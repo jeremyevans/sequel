@@ -9,11 +9,6 @@ module Sequel
       module DatabaseMethods
         include Sequel::MySQL::DatabaseMethods
         
-        # Return instance of Sequel::Swift::MySQL::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::Swift::MySQL::Dataset.new(self, opts)
-        end
-        
         private
         
         # The database name for the given database.

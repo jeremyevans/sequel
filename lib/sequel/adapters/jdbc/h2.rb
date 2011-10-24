@@ -17,11 +17,6 @@ module Sequel
           :h2
         end
 
-        # Return Sequel::JDBC::H2::Dataset object with the given opts.
-        def dataset(opts=nil)
-          Sequel::JDBC::H2::Dataset.new(self, opts)
-        end
-        
         # Rollback an existing prepared transaction with the given transaction
         # identifier string.
         def rollback_prepared_transaction(transaction_id)

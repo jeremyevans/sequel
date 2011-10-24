@@ -13,10 +13,6 @@ module Sequel
         ::Informix.connect(opts[:database], opts[:user], opts[:password])
       end
     
-      def dataset(opts = nil)
-        Sequel::Informix::Dataset.new(self, opts)
-      end
-      
       # Returns number of rows affected
       def execute_dui(sql, opts={})
         synchronize(opts[:server]){|c| log_yield(sql){c.immediate(sql)}}
@@ -37,6 +33,8 @@ module Sequel
     
     class Dataset < Sequel::Dataset
       include DatasetMethods
+
+      Database::DatasetClass = self
 
       def fetch_rows(sql)
         execute(sql) do |cursor|

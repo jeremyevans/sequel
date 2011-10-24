@@ -5,6 +5,9 @@ module Sequel
     # This methods change the default behavior of this database's datasets.
     # ---------------------
 
+    # The default class to use for datasets
+    DatasetClass = Sequel::Dataset
+
     # The identifier input method to use by default
     @@identifier_input_method = nil
 
@@ -13,6 +16,11 @@ module Sequel
 
     # Whether to quote identifiers (columns and tables) by default
     @@quote_identifiers = nil
+
+    # The class to use for creating datasets.  Should respond to
+    # new with the Database argument as the first argument, and
+    # an optional options hash.
+    attr_accessor :dataset_class
 
     # The method to call on identifiers going into the database
     def self.identifier_input_method
@@ -108,6 +116,11 @@ module Sequel
     end
     
     private
+    
+    # The default dataset class to use for the database
+    def dataset_class_default
+      self.class.const_get(:DatasetClass)
+    end
     
     # The default value for default_schema.
     def default_schema_default

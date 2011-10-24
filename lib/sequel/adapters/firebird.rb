@@ -28,10 +28,6 @@ module Sequel
           :password => opts[:password]).connect
       end
 
-      def dataset(opts = nil)
-        Firebird::Dataset.new(self, opts)
-      end
-
       def execute(sql, opts={})
         begin
           synchronize(opts[:server]) do |conn|
@@ -81,6 +77,8 @@ module Sequel
     # Dataset class for Firebird datasets
     class Dataset < Sequel::Dataset
       include Sequel::Firebird::DatasetMethods
+
+      Database::DatasetClass = self
 
       # Yield all rows returned by executing the given SQL and converting
       # the types.

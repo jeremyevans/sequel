@@ -9,11 +9,6 @@ module Sequel
         include Sequel::MSSQL::DatabaseMethods
         LAST_INSERT_ID_SQL='SELECT SCOPE_IDENTITY()'
         
-        # Return an instance of Sequel::ODBC::MSSQL::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::ODBC::MSSQL::Dataset.new(self, opts)
-        end
-        
         # Return the last inserted identity value.
         def execute_insert(sql, opts={})
           synchronize(opts[:server]) do |conn|

@@ -63,10 +63,6 @@ module Sequel
         ::DBI.connect(dbname, opts[:user], opts[:password])
       end
       
-      def dataset(opts = nil)
-        DBI::Dataset.new(self, opts)
-      end
-    
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
           r = log_yield(sql){conn.execute(sql)}
@@ -88,6 +84,8 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
+      Database::DatasetClass = self
+
       def fetch_rows(sql)
         execute(sql) do |s|
           begin

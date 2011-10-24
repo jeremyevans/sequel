@@ -13,11 +13,6 @@ module Sequel
           :hsqldb
         end
 
-        # Return Sequel::JDBC::HSQLDB::Dataset object with the given opts.
-        def dataset(opts=nil)
-          Sequel::JDBC::HSQLDB::Dataset.new(self, opts)
-        end
-
         # HSQLDB uses an IDENTITY sequence as the default value for primary
         # key columns.
         def serial_primary_key_options

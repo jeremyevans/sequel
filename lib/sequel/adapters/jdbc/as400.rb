@@ -17,11 +17,6 @@ module Sequel
           :as400
         end
 
-        # Return Sequel::JDBC::AS400::Dataset object with the given opts.
-        def dataset(opts=nil)
-          Sequel::JDBC::AS400::Dataset.new(self, opts)
-        end
-
         # TODO: Fix for AS400
         def last_insert_id(conn, opts={})
           nil

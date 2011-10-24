@@ -16,11 +16,6 @@ module Sequel
         TinyTds::Client.new(opts)
       end
       
-      # Return instance of Sequel::TinyTDS::Dataset with the given options.
-      def dataset(opts = nil)
-        TinyTDS::Dataset.new(self, opts)
-      end
-    
       # Execute the given +sql+ on the server.  If the :return option
       # is present, its value should be a method symbol that is called
       # on the TinyTds::Result object returned from executing the
@@ -150,6 +145,8 @@ module Sequel
     
     class Dataset < Sequel::Dataset
       include Sequel::MSSQL::DatasetMethods
+
+      Database::DatasetClass = self
       
       # SQLite already supports named bind arguments, so use directly.
       module ArgumentMapper

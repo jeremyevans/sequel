@@ -15,6 +15,7 @@ module Sequel
         when 'mssql'
           Sequel.ts_require 'adapters/odbc/mssql'
           extend Sequel::ODBC::MSSQL::DatabaseMethods
+          @dataset_class = Sequel::ODBC::MSSQL::Dataset
           set_mssql_unicode_strings
         when 'progress'
           Sequel.ts_require 'adapters/shared/progress'
@@ -22,6 +23,7 @@ module Sequel
         when 'db2'
           Sequel.ts_require 'adapters/odbc/db2'
           extend Sequel::ODBC::DB2::DatabaseMethods
+          @dataset_class = Sequel::ODBC::DB2::Dataset
         end
       end
 
@@ -45,10 +47,6 @@ module Sequel
         conn
       end      
 
-      def dataset(opts = nil)
-        ODBC::Dataset.new(self, opts)
-      end
-    
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
           begin
@@ -98,6 +96,8 @@ module Sequel
       BOOL_FALSE = '0'.freeze
       ODBC_DATE_FORMAT = "{d '%Y-%m-%d'}".freeze
       TIMESTAMP_FORMAT="{ts '%Y-%m-%d %H:%M:%S'}".freeze
+
+      Database::DatasetClass = self
 
       def fetch_rows(sql)
         execute(sql) do |s|

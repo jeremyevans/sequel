@@ -21,11 +21,6 @@ module Sequel
           :derby
         end
 
-        # Return Sequel::JDBC::Derby::Dataset object with the given opts.
-        def dataset(opts=nil)
-          Sequel::JDBC::Derby::Dataset.new(self, opts)
-        end
-
         # Derby uses an IDENTITY sequence for autoincrementing columns.
         def serial_primary_key_options
           {:primary_key => true, :type => :integer, :identity=>true, :start_with=>1}

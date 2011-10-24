@@ -15,16 +15,19 @@ module Sequel
     DATABASE_SETUP = {:postgres=>proc do |db|
         Sequel.ts_require 'adapters/swift/postgres'
         db.extend(Sequel::Swift::Postgres::DatabaseMethods)
+        db.dataset_class = Sequel::Swift::Postgres::Dataset
         db.swift_class = ::Swift::DB::Postgres
       end,
       :mysql=>proc do |db|
         Sequel.ts_require 'adapters/swift/mysql'
         db.extend(Sequel::Swift::MySQL::DatabaseMethods)
+        db.dataset_class = Sequel::Swift::MySQL::Dataset
         db.swift_class = ::Swift::DB::Mysql
       end,
       :sqlite=>proc do |db|
         Sequel.ts_require 'adapters/swift/sqlite'
         db.extend(Sequel::Swift::SQLite::DatabaseMethods)
+        db.dataset_class = Sequel::Swift::SQLite::Dataset
         db.swift_class = ::Swift::DB::Sqlite3
       end,
     }
@@ -59,11 +62,6 @@ module Sequel
         setup_connection(swift_class.new(server_opts(server)))
       end
       
-      # Return a Sequel::Swift::Dataset object for this database.
-      def dataset(opts = nil)
-        Swift::Dataset.new(self, opts)
-      end
-    
       # Execute the given SQL, yielding a Swift::Result if a block is given.
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
@@ -134,6 +132,8 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
+      Database::DatasetClass = self
+
       # Set the columns and yield the hashes to the block.
       def fetch_rows(sql, &block)
         execute(sql) do |res|

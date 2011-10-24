@@ -32,35 +32,41 @@ module Sequel
     DATABASE_SETUP = {:postgresql=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/postgresql'
         db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::Postgres::Dataset
         JDBC.load_gem('postgres')
         org.postgresql.Driver
       end,
       :mysql=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/mysql'
         db.extend(Sequel::JDBC::MySQL::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::MySQL::Dataset
         JDBC.load_gem('mysql')
         com.mysql.jdbc.Driver
       end,
       :sqlite=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/sqlite'
         db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::SQLite::Dataset
         JDBC.load_gem('sqlite3')
         org.sqlite.JDBC
       end,
       :oracle=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/oracle'
         db.extend(Sequel::JDBC::Oracle::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::Oracle::Dataset
         Java::oracle.jdbc.driver.OracleDriver
       end,
       :sqlserver=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/sqlserver'
         db.extend(Sequel::JDBC::SQLServer::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::SQLServer::Dataset
         db.send(:set_mssql_unicode_strings)
         com.microsoft.sqlserver.jdbc.SQLServerDriver
       end,
       :jtds=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/jtds'
         db.extend(Sequel::JDBC::JTDS::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::JTDS::Dataset
         db.send(:set_mssql_unicode_strings)
         JDBC.load_gem('jtds')
         Java::net.sourceforge.jtds.jdbc.Driver
@@ -68,39 +74,46 @@ module Sequel
       :h2=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/h2'
         db.extend(Sequel::JDBC::H2::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::H2::Dataset
         JDBC.load_gem('h2')
         org.h2.Driver
       end,
       :hsqldb=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/hsqldb'
         db.extend(Sequel::JDBC::HSQLDB::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::HSQLDB::Dataset
         # Current gem is 1.8.1.3, but Sequel supports 2.2.5
         org.hsqldb.jdbcDriver
       end,
       :derby=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/derby'
         db.extend(Sequel::JDBC::Derby::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::Derby::Dataset
         JDBC.load_gem('derby')
         org.apache.derby.jdbc.EmbeddedDriver
       end,
       :as400=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/as400'
         db.extend(Sequel::JDBC::AS400::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::AS400::Dataset
         com.ibm.as400.access.AS400JDBCDriver
       end,
       :"informix-sqli"=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/informix'
         db.extend(Sequel::JDBC::Informix::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::Informix::Dataset
         com.informix.jdbc.IfxDriver
       end,
       :db2=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/db2'
         db.extend(Sequel::JDBC::DB2::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::DB2::Dataset
         com.ibm.db2.jcc.DB2Driver
       end,
       :firebirdsql=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/firebird'
         db.extend(Sequel::JDBC::Firebird::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::Firebird::Dataset
         org.firebirdsql.jdbc.FBDriver
       end
     }
@@ -207,11 +220,6 @@ module Sequel
           end
         end
         setup_connection(conn)
-      end
-      
-      # Return instances of JDBC::Dataset with the given opts.
-      def dataset(opts = nil)
-        JDBC::Dataset.new(self, opts)
       end
       
       # Execute the given SQL.  If a block is given, if should be a SELECT
@@ -523,6 +531,8 @@ module Sequel
     
     class Dataset < Sequel::Dataset
       include StoredProcedures
+
+      Database::DatasetClass = self
       
       # Use JDBC PreparedStatements instead of emulated ones.  Statements
       # created using #prepare are cached at the connection level to allow

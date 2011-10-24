@@ -41,11 +41,6 @@ module Sequel
           end
         end
         
-        # Return instance of Sequel::Swift::Postgres::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::Swift::Postgres::Dataset.new(self, opts)
-        end
-        
         # Run the SELECT SQL on the database and yield the rows
         def execute(sql, opts={})
           synchronize(opts[:server]) do |conn|

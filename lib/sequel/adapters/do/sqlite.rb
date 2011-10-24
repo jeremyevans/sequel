@@ -8,11 +8,6 @@ module Sequel
       module DatabaseMethods
         include Sequel::SQLite::DatabaseMethods
         
-        # Return Sequel::DataObjects::SQLite::Dataset object with the given opts.
-        def dataset(opts=nil)
-          Sequel::DataObjects::SQLite::Dataset.new(self, opts)
-        end
-        
         private
         
         # Default to a single connection for a memory database.

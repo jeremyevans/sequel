@@ -9,11 +9,6 @@ module Sequel
       module DatabaseMethods
         include Sequel::JDBC::MSSQL::DatabaseMethods
         
-        # Return instance of Sequel::JDBC::SQLServer::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::JDBC::SQLServer::Dataset.new(self, opts)
-        end
-        
         def metadata_dataset
           ds = super
           # Work around a bug in SQL Server JDBC Driver 3.0, where the metadata

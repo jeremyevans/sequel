@@ -198,11 +198,6 @@ module Sequel
         Connection.new(connection_string)
       end
 
-      # Return a related IBMDB::Dataset instance with the given options.
-      def dataset(opts = nil)
-        IBMDB::Dataset.new(self, opts)
-      end
-
       # Execute the given SQL on the database.
       def execute(sql, opts={}, &block)
         if sql.is_a?(Symbol)
@@ -353,6 +348,8 @@ module Sequel
     
     class Dataset < Sequel::Dataset
       include Sequel::DB2::DatasetMethods
+
+      Database::DatasetClass = self
 
       module CallableStatementMethods
         # Extend given dataset with this module so subselects inside subselects in

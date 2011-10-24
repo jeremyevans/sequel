@@ -239,11 +239,6 @@ module Sequel
         conn
       end
       
-      # Return instance of Sequel::Postgres::Dataset with the given options.
-      def dataset(opts = nil)
-        Postgres::Dataset.new(self, opts)
-      end
-      
       # Execute the given SQL with the given args on an available connection.
       def execute(sql, opts={}, &block)
         check_database_errors do
@@ -450,6 +445,8 @@ module Sequel
     # postgres-pr driver.
     class Dataset < Sequel::Dataset
       include Sequel::Postgres::DatasetMethods
+
+      Database::DatasetClass = self
       
       # Yield all rows returned by executing the given SQL and converting
       # the types.

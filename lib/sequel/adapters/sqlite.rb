@@ -77,11 +77,6 @@ module Sequel
         db
       end
       
-      # Return instance of Sequel::SQLite::Dataset with the given options.
-      def dataset(opts = nil)
-        SQLite::Dataset.new(self, opts)
-      end
-      
       # Run the given SQL with the given arguments and yield each row.
       def execute(sql, opts={}, &block)
         _execute(:select, sql, opts, &block)
@@ -210,6 +205,8 @@ module Sequel
     # Dataset class for SQLite datasets that use the ruby-sqlite3 driver.
     class Dataset < Sequel::Dataset
       include ::Sequel::SQLite::DatasetMethods
+
+      Database::DatasetClass = self
       
       PREPARED_ARG_PLACEHOLDER = ':'.freeze
       

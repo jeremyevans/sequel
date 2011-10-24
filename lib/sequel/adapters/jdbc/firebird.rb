@@ -18,11 +18,6 @@ module Sequel
             @primary_keys = {}
           end
         end
-        
-        # Return instance of Sequel::JDBC::Firebird::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::JDBC::Firebird::Dataset.new(self, opts)
-        end
       end
       
       # Dataset class for Firebird datasets accessed via JDBC.

@@ -7,10 +7,6 @@ module Sequel
     module DB2
       module DatabaseMethods
         include ::Sequel::DB2::DatabaseMethods
-
-        def dataset(opts=nil)
-          Sequel::ODBC::DB2::Dataset.new(self, opts)
-        end
       end
       
       class Dataset < ODBC::Dataset

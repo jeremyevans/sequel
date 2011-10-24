@@ -55,11 +55,6 @@ module Sequel
           end
         end
         
-        # Return instance of Sequel::DataObjects::Postgres::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::DataObjects::Postgres::Dataset.new(self, opts)
-        end
-        
         # Run the INSERT sql on the database and return the primary key
         # for the record.
         def execute_insert(sql, opts={})

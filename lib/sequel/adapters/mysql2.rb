@@ -69,11 +69,6 @@ module Sequel
         conn
       end
 
-      # Returns instance of Sequel::MySQL::Dataset with the given options.
-      def dataset(opts = nil)
-        Mysql2::Dataset.new(self, opts)
-      end
-
       # Return the version of the MySQL server two which we are connecting.
       def server_version(server=nil)
         @server_version ||= (synchronize(server){|conn| conn.server_info[:id]} || super)
@@ -132,6 +127,8 @@ module Sequel
     class Dataset < Sequel::Dataset
       include Sequel::MySQL::DatasetMethods
       include Sequel::MySQL::PreparedStatements::DatasetMethods
+
+      Database::DatasetClass = self
 
       # Delete rows matching this dataset
       def delete

@@ -8,9 +8,7 @@ module Sequel
       end
 
       def dataset(opts = nil)
-        ds = super
-        ds.extend(DatasetMethods)
-        ds
+        super.extend(DatasetMethods)
       end
     end
   

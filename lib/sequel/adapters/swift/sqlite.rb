@@ -15,11 +15,6 @@ module Sequel
           connection_pragmas.each{|s| log_yield(s){c.execute(s)}}
           c
         end
-        
-        # Return instance of Sequel::Swift::SQL::Dataset with the given opts.
-        def dataset(opts=nil)
-          Sequel::Swift::SQLite::Dataset.new(self, opts)
-        end
       end
       
       # Dataset class for SQLite datasets accessed via Swift.
