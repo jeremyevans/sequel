@@ -6,10 +6,6 @@ module Sequel
       def database_type
         :progress
       end
-
-      def dataset(opts = nil)
-        super.extend(DatasetMethods)
-      end
     end
   
     module DatasetMethods

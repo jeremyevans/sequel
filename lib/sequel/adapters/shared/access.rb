@@ -6,10 +6,6 @@ module Sequel
         :access
       end
 
-      def dataset(opts = nil)
-        super.extend(DatasetMethods)
-      end
-
       # Doesn't work, due to security restrictions on MSysObjects
       def tables
         from(:MSysObjects).filter(:Type=>1, :Flags=>0).select_map(:Name).map{|x| x.to_sym}

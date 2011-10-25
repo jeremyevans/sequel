@@ -14,6 +14,7 @@ module Sequel
         when /Microsoft\.(Jet|ACE)\.OLEDB/io
           Sequel.ts_require 'adapters/shared/access'
           extend Sequel::Access::DatabaseMethods
+          extend_datasets(Sequel::Access::DatasetMethods)
         else
           @opts[:driver] ||= 'SQL Server'
           case @opts[:driver]

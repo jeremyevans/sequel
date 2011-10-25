@@ -20,6 +20,7 @@ module Sequel
         when 'progress'
           Sequel.ts_require 'adapters/shared/progress'
           extend Sequel::Progress::DatabaseMethods
+          extend_datasets(Sequel::Progress::DatasetMethods)
         when 'db2'
           Sequel.ts_require 'adapters/odbc/db2'
           extend Sequel::ODBC::DB2::DatabaseMethods
