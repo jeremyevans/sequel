@@ -1,5 +1,7 @@
 === HEAD
 
+* Make like case sensitive on SQLite and Microsoft SQL Server (use ilike for case insensitive matching) (jeremyevans)
+
 * Add Database#extend_datasets for the equivalent of extending of the Database object's datasets with a module (jeremyevans)
 
 * Speed up Dataset #map, #to_hash, and related methods if an array of symbols is given (jeremyevans)

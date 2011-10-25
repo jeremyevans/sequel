@@ -23,7 +23,20 @@ module Sequel
         value = AUTO_VACUUM.index(value) || (raise Error, "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
         pragma_set(:auto_vacuum, value)
       end
+
+      # Boolean signifying the value of the case_sensitive_likePRAGMA, or nil
+      # if not using SQLite 3.2.3+.
+      def case_sensitive_like
+        pragma_get(:case_sensitive_like).to_i == 1 if sqlite_version >= 30203
+      end
       
+      # Set the case_sensitive_like PRAGMA using the given boolean value, if using
+      # SQLite 3.2.3+.  If not using 3.2.3+, no error is raised. See pragma_set.
+      # Consider using the :case_sensitive_like Database option instead.
+      def case_sensitive_like=(value)
+        pragma_set(:case_sensitive_like, !!value ? 'on' : 'off') if sqlite_version >= 30203
+      end
+
       # SQLite uses the :sqlite database type.
       def database_type
         :sqlite
@@ -231,6 +244,8 @@ module Sequel
         ps = []
         v = typecast_value_boolean(opts.fetch(:foreign_keys, 1))
         ps << "PRAGMA foreign_keys = #{v ? 1 : 0}"
+        v = typecast_value_boolean(opts.fetch(:case_sensitive_like, 1))
+        ps << "PRAGMA case_sensitive_like = #{v ? 1 : 0}"
         [[:auto_vacuum, AUTO_VACUUM], [:synchronous, SYNCHRONOUS], [:temp_store, TEMP_STORE]].each do |prag, con|
           if v = opts[prag]
             raise(Error, "Value for PRAGMA #{prag} not supported, should be one of #{con.join(', ')}") unless v = con.index(v.to_sym)
@@ -388,9 +403,10 @@ module Sequel
         case op
         when :~, :'!~', :'~*', :'!~*'
           raise Error, "SQLite does not support pattern matching via regular expressions"
-        when :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'
-          # SQLite is case insensitive for ASCII, and non case sensitive for other character sets
-          "#{'NOT ' if [:'NOT LIKE', :'NOT ILIKE'].include?(op)}(#{literal(args.at(0))} LIKE #{literal(args.at(1))})"
+        when :ILIKE
+          super(:LIKE, args.map{|a| SQL::Function.new(:upper, a)})
+        when :"NOT LIKE", :"NOT ILIKE"
+          "NOT #{complex_expression_sql((op == :"NOT ILIKE" ? :ILIKE : :LIKE), args)}"
         when :^
           complex_expression_arg_pairs(args) do |a, b|
             a = literal(a)

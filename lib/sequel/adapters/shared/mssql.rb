@@ -273,10 +273,10 @@ module Sequel
         case op
         when :'||'
           super(:+, args)
-        when :ILIKE
-          super(:LIKE, args)
-        when :"NOT ILIKE"
-          super(:"NOT LIKE", args)
+        when :LIKE, :"NOT LIKE"
+          super(op, args.map{|a| LiteralString.new("(#{literal(a)} COLLATE Latin1_General_CS_AS)")})
+        when :ILIKE, :"NOT ILIKE"
+          super((op == :ILIKE ? :LIKE : :"NOT LIKE"), args)
         when :<<
           complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
         when :>>

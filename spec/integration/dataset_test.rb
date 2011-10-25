@@ -1187,6 +1187,19 @@ describe "Dataset string methods" do
     @ds.filter(:a.like('foo')).all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.filter(:a.like('bar')).all.should == []
     @ds.filter(:a.like('foo', 'bar')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(:a.like('foo')).all.should == []
+    @ds.exclude(:a.like('bar')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(:a.like('foo', 'bar')).all.should == []
+  end
+  
+  it "#like should be case sensitive" do
+    @ds.insert('foo', 'bar')
+    @ds.filter(:a.like('Foo')).all.should == []
+    @ds.filter(:a.like('baR')).all.should == []
+    @ds.filter(:a.like('FOO', 'BAR')).all.should == []
+    @ds.exclude(:a.like('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(:a.like('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(:a.like('FOO', 'BAR')).all.should == [{:a=>'foo', :b=>'bar'}]
   end
   
   it "#ilike should return matching rows, in a case insensitive manner" do
@@ -1194,6 +1207,9 @@ describe "Dataset string methods" do
     @ds.filter(:a.ilike('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.filter(:a.ilike('baR')).all.should == []
     @ds.filter(:a.ilike('FOO', 'BAR')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(:a.ilike('Foo')).all.should == []
+    @ds.exclude(:a.ilike('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(:a.ilike('FOO', 'BAR')).all.should == []
   end
   
   it "should work with strings created with sql_string_join" do

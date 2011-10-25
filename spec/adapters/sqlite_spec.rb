@@ -144,13 +144,6 @@ describe "An SQLite dataset" do
     @d = SQLITE_DB[:items]
   end
   
-  specify "should handle string pattern matches correctly" do
-    @d.literal(:x.like('a')).should == "(`x` LIKE 'a')"
-    @d.literal(~:x.like('a')).should == "NOT (`x` LIKE 'a')"
-    @d.literal(:x.ilike('a')).should == "(`x` LIKE 'a')"
-    @d.literal(~:x.ilike('a')).should == "NOT (`x` LIKE 'a')"
-  end
-
   specify "should raise errors if given a regexp pattern match" do
     proc{@d.literal(:x.like(/a/))}.should raise_error(Sequel::Error)
     proc{@d.literal(~:x.like(/a/))}.should raise_error(Sequel::Error)
