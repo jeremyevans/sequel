@@ -2,12 +2,11 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Model attribute setters" do
   before do
-    MODEL_DB.reset
-
     @c = Class.new(Sequel::Model(:items)) do
       columns :id, :x, :y, :"x y"
     end
     @o = @c.new
+    MODEL_DB.reset
   end
 
   it "should mark the column value as changed" do
@@ -40,18 +39,13 @@ describe Sequel::Model, "dataset" do
   before do
     @a = Class.new(Sequel::Model(:items))
     @b = Class.new(Sequel::Model)
-    
-    class Elephant < Sequel::Model(:ele1)
-    end
-    
-    class Maggot < Sequel::Model
-    end
-
-    class ShoeSize < Sequel::Model
-    end
-    
-    class BootSize < ShoeSize
-    end
+    class ::Elephant < Sequel::Model(:ele1); end
+    class ::Maggot < Sequel::Model; end
+    class ::ShoeSize < Sequel::Model; end
+    class ::BootSize < ShoeSize; end
+  end
+  after do
+    [:Elephant, :Maggot, :ShoeSize, :BootSize].each{|x| Object.send(:remove_const, x)}
   end
   
   specify "should default to the plural of the class name" do
@@ -73,12 +67,16 @@ describe Sequel::Model, "dataset" do
   end
   
   specify "should disregard namespaces for the table name" do
-    module BlahBlah
-      class MwaHaHa < Sequel::Model
+    begin
+      module ::BlahBlah
+        class MwaHaHa < Sequel::Model
+        end
       end
-    end
     
-    BlahBlah::MwaHaHa.dataset.sql.should == 'SELECT * FROM mwa_ha_has'
+      BlahBlah::MwaHaHa.dataset.sql.should == 'SELECT * FROM mwa_ha_has'
+    ensure
+      Object.send(:remove_const, :BlahBlah)
+    end
   end
 end
 
@@ -204,8 +202,11 @@ end
 
 describe "A model class with implicit table name" do
   before do
-    class Donkey < Sequel::Model
+    class ::Donkey < Sequel::Model
     end
+  end
+  after do
+    Object.send(:remove_const, :Donkey)
   end
   
   specify "should have a dataset associated with the model class" do
@@ -215,11 +216,12 @@ end
 
 describe "A model inheriting from a model" do
   before do
-    class Feline < Sequel::Model
-    end
-    
-    class Leopard < Feline
-    end
+    class ::Feline < Sequel::Model; end
+    class ::Leopard < Feline; end
+  end
+  after do
+    Object.send(:remove_const, :Leopard)
+    Object.send(:remove_const, :Feline)
   end
   
   specify "should have a dataset associated with itself" do
@@ -327,9 +329,6 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
   before do
     @c = Class.new(Sequel::Model(:blahblah)) do
       columns :x, :y, :z
-      def _save_refresh
-        self
-      end
     end
     @c.strict_param_setting = false
     @c.instance_variable_set(:@columns, [:x, :y, :z])
@@ -357,9 +356,12 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     i.values.should == {:x => 1, :y => 2}
     i.set(:x => 4, :y => 5, :z => 6)
     i.values.should == {:x => 4, :y => 5}
-    i.update(:x => 7, :y => 8, :z => 9)
-    i.values.delete(:id) # stupid specs
-    i.values.should == {:x => 7, :y => 8}
+
+    @c.dataset._fetch = {:x => 7}
+    i = @c.new
+    i.update(:x => 7, :z => 9)
+    i.values.should == {:x => 7}
+    MODEL_DB.sqls.should == ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
   end
 
   it "should not set restricted columns by default" do
@@ -368,9 +370,12 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     i.values.should == {:x => 1, :y => 2}
     i.set(:x => 4, :y => 5, :z => 6)
     i.values.should == {:x => 4, :y => 5}
-    i.update(:x => 7, :y => 8, :z => 9)
-    i.values.delete(:id) # stupid specs
-    i.values.should == {:x => 7, :y => 8}
+
+    @c.dataset._fetch = {:x => 7}
+    i = @c.new
+    i.update(:x => 7, :z => 9)
+    i.values.should == {:x => 7}
+    MODEL_DB.sqls.should == ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
   end
 
   it "should have allowed take precedence over restricted" do
@@ -380,9 +385,12 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     i.values.should == {:x => 1, :y => 2}
     i.set(:x => 4, :y => 5, :z => 6)
     i.values.should == {:x => 4, :y => 5}
-    i.update(:x => 7, :y => 8, :z => 9)
-    i.values.delete(:id) # stupid specs
-    i.values.should == {:x => 7, :y => 8}
+
+    @c.dataset._fetch = {:y => 7}
+    i = @c.new
+    i.update(:y => 7, :z => 9)
+    i.values.should == {:y => 7}
+    MODEL_DB.sqls.should == ["INSERT INTO blahblah (y) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
   end
 end
 
@@ -391,12 +399,8 @@ describe Sequel::Model, ".(un)?restrict_primary_key\\??" do
     @c = Class.new(Sequel::Model(:blahblah)) do
       set_primary_key :id
       columns :x, :y, :z, :id
-      def refresh
-        self
-      end
     end
     @c.strict_param_setting = false
-    @c.instance_variable_set(:@columns, [:x, :y, :z])
   end
   
   it "should restrict updates to primary key by default" do
@@ -433,11 +437,7 @@ describe Sequel::Model, ".strict_param_setting" do
     @c = Class.new(Sequel::Model(:blahblah)) do
       columns :x, :y, :z, :id
       set_restricted_columns :z
-      def refresh
-        self
-      end
     end
-    @c.instance_variable_set(:@columns, [:x, :y, :z])
   end
   
   it "should be enabled by default" do
@@ -559,10 +559,7 @@ describe "Model datasets #with_pk" do
   before do
     @c = Class.new(Sequel::Model(:a))
     @ds = @c.dataset
-    def @ds.fetch_rows(sql)
-      db << sql
-      yield(:id=>1)
-    end
+    @ds._fetch = {:id=>1}
     MODEL_DB.reset
   end
 
@@ -586,8 +583,8 @@ describe "Model datasets #with_pk" do
     @ds.with_pk([1, 2])
     sqls = MODEL_DB.sqls
     ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1",
-    "SELECT * FROM a WHERE ((a.id2 = 2) AND (a.id1 = 1)) LIMIT 1"].should include(sqls.first)
-    sqls.length.should == 1
+    "SELECT * FROM a WHERE ((a.id2 = 2) AND (a.id1 = 1)) LIMIT 1"].should include(sqls.pop)
+    sqls.should == []
   end
 
   it "should have #[] consider an integer as a primary key lookup" do
