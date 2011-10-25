@@ -18,6 +18,7 @@ Sequel.identifier_input_method = nil
 Sequel.identifier_output_method = nil
 
 class << Sequel::Model
+  attr_writer :db_schema
   alias orig_columns columns
   def columns(*cols)
     return super if cols.empty?

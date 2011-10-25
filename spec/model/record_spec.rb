@@ -652,16 +652,14 @@ end
 
 describe Sequel::Model, "#set" do
   before do
-    MODEL_DB.reset
-    
     @c = Class.new(Sequel::Model(:items)) do
       set_primary_key :id
       columns :x, :y, :id
     end
     @c.strict_param_setting = false
-    @c.instance_variable_set(:@columns, true)
     @o1 = @c.new
     @o2 = @c.load(:id => 5)
+    MODEL_DB.reset
   end
 
   it "should filter the given params using the model columns" do
@@ -785,47 +783,44 @@ end
 
 describe Sequel::Model, "#update" do
   before do
-    MODEL_DB.reset
-    
     @c = Class.new(Sequel::Model(:items)) do
       set_primary_key :id
       columns :x, :y, :id
     end
     @c.strict_param_setting = false
-    @c.instance_variable_set(:@columns, true)
     @o1 = @c.new
     @o2 = @c.load(:id => 5)
+    MODEL_DB.reset
   end
   
   it "should filter the given params using the model columns" do
     @o1.update(:x => 1, :z => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
 
     MODEL_DB.reset
     @o2.update(:y => 1, :abc => 2)
-    MODEL_DB.sqls.first.should == "UPDATE items SET y = 1 WHERE (id = 5)"
+    MODEL_DB.sqls.should == ["UPDATE items SET y = 1 WHERE (id = 5)"]
   end
   
   it "should support virtual attributes" do
     @c.send(:define_method, :blah=){|v| self.x = v}
     @o1.update(:blah => 333)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (333)"
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
   
   it "should not modify the primary key" do
     @o1.update(:x => 1, :id => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     MODEL_DB.reset
     @o2.update('y'=> 1, 'id'=> 2)
     @o2.values.should == {:y => 1, :id=> 5}
-    MODEL_DB.sqls.first.should == "UPDATE items SET y = 1 WHERE (id = 5)"
+    MODEL_DB.sqls.should == ["UPDATE items SET y = 1 WHERE (id = 5)"]
   end
 end
 
 describe Sequel::Model, "#set_fields" do
   before do
-    @c = Class.new(Sequel::Model(:items))
-    @c.class_eval do
+    @c = Class.new(Sequel::Model(:items)) do
       set_primary_key :id
       columns :x, :y, :z, :id
     end
@@ -845,11 +840,9 @@ end
 
 describe Sequel::Model, "#update_fields" do
   before do
-    @c = Class.new(Sequel::Model(:items))
-    @c.class_eval do
+    @c = Class.new(Sequel::Model(:items)) do
       set_primary_key :id
       columns :x, :y, :z, :id
-      def _refresh(ds); end
     end
     @c.strict_param_setting = true 
     @o1 = @c.load(:id=>1)
@@ -860,8 +853,8 @@ describe Sequel::Model, "#update_fields" do
     @o1.update_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y])
     @o1.values.should == {:x => 1, :y => 2, :id=>1}
     sqls = MODEL_DB.sqls
-    sqls.first.should =~ /UPDATE items SET [xy] = [12], [xy] = [12] WHERE \(id = 1\)/
-    sqls.length.should == 1
+    sqls.pop.should =~ /UPDATE items SET [xy] = [12], [xy] = [12] WHERE \(id = 1\)/
+    sqls.should == []
 
     @o1.update_fields({:x => 1, :y => 5, :z=>6, :id=>7}, [:x, :y])
     @o1.values.should == {:x => 1, :y => 5, :id=>1}
@@ -871,8 +864,6 @@ end
 
 describe Sequel::Model, "#(set|update)_(all|except|only)" do
   before do
-    MODEL_DB.reset
-    
     @c = Class.new(Sequel::Model(:items)) do
       set_primary_key :id
       columns :x, :y, :z, :id
@@ -880,8 +871,8 @@ describe Sequel::Model, "#(set|update)_(all|except|only)" do
       set_restricted_columns :y
     end
     @c.strict_param_setting = false
-    @c.instance_variable_set(:@columns, true)
     @o1 = @c.new
+    MODEL_DB.reset
   end
 
   it "should raise errors if not all hash fields can be set and strict_param_setting is true" do
@@ -925,40 +916,34 @@ describe Sequel::Model, "#(set|update)_(all|except|only)" do
 
   it "#update_all should update all attributes" do
     @c.new.update_all(:x => 1, :id=>4)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
-    MODEL_DB.reset
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     @c.new.update_all(:y => 1, :id=>4)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
-    MODEL_DB.reset
+    MODEL_DB.sqls.should == ["INSERT INTO items (y) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     @c.new.update_all(:z => 1, :id=>4)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (z) VALUES (1)"
+    MODEL_DB.sqls.should == ["INSERT INTO items (z) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   it "#update_only should only update given attributes" do
     @o1.update_only({:x => 1, :y => 2, :z=>3, :id=>4}, [:x])
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
-    MODEL_DB.reset
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     @c.new.update_only({:x => 1, :y => 2, :z=>3, :id=>4}, :x)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   it "#update_except should not update given attributes" do
     @o1.update_except({:x => 1, :y => 2, :z=>3, :id=>4}, [:y, :z])
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
-    MODEL_DB.reset
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     @c.new.update_except({:x => 1, :y => 2, :z=>3, :id=>4}, :y, :z)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 end
 
 describe Sequel::Model, "#destroy" do
   before do
-    MODEL_DB.reset
     @model = Class.new(Sequel::Model(:items))
     @model.columns :id
-    @model.dataset.meta_def(:delete){MODEL_DB.execute delete_sql;1}
-    
     @instance = @model.load(:id => 1234)
+    MODEL_DB.reset
   end
 
   it "should return self" do
@@ -983,49 +968,40 @@ describe Sequel::Model, "#destroy" do
 
   it "should run within a transaction if use_transactions is true" do
     @instance.use_transactions = true
-    @model.db.should_receive(:transaction)
     @instance.destroy
+    MODEL_DB.sqls.should == ["BEGIN", "DELETE FROM items WHERE (id = 1234)", "COMMIT"]
   end
 
   it "should not run within a transaction if use_transactions is false" do
     @instance.use_transactions = false
-    @model.db.should_not_receive(:transaction)
     @instance.destroy
+    MODEL_DB.sqls.should == ["DELETE FROM items WHERE (id = 1234)"]
   end
 
   it "should run within a transaction if :transaction option is true" do
     @instance.use_transactions = false
-    @model.db.should_receive(:transaction)
     @instance.destroy(:transaction => true)
+    MODEL_DB.sqls.should == ["BEGIN", "DELETE FROM items WHERE (id = 1234)", "COMMIT"]
   end
 
   it "should not run within a transaction if :transaction option is false" do
     @instance.use_transactions = true
-    @model.db.should_not_receive(:transaction)
     @instance.destroy(:transaction => false)
+    MODEL_DB.sqls.should == ["DELETE FROM items WHERE (id = 1234)"]
   end
 
   it "should run before_destroy and after_destroy hooks" do
     @model.send(:define_method, :before_destroy){MODEL_DB.execute('before blah')}
     @model.send(:define_method, :after_destroy){MODEL_DB.execute('after blah')}
     @instance.destroy
-    
-    MODEL_DB.sqls.should == [
-      "before blah",
-      "DELETE FROM items WHERE (id = 1234)",
-      "after blah"
-    ]
+    MODEL_DB.sqls.should == ["before blah", "DELETE FROM items WHERE (id = 1234)", "after blah"]
   end
 end
 
 describe Sequel::Model, "#exists?" do
   before do
     @model = Class.new(Sequel::Model(:items))
-    @ds = @model.dataset
-    def @ds.fetch_rows(sql)
-      db.execute(sql)
-      yield(:x=>1) if sql =~ /id = 1/
-    end
+    @model.dataset._fetch = proc{|sql| {:x=>1} if sql =~ /id = 1/}
     MODEL_DB.reset
   end
 
@@ -1054,7 +1030,7 @@ describe Sequel::Model, "#each" do
   
   specify "should iterate over the values" do
     h = {}
-    @m.each {|k, v| h[k] = v}
+    @m.each{|k, v| h[k] = v}
     h.should == {:a => 1, :b => 2, :id => 4444}
   end
 end
@@ -1067,11 +1043,8 @@ describe Sequel::Model, "#keys" do
   end
   
   specify "should return the value keys" do
-    @m.keys.size.should == 3
-    @m.keys.should include(:a, :b, :id)
-    
-    @m = @model.new()
-    @m.keys.should == []
+    @m.keys.sort_by{|k| k.to_s}.should == [:a, :b, :id]
+    @model.new.keys.should == []
   end
 end
 
@@ -1286,7 +1259,6 @@ describe Sequel::Model, "#initialize_set" do
 end
 
 describe Sequel::Model, ".create" do
-
   before do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
@@ -1298,7 +1270,7 @@ describe Sequel::Model, ".create" do
   it "should be able to create rows in the associated table" do
     o = @c.create(:x => 1)
     o.class.should == @c
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)',  "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)', "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   it "should be able to create rows without any values specified" do
@@ -1327,32 +1299,35 @@ end
 
 describe Sequel::Model, "#refresh" do
   before do
-    MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
       unrestrict_primary_key
       columns :id, :x
     end
+    MODEL_DB.reset
   end
 
   specify "should reload the instance values from the database" do
     @m = @c.new(:id => 555)
     @m[:x] = 'blah'
-    @m.this.should_receive(:first).and_return({:x => 'kaboom', :id => 555})
+    @c.dataset._fetch = {:x => 'kaboom', :id => 555}
     @m.refresh
     @m[:x].should == 'kaboom'
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
   end
   
   specify "should raise if the instance is not found" do
     @m = @c.new(:id => 555)
-    @m.this.should_receive(:first).and_return(nil)
+    @c.dataset._fetch = []
     proc {@m.refresh}.should raise_error(Sequel::Error)
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
   end
   
   specify "should be aliased by #reload" do
     @m = @c.new(:id => 555)
-    @m.this.should_receive(:first).and_return({:x => 'kaboom', :id => 555})
+    @c.dataset._fetch = {:x => 'kaboom', :id => 555}
     @m.reload
     @m[:x].should == 'kaboom'
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
   end
 
   specify "should remove cached associations" do
@@ -1366,10 +1341,11 @@ end
 
 describe Sequel::Model, "typecasting" do
   before do
-    MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
       columns :x
     end
+    @c.db_schema = {:x=>{:type=>:integer}}
+    MODEL_DB.reset
   end
 
   after do
@@ -1378,14 +1354,13 @@ describe Sequel::Model, "typecasting" do
 
   specify "should not convert if typecasting is turned off" do
     @c.typecast_on_assignment = false
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
     m = @c.new
     m.x = '1'
     m.x.should == '1'
   end
 
   specify "should convert to integer for an integer field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
+    @c.db_schema = {:x=>{:type=>:integer}}
     m = @c.new
     m.x = '1'
     m.x.should == 1
@@ -1397,13 +1372,13 @@ describe Sequel::Model, "typecasting" do
 
   specify "should typecast '' to nil unless type is string or blob" do
     [:integer, :float, :decimal, :boolean, :date, :time, :datetime].each do |x|
-      @c.instance_variable_set(:@db_schema, {:x=>{:type=>x}})
+      @c.db_schema = {:x=>{:type=>x}}
       m = @c.new
       m.x = ''
       m.x.should == nil
     end
    [:string, :blob].each do |x|
-      @c.instance_variable_set(:@db_schema, {:x=>{:type=>x}})
+      @c.db_schema = {:x=>{:type=>x}}
       m = @c.new
       m.x = ''
       m.x.should == ''
@@ -1411,7 +1386,6 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should not typecast '' to nil if typecast_empty_string_to_nil is false" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
     m = @c.new
     m.typecast_empty_string_to_nil = false
     proc{m.x = ''}.should raise_error
@@ -1420,21 +1394,21 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should not typecast nil if NULLs are allowed" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer,:allow_null=>true}})
+    @c.db_schema[:x][:allow_null] = true
     m = @c.new
     m.x = nil
     m.x.should == nil
   end
 
   specify "should raise an error if attempting to typecast nil and NULLs are not allowed" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer,:allow_null=>false}})
+    @c.db_schema[:x][:allow_null] = false
     proc{@c.new.x = nil}.should raise_error(Sequel::Error)
     proc{@c.new.x = ''}.should raise_error(Sequel::Error)
   end
 
   specify "should not raise an error if NULLs are not allowed and typecasting is turned off" do
     @c.typecast_on_assignment = false
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer,:allow_null=>false}})
+    @c.db_schema[:x][:allow_null] = false
     m = @c.new
     m.x = nil
     m.x.should == nil
@@ -1443,7 +1417,6 @@ describe Sequel::Model, "typecasting" do
   specify "should not raise when typecasting nil to NOT NULL column but raise_on_typecast_failure is off" do
     @c.raise_on_typecast_failure = false
     @c.typecast_on_assignment = true
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer,:allow_null=>false}})
     m = @c.new
     m.x = ''
     m.x.should == nil
@@ -1452,20 +1425,18 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should raise an error if invalid data is used in an integer field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
     proc{@c.new.x = 'a'}.should raise_error(Sequel::InvalidValue)
   end
 
   specify "should assign value if raise_on_typecast_failure is off and assigning invalid integer" do
     @c.raise_on_typecast_failure = false
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
     model = @c.new
     model.x = '1d'
     model.x.should == '1d'
   end
 
   specify "should convert to float for a float field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:float}})
+    @c.db_schema = {:x=>{:type=>:float}}
     m = @c.new
     m.x = '1.3'
     m.x.should == 1.3
@@ -1476,20 +1447,20 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should raise an error if invalid data is used in an float field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:float}})
+    @c.db_schema = {:x=>{:type=>:float}}
     proc{@c.new.x = 'a'}.should raise_error(Sequel::InvalidValue)
   end
 
   specify "should assign value if raise_on_typecast_failure is off and assigning invalid float" do
     @c.raise_on_typecast_failure = false
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:float}})
+    @c.db_schema = {:x=>{:type=>:float}}
     model = @c.new
     model.x = '1d'
     model.x.should == '1d'
   end
 
   specify "should convert to BigDecimal for a decimal field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:decimal}})
+    @c.db_schema = {:x=>{:type=>:decimal}}
     m = @c.new
     bd = BigDecimal.new('1.0')
     m.x = '1.0'
@@ -1503,13 +1474,13 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should raise an error if invalid data is used in an decimal field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:decimal}})
+    @c.db_schema = {:x=>{:type=>:decimal}}
     proc{@c.new.x = Date.today}.should raise_error(Sequel::InvalidValue)
   end
 
   specify "should assign value if raise_on_typecast_failure is off and assigning invalid decimal" do
     @c.raise_on_typecast_failure = false
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:decimal}})
+    @c.db_schema = {:x=>{:type=>:decimal}}
     model = @c.new
     time = Time.now
     model.x = time
@@ -1517,7 +1488,7 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should convert to string for a string field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:string}})
+    @c.db_schema = {:x=>{:type=>:string}}
     m = @c.new
     m.x = '1.3'
     m.x.should == '1.3'
@@ -1528,7 +1499,7 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should convert to boolean for a boolean field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:boolean}})
+    @c.db_schema = {:x=>{:type=>:boolean}}
     m = @c.new
     m.x = '1.3'
     m.x.should == true
@@ -1539,6 +1510,10 @@ describe Sequel::Model, "typecasting" do
     m.x = 't'
     m.x.should == true
     m.x = 'T'
+    m.x.should == true
+    m.x = 'y'
+    m.x.should == true
+    m.x = 'Y'
     m.x.should == true
     m.x = true
     m.x.should == true
@@ -1556,6 +1531,14 @@ describe Sequel::Model, "typecasting" do
     m.x.should == false
     m.x = 'FALSE'
     m.x.should == false
+    m.x = 'n'
+    m.x.should == false
+    m.x = 'N'
+    m.x.should == false
+    m.x = 'no'
+    m.x.should == false
+    m.x = 'NO'
+    m.x.should == false
     m.x = '0'
     m.x.should == false
     m.x = 0
@@ -1565,7 +1548,7 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should convert to date for a date field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:date}})
+    @c.db_schema = {:x=>{:type=>:date}}
     m = @c.new
     y = Date.new(2007,10,21)
     m.x = '2007-10-21'
@@ -1579,7 +1562,7 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should accept a hash with symbol or string keys for a date field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:date}})
+    @c.db_schema = {:x=>{:type=>:date}}
     m = @c.new
     y = Date.new(2007,10,21)
     m.x = {:year=>2007, :month=>10, :day=>21}
@@ -1589,32 +1572,33 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should raise an error if invalid data is used in a date field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:date}})
+    @c.db_schema = {:x=>{:type=>:date}}
     proc{@c.new.x = 'a'}.should raise_error(Sequel::InvalidValue)
     proc{@c.new.x = 100}.should raise_error(Sequel::InvalidValue)
   end
 
   specify "should assign value if raise_on_typecast_failure is off and assigning invalid date" do
     @c.raise_on_typecast_failure = false
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:date}})
+    @c.db_schema = {:x=>{:type=>:date}}
     model = @c.new
     model.x = 4
     model.x.should == 4
   end
 
-  specify "should convert to time for a time field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
+  specify "should convert to Sequel::SQLTime for a time field" do
+    @c.db_schema = {:x=>{:type=>:time}}
     m = @c.new
     x = '10:20:30'
-    y = Time.parse(x)
+    y = Sequel::SQLTime.parse(x)
     m.x = x
     m.x.should == y
     m.x = y
     m.x.should == y
+    m.x.should be_a_kind_of(Sequel::SQLTime)
   end
 
   specify "should accept a hash with symbol or string keys for a time field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
+    @c.db_schema = {:x=>{:type=>:time}}
     m = @c.new
     y = Time.parse('10:20:30')
     m.x = {:hour=>10, :minute=>20, :second=>30}
@@ -1624,7 +1608,7 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should raise an error if invalid data is used in a time field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
+    @c.db_schema = {:x=>{:type=>:time}}
     proc{@c.new.x = '0000'}.should raise_error
     proc{@c.new.x = Date.parse('2008-10-21')}.should raise_error(Sequel::InvalidValue)
     proc{@c.new.x = DateTime.parse('2008-10-21')}.should raise_error(Sequel::InvalidValue)
@@ -1632,14 +1616,14 @@ describe Sequel::Model, "typecasting" do
 
   specify "should assign value if raise_on_typecast_failure is off and assigning invalid time" do
     @c.raise_on_typecast_failure = false
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
+    @c.db_schema = {:x=>{:type=>:time}}
     model = @c.new
     model.x = '0000'
     model.x.should == '0000'
   end
 
   specify "should convert to the Sequel.datetime_class for a datetime field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
+    @c.db_schema = {:x=>{:type=>:datetime}}
     m = @c.new
     x = '2007-10-21T10:20:30-07:00'
     y = Time.parse(x)
@@ -1664,7 +1648,7 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should accept a hash with symbol or string keys for a datetime field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
+    @c.db_schema = {:x=>{:type=>:datetime}}
     m = @c.new
     y = Time.parse('2007-10-21 10:20:30')
     m.x = {:year=>2007, :month=>10, :day=>21, :hour=>10, :minute=>20, :second=>30}
@@ -1680,7 +1664,7 @@ describe Sequel::Model, "typecasting" do
   end
 
   specify "should raise an error if invalid data is used in a datetime field" do
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
+    @c.db_schema = {:x=>{:type=>:datetime}}
     proc{@c.new.x = '0000'}.should raise_error(Sequel::InvalidValue)
     Sequel.datetime_class = DateTime
     proc{@c.new.x = '0000'}.should raise_error(Sequel::InvalidValue)
@@ -1689,7 +1673,7 @@ describe Sequel::Model, "typecasting" do
 
   specify "should assign value if raise_on_typecast_failure is off and assigning invalid datetime" do
     @c.raise_on_typecast_failure = false
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
+    @c.db_schema = {:x=>{:type=>:datetime}}
     model = @c.new
     model.x = '0000'
     model.x.should == '0000'
@@ -1707,11 +1691,7 @@ describe "Model#lock!" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :id
     end
-    ds = @c.dataset
-    def ds.fetch_rows(sql)
-      db.execute(sql)
-      yield({:id=>1})
-    end
+    @c.dataset._fetch = {:id=>1}
     MODEL_DB.reset
   end
   
