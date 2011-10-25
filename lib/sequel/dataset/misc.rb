@@ -137,7 +137,9 @@ module Sequel
     # Returns a string representation of the dataset including the class name 
     # and the corresponding SQL select statement.
     def inspect
-      "#<#{self.class}: #{sql.inspect}>"
+      c = self.class
+      c = c.superclass while c.name.nil? || c.name == ''
+      "#<#{c.name}: #{sql.inspect}>"
     end
     
     # The alias to use for the row_number column, used when emulating OFFSET

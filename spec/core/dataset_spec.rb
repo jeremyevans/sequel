@@ -2859,9 +2859,21 @@ describe "Dataset#insert_sql" do
 end
 
 describe "Dataset#inspect" do
+  before do
+    class ::InspectDataset < Sequel::Dataset; end
+  end
+  after do
+    Object.send(:remove_const, :InspectDataset) if defined?(::InspectDataset)
+  end
+
   specify "should include the class name and the corresponding SQL statement" do
-    ds = Sequel::Dataset.new(nil).from(:blah)
-    ds.inspect.should == "#<#{ds.class}: #{ds.sql.inspect}>"
+    Sequel::Dataset.new(nil).from(:blah).inspect.should == '#<Sequel::Dataset: "SELECT * FROM blah">'
+    InspectDataset.new(nil).from(:blah).inspect.should == '#<InspectDataset: "SELECT * FROM blah">'
+  end
+
+  specify "should skip anonymous classes" do
+    Class.new(Class.new(Sequel::Dataset)).new(nil).from(:blah).inspect.should == '#<Sequel::Dataset: "SELECT * FROM blah">'
+    Class.new(InspectDataset).new(nil).from(:blah).inspect.should == '#<InspectDataset: "SELECT * FROM blah">'
   end
 end
 
