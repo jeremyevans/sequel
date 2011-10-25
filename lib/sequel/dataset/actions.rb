@@ -358,7 +358,7 @@ module Sequel
         raise(Error, ARG_BLOCK_ERROR_MSG) if block
         return naked.map(column) if row_proc
         if column.is_a?(Array)
-          super(){|r| column.map{|c| r[c]}}
+          super(){|r| r.values_at(*column)}
         else
           super(){|r| r[column]}
         end
@@ -552,19 +552,19 @@ module Sequel
         return naked.to_hash(key_column, value_column) if row_proc
         if value_column.is_a?(Array)
           if key_column.is_a?(Array)
-            each{|r| h[key_column.map{|c| r[c]}] = value_column.map{|c| r[c]}}
+            each{|r| h[r.values_at(*key_column)] = r.values_at(*value_column)}
           else
-            each{|r| h[r[key_column]] = value_column.map{|c| r[c]}}
+            each{|r| h[r[key_column]] = r.values_at(*value_column)}
           end
         else
           if key_column.is_a?(Array)
-            each{|r| h[key_column.map{|c| r[c]}] = r[value_column]}
+            each{|r| h[r.values_at(*key_column)] = r[value_column]}
           else
             each{|r| h[r[key_column]] = r[value_column]}
           end
         end
       elsif key_column.is_a?(Array)
-        each{|r| h[key_column.map{|c| r[c]}] = r}
+        each{|r| h[r.values_at(*key_column)] = r}
       else
         each{|r| h[r[key_column]] = r}
       end
@@ -602,7 +602,7 @@ module Sequel
 
     # Return an array of arrays of values given by the symbols in ret_cols.
     def _select_map_multiple(ret_cols)
-      map{|r| ret_cols.map{|c| r[c]}}
+      map{|r| r.values_at(*ret_cols)}
     end
   
     # Returns an array of the first value in each row.

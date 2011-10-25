@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up Dataset #map, #to_hash, and related methods if an array of symbols is given (jeremyevans)
+
 * Add Database#dataset_class for modifying the class used for datasets for a single Database object (jeremyevans)
 
 * Plugins that override Model.load should be modified to override Model.call instead (jeremyevans)
