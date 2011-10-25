@@ -405,6 +405,61 @@ describe "Database#dataset_class" do
   end
 end
   
+describe "Database#extend_datasets" do
+  before do
+    @db = Sequel::Database.new
+    @m = Module.new{def foo() [3] end}
+    @m2 = Module.new{def foo() [4] + super end}
+    @db.extend_datasets(@m)
+  end
+  
+  specify "should change the dataset class to a subclass the first time it is called" do
+    @db.dataset_class.superclass.should == Sequel::Dataset
+  end
+
+  specify "should not create a subclass of the dataset class if called more than once" do
+    @db.extend_datasets(@m2)
+    @db.dataset_class.superclass.should == Sequel::Dataset
+  end
+
+  specify "should make the dataset class include the module" do
+    @db.dataset_class.ancestors.should include(@m)
+    @db.dataset_class.ancestors.should_not include(@m2)
+    @db.extend_datasets(@m2)
+    @db.dataset_class.ancestors.should include(@m)
+    @db.dataset_class.ancestors.should include(@m2)
+  end
+
+  specify "should have datasets respond to the module's methods" do
+    @db.dataset.foo.should == [3]
+    @db.extend_datasets(@m2)
+    @db.dataset.foo.should == [4, 3]
+  end
+
+  specify "should take a block and create a module from it to use" do
+    @db.dataset.foo.should == [3]
+    @db.extend_datasets{def foo() [5] + super end}
+    @db.dataset.foo.should == [5, 3]
+  end
+
+  specify "should raise an error if both a module and a block are provided" do
+    proc{@db.extend_datasets(@m2){def foo() [5] + super end}}.should raise_error(Sequel::Error)
+  end
+
+  specify "should be able to override methods defined in the original Dataset class" do
+    @db.extend_datasets(Module.new{def select(*a, &block) super.order(*a, &block) end})
+    @db[:t].select(:a, :b).sql.should == 'SELECT a, b FROM t ORDER BY a, b'
+  end
+
+  specify "should reapply settings if dataset_class is chagned" do
+    c = Class.new(Sequel::Dataset)
+    @db.dataset_class = c
+    @db.dataset_class.superclass.should == c
+    @db.dataset_class.ancestors.should include(@m)
+    @db.dataset.foo.should == [3]
+  end
+end
+  
 describe "Database#execute" do
   specify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.execute('blah blah')}.should raise_error(Sequel::NotImplemented)
