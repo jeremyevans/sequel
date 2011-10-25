@@ -5,12 +5,16 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_class"
     @c = Class.new(Sequel::Model(:foo))
     class ::ParParent < Sequel::Model; end
   end
+  after do
+    Object.send(:remove_const, :ParParent)
+  end
 
   it "should use the :class value if present" do
     @c.many_to_one :c, :class=>ParParent
     @c.association_reflection(:c).keys.should include(:class)
     @c.association_reflection(:c).associated_class.should == ParParent
   end
+
   it "should figure out the class if the :class value is not present" do
     @c.many_to_one :c, :class=>'ParParent'
     @c.association_reflection(:c).keys.should_not include(:class)
@@ -23,12 +27,16 @@ describe Sequel::Model::Associations::AssociationReflection, "#primary_key" do
     @c = Class.new(Sequel::Model(:foo))
     class ::ParParent < Sequel::Model; end
   end
+  after do
+    Object.send(:remove_const, :ParParent)
+  end
 
   it "should use the :primary_key value if present" do
     @c.many_to_one :c, :class=>ParParent, :primary_key=>:blah__blah
     @c.association_reflection(:c).keys.should include(:primary_key)
     @c.association_reflection(:c).primary_key.should == :blah__blah
   end
+
   it "should use the associated table's primary key if :primary_key is not present" do
     @c.many_to_one :c, :class=>'ParParent'
     @c.association_reflection(:c).keys.should_not include(:primary_key)
@@ -114,6 +122,9 @@ describe Sequel::Model::Associations::AssociationReflection, "#select" do
     @c = Class.new(Sequel::Model(:foo))
     class ::ParParent < Sequel::Model; end
   end
+  after do
+    Object.send(:remove_const, :ParParent)
+  end
 
   it "should use the :select value if present" do
     @c.many_to_one :c, :class=>ParParent, :select=>[:par_parents__id]
@@ -145,6 +156,9 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_object
   before do
     @c = Class.new(Sequel::Model(:foo))
     class ::ParParent < Sequel::Model; end
+  end
+  after do
+    Object.send(:remove_const, :ParParent)
   end
 
   it "should use the primary keys for a many_to_one association" do
