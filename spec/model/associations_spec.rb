@@ -2,42 +2,47 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe Sequel::Model, "associate" do
   it "should use explicit class if given a class, symbol, or string" do
-    MODEL_DB.reset
-    klass = Class.new(Sequel::Model(:nodes))
-    class ::ParParent < Sequel::Model
+    begin
+      klass = Class.new(Sequel::Model(:nodes))
+      class ::ParParent < Sequel::Model; end
+      
+      klass.associate :many_to_one, :par_parent0, :class=>ParParent
+      klass.associate :one_to_many, :par_parent1s, :class=>'ParParent'
+      klass.associate :many_to_many, :par_parent2s, :class=>:ParParent
+      
+      klass.association_reflection(:"par_parent0").associated_class.should == ParParent
+      klass.association_reflection(:"par_parent1s").associated_class.should == ParParent
+      klass.association_reflection(:"par_parent2s").associated_class.should == ParParent
+    ensure
+      Object.send(:remove_const, :ParParent)
     end
-    
-    klass.associate :many_to_one, :par_parent0, :class=>ParParent
-    klass.associate :one_to_many, :par_parent1s, :class=>'ParParent'
-    klass.associate :many_to_many, :par_parent2s, :class=>:ParParent
-    
-    klass.association_reflection(:"par_parent0").associated_class.should == ParParent
-    klass.association_reflection(:"par_parent1s").associated_class.should == ParParent
-    klass.association_reflection(:"par_parent2s").associated_class.should == ParParent
   end
 
   it "should default to associating to other models in the same scope" do
-    class ::AssociationModuleTest
-      class Album < Sequel::Model
-        many_to_one :artist
-        many_to_many :tags
+    begin
+      class ::AssociationModuleTest
+        class Album < Sequel::Model
+          many_to_one :artist
+          many_to_many :tags
+        end
+        class Artist< Sequel::Model
+          one_to_many :albums
+        end
+        class Tag < Sequel::Model
+          many_to_many :albums
+        end
       end
-      class Artist< Sequel::Model
-        one_to_many :albums
-      end
-      class Tag < Sequel::Model
-        many_to_many :albums
-      end
+      
+      ::AssociationModuleTest::Album.association_reflection(:artist).associated_class.should == ::AssociationModuleTest::Artist
+      ::AssociationModuleTest::Album.association_reflection(:tags).associated_class.should == ::AssociationModuleTest::Tag
+      ::AssociationModuleTest::Artist.association_reflection(:albums).associated_class.should == ::AssociationModuleTest::Album
+      ::AssociationModuleTest::Tag.association_reflection(:albums).associated_class.should == ::AssociationModuleTest::Album
+    ensure
+      Object.send(:remove_const, :AssociationModuleTest)
     end
-    
-    ::AssociationModuleTest::Album.association_reflection(:artist).associated_class.should == ::AssociationModuleTest::Artist
-    ::AssociationModuleTest::Album.association_reflection(:tags).associated_class.should == ::AssociationModuleTest::Tag
-    ::AssociationModuleTest::Artist.association_reflection(:albums).associated_class.should == ::AssociationModuleTest::Album
-    ::AssociationModuleTest::Tag.association_reflection(:albums).associated_class.should == ::AssociationModuleTest::Album
   end
 
   it "should add a model_object and association_reflection accessors to the dataset, and return it with the current model object" do
-    MODEL_DB.reset
     klass = Class.new(Sequel::Model(:nodes)) do
       columns :id, :a_id
     end
@@ -64,7 +69,6 @@ describe Sequel::Model, "associate" do
   end
 
   it "should allow extending the dataset with :extend option" do
-    MODEL_DB.reset
     klass = Class.new(Sequel::Model(:nodes)) do
       columns :id, :a_id
     end
@@ -91,44 +95,46 @@ describe Sequel::Model, "associate" do
   end
 
   it "should clone an existing association with the :clone option" do
-    MODEL_DB.reset
-    klass = Class.new(Sequel::Model(:nodes))
-    
-    klass.many_to_one(:par_parent, :order=>:a){1}
-    klass.one_to_many(:par_parent1s, :class=>'ParParent', :limit=>12){4}
-    klass.many_to_many(:par_parent2s, :class=>:ParParent, :uniq=>true){2}
+    begin
+      class ::ParParent < Sequel::Model; end
+      klass = Class.new(Sequel::Model(:nodes))
+      
+      klass.many_to_one(:par_parent, :order=>:a){1}
+      klass.one_to_many(:par_parent1s, :class=>'ParParent', :limit=>12){4}
+      klass.many_to_many(:par_parent2s, :class=>:ParParent, :uniq=>true){2}
 
-    klass.many_to_one :par, :clone=>:par_parent, :select=>:b
-    klass.one_to_many :par1s, :clone=>:par_parent1s, :order=>:b, :limit=>10, :block=>nil
-    klass.many_to_many(:par2s, :clone=>:par_parent2s, :order=>:c){3}
-    
-    klass.association_reflection(:par).associated_class.should == ParParent
-    klass.association_reflection(:par1s).associated_class.should == ParParent
-    klass.association_reflection(:par2s).associated_class.should == ParParent
-    
-    klass.association_reflection(:par)[:order].should == :a
-    klass.association_reflection(:par).select.should == :b
-    klass.association_reflection(:par)[:block].call.should == 1
-    klass.association_reflection(:par1s)[:limit].should == 10
-    klass.association_reflection(:par1s)[:order].should == :b
-    klass.association_reflection(:par1s)[:block].should == nil
-    klass.association_reflection(:par2s)[:after_load].length.should == 1
-    klass.association_reflection(:par2s)[:order].should == :c
-    klass.association_reflection(:par2s)[:block].call.should == 3
+      klass.many_to_one :par, :clone=>:par_parent, :select=>:b
+      klass.one_to_many :par1s, :clone=>:par_parent1s, :order=>:b, :limit=>10, :block=>nil
+      klass.many_to_many(:par2s, :clone=>:par_parent2s, :order=>:c){3}
+      
+      klass.association_reflection(:par).associated_class.should == ParParent
+      klass.association_reflection(:par1s).associated_class.should == ParParent
+      klass.association_reflection(:par2s).associated_class.should == ParParent
+      
+      klass.association_reflection(:par)[:order].should == :a
+      klass.association_reflection(:par).select.should == :b
+      klass.association_reflection(:par)[:block].call.should == 1
+      klass.association_reflection(:par1s)[:limit].should == 10
+      klass.association_reflection(:par1s)[:order].should == :b
+      klass.association_reflection(:par1s)[:block].should == nil
+      klass.association_reflection(:par2s)[:after_load].length.should == 1
+      klass.association_reflection(:par2s)[:order].should == :c
+      klass.association_reflection(:par2s)[:block].call.should == 3
+    ensure
+      Object.send(:remove_const, :ParParent)
+    end
   end
 
 end
 
 describe Sequel::Model, "many_to_one" do
   before do
-    MODEL_DB.reset
-    
     @c2 = Class.new(Sequel::Model(:nodes)) do
       unrestrict_primary_key
       columns :id, :parent_id, :par_parent_id, :blah
     end
-
     @dataset = @c2.dataset
+    MODEL_DB.reset
   end
 
   it "should use implicit key if omitted" do
@@ -143,31 +149,27 @@ describe Sequel::Model, "many_to_one" do
   end
   
   it "should use implicit class if omitted" do
-    class ::ParParent < Sequel::Model
+    begin
+      class ::ParParent < Sequel::Model; end
+      @c2.many_to_one :par_parent
+      @c2.new(:id => 1, :par_parent_id => 234).par_parent.class.should == ParParent
+      MODEL_DB.sqls.should == ["SELECT * FROM par_parents WHERE (par_parents.id = 234) LIMIT 1"]
+    ensure
+      Object.send(:remove_const, :ParParent)
     end
-    
-    @c2.many_to_one :par_parent
-    
-    d = @c2.new(:id => 1, :par_parent_id => 234)
-    p = d.par_parent
-    p.class.should == ParParent
-    
-    MODEL_DB.sqls.should == ["SELECT * FROM par_parents WHERE (par_parents.id = 234) LIMIT 1"]
   end
 
   it "should use class inside module if given as a string" do
-    module ::Par 
-      class Parent < Sequel::Model
+    begin
+      module ::Par 
+        class Parent < Sequel::Model; end
       end
+      @c2.many_to_one :par_parent, :class=>"Par::Parent"
+      @c2.new(:id => 1, :par_parent_id => 234).par_parent.class.should == Par::Parent
+      MODEL_DB.sqls.should == ["SELECT * FROM parents WHERE (parents.id = 234) LIMIT 1"]
+    ensure
+      Object.send(:remove_const, :Par)
     end
-    
-    @c2.many_to_one :par_parent, :class=>"Par::Parent"
-    
-    d = @c2.new(:id => 1, :par_parent_id => 234)
-    p = d.par_parent
-    p.class.should == Par::Parent
-    
-    MODEL_DB.sqls.should == ["SELECT * FROM parents WHERE (parents.id = 234) LIMIT 1"]
   end
 
   it "should use explicit key if given" do
@@ -224,14 +226,12 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.id = 567) AND (a = 32)) LIMIT 1"]
 
     @c2.many_to_one :parent, :class => @c2, :key => :blah, :conditions=>:a
-    MODEL_DB.sqls.clear
     @c2.new(:id => 1, :blah => 567).parent
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.id = 567) AND a) LIMIT 1"]
   end
 
   it "should support :order, :limit (only for offset), and :dataset options, as well as a block" do
-    c2 = @c2
-    @c2.many_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{c2.filter(:parent_id=>pk)}, :limit=>[10,20], :order=>:name do |ds|
+    @c2.many_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{model.filter(:parent_id=>pk)}, :limit=>[10,20], :order=>:name do |ds|
       ds.filter(:x.sql_number > 1)
     end
     @c2.load(:id => 100).child_20
@@ -240,9 +240,8 @@ describe Sequel::Model, "many_to_one" do
 
   it "should return nil if key value is nil" do
     @c2.many_to_one :parent, :class => @c2
-
-    d = @c2.new(:id => 1)
-    d.parent.should == nil
+    @c2.new(:id => 1).parent.should == nil
+    MODEL_DB.sqls.should == []
   end
 
   it "should cache negative lookup" do
@@ -391,7 +390,6 @@ describe Sequel::Model, "many_to_one" do
     e.children.should_not(include(d))
     MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (nodes.parent_id = 2)']
 
-    MODEL_DB.reset
     d = @c2.new(:id => 1)
     e = @c2.new(:id => 2)
     e.children.should_not(include(d))
@@ -426,10 +424,7 @@ describe Sequel::Model, "many_to_one" do
   it "should have the setter remove the object from the previous associated object's reciprocal one_to_many cached association list if it exists" do
     @c2.many_to_one :parent, :class => @c2
     @c2.one_to_many :children, :class => @c2, :key=>:parent_id
-    ds = @c2.dataset
-    def ds.fetch_rows(sql, &block)
-      MODEL_DB.sqls << sql
-    end
+    @c2.dataset._fetch = []
 
     d = @c2.new(:id => 1)
     e = @c2.new(:id => 2)
@@ -448,10 +443,9 @@ describe Sequel::Model, "many_to_one" do
   end
 
   it "should get all matching records and only return the first if :key option is set to nil" do
-    c2 = @c2
     @c2.one_to_many :children, :class => @c2, :key=>:parent_id
-    @c2.many_to_one :first_grand_parent, :class => @c2, :key=>nil, :eager_graph=>:children, :dataset=>proc{c2.filter(:children_id=>parent_id)}
-    @c2.dataset.columns(:id, :parent_id, :par_parent_id, :blah)._fetch = {:id=>1, :parent_id=>0, :par_parent_id=>3, :blah=>4, :children_id=>2, :children_parent_id=>1, :children_par_parent_id=>5, :children_blah=>6}
+    @c2.many_to_one :first_grand_parent, :class => @c2, :key=>nil, :eager_graph=>:children, :dataset=>proc{model.filter(:children_id=>parent_id)}
+    @c2.dataset.columns(:id, :parent_id, :par_parent_id, :blah)._fetch = [{:id=>1, :parent_id=>0, :par_parent_id=>3, :blah=>4, :children_id=>2, :children_parent_id=>1, :children_par_parent_id=>5, :children_blah=>6}, {}]
     p = @c2.new(:parent_id=>2)
     fgp = p.first_grand_parent
     MODEL_DB.sqls.should == ["SELECT nodes.id, nodes.parent_id, nodes.par_parent_id, nodes.blah, children.id AS children_id, children.parent_id AS children_parent_id, children.par_parent_id AS children_par_parent_id, children.blah AS children_blah FROM nodes LEFT OUTER JOIN nodes AS children ON (children.parent_id = nodes.id) WHERE (children_id = 2)"]
@@ -512,15 +506,15 @@ describe Sequel::Model, "many_to_one" do
     h = []
     @c2.many_to_one :parent, :class => @c2, :before_set=>[proc{|x,y| h << x.pk; h << (y ? -y.pk : :y)}, :blah], :after_set=>proc{h << 3}
     @c2.class_eval do
-      class_variable_set(:@@blah, h)
+      self::Foo = h
       def []=(a, v)
-        a == :parent_id ? (self.class.send(:class_variable_get, :@@blah) << (v ? 4 : 5)) : super
+        a == :parent_id ? (model::Foo << (v ? 4 : 5)) : super
       end
       def blah(x)
-        self.class.send(:class_variable_get, :@@blah) << (x ? x.pk : :x)
+        model::Foo << (x ? x.pk : :x)
       end
       def blahr(x)
-        self.class.send(:class_variable_get, :@@blah) << 6
+        model::Foo << 6
       end
     end
     p = @c2.load(:id=>10)
@@ -536,13 +530,11 @@ describe Sequel::Model, "many_to_one" do
     h = []
     @c2.many_to_one :parent, :class => @c2, :after_load=>[proc{|x,y| h << [x.pk, y.pk]}, :al]
     @c2.class_eval do
-      class_variable_set(:@@blah, h)
+      self::Foo = h
       def al(v)
-        self.class.send(:class_variable_get, :@@blah) << v.pk
+        model::Foo << v.pk
       end
-      def @dataset.fetch_rows(sql)
-        yield({:id=>20})
-      end
+      dataset._fetch = {:id=>20}
     end
     p = @c2.load(:id=>10, :parent_id=>20)
     parent = p.parent
@@ -551,7 +543,6 @@ describe Sequel::Model, "many_to_one" do
   end
 
   it "should support after_load association callback that changes the cached object" do
-    h = []
     @c2.many_to_one :parent, :class => @c2, :after_load=>:al
     @c2.class_eval do
       def al(v)
@@ -590,22 +581,21 @@ describe Sequel::Model, "many_to_one" do
     d = @c2.load(:id=>321)
     p = @c2.new
     p.associations[:parent] = d
-    h = []
     @c2.many_to_one :parent, :class => @c2, :before_set=>:bs, :after_set=>:as
     @c2.class_eval do
-      class_variable_set(:@@blah, h)
+      self::Foo = []
       def []=(a, v)
-        a == :parent_id ? (self.class.send(:class_variable_get, :@@blah) << 5) : super
+        a == :parent_id ? (model::Foo << 5) : super
       end
       def bs(x)
-        self.class.send(:class_variable_get, :@@blah) << x.pk
+        model::Foo << x.pk
       end
       def as(x)
-        self.class.send(:class_variable_get, :@@blah) << x.pk * 2
+        model::Foo << x.pk * 2
       end
     end
     p.parent = c
-    h.should == [123, 5, 246]
+    @c2::Foo.should == [123, 5, 246]
   end
 end
 
