@@ -78,22 +78,6 @@ module Sequel
         AUTOINCREMENT
       end
 
-      def column_definition_order
-        super + [:check]
-      end
-
-      def column_definition_sql(column)
-        if (column[:type] == FalseClass || column[:type] == TrueClass)
-          super({:check=>{column[:name]=>%w[Y N]}}.merge(column))
-        else
-          super
-        end
-      end
-
-      def column_definition_check_sql(sql, column)
-        sql << " CHECK #{literal(column[:check])}" if column[:check]
-      end
-
       def create_sequence_sql(name, opts={})
         "CREATE SEQUENCE #{quote_identifier(name)} start with #{opts [:start_with]||1} increment by #{opts[:increment_by]||1} nomaxvalue"
       end
