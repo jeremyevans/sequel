@@ -197,6 +197,12 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT *, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
   end
   
+  it "should correctly handle an aliased join table in many_to_many" do
+    EagerAlbum.many_to_many :sgenres, :clone=>:genres, :join_table=>:ag___ga
+    a = EagerAlbum.eager(:sgenres).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ga.album_id AS x_foreign_key_x FROM genres INNER JOIN ag AS ga ON ((ga.genre_id = genres.id) AND (ga.album_id IN (1)))"]
+  end
+  
   it "should eagerly load multiple associations in a single call" do
     a = EagerAlbum.eager(:genres, :tracks, :band).all
     a.should be_a_kind_of(Array)
@@ -969,6 +975,18 @@ describe Sequel::Model, "#eager_graph" do
     a.genres.first.values.should == {:id => 4}
   end
 
+  it "should correctly handle an aliased join table in many_to_many" do
+    c = Class.new(GraphAlbum)
+    c.many_to_many :genres, :clone=>:genres, :join_table=>:ag___ga
+    c.eager_graph(:genres).sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ga.genre_id)'
+
+    c.many_to_many :genres, :clone=>:genres, :join_table=>:ag___albums
+    c.eager_graph(:genres).sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS albums_0 ON (albums_0.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = albums_0.genre_id)'
+
+    c.many_to_many :genres, :clone=>:genres, :join_table=>:ag___genres
+    c.eager_graph(:genres).sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS genres_0 ON (genres_0.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = genres_0.genre_id)'
+  end
+  
   it "should eagerly load multiple associations in a single call" do 
     ds = GraphAlbum.eager_graph(:genres, :tracks, :band)
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id, tracks.id AS tracks_id, tracks.album_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'

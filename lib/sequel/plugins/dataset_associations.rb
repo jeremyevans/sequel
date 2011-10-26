@@ -78,7 +78,7 @@ module Sequel
           when :one_to_one, :one_to_many
             ds.filter(r.qualified_key=>sds.select(*Array(r.qualified_primary_key)))
           when :many_to_many
-            ds.filter(r.qualified_right_primary_key=>sds.select(*Array(r[:qualified_right_key])).
+            ds.filter(r.qualified_right_primary_key=>sds.select(*Array(r.qualified_right_key)).
               join(r[:join_table], r[:left_keys].zip(r[:left_primary_keys]), :implicit_qualifier=>model.table_name))
           when :many_through_many
             fre = r.reverse_edges.first

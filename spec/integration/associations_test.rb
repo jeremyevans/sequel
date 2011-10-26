@@ -108,6 +108,7 @@ shared_examples_for "regular and composite key associations" do
     @artist.first_album.should == nil
     @artist.albums.should == []
     @album.tags.should == []
+    @album.alias_tags.should == []
     @tag.albums.should == []
   end
 
@@ -123,6 +124,7 @@ shared_examples_for "regular and composite key associations" do
     @artist.first_album.should == @album
     @artist.albums.should == [@album]
     @album.tags.should == [@tag]
+    @album.alias_tags.should == [@tag]
     @tag.albums.should == [@album]
   end
   
@@ -139,6 +141,7 @@ shared_examples_for "regular and composite key associations" do
     @artist.first_album.should == @album
     @artist.albums.should == [@album]
     @album.tags.should == [@tag]
+    @album.alias_tags.should == [@tag]
     @tag.albums.should == [@album]
   end
 
@@ -150,6 +153,7 @@ shared_examples_for "regular and composite key associations" do
     Artist.filter(:first_album=>@album).all.should == [@artist]
     Album.filter(:artist=>@artist).all.should == [@album]
     Album.filter(:tags=>@tag).all.should == [@album]
+    Album.filter(:alias_tags=>@tag).all.should == [@album]
     Tag.filter(:albums=>@album).all.should == [@tag]
     Album.filter(:artist=>@artist, :tags=>@tag).all.should == [@album]
     @artist.albums_dataset.filter(:tags=>@tag).all.should == [@album]
@@ -164,6 +168,7 @@ shared_examples_for "regular and composite key associations" do
     Artist.exclude(:first_album=>@album).all.should == [artist]
     Album.exclude(:artist=>@artist).all.should == [album]
     Album.exclude(:tags=>@tag).all.should == [album]
+    Album.exclude(:alias_tags=>@tag).all.should == [album]
     Tag.exclude(:albums=>@album).all.should == [tag]
     Album.exclude(:artist=>@artist, :tags=>@tag).all.should == [album]
   end
@@ -177,6 +182,7 @@ shared_examples_for "regular and composite key associations" do
     Artist.filter(:first_album=>[@album, album]).all.should == [@artist]
     Album.filter(:artist=>[@artist, artist]).all.should == [@album]
     Album.filter(:tags=>[@tag, tag]).all.should == [@album]
+    Album.filter(:alias_tags=>[@tag, tag]).all.should == [@album]
     Tag.filter(:albums=>[@album, album]).all.should == [@tag]
     Album.filter(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == [@album]
     @artist.albums_dataset.filter(:tags=>[@tag, tag]).all.should == [@album]
@@ -187,6 +193,7 @@ shared_examples_for "regular and composite key associations" do
     Artist.filter(:first_album=>[@album, album]).all.should == [@artist]
     Album.filter(:artist=>[@artist, artist]).all.should == [@album]
     Album.filter(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
+    Album.filter(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
     Tag.filter(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
     Album.filter(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == [@album]
 
@@ -196,6 +203,7 @@ shared_examples_for "regular and composite key associations" do
     Artist.filter(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
     Album.filter(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [@album, album]
     Album.filter(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
+    Album.filter(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
     Tag.filter(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
     Album.filter(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
   end
@@ -207,6 +215,7 @@ shared_examples_for "regular and composite key associations" do
     Artist.exclude(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
     Album.exclude(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [@album, album]
     Album.exclude(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
+    Album.exclude(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
     Tag.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
     Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
 
@@ -217,6 +226,7 @@ shared_examples_for "regular and composite key associations" do
     Artist.exclude(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [artist]
     Album.exclude(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [album]
     Album.exclude(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [album]
+    Album.exclude(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [album]
     Tag.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [tag]
     Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [album]
 
@@ -226,6 +236,7 @@ shared_examples_for "regular and composite key associations" do
     Artist.exclude(:first_album=>[@album, album]).all.should == [artist]
     Album.exclude(:artist=>[@artist, artist]).all.should == [album]
     Album.exclude(:tags=>[@tag, tag]).all.should == []
+    Album.exclude(:alias_tags=>[@tag, tag]).all.should == []
     Tag.exclude(:albums=>[@album, album]).all.should == []
     Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == [album]
 
@@ -235,6 +246,7 @@ shared_examples_for "regular and composite key associations" do
     Artist.exclude(:first_album=>[@album, album]).all.should == []
     Album.exclude(:artist=>[@artist, artist]).all.should == []
     Album.exclude(:tags=>[@tag, tag]).all.should == []
+    Album.exclude(:alias_tags=>[@tag, tag]).all.should == []
     Tag.exclude(:albums=>[@album, album]).all.should == []
     Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == []
   end
@@ -244,6 +256,7 @@ shared_examples_for "regular and composite key associations" do
     Artist.exclude(:first_album=>@album).all.should == [@artist]
     Album.exclude(:artist=>@artist).all.should == [@album]
     Album.exclude(:tags=>@tag).all.should == [@album]
+    Album.exclude(:alias_tags=>@tag).all.should == [@album]
     Tag.exclude(:albums=>@album).all.should == [@tag]
     Album.exclude(:artist=>@artist, :tags=>@tag).all.should == [@album]
 
@@ -254,11 +267,15 @@ shared_examples_for "regular and composite key associations" do
   specify "should handle NULL values in join table correctly when filtering/excluding many_to_many associations" do
     @ins.call
     Album.exclude(:tags=>@tag).all.should == [@album]
+    Album.exclude(:alias_tags=>@tag).all.should == [@album]
     @album.add_tag(@tag)
     Album.filter(:tags=>@tag).all.should == [@album]
+    Album.filter(:alias_tags=>@tag).all.should == [@album]
     album, artist, tag = @pr.call
     Album.exclude(:tags=>@tag).all.should == [album]
+    Album.exclude(:alias_tags=>@tag).all.should == [album]
     Album.exclude(:tags=>tag).all.sort_by{|x| x.pk}.should == [@album, album]
+    Album.exclude(:alias_tags=>tag).all.sort_by{|x| x.pk}.should == [@album, album]
   end
 
   specify "should work correctly when filtering by association datasets" do
@@ -280,6 +297,9 @@ shared_examples_for "regular and composite key associations" do
     Album.filter(:tags=>Tag.dataset).all.sort_by{|x| x.pk}.should == [@album, album]
     Album.filter(:tags=>Tag.dataset.filter(Array(Tag.primary_key).zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [album]
     Album.filter(:tags=>Tag.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+    Album.filter(:alias_tags=>Tag.dataset).all.sort_by{|x| x.pk}.should == [@album, album]
+    Album.filter(:alias_tags=>Tag.dataset.filter(Array(Tag.primary_key).zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [album]
+    Album.filter(:alias_tags=>Tag.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
     Tag.filter(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == [@tag, tag]
     Tag.filter(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [tag]
     Tag.filter(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
@@ -301,6 +321,9 @@ shared_examples_for "regular and composite key associations" do
     Album.exclude(:tags=>Tag.dataset).all.sort_by{|x| x.pk}.should == []
     Album.exclude(:tags=>Tag.dataset.filter(Array(Tag.primary_key).zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [@album]
     Album.exclude(:tags=>Tag.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
+    Album.exclude(:alias_tags=>Tag.dataset).all.sort_by{|x| x.pk}.should == []
+    Album.exclude(:alias_tags=>Tag.dataset.filter(Array(Tag.primary_key).zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [@album]
+    Album.exclude(:alias_tags=>Tag.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
     Tag.exclude(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == []
     Tag.exclude(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@tag]
     Tag.exclude(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@tag, tag]
@@ -312,6 +335,7 @@ shared_examples_for "regular and composite key associations" do
     Tag.albums.all.should == []
     Album.artists.all.should == []
     Album.tags.all.should == []
+    Album.alias_tags.all.should == []
     Artist.albums.all.should == []
     Artist.tags.all.should == []
     Artist.albums.tags.all.should == []
@@ -322,6 +346,7 @@ shared_examples_for "regular and composite key associations" do
     Tag.albums.all.should == [@album]
     Album.artists.all.should == [@artist]
     Album.tags.all.should == [@tag]
+    Album.alias_tags.all.should == [@tag]
     Artist.albums.all.should == [@album]
     Artist.tags.all.should == [@tag]
     Artist.albums.tags.all.should == [@tag]
@@ -332,6 +357,7 @@ shared_examples_for "regular and composite key associations" do
     Tag.albums.order(:name).all.should == [@album, album]
     Album.artists.order(:name).all.should == [@artist, artist]
     Album.tags.order(:name).all.should == [@tag, tag]
+    Album.alias_tags.order(:name).all.should == [@tag, tag]
     Artist.albums.order(:name).all.should == [@album, album]
     Artist.tags.order(:name).all.should == [@tag, tag]
     Artist.albums.tags.order(:name).all.should == [@tag, tag]
@@ -339,6 +365,7 @@ shared_examples_for "regular and composite key associations" do
     Tag.filter(Tag.qualified_primary_key_hash(tag.pk)).albums.all.should == [album]
     Album.filter(Album.qualified_primary_key_hash(album.pk)).artists.all.should == [artist]
     Album.filter(Album.qualified_primary_key_hash(album.pk)).tags.all.should == [tag]
+    Album.filter(Album.qualified_primary_key_hash(album.pk)).alias_tags.all.should == [tag]
     Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).albums.all.should == [album]
     Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).tags.all.should == [tag]
     Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).albums.tags.all.should == [tag]
@@ -355,6 +382,9 @@ shared_examples_for "regular and composite key associations" do
     
     @album.update(:artist => nil)
     @album.remove_tag(@tag)
+
+    @album.add_alias_tag(@tag)
+    @album.remove_alias_tag(@tag)
     
     @album.reload
     @artist.reload
@@ -364,6 +394,12 @@ shared_examples_for "regular and composite key associations" do
     @artist.albums.should == []
     @album.tags.should == []
     @tag.albums.should == []
+
+    @album.add_alias_tag(@tag)
+    @album.remove_alias_tag(@tag)
+
+    @album.reload
+    @album.alias_tags.should == []
   end
   
   specify "should have remove_all methods work" do
@@ -381,17 +417,24 @@ shared_examples_for "regular and composite key associations" do
     @artist.albums.should == []
     @album.tags.should == []
     @tag.albums.should == []
+
+    @album.add_alias_tag(@tag)
+    @album.remove_all_alias_tags
+
+    @album.reload
+    @album.alias_tags.should == []
   end
   
   specify "should eager load via eager correctly" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
     
-    a = Artist.eager(:albums=>:tags).eager(:first_album).all
+    a = Artist.eager(:albums=>[:tags, :alias_tags]).eager(:first_album).all
     a.should == [@artist]
     a.first.albums.should == [@album]
     a.first.first_album.should == @album
     a.first.albums.first.tags.should == [@tag]
+    a.first.albums.first.alias_tags.should == [@tag]
     
     a = Tag.eager(:albums=>:artist).all
     a.should == [@tag]
@@ -421,11 +464,12 @@ shared_examples_for "regular and composite key associations" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
     
-    a = Artist.eager_graph(:albums=>:tags).eager_graph(:first_album).all
+    a = Artist.eager_graph(:albums=>[:tags, :alias_tags]).eager_graph(:first_album).all
     a.should == [@artist]
     a.first.albums.should == [@album]
     a.first.first_album.should == @album
     a.first.albums.first.tags.should == [@tag]
+    a.first.albums.first.alias_tags.should == [@tag]
     
     a = Tag.eager_graph(:albums=>:artist).all
     a.should == [@tag]
@@ -505,6 +549,7 @@ describe "Sequel::Model Simple Associations" do
       plugin :dataset_associations
       many_to_one :artist
       many_to_many :tags, :right_key=>:tag_id
+      many_to_many :alias_tags, :clone=>:tags, :join_table=>:albums_tags___at
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
       many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
       many_to_many :last_two_tags, :clone=>:tags, :order=>:name.desc, :limit=>2
@@ -702,6 +747,7 @@ describe "Sequel::Model Composite Key Associations" do
       unrestrict_primary_key
       many_to_one :artist, :key=>[:artist_id1, :artist_id2]
       many_to_many :tags, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2]
+      many_to_many :alias_tags, :clone=>:tags, :join_table=>:albums_tags___at
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
       many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
       many_to_many :last_two_tags, :clone=>:tags, :order=>:name.desc, :limit=>2

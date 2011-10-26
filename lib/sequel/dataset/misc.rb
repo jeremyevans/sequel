@@ -172,6 +172,10 @@ module Sequel
     # used, where N is an integer starting at 0 and increasing until an
     # unused one is found.
     #
+    # You can provide a second addition array argument containing symbols
+    # that should not be considered valid table aliases.  The current aliases
+    # for the FROM and JOIN tables are automatically included in this array.
+    #
     #   DB[:table].unused_table_alias(:t)
     #   # => :t
     #
@@ -180,9 +184,11 @@ module Sequel
     #
     #   DB[:table, :table_0].unused_table_alias(:table)
     #   # => :table_1
-    def unused_table_alias(table_alias)
+    #
+    #   DB[:table, :table_0].unused_table_alias(:table, [:table_1, :table_2])
+    #   # => :table_3
+    def unused_table_alias(table_alias, used_aliases = [])
       table_alias = alias_symbol(table_alias)
-      used_aliases = []
       used_aliases += opts[:from].map{|t| alias_symbol(t)} if opts[:from]
       used_aliases += opts[:join].map{|j| j.table_alias ? alias_alias_symbol(j.table_alias) : alias_symbol(j.table)} if opts[:join]
       if used_aliases.include?(table_alias)

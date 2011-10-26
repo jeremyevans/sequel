@@ -1971,15 +1971,32 @@ describe Sequel::Model, "many_to_many" do
     @c2.new(:id => 1234).attributes_dataset.opts[:eager].should == {:attributes=>nil}
   end
   
+  it "should handle an aliased join table" do
+    @c2.many_to_many :attributes, :class => @c1, :join_table => :attribute2node___attributes_nodes
+    n = @c2.load(:id => 1234)
+    a = @c1.load(:id => 2345)
+    n.attributes_dataset.sql.should == "SELECT attributes.* FROM attributes INNER JOIN attribute2node AS attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))"
+    a.should == n.add_attribute(a)
+    a.should == n.remove_attribute(a)
+    n.remove_all_attributes
+    sqls = MODEL_DB.sqls
+    ['INSERT INTO attribute2node (node_id, attribute_id) VALUES (1234, 2345)',
+     'INSERT INTO attribute2node (attribute_id, node_id) VALUES (2345, 1234)'].should(include(sqls.shift))
+    ["DELETE FROM attribute2node WHERE ((node_id = 1234) AND (attribute_id = 2345))", 
+     "DELETE FROM attribute2node WHERE ((attribute_id = 2345) AND (node_id = 1234))"].should(include(sqls.shift))
+    sqls.should == ["DELETE FROM attribute2node WHERE (node_id = 1234)"]
+  end
+  
   it "should define an add_ method that works on existing records" do
     @c2.many_to_many :attributes, :class => @c1
     
     n = @c2.load(:id => 1234)
     a = @c1.load(:id => 2345)
-    a.should == n.add_attribute(a)
+    n.add_attribute(a).should == a
+    sqls = MODEL_DB.sqls
     ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 2345)',
-     'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (2345, 1234)'
-    ].should(include(MODEL_DB.sqls.first))
+     'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (2345, 1234)'].should(include(sqls.shift))
+    sqls.should == []
   end
 
   it "should define an add_ method that works with a primary key" do

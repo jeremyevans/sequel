@@ -63,7 +63,8 @@ module Sequel
           self[:eager_loading_predicate_key] ||= begin
             calculate_edges
             e = self[:edges].first
-            qualify(e[:table], e[:right])
+            f = self[:final_reverse_edge]
+            qualify(f[:alias], e[:right])
           end
         end
     
@@ -196,7 +197,7 @@ module Sequel
             ds = opts.associated_class 
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
             ft = opts[:final_reverse_edge]
-            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.qualify(ft[:alias], left_key), h.keys]], :table_alias=>ft[:alias])
+            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.eager_loading_predicate_key, h.keys]], :table_alias=>ft[:alias])
             ds = model.eager_loading_dataset(opts, ds, nil, eo[:associations], eo)
             case opts.eager_limit_strategy
             when :window_function

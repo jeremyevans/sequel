@@ -416,13 +416,6 @@ module Sequel
           self[:left_key]
         end
 
-        # The table containing the column to use for the associated key when eagerly loading
-        def associated_key_table
-          self[:associated_key_table] ||= (
-          syms = associated_class.dataset.split_alias(self[:join_table]);
-          syms[1] || syms[0])
-        end
-        
         # Alias of right_primary_keys
         def associated_object_keys
           right_primary_keys
@@ -462,17 +455,42 @@ module Sequel
           self[:eager_loader_key] ||= self[:left_primary_key]
         end
     
-        # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
+        # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3)).
+        # The left key qualified by the join table.
         def eager_loading_predicate_key
-          self[:eager_loading_predicate_key] ||= qualify(self[:join_table], self[:left_key])
+          self[:eager_loading_predicate_key] ||= qualify(join_table_alias, self[:left_key])
         end
         alias qualified_left_key eager_loading_predicate_key
+
+        # The right key qualified by the join table.
+        def qualified_right_key
+          self[:qualified_right_key] ||= qualify(join_table_alias, self[:right_key])
+        end
     
         # many_to_many associations need to select a key in an associated table to eagerly load
         def eager_loading_use_associated_key?
           true
         end
 
+        # The source of the join table.  This is the join table itself, unless it
+        # is aliased, in which case it is the unaliased part.
+        def join_table_source
+          fetch(:join_table_source) do
+            split_join_table_alias
+            self[:join_table_source]
+          end
+        end
+
+        # The join table itself, unless it is aliased, in which case this
+        # is the alias.
+        def join_table_alias
+          fetch(:join_table_alias) do
+            split_join_table_alias
+            self[:join_table_alias]
+          end
+        end
+        alias associated_key_table join_table_alias
+        
         # Whether the associated object needs a primary key to be added/removed,
         # true for many_to_many associations.
         def need_associated_primary_key?
@@ -514,6 +532,15 @@ module Sequel
         def select
          return self[:select] if include?(:select)
          self[:select] ||= Sequel::SQL::ColumnAll.new(associated_class.table_name)
+        end
+
+        private
+
+        # Split the join table into source and alias parts.
+        def split_join_table_alias
+          s, a = associated_class.dataset.split_alias(self[:join_table])
+          self[:join_table_source] = s
+          self[:join_table_alias] = a || s
         end
       end
   
@@ -834,10 +861,9 @@ module Sequel
           ds = eager_options[:eager_block].call(ds) if eager_options[:eager_block]
           if opts.eager_loading_use_associated_key?
             ds = if opts[:uses_left_composite_keys]
-              t = opts.associated_key_table
-              ds.select_append(*opts.associated_key_alias.zip(opts.associated_key_column).map{|a, c| SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, c), a)})
+              ds.select_append(*opts.associated_key_alias.zip(opts.eager_loading_predicate_key).map{|a, k| SQL::AliasedExpression.new(k, a)})
             else
-              ds.select_append(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column), opts.associated_key_alias))
+              ds.select_append(SQL::AliasedExpression.new(opts.eager_loading_predicate_key, opts.associated_key_alias))
             end
           end
           ds
@@ -1008,7 +1034,6 @@ module Sequel
           uses_rcks = opts[:uses_right_composite_keys] = rcks.length > 1
           opts[:cartesian_product_number] ||= 1
           join_table = (opts[:join_table] ||= opts.default_join_table)
-          opts[:qualified_right_key] = opts.qualify(opts[:join_table], right)
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
           graph_jt_conds = opts[:graph_join_table_conditions] = opts.fetch(:graph_join_table_conditions, []).to_a
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
@@ -1020,7 +1045,7 @@ module Sequel
             rows = eo[:rows]
             rows.each{|object| object.associations[name] = []}
             r = rcks.zip(opts.right_primary_keys)
-            l = [[opts.qualify(join_table, left), h.keys]]
+            l = [[opts.qualify(opts.join_table_alias, left), h.keys]]
             ds = model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), nil, eo[:associations], eo)
             case opts.eager_limit_strategy
             when :window_function
@@ -1030,7 +1055,7 @@ module Sequel
             when :correlated_subquery
               ds = apply_correlated_subquery_eager_limit_strategy(ds, opts) do |xds|
                 dsa = ds.send(:dataset_alias, 2)
-                xds.inner_join(join_table, r + lcks.map{|k| [k, SQL::QualifiedIdentifier.new(join_table, k)]}, :table_alias=>dsa)
+                xds.inner_join(join_table, r + lcks.map{|k| [k, SQL::QualifiedIdentifier.new(opts.join_table_alias, k)]}, :table_alias=>dsa)
               end
             end
             ds.all do |assoc_record|
@@ -1061,7 +1086,7 @@ module Sequel
           jt_graph_block = opts[:graph_join_table_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lcpks) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table), :join_type=>jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
+            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lcpks) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
             ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, &graph_block)
           end
       
@@ -1334,7 +1359,7 @@ module Sequel
 
         # Dataset for the join table of the given many to many association reflection
         def _join_table_dataset(opts)
-          ds = model.db.from(opts[:join_table])
+          ds = model.db.from(opts.join_table_source)
           opts[:join_table_block] ? opts[:join_table_block].call(ds) : ds
         end
 
@@ -1902,7 +1927,7 @@ module Sequel
           if exp == SQL::Constants::FALSE
             association_filter_handle_inversion(op, exp, Array(lpks))
           else
-            association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>model.db[ref[:join_table]].select(*lks).where(exp).exclude(SQL::BooleanExpression.from_value_pairs(lks.zip([]), :OR))), Array(lpks))
+            association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>model.db.from(ref[:join_table]).select(*lks).where(exp).exclude(SQL::BooleanExpression.from_value_pairs(lks.zip([]), :OR))), Array(lpks))
           end
         end
 
