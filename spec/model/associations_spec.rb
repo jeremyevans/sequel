@@ -2485,68 +2485,6 @@ describe Sequel::Model, "many_to_many" do
   end
 end
 
-describe Sequel::Model, " association reflection methods" do
-  before do
-    MODEL_DB.reset
-    @c1 = Class.new(Sequel::Model(:nodes)) do
-      def self.name; 'Node'; end
-      def self.to_s; 'Node'; end
-    end
-  end
-  
-  it "#all_association_reflections should include all association reflection hashes" do
-    @c1.all_association_reflections.should == []
-
-    @c1.associate :many_to_one, :parent, :class => @c1
-    @c1.all_association_reflections.collect{|v| v[:name]}.should == [:parent]
-    @c1.all_association_reflections.collect{|v| v[:type]}.should == [:many_to_one]
-    @c1.all_association_reflections.collect{|v| v[:class]}.should == [@c1]
-
-    @c1.associate :one_to_many, :children, :class => @c1
-    @c1.all_association_reflections.sort_by{|x|x[:name].to_s}
-    @c1.all_association_reflections.sort_by{|x|x[:name].to_s}.collect{|v| v[:name]}.should == [:children, :parent]
-    @c1.all_association_reflections.sort_by{|x|x[:name].to_s}.collect{|v| v[:type]}.should == [:one_to_many, :many_to_one]
-    @c1.all_association_reflections.sort_by{|x|x[:name].to_s}.collect{|v| v[:class]}.should == [@c1, @c1]
-  end
-
-  it "#association_reflection should return nil for nonexistent association" do
-    @c1.association_reflection(:blah).should == nil
-  end
-
-  it "#association_reflection should return association reflection hash if association exists" do
-    @c1.associate :many_to_one, :parent, :class => @c1
-    @c1.association_reflection(:parent).should be_a_kind_of(Sequel::Model::Associations::AssociationReflection)
-    @c1.association_reflection(:parent)[:name].should == :parent
-    @c1.association_reflection(:parent)[:type].should == :many_to_one
-    @c1.association_reflection(:parent)[:class].should == @c1
-
-    @c1.associate :one_to_many, :children, :class => @c1
-    @c1.association_reflection(:children).should be_a_kind_of(Sequel::Model::Associations::AssociationReflection)
-    @c1.association_reflection(:children)[:name].should == :children
-    @c1.association_reflection(:children)[:type].should == :one_to_many
-    @c1.association_reflection(:children)[:class].should == @c1
-  end
-
-  it "#associations should include all association names" do
-    @c1.associations.should == []
-    @c1.associate :many_to_one, :parent, :class => @c1
-    @c1.associations.should == [:parent]
-    @c1.associate :one_to_many, :children, :class => @c1
-    @c1.associations.sort_by{|x|x.to_s}.should == [:children, :parent]
-  end
-
-  it "association reflections should be copied upon subclasing" do
-    @c1.associate :many_to_one, :parent, :class => @c1
-    c = Class.new(@c1)
-    @c1.associations.should == [:parent]
-    c.associations.should == [:parent]
-    c.associate :many_to_one, :parent2, :class => @c1
-    @c1.associations.should == [:parent]
-    c.associations.sort_by{|x| x.to_s}.should == [:parent, :parent2]
-    c.instance_methods.map{|x| x.to_s}.should include('parent')
-  end
-end
-
 describe "Filtering by associations" do
   before do
     @Album = Class.new(Sequel::Model(:albums))
