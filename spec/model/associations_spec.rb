@@ -602,13 +602,11 @@ end
 describe Sequel::Model, "one_to_one" do
   before do
     @c1 = Class.new(Sequel::Model(:attributes)) do
-      def _refresh(ds); end
       unrestrict_primary_key
       columns :id, :node_id, :y
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
-      def _refresh(ds); end
       unrestrict_primary_key
       attr_accessor :xxx
       
@@ -618,11 +616,7 @@ describe Sequel::Model, "one_to_one" do
     end
     @dataset = @c2.dataset
     @dataset._fetch = {}
-    def @dataset.empty?; false; end
-
-    ds1 = @c1.dataset
-    ds1._fetch = {}
-    def ds1.empty?; opts.has_key?(:empty) ? (super; true) : false; end
+    @c1.dataset._fetch = {}
     MODEL_DB.reset
   end
   
@@ -644,26 +638,24 @@ describe Sequel::Model, "one_to_one" do
   it "should add a setter method" do
     @c2.one_to_one :attribute, :class => @c1
     attrib = @c1.new(:id=>3)
-    d = @c1.dataset
-    @c1.class_eval{remove_method :_refresh}
-    def d.fetch_rows(s); yield({:id=>3}) end
+    @c1.dataset._fetch = {:id=>3}
     @c2.new(:id => 1234).attribute = attrib
     sqls = MODEL_DB.sqls
     ['INSERT INTO attributes (node_id, id) VALUES (1234, 3)',
-      'INSERT INTO attributes (id, node_id) VALUES (3, 1234)'].should(include(sqls.pop))
-    sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))']
+      'INSERT INTO attributes (id, node_id) VALUES (3, 1234)'].should(include(sqls.slice! 1))
+    sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))', "SELECT * FROM attributes WHERE (id = 3) LIMIT 1"]
 
     @c2.new(:id => 1234).attribute.should == attrib
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 1234).attribute = attrib
-    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))',
+    MODEL_DB.sqls.should == ["SELECT * FROM attributes WHERE (attributes.node_id = 1234) LIMIT 1",
+      'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))',
       "UPDATE attributes SET node_id = 1234 WHERE (id = 3)"]
   end
 
   it "should use a transaction in the setter method" do
     @c2.one_to_one :attribute, :class => @c1
     @c2.use_transactions = true
-    MODEL_DB.sqls.clear
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 1234).attribute = attrib
     MODEL_DB.sqls.should == ['BEGIN',
@@ -676,7 +668,6 @@ describe Sequel::Model, "one_to_one" do
     @c2.one_to_one :attribute, :class => @c1, :conditions=>{:a=>1} do |ds|
       ds.filter(:b=>2)
     end
-    MODEL_DB.sqls.clear
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 1234).attribute = attrib
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (a = 1) AND (b = 2) AND (id != 3))',
@@ -686,27 +677,25 @@ describe Sequel::Model, "one_to_one" do
   it "should have the setter method respect the :primary_key option" do
     @c2.one_to_one :attribute, :class => @c1, :primary_key=>:xxx
     attrib = @c1.new(:id=>3)
-    d = @c1.dataset
-    @c1.class_eval{remove_method :_refresh}
-    def d.fetch_rows(s); yield({:id=>3}) end
+    @c1.dataset._fetch = {:id=>3}
     @c2.new(:id => 1234, :xxx=>5).attribute = attrib
     sqls = MODEL_DB.sqls
     ['INSERT INTO attributes (node_id, id) VALUES (5, 3)',
-      'INSERT INTO attributes (id, node_id) VALUES (3, 5)'].should(include(sqls.pop))
-    sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))']
+      'INSERT INTO attributes (id, node_id) VALUES (3, 5)'].should(include(sqls.slice! 1))
+    sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))', "SELECT * FROM attributes WHERE (id = 3) LIMIT 1"]
 
     @c2.new(:id => 321, :xxx=>5).attribute.should == attrib
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 621, :xxx=>5).attribute = attrib
-    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))',
+    MODEL_DB.sqls.should == ["SELECT * FROM attributes WHERE (attributes.node_id = 5) LIMIT 1",
+      'UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))',
       'UPDATE attributes SET node_id = 5 WHERE (id = 3)']
     end
     
   it "should have the setter method respect composite keys" do
     @c2.one_to_one :attribute, :class => @c1, :key=>[:node_id, :y], :primary_key=>[:id, :x]
     attrib = @c1.load(:id=>3, :y=>6)
-    d = @c1.dataset
-    def d.fetch_rows(s); yield({:id=>3, :y=>6}) end
+    @c1.dataset._fetch = {:id=>3, :y=>6}
     @c2.load(:id => 1234, :x=>5).attribute = attrib
     sqls = MODEL_DB.sqls
     sqls.last.should =~ /UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 3\)/
@@ -726,31 +715,27 @@ describe Sequel::Model, "one_to_one" do
   end
   
   it "should use implicit class if omitted" do
-    class ::ParParent < Sequel::Model
+    begin
+      class ::ParParent < Sequel::Model; end
+      @c2.one_to_one :par_parent
+      @c2.new(:id => 234).par_parent.class.should == ParParent
+      MODEL_DB.sqls.should == ["SELECT * FROM par_parents WHERE (par_parents.node_id = 234) LIMIT 1"]
+    ensure
+      Object.send(:remove_const, :ParParent)
     end
-    
-    @c2.one_to_one :par_parent
-    
-    d = @c2.new(:id => 234)
-    p = d.par_parent
-    p.class.should == ParParent
-    
-    MODEL_DB.sqls.should == ["SELECT * FROM par_parents WHERE (par_parents.node_id = 234) LIMIT 1"]
   end
 
   it "should use class inside module if given as a string" do
-    module ::Par 
-      class Parent < Sequel::Model
+    begin
+      module ::Par 
+        class Parent < Sequel::Model; end
       end
+      @c2.one_to_one :par_parent, :class=>"Par::Parent"
+      @c2.new(:id => 234).par_parent.class.should == Par::Parent
+      MODEL_DB.sqls.should == ["SELECT * FROM parents WHERE (parents.node_id = 234) LIMIT 1"]
+    ensure
+      Object.send(:remove_const, :Par)
     end
-    
-    @c2.one_to_one :par_parent, :class=>"Par::Parent"
-    
-    d = @c2.new(:id => 234)
-    p = d.par_parent
-    p.class.should == Par::Parent
-    
-    MODEL_DB.sqls.should == ["SELECT * FROM parents WHERE (parents.node_id = 234) LIMIT 1"]
   end
 
   it "should use explicit key if given" do
@@ -801,14 +786,12 @@ describe Sequel::Model, "one_to_one" do
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.node_id = 567) AND (a = 32)) LIMIT 1"]
 
     @c2.one_to_one :parent, :class => @c2, :conditions=>:a
-    MODEL_DB.sqls.clear
     @c2.new(:id => 567).parent
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.node_id = 567) AND a) LIMIT 1"]
   end
 
   it "should support :order, :limit (only for offset), and :dataset options, as well as a block" do
-    c2 = @c2
-    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{c2.filter(:parent_id=>pk)}, :limit=>[10,20], :order=>:name do |ds|
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{model.filter(:parent_id=>pk)}, :limit=>[10,20], :order=>:name do |ds|
       ds.filter(:x.sql_number > 1)
     end
     @c2.load(:id => 100).child_20
@@ -818,8 +801,7 @@ describe Sequel::Model, "one_to_one" do
   it "should return nil if primary_key value is nil" do
     @c2.one_to_one :parent, :class => @c2, :primary_key=>:node_id
 
-    d = @c2.new(:id => 1)
-    d.parent.should == nil
+    @c2.new(:id => 1).parent.should be_nil
     MODEL_DB.sqls.should == []
   end
 
@@ -839,28 +821,44 @@ describe Sequel::Model, "one_to_one" do
 
     d = @c2.new(:id => 1)
     f = @c2.new(:id => 3, :node_id=> 4321)
+    @c2.dataset._fetch = {:id => 3, :node_id=>1}
     d.parent = f
     f.values.should == {:id => 3, :node_id=>1}
     d.parent.should == f
+    sqls = MODEL_DB.sqls
+    ["INSERT INTO nodes (node_id, id) VALUES (1, 3)",
+     "INSERT INTO nodes (id, node_id) VALUES (3, 1)"].should include(sqls.slice! 1)
+    sqls.should == ["UPDATE nodes SET node_id = NULL WHERE ((node_id = 1) AND (id != 3))", "SELECT * FROM nodes WHERE (id = 3) LIMIT 1"]
     
     d.parent = nil
     d.parent.should == nil
+    MODEL_DB.sqls.should == ["UPDATE nodes SET node_id = NULL WHERE (node_id = 1)"]
   end
   
   it "should have the setter method respect the :primary_key option" do
     @c2.one_to_one :parent, :class => @c2, :primary_key=>:blah
     d = @c2.new(:id => 1, :blah => 3)
     e = @c2.new(:id => 4321, :node_id=>444)
+    @c2.dataset._fetch = {:id => 4321, :node_id => 3}
     d.parent = e
     e.values.should == {:id => 4321, :node_id => 3}
+    sqls = MODEL_DB.sqls
+    ["INSERT INTO nodes (node_id, id) VALUES (3, 4321)",
+     "INSERT INTO nodes (id, node_id) VALUES (4321, 3)"].should include(sqls.slice! 1)
+    sqls.should == ["UPDATE nodes SET node_id = NULL WHERE ((node_id = 3) AND (id != 4321))", "SELECT * FROM nodes WHERE (id = 4321) LIMIT 1"]
   end
   
   it "should have the setter method respect the :key option" do
     @c2.one_to_one :parent, :class => @c2, :key=>:blah
     d = @c2.new(:id => 3)
     e = @c2.new(:id => 4321, :blah=>444)
+    @c2.dataset._fetch = {:id => 4321, :blah => 3}
     d.parent = e
     e.values.should == {:id => 4321, :blah => 3}
+    sqls = MODEL_DB.sqls
+    ["INSERT INTO nodes (blah, id) VALUES (3, 4321)",
+     "INSERT INTO nodes (id, blah) VALUES (4321, 3)"].should include(sqls.slice! 1)
+    sqls.should == ["UPDATE nodes SET blah = NULL WHERE ((blah = 3) AND (id != 4321))", "SELECT * FROM nodes WHERE (id = 4321) LIMIT 1"]
   end
   
   it "should persist changes to associated object when the setter is called" do
@@ -922,7 +920,6 @@ describe Sequel::Model, "one_to_one" do
     e.child.should == d
     MODEL_DB.sqls.should == ["UPDATE nodes SET parent_id = NULL WHERE ((parent_id = 1) AND (id != 2))",
       "UPDATE nodes SET parent_id = 1 WHERE (id = 2)"]
-    MODEL_DB.reset
     d.parent = nil
     e.child.should == nil
     MODEL_DB.sqls.should == ["UPDATE nodes SET parent_id = NULL WHERE (parent_id = 1)"]
@@ -931,17 +928,13 @@ describe Sequel::Model, "one_to_one" do
   it "should have the setter remove the object from the previous associated object's reciprocal many_to_one cached association list if it exists" do
     @c2.one_to_one :parent, :class => @c2, :key=>:parent_id
     @c2.many_to_one :child, :class => @c2, :key=>:parent_id
-    ds = @c2.dataset
-    def ds.fetch_rows(sql, &block)
-      MODEL_DB.sqls << sql
-    end
+    @c2.dataset._fetch = []
 
     d = @c2.load(:id => 1)
     e = @c2.load(:id => 2)
     f = @c2.load(:id => 3)
     e.child.should == nil
     f.child.should == nil
-    MODEL_DB.reset
     d.parent = e
     e.child.should == d
     d.parent = f
@@ -983,12 +976,12 @@ describe Sequel::Model, "one_to_one" do
     h = []
     @c2.one_to_one :parent, :class => @c2, :before_set=>[proc{|x,y| h << x.pk; h << (y ? -y.pk : :y)}, :blah], :after_set=>proc{h << 3}
     @c2.class_eval do
-      class_variable_set(:@@blah, h)
+      self::Foo = h
       def blah(x)
-        self.class.send(:class_variable_get, :@@blah) << (x ? x.pk : :x)
+        model::Foo << (x ? x.pk : :x)
       end
       def blahr(x)
-        self.class.send(:class_variable_get, :@@blah) << 6
+        model::Foo << 6
       end
     end
     p = @c2.load(:id=>10)
@@ -1004,13 +997,11 @@ describe Sequel::Model, "one_to_one" do
     h = []
     @c2.one_to_one :parent, :class => @c2, :after_load=>[proc{|x,y| h << [x.pk, y.pk]}, :al]
     @c2.class_eval do
-      class_variable_set(:@@blah, h)
+      self::Foo = h
       def al(v)
-        self.class.send(:class_variable_get, :@@blah) << v.pk
+        model::Foo << v.pk
       end
-      def @dataset.fetch_rows(sql)
-        yield({:id=>20})
-      end
+      @dataset._fetch = {:id=>20}
     end
     p = @c2.load(:id=>10)
     parent = p.parent
@@ -1048,15 +1039,15 @@ describe Sequel::Model, "one_to_one" do
     h = []
     @c2.one_to_one :parent, :class => @c2, :before_set=>:bs, :after_set=>:as
     @c2.class_eval do
-      class_variable_set(:@@blah, h)
+      self::Foo = h
       def []=(a, v)
-        a == :node_id ? (self.class.send(:class_variable_get, :@@blah) << 5) : super
+        a == :node_id ? (model::Foo << 5) : super
       end
       def bs(x)
-        self.class.send(:class_variable_get, :@@blah) << x.pk
+        model::Foo << x.pk
       end
       def as(x)
-        self.class.send(:class_variable_get, :@@blah) << x.pk * 2
+        model::Foo << x.pk * 2
       end
     end
     p.parent = c
