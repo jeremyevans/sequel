@@ -3,39 +3,25 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe Sequel::Model::DatasetMethods, "#destroy"  do
   before do
     @c = Class.new(Sequel::Model(:items)) do
-      class_variable_set(:@@destroyed, [])
+      self::Destroyed = []
       def destroy
-        self.class.send(:class_variable_get, :@@destroyed) << self
-      end
-      def self.destroyed
-        class_variable_get(:@@destroyed)
+        model::Destroyed << self
       end
     end
     @d = @c.dataset
+    @d._fetch = [{:id=>1}, {:id=>2}]
     MODEL_DB.reset
   end
 
   it "should instantiate objects in the dataset and call destroy on each" do
-    def @d.fetch_rows(sql)
-      yield({:id=>1})
-      yield({:id=>2})
-    end
     @d.destroy
-    @c.destroyed.collect{|x| x.values}.should == [{:id=>1}, {:id=>2}]
+    @c::Destroyed.collect{|x| x.values}.should == [{:id=>1}, {:id=>2}]
   end
 
   it "should return the number of records destroyed" do
-    def @d.fetch_rows(sql)
-      yield({:id=>1})
-      yield({:id=>2})
-    end
     @d.destroy.should == 2
-    def @d.fetch_rows(sql)
-      yield({:id=>1})
-    end
+    @d._fetch = [[{:i=>1}], []]
     @d.destroy.should == 1
-    def @d.fetch_rows(sql)
-    end
     @d.destroy.should == 0
   end
 
@@ -61,10 +47,7 @@ describe Sequel::Model::DatasetMethods, "#to_hash"  do
   end
 
   it "should result in a hash with primary key value keys and model object values" do
-    def @d.fetch_rows(sql)
-      yield({:name=>1})
-      yield({:name=>2})
-    end
+    @d._fetch = [{:name=>1}, {:name=>2}]
     h = @d.to_hash
     h.should be_a_kind_of(Hash)
     a = h.to_a
@@ -73,10 +56,7 @@ describe Sequel::Model::DatasetMethods, "#to_hash"  do
   end
 
   it "should result in a hash with given value keys and model object values" do
-    def @d.fetch_rows(sql)
-      yield({:name=>1, :number=>3})
-      yield({:name=>2, :number=>4})
-    end
+    @d._fetch = [{:name=>1, :number=>3}, {:name=>2, :number=>4}]
     h = @d.to_hash(:number)
     h.should be_a_kind_of(Hash)
     a = h.to_a
