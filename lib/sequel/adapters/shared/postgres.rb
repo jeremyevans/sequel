@@ -731,12 +731,14 @@ module Sequel
       
       # Insert given values into the database.
       def insert(*values, &block)
-        if @opts[:sql] || @opts[:returning]
+        if @opts[:returning]
           super
-        elsif supports_insert_select?
+        elsif !@opts[:sql] && supports_insert_select?
           returning(insert_pk).insert(*values){|r| return r.values.first}
+        elsif (f = opts[:from]) && !f.empty?
+          execute_insert(insert_sql(*values), :table=>f.first, :values=>values.size == 1 ? values.first : values)
         else
-          execute_insert(insert_sql(*values), :table=>opts[:from].first, :values=>values.size == 1 ? values.first : values)
+          super
         end
       end
 
