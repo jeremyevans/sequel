@@ -218,7 +218,6 @@ module Sequel
     # If a server option is given, acquires a connection for that specific
     # server, instead of the :default server.
     #
-    #
     #   DB.synchronize do |conn|
     #     ...
     #   end
