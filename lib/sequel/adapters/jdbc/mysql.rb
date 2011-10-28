@@ -66,11 +66,6 @@ module Sequel
       class Dataset < JDBC::Dataset
         include Sequel::MySQL::DatasetMethods
         
-        # Use execute_insert to execute the insert_sql.
-        def insert(*values)
-          execute_insert(insert_sql(*values))
-        end
-        
         # Use execute_insert to execute the replace_sql.
         def replace(*args)
           execute_insert(replace_sql(*args))
