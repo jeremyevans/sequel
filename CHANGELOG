@@ -1,5 +1,7 @@
 === HEAD
 
+* Work around pragma bug on jdbc/sqlite when emulating alter table support (jeremyevans)
+
 * Database#<< and Dataset#<< now return self so they can be safely chained (jeremyevans)
 
 * Fully support using an aliased table name as the :join_table option for a many_to_many association (jeremyevans)

@@ -68,7 +68,7 @@ describe "Supported types" do
     ds.first[:dat].to_s.should == d.to_s
   end
   
-  cspecify "should support generic time type", [:do], [:swift], [:odbc], [:jdbc, :mssql], [:jdbc, :postgres], [:mysql2], [:tinytds], :oracle do
+  cspecify "should support generic time type", [:do], [:swift], [:odbc], [:jdbc, :mssql], [:jdbc, :postgres], [:jdbc, :sqlite], [:mysql2], [:tinytds], :oracle do
     ds = create_items_table_with_column(:tim, Time, :only_time=>true)
     t = Sequel::SQLTime.now
     ds.insert(:tim => t)

@@ -267,15 +267,20 @@ module Sequel
           cols.reject!{|c| nono.include? c[:name] }
         end
 
-        if foreign_keys
-          metadata_dataset.with_sql("PRAGMA foreign_key_list(?)", input_identifier_meth.call(table)).each do |row|
-            c = cols.find {|co| co[:name] == row[:from] } or next
-            c[:table] = row[:table]
-            c[:key] = row[:to]
-            c[:on_update] = on_delete_sql_to_sym(row[:on_update])
-            c[:on_delete] = on_delete_sql_to_sym(row[:on_delete])
-            # is there any way to get deferrable status?
+        begin
+          if foreign_keys
+            metadata_dataset.with_sql("PRAGMA foreign_key_list(?)", input_identifier_meth.call(table)).each do |row|
+              c = cols.find {|co| co[:name] == row[:from] } or next
+              c[:table] = row[:table]
+              c[:key] = row[:to]
+              c[:on_update] = on_delete_sql_to_sym(row[:on_update])
+              c[:on_delete] = on_delete_sql_to_sym(row[:on_delete])
+              # is there any way to get deferrable status?
+            end
           end
+        rescue Sequel::DatabaseError
+          # Doesn't work correctly on some versions of JDBC SQLite,
+          # giving a "query does not return ResultSet" error.
         end
         cols
       end
