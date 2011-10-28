@@ -770,7 +770,7 @@ module Sequel
     # * The following instance_methods all call the class method of the same
     #   name: columns, db, primary_key, db_schema.
     # * All of the methods in +BOOLEAN_SETTINGS+ create attr_writers allowing you
-    #   to set values for the attribute.  It also creates instnace getters returning
+    #   to set values for the attribute.  It also creates instance getters returning
     #   the value of the setting.  If the value has not yet been set, it
     #   gets the default value from the class by calling the class method of the same name.
     module InstanceMethods
