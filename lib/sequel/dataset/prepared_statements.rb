@@ -35,7 +35,7 @@ module Sequel
         return @prepared_sql if @prepared_sql
         @prepared_args ||= []
         @prepared_sql = super
-        meta_def("#{sql_query_type}_sql"){|*args| prepared_sql}
+        @opts[:sql] = @prepared_sql
         @prepared_sql
       end
       
@@ -121,8 +121,7 @@ module Sequel
         when :select, :all
           all(&block)
         when :insert_select
-          meta_def(:select_sql){prepared_sql}
-          first
+          with_sql(prepared_sql).first
         when :first
           first
         when :insert
