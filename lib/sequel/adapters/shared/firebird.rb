@@ -158,7 +158,7 @@ module Sequel
       def insert(*values)
         if @opts[:sql] || @opts[:returning]
           super
-        elsif supports_insert_select?
+        else
           returning(insert_pk).insert(*values){|r| return r.values.first}
         end
       end
