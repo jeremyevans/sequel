@@ -2,8 +2,6 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe Sequel::Model, "#eager" do
   before do
-    MODEL_DB.reset
-    
     class ::EagerAlbum < Sequel::Model(:albums)
       columns :id, :band_id
       many_to_one :band, :class=>'EagerBand', :key=>:band_id
@@ -85,6 +83,8 @@ describe Sequel::Model, "#eager" do
       h[:x_foreign_key_x] = 2 if sql =~ /bm\.band_id/
       h
     end
+
+    MODEL_DB.reset
   end
   after do
     [:EagerAlbum, :EagerBand, :EagerTrack, :EagerGenre, :EagerBandMember].each{|x| Object.send(:remove_const, x)}
@@ -96,14 +96,9 @@ describe Sequel::Model, "#eager" do
 
   it "should eagerly load a single many_to_one association" do
     a = EagerAlbum.eager(:band).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
     MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM bands WHERE (bands.id IN (2))']
-    a = a.first
-    a.band.should be_a_kind_of(EagerBand)
-    a.band.values.should == {:id => 2}
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.first.band.should == EagerBand.load(:id=>2)
     MODEL_DB.sqls.should == []
   end
   
@@ -178,16 +173,9 @@ describe Sequel::Model, "#eager" do
   
   it "should eagerly load a single many_to_many association" do
     a = EagerAlbum.eager(:genres).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
-    a = a.first
-    a.genres.should be_a_kind_of(Array)
-    a.genres.size.should == 1
-    a.genres.first.should be_a_kind_of(EagerGenre)
-    a.genres.first.values.should == {:id => 4}
+    a.first.genres.should == [EagerGenre.load(:id=>4)]
     MODEL_DB.sqls.should == []
   end
   
@@ -205,142 +193,79 @@ describe Sequel::Model, "#eager" do
   
   it "should eagerly load multiple associations in a single call" do
     a = EagerAlbum.eager(:genres, :tracks, :band).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     sqls = MODEL_DB.sqls
-    sqls.length.should == 4
-    sqls[0].should == 'SELECT * FROM albums'
-    sqls[1..-1].should(include('SELECT * FROM bands WHERE (bands.id IN (2))'))
-    sqls[1..-1].should(include('SELECT * FROM tracks WHERE (tracks.album_id IN (1))'))
-    sqls[1..-1].should(include('SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))'))
+    sqls.shift.should == 'SELECT * FROM albums'
+    sqls.sort.should == ['SELECT * FROM bands WHERE (bands.id IN (2))',
+      'SELECT * FROM tracks WHERE (tracks.album_id IN (1))',
+      'SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))']
     a = a.first
-    a.band.should be_a_kind_of(EagerBand)
-    a.band.values.should == {:id => 2}
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(EagerTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id=>1}
-    a.genres.should be_a_kind_of(Array)
-    a.genres.size.should == 1
-    a.genres.first.should be_a_kind_of(EagerGenre)
-    a.genres.first.values.should == {:id => 4}
+    a.band.should == EagerBand.load(:id=>2)
+    a.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
+    a.genres.should == [EagerGenre.load(:id => 4)]
     MODEL_DB.sqls.should == []
   end
   
   it "should eagerly load multiple associations in separate calls" do
     a = EagerAlbum.eager(:genres).eager(:tracks).eager(:band).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     sqls = MODEL_DB.sqls
-    sqls.length.should == 4
-    sqls[0].should == 'SELECT * FROM albums'
-    sqls[1..-1].should(include('SELECT * FROM bands WHERE (bands.id IN (2))'))
-    sqls[1..-1].should(include('SELECT * FROM tracks WHERE (tracks.album_id IN (1))'))
-    sqls[1..-1].should(include('SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))'))
+    sqls.shift.should == 'SELECT * FROM albums'
+    sqls.sort.should == ['SELECT * FROM bands WHERE (bands.id IN (2))',
+      'SELECT * FROM tracks WHERE (tracks.album_id IN (1))',
+      'SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))']
     a = a.first
-    a.band.should be_a_kind_of(EagerBand)
-    a.band.values.should == {:id => 2}
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(EagerTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id=>1}
-    a.genres.should be_a_kind_of(Array)
-    a.genres.size.should == 1
-    a.genres.first.should be_a_kind_of(EagerGenre)
-    a.genres.first.values.should == {:id => 4}
+    a.band.should == EagerBand.load(:id=>2)
+    a.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
+    a.genres.should == [EagerGenre.load(:id => 4)]
     MODEL_DB.sqls.should == []
   end
   
   it "should allow cascading of eager loading for associations of associated models" do
     a = EagerTrack.eager(:album=>{:band=>:members}).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerTrack)
-    a.first.values.should == {:id => 3, :album_id => 1}
+    a.should == [EagerTrack.load(:id => 3, :album_id => 1)]
     MODEL_DB.sqls.should == ['SELECT * FROM tracks', 
       'SELECT * FROM albums WHERE (albums.id IN (1))',
       'SELECT * FROM bands WHERE (bands.id IN (2))',
       "SELECT members.*, bm.band_id AS x_foreign_key_x FROM members INNER JOIN bm ON ((bm.member_id = members.id) AND (bm.band_id IN (2)))"]
     a = a.first
-    a.album.should be_a_kind_of(EagerAlbum)
-    a.album.values.should == {:id => 1, :band_id => 2}
-    a.album.band.should be_a_kind_of(EagerBand)
-    a.album.band.values.should == {:id => 2}
-    a.album.band.members.should be_a_kind_of(Array)
-    a.album.band.members.size.should == 1
-    a.album.band.members.first.should be_a_kind_of(EagerBandMember)
-    a.album.band.members.first.values.should == {:id => 5}
+    a.album.should == EagerAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.should == EagerBand.load(:id => 2)
+    a.album.band.members.should == [EagerBandMember.load(:id => 5)]
     MODEL_DB.sqls.should == []
   end
   
   it "should cascade eagerly loading when the :eager association option is used" do
     a = EagerBand.eager(:albums).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerBand)
-    a.first.values.should == {:id => 2}
+    a.should == [EagerBand.load(:id=>2)]
     MODEL_DB.sqls.should == ['SELECT * FROM bands', 
-                             'SELECT * FROM albums WHERE (albums.band_id IN (2))',
-                             'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
-    a = a.first
-    a.albums.should be_a_kind_of(Array)
-    a.albums.size.should == 1
-    a.albums.first.should be_a_kind_of(EagerAlbum)
-    a.albums.first.values.should == {:id => 1, :band_id => 2}
-    a = a.albums.first
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(EagerTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id => 1}
+      'SELECT * FROM albums WHERE (albums.band_id IN (2))',
+      'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
+    a.first.albums.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.first.albums.first.tracks.should == [EagerTrack.load(:id => 3, :album_id => 1)]
     MODEL_DB.sqls.should == []
   end
   
   it "should respect :eager when lazily loading an association" do
     a = EagerBand.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerBand)
-    a.first.values.should == {:id => 2}
+    a.should == [EagerBand.load(:id=>2)]
     MODEL_DB.sqls.should == ['SELECT * FROM bands']
-    a = a.first
-    a.albums
+    a = a.first.albums
     MODEL_DB.sqls.should == ['SELECT * FROM albums WHERE (albums.band_id = 2)',
-                             'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
-    a.albums.should be_a_kind_of(Array)
-    a.albums.size.should == 1
-    a.albums.first.should be_a_kind_of(EagerAlbum)
-    a.albums.first.values.should == {:id => 1, :band_id => 2}
-    a = a.albums.first
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(EagerTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id => 1}
+      'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id => 1)]
     MODEL_DB.sqls.should == []
   end
   
   it "should cascade eagerly loading when the :eager_graph association option is used" do
     EagerAlbum.dataset._fetch = {:id=>1, :band_id=>2, :tracks_id=>3, :album_id=>1}
     a = EagerBand.eager(:graph_albums).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerBand)
-    a.first.values.should == {:id => 2}
+    a.should == [EagerBand.load(:id=>2)]
     MODEL_DB.sqls.should == ['SELECT * FROM bands', 
-                             'SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) WHERE (albums.band_id IN (2))']
-    a = a.first
-    a.graph_albums.should be_a_kind_of(Array)
-    a.graph_albums.size.should == 1
-    a.graph_albums.first.should be_a_kind_of(EagerAlbum)
-    a.graph_albums.first.values.should == {:id => 1, :band_id => 2}
-    a = a.graph_albums.first
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(EagerTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id => 1}
+      'SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) WHERE (albums.band_id IN (2))']
+    a.first.graph_albums.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.first.graph_albums.first.tracks.should == [EagerTrack.load(:id => 3, :album_id => 1)]
     MODEL_DB.sqls.should == []
   end
   
@@ -350,24 +275,14 @@ describe Sequel::Model, "#eager" do
   
   it "should respect :eager_graph when lazily loading an association" do
     a = EagerBand.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerBand)
-    a.first.values.should == {:id => 2}
+    a.should == [EagerBand.load(:id=>2)]
     MODEL_DB.sqls.should == ['SELECT * FROM bands']
     a = a.first
     EagerAlbum.dataset._fetch = {:id=>1, :band_id=>2, :tracks_id=>3, :album_id=>1}
     a.graph_albums
     MODEL_DB.sqls.should == ['SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) WHERE (albums.band_id = 2)']
-    a.graph_albums.should be_a_kind_of(Array)
-    a.graph_albums.size.should == 1
-    a.graph_albums.first.should be_a_kind_of(EagerAlbum)
-    a.graph_albums.first.values.should == {:id => 1, :band_id => 2}
-    a = a.graph_albums.first
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(EagerTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id => 1}
+    a.graph_albums.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.graph_albums.first.tracks.should == [EagerTrack.load(:id => 3, :album_id => 1)]
     MODEL_DB.sqls.should == []
   end
   
@@ -385,16 +300,9 @@ describe Sequel::Model, "#eager" do
   it "should respect :conditions when eagerly loading" do
     EagerBandMember.many_to_many :good_bands, :clone=>:bands, :conditions=>{:a=>32}
     a = EagerBandMember.eager(:good_bands).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerBandMember)
-    a.first.values.should == {:id => 5}
+    a.should == [EagerBandMember.load(:id => 5)]
     MODEL_DB.sqls.should == ['SELECT * FROM members', 'SELECT bands.*, bm.member_id AS x_foreign_key_x FROM bands INNER JOIN bm ON ((bm.band_id = bands.id) AND (bm.member_id IN (5))) WHERE (a = 32) ORDER BY id']
-    a = a.first
-    a.good_bands.should be_a_kind_of(Array)
-    a.good_bands.size.should == 1
-    a.good_bands.first.should be_a_kind_of(EagerBand)
-    a.good_bands.first.values.should == {:id => 2}
+    a.first.good_bands.should == [EagerBand.load(:id => 2)]
     MODEL_DB.sqls.should == []
 
     EagerBandMember.many_to_many :good_bands, :clone=>:bands, :conditions=>"x = 1"
@@ -404,62 +312,35 @@ describe Sequel::Model, "#eager" do
   
   it "should respect :order when eagerly loading" do
     a = EagerBandMember.eager(:bands).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerBandMember)
-    a.first.values.should == {:id => 5}
+    a.should == [EagerBandMember.load(:id => 5)]
     MODEL_DB.sqls.should == ['SELECT * FROM members', 'SELECT bands.*, bm.member_id AS x_foreign_key_x FROM bands INNER JOIN bm ON ((bm.band_id = bands.id) AND (bm.member_id IN (5))) ORDER BY id']
-    a = a.first
-    a.bands.should be_a_kind_of(Array)
-    a.bands.size.should == 1
-    a.bands.first.should be_a_kind_of(EagerBand)
-    a.bands.first.values.should == {:id => 2}
+    a.first.bands.should == [EagerBand.load(:id => 2)]
     MODEL_DB.sqls.should == []
   end
   
   it "should populate the reciprocal many_to_one association when eagerly loading the one_to_many association" do
     a = EagerAlbum.eager(:tracks).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
-    a = a.first
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(EagerTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id=>1}
-    a.tracks.first.album.should be_a_kind_of(EagerAlbum)
-    a.tracks.first.album.should == a
+    a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
+    a.first.tracks.first.album.should == a.first
     MODEL_DB.sqls.should == []
   end
 
   it "should cache the negative lookup when eagerly loading a many_to_one association" do
     a = EagerAlbum.eager(:band).filter(:id=>101).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerAlbum)
-    a.first.values.should == {:id => 101, :band_id => 101}
+    a.should == [EagerAlbum.load(:id => 101, :band_id => 101)]
     MODEL_DB.sqls.should == ['SELECT * FROM albums WHERE (id = 101)', 'SELECT * FROM bands WHERE (bands.id IN (101))']
-    a = a.first
-    a.associations.fetch(:band, 2).should == nil
-    a.band.should == nil
+    a.first.associations.fetch(:band, 2).should be_nil
+    a.first.band.should be_nil
     MODEL_DB.sqls.should == []
   end
   
   it "should cache the negative lookup when eagerly loading a *_to_many associations" do
     a = EagerBand.eager(:albums).filter('id > 100').all
-    a.should be_a_kind_of(Array)
-    a.size.should == 2
-    a.first.should be_a_kind_of(EagerBand)
-    a.first.values.should == {:id => 101}
-    a.last.values.should == {:id => 102}
+    a.should == [EagerBand.load(:id => 101), EagerBand.load(:id =>102)]
     MODEL_DB.sqls.should == ['SELECT * FROM bands WHERE (id > 100)', 'SELECT * FROM albums WHERE (albums.band_id IN (101, 102))', "SELECT * FROM tracks WHERE (tracks.album_id IN (101))"]
-    a.first.associations[:albums].should be_a_kind_of(Array)
-    a.first.albums.length.should == 1
-    a.first.albums.first.should be_a_kind_of(EagerAlbum)
-    a.last.associations[:albums].should == []
-    a.last.albums.should == []
+    a.map{|b| b.associations[:albums]}.should == [[EagerAlbum.load({:band_id=>101, :id=>101})], []]
     MODEL_DB.sqls.should == []
   end
   
@@ -471,7 +352,6 @@ describe Sequel::Model, "#eager" do
   it "should use the eager_block option when eager loading if given" do
     EagerBand.eager(:good_albums).all
     MODEL_DB.sqls.should == ['SELECT * FROM bands', "SELECT * FROM albums WHERE ((albums.band_id IN (2)) AND (name = 'good'))"]
-    MODEL_DB.sqls.clear
     EagerBand.eager(:good_albums=>:good_tracks).all
     MODEL_DB.sqls.should == ['SELECT * FROM bands', "SELECT * FROM albums WHERE ((albums.band_id IN (2)) AND (name = 'good'))", "SELECT * FROM tracks WHERE ((tracks.album_id IN (1)) AND (name = 'Good'))"]
   end
@@ -484,10 +364,8 @@ describe Sequel::Model, "#eager" do
   it "should respect the association's :select option" do
     EagerAlbum.eager(:band_name).all
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT id, name FROM bands WHERE (bands.id IN (2))"]
-    MODEL_DB.sqls.clear
     EagerAlbum.eager(:track_names).all
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT id, name FROM tracks WHERE (tracks.album_id IN (1))"]
-    MODEL_DB.sqls.clear
     EagerAlbum.eager(:genre_names).all
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT id, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
   end
@@ -498,6 +376,7 @@ describe Sequel::Model, "#eager" do
     as = EagerAlbum.eager(:special_band).all
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM bands WHERE (id IN (2))"]
     as.map{|a| a.special_band}.should == [EagerBand.load(:id=>2)]
+    MODEL_DB.sqls.should == []
   end
 
   it "should respect the association's :primary_key option" do
@@ -669,27 +548,16 @@ describe Sequel::Model, "#eager" do
       records.each{|r| r.associations[:special_genres] = items}
     end)
     a = EagerAlbum.eager(:special_genres, :special_tracks, :special_band).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     sqls = MODEL_DB.sqls
-    sqls.length.should == 4
-    sqls[0].should == 'SELECT * FROM albums'
-    sqls[1..-1].should(include('SELECT * FROM bands WHERE (album_id IN (1, 2)) ORDER BY name LIMIT 1'))
-    sqls[1..-1].should(include('SELECT * FROM tracks WHERE (album_id IN (1, 2))'))
-    sqls[1..-1].should(include('SELECT * FROM genres INNER JOIN ag USING (genre_id) WHERE (album_id IN (1))'))
+    sqls.shift.should == 'SELECT * FROM albums'
+    sqls.sort.should == ['SELECT * FROM bands WHERE (album_id IN (1, 2)) ORDER BY name LIMIT 1',
+      'SELECT * FROM genres INNER JOIN ag USING (genre_id) WHERE (album_id IN (1))',
+      'SELECT * FROM tracks WHERE (album_id IN (1, 2))']
     a = a.first
-    a.special_band.should be_a_kind_of(EagerBand)
-    a.special_band.values.should == {:id => 2}
-    a.special_tracks.should be_a_kind_of(Array)
-    a.special_tracks.size.should == 1
-    a.special_tracks.first.should be_a_kind_of(EagerTrack)
-    a.special_tracks.first.values.should == {:id => 3, :album_id=>1}
-    a.special_genres.should be_a_kind_of(Array)
-    a.special_genres.size.should == 1
-    a.special_genres.first.should be_a_kind_of(EagerGenre)
-    a.special_genres.first.values.should == {:id => 4}
+    a.special_band.should == EagerBand.load(:id => 2)
+    a.special_tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
+    a.special_genres.should == [EagerGenre.load(:id => 4)]
     MODEL_DB.sqls.should == []
   end
 
@@ -727,14 +595,9 @@ describe Sequel::Model, "#eager" do
 
   it "should eagerly load a many_to_one association with custom eager block" do
     a = EagerAlbum.eager(:band => proc {|ds| ds.select(:id, :name)}).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT id, name FROM bands WHERE (bands.id IN (2))']
-    a = a.first
-    a.band.should be_a_kind_of(EagerBand)
-    a.band.values.should == {:id => 2}
+    a.first.band.should == EagerBand.load(:id => 2)
     MODEL_DB.sqls.should == []
   end
 
@@ -749,114 +612,72 @@ describe Sequel::Model, "#eager" do
 
   it "should eagerly load a one_to_many association with custom eager block" do
     a = EagerAlbum.eager(:tracks => proc {|ds| ds.select(:id)}).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT id FROM tracks WHERE (tracks.album_id IN (1))']
-    a = a.first
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(EagerTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id=>1}
+    a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
     MODEL_DB.sqls.should == []
   end
 
   it "should eagerly load a many_to_many association with custom eager block" do
     a = EagerAlbum.eager(:genres => proc {|ds| ds.select(:name)}).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT name, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
-    a = a.first
-    a.genres.should be_a_kind_of(Array)
-    a.genres.size.should == 1
-    a.genres.first.should be_a_kind_of(EagerGenre)
-    a.genres.first.values.should == {:id => 4}
+    a.first.genres.should == [EagerGenre.load(:id => 4)]
     MODEL_DB.sqls.should == []
   end
 
   it "should allow cascading of eager loading within a custom eager block" do
     a = EagerTrack.eager(:album => proc {|ds| ds.eager(:band => :members)}).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerTrack)
-    a.first.values.should == {:id => 3, :album_id => 1}
+    a.should == [EagerTrack.load(:id => 3, :album_id => 1)]
     MODEL_DB.sqls.should == ['SELECT * FROM tracks',
       'SELECT * FROM albums WHERE (albums.id IN (1))',
       'SELECT * FROM bands WHERE (bands.id IN (2))',
       "SELECT members.*, bm.band_id AS x_foreign_key_x FROM members INNER JOIN bm ON ((bm.member_id = members.id) AND (bm.band_id IN (2)))"]
     a = a.first
-    a.album.should be_a_kind_of(EagerAlbum)
-    a.album.values.should == {:id => 1, :band_id => 2}
-    a.album.band.should be_a_kind_of(EagerBand)
-    a.album.band.values.should == {:id => 2}
-    a.album.band.members.should be_a_kind_of(Array)
-    a.album.band.members.size.should == 1
-    a.album.band.members.first.should be_a_kind_of(EagerBandMember)
-    a.album.band.members.first.values.should == {:id => 5}
+    a.album.should == EagerAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.should == EagerBand.load(:id => 2)
+    a.album.band.members.should == [EagerBandMember.load(:id => 5)]
     MODEL_DB.sqls.should == []
   end
 
   it "should allow cascading of eager loading with custom callback with hash value" do
     a = EagerTrack.eager(:album=>{proc{|ds| ds.select(:id, :band_id)}=>{:band => :members}}).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerTrack)
-    a.first.values.should == {:id => 3, :album_id => 1}
+    a.should == [EagerTrack.load(:id => 3, :album_id => 1)]
     MODEL_DB.sqls.should == ['SELECT * FROM tracks',
       'SELECT id, band_id FROM albums WHERE (albums.id IN (1))',
       'SELECT * FROM bands WHERE (bands.id IN (2))',
       "SELECT members.*, bm.band_id AS x_foreign_key_x FROM members INNER JOIN bm ON ((bm.member_id = members.id) AND (bm.band_id IN (2)))"]
     a = a.first
-    a.album.should be_a_kind_of(EagerAlbum)
-    a.album.values.should == {:id => 1, :band_id => 2}
-    a.album.band.should be_a_kind_of(EagerBand)
-    a.album.band.values.should == {:id => 2}
-    a.album.band.members.should be_a_kind_of(Array)
-    a.album.band.members.size.should == 1
-    a.album.band.members.first.should be_a_kind_of(EagerBandMember)
-    a.album.band.members.first.values.should == {:id => 5}
+    a.album.should == EagerAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.should == EagerBand.load(:id => 2)
+    a.album.band.members.should == [EagerBandMember.load(:id => 5)]
     MODEL_DB.sqls.should == []
   end
 
   it "should allow cascading of eager loading with custom callback with symbol value" do
     a = EagerTrack.eager(:album=>{proc{|ds| ds.select(:id, :band_id)}=>:band}).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerTrack)
-    a.first.values.should == {:id => 3, :album_id => 1}
+    a.should == [EagerTrack.load(:id => 3, :album_id => 1)]
     MODEL_DB.sqls.should == ['SELECT * FROM tracks',
       'SELECT id, band_id FROM albums WHERE (albums.id IN (1))',
       'SELECT * FROM bands WHERE (bands.id IN (2))']
     a = a.first
-    a.album.should be_a_kind_of(EagerAlbum)
-    a.album.values.should == {:id => 1, :band_id => 2}
-    a.album.band.should be_a_kind_of(EagerBand)
-    a.album.band.values.should == {:id => 2}
+    a.album.should == EagerAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.should == EagerBand.load(:id => 2)
     MODEL_DB.sqls.should == []
   end
 
   it "should allow cascading of eager loading with custom callback with array value" do
     a = EagerTrack.eager(:album=>{proc{|ds| ds.select(:id, :band_id)}=>[:band, :band_name]}).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerTrack)
-    a.first.values.should == {:id => 3, :album_id => 1}
+    a.should == [EagerTrack.load(:id => 3, :album_id => 1)]
     sqls = MODEL_DB.sqls
-    sqls.length.should == 4
-    sqls[0..1].should == ['SELECT * FROM tracks',
+    sqls.slice!(0..1).should == ['SELECT * FROM tracks',
       'SELECT id, band_id FROM albums WHERE (albums.id IN (1))']
-    sqls[2..-1].sort.should == ['SELECT * FROM bands WHERE (bands.id IN (2))',
+    sqls.sort.should == ['SELECT * FROM bands WHERE (bands.id IN (2))',
       'SELECT id, name FROM bands WHERE (bands.id IN (2))']
     a = a.first
-    a.album.should be_a_kind_of(EagerAlbum)
-    a.album.values.should == {:id => 1, :band_id => 2}
-    a.album.band.should be_a_kind_of(EagerBand)
-    a.album.band.values.should == {:id => 2}
-    a.album.band_name.should be_a_kind_of(EagerBand)
-    a.album.band_name.values.should == {:id => 2}
+    a.album.should == EagerAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.should == EagerBand.load(:id => 2)
+    a.album.band_name.should == EagerBand.load(:id => 2)
     MODEL_DB.sqls.should == []
   end
 
