@@ -49,7 +49,7 @@ module Sequel
     #   DB[:table].all{|row| p row}
     def all(&block)
       a = []
-      each{|r| a << r}
+      _each{|r| a << r}
       post_load(a)
       a.each(&block) if block
       a
@@ -122,12 +122,10 @@ module Sequel
     # running queries inside the block, you should use +all+ instead of +each+
     # for the outer queries, or use a separate thread or shard inside +each+:
     def each(&block)
-      if @opts[:graph]
-        graph_each(&block)
-      elsif row_proc = @row_proc
-        fetch_rows(select_sql){|r| yield row_proc.call(r)}
-      else
-        fetch_rows(select_sql, &block)
+      _each do |r|
+        a = [r]
+        post_load(a)
+        a.each(&block)
       end
       self
     end
@@ -611,7 +609,18 @@ module Sequel
     end
   
     private
-    
+
+    # Internal method used by +each+ and +all+
+    def _each(&block)
+      if @opts[:graph]
+        graph_each(&block)
+      elsif row_proc = @row_proc
+        fetch_rows(select_sql){|r| yield row_proc.call(r)}
+      else
+        fetch_rows(select_sql, &block)
+      end
+    end
+
     # Internals of +select_map+ and +select_order_map+
     def _select_map(column, order, &block)
       ds = naked.ungraphed

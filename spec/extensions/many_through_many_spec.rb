@@ -880,8 +880,11 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     MODEL_DB.sqls.length.should == 1
   end
 
-  it "eager graphing should give you a plain hash when called without .all" do 
-    @c1.eager_graph(:tags, :artists).first.should == {:albums_0_id=>3, :artists_0_id=>10, :id=>1, :tags_id=>2}
+  it "eager graphing should give you model instances when called without .all" do
+    a = @c1.eager_graph(:tags, :artists).first
+    a.should == @c1.load(:id=>1)
+    a.tags.should == [Tag.load(:id=>2)]
+    a.artists.should == [@c1.load(:id=>10)]
   end
 
   it "should be able to use eager and eager_graph together" do
