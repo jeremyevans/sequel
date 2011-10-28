@@ -1118,11 +1118,13 @@ describe Sequel::Model, "#eager_graph" do
     a.members.first.values.should == {:id => 5}
   end
 
-  it "should give you a plain hash when called without .all" do 
+  it "should give you model instances when called without .all" do
     ds = GraphAlbum.eager_graph(:band)
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
     ds._fetch = {:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>3}
-    ds.first.should == {:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>3}
+    ds.first.should be_a_kind_of(GraphAlbum)
+    ds.first.values.should == {:id=>1, :band_id=>2}
+    ds.first.band.values.should == {:id=>2, :vocalist_id=>3}
   end
 
   it "should not drop any associated objects if the graph could not be a cartesian product" do
