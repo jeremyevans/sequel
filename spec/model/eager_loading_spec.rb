@@ -745,13 +745,8 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
     ds._fetch = {:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>3}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
-    a = a.first
-    a.band.should be_a_kind_of(GraphBand)
-    a.band.values.should == {:id => 2, :vocalist_id=>3}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.band.should == GraphBand.load(:id => 2, :vocalist_id=>3)
   end
   
   it "should eagerly load a single one_to_one association" do
@@ -769,15 +764,8 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)'
     ds._fetch = {:id=>1, :band_id=>2, :tracks_id=>3, :album_id=>1}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
-    a = a.first
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(GraphTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id=>1}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.tracks.should == [GraphTrack.load(:id => 3, :album_id=>1)]
   end
 
   it "should eagerly load a single many_to_many association" do
@@ -785,15 +773,8 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id)'
     ds._fetch = {:id=>1, :band_id=>2, :genres_id=>4}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
-    a = a.first
-    a.genres.should be_a_kind_of(Array)
-    a.genres.size.should == 1
-    a.genres.first.should be_a_kind_of(GraphGenre)
-    a.genres.first.values.should == {:id => 4}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.genres.should == [GraphGenre.load(:id => 4)]
   end
 
   it "should correctly handle an aliased join table in many_to_many" do
@@ -813,21 +794,11 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id, tracks.id AS tracks_id, tracks.album_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
     ds._fetch = {:id=>1, :band_id=>2, :genres_id=>4, :tracks_id=>3, :album_id=>1, :band_id_0=>2, :vocalist_id=>6}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
     a = a.first
-    a.band.should be_a_kind_of(GraphBand)
-    a.band.values.should == {:id => 2, :vocalist_id=>6}
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(GraphTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id=>1}
-    a.genres.should be_a_kind_of(Array)
-    a.genres.size.should == 1
-    a.genres.first.should be_a_kind_of(GraphGenre)
-    a.genres.first.values.should == {:id => 4}
+    a.band.should == GraphBand.load(:id => 2, :vocalist_id=>6)
+    a.tracks.should == [GraphTrack.load({:id => 3, :album_id=>1})]
+    a.genres.should == [GraphGenre.load(:id => 4)]
   end
 
   it "should eagerly load multiple associations in separate calls" do 
@@ -835,21 +806,11 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id, tracks.id AS tracks_id, tracks.album_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
     ds._fetch = {:id=>1, :band_id=>2, :genres_id=>4, :tracks_id=>3, :album_id=>1, :band_id_0=>2, :vocalist_id=>6}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
     a = a.first
-    a.band.should be_a_kind_of(GraphBand)
-    a.band.values.should == {:id => 2, :vocalist_id=>6}
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(GraphTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id=>1}
-    a.genres.should be_a_kind_of(Array)
-    a.genres.size.should == 1
-    a.genres.first.should be_a_kind_of(GraphGenre)
-    a.genres.first.values.should == {:id => 4}
+    a.band.should == GraphBand.load(:id => 2, :vocalist_id=>6)
+    a.tracks.should == [GraphTrack.load({:id => 3, :album_id=>1})]
+    a.genres.should == [GraphGenre.load(:id => 4)]
   end
 
   it "should allow cascading of eager loading for associations of associated models" do
@@ -857,19 +818,11 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT tracks.id, tracks.album_id, album.id AS album_id_0, album.band_id, band.id AS band_id_0, band.vocalist_id, members.id AS members_id FROM tracks LEFT OUTER JOIN albums AS album ON (album.id = tracks.album_id) LEFT OUTER JOIN bands AS band ON (band.id = album.band_id) LEFT OUTER JOIN bm ON (bm.band_id = band.id) LEFT OUTER JOIN members ON (members.id = bm.member_id)'
     ds._fetch = {:id=>3, :album_id=>1, :album_id_0=>1, :band_id=>2, :members_id=>5, :band_id_0=>2, :vocalist_id=>6}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphTrack)
-    a.first.values.should == {:id => 3, :album_id => 1}
+    a.should == [GraphTrack.load(:id => 3, :album_id => 1)]
     a = a.first
-    a.album.should be_a_kind_of(GraphAlbum)
-    a.album.values.should == {:id => 1, :band_id => 2}
-    a.album.band.should be_a_kind_of(GraphBand)
-    a.album.band.values.should == {:id => 2, :vocalist_id=>6}
-    a.album.band.members.should be_a_kind_of(Array)
-    a.album.band.members.size.should == 1
-    a.album.band.members.first.should be_a_kind_of(GraphBandMember)
-    a.album.band.members.first.values.should == {:id => 5}
+    a.album.should == GraphAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.should == GraphBand.load(:id => 2, :vocalist_id=>6)
+    a.album.band.members.should == [GraphBandMember.load(:id => 5)]
   end
   
   it "should allow cascading of eager loading for multiple *_to_many associations, eliminating duplicates caused by cartesian products" do
@@ -907,18 +860,11 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)'
     ds._fetch = {:id=>1, :band_id=>2, :tracks_id=>3, :album_id=>1}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
     a = a.first
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(GraphTrack)
-    a.tracks.first.values.should == {:id => 3, :album_id=>1}
-    a.tracks.first.album.should be_a_kind_of(GraphAlbum)
+    a.tracks.should == [GraphTrack.load(:id => 3, :album_id=>1)]
     a.tracks.first.album.should == a
-    MODEL_DB.sqls.length.should == 1
+    MODEL_DB.sqls.should == ['SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)']
   end
 
   it "should eager load multiple associations from the same table" do
@@ -926,17 +872,10 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT bands.id, bands.vocalist_id, vocalist.id AS vocalist_id_0, members.id AS members_id FROM bands LEFT OUTER JOIN members AS vocalist ON (vocalist.id = bands.vocalist_id) LEFT OUTER JOIN bm ON (bm.band_id = bands.id) LEFT OUTER JOIN members ON (members.id = bm.member_id)'
     ds._fetch = {:id=>2, :vocalist_id=>6, :vocalist_id_0=>6, :members_id=>5}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphBand)
-    a.first.values.should == {:id => 2, :vocalist_id => 6}
+    a.should == [GraphBand.load(:id => 2, :vocalist_id => 6)]
     a = a.first
-    a.vocalist.should be_a_kind_of(GraphBandMember)
-    a.vocalist.values.should == {:id => 6}
-    a.members.should be_a_kind_of(Array)
-    a.members.size.should == 1
-    a.members.first.should be_a_kind_of(GraphBandMember)
-    a.members.first.values.should == {:id => 5}
+    a.vocalist.should == GraphBandMember.load(:id => 6)
+    a.members.should == [GraphBandMember.load(:id => 5)]
   end
 
   it "should give you a plain hash when called without .all" do 
@@ -951,19 +890,10 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT bands.id, bands.vocalist_id, members.id AS members_id, vocalist.id AS vocalist_id_0 FROM bands LEFT OUTER JOIN bm ON (bm.band_id = bands.id) LEFT OUTER JOIN members ON (members.id = bm.member_id) LEFT OUTER JOIN members AS vocalist ON (vocalist.id = bands.vocalist_id)'
     ds._fetch = [{:id=>2, :vocalist_id=>6, :members_id=>5, :vocalist_id_0=>6}, {:id=>2, :vocalist_id=>6, :members_id=>5, :vocalist_id_0=>6}]
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphBand)
-    a.first.values.should == {:id => 2, :vocalist_id => 6}
+    a.should == [GraphBand.load(:id => 2, :vocalist_id => 6)]
     a = a.first
-    a.vocalist.should be_a_kind_of(GraphBandMember)
-    a.vocalist.values.should == {:id => 6}
-    a.members.should be_a_kind_of(Array)
-    a.members.size.should == 2
-    a.members.first.should be_a_kind_of(GraphBandMember)
-    a.members.first.values.should == {:id => 5}
-    a.members.last.should be_a_kind_of(GraphBandMember)
-    a.members.last.values.should == {:id => 5}
+    a.vocalist.should == GraphBandMember.load(:id => 6)
+    a.members.should == [GraphBandMember.load(:id => 5), GraphBandMember.load(:id => 5)]
   end
 
   it "should respect the :cartesian_product_number option" do 
@@ -985,22 +915,10 @@ describe Sequel::Model, "#eager_graph" do
       {:id=>2, :vocalist_id=>6, :members_id=>6, :genres_id=>7},
       {:id=>2, :vocalist_id=>6, :members_id=>6, :genres_id=>8}]
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphBand)
-    a.first.values.should == {:id => 2, :vocalist_id => 6}
+    a.should == [GraphBand.load(:id => 2, :vocalist_id => 6)]
     a = a.first
-    a.members.should be_a_kind_of(Array)
-    a.members.size.should == 2
-    a.members.first.should be_a_kind_of(GraphBandMember)
-    a.members.first.values.should == {:id => 5}
-    a.members.last.should be_a_kind_of(GraphBandMember)
-    a.members.last.values.should == {:id => 6}
-    a.genres.size.should == 2
-    a.genres.first.should be_a_kind_of(GraphGenre)
-    a.genres.first.values.should == {:id => 7}
-    a.genres.last.should be_a_kind_of(GraphGenre)
-    a.genres.last.values.should == {:id => 8}
+    a.members.should == [GraphBandMember.load(:id => 5), GraphBandMember.load(:id => 6)]
+    a.genres.should == [GraphGenre.load(:id => 7), GraphGenre.load(:id => 8)]
   end
 
   it "should be able to be used in combination with #eager" do
@@ -1010,19 +928,10 @@ describe Sequel::Model, "#eager_graph" do
     ds2 = GraphGenre.dataset
     ds2._fetch = {:id=>6, :x_foreign_key_x=>1}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
     a = a.first
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(GraphTrack)
-    a.tracks.first.values.should == {:id=>3, :album_id=>1}
-    a.genres.should be_a_kind_of(Array)
-    a.genres.size.should == 1
-    a.genres.first.should be_a_kind_of(GraphGenre)
-    a.genres.first.values.should == {:id=>6}
+    a.tracks.should == [GraphTrack.load(:id=>3, :album_id=>1)]
+    a.genres.should == [GraphGenre.load(:id => 6)]
     MODEL_DB.sqls.should == ['SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)',
     "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
   end
@@ -1032,11 +941,8 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
     ds._fetch = {:id=>1, :band_id=>2, :band_id_0=>nil, :vocalist_id=>nil}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
-    a.first.associations.fetch(:band, 2).should == nil
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.band.should == nil
   end
 
   it "should handle no associated records for a single one_to_many association" do
@@ -1044,10 +950,7 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)'
     ds._fetch = {:id=>1, :band_id=>2, :tracks_id=>nil, :album_id=>nil}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
     a.first.tracks.should == []
   end
 
@@ -1056,10 +959,7 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id)'
     ds._fetch = {:id=>1, :band_id=>2, :genres_id=>nil}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
     a.first.genres.should == []
   end
 
@@ -1071,16 +971,10 @@ describe Sequel::Model, "#eager_graph" do
       {:id=>1, :band_id=>2, :genres_id=>nil, :tracks_id=>5, :album_id=>1, :band_id_0=>nil, :vocalist_id=>nil},
       {:id=>1, :band_id=>2, :genres_id=>nil, :tracks_id=>6, :album_id=>1, :band_id_0=>nil, :vocalist_id=>nil}]
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
     a = a.first
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 4
-    a.tracks.first.should be_a_kind_of(GraphTrack)
-    a.tracks.collect{|x|x[:id]}.should == [3,4,5,6]
-    a.associations.fetch(:band, 2).should == nil
+    a.tracks.should == [GraphTrack.load(:id => 3, :album_id => 1), GraphTrack.load(:id => 4, :album_id => 1), GraphTrack.load(:id => 5, :album_id => 1), GraphTrack.load(:id => 6, :album_id => 1)]
+    a.band.should == nil
     a.genres.should == []
   end
 
@@ -1093,28 +987,10 @@ describe Sequel::Model, "#eager_graph" do
       {:id=>5, :album_id=>1, :album_id_0=>1, :band_id=>4, :members_id=>5, :band_id_0=>4, :vocalist_id=>8},
       {:id=>5, :album_id=>1, :album_id_0=>1, :band_id=>4, :members_id=>6, :band_id_0=>4, :vocalist_id=>8}]
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 4
-    a.first.should be_a_kind_of(GraphTrack)
-    a.collect{|x|x[:id]}.should == [2,3,4,5]
-    a[0].associations.fetch(:album, 2).should == nil
-    a[1].album.should be_a_kind_of(GraphAlbum)
-    a[1].album.values.should == {:id => 3, :band_id => 3}
-    a[1].album.associations.fetch(:band, 2).should == nil
-    a[2].album.should be_a_kind_of(GraphAlbum)
-    a[2].album.values.should == {:id => 4, :band_id => 2}
-    a[2].album.band.should be_a_kind_of(GraphBand)
-    a[2].album.band.values.should == {:id => 2, :vocalist_id=>6}
-    a[2].album.band.members.should == []
-    a[3].album.should be_a_kind_of(GraphAlbum)
-    a[3].album.values.should == {:id => 1, :band_id => 4}
-    a[3].album.band.should be_a_kind_of(GraphBand)
-    a[3].album.band.values.should == {:id => 4, :vocalist_id=>8}
-    a[3].album.band.members.size.should == 2
-    a[3].album.band.members.first.should be_a_kind_of(GraphBandMember)
-    a[3].album.band.members.first.values.should == {:id => 5}
-    a[3].album.band.members.last.should be_a_kind_of(GraphBandMember)
-    a[3].album.band.members.last.values.should == {:id => 6}
+    a.should == [GraphTrack.load(:id => 2, :album_id => 2), GraphTrack.load(:id => 3, :album_id => 3), GraphTrack.load(:id => 4, :album_id => 4), GraphTrack.load(:id => 5, :album_id => 1)]
+    a.map{|x| x.album}.should == [nil, GraphAlbum.load(:id => 3, :band_id => 3), GraphAlbum.load(:id => 4, :band_id => 2), GraphAlbum.load(:id => 1, :band_id => 4)]
+    a.map{|x| x.album.band if x.album}.should == [nil, nil, GraphBand.load(:id => 2, :vocalist_id=>6), GraphBand.load(:id => 4, :vocalist_id=>8)]
+    a.map{|x| x.album.band.members if x.album && x.album.band}.should == [nil, nil, [], [GraphBandMember.load(:id => 5), GraphBandMember.load(:id => 6)]]
   end
 
   it "should respect the association's :primary_key option" do 
@@ -1425,13 +1301,8 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0 FROM albums LEFT OUTER JOIN (SELECT id FROM bands) AS band ON (band.id = albums.band_id)'
     ds._fetch = {:id=>1, :band_id=>2, :band_id_0=>2}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
-    a = a.first
-    a.band.should be_a_kind_of(GraphBand)
-    a.band.values.should == {:id => 2}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.band.should == GraphBand.load(:id => 2)
   end
 
   it "should eagerly load a one_to_one association with a custom callback" do
@@ -1449,15 +1320,8 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, tracks.album_id FROM albums LEFT OUTER JOIN (SELECT album_id FROM tracks) AS tracks ON (tracks.album_id = albums.id)'
     ds._fetch = {:id=>1, :band_id=>2, :album_id=>1}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
-    a = a.first
-    a.tracks.should be_a_kind_of(Array)
-    a.tracks.size.should == 1
-    a.tracks.first.should be_a_kind_of(GraphTrack)
-    a.tracks.first.values.should == {:album_id=>1}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.tracks.should == [GraphTrack.load(:album_id=>1)]
   end
 
   it "should eagerly load a many_to_many association with a custom callback" do
@@ -1465,15 +1329,8 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN (SELECT id FROM genres) AS genres ON (genres.id = ag.genre_id)'
     ds._fetch = {:id=>1, :band_id=>2, :genres_id=>4}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphAlbum)
-    a.first.values.should == {:id => 1, :band_id => 2}
-    a = a.first
-    a.genres.should be_a_kind_of(Array)
-    a.genres.size.should == 1
-    a.genres.first.should be_a_kind_of(GraphGenre)
-    a.genres.first.values.should == {:id => 4}
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.genres.should == [GraphGenre.load(:id => 4)]
   end
 
   it "should allow cascading of eager loading with a custom callback with hash value" do
@@ -1481,19 +1338,11 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT tracks.id, tracks.album_id, album.id AS album_id_0, album.band_id, band.id AS band_id_0, band.vocalist_id, members.id AS members_id FROM tracks LEFT OUTER JOIN (SELECT id, band_id FROM albums) AS album ON (album.id = tracks.album_id) LEFT OUTER JOIN bands AS band ON (band.id = album.band_id) LEFT OUTER JOIN bm ON (bm.band_id = band.id) LEFT OUTER JOIN members ON (members.id = bm.member_id)'
     ds._fetch = {:id=>3, :album_id=>1, :album_id_0=>1, :band_id=>2, :members_id=>5, :band_id_0=>2, :vocalist_id=>6}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphTrack)
-    a.first.values.should == {:id => 3, :album_id => 1}
+    a.should == [GraphTrack.load(:id => 3, :album_id => 1)]
     a = a.first
-    a.album.should be_a_kind_of(GraphAlbum)
-    a.album.values.should == {:id => 1, :band_id => 2}
-    a.album.band.should be_a_kind_of(GraphBand)
-    a.album.band.values.should == {:id => 2, :vocalist_id=>6}
-    a.album.band.members.should be_a_kind_of(Array)
-    a.album.band.members.size.should == 1
-    a.album.band.members.first.should be_a_kind_of(GraphBandMember)
-    a.album.band.members.first.values.should == {:id => 5}
+    a.album.should == GraphAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.should == GraphBand.load(:id => 2, :vocalist_id=>6)
+    a.album.band.members.should == [GraphBandMember.load(:id => 5)]
   end
   
   it "should allow cascading of eager loading with a custom callback with array value" do
@@ -1501,19 +1350,10 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT tracks.id, tracks.album_id, album.id AS album_id_0, album.band_id, band.id AS band_id_0, band.vocalist_id, tracks_0.id AS tracks_0_id, tracks_0.album_id AS tracks_0_album_id FROM tracks LEFT OUTER JOIN (SELECT id, band_id FROM albums) AS album ON (album.id = tracks.album_id) LEFT OUTER JOIN bands AS band ON (band.id = album.band_id) LEFT OUTER JOIN tracks AS tracks_0 ON (tracks_0.album_id = album.id)'
     ds._fetch = {:id=>3, :album_id=>1, :album_id_0=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>6, :tracks_0_id=>3, :tracks_0_album_id=>1}
     a = ds.all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(GraphTrack)
-    a.first.values.should == {:id => 3, :album_id => 1}
+    a.should == [GraphTrack.load(:id => 3, :album_id => 1)]
     a = a.first
-    a.album.should be_a_kind_of(GraphAlbum)
-    a.album.values.should == {:id => 1, :band_id => 2}
-    a.album.band.should be_a_kind_of(GraphBand)
-    a.album.band.values.should == {:id => 2, :vocalist_id=>6}
-    a.album.tracks.should be_a_kind_of(Array)
-    a.album.tracks.size.should == 1
-    a.album.tracks.first.should be_a_kind_of(GraphTrack)
-    a.album.tracks.first.values.should == {:id => 3, :album_id => 1}
+    a.album.should == GraphAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.should == GraphBand.load(:id => 2, :vocalist_id=>6)
+    a.album.tracks.should == [GraphTrack.load(:id => 3, :album_id => 1)]
   end
-  
 end
