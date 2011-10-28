@@ -125,24 +125,21 @@ describe Sequel::Model, ".plugin" do
       def self.configure(model, *args, &block)
         @args << :configure
       end
-      im = Module.new do
+      self::InstanceMethods = Module.new do
         def self.included(model)
           model.plugins.last.args << :im
         end
       end
-      cm = Module.new do
+      self::ClassMethods = Module.new do
         def self.extended(model)
           model.plugins.last.args << :cm
         end
       end
-      dm = Module.new do
+      self::DatasetMethods = Module.new do
         def self.extended(dataset)
           dataset.model.plugins.last.args << :dm
         end
       end
-      const_set(:InstanceMethods, im)
-      const_set(:ClassMethods, cm)
-      const_set(:DatasetMethods, dm)
     end
     
     b = lambda{44}
@@ -192,11 +189,10 @@ describe Sequel::Model, ".plugin" do
 
   it "should define class methods for all public instance methods in DatasetMethod" do
     m = Module.new do
-      dm = Module.new do
+      self::DatasetMethods = Module.new do
         def a; 1; end
         def b; 2; end
       end
-      const_set(:DatasetMethods, dm)
     end
     @c.plugin m
     @c.dataset.a.should == 1
@@ -205,14 +201,13 @@ describe Sequel::Model, ".plugin" do
     @c.b.should == 2
   end
   
-  it "should define class methods for all public instance methods in DatasetMethod" do
+  it "should not define class methods for private instance methods in DatasetMethod" do
     m = Module.new do
-      dm = Module.new do
+      self::DatasetMethods = Module.new do
         def b; 2; end
         private
         def a; 1; end
       end
-      const_set(:DatasetMethods, dm)
     end
     @c.plugin m
     @c.dataset.b.should == 2
@@ -225,11 +220,10 @@ describe Sequel::Model, ".plugin" do
 
   it "should not raise an error if the DatasetMethod module has no public instance methods" do
     m = Module.new do
-      dm = Module.new do
+      self::DatasetMethods = Module.new do
         private
         def a; 1; end
       end
-      const_set(:DatasetMethods, dm)
     end
     lambda{@c.plugin m}.should_not raise_error
   end
