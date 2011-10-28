@@ -37,9 +37,12 @@ module Sequel
     attr_accessor :transaction_isolation_level
     
     # Runs the supplied SQL statement string on the database server.
-    # Alias for run.
+    # Returns self so it can be safely chained:
+    #
+    #   DB << "UPADTE albums SET artist_id = NULL" << "DROP TABLE artists"
     def <<(sql)
       run(sql)
+      self
     end
     
     # Call the prepared statement with the given name with the given hash

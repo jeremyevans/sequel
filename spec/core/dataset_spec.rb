@@ -2495,10 +2495,18 @@ describe "Dataset#set_row_proc" do
 end
 
 describe "Dataset#<<" do
+  before do
+    @db = Sequel.mock
+  end
+
   specify "should call #insert" do
-    db = Sequel.mock(:autoid=>1234567890)
-    (db[:items] << {:name => 1}).should == 1234567890
-    db.sqls.should == ['INSERT INTO items (name) VALUES (1)']
+    @db[:items] << {:name => 1}
+    @db.sqls.should == ['INSERT INTO items (name) VALUES (1)']
+  end
+
+  specify "should be chainable" do
+    @db[:items] << {:name => 1} << @db[:old_items].select(:name)
+    @db.sqls.should == ['INSERT INTO items (name) VALUES (1)', 'INSERT INTO items SELECT name FROM old_items']
   end
 end
 

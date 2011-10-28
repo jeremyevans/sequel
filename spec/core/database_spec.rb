@@ -463,7 +463,6 @@ end
 describe "Database#execute" do
   specify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.execute('blah blah')}.should raise_error(Sequel::NotImplemented)
-    proc {Sequel::Database.new << 'blah blah'}.should raise_error(Sequel::NotImplemented)
   end
 end
 
@@ -485,26 +484,39 @@ describe "Database#indexes" do
   end
 end
 
-describe "Database#<< and run" do
+describe "Database#run" do
   before do
     @db = Sequel.mock(:servers=>{:s1=>{}})
   end
   
   specify "should execute the code on the database" do
-    (@db << "DELETE FROM items")
+    @db.run("DELETE FROM items")
     @db.sqls.should == ["DELETE FROM items"]
-    @db.run("DELETE FROM items2")
-    @db.sqls.should == ["DELETE FROM items2"]
   end
   
   specify "should return nil" do
-    (@db << "DELETE FROM items").should be_nil
     @db.run("DELETE FROM items").should be_nil
   end
   
   specify "should accept options passed to execute_ddl" do
     @db.run("DELETE FROM items", :server=>:s1)
     @db.sqls.should == ["DELETE FROM items -- s1"]
+  end
+end
+
+describe "Database#<<" do
+  before do
+    @db = Sequel.mock
+  end
+
+  specify "should execute the code on the database" do
+    @db << "DELETE FROM items"
+    @db.sqls.should == ["DELETE FROM items"]
+  end
+  
+  specify "should be chainable" do
+    @db << "DELETE FROM items" << "DELETE FROM items2"
+    @db.sqls.should == ["DELETE FROM items", "DELETE FROM items2"]
   end
 end
 

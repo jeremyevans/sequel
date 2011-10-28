@@ -1,5 +1,7 @@
 === HEAD
 
+* Database#<< and Dataset#<< now return self so they can be safely chained (jeremyevans)
+
 * Fully support using an aliased table name as the :join_table option for a many_to_many association (jeremyevans)
 
 * Make like case sensitive on SQLite and Microsoft SQL Server (use ilike for case insensitive matching) (jeremyevans)

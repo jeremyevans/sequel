@@ -15,10 +15,13 @@ module Sequel
       set single_record single_value sum to_csv to_hash truncate update
     METHS
 
-    # Alias for insert, but not aliased directly so subclasses
-    # don't have to override both methods.
-    def <<(*args)
-      insert(*args)
+    # Inserts the given argument into the database.  Returns self so it
+    # can be used safely when chaining:
+    # 
+    #   DB[:items] << {:id=>0, :name=>'Zero'} << DB[:old_items].select(:id, name)
+    def <<(arg)
+      insert(arg)
+      self
     end
     
     # Returns the first record matching the conditions. Examples:
