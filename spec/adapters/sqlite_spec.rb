@@ -425,14 +425,15 @@ describe "A SQLite database" do
   specify "should choose a temporary table name that isn't already used when dropping or renaming columns" do
     sqls = []
     @db.loggers << (l=Class.new{%w'info error'.each{|m| define_method(m){|sql| sqls << sql}}}.new)
-    @db.create_table! :test3 do
+    @db.tables.each{|t| @db.drop_table(t) if t.to_s =~ /test3/}
+    @db.create_table :test3 do
       Integer :h
       Integer :i
     end
-    @db.create_table! :test3_backup0 do
+    @db.create_table :test3_backup0 do
       Integer :j
     end
-    @db.create_table! :test3_backup1 do
+    @db.create_table :test3_backup1 do
       Integer :k
     end
 
@@ -447,7 +448,7 @@ describe "A SQLite database" do
     @db[:test3_backup0].columns.should == [:j]
     @db[:test3_backup1].columns.should == [:k]
 
-    @db.create_table! :test3_backup2 do
+    @db.create_table :test3_backup2 do
       Integer :l
     end
 
