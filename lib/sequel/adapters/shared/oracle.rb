@@ -225,16 +225,6 @@ module Sequel
         db[:dual].where(unordered.exists).get(1) == nil
       end
 
-      # If this dataset is associated with a sequence, return the most recently
-      # inserted sequence value.
-      def insert(*values)
-        if opts[:sql]
-          super
-        else
-          execute_insert(insert_sql(*values), :table=>opts[:from].first, :sequence=>opts[:sequence])
-        end
-      end
-
       # Oracle requires SQL standard datetimes
       def requires_sql_standard_datetimes?
         true
@@ -306,6 +296,12 @@ module Sequel
       # The strftime format to use when literalizing the time.
       def default_timestamp_format
         "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'".freeze
+      end
+
+      # If this dataset is associated with a sequence, return the most recently
+      # inserted sequence value.
+      def execute_insert(sql, opts={})
+        super(sql, {:table=>@opts[:from].first, :sequence=>@opts[:sequence]}.merge(opts))
       end
 
       # Use a colon for the timestamp offset, since Oracle appears to require it.
