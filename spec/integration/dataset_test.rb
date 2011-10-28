@@ -34,6 +34,11 @@ describe "Simple Dataset operations" do
     @ds.filter(:id=>2).first[:number].should == 20
   end
 
+  specify "should have insert work correctly with static SQL" do
+    @db["INSERT INTO #{@ds.literal(:items)} (#{@ds.literal(:number)}) VALUES (20)"].insert
+    @ds.filter(:id=>2).first[:number].should == 20
+  end
+
   specify "should join correctly" do
     @ds.join(:items___b, :id=>:id).select_all(:items).all.should == [{:id=>1, :number=>10}]
   end
