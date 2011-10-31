@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Model.dataset_module to take a Module instance (jeremyevans)
+
 * Apply Model.[] optimization in more cases (jeremyevans)
 
 * Fix Model.[] optimization when dataset uses identifier_input_method different than database (jeremyevans)

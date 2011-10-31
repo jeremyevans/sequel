@@ -160,9 +160,13 @@ module Sequel
         set_dataset(ds)
       end
 
-      # Extend the dataset with an anonymous module, similar to adding
+      # Extend the dataset with a module, similar to adding
       # a plugin with the methods defined in DatasetMethods.  If a block
-      # is given, it is module_evaled.
+      # is given, an anonymous module is created and the module_evaled, otherwise
+      # the argument should be a module.  Returns the module given or the anonymous
+      # module created.
+      #
+      #   Artist.dataset_module Sequel::ColumnsIntrospection
       #
       #   Artist.dataset_module do
       #     def foo
@@ -173,11 +177,17 @@ module Sequel
       #   # => :bar
       #   Artist.foo
       #   # => :bar
-      def dataset_module
-        @dataset_module ||= Module.new
-        @dataset_module.module_eval(&Proc.new) if block_given?
-        dataset_extend(@dataset_module)
-        @dataset_module
+      def dataset_module(mod = nil)
+        if mod
+          raise Error, "can't provide both argument and block to Model.dataset_module" if block_given?
+          dataset_extend(mod)
+          mod
+        else
+          @dataset_module ||= Module.new
+          @dataset_module.module_eval(&Proc.new) if block_given?
+          dataset_extend(@dataset_module)
+          @dataset_module
+        end
       end
     
       # Returns the database associated with the Model class.

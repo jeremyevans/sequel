@@ -86,17 +86,13 @@ describe Sequel::Model, ".def_dataset_method" do
   end
   
   it "should add a method to the dataset and model if called with a block argument" do
-    @c.instance_eval do
-      def_dataset_method(:return_3){3}
-    end
+    @c.def_dataset_method(:return_3){3}
     @c.return_3.should == 3
     @c.dataset.return_3.should == 3
   end
 
   it "should handle weird method names" do
-    @c.instance_eval do
-      def_dataset_method(:"return 3"){3}
-    end
+    @c.def_dataset_method(:"return 3"){3}
     @c.send(:"return 3").should == 3
     @c.dataset.send(:"return 3").should == 3
   end
@@ -123,9 +119,7 @@ describe Sequel::Model, ".def_dataset_method" do
   end
 
   it "should add all passed methods to the model if called without a block argument" do
-    @c.instance_eval do
-      def_dataset_method(:return_3, :return_4)
-    end
+    @c.def_dataset_method(:return_3, :return_4)
     proc{@c.return_3}.should raise_error(NoMethodError)
     proc{@c.return_4}.should raise_error(NoMethodError)
     @c.dataset.instance_eval do
@@ -137,18 +131,14 @@ describe Sequel::Model, ".def_dataset_method" do
   end
 
   it "should cache calls and readd methods if set_dataset is used" do
-    @c.instance_eval do
-      def_dataset_method(:return_3){3}
-    end
+    @c.def_dataset_method(:return_3){3}
     @c.set_dataset :items
     @c.return_3.should == 3
     @c.dataset.return_3.should == 3
   end
 
   it "should readd methods to subclasses, if set_dataset is used in a subclass" do
-    @c.instance_eval do
-      def_dataset_method(:return_3){3}
-    end
+    @c.def_dataset_method(:return_3){3}
     c = Class.new(@c)
     c.set_dataset :items
     c.return_3.should == 3
@@ -162,24 +152,24 @@ describe Sequel::Model, ".dataset_module" do
   end
   
   it "should extend the dataset with the module if the model has a dataset" do
-    @c.instance_eval{dataset_module{def return_3() 3 end}}
+    @c.dataset_module{def return_3() 3 end}
     @c.dataset.return_3.should == 3
   end
 
   it "should add methods defined in the module to the class" do
-    @c.instance_eval{dataset_module{def return_3() 3 end}}
+    @c.dataset_module{def return_3() 3 end}
     @c.return_3.should == 3
   end
 
   it "should cache calls and readd methods if set_dataset is used" do
-    @c.instance_eval{dataset_module{def return_3() 3 end}}
+    @c.dataset_module{def return_3() 3 end}
     @c.set_dataset :items
     @c.return_3.should == 3
     @c.dataset.return_3.should == 3
   end
 
   it "should readd methods to subclasses, if set_dataset is used in a subclass" do
-    @c.instance_eval{dataset_module{def return_3() 3 end}}
+    @c.dataset_module{def return_3() 3 end}
     c = Class.new(@c)
     c.set_dataset :items
     c.return_3.should == 3
@@ -187,16 +177,56 @@ describe Sequel::Model, ".dataset_module" do
   end
 
   it "should only have a single dataset_module per class" do
-    @c.instance_eval{dataset_module{def return_3() 3 end}}
-    @c.instance_eval{dataset_module{def return_3() 3 + (begin; super; rescue NoMethodError; 1; end) end}}
+    @c.dataset_module{def return_3() 3 end}
+    @c.dataset_module{def return_3() 3 + (begin; super; rescue NoMethodError; 1; end) end}
     @c.return_3.should == 4
   end
 
   it "should not have subclasses share the dataset_module" do
-    @c.instance_eval{dataset_module{def return_3() 3 end}}
+    @c.dataset_module{def return_3() 3 end}
     c = Class.new(@c)
-    c.instance_eval{dataset_module{def return_3() 3 + (begin; super; rescue NoMethodError; 1; end) end}}
+    c.dataset_module{def return_3() 3 + (begin; super; rescue NoMethodError; 1; end) end}
     c.return_3.should == 6
+  end
+
+  it "should accept a module object and extend the dataset with it" do
+    @c.dataset_module Module.new{def return_3() 3 end}
+    @c.dataset.return_3.should == 3
+  end
+
+  it "should be able to call dataset_module with a module multiple times" do
+    @c.dataset_module Module.new{def return_3() 3 end}
+    @c.dataset_module Module.new{def return_4() 4 end}
+    @c.dataset.return_3.should == 3
+    @c.dataset.return_4.should == 4
+  end
+
+  it "should be able mix dataset_module calls with and without arguments" do
+    @c.dataset_module{def return_3() 3 end}
+    @c.dataset_module Module.new{def return_4() 4 end}
+    @c.dataset.return_3.should == 3
+    @c.dataset.return_4.should == 4
+  end
+
+  it "should have modules provided to dataset_module extend subclass datasets" do
+    @c.dataset_module{def return_3() 3 end}
+    @c.dataset_module Module.new{def return_4() 4 end}
+    c = Class.new(@c)
+    c.set_dataset :a
+    c.dataset.return_3.should == 3
+    c.dataset.return_4.should == 4
+  end
+
+  it "should return the dataset module if given a block" do
+    Object.new.extend(@c.dataset_module{def return_3() 3 end}).return_3.should == 3
+  end
+
+  it "should return the argument if given one" do
+    Object.new.extend(@c.dataset_module Module.new{def return_3() 3 end}).return_3.should == 3
+  end
+
+  it "should raise error if called with both an argument and ablock" do
+    proc{@c.dataset_module(Module.new{def return_3() 3 end}){}}.should raise_error(Sequel::Error)
   end
 end
 
