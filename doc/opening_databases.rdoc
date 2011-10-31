@@ -66,24 +66,24 @@ For example:
 
 These options are shared by all adapters unless otherwise noted.
 
-* :adapter - The adapter to use
-* :database - The name of the database to which to connect
-* :default_schema - The database schema to use by default.
-* :host - The hostname of the database server to which to connect
-* :logger - An array of SQL loggers to log to
-* :loggers - An array of SQL loggers to log to
-* :password - The password for the user account
-* :servers - A hash with symbol keys and hash or proc values, used with master/slave/partitioned database configurations
-* :single_threaded - Whether to use a single-threaded (non-thread safe) connection pool
-* :test - Whether to test that a valid database connection can be made (false by default)
-* :user - The user account name to use logging in
+:adapter :: The adapter to use
+:database :: The name of the database to which to connect
+:default_schema :: The database schema to use by default.
+:host :: The hostname of the database server to which to connect
+:logger :: An array of SQL loggers to log to
+:loggers :: An array of SQL loggers to log to
+:password :: The password for the user account
+:servers :: A hash with symbol keys and hash or proc values, used with master/slave/partitioned database configurations
+:single_threaded :: Whether to use a single-threaded (non-thread safe) connection pool
+:test :: Whether to test that a valid database connection can be made (false by default)
+:user :: The user account name to use logging in
 
 The following options can be specified and are passed to the the database's internal connection pool.
 
-* :after_connect - A proc called after a new connection is made, with the connection object (default: nil)
-* :max_connections - The maximum size of the connection pool (default: 4 connections on most databases)
-* :pool_sleep_time - The number of seconds to sleep before trying to acquire a connection again (default: 0.001 seconds)
-* :pool_timeout - The number of seconds to wait if a connection cannot be acquired before raising an error (default: 5 seconds)
+:after_connect :: A proc called after a new connection is made, with the connection object (default: nil)
+:max_connections :: The maximum size of the connection pool (default: 4 connections on most databases)
+:pool_sleep_time :: The number of seconds to sleep before trying to acquire a connection again (default: 0.001 seconds)
+:pool_timeout :: The number of seconds to wait if a connection cannot be acquired before raising an error (default: 5 seconds)
 
 == Adapter specific connection options
 
@@ -138,8 +138,8 @@ Amalgalite is an ruby extension that provides self contained access to SQLite,
 so you don't need to install SQLite separately.  As amalgalite is a file backed
 database, the :host, :user, and :password options are not used.
 
-* :database - The name of the database file
-* :timeout - The busy timeout period given in milliseconds
+:database :: The name of the database file
+:timeout :: The busy timeout period given in milliseconds
 
 Without a database argument, assumes a memory database, so you can do:
 
@@ -159,8 +159,8 @@ instead for new DB2 work, as it is better supported.
 
 Allows access to a multitude of databases via ruby-dbi.  Additional options:
 
-* :db_type - Specifying 'mssql' allows Microsoft SQL Server specific syntax to
-  be used.  Otherwise has no effect.
+:db_type :: Specifying 'mssql' allows Microsoft SQL Server specific syntax to
+            be used.  Otherwise has no effect.
 
 DBI connection strings are a preprocessed a bit, and are specified with a dbi-
 in front of the protocol.  Examples:
@@ -272,10 +272,10 @@ You can also use JNDI connection strings:
 
 The following additional options are supported:
 
-* :convert_types - If set to false, does not attempt to convert some Java types to ruby types.
-  Setting to false roughly doubles performance when selecting large numbers of rows.
-  Note that you can't provide this option inside the connection string (as that is passed
-  directly to JDBC), you have to pass it as a separate option.
+:convert_types :: If set to false, does not attempt to convert some Java types to ruby types.
+                  Setting to false roughly doubles performance when selecting large numbers of rows.
+                  Note that you can't provide this option inside the connection string (as that is passed
+                  directly to JDBC), you have to pass it as a separate option.
 
 === mysql 
 
@@ -286,16 +286,16 @@ ActiveRecord, it requires the native adapter.
 
 The following additional options are supported:
 
-* :auto_is_null - If set to true, makes "WHERE primary_key IS NULL" select the last inserted id.
-* :charset - Same as :encoding, :encoding takes precedence.
-* :compress - Whether to compress data sent/received via the socket connection.
-* :config_default_group - The default group to read from the in the MySQL config file.
-* :config_local_infile - If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with the given value.
-* :encoding - Specify the encoding/character set to use for the connection.
-* :socket - Can be used to specify a Unix socket file to connect to instead of a TCP host and port.
-* :timeout - Sets the wait_timeout for the connection, defaults to 1 month.
-* :read_timeout - Set the timeout in seconds for reading back results to a query.
-* :connect_timeout - Set the timeout in seconds before a connection attempt is abandoned.
+:auto_is_null :: If set to true, makes "WHERE primary_key IS NULL" select the last inserted id.
+:charset :: Same as :encoding, :encoding takes precedence.
+:compress :: Whether to compress data sent/received via the socket connection.
+:config_default_group :: The default group to read from the in the MySQL config file.
+:config_local_infile :: If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with the given value.
+:encoding :: Specify the encoding/character set to use for the connection.
+:socket :: Can be used to specify a Unix socket file to connect to instead of a TCP host and port.
+:timeout :: Sets the wait_timeout for the connection, defaults to 1 month.
+:read_timeout :: Set the timeout in seconds for reading back results to a query.
+:connect_timeout :: Set the timeout in seconds before a connection attempt is abandoned.
 
 === mysql2
 
@@ -312,8 +312,8 @@ The :database option given ODBC database should be the DSN (Descriptive Service 
 
 The :host and :port options are not respected. The following additional options are supported:
 
-* :db_type - Can be specified as 'mssql' or 'progress' to use SQL syntax specific to those databases.
-* :driver - The name of the ODBC driver to utilize.
+:db_type :: Can be specified as 'mssql' or 'progress' to use SQL syntax specific to those databases.
+:driver :: The name of the ODBC driver to utilize.
 
 === openbase 
 
@@ -325,7 +325,11 @@ Requires: oci8
 
 The following additional options are supported:
 
-* :privilege - The Oracle privilege level.
+:autosequence :: Set to true to use Sequel's conventions to guess the sequence to use for datasets.  False
+                 by default.
+:prefetch_rows :: The number of rows to prefetch.  Defaults to 1, a larger number can be specified
+                  and will improve performance when retrieving a large number of rows.
+:privilege :: The Oracle privilege level.
 
 === postgres
 
@@ -336,8 +340,8 @@ The pg library is the best supported, as it supports real bound variables and pr
 
 The following additional options are supported:
 
-* :charset - Same as :encoding, :encoding takes precedence
-* :encoding - Set the client_encoding to the given string
+:charset :: Same as :encoding, :encoding takes precedence
+:encoding :: Set the client_encoding to the given string
 
 === sqlite
 
@@ -364,7 +368,7 @@ Examples:
 
 The following additional options are supported:
 
-* :timeout - the busy timeout to use in milliseconds (default: 5000).
+:timeout :: the busy timeout to use in milliseconds (default: 5000).
 
 === swift
 
