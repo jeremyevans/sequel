@@ -539,16 +539,22 @@ describe Sequel::Model, ".[]" do
   end
 
   it "should return the first record for the given pk" do
-    @c[1].should be_a_kind_of(@c)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 1) LIMIT 1"]
-    @c[9999].should be_a_kind_of(@c)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 9999) LIMIT 1"]
+    @c[1].should == @c.load(:name => 'sharon', :id => 1)
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE id = 1"]
+    @c[9999].should == @c.load(:name => 'sharon', :id => 1)
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE id = 9999"]
   end
 
   it "should work correctly for custom primary key" do
     @c.set_primary_key :name
-    @c['sharon'].should be_a_kind_of(@c)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"]
+    @c['sharon'].should == @c.load(:name => 'sharon', :id => 1)
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE name = 'sharon'"]
+  end
+
+  it "should return the first record for the given pk for a filtered dataset" do
+    @c.dataset = @c.dataset.filter(:active=>true)
+    @c[1].should == @c.load(:name => 'sharon', :id => 1)
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE ((active IS TRUE) AND (id = 1)) LIMIT 1"]
   end
 
   it "should work correctly for composite primary key specified as array" do

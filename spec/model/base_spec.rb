@@ -495,11 +495,6 @@ end
 describe Sequel::Model, ".[] optimization" do
   before do
     @c = Class.new(Sequel::Model(:a))
-    @c.instance_eval do
-      def simple_table
-        @simple_table
-      end
-    end
   end
 
   it "should set simple_pk to the literalized primary key column name if a single primary key" do
