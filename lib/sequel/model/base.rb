@@ -476,7 +476,11 @@ module Sequel
           @simple_table = db.literal(ds)
           db.from(ds)
         when Dataset
-          @simple_table = nil
+          @simple_table = if ds.send(:simple_select_all?)
+            ds.literal(ds.first_source_table)
+          else
+            nil
+          end
           @db = ds.db
           ds
         else
@@ -513,7 +517,11 @@ module Sequel
       def set_primary_key(*key)
         clear_setter_methods_cache
         key = key.flatten
-        @simple_pk = key.length == 1 ? db.literal(key.first) : nil 
+        @simple_pk = if key.length == 1
+          (@dataset || db).literal(key.first)
+        else 
+          nil 
+        end
         @primary_key = (key.length == 1) ? key[0] : key
       end
   

@@ -494,15 +494,18 @@ end
 
 describe Sequel::Model, ".[] optimization" do
   before do
-    @c = Class.new(Sequel::Model(:a))
+    @db = MODEL_DB.clone
+    @db.quote_identifiers = true
+    @c = Class.new(Sequel::Model(@db))
   end
 
   it "should set simple_pk to the literalized primary key column name if a single primary key" do
-    @c.simple_pk.should == 'id'
+    @c.set_primary_key :id
+    @c.simple_pk.should == '"id"'
     @c.set_primary_key :b
-    @c.simple_pk.should == 'b'
+    @c.simple_pk.should == '"b"'
     @c.set_primary_key :b__a.identifier
-    @c.simple_pk.should == 'b__a'
+    @c.simple_pk.should == '"b__a"'
   end
 
   it "should have simple_pk be blank if compound or no primary key" do
@@ -516,37 +519,57 @@ describe Sequel::Model, ".[] optimization" do
 
   it "should have simple table set if passed a Symbol to set_dataset" do
     @c.set_dataset :a
-    @c.simple_table.should == 'a'
+    @c.simple_table.should == '"a"'
     @c.set_dataset :b
-    @c.simple_table.should == 'b'
+    @c.simple_table.should == '"b"'
     @c.set_dataset :b__a
-    @c.simple_table.should == 'b.a'
+    @c.simple_table.should == '"b"."a"'
   end
 
-  it "should have simple_table = nil if passed a dataset to set_dataset" do
-    @c.set_dataset @c.db[:a]
+  it "should have simple_table set if passed a simple select all dataset to set_dataset" do
+    @c.set_dataset @db[:a]
+    @c.simple_table.should == '"a"'
+    @c.set_dataset @db[:b]
+    @c.simple_table.should == '"b"'
+    @c.set_dataset @db[:b__a]
+    @c.simple_table.should == '"b"."a"'
+  end
+
+  it "should simple_pk and simple_table respect dataset's identifier input methods" do
+    ds = @db[:ab]
+    ds.identifier_input_method = :reverse
+    @c.set_dataset ds
+    @c.simple_table.should == '"ba"'
+    @c.set_primary_key :cd
+    @c.simple_pk.should == '"dc"'
+
+    @c.set_dataset ds.from(:ef__gh)
+    @c.simple_table.should == '"fe"."hg"'
+  end
+
+  it "should have simple_table = nil if passed a non-simple select all dataset to set_dataset" do
+    @c.set_dataset @c.db[:a].filter(:active)
     @c.simple_table.should == nil
   end
 
   it "should have simple_table superclasses setting if inheriting" do
-    @c.set_dataset :a
-    Class.new(@c).simple_table.should == 'a'
-    @c.instance_variable_set(:@simple_table, nil)
     Class.new(@c).simple_table.should == nil
-    @c.instance_variable_set(:@simple_table, "'b'")
-    Class.new(@c).simple_table.should == "'b'"
+    @c.set_dataset :a
+    Class.new(@c).simple_table.should == '"a"'
   end
 
   it "should use Dataset#with_sql if simple_table and simple_pk are true" do
     @c.set_dataset :a
-    @c.dataset.should_receive(:with_sql).and_return(@c.dataset)
-    @c[1]
+    @c.dataset._fetch = {:id => 1}
+    @c[1].should == @c.load(:id=>1)
+    @db.sqls.should == ['SELECT * FROM "a" WHERE "id" = 1']
   end
 
   it "should not use Dataset#with_sql if either simple_table or simple_pk is nil" do
-    @c.set_dataset @c.dataset
-    @c.dataset.should_not_receive(:with_sql)
-    @c[1]
+    @c.set_dataset @db[:a].filter(:active)
+    @c.dataset._fetch = {:id => 1}
+    @c[1].should == @c.load(:id=>1)
+    @db.sqls.should == ['SELECT * FROM "a" WHERE ("active" AND ("id" = 1)) LIMIT 1']
   end
 end
 
