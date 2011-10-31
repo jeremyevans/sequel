@@ -22,11 +22,11 @@ describe "Serialization plugin" do
   it "should allow setting additional serializable attributes via plugin :serialization call" do
     @c.plugin :serialization, :yaml, :abc
     @c.create(:abc => 1, :def=> 2)
-    MODEL_DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n', 2|2, '--- 1\n')\)/
+    MODEL_DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n(\.\.\.\n)?', 2|2, '--- 1\n(\.\.\.\n)?')\)/
 
     @c.plugin :serialization, :marshal, :def
     @c.create(:abc => 1, :def=> 1)
-    MODEL_DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n', 'BAhpBg==\n'|'BAhpBg==\n', '--- 1\n')\)/
+    MODEL_DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n(\.\.\.\n)?', 'BAhpBg==\n'|'BAhpBg==\n', '--- 1\n(\.\.\.\n)?')\)/
     
     @c.plugin :serialization, :json, :ghi
     @c.create(:ghi => [123])
@@ -38,10 +38,7 @@ describe "Serialization plugin" do
     @c.create(:abc => 1)
     @c.create(:abc => "hello")
 
-    MODEL_DB.sqls.should == [ \
-      "INSERT INTO items (abc) VALUES ('--- 1\n')", \
-      "INSERT INTO items (abc) VALUES ('--- hello\n')", \
-    ]
+    MODEL_DB.sqls.map{|s| s.sub("...\n", '')}.should == ["INSERT INTO items (abc) VALUES ('--- 1\n')", "INSERT INTO items (abc) VALUES ('--- hello\n')"]
   end
 
   it "serialization_format should be the serialization format used" do
@@ -97,7 +94,7 @@ describe "Serialization plugin" do
 
     o.update(:abc => 23)
     @c.create(:abc => [1, 2, 3])
-    MODEL_DB.sqls.should == ["UPDATE items SET abc = '--- 23\n' WHERE (id = 1)",
+    MODEL_DB.sqls.should == ["UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')"]
   end
 
@@ -164,7 +161,7 @@ describe "Serialization plugin" do
 
     o.update(:abc => 23)
     Class.new(@c).create(:abc => [1, 2, 3])
-    MODEL_DB.sqls.should == ["UPDATE items SET abc = '--- 23\n' WHERE (id = 1)",
+    MODEL_DB.sqls.should == ["UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')"]
   end
 
