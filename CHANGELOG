@@ -3364,9 +3364,9 @@
 
 === 0.1.9.3 (2007-08-10)
 
-* Added support for specifying field size in schema definitions (thanks Florian Aßmann.)
+* Added support for specifying field size in schema definitions (thanks Florian Assmann.)
 
-* Added migration code based on work by Florian Aßmann.
+* Added migration code based on work by Florian Assmann.
 
 * Reintroduced metaid dependency. No need to keep a local copy of it.
 
@@ -3444,7 +3444,7 @@
 
 * Fixed Dataset#first to include a LIMIT clause for a single record.
 
-* Small fix to Postgres driver to return a primary_key value for the inserted record if it is specified in the insertion values (thanks Florian Aßmann and Pedro Gutierrez).
+* Small fix to Postgres driver to return a primary_key value for the inserted record if it is specified in the insertion values (thanks Florian Assmann and Pedro Gutierrez).
 
 * Fixed Symbol#DESC to support qualified notation (thanks Pedro Gutierrez).
 
