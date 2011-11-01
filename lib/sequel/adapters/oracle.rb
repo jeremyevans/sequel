@@ -317,17 +317,17 @@ module Sequel
         # Run execute_select on the database with the given SQL and the stored
         # bind arguments.
         def execute(sql, opts={}, &block)
-          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+          super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts={}, &block)
-          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+          super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_insert(sql, opts={}, &block)
-          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+          super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
       end
 
