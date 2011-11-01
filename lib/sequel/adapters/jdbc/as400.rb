@@ -60,9 +60,14 @@ module Sequel
 
         # Modify the sql to limit the number of rows returned
         def select_limit_sql(sql)
-          if @opts[:limit]
-            sql << " FETCH FIRST ROW ONLY" if @opts[:limit] == 1
-            sql << " FETCH FIRST #{@opts[:limit]} ROWS ONLY" if @opts[:limit] > 1
+          if l = @opts[:limit]
+            if l == 1
+              sql << " FETCH FIRST ROW ONLY"
+            elsif l > 1
+              sql << " FETCH FIRST "
+              literal_append(sql, l)
+              sql << " ROWS ONLY"
+            end
           end
         end
           

@@ -80,7 +80,7 @@ module Sequel
         when :select, :all
           select_sql
         when :first
-          limit(1).select_sql
+          clone(:limit=>1).select_sql
         when :insert_select
           returning.insert_sql(*@prepared_modify_values)
         when :insert
@@ -95,10 +95,14 @@ module Sequel
       # Changes the values of symbols if they start with $ and
       # prepared_args is present.  If so, they are considered placeholders,
       # and they are substituted using prepared_arg.
-      def literal_symbol(v)
+      def literal_symbol_append(sql, v)
         if @opts[:bind_vars] and match = PLACEHOLDER_RE.match(v.to_s)
           s = match[1].to_sym
-          prepared_arg?(s) ? literal(prepared_arg(s)) : v
+          if prepared_arg?(s)
+            literal_append(sql, prepared_arg(s))
+          else
+            sql << v.to_s
+          end
         else
           super
         end
@@ -148,8 +152,8 @@ module Sequel
       # Use a clone of the dataset extended with prepared statement
       # support and using the same argument hash so that you can use
       # bind variables/prepared arguments in subselects.
-      def subselect_sql(ds)
-        ps = ds.prepare(:select)
+      def subselect_sql_append(sql, ds)
+        ps = ds.clone(:append_sql=>sql).prepare(:select)
         ps = ps.bind(@opts[:bind_vars]) if @opts[:bind_vars]
         ps.prepared_args = prepared_args
         ps.prepared_sql

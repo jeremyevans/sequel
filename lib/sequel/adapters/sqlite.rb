@@ -323,7 +323,6 @@ module Sequel
           ps.prepared_statement_name = name
           db.prepared_statements[name] = ps
         end
-        ps.prepared_sql
         ps
       end
       
@@ -335,8 +334,8 @@ module Sequel
       end
 
       # Quote the string using the adapter class method.
-      def literal_string(v)
-        "'#{::SQLite3::Database.quote(v)}'"
+      def literal_string_append(sql, v)
+        sql << "'" << ::SQLite3::Database.quote(v) << "'"
       end
 
       # SQLite uses a : before the name of the argument as a placeholder.

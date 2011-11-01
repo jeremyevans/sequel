@@ -347,8 +347,10 @@ module Sequel
       end
       
       # Handle correct quoting of strings using ::MySQL.quote.
-      def literal_string(v)
-        "'#{::Mysql.quote(v)}'"
+      def literal_string_append(sql, v)
+        sql << "'"
+        sql << ::Mysql.quote(v)
+        sql << "'"
       end
       
       # Yield each row of the given result set r with columns cols

@@ -177,27 +177,34 @@ module Sequel
     module DatasetMethods
       include EmulateOffsetWithRowNumber
 
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with distinct columns from join where group having compounds order lock')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with select distinct columns from join where group having compounds order lock')
       ROW_NUMBER_EXPRESSION = 'ROWNUM'.lit.freeze
 
       # Oracle needs to emulate bitwise operators and ILIKE/NOT ILIKE operators.
-      def complex_expression_sql(op, args)
+      def complex_expression_sql_append(sql, op, args)
         case op
         when :&
-          complex_expression_arg_pairs(args){|a, b| "CAST(BITAND(#{literal(a)}, #{literal(b)}) AS INTEGER)"}
+          sql << complex_expression_arg_pairs(args){|a, b| "CAST(BITAND(#{literal(a)}, #{literal(b)}) AS INTEGER)"}
         when :|
-          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} - #{complex_expression_sql(:&, [a, b])} + #{literal(b)})"}
+          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} - #{complex_expression_sql(:&, [a, b])} + #{literal(b)})"}
         when :^
-          complex_expression_arg_pairs(args){|*x| "(#{complex_expression_sql(:|, x)} - #{complex_expression_sql(:&, x)})"}
+          sql << complex_expression_arg_pairs(args){|*x| "(#{complex_expression_sql(:|, x)} - #{complex_expression_sql(:&, x)})"}
         when :'B~'
-          "((0 - #{literal(args.at(0))}) - 1)"
+          sql << "((0 - "
+          literal_append(sql, args.at(0))
+          sql << ") - 1)"
         when :<<
-          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * power(2, #{literal b}))"}
+          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * power(2, #{literal b}))"}
         when :>>
-          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / power(2, #{literal b}))"}
+          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / power(2, #{literal b}))"}
         when :ILIKE, :'NOT ILIKE'
-          a, b = args
-          "(UPPER(#{literal(a)}) #{op == :ILIKE ? :LIKE : :'NOT LIKE'} UPPER(#{literal(b)}))"
+          sql << "(UPPER("
+          literal_append(sql, args.at(0))
+          sql << ") "
+          sql << (op == :ILIKE ? 'LIKE' : 'NOT LIKE')
+          sql<< ' UPPER('
+          literal_append(sql, args.at(1))
+          sql << "))"
         else
           super
         end
@@ -206,9 +213,9 @@ module Sequel
       # Oracle doesn't support CURRENT_TIME, as it doesn't have
       # a type for storing just time values without a date, so
       # use CURRENT_TIMESTAMP in its place.
-      def constant_sql(c)
+      def constant_sql_append(sql, c)
         if c == :CURRENT_TIME
-          super(:CURRENT_TIMESTAMP)
+          super(sql, :CURRENT_TIMESTAMP)
         else
           super
         end
@@ -244,7 +251,9 @@ module Sequel
           # Lock doesn't work in subselects, so don't use a subselect when locking.
           # Don't use a subselect if custom SQL is used, as it breaks somethings.
           ds = ds.from_self unless @opts[:lock]
-          subselect_sql(ds.where(SQL::ComplexExpression.new(:<=, ROW_NUMBER_EXPRESSION, limit)))
+          sql = @opts[:append_sql] || ''
+          subselect_sql_append(sql, ds.where(SQL::ComplexExpression.new(:<=, ROW_NUMBER_EXPRESSION, limit)))
+          sql
         else
           super
         end
@@ -289,8 +298,9 @@ module Sequel
 
       # Oracle doesn't support the use of AS when aliasing a dataset.  It doesn't require
       # the use of AS anywhere, so this disables it in all cases.
-      def as_sql(expression, aliaz)
-        "#{expression} #{quote_identifier(aliaz)}"
+      def as_sql_append(sql, aliaz)
+        sql << ' '
+        quote_identifier_append(sql, aliaz)
       end
 
       # The strftime format to use when literalizing the time.
@@ -316,11 +326,8 @@ module Sequel
       end
 
       # Use string in hex format for blob data.
-      def literal_blob(v)
-        blob = "'"
-        v.each_byte{|x| blob << sprintf('%02x', x)}
-        blob << "'"
-        blob
+      def literal_blob_append(sql, v)
+        sql << "'" << v.unpack("H*").first << "'"
       end
 
       # Oracle uses 'N' for false values.
@@ -329,8 +336,10 @@ module Sequel
       end
 
       # Oracle uses the SQL standard of only doubling ' inside strings.
-      def literal_string(v)
-        "'#{v.gsub("'", "''")}'"
+      def literal_string_append(sql, v)
+        sql << "'"
+        sql << v.gsub("'", "''")
+        sql << "'"
       end
 
       # Oracle uses 'Y' for true values.
@@ -348,7 +357,8 @@ module Sequel
       # so add the dummy DUAL table if the dataset doesn't select
       # from a table.
       def select_from_sql(sql)
-        sql << " FROM #{source_list(@opts[:from] || ['DUAL'])}"
+        sql << " FROM "
+        source_list_append(sql, @opts[:from] || ['DUAL'])
       end
     end
   end

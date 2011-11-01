@@ -151,8 +151,8 @@ module Sequel
       BOOL_FALSE = '0'.freeze
       NULL = LiteralString.new('NULL').freeze
       COMMA_SEPARATOR = ', '.freeze
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with distinct limit columns from join where group having compounds order')
-      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'into columns values returning')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with select distinct limit columns from join where group having compounds order')
+      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'insert into columns values returning')
       
       # Insert given values into the database.
       def insert(*values)
@@ -206,8 +206,14 @@ module Sequel
       end
       
       def select_limit_sql(sql)
-        sql << " FIRST #{@opts[:limit]}" if @opts[:limit]
-        sql << " SKIP #{@opts[:offset]}" if @opts[:offset]
+        if l = @opts[:limit]
+          sql << " FIRST "
+          literal_append(sql, l)
+        end
+        if o = @opts[:offset]
+          sql << " SKIP "
+          literal_append(sql, o)
+        end
       end
     end
   end

@@ -3412,7 +3412,7 @@ describe "Sequel::Dataset #with and #with_recursive" do
 
   specify "#with should work on insert, update, and delete statements if they support it" do
     [:insert, :update, :delete].each do |m|
-      @ds.meta_def(:"#{m}_clause_methods"){super() + [:"#{m}_with_sql"]}
+      @ds.meta_def(:"#{m}_clause_methods"){[:"#{m}_with_sql"] + super()}
     end
     @ds.with(:t, @db[:x]).insert_sql(1).should == 'WITH t AS (SELECT * FROM x) INSERT INTO t VALUES (1)'
     @ds.with(:t, @db[:x]).update_sql(:foo=>1).should == 'WITH t AS (SELECT * FROM x) UPDATE t SET foo = 1'
@@ -3888,8 +3888,8 @@ describe "Dataset emulating bitwise operator support" do
   before do
     @ds = Sequel::Database.new.dataset
     @ds.quote_identifiers = true
-    def @ds.complex_expression_sql(op, args)
-      complex_expression_arg_pairs(args){|a, b| "bitand(#{literal(a)}, #{literal(b)})"}
+    def @ds.complex_expression_sql_append(sql, op, args)
+      sql << complex_expression_arg_pairs(args){|a, b| "bitand(#{literal(a)}, #{literal(b)})"}
     end
   end
 

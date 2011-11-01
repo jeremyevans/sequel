@@ -172,8 +172,8 @@ module Sequel
       end
 
       # Handle correct quoting of strings using ::Mysql2::Client#escape.
-      def literal_string(v)
-        db.synchronize{|c| "'#{c.escape(v)}'"}
+      def literal_string_append(sql, v)
+        sql << "'" << db.synchronize{|c| c.escape(v)} << "'"
       end
     end
   end

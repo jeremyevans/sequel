@@ -638,29 +638,29 @@ module Sequel
       BOOL_FALSE = 'false'.freeze
       BOOL_TRUE = 'true'.freeze
       COMMA_SEPARATOR = ', '.freeze
-      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'from using where')
-      DELETE_CLAUSE_METHODS_91 = Dataset.clause_methods(:delete, %w'with from using where returning')
+      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'delete from using where')
+      DELETE_CLAUSE_METHODS_91 = Dataset.clause_methods(:delete, %w'with delete from using where returning')
       EXCLUSIVE = 'EXCLUSIVE'.freeze
       EXPLAIN = 'EXPLAIN '.freeze
       EXPLAIN_ANALYZE = 'EXPLAIN ANALYZE '.freeze
       FOR_SHARE = ' FOR SHARE'.freeze
-      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'into columns values')
-      INSERT_CLAUSE_METHODS_82 = Dataset.clause_methods(:insert, %w'into columns values returning')
-      INSERT_CLAUSE_METHODS_91 = Dataset.clause_methods(:insert, %w'with into columns values returning')
+      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'insert into columns values')
+      INSERT_CLAUSE_METHODS_82 = Dataset.clause_methods(:insert, %w'insert into columns values returning')
+      INSERT_CLAUSE_METHODS_91 = Dataset.clause_methods(:insert, %w'with insert into columns values returning')
       LOCK = 'LOCK TABLE %s IN %s MODE'.freeze
       NULL = LiteralString.new('NULL').freeze
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
       QUERY_PLAN = 'QUERY PLAN'.to_sym
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
       ROW_SHARE = 'ROW SHARE'.freeze
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct columns from join where group having compounds order limit lock')
-      SELECT_CLAUSE_METHODS_84 = Dataset.clause_methods(:select, %w'with distinct columns from join where group having window compounds order limit lock')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct columns from join where group having compounds order limit lock')
+      SELECT_CLAUSE_METHODS_84 = Dataset.clause_methods(:select, %w'with select distinct columns from join where group having window compounds order limit lock')
       SHARE = 'SHARE'.freeze
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
       SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
-      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'table set from where')
-      UPDATE_CLAUSE_METHODS_91 = Dataset.clause_methods(:update, %w'with table set from where returning')
+      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'update table set from where')
+      UPDATE_CLAUSE_METHODS_91 = Dataset.clause_methods(:update, %w'with update table set from where returning')
       
       # Shared methods for prepared statements when used with PostgreSQL databases.
       module PreparedStatementMethods
@@ -698,10 +698,16 @@ module Sequel
       
       # Handle converting the ruby xor operator (^) into the
       # PostgreSQL xor operator (#).
-      def complex_expression_sql(op, args)
+      def complex_expression_sql_append(sql, op, args)
         case op
         when :^
-          "(#{args.collect{|a| literal(a)}.join(" # ")})"
+          j = ' # '
+          c = false
+          args.each do |a|
+            sql << j if c
+            literal_append(sql, a)
+            c ||= true
+          end
         else
           super
         end
@@ -767,7 +773,9 @@ module Sequel
         return super if server_version < 80200
         
         # postgresql 8.2 introduces support for multi-row insert
-        [insert_sql(columns, LiteralString.new('VALUES ' + values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)))]
+        sql = LiteralString.new('VALUES ')
+        expression_list_append(sql, values.map{|r| Array(r)})
+        [insert_sql(columns, sql)]
       end
       
       # PostgreSQL supports using the WITH clause in subqueries if it
@@ -818,7 +826,8 @@ module Sequel
 
       # Only include the primary table in the main delete clause
       def delete_from_sql(sql)
-        sql << " FROM #{source_list(@opts[:from][0..0])}"
+        sql << " FROM "
+        source_list_append(sql, @opts[:from][0..0])
       end
 
       # Use USING to specify additional tables in a delete query
@@ -849,14 +858,17 @@ module Sequel
         if(from = @opts[:from][1..-1]).empty?
           raise(Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs') if @opts[:join]
         else
-          sql << " #{type} #{source_list(from)}"
+          sql << " " << type.to_s << " "
+          source_list_append(sql, from)
           select_join_sql(sql)
         end
       end
 
       # Use a generic blob quoting method, hopefully overridden in one of the subadapter methods
-      def literal_blob(v)
-        "'#{v.gsub(/[\000-\037\047\134\177-\377]/n){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}}'"
+      def literal_blob_append(sql, v)
+        sql << "'"
+        sql << v.gsub(/[\000-\037\047\134\177-\377]/n){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}
+        sql << "'"
       end
 
       # PostgreSQL uses FALSE for false values
@@ -865,8 +877,10 @@ module Sequel
       end
 
       # Assume that SQL standard quoting is on, per Sequel's defaults
-      def literal_string(v)
-        "'#{v.gsub("'", "''")}'"
+      def literal_string_append(sql, v)
+        sql << "'"
+        sql << v.gsub("'", "''")
+        sql << "'"
       end
 
       # PostgreSQL uses FALSE for false values
@@ -881,8 +895,10 @@ module Sequel
       
       # PostgreSQL requires parentheses around compound datasets if they use
       # CTEs, and using them in other places doesn't hurt.
-      def compound_dataset_sql(ds)
-        "(#{super})"
+      def compound_dataset_sql_append(sql, ds)
+        sql << "("
+        super
+        sql << ")"
       end
 
       # Support FOR SHARE locking when using the :share lock style.
@@ -892,14 +908,25 @@ module Sequel
 
       # SQL fragment for named window specifications
       def select_window_sql(sql)
-        sql << " WINDOW #{@opts[:window].map{|name, window| "#{literal(name)} AS #{literal(window)}"}.join(', ')}" if @opts[:window]
+        if ws = @opts[:window]
+          sql << " WINDOW "
+          c = false
+          co = ', '
+          ws.map do |name, window| 
+            sql << co if c
+            literal_append(sql, name)
+            sql << " AS "
+            literal_append(sql, window)
+            c ||= true
+          end
+        end
       end
       
       # Use WITH RECURSIVE instead of WITH if any of the CTEs is recursive
       def select_with_sql_base
         opts[:with].any?{|w| w[:recursive]} ? SQL_WITH_RECURSIVE : super
       end
-      
+
       # The version of the database server
       def server_version
         db.server_version(@opts[:server])
@@ -925,7 +952,8 @@ module Sequel
 
       # Only include the primary table in the main update clause
       def update_table_sql(sql)
-        sql << " #{source_list(@opts[:from][0..0])}"
+        sql << " "
+        source_list_append(sql, @opts[:from][0..0])
       end
     end
   end

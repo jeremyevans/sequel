@@ -1618,7 +1618,7 @@ module Sequel
         # association and the values of the foreign/primary keys of +y+.  For most association
         # types, this is a simple transformation, but for +many_to_many+ associations this 
         # creates a subquery to the join table.
-        def complex_expression_sql(op, args)
+        def complex_expression_sql_append(sql, op, args)
           r = args.at(1)
           if (((op == :'=' || op == :'!=') and r.is_a?(Sequel::Model)) ||
               (multiple = ((op == :IN || op == :'NOT IN') and ((is_ds = r.is_a?(Sequel::Dataset)) or r.all?{|x| x.is_a?(Sequel::Model)}))))
@@ -1646,7 +1646,7 @@ module Sequel
               end
 
               if exp = association_filter_expression(op, ar, r)
-                literal(exp)
+                literal_append(sql, exp)
               else
                 raise Sequel::Error, "invalid association type #{ar[:type].inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}"
               end

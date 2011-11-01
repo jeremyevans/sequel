@@ -31,7 +31,10 @@ module Sequel
       # The Progress adapter targets Progress 9, so it silently ignores the option.
       def select_limit_sql(sql)
         raise(Error, "OFFSET not supported") if @opts[:offset]
-        #sql << " TOP #{@opts[:limit]}" if @opts[:limit]
+        # if l = @opts[:limit]
+        #   sql << " TOP "
+        #   literal_append(sql, l)
+        # end
       end
     end
   end

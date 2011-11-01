@@ -63,8 +63,8 @@ module Sequel
         module CallableStatementMethods
           # Extend given dataset with this module so subselects inside subselects in
           # prepared statements work.
-          def subselect_sql(ds)
-            ps = ds.to_prepared_statement(:select)
+          def subselect_sql_append(sql, ds)
+            ps = ds.to_prepared_statement(:select).clone(:append_sql => sql)
             ps.extend(CallableStatementMethods)
             ps = ps.bind(@opts[:bind_vars]) if @opts[:bind_vars]
             ps.prepared_args = prepared_args

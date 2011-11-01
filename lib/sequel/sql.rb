@@ -79,7 +79,8 @@ module Sequel
       # the method provided on the dataset with args as the argument (self by default).
       # Used to DRY up some code.
       def self.to_s_method(meth, args=:self) # :nodoc:
-        class_eval("def to_s(ds); ds.#{meth}(#{args}) end", __FILE__, __LINE__)
+        class_eval("def to_s(ds) ds.#{meth}(#{args}) end", __FILE__, __LINE__)
+        class_eval("def to_s_append(ds, sql) ds.#{meth}_append(sql, #{args}) end", __FILE__, __LINE__)
       end
       private_class_method :to_s_method
 

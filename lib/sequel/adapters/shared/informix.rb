@@ -23,7 +23,7 @@ module Sequel
     end
     
     module DatasetMethods
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'limit distinct columns from join where having group compounds order')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select limit distinct columns from join where having group compounds order')
 
       private
 
@@ -37,8 +37,14 @@ module Sequel
       end
 
       def select_limit_sql(sql)
-        sql << " SKIP #{@opts[:offset]}" if @opts[:offset]
-        sql << " FIRST #{@opts[:limit]}" if @opts[:limit]
+        if o = @opts[:offset]
+          sql << " SKIP "
+          literal_append(sql, o)
+        end
+        if l = @opts[:limit]
+          sql << " FIRST "
+          literal_append(sql, l)
+        end
       end
     end
   end

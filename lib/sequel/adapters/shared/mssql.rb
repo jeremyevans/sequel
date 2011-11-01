@@ -249,10 +249,10 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
-      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'with from output from2 where')
-      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'with into columns output values')
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with distinct limit columns into from lock join where group having order compounds')
-      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with table set output from where')
+      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'with delete from output from2 where')
+      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'with insert into columns output values')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with select distinct limit columns into from lock join where group having order compounds')
+      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with update table set output from where')
       NOLOCK = ' WITH (NOLOCK)'.freeze
       UPDLOCK = ' WITH (UPDLOCK)'.freeze
       WILDCARD = LiteralString.new('*').freeze
@@ -269,33 +269,41 @@ module Sequel
       end
 
       # MSSQL uses + for string concatenation, and LIKE is case insensitive by default.
-      def complex_expression_sql(op, args)
+      def complex_expression_sql_append(sql, op, args)
         case op
         when :'||'
-          super(:+, args)
+          super(sql, :+, args)
         when :LIKE, :"NOT LIKE"
-          super(op, args.map{|a| LiteralString.new("(#{literal(a)} COLLATE Latin1_General_CS_AS)")})
+          super(sql, op, args.map{|a| LiteralString.new("(#{literal(a)} COLLATE Latin1_General_CS_AS)")})
         when :ILIKE, :"NOT ILIKE"
-          super((op == :ILIKE ? :LIKE : :"NOT LIKE"), args)
+          super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args)
         when :<<
-          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
+          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
         when :>>
-          complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
+          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
         when :extract
           part = args.at(0)
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
-          expr = literal(args.at(1))
-          s = "datepart(#{format}, #{expr})"
-          s = "CAST((#{s} + datepart(ns, #{expr})/1000000000.0) AS double precision)" if part == :second
-          s
+          if part == :second
+            expr = literal(args.at(1))
+            sql << "CAST((datepart(" << format.to_s << ', ' << expr << ') + datepart(ns, ' << expr << ")/1000000000.0) AS double precision)"
+          else
+            sql << "datepart(" << format.to_s << ', '
+            literal_append(sql, args.at(1))
+            sql << ')'
+          end
         else
-          super(op, args)
+          super
         end
       end
       
       # MSSQL doesn't support the SQL standard CURRENT_DATE or CURRENT_TIME
-      def constant_sql(constant)
-        CONSTANT_MAP[constant] || super
+      def constant_sql_append(sql, constant)
+        if c = CONSTANT_MAP[constant]
+          sql << c
+        else
+          super
+        end
       end
       
       # Disable the use of INSERT OUTPUT
@@ -326,7 +334,16 @@ module Sequel
 
       # MSSQL uses a UNION ALL statement to insert multiple values at once.
       def multi_insert_sql(columns, values)
-        [insert_sql(columns, LiteralString.new(values.map {|r| "SELECT #{expression_list(r)}" }.join(" UNION ALL ")))]
+        c = false
+        sql = LiteralString.new('')
+        u = ' UNION ALL '
+        values.each do |v|
+          sql << u if c
+          sql << 'SELECT '
+          expression_list_append(sql, v)
+          c ||= true
+        end
+        [insert_sql(columns, sql)]
       end
 
       # Allows you to do a dirty read of uncommitted data using WITH (NOLOCK).
@@ -365,8 +382,8 @@ module Sequel
       end
 
       # MSSQL uses [] to quote identifiers
-      def quoted_identifier(name)
-        "[#{name}]"
+      def quoted_identifier_append(sql, name)
+        sql << "[" << name.to_s << "]"
       end
       
       # The version of the database server.
@@ -439,7 +456,8 @@ module Sequel
 
       # Only include the primary table in the main delete clause
       def delete_from_sql(sql)
-        sql << " FROM #{source_list(@opts[:from][0..0])}"
+        sql << " FROM "
+        source_list_append(sql, @opts[:from][0..0])
       end
 
       # MSSQL supports FROM clauses in DELETE and UPDATE statements.
@@ -450,14 +468,6 @@ module Sequel
         end
       end
       alias update_from_sql delete_from2_sql
-      
-      # Handle the with clause for delete, insert, and update statements
-      # to be the same as the insert statement.
-      def delete_with_sql(sql)
-        select_with_sql(sql)
-      end
-      alias insert_with_sql delete_with_sql
-      alias update_with_sql delete_with_sql
       
       # MSSQL raises an error if you try to provide more than 3 decimal places
       # for a fractional timestamp.  This probably doesn't work for smalldatetime
@@ -483,16 +493,15 @@ module Sequel
       end
 
       # MSSQL uses a literal hexidecimal number for blob strings
-      def literal_blob(v)
-        blob = '0x'
-        v.each_byte{|x| blob << sprintf('%02x', x)}
-        blob
+      def literal_blob_append(sql, v)
+        sql << '0x' << v.unpack("H*").first
       end
       
       # Optionally use unicode string syntax for all strings. Don't double
       # backslashes.
-      def literal_string(v)
-        "#{'N' if mssql_unicode_strings}'#{v.gsub(/'/, "''")}'"
+      def literal_string_append(sql, v)
+        sql << 'N' if mssql_unicode_strings
+        sql << "'" << v.gsub("'", "''") << "'"
       end
       
       # Use 0 for false on MSSQL
@@ -511,16 +520,24 @@ module Sequel
       end
 
       def select_into_sql(sql)
-        sql << " INTO #{table_ref(@opts[:into])}" if @opts[:into]
+        if i = @opts[:into]
+          sql << " INTO "
+          table_ref_append(sql, i)
+        end
       end
 
       # MSSQL uses TOP N for limit.  For MSSQL 2005+ TOP (N) is used
       # to allow the limit to be a bound variable.
       def select_limit_sql(sql)
         if l = @opts[:limit]
-          l = literal(l)
-          l = "(#{l})" if server_version >= 9000000
-          sql << " TOP #{l}"
+          if is_2005_or_later?
+            sql << " TOP ("
+            literal_append(sql, l)
+            sql << ")"
+          else
+            sql << " TOP "
+            literal_append(sql, l)
+          end
         end
       end
 
@@ -540,13 +557,15 @@ module Sequel
       def output_sql(sql)
         return unless supports_output_clause?
         return unless output = @opts[:output]
-        sql << " OUTPUT #{column_list(output[:select_list])}"
+        sql << " OUTPUT "
+        column_list_append(sql, output[:select_list])
         if into = output[:into]
-          sql << " INTO #{table_ref(into)}"
+          sql << " INTO "
+          table_ref_append(sql, into)
           if column_list = output[:column_list]
-            cl = []
-            column_list.each { |k, v| cl << literal(String === k ? k.to_sym : k) }
-            sql << " (#{cl.join(COMMA_SEPARATOR)})"
+            sql << " ("
+            source_list_append(sql, column_list)
+            sql << ")"
           end
         end
       end
@@ -561,7 +580,8 @@ module Sequel
 
       # Only include the primary table in the main update clause
       def update_table_sql(sql)
-        sql << " #{source_list(@opts[:from][0..0])}"
+        sql << " "
+        source_list_append(sql, @opts[:from][0..0])
       end
     end
   end

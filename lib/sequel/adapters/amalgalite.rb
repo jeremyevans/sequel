@@ -176,8 +176,8 @@ module Sequel
       private
       
       # Quote the string using the adapter instance method.
-      def literal_string(v)
-        db.synchronize{|c| c.quote(v)}
+      def literal_string_append(sql, v)
+        db.synchronize{|c| sql << c.quote(v)}
       end
     end
   end

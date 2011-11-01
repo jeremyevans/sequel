@@ -104,26 +104,28 @@ module Sequel
       
       # Dataset class for H2 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
-        SELECT_CLAUSE_METHODS = clause_methods(:select, %w'distinct columns from join where group having compounds order limit')
+        SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
         BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
         
         # Emulate the case insensitive LIKE operator and the bitwise operators.
-        def complex_expression_sql(op, args)
+        def complex_expression_sql_append(sql, op, args)
           case op
           when :ILIKE
-            super(:LIKE, [SQL::PlaceholderLiteralString.new("CAST(? AS VARCHAR_IGNORECASE)", [args.at(0)]), args.at(1)])
+            super(sql, :LIKE, [SQL::PlaceholderLiteralString.new("CAST(? AS VARCHAR_IGNORECASE)", [args.at(0)]), args.at(1)])
           when :"NOT ILIKE"
-            super(:"NOT LIKE", [SQL::PlaceholderLiteralString.new("CAST(? AS VARCHAR_IGNORECASE)", [args.at(0)]), args.at(1)])
+            super(sql, :"NOT LIKE", [SQL::PlaceholderLiteralString.new("CAST(? AS VARCHAR_IGNORECASE)", [args.at(0)]), args.at(1)])
           when :&, :|, :^
-            complex_expression_arg_pairs(args){|a, b| literal(SQL::Function.new(BITWISE_METHOD_MAP[op], a, b))}
+            sql << complex_expression_arg_pairs(args){|a, b| literal(SQL::Function.new(BITWISE_METHOD_MAP[op], a, b))}
           when :<<
-            complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
+            sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
           when :>>
-            complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
+            sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
           when :'B~'
-            "((0 - #{literal(args.at(0))}) - 1)"
+            sql << "((0 - "
+            literal_append(sql, args.at(0))
+            sql << ") - 1)"
           else
-            super(op, args)
+            super
           end
         end
         
@@ -160,8 +162,8 @@ module Sequel
         end
         
         # H2 expects hexadecimal strings for blob values
-        def literal_blob(v)
-          literal_string v.unpack("H*").first
+        def literal_blob_append(sql, v)
+          sql << "'" << v.unpack("H*").first << "'"
         end
         
         # H2 handles fractional seconds in timestamps, but not in times

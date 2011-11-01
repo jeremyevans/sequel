@@ -35,8 +35,8 @@ module Sequel
         private
         
         # do_mysql sets NO_BACKSLASH_ESCAPES, so use standard SQL string escaping
-        def literal_string(s)
-          "'#{s.gsub("'", "''")}'"
+        def literal_string_append(sql, s)
+          sql << "'" << s.gsub("'", "''") << "'"
         end
       end
     end

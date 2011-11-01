@@ -177,7 +177,9 @@ end
 describe "Column references" do
   before do
     @ds = Sequel::Database.new.dataset
-    def @ds.quoted_identifier(c); "`#{c}`"; end
+    def @ds.quoted_identifier_append(sql, c)
+      sql << "`#{c}`"
+    end
     @ds.quote_identifiers = true
   end
   

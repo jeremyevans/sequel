@@ -43,8 +43,8 @@ module Sequel
         private
         
         # Use Swift's escape method for quoting.
-        def literal_string(s)
-          db.synchronize{|c| "'#{c.escape(s)}'"}
+        def literal_string_append(sql, s)
+          sql << "'" << db.synchronize{|c| c.escape(s)} << "'"
         end
       end
     end

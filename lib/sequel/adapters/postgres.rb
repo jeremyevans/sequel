@@ -639,13 +639,13 @@ module Sequel
       end
       
       # Use the driver's escape_bytea
-      def literal_blob(v)
-        db.synchronize{|c| "'#{c.escape_bytea(v)}'"}
+      def literal_blob_append(sql, v)
+        sql << "'" << db.synchronize{|c| c.escape_bytea(v)} << "'"
       end
       
       # Use the driver's escape_string
-      def literal_string(v)
-        db.synchronize{|c| "'#{c.escape_string(v)}'"}
+      def literal_string_append(sql, v)
+        sql << "'" << db.synchronize{|c| c.escape_string(v)} << "'"
       end
       
       # For each row in the result set, yield a hash with column name symbol

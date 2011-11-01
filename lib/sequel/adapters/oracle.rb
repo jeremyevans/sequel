@@ -414,13 +414,13 @@ module Sequel
 
       private
 
-      def literal_other(v)
+      def literal_other_append(sql, v)
         case v
         when OraDate
-          literal(db.to_application_timestamp(v))
+          literal_append(sql, db.to_application_timestamp(v))
         when OCI8::CLOB
           v.rewind
-          literal(v.read)
+          literal_append(sql, v.read)
         else
           super
         end

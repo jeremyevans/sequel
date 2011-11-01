@@ -82,8 +82,8 @@ module Sequel
         end
         
         # Literalize strings similar to the native postgres adapter
-        def literal_string(v)
-          db.synchronize{|c| "'#{c.escape_string(v)}'"}
+        def literal_string_append(sql, v)
+          sql << "'" << db.synchronize{|c| c.escape_string(v)} << "'"
         end
       end
     end

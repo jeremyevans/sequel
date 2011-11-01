@@ -28,7 +28,7 @@ module Sequel
     end
   
     module DatasetMethods
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'limit distinct columns from join where group order having compounds')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select limit distinct columns from join where group order having compounds')
 
       # Access doesn't support INTERSECT or EXCEPT
       def supports_intersect_except?
@@ -50,12 +50,15 @@ module Sequel
 
       # Access uses TOP for limits
       def select_limit_sql(sql)
-        sql << " TOP #{@opts[:limit]}" if @opts[:limit]
+        if l = @opts[:limit]
+          sql << " TOP "
+          literal_append(sql, l)
+        end
       end
 
       # Access uses [] for quoting identifiers
-      def quoted_identifier(v)
-        "[#{v}]"
+      def quoted_identifier_append(sql, v)
+        sql << '[' << v.to_s << ']'
       end
 
       # Access requires the limit clause come before other clauses

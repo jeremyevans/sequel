@@ -106,15 +106,15 @@ module Sequel
       class Dataset < JDBC::Dataset
         BOOL_TRUE = '(1 = 1)'.freeze
         BOOL_FALSE = '(1 = 0)'.freeze
-        SELECT_CLAUSE_METHODS = clause_methods(:select, %w'distinct columns from join where group having compounds order limit lock')
+        SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit lock')
 
         # Derby doesn't support an expression between CASE and WHEN,
         # so emulate it by using an equality statement for all of the
         # conditions.
-        def case_expression_sql(ce)
+        def case_expression_sql_append(sql, ce)
           if ce.expression?
             e = ce.expression
-            literal(::Sequel::SQL::CaseExpression.new(ce.conditions.map{|c, r| [::Sequel::SQL::BooleanExpression.new(:'=', e, c), r]}, ce.default))
+            case_expression_sql_append(sql, ::Sequel::SQL::CaseExpression.new(ce.conditions.map{|c, r| [::Sequel::SQL::BooleanExpression.new(:'=', e, c), r]}, ce.default))
           else
             super
           end
@@ -123,27 +123,33 @@ module Sequel
         # If the type is String, trim the extra spaces since CHAR is used instead
         # of varchar.  This can cause problems if you are casting a char/varchar to
         # a string and the ending whitespace is important.
-        def cast_sql(expr, type)
+        def cast_sql_append(sql, expr, type)
           if type == String
-            "RTRIM(#{super})"
+            sql << "RTRIM("
+            super
+            sql << ")"
           else
             super
           end
         end
 
         # Handle Derby specific LIKE, extract, and some bitwise compliment support.
-        def complex_expression_sql(op, args)
+        def complex_expression_sql_append(sql, op, args)
           case op
           when :ILIKE
-            super(:LIKE, [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
+            super(sql, :LIKE, [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
           when :"NOT ILIKE"
-            super(:"NOT LIKE", [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
+            super(sql, :"NOT LIKE", [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
           when :&, :|, :^, :<<, :>>
             raise Error, "Derby doesn't support the #{op} operator"
           when :'B~'
-            "((0 - #{literal(args.at(0))}) - 1)"
+            sql << "((0 - "
+            literal_append(sql, args.at(0))
+            sql << ") - 1)"
           when :extract
-            "#{args.at(0)}(#{literal(args.at(1))})"
+            sql << args.at(0).to_s << '('
+            literal_append(sql, args.at(1))
+            sql << ')'
           else
             super
           end
@@ -162,11 +168,8 @@ module Sequel
         private
 
         # Derby needs a hex string casted to BLOB for blobs.
-        def literal_blob(v)
-          blob = "CAST(X'"
-          v.each_byte{|x| blob << sprintf('%02x', x)}
-          blob << "' AS BLOB)"
-          blob
+        def literal_blob_append(sql, v)
+          sql << "CAST(X'" << v.unpack("H*").first << "' AS BLOB)"
         end
 
         # Derby needs the standard workaround to insert all default values into
@@ -208,8 +211,16 @@ module Sequel
 
         # Offset comes before limit in Derby
         def select_limit_sql(sql)
-          sql << " OFFSET #{literal(@opts[:offset])} ROWS" if @opts[:offset]
-          sql << " FETCH FIRST #{literal(@opts[:limit])} ROWS ONLY" if @opts[:limit]
+          if o = @opts[:offset]
+            sql << " OFFSET "
+            literal_append(sql, o)
+            sql << " ROWS"
+          end
+          if l = @opts[:limit]
+            sql << " FETCH FIRST "
+            literal_append(sql, l)
+            sql << " ROWS ONLY"
+          end
         end
       end
     end
