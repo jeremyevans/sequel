@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.29.0 (2011-11-01)
 
 * Allow Model.dataset_module to take a Module instance (jeremyevans)
 
