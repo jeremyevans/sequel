@@ -64,11 +64,11 @@
   query types that only load the related records from the database.
   The available values for the :eager_limit_strategy option are:
 
-    :window_function: This uses the row_number window function
+    :window_function - This uses the row_number window function
       partitioned by the related key fields.  It can only be used
       on databases that support window functions (PostgreSQL 8.4+,
       Microsoft SQL Server 2005+, DB2).
-    :correlated_subquery: This uses a correlated subquery that is
+    :correlated_subquery - This uses a correlated subquery that is
       limited.  It works on most databases except MySQL and DB2.
 
   You can provide a value of true as the option to have Sequel
