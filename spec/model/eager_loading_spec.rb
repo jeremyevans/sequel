@@ -740,6 +740,14 @@ describe Sequel::Model, "#eager_graph" do
     ds.all.should == [GraphAlbum.load(:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>3)]
   end
 
+  it "should not modify existing dataset" do
+    ds1 = GraphAlbum.dataset
+    ds2 = ds1.eager_graph(:band)
+    proc{ds1.eager_graph(:band)}.should_not raise_error
+    proc{ds2.eager_graph(:tracks)}.should_not raise_error
+    proc{ds2.eager_graph(:tracks)}.should_not raise_error
+  end
+
   it "should eagerly load a single many_to_one association" do
     ds = GraphAlbum.eager_graph(:band)
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'

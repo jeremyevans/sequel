@@ -28,6 +28,13 @@ describe Sequel::Dataset, " graphing" do
     ds1.opts.should_not == o1
   end
 
+  it "#graph should not modify the current dataset's opts if current dataset is already graphed" do
+    ds2 = @ds1.graph(@ds2)
+    proc{@ds1.graph(@ds2)}.should_not raise_error
+    proc{ds2.graph(@ds3)}.should_not raise_error
+    proc{ds2.graph(@ds3)}.should_not raise_error
+  end
+
   it "#graph should accept a simple dataset and pass the table to join" do
     ds = @ds1.graph(@ds2, :x=>:id)
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'

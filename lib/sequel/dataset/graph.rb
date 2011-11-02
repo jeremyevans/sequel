@@ -117,7 +117,10 @@ module Sequel
       select = (opts[:select] || []).dup
 
       # Setup the initial graph data structure if it doesn't exist
-      unless graph = opts[:graph]
+      if graph = opts[:graph]
+        opts[:graph] = graph = graph.dup
+        [:column_aliases, :table_aliases, :column_alias_num].each{|k| graph[k] = graph[k].dup}
+      else
         master = alias_symbol(ds.first_source_alias)
         raise_alias_error.call if master == table_alias
         # Master hash storing all .graph related information

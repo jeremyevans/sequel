@@ -1,3 +1,9 @@
+=== HEAD
+
+* Fix Dataset#graph and #eager_graph modifying the receiver if the receiver is already graphed (jeremyevans) (#392)
+
+* Change dataset literalization to an append-only-all-the-way-down design (jeremyevans)
+
 === 3.29.0 (2011-11-01)
 
 * Allow Model.dataset_module to take a Module instance (jeremyevans)
@@ -64,7 +70,7 @@
 
 * Add after_commit, after_rollback, after_destroy_commit, and after_destroy_rollback hooks to Model objects (jeremyevans)
 
-* Add after_commit and after_rollback hooks to Database objects (jeremyevans)
+* Add after_commit and after_rollback hooks to Database objects (jeremyevans) (#383)
 
 * Support savepoints inside prepared transactions on MySQL (jeremyevans)
 
@@ -184,9 +190,9 @@
 
 * Fix the db2 adapter so it actually works (jeremyevans)
 
-* Add ibmdb adapter for accessing DB2 (roylez, jeremyevans)
+* Add ibmdb adapter for accessing DB2 (roylez, jeremyevans) (#376)
 
-* Add much better support for DB2 databases (roylez, jeremyevans)
+* Add much better support for DB2 databases (roylez, jeremyevans) (#376)
 
 * Handle SQL::AliasedExpressions and SQL::JoinClauses in Dataset#select_all (jeremyevans)
 

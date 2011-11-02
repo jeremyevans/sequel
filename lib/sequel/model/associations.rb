@@ -1725,8 +1725,10 @@ module Sequel
         # Like +eager+, you need to call +all+ on the dataset for the eager loading to work.  If you just
         # call +each+, it will yield plain hashes, each containing all columns from all the tables.
         def eager_graph(*associations)
-          ds = if @opts[:eager_graph]
-            self
+          ds = if eg = @opts[:eager_graph]
+            eg = eg.dup
+            [:requirements, :reflections, :reciprocals].each{|k| eg[k] = eg[k].dup}
+            clone(:eager_graph=>eg)
           else
             # Each of the following have a symbol key for the table alias, with the following values: 
             # :reciprocals - the reciprocal instance variable to use for this association
