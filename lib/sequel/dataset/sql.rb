@@ -258,6 +258,7 @@ module Sequel
     QUAD_BACKSLASH = "\\\\\\\\".freeze
     QUALIFY_KEYS = [:select, :where, :having, :order, :group]
     QUESTION_MARK = '?'.freeze
+    QUESTION_MARK_RE = /\?/.freeze
     QUOTE = '"'.freeze
     QUOTE_RE = /"/.freeze
     RETURNING = " RETURNING ".freeze
@@ -562,12 +563,32 @@ module Sequel
     def placeholder_literal_string_sql_append(sql, pls)
       args = pls.args
       sql << PAREN_OPEN if pls.parens
-      sql << if args.is_a?(Hash)
+      if args.is_a?(Hash)
         re = /:(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join('|')})\b/
-        pls.str.gsub(re){literal(args[$1.to_sym])}
+        if RUBY_VERSION >= '1.8.7'
+          str = pls.str
+          loop do
+            previous, q, str = str.partition(re)
+            sql << previous
+            literal_append(sql, args[($1||q[1..-1].to_s).to_sym]) unless q.empty?
+            break if str.empty?
+          end
+        else
+          sql << pls.str.gsub(re){literal(args[$1.to_sym])}
+        end
       else
         i = -1
-        pls.str.gsub(QUESTION_MARK){literal(args.at(i+=1))}
+        if RUBY_VERSION >= '1.8.7'
+          str = pls.str
+          loop do
+            previous, q, str = str.partition(QUESTION_MARK)
+            sql << previous
+            literal_append(sql, args.at(i+=1)) unless q.empty?
+            break if str.empty?
+          end
+        else
+          sql << pls.str.gsub(QUESTION_MARK_RE){literal(args.at(i+=1))}
+        end
       end
       sql << PAREN_CLOSE if pls.parens
     end
