@@ -1,5 +1,9 @@
 === HEAD
 
+* Fix tinytds adapter if DB.identifier_output_method = nil (jeremyevans)
+
+* Explicitly order by the row number column when emulating offsets (jfirebaugh) (#393)
+
 * Fix Dataset#graph and #eager_graph modifying the receiver if the receiver is already graphed (jeremyevans) (#392)
 
 * Change dataset literalization to an append-only-all-the-way-down design (jeremyevans)

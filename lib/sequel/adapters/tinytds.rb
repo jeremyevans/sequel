@@ -206,15 +206,15 @@ module Sequel
         execute(sql) do |result|
           each_opts = {:cache_rows=>false}
           each_opts[:timezone] = :utc if db.timezone == :utc
-          rn = row_number_column if @opts[:offset]
+          rn = row_number_column if offset = @opts[:offset]
           columns = cols = result.fields.map{|c| output_identifier(c)}
-          if opts[:offset]
+          if offset
             rn = row_number_column
             columns = columns.dup
             columns.delete(rn)
           end
           @columns = columns
-          if identifier_output_method
+          #if identifier_output_method
             each_opts[:as] = :array
             result.each(each_opts) do |r|
               h = {}
@@ -222,6 +222,10 @@ module Sequel
               h.delete(rn) if rn
               yield h
             end
+=begin
+        # Temporarily disable this optimization, as tiny_tds uses string keys
+        # if result.fields is called before result.each(:symbolize_keys=>true).
+        # See https://github.com/rails-sqlserver/tiny_tds/issues/57
           else
             each_opts[:symbolize_keys] = true
             if offset
@@ -233,6 +237,7 @@ module Sequel
               result.each(each_opts, &Proc.new)
             end
           end
+=end
         end
         self
       end

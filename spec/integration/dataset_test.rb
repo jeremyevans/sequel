@@ -1249,6 +1249,11 @@ describe "Dataset identifier methods" do
     @ds.first.should == {:BA=>1}
   end
   
+  it "should work with a nil identifier_output_method" do
+    @ds.identifier_output_method = nil
+    [{:ab=>1}, {:AB=>1}].should include(@ds.first)
+  end
+
   it "should work when not quoting identifiers" do
     @ds.quote_identifiers = false
     @ds.first.should == {:ab=>1}
