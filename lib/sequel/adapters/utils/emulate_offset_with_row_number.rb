@@ -50,7 +50,8 @@ module Sequel
         select_append{ROW_NUMBER(:over, :order=>order){}.as(rn)}.
         from_self(:alias=>dsa1).
         limit(@opts[:limit]).
-        where(SQL::Identifier.new(rn) > o))
+        where(SQL::Identifier.new(rn) > o).
+        order(rn))
       sql
     end
 
