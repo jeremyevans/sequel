@@ -76,22 +76,26 @@ module Sequel
               if v.equals(JAVA_BIG_DECIMAL.new(i))
                 i
               else
-                super
+                decimal(v)
               end
             else
-              super
+              decimal(v)
             end
           end
         end
 
         ORACLE_DECIMAL_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:oracle_decimal)
+
+        def convert_type_oracle_timestamp(v)
+          db.to_application_timestamp(v.to_string)
+        end
       
         def convert_type_proc(v)
           case v
           when JAVA_BIG_DECIMAL
             ORACLE_DECIMAL_METHOD
           when Java::OracleSql::TIMESTAMP
-            method(:convert_type_timestamp)
+            method(:convert_type_oracle_timestamp)
           else
             super
           end
