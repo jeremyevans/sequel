@@ -1774,6 +1774,36 @@ describe "Database#typecast_value" do
     end
   end
 
+  specify "should handle arrays when typecasting timestamps" do
+    begin
+      @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14]).should == Time.local(2011, 10, 11, 12, 13, 14)
+      @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14, 500000000]).should == Time.local(2011, 10, 11, 12, 13, 14, 500000)
+
+      Sequel.datetime_class = DateTime
+      @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14]).should == DateTime.civil(2011, 10, 11, 12, 13, 14)
+      @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14, 500000000]).should == DateTime.civil(2011, 10, 11, 12, 13, (defined?(Rational) ? Rational(29, 2) : 14.5))
+    ensure
+      Sequel.datetime_class = Time
+    end
+  end
+
+  specify "should handle hashes when typecasting timestamps" do
+    begin
+      @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14).should == Time.local(2011, 10, 11, 12, 13, 14)
+      @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14, :nanos=>500000000).should == Time.local(2011, 10, 11, 12, 13, 14, 500000)
+      @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14).should == Time.local(2011, 10, 11, 12, 13, 14)
+      @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14, 'nanos'=>500000000).should == Time.local(2011, 10, 11, 12, 13, 14, 500000)
+
+      Sequel.datetime_class = DateTime
+      @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14).should == DateTime.civil(2011, 10, 11, 12, 13, 14)
+      @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14, :nanos=>500000000).should == DateTime.civil(2011, 10, 11, 12, 13, (defined?(Rational) ? Rational(29, 2) : 14.5))
+      @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14).should == DateTime.civil(2011, 10, 11, 12, 13, 14)
+      @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14, 'nanos'=>500000000).should == DateTime.civil(2011, 10, 11, 12, 13, (defined?(Rational) ? Rational(29, 2) : 14.5))
+    ensure
+      Sequel.datetime_class = Time
+    end
+  end
+
   specify "should typecast decimal values to BigDecimal" do
     [1.0, 1, '1.0', BigDecimal('1.0')].each do |i|
       v = @db.typecast_value(:decimal, i)
