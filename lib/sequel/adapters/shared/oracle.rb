@@ -356,7 +356,7 @@ module Sequel
 
       # Oracle uses the SQL standard of only doubling ' inside strings.
       def literal_string_append(sql, v)
-        sql APOS << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
+        sql << APOS << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
       end
 
       # Oracle uses 'Y' for true values.
