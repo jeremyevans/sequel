@@ -588,12 +588,6 @@ module Sequel
       # double performance when fetching rows.
       attr_accessor :convert_types
 
-      # Use the convert_types default setting from the database.
-      def initialize(db, opts={})
-        @convert_types = db.convert_types
-        super
-      end
-      
       # Correctly return rows from the database and return them as hashes.
       def fetch_rows(sql, &block)
         execute(sql){|result| process_result_set(result, &block)}
@@ -614,6 +608,7 @@ module Sequel
       
       private
 
+      # Cache Java class constants to speed up lookups
       JAVA_SQL_TIMESTAMP    = Java::JavaSQL::Timestamp
       JAVA_SQL_TIME         = Java::JavaSQL::Time
       JAVA_SQL_DATE         = Java::JavaSQL::Date
@@ -623,29 +618,66 @@ module Sequel
       JAVA_BIG_DECIMAL      = Java::JavaMath::BigDecimal
       JAVA_BYTE_ARRAY       = Java::byte[]
 
-      # Convert the type.  Used for converting Java types to ruby types.
-      def convert_type(v)
+      # Handle type conversions for common Java types.
+      class TYPE_TRANSLATOR
+        LF = "\n".freeze
+        def time(v) Sequel.string_to_time(v.to_string) end
+        def date(v) Date.civil(v.getYear + 1900, v.getMonth + 1, v.getDate) end
+        def decimal(v) BigDecimal.new(v.to_string) end
+        def byte_array(v) Sequel::SQL::Blob.new(String.from_java_bytes(v)) end
+        def blob(v) Sequel::SQL::Blob.new(String.from_java_bytes(v.getBytes(1, v.length))) end
+        def clob(v) Sequel::SQL::Blob.new(v.getSubString(1, v.length)) end
+        def buffered_reader(v)
+          lines = ""
+          c = false
+          while(line = v.read_line) do
+            lines << LF if c
+            lines << line
+            c ||= true
+          end
+          lines
+        end
+      end
+      TYPE_TRANSLATOR_INSTANCE = tt = TYPE_TRANSLATOR.new
+
+      # Cache type translator methods so that duplicate Method
+      # objects are not created.
+      DECIMAL_METHOD = tt.method(:decimal)
+      TIME_METHOD = tt.method(:time)
+      DATE_METHOD = tt.method(:date)
+      BUFFERED_READER_METHOD = tt.method(:buffered_reader)
+      BYTE_ARRAY_METHOD = tt.method(:byte_array)
+      BLOB_METHOD = tt.method(:blob)
+      CLOB_METHOD = tt.method(:clob)
+
+      # Convert the given Java timestamp to an instance of Sequel.datetime_class.
+      def convert_type_timestamp(v)
+        db.to_application_timestamp([v.getYear + 1900, v.getMonth + 1, v.getDate, v.getHours, v.getMinutes, v.getSeconds, v.getNanos])
+      end
+
+      # Return a callable object that will convert any value of <tt>v</tt>'s
+      # class to a ruby object.  If no callable object can handle <tt>v</tt>'s
+      # class, return false so that the negative lookup is cached.
+      def convert_type_proc(v)
         case v
-        when JAVA_SQL_TIMESTAMP
-          db.to_application_timestamp([v.getYear + 1900, v.getMonth + 1, v.getDate, v.getHours, v.getMinutes, v.getSeconds, v.getNanos])
-        when JAVA_SQL_TIME
-          Sequel.string_to_time(v.to_string)
-        when JAVA_SQL_DATE
-          Sequel.string_to_date(v.to_string)
-        when JAVA_BUFFERED_READER
-          lines = []
-          while(line = v.read_line) do lines << line end
-          lines.join("\n")
         when JAVA_BIG_DECIMAL
-          BigDecimal.new(v.to_string)
+          DECIMAL_METHOD
+        when JAVA_SQL_TIMESTAMP
+          method(:convert_type_timestamp)
+        when JAVA_SQL_TIME
+          TIME_METHOD
+        when JAVA_SQL_DATE
+          DATE_METHOD
+        when JAVA_BUFFERED_READER
+          BUFFERED_READER_METHOD
         when JAVA_BYTE_ARRAY
-          Sequel::SQL::Blob.new(String.from_java_bytes(v))
+          BYTE_ARRAY_METHOD
         when JAVA_SQL_BLOB
-          convert_type(v.getBytes(1, v.length))
+          BLOB_METHOD
         when JAVA_SQL_CLOB
-          Sequel::SQL::Blob.new(v.getSubString(1, v.length))
+          CLOB_METHOD
         else
-          v
+          false
         end
       end
       
@@ -656,7 +688,7 @@ module Sequel
       
       # Split out from fetch rows to allow processing of JDBC result sets
       # that don't come from issuing an SQL string.
-      def process_result_set(result)
+      def process_result_set(result, &block)
         # get column names
         meta = result.getMetaData
         cols = []
@@ -668,28 +700,69 @@ module Sequel
           columns.delete(rn)
         end
         @columns = columns
-        blk = result_set_object_getter
-        # get rows
-        while result.next
-          row = {}
-          cols.each do |n, i|
-            row[n] = blk.call(result, n, i)
-          end
-          row.delete(rn) if rn
-          yield row
+        if (@convert_types || db.convert_types)
+          cols.each{|c| c << nil}
+          process_result_set_convert(cols, result, rn, &block)
+        else
+          process_result_set_no_convert(cols, result, rn, &block)
         end
       ensure
         result.close
       end
 
-      # Proc that takes the ResultSet and an integer field number and returns
-      # the object for that field.  Respects the @convert_types setting to
-      # convert Java types to ruby types.
-      def result_set_object_getter
-        if @convert_types
-          lambda {|result, n, i| convert_type(result.getObject(i))}
-        else
-          lambda {|result, n, i| result.getObject(i)}
+      # Use conversion procs to convert data retrieved
+      # from the database.  This has been optimized, the algorithm it uses
+      # is roughly, for each column value in each row:
+      # * check if the value is truthy (not false/nil)
+      # * if not truthy, return object
+      # * otherwise, see if a conversion method exists for
+      #   the column.  All columns start with a nil conversion proc,
+      #   since unlike other adapters, Sequel doesn't get the type of
+      #   the column when parsing the column metadata.
+      # * if a conversion proc is not false/nil, call it with the object
+      #   and return the result.
+      # * if a conversion proc has already been looked up and doesn't
+      #   exist (false value), return object.  
+      # * if a conversion proc hasn't been looked up yet (nil value),
+      #   call convert_type_proc to get the conversion method.  Cache
+      #   the result of as the column's conversion proc to speed up
+      #   later processing.  If the conversion proc exists, call it
+      #   and return the result, otherwise, return the object.
+      def process_result_set_convert(cols, result, rn)
+        while result.next
+          row = {}
+          cols.each do |n, i, p|
+            v = result.getObject(i)
+            row[n] = if v
+              if p
+                p.call(v)
+              elsif p.nil?
+                cols[i-1][2] = p = convert_type_proc(v)
+                if p
+                  p.call(v)
+                else
+                  v
+                end
+              else
+                v
+              end
+            else
+              v
+            end
+          end
+          row.delete(rn) if rn
+          yield row
+        end
+      end
+
+      # Yield rows without calling any conversion procs.  This
+      # may yield Java values and not ruby values.
+      def process_result_set_no_convert(cols, result, rn)
+        while result.next
+          row = {}
+          cols.each{|n, i| row[n] = result.getObject(i)}
+          row.delete(rn) if rn
+          yield row
         end
       end
     end

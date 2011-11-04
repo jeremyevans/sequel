@@ -2,7 +2,7 @@
 
 * Allow specifying nanoseconds when converting a hash or array to a timestamp (jfirebaugh, jeremyevans) (#395)
 
-* Improve performance when converting Java types to ruby types in the jdbc adapter (jfirebaugh) (#395)
+* Improve performance when converting Java types to ruby types in the jdbc adapter (jeremyevans, jfirebaugh) (#395)
 
 * Fix tinytds adapter if DB.identifier_output_method = nil (jeremyevans)
 

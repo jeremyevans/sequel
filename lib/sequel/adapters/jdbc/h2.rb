@@ -154,14 +154,21 @@ module Sequel
         end 
 
         private
+
+        #JAVA_H2_CLOB = Java::OrgH2Jdbc::JdbcClob
+
+        class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
+          def h2_clob(v) Sequel::SQL::Blob.new(v.getSubString(1, v.length)) end
+        end
+
+        H2_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:h2_clob)
       
         # Handle H2 specific clobs as strings.
-        def convert_type(v)
-          case v
-          when Java::OrgH2Jdbc::JdbcClob
-            convert_type(v.getSubString(1, v.length))
+        def convert_type_proc(v)
+          if v.is_a?(Java::OrgH2Jdbc::JdbcClob)
+            H2_CLOB_METHOD
           else
-            super(v)
+            super
           end
         end
         
