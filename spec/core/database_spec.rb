@@ -1782,6 +1782,7 @@ describe "Database#typecast_value" do
       Sequel.datetime_class = DateTime
       @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14]).should == DateTime.civil(2011, 10, 11, 12, 13, 14)
       @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14, 500000000]).should == DateTime.civil(2011, 10, 11, 12, 13, (defined?(Rational) ? Rational(29, 2) : 14.5))
+      @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14, 500000000, (defined?(Rational) ? Rational(1, 2) : 0.5)]).should == DateTime.civil(2011, 10, 11, 12, 13, (defined?(Rational) ? Rational(29, 2) : 14.5), (defined?(Rational) ? Rational(1, 2) : 0.5))
     ensure
       Sequel.datetime_class = Time
     end
@@ -1799,6 +1800,10 @@ describe "Database#typecast_value" do
       @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14, :nanos=>500000000).should == DateTime.civil(2011, 10, 11, 12, 13, (defined?(Rational) ? Rational(29, 2) : 14.5))
       @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14).should == DateTime.civil(2011, 10, 11, 12, 13, 14)
       @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14, 'nanos'=>500000000).should == DateTime.civil(2011, 10, 11, 12, 13, (defined?(Rational) ? Rational(29, 2) : 14.5))
+      @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14, :offset=>(defined?(Rational) ? Rational(1, 2) : 0.5)).should == DateTime.civil(2011, 10, 11, 12, 13, 14, (defined?(Rational) ? Rational(1, 2) : 0.5))
+      @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14, :nanos=>500000000, :offset=>(defined?(Rational) ? Rational(1, 2) : 0.5)).should == DateTime.civil(2011, 10, 11, 12, 13, (defined?(Rational) ? Rational(29, 2) : 14.5), (defined?(Rational) ? Rational(1, 2) : 0.5))
+      @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14, 'offset'=>(defined?(Rational) ? Rational(1, 2) : 0.5)).should == DateTime.civil(2011, 10, 11, 12, 13, 14, (defined?(Rational) ? Rational(1, 2) : 0.5))
+      @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14, 'nanos'=>500000000, 'offset'=>(defined?(Rational) ? Rational(1, 2) : 0.5)).should == DateTime.civil(2011, 10, 11, 12, 13, (defined?(Rational) ? Rational(29, 2) : 14.5), (defined?(Rational) ? Rational(1, 2) : 0.5))
     ensure
       Sequel.datetime_class = Time
     end
