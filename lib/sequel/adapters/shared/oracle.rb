@@ -179,6 +179,25 @@ module Sequel
 
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with select distinct columns from join where group having compounds order lock')
       ROW_NUMBER_EXPRESSION = 'ROWNUM'.lit.freeze
+      SPACE = Dataset::SPACE
+      APOS = Dataset::APOS
+      APOS_RE = Dataset::APOS_RE
+      DOUBLE_APOS = Dataset::DOUBLE_APOS
+      FROM = Dataset::FROM
+      BITCOMP_OPEN = "((0 - ".freeze
+      BITCOMP_CLOSE = ") - 1)".freeze
+      ILIKE_0 = "(UPPER(".freeze
+      ILIKE_1 = ") ".freeze
+      ILIKE_2 = ' UPPER('.freeze
+      ILIKE_3 = "))".freeze
+      LIKE = 'LIKE'.freeze
+      NOT_LIKE = 'NOT LIKE'.freeze
+      TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'".freeze
+      TIMESTAMP_OFFSET_FORMAT = "%+03i:%02i".freeze
+      BOOL_FALSE = "'N'".freeze
+      BOOL_TRUE = "'Y'".freeze
+      HSTAR = "H*".freeze
+      DUAL = ['DUAL'.freeze].freeze
 
       # Oracle needs to emulate bitwise operators and ILIKE/NOT ILIKE operators.
       def complex_expression_sql_append(sql, op, args)
@@ -190,21 +209,21 @@ module Sequel
         when :^
           sql << complex_expression_arg_pairs(args){|*x| "(#{complex_expression_sql(:|, x)} - #{complex_expression_sql(:&, x)})"}
         when :'B~'
-          sql << "((0 - "
+          sql << BITCOMP_OPEN
           literal_append(sql, args.at(0))
-          sql << ") - 1)"
+          sql << BITCOMP_CLOSE
         when :<<
           sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * power(2, #{literal b}))"}
         when :>>
           sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / power(2, #{literal b}))"}
         when :ILIKE, :'NOT ILIKE'
-          sql << "(UPPER("
+          sql << ILIKE_0
           literal_append(sql, args.at(0))
-          sql << ") "
-          sql << (op == :ILIKE ? 'LIKE' : 'NOT LIKE')
-          sql<< ' UPPER('
+          sql << ILIKE_1
+          sql << (op == :ILIKE ? LIKE : NOT_LIKE)
+          sql<< ILIKE_2
           literal_append(sql, args.at(1))
-          sql << "))"
+          sql << ILIKE_3
         else
           super
         end
@@ -299,13 +318,13 @@ module Sequel
       # Oracle doesn't support the use of AS when aliasing a dataset.  It doesn't require
       # the use of AS anywhere, so this disables it in all cases.
       def as_sql_append(sql, aliaz)
-        sql << ' '
+        sql << SPACE
         quote_identifier_append(sql, aliaz)
       end
 
       # The strftime format to use when literalizing the time.
       def default_timestamp_format
-        "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'".freeze
+        TIMESTAMP_FORMAT
       end
 
       # If this dataset is associated with a sequence, return the most recently
@@ -317,7 +336,7 @@ module Sequel
 
       # Use a colon for the timestamp offset, since Oracle appears to require it.
       def format_timestamp_offset(hour, minute)
-        sprintf("%+03i:%02i", hour, minute)
+        sprintf(TIMESTAMP_OFFSET_FORMAT, hour, minute)
       end
 
       # Oracle doesn't support empty values when inserting.
@@ -327,24 +346,22 @@ module Sequel
 
       # Use string in hex format for blob data.
       def literal_blob_append(sql, v)
-        sql << "'" << v.unpack("H*").first << "'"
+        sql << APOS << v.unpack(HSTAR).first << APOS
       end
 
       # Oracle uses 'N' for false values.
       def literal_false
-        "'N'"
+        BOOL_FALSE
       end
 
       # Oracle uses the SQL standard of only doubling ' inside strings.
       def literal_string_append(sql, v)
-        sql << "'"
-        sql << v.gsub("'", "''")
-        sql << "'"
+        sql APOS << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
       end
 
       # Oracle uses 'Y' for true values.
       def literal_true
-        "'Y'"
+        BOOL_TRUE
       end
 
       # Use the Oracle-specific SQL clauses (no limit, since it is emulated).
@@ -357,8 +374,8 @@ module Sequel
       # so add the dummy DUAL table if the dataset doesn't select
       # from a table.
       def select_from_sql(sql)
-        sql << " FROM "
-        source_list_append(sql, @opts[:from] || ['DUAL'])
+        sql << FROM
+        source_list_append(sql, @opts[:from] || DUAL)
       end
     end
   end

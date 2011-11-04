@@ -104,6 +104,20 @@ module Sequel
       
       # Dataset class for Derby datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
+        PAREN_CLOSE = Dataset::PAREN_CLOSE
+        PAREN_OPEN = Dataset::PAREN_OPEN
+        OFFSET = Dataset::OFFSET
+        CAST_STRING_OPEN = "RTRIM(".freeze
+        BITCOMP_OPEN = "((0 - ".freeze
+        BITCOMP_CLOSE = ") - 1)".freeze
+        BLOB_OPEN = "CAST(X'".freeze
+        BLOB_CLOSE = "' AS BLOB)".freeze
+        HSTAR = "H*".freeze
+        TIME_FORMAT = "'%H:%M:%S'".freeze
+        DEFAULT_FROM = " FROM sysibm.sysdummy1".freeze
+        ROWS = " ROWS".freeze
+        FETCH_FIRST = " FETCH FIRST ".freeze
+        ROWS_ONLY = " ROWS ONLY".freeze
         BOOL_TRUE = '(1 = 1)'.freeze
         BOOL_FALSE = '(1 = 0)'.freeze
         SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit lock')
@@ -125,9 +139,9 @@ module Sequel
         # a string and the ending whitespace is important.
         def cast_sql_append(sql, expr, type)
           if type == String
-            sql << "RTRIM("
+            sql << CAST_STRING_OPEN
             super
-            sql << ")"
+            sql << PAREN_CLOSE
           else
             super
           end
@@ -137,19 +151,19 @@ module Sequel
         def complex_expression_sql_append(sql, op, args)
           case op
           when :ILIKE
-            super(sql, :LIKE, [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
+            super(sql, :LIKE, [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1))])
           when :"NOT ILIKE"
-            super(sql, :"NOT LIKE", [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
+            super(sql, :"NOT LIKE", [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1))])
           when :&, :|, :^, :<<, :>>
             raise Error, "Derby doesn't support the #{op} operator"
           when :'B~'
-            sql << "((0 - "
+            sql << BITCOMP_OPEN
             literal_append(sql, args.at(0))
-            sql << ") - 1)"
+            sql << BITCOMP_CLOSE
           when :extract
-            sql << args.at(0).to_s << '('
+            sql << args.at(0).to_s << PAREN_OPEN
             literal_append(sql, args.at(1))
-            sql << ')'
+            sql << PAREN_CLOSE
           else
             super
           end
@@ -169,7 +183,7 @@ module Sequel
 
         # Derby needs a hex string casted to BLOB for blobs.
         def literal_blob_append(sql, v)
-          sql << "CAST(X'" << v.unpack("H*").first << "' AS BLOB)"
+          sql << BLOB_OPEN << v.unpack(HSTAR).first << BLOB_CLOSE
         end
 
         # Derby needs the standard workaround to insert all default values into
@@ -186,7 +200,7 @@ module Sequel
 
         # Derby handles fractional seconds in timestamps, but not in times
         def literal_sqltime(v)
-          v.strftime("'%H:%M:%S'")
+          v.strftime(TIME_FORMAT)
         end
 
         # Derby uses an expression yielding true for true values.
@@ -205,21 +219,21 @@ module Sequel
           if @opts[:from]
             super
           else
-            sql << " FROM sysibm.sysdummy1"
+            sql << DEFAULT_FROM
           end
         end
 
         # Offset comes before limit in Derby
         def select_limit_sql(sql)
           if o = @opts[:offset]
-            sql << " OFFSET "
+            sql << OFFSET
             literal_append(sql, o)
-            sql << " ROWS"
+            sql << ROWS
           end
           if l = @opts[:limit]
-            sql << " FETCH FIRST "
+            sql << FETCH_FIRST
             literal_append(sql, l)
-            sql << " ROWS ONLY"
+            sql << ROWS_ONLY
           end
         end
       end

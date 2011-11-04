@@ -106,14 +106,18 @@ module Sequel
       class Dataset < JDBC::Dataset
         SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
         BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
+        APOS = Dataset::APOS
+        HSTAR = "H*".freeze
+        BITCOMP_OPEN = "((0 - ".freeze
+        BITCOMP_CLOSE = ") - 1)".freeze
+        ILIKE_PLACEHOLDER = "CAST(? AS VARCHAR_IGNORECASE)".freeze
+        TIME_FORMAT = "'%H:%M:%S'".freeze
         
         # Emulate the case insensitive LIKE operator and the bitwise operators.
         def complex_expression_sql_append(sql, op, args)
           case op
-          when :ILIKE
-            super(sql, :LIKE, [SQL::PlaceholderLiteralString.new("CAST(? AS VARCHAR_IGNORECASE)", [args.at(0)]), args.at(1)])
-          when :"NOT ILIKE"
-            super(sql, :"NOT LIKE", [SQL::PlaceholderLiteralString.new("CAST(? AS VARCHAR_IGNORECASE)", [args.at(0)]), args.at(1)])
+          when :ILIKE, :"NOT ILIKE"
+            super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), [SQL::PlaceholderLiteralString.new(ILIKE_PLACEHOLDER, [args.at(0)]), args.at(1)])
           when :&, :|, :^
             sql << complex_expression_arg_pairs(args){|a, b| literal(SQL::Function.new(BITWISE_METHOD_MAP[op], a, b))}
           when :<<
@@ -121,9 +125,9 @@ module Sequel
           when :>>
             sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
           when :'B~'
-            sql << "((0 - "
+            sql << BITCOMP_OPEN
             literal_append(sql, args.at(0))
-            sql << ") - 1)"
+            sql << BITCOMP_CLOSE
           else
             super
           end
@@ -163,12 +167,12 @@ module Sequel
         
         # H2 expects hexadecimal strings for blob values
         def literal_blob_append(sql, v)
-          sql << "'" << v.unpack("H*").first << "'"
+          sql << APOS << v.unpack(HSTAR).first << APOS
         end
         
         # H2 handles fractional seconds in timestamps, but not in times
         def literal_sqltime(v)
-          v.strftime("'%H:%M:%S'")
+          v.strftime(TIME_FORMAT)
         end
 
         def select_clause_methods

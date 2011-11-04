@@ -73,6 +73,7 @@ module Sequel
       # Dataset subclass used for datasets that connect to PostgreSQL via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Postgres::DatasetMethods
+        APOS = Dataset::APOS
 
         # Add the shared PostgreSQL prepared statement methods
         def prepare(*args)
@@ -83,7 +84,7 @@ module Sequel
         
         # Literalize strings similar to the native postgres adapter
         def literal_string_append(sql, v)
-          sql << "'" << db.synchronize{|c| c.escape_string(v)} << "'"
+          sql << APOS << db.synchronize{|c| c.escape_string(v)} << APOS
         end
       end
     end

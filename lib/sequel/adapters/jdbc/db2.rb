@@ -18,6 +18,7 @@ module Sequel
       module DatabaseMethods
         include Sequel::DB2::DatabaseMethods
         include Sequel::JDBC::Transactions
+        IDENTITY_VAL_LOCAL = "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1".freeze
         
         %w'schema_parse_table tables views indexes'.each do |s|
           class_eval("def #{s}(*a) jdbc_#{s}(*a) end", __FILE__, __LINE__)
@@ -27,7 +28,7 @@ module Sequel
         
         def last_insert_id(conn, opts={})
           statement(conn) do |stmt|
-            sql = "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1"
+            sql = IDENTITY_VAL_LOCAL
             rs = log_yield(sql){stmt.executeQuery(sql)}
             rs.next
             rs.getInt(1)

@@ -8,6 +8,7 @@ module Sequel
       # Database instance methods for MySQL databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::MySQL::DatabaseMethods
+        LAST_INSERT_ID = 'SELECT LAST_INSERT_ID()'.freeze
         
         private
         
@@ -34,7 +35,7 @@ module Sequel
             end
           else
             statement(conn) do |stmt|
-              rs = stmt.executeQuery('SELECT LAST_INSERT_ID()')
+              rs = stmt.executeQuery(LAST_INSERT_ID)
               rs.next
               rs.getInt(1)
             end

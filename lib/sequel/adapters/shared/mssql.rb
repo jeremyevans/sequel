@@ -258,6 +258,31 @@ module Sequel
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
       EXTRACT_MAP = {:year=>"yy", :month=>"m", :day=>"d", :hour=>"hh", :minute=>"n", :second=>"s"}
+      BRACKET_CLOSE = Dataset::BRACKET_CLOSE
+      BRACKET_OPEN = Dataset::BRACKET_OPEN
+      COMMA = Dataset::COMMA
+      PAREN_CLOSE = Dataset::PAREN_CLOSE
+      PAREN_SPACE_OPEN = Dataset::PAREN_SPACE_OPEN
+      SPACE = Dataset::SPACE
+      FROM = Dataset::FROM
+      APOS = Dataset::APOS
+      APOS_RE = Dataset::APOS_RE
+      DOUBLE_APOS = Dataset::DOUBLE_APOS
+      INTO = Dataset::INTO
+      DATEPART_SECOND_OPEN = "CAST((datepart(".freeze
+      DATEPART_SECOND_MIDDLE = ') + datepart(ns, '.freeze
+      DATEPART_SECOND_CLOSE = ")/1000000000.0) AS double precision)".freeze
+      DATEPART_OPEN = "datepart(".freeze
+      UNION_ALL = ' UNION ALL '.freeze
+      SELECT_SPACE = 'SELECT '.freeze
+      TIMESTAMP_USEC_FORMAT = ".%03d".freeze
+      OUTPUT_INSERTED = " OUTPUT INSERTED.*".freeze
+      HEX_START = '0x'.freeze
+      UNICODE_STRING_START = "N'".freeze
+      TOP_PAREN = " TOP (".freeze
+      TOP = " TOP ".freeze
+      OUTPUT = " OUTPUT ".freeze
+      HSTAR = "H*".freeze
 
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
       attr_accessor :mssql_unicode_strings
@@ -286,11 +311,11 @@ module Sequel
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
           if part == :second
             expr = literal(args.at(1))
-            sql << "CAST((datepart(" << format.to_s << ', ' << expr << ') + datepart(ns, ' << expr << ")/1000000000.0) AS double precision)"
+            sql << DATEPART_SECOND_OPEN << format.to_s << COMMA << expr << DATEPART_SECOND_MIDDLE << expr << DATEPART_SECOND_CLOSE
           else
-            sql << "datepart(" << format.to_s << ', '
+            sql << DATEPART_OPEN << format.to_s << COMMA
             literal_append(sql, args.at(1))
-            sql << ')'
+            sql << PAREN_CLOSE
           end
         else
           super
@@ -336,10 +361,10 @@ module Sequel
       def multi_insert_sql(columns, values)
         c = false
         sql = LiteralString.new('')
-        u = ' UNION ALL '
+        u = UNION_ALL
         values.each do |v|
           sql << u if c
-          sql << 'SELECT '
+          sql << SELECT_SPACE
           expression_list_append(sql, v)
           c ||= true
         end
@@ -383,7 +408,7 @@ module Sequel
 
       # MSSQL uses [] to quote identifiers
       def quoted_identifier_append(sql, name)
-        sql << "[" << name.to_s << "]"
+        sql << BRACKET_OPEN << name.to_s << BRACKET_CLOSE
       end
       
       # The version of the database server.
@@ -456,7 +481,7 @@ module Sequel
 
       # Only include the primary table in the main delete clause
       def delete_from_sql(sql)
-        sql << " FROM "
+        sql << FROM
         source_list_append(sql, @opts[:from][0..0])
       end
 
@@ -473,7 +498,7 @@ module Sequel
       # for a fractional timestamp.  This probably doesn't work for smalldatetime
       # fields.
       def format_timestamp_usec(usec)
-        sprintf(".%03d", usec/1000)
+        sprintf(TIMESTAMP_USEC_FORMAT, usec/1000)
       end
 
       # MSSQL supports the OUTPUT clause for INSERT statements.
@@ -486,7 +511,7 @@ module Sequel
       # for use with the prepared statement code.
       def insert_output_sql(sql)
         if @opts.has_key?(:returning)
-          sql << " OUTPUT INSERTED.*"
+          sql << OUTPUT_INSERTED
         else
           output_sql(sql)
         end
@@ -494,14 +519,14 @@ module Sequel
 
       # MSSQL uses a literal hexidecimal number for blob strings
       def literal_blob_append(sql, v)
-        sql << '0x' << v.unpack("H*").first
+        sql << HEX_START << v.unpack(HSTAR).first
       end
       
       # Optionally use unicode string syntax for all strings. Don't double
       # backslashes.
       def literal_string_append(sql, v)
-        sql << 'N' if mssql_unicode_strings
-        sql << "'" << v.gsub("'", "''") << "'"
+        sql << (mssql_unicode_strings ? UNICODE_STRING_START : APOS)
+        sql << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
       end
       
       # Use 0 for false on MSSQL
@@ -521,7 +546,7 @@ module Sequel
 
       def select_into_sql(sql)
         if i = @opts[:into]
-          sql << " INTO "
+          sql << INTO
           table_ref_append(sql, i)
         end
       end
@@ -531,11 +556,11 @@ module Sequel
       def select_limit_sql(sql)
         if l = @opts[:limit]
           if is_2005_or_later?
-            sql << " TOP ("
+            sql << TOP_PAREN
             literal_append(sql, l)
-            sql << ")"
+            sql << PAREN_CLOSE
           else
-            sql << " TOP "
+            sql << TOP
             literal_append(sql, l)
           end
         end
@@ -557,15 +582,15 @@ module Sequel
       def output_sql(sql)
         return unless supports_output_clause?
         return unless output = @opts[:output]
-        sql << " OUTPUT "
+        sql << OUTPUT
         column_list_append(sql, output[:select_list])
         if into = output[:into]
-          sql << " INTO "
+          sql << INTO
           table_ref_append(sql, into)
           if column_list = output[:column_list]
-            sql << " ("
+            sql << PAREN_SPACE_OPEN
             source_list_append(sql, column_list)
-            sql << ")"
+            sql << PAREN_CLOSE
           end
         end
       end
@@ -580,7 +605,7 @@ module Sequel
 
       # Only include the primary table in the main update clause
       def update_table_sql(sql)
-        sql << " "
+        sql << SPACE
         source_list_append(sql, @opts[:from][0..0])
       end
     end

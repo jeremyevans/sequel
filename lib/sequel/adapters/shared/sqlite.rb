@@ -397,9 +397,20 @@ module Sequel
     # Instance methods for datasets that connect to an SQLite database
     module DatasetMethods
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
-      COMMA_SEPARATOR = ', '.freeze
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
       EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%f'"}
+      NOT_SPACE = Dataset::NOT_SPACE
+      COMMA = Dataset::COMMA
+      PAREN_CLOSE = Dataset::PAREN_CLOSE
+      AS = Dataset::AS
+      APOS = Dataset::APOS
+      EXTRACT_OPEN = "CAST(strftime(".freeze
+      EXRACT_CLOSE = ') AS '.freeze
+      NUMERIC = 'NUMERIC'.freeze
+      INTEGER = 'INTEGER'.freeze
+      BACKTICK = '`'.freeze
+      BLOB_START = "X'".freeze
+      HSTAR = "H*".freeze
 
       # SQLite does not support pattern matching via regular expressions.
       # SQLite is case insensitive (depending on pragma), so use LIKE for
@@ -411,7 +422,7 @@ module Sequel
         when :ILIKE
           super(sql, :LIKE, args.map{|a| SQL::Function.new(:upper, a)})
         when :"NOT LIKE", :"NOT ILIKE"
-          sql << "NOT "
+          sql << NOT_SPACE
           complex_expression_sql_append(sql, (op == :"NOT ILIKE" ? :ILIKE : :LIKE), args)
         when :^
           sql << complex_expression_arg_pairs(args) do |a, b|
@@ -422,9 +433,9 @@ module Sequel
         when :extract
           part = args.at(0)
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
-          sql << "CAST(strftime(" << format << ', '
+          sql << EXTRACT_OPEN << format << COMMA
           literal_append(sql, args.at(1))
-          sql << ') AS ' << (part == :second ? 'NUMERIC' : 'INTEGER') << ')'
+          sql << EXRACT_CLOSE << (part == :second ? NUMERIC : INTEGER) << PAREN_CLOSE
         else
           super
         end
@@ -461,9 +472,7 @@ module Sequel
       
       # SQLite uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
-        sql << "`"
-        sql << c.to_s
-        sql << "`"
+        sql << BACKTICK << c.to_s << BACKTICK
       end
       
       # When a qualified column is selected on SQLite and the qualifier
@@ -510,7 +519,7 @@ module Sequel
       # SQLite uses string literals instead of identifiers in AS clauses.
       def as_sql_append(sql, aliaz)
         aliaz = aliaz.value if aliaz.is_a?(SQL::Identifier)
-        sql << " AS "
+        sql << AS
         literal_append(sql, aliaz.to_s)
       end
 
@@ -533,12 +542,12 @@ module Sequel
       
       # SQL fragment specifying a list of identifiers
       def identifier_list(columns)
-        columns.map{|i| quote_identifier(i)}.join(COMMA_SEPARATOR)
+        columns.map{|i| quote_identifier(i)}.join(COMMA)
       end
     
       # SQLite uses a preceding X for hex escaping strings
       def literal_blob_append(sql, v)
-        sql << "X'" << v.unpack("H*").first << "'"
+        sql << BLOB_START << v.unpack(HSTAR).first << APOS
       end
 
       # SQLite does not support the SQL WITH clause

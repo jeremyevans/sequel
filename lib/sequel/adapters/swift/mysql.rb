@@ -34,6 +34,7 @@ module Sequel
       # Dataset class for MySQL datasets accessed via Swift.
       class Dataset < Swift::Dataset
         include Sequel::MySQL::DatasetMethods
+        APOS = Dataset::APOS
         
         # Use execute_insert to execute the replace_sql.
         def replace(*args)
@@ -44,7 +45,7 @@ module Sequel
         
         # Use Swift's escape method for quoting.
         def literal_string_append(sql, s)
-          sql << "'" << db.synchronize{|c| c.escape(s)} << "'"
+          sql << APOS << db.synchronize{|c| c.escape(s)} << APOS
         end
       end
     end

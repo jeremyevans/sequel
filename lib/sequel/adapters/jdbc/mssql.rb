@@ -13,6 +13,8 @@ module Sequel
       # Database instance methods for MSSQL databases accessed via JDBC.
       module DatabaseMethods
         PRIMARY_KEY_INDEX_RE = /\Apk__/i.freeze
+        ATAT_IDENTITY = 'SELECT @@IDENTITY'.freeze
+        SCOPE_IDENTITY = 'SELECT SCOPE_IDENTITY()'.freeze
         
         include Sequel::MSSQL::DatabaseMethods
         
@@ -21,7 +23,7 @@ module Sequel
         # Get the last inserted id using SCOPE_IDENTITY().
         def last_insert_id(conn, opts={})
           statement(conn) do |stmt|
-            sql = opts[:prepared] ? 'SELECT @@IDENTITY' : 'SELECT SCOPE_IDENTITY()'
+            sql = opts[:prepared] ? ATAT_IDENTITY : SCOPE_IDENTITY
             rs = log_yield(sql){stmt.executeQuery(sql)}
             rs.next
             rs.getInt(1)

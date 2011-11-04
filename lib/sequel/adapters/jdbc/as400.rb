@@ -39,6 +39,9 @@ module Sequel
       # Dataset class for AS400 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         WILDCARD = Sequel::LiteralString.new('*').freeze
+        FETCH_FIRST_ROW_ONLY = " FETCH FIRST ROW ONLY".freeze
+        FETCH_FIRST = " FETCH FIRST ".freeze
+        ROWS_ONLY = " ROWS ONLY".freeze
         
         # AS400 needs to use a couple of subselects for queries with offsets.
         def select_sql
@@ -62,11 +65,11 @@ module Sequel
         def select_limit_sql(sql)
           if l = @opts[:limit]
             if l == 1
-              sql << " FETCH FIRST ROW ONLY"
+              sql << FETCH_FIRST_ROW_ONLY
             elsif l > 1
-              sql << " FETCH FIRST "
+              sql << FETCH_FIRST
               literal_append(sql, l)
-              sql << " ROWS ONLY"
+              sql << ROWS_ONLY
             end
           end
         end

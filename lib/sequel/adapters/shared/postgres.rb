@@ -661,6 +661,20 @@ module Sequel
       SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'update table set from where')
       UPDATE_CLAUSE_METHODS_91 = Dataset.clause_methods(:update, %w'with update table set from where returning')
+      SPACE = Dataset::SPACE
+      FROM = Dataset::FROM
+      APOS = Dataset::APOS
+      APOS_RE = Dataset::APOS_RE
+      DOUBLE_APOS = Dataset::DOUBLE_APOS
+      PAREN_OPEN = Dataset::PAREN_OPEN
+      PAREN_CLOSE = Dataset::PAREN_CLOSE
+      COMMA = Dataset::COMMA
+      AS = Dataset::AS
+      XOR_OP = ' # '.freeze
+      CRLF = "\r\n".freeze
+      BLOB_RE = /[\000-\037\047\134\177-\377]/n.freeze
+      WINDOW = " WINDOW ".freeze
+      EMPTY_STRING = ''.freeze
       
       # Shared methods for prepared statements when used with PostgreSQL databases.
       module PreparedStatementMethods
@@ -701,7 +715,7 @@ module Sequel
       def complex_expression_sql_append(sql, op, args)
         case op
         when :^
-          j = ' # '
+          j = XOR_OP
           c = false
           args.each do |a|
             sql << j if c
@@ -720,7 +734,7 @@ module Sequel
 
       # Return the results of an EXPLAIN query as a string
       def explain(opts={})
-        with_sql((opts[:analyze] ? EXPLAIN_ANALYZE : EXPLAIN) + select_sql).map(QUERY_PLAN).join("\r\n")
+        with_sql((opts[:analyze] ? EXPLAIN_ANALYZE : EXPLAIN) + select_sql).map(QUERY_PLAN).join(CRLF)
       end
       
       # Return a cloned dataset which will use FOR SHARE to lock returned rows.
@@ -826,7 +840,7 @@ module Sequel
 
       # Only include the primary table in the main delete clause
       def delete_from_sql(sql)
-        sql << " FROM "
+        sql << FROM
         source_list_append(sql, @opts[:from][0..0])
       end
 
@@ -858,7 +872,7 @@ module Sequel
         if(from = @opts[:from][1..-1]).empty?
           raise(Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs') if @opts[:join]
         else
-          sql << " " << type.to_s << " "
+          sql << SPACE << type.to_s << SPACE
           source_list_append(sql, from)
           select_join_sql(sql)
         end
@@ -866,9 +880,7 @@ module Sequel
 
       # Use a generic blob quoting method, hopefully overridden in one of the subadapter methods
       def literal_blob_append(sql, v)
-        sql << "'"
-        sql << v.gsub(/[\000-\037\047\134\177-\377]/n){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}
-        sql << "'"
+        sql << APOS << v.gsub(BLOB_RE){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"} << APOS
       end
 
       # PostgreSQL uses FALSE for false values
@@ -878,9 +890,7 @@ module Sequel
 
       # Assume that SQL standard quoting is on, per Sequel's defaults
       def literal_string_append(sql, v)
-        sql << "'"
-        sql << v.gsub("'", "''")
-        sql << "'"
+        sql << APOS << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
       end
 
       # PostgreSQL uses FALSE for false values
@@ -896,9 +906,9 @@ module Sequel
       # PostgreSQL requires parentheses around compound datasets if they use
       # CTEs, and using them in other places doesn't hurt.
       def compound_dataset_sql_append(sql, ds)
-        sql << "("
+        sql << PAREN_OPEN
         super
-        sql << ")"
+        sql << PAREN_CLOSE
       end
 
       # Support FOR SHARE locking when using the :share lock style.
@@ -909,13 +919,14 @@ module Sequel
       # SQL fragment for named window specifications
       def select_window_sql(sql)
         if ws = @opts[:window]
-          sql << " WINDOW "
+          sql << WINDOW
           c = false
-          co = ', '
+          co = COMMA
+          as = AS
           ws.map do |name, window| 
             sql << co if c
             literal_append(sql, name)
-            sql << " AS "
+            sql << as
             literal_append(sql, window)
             c ||= true
           end
@@ -934,8 +945,8 @@ module Sequel
 
       # Concatenate the expressions with a space in between
       def full_text_string_join(cols)
-        cols = Array(cols).map{|x| SQL::Function.new(:COALESCE, x, '')}
-        cols = cols.zip([' '] * cols.length).flatten
+        cols = Array(cols).map{|x| SQL::Function.new(:COALESCE, x, EMPTY_STRING)}
+        cols = cols.zip([SPACE] * cols.length).flatten
         cols.pop
         literal(SQL::StringExpression.new(:'||', *cols))
       end
@@ -952,7 +963,7 @@ module Sequel
 
       # Only include the primary table in the main update clause
       def update_table_sql(sql)
-        sql << " "
+        sql << SPACE
         source_list_append(sql, @opts[:from][0..0])
       end
     end

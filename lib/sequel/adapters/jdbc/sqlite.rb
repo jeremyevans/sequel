@@ -7,13 +7,14 @@ module Sequel
       # Instance methods for SQLite Database objects accessed via JDBC.
       module DatabaseMethods
         include Sequel::SQLite::DatabaseMethods
+        LAST_INSERT_ROWID = 'SELECT last_insert_rowid()'.freeze
         
         private
         
         # Use last_insert_rowid() to get the last inserted id.
         def last_insert_id(conn, opts={})
           statement(conn) do |stmt|
-            rs = stmt.executeQuery('SELECT last_insert_rowid()')
+            rs = stmt.executeQuery(LAST_INSERT_ROWID)
             rs.next
             rs.getInt(1)
           end

@@ -175,16 +175,24 @@ module Sequel
     module DatasetMethods
       include EmulateOffsetWithRowNumber
 
+      PAREN_CLOSE = Dataset::PAREN_CLOSE
+      PAREN_OPEN = Dataset::PAREN_OPEN
       BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
-      
+      CAST_STRING_OPEN = "RTRIM(CHAR(".freeze
+      CAST_STRING_CLOSE = "))".freeze
+      FETCH_FIRST_ROW_ONLY = " FETCH FIRST ROW ONLY".freeze
+      FETCH_FIRST = " FETCH FIRST ".freeze
+      ROWS_ONLY = " ROWS ONLY".freeze
+      EMPTY_FROM_TABLE = ' FROM "SYSIBM"."SYSDUMMY1"'.freeze
+
       # DB2 casts strings using RTRIM and CHAR instead of VARCHAR.
       def cast_sql_append(sql, expr, type)
         if(type == String)
-          sql << "RTRIM(CHAR("
+          sql << CAST_STRING_OPEN
           literal_append(sql, expr)
-          sql << "))"
+          sql << CAST_STRING_CLOSE
         else
           super
         end
@@ -210,9 +218,9 @@ module Sequel
           literal_append(sql, SQL::Function.new(:BITNOT, *args))
         when :extract
           sql << args.at(0).to_s
-          sql << '('
+          sql << PAREN_OPEN
           literal_append(sql, args.at(1))
-          sql << ')'
+          sql << PAREN_CLOSE
         else
           super
         end
@@ -268,7 +276,7 @@ module Sequel
 
       # Add a fallback table for empty from situation
       def select_from_sql(sql)
-        @opts[:from] ? super : (sql << ' FROM "SYSIBM"."SYSDUMMY1"')
+        @opts[:from] ? super : (sql << EMPTY_FROM_TABLE)
       end
 
       # Modify the sql to limit the number of rows returned
@@ -283,14 +291,13 @@ module Sequel
       #     Support for this feature is not used in this adapter however.
       def select_limit_sql(sql)
         if l = @opts[:limit]
-          sql << " FETCH FIRST "
           if l == 1
-            sql << 'ROW'
-          else
+            sql << FETCH_FIRST_ROW_ONLY
+          elsif l > 1
+            sql << FETCH_FIRST
             literal_append(sql, l)
-            sql << " ROWS"
+            sql << ROWS_ONLY
           end
-          sql << " ONLY"
         end
       end
       

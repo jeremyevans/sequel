@@ -337,6 +337,30 @@ module Sequel
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'insert ignore into columns values on_duplicate_key_update')
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct calc_found_rows columns from join where group having compounds order limit lock')
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'update table set where order limit')
+      SPACE = Dataset::SPACE
+      PAREN_OPEN = Dataset::PAREN_OPEN
+      PAREN_CLOSE = Dataset::PAREN_CLOSE
+      NOT_SPACE = Dataset::NOT_SPACE
+      FROM = Dataset::FROM
+      INSERT = Dataset::INSERT
+      COMMA = Dataset::COMMA
+      LIMIT = Dataset::LIMIT
+      REGEXP = 'REGEXP'.freeze
+      LIKE = 'LIKE'.freeze
+      BINARY = 'BINARY '.freeze
+      CONCAT = "CONCAT".freeze
+      CAST_BITCOMP_OPEN = "CAST(~".freeze
+      CAST_BITCOMP_CLOSE = " AS SIGNED INTEGER)".freeze
+      STRAIGHT_JOIN = 'STRAIGHT_JOIN'.freeze
+      NATURAL_LEFT_JOIN = 'NATURAL LEFT JOIN'.freeze
+      BACKTICK = '`'.freeze
+      EMPTY_COLUMNS = " ()".freeze
+      EMPTY_VALUES = " VALUES ()".freeze
+      IGNORE = " IGNORE".freeze
+      REPLACE = 'REPLACE'.freeze
+      ON_DUPLICATE_KEY_UPDATE = " ON DUPLICATE KEY UPDATE ".freeze
+      EQ_VALUES = '=VALUES('.freeze
+      EQ = '='.freeze
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
@@ -350,26 +374,26 @@ module Sequel
             super
           end
         when :~, :'!~', :'~*', :'!~*', :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'
-          sql << '('
+          sql << PAREN_OPEN
           literal_append(sql, args.at(0))
-          sql << ' '
+          sql << SPACE
           sql << 'NOT ' if [:'NOT LIKE', :'NOT ILIKE', :'!~', :'!~*'].include?(op)
-          sql << ([:~, :'!~', :'~*', :'!~*'].include?(op) ? 'REGEXP' : 'LIKE')
-          sql << ' '
-          sql << 'BINARY ' if [:~, :'!~', :LIKE, :'NOT LIKE'].include?(op)
+          sql << ([:~, :'!~', :'~*', :'!~*'].include?(op) ? REGEXP : LIKE)
+          sql << SPACE
+          sql << BINARY if [:~, :'!~', :LIKE, :'NOT LIKE'].include?(op)
           literal_append(sql, args.at(1))
-          sql << ')'
+          sql << PAREN_CLOSE
         when :'||'
           if args.length > 1
-            sql << "CONCAT"
+            sql << CONCAT
             array_sql_append(sql, args)
           else
             literal_append(sql, args.at(0))
           end
         when :'B~'
-          sql << "CAST(~"
+          sql << CAST_BITCOMP_OPEN
           literal_append(sql, args.at(0))
-          sql << " AS SIGNED INTEGER)"
+          sql << CAST_BITCOMP_CLOSE
         else
           super
         end
@@ -420,9 +444,12 @@ module Sequel
       # STRAIGHT_JOIN.
       def join_type_sql(join_type)
         case join_type
-        when :straight then 'STRAIGHT_JOIN'
-        when :natural_inner then 'NATURAL LEFT JOIN'
-        else super
+        when :straight
+          STRAIGHT_JOIN
+        when :natural_inner
+          NATURAL_LEFT_JOIN
+        else
+          super
         end
       end
       
@@ -476,7 +503,7 @@ module Sequel
       
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
-        sql << "`" << c.to_s << "`"
+        sql << BACKTICK << c.to_s << BACKTICK
       end
       
       # MySQL specific syntax for REPLACE (aka UPSERT, or update if exists,
@@ -525,9 +552,9 @@ module Sequel
       # from, but include the others for the purposes of selecting rows.
       def delete_from_sql(sql)
         if joined_dataset?
-          sql << " "
+          sql << SPACE
           source_list_append(sql, @opts[:from][0..0])
-          sql << " FROM "
+          sql << FROM
           source_list_append(sql, @opts[:from])
           select_join_sql(sql)
         else
@@ -545,7 +572,7 @@ module Sequel
       def insert_columns_sql(sql)
         values = opts[:values]
         if values.is_a?(Array) && values.empty?
-          sql << " ()"
+          sql << EMPTY_COLUMNS
         else
           super
         end
@@ -553,12 +580,12 @@ module Sequel
 
       # MySQL supports INSERT IGNORE INTO
       def insert_ignore_sql(sql)
-        sql << " IGNORE" if opts[:insert_ignore]
+        sql << IGNORE if opts[:insert_ignore]
       end
 
       # If this is an replace instead of an insert, use replace instead
       def insert_insert_sql(sql)
-        sql << (@opts[:replace] ? 'REPLACE' : 'INSERT')
+        sql << (@opts[:replace] ? REPLACE : INSERT)
       end
 
       # MySQL supports INSERT ... ON DUPLICATE KEY UPDATE
@@ -573,11 +600,11 @@ module Sequel
             update_cols = update_cols[0..-2]
           end
 
-          sql << " ON DUPLICATE KEY UPDATE "
+          sql << ON_DUPLICATE_KEY_UPDATE
           c = false
-          co = ', '
-          values = '=VALUES('
-          endp = ')'
+          co = COMMA
+          values = EQ_VALUES
+          endp = PAREN_CLOSE
           update_cols.each do |col|
             sql << co if c
             quote_identifier_append(sql, col)
@@ -587,7 +614,7 @@ module Sequel
             c ||= true
           end
           if update_vals
-            eq = '='
+            eq = EQ
             update_vals.map do |col,v| 
               sql << co if c
               quote_identifier_append(sql, col)
@@ -603,7 +630,7 @@ module Sequel
       def insert_values_sql(sql)
         values = opts[:values]
         if values.is_a?(Array) && values.empty?
-          sql << " VALUES ()"
+          sql << EMPTY_VALUES
         else
           super
         end
@@ -612,7 +639,7 @@ module Sequel
       # MySQL allows a LIMIT in DELETE and UPDATE statements.
       def limit_sql(sql)
         if l = @opts[:limit]
-          sql << " LIMIT "
+          sql << LIMIT
           literal_append(sql, @opts[:limit])
         end
       end
