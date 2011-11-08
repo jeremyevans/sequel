@@ -22,16 +22,20 @@ describe Sequel::Model, "many_through_many" do
   end
 
   it "should default to associating to other models in the same scope" do
-    class ::AssociationModuleTest
-      class Artist < Sequel::Model
-        plugin :many_through_many
-        many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
+    begin
+      class ::AssociationModuleTest
+        class Artist < Sequel::Model
+          plugin :many_through_many
+          many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
+        end  
+        class Tag < Sequel::Model
+        end  
       end  
-      class Tag < Sequel::Model
-      end  
-    end  
-    
-    ::AssociationModuleTest::Artist.association_reflection(:tags).associated_class.should == ::AssociationModuleTest::Tag
+      
+      ::AssociationModuleTest::Artist.association_reflection(:tags).associated_class.should == ::AssociationModuleTest::Tag
+    ensure
+      Object.send(:remove_const, :AssociationModuleTest)
+    end
   end 
 
   it "should raise an error if in invalid form of through is used" do
@@ -43,9 +47,7 @@ describe Sequel::Model, "many_through_many" do
   it "should allow only two arguments with the :through option" do
     @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
     n.tags.should == [@c2.load(:id=>1)]
   end
 
@@ -53,18 +55,14 @@ describe Sequel::Model, "many_through_many" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     @c1.many_through_many :other_tags, :clone=>:tags
     n = @c1.load(:id => 1234)
-    a = n.other_tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
+    n.other_tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
     n.tags.should == [@c2.load(:id=>1)]
   end
 
   it "should use join tables given" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
     n.tags.should == [@c2.load(:id=>1)]
   end
 
@@ -73,9 +71,7 @@ describe Sequel::Model, "many_through_many" do
     end
     @c1.many_through_many :albums, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id], [:artists, :id, :id], [:albums_artists, :artist_id, :album_id]]
     n = @c1.load(:id => 1234)
-    a = n.albums_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT albums.* FROM albums INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) INNER JOIN artists ON (artists.id = albums_artists.artist_id) INNER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) INNER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id) INNER JOIN albums_artists AS albums_artists_1 ON ((albums_artists_1.album_id = albums_0.id) AND (albums_artists_1.artist_id = 1234))'
+    n.albums_dataset.sql.should == 'SELECT albums.* FROM albums INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) INNER JOIN artists ON (artists.id = albums_artists.artist_id) INNER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) INNER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id) INNER JOIN albums_artists AS albums_artists_1 ON ((albums_artists_1.album_id = albums_0.id) AND (albums_artists_1.artist_id = 1234))'
     n.albums.should == [Album.load(:id=>1, :x=>1)]
     Object.send(:remove_const, :Album)
   end
@@ -83,9 +79,7 @@ describe Sequel::Model, "many_through_many" do
   it "should use explicit class if given" do
     @c1.many_through_many :albums_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag
     n = @c1.load(:id => 1234)
-    a = n.albums_tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
+    n.albums_tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
     n.albums_tags.should == [@c2.load(:id=>1)]
   end
 
@@ -93,9 +87,7 @@ describe Sequel::Model, "many_through_many" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :right_primary_key=>:tag_id, :left_primary_key=>:yyy
     n = @c1.load(:id => 1234)
     n.yyy = 85
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.tag_id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 85))'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.tag_id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 85))'
     n.tags.should == [@c2.load(:id=>1)]
   end
   
@@ -103,9 +95,7 @@ describe Sequel::Model, "many_through_many" do
     @c1.many_through_many :tags, [[:albums_artists, [:b1, :b2], [:c1, :c2]], [:albums, [:d1, :d2], [:e1, :e2]], [:albums_tags, [:f1, :f2], [:g1, :g2]]], :right_primary_key=>[:h1, :h2], :left_primary_key=>[:id, :yyy]
     n = @c1.load(:id => 1234)
     n.yyy = 85
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON ((albums_tags.g1 = tags.h1) AND (albums_tags.g2 = tags.h2)) INNER JOIN albums ON ((albums.e1 = albums_tags.f1) AND (albums.e2 = albums_tags.f2)) INNER JOIN albums_artists ON ((albums_artists.c1 = albums.d1) AND (albums_artists.c2 = albums.d2) AND (albums_artists.b1 = 1234) AND (albums_artists.b2 = 85))'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON ((albums_tags.g1 = tags.h1) AND (albums_tags.g2 = tags.h2)) INNER JOIN albums ON ((albums.e1 = albums_tags.f1) AND (albums.e2 = albums_tags.f2)) INNER JOIN albums_artists ON ((albums_artists.c1 = albums.d1) AND (albums_artists.c2 = albums.d2) AND (albums_artists.b1 = 1234) AND (albums_artists.b2 = 85))'
     n.tags.should == [@c2.load(:id=>1)]
   end
   
@@ -188,52 +178,40 @@ describe Sequel::Model, "many_through_many" do
   it "should support a :conditions option" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :conditions=>{:a=>32}
     n = @c1.load(:id => 1234)
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) WHERE (a = 32)'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) WHERE (a = 32)'
     n.tags.should == [@c2.load(:id=>1)]
 
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :conditions=>['a = ?', 42]
     n = @c1.load(:id => 1234)
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) WHERE (a = 42)'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) WHERE (a = 42)'
     n.tags.should == [@c2.load(:id=>1)]
   end
   
   it "should support an :order option" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :order=>:blah
     n = @c1.load(:id => 1234)
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) ORDER BY blah'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) ORDER BY blah'
     n.tags.should == [@c2.load(:id=>1)]
   end
   
   it "should support an array for the :order option" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :order=>[:blah1, :blah2]
     n = @c1.load(:id => 1234)
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) ORDER BY blah1, blah2'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) ORDER BY blah1, blah2'
     n.tags.should == [@c2.load(:id=>1)]
   end
 
   it "should support a select option" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>:blah
     n = @c1.load(:id => 1234)
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT blah FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
+    n.tags_dataset.sql.should == 'SELECT blah FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
     n.tags.should == [@c2.load(:id=>1)]
   end
   
   it "should support an array for the select option" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>[:tags.*, :albums__name]
     n = @c1.load(:id => 1234)
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.*, albums.name FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
+    n.tags_dataset.sql.should == 'SELECT tags.*, albums.name FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
     n.tags.should == [@c2.load(:id=>1)]
   end
   
@@ -241,9 +219,7 @@ describe Sequel::Model, "many_through_many" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]] do |ds| ds.filter(:yyy=>@yyy) end
     n = @c1.load(:id => 1234)
     n.yyy = 85
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) WHERE (yyy = 85)'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) WHERE (yyy = 85)'
     n.tags.should == [@c2.load(:id=>1)]
   end
 
@@ -251,34 +227,26 @@ describe Sequel::Model, "many_through_many" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :order=>:blah do |ds| ds.filter(:yyy=>@yyy) end
     n = @c1.load(:id => 1234)
     n.yyy = 85
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) WHERE (yyy = 85) ORDER BY blah'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) WHERE (yyy = 85) ORDER BY blah'
     n.tags.should == [@c2.load(:id=>1)]
   end
 
   it "should support a :dataset option that is used instead of the default" do
     @c1.many_through_many :tags, [[:a, :b, :c]], :dataset=>proc{Tag.join(:albums_tags, [:tag_id]).join(:albums, [:album_id]).join(:albums_artists, [:album_id]).filter(:albums_artists__artist_id=>id)}
     n = @c1.load(:id => 1234)
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags USING (tag_id) INNER JOIN albums USING (album_id) INNER JOIN albums_artists USING (album_id) WHERE (albums_artists.artist_id = 1234)'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags USING (tag_id) INNER JOIN albums USING (album_id) INNER JOIN albums_artists USING (album_id) WHERE (albums_artists.artist_id = 1234)'
     n.tags.should == [@c2.load(:id=>1)]
   end
 
   it "should support a :limit option" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :limit=>10
     n = @c1.load(:id => 1234)
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) LIMIT 10'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) LIMIT 10'
     n.tags.should == [@c2.load(:id=>1)]
 
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :limit=>[10, 10]
     n = @c1.load(:id => 1234)
-    a = n.tags_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) LIMIT 10 OFFSET 10'
+    n.tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234)) LIMIT 10 OFFSET 10'
     n.tags.should == [@c2.load(:id=>1)]
   end
 
@@ -338,18 +306,13 @@ describe Sequel::Model, "many_through_many" do
     h = []
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :after_load=>:al
     @c1.class_eval do
-      class_variable_set(:@@blah, h)
+      self::Foo = h
       def al(v)
-        v.each{|x| self.class.send(:class_variable_get, :@@blah) << x.pk * 20}
+        v.each{|x| model::Foo << x.pk * 20}
       end
     end
-    @c2.class_eval do
-      def @dataset.fetch_rows(sql)
-        yield({:id=>20})
-        yield({:id=>30})
-      end
-    end
-    p =  @c1.load(:id=>10, :parent_id=>20)
+    @c2.dataset._fetch = [{:id=>20}, {:id=>30}]
+    p = @c1.load(:id=>10, :parent_id=>20)
     p.tags
     h.should == [400, 600]
     p.tags.collect{|a| a.pk}.should == [20, 30]
@@ -358,14 +321,7 @@ describe Sequel::Model, "many_through_many" do
   it "should support a :uniq option that removes duplicates from the association" do
     h = []
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :uniq=>true
-    @c2.class_eval do
-      def @dataset.fetch_rows(sql)
-        yield({:id=>20})
-        yield({:id=>30})
-        yield({:id=>20})
-        yield({:id=>30})
-      end
-    end
+    @c2.dataset._fetch = [{:id=>20}, {:id=>30}, {:id=>20}, {:id=>30}]
     @c1.load(:id=>10).tags.should == [@c2.load(:id=>20), @c2.load(:id=>30)]
   end
 end
@@ -426,57 +382,40 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     end
     class ::Track < Sequel::Model
     end
-
-    Artist.dataset.extend(Module.new {
-      def columns
-        [:id]
+    Artist.dataset.columns(:id)._fetch = proc do |sql|
+      h = {:id => 1}
+      if sql =~ /FROM artists LEFT OUTER JOIN albums_artists/
+        h[:tags_id] = 2
+        h[:albums_0_id] = 3 if sql =~ /LEFT OUTER JOIN albums AS albums_0/
+        h[:tracks_id] = 4 if sql =~ /LEFT OUTER JOIN tracks/
+        h[:other_tags_id] = 9 if sql =~ /other_tags\.id AS other_tags_id/
+        h[:artists_0_id] = 10 if sql =~ /artists_0\.id AS artists_0_id/
       end
-
-      def fetch_rows(sql)
-        @db << sql
-        h = {:id => 1}
-        if sql =~ /FROM artists LEFT OUTER JOIN albums_artists/
-          h[:tags_id] = 2
-          h[:albums_0_id] = 3 if sql =~ /LEFT OUTER JOIN albums AS albums_0/
-          h[:tracks_id] = 4 if sql =~ /LEFT OUTER JOIN tracks/
-          h[:other_tags_id] = 9 if sql =~ /other_tags\.id AS other_tags_id/
-          h[:artists_0_id] = 10 if sql =~ /artists_0\.id AS artists_0_id/
-        end
-        yield h
-      end
-    })
-
-    Tag.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        @db << sql
-        h = {:id => 2}
-        if sql =~ /albums_artists.artist_id IN \(([18])\)/
-          h.merge!(:x_foreign_key_x=>$1.to_i)
-        elsif sql =~ /\(\(albums_artists.b1, albums_artists.b2\) IN \(\(1, 8\)\)\)/
-          h.merge!(:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>8)
-        end
-        h[:tag_id] = h.delete(:id) if sql =~ /albums_artists.artist_id IN \(8\)/
-        yield h
-      end
-    })
+      h
+    end
     
-    Album.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        @db << sql
-        h = {:id => 3}
-        h.merge!(:x_foreign_key_x=>1) if sql =~ /albums_artists.artist_id IN \(1\)/
-        yield h
+    Tag.dataset._fetch = proc do |sql|
+      h = {:id => 2}
+      if sql =~ /albums_artists.artist_id IN \(([18])\)/
+        h[:x_foreign_key_x] = $1.to_i 
+      elsif sql =~ /\(\(albums_artists.b1, albums_artists.b2\) IN \(\(1, 8\)\)\)/
+        h.merge!(:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>8)
       end
-    })
+      h[:tag_id] = h.delete(:id) if sql =~ /albums_artists.artist_id IN \(8\)/
+      h
+    end
     
-    Track.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        @db << sql
-        h = {:id => 4}
-        h.merge!(:x_foreign_key_x=>2) if sql =~ /albums_tags.tag_id IN \(2\)/
-        yield h
-      end
-    })
+    Album.dataset._fetch = proc do |sql|
+      h = {:id => 3}
+      h[:x_foreign_key_x] = 1 if sql =~ /albums_artists.artist_id IN \(1\)/
+      h
+    end
+    
+    Track.dataset._fetch = proc do |sql|
+      h = {:id => 4}
+      h[:x_foreign_key_x] = 2 if sql =~ /albums_tags.tag_id IN \(2\)/
+      h
+    end
 
     @c1 = Artist
     MODEL_DB.reset
@@ -562,13 +501,10 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   end
   
   it "should respect :eager_graph when lazily loading an association" do
+    Tag.dataset._fetch = {:id=>2, :tracks_id=>4}
     Tag.dataset.extend(Module.new {
       def columns
         [:id]
-      end
-      def fetch_rows(sql)
-        @db << sql
-        yield({:id=>2, :tracks_id=>4})
       end
     })
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_graph=>:tracks
@@ -622,14 +558,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
 
   it "should respect the :limit option on a many_through_many association" do
     @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2
-    Tag.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        MODEL_DB.run sql
-        yield({:x_foreign_key_x=>1, :id=>5})
-        yield({:x_foreign_key_x=>1, :id=>6})
-        yield({:x_foreign_key_x=>1, :id=>7})
-      end
-    })
+    Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5},{:x_foreign_key_x=>1, :id=>6}, {:x_foreign_key_x=>1, :id=>7}]
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
     MODEL_DB.sqls.should == ['SELECT * FROM artists',
@@ -649,13 +578,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   it "should respect the :limit option on a many_through_many association using a :window_function strategy" do
     Tag.dataset.meta_def(:supports_window_functions?){true}
     @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :eager_limit_strategy=>true, :order=>:name
-    Tag.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        MODEL_DB.run sql
-        yield({:x_foreign_key_x=>1, :id=>5})
-        yield({:x_foreign_key_x=>1, :id=>6})
-      end
-    })
+    Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5},{:x_foreign_key_x=>1, :id=>6}]
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
     MODEL_DB.sqls.should == ['SELECT * FROM artists',
@@ -676,19 +599,8 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     Tag.dataset.meta_def(:supports_window_functions?){true}
     @c1.set_primary_key([:id1, :id2])
     @c1.many_through_many :first_two_tags, [[:albums_artists, [:artist_id1, :artist_id2], :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :eager_limit_strategy=>true, :order=>:name
-    @c1.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        MODEL_DB.run sql
-        yield({:id1=>1, :id2=>2})
-      end
-    })
-    Tag.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        MODEL_DB.run sql
-        yield({:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>5})
-        yield({:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>6})
-      end
-    })
+    @c1.dataset._fetch = [{:id1=>1, :id2=>2}]
+    Tag.dataset._fetch = [{:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>5}, {:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>6}]
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id1=>1, :id2=>2)]
     MODEL_DB.sqls.should == ['SELECT * FROM artists',
@@ -707,13 +619,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
 
   it "should respect the :limit option on a many_through_many association using a :correlated_subquery strategy" do
     @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :eager_limit_strategy=>:correlated_subquery, :order=>:name
-    Tag.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        MODEL_DB.run sql
-        yield({:x_foreign_key_x=>1, :id=>5})
-        yield({:x_foreign_key_x=>1, :id=>6})
-      end
-    })
+    Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5},{:x_foreign_key_x=>1, :id=>6}]
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
     MODEL_DB.sqls.should == ['SELECT * FROM artists',
@@ -748,15 +654,8 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
 
   it "should respect many_through_many association's :left_primary_key and :right_primary_key options" do
     @c1.send(:define_method, :yyy){values[:yyy]}
-    @c1.dataset.extend(Module.new {
-      def columns
-        [:id, :yyy]
-      end
-      def fetch_rows(sql)
-        @db << sql
-        yield({:id=>1, :yyy=>8})
-      end
-    })
+    @c1.dataset._fetch = {:id=>1, :yyy=>8}
+    @c1.dataset.meta_def(:columns){[:id, :yyy]}
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :left_primary_key=>:yyy, :right_primary_key=>:tag_id
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>1, :yyy=>8)]
@@ -768,15 +667,8 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   
   it "should handle composite keys" do
     @c1.send(:define_method, :yyy){values[:yyy]}
-    @c1.dataset.extend(Module.new {
-      def columns
-        [:id, :yyy]
-      end
-      def fetch_rows(sql)
-        @db << sql
-        yield({:id=>1, :yyy=>8})
-      end
-    })
+    @c1.dataset._fetch = {:id=>1, :yyy=>8}
+    @c1.dataset.meta_def(:columns){[:id, :yyy]}
     @c1.many_through_many :tags, [[:albums_artists, [:b1, :b2], [:c1, :c2]], [:albums, [:d1, :d2], [:e1, :e2]], [:albums_tags, [:f1, :f2], [:g1, :g2]]], :right_primary_key=>[:h1, :h2], :left_primary_key=>[:id, :yyy]
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>1, :yyy=>8)]
@@ -840,14 +732,8 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   
   it "eager graphing should eliminate duplicates caused by cartesian products" do
     ds = @c1.eager_graph(:tags)
-    def ds.fetch_rows(sql, &block)
-      @db << sql
-      # Assume artist has 2 albums each with 2 tags
-      yield({:id=>1, :tags_id=>2})
-      yield({:id=>1, :tags_id=>3})
-      yield({:id=>1, :tags_id=>2})
-      yield({:id=>1, :tags_id=>3})
-    end
+    # Assume artist has 2 albums each with 2 tags
+    ds._fetch = [{:id=>1, :tags_id=>2}, {:id=>1, :tags_id=>3}, {:id=>1, :tags_id=>2}, {:id=>1, :tags_id=>3}]
     a = ds.all
     a.should == [@c1.load(:id=>1)]
     MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)']
@@ -892,10 +778,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
 
   it "should handle no associated records when eagerly graphing a single many_through_many association" do
     ds = @c1.eager_graph(:tags)
-    def ds.fetch_rows(sql)
-      @db << sql
-      yield({:id=>1, :tags_id=>nil})
-    end
+    ds._fetch = {:id=>1, :tags_id=>nil}
     a = ds.all
     a.should == [@c1.load(:id=>1)]
     MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)']
@@ -905,13 +788,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
 
   it "should handle no associated records when eagerly graphing multiple many_through_many associations" do
     ds = @c1.eager_graph(:tags, :albums)
-    def ds.fetch_rows(sql)
-      @db << sql
-      yield({:id=>1, :tags_id=>nil, :albums_0_id=>3})
-      yield({:id=>1, :tags_id=>2, :albums_0_id=>nil})
-      yield({:id=>1, :tags_id=>5, :albums_0_id=>6})
-      yield({:id=>7, :tags_id=>nil, :albums_0_id=>nil})
-    end
+    ds._fetch = [{:id=>1, :tags_id=>nil, :albums_0_id=>3}, {:id=>1, :tags_id=>2, :albums_0_id=>nil}, {:id=>1, :tags_id=>5, :albums_0_id=>6}, {:id=>7, :tags_id=>nil, :albums_0_id=>nil}]
     a = ds.all
     a.should == [@c1.load(:id=>1), @c1.load(:id=>7)]
     MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, albums_0.id AS albums_0_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id)']
@@ -924,12 +801,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
 
   it "should handle missing associated records when cascading eager graphing for associations of associated models" do
     ds = @c1.eager_graph(:tags=>:tracks)
-    def ds.fetch_rows(sql)
-      @db << sql
-      yield({:id=>1, :tags_id=>2, :tracks_id=>4})
-      yield({:id=>1, :tags_id=>3, :tracks_id=>nil})
-      yield({:id=>2, :tags_id=>nil, :tracks_id=>nil})
-    end
+    ds._fetch = [{:id=>1, :tags_id=>2, :tracks_id=>4}, {:id=>1, :tags_id=>3, :tracks_id=>nil}, {:id=>2, :tags_id=>nil, :tracks_id=>nil}]
     a = ds.all
     a.should == [@c1.load(:id=>1), @c1.load(:id=>2)]
     MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, tracks.id AS tracks_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_tags AS albums_tags_0 ON (albums_tags_0.tag_id = tags.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_tags_0.album_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums_0.id)']
@@ -946,10 +818,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     @c1.dataset.meta_def(:columns){[:id, :yyy]}
     Tag.dataset.meta_def(:columns){[:id, :tag_id]}
     ds = @c1.eager_graph(:tags)
-    def ds.fetch_rows(sql)
-      @db << sql
-      yield({:id=>1, :yyy=>8, :tags_id=>2, :tag_id=>4})
-    end
+    ds._fetch = {:id=>1, :yyy=>8, :tags_id=>2, :tag_id=>4}
     a = ds.all
     a.should == [@c1.load(:id=>1, :yyy=>8)]
     MODEL_DB.sqls.should == ['SELECT artists.id, artists.yyy, tags.id AS tags_id, tags.tag_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.yyy) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.tag_id = albums_tags.tag_id)']
@@ -962,10 +831,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     @c1.dataset.meta_def(:columns){[:id, :yyy]}
     Tag.dataset.meta_def(:columns){[:id, :tag_id]}
     ds = @c1.eager_graph(:tags)
-    def ds.fetch_rows(sql)
-      @db << sql
-      yield({:id=>1, :yyy=>8, :tags_id=>2, :tag_id=>4})
-    end
+    ds._fetch = {:id=>1, :yyy=>8, :tags_id=>2, :tag_id=>4}
     a = ds.all
     a.should == [@c1.load(:id=>1, :yyy=>8)]
     MODEL_DB.sqls.should == ['SELECT artists.id, artists.yyy, tags.id AS tags_id, tags.tag_id FROM artists LEFT OUTER JOIN albums_artists ON ((albums_artists.b1 = artists.id) AND (albums_artists.b2 = artists.yyy)) LEFT OUTER JOIN albums ON ((albums.d1 = albums_artists.c1) AND (albums.d2 = albums_artists.c2)) LEFT OUTER JOIN albums_tags ON ((albums_tags.f1 = albums.e1) AND (albums_tags.f2 = albums.e2)) LEFT OUTER JOIN tags ON ((tags.id = albums_tags.g1) AND (tags.tag_id = albums_tags.g2))']
@@ -976,10 +842,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   it "should respect the association's :graph_select option" do 
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :graph_select=>:b
     ds = @c1.eager_graph(:tags)
-    def ds.fetch_rows(sql)
-      @db << sql
-      yield({:id=>1, :b=>2})
-    end
+    ds._fetch = {:id=>1, :b=>2}
     a = ds.all
     a.should == [@c1.load(:id=>1)]
     MODEL_DB.sqls.should == ['SELECT artists.id, tags.b FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)']
