@@ -180,29 +180,10 @@ end
 
 describe "InstanceHooks plugin with transactions" do
   before do
-    @logger = Object.new
-    def @logger.method_missing(meth, sql)
-      (@sqls ||= []) << sql
-    end
-    def @logger.sqls
-      @sqls
-    end
-    @db = Class.new(Sequel::Database) do
-      def connect(*)
-        Object.new
-      end
-      def log_connection_execute(conn, sql)
-        execute(sql)
-      end
-      def execute(sql, opts={})
-        @loggers.each{|l| l.info(sql)}
-      end
-    end.new(:loggers=>[@logger])
+    @db = Sequel.mock(:numrows=>1)
     pr = proc{|x| r(x)}
     @c = Class.new(Sequel::Model(@db[:items])) do
       attr_accessor :rb
-      def _delete
-      end
       def after_save
         db.execute('as')
         raise Sequel::Rollback if rb
@@ -218,33 +199,34 @@ describe "InstanceHooks plugin with transactions" do
     @or = @c.load({:id=>1})
     @or.rb = true
     @r = []
+    @db.sqls
   end
   
   it "should support after_commit_hook" do
     @o.after_commit_hook{@db.execute('ac1')}
     @o.after_commit_hook{@db.execute('ac2')}
     @o.save.should_not be_nil
-    @logger.sqls.should == ['BEGIN', 'as', 'COMMIT', 'ac1', 'ac2']
+    @db.sqls.should == ['BEGIN', 'as', 'COMMIT', 'ac1', 'ac2']
   end
   
   it "should support after_rollback_hook" do
     @or.after_rollback_hook{@db.execute('ar1')}
     @or.after_rollback_hook{@db.execute('ar2')}
     @or.save.should be_nil
-    @logger.sqls.should == ['BEGIN', 'as', 'ROLLBACK', 'ar1', 'ar2']
+    @db.sqls.should == ['BEGIN', 'as', 'ROLLBACK', 'ar1', 'ar2']
   end
   
   it "should support after_commit_hook" do
     @o.after_destroy_commit_hook{@db.execute('adc1')}
     @o.after_destroy_commit_hook{@db.execute('adc2')}
     @o.destroy.should_not be_nil
-    @logger.sqls.should == ['BEGIN', 'ad', 'COMMIT', 'adc1', 'adc2']
+    @db.sqls.should == ['BEGIN', "DELETE FROM items WHERE (id = 1)", 'ad', 'COMMIT', 'adc1', 'adc2']
   end
   
   it "should support after_rollback_hook" do
     @or.after_destroy_rollback_hook{@db.execute('adr1')}
     @or.after_destroy_rollback_hook{@db.execute('adr2')}
     @or.destroy.should be_nil
-    @logger.sqls.should == ['BEGIN', 'ad', 'ROLLBACK', 'adr1', 'adr2']
+    @db.sqls.should == ['BEGIN', "DELETE FROM items WHERE (id = 1)", 'ad', 'ROLLBACK', 'adr1', 'adr2']
   end
 end
