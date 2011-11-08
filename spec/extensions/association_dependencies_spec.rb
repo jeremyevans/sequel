@@ -105,11 +105,9 @@ describe "AssociationDependencies plugin" do
     c.add_association_dependencies :artist=>:destroy
     c.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
     MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (id = 1)', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE (id = 2)']
-    MODEL_DB.reset
 
     @Album.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
     MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (id = 1)']
-    MODEL_DB.reset
 
     @Album.add_association_dependencies :artist=>:destroy
     c2 = Class.new(@Album)
