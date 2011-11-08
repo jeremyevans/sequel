@@ -6,187 +6,185 @@ describe "Model hooks" do
   end
   
   specify "should be definable using a block" do
-    $adds = []
+    adds = []
     c = Class.new(Sequel::Model)
     c.class_eval do
-      before_save {$adds << 'hi'}
+      before_save{adds << 'hi'}
     end
     
     c.new.before_save
-    $adds.should == ['hi']
+    adds.should == ['hi']
   end
   
   specify "should be definable using a method name" do
-    $adds = []
+    adds = []
     c = Class.new(Sequel::Model)
     c.class_eval do
-      def bye; $adds << 'bye'; end
+      define_method(:bye){adds << 'bye'}
       before_save :bye
     end
     
     c.new.before_save
-    $adds.should == ['bye']
+    adds.should == ['bye']
   end
 
   specify "should be additive" do
-    $adds = []
+    adds = []
     c = Class.new(Sequel::Model)
     c.class_eval do
-      after_save {$adds << 'hyiyie'}
-      after_save {$adds << 'byiyie'}
+      after_save{adds << 'hyiyie'}
+      after_save{adds << 'byiyie'}
     end
 
     c.new.after_save
-    $adds.should == ['hyiyie', 'byiyie']
+    adds.should == ['hyiyie', 'byiyie']
   end
   
   specify "before hooks should run in reverse order" do
-    $adds = []
+    adds = []
     c = Class.new(Sequel::Model)
     c.class_eval do
-      before_save {$adds << 'hyiyie'}
-      before_save {$adds << 'byiyie'}
+      before_save{adds << 'hyiyie'}
+      before_save{adds << 'byiyie'}
     end
     
     c.new.before_save
-    $adds.should == ['byiyie', 'hyiyie']
+    adds.should == ['byiyie', 'hyiyie']
   end
 
   specify "should not be additive if the method or tag already exists" do
-    $adds = []
+    adds = []
     c = Class.new(Sequel::Model)
     c.class_eval do
-      def bye; $adds << 'bye'; end
+      define_method(:bye){adds << 'bye'}
       before_save :bye
       before_save :bye
     end
     
     c.new.before_save
-    $adds.should == ['bye']
+    adds.should == ['bye']
 
-    $adds = []
+    adds = []
     d = Class.new(Sequel::Model)
     d.class_eval do
-      before_save(:bye){$adds << 'hyiyie'}
-      before_save(:bye){$adds << 'byiyie'}
+      before_save(:bye){adds << 'hyiyie'}
+      before_save(:bye){adds << 'byiyie'}
     end
     
     d.new.before_save
-    $adds.should == ['byiyie']
+    adds.should == ['byiyie']
 
-    $adds = []
+    adds = []
     e = Class.new(Sequel::Model)
     e.class_eval do
-      def bye; $adds << 'bye'; end
+      define_method(:bye){adds << 'bye'}
       before_save :bye
-      before_save(:bye){$adds << 'byiyie'}
+      before_save(:bye){adds << 'byiyie'}
     end
     
     e.new.before_save
-    $adds.should == ['byiyie']
+    adds.should == ['byiyie']
 
-    $adds = []
+    adds = []
     e = Class.new(Sequel::Model)
     e.class_eval do
-      def bye; $adds << 'bye'; end
-      before_save(:bye){$adds << 'byiyie'}
+      define_method(:bye){adds << 'bye'}
+      before_save(:bye){adds << 'byiyie'}
       before_save :bye
     end
     
     e.new.before_save
-    $adds.should == ['bye']
+    adds.should == ['bye']
   end
   
   specify "should be inheritable" do
-    # pending
-    
-    $adds = []
+    adds = []
     a = Class.new(Sequel::Model)
     a.class_eval do
-      after_save {$adds << '123'}
+      after_save{adds << '123'}
     end
     
     b = Class.new(a)
     b.class_eval do
-      after_save {$adds << '456'}
-      after_save {$adds << '789'}
+      after_save{adds << '456'}
+      after_save{adds << '789'}
     end
     
     b.new.after_save
-    $adds.should == ['123', '456', '789']
+    adds.should == ['123', '456', '789']
   end
   
   specify "should be overridable in descendant classes" do
-    $adds = []
+    adds = []
     a = Class.new(Sequel::Model)
     a.class_eval do
-      before_save {$adds << '123'}
+      before_save{adds << '123'}
     end
     
     b = Class.new(a)
     b.class_eval do
-      def before_save; $adds << '456'; end
+      define_method(:before_save){adds << '456'}
     end
     
     a.new.before_save
-    $adds.should == ['123']
-    $adds = []
+    adds.should == ['123']
+    adds = []
     b.new.before_save
-    $adds.should == ['456']
+    adds.should == ['456']
   end
   
   specify "should stop processing if a before hook returns false" do
-    $flag = true
-    $adds = []
+    flag = true
+    adds = []
     
     a = Class.new(Sequel::Model)
     a.class_eval do
-      before_save {$adds << 'cruel'; $flag}
-      before_save {$adds << 'blah'; $flag}
+      before_save{adds << 'cruel'; flag}
+      before_save{adds << 'blah'; flag}
     end
     
     a.new.before_save
-    $adds.should == ['blah', 'cruel']
+    adds.should == ['blah', 'cruel']
 
     # chain should not break on nil
-    $adds = []
-    $flag = nil
+    adds = []
+    flag = nil
     a.new.before_save
-    $adds.should == ['blah', 'cruel']
+    adds.should == ['blah', 'cruel']
     
-    $adds = []
-    $flag = false
+    adds = []
+    flag = false
     a.new.before_save
-    $adds.should == ['blah']
+    adds.should == ['blah']
     
     b = Class.new(a)
     b.class_eval do
-      before_save {$adds << 'mau'}
+      before_save{adds << 'mau'}
     end
     
-    $adds = []
+    adds = []
     b.new.before_save
-    $adds.should == ['mau', 'blah']
+    adds.should == ['mau', 'blah']
   end
 end
 
 describe "Model#after_initialize" do
   specify "should be called after initialization" do
-    $values1 = nil
-    $reached_after_initialized = false
+    values1 = nil
+    reached_after_initialized = false
     
     a = Class.new(Sequel::Model)
     a.class_eval do
       columns :x, :y
       after_initialize do
-        $values1 = @values.clone
-        $reached_after_initialized = true
+        values1 = @values.clone
+        reached_after_initialized = true
       end
     end
     
     a.new(:x => 1, :y => 2)
-    $values1.should == {:x => 1, :y => 2}
-    $reached_after_initialized.should == true
+    values1.should == {:x => 1, :y => 2}
+    reached_after_initialized.should == true
   end
 end
 
@@ -206,11 +204,7 @@ describe "Model#before_create && Model#after_create" do
   specify "should be called around new record creation" do
     @c.before_create {MODEL_DB << "BLAH before"}
     @c.create(:x => 2)
-    MODEL_DB.sqls.should == [
-      'BLAH before',
-      'INSERT INTO items (x) VALUES (2)',
-      'BLAH after'
-    ]
+    MODEL_DB.sqls.should == ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after']
   end
 
   specify ".create should cancel the save and raise an error if before_create returns false and raise_on_save_failure is true" do
@@ -242,11 +236,7 @@ describe "Model#before_update && Model#after_update" do
     @c.before_update {MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233, :x=>123)
     m.save
-    MODEL_DB.sqls.should == [
-      'BLAH before',
-      'UPDATE items SET x = 123 WHERE (id = 2233)',
-      'BLAH after'
-    ]
+    MODEL_DB.sqls.should == ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
   end
 
   specify "#save should cancel the save and raise an error if before_update returns false and raise_on_save_failure is true" do
@@ -279,22 +269,14 @@ describe "Model#before_save && Model#after_save" do
     @c.before_save {MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233, :x=>123)
     m.save
-    MODEL_DB.sqls.should == [
-      'BLAH before',
-      'UPDATE items SET x = 123 WHERE (id = 2233)',
-      'BLAH after'
-    ]
+    MODEL_DB.sqls.should == ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
   end
   
   specify "should be called around record creation" do
     @c.before_save {MODEL_DB << "BLAH before"}
     @c.no_primary_key
     @c.create(:x => 2)
-    MODEL_DB.sqls.should == [
-      'BLAH before',
-      'INSERT INTO items (x) VALUES (2)',
-      'BLAH after'
-    ]
+    MODEL_DB.sqls.should == ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after']
   end
 
   specify "#save should cancel the save and raise an error if before_save returns false and raise_on_save_failure is true" do
@@ -319,10 +301,6 @@ describe "Model#before_destroy && Model#after_destroy" do
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval do
       after_destroy {MODEL_DB << "BLAH after"}
-      
-      def delete
-        MODEL_DB << "DELETE BLAH"
-      end
     end
   end
   
@@ -330,11 +308,7 @@ describe "Model#before_destroy && Model#after_destroy" do
     @c.before_destroy {MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.destroy
-    MODEL_DB.sqls.should == [
-      'BLAH before',
-      'DELETE BLAH',
-      'BLAH after'
-    ]
+    MODEL_DB.sqls.should == ['BLAH before', "DELETE FROM items WHERE (id = 2233)", 'BLAH after']
   end
 
   specify "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_save_failure is true" do
