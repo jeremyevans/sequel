@@ -2,9 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Touch plugin" do
   before do
-    @c = Class.new(Sequel::Model) do
-      def _refresh(*); end 
-    end
+    @c = Class.new(Sequel::Model)
     p = proc{def touch_instance_value; touch_association_value; end}
     @Artist = Class.new(@c, &p).set_dataset(:artists)
     @Album = Class.new(@c, &p).set_dataset(:albums)
@@ -63,8 +61,9 @@ describe "Touch plugin" do
   specify "should be able to give an array to the :associations option specifying multiple associations" do
     @Album.plugin :touch, :associations=>[:artist, :followup_albums]
     @Album.load(:id=>4, :artist_id=>1).touch
-    MODEL_DB.sqls.shift.should == "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"
-    MODEL_DB.sqls.sort.should == ["UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
+    sqls = MODEL_DB.sqls
+    sqls.shift.should == "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"
+    sqls.sort.should == ["UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
       "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 1)"]
   end
 
@@ -85,8 +84,9 @@ describe "Touch plugin" do
   specify "should allow the mixed use of symbols and hashes inside an array for the :associations option" do
     @Album.plugin :touch, :associations=>[:artist, {:followup_albums=>:modified_on}]
     @Album.load(:id=>4, :artist_id=>1).touch
-    MODEL_DB.sqls.shift.should == "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"
-    MODEL_DB.sqls.sort.should == ["UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
+    sqls = MODEL_DB.sqls
+    sqls.shift.should == "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"
+    sqls.sort.should == ["UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
       "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 1)"]
   end
 
@@ -94,8 +94,9 @@ describe "Touch plugin" do
     @Album.plugin :touch
     @Album.touch_associations(:artist, {:followup_albums=>:modified_on})
     @Album.load(:id=>4, :artist_id=>1).touch
-    MODEL_DB.sqls.shift.should == "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"
-    MODEL_DB.sqls.sort.should == ["UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
+    sqls = MODEL_DB.sqls
+    sqls.shift.should == "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"
+    sqls.sort.should == ["UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
       "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 1)"]
   end
 
@@ -103,8 +104,9 @@ describe "Touch plugin" do
     @Album.plugin :touch
     @Album.touch_associations(:artist, {:followup_albums=>:modified_on})
     @Album.load(:id=>4, :artist_id=>1).destroy
-    MODEL_DB.sqls.shift.should == "DELETE FROM albums WHERE (id = 4)"
-    MODEL_DB.sqls.sort.should == ["UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
+    sqls = MODEL_DB.sqls
+    sqls.shift.should == "DELETE FROM albums WHERE (id = 4)"
+    sqls.sort.should == ["UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
       "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 1)"]
   end
 
@@ -133,18 +135,15 @@ describe "Touch plugin" do
     c1 = Class.new(@Artist)
     c1.load(:id=>4).touch
     MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"]
-    MODEL_DB.reset
 
     c1.touch_column = :modified_on
     c1.touch_associations :albums
     c1.load(:id=>1).touch
     MODEL_DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 1)",
       "UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.artist_id = 1)"]
-    MODEL_DB.reset
 
     @a.touch
     MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
-    MODEL_DB.reset
 
     @Artist.plugin :touch, :column=>:modified_on, :associations=>:albums
     c2 = Class.new(@Artist)

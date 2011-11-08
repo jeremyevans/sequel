@@ -195,7 +195,7 @@ end
 
 describe "Sequel::IntegerMigrator" do
   before do
-    dbc = Class.new(MockDatabase) do
+    dbc = Class.new(Sequel::Mock::Database) do
       attr_reader :drops, :tables_created, :columns_created, :versions
       def initialize(*args)
         super
@@ -211,7 +211,7 @@ describe "Sequel::IntegerMigrator" do
 
       def create_table(name, opts={}, &block)
         super
-        @columns_created << / \(?(\w+) integer.*\)?\z/.match(sqls.last)[1].to_sym
+        @columns_created << / \(?(\w+) integer.*\)?\z/.match(@sqls.last)[1].to_sym
         @tables_created << name.to_sym
       end
       
@@ -220,8 +220,8 @@ describe "Sequel::IntegerMigrator" do
         ds.extend(Module.new do
           def count; 1; end
           def columns; db.columns_created end
-          def insert(h); db.versions.merge!(h); db.sqls << insert_sql(h) end
-          def update(h); db.versions.merge!(h); db.sqls << update_sql(h) end
+          def insert(h); db.versions.merge!(h); db.run insert_sql(h) end
+          def update(h); db.versions.merge!(h); db.run update_sql(h) end
           def fetch_rows(sql); db.execute(sql); yield(db.versions) unless db.versions.empty? end
         end)
         ds
@@ -317,7 +317,7 @@ describe "Sequel::TimestampMigrator" do
   before do
     $sequel_migration_version = 0
     $sequel_migration_files = []
-    @dsc = dsc = Class.new(MockDataset) do
+    @dsc = dsc = Class.new(Sequel::Mock::Dataset) do
       def columns
         case opts[:from].first
         when :schema_info, 'schema_info'
@@ -363,7 +363,7 @@ describe "Sequel::TimestampMigrator" do
         end
       end
     end
-    dbc = Class.new(MockDatabase) do
+    dbc = Class.new(Sequel::Mock::Database) do
       tables = {}
       define_method(:dataset){|*a| dsc.new(self, *a)}
       define_method(:create_table){|name, *args| tables[name.to_sym] = true}

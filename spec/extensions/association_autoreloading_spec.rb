@@ -5,11 +5,7 @@ describe "AssociationAutoreloading plugin" do
     @c = Class.new(Sequel::Model)
     @c.plugin :association_autoreloading
     @Artist = Class.new(@c).set_dataset(:artists)
-    ds1 = @Artist.dataset
-    def ds1.fetch_rows(s)
-      (MODEL_DB.sqls ||= []) << s
-      yield({:id=>2, :name=>'Ar'})
-    end
+    @Artist.dataset._fetch = {:id=>2, :name=>'Ar'}
     @Album = Class.new(@c).set_dataset(:albums)
     @Artist.columns :id, :name
     @Album.columns :id, :name, :artist_id
@@ -22,7 +18,6 @@ describe "AssociationAutoreloading plugin" do
     album = @Album.load(:id => 1, :name=>'Al', :artist_id=>2)
     album.artist
     MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1']
-    MODEL_DB.reset
 
     album.artist_id = 1
     album.artist
@@ -33,7 +28,6 @@ describe "AssociationAutoreloading plugin" do
     album = @Album.load(:id => 1, :name=>'Al', :artist_id=>2)
     album.artist
     MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1']
-    MODEL_DB.reset
 
     album.artist_id = 2
     album.artist
@@ -54,7 +48,6 @@ describe "AssociationAutoreloading plugin" do
     album.artist_id = 1
     album.artist
     MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE (artists.id = 1) LIMIT 1']
-    MODEL_DB.reset
 
     album.other_artist
     MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE (artists.id = 1) LIMIT 1']
@@ -69,7 +62,6 @@ describe "AssociationAutoreloading plugin" do
     album.artist_id = 1
     album.composite_artist
     MODEL_DB.sqls.should == ["SELECT * FROM artists WHERE ((artists.id = 1) AND (artists.name = 'Al')) LIMIT 1"]
-    MODEL_DB.reset
 
     album.name = 'Al2'
     album.composite_artist
@@ -84,7 +76,6 @@ describe "AssociationAutoreloading plugin" do
     album = salbum.load(:id => 1, :name=>'Al', :artist_id=>2)
     album.artist
     MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1']
-    MODEL_DB.reset
 
     album.artist_id = 1
     album.artist

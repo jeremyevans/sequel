@@ -5,13 +5,9 @@ describe "Sequel::Plugins::IdentityMap" do
     class ::IdentityMapModel < Sequel::Model
       plugin :identity_map
       attr_accessor :foo
-      ds = dataset
-      def ds.fetch_rows(sql)
-        c = @opts[:where].args.first
-        c = c.column if c.is_a?(Sequel::SQL::QualifiedIdentifier)
-        h = {c=>@opts[:where].args.last}
-        execute(sql)
-        yield h
+      dataset._fetch = proc do |sql|
+        sql =~ /WHERE \(?(\w+\.)?(\w+) = (\d)\)?/
+        {$2.to_sym=>$3.to_i}
       end
       def self.waw_identity_map(&block) # with and without
         with_identity_map(&block)
@@ -110,9 +106,9 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 1
       o.foo = 1
       @c[1].foo.should == o.foo
-      MODEL_DB.sqls.length.should == 1
+      MODEL_DB.sqls.length.should == 0
       @c[2].foo.should_not == o.foo
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 1
     end
   end
 
@@ -123,22 +119,22 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 1
       o.foo = 1
       @c[1].should == o
-      MODEL_DB.sqls.length.should == 1
+      MODEL_DB.sqls.length.should == 0
       o.destroy
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 1
       @c[1].foo.should_not == o.foo
-      MODEL_DB.sqls.length.should == 3
+      MODEL_DB.sqls.length.should == 1
 
       MODEL_DB.reset
       o = @c[2]
       MODEL_DB.sqls.length.should == 1
       o.foo = 1
       @c[2].should == o
-      MODEL_DB.sqls.length.should == 1
+      MODEL_DB.sqls.length.should == 0
       o.delete
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 1
       @c[2].foo.should_not == o.foo
-      MODEL_DB.sqls.length.should == 3
+      MODEL_DB.sqls.length.should == 1
     end
   end
 
@@ -153,10 +149,10 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 1
       o = @c1.load(:id=>1, :another_id=>2, :artist_id=>2)
       o.artist.should == a
-      MODEL_DB.sqls.length.should == 1
+      MODEL_DB.sqls.length.should == 0
       o = @c1.load(:id=>3, :another_id=>3, :artist_id=>3)
       o.artist.should_not == a
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 1
     end
   end
 
@@ -170,10 +166,10 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 1
       o = @c1.load(:id=>2, :artist_id=>2)
       o.artist.should == a
-      MODEL_DB.sqls.length.should == 1
+      MODEL_DB.sqls.length.should == 0
       o = @c1.load(:id=>3, :artist_id=>3)
       o.artist.should_not == a
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 1
     end
   end
 
@@ -187,9 +183,9 @@ describe "Sequel::Plugins::IdentityMap" do
       a.should be_a_kind_of(@c1)
       MODEL_DB.sqls.length.should == 1
       o.reload
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 1
       o.artist.should == a
-      MODEL_DB.sqls.length.should == 3
+      MODEL_DB.sqls.length.should == 1
     end
   end
 
@@ -204,7 +200,7 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 1
       o = @c1.load(:id=>2, :artist_id=>2)
       o.artist.should == a
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 1
     end
   end
 
@@ -218,7 +214,7 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 1
       o = @c1.load(:id=>2, :artist_id=>2)
       o.artist.should == a
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 1
     end
   end
 
@@ -243,7 +239,7 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 1
       a.should == [@c1.load(:id=>1), @c1.load(:id=>2), @c1.load(:id=>3)]
       a.map{|x| x.artists}.should == [[@c2.load(:id=>1)], [@c2.load(:id=>2)], [@c2.load(:id=>3)]]
-      MODEL_DB.sqls.length.should == 1
+      MODEL_DB.sqls.length.should == 0
     end
   end
 
@@ -275,7 +271,7 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 2
       a.should == [@c1.load(:id=>1), @c1.load(:id=>2), @c1.load(:id=>3)]
       a.map{|x| x.artists}.should == [[@c2.load(:id=>1), @c2.load(:id=>2), @c2.load(:id=>3), @c2.load(:id=>3)], [@c2.load(:id=>1), @c2.load(:id=>2)], []]
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 0
     end
   end
 
@@ -308,7 +304,7 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 2
       a.should == [@c1.load(:id=>1, :id2=>4), @c1.load(:id=>2, :id2=>5), @c1.load(:id=>3, :id2=>6)]
       a.map{|x| x.artists}.should == [[@c2.load(:id=>1), @c2.load(:id=>2), @c2.load(:id=>3), @c2.load(:id=>3)], [@c2.load(:id=>1), @c2.load(:id=>2)], []]
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 0
     end
   end
 
@@ -341,7 +337,7 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 2
       a.should == [@c1.load(:id=>1), @c1.load(:id=>2), @c1.load(:id=>3)]
       a.map{|x| x.artists}.should == [[@c2.load(:id=>1), @c2.load(:id=>2), @c2.load(:id=>3), @c2.load(:id=>3)], [@c2.load(:id=>1), @c2.load(:id=>2)], []]
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 0
     end
   end
 
@@ -375,7 +371,7 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 2
       a.should == [@c1.load(:id=>1, :id2=>4), @c1.load(:id=>2, :id2=>5), @c1.load(:id=>3, :id2=>6)]
       a.map{|x| x.artists}.should == [[@c2.load(:id=>1), @c2.load(:id=>2), @c2.load(:id=>3), @c2.load(:id=>3)], [@c2.load(:id=>1), @c2.load(:id=>2)], []]
-      MODEL_DB.sqls.length.should == 2
+      MODEL_DB.sqls.length.should == 0
     end
   end
 end

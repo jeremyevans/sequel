@@ -12,7 +12,7 @@ describe "Sequel named_timezones extension" do
   before do
     @tz_in = TZInfo::Timezone.get('America/Los_Angeles')
     @tz_out = TZInfo::Timezone.get('America/New_York')
-    @db = MockDatabase.new
+    @db = Sequel.mock
     @dt = DateTime.civil(2009,6,1,10,20,30,0)
     Sequel.application_timezone = 'America/Los_Angeles'
     Sequel.database_timezone = 'America/New_York'

@@ -6,17 +6,9 @@ describe "AssociationDependencies plugin" do
     @c = Class.new(Sequel::Model)
     @c.plugin :association_dependencies
     @Artist = Class.new(@c).set_dataset(:artists)
-    ds1 = @Artist.dataset
-    def ds1.fetch_rows(s)
-      (MODEL_DB.sqls ||= []) << s
-      yield({:id=>2, :name=>'Ar'})
-    end
+    @Artist.dataset._fetch = {:id=>2, :name=>'Ar'}
     @Album = Class.new(@c).set_dataset(:albums)
-    ds1 = @Album.dataset
-    def ds1.fetch_rows(s)
-      (MODEL_DB.sqls ||= []) << s
-      yield({:id=>1, :name=>'Al', :artist_id=>2})
-    end
+    @Album.dataset._fetch = {:id=>1, :name=>'Al', :artist_id=>2}
     @Artist.columns :id, :name
     @Album.columns :id, :name, :artist_id
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id

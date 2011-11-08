@@ -22,7 +22,7 @@ describe Sequel::Model, "#sti_key" do
   end
 
   specify "should have simple_table = nil" do
-    StiTest.simple_table.should == nil
+    StiTest.simple_table.should == "sti_tests"
     StiTestSub1.simple_table.should == nil
   end
   

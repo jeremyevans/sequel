@@ -7,23 +7,13 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
       columns :id, :parent_id
       many_to_one :parent, :class=>self
       one_to_many :children, :class=>self, :key=>:parent_id
-      ds = dataset
-      def ds.fetch_rows(sql)
-        execute(sql)
-        where = @opts[:where]
-        if !where
-          yield(:id=>1, :parent_id=>101)
-          yield(:id=>2, :parent_id=>102)
-          yield(:id=>101, :parent_id=>nil)
-          yield(:id=>102, :parent_id=>nil)
-        elsif where.args.first.column == :id
-          Array(where.args.last).each do |x|
-            yield(:id=>x, :parent_id=>nil)
-          end
-        elsif where.args.first.column == :parent_id
-          Array(where.args.last).each do |x|
-            yield(:id=>x-100, :parent_id=>x) if x > 100
-          end
+      dataset._fetch = proc do |sql|
+        if sql !~ /WHERE/
+          [{:id=>1, :parent_id=>101}, {:id=>2, :parent_id=>102}, {:id=>101, :parent_id=>nil}, {:id=>102, :parent_id=>nil}]
+        elsif sql =~ /WHERE.*\bid IN \(([\d, ]*)\)/
+          $1.split(', ').map{|x| {:id=>x.to_i, :parent_id=>nil}}
+        elsif sql =~ /WHERE.*\bparent_id IN \(([\d, ]*)\)/
+          $1.split(', ').map{|x| {:id=>x.to_i - 100, :parent_id=>x.to_i} if x.to_i > 100}.compact
         end
       end
     end
@@ -49,9 +39,9 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
     ts = @c.all
     MODEL_DB.sqls.length.should == 1
     ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
-    MODEL_DB.sqls.length.should == 2
+    MODEL_DB.sqls.length.should == 1
     ts.map{|x| x.children}.should == [[], [], [ts[0]], [ts[1]]]
-    MODEL_DB.sqls.length.should == 3
+    MODEL_DB.sqls.length.should == 1
   end
 
   it "association getter methods should not eagerly load the association if the association is cached" do

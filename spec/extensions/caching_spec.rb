@@ -2,8 +2,6 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe Sequel::Model, "caching" do
   before do
-    MODEL_DB.reset
-    
     @cache_class = Class.new(Hash) do
       attr_accessor :ttl
       def set(k, v, ttl); self[k] = v; @ttl = ttl; end
@@ -44,31 +42,14 @@ describe Sequel::Model, "caching" do
       columns :name, :id
     end
    
-
-    $cache_dataset_row = {:name => 'sharon', :id => 1}
     @dataset = @c.dataset = @c3.dataset = @c4.dataset
-    $sqls = []
-    @dataset.extend(Module.new {
-      def fetch_rows(sql)
-        $sqls << sql
-        yield $cache_dataset_row
-      end
-      
-      def update(values)
-        $sqls << update_sql(values)
-        $cache_dataset_row.merge!(values)
-        1
-      end
-      
-      def delete
-        $sqls << delete_sql
-        1
-      end
-    })
+    @dataset._fetch = {:name => 'sharon', :id => 1}
+    @dataset.numrows = 1
     
     @c2 = Class.new(@c) do
       def self.name; 'SubItem' end
     end    
+    @c.db.reset
   end
   
   it "should set the model's cache store" do
@@ -154,27 +135,26 @@ describe Sequel::Model, "caching" do
   end
   
   it "should set the cache when reading from the database" do
-    $sqls.should == []
+    @c.db.sqls.should == []
     @cache.should be_empty
     
     m = @c[1]
-    $sqls.should == ['SELECT * FROM items WHERE (id = 1) LIMIT 1']
-    m.values.should == $cache_dataset_row
+    @c.db.sqls.should == ['SELECT * FROM items WHERE id = 1']
+    m.values.should == {:name=>"sharon", :id=>1}
     @cache[m.cache_key].should == m
     m2 = @c[1]
-    $sqls.should == ['SELECT * FROM items WHERE (id = 1) LIMIT 1']
+    @c.db.sqls.should == []
     m2.should == m
-    m2.values.should == $cache_dataset_row
+    m2.values.should == {:name=>"sharon", :id=>1}
 
-    $sqls.clear
     m = @c2[1]
-    $sqls.should == ['SELECT * FROM items WHERE (id = 1) LIMIT 1']
-    m.values.should == $cache_dataset_row
+    @c.db.sqls.should == ['SELECT * FROM items WHERE id = 1']
+    m.values.should == {:name=>"sharon", :id=>1}
     @cache[m.cache_key].should == m
     m2 = @c2[1]
-    $sqls.should == ['SELECT * FROM items WHERE (id = 1) LIMIT 1']
+    @c.db.sqls.should == []
     m2.should == m
-    m2.values.should == $cache_dataset_row
+    m2.values.should == {:name=>"sharon", :id=>1}
   end
   
   it "should delete the cache when writing to the database" do
@@ -183,14 +163,14 @@ describe Sequel::Model, "caching" do
     m.name = 'hey'
     m.save
     @cache.has_key?(m.cache_key).should be_false
-    $sqls.last.should == "UPDATE items SET name = 'hey' WHERE (id = 1)"
+    @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "UPDATE items SET name = 'hey' WHERE (id = 1)"]
 
     m = @c2[1]
     @cache[m.cache_key].should == m
     m.name = 'hey'
     m.save
     @cache.has_key?(m.cache_key).should be_false
-    $sqls.last.should == "UPDATE items SET name = 'hey' WHERE (id = 1)"
+    @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "UPDATE items SET name = 'hey' WHERE (id = 1)"]
   end
 
   it "should delete the cache when deleting the record" do
@@ -198,40 +178,33 @@ describe Sequel::Model, "caching" do
     @cache[m.cache_key].should == m
     m.delete
     @cache.has_key?(m.cache_key).should be_false
-    $sqls.last.should == "DELETE FROM items WHERE (id = 1)"
+    @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "DELETE FROM items WHERE (id = 1)"]
 
     m = @c2[1]
     @cache[m.cache_key].should == m
     m.delete
     @cache.has_key?(m.cache_key).should be_false
-    $sqls.last.should == "DELETE FROM items WHERE (id = 1)"
+    @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "DELETE FROM items WHERE (id = 1)"]
   end
   
   it "should support #[] as a shortcut to #find with hash" do
     m = @c[:id => 3]
     @cache[m.cache_key].should be_nil
-    $sqls.last.should == "SELECT * FROM items WHERE (id = 3) LIMIT 1"
+    @c.db.sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1"]
     m = @c[1]
     @cache[m.cache_key].should == m
-    $sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1", \
-      "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
+    @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1"]
     @c[:id => 4]
-    $sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1", \
-      "SELECT * FROM items WHERE (id = 1) LIMIT 1", \
-      "SELECT * FROM items WHERE (id = 4) LIMIT 1"]
+    @c.db.sqls.should == ["SELECT * FROM items WHERE (id = 4) LIMIT 1"]
 
-    $sqls.clear
     m = @c2[:id => 3]
     @cache[m.cache_key].should be_nil
-    $sqls.last.should == "SELECT * FROM items WHERE (id = 3) LIMIT 1"
+    @c.db.sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1"]
     m = @c2[1]
     @cache[m.cache_key].should == m
-    $sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1", \
-      "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
+    @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1"]
     @c2[:id => 4]
-    $sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1", \
-      "SELECT * FROM items WHERE (id = 1) LIMIT 1", \
-      "SELECT * FROM items WHERE (id = 4) LIMIT 1"]
+    @c.db.sqls.should == ["SELECT * FROM items WHERE (id = 4) LIMIT 1"]
   end
   
   it "should support ignore_exception option" do
@@ -245,6 +218,6 @@ describe Sequel::Model, "caching" do
   end
   
   it "should rescue an exception if cache_store is memcached and ignore_exception is enabled" do
-    @c4[1].values.should == $cache_dataset_row
+    @c4[1].values.should == {:name => 'sharon', :id => 1}
   end
 end

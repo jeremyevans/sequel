@@ -48,9 +48,10 @@ describe "Composition plugin" do
     @c.composition :date, :composer=>proc{Date.new(year+1, month+2, day+3)}, :decomposer=>proc{[:year, :month, :day].each{|s| self.send("#{s}=", date.send(s) * 2)}}
     @o.date.should == Date.new(2, 4, 6)
     @o.save
-    MODEL_DB.sqls.last.should include("year = 4")
-    MODEL_DB.sqls.last.should include("month = 8")
-    MODEL_DB.sqls.last.should include("day = 12")
+    sql = MODEL_DB.sqls.last
+    sql.should include("year = 4")
+    sql.should include("month = 8")
+    sql.should include("day = 12")
   end
 
   it "should allow call super in composition getter and setter method definition in class" do
@@ -139,8 +140,9 @@ describe "Composition plugin" do
     @o.date.month.should == 6
     @o.date = c.new(3, 4)
     @o.save
-    MODEL_DB.sqls.last.should include("year = 6")
-    MODEL_DB.sqls.last.should include("month = 12")
+    sql = MODEL_DB.sqls.last
+    sql.should include("year = 6")
+    sql.should include("month = 12")
   end
 
   it ":mapping option should work with an array of two pairs of symbols" do
@@ -160,8 +162,9 @@ describe "Composition plugin" do
     @o.date.m.should == 6
     @o.date = c.new(3, 4)
     @o.save
-    MODEL_DB.sqls.last.should include("year = 6")
-    MODEL_DB.sqls.last.should include("month = 12")
+    sql = MODEL_DB.sqls.last
+    sql.should include("year = 6")
+    sql.should include("month = 12")
   end
 
   it ":mapping option :composer should return nil if all values are nil" do
@@ -173,9 +176,10 @@ describe "Composition plugin" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     @o.date = nil
     @o.save
-    MODEL_DB.sqls.last.should include("year = NULL")
-    MODEL_DB.sqls.last.should include("month = NULL")
-    MODEL_DB.sqls.last.should include("day = NULL")
+    sql = MODEL_DB.sqls.last
+    sql.should include("year = NULL")
+    sql.should include("month = NULL")
+    sql.should include("day = NULL")
   end
 
   it "should work correctly with subclasses" do
@@ -184,8 +188,9 @@ describe "Composition plugin" do
     o = c.load(:id=>1, :year=>1, :month=>2, :day=>3)
     o.date.should == Date.new(1, 2, 3)
     o.save
-    MODEL_DB.sqls.last.should include("year = 1")
-    MODEL_DB.sqls.last.should include("month = 2")
-    MODEL_DB.sqls.last.should include("day = 3")
+    sql = MODEL_DB.sqls.last
+    sql.should include("year = 1")
+    sql.should include("month = 2")
+    sql.should include("day = 3")
   end
 end

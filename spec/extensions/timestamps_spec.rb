@@ -13,9 +13,10 @@ describe "Sequel::Plugins::Timestamps" do
     @c.class_eval do
       columns :id, :created_at, :updated_at
       plugin :timestamps
+      def _save_refresh(*) end
       db.reset
-      def _refresh(ds); self end
     end
+    @c.dataset.autoid = nil
   end 
   after do
     Sequel.datetime_class = Time
@@ -40,8 +41,9 @@ describe "Sequel::Plugins::Timestamps" do
   it "should use the same value for the creation and update timestamps when creating if the :update_on_create option is given" do
     @c.plugin :timestamps, :update_on_create=>true
     o = @c.create
-    @c.db.sqls.length.should == 1
-    @c.db.sqls.first.should =~ /INSERT INTO t \((creat|updat)ed_at, (creat|updat)ed_at\) VALUES \('2009-08-01', '2009-08-01'\)/
+    sqls = @c.db.sqls
+    sqls.shift.should =~ /INSERT INTO t \((creat|updat)ed_at, (creat|updat)ed_at\) VALUES \('2009-08-01', '2009-08-01'\)/
+    sqls.should == []
     o.created_at.should === o.updated_at
   end
 
@@ -50,8 +52,7 @@ describe "Sequel::Plugins::Timestamps" do
     c.class_eval do
       columns :id, :c
       plugin :timestamps, :create=>:c
-      db.reset
-      def _refresh(ds); self end
+      def _save_refresh(*) end
     end
     o = c.create
     c.db.sqls.should == ["INSERT INTO t (c) VALUES ('2009-08-01')"]
@@ -64,7 +65,7 @@ describe "Sequel::Plugins::Timestamps" do
       columns :id, :u
       plugin :timestamps, :update=>:u
       db.reset
-      def _refresh(ds); self end
+      def _save_refresh(*) end
     end
     o = c.load(:id=>1).save
     c.db.sqls.should == ["UPDATE t SET u = '2009-08-01' WHERE (id = 1)"]

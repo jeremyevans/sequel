@@ -2,17 +2,16 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "class_table_inheritance plugin" do
   before do
-    @db = db = MODEL_DB.clone
-    def db.schema(table, opts={})
+    @db = Sequel.mock(:autoid=>proc{|sql| 1})
+    def @db.schema(table, opts={})
       {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}], [:kind, {:type=>:string}]],
        :managers=>[[:id, {:type=>:integer}], [:num_staff, {:type=>:integer}]],
        :executives=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}]],
        :staff=>[[:id, {:type=>:integer}], [:manager_id, {:type=>:integer}]],
        }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
      end
-    def db.dataset(*args)
-      ds = super(*args)
-      def ds.columns
+    @db.extend_datasets do
+      def columns
         {[:employees]=>[:id, :name, :kind],
          [:managers]=>[:id, :num_staff],
          [:executives]=>[:id, :num_managers],
@@ -22,13 +21,8 @@ describe "class_table_inheritance plugin" do
          [:employees, :staff]=>[:id, :name, :kind, :manager_id],
         }[opts[:from] + (opts[:join] || []).map{|x| x.table}]
       end
-      def ds.insert(*args)
-        db << insert_sql(*args)
-        1
-      end
-      ds
     end
-    class ::Employee < Sequel::Model(db)
+    class ::Employee < Sequel::Model(@db)
       def _refresh(x); @values[:id] = 1 end
       def self.columns
         dataset.columns
@@ -44,7 +38,7 @@ describe "class_table_inheritance plugin" do
       many_to_one :manager
     end 
     @ds = Employee.dataset
-    @db.reset
+    @db.sqls
   end
   after do
     Object.send(:remove_const, :Executive)
@@ -54,7 +48,7 @@ describe "class_table_inheritance plugin" do
   end
 
   specify "should have simple_table = nil" do
-    Employee.simple_table.should == nil
+    Employee.simple_table.should == "employees"
     Manager.simple_table.should == nil
     Executive.simple_table.should == nil
     Staff.simple_table.should == nil
@@ -174,7 +168,6 @@ describe "class_table_inheritance plugin" do
     end
     m = Manager[1]
     @db.sqls.should == ['SELECT * FROM employees INNER JOIN managers USING (id) WHERE (id = 1) LIMIT 1']
-    @db.reset
     ds = Executive.dataset
     def ds.fetch_rows(sql)
       @db << sql
@@ -210,20 +203,22 @@ describe "class_table_inheritance plugin" do
 
   it "should insert the correct rows into all tables when inserting" do
     Executive.create(:num_managers=>3, :num_staff=>2, :name=>'E')
-    @db.sqls.length.should == 3
-    @db.sqls[0].should =~ /INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Executive)', '(E|Executive)'\)/
-    @db.sqls[1].should =~ /INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \([12], [12]\)/
-    @db.sqls[2].should =~ /INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\)/
+    sqls = @db.sqls
+    sqls.length.should == 3
+    sqls[0].should =~ /INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Executive)', '(E|Executive)'\)/
+    sqls[1].should =~ /INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \([12], [12]\)/
+    sqls[2].should =~ /INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\)/
     end
     
   it "should insert the correct rows into all tables with a given primary key" do
     e = Executive.new(:num_managers=>3, :num_staff=>2, :name=>'E')
     e.id = 2
     e.save
-    @db.sqls.length.should == 3
-    @db.sqls[0].should =~ /INSERT INTO employees \((name|kind|id), (name|kind|id), (name|kind|id)\) VALUES \(('E'|'Executive'|2), ('E'|'Executive'|2), ('E'|'Executive'|2)\)/
-    @db.sqls[1].should =~ /INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \(2, 2\)/
-    @db.sqls[2].should =~ /INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([23], [23]\)/
+    sqls = @db.sqls
+    sqls.length.should == 3
+    sqls[0].should =~ /INSERT INTO employees \((name|kind|id), (name|kind|id), (name|kind|id)\) VALUES \(('E'|'Executive'|2), ('E'|'Executive'|2), ('E'|'Executive'|2)\)/
+    sqls[1].should =~ /INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \(2, 2\)/
+    sqls[2].should =~ /INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([23], [23]\)/
   end
 
   it "should update the correct rows in all tables when updating" do

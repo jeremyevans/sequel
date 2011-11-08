@@ -12,15 +12,6 @@ describe "List plugin" do
       class << self
         attr_accessor :rows
       end
-
-      def checked_transaction(opts={})
-        return super if @in_transaction || !use_transaction?(opts)
-        @in_transaction = true
-        db.execute 'BEGIN'
-        super
-        db.execute 'COMMIT'
-        @in_transaction = false
-      end
     end
     c
   end
@@ -145,7 +136,7 @@ describe "List plugin" do
     proc{@o.move_to(11)}.should raise_error(Sequel::Error)
   end
 
-  it "should have move_to use a transaction is the instance is configured to use transactions" do
+  it "should have move_to use a transaction if the instance is configured to use transactions" do
     @o.use_transactions = true
     @o.move_to(2)
     @db.sqls.should == ["BEGIN",

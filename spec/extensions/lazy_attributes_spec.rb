@@ -1,8 +1,9 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
+require 'yaml'
 
 describe "Sequel::Plugins::LazyAttributes" do
   before do
-    @db = MockDatabase.new
+    @db = Sequel.mock
     @db.meta_def(:schema){|*a| [[:id, {:type=>:integer}], [:name,{:type=>:string}]]}
     class ::LazyAttributesModel < Sequel::Model(@db[:la])
       plugin :lazy_attributes
@@ -38,7 +39,7 @@ describe "Sequel::Plugins::LazyAttributes" do
     end
     @c = ::LazyAttributesModel
     @ds = LazyAttributesModel.dataset
-    @db.reset
+    @db.sqls
   end
   after do
     Object.send(:remove_const, :LazyAttributesModel)
@@ -146,7 +147,6 @@ describe "Sequel::Plugins::LazyAttributes" do
       ms.map{|m| m.name}.should == [3,6]
       @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
     end
-    @db.reset
     @c.with_identity_map do
       m = @ds.first
       m.values.should == {:id=>1}
