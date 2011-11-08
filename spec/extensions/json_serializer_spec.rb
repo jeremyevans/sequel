@@ -102,8 +102,8 @@ describe "Sequel::Plugins::JsonSerializer" do
   end
 
   it "should support a to_json class and dataset method" do
-    album = @album
-    Album.dataset.meta_def(:all){[album]}
+    Album.dataset._fetch = {:id=>1, :name=>'RF', :artist_id=>2}
+    Artist.dataset._fetch = {:id=>2, :name=>'YJM'}
     JSON.parse(Album.to_json).should == [@album]
     JSON.parse(Album.to_json(:include=>:artist)).map{|x| x.artist}.should == [@artist]
     JSON.parse(Album.dataset.to_json(:only=>:name)).should == [Album.load(:name=>@album.name)]
@@ -112,7 +112,7 @@ describe "Sequel::Plugins::JsonSerializer" do
   it "should have dataset to_json method work with naked datasets" do
     album = @album
     ds = Album.dataset.naked
-    ds.meta_def(:all){[album.values]}
+    ds._fetch = {:id=>1, :name=>'RF', :artist_id=>2}
     JSON.parse(ds.to_json).should == [@album.values.inject({}){|h, (k, v)| h[k.to_s] = v; h}]
   end
 
@@ -137,8 +137,7 @@ describe "Sequel::Plugins::JsonSerializer" do
   end
   
   it "should handle the :root option to qualify a dataset of records" do
-    album = @album
-    Album.dataset.meta_def(:all){[album, album]}
+    Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
     Album.dataset.to_json(:root=>true, :only => :id).to_s.should == '{"albums":[{"album":{"id":1}},{"album":{"id":1}}]}'
   end
 
