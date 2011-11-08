@@ -7,6 +7,10 @@ describe "Sequel Mock Adapter" do
     db.adapter_scheme.should == :mock
   end
 
+  specify "should have constructor accept no arguments" do
+    Sequel::Mock::Database.new.should be_a_kind_of(Sequel::Mock::Database)
+  end
+
   specify "should each not return any rows by default" do
     called = false
     Sequel.mock[:t].each{|r| called = true}

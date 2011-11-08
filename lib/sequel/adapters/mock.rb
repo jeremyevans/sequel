@@ -92,8 +92,9 @@ module Sequel
       # :numrows :: Call #numrows= with the value
       # :extend :: A module the object is extended with.
       # :sqls :: The array to store the SQL queries in.
-      def initialize(opts=nil)
+      def initialize(opts={})
         super
+        opts = @opts
         self.autoid = opts[:autoid]
         self.columns = opts[:columns]
         self.fetch = opts[:fetch]
