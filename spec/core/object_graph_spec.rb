@@ -137,6 +137,10 @@ describe Sequel::Dataset, " graphing" do
     proc{@ds1.graph(@ds2, :x=>:id).graph(@ds2, {:x=>:id}, :table_alias=>:blah)}.should_not raise_error
   end
 
+  it "#graph should raise an error if columns are already selected and :graph_aliases is not set" do
+    proc{@ds1.select(:id).graph(@ds2)}.should raise_error(Sequel::Error)
+  end
+
   it "#set_graph_aliases and #add_graph_aliases should not modify the current dataset's opts" do
     o1 = @ds1.opts
     o2 = o1.dup

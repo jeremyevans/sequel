@@ -1,5 +1,7 @@
 === HEAD
 
+* Raise Error if attempting to setup a graphed dataset that already has columns selected (jeremyevans)
+
 * Allow specifying nanoseconds and offsets when converting a hash or array to a timestamp (jeremyevans, jfirebaugh) (#395)
 
 * Improve performance when converting Java types to ruby types in the jdbc adapter (jeremyevans, jfirebaugh) (#395)

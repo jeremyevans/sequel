@@ -121,6 +121,10 @@ module Sequel
         opts[:graph] = graph = graph.dup
         [:column_aliases, :table_aliases, :column_alias_num].each{|k| graph[k] = graph[k].dup}
       else
+        if add_columns && ds.opts[:select] && !ds.opts[:select].empty?
+          raise(Error, "can't add graph to dataset that already has selected columns, use set_graph_aliases or select_all before graphing")
+        end
+
         master = alias_symbol(ds.first_source_alias)
         raise_alias_error.call if master == table_alias
         # Master hash storing all .graph related information
