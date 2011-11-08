@@ -225,13 +225,7 @@ describe "Sequel::Plugins::IdentityMap" do
     @c1.many_to_many :artists, :class=>@c2, :left_key=>:album_id, :right_key=>:artist_id, :join_table=>:aa, :eager_loader=>(proc do |eo|
        eo[:rows].each{|object| object.associations[:artists] = [c.load(:id=>object.id)]}
     end)
-    ds = @c1.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1})
-      yield({:id=>2})
-      yield({:id=>3})
-    end
+    @c1.dataset._fetch = [{:id=>1}, {:id=>2}, {:id=>3}]
 
     @c.waw_identity_map do
       MODEL_DB.sqls.length.should == 0
@@ -247,23 +241,8 @@ describe "Sequel::Plugins::IdentityMap" do
     @c1.columns :id
     @c2.columns :id
     @c1.many_to_many :artists, :class=>@c2, :left_key=>:album_id, :right_key=>:artist_id, :join_table=>:aa
-    ds = @c1.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1})
-      yield({:id=>2})
-      yield({:id=>3})
-    end
-    ds = @c2.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1, :x_foreign_key_x=>1})
-      yield({:id=>1, :x_foreign_key_x=>2})
-      yield({:id=>2, :x_foreign_key_x=>1})
-      yield({:id=>2, :x_foreign_key_x=>2})
-      yield({:id=>3, :x_foreign_key_x=>1})
-      yield({:id=>3, :x_foreign_key_x=>1})
-    end
+    @c1.dataset._fetch = [{:id=>1}, {:id=>2}, {:id=>3}]
+    @c2.dataset._fetch = [{:id=>1, :x_foreign_key_x=>1}, {:id=>1, :x_foreign_key_x=>2}, {:id=>2, :x_foreign_key_x=>1}, {:id=>2, :x_foreign_key_x=>2}, {:id=>3, :x_foreign_key_x=>1}, {:id=>3, :x_foreign_key_x=>1}]
 
     @c.waw_identity_map do
       MODEL_DB.sqls.length.should == 0
@@ -280,23 +259,8 @@ describe "Sequel::Plugins::IdentityMap" do
     @c2.columns :id
     @c1.set_primary_key :id, :id2
     @c1.many_to_many :artists, :class=>@c2, :left_key=>[:album_id1, :album_id2], :right_key=>:artist_id, :join_table=>:aa
-    ds = @c1.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1, :id2=>4})
-      yield({:id=>2, :id2=>5})
-      yield({:id=>3, :id2=>6})
-    end
-    ds = @c2.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4})
-      yield({:id=>1, :x_foreign_key_0_x=>2, :x_foreign_key_1_x=>5})
-      yield({:id=>2, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4})
-      yield({:id=>2, :x_foreign_key_0_x=>2, :x_foreign_key_1_x=>5})
-      yield({:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4})
-      yield({:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4})
-    end
+    @c1.dataset._fetch = [{:id=>1, :id2=>4}, {:id=>2, :id2=>5}, {:id=>3, :id2=>6}]
+    @c2.dataset._fetch = [ {:id=>1, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}, {:id=>1, :x_foreign_key_0_x=>2, :x_foreign_key_1_x=>5}, {:id=>2, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}, {:id=>2, :x_foreign_key_0_x=>2, :x_foreign_key_1_x=>5}, {:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}, {:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}]
 
     @c.waw_identity_map do
       MODEL_DB.sqls.length.should == 0
@@ -313,23 +277,8 @@ describe "Sequel::Plugins::IdentityMap" do
     @c2.columns :id
     @c1.plugin :many_through_many
     @c1.many_through_many :artists, [[:aa, :album_id, :artist_id]], :class=>@c2
-    ds = @c1.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1})
-      yield({:id=>2})
-      yield({:id=>3})
-    end
-    ds = @c2.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1, :x_foreign_key_x=>1})
-      yield({:id=>1, :x_foreign_key_x=>2})
-      yield({:id=>2, :x_foreign_key_x=>1})
-      yield({:id=>2, :x_foreign_key_x=>2})
-      yield({:id=>3, :x_foreign_key_x=>1})
-      yield({:id=>3, :x_foreign_key_x=>1})
-    end
+    @c1.dataset._fetch = [{:id=>1}, {:id=>2}, {:id=>3}]
+    @c2.dataset._fetch = [{:id=>1, :x_foreign_key_x=>1}, {:id=>1, :x_foreign_key_x=>2}, {:id=>2, :x_foreign_key_x=>1}, {:id=>2, :x_foreign_key_x=>2}, {:id=>3, :x_foreign_key_x=>1}, {:id=>3, :x_foreign_key_x=>1}]
 
     @c.waw_identity_map do
       MODEL_DB.sqls.length.should == 0
@@ -347,23 +296,8 @@ describe "Sequel::Plugins::IdentityMap" do
     @c1.set_primary_key :id, :id2
     @c1.plugin :many_through_many
     @c1.many_through_many :artists, [[:aa, [:album_id1, :album_id2], :artist_id]], :class=>@c2
-    ds = @c1.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1, :id2=>4})
-      yield({:id=>2, :id2=>5})
-      yield({:id=>3, :id2=>6})
-    end
-    ds = @c2.dataset
-    def ds.fetch_rows(sql)
-      execute(sql)
-      yield({:id=>1, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4})
-      yield({:id=>1, :x_foreign_key_0_x=>2, :x_foreign_key_1_x=>5})
-      yield({:id=>2, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4})
-      yield({:id=>2, :x_foreign_key_0_x=>2, :x_foreign_key_1_x=>5})
-      yield({:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4})
-      yield({:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4})
-    end
+    @c1.dataset._fetch = [{:id=>1, :id2=>4}, {:id=>2, :id2=>5}, {:id=>3, :id2=>6}]
+    @c2.dataset._fetch = [ {:id=>1, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}, {:id=>1, :x_foreign_key_0_x=>2, :x_foreign_key_1_x=>5}, {:id=>2, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}, {:id=>2, :x_foreign_key_0_x=>2, :x_foreign_key_1_x=>5}, {:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}, {:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}]
 
     @c.waw_identity_map do
       MODEL_DB.sqls.length.should == 0
