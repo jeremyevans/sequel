@@ -11,27 +11,23 @@ describe "Sequel::Plugins::LazyAttributes" do
       meta_def(:columns){[:id, :name]}
       lazy_attributes :name
       meta_def(:columns){[:id]}
-      ds = dataset
-      def ds.fetch_rows(sql)
-        execute(sql)
-        select = @opts[:select]
-        where = @opts[:where]
-        block = @mod_block || proc{|s| s}
-        if !where
-          if select.include?(:name)
-            yield(block[:id=>1, :name=>'1'])
-            yield(block[:id=>2, :name=>'2'])
+      dataset._fetch = proc do |sql|
+        if sql !~ /WHERE/
+          if sql =~ /name/
+            [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
           else
-            yield(:id=>1)
-            yield(:id=>2)
+            [{:id=>1}, {:id=>2}]
           end
         else
-          i = where.args.last
-          Array(i).each do |x|
+          if sql =~ /id IN \(([\d, ]+)\)/
+            $1.split(', ')
+          elsif sql =~ /id = (\d)/
+            [$1]
+          end.map do |x|
             if sql =~ /SELECT name FROM/
-              yield(block[:name=>x.to_s])
+              {:name=>x.to_s}
             else
-              yield(block[:id=>x, :name=>x.to_s])
+              {:id=>x.to_i, :name=>x.to_s}
             end
           end
         end
@@ -137,7 +133,7 @@ describe "Sequel::Plugins::LazyAttributes" do
 
   it "should work with the serialization plugin" do
     @c.plugin :serialization, :yaml, :name
-    @ds.instance_variable_set(:@mod_block, proc{|s| s.merge(:name=>"--- #{s[:name].to_i*3}\n")})
+    @ds._fetch = [[{:id=>1}, {:id=>2}], [{:id=>1, :name=>"--- 3\n"}, {:id=>2, :name=>"--- 6\n"}], [{:id=>1}], [{:name=>"--- 3\n"}]]
     @c.with_identity_map do
       ms = @ds.all
       ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
