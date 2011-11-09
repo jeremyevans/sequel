@@ -40,6 +40,37 @@ describe Sequel::Dataset, " graphing" do
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
   end
 
+  it "#graph should use currently selected columns as the basis for the selected columns in a new graph" do
+    ds = @ds1.select(:id).graph(@ds2, :x=>:id)
+    ds.sql.should == 'SELECT points.id, lines.id AS lines_id, lines.x, lines.y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ds._fetch = {:id=>1, :lines_id=>2, :x=>3, :y=>4, :graph_id=>5}
+    ds.all.should == [{:points=>{:id=>1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
+
+    ds = @ds1.select(:id, :x).graph(@ds2, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x, lines.id AS lines_id, lines.x AS lines_x, lines.y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ds._fetch = {:id=>1, :x=>-1, :lines_id=>2, :lines_x=>3, :y=>4, :graph_id=>5}
+    ds.all.should == [{:points=>{:id=>1, :x=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
+
+    ds = @ds1.select(:id.identifier, :x.qualify(:points)).graph(@ds2, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x, lines.id AS lines_id, lines.x AS lines_x, lines.y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ds._fetch = {:id=>1, :x=>-1, :lines_id=>2, :lines_x=>3, :y=>4, :graph_id=>5}
+    ds.all.should == [{:points=>{:id=>1, :x=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
+
+    ds = @ds1.select(:id.identifier.qualify(:points), :x.identifier.as(:y)).graph(@ds2, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x AS y, lines.id AS lines_id, lines.x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ds._fetch = {:id=>1, :y=>-1, :lines_id=>2, :x=>3, :lines_y=>4, :graph_id=>5}
+    ds.all.should == [{:points=>{:id=>1, :y=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
+
+    ds = @ds1.select(:id, :x.identifier.qualify(:points.identifier).as(:y.identifier)).graph(@ds2, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x AS y, lines.id AS lines_id, lines.x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ds._fetch = {:id=>1, :y=>-1, :lines_id=>2, :x=>3, :lines_y=>4, :graph_id=>5}
+    ds.all.should == [{:points=>{:id=>1, :y=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
+  end
+
+  it "#graph should raise error if currently selected expressions cannot be handled" do
+    proc{@ds1.select(1).graph(@ds2, :x=>:id)}.should raise_error(Sequel::Error)
+  end
+
   it "#graph should accept a complex dataset and pass it directly to join" do
     ds = @ds1.graph(@ds2.filter(:x=>1), {:x=>:id})
     ds.sql.should == 'SELECT points.id, points.x, points.y, t1.id AS t1_id, t1.x AS t1_x, t1.y AS t1_y, t1.graph_id FROM points LEFT OUTER JOIN (SELECT * FROM lines WHERE (x = 1)) AS t1 ON (t1.x = points.id)'
@@ -135,10 +166,6 @@ describe Sequel::Dataset, " graphing" do
     proc{@ds1.graph(@ds2, :x=>:id)}.should_not raise_error
     proc{@ds1.graph(@ds2, :x=>:id).graph(@ds2, :x=>:id)}.should raise_error(Sequel::Error)
     proc{@ds1.graph(@ds2, :x=>:id).graph(@ds2, {:x=>:id}, :table_alias=>:blah)}.should_not raise_error
-  end
-
-  it "#graph should raise an error if columns are already selected and :graph_aliases is not set" do
-    proc{@ds1.select(:id).graph(@ds2)}.should raise_error(Sequel::Error)
   end
 
   it "#set_graph_aliases and #add_graph_aliases should not modify the current dataset's opts" do

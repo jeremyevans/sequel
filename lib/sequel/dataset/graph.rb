@@ -113,18 +113,13 @@ module Sequel
       add_table = options[:select] == false ? false : true
       # Whether to add the columns to the list of column aliases
       add_columns = !ds.opts.include?(:graph_aliases)
-      # columns to select
-      select = (opts[:select] || []).dup
 
       # Setup the initial graph data structure if it doesn't exist
       if graph = opts[:graph]
         opts[:graph] = graph = graph.dup
+        select = opts[:select].dup
         [:column_aliases, :table_aliases, :column_alias_num].each{|k| graph[k] = graph[k].dup}
       else
-        if add_columns && ds.opts[:select] && !ds.opts[:select].empty?
-          raise(Error, "can't add graph to dataset that already has selected columns, use set_graph_aliases or select_all before graphing")
-        end
-
         master = alias_symbol(ds.first_source_alias)
         raise_alias_error.call if master == table_alias
         # Master hash storing all .graph related information
@@ -139,9 +134,33 @@ module Sequel
         # aliased, but are not included if set_graph_aliases
         # has been used.
         if add_columns
-          columns.each do |column|
-            column_aliases[column] = [master, column]
-            select.push(SQL::QualifiedIdentifier.new(master, column))
+          if (select = @opts[:select]) && !select.empty? && !(select.length == 1 && (select.first.is_a?(SQL::ColumnAll)))
+            select = select.each do |sel|
+              column = case sel
+              when Symbol
+                _, c, a = split_symbol(sel)
+                (a || c).to_sym
+              when SQL::Identifier
+                sel.value.to_sym
+              when SQL::QualifiedIdentifier
+                column = sel.column
+                column = column.value if column.is_a?(SQL::Identifier)
+                column.to_sym
+              when SQL::AliasedExpression
+                column = sel.aliaz
+                column = column.value if column.is_a?(SQL::Identifier)
+                column.to_sym
+              else
+                raise Error, "can't figure out alias to use for graphing for #{sel.inspect}"
+              end
+              column_aliases[column] = [master, column]
+            end
+            select = qualified_expression(select, master)
+          else
+            select = columns.map do |column|
+              column_aliases[column] = [master, column]
+              SQL::QualifiedIdentifier.new(master, column)
+            end
           end
         end
       end
@@ -181,7 +200,7 @@ module Sequel
           select.push(identifier)
         end
       end
-      ds.select(*select)
+      add_columns ? ds.select(*select) : ds
     end
 
     # This allows you to manually specify the graph aliases to use

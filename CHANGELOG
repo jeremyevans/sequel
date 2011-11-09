@@ -1,6 +1,6 @@
 === HEAD
 
-* Raise Error if attempting to setup a graphed dataset that already has columns selected (jeremyevans)
+* When starting a new dataset graph, assume existing selection is the columns to select from the current table (jeremyevans)
 
 * Allow specifying nanoseconds and offsets when converting a hash or array to a timestamp (jeremyevans, jfirebaugh) (#395)
 
