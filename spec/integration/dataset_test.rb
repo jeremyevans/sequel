@@ -1148,9 +1148,13 @@ end
 describe "Dataset string methods" do
   before(:all) do
     @db = INTEGRATION_DB
+    csc = {}
+    cic = {}
+    csc[:collate] = @db.dataset_class::CASE_SENSITIVE_COLLATION if defined? @db.dataset_class::CASE_SENSITIVE_COLLATION
+    cic[:collate] = @db.dataset_class::CASE_INSENSITIVE_COLLATION if defined? @db.dataset_class::CASE_INSENSITIVE_COLLATION
     @db.create_table!(:a) do
-      String :a, ({:collate => @db.dataset.class::CASE_SENSITIVE_COLLATION} if defined? @db.dataset.class::CASE_SENSITIVE_COLLATION)
-      String :b, ({:collate => @db.dataset.class::CASE_INSENSITIVE_COLLATION} if defined? @db.dataset.class::CASE_INSENSITIVE_COLLATION)
+      String :a, csc
+      String :b, cic
     end
     @ds = @db[:a].order(:a)
   end
