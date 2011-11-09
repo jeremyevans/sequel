@@ -8,21 +8,8 @@ describe "List plugin" do
       columns :id, :position, :scope_id, :pos
       plugin :list, opts
       self.use_transactions = false
-
-      class << self
-        attr_accessor :rows
-      end
     end
     c
-  end
-
-  def y(c, *hs)
-    c.rows = hs
-    ds = c.dataset
-    def ds.fetch_rows(sql)
-      db.execute(sql)
-      yield model.rows.shift
-    end
   end
 
   before do
@@ -80,18 +67,18 @@ describe "List plugin" do
   end
 
   it "should have at_position return the model object at the given position" do
-    y(@c, :id=>1, :position=>1)
+    @c.dataset._fetch = {:id=>1, :position=>1}
     @o.at_position(10).should == @c.load(:id=>1, :position=>1)
-    y(@sc, :id=>2, :position=>2, :scope_id=>5)
+    @sc.dataset._fetch = {:id=>2, :position=>2, :scope_id=>5}
     @so.at_position(20).should == @sc.load(:id=>2, :position=>2, :scope_id=>5)
     @db.sqls.should == ["SELECT * FROM items WHERE (position = 10) ORDER BY position LIMIT 1",
       "SELECT * FROM items WHERE ((scope_id = 5) AND (position = 20)) ORDER BY scope_id, position LIMIT 1"]
   end
 
   it "should have last_position return the last position in the list" do
-    y(@c, :max=>10)
+    @c.dataset._fetch  = {:max=>10}
     @o.last_position.should == 10
-    y(@sc, :max=>20)
+    @sc.dataset._fetch = {:max=>20}
     @so.last_position.should == 20
     @db.sqls.should == ["SELECT max(position) FROM items LIMIT 1",
       "SELECT max(position) FROM items WHERE (scope_id = 5) LIMIT 1"]
@@ -106,7 +93,7 @@ describe "List plugin" do
   end
 
   it "should have move_down without an argument move down a single position" do
-    y(@c, :max=>10)
+    @c.dataset._fetch = {:max=>10}
     @o.move_down.should == @o
     @o.position.should == 4
     @db.sqls.should == ["SELECT max(position) FROM items LIMIT 1",
@@ -115,7 +102,7 @@ describe "List plugin" do
   end
 
   it "should have move_down with an argument move down the given number of positions" do
-    y(@c, :max=>10)
+    @c.dataset._fetch = {:max=>10}
     @o.move_down(3).should == @o
     @o.position.should == 6
     @db.sqls.should == ["SELECT max(position) FROM items LIMIT 1",
@@ -132,7 +119,7 @@ describe "List plugin" do
 
   it "should have move_to raise an error if an invalid target is used" do
     proc{@o.move_to(0)}.should raise_error(Sequel::Error)
-    y(@c, :max=>10)
+    @c.dataset._fetch = {:max=>10}
     proc{@o.move_to(11)}.should raise_error(Sequel::Error)
   end
 
@@ -158,13 +145,13 @@ describe "List plugin" do
   end
 
   it "should have move to shift entries correctly between current and target if moving down" do
-    y(@c, :max=>10)
+    @c.dataset._fetch = {:max=>10}
     @o.move_to(4)
     @db.sqls[1].should == "UPDATE items SET position = (position - 1) WHERE ((position >= 4) AND (position <= 4))"
   end
 
   it "should have move_to_bottom move the item to the last position" do
-    y(@c, :max=>10)
+    @c.dataset._fetch = {:max=>10}
     @o.move_to_bottom
     @db.sqls.should == ["SELECT max(position) FROM items LIMIT 1",
       "UPDATE items SET position = (position - 1) WHERE ((position >= 4) AND (position <= 10))",
@@ -192,7 +179,7 @@ describe "List plugin" do
   end
 
   it "should have move_up with a negative argument move down the given number of positions" do
-    y(@c, :max=>10)
+    @c.dataset._fetch = {:max=>10}
     @o.move_up(-1).should == @o
     @o.position.should == 4
     @db.sqls.should == ["SELECT max(position) FROM items LIMIT 1",
@@ -201,19 +188,19 @@ describe "List plugin" do
   end
 
   it "should have next return the next entry in the list if not given an argument" do
-    y(@c, :id=>9, :position=>4)
+    @c.dataset._fetch = {:id=>9, :position=>4}
     @o.next.should == @c.load(:id=>9, :position=>4)
     @db.sqls.should == ["SELECT * FROM items WHERE (position = 4) ORDER BY position LIMIT 1"]
   end
 
   it "should have next return the entry the given number of positions below the instance if given an argument" do
-    y(@c, :id=>9, :position=>5)
+    @c.dataset._fetch = {:id=>9, :position=>5}
     @o.next(2).should == @c.load(:id=>9, :position=>5)
     @db.sqls.should == ["SELECT * FROM items WHERE (position = 5) ORDER BY position LIMIT 1"]
   end
 
   it "should have next return a previous entry if given a negative argument" do
-    y(@c, :id=>9, :position=>2)
+    @c.dataset._fetch = {:id=>9, :position=>2}
     @o.next(-1).should == @c.load(:id=>9, :position=>2)
     @db.sqls.should == ["SELECT * FROM items WHERE (position = 2) ORDER BY position LIMIT 1"]
   end
@@ -223,19 +210,19 @@ describe "List plugin" do
   end
 
   it "should have prev return the previous entry in the list if not given an argument" do
-    y(@c, :id=>9, :position=>2)
+    @c.dataset._fetch = {:id=>9, :position=>2}
     @o.prev.should == @c.load(:id=>9, :position=>2)
     @db.sqls.should == ["SELECT * FROM items WHERE (position = 2) ORDER BY position LIMIT 1"]
   end
 
   it "should have prev return the entry the given number of positions above the instance if given an argument" do
-    y(@c, :id=>9, :position=>1)
+    @c.dataset._fetch = {:id=>9, :position=>1}
     @o.prev(2).should == @c.load(:id=>9, :position=>1)
     @db.sqls.should == ["SELECT * FROM items WHERE (position = 1) ORDER BY position LIMIT 1"]
   end
 
   it "should have prev return a following entry if given a negative argument" do
-    y(@c, :id=>9, :position=>4)
+    @c.dataset._fetch = {:id=>9, :position=>4}
     @o.prev(-1).should == @c.load(:id=>9, :position=>4)
     @db.sqls.should == ["SELECT * FROM items WHERE (position = 4) ORDER BY position LIMIT 1"]
   end
