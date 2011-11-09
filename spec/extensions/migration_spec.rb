@@ -315,9 +315,12 @@ end
 
 describe "Sequel::TimestampMigrator" do
   before do
-    $sequel_migration_version = 0
-    $sequel_migration_files = []
+    sequel_migration_version = 0
     @dsc = dsc = Class.new(Sequel::Mock::Dataset) do
+      self::FILES =[]
+      define_method(:sequel_migration_version){sequel_migration_version}
+      define_method(:sequel_migration_version=){|v| sequel_migration_version = v}
+
       def columns
         case opts[:from].first
         when :schema_info, 'schema_info'
@@ -332,34 +335,34 @@ describe "Sequel::TimestampMigrator" do
       def fetch_rows(sql)
         case opts[:from].first
         when :schema_info, 'schema_info'
-          yield({:version=>$sequel_migration_version})
+          yield({:version=>sequel_migration_version})
         when :schema_migrations, 'schema_migrations'
-          $sequel_migration_files.sort.each{|f| yield(:filename=>f)}
+          self.class::FILES.sort.each{|f| yield(:filename=>f)}
         when :sm, 'sm'
-          $sequel_migration_files.sort.each{|f| yield(:fn=>f)}
+          self.class::FILES.sort.each{|f| yield(:fn=>f)}
         end
       end
 
       def insert(h={})
         case opts[:from].first
         when :schema_info, 'schema_info'
-          $sequel_migration_version = h.values.first
+          self.sequel_migration_version = h.values.first
         when :schema_migrations, :sm, 'schema_migrations', 'sm'
-          $sequel_migration_files << h.values.first
+          self.class::FILES << h.values.first
         end
       end
 
       def update(h={})
         case opts[:from].first
         when :schema_info, 'schema_info'
-          $sequel_migration_version = h.values.first
+          self.sequel_migration_version = h.values.first
         end
       end
 
       def delete
         case opts[:from].first
         when :schema_migrations, :sm, 'schema_migrations', 'sm'
-          $sequel_migration_files.delete(opts[:where].args.last)
+          self.class::FILES.delete(opts[:where].args.last)
         end
       end
     end
