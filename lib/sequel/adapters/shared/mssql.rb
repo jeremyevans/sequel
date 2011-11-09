@@ -283,6 +283,8 @@ module Sequel
       TOP = " TOP ".freeze
       OUTPUT = " OUTPUT ".freeze
       HSTAR = "H*".freeze
+      CASE_SENSITIVE_COLLATION = 'Latin1_General_CS_AS'.freeze
+      CASE_INSENSITIVE_COLLATION = 'Latin1_General_CI_AS'.freeze
 
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
       attr_accessor :mssql_unicode_strings
@@ -299,9 +301,9 @@ module Sequel
         when :'||'
           super(sql, :+, args)
         when :LIKE, :"NOT LIKE"
-          super(sql, op, args.map{|a| LiteralString.new("(#{literal(a)} COLLATE Latin1_General_CS_AS)")})
+          super(sql, op, args.map{|a| LiteralString.new("(#{literal(a)} COLLATE #{CASE_SENSITIVE_COLLATION})")})
         when :ILIKE, :"NOT ILIKE"
-          super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args)
+          super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args.map{|a| LiteralString.new("(#{literal(a)} COLLATE #{CASE_INSENSITIVE_COLLATION})")})
         when :<<
           sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
         when :>>

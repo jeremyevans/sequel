@@ -1148,7 +1148,10 @@ end
 describe "Dataset string methods" do
   before(:all) do
     @db = INTEGRATION_DB
-    @db.create_table!(:a){String :a; String :b}
+    @db.create_table!(:a) do
+      String :a, ({:collate => @db.dataset.class::CASE_SENSITIVE_COLLATION} if defined? @db.dataset.class::CASE_SENSITIVE_COLLATION)
+      String :b, ({:collate => @db.dataset.class::CASE_INSENSITIVE_COLLATION} if defined? @db.dataset.class::CASE_INSENSITIVE_COLLATION)
+    end
     @ds = @db[:a].order(:a)
   end
   before do
@@ -1200,7 +1203,7 @@ describe "Dataset string methods" do
   it "#like should be case sensitive" do
     @ds.insert('foo', 'bar')
     @ds.filter(:a.like('Foo')).all.should == []
-    @ds.filter(:a.like('baR')).all.should == []
+    @ds.filter(:b.like('baR')).all.should == []
     @ds.filter(:a.like('FOO', 'BAR')).all.should == []
     @ds.exclude(:a.like('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.exclude(:a.like('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
@@ -1219,8 +1222,8 @@ describe "Dataset string methods" do
   
   it "should work with strings created with sql_string_join" do
     @ds.insert('foo', 'bar')
-    @ds.get([:a, :b].sql_string_join).should == 'foobar'
-    @ds.get([:a, :b].sql_string_join(' ')).should == 'foo bar'
+    @ds.get([:a, "bar"].sql_string_join).should == 'foobar'
+    @ds.get(["foo", :b].sql_string_join(' ')).should == 'foo bar'
   end
 end
 
