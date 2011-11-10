@@ -1,50 +1,30 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "NestedAttributes plugin" do
+  def check_sqls(should, is)
+    if should.is_a?(Array)
+      should.should include(is)
+    else
+      should.should == is
+    end
+  end
+
+  def check_sql_array(*shoulds)
+    sqls = @db.sqls
+    shoulds.length.should == sqls.length
+    shoulds.zip(sqls){|s, i| check_sqls(s, i)}
+  end
+
   before do
-    mods = @mods = []
-    i = 0
-    gi = lambda{i}
-    ii = lambda{i+=1}
-    ds_mod = Module.new do
-      def empty?; false; end
-      define_method(:insert) do |h|
-        x = ii.call
-        mods << [:i, first_source, h, x]
-        x
-      end
-      define_method(:supports_insert_select?){true}
-      define_method(:insert_select) do |h|
-        x = ii.call
-        mods << [:is, first_source, h, x]
-        h.merge(:id=>x)
-      end
-      define_method(:update) do |h|
-        mods << [:u, first_source, h, literal(opts[:where])]
-        1
-      end
-      define_method(:delete) do
-        mods << [:d, first_source, literal(opts[:where])]
-        1
-      end
-    end
-    db = Sequel::Database.new({})
-    def db.connect(opts)
-      Object.new
-    end
-    db.meta_def(:dataset) do |*a|
-      x = super(*a)
-      x.extend(ds_mod)
-      x
-    end
-    @c = Class.new(Sequel::Model(db))
+    @db = Sequel.mock(:autoid=>1, :numrows=>1)
+    @c = Class.new(Sequel::Model(@db))
     @c.plugin :nested_attributes
     @Artist = Class.new(@c).set_dataset(:artists)
     @Album = Class.new(@c).set_dataset(:albums)
     @Tag = Class.new(@c).set_dataset(:tags)
-    [@Artist, @Album, @Tag].each do |m|
-      m.dataset.extend(ds_mod)
-    end
+    @Artist.plugin :skip_create_refresh
+    @Album.plugin :skip_create_refresh
+    @Tag.plugin :skip_create_refresh
     @Artist.columns :id, :name
     @Album.columns :id, :name, :artist_id
     @Tag.columns :id, :name
@@ -54,36 +34,44 @@ describe "NestedAttributes plugin" do
     @Album.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:at
     @Artist.nested_attributes :albums, :first_album, :destroy=>true, :remove=>true
     @Album.nested_attributes :artist, :tags, :destroy=>true, :remove=>true
+    @db.sqls
   end
   
   it "should support creating new many_to_one objects" do
     a = @Album.new({:name=>'Al', :artist_attributes=>{:name=>'Ar'}})
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:is, :artists, {:name=>"Ar"}, 1], [:is, :albums, {:name=>"Al", :artist_id=>1}, 2]]
+    check_sql_array("INSERT INTO artists (name) VALUES ('Ar')",
+      ["INSERT INTO albums (name, artist_id) VALUES ('Al', 1)", "INSERT INTO albums (artist_id, name) VALUES (1, 'Al')"])
   end
   
   it "should support creating new one_to_one objects" do
     a = @Artist.new(:name=>'Ar')
     a.id = 1
     a.first_album_attributes = {:name=>'Al'}
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:is, :artists, {:name=>"Ar", :id=>1}, 1], [:is, :albums, {:name=>"Al"}, 2], [:u, :albums, {:artist_id=>nil}, "((artist_id = 1) AND (id != 2))"], [:u, :albums, {:name=>"Al", :artist_id=>1}, "(id = 2)"]]
+    check_sql_array(["INSERT INTO artists (name, id) VALUES ('Ar', 1)", "INSERT INTO artists (id, name) VALUES (1, 'Ar')"],
+      "INSERT INTO albums (name) VALUES ('Al')",
+      "UPDATE albums SET artist_id = NULL WHERE ((artist_id = 1) AND (id != 2))",
+      ["UPDATE albums SET artist_id = 1, name = 'Al' WHERE (id = 2)", "UPDATE albums SET name = 'Al', artist_id = 1 WHERE (id = 2)"])
   end
   
   it "should support creating new one_to_many objects" do
     a = @Artist.new({:name=>'Ar', :albums_attributes=>[{:name=>'Al'}]})
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:is, :artists, {:name=>"Ar"}, 1], [:is, :albums, {:name=>"Al", :artist_id=>1}, 2]]
+    check_sql_array("INSERT INTO artists (name) VALUES ('Ar')",
+      ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
   end
   
   it "should support creating new many_to_many objects" do
     a = @Album.new({:name=>'Al', :tags_attributes=>[{:name=>'T'}]})
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:is, :albums, {:name=>"Al"}, 1], [:is, :tags, {:name=>"T"}, 2], [:i, :at, {:album_id=>1, :tag_id=>2}, 3]]
+    check_sql_array("INSERT INTO albums (name) VALUES ('Al')",
+      "INSERT INTO tags (name) VALUES ('T')",
+      ["INSERT INTO at (album_id, tag_id) VALUES (1, 2)", "INSERT INTO at (tag_id, album_id) VALUES (2, 1)"])
   end
   
   it "should add new objects to the cached association array as soon as the *_attributes= method is called" do
@@ -97,9 +85,9 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     al.associations[:artist] = ar
     al.set(:artist_attributes=>{:id=>'20', :name=>'Ar2'})
-    @mods.should == []
+    @db.sqls.should == []
     al.save
-    @mods.should == [[:u, :albums, {:name=>"Al"}, '(id = 10)'], [:u, :artists, {:name=>"Ar2"}, '(id = 20)']]
+    @db.sqls.should == ["UPDATE albums SET name = 'Al' WHERE (id = 10)", "UPDATE artists SET name = 'Ar2' WHERE (id = 20)"]
   end
   
   it "should support updating one_to_one objects" do
@@ -107,9 +95,9 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     ar.associations[:first_album] = al
     ar.set(:first_album_attributes=>{:id=>10, :name=>'Al2'})
-    @mods.should == []
+    @db.sqls.should == []
     ar.save
-    @mods.should == [[:u, :artists, {:name=>"Ar"}, '(id = 20)'], [:u, :albums, {:name=>"Al2"}, '(id = 10)']]
+    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "UPDATE albums SET name = 'Al2' WHERE (id = 10)"]
   end
   
   it "should support updating one_to_many objects" do
@@ -117,9 +105,9 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     ar.associations[:albums] = [al]
     ar.set(:albums_attributes=>[{:id=>10, :name=>'Al2'}])
-    @mods.should == []
+    @db.sqls.should == []
     ar.save
-    @mods.should == [[:u, :artists, {:name=>"Ar"}, '(id = 20)'], [:u, :albums, {:name=>"Al2"}, '(id = 10)']]
+    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "UPDATE albums SET name = 'Al2' WHERE (id = 10)"]
   end
   
   it "should support updating many_to_many objects" do
@@ -127,9 +115,9 @@ describe "NestedAttributes plugin" do
     t = @Tag.load(:id=>20, :name=>'T')
     a.associations[:tags] = [t]
     a.set(:tags_attributes=>[{:id=>20, :name=>'T2'}])
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:u, :albums, {:name=>"Al"}, '(id = 10)'], [:u, :tags, {:name=>"T2"}, '(id = 20)']]
+    @db.sqls.should == ["UPDATE albums SET name = 'Al' WHERE (id = 10)", "UPDATE tags SET name = 'T2' WHERE (id = 20)"]
   end
   
   it "should support removing many_to_one objects" do
@@ -137,9 +125,9 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     al.associations[:artist] = ar
     al.set(:artist_attributes=>{:id=>'20', :_remove=>'1'})
-    @mods.should == []
+    @db.sqls.should == []
     al.save
-    @mods.should == [[:u, :albums, {:artist_id=>nil, :name=>'Al'}, '(id = 10)']]
+    check_sql_array(["UPDATE albums SET artist_id = NULL, name = 'Al' WHERE (id = 10)", "UPDATE albums SET name = 'Al', artist_id = NULL WHERE (id = 10)"])
   end
   
   it "should support removing one_to_one objects" do
@@ -147,10 +135,9 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     ar.associations[:first_album] = al
     ar.set(:first_album_attributes=>{:id=>10, :_remove=>'t'})
-    @mods.should == []
+    @db.sqls.should == []
     ar.save
-    @mods.should == [[:u, :albums, {:artist_id=>nil}, "(artist_id = 20)"], [:u, :artists, {:name=>"Ar"}, "(id = 20)"]]
-    
+    @db.sqls.should == ["UPDATE albums SET artist_id = NULL WHERE (artist_id = 20)", "UPDATE artists SET name = 'Ar' WHERE (id = 20)"]
   end
   
   it "should support removing one_to_many objects" do
@@ -158,9 +145,12 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     ar.associations[:albums] = [al]
     ar.set(:albums_attributes=>[{:id=>10, :_remove=>'t'}])
-    @mods.should == []
+    @db.sqls.should == []
+    @Album.dataset._fetch = {:id=>1}
     ar.save
-    @mods.should == [[:u, :albums, {:name=>"Al", :artist_id=>nil}, '(id = 10)'], [:u, :artists, {:name=>"Ar"}, '(id = 20)']]
+    check_sql_array("SELECT 1 FROM albums WHERE ((albums.artist_id = 20) AND (id = 10)) LIMIT 1",
+      ["UPDATE albums SET artist_id = NULL, name = 'Al' WHERE (id = 10)", "UPDATE albums SET name = 'Al', artist_id = NULL WHERE (id = 10)"],
+      "UPDATE artists SET name = 'Ar' WHERE (id = 20)")
   end
   
   it "should support removing many_to_many objects" do
@@ -168,9 +158,9 @@ describe "NestedAttributes plugin" do
     t = @Tag.load(:id=>20, :name=>'T')
     a.associations[:tags] = [t]
     a.set(:tags_attributes=>[{:id=>20, :_remove=>true}])
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:d, :at, '((album_id = 10) AND (tag_id = 20))'], [:u, :albums, {:name=>"Al"}, '(id = 10)']]
+    @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)"]
   end
   
   it "should support destroying many_to_one objects" do
@@ -178,9 +168,10 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     al.associations[:artist] = ar
     al.set(:artist_attributes=>{:id=>'20', :_delete=>'1'})
-    @mods.should == []
+    @db.sqls.should == []
     al.save
-    @mods.should == [[:u, :albums, {:artist_id=>nil, :name=>'Al'}, '(id = 10)'], [:d, :artists, '(id = 20)']]
+    check_sql_array(["UPDATE albums SET artist_id = NULL, name = 'Al' WHERE (id = 10)", "UPDATE albums SET name = 'Al', artist_id = NULL WHERE (id = 10)"],
+      "DELETE FROM artists WHERE (id = 20)")
   end
   
   it "should support destroying one_to_one objects" do
@@ -188,9 +179,9 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     ar.associations[:first_album] = al
     ar.set(:first_album_attributes=>{:id=>10, :_delete=>'t'})
-    @mods.should == []
+    @db.sqls.should == []
     ar.save
-    @mods.should == [[:u, :artists, {:name=>"Ar"}, "(id = 20)"], [:d, :albums, "(id = 10)"]]
+    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "DELETE FROM albums WHERE (id = 10)"]
   end
   
   it "should support destroying one_to_many objects" do
@@ -198,9 +189,9 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     ar.associations[:albums] = [al]
     ar.set(:albums_attributes=>[{:id=>10, :_delete=>'t'}])
-    @mods.should == []
+    @db.sqls.should == []
     ar.save
-    @mods.should == [[:u, :artists, {:name=>"Ar"}, '(id = 20)'], [:d, :albums, '(id = 10)']]
+    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "DELETE FROM albums WHERE (id = 10)"]
   end
   
   it "should support destroying many_to_many objects" do
@@ -208,9 +199,9 @@ describe "NestedAttributes plugin" do
     t = @Tag.load(:id=>20, :name=>'T')
     a.associations[:tags] = [t]
     a.set(:tags_attributes=>[{:id=>20, :_delete=>true}])
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:d, :at, '((album_id = 10) AND (tag_id = 20))'], [:u, :albums, {:name=>"Al"}, '(id = 10)'], [:d, :tags, '(id = 20)']]
+    @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)", "DELETE FROM tags WHERE (id = 20)"]
   end
   
   it "should support both string and symbol keys in nested attribute hashes" do
@@ -218,9 +209,9 @@ describe "NestedAttributes plugin" do
     t = @Tag.load(:id=>20, :name=>'T')
     a.associations[:tags] = [t]
     a.set('tags_attributes'=>[{'id'=>20, '_delete'=>true}])
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:d, :at, '((album_id = 10) AND (tag_id = 20))'], [:u, :albums, {:name=>"Al"}, '(id = 10)'], [:d, :tags, '(id = 20)']]
+    @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)", "DELETE FROM tags WHERE (id = 20)"]
   end
   
   it "should support using a hash instead of an array for to_many nested attributes" do
@@ -228,9 +219,9 @@ describe "NestedAttributes plugin" do
     t = @Tag.load(:id=>20, :name=>'T')
     a.associations[:tags] = [t]
     a.set('tags_attributes'=>{'1'=>{'id'=>20, '_delete'=>true}})
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:d, :at, '((album_id = 10) AND (tag_id = 20))'], [:u, :albums, {:name=>"Al"}, '(id = 10)'], [:d, :tags, '(id = 20)']]
+    @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)", "DELETE FROM tags WHERE (id = 20)"]
   end
   
   it "should only allow destroying associated objects if :destroy option is used in the nested_attributes call" do
@@ -267,9 +258,9 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     ar.associations[:albums] = [al]
     ar.set(:albums_attributes=>[{:id=>30, :_delete=>'t'}])
-    @mods.should == []
+    @db.sqls.should == []
     ar.save
-    @mods.should == [[:u, :artists, {:name=>"Ar"}, '(id = 20)']]
+    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)"]
   end
   
   it "should not save if nested attribute is not valid and should include nested attribute validation errors in the main object's validation errors" do
@@ -280,10 +271,10 @@ describe "NestedAttributes plugin" do
       end
     end
     a = @Album.new(:name=>'Al', :artist_attributes=>{:name=>'Ar'})
-    @mods.should == []
+    @db.sqls.should == []
     proc{a.save}.should raise_error(Sequel::ValidationFailed)
     a.errors.full_messages.should == ['artist name cannot be Ar']
-    @mods.should == []
+    @db.sqls.should == []
     # Should preserve attributes
     a.artist.name.should == 'Ar'
   end
@@ -298,9 +289,10 @@ describe "NestedAttributes plugin" do
       end
     end
     a = @Album.new(:name=>'Al', :artist_attributes=>{:name=>'Ar'})
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:is, :artists, {:name=>"Ar"}, 1], [:is, :albums, {:name=>"Al", :artist_id=>1}, 2]]
+    check_sql_array("INSERT INTO artists (name) VALUES ('Ar')",
+      ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
   end
   
   it "should not attempt to validate nested attributes if the :validate=>false option is passed to save" do
@@ -311,23 +303,25 @@ describe "NestedAttributes plugin" do
       end
     end
     a = @Album.new(:name=>'Al', :artist_attributes=>{:name=>'Ar'})
-    @mods.should == []
+    @db.sqls.should == []
     a.save(:validate=>false)
-    @mods.should == [[:is, :artists, {:name=>"Ar"}, 1], [:is, :albums, {:name=>"Al", :artist_id=>1}, 2]]
+    check_sql_array("INSERT INTO artists (name) VALUES ('Ar')",
+      ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
   end
   
   it "should not accept nested attributes unless explicitly specified" do
     @Artist.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:at
     proc{@Artist.create({:name=>'Ar', :tags_attributes=>[{:name=>'T'}]})}.should raise_error(Sequel::Error)
-    @mods.should == []
+    @db.sqls.should == []
   end
   
   it "should save when save_changes or update is called if nested attribute associated objects changed but there are no changes to the main object" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
     al.associations[:artist] = ar
+    @db.sqls.should == []
     al.update(:artist_attributes=>{:id=>'20', :name=>'Ar2'})
-    @mods.should == [[:u, :artists, {:name=>"Ar2"}, '(id = 20)']]
+    @db.sqls.should == ["UPDATE artists SET name = 'Ar2' WHERE (id = 20)"]
   end
   
   it "should have a :limit option limiting the amount of entries" do
@@ -335,17 +329,25 @@ describe "NestedAttributes plugin" do
     arr = [{:name=>'T'}]
     proc{@Album.new({:name=>'Al', :tags_attributes=>arr*3})}.should raise_error(Sequel::Error)
     a = @Album.new({:name=>'Al', :tags_attributes=>arr*2})
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:is, :albums, {:name=>"Al"}, 1], [:is, :tags, {:name=>"T"}, 2], [:i, :at, {:album_id=>1, :tag_id=>2}, 3], [:is, :tags, {:name=>"T"}, 4], [:i, :at, {:album_id=>1, :tag_id=>4}, 5]]
+    check_sql_array("INSERT INTO albums (name) VALUES ('Al')",
+      "INSERT INTO tags (name) VALUES ('T')",
+      ["INSERT INTO at (album_id, tag_id) VALUES (1, 2)", "INSERT INTO at (tag_id, album_id) VALUES (2, 1)"],
+      "INSERT INTO tags (name) VALUES ('T')",
+      ["INSERT INTO at (album_id, tag_id) VALUES (1, 4)", "INSERT INTO at (tag_id, album_id) VALUES (4, 1)"])
   end
   
   it "should accept a block that each hash gets passed to determine if it should be processed" do
     @Album.nested_attributes(:tags){|h| h[:name].empty?}
     a = @Album.new({:name=>'Al', :tags_attributes=>[{:name=>'T'}, {:name=>''}, {:name=>'T2'}]})
-    @mods.should == []
+    @db.sqls.should == []
     a.save
-    @mods.should == [[:is, :albums, {:name=>"Al"}, 1], [:is, :tags, {:name=>"T"}, 2], [:i, :at, {:album_id=>1, :tag_id=>2}, 3], [:is, :tags, {:name=>"T2"}, 4], [:i, :at, {:album_id=>1, :tag_id=>4}, 5]]
+    check_sql_array("INSERT INTO albums (name) VALUES ('Al')",
+      "INSERT INTO tags (name) VALUES ('T')",
+      ["INSERT INTO at (album_id, tag_id) VALUES (1, 2)", "INSERT INTO at (tag_id, album_id) VALUES (2, 1)"],
+      "INSERT INTO tags (name) VALUES ('T2')",
+      ["INSERT INTO at (album_id, tag_id) VALUES (1, 4)", "INSERT INTO at (tag_id, album_id) VALUES (4, 1)"])
   end
   
   it "should return objects created/modified in the internal methods" do
@@ -391,9 +393,12 @@ describe "NestedAttributes plugin" do
     t = @Tag.load(:id=>30, :name=>'T', :number=>10)
     al.associations[:tags] = [t]
     al.set(:tags_attributes=>[{:id=>30, :name=>'T2'}, {:name=>'T3'}])
-    @mods.should == []
+    @db.sqls.should == []
     al.save
-    @mods.should == [[:u, :albums, {:name=>'Al'}, '(id = 10)'], [:u, :tags, {:name=>'T2'}, '(id = 30)'], [:is, :tags, {:name=>"T3"}, 1], [:i, :at, {:album_id=>10, :tag_id=>1}, 2]]
+    check_sql_array("UPDATE albums SET name = 'Al' WHERE (id = 10)",
+      "UPDATE tags SET name = 'T2' WHERE (id = 30)",
+      "INSERT INTO tags (name) VALUES ('T3')",
+      ["INSERT INTO at (album_id, tag_id) VALUES (10, 1)", "INSERT INTO at (tag_id, album_id) VALUES (1, 10)"])
     proc{al.set(:tags_attributes=>[{:id=>30, :name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
     proc{al.set(:tags_attributes=>[{:name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
   end
