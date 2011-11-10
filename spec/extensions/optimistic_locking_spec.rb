@@ -6,11 +6,8 @@ describe "optimistic_locking plugin" do
     end
     h = {1=>{:id=>1, :name=>'John', :lock_version=>2}}
     lv = @lv = "lock_version"
-    @c.dataset.quote_identifiers = false
-    @c.dataset.meta_def(:h){h}
-    @c.dataset.meta_def(:lv){lv}
-    @c.dataset.meta_def(:update) do |opts|
-      case update_sql(opts)
+    @c.dataset.numrows = proc do |sql|
+      case sql
       when /UPDATE people SET (name|#{lv}) = ('Jim'|'Bob'|\d+), (?:name|#{lv}) = ('Jim'|'Bob'|\d+) WHERE \(\(id = (\d+)\) AND \(#{lv} = (\d+)\)\)/
         name, nlv = $1 == 'name' ? [$2, $3] : [$3, $2]
         m = h[$4.to_i]
@@ -28,20 +25,6 @@ describe "optimistic_locking plugin" do
         else
           0
         end
-      else
-        puts update_sql(opts)
-      end
-    end
-    @c.dataset.instance_eval do
-      def fetch_rows(sql)
-        m = h[1].dup
-        v = m.delete(:lock_version)
-        m[lv.to_sym] = v
-        yield(m)
-      end
-    end
-    @c.dataset.meta_def(:delete) do
-      case delete_sql
       when /DELETE FROM people WHERE \(\(id = (\d+)\) AND \(#{lv} = (\d+)\)\)/
         m = h[$1.to_i]
         if m && m[lv.to_sym] == $2.to_i
@@ -51,8 +34,14 @@ describe "optimistic_locking plugin" do
           0
         end
       else
-        puts delete_sql
+        puts sql
       end
+    end
+    @c.dataset._fetch = proc do |sql|
+      m = h[1].dup
+      v = m.delete(:lock_version)
+      m[lv.to_sym] = v
+      m
     end
     @c.columns :id, :name, :lock_version
     @c.plugin :optimistic_locking
