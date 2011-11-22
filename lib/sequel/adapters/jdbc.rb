@@ -700,7 +700,8 @@ module Sequel
           columns.delete(rn)
         end
         @columns = columns
-        if (@convert_types || db.convert_types)
+        ct = @convert_types
+        if (ct.nil? ? db.convert_types : ct)
           cols.each{|c| c << nil}
           process_result_set_convert(cols, result, rn, &block)
         else
