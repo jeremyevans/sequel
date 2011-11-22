@@ -130,7 +130,7 @@
 * Database#<< and Dataset#<< now return self, which allow them
   to be used in chaining:
 
-    DB << "UPADTE foo SET bar_id = NULL" << "DROP TABLE bars"
+    DB << "UPDATE foo SET bar_id = NULL" << "DROP TABLE bars"
     DB[:foo] << {:bar_id=>0} << DB[:bars].select(:id)
 
 * A Database#timezone accessor has been added, allowing you to

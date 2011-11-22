@@ -39,7 +39,7 @@ module Sequel
     # Runs the supplied SQL statement string on the database server.
     # Returns self so it can be safely chained:
     #
-    #   DB << "UPADTE albums SET artist_id = NULL" << "DROP TABLE artists"
+    #   DB << "UPDATE albums SET artist_id = NULL" << "DROP TABLE artists"
     def <<(sql)
       run(sql)
       self

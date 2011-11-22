@@ -14,20 +14,20 @@ create the necessary database structure manually using Sequel's schema
 modification methods or another database tool.  However, if you are dealing
 with other developers, you'll have to send them all of the changes you are
 making.  Even if you aren't dealing with other developers, you generally have
-to make the schema changes in 3 places (development, testing, and 
+to make the schema changes in 3 places (development, testing, and
 production), and it's probably easier to use the migrations system to apply
 the schema changes than it is to keep track of the changes manually and
 execute them manually at the appropriate time.
 
 Sequel tracks which migrations you have already run, so to apply migrations
-you generally need to use run Sequel's migrator with <tt>bin/sequel -m</tt>:
+you generally need to run Sequel's migrator with <tt>bin/sequel -m</tt>:
 
   sequel -m path/to/migrations postgres://host/database
 
 Migrations in Sequel use a very simple DSL via the <tt>Sequel.migration</tt>
 method, and inside the DSL, use the <tt>Sequel::Database</tt> schema
 modification methods such as +create_table+ and +alter_table+.
-See the {schema modification guide}[link:files/doc/schema_modification_rdoc.html] 
+See the {schema modification guide}[link:files/doc/schema_modification_rdoc.html]
 for details on the schema modification methods you can use.
 
 == A Basic Migration
@@ -267,7 +267,7 @@ is important though, as it is used to mean that all migrations should be unappli
 === +TimestampMigrator+ Filenames
 
 With the +TimestampMigrator+, the version integer should represent a timestamp, though this isn't strictly
-required.  
+required.
 
 For example, for <tt>5/10/2010 12:00:00pm</tt>, you could use any of the following formats:
 
@@ -322,8 +322,8 @@ you should give it some thought before using it.
 
 Just don't do it.
 
-In general, you should not modify any migration that has been run on the database and been committed
-the source control repository, unless the migration contains a error that causes data loss.  As long
+In general, you should not modify any migration that has been run on the database and been committed to
+the source control repository, unless the migration contains an error that causes data loss.  As long
 as it is possible to undo the migration without losing data, you should just add another migration
 that undoes the actions of the previous bad migration, and maybe does the correct action afterward.
 
@@ -358,7 +358,7 @@ or they should use the reversible migrations feature with a +change+ block:
 It's usually easy to determine what you should put in your migration's +up+ block,
 as it's whatever change you want to make to the database.  The +down+ block is
 less obvious.  In general, it should reverse the changes made by the +up+ block, which means
-it should execute the opposite of what the +up+ block does in the reverse order in which 
+it should execute the opposite of what the +up+ block does in the reverse order in which
 the +up+ block does it.  Here's an example where you are switching from having a single
 artist per album to multiple artists per album:
 
@@ -402,12 +402,12 @@ artist per album to multiple artists per album:
     end
   end
 
-Note that the order in which things were done in the +down+ block is in
-reverse order to how they were done in the +up+ block.  Also note how it
-isn't always possible to reverse exactly what was done in the +up+ block.
-You should try to do so as much as possible, but if you can't, you may
-want to have your +down+ block raise a <tt>Sequel::Error</tt> exception
-saying why the migration cannot be reverted.
+Note that the operations performed in the +down+ block are performed in the
+reverse order of how they are performed in the +up+ block.  Also note how it
+isn't always possible to reverse exactly what was done in the +up+ block.  You
+should try to do so as much as possible, but if you can't, you may want to have
+your +down+ block raise a <tt>Sequel::Error</tt> exception saying why the
+migration cannot be reverted.
 
 == Running migrations
 
