@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :graph_alias_base association option for setting base name to use for table aliases when eager graphing (jeremyevans)
+
 * Make ILIKE work correctly on Microsoft SQL Server if database/column collation is case sensitive (jfirebaugh) (#398)
 
 * When starting a new dataset graph, assume existing selection is the columns to select from the current table (jeremyevans)

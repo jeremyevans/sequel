@@ -1089,6 +1089,14 @@ describe Sequel::Model, "#eager_graph" do
     GraphAlbum.eager_graph(:inner_genres).sql.should == 'SELECT albums.id, albums.band_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS inner_genres ON (inner_genres.id = ag.genre_id)'
   end
 
+  it "should respect the association's :graph_alias_base option" do 
+    GraphAlbum.many_to_one :inner_band, :class=>'GraphBand', :key=>:band_id, :graph_alias_base=>:foo
+    ds = GraphAlbum.eager_graph(:inner_band)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, foo.id AS foo_id, foo.vocalist_id FROM albums LEFT OUTER JOIN bands AS foo ON (foo.id = albums.band_id)'
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :graph_alias_base=>:foo
+    ds.eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, foo.id AS foo_id, foo.vocalist_id, foo_0.id AS foo_0_id, foo_0.album_id FROM albums LEFT OUTER JOIN bands AS foo ON (foo.id = albums.band_id) LEFT OUTER JOIN tracks AS foo_0 ON (foo_0.album_id = albums.id)'
+  end
+
   it "should respect the association's :graph_join_type option" do 
     GraphAlbum.many_to_one :inner_band, :class=>'GraphBand', :key=>:band_id, :graph_join_type=>:inner
     GraphAlbum.eager_graph(:inner_band).sql.should == 'SELECT albums.id, albums.band_id, inner_band.id AS inner_band_id, inner_band.vocalist_id FROM albums INNER JOIN bands AS inner_band ON (inner_band.id = albums.band_id)'

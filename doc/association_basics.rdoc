@@ -1329,6 +1329,17 @@ a JOIN USING or NATURAL JOIN for the graph:
   Artist.one_to_many :albums, :key=>:artist_name,
    :graph_only_conditions=>nil, :graph_join_type=>:natural
 
+==== :graph_alias_base
+
+The base name to use for the table alias when eager graphing.  Defaults to the name
+of the association.  If the alias name has already been used in the query, Sequel will create
+a unique alias by appending a numeric suffix (e.g. alias_0, alias_1, ...) until the alias is
+unique.
+
+This is mostly useful if you have associations with the same name in many models, and you want
+to be able to easily tell which table alias corresponds to which association when eagerly
+graphing multiple associations with the same name.
+
 ==== :eager_grapher
 
 Sets up a custom grapher to use when eager loading the objects via eager_graph.
