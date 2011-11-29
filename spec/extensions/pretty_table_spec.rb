@@ -7,12 +7,7 @@ describe "Dataset#print" do
     @output = StringIO.new
     @orig_stdout = $stdout
     $stdout = @output
-    @dataset = Sequel::Dataset.new(nil).from(:items)
-    def @dataset.fetch_rows(sql)
-      yield({:a=>1, :b=>2})
-      yield({:a=>3, :b=>4})
-      yield({:a=>5, :b=>6})
-    end
+    @dataset = Sequel.mock(:fetch=>[{:a=>1, :b=>2}, {:a=>3, :b=>4}, {:a=>5, :b=>6}])[:items]
   end
 
   after do
