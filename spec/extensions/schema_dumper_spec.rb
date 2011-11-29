@@ -43,19 +43,17 @@ describe "Sequel::Schema::Generator dump methods" do
       index [:b, :c], :unique=>true
     end
 
-    t = <<END_CODE
+    g.dump_indexes(:add_index=>:t).should == (<<END_CODE).strip
 add_index :t, [:a]
 add_index :t, [:c, :e], :name=>:blah
 add_index :t, [:b, :c], :unique=>true
 END_CODE
-    g.dump_indexes(:add_index=>:t).should == t.strip
 
-    t = <<END_CODE
+    g.dump_indexes(:drop_index=>:t).should == (<<END_CODE).strip
 drop_index :t, [:a]
 drop_index :t, [:c, :e], :name=>:blah
 drop_index :t, [:b, :c], :unique=>true
 END_CODE
-    g.dump_indexes(:drop_index=>:t).should == t.strip
   end
 
   it "should raise an error if you try to dump a Generator that uses a constraint with a proc" do
@@ -296,7 +294,7 @@ END_MIG
       i = 0
       types.map{|x| [:"c#{i+=1}", {:db_type=>x, :allow_null=>true}]}
     end
-    table = <<END_MIG
+    @d.dump_table_schema(:x).should == (<<END_MIG).chomp
 create_table(:x) do
   Integer :c1
   Integer :c2
@@ -365,6 +363,5 @@ create_table(:x) do
   Bignum :c65
 end
 END_MIG
-    @d.dump_table_schema(:x).should == table.chomp
   end
 end
