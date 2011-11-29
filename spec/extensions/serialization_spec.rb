@@ -9,10 +9,6 @@ else
 describe "Serialization plugin" do
   before do
     @c = Class.new(Sequel::Model(:items)) do
-      include(Module.new do
-        def before_save
-        end
-      end)
       no_primary_key
       columns :id, :abc, :def, :ghi
     end
