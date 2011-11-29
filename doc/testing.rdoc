@@ -20,7 +20,7 @@ Make sure you are using Sequel 3.29.0 or above when using these examples, as old
 
 === RSpec 2
 
-  class Spec::Example::ExampleGroup
+  class RSpec::Core::ExampleGroup
     around do |example|
       Sequel::Model.db.transaction(:rollback=>:always){example.call}
     end
