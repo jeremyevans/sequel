@@ -21,8 +21,13 @@ Make sure you are using Sequel 3.29.0 or above when using these examples, as old
 === RSpec 2
 
   class RSpec::Core::ExampleGroup
-    around do |example|
-      Sequel::Model.db.transaction(:rollback=>:always){example.call}
+    # Setting an around filter globally doesn't appear to work in 2.7 (and maybe other versions),
+    # so set one up for each subclass.
+    def self.inherited(subclass)
+      super
+      subclass.around do |example|
+        Sequel::Model.db.transaction(:rollback=>:always){example.call}
+      end
     end
   end
 
@@ -30,6 +35,15 @@ Make sure you are using Sequel 3.29.0 or above when using these examples, as old
 
   # Must use this class as the base class for your tests
   class SequelTestCase < Test::Unit::TestCase
+    def run(*args, &block)
+      Sequel::Model.db.transaction(:rollback=>:always){super}
+    end
+  end
+
+=== MiniTest::Unit
+
+  # Must use this class as the base class for your tests
+  class SequelTestCase < MiniTest::Unit::TestCase
     def run(*args, &block)
       Sequel::Model.db.transaction(:rollback=>:always){super}
     end
