@@ -527,13 +527,8 @@ describe Sequel::Model do
   end
   
   specify "should raise an error if inclusion_of doesn't receive a valid :in option" do
-    lambda {
-      @c.validates_inclusion_of :value
-    }.should raise_error(ArgumentError)
-    
-    lambda {
-      @c.validates_inclusion_of :value, :in => 1
-    }.should raise_error(ArgumentError)
+    lambda{@c.validates_inclusion_of :value}.should raise_error(ArgumentError)
+    lambda{@c.validates_inclusion_of :value, :in => 1}.should raise_error(ArgumentError)
   end
   
   specify "should raise an error if inclusion_of handles :allow_nil too" do
@@ -570,7 +565,6 @@ describe Sequel::Model do
 
   specify "should validate uniqueness_of with if => false" do
     @c.validates_uniqueness_of :value, :if => :skip
-
     @m.value = 'a'
     @m.should be_valid
   end
@@ -602,16 +596,11 @@ describe "Superclass validations" do
     o = @c2.new
     o.value = 'ab'
     o.valid?.should == false
-    o.errors.full_messages.should == [
-      'value is too short'
-    ]
+    o.errors.full_messages.should == ['value is too short']
 
     o.value = '12'
     o.valid?.should == false
-    o.errors.full_messages.should == [
-      'value is too short',
-      'value is invalid'
-    ]
+    o.errors.full_messages.should == ['value is too short', 'value is invalid']
 
     o.value = 'abcde'
     o.valid?.should be_true
@@ -626,9 +615,7 @@ describe "Superclass validations" do
 
     o.value = '12'
     o.valid?.should == false
-    o.errors.full_messages.should == [
-      'value is invalid'
-    ]
+    o.errors.full_messages.should == ['value is invalid']
 
     o.value = 'abcde'
     o.valid?.should be_true
@@ -824,22 +811,18 @@ describe Sequel::Model, "Validations" do
         uniqueness_of :username
       end
     end
-    User.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        @db << sql
-        
-        case sql
-        when /COUNT.*username = '0records'/
-          yield({:v => 0})
-        when /COUNT.*username = '2records'/
-          yield({:v => 2})
-        when /COUNT.*username = '1record'/
-          yield({:v => 1})
-        when /username = '1record'/
-          yield({:id => 3, :username => "1record", :password => "test"})
-        end
+    User.dataset._fetch = proc do |sql|
+      case sql
+      when /COUNT.*username = '0records'/
+        {:v => 0}
+      when /COUNT.*username = '2records'/
+        {:v => 2}
+      when /COUNT.*username = '1record'/
+        {:v => 1}
+      when /username = '1record'/
+        {:id => 3, :username => "1record", :password => "test"}
       end
-    })
+    end
     
     @user = User.new(:username => "2records", :password => "anothertest")
     @user.should_not be_valid
@@ -869,26 +852,22 @@ describe Sequel::Model, "Validations" do
         uniqueness_of [:username, :password]
       end
     end
-    User.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        @db << sql
-        
-        case sql
-        when /COUNT.*username = '0records'/
-          yield({:v => 0})
-        when /COUNT.*username = '2records'/
-          yield({:v => 2})
-        when /COUNT.*username = '1record'/
-          yield({:v => 1})
-        when /username = '1record'/
-          if sql =~ /password = 'anothertest'/
-            yield({:id => 3, :username => "1record", :password => "anothertest"})
-          else
-            yield({:id => 4, :username => "1record", :password => "test"})
-          end
+    User.dataset._fetch = proc do |sql|
+      case sql
+      when /COUNT.*username = '0records'/
+        {:v => 0}
+      when /COUNT.*username = '2records'/
+        {:v => 2}
+      when /COUNT.*username = '1record'/
+        {:v => 1}
+      when /username = '1record'/
+        if sql =~ /password = 'anothertest'/
+          {:id => 3, :username => "1record", :password => "anothertest"}
+        else
+          {:id => 4, :username => "1record", :password => "test"}
         end
       end
-    })
+    end
     
     @user = User.new(:username => "2records", :password => "anothertest")
     @user.should_not be_valid
