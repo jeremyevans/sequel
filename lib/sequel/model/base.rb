@@ -1731,7 +1731,7 @@ module Sequel
       #   # ...
       def destroy
         pr = proc{all{|r| r.destroy}.length}
-        model.use_transactions ? @db.transaction(&pr) : pr.call
+        model.use_transactions ? @db.transaction(:server=>opts[:server], &pr) : pr.call
       end
 
       # This allows you to call +to_hash+ without any arguments, which will

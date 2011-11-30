@@ -214,11 +214,25 @@ describe Sequel::Model, "dataset & schema" do
     proc{@model.set_dataset(Object.new)}.should raise_error(Sequel::Error)
   end
 
-  it "set_dataset should add the destroy method to the dataset" do
+  it "set_dataset should add the destroy method to the dataset that destroys each object" do
     ds = MODEL_DB[:foo]
     ds.should_not respond_to(:destroy)
     @model.set_dataset(ds)
     ds.should respond_to(:destroy)
+    MODEL_DB.sqls
+    ds._fetch = [{:id=>1}, {:id=>2}]
+    ds.destroy.should == 2
+    MODEL_DB.sqls.should == ["SELECT * FROM foo", "DELETE FROM foo WHERE (id = 1)", "DELETE FROM foo WHERE (id = 2)"]
+  end
+
+  it "set_dataset should add the destroy method that respects sharding with transactions" do
+    db = Sequel.mock(:servers=>{:s1=>{}})
+    ds = db[:foo].server(:s1)
+    @model.use_transactions = true
+    @model.set_dataset(ds)
+    db.sqls
+    ds.destroy.should == 0
+    db.sqls.should == ["BEGIN -- s1", "SELECT * FROM foo -- s1", "COMMIT -- s1"]
   end
 
   it "should raise an error on set_dataset if there is an error connecting to the database" do
