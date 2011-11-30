@@ -7,24 +7,9 @@ describe Sequel::Model, "tree plugin" do
     c.class_eval do
       def self.name; 'Node'; end
       columns :id, :name, :parent_id, :i, :pi
+      plugin :tree, opts
     end
-    ds = c.dataset
-    class << ds
-      attr_accessor :row_sets
-      def fetch_rows(sql)
-        @db << sql
-        if rs = row_sets.shift
-          rs.each{|row| yield row}
-        end
-      end
-    end
-    c.plugin :tree, opts
     c
-  end
-
-  def y(c, *hs)
-    ds = c.dataset
-    ds.row_sets = hs
   end
 
   before do
@@ -71,7 +56,7 @@ describe Sequel::Model, "tree plugin" do
   end
 
   it "should have roots return an array of the tree's roots" do
-    y(@c, [{:id=>1, :parent_id=>nil, :name=>'r'}])
+    @ds._fetch = [{:id=>1, :parent_id=>nil, :name=>'r'}]
     @c.roots.should == [@c.load(:id=>1, :parent_id=>nil, :name=>'r')]
     @db.sqls.should == ["SELECT * FROM nodes WHERE (parent_id IS NULL)"]
   end
@@ -81,14 +66,14 @@ describe Sequel::Model, "tree plugin" do
   end
 
   it "should have ancestors return the ancestors of the current node" do
-    y(@c, [{:id=>1, :parent_id=>5, :name=>'r'}], [{:id=>5, :parent_id=>nil, :name=>'r2'}])
+    @ds._fetch = [[{:id=>1, :parent_id=>5, :name=>'r'}], [{:id=>5, :parent_id=>nil, :name=>'r2'}]]
     @o.ancestors.should == [@c.load(:id=>1, :parent_id=>5, :name=>'r'), @c.load(:id=>5, :parent_id=>nil, :name=>'r2')]
     @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1",
       "SELECT * FROM nodes WHERE (nodes.id = 5) LIMIT 1"]
   end
 
   it "should have descendants return the descendants of the current node" do
-    y(@c, [{:id=>3, :parent_id=>2, :name=>'r'}, {:id=>4, :parent_id=>2, :name=>'r2'}], [{:id=>5, :parent_id=>4, :name=>'r3'}], [])
+    @ds._fetch = [[{:id=>3, :parent_id=>2, :name=>'r'}, {:id=>4, :parent_id=>2, :name=>'r2'}], [{:id=>5, :parent_id=>4, :name=>'r3'}], []]
     @o.descendants.should == [@c.load(:id=>3, :parent_id=>2, :name=>'r'), @c.load(:id=>4, :parent_id=>2, :name=>'r2'), @c.load(:id=>5, :parent_id=>4, :name=>'r3')] 
     @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.parent_id = 2)",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 3)",
@@ -97,7 +82,7 @@ describe Sequel::Model, "tree plugin" do
   end
 
   it "should have root return the root of the current node" do
-    y(@c, [{:id=>1, :parent_id=>5, :name=>'r'}], [{:id=>5, :parent_id=>nil, :name=>'r2'}])
+    @ds._fetch = [[{:id=>1, :parent_id=>5, :name=>'r'}], [{:id=>5, :parent_id=>nil, :name=>'r2'}]]
     @o.root.should == @c.load(:id=>5, :parent_id=>nil, :name=>'r2')
     @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1",
       "SELECT * FROM nodes WHERE (nodes.id = 5) LIMIT 1"]
@@ -113,14 +98,14 @@ describe Sequel::Model, "tree plugin" do
   end
 
   it "should have self_and_siblings return the children of the current node's parent" do
-    y(@c, [{:id=>1, :parent_id=>3, :name=>'r'}], [{:id=>7, :parent_id=>1, :name=>'r2'}, @o.values.dup])
+    @ds._fetch = [[{:id=>1, :parent_id=>3, :name=>'r'}], [{:id=>7, :parent_id=>1, :name=>'r2'}, @o.values.dup]]
     @o.self_and_siblings.should == [@c.load(:id=>7, :parent_id=>1, :name=>'r2'), @o] 
     @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 1)"]
   end
 
   it "should have siblings return the children of the current node's parent, except for the current node" do
-    y(@c, [{:id=>1, :parent_id=>3, :name=>'r'}], [{:id=>7, :parent_id=>1, :name=>'r2'}, @o.values.dup])
+    @ds._fetch = [[{:id=>1, :parent_id=>3, :name=>'r'}], [{:id=>7, :parent_id=>1, :name=>'r2'}, @o.values.dup]]
     @o.siblings.should == [@c.load(:id=>7, :parent_id=>1, :name=>'r2')] 
     @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 1)"]
@@ -132,23 +117,23 @@ describe Sequel::Model, "tree plugin" do
     end
 
     it "should have root class method return the root" do
-      y(@c, [{:id=>1, :parent_id=>nil, :name=>'r'}])
+      @c.dataset._fetch = [{:id=>1, :parent_id=>nil, :name=>'r'}]
       @c.root.should == @c.load(:id=>1, :parent_id=>nil, :name=>'r')
     end
 
     it "prevents creating a second root" do
-      y(@c, [{:id=>1, :parent_id=>nil, :name=>'r'}])
+      @c.dataset._fetch = [{:id=>1, :parent_id=>nil, :name=>'r'}]
       lambda { @c.create }.should raise_error(Sequel::Plugins::Tree::TreeMultipleRootError)
     end
 
     it "errors when promoting an existing record to a second root" do
-      y(@c, [{:id=>1, :parent_id=>nil, :name=>'r'}])
+      @c.dataset._fetch = [{:id=>1, :parent_id=>nil, :name=>'r'}]
       n = @c.load(:id => 2, :parent_id => 1)
       lambda { n.update(:parent_id => nil) }.should raise_error(Sequel::Plugins::Tree::TreeMultipleRootError)
     end
 
     it "allows updating existing root" do
-      y(@c, [{:id=>1, :parent_id=>nil, :name=>'r'}])
+      @c.dataset._fetch = [{:id=>1, :parent_id=>nil, :name=>'r'}]
       lambda { @c.root.update(:name => 'fdsa') }.should_not raise_error
     end
   end
