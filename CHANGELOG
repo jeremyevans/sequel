@@ -1,5 +1,9 @@
 === HEAD
 
+* Make :server option to Model#save set the shard to use (jeremyevans)
+
+* Move Model#set_server from the sharding plugin to the base plugin (jeremyevans)
+
 * Add :graph_alias_base association option for setting base name to use for table aliases when eager graphing (jeremyevans)
 
 * Make ILIKE work correctly on Microsoft SQL Server if database/column collation is case sensitive (jfirebaugh) (#398)

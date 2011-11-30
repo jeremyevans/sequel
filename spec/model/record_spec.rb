@@ -270,6 +270,66 @@ describe "Model#save" do
     proc { o.save(:y) }.should raise_error(Sequel::Rollback)
     MODEL_DB.sqls.should == []
   end
+
+  it "should support a :server option to set the server/shard to use" do
+    db = Sequel.mock(:fetch=>{:id=>13, :x=>1}, :autoid=>proc{13}, :numrows=>1, :servers=>{:s1=>{}})
+    c = Class.new(Sequel::Model(db[:items]))
+    c.columns :id, :x
+    db.sqls
+    o = c.new(:x => 1)
+    o.save(:server=>:s1)
+    db.sqls.should == ["INSERT INTO items (x) VALUES (1) -- s1", "SELECT * FROM items WHERE (id = 13) LIMIT 1 -- s1"]
+    o.save(:server=>:s1, :transaction=>true)
+    db.sqls.should == ["BEGIN -- s1", "UPDATE items SET x = 1 WHERE (id = 13) -- s1", 'COMMIT -- s1']
+  end
+end
+
+describe "Model#set_server" do
+  before do
+    @db = Sequel.mock(:fetch=>{:id=>13, :x=>1}, :autoid=>proc{13}, :numrows=>1, :servers=>{:s1=>{}})
+    @c = Class.new(Sequel::Model(@db[:items])) do
+      columns :id, :x
+    end
+    @db.sqls
+  end
+
+  it "should set the server to use when inserting" do
+    @c.new(:x => 1).set_server(:s1).save
+    @db.sqls.should == ["INSERT INTO items (x) VALUES (1) -- s1", "SELECT * FROM items WHERE (id = 13) LIMIT 1 -- s1"]
+  end
+
+  it "should set the server to use when updating" do
+     @c.load(:id=>13, :x => 1).set_server(:s1).save
+    @db.sqls.should == ["UPDATE items SET x = 1 WHERE (id = 13) -- s1"]
+  end
+
+  it "should set the server to use for transactions when saving" do
+    @c.load(:id=>13, :x => 1).set_server(:s1).save(:transaction=>true)
+    @db.sqls.should == ["BEGIN -- s1", "UPDATE items SET x = 1 WHERE (id = 13) -- s1", 'COMMIT -- s1']
+  end
+
+  it "should set the server to use when deleting" do
+    @c.load(:id=>13).set_server(:s1).delete
+    @db.sqls.should == ["DELETE FROM items WHERE (id = 13) -- s1"]
+  end
+
+  it "should set the server to use for transactions when destroying" do
+    o = @c.load(:id=>13).set_server(:s1)
+    o.use_transactions = true
+    o.destroy
+    @db.sqls.should == ["BEGIN -- s1", "DELETE FROM items WHERE (id = 13) -- s1", 'COMMIT -- s1']
+  end
+
+  it "should set the server on this if this is already loaded" do
+    o = @c.load(:id=>13, :x => 1)
+    o.this
+    o.set_server(:s1)
+    o.this.opts[:server].should == :s1
+  end
+
+  it "should set the server on this if this is not already loaded" do
+    @c.load(:id=>13, :x => 1).set_server(:s1).this.opts[:server].should == :s1
+  end
 end
 
 describe "Model#marshallable" do

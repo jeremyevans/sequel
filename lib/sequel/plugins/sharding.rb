@@ -1,13 +1,14 @@
 module Sequel
   module Plugins
-    # The sharding plugin makes it easy to use Sequel's sharding features
-    # with models.  It lets you create model objects on specific shards,
-    # and any models retrieved from specific shards are automatically
-    # saved back to those shards.  It also works with associations,
-    # so that model objects retrieved from specific shards will only
-    # return associated objects from that shard, and using the
-    # add/remove/remove_all association methods will only affect
-    # that shard.
+    # The sharding plugin augments Sequel's default model sharding support
+    # in the following ways:
+    #
+    # 1) It automatically sets model instances to be saved back to the
+    #    shard they were retreived from.
+    # 2) It makes model associations use the same shard as the model
+    #    object.
+    # 3) It adds a slightly nicer API for creating model instances on
+    #    specific shards.
     # 
     # Usage:
     #
@@ -55,12 +56,6 @@ module Sequel
       end
 
       module InstanceMethods
-        # Set the shard that this object is tied to.  Returns self.
-        def set_server(s)
-          @server = s
-          self
-        end
-
         # Set the server that this object is tied to, unless it has
         # already been set.  Returns self.
         def set_server?(s)
@@ -68,20 +63,10 @@ module Sequel
           self
         end
 
-        # Ensure that the instance dataset is tied to the correct shard.
-        def this
-          use_server(super)
-        end
-
         private
 
         # Ensure that association datasets are tied to the correct shard.
         def _apply_association_options(*args)
-          use_server(super)
-        end
-
-        # Ensure that the object is inserted into the correct shard.
-        def _insert_dataset
           use_server(super)
         end
 
@@ -96,11 +81,6 @@ module Sequel
         def ensure_associated_primary_key(opts, o, *args)
           o.set_server?(@server) if o.respond_to?(:set_server?)
           super
-        end
-
-        # Set the given dataset to use the current object's shard.
-        def use_server(ds)
-          @server ? ds.server(@server) : ds
         end
       end
 

@@ -1139,13 +1139,16 @@ module Sequel
       # Takes the following options:
       #
       # :changed :: save all changed columns, instead of all columns or the columns given
+      # :raise_on_failure :: set to true or false to override the current
+      #                      +raise_on_save_failure+ setting
+      # :server :: set the server/shard on the object before saving, and use that
+      #            server/shard in any transaction.
       # :transaction :: set to true or false to override the current
       #                 +use_transactions+ setting
       # :validate :: set to false to skip validation
-      # :raise_on_failure :: set to true or false to override the current
-      #                      +raise_on_save_failure+ setting
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
+        set_server(opts[:server]) if opts[:server] 
         if opts[:validate] != false
           unless checked_save_failure(opts){_valid?(true, opts)}
             raise(ValidationFailed.new(errors)) if raise_on_failure?(opts)
@@ -1225,6 +1228,13 @@ module Sequel
         set_restricted(hash, only.flatten, false)
       end
   
+      # Set the shard that this object is tied to.  Returns self.
+      def set_server(s)
+        @server = s
+        @this.opts[:server] = s if @this
+        self
+      end
+
       # Replace the current values with hash.  Should definitely not be
       # used with untrusted input, and should probably not be called
       # directly by user code.
@@ -1243,7 +1253,7 @@ module Sequel
       #   Artist[1].this
       #   # SELECT * FROM artists WHERE (id = 1) LIMIT 1
       def this
-        @this ||= model.dataset.filter(pk_hash).limit(1).naked
+        @this ||= use_server(model.dataset.filter(pk_hash).limit(1).naked)
       end
       
       # Runs #set with the passed hash and then runs save_changes.
@@ -1382,7 +1392,7 @@ module Sequel
       # The dataset to use when inserting a new object.   The same as the model's
       # dataset by default.
       def _insert_dataset
-        model.dataset
+        use_server(model.dataset)
       end
   
       # Insert into the given dataset and return the primary key created (if any).
@@ -1675,6 +1685,11 @@ module Sequel
       def update_restricted(hash, only, except)
         set_restricted(hash, only, except)
         save_changes
+      end
+
+      # Set the given dataset to use the current object's shard.
+      def use_server(ds)
+        @server ? ds.server(@server) : ds
       end
       
       # Whether to use a transaction for this action.  If the :transaction
