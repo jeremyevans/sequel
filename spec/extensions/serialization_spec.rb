@@ -75,11 +75,7 @@ describe "Serialization plugin" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
     vals = nil
-
-    ds = @c.dataset
-    def ds.fetch_rows(sql, &block)
-      block.call(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
-    end
+    @c.dataset._fetch = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
 
     o = @c.first
     o.id.should == 1
@@ -90,18 +86,16 @@ describe "Serialization plugin" do
 
     o.update(:abc => 23)
     @c.create(:abc => [1, 2, 3])
-    MODEL_DB.sqls.should == ["UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)",
-      "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')"]
+    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+      "UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)",
+      "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')",
+      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   it "should translate values to and from marshal serialization format using accessor methods" do
     @c.set_primary_key :id
     @c.plugin :serialization, :marshal, :abc, :def
-
-    ds = @c.dataset
-    def ds.fetch_rows(sql, &block)
-      block.call(:id => 1, :abc =>[Marshal.dump(1)].pack('m'), :def =>[Marshal.dump('hello')].pack('m'))
-    end
+    @c.dataset._fetch = [:id => 1, :abc =>[Marshal.dump(1)].pack('m'), :def =>[Marshal.dump('hello')].pack('m')]
 
     o = @c.first
     o.id.should == 1
@@ -112,18 +106,16 @@ describe "Serialization plugin" do
 
     o.update(:abc => 23)
     @c.create(:abc => [1, 2, 3])
-    MODEL_DB.sqls.should == ["UPDATE items SET abc = '#{[Marshal.dump(23)].pack('m')}' WHERE (id = 1)",
-      "INSERT INTO items (abc) VALUES ('#{[Marshal.dump([1, 2, 3])].pack('m')}')"]
+    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+      "UPDATE items SET abc = '#{[Marshal.dump(23)].pack('m')}' WHERE (id = 1)",
+      "INSERT INTO items (abc) VALUES ('#{[Marshal.dump([1, 2, 3])].pack('m')}')",
+      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
   
   it "should translate values to and from json serialization format using accessor methods" do
     @c.set_primary_key :id
     @c.plugin :serialization, :json, :abc, :def
-    
-    ds = @c.dataset
-    def ds.fetch_rows(sql, &block)
-      block.call(:id => 1, :abc => [1].to_json, :def => ["hello"].to_json)
-    end
+    @c.dataset._fetch = {:id => 1, :abc => [1].to_json, :def => ["hello"].to_json}
     
     o = @c.first
     o.id.should == 1
@@ -135,18 +127,16 @@ describe "Serialization plugin" do
     o.update(:abc => [23])
     @c.create(:abc => [1,2,3])
     
-    MODEL_DB.sqls.should == ["UPDATE items SET abc = '#{[23].to_json}' WHERE (id = 1)",
-      "INSERT INTO items (abc) VALUES ('#{[1,2,3].to_json}')"]
+    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+      "UPDATE items SET abc = '#{[23].to_json}' WHERE (id = 1)",
+      "INSERT INTO items (abc) VALUES ('#{[1,2,3].to_json}')",
+      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   it "should copy serialization formats and columns to subclasses" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
-
-    ds = @c.dataset
-    def ds.fetch_rows(sql, &block)
-      block.call(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
-    end
+    @c.dataset._fetch = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
 
     o = Class.new(@c).first
     o.id.should == 1
@@ -157,8 +147,10 @@ describe "Serialization plugin" do
 
     o.update(:abc => 23)
     Class.new(@c).create(:abc => [1, 2, 3])
-    MODEL_DB.sqls.should == ["UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)",
-      "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')"]
+    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+      "UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)",
+      "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')",
+      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   it "should clear the deserialized columns when refreshing" do
