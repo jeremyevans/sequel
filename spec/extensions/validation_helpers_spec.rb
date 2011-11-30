@@ -317,18 +317,14 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.columns(:id, :username, :password)
     @c.set_dataset MODEL_DB[:items]
     @c.set_validations{validates_unique(:username)}
-    @c.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        @db << sql
-        
-        case sql
-        when /COUNT.*username = '0records'/
-          yield({:v => 0})
-        when /COUNT.*username = '1record'/
-          yield({:v => 1})
-        end
+    @c.dataset._fetch = proc do |sql|
+      case sql
+      when /COUNT.*username = '0records'/
+        {:v => 0}
+      when /COUNT.*username = '1record'/
+        {:v => 1}
       end
-    })
+    end
     
     @user = @c.new(:username => "0records", :password => "anothertest")
     @user.should be_valid
@@ -359,18 +355,14 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.columns(:id, :username, :password)
     @c.set_dataset MODEL_DB[:items]
     @c.set_validations{validates_unique([:username, :password])}
-    @c.dataset.extend(Module.new {
-      def fetch_rows(sql)
-        @db << sql
-        
-        case sql
-        when /COUNT.*username = '0records'/
-          yield({:v => 0})
-        when /COUNT.*username = '1record'/
-          yield({:v => 1})
-        end
+    @c.dataset._fetch = proc do |sql|
+      case sql
+      when /COUNT.*username = '0records'/
+        {:v => 0}
+      when /COUNT.*username = '1record'/
+        {:v => 1}
       end
-    })
+    end
     
     @user = @c.new(:username => "0records", :password => "anothertest")
     @user.should be_valid
@@ -401,12 +393,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.columns(:id, :username, :password)
     @c.set_dataset MODEL_DB[:items]
     @c.set_validations{validates_unique(:username){|ds| ds.filter(:active)}}
-    @c.dataset.extend(Module.new {
-      def fetch_rows (sql)
-        @db << sql
-        yield({:v => 0})
-      end
-    })
+    @c.dataset._fetch = {:v=>0}
     
     MODEL_DB.reset
     @c.new(:username => "0records", :password => "anothertest").should be_valid
@@ -419,13 +406,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.columns(:id, :username, :password)
     @c.set_dataset MODEL_DB[:items]
     @c.set_validations{validates_unique([:username, :password], :only_if_modified=>true)}
-    
-    @c.dataset.extend(Module.new {
-      def fetch_rows (sql)
-        @db << sql
-        yield({:v => 0})
-      end
-    })
+    @c.dataset._fetch = {:v=>0}
     
     MODEL_DB.reset
     @c.new(:username => "0records", :password => "anothertest").should be_valid
