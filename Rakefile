@@ -12,7 +12,8 @@ CLEAN.include ["**/.*.sw?", "sequel-*.gem", ".config", "rdoc", "coverage", "www/
 
 desc "Packages sequel"
 task :package=>[:clean] do |p|
-  sh %{gem build sequel.gemspec}
+  load './sequel.gemspec'
+  Gem::Builder.new(SEQUEL_GEMSPEC).build
 end
 
 desc "Install sequel gem"

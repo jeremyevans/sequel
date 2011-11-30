@@ -1,5 +1,5 @@
 require File.expand_path("../lib/sequel/version", __FILE__)
-spec = Gem::Specification.new do |s|
+SEQUEL_GEMSPEC = Gem::Specification.new do |s|
   s.name = 'sequel'
   s.rubyforge_project = 'sequel'
   s.version = Sequel.version
