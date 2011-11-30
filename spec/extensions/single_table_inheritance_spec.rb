@@ -3,9 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe Sequel::Model, "#sti_key" do
   before do
     class ::StiTest < Sequel::Model
-      def kind; self[:kind]; end 
-      def kind=(x); self[:kind] = x; end 
-      def _refresh(x); end 
+      columns :id, :kind, :blah
       plugin :single_table_inheritance, :kind
     end 
     class ::StiTestSub1 < StiTest
@@ -30,15 +28,9 @@ describe Sequel::Model, "#sti_key" do
     StiTest.plugin :single_table_inheritance, :blah
     Object.send(:remove_const, :StiTestSub1)
     Object.send(:remove_const, :StiTestSub2)
-    class ::StiTestSub1 < StiTest
-    end 
-    class ::StiTestSub2 < StiTest
-    end 
-    def @ds.fetch_rows(sql)
-      yield({:blah=>'StiTest'})
-      yield({:blah=>'StiTestSub1'})
-      yield({:blah=>'StiTestSub2'})
-    end 
+    class ::StiTestSub1 < StiTest; end 
+    class ::StiTestSub2 < StiTest; end 
+    @ds._fetch = [{:blah=>'StiTest'}, {:blah=>'StiTestSub1'}, {:blah=>'StiTestSub2'}]
     StiTest.all.collect{|x| x.class}.should == [StiTest, StiTestSub1, StiTestSub2]
     StiTest.dataset.sql.should == "SELECT * FROM sti_tests"
     StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.blah IN ('StiTestSub1'))"
@@ -46,29 +38,18 @@ describe Sequel::Model, "#sti_key" do
   end 
   
   it "should return rows with the correct class based on the polymorphic_key value" do
-    def @ds.fetch_rows(sql)
-      yield({:kind=>'StiTest'})
-      yield({:kind=>'StiTestSub1'})
-      yield({:kind=>'StiTestSub2'})
-    end 
+    @ds._fetch = [{:kind=>'StiTest'}, {:kind=>'StiTestSub1'}, {:kind=>'StiTestSub2'}]
     StiTest.all.collect{|x| x.class}.should == [StiTest, StiTestSub1, StiTestSub2]
   end 
 
   it "should return rows with the correct class for subclasses based on the polymorphic_key value" do
-    class ::StiTestSub1Sub < StiTestSub1
-    end 
-    ds = StiTestSub1.dataset
-    def ds.fetch_rows(sql)
-      yield({:kind=>'StiTestSub1'})
-      yield({:kind=>'StiTestSub1Sub'})
-    end 
+    class ::StiTestSub1Sub < StiTestSub1; end 
+    StiTestSub1.dataset._fetch = [{:kind=>'StiTestSub1'}, {:kind=>'StiTestSub1Sub'}]
     StiTestSub1.all.collect{|x| x.class}.should == [StiTestSub1, StiTestSub1Sub]
   end 
 
   it "should fallback to the main class if the given class does not exist" do
-    def @ds.fetch_rows(sql)
-      yield({:kind=>'StiTestSub3'})
-    end
+    @ds._fetch = {:kind=>'StiTestSub3'}
     StiTest.all.collect{|x| x.class}.should == [StiTest]
   end
 
@@ -79,10 +60,7 @@ describe Sequel::Model, "#sti_key" do
       Object
     end
     StiTest.plugin :single_table_inheritance, :kind
-    def @ds.fetch_rows(sql)
-      yield({:kind=>''})
-      yield({:kind=>nil})
-    end
+    @ds._fetch = [{:kind=>''}, {:kind=>nil}]
     StiTest.all.collect{|x| x.class}.should == [StiTest, StiTest]
     called.should == false
   end
@@ -91,19 +69,19 @@ describe Sequel::Model, "#sti_key" do
     StiTest.new.save
     StiTestSub1.new.save
     StiTestSub2.new.save
-    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTest')", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub2')"]
+    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 10)) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub2')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub2')) AND (id = 10)) LIMIT 1"]
   end
 
   it "should have the before_create hook not override an existing value" do
     StiTest.create(:kind=>'StiTestSub1')
-    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')"]
+    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]
   end
 
   it "should have the before_create hook handle columns with the same name as existing method names" do
     StiTest.plugin :single_table_inheritance, :type
     StiTest.columns :id, :type
     StiTest.create
-    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (type) VALUES ('StiTest')"]
+    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (type) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]
   end
 
   it "should add a filter to model datasets inside subclasses hook to only retreive objects with the matching key" do
@@ -129,7 +107,7 @@ describe Sequel::Model, "#sti_key" do
     before do
       class ::StiTest2 < Sequel::Model
         columns :id, :kind
-        def _refresh(x); end
+        def _save_refresh; end
       end
     end
     after do
