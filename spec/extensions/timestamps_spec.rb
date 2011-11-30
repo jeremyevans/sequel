@@ -65,7 +65,6 @@ describe "Sequel::Plugins::Timestamps" do
       columns :id, :u
       plugin :timestamps, :update=>:u
       db.reset
-      def _save_refresh(*) end
     end
     o = c.load(:id=>1).save
     c.db.sqls.should == ["UPDATE t SET u = '2009-08-01' WHERE (id = 1)"]
