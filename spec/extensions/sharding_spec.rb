@@ -124,7 +124,9 @@ describe "sharding plugin" do
     @db.sqls.should == ["SELECT * FROM albums LIMIT 1 -- s1", "SELECT * FROM artists LIMIT 1 -- s2"]
 
     artist.add_album(:name=>'MO')
-    @db.sqls.should == ["INSERT INTO albums (artist_id, name) VALUES (2, 'MO') -- s2", "SELECT * FROM albums WHERE (id = 1) LIMIT 1 -- s2"]
+    sqls = @db.sqls
+    ["INSERT INTO albums (artist_id, name) VALUES (2, 'MO') -- s2", "INSERT INTO albums (name, artist_id) VALUES ('MO', 2) -- s2"].should include(sqls.shift)
+    sqls.should == ["SELECT * FROM albums WHERE (id = 1) LIMIT 1 -- s2"]
     
     album.add_tag(:name=>'SR')
     @db.sqls.should == ["INSERT INTO tags (name) VALUES ('SR') -- s1", "SELECT * FROM tags WHERE (id = 1) LIMIT 1 -- s1", "INSERT INTO albums_tags (album_id, tag_id) VALUES (1, 3) -- s1"]
@@ -136,7 +138,9 @@ describe "sharding plugin" do
     @db.sqls.should == ["SELECT * FROM albums LIMIT 1 -- s1", "SELECT * FROM artists LIMIT 1 -- s2"]
 
     artist.remove_album(1)
-    @db.sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 2) AND (albums.id = 1)) LIMIT 1 -- s2", "UPDATE albums SET artist_id = NULL, name = 'RF' WHERE (id = 1) -- s2"]
+    sqls = @db.sqls
+    ["UPDATE albums SET artist_id = NULL, name = 'RF' WHERE (id = 1) -- s2", "UPDATE albums SET name = 'RF', artist_id = NULL WHERE (id = 1) -- s2"].should include(sqls.pop)
+    sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 2) AND (albums.id = 1)) LIMIT 1 -- s2"]
     
     album.remove_tag(3)
     @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.album_id = 1)) WHERE (tags.id = 3) LIMIT 1 -- s1", "DELETE FROM albums_tags WHERE ((album_id = 1) AND (tag_id = 3)) -- s1"]
@@ -160,11 +164,13 @@ describe "sharding plugin" do
     @db.sqls.should == ["SELECT * FROM albums LIMIT 1 -- s1", "SELECT * FROM artists LIMIT 1 -- s2"]
 
     artist.add_album(@Album.load(:id=>4, :name=>'MO').set_server(:s3))
-    @db.sqls.should == ["UPDATE albums SET artist_id = 2, name = 'MO' WHERE (id = 4) -- s3"]
+    ["UPDATE albums SET artist_id = 2, name = 'MO' WHERE (id = 4) -- s3", "UPDATE albums SET name = 'MO', artist_id = 2 WHERE (id = 4) -- s3"].should include(@db.sqls.pop)
 
     artist.remove_album(@Album.load(:id=>5, :name=>'T', :artist_id=>2).set_server(:s4))
     # Should select from current object's shard to check existing association, but update associated object's shard
-    @db.sqls.should == ["SELECT 1 FROM albums WHERE ((albums.artist_id = 2) AND (id = 5)) LIMIT 1 -- s2", "UPDATE albums SET artist_id = NULL, name = 'T' WHERE (id = 5) -- s4"]
+    sqls = @db.sqls
+    ["UPDATE albums SET artist_id = NULL, name = 'T' WHERE (id = 5) -- s4", "UPDATE albums SET name = 'T', artist_id = NULL WHERE (id = 5) -- s4"].should include(sqls.pop)
+    sqls.should == ["SELECT 1 FROM albums WHERE ((albums.artist_id = 2) AND (id = 5)) LIMIT 1 -- s2"]
   end 
 
   specify "should be able to set a shard to use for any object using set_server" do
@@ -175,12 +181,16 @@ describe "sharding plugin" do
   specify "should use transactions on the correct shard" do
     @Album.use_transactions = true
     @Album.server(:s2).first.save
-    @db.sqls.should == ["SELECT * FROM albums LIMIT 1 -- s2", "BEGIN -- s2", "UPDATE albums SET artist_id = 2, name = 'RF' WHERE (id = 1) -- s2", "COMMIT -- s2"]
+    sqls = @db.sqls
+    ["UPDATE albums SET artist_id = 2, name = 'RF' WHERE (id = 1) -- s2", "UPDATE albums SET name = 'RF', artist_id = 2 WHERE (id = 1) -- s2"].should include(sqls.slice!(2))
+    sqls.should == ["SELECT * FROM albums LIMIT 1 -- s2", "BEGIN -- s2", "COMMIT -- s2"]
   end 
 
-  specify "should use not override shard given when saving" do
+  specify "should use override current shard when saving with given :server option" do
     @Album.use_transactions = true
     @Album.server(:s2).first.save(:server=>:s1)
-    @db.sqls.should == ["SELECT * FROM albums LIMIT 1 -- s2", "BEGIN -- s1", "UPDATE albums SET artist_id = 2, name = 'RF' WHERE (id = 1) -- s2", "COMMIT -- s1"]
+    sqls = @db.sqls
+    ["UPDATE albums SET artist_id = 2, name = 'RF' WHERE (id = 1) -- s1", "UPDATE albums SET name = 'RF', artist_id = 2 WHERE (id = 1) -- s1"].should include(sqls.slice!(2))
+    sqls.should == ["SELECT * FROM albums LIMIT 1 -- s2", "BEGIN -- s1", "COMMIT -- s1"]
   end 
 end
