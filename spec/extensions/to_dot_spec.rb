@@ -11,14 +11,13 @@ describe Sequel::Model, "to_dot extension" do
   end
 
   it "should output a string suitable for input to the graphviz dot program" do
-    @ds.to_dot.should == (<<END
+    @ds.to_dot.should == (<<END).strip
 digraph G {
 0 [label="self"];
 0 -> 1 [label=""];
 1 [label="Dataset"];
 }
 END
-).strip
   end
 
   it "should handle an empty dataset" do
