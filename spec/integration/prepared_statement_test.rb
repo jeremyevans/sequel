@@ -223,7 +223,7 @@ describe "Prepared Statements and Bound Arguments" do
 end
 
 describe "Bound Argument Types" do
-  before do
+  before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:items) do
       primary_key :id
@@ -244,6 +244,8 @@ describe "Bound Argument Types" do
   end
   after do
     Sequel.datetime_class = Time
+  end
+  after(:all) do
     @db.drop_table(:items)
   end
 
@@ -256,7 +258,7 @@ describe "Bound Argument Types" do
     @ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>@vs[:dt])[:dt].should == @vs[:dt]
   end
 
-  cspecify "should handle time type", [:do], [:jdbc, :sqlite] do
+  cspecify "should handle time type", [:do], [:jdbc, :sqlite], [:oracle] do
     @ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
   end
 
