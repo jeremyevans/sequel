@@ -219,12 +219,14 @@ module Sequel
       def connect(server)
         opts = server_opts(server)
         conn = Adapter.connect(
-          (opts[:host] unless blank_object?(opts[:host])),
-          opts[:port] || 5432,
-          nil, '',
-          opts[:database],
-          opts[:user],
-          opts[:password]
+          :host => (opts[:host] unless blank_object?(opts[:host])),
+          :port => opts[:port] || 5432,
+          :options => nil,
+          :tty => '',
+          :dbname => opts[:database],
+          :user => opts[:user],
+          :password => opts[:password],
+          :connect_timeout => opts[:connect_timeout] || 20
         )
         if encoding = opts[:encoding] || opts[:charset]
           if conn.respond_to?(:set_client_encoding)
