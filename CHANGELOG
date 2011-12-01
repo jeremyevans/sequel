@@ -1,4 +1,10 @@
-=== HEAD
+=== 3.30.0 (2011-12-01)
+
+* Handle usage of on_duplicate_key_update in MySQL prepared statements (jeremyevans) (#404)
+
+* Make after_commit and after_rollback respect :server option (jeremyevans) (#401)
+
+* Respect :connect_timeout option in the postgres adapter when using pg (glebpom, jeremyevans) (#402)
 
 * Make Dataset#destroy for model datasets respect dataset shard when using a transaction (jeremyevans)
 
