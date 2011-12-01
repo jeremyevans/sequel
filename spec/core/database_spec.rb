@@ -739,6 +739,13 @@ describe "Database#transaction" do
     proc{@db.after_rollback}.should raise_error(Sequel::Error)
   end
 
+  specify "should have after_commit and after_rollback respect :server option" do
+    @db.transaction(:server=>:test){@db.after_commit(:server=>:test){@db.execute('foo', :server=>:test)}}
+    @db.sqls.should == ['BEGIN -- test', 'COMMIT -- test', 'foo -- test']
+    @db.transaction(:server=>:test){@db.after_rollback(:server=>:test){@db.execute('foo', :server=>:test)}; raise Sequel::Rollback}
+    @db.sqls.should == ['BEGIN -- test', 'ROLLBACK -- test', 'foo -- test']
+  end
+
   specify "should execute after_commit outside transactions" do
     @db.after_commit{@db.execute('foo')}
     @db.sqls.should == ['foo']
