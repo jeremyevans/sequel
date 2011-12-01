@@ -3066,6 +3066,13 @@ describe "Dataset prepared statements and bound variables " do
     @db.sqls.should == ['SELECT * FROM items WHERE (num = 1)']
   end
     
+  specify "should handle columns on prepared statements correctly" do
+    @db.columns = [:num]
+    @ds.meta_def(:select_where_sql){|sql| super(sql); sql << " OR #{columns.first} = 1" if opts[:where]}
+    @ds.filter(:num=>:$n).prepare(:select, :sn).sql.should == 'SELECT * FROM items WHERE (num = $n) OR num = 1'
+    @db.sqls.should == ['SELECT * FROM items LIMIT 1']
+  end
+    
   specify "should handle datasets using static sql and placeholders" do
     @db["SELECT * FROM items WHERE (num = ?)", :$n].call(:select, :n=>1)
     @db.sqls.should == ['SELECT * FROM items WHERE (num = 1)']

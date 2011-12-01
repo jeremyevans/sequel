@@ -63,6 +63,9 @@ module Sequel
       # The array/hash of bound variable placeholder names.
       attr_accessor :prepared_args
       
+      # The dataset that created this prepared statement.
+      attr_accessor :orig_dataset
+      
       # The argument to supply to insert and update, which may use
       # placeholders specified by prepared_args
       attr_accessor :prepared_modify_values
@@ -71,6 +74,12 @@ module Sequel
       # prepared statement.
       def call(bind_vars={}, &block)
         bind(bind_vars).run(&block)
+      end
+
+      # Send the columns to the original dataset, as calling it
+      # on the prepared statement can cause problems.
+      def columns
+        orig_dataset.columns
       end
       
       # Returns the SQL for the prepared statement, depending on
@@ -244,6 +253,7 @@ module Sequel
     def to_prepared_statement(type, values=nil)
       ps = bind
       ps.extend(PreparedStatementMethods)
+      ps.orig_dataset = self
       ps.prepared_type = type
       ps.prepared_modify_values = values
       ps

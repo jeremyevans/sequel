@@ -247,6 +247,16 @@ describe "A MySQL dataset" do
     
     @d.first[:name].should == ':\\'
   end
+  
+  specify "should handle prepared statements with on_duplicate_key_update" do
+    @d.db.add_index :items, :value, :unique=>true
+    ds = @d.on_duplicate_key_update
+    ps = ds.prepare(:insert, :insert_user_id_feature_name, :value => :$v, :name => :$n)
+    ps.call(:v => 1, :n => 'a')
+    ds.all.should == [{:value=>1, :name=>'a'}]
+    ps.call(:v => 1, :n => 'b')
+    ds.all.should == [{:value=>1, :name=>'b'}]
+  end
 end
 
 describe "MySQL datasets" do
