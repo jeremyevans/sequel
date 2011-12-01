@@ -218,16 +218,27 @@ module Sequel
       # client encoding for the connection.
       def connect(server)
         opts = server_opts(server)
-        connection_params = {
-          :host => opts[:host],
-          :port => opts[:port] || 5432,
-          :tty => '',
-          :dbname => opts[:database],
-          :user => opts[:user],
-          :password => opts[:password],
-          :connect_timeout => opts[:connect_timeout] || 20
-        }.delete_if { |key, value| blank_object?(value) }
-        conn = Adapter.connect(connection_params)
+        conn = if SEQUEL_POSTGRES_USES_PG
+          connection_params = {
+            :host => opts[:host],
+            :port => opts[:port] || 5432,
+            :tty => '',
+            :dbname => opts[:database],
+            :user => opts[:user],
+            :password => opts[:password],
+            :connect_timeout => opts[:connect_timeout] || 20
+          }.delete_if { |key, value| blank_object?(value) }
+          Adapter.connect(connection_params)
+        else
+          Adapter.connect(
+            (opts[:host] unless blank_object?(opts[:host])),
+            opts[:port] || 5432,
+            nil, '',
+            opts[:database],
+            opts[:user],
+            opts[:password]
+          )
+        end
         if encoding = opts[:encoding] || opts[:charset]
           if conn.respond_to?(:set_client_encoding)
             conn.set_client_encoding(encoding)

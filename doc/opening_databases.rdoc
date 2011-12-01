@@ -342,6 +342,8 @@ The following additional options are supported:
 
 :charset :: Same as :encoding, :encoding takes precedence
 :encoding :: Set the client_encoding to the given string
+:connect_timeout :: Set the number of seconds to wait for a connection (default 20, only respected
+                    if using the pg library).
 
 === sqlite
 
