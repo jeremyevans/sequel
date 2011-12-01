@@ -129,7 +129,9 @@ describe "sharding plugin" do
     sqls.should == ["SELECT * FROM albums WHERE (id = 1) LIMIT 1 -- s2"]
     
     album.add_tag(:name=>'SR')
-    @db.sqls.should == ["INSERT INTO tags (name) VALUES ('SR') -- s1", "SELECT * FROM tags WHERE (id = 1) LIMIT 1 -- s1", "INSERT INTO albums_tags (album_id, tag_id) VALUES (1, 3) -- s1"]
+    sqls = @db.sqls
+    ["INSERT INTO albums_tags (album_id, tag_id) VALUES (1, 3) -- s1", "INSERT INTO albums_tags (tag_id, album_id) VALUES (3, 1) -- s1"].should include(sqls.pop)
+    sqls.should == ["INSERT INTO tags (name) VALUES ('SR') -- s1", "SELECT * FROM tags WHERE (id = 1) LIMIT 1 -- s1", ]
   end 
 
   specify "should have objects retrieved from a specific shard remove associated objects from that shard" do
