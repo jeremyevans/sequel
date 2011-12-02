@@ -200,7 +200,7 @@ module Sequel
           args = [uri(opts)]
           args.concat([opts[:user], opts[:password]]) if opts[:user] && opts[:password]
           begin
-            JavaSQL::DriverManager.setLoginTimeout(opts[:login_timeout]) if opts[:login_timeout].is_a?(Numeric)
+            JavaSQL::DriverManager.setLoginTimeout(opts[:login_timeout]) if opts[:login_timeout]
             JavaSQL::DriverManager.getConnection(*args)
           rescue => e
             raise e unless driver

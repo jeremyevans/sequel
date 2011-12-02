@@ -1,3 +1,7 @@
+=== HEAD
+
+* Support a :login_timeout option in the jdbc adapter (glebpom) (#406)
+
 === 3.30.0 (2011-12-01)
 
 * Handle usage of on_duplicate_key_update in MySQL prepared statements (jeremyevans) (#404)

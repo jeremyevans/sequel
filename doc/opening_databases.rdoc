@@ -276,6 +276,7 @@ The following additional options are supported:
                   Setting to false roughly doubles performance when selecting large numbers of rows.
                   Note that you can't provide this option inside the connection string (as that is passed
                   directly to JDBC), you have to pass it as a separate option.
+:login_timeout :: Set the login timeout on the JDBC connection (in seconds).
 
 === mysql 
 
