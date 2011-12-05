@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for custom serialization formats to the serialization plugin (jeremyevans)
+
 * Support a :login_timeout option in the jdbc adapter (glebpom) (#406)
 
 === 3.30.0 (2011-12-01)

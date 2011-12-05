@@ -37,11 +37,6 @@ describe "Serialization plugin" do
     MODEL_DB.sqls.map{|s| s.sub("...\n", '')}.should == ["INSERT INTO items (abc) VALUES ('--- 1\n')", "INSERT INTO items (abc) VALUES ('--- hello\n')"]
   end
 
-  it "serialization_format should be the serialization format used" do
-    @c.plugin :serialization, :yaml, :abc
-    @c.serialization_format.should == :yaml
-  end
-
   it "serialized_columns should be the columns serialized" do
     @c.plugin :serialization, :yaml, :abc
     @c.serialized_columns.should == [:abc]
@@ -71,6 +66,12 @@ describe "Serialization plugin" do
     ]
   end
 
+  it "should allow serializing attributes using arbitrary callable" do
+    @c.plugin :serialization, [proc{|s| s.reverse}, proc{}], :abc
+    @c.create(:abc => "hello")
+    MODEL_DB.sqls.should == ["INSERT INTO items (abc) VALUES ('olleh')"]
+  end
+  
   it "should translate values to and from yaml serialization format using accessor methods" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
@@ -130,6 +131,49 @@ describe "Serialization plugin" do
     MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = '#{[23].to_json}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[1,2,3].to_json}')",
+      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+  end
+
+  it "should translate values to and from arbitrary callables using accessor methods" do
+    @c.set_primary_key :id
+    @c.plugin :serialization, [proc{|s| s.reverse}, proc{|s| s.reverse}], :abc, :def
+    @c.dataset._fetch = {:id => 1, :abc => 'cba', :def => 'olleh'}
+    
+    o = @c.first
+    o.id.should == 1
+    o.abc.should == 'abc'
+    o.abc.should == 'abc'
+    o.def.should == "hello"
+    o.def.should == "hello"
+    
+    o.update(:abc => 'foo')
+    @c.create(:abc => 'bar')
+    
+    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+      "UPDATE items SET abc = 'oof' WHERE (id = 1)",
+      "INSERT INTO items (abc) VALUES ('rab')",
+      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+  end
+
+  it "should handle registration of custom serializer/deserializer pairs" do
+    @c.set_primary_key :id
+    Sequel::Plugins::Serialization.register_format(:reverse, proc{|s| s.reverse}, proc{|s| s.reverse})
+    @c.plugin :serialization, :reverse, :abc, :def
+    @c.dataset._fetch = {:id => 1, :abc => 'cba', :def => 'olleh'}
+    
+    o = @c.first
+    o.id.should == 1
+    o.abc.should == 'abc'
+    o.abc.should == 'abc'
+    o.def.should == "hello"
+    o.def.should == "hello"
+    
+    o.update(:abc => 'foo')
+    @c.create(:abc => 'bar')
+    
+    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+      "UPDATE items SET abc = 'oof' WHERE (id = 1)",
+      "INSERT INTO items (abc) VALUES ('rab')",
       "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
