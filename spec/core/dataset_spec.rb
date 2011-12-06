@@ -342,12 +342,12 @@ describe "Dataset#exists" do
     @ds1.filter(@ds2.exists).sql.should ==
       'SELECT * FROM test WHERE (EXISTS (SELECT * FROM test WHERE (price < 100)))'
     @ds1.filter(@ds2.exists & @ds3.exists).sql.should ==
-      'SELECT * FROM test WHERE (EXISTS (SELECT * FROM test WHERE (price < 100)) AND EXISTS (SELECT * FROM test WHERE (price > 50)))'
+      'SELECT * FROM test WHERE ((EXISTS (SELECT * FROM test WHERE (price < 100))) AND (EXISTS (SELECT * FROM test WHERE (price > 50))))'
   end
 
   specify "should work in select" do
     @ds1.select(@ds2.exists.as(:a), @ds3.exists.as(:b)).sql.should ==
-      'SELECT EXISTS (SELECT * FROM test WHERE (price < 100)) AS a, EXISTS (SELECT * FROM test WHERE (price > 50)) AS b FROM test'
+      'SELECT (EXISTS (SELECT * FROM test WHERE (price < 100))) AS a, (EXISTS (SELECT * FROM test WHERE (price > 50))) AS b FROM test'
   end
 end
 

@@ -66,6 +66,10 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:id=>:$i).filter(:numb=>@ds.select(:numb).filter(:numb=>:$n)).filter(:id=>:$j).call(:select, :n=>10, :i=>1, :j=>1).should == [{:id=>1, :numb=>10}]
   end
 
+  specify "should support subselects with exists with call" do
+    @ds.filter(:id=>:$i).filter(@ds.select(:numb).filter(:numb=>:$n).exists).filter(:id=>:$j).call(:select, :n=>10, :i=>1, :j=>1).should == [{:id=>1, :numb=>10}]
+  end
+
   specify "should support subselects with literal strings with call" do
     @ds.filter(:id=>:$i, :numb=>@ds.select(:numb).filter("numb = ?", :$n)).call(:select, :n=>10, :i=>1).should == [{:id=>1, :numb=>10}]
   end
@@ -149,6 +153,10 @@ describe "Prepared Statements and Bound Arguments" do
 
   specify "should support subselects with prepare" do
     @ds.filter(:id=>:$i).filter(:numb=>@ds.select(:numb).filter(:numb=>:$n)).filter(:id=>:$j).prepare(:select, :seq_select).call(:n=>10, :i=>1, :j=>1).should == [{:id=>1, :numb=>10}]
+  end
+
+  specify "should support subselects with exists with prepare" do
+    @ds.filter(:id=>:$i).filter(@ds.select(:numb).filter(:numb=>:$n).exists).filter(:id=>:$j).prepare(:select, :seq_select).call(:n=>10, :i=>1, :j=>1).should == [{:id=>1, :numb=>10}]
   end
 
   specify "should support subselects with literal strings with prepare" do

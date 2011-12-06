@@ -20,7 +20,7 @@ module Sequel
     #   DB.select(1).where(DB[:items].exists)
     #   # SELECT 1 WHERE (EXISTS (SELECT * FROM items))
     def exists
-      LiteralString.new("EXISTS (#{select_sql})")
+      SQL::PlaceholderLiteralString.new("EXISTS ?", [self], true)
     end
     
     # Returns an INSERT SQL query string.  See +insert+.
