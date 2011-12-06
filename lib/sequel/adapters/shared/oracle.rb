@@ -247,8 +247,10 @@ module Sequel
         compound_clone(:minus, dataset, opts)
       end
 
+      # Use a custom expression with EXISTS to determine whether a dataset
+      # is empty.
       def empty?
-        db[:dual].where(unordered.exists).get(1) == nil
+        db[:dual].where(@opts[:offset] ? exists : unordered.exists).get(1) == nil
       end
 
       # Oracle requires SQL standard datetimes
