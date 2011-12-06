@@ -187,6 +187,33 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_object
   end
 end
 
+describe Sequel::Model::Associations::AssociationReflection do
+  before do
+    @c = Class.new(Sequel::Model(:foo))
+    @c.meta_def(:name){"C"}
+  end
+
+  it "one_to_many #qualified_primary_key should be a qualified version of the primary key" do
+    @c.one_to_many :cs, :class=>@c
+    @c.dataset.literal(@c.association_reflection(:cs).qualified_primary_key).should == 'foo.id'
+  end
+
+  it "many_to_many #associated_key_column should be the left key" do
+    @c.many_to_many :cs, :class=>@c
+    @c.association_reflection(:cs).associated_key_column.should == :c_id
+  end
+
+  it "many_to_many #qualified_right_key should be a qualified version of the primary key" do
+    @c.many_to_many :cs, :class=>@c, :right_key=>:c2_id
+    @c.dataset.literal(@c.association_reflection(:cs).qualified_right_key).should == 'cs_cs.c2_id'
+  end
+
+  it "many_to_many #qualified_right_primary_key should be a qualified version of the primary key" do
+    @c.many_to_many :cs, :class=>@c
+    @c.dataset.literal(@c.association_reflection(:cs).qualified_right_primary_key).should == 'foo.id'
+  end
+end
+
 describe Sequel::Model::Associations::AssociationReflection, "#remove_before_destroy?" do
   before do
     @c = Class.new(Sequel::Model(:foo))
