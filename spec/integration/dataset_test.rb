@@ -764,6 +764,22 @@ describe "Sequel::Dataset convenience methods" do
     @ds.empty?.should == false
   end
   
+  it "#empty? should work correctly for datasets with limits" do
+    ds = @ds.limit(1)
+    ds.empty?.should == true
+    ds.insert(20, 10)
+    ds.empty?.should == false
+  end
+  
+  it "#empty? should work correctly for datasets with limits and offsets" do
+    ds = @ds.limit(1, 1)
+    ds.empty?.should == true
+    ds.insert(20, 10)
+    ds.empty?.should == true
+    ds.insert(20, 10)
+    ds.empty?.should == false
+  end
+  
   it "#group_and_count should return a grouping by count" do
     @ds.group_and_count(:a).order(:count).all.should == []
     @ds.insert(20, 10)

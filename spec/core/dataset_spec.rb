@@ -1787,9 +1787,9 @@ describe "Dataset#empty?" do
   specify "should return true if records exist in the dataset" do
     db = Sequel.mock(:fetch=>proc{|sql| {1=>1} unless sql =~ /WHERE 'f'/})
     db.from(:test).should_not be_empty
-    db.sqls.should == ['SELECT 1 FROM test LIMIT 1']
+    db.sqls.should == ['SELECT 1 AS one FROM test LIMIT 1']
     db.from(:test).filter(false).should be_empty
-    db.sqls.should == ["SELECT 1 FROM test WHERE 'f' LIMIT 1"]
+    db.sqls.should == ["SELECT 1 AS one FROM test WHERE 'f' LIMIT 1"]
   end
 end
 

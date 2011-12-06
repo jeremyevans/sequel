@@ -137,10 +137,10 @@ module Sequel
     
     # Returns true if no records exist in the dataset, false otherwise
     #
-    #   DB[:table].empty? # SELECT 1 FROM table LIMIT 1
+    #   DB[:table].empty? # SELECT 1 AS one FROM table LIMIT 1
     #   # => false
     def empty?
-      get(1).nil?
+      get(Sequel::SQL::AliasedExpression.new(1, :one)).nil?
     end
 
     # Executes a select query and fetches records, yielding each record to the

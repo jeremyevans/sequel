@@ -172,7 +172,7 @@ describe "sharding plugin" do
     # Should select from current object's shard to check existing association, but update associated object's shard
     sqls = @db.sqls
     ["UPDATE albums SET artist_id = NULL, name = 'T' WHERE (id = 5) -- s4", "UPDATE albums SET name = 'T', artist_id = NULL WHERE (id = 5) -- s4"].should include(sqls.pop)
-    sqls.should == ["SELECT 1 FROM albums WHERE ((albums.artist_id = 2) AND (id = 5)) LIMIT 1 -- s2"]
+    sqls.should == ["SELECT 1 AS one FROM albums WHERE ((albums.artist_id = 2) AND (id = 5)) LIMIT 1 -- s2"]
   end 
 
   specify "should be able to set a shard to use for any object using set_server" do

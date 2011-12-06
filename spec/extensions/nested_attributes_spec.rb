@@ -148,7 +148,7 @@ describe "NestedAttributes plugin" do
     @db.sqls.should == []
     @Album.dataset._fetch = {:id=>1}
     ar.save
-    check_sql_array("SELECT 1 FROM albums WHERE ((albums.artist_id = 20) AND (id = 10)) LIMIT 1",
+    check_sql_array("SELECT 1 AS one FROM albums WHERE ((albums.artist_id = 20) AND (id = 10)) LIMIT 1",
       ["UPDATE albums SET artist_id = NULL, name = 'Al' WHERE (id = 10)", "UPDATE albums SET name = 'Al', artist_id = NULL WHERE (id = 10)"],
       "UPDATE artists SET name = 'Ar' WHERE (id = 20)")
   end

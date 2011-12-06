@@ -1181,7 +1181,7 @@ describe Sequel::Model, "one_to_many" do
     a = @c1.load(:id => 2345, :node_id => 1234)
     a.should == n.remove_attribute(a)
     a.values.should == {:node_id => nil, :id => 2345}
-    MODEL_DB.sqls.should == ["SELECT 1 FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 2345)) LIMIT 1", 'UPDATE attributes SET node_id = NULL WHERE (id = 2345)']
+    MODEL_DB.sqls.should == ["SELECT 1 AS one FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 2345)) LIMIT 1", 'UPDATE attributes SET node_id = NULL WHERE (id = 2345)']
   end
 
   it "should have the remove_ method raise an error if the passed object is not already associated" do
@@ -1191,7 +1191,7 @@ describe Sequel::Model, "one_to_many" do
     a = @c1.load(:id => 2345, :node_id => 1234)
     @c1.dataset._fetch = []
     proc{n.remove_attribute(a)}.should raise_error(Sequel::Error)
-    MODEL_DB.sqls.should == ["SELECT 1 FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 2345)) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT 1 AS one FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 2345)) LIMIT 1"]
   end
 
   it "should accept a hash for the add_ method and create a new record" do
@@ -1287,7 +1287,7 @@ describe Sequel::Model, "one_to_many" do
     n.remove_attribute(a).should == a
     sqls = MODEL_DB.sqls
     sqls.pop.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(id = 2345\)/
-    sqls.should == ["SELECT 1 FROM attributes WHERE ((attributes.node_id = 1234) AND (attributes.y = 5) AND (id = 2345)) LIMIT 1"]
+    sqls.should == ["SELECT 1 AS one FROM attributes WHERE ((attributes.node_id = 1234) AND (attributes.y = 5) AND (id = 2345)) LIMIT 1"]
   end
   
   it "should accept a array of composite primary key values for the remove_ method and remove an existing record" do
