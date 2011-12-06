@@ -1196,7 +1196,12 @@ module Sequel
     def select_group_sql(sql)
       if group = @opts[:group]
         sql << GROUP_BY
+        if go = @opts[:group_options]
+          sql << go.to_s.upcase
+          sql << PAREN_OPEN
+        end
         expression_list_append(sql, group)
+        sql << PAREN_CLOSE if go
       end
     end
 

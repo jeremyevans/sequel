@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#group_rollup and #group_cube methods for GROUP BY ROLLUP and CUBE support (jeremyevans)
+
 * Add support for custom serialization formats to the serialization plugin (jeremyevans)
 
 * Support a :login_timeout option in the jdbc adapter (glebpom) (#406)

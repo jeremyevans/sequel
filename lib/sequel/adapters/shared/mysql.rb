@@ -345,6 +345,7 @@ module Sequel
       INSERT = Dataset::INSERT
       COMMA = Dataset::COMMA
       LIMIT = Dataset::LIMIT
+      GROUP_BY = Dataset::GROUP_BY
       REGEXP = 'REGEXP'.freeze
       LIKE = 'LIKE'.freeze
       BINARY = 'BINARY '.freeze
@@ -361,6 +362,7 @@ module Sequel
       ON_DUPLICATE_KEY_UPDATE = " ON DUPLICATE KEY UPDATE ".freeze
       EQ_VALUES = '=VALUES('.freeze
       EQ = '='.freeze
+      WITH_ROLLUP = ' WITH ROLLUP'.freeze
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
@@ -518,6 +520,11 @@ module Sequel
         true
       end
 
+      # MySQL supports GROUP BY WITH ROLLUP (but not CUBE)
+      def supports_group_rollup?
+        true
+      end
+
       # MySQL does not support INTERSECT or EXCEPT
       def supports_intersect_except?
         false
@@ -661,6 +668,15 @@ module Sequel
         SELECT_CLAUSE_METHODS
       end
       
+      # MySQL supports ROLLUP via nonstandard SQL syntax
+      def select_group_sql(sql)
+        if group = @opts[:group]
+          sql << GROUP_BY
+          expression_list_append(sql, group)
+          sql << WITH_ROLLUP if @opts[:group_options] == :rollup
+        end
+      end
+
       # Support FOR SHARE locking when using the :share lock style.
       def select_lock_sql(sql)
         @opts[:lock] == :share ? (sql << FOR_SHARE) : super

@@ -283,6 +283,16 @@ module Sequel
         true
       end
 
+      # Oracle supports GROUP BY CUBE
+      def supports_group_cube?
+        true
+      end
+
+      # Oracle supports GROUP BY ROLLUP
+      def supports_group_rollup?
+        true
+      end
+
       # Oracle does not support INTERSECT ALL or EXCEPT ALL
       def supports_intersect_except_all?
         false

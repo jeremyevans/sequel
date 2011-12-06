@@ -844,7 +844,7 @@ end
 
 describe "Dataset#group_by" do
   before do
-    @dataset = Sequel::Dataset.new(nil).from(:test).group_by(:type_id)
+    @dataset = Sequel.mock[:test].group_by(:type_id)
   end
 
   specify "should raise when trying to generate an update statement" do
@@ -880,6 +880,23 @@ describe "Dataset#group_by" do
     @dataset.group_by{type_id > 1}.sql.should == "SELECT * FROM test GROUP BY (type_id > 1)"
     @dataset.group{[type_id > 1, type_id < 2]}.sql.should == "SELECT * FROM test GROUP BY (type_id > 1), (type_id < 2)"
     @dataset.group(:foo){type_id > 1}.sql.should == "SELECT * FROM test GROUP BY foo, (type_id > 1)"
+  end
+
+  specify "should support a #group_rollup method if the database supports it" do
+    @dataset.meta_def(:supports_group_rollup?){true}
+    @dataset.group(:type_id).group_rollup.select_sql.should == "SELECT * FROM test GROUP BY ROLLUP(type_id)"
+    @dataset.group(:type_id, :b).group_rollup.select_sql.should == "SELECT * FROM test GROUP BY ROLLUP(type_id, b)"
+  end
+
+  specify "should support a #group_cube method if the database supports it" do
+    @dataset.meta_def(:supports_group_cube?){true}
+    @dataset.group(:type_id).group_cube.select_sql.should == "SELECT * FROM test GROUP BY CUBE(type_id)"
+    @dataset.group(:type_id, :b).group_cube.select_sql.should == "SELECT * FROM test GROUP BY CUBE(type_id, b)"
+  end
+
+  specify "should have #group_cube and #group_rollup methods raise an Error if not supported it" do
+    proc{@dataset.group(:type_id).group_rollup}.should raise_error(Sequel::Error)
+    proc{@dataset.group(:type_id).group_cube}.should raise_error(Sequel::Error)
   end
 end
 

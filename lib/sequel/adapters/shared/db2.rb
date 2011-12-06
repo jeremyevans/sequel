@@ -226,6 +226,16 @@ module Sequel
         end
       end
 
+      # DB2 supports GROUP BY CUBE
+      def supports_group_cube?
+        true
+      end
+
+      # DB2 supports GROUP BY ROLLUP
+      def supports_group_rollup?
+        true
+      end
+
       # DB2 does not support IS TRUE.
       def supports_is_true?
         false

@@ -716,6 +716,32 @@ end
 describe "Sequel::Dataset convenience methods" do
   before(:all) do
     @db = INTEGRATION_DB
+    @db.create_table!(:a){Integer :a; Integer :b; Integer :c}
+    @ds = @db[:a]
+    @ds.insert(1, 3, 5)
+    @ds.insert(1, 3, 6)
+    @ds.insert(1, 4, 5)
+    @ds.insert(2, 3, 5)
+    @ds.insert(2, 4, 6)
+  end
+  after(:all) do
+    @db.drop_table(:a)
+  end
+  
+  it "#group_rollup should include hierarchy of groupings" do
+    @ds.group_by(:a).group_rollup.select_map([:a, :sum.sql_function(:b).cast(Integer).as(:b), :sum.sql_function(:c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 10, 16], [2, 7, 11], [nil, 17, 27]]
+    @ds.group_by(:a, :b).group_rollup.select_map([:a, :b, :sum.sql_function(:c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 3, 11], [1, 4, 5], [1, nil, 16], [2, 3, 5], [2, 4, 6], [2, nil, 11], [nil, nil, 27]]
+  end if INTEGRATION_DB.dataset.supports_group_rollup?
+
+  it "#group_cube should include all combinations of groupings" do
+    @ds.group_by(:a).group_cube.select_map([:a, :sum.sql_function(:b).cast(Integer).as(:b), :sum.sql_function(:c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 10, 16], [2, 7, 11], [nil, 17, 27]]
+    @ds.group_by(:a, :b).group_cube.select_map([:a, :b, :sum.sql_function(:c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 3, 11], [1, 4, 5], [1, nil, 16], [2, 3, 5], [2, 4, 6], [2, nil, 11], [nil, 3, 16], [nil, 4, 11], [nil, nil, 27]]
+  end if INTEGRATION_DB.dataset.supports_group_cube?
+end
+
+describe "Sequel::Dataset convenience methods" do
+  before(:all) do
+    @db = INTEGRATION_DB
     @db.create_table!(:a){Integer :a; Integer :b}
     @ds = @db[:a].order(:a)
   end

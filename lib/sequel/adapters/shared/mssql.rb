@@ -418,6 +418,16 @@ module Sequel
         db.server_version(@opts[:server])
       end
 
+      # MSSQL 2005+ supports GROUP BY CUBE.
+      def supports_group_cube?
+        is_2005_or_later?
+      end
+
+      # MSSQL 2005+ supports GROUP BY ROLLUP
+      def supports_group_rollup?
+        is_2005_or_later?
+      end
+
       # MSSQL supports insert_select via the OUTPUT clause.
       def supports_insert_select?
         supports_output_clause? && !opts[:disable_insert_output]

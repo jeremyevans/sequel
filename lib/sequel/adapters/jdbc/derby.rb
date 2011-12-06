@@ -169,6 +169,11 @@ module Sequel
           end
         end
 
+        # Derby supports GROUP BY ROLLUP (but not CUBE)
+        def supports_group_rollup?
+          true
+        end
+
         # Derby does not support IS TRUE.
         def supports_is_true?
           false

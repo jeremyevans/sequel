@@ -337,6 +337,18 @@ module Sequel
       select_group(*columns, &block).select_more(COUNT_OF_ALL_AS_COUNT)
     end
 
+    # Adds the appropriate CUBE syntax to GROUP BY.
+    def group_cube
+      raise Error, "GROUP BY CUBE not supported on #{db.database_type}" unless supports_group_cube?
+      clone(:group_options=>:cube)
+    end
+
+    # Adds the appropriate ROLLUP syntax to GROUP BY.
+    def group_rollup
+      raise Error, "GROUP BY ROLLUP not supported on #{db.database_type}" unless supports_group_rollup?
+      clone(:group_options=>:rollup)
+    end
+
     # Returns a copy of the dataset with the HAVING conditions changed. See #filter for argument types.
     #
     #   DB[:items].group(:sum).having(:sum=>10)

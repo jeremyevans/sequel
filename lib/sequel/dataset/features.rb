@@ -61,6 +61,16 @@ module Sequel
       false
     end
 
+    # Whether the dataset supports CUBE with GROUP BY.
+    def supports_group_cube?
+      false
+    end
+
+    # Whether the dataset supports ROLLUP with GROUP BY.
+    def supports_group_rollup?
+      false
+    end
+
     # Whether this dataset supports the +insert_select+ method for returning all columns values
     # directly from an insert query.
     def supports_insert_select?
