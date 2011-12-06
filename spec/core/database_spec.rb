@@ -571,11 +571,7 @@ describe "Database#table_exists?" do
   end
 end
 
-describe "Database#transaction" do
-  before do
-    @db = Sequel.mock(:servers=>{:test=>{}})
-  end
-  
+shared_examples_for "Database#transaction" do  
   specify "should wrap the supplied block with BEGIN + COMMIT statements" do
     @db.transaction{@db.execute 'DROP TABLE test;'}
     @db.sqls.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
@@ -699,7 +695,7 @@ describe "Database#transaction" do
     q1.pop
     cc.should be_a_kind_of(Sequel::Mock::Connection)
     tr = @db.instance_variable_get(:@transactions)
-    tr.should == {cc=>{:savepoint_level=>1}}
+    tr.keys.should == [cc]
     q.push nil
     t.join
     tr.should be_empty
@@ -796,6 +792,26 @@ describe "Database#transaction" do
     @db.sqls.should == ['BEGIN', 'ROLLBACK', 'foo']
   end
 
+  specify "should raise an error if you attempt to use after_commit inside a prepared transaction" do
+    @db.meta_def(:supports_prepared_transactions?){true}
+    proc{@db.transaction(:prepare=>'XYZ'){@db.after_commit{@db.execute('foo')}}}.should raise_error(Sequel::Error)
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
+  end
+
+  specify "should raise an error if you attempt to use after_rollback inside a prepared transaction" do
+    @db.meta_def(:supports_prepared_transactions?){true}
+    proc{@db.transaction(:prepare=>'XYZ'){@db.after_rollback{@db.execute('foo')}}}.should raise_error(Sequel::Error)
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
+  end
+end
+
+describe "Database#transaction with savepoint support" do
+  before do
+    @db = Sequel.mock(:servers=>{:test=>{}})
+  end
+
+  it_should_behave_like "Database#transaction"
+
   specify "should support after_commit inside savepoints" do
     @db.meta_def(:supports_savepoints?){true}
     @db.transaction do
@@ -817,18 +833,6 @@ describe "Database#transaction" do
     @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'ROLLBACK', 'foo', 'bar', 'baz']
   end
 
-  specify "should raise an error if you attempt to use after_commit inside a prepared transaction" do
-    @db.meta_def(:supports_prepared_transactions?){true}
-    proc{@db.transaction(:prepare=>'XYZ'){@db.after_commit{@db.execute('foo')}}}.should raise_error(Sequel::Error)
-    @db.sqls.should == ['BEGIN', 'ROLLBACK']
-  end
-
-  specify "should raise an error if you attempt to use after_rollback inside a prepared transaction" do
-    @db.meta_def(:supports_prepared_transactions?){true}
-    proc{@db.transaction(:prepare=>'XYZ'){@db.after_rollback{@db.execute('foo')}}}.should raise_error(Sequel::Error)
-    @db.sqls.should == ['BEGIN', 'ROLLBACK']
-  end
-
   specify "should raise an error if you attempt to use after_commit inside a savepoint in a prepared transaction" do
     @db.meta_def(:supports_savepoints?){true}
     @db.meta_def(:supports_prepared_transactions?){true}
@@ -843,7 +847,16 @@ describe "Database#transaction" do
     @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
   end
 end
+  
+describe "Database#transaction without savepoint support" do
+  before do
+    @db = Sequel.mock(:servers=>{:test=>{}})
+    @db.meta_def(:supports_savepoints?){false}
+  end
 
+  it_should_behave_like "Database#transaction"
+end
+  
 describe "Sequel.transaction" do
   before do
     @sqls = []
