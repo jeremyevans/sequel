@@ -547,17 +547,17 @@ module Sequel
         # Execute the prepared SQL using the stored type and
         # arguments derived from the hash passed to call.
         def execute(sql, opts={}, &block)
-          super(self, {:arguments=>bind_arguments, :type=>sql_query_type}.merge(opts), &block)
+          super(self, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts={}, &block)
-          super(self, {:arguments=>bind_arguments, :type=>sql_query_type}.merge(opts), &block)
+          super(self, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_insert(sql, opts={}, &block)
-          super(self, {:arguments=>bind_arguments, :type=>sql_query_type}.merge(opts), &block)
+          super(self, {:arguments=>bind_arguments, :type=>:insert}.merge(opts), &block)
         end
       end
       
@@ -570,17 +570,17 @@ module Sequel
         
         # Execute the database stored procedure with the stored arguments.
         def execute(sql, opts={}, &block)
-          super(@sproc_name, {:args=>@sproc_args, :sproc=>true, :type=>sql_query_type}.merge(opts), &block)
+          super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts={}, &block)
-          super(@sproc_name, {:args=>@sproc_args, :sproc=>true, :type=>sql_query_type}.merge(opts), &block)
+          super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_insert(sql, opts={}, &block)
-          super(@sproc_name, {:args=>@sproc_args, :sproc=>true, :type=>sql_query_type}.merge(opts), &block)
+          super(@sproc_name, {:args=>@sproc_args, :sproc=>true, :type=>:insert}.merge(opts), &block)
         end
       end
       

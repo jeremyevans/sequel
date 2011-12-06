@@ -1,9 +1,6 @@
 module Sequel 
   class Dataset
     module StoredProcedureMethods
-      SQL_QUERY_TYPE = Hash.new{|h,k| h[k] = k}
-      SQL_QUERY_TYPE[:first] = SQL_QUERY_TYPE[:all] = :select
-      
       # The name of the stored procedure to call
       attr_accessor :sproc_name
       
@@ -44,14 +41,7 @@ module Sequel
       # ignored anyway).
       def sproc_type=(type)
         @sproc_type = type
-        meta_def("#{sql_query_type}_sql"){|*a| ''}
-      end
-      
-      private
-      
-      # The type of query (:select, :insert, :delete, :update).
-      def sql_query_type
-        SQL_QUERY_TYPE[@sproc_type]
+        @opts[:sql] = ''
       end
     end
   

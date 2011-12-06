@@ -12,9 +12,6 @@ module Sequel
     # native database support for bind variables and prepared
     # statements (as opposed to the emulated ones used by default).
     module ArgumentMapper
-      SQL_QUERY_TYPE = Hash.new{|h,k| h[k] = k}
-      SQL_QUERY_TYPE[:first] = SQL_QUERY_TYPE[:all] = :select
-      
       # The name of the prepared statement, if any.
       attr_accessor :prepared_statement_name
       
@@ -37,13 +34,6 @@ module Sequel
         @prepared_sql = super
         @opts[:sql] = @prepared_sql
         @prepared_sql
-      end
-      
-      private
-      
-      # The type of query (:select, :insert, :delete, :update).
-      def sql_query_type
-        SQL_QUERY_TYPE[@prepared_type]
       end
     end
 
