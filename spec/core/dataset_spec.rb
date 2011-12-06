@@ -947,6 +947,21 @@ describe "Dataset#literal" do
     @dataset.literal(:"items__na#m$e").should == "items.na#m$e"
   end
 
+  specify "should call sql_literal_append with dataset and sql on type if not natively supported and the object responds to it" do
+    @a = Class.new do
+      def sql_literal_append(ds, sql)
+        sql << "called #{ds.blah}"
+      end
+      def sql_literal(ds)
+        "not called #{ds.blah}"
+      end
+    end
+    def @dataset.blah
+      "ds"
+    end
+    @dataset.literal(@a.new).should == "called ds"
+  end
+  
   specify "should call sql_literal with dataset on type if not natively supported and the object responds to it" do
     @a = Class.new do
       def sql_literal(ds)
@@ -1050,10 +1065,9 @@ describe "Dataset#literal" do
   end
   
   specify "should not modify literal strings" do
+    @dataset.quote_identifiers = true
     @dataset.literal('col1 + 2'.lit).should == 'col1 + 2'
-    
-    @dataset.update_sql(:a => 'a + 2'.lit).should == 
-      'UPDATE test SET a = a + 2'
+    @dataset.update_sql(Sequel::SQL::Identifier.new('a'.lit) => 'a + 2'.lit).should == 'UPDATE "test" SET a = a + 2'
   end
 
   specify "should literalize BigDecimal instances correctly" do
