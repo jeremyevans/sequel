@@ -265,7 +265,7 @@ module Sequel
         nil
       end
 
-      def identifier_input_method_default
+      def identifier_output_method_default
         nil
       end
     end
