@@ -405,7 +405,7 @@ module Sequel
       AS = Dataset::AS
       APOS = Dataset::APOS
       EXTRACT_OPEN = "CAST(strftime(".freeze
-      EXRACT_CLOSE = ') AS '.freeze
+      EXTRACT_CLOSE = ') AS '.freeze
       NUMERIC = 'NUMERIC'.freeze
       INTEGER = 'INTEGER'.freeze
       BACKTICK = '`'.freeze
@@ -435,13 +435,14 @@ module Sequel
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
           sql << EXTRACT_OPEN << format << COMMA
           literal_append(sql, args.at(1))
-          sql << EXRACT_CLOSE << (part == :second ? NUMERIC : INTEGER) << PAREN_CLOSE
+          sql << EXTRACT_CLOSE << (part == :second ? NUMERIC : INTEGER) << PAREN_CLOSE
         else
           super
         end
       end
       
-      # MSSQL doesn't support the SQL standard CURRENT_DATE or CURRENT_TIME
+      # SQLite has CURRENT_TIMESTAMP and related constants in UTC instead
+      # of in localtime, so convert those constants to local time.
       def constant_sql_append(sql, constant)
         if c = CONSTANT_MAP[constant]
           sql << c
