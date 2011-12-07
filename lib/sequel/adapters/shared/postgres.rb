@@ -345,8 +345,11 @@ module Sequel
           (conn.server_version rescue nil) if conn.respond_to?(:server_version)
         end
         unless @server_version
-          m = /PostgreSQL (\d+)\.(\d+)(?:(?:rc\d+)|\.(\d+))?/.match(fetch('SELECT version()').single_value)
-          @server_version = (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
+          @server_version = if m = /PostgreSQL (\d+)\.(\d+)(?:(?:rc\d+)|\.(\d+))?/.match(fetch('SELECT version()').single_value)
+            (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
+          else
+            0
+          end
         end
         @server_version
       end
