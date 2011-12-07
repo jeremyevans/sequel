@@ -60,6 +60,35 @@ describe "A MSSQL database" do
   end
 end
 
+# This spec is currently disabled as the SQL Server 2008 R2 Express doesn't support
+# full text searching.  Even if full text searching is supported,
+# you may need to create a full text catalog on the database first via:
+#   CREATE FULLTEXT CATALOG ftscd AS DEFAULT
+describe "MSSQL full_text_search" do
+  before do
+    @db = MSSQL_DB
+    @db.drop_table(:posts) rescue nil
+  end
+  after do
+    @db.drop_table(:posts) rescue nil
+  end
+  
+  specify "should support fulltext indexes and full_text_search" do
+    log do
+    @db.create_table(:posts){Integer :id, :null=>false; String :title; String :body; index :id, :name=>:fts_id_idx, :unique=>true; full_text_index :title, :key_index=>:fts_id_idx; full_text_index [:title, :body], :key_index=>:fts_id_idx}
+    @db[:posts].insert(:title=>'ruby rails', :body=>'y')
+    @db[:posts].insert(:title=>'sequel', :body=>'ruby')
+    @db[:posts].insert(:title=>'ruby scooby', :body=>'x')
+
+    @db[:posts].full_text_search(:title, 'rails').all.should == [{:title=>'ruby rails', :body=>'y'}]
+    @db[:posts].full_text_search([:title, :body], ['sequel', 'ruby']).all.should == [{:title=>'sequel', :body=>'ruby'}]
+
+    @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').should == [{:title=>'ruby rails', :body=>'y'}]
+    @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').should == [{:title=>'ruby rails', :body=>'y'}]
+    end
+  end
+end if false
+
 describe "MSSQL Dataset#join_table" do
   specify "should emulate the USING clause with ON" do
     MSSQL_DB[:items].join(:categories, [:id]).sql.should ==

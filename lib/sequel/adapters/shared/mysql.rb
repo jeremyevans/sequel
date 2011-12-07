@@ -425,8 +425,9 @@ module Sequel
       end
       
       # MySQL specific full text search syntax.
-      def full_text_sql(cols, term, opts = {})
-        "MATCH #{literal(Array(cols))} AGAINST (#{literal(Array(term).join(' '))}#{" IN BOOLEAN MODE" if opts[:boolean]})"
+      def full_text_sql(cols, terms, opts = {})
+        terms = terms.join(' ') if terms.is_a?(Array)
+        SQL::PlaceholderLiteralString.new("MATCH ? AGAINST (?#{" IN BOOLEAN MODE" if opts[:boolean]})", [Array(cols), terms], true)
       end
 
       # MySQL allows HAVING clause on ungrouped datasets.

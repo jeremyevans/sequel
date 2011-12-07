@@ -380,6 +380,9 @@ describe "A PostgreSQL database" do
       %{SELECT * FROM "posts" WHERE (to_tsvector('simple', (COALESCE("title", ''))) @@ to_tsquery('simple', 'rails'))},
       %{SELECT * FROM "posts" WHERE (to_tsvector('simple', (COALESCE("title", '') || ' ' || COALESCE("body", ''))) @@ to_tsquery('simple', 'yowsa | rails'))},
       %{SELECT * FROM "posts" WHERE (to_tsvector('french', (COALESCE("title", ''))) @@ to_tsquery('french', 'scooby'))}]
+
+    @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
+    @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
   end
 
   specify "should support spatial indexes" do

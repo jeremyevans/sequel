@@ -493,7 +493,7 @@ module Sequel
         filter = " WHERE #{filter_expr(filter)}" if filter
         case index_type
         when :full_text
-          expr = "(to_tsvector(#{literal(index[:language] || 'simple')}, #{dataset.send(:full_text_string_join, cols)}))"
+          expr = "(to_tsvector(#{literal(index[:language] || 'simple')}, #{literal(dataset.send(:full_text_string_join, cols))}))"
           index_type = :gin
         when :spatial
           index_type = :gist
@@ -746,7 +746,8 @@ module Sequel
       # in 8.3 by default, and available for earlier versions as an add-on).
       def full_text_search(cols, terms, opts = {})
         lang = opts[:language] || 'simple'
-        filter("to_tsvector(#{literal(lang)}, #{full_text_string_join(cols)}) @@ to_tsquery(#{literal(lang)}, #{literal(Array(terms).join(' | '))})")
+        terms = terms.join(' | ') if terms.is_a?(Array)
+        filter("to_tsvector(?, ?) @@ to_tsquery(?, ?)", lang, full_text_string_join(cols), lang, terms)
       end
       
       # Insert given values into the database.
@@ -948,7 +949,7 @@ module Sequel
         cols = Array(cols).map{|x| SQL::Function.new(:COALESCE, x, EMPTY_STRING)}
         cols = cols.zip([SPACE] * cols.length).flatten
         cols.pop
-        literal(SQL::StringExpression.new(:'||', *cols))
+        SQL::StringExpression.new(:'||', *cols)
       end
 
       # PostgreSQL splits the main table from the joined tables

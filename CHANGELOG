@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow creation of full text indexes on Microsoft SQL Server, but you need to provide a :key_index option (jeremyevans)
+
+* Allow Dataset#full_text_search usage with prepared statements (jeremyevans)
+
 * Make Dataset#exists use a PlaceholderLiteralString so it works with prepared statements (jeremyevans)
 
 * Fix Dataset#empty? for datasets with offsets when offset support is emulated (jeremyevans)

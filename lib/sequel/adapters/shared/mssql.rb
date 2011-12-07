@@ -234,11 +234,11 @@ module Sequel
       # support for clustered index type
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
-        clustered = index[:type] == :clustered
-        if index[:where]
-          raise Error, "Partial indexes are not supported for this database"
+        raise Error, "Partial indexes are not supported for this database" if index[:where]
+        if index[:type] == :full_text
+          "CREATE FULLTEXT INDEX ON #{quote_schema_table(table_name)} #{literal(index[:columns])} KEY INDEX #{literal(index[:key_index])}"
         else
-          "CREATE #{'UNIQUE ' if index[:unique]}#{'CLUSTERED ' if clustered}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
+          "CREATE #{'UNIQUE ' if index[:unique]}#{'CLUSTERED ' if index[:type] == :clustered}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
         end
       end
     end
@@ -345,7 +345,8 @@ module Sequel
 
       # MSSQL uses the CONTAINS keyword for full text search
       def full_text_search(cols, terms, opts = {})
-        filter("CONTAINS (#{literal(cols)}, #{literal(terms)})")
+        terms = "\"#{terms.join('" OR "')}\"" if terms.is_a?(Array)
+        filter("CONTAINS (?, ?)", cols, terms)
       end
 
       # Use the OUTPUT clause to get the value of all columns for the newly inserted record.
