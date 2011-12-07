@@ -1,5 +1,7 @@
 === HEAD
 
+* Add database type support to the mock adapter, e.g. mock://postgres (jeremyevans)
+
 * Allow creation of full text indexes on Microsoft SQL Server, but you need to provide a :key_index option (jeremyevans)
 
 * Allow Dataset#full_text_search usage with prepared statements (jeremyevans)
