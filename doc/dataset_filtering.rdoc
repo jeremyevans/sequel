@@ -59,6 +59,14 @@ Ranges (both inclusive and exclusive) can also be used:
   items.filter(:price => 100...200).sql
   #=> "SELECT * FROM items WHERE (price >= 100 AND price < 200)"
 
+== Filtering using an array
+
+If you need to select multiple items from a dataset, you can supply an array:
+
+	item_array = [1, 38, 47, 99]
+	items.filter(:id => item_array).sql
+	#=> "SELECT * FROM items WHERE (id IN (1, 38, 47, 99))"
+
 == Filtering using expressions
 
 Sequel allows you to use ruby expressions directly in the call to filter:
