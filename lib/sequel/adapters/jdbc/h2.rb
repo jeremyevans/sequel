@@ -100,6 +100,11 @@ module Sequel
         def primary_key_index_re
           PRIMARY_KEY_INDEX_RE
         end
+
+        # Treat clob as string instead of blob
+        def schema_column_type(db_type)
+          db_type == 'clob' ? :string : super
+        end
       end
       
       # Dataset class for H2 datasets accessed via JDBC.
@@ -158,7 +163,7 @@ module Sequel
         #JAVA_H2_CLOB = Java::OrgH2Jdbc::JdbcClob
 
         class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
-          def h2_clob(v) Sequel::SQL::Blob.new(v.getSubString(1, v.length)) end
+          def h2_clob(v) v.getSubString(1, v.length) end
         end
 
         H2_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:h2_clob)
