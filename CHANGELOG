@@ -1,5 +1,7 @@
 === HEAD
 
+* Raise error if tables from two separate schema are detected when parsing the schema for a single table on PostgreSQL (jeremyevans)
+
 * Handle clob types as string instead of blob on H2 (jeremyevans)
 
 * Add database type support to the mock adapter, e.g. mock://postgres (jeremyevans)

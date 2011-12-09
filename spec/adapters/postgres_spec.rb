@@ -608,6 +608,18 @@ describe "Postgres::Database schema qualified tables" do
     POSTGRES_DB.drop_table(:domains)
   end
   
+  specify "#schema should raise an exception if columns from tables in two separate schema are returned" do
+    POSTGRES_DB.create_table!(:public__domains){integer :d}
+    POSTGRES_DB.create_table(:schema_test__domains){integer :i}
+    begin
+      proc{POSTGRES_DB.schema(:domains)}.should raise_error(Sequel::Error)
+      POSTGRES_DB.schema(:public__domains).map{|x| x.first}.should == [:d]
+      POSTGRES_DB.schema(:schema_test__domains).map{|x| x.first}.should == [:i]
+    ensure
+      POSTGRES_DB.drop_table(:public__domains)
+    end
+  end
+  
   specify "#table_exists? should see if the table is in a given schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
     POSTGRES_DB.table_exists?(:schema_test__schema_test).should == true

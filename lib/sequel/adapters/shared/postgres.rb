@@ -580,7 +580,8 @@ module Sequel
             SQL::Function.new(:format_type, :pg_type__oid, :pg_attribute__atttypmod).as(:db_type),
             SQL::Function.new(:pg_get_expr, :pg_attrdef__adbin, :pg_class__oid).as(:default),
             SQL::BooleanExpression.new(:NOT, :pg_attribute__attnotnull).as(:allow_null),
-            SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(:pg_attribute__attnum => SQL::Function.new(:ANY, :pg_index__indkey)), false).as(:primary_key)).
+            SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(:pg_attribute__attnum => SQL::Function.new(:ANY, :pg_index__indkey)), false).as(:primary_key),
+            :pg_namespace__nspname).
           from(:pg_class).
           join(:pg_attribute, :attrelid=>:oid).
           join(:pg_type, :oid=>:atttypid).
@@ -592,7 +593,16 @@ module Sequel
           filter(:pg_class__relname=>m2.call(table_name)).
           order(:pg_attribute__attnum)
         ds = filter_schema(ds, opts)
+        current_schema = nil
         ds.map do |row|
+          sch = row.delete(:nspname)
+          if current_schema
+            if sch != current_schema
+              raise Error, "columns from tables in two separate schema were returned (please specify a schema): #{current_schema.inspect}, #{sch.inspect}"
+            end
+          else
+            current_schema = sch
+          end
           row[:default] = nil if blank_object?(row[:default])
           row[:type] = schema_column_type(row[:db_type])
           [m.call(row.delete(:name)), row]
