@@ -826,7 +826,7 @@ module Sequel
         if type == :insert
           server_version >= 80200 && !opts[:disable_insert_returning]
         else
-          server_version >= 90100
+          server_version >= 80200
         end
       end
 
