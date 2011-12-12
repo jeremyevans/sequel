@@ -719,6 +719,29 @@ describe "Sequel::Dataset#import and #multi_insert" do
   end
 end
 
+describe "Sequel::Dataset#import and #multi_insert :return=>:primary_key " do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:imp){primary_key :id; Integer :i}
+    @ds = @db[:imp]
+  end
+  after do
+    @db.drop_table(:imp)
+  end
+
+  specify "should return primary key values " do
+    @ds.multi_insert([{:i=>10}, {:i=>20}, {:i=>30}], :return=>:primary_key).should == [1, 2, 3]
+    @ds.import([:i], [[40], [50], [60]], :return=>:primary_key).should == [4, 5, 6]
+    @ds.order(:id).map([:id, :i]).should == [[1, 10], [2, 20], [3, 30], [4, 40], [5, 50], [6, 60]]
+  end
+
+  specify "should return primary key values when :slice is used" do
+    @ds.multi_insert([{:i=>10}, {:i=>20}, {:i=>30}], :return=>:primary_key, :slice=>2).should == [1, 2, 3]
+    @ds.import([:i], [[40], [50], [60]], :return=>:primary_key, :slice=>2).should == [4, 5, 6]
+    @ds.order(:id).map([:id, :i]).should == [[1, 10], [2, 20], [3, 30], [4, 40], [5, 50], [6, 60]]
+  end
+end
+
 describe "Sequel::Dataset convenience methods" do
   before(:all) do
     @db = INTEGRATION_DB

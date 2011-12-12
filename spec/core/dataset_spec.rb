@@ -2623,6 +2623,11 @@ describe "Dataset#import" do
     @ds = @db[:items]
   end
   
+  specify "should return nil without a query if no values" do
+    @ds.import(['x', 'y'], []).should == nil
+    @db.sqls.should == []
+  end
+
   specify "should accept string keys as column names" do
     @ds.import(['x', 'y'], [[1, 2], [3, 4]])
     @db.sqls.should == ['BEGIN',
@@ -2670,13 +2675,46 @@ end
 
 describe "Dataset#multi_insert" do
   before do
-    @db = Sequel.mock
+    @db = Sequel.mock(:servers=>{:s1=>{}})
     @ds = @db[:items]
     @list = [{:name => 'abc'}, {:name => 'def'}, {:name => 'ghi'}]
   end
   
+  specify "should return nil without a query if no values" do
+    @ds.multi_insert([]).should == nil
+    @db.sqls.should == []
+  end
+
   specify "should issue multiple insert statements inside a transaction" do
     @ds.multi_insert(@list)
+    @db.sqls.should == ['BEGIN',
+      "INSERT INTO items (name) VALUES ('abc')",
+      "INSERT INTO items (name) VALUES ('def')",
+      "INSERT INTO items (name) VALUES ('ghi')",
+      'COMMIT']
+  end
+  
+  specify "should respect :server option" do
+    @ds.multi_insert(@list, :server=>:s1)
+    @db.sqls.should == ['BEGIN -- s1',
+      "INSERT INTO items (name) VALUES ('abc') -- s1",
+      "INSERT INTO items (name) VALUES ('def') -- s1",
+      "INSERT INTO items (name) VALUES ('ghi') -- s1",
+      'COMMIT -- s1']
+  end
+  
+  specify "should respect existing :server option on dataset" do
+    @ds.server(:s1).multi_insert(@list)
+    @db.sqls.should == ['BEGIN -- s1',
+      "INSERT INTO items (name) VALUES ('abc') -- s1",
+      "INSERT INTO items (name) VALUES ('def') -- s1",
+      "INSERT INTO items (name) VALUES ('ghi') -- s1",
+      'COMMIT -- s1']
+  end
+  
+  specify "should respect :return=>:primary_key option" do
+    @db.autoid = 1
+    @ds.multi_insert(@list, :return=>:primary_key).should == [1, 2, 3]
     @db.sqls.should == ['BEGIN',
       "INSERT INTO items (name) VALUES ('abc')",
       "INSERT INTO items (name) VALUES ('def')",

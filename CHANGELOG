@@ -1,5 +1,11 @@
 === HEAD
 
+* Support :server option in Dataset#import and #multi_insert (jeremyevans)
+
+* Respect existing RETURNING/OUTPUT clauses in #import/#multi_insert on PostgreSQL/MSSQL (jeremyevans)
+
+* Support :return=>:primary_key option to Dataset#import and #multi_insert (jeremyevans)
+
 * Correctly handle return value for Dataset#insert with column array and value array on PostgreSQL <8.2 (jeremyevans)
 
 * Dataset#insert_multiple now returns an array of inserted primary keys (jeremyevans) (#408)

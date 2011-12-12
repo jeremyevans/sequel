@@ -852,6 +852,29 @@ module Sequel
         clone(:window=>(@opts[:window]||[]) + [[name, SQL::Window.new(opts)]])
       end
       
+      protected
+
+      # If returned primary keys are requested, use RETURNING unless already set on the
+      # dataset.  If RETURNING is already set, use existing returning values.  If RETURNING
+      # is only set to return a single columns, return an array of just that column.
+      # Otherwise, return an array of hashes.
+      def _import(columns, values, opts={})
+        if server_version >= 80200
+          if opts[:return] == :primary_key && !@opts[:returning]
+            returning(insert_pk)._import(columns, values, opts)
+          elsif @opts[:returning]
+            statements = multi_insert_sql(columns, values)
+            @db.transaction(opts.merge(:server=>@opts[:server])) do
+              statements.map{|st| returning_fetch_rows(st)}
+            end.first.map{|v| v.length == 1 ? v.values.first : v}
+          else
+            super
+          end
+        else
+          super
+        end
+      end
+
       private
       
       # PostgreSQL allows deleting from joined datasets

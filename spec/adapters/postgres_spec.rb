@@ -434,7 +434,7 @@ end
 describe "Postgres::Dataset#import" do
   before do
     @db = POSTGRES_DB
-    @db.create_table!(:test){Integer :x; Integer :y}
+    @db.create_table!(:test){primary_key :x; Integer :y}
     @db.sqls.clear
     @ds = @db[:test]
   end
@@ -444,28 +444,45 @@ describe "Postgres::Dataset#import" do
   
   specify "#import should return separate insert statements if server_version < 80200" do
     @ds.meta_def(:server_version){80199}
-    
     @ds.import([:x, :y], [[1, 2], [3, 4]])
-    
-    @db.sqls.should == [
-      'BEGIN',
-      'INSERT INTO "test" ("x", "y") VALUES (1, 2)',
-      'INSERT INTO "test" ("x", "y") VALUES (3, 4)',
-      'COMMIT'
-    ]
+    @db.sqls.should == ['BEGIN', 'INSERT INTO "test" ("x", "y") VALUES (1, 2)', 'INSERT INTO "test" ("x", "y") VALUES (3, 4)', 'COMMIT']
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
   
   specify "#import should a single insert statement if server_version >= 80200" do
     @ds.meta_def(:server_version){80200}
-    
     @ds.import([:x, :y], [[1, 2], [3, 4]])
-    
-    @db.sqls.should == [
-      'BEGIN',
-      'INSERT INTO "test" ("x", "y") VALUES (1, 2), (3, 4)',
-      'COMMIT'
-    ]
+    @db.sqls.should == ['BEGIN', 'INSERT INTO "test" ("x", "y") VALUES (1, 2), (3, 4)', 'COMMIT']
+    @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
+  end
+  
+  specify "#import should work correctly when returning primary keys for server_version < 80200" do
+    @ds.meta_def(:server_version){80199}
+    @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key).should == [1, 3]
+    @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
+  end
+  
+  specify "#import should work correctly when returning primary keys for server_version >= 80200" do
+    @ds.meta_def(:server_version){80200}
+    @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key).should == [1, 3]
+    @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
+  end
+  
+  specify "#import should work correctly when returning primary keys with :slice option for server_version < 80200" do
+    @ds.meta_def(:server_version){80199}
+    @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key, :slice=>1).should == [1, 3]
+    @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
+  end
+  
+  specify "#import should work correctly when returning primary keys with :slice option for server_version >= 80200" do
+    @ds.meta_def(:server_version){80200}
+    @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key, :slice=>1).should == [1, 3]
+    @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
+  end
+  
+  specify "#import should work correctly with an arbitrary returning value" do
+    @ds.meta_def(:server_version){80200}
+    @ds.returning(:y, :x).import([:x, :y], [[1, 2], [3, 4]]).should == [{:y=>2, :x=>1}, {:y=>4, :x=>3}]
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
 end
@@ -503,21 +520,26 @@ describe "Postgres::Dataset#insert" do
     @ds.all.should == [{:xid=>1, :value=>10}, {:xid=>2, :value=>20}, {:xid=>3, :value=>13}]
   end
   
-  specify "should call execute_insert if server_version < 80200" do
+  specify "should insert correctly if server_version < 80200" do
     @ds.meta_def(:server_version){80100}
-    @ds.should_receive(:execute_insert).once.with('INSERT INTO "test5" ("value") VALUES (10)', :table=>:test5, :values=>{:value=>10})
-    @ds.insert(:value=>10)
+    @ds.insert(:value=>10).should == 1
+    @ds.all.should == [{:xid=>1, :value=>10}]
   end
 
-  specify "should call execute_insert if disabling insert returning" do
-    @ds.disable_insert_returning!
-    @ds.should_receive(:execute_insert).once.with('INSERT INTO "test5" ("value") VALUES (10)', :table=>:test5, :values=>{:value=>10})
-    @ds.insert(:value=>10)
+  specify "should insert correctly if disabling insert returning" do
+    @ds.disable_insert_returning.insert(:value=>10).should == 1
+    @ds.all.should == [{:xid=>1, :value=>10}]
+  end
+
+  specify "should insert correctly if using a column array and a value array and server_version < 80200" do
+    @ds.meta_def(:server_version){80100}
+    @ds.insert([:value], [10]).should == 1
+    @ds.all.should == [{:xid=>1, :value=>10}]
   end
 
   specify "should use INSERT RETURNING if server_version >= 80200" do
     @ds.meta_def(:server_version){80201}
-    @ds.insert(:value=>10)
+    @ds.insert(:value=>10).should == 1
     @db.sqls.last.should == 'INSERT INTO "test5" ("value") VALUES (10) RETURNING "xid"'
   end
 

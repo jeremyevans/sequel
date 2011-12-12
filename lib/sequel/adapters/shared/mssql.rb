@@ -475,6 +475,24 @@ module Sequel
       end
       
       protected
+      
+      # If returned primary keys are requested, use OUTPUT unless already set on the
+      # dataset.  If OUTPUT is already set, use existing returning values.  If OUTPUT
+      # is only set to return a single columns, return an array of just that column.
+      # Otherwise, return an array of hashes.
+      def _import(columns, values, opts={})
+        if opts[:return] == :primary_key && !@opts[:output]
+          output(nil, [SQL::QualifiedIdentifier.new(:inserted, first_primary_key)])._import(columns, values, opts)
+        elsif @opts[:output]
+          statements = multi_insert_sql(columns, values)
+          @db.transaction(opts.merge(:server=>@opts[:server])) do
+            statements.map{|st| with_sql(st)}
+          end.first.map{|v| v.length == 1 ? v.values.first : v}
+        else
+          super
+        end
+      end
+
       # MSSQL does not allow ordering in sub-clauses unless 'top' (limit) is specified
       def aggregate_dataset
         (options_overlap(Sequel::Dataset::COUNT_FROM_SELF_OPTS) && !options_overlap([:limit])) ? unordered.from_self : super
@@ -507,6 +525,12 @@ module Sequel
       end
       alias update_from_sql delete_from2_sql
       
+      # Return the first primary key for the current table.  If this table has
+      # multiple primary keys, this will only return one of them.  Used by #_import.
+      def first_primary_key
+        @db.schema(self).map{|k, v| k if v[:primary_key] == true}.compact.first
+      end
+
       # MSSQL raises an error if you try to provide more than 3 decimal places
       # for a fractional timestamp.  This probably doesn't work for smalldatetime
       # fields.

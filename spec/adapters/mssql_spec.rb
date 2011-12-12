@@ -248,6 +248,23 @@ describe "MSSQL dataset" do
   end
 end
 
+describe "MSSQL::Dataset#import" do
+  before do
+    @db = MSSQL_DB
+    @db.create_table!(:test){primary_key :x; Integer :y}
+    @db.sqls.clear
+    @ds = @db[:test]
+  end
+  after do
+    @db.drop_table(:test) rescue nil
+  end
+  
+  specify "#import should work correctly with an arbitrary output value" do
+    @ds.output(nil, [:inserted__y, :inserted__x]).import([:y], [[3], [4]]).should == [{:y=>3, :x=>1}, {:y=>4, :x=>2}]
+    @ds.all.should == [{:x=>1, :y=>3}, {:x=>2, :y=>4}]
+  end
+end
+
 describe "MSSQL joined datasets" do
   before do
     @db = MSSQL_DB

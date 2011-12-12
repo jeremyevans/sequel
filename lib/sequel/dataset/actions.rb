@@ -229,31 +229,33 @@ module Sequel
     #   DB[:table].import([:x, :y], DB[:table2].select(:a, :b))
     #   # INSERT INTO table (x, y) SELECT a, b FROM table2 
     #
-    # The method also accepts a :slice or :commit_every option that specifies
-    # the number of records to insert per transaction. This is useful especially
-    # when inserting a large number of records, e.g.:
-    #
-    #   # this will commit every 50 records
-    #   dataset.import([:x, :y], [[1, 2], [3, 4], ...], :slice => 50)
+    # Options:
+    # :commit_every :: Open a new transaction for every given number of records.
+    #                  For example, if you provide a value of 50, will commit
+    #                  after every 50 records.
+    # :server :: Set the server/shard to use for the transaction and insert
+    #            queries.
+    # :slice :: Same as :commit_every, :commit_every takes precedence.
     def import(columns, values, opts={})
       return @db.transaction{insert(columns, values)} if values.is_a?(Dataset)
 
       return if values.empty?
       raise(Error, IMPORT_ERROR_MSG) if columns.empty?
+      ds = opts[:server] ? server(opts[:server]) : self
       
       if slice_size = opts[:commit_every] || opts[:slice]
         offset = 0
-        loop do
-          @db.transaction(opts){multi_insert_sql(columns, values[offset, slice_size]).each{|st| execute_dui(st)}}
+        rows = []
+        while offset < values.length
+          rows << ds._import(columns, values[offset, slice_size], opts)
           offset += slice_size
-          break if offset >= values.length
         end
+        rows.flatten
       else
-        statements = multi_insert_sql(columns, values)
-        @db.transaction{statements.each{|st| execute_dui(st)}}
+        ds._import(columns, values, opts)
       end
     end
-  
+
     # Inserts values into the associated table.  The returned value is generally
     # the value of the primary key for the inserted row, but that is adapter dependent.
     #
@@ -606,6 +608,19 @@ module Sequel
 
     protected
 
+    # Internals of #import.  If primary key values are requested, use
+    # separate insert commands for each row.  Otherwise, call #multi_insert_sql
+    # and execute each statement it gives separately.
+    def _import(columns, values, opts)
+      trans_opts = opts.merge(:server=>@opts[:server])
+      if opts[:return] == :primary_key
+        @db.transaction(trans_opts){values.map{|v| insert(columns, v)}}
+      else
+        stmts = multi_insert_sql(columns, values)
+        @db.transaction(trans_opts){stmts.each{|st| execute_dui(st)}}
+      end
+    end
+  
     # Return an array of arrays of values given by the symbols in ret_cols.
     def _select_map_multiple(ret_cols)
       map{|r| r.values_at(*ret_cols)}
