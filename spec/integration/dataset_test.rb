@@ -39,6 +39,12 @@ describe "Simple Dataset operations" do
     @ds.filter(:id=>2).first[:number].should == 20
   end
 
+  specify "should have insert_multiple return primary key values" do
+    @ds.insert_multiple([{:number=>20}, {:number=>30}]).should == [2, 3]
+    @ds.filter(:id=>2).get(:number).should == 20
+    @ds.filter(:id=>3).get(:number).should == 30
+  end
+
   specify "should join correctly" do
     @ds.join(:items___b, :id=>:id).select_all(:items).all.should == [{:id=>1, :number=>10}]
   end

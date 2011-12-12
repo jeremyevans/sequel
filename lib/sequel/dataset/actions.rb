@@ -300,21 +300,24 @@ module Sequel
     
     # Inserts multiple values. If a block is given it is invoked for each
     # item in the given array before inserting it.  See +multi_insert+ as
-    # a possible faster version that inserts multiple records in one
-    # SQL statement.
+    # a possibly faster version that may be able to insert multiple
+    # records in one SQL statement (if supported by the database).
+    # Returns an array of primary keys of inserted rows.
     #
     #   DB[:table].insert_multiple([{:x=>1}, {:x=>2}])
+    #   # => [4, 5]
     #   # INSERT INTO table (x) VALUES (1)
     #   # INSERT INTO table (x) VALUES (2)
     #
     #   DB[:table].insert_multiple([{:x=>1}, {:x=>2}]){|row| row[:y] = row[:x] * 2}
+    #   # => [6, 7]
     #   # INSERT INTO table (x, y) VALUES (1, 2)
     #   # INSERT INTO table (x, y) VALUES (2, 4)
     def insert_multiple(array, &block)
       if block
-        array.each {|i| insert(block[i])}
+        array.map{|i| insert(block.call(i))}
       else
-        array.each {|i| insert(i)}
+        array.map{|i| insert(i)}
       end
     end
     

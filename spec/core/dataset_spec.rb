@@ -2176,7 +2176,7 @@ end
 
 describe "Dataset#insert_multiple" do
   before do
-    @db = Sequel.mock
+    @db = Sequel.mock(:autoid=>2)
     @ds = @db[:items]
   end
   
@@ -2193,6 +2193,10 @@ describe "Dataset#insert_multiple" do
     @db.sqls.should == ["INSERT INTO items VALUES ('inevitabre')",
       "INSERT INTO items VALUES ('herro')",
       "INSERT INTO items VALUES ('the ticking crock')"]
+  end
+
+  specify "should return array of inserted ids" do
+    @ds.insert_multiple(['aa', 5, 3, {:a => 2}]).should == [2, 3, 4, 5]
   end
 end
 
