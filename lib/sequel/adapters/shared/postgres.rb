@@ -770,7 +770,14 @@ module Sequel
         elsif !@opts[:sql] && supports_insert_select?
           returning(insert_pk).insert(*values){|r| return r.values.first}
         elsif (f = opts[:from]) && !f.empty?
-          execute_insert(insert_sql(*values), :table=>f.first, :values=>values.size == 1 ? values.first : values)
+          v = if values.size == 1
+            values.first
+          elsif values.size == 2 && values.all?{|v0| v0.is_a?(Array)}
+            Hash[*values.first.zip(values.last).flatten]
+          else
+            values
+          end
+          execute_insert(insert_sql(*values), :table=>f.first, :values=>v)
         else
           super
         end

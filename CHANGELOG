@@ -1,5 +1,7 @@
 === HEAD
 
+* Correctly handle return value for Dataset#insert with column array and value array on PostgreSQL <8.2 (jeremyevans)
+
 * Dataset#insert_multiple now returns an array of inserted primary keys (jeremyevans) (#408)
 
 * Support RETURNING with DELETE and UPDATE on PostgreSQL 8.2+ (funny-falcon)
