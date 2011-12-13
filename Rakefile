@@ -117,15 +117,25 @@ begin
     end
   end
 
-  spec_with_cov = lambda do |name, files, d|
+  sc = spec_with_cov = lambda do |name, files, d|
     spec.call(name, files, d)
     t = spec.call("#{name}_cov", files, "#{d} with coverage")
     t.rcov = true
     t.rcov_opts = File.read("spec/rcov.opts").split("\n")
+    t
+  end
+
+  if RUBY_VERSION >= '1.8.7'
+    eval <<-END
+      spec_with_cov = lambda do |*x, &b|
+        t = sc.call(*x)
+        b.call(t) if b
+      end
+    END
   end
   
   task :default => [:spec]
-  spec_with_cov.call("spec", Dir["spec/{core,model}/*_spec.rb"], "Run core and model specs")
+  spec_with_cov.call("spec", Dir["spec/{core,model}/*_spec.rb"], "Run core and model specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/adapters/([a-ln-z]|m[a-np-z])"')}
   spec.call("spec_core", Dir["spec/core/*_spec.rb"], "Run core specs")
   spec.call("spec_model", Dir["spec/model/*_spec.rb"], "Run model specs")
   spec_with_cov.call("spec_plugin", Dir["spec/extensions/*_spec.rb"], "Run extension/plugin specs")
