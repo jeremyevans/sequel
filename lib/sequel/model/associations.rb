@@ -761,6 +761,10 @@ module Sequel
         # :key :: foreign key in current model's table that references
         #         associated model's primary key, as a symbol.  Defaults to :"#{name}_id".  Can use an
         #         array of symbols for a composite key association.
+        # :key_column :: Similar to, and usually identical to, :key, but :key refers to the model method
+        #                to call, where :key_column refers to the underlying column.  Should only be
+        #                used if the association has the same name as the foreign key column, in conjunction
+        #                with defining a model alias method for the key column.
         # :primary_key :: column in the associated table that :key option references, as a symbol.
         #                 Defaults to the primary key of the associated table. Can use an
         #                 array of symbols for a composite key association.
@@ -1121,8 +1125,13 @@ module Sequel
           name = opts[:name]
           model = self
           opts[:key] = opts.default_key unless opts.include?(:key)
-          key = opts[:key]
-          cks = opts[:keys] = Array(opts[:key])
+          key_column = key = opts[:key]
+          cks = opts[:graph_keys] = opts[:keys] = Array(key)
+          if opts[:key_column]
+            key_column = opts[:key_column]
+            opts[:eager_loader_key] ||= key_column
+            opts[:graph_keys] = Array(key_column)
+          end
           opts[:qualified_key] = opts.qualify_cur(key)
           if opts[:primary_key]
             cpks = Array(opts[:primary_key])
@@ -1136,7 +1145,7 @@ module Sequel
             klass.filter(Array(opts.qualified_primary_key).zip(cks.map{|k| send(k)}))
           end
           opts[:eager_loader] ||= proc do |eo|
-            h = eo[:key_hash][key]
+            h = eo[:key_hash][key_column]
             keys = h.keys
             # Default the cached association to nil, so any object that doesn't have it
             # populated will have cached the negative lookup.
@@ -1158,9 +1167,10 @@ module Sequel
           only_conditions = opts[:graph_only_conditions]
           conditions = opts[:graph_conditions]
           graph_block = opts[:graph_block]
+          graph_cks = opts[:graph_keys]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(cks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(graph_cks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
           end
       
           def_association_dataset_methods(opts)

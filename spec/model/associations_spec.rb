@@ -148,6 +148,21 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
   end
   
+  it "should allow association with the same name as the key if :key_alias is given" do
+    @c2.def_column_alias(:parent_id_id, :parent_id)
+    @c2.many_to_one :parent_id, :key_column=>:parent_id, :class => @c2
+    d = @c2.load(:id => 1, :parent_id => 234)
+    d.parent_id_dataset.sql.should == "SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"
+    d.parent_id.should == @c2.load(:x => 1, :id => 1)
+    d.parent_id_id.should == 234
+    d[:parent_id].should == 234
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
+
+    d.parent_id_id = 3
+    d.parent_id_id.should == 3
+    d[:parent_id].should == 3
+  end
+  
   it "should use implicit class if omitted" do
     begin
       class ::ParParent < Sequel::Model; end

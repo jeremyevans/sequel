@@ -584,6 +584,21 @@ describe "Sequel::Model Simple Associations" do
     it_should_behave_like "eager limit strategies"
   end unless Sequel.guarded?(:mysql, :db2, :oracle)
 
+  specify "should handle many_to_one associations with same name as :key" do
+    Album.def_column_alias(:artist_id_id, :artist_id)
+    Album.many_to_one :artist_id, :key_column =>:artist_id, :class=>Artist
+    @album.update(:artist_id_id => @artist.id)
+    @album.artist_id.should == @artist
+
+    as = Album.eager(:artist_id).all
+    as.should == [@album]
+    as.map{|a| a.artist_id}.should == [@artist]
+
+    as = Album.eager_graph(:artist_id).all
+    as.should == [@album]
+    as.map{|a| a.artist_id}.should == [@artist]
+  end
+
   specify "should handle aliased tables when eager_graphing" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)

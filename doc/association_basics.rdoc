@@ -1483,6 +1483,34 @@ If the default modification methods would not do what you want, and you
 don't plan on overriding the internal modification methods to do what you
 want, it may be best to set this option to true.
 
+==== :key_column [+many_to_one+]
+
+This option exists to make it possible to create a +many_to_one+ association
+with the same name as the foreign key it uses.  Before this option was
+introduced, this was problematic, since the :key option was used to refer
+both to the model methods and the underlying database columns (which are
+usually the same).
+
+If you have a legacy database with a foreign key that is the same as the name
+of the association you would like to use, you should create a column alias
+for the foreign key and use this option:
+
+  # Example schema:
+  #  albums           artists
+  #   :id        /-->  :id
+  #   :artist --/      :name
+  #   :name
+
+  class Album < Sequel::Model
+    def_column_alias(:artist_id, :artist)
+    many_to_one :artist, :key_column=>:artist
+  end
+
+Note that if you have control over the database, it's better to just rename
+the foreign key column than use this option.  Similarly, if you can think
+of another association name that will work, it's wiser to rename the
+association than use this option.  Think of this option as a last resort.
+
 ==== :validate
 
 Set to false to not validate when implicitly saving any associated object.
