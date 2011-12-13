@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.def_column_alias for defining alias methods for columns (jeremyevans)
+
 * Support :server option in Dataset#import and #multi_insert (jeremyevans)
 
 * Respect existing RETURNING/OUTPUT clauses in #import/#multi_insert on PostgreSQL/MSSQL (jeremyevans)

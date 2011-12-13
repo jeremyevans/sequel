@@ -234,6 +234,16 @@ module Sequel
         @db_schema ||= get_db_schema
       end
   
+      # Create a column alias, where the column methods have one name, but the underlying storage uses a
+      # different name.
+      def def_column_alias(meth, column)
+        clear_setter_methods_cache
+        overridable_methods_module.module_eval do
+          define_method(meth){self[column]}
+          define_method("#{meth}="){|v| self[column] = v}
+        end
+      end
+  
       # If a block is given, define a method on the dataset (if the model currently has an dataset)  with the given argument name using
       # the given block.  Also define a class method on the model that calls the
       # dataset method.  Stores the method name and block so that it can be reapplied if the model's

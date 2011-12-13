@@ -35,6 +35,26 @@ describe "Model attribute setters" do
   end
 end
 
+describe "Model.def_column_alias" do
+  before do
+    @o = Class.new(Sequel::Model(:items)) do
+      columns :id
+      def_column_alias(:id2, :id)
+    end.load(:id=>1)
+    MODEL_DB.reset
+  end
+
+  it "should create an getter alias for the column" do
+    @o.id2.should == 1
+  end
+
+  it "should create an setter alias for the column" do
+    @o.id2 = 2
+    @o.id2.should == 2
+    @o.values.should == {:id => 2}
+  end
+end
+
 describe Sequel::Model, "dataset" do
   before do
     @a = Class.new(Sequel::Model(:items))
