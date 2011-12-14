@@ -402,7 +402,7 @@ module Sequel
     # otherwise some columns could be missed or set to null instead of to default
     # values.
     #
-    # You can also use the :slice or :commit_every option that import accepts.
+    # This respects the same options as #import.
     def multi_insert(hashes, opts={})
       return if hashes.empty?
       columns = hashes.first.keys
