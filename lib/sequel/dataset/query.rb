@@ -218,7 +218,7 @@ module Sequel
         when Symbol
           sch, table, aliaz = split_symbol(s)
           if aliaz
-            s = sch ? SQL::QualifiedIdentifier.new(sch.to_sym, table.to_sym) : SQL::Identifier.new(table.to_sym)
+            s = sch ? SQL::QualifiedIdentifier.new(sch, table) : SQL::Identifier.new(table)
             sources << SQL::AliasedExpression.new(s, aliaz.to_sym)
           else
             sources << s

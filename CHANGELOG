@@ -1,5 +1,7 @@
 === HEAD
 
+* Dataset#from no longer handles :a__b__c___d as a.b.c AS d (jeremyevans)
+
 * Support many_to_one associations with the same name as their column, using the :key_column option (jeremyevans)
 
 * Add Model.def_column_alias for defining alias methods for columns (jeremyevans)

@@ -1134,6 +1134,10 @@ describe "Dataset#from" do
     @dataset.from(:'#___#').select_sql.should == 'SELECT * FROM # AS #'
   end
 
+  specify "should not handle :foo__schema__table___alias specially" do
+    @dataset.from(:foo__schema__table___alias).select_sql.should == "SELECT * FROM foo.schema__table AS alias"
+  end
+
   specify "should hoist WITH clauses from subqueries if the dataset doesn't support CTEs in subselects" do
     @dataset.meta_def(:supports_cte?){true}
     @dataset.meta_def(:supports_cte_in_subselect?){false}
@@ -1850,9 +1854,9 @@ describe "Dataset#first_source_table" do
   end
   
   specify "should be the unaliased part if aliased" do
-    @ds.from(:t___a).first_source_table.should == :t.identifier
-    @ds.from(:s__t___a).first_source_table.should == :t.qualify(:s)
-    @ds.from(:t.as(:a)).first_source_table.should == :t
+    @ds.literal(@ds.from(:t___a).first_source_table).should == "t"
+    @ds.literal(@ds.from(:s__t___a).first_source_table).should == "s.t"
+    @ds.literal(@ds.from(:t.as(:a)).first_source_table).should == "t"
   end
   
   specify "should raise exception if table doesn't have a source" do
