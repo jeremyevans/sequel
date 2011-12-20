@@ -226,6 +226,9 @@ module Sequel
 
       # Add a composite foreign key constraint
       def composite_foreign_key(columns, opts)
+        if (opts[:constraint_name] != nil) then
+            opts[:name] = opts[:constraint_name]
+        end
         constraints << {:type => :foreign_key, :columns => columns}.merge(opts)
       end
       
@@ -384,6 +387,9 @@ module Sequel
 
       # Add a composite primary key constraint
       def add_composite_primary_key(columns, opts)
+        if (opts[:constraint_name] != nil) then
+            opts[:name] = opts[:constraint_name]
+        end
         @operations << {:op => :add_constraint, :type => :primary_key, :columns => columns}.merge(opts)
       end
 
