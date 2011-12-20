@@ -77,7 +77,7 @@ module Sequel
       # Hash :: Always yield a single row with this hash
       # Array of Hashes :: Yield separately for each hash in this array
       # Array (otherwise) :: First retrieval gets the first value
-      #          in the array, second gets the second value, etc.
+      #                      in the array, second gets the second value, etc.
       # Proc :: Called with the select SQL query, uses
       #         the value returned, which should be a hash or
       #         array of hashes.
