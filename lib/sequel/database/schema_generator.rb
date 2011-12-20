@@ -125,6 +125,13 @@ module Sequel
       #   foreign_key(:artist_id) # artist_id INTEGER
       #   foreign_key(:artist_id, :artists) # artist_id INTEGER REFERENCES artists
       #   foreign_key(:artist_id, :artists, :key=>:id) # artist_id INTEGER REFERENCES artists(id)
+      #
+      # If you want a foreign key constraint without adding a column (usually because it is a
+      # composite foreign key), you can provide an array of columns as the first argument, and
+      # you can provide the :name option to name the constraint:
+      #
+      #   foreign_key([:artist_name, :artist_location], :artists, :name=>:artist_fk)
+      #   # ADD CONSTRAINT artist_fk FOREIGN KEY (artist_name, artist_location) REFERENCES artists
       def foreign_key(name, table=nil, opts = {})
         opts = case table
         when Hash
@@ -282,8 +289,8 @@ module Sequel
       # to the DDL for the table.  See Generator#column for the available options.
       #
       # You can also pass an array of column names for creating composite foreign
-      # keys. In this case, it will assume the columns exists and will only add
-      # the constraint.
+      # keys. In this case, it will assume the columns exist and will only add
+      # the constraint.  You can provide a :name option to name the constraint.
       #
       # NOTE: If you need to add a foreign key constraint to a single existing column
       # use the composite key syntax even if it is only one column.
