@@ -7,6 +7,7 @@ describe "instance_filters plugin" do
     @c.columns :id, :name, :num
     @c.plugin :instance_filters
     @p = @c.load(:id=>1, :name=>'John', :num=>1)
+    MODEL_DB.sqls
   end
 
   specify "should raise an error when updating a stale record" do
