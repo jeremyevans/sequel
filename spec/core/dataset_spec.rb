@@ -2778,10 +2778,10 @@ describe "Dataset#multi_insert" do
   
   specify "should accept string keys as column names" do
     @ds.multi_insert([{'x'=>1, 'y'=>2}, {'x'=>3, 'y'=>4}])
-    @db.sqls.should == ['BEGIN',
-      "INSERT INTO items (x, y) VALUES (1, 2)",
-      "INSERT INTO items (x, y) VALUES (3, 4)",
-      'COMMIT']
+    sqls = @db.sqls
+    ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].should include(sqls.slice!(1))
+    ["INSERT INTO items (x, y) VALUES (3, 4)", "INSERT INTO items (y, x) VALUES (4, 3)"].should include(sqls.slice!(1))
+    sqls.should == ['BEGIN', 'COMMIT']
   end
 
   specify "should not do anything if no hashes are provided" do
