@@ -1,0 +1,146 @@
+= New Features
+
+* The serialization plugin can now support custom serialization
+  formats, by supplying a serializer/deserializer pair of
+  callable objects.  You can also register custom deserializers
+  via Sequel::Plugins::Serialization.register_format, so that
+  they can be referenced by name.  Example:
+  
+    Sequel::Plugins::Serialization.register_format(:reverse,
+      lambda{|v| v.reverse},
+      lambda{|v| v.reverse})
+    class User < Sequel::Model
+      serialize_attributes :reverse, :password
+    end
+
+* Dataset#import and #multi_insert now support a
+  :return=>:primary_key option.  When this option is used, the
+  methods return an array of primary key values, one for each
+  inserted row.  Usage of this option on MySQL requires that a
+  separate query be issued per row (instead of the single
+  query for all rows that MySQL would usually use).
+  
+* PostgreSQL can now use Dataset#returning in conjunction with
+  import/multi_insert to set a custom column to return.
+  
+* Microsoft SQL Server can now use Dataset#output in conjection with
+  import/multi_insert to set a custom column to return.
+  
+* Dataset#import and #multi_insert now respect a :server option to
+  set the server/shard on which to execute the queries.
+  Additionally, options given to this method are also passed to
+  Dataset#transaction.
+
+* Dataset#insert_multiple now returns an array of inserted primary
+  keys.
+
+* Model.def_column_alias has been added to make it easy to create
+  alias methods for columns.  This is useful if you have a legacy
+  database and want to create friendly method names for the
+  underlying columns.  Note that this alias only affects the setter
+  and getter methods.  This does not affect the dataset level, so you
+  still need to use the actual column names in dataset filters.
+
+* many_to_one associations can now have the same name as the related
+  foreign key column, using the :key_column option.  Use of this
+  feature is not recommended, as it is much better to either rename
+  the column or rename the association.  Here's an example of usage:
+  
+    # Example schema:
+    #  albums           artists
+    #   :id        /-->  :id
+    #   :artist --/      :name
+    #   :name
+    class Album < Sequel::Model
+      def_column_alias(:artist_id, :artist)
+      many_to_one :artist, :key_column=>:artist
+    end
+
+* The mock adapter can now mock out database types, by providing a
+  shared adapter name as the host (e.g. mock://postgres).  This
+  emulation is not perfect, but in most cases it allows you to see
+  what SQL Sequel would generate on a given database without needing
+  to install the required database driver.
+
+* Sequel now supports creating full text indexes on Microsoft SQL
+  Server.  Before using it, you must have previously setup a default
+  full text search catalog, and you need to provide a :key_index
+  option with an index name symbol.
+  
+* Dataset#group_rollup and #group_cube methods have been added for
+  GROUP BY ROLLUP and GROUP BY CUBE support.  These features are in
+  a recent SQL standard, and they are supported to various degrees on
+  Microsoft SQL Server, DB2, Oracle, MySQL, and Derby.
+
+* Dataset#full_text_search on Microsoft SQL Server now supports
+  multiple search terms.
+  
+* The jdbc adapter now supports a :login_timeout option, giving the
+  timeout in seconds.
+
+= Other Improvements
+
+* Dataset#exists can now be used with prepared statement
+  placeholders.
+
+* Dataset#full_text_search can now be used with prepared statement
+  placeholders on PostgreSQL, MySQL, and Microsoft SQL Server.
+  
+* If tables from two separate schema are detected when parsing the
+  schema for a table on PostgreSQL, an error is now raised.
+  Previously, no error was raised, which led to weird errors later,
+  such as duplicate columns in a model's primary_key.
+
+* RETURNING is now supported with UPDATE/DELETE on PostgreSQL 8.2+.
+  Previously, Sequel only supported it on 9.1+, but PostgreSQL
+  introduced support for it in 8.2.
+
+* The shared postgres adapter now correctly handles the return value
+  for Dataset#insert if you provide a separate column array and value
+  array on PostgreSQL < 8.2.
+  
+* Handle case in the PostgreSQL adapter where the server version
+  cannot be determined via a query.
+  
+* H2 clob types are now treated as string instead of as blob.
+  Treating clob as blob breaks on H2, as it doesn't automatically
+  hex-unescape the input for clobs as it does for blobs.
+  
+* Dataset#empty? now works correctly when the dataset has an offset
+  and offset support is being emulated.
+
+* The mock adapter no longer defaults to downcasing identifiers on
+  output.
+
+= Backwards Compatibility
+
+* Dataset#exists now returns a PlaceholderLiteralString instead of a
+  LiteralString, which could potentially break some code.  If you
+  would like a String returned, you can pass the returned object to
+  Dataset#literal:
+  
+    dataset.literal(dataset.exists)
+
+* Dataset#from no longer handles :a__b__c___d as "a.b.c AS d".  This
+  was not the intended behavior, and nowhere else in Sequel is a
+  symbol treated that way.  Now, Dataset#from is consistent with the
+  rest of Sequel, using "a.b__c AS d".  This should only affect
+  people in very rare cases, as most databases don't use three level
+  qualified tables.  One exception is Microsoft SQL Server, which can
+  use three level qualified tables for cross-database access.
+  
+* Previously, Dataset#insert_multiple returned an array of hashes, now
+  it returns an array of primary key values.
+
+* Dataset#EXRACT_CLOSE in the shared sqlite adapter has been renamed to
+  Dataset#EXTRACT_CLOSE.
+  
+* Dataset::StoredProcedureMethods::SQL_QUERY_TYPE and
+  Dataset::ArgumentMapper::SQL_QUERY_TYPE constants have been removed,
+  as have related sql_query_type private methods.
+
+* The serialization plugin was significantly refactored.
+  Model.serialization_map now contains a callable object instead of a
+  Symbol, and Model.serialization_format has been removed.
+  Model.define_serialized_attribute_accessors private method now takes
+  two callable objects before the columns, instead of a single symbol.

@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.31.0 (2012-01-03)
 
 * Dataset#from no longer handles :a__b__c___d as a.b.c AS d (jeremyevans)
 
