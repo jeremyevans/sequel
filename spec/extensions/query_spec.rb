@@ -17,6 +17,12 @@ describe "Dataset#query" do
     @d = Sequel::Dataset.new(nil)
   end
   
+  specify "should allow cloning without arguments" do
+    q = @d.query {clone}
+    q.class.should == @d.class
+    q.sql.should == "SELECT *"
+  end
+  
   specify "should support #from" do
     q = @d.query {from :xxx}
     q.class.should == @d.class

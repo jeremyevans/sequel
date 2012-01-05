@@ -43,7 +43,7 @@ module Sequel
 
       # Merge the given options into the receiver's options and return the receiver
       # instead of cloning the receiver.
-      def clone(opts = nil)
+      def clone(opts = {})
         @opts.merge!(opts)
         self
       end
