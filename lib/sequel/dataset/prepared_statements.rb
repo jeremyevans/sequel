@@ -77,6 +77,7 @@ module Sequel
       def prepared_sql
         case @prepared_type
         when :select, :all
+          # Most common scenario, so listed first.
           select_sql
         when :first
           clone(:limit=>1).select_sql
@@ -88,6 +89,8 @@ module Sequel
           update_sql(*@prepared_modify_values)
         when :delete
           delete_sql
+        else
+          select_sql
         end
       end
       
@@ -122,6 +125,7 @@ module Sequel
       def run(&block)
         case @prepared_type
         when :select, :all
+          # Most common scenario, so listed first
           all(&block)
         when :insert_select
           with_sql(prepared_sql).first
@@ -133,6 +137,13 @@ module Sequel
           update(*@prepared_modify_values)
         when :delete
           delete
+        when Array
+          case @prepared_type.at(0)
+          when :map, :to_hash
+            send(*@prepared_type, &block) 
+          end
+        else
+          all(&block)
         end
       end
       

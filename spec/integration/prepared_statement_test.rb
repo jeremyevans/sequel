@@ -16,15 +16,18 @@ describe "Prepared Statements and Bound Arguments" do
     @db.drop_table(:items)
   end
   
-  specify "should support bound variables with select, all, and first" do
+  specify "should support bound variables when selecting" do
     @ds.filter(:numb=>:$n).call(:select, :n=>10).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).call(:all, :n=>10).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).call(:first, :n=>10).should == {:id=>1, :numb=>10}
+    @ds.filter(:numb=>:$n).call([:map, :numb], :n=>10).should == [10]
+    @ds.filter(:numb=>:$n).call([:to_hash, :id, :numb], :n=>10).should == {1=>10}
   end
     
-  specify "should support blocks for select and all" do
+  specify "should support blocks for select, all, and map " do
     @ds.filter(:numb=>:$n).call(:select, :n=>10){|r| r[:numb] *= 2}.should == [{:id=>1, :numb=>20}]
     @ds.filter(:numb=>:$n).call(:all, :n=>10){|r| r[:numb] *= 2}.should == [{:id=>1, :numb=>20}]
+    @ds.filter(:numb=>:$n).call([:map], :n=>10){|r| r[:numb] * 2}.should == [20]
   end
     
   specify "should support binding variables before the call with #bind" do
@@ -120,13 +123,17 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.all.should == [{:id=>1, :numb=>30}]
   end
   
-  specify "should support prepared statements with select, first, and all" do
+  specify "should support prepared statements when selecting" do
     @ds.filter(:numb=>:$n).prepare(:select, :select_n)
     @db.call(:select_n, :n=>10).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).prepare(:all, :select_n)
     @db.call(:select_n, :n=>10).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).prepare(:first, :select_n)
     @db.call(:select_n, :n=>10).should == {:id=>1, :numb=>10}
+    @ds.filter(:numb=>:$n).prepare([:map, :numb], :select_n)
+    @db.call(:select_n, :n=>10).should == [10]
+    @ds.filter(:numb=>:$n).prepare([:to_hash, :id, :numb], :select_n)
+    @db.call(:select_n, :n=>10).should == {1=>10}
   end
 
   specify "should support prepared statements being call multiple times with different arguments" do

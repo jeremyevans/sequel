@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :map and :to_hash prepared statement types (jeremyevans)
+
 * Make Dataset#naked! work correctly (jeremyevans)
 
 * Remove Dataset#paginate!, as it was broken (jeremyevans)

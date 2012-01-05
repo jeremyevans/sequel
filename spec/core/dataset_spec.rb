@@ -3106,12 +3106,16 @@ describe "Dataset prepared statements and bound variables " do
   
   specify "#call should take a type and bind hash and interpolate it" do
     @ds.filter(:num=>:$n).call(:select, :n=>1)
+    @ds.filter(:num=>:$n).call([:map, :a], :n=>1)
+    @ds.filter(:num=>:$n).call([:to_hash, :a, :b], :n=>1)
     @ds.filter(:num=>:$n).call(:first, :n=>1)
     @ds.filter(:num=>:$n).call(:delete, :n=>1)
     @ds.filter(:num=>:$n).call(:update, {:n=>1, :n2=>2}, :num=>:$n2)
     @ds.call(:insert, {:n=>1}, :num=>:$n)
     @ds.call(:insert_select, {:n=>1}, :num=>:$n)
     @db.sqls.should == ['SELECT * FROM items WHERE (num = 1)',
+      'SELECT * FROM items WHERE (num = 1)',
+      'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1) LIMIT 1',
       'DELETE FROM items WHERE (num = 1)',
       'UPDATE items SET num = 2 WHERE (num = 1)',
@@ -3122,20 +3126,26 @@ describe "Dataset prepared statements and bound variables " do
   specify "#prepare should take a type and name and store it in the database for later use with call" do
     pss = []
     pss << @ds.filter(:num=>:$n).prepare(:select, :sn)
+    pss << @ds.filter(:num=>:$n).prepare([:map, :a], :sm)
+    pss << @ds.filter(:num=>:$n).prepare([:to_hash, :a, :b], :sh)
     pss << @ds.filter(:num=>:$n).prepare(:first, :fn)
     pss << @ds.filter(:num=>:$n).prepare(:delete, :dn)
     pss << @ds.filter(:num=>:$n).prepare(:update, :un, :num=>:$n2)
     pss << @ds.prepare(:insert, :in, :num=>:$n)
     pss << @ds.prepare(:insert_select, :ins, :num=>:$n)
-    @db.prepared_statements.keys.sort_by{|k| k.to_s}.should == [:dn, :fn, :in, :ins, :sn, :un]
-    [:sn, :fn, :dn, :un, :in, :ins].each_with_index{|x, i| @db.prepared_statements[x].should == pss[i]}
+    @db.prepared_statements.keys.sort_by{|k| k.to_s}.should == [:dn, :fn, :in, :ins, :sh, :sm, :sn, :un]
+    [:sn, :sm, :sh, :fn, :dn, :un, :in, :ins].each_with_index{|x, i| @db.prepared_statements[x].should == pss[i]}
     @db.call(:sn, :n=>1)
+    @db.call(:sm, :n=>1)
+    @db.call(:sh, :n=>1)
     @db.call(:fn, :n=>1)
     @db.call(:dn, :n=>1)
     @db.call(:un, :n=>1, :n2=>2)
     @db.call(:in, :n=>1)
     @db.call(:ins, :n=>1)
     @db.sqls.should == ['SELECT * FROM items WHERE (num = 1)',
+      'SELECT * FROM items WHERE (num = 1)',
+      'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1) LIMIT 1',
       'DELETE FROM items WHERE (num = 1)',
       'UPDATE items SET num = 2 WHERE (num = 1)',
