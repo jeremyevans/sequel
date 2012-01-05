@@ -1581,10 +1581,20 @@ describe "Dataset#limit" do
 end
 
 describe "Dataset#naked" do
-  specify "should remove any existing row_proc" do
+  specify "should returned clone dataset without row_proc" do
     d = Sequel::Dataset.new(nil)
     d.row_proc = Proc.new{|r| r}
     d.naked.row_proc.should be_nil
+    d.row_proc.should_not be_nil
+  end
+end
+
+describe "Dataset#naked!" do
+  specify "should remove any existing row_proc" do
+    d = Sequel::Dataset.new(nil)
+    d.row_proc = Proc.new{|r| r}
+    d.naked!.row_proc.should be_nil
+    d.row_proc.should be_nil
   end
 end
 

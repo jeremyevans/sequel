@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Dataset#naked! work correctly (jeremyevans)
+
+* Remove Dataset#paginate!, as it was broken (jeremyevans)
+
 * Fix query extension to not break usage of #clone without arguments (jeremyevans) (#413)
 
 === 3.31.0 (2012-01-03)
