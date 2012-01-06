@@ -276,6 +276,10 @@ module Sequel
       def disconnect_connection(c)
       end
 
+      def log_connection_execute(c, sql)
+        c.execute(sql)
+      end
+
       def quote_identifiers_default
         false
       end
