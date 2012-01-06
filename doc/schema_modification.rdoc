@@ -515,7 +515,7 @@ mess up the migration.
 <tt>create_table?</tt> with a question mark only creates the table if it does
 not already exist, so:
 
-  create_table!(:artists)
+  create_table?(:artists)
     primary_key :id
   end
 
