@@ -1080,7 +1080,7 @@ module Sequel
       #   a = Artist[1]
       #   a.modified? # => false
       #   a.set(:name=>'Jim')
-      #   a.modified # => true
+      #   a.modified? # => true
       def modified?
         @modified || !changed_columns.empty?
       end
