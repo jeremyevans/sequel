@@ -1,20 +1,75 @@
 module Sequel
   module Plugins
-    # The nested_attributes plugin allows you to update attributes for associated
-    # objects directly through the parent object, similar to ActiveRecord's
-    # Nested Attributes feature.
-    #
-    # Nested attributes are created using the nested_attributes method:
+    # The nested_attributes plugin allows you to create, update, and delete
+    # associated objects directly by calling a method on the current object.
+    # Nested attributes are defined using the nested_attributes class method:
     #
     #   Artist.one_to_many :albums
     #   Artist.plugin :nested_attributes
     #   Artist.nested_attributes :albums
-    #   a = Artist.new(:name=>'YJM',
-    #    :albums_attributes=>[{:name=>'RF'}, {:name=>'MO'}])
-    #   # No database activity yet
     #
-    #   a.save # Saves artist and both albums
-    #   a.albums.map{|x| x.name} # ['RF', 'MO']
+    # The nested_attributes call defines a single method, <tt><i>association</i>_attributes=</tt>,
+    # (e.g. <tt>albums_attributes=</tt>).  So if you have an Artist instance:
+    #
+    #   a = Artist.new(:name=>'YJM')
+    #
+    # You can create new album instances related to this artist:
+    #
+    #   a.albums_attributes = [{:name=>'RF'}, {:name=>'MO'}]
+    #
+    # Note that this doesn't send any queries to the database yet.  That doesn't happen till
+    # you save the object:
+    #
+    #   a.save
+    #
+    # That will save the artist first, and then save both albums.  If either the artist
+    # is invalid or one of the albums is invalid, none of the objects will be saved to the
+    # database, and all related validation errors will be available in the artist's validation
+    # errors.
+    #
+    # In addition to creating new associated objects, you can also update existing associated
+    # objects.  You just need to make sure that the primary key field is filled in for the
+    # associated object:
+    #
+    #   a.update(:albums_attributes => [{:id=>1, :name=>'T'}])
+    #
+    # Since the primary key field is filled in, the plugin will update the album with id 1 instead
+    # of creating a new album.
+    #
+    # If you would like to delete the associated object instead of updating it, you add a _delete
+    # entry to the hash:
+    #
+    #   a.update(:albums_attributes => [{:id=>1, :_delete=>true}])
+    #
+    # This will delete the related associated object from the database.  If you want to leave the
+    # associated object in the database, but just remove it from the association, add a _remove
+    # entry in the hash:
+    #
+    #   a.update(:albums_attributes => [{:id=>1, :_remove=>true}])
+    #
+    # The above example was for a one_to_many association, but the plugin also works similarly
+    # for other association types.  For one_to_one and many_to_one associations, you need to
+    # pass a single hash instead of an array of hashes.
+    #
+    # This plugin is mainly designed to make it easy to use on html forms, where a single form
+    # submission can contained nested attributes (and even nested attributes of those attributes).
+    # You just need to name your form inputs correctly:
+    #
+    #   artist[name]
+    #   artist[albums_attributes][0][:name]
+    #   artist[albums_attributes][1][:id]
+    #   artist[albums_attributes][1][:name]
+    #
+    # Your web stack will probably parse that into a nested hash similar to:
+    #
+    #   {:artist=>{:name=>?, :albums_attributes=>{0=>{:name=>?}, 1=>{:id=>?, :name=>?}}}}
+    #
+    # Then you can do:
+    #
+    #   artist.update(params[:artist])
+    #
+    # To save changes to the artist, create the first album and associate it to the artist,
+    # and update the other existing associated album.
     module NestedAttributes
       # Depend on the instance_hooks plugin.
       def self.apply(model)
