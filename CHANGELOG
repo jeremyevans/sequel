@@ -1,5 +1,7 @@
 === HEAD
 
+* Add use_after_commit_rollback setting to models, can be turned off to allow model usage with prepared transactions (jeremyevans)
+
 * Fix alter table emulation on SQLite when foreign keys reference the table being altered (jeremyevans)
 
 * Fix progress shared adapter, broken since the dataset literalization refactoring (jeremyevans) (#414)

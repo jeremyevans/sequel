@@ -86,6 +86,11 @@ module Sequel
       # database to typecast the value correctly.
       attr_accessor :typecast_on_assignment
   
+      # Whether to enable the after_commit and after_rollback hooks when saving/destroying
+      # instances.  On by default, can be turned off for performance reasons or when using
+      # prepared transactions (which aren't compatible with after commit/rollback).
+      attr_accessor :use_after_commit_rollback
+  
       # Whether to use a transaction by default when saving/deleting records (default: true).
       # If you are sending database queries in before_* or after_* hooks, you shouldn't change
       # the default setting without a good reason.
@@ -1360,7 +1365,7 @@ module Sequel
       # allow running inside a transaction
       def _destroy(opts)
         sh = {:server=>this_server}
-        db.after_rollback(sh){after_destroy_rollback}
+        db.after_rollback(sh){after_destroy_rollback} if use_after_commit_rollback
         called = false
         around_destroy do
           called = true
@@ -1370,7 +1375,7 @@ module Sequel
           true
         end
         raise_hook_failure(:destroy) unless called
-        db.after_commit(sh){after_destroy_commit}
+        db.after_commit(sh){after_destroy_commit} if use_after_commit_rollback
         self
       end
       
@@ -1432,7 +1437,7 @@ module Sequel
       # it's own transaction.
       def _save(columns, opts)
         sh = {:server=>this_server}
-        db.after_rollback(sh){after_rollback}
+        db.after_rollback(sh){after_rollback} if use_after_commit_rollback
         was_new = false
         pk = nil
         called_save = false
@@ -1486,7 +1491,7 @@ module Sequel
           @columns_updated = nil
         end
         @modified = false
-        db.after_commit(sh){after_commit}
+        db.after_commit(sh){after_commit} if use_after_commit_rollback
         self
       end
 

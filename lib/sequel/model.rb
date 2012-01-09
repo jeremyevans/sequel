@@ -70,7 +70,8 @@ module Sequel
     EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@db]
 
     # Boolean settings that can be modified at the global, class, or instance level.
-    BOOLEAN_SETTINGS = [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions]
+    BOOLEAN_SETTINGS = [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, \
+      :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_after_commit_rollback, :use_transactions]
 
     # Hooks that are called before an action.  Can return false to not do the action.  When
     # overriding these, it is recommended to call +super+ as the last line of your method,
@@ -103,7 +104,8 @@ module Sequel
       :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
       :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
-      :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil}
+      :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
+      :@use_after_commit_rollback=>nil}
 
     # Regular expression that determines if a method name is normal in the sense that
     # it could be used literally in ruby code without using send.  Used to
@@ -133,6 +135,7 @@ module Sequel
     @strict_param_setting = true
     @typecast_empty_string_to_nil = true
     @typecast_on_assignment = true
+    @use_after_commit_rollback = true
     @use_transactions = true
 
     Sequel.require %w"default_inflections inflections plugins base exceptions errors", "model"

@@ -134,6 +134,16 @@ describe "Database transactions" do
   end
 
   if INTEGRATION_DB.supports_prepared_transactions?
+    specify "should allow saving and destroying of model objects" do
+      c = Class.new(Sequel::Model(@d))
+      c.set_primary_key :name
+      c.unrestrict_primary_key
+      c.use_after_commit_rollback = false
+      @db.transaction(:prepare=>'XYZ'){c.create(:name => '1'); c.create(:name => '2').destroy}
+      @db.commit_prepared_transaction('XYZ')
+      @d.select_order_map(:name).should == ['1']
+    end
+
     specify "should commit prepared transactions using commit_prepared_transaction" do
       @db.transaction(:prepare=>'XYZ'){@d << {:name => '1'}}
       @db.commit_prepared_transaction('XYZ')

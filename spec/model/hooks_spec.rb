@@ -510,4 +510,44 @@ describe "Model#after_commit and #after_rollback" do
     end
     @db.sqls.should == ['BEGIN -- test', 'BEGIN', 'ad', 'ROLLBACK', 'adr', 'COMMIT -- test']
   end
+
+  specify "should not call after_commit if use_after_commit_rollback is false" do
+    @o.use_after_commit_rollback = false
+    @o.save
+    @db.sqls.should == ['BEGIN', 'as', 'COMMIT']
+  end
+
+  specify "should not call after_rollback if use_after_commit_rollback is false" do
+    @o.use_after_commit_rollback = false
+    @o.rb = true
+    @o.save
+    @db.sqls.should == ['BEGIN', 'as', 'ROLLBACK']
+  end
+
+  specify "should not call after_destroy_commit if use_after_commit_rollback is false" do
+    @o.use_after_commit_rollback = false
+    @o.destroy
+    @db.sqls.should == ['BEGIN', 'ad', 'COMMIT']
+  end
+
+  specify "should not call after_destroy_rollback for save if use_after_commit_rollback is false" do
+    @o.use_after_commit_rollback = false
+    @o.rb = true
+    @o.destroy
+    @db.sqls.should == ['BEGIN', 'ad', 'ROLLBACK']
+  end
+
+  specify "should handle use_after_commit_rollback at the class level" do
+    @m.use_after_commit_rollback = false
+    @o.save
+    @db.sqls.should == ['BEGIN', 'as', 'COMMIT']
+  end
+
+  specify "should handle use_after_commit_rollback when subclassing" do
+    @m.use_after_commit_rollback = false
+    o = Class.new(@m).load({})
+    @db.sqls
+    o.save
+    @db.sqls.should == ['BEGIN', 'as', 'COMMIT']
+  end
 end
