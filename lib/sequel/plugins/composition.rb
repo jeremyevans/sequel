@@ -1,20 +1,53 @@
 module Sequel
   module Plugins
-    # The composition plugin allows you to easily define getter and
-    # setter instance methods for a class where the backing data
-    # is composed of other getters and decomposed to other setters.
+    # The composition plugin allows you to easily define a virtual
+    # attribute where the backing data is composed of other columns.
     #
-    # A simple example of this is when you have a database table with
-    # separate columns for year, month, and day, but where you want
-    # to deal with Date objects in your ruby code.  This can be handled
-    # with:
+    # There are two ways to use the plugin.  One way is with the
+    # :mapping option.  A simple example of this is when you have a
+    # database table with separate columns for year, month, and day,
+    # but where you want to deal with Date objects in your ruby code.
+    # This can be handled with:
     #
     #   Album.plugin :composition
     #   Album.composition :date, :mapping=>[:year, :month, :day]
     #
-    # The :mapping option is optional, but you can define custom
-    # composition and decomposition procs via the :composer and
-    # :decomposer options.
+    # With the :mapping option, you can provide a :class option
+    # that gives the class to use, but if that is not provided, it
+    # is inferred from the name of the composition (e.g. :date -> Date).
+    # When the <tt>date</tt> method is called, it will return a
+    # Date object by calling:
+    #
+    #   Date.new(year, month, day)
+    #
+    # When saving the object, if the date composition has been used
+    # (by calling either the getter or setter method), it will
+    # populate the related columns of the object before saving:
+    #
+    #   self.year = date.year
+    #   self.month = date.month
+    #   self.day = date.day
+    #
+    # The :mapping option is just a shortcut that works in particular
+    # cases.  To handle any case, you can define a custom :composer
+    # and :decomposer procs.  The :composer proc will be instance_evaled
+    # the first time the getter is called, and the :decomposer proc
+    # will be instance_evaled before saving.  The above example could
+    # also be implemented as:
+    #
+    #   Album.composition, :date,
+    #     :composer=>proc{Date.new(year, month, day) if year || month || day},
+    #     :decomposer=>(proc do
+    #       if d = compositions[:date]
+    #         self.year = d.year
+    #         self.month = d.month
+    #         self.day = d.day
+    #       else
+    #         self.year = nil
+    #         self.month = nil
+    #         self.day = nil
+    #       end
+    #     end)
     #
     # Note that when using the composition object, you should not
     # modify the underlying columns if you are also instantiating
