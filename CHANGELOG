@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix alter table emulation on SQLite when foreign keys reference the table being altered (jeremyevans)
+
 * Fix progress shared adapter, broken since the dataset literalization refactoring (jeremyevans) (#414)
 
 * Support :map and :to_hash prepared statement types (jeremyevans)

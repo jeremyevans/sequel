@@ -170,6 +170,8 @@ module Sequel
       # Run all alter_table commands in a transaction.  This is technically only
       # needed for drop column.
       def apply_alter_table(table, ops)
+        fks = foreign_keys
+        self.foreign_keys = false if fks
         transaction do 
           if ops.length > 1 && ops.all?{|op| op[:op] == :add_constraint}
             # If you are just doing constraints, apply all of them at the same time,
@@ -181,6 +183,7 @@ module Sequel
             ops.each{|op| alter_table_sql_list(table, [op]).flatten.each{|sql| execute_ddl(sql)}}
           end
         end
+        self.foreign_keys = true if fks
       end
 
       # SQLite supports limited table modification.  You can add a column
@@ -268,15 +271,13 @@ module Sequel
         end
 
         begin
-          if foreign_keys
-            metadata_dataset.with_sql("PRAGMA foreign_key_list(?)", input_identifier_meth.call(table)).each do |row|
-              c = cols.find {|co| co[:name] == row[:from] } or next
-              c[:table] = row[:table]
-              c[:key] = row[:to]
-              c[:on_update] = on_delete_sql_to_sym(row[:on_update])
-              c[:on_delete] = on_delete_sql_to_sym(row[:on_delete])
-              # is there any way to get deferrable status?
-            end
+          metadata_dataset.with_sql("PRAGMA foreign_key_list(?)", input_identifier_meth.call(table)).each do |row|
+            c = cols.find {|co| co[:name] == row[:from] } or next
+            c[:table] = row[:table]
+            c[:key] = row[:to]
+            c[:on_update] = on_delete_sql_to_sym(row[:on_update])
+            c[:on_delete] = on_delete_sql_to_sym(row[:on_delete])
+            # is there any way to get deferrable status?
           end
         rescue Sequel::DatabaseError
           # Doesn't work correctly on some versions of JDBC SQLite,

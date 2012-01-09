@@ -320,6 +320,21 @@ describe "Database schema modifiers" do
     proc{@ds.insert(:n=>nil)}.should raise_error(Sequel::DatabaseError)
   end
 
+  specify "should rename columns when the table is referenced by a foreign key" do
+    begin
+      @db.create_table!(:itemsfk){primary_key :id; Integer :a}
+      @db.create_table!(:items){foreign_key :id, :itemsfk}
+      @db[:itemsfk].insert(:a=>10)
+      @ds.insert(:id=>1)
+      @db.alter_table(:itemsfk){rename_column :a, :b}
+      @db[:itemsfk].insert(:b=>20)
+      @ds.insert(:id=>2)
+      @db[:itemsfk].select_order_map([:id, :b]).should == [[1, 10], [2, 20]]
+    ensure
+      @db.drop_table(:items, :itemsfk)
+    end
+  end
+
   cspecify "should set column NULL/NOT NULL correctly", [:jdbc, :db2], [:db2] do
     @db.create_table!(:items, :engine=>:InnoDB){Integer :id}
     @ds.insert(:id=>10)
