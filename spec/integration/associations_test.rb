@@ -838,3 +838,101 @@ describe "Sequel::Model Composite Key Associations" do
     proc{@artist.remove_album(@album)}.should raise_error(Sequel::Error)
   end
 end
+
+describe "Sequel::Model Associations with clashing column names" do
+  before(:all) do
+    @db = INTEGRATION_DB
+    [:bars_foos, :bars, :foos].each{|t| @db.drop_table(t) rescue nil}
+    @db.create_table(:foos) do
+      primary_key :id
+      Integer :object_id
+    end
+    @db.create_table(:bars) do
+      primary_key :id
+      Integer :object_id
+    end
+    @db.create_table(:bars_foos) do
+      Integer :foo_id
+      Integer :object_id
+      primary_key [:foo_id, :object_id]
+    end
+  end
+  before do
+    [:bars_foos, :bars, :foos].each{|t| @db[t].delete}
+    @Foo = Class.new(Sequel::Model(:foos))
+    @Bar = Class.new(Sequel::Model(:bars))
+    @Foo.def_column_alias(:obj_id, :object_id)
+    @Bar.def_column_alias(:obj_id, :object_id)
+    @Foo.one_to_many :bars, :primary_key=>:obj_id, :primary_key_column=>:object_id, :key=>:object_id, :key_method=>:obj_id, :eager_loader_key=>:object_id, :class=>@Bar
+    @Foo.one_to_one :bar, :primary_key=>:obj_id, :primary_key_column=>:object_id, :key=>:object_id, :key_method=>:obj_id, :eager_loader_key=>:object_id, :class=>@Bar
+    @Bar.many_to_one :foo, :key=>:obj_id, :key_column=>:object_id, :primary_key=>:object_id, :primary_key_method=>:obj_id, :class=>@Foo
+    @Foo.many_to_many :mtmbars, :join_table=>:bars_foos, :left_primary_key=>:obj_id, :left_primary_key_column=>:object_id, :right_primary_key=>:object_id, :right_primary_key_method=>:obj_id, :left_key=>:foo_id, :right_key=>:object_id, :eager_loader_key=>:object_id, :class=>@Bar
+    @Bar.many_to_many :mtmfoos, :join_table=>:bars_foos, :left_primary_key=>:obj_id, :left_primary_key_column=>:object_id, :right_primary_key=>:object_id, :right_primary_key_method=>:obj_id, :left_key=>:object_id, :right_key=>:foo_id, :eager_loader_key=>:object_id, :class=>@Foo
+    @foo = @Foo.create(:obj_id=>2)
+    @bar = @Bar.create(:obj_id=>2)
+    @Foo.db[:bars_foos].insert(2, 2)
+  end
+  after(:all) do
+    @db.drop_table(:bars_foos, :bars, :foos)
+  end
+
+  it "should have working regular association methods" do
+    @Bar.first.foo.should == @foo
+    @Foo.first.bars.should == [@bar]
+    @Foo.first.bar.should == @bar
+    @Foo.first.mtmbars.should == [@bar]
+    @Bar.first.mtmfoos.should == [@foo]
+  end
+
+  it "should have working eager loading methods" do
+    @Bar.eager(:foo).all.map{|o| [o, o.foo]}.should == [[@bar, @foo]]
+    @Foo.eager(:bars).all.map{|o| [o, o.bars]}.should == [[@foo, [@bar]]]
+    @Foo.eager(:bar).all.map{|o| [o, o.bar]}.should == [[@foo, @bar]]
+    @Foo.eager(:mtmbars).all.map{|o| [o, o.mtmbars]}.should == [[@foo, [@bar]]]
+    @Bar.eager(:mtmfoos).all.map{|o| [o, o.mtmfoos]}.should == [[@bar, [@foo]]]
+  end
+
+  it "should have working eager graphing methods" do
+    @Bar.eager_graph(:foo).all.map{|o| [o, o.foo]}.should == [[@bar, @foo]]
+    @Foo.eager_graph(:bars).all.map{|o| [o, o.bars]}.should == [[@foo, [@bar]]]
+    @Foo.eager_graph(:bar).all.map{|o| [o, o.bar]}.should == [[@foo, @bar]]
+    @Foo.eager_graph(:mtmbars).all.map{|o| [o, o.mtmbars]}.should == [[@foo, [@bar]]]
+    @Bar.eager_graph(:mtmfoos).all.map{|o| [o, o.mtmfoos]}.should == [[@bar, [@foo]]]
+  end
+
+  it "should have working modification methods" do
+    b = @Bar.create(:obj_id=>3)
+    f = @Foo.create(:obj_id=>3)
+
+    @bar.foo = f
+    @bar.obj_id.should == 3
+    @foo.bar = @bar
+    @bar.obj_id.should == 2
+
+    @foo.add_bar(b)
+    @foo.bars.sort_by{|x| x.obj_id}.should == [@bar, b]
+    @foo.remove_bar(b)
+    @foo.bars.should == [@bar]
+    @foo.remove_all_bars
+    @foo.bars.should == []
+
+    @bar.refresh.update(:obj_id=>2)
+    b.refresh.update(:obj_id=>3)
+    @foo.mtmbars.should == [@bar]
+    @foo.remove_all_mtmbars
+    @foo.mtmbars.should == []
+    @foo.add_mtmbar(b)
+    @foo.mtmbars.should == [b]
+    @foo.remove_mtmbar(b)
+    @foo.mtmbars.should == []
+
+    @bar.add_mtmfoo(f)
+    @bar.mtmfoos.should == [f]
+    @bar.remove_all_mtmfoos
+    @bar.mtmfoos.should == []
+    @bar.add_mtmfoo(f)
+    @bar.mtmfoos.should == [f]
+    @bar.remove_mtmfoo(f)
+    @bar.mtmfoos.should == []
+  end
+end 

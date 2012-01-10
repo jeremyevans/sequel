@@ -2927,3 +2927,93 @@ describe "Filtering by associations" do
     @Album.filter(:artist=>@Album.db.from(:albums).select(:x)).sql.should == 'SELECT * FROM albums WHERE (artist IN (SELECT x FROM albums))'
   end
 end
+
+describe "Sequel::Model Associations with clashing column names" do
+  before do
+    @db = Sequel.mock(:fetch=>{:id=>1, :object_id=>2})
+    @Foo = Class.new(Sequel::Model(@db[:foos]))
+    @Bar = Class.new(Sequel::Model(@db[:bars]))
+    @Foo.columns :id, :object_id
+    @Bar.columns :id, :object_id
+    @Foo.def_column_alias(:obj_id, :object_id)
+    @Bar.def_column_alias(:obj_id, :object_id)
+    @Foo.one_to_many :bars, :primary_key=>:obj_id, :primary_key_column=>:object_id, :key=>:object_id, :key_method=>:obj_id, :eager_loader_key=>:object_id, :class=>@Bar
+    @Foo.one_to_one :bar, :primary_key=>:obj_id, :primary_key_column=>:object_id, :key=>:object_id, :key_method=>:obj_id, :eager_loader_key=>:object_id, :class=>@Bar
+    @Bar.many_to_one :foo, :key=>:obj_id, :key_column=>:object_id, :primary_key=>:object_id, :primary_key_method=>:obj_id, :class=>@Foo
+    @Foo.many_to_many :mtmbars, :join_table=>:bars_foos, :left_primary_key=>:obj_id, :left_primary_key_column=>:object_id, :right_primary_key=>:object_id, :right_primary_key_method=>:obj_id, :left_key=>:foo_id, :right_key=>:object_id, :eager_loader_key=>:object_id, :class=>@Bar
+    @Bar.many_to_many :mtmfoos, :join_table=>:bars_foos, :left_primary_key=>:obj_id, :left_primary_key_column=>:object_id, :right_primary_key=>:object_id, :right_primary_key_method=>:obj_id, :left_key=>:object_id, :right_key=>:foo_id, :eager_loader_key=>:object_id, :class=>@Foo
+    @foo = @Foo.load(:id=>1, :object_id=>2)
+    @bar = @Bar.load(:id=>1, :object_id=>2)
+    @db.sqls
+  end
+
+  it "should have working regular association methods" do
+    @Bar.first.foo.should == @foo
+    @Foo.first.bars.should == [@bar]
+    @Foo.first.bar.should == @bar
+    @Foo.first.mtmbars.should == [@bar]
+    @Bar.first.mtmfoos.should == [@foo]
+  end
+
+  it "should have working eager loading methods" do
+    @Bar.eager(:foo).all.map{|o| [o, o.foo]}.should == [[@bar, @foo]]
+    @Foo.eager(:bars).all.map{|o| [o, o.bars]}.should == [[@foo, [@bar]]]
+    @Foo.eager(:bar).all.map{|o| [o, o.bar]}.should == [[@foo, @bar]]
+    @db.fetch = [[{:id=>1, :object_id=>2}], [{:id=>1, :object_id=>2, :x_foreign_key_x=>2}]]
+    @Foo.eager(:mtmbars).all.map{|o| [o, o.mtmbars]}.should == [[@foo, [@bar]]]
+    @db.fetch = [[{:id=>1, :object_id=>2}], [{:id=>1, :object_id=>2, :x_foreign_key_x=>2}]]
+    @Bar.eager(:mtmfoos).all.map{|o| [o, o.mtmfoos]}.should == [[@bar, [@foo]]]
+  end
+
+  it "should have working eager graphing methods" do
+    @db.fetch = {:id=>1, :object_id=>2, :foo_id=>1, :foo_object_id=>2}
+    @Bar.eager_graph(:foo).all.map{|o| [o, o.foo]}.should == [[@bar, @foo]]
+    @db.fetch = {:id=>1, :object_id=>2, :bars_id=>1, :bars_object_id=>2}
+    @Foo.eager_graph(:bars).all.map{|o| [o, o.bars]}.should == [[@foo, [@bar]]]
+    @db.fetch = {:id=>1, :object_id=>2, :bar_id=>1, :bar_object_id=>2}
+    @Foo.eager_graph(:bar).all.map{|o| [o, o.bar]}.should == [[@foo, @bar]]
+    @db.fetch = {:id=>1, :object_id=>2, :mtmfoos_id=>1, :mtmfoos_object_id=>2}
+    @Bar.eager_graph(:mtmfoos).all.map{|o| [o, o.mtmfoos]}.should == [[@bar, [@foo]]]
+    @db.fetch = {:id=>1, :object_id=>2, :mtmbars_id=>1, :mtmbars_object_id=>2}
+    @Foo.eager_graph(:mtmbars).all.map{|o| [o, o.mtmbars]}.should == [[@foo, [@bar]]]
+  end
+
+  it "should have working modification methods" do
+    b = @Bar.load(:id=>2, :object_id=>3)
+    f = @Foo.load(:id=>2, :object_id=>3)
+    @db.numrows = 1
+
+    @bar.foo = f
+    @bar.obj_id.should == 3
+    @foo.bar = @bar
+    @bar.obj_id.should == 2
+
+    @foo.add_bar(b)
+    @db.fetch = [[{:id=>1, :object_id=>2}, {:id=>2, :object_id=>2}], [{:id=>1, :object_id=>2}]]
+    @foo.bars.should == [@bar, b]
+    @foo.remove_bar(b)
+    @foo.bars.should == [@bar]
+    @foo.remove_all_bars
+    @foo.bars.should == []
+
+    @db.fetch = [[{:id=>1, :object_id=>2}], [], [{:id=>2, :object_id=>2}]]
+    @bar = @Bar.load(:id=>1, :object_id=>2)
+    @foo.mtmbars.should == [@bar]
+    @foo.remove_all_mtmbars
+    @foo.mtmbars.should == []
+    @foo.add_mtmbar(b)
+    @foo.mtmbars.should == [b]
+    @foo.remove_mtmbar(b)
+    @foo.mtmbars.should == []
+
+    @db.fetch = [[{:id=>2, :object_id=>3}], [], [{:id=>2, :object_id=>3}]]
+    @bar.add_mtmfoo(f)
+    @bar.mtmfoos.should == [f]
+    @bar.remove_all_mtmfoos
+    @bar.mtmfoos.should == []
+    @bar.add_mtmfoo(f)
+    @bar.mtmfoos.should == [f]
+    @bar.remove_mtmfoo(f)
+    @bar.mtmfoos.should == []
+  end
+end 

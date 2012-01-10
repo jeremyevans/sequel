@@ -268,6 +268,18 @@ module Sequel
         end
         alias associated_object_keys primary_keys
 
+        # The method symbol or array of method symbols to call on the associated object
+        # to get the value to use for the foreign keys.
+        def primary_key_method
+         self[:primary_key_method] ||= primary_key
+        end
+       
+        # The array of method symbols to call on the associated object
+        # to get the value to use for the foreign keys.
+        def primary_key_methods
+         self[:primary_key_methods] ||= Array(primary_key_method)
+        end
+       
         # #primary_key qualified by the associated table
         def qualified_primary_key
           self[:qualified_primary_key] ||= self[:qualify] == false ? primary_key : qualify_assoc(primary_key)
@@ -528,6 +540,18 @@ module Sequel
           self[:right_primary_keys] ||= Array(right_primary_key)
         end
     
+        # The method symbol or array of method symbols to call on the associated objects
+        # to get the foreign key values for the join table. 
+        def right_primary_key_method
+          self[:right_primary_key_method] ||= right_primary_key
+        end
+
+        # The array of method symbols to call on the associated objects
+        # to get the foreign key values for the join table. 
+        def right_primary_key_methods
+          self[:right_primary_key_methods] ||= Array(right_primary_key_method)
+        end
+        
         # The columns to select when loading the association, associated_class.table_name.* by default.
         def select
          return self[:select] if include?(:select)
@@ -763,11 +787,13 @@ module Sequel
         #         array of symbols for a composite key association.
         # :key_column :: Similar to, and usually identical to, :key, but :key refers to the model method
         #                to call, where :key_column refers to the underlying column.  Should only be
-        #                used if the association has the same name as the foreign key column, in conjunction
+        #                used if the the model method differs from the foreign key column, in conjunction
         #                with defining a model alias method for the key column.
         # :primary_key :: column in the associated table that :key option references, as a symbol.
         #                 Defaults to the primary key of the associated table. Can use an
         #                 array of symbols for a composite key association.
+        # :primary_key_method :: the method symbol or array of method symbols to call on the associated
+        #                        object to get the foreign key values.  Defaults to :primary_key option.
         # :qualify :: Whether to use qualifier primary keys when loading the association.  The default
         #             is true, so you must set to false to not qualify.  Qualification rarely causes
         #             problems, but it's necessary to disable in some cases, such as when you are doing
@@ -777,9 +803,15 @@ module Sequel
         #         current model's primary key, as a symbol.  Defaults to
         #         :"#{self.name.underscore}_id".  Can use an
         #         array of symbols for a composite key association.
+        # :key_method :: the method symbol or array of method symbols to call on the associated
+        #                object to get the foreign key values.  Defaults to :key option.
         # :primary_key :: column in the current table that :key option references, as a symbol.
         #                 Defaults to primary key of the current table. Can use an
         #                 array of symbols for a composite key association.
+        # :primary_key_column :: Similar to, and usually identical to, :primary_key, but :primary_key refers
+        #                to the model method call, where :primary_key_column refers to the underlying column.
+        #                Should only be used if the the model method differs from the primary key column, in
+        #                conjunction with defining a model alias method for the primary key column.
         # === :many_to_many
         # :graph_join_table_block :: The block to pass to +join_table+ for
         #                            the join table when eagerly loading the association via +eager_graph+.
@@ -806,12 +838,19 @@ module Sequel
         # :left_primary_key :: column in current table that :left_key points to, as a symbol.
         #                      Defaults to primary key of current table.  Can use an
         #                      array of symbols for a composite key association.
+        # :left_primary_key_column :: Similar to, and usually identical to, :left_primary_key, but :left_primary_key refers to
+        #                the model method to call, where :left_primary_key_column refers to the underlying column.  Should only
+        #                be used if the model method differs from the left primary key column, in conjunction
+        #                with defining a model alias method for the left primary key column.
         # :right_key :: foreign key in join table that points to associated
         #               model's primary key, as a symbol.  Defaults to Defaults to :"#{name.to_s.singularize}_id".
         #               Can use an array of symbols for a composite key association.
         # :right_primary_key :: column in associated table that :right_key points to, as a symbol.
         #                       Defaults to primary key of the associated table.  Can use an
         #                       array of symbols for a composite key association.
+        # :right_primary_key_method :: the method symbol or array of method symbols to call on the associated
+        #                              object to get the foreign key values for the join table.
+        #                              Defaults to :right_primary_key option.
         # :uniq :: Adds a after_load callback that makes the array of objects unique.
         def associate(type, name, opts = {}, &block)
           raise(Error, 'one_to_many association type with :one_to_one option removed, used one_to_one association type') if opts[:one_to_one] && type == :one_to_many
@@ -1034,6 +1073,9 @@ module Sequel
           rcks = opts[:right_keys] = Array(right)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
           lcpks = opts[:left_primary_keys] = Array(left_pk)
+          lpkc = opts[:left_primary_key_column] ||= left_pk
+          lpkcs = opts[:left_primary_key_columns] ||= Array(lpkc)
+          elk = opts.eager_loader_key
           raise(Error, "mismatched number of left composite keys: #{lcks.inspect} vs #{lcpks.inspect}") unless lcks.length == lcpks.length
           if opts[:right_primary_key]
             rcpks = Array(opts[:right_primary_key])
@@ -1050,7 +1092,7 @@ module Sequel
           opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, rcks.zip(opts.right_primary_keys) + lcks.zip(lcpks.map{|k| send(k)}))}
 
           opts[:eager_loader] ||= proc do |eo|
-            h = eo[:key_hash][left_pk]
+            h = eo[:key_hash][elk]
             rows = eo[:rows]
             rows.each{|object| object.associations[name] = []}
             r = rcks.zip(opts.right_primary_keys)
@@ -1095,7 +1137,7 @@ module Sequel
           jt_graph_block = opts[:graph_join_table_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lcpks) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
+            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
             ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, &graph_block)
           end
       
@@ -1106,11 +1148,11 @@ module Sequel
           association_module_private_def(opts._add_method, opts) do |o|
             h = {}
             lcks.zip(lcpks).each{|k, pk| h[k] = send(pk)}
-            rcks.zip(opts.right_primary_keys).each{|k, pk| h[k] = o.send(pk)}
+            rcks.zip(opts.right_primary_key_methods).each{|k, pk| h[k] = o.send(pk)}
             _join_table_dataset(opts).insert(h)
           end
           association_module_private_def(opts._remove_method, opts) do |o|
-            _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_keys.map{|k| o.send(k)})).delete
+            _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_key_methods.map{|k| o.send(k)})).delete
           end
           association_module_private_def(opts._remove_all_method, opts) do
             _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)})).delete
@@ -1154,7 +1196,7 @@ module Sequel
             unless keys.empty?
               klass = opts.associated_class
               model.eager_loading_dataset(opts, klass.filter(opts.qualified_primary_key=>keys), nil, eo[:associations], eo).all do |assoc_record|
-                hash_key = uses_cks ? opts.primary_keys.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key)
+                hash_key = uses_cks ? opts.primary_key_methods.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key_method)
                 next unless objects = h[hash_key]
                 objects.each{|object| object.associations[name] = assoc_record}
               end
@@ -1177,7 +1219,7 @@ module Sequel
           
           return if opts[:read_only]
       
-          association_module_private_def(opts._setter_method, opts){|o| cks.zip(opts.primary_keys).each{|k, pk| send(:"#{k}=", (o.send(pk) if o))}}
+          association_module_private_def(opts._setter_method, opts){|o| cks.zip(opts.primary_key_methods).each{|k, pk| send(:"#{k}=", (o.send(pk) if o))}}
           association_module_def(opts.setter_method, opts){|o| set_associated_object(opts, o)}
         end
         
@@ -1187,16 +1229,20 @@ module Sequel
           name = opts[:name]
           model = self
           key = (opts[:key] ||= opts.default_key)
+          km = opts[:key_method] ||= opts[:key]
           cks = opts[:keys] = Array(key)
           primary_key = (opts[:primary_key] ||= self.primary_key)
           cpks = opts[:primary_keys] = Array(primary_key)
+          pkc = opts[:primary_key_column] ||= primary_key
+          pkcs = opts[:primary_key_columns] ||= Array(pkc)
+          elk = opts.eager_loader_key
           raise(Error, "mismatched number of composite keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
           opts[:dataset] ||= proc do
             opts.associated_class.filter(Array(opts.qualified_key).zip(cpks.map{|k| send(k)}))
           end
           opts[:eager_loader] ||= proc do |eo|
-            h = eo[:key_hash][primary_key]
+            h = eo[:key_hash][elk]
             rows = eo[:rows]
             if one_to_one
               rows.each{|object| object.associations[name] = nil}
@@ -1221,7 +1267,7 @@ module Sequel
             end
             ds.all do |assoc_record|
               assoc_record.values.delete(rn) if delete_rn
-              hash_key = uses_cks ? cks.map{|k| assoc_record.send(k)} : assoc_record.send(key)
+              hash_key = uses_cks ? km.map{|k| assoc_record.send(k)} : assoc_record.send(km)
               next unless objects = h[hash_key]
               if one_to_one
                 objects.each do |object| 
@@ -1252,7 +1298,7 @@ module Sequel
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : cks.zip(cpks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds = ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : cks.zip(pkcs) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
             # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
             ds.opts[:eager_graph][:reciprocals][eo[:table_alias]] = opts.reciprocal
             ds

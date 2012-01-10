@@ -1430,6 +1430,78 @@ by the foreign/primary keys.  This option causes the
 you want to replace the default foreign/primary key conditions that Sequel
 would use when eagerly graphing.
 
+=== Column Naming Conflict Options
+
+Sequel's association support historically called methods on model objects
+to get primary key or foreign key values instead of accessing the column
+values directly, in order to allow advanced features such as associations
+based on virtual column keys.  Unfortunately, that causes issues if columns
+are used with names that clash with existing method names, which can happen
+if you want to name the association the same name as an existing column, or
+if the column has the same name as an already defined method such as
+<tt>object_id</tt>.
+
+Sequel has added the following options that allow you to work around the
+issue by either specifying the column name symbol or the method name symbol
+to use.  In most cases, these methods are designed to be used with column
+aliases defined with <tt>Model.def_column_alias</tt>:
+
+  # Example schema:
+  #  albums           artists
+  #   :id        /-->  :id
+  #   :artist --/      :name
+  #   :name
+  class Album < Sequel::Model
+    def_column_alias(:artist_id, :artist)
+    many_to_one :artist, :key=>:artist_id, :key_column=>:artist
+  end
+  
+  # Example schema:
+  #  things              objs
+  #   :id           /-->  :id
+  #   :object_id --/      :name
+  #   :name
+  class Thing < Sequel::Model
+    def_column_alias(:obj_id, :object_id)
+  end
+  class Obj < Sequel::Model
+    many_to_one :things, :key=>:object_id, :key_method=>:obj_id
+  end
+
+Note that for eager loading purposes, you generally need to set the
+<tt>:eager_loader_key</tt> option as well, specifying the underlying
+column(s) to use.
+
+==== :key_column [+many_to_one+]
+
+Like the :key option, but :key references the method name, while
+:key_column references the underlying column.
+
+==== :primary_key_method [+many_to_one+]
+
+Like the :primary_key option, but :primary_key references the column
+name, while :primary_key_method references the method name.
+
+==== :primary_key_column [+one_to_many+, +one_to_one+]
+
+Like the :primary_key option, but :primary_key references the method name, while
+:primary_key_column references the underlying column.
+
+==== :key_method [+one_to_many+, +one_to_one+]
+
+Like the :key option, but :key references the column
+name, while :key_method references the method name.
+
+==== :left_primary_key_column [+many_to_many+]
+
+Like the :left_primary_key option, but :left_primary_key references the method name, while
+:left_primary_key_column references the underlying column.
+
+==== :right_primary_key_method [+many_to_many+]
+
+Like the :right_primary_key option, but :right_primary_key references the column
+name, while :right_primary_key_method references the method name.
+
 === Advanced Options
 
 ==== :reciprocal
@@ -1482,34 +1554,6 @@ remove_<i>association</i>, or remove_all_<i>association</i> methods.
 If the default modification methods would not do what you want, and you
 don't plan on overriding the internal modification methods to do what you
 want, it may be best to set this option to true.
-
-==== :key_column [+many_to_one+]
-
-This option exists to make it possible to create a +many_to_one+ association
-with the same name as the foreign key it uses.  Before this option was
-introduced, this was problematic, since the :key option was used to refer
-both to the model methods and the underlying database columns (which are
-usually the same).
-
-If you have a legacy database with a foreign key that is the same as the name
-of the association you would like to use, you should create a column alias
-for the foreign key and use this option:
-
-  # Example schema:
-  #  albums           artists
-  #   :id        /-->  :id
-  #   :artist --/      :name
-  #   :name
-
-  class Album < Sequel::Model
-    def_column_alias(:artist_id, :artist)
-    many_to_one :artist, :key_column=>:artist
-  end
-
-Note that if you have control over the database, it's better to just rename
-the foreign key column than use this option.  Similarly, if you can think
-of another association name that will work, it's wiser to rename the
-association than use this option.  Think of this option as a last resort.
 
 ==== :validate
 
@@ -1595,8 +1639,8 @@ strategies are:
                     functions.
 :correlated_subquery :: Uses a correlated subquery to get the information.
                         This is never used by default as if you aren't careful,
-                        it can result in pathologically long running times
-                        This will not work correctly for association where
+                        it can result in pathologically long running times.
+                        This will not work correctly for associations where
                         the associated table has a composite primary key if
                         the database doesn't support using IN
                         with multiple columns.  This will also not work on MySQL
