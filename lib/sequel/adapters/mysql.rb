@@ -78,6 +78,8 @@ module Sequel
       #   attempt is abandoned.
       # * :encoding - Set all the related character sets for this
       #   connection (connection, client, database, server, and results).
+      #   :query_with_result - If true, query() also invokes store_result() 
+      #   and returns a Mysql::Result object. Default is true.
       # * :read_timeout - Set the timeout in seconds for reading back results
       #   to a query.
       # * :socket - Use a unix socket file instead of connecting via TCP/IP.
@@ -86,6 +88,7 @@ module Sequel
       def connect(server)
         opts = server_opts(server)
         conn = Mysql.init
+        conn.query_with_result = opts[:query_with_result] unless opts[:query_with_result].nil?
         conn.options(Mysql::READ_DEFAULT_GROUP, opts[:config_default_group] || "client")
         conn.options(Mysql::OPT_LOCAL_INFILE, opts[:config_local_infile]) if opts.has_key?(:config_local_infile)
         conn.ssl_set(opts[:sslkey], opts[:sslcert], opts[:sslca], opts[:sslcapath], opts[:sslcipher]) if opts[:sslca] || opts[:sslkey]
