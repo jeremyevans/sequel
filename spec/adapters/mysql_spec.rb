@@ -102,6 +102,18 @@ describe "A MySQL database" do
   specify "should support for_share" do
     MYSQL_DB.transaction{MYSQL_DB[:test2].for_share.all.should == []}
   end
+  
+  specify "should set autocommit flag enable for new connection" do
+    MYSQL_DB.disconnect
+    Sequel::MySQL.auto_commit = true
+    MYSQL_DB["SELECT @@autocommit"].first[:@@autocommit].should == 1
+  end
+  
+  specify "should set autocommit flag disable for new connection" do
+    MYSQL_DB.disconnect
+    Sequel::MySQL.auto_commit = false
+    MYSQL_DB["SELECT @@autocommit"].first[:@@autocommit].should == 0
+  end
 end
 
 if MYSQL_DB.adapter_scheme == :mysql
