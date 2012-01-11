@@ -236,7 +236,7 @@ module Sequel
         pks = ds.select_map(:cols__column_name)
 
         # Default values
-        defaults =  metadata_dataset.from(:dba_tab_cols).
+        defaults =  metadata_dataset.from(:all_tables).
           where(:table_name=>im.call(table)).
           to_hash(:column_name, :data_default)
 
