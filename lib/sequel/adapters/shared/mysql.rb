@@ -4,6 +4,7 @@ module Sequel
 
   module MySQL
     @convert_tinyint_to_bool = true
+    @auto_commit = true
 
     class << self
       # Sequel converts the column type tinyint(1) to a boolean by default when
@@ -23,6 +24,9 @@ module Sequel
       # Set the default engine used for CREATE TABLE.  You can pass the
       # :engine option to create_table to override this setting.
       attr_accessor :default_engine
+
+      # Set the default commit mode for each query.
+      attr_accessor :auto_commit
     end
 
     # Methods shared by Database instances that connect to MySQL,

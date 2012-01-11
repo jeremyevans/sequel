@@ -63,6 +63,8 @@ module Sequel
         # By default, MySQL 'where id is null' selects the last inserted id
         sqls << "SET SQL_AUTO_IS_NULL=0" unless opts[:auto_is_null]
 
+        sqls << "SET AUTOCOMMIT=0" unless opts.fetch(:auto_commit, Sequel::MySQL.auto_commit)
+
         sqls.each{|sql| log_yield(sql){conn.query(sql)}}
 
         add_prepared_statements_cache(conn)
