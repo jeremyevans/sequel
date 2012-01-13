@@ -184,13 +184,16 @@ module Sequel
     # to the database.
     #
     #   DB.table_exists?(:foo) # => false
-    #   # SELECT * FROM foo LIMIT 1
+    #   # SELECT NULL FROM foo LIMIT 1
+    #
+    # Note that since this does a SELECT from the table, it can give false negatives
+    # if you don't have permission to SELECT from the table.
     def table_exists?(name)
       sch, table_name = schema_and_table(name)
       name = SQL::QualifiedIdentifier.new(sch, table_name) if sch
-      from(name).first
+      from(name).get(Sequel::NULL)
       true
-    rescue
+    rescue DatabaseError
       false
     end
     

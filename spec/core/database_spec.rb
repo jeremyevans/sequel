@@ -566,6 +566,7 @@ describe "Database#table_exists?" do
   specify "should try to select the first record from the table's dataset" do
     db = Sequel.mock(:fetch=>[Sequel::Error, [], [{:a=>1}]])
     db.table_exists?(:a).should be_false
+    db.sqls.should == ["SELECT NULL FROM a LIMIT 1"]
     db.table_exists?(:b).should be_true
     db.table_exists?(:c).should be_true
   end
