@@ -37,6 +37,12 @@ module Sequel
         
         private
         
+        # Derby optimizes away Sequel's default check of SELECT NULL FROM table,
+        # so use a SELECT * FROM table there.
+        def _table_exists?(ds)
+          ds.first
+        end
+    
         # Derby-specific syntax for renaming columns and changing a columns type/nullity.
         def alter_table_sql(table, op)
           case op[:op]

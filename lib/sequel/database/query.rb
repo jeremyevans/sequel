@@ -191,12 +191,12 @@ module Sequel
     def table_exists?(name)
       sch, table_name = schema_and_table(name)
       name = SQL::QualifiedIdentifier.new(sch, table_name) if sch
-      from(name).get(Sequel::NULL)
+      _table_exists?(from(name))
       true
     rescue DatabaseError
       false
     end
-    
+
     # Return all tables in the database as an array of symbols.
     #
     #   DB.tables # => [:albums, :artists]
@@ -240,6 +240,12 @@ module Sequel
     end
     
     private
+    
+    # Should raise an error if the table doesn't not exist,
+    # and not raise an error if the table does exist.
+    def _table_exists?(ds)
+      ds.get(Sequel::NULL)
+    end
     
     # Internal generic transaction method.  Any exception raised by the given
     # block will cause the transaction to be rolled back.  If the exception is
