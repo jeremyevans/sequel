@@ -798,7 +798,7 @@ module Sequel
     #
     # * All of the methods in +HOOKS+ and +AROUND_HOOKS+ create instance methods that are called
     #   by Sequel when the appropriate action occurs.  For example, when destroying
-    #   a model object, Sequel will call +around_destory+, which will call +before_destroy+, do
+    #   a model object, Sequel will call +around_destroy+, which will call +before_destroy+, do
     #   the destroy, and then call +after_destroy+.
     # * The following instance_methods all call the class method of the same
     #   name: columns, db, primary_key, db_schema.

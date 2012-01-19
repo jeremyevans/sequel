@@ -2711,25 +2711,25 @@ describe "Filtering by associations" do
     @Album.filter(:tags=>@Tag.new).sql.should == 'SELECT * FROM albums WHERE \'f\''
   end
 
-  it "should be able to handle filteringing with NULL values for many_to_one associations with composite keys" do
+  it "should be able to handle filtering with NULL values for many_to_one associations with composite keys" do
     @Album.filter(:cartist=>@Artist.load(:id2=>4)).sql.should == 'SELECT * FROM albums WHERE \'f\''
     @Album.filter(:cartist=>@Artist.load(:id1=>3)).sql.should == 'SELECT * FROM albums WHERE \'f\''
     @Album.filter(:cartist=>@Artist.new).sql.should == 'SELECT * FROM albums WHERE \'f\''
   end
 
-  it "should be able to filtering with NULL values for one_to_many associations with composite keys" do
+  it "should be able to filter with NULL values for one_to_many associations with composite keys" do
     @Album.filter(:ctracks=>@Track.load(:album_id2=>4)).sql.should == 'SELECT * FROM albums WHERE \'f\''
     @Album.filter(:ctracks=>@Track.load(:album_id1=>3)).sql.should == 'SELECT * FROM albums WHERE \'f\''
     @Album.filter(:ctracks=>@Track.new).sql.should == 'SELECT * FROM albums WHERE \'f\''
   end
 
-  it "should be able to filtering with NULL values for one_to_one associations with composite keys" do
+  it "should be able to filter with NULL values for one_to_one associations with composite keys" do
     @Album.filter(:calbum_info=>@AlbumInfo.load(:album_id2=>4)).sql.should == 'SELECT * FROM albums WHERE \'f\'' 
     @Album.filter(:calbum_info=>@AlbumInfo.load(:album_id1=>3)).sql.should == 'SELECT * FROM albums WHERE \'f\'' 
     @Album.filter(:calbum_info=>@AlbumInfo.new).sql.should == 'SELECT * FROM albums WHERE \'f\'' 
   end
 
-  it "should be able to filtering with NULL values for many_to_many associations with composite keys" do
+  it "should be able to filter with NULL values for many_to_many associations with composite keys" do
     @Album.filter(:ctags=>@Tag.load(:tid1=>3)).sql.should == 'SELECT * FROM albums WHERE \'f\''
     @Album.filter(:ctags=>@Tag.load(:tid2=>4)).sql.should == 'SELECT * FROM albums WHERE \'f\''
     @Album.filter(:ctags=>@Tag.new).sql.should == 'SELECT * FROM albums WHERE \'f\''
