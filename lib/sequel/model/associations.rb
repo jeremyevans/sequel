@@ -1985,25 +1985,33 @@ module Sequel
         # Return a subquery expression for filering by a many_to_many association
         def many_to_many_association_filter_expression(op, ref, obj)
           lpks, lks, rks = ref.values_at(:left_primary_keys, :left_keys, :right_keys)
+          jt = ref.join_table_alias
           lpks = lpks.first if lpks.length == 1
-          exp = association_filter_key_expression(rks, ref.right_primary_keys, obj)
+          lpks = ref.qualify(model.table_name, lpks)
+          meths = ref.right_primary_keys
+          meths = ref.qualify(obj.model.table_name, meths) if obj.is_a?(Sequel::Dataset)
+          exp = association_filter_key_expression(ref.qualify(jt, rks), meths, obj)
           if exp == SQL::Constants::FALSE
             association_filter_handle_inversion(op, exp, Array(lpks))
           else
-            association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>model.db.from(ref[:join_table]).select(*lks).where(exp).exclude(SQL::BooleanExpression.from_value_pairs(lks.zip([]), :OR))), Array(lpks))
+            association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>model.db.from(ref[:join_table]).select(*ref.qualify(jt, lks)).where(exp).exclude(SQL::BooleanExpression.from_value_pairs(ref.qualify(jt, lks).zip([]), :OR))), Array(lpks))
           end
         end
 
         # Return a simple equality expression for filering by a many_to_one association
         def many_to_one_association_filter_expression(op, ref, obj)
-          keys = ref[:keys]
-          association_filter_handle_inversion(op, association_filter_key_expression(keys, ref.primary_keys, obj), keys)
+          keys = ref.qualify(model.table_name, ref[:keys])
+          meths = ref.primary_keys
+          meths = ref.qualify(obj.model.table_name, meths) if obj.is_a?(Sequel::Dataset)
+          association_filter_handle_inversion(op, association_filter_key_expression(keys, meths, obj), keys)
         end
 
         # Return a simple equality expression for filering by a one_to_* association
         def one_to_many_association_filter_expression(op, ref, obj)
-          keys = ref[:primary_keys]
-          association_filter_handle_inversion(op, association_filter_key_expression(keys, ref[:keys], obj), keys)
+          keys = ref.qualify(model.table_name, ref[:primary_keys])
+          meths = ref[:keys]
+          meths = ref.qualify(obj.model.table_name, meths) if obj.is_a?(Sequel::Dataset)
+          association_filter_handle_inversion(op, association_filter_key_expression(keys, meths, obj), keys)
         end
         alias one_to_one_association_filter_expression one_to_many_association_filter_expression
 

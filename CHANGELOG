@@ -1,5 +1,7 @@
 === HEAD
 
+* Qualify identifiers when filtering/excluding by associations (jeremyevans)
+
 * Make table_exists? better handle tables where you don't have permissions for all columns (jeremyevans) (#422)
 
 * Using new association options, support associations based on columns that clash with ruby method names (jeremyevans) (#417)

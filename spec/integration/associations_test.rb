@@ -102,6 +102,192 @@ shared_examples_for "eager limit strategies" do
   end
 end
 
+shared_examples_for "filtering/excluding by associations" do
+  specify "should work correctly when filtering by associations" do
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    
+    @Artist.filter(:albums=>@album).all.should == [@artist]
+    @Artist.filter(:first_album=>@album).all.should == [@artist]
+    @Album.filter(:artist=>@artist).all.should == [@album]
+    @Album.filter(:tags=>@tag).all.should == [@album]
+    @Album.filter(:alias_tags=>@tag).all.should == [@album]
+    @Tag.filter(:albums=>@album).all.should == [@tag]
+    @Album.filter(:artist=>@artist, :tags=>@tag).all.should == [@album]
+    @artist.albums_dataset.filter(:tags=>@tag).all.should == [@album]
+  end
+
+  specify "should work correctly when excluding by associations" do
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    album, artist, tag = @pr.call
+
+    @Artist.exclude(:albums=>@album).all.should == [artist]
+    @Artist.exclude(:first_album=>@album).all.should == [artist]
+    @Album.exclude(:artist=>@artist).all.should == [album]
+    @Album.exclude(:tags=>@tag).all.should == [album]
+    @Album.exclude(:alias_tags=>@tag).all.should == [album]
+    @Tag.exclude(:albums=>@album).all.should == [tag]
+    @Album.exclude(:artist=>@artist, :tags=>@tag).all.should == [album]
+  end
+  
+  specify "should work correctly when filtering by multiple associations" do
+    album, artist, tag = @pr.call
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    
+    @Artist.filter(:albums=>[@album, album]).all.should == [@artist]
+    @Artist.filter(:first_album=>[@album, album]).all.should == [@artist]
+    @Album.filter(:artist=>[@artist, artist]).all.should == [@album]
+    @Album.filter(:tags=>[@tag, tag]).all.should == [@album]
+    @Album.filter(:alias_tags=>[@tag, tag]).all.should == [@album]
+    @Tag.filter(:albums=>[@album, album]).all.should == [@tag]
+    @Album.filter(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == [@album]
+    @artist.albums_dataset.filter(:tags=>[@tag, tag]).all.should == [@album]
+
+    album.add_tag(tag)
+
+    @Artist.filter(:albums=>[@album, album]).all.should == [@artist]
+    @Artist.filter(:first_album=>[@album, album]).all.should == [@artist]
+    @Album.filter(:artist=>[@artist, artist]).all.should == [@album]
+    @Album.filter(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Album.filter(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Tag.filter(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
+    @Album.filter(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == [@album]
+
+    album.update(:artist => artist)
+
+    @Artist.filter(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    @Artist.filter(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    @Album.filter(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Album.filter(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Album.filter(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Tag.filter(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
+    @Album.filter(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
+  end
+
+  specify "should work correctly when excluding by multiple associations" do
+    album, artist, tag = @pr.call
+
+    @Artist.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    @Artist.exclude(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    @Album.exclude(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Album.exclude(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Album.exclude(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Tag.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
+    @Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
+
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+
+    @Artist.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [artist]
+    @Artist.exclude(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [artist]
+    @Album.exclude(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [album]
+    @Album.exclude(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [album]
+    @Album.exclude(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [album]
+    @Tag.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [tag]
+    @Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [album]
+
+    album.add_tag(tag)
+
+    @Artist.exclude(:albums=>[@album, album]).all.should == [artist]
+    @Artist.exclude(:first_album=>[@album, album]).all.should == [artist]
+    @Album.exclude(:artist=>[@artist, artist]).all.should == [album]
+    @Album.exclude(:tags=>[@tag, tag]).all.should == []
+    @Album.exclude(:alias_tags=>[@tag, tag]).all.should == []
+    @Tag.exclude(:albums=>[@album, album]).all.should == []
+    @Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == [album]
+
+    album.update(:artist => artist)
+
+    @Artist.exclude(:albums=>[@album, album]).all.should == []
+    @Artist.exclude(:first_album=>[@album, album]).all.should == []
+    @Album.exclude(:artist=>[@artist, artist]).all.should == []
+    @Album.exclude(:tags=>[@tag, tag]).all.should == []
+    @Album.exclude(:alias_tags=>[@tag, tag]).all.should == []
+    @Tag.exclude(:albums=>[@album, album]).all.should == []
+    @Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == []
+  end
+  
+  specify "should work correctly when excluding by associations in regards to NULL values" do
+    @Artist.exclude(:albums=>@album).all.should == [@artist]
+    @Artist.exclude(:first_album=>@album).all.should == [@artist]
+    @Album.exclude(:artist=>@artist).all.should == [@album]
+    @Album.exclude(:tags=>@tag).all.should == [@album]
+    @Album.exclude(:alias_tags=>@tag).all.should == [@album]
+    @Tag.exclude(:albums=>@album).all.should == [@tag]
+    @Album.exclude(:artist=>@artist, :tags=>@tag).all.should == [@album]
+
+    @album.update(:artist => @artist)
+    @artist.albums_dataset.exclude(:tags=>@tag).all.should == [@album]
+  end
+
+  specify "should handle NULL values in join table correctly when filtering/excluding many_to_many associations" do
+    @ins.call
+    @Album.exclude(:tags=>@tag).all.should == [@album]
+    @Album.exclude(:alias_tags=>@tag).all.should == [@album]
+    @album.add_tag(@tag)
+    @Album.filter(:tags=>@tag).all.should == [@album]
+    @Album.filter(:alias_tags=>@tag).all.should == [@album]
+    album, artist, tag = @pr.call
+    @Album.exclude(:tags=>@tag).all.should == [album]
+    @Album.exclude(:alias_tags=>@tag).all.should == [album]
+    @Album.exclude(:tags=>tag).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Album.exclude(:alias_tags=>tag).all.sort_by{|x| x.pk}.should == [@album, album]
+  end
+
+  specify "should work correctly when filtering by association datasets" do
+    album, artist, tag = @pr.call
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    album.add_tag(tag)
+    album.update(:artist => artist)
+
+    @Artist.filter(:albums=>@Album).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    @Artist.filter(:albums=>@Album.filter(Array(Album.primary_key).map{|k| k.qualify(Album.table_name)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [artist]
+    @Artist.filter(:albums=>@Album.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+    @Artist.filter(:first_album=>@Album).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    @Artist.filter(:first_album=>@Album.filter(Array(Album.primary_key).map{|k| k.qualify(Album.table_name)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [artist]
+    @Artist.filter(:first_album=>@Album.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+    @Album.filter(:artist=>@Artist).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Album.filter(:artist=>@Artist.filter(Array(Artist.primary_key).map{|k| k.qualify(Artist.table_name)}.zip(Array(artist.pk)))).all.sort_by{|x| x.pk}.should == [album]
+    @Album.filter(:artist=>@Artist.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+    @Album.filter(:tags=>@Tag).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Album.filter(:tags=>@Tag.filter(Array(Tag.primary_key).map{|k| k.qualify(Tag.table_name)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [album]
+    @Album.filter(:tags=>@Tag.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+    @Album.filter(:alias_tags=>@Tag).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Album.filter(:alias_tags=>@Tag.filter(Array(Tag.primary_key).map{|k| k.qualify(Tag.table_name)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [album]
+    @Album.filter(:alias_tags=>@Tag.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+    @Tag.filter(:albums=>@Album).all.sort_by{|x| x.pk}.should == [@tag, tag]
+    @Tag.filter(:albums=>@Album.filter(Array(Album.primary_key).map{|k| k.qualify(Album.table_name)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [tag]
+    @Tag.filter(:albums=>@Album.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+  end
+
+  specify "should work correctly when excluding by association datasets" do
+    album, artist, tag = @pr.call
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    album.add_tag(tag)
+    album.update(:artist => artist)
+
+    @Artist.exclude(:albums=>@Album).all.sort_by{|x| x.pk}.should == []
+    @Artist.exclude(:albums=>@Album.filter(Array(Album.primary_key).map{|k| k.qualify(Album.table_name)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@artist]
+    @Artist.exclude(:albums=>@Album.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    @Album.exclude(:artist=>@Artist).all.sort_by{|x| x.pk}.should == []
+    @Album.exclude(:artist=>@Artist.filter(Array(Artist.primary_key).map{|k| k.qualify(Artist.table_name)}.zip(Array(artist.pk)))).all.sort_by{|x| x.pk}.should == [@album]
+    @Album.exclude(:artist=>@Artist.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Album.exclude(:tags=>@Tag).all.sort_by{|x| x.pk}.should == []
+    @Album.exclude(:tags=>@Tag.filter(Array(Tag.primary_key).map{|k| k.qualify(Tag.table_name)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [@album]
+    @Album.exclude(:tags=>@Tag.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Album.exclude(:alias_tags=>@Tag).all.sort_by{|x| x.pk}.should == []
+    @Album.exclude(:alias_tags=>@Tag.filter(Array(Tag.primary_key).map{|k| k.qualify(Tag.table_name)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [@album]
+    @Album.exclude(:alias_tags=>@Tag.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
+    @Tag.exclude(:albums=>@Album).all.sort_by{|x| x.pk}.should == []
+    @Tag.exclude(:albums=>@Album.filter(Array(Album.primary_key).map{|k| k.qualify(Album.table_name)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@tag]
+    @Tag.exclude(:albums=>@Album.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@tag, tag]
+  end
+end
+
 shared_examples_for "regular and composite key associations" do  
   specify "should return no objects if none are associated" do
     @album.artist.should == nil
@@ -143,190 +329,6 @@ shared_examples_for "regular and composite key associations" do
     @album.tags.should == [@tag]
     @album.alias_tags.should == [@tag]
     @tag.albums.should == [@album]
-  end
-
-  specify "should work correctly when filtering by associations" do
-    @album.update(:artist => @artist)
-    @album.add_tag(@tag)
-    
-    Artist.filter(:albums=>@album).all.should == [@artist]
-    Artist.filter(:first_album=>@album).all.should == [@artist]
-    Album.filter(:artist=>@artist).all.should == [@album]
-    Album.filter(:tags=>@tag).all.should == [@album]
-    Album.filter(:alias_tags=>@tag).all.should == [@album]
-    Tag.filter(:albums=>@album).all.should == [@tag]
-    Album.filter(:artist=>@artist, :tags=>@tag).all.should == [@album]
-    @artist.albums_dataset.filter(:tags=>@tag).all.should == [@album]
-  end
-
-  specify "should work correctly when excluding by associations" do
-    @album.update(:artist => @artist)
-    @album.add_tag(@tag)
-    album, artist, tag = @pr.call
-
-    Artist.exclude(:albums=>@album).all.should == [artist]
-    Artist.exclude(:first_album=>@album).all.should == [artist]
-    Album.exclude(:artist=>@artist).all.should == [album]
-    Album.exclude(:tags=>@tag).all.should == [album]
-    Album.exclude(:alias_tags=>@tag).all.should == [album]
-    Tag.exclude(:albums=>@album).all.should == [tag]
-    Album.exclude(:artist=>@artist, :tags=>@tag).all.should == [album]
-  end
-  
-  specify "should work correctly when filtering by multiple associations" do
-    album, artist, tag = @pr.call
-    @album.update(:artist => @artist)
-    @album.add_tag(@tag)
-    
-    Artist.filter(:albums=>[@album, album]).all.should == [@artist]
-    Artist.filter(:first_album=>[@album, album]).all.should == [@artist]
-    Album.filter(:artist=>[@artist, artist]).all.should == [@album]
-    Album.filter(:tags=>[@tag, tag]).all.should == [@album]
-    Album.filter(:alias_tags=>[@tag, tag]).all.should == [@album]
-    Tag.filter(:albums=>[@album, album]).all.should == [@tag]
-    Album.filter(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == [@album]
-    @artist.albums_dataset.filter(:tags=>[@tag, tag]).all.should == [@album]
-
-    album.add_tag(tag)
-
-    Artist.filter(:albums=>[@album, album]).all.should == [@artist]
-    Artist.filter(:first_album=>[@album, album]).all.should == [@artist]
-    Album.filter(:artist=>[@artist, artist]).all.should == [@album]
-    Album.filter(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
-    Album.filter(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
-    Tag.filter(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
-    Album.filter(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == [@album]
-
-    album.update(:artist => artist)
-
-    Artist.filter(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
-    Artist.filter(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
-    Album.filter(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [@album, album]
-    Album.filter(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
-    Album.filter(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
-    Tag.filter(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
-    Album.filter(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
-  end
-
-  specify "should work correctly when excluding by multiple associations" do
-    album, artist, tag = @pr.call
-
-    Artist.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
-    Artist.exclude(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [@artist, artist]
-    Album.exclude(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [@album, album]
-    Album.exclude(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
-    Album.exclude(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
-    Tag.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [@tag, tag]
-    Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [@album, album]
-
-    @album.update(:artist => @artist)
-    @album.add_tag(@tag)
-
-    Artist.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [artist]
-    Artist.exclude(:first_album=>[@album, album]).all.sort_by{|x| x.pk}.should == [artist]
-    Album.exclude(:artist=>[@artist, artist]).all.sort_by{|x| x.pk}.should == [album]
-    Album.exclude(:tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [album]
-    Album.exclude(:alias_tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [album]
-    Tag.exclude(:albums=>[@album, album]).all.sort_by{|x| x.pk}.should == [tag]
-    Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.sort_by{|x| x.pk}.should == [album]
-
-    album.add_tag(tag)
-
-    Artist.exclude(:albums=>[@album, album]).all.should == [artist]
-    Artist.exclude(:first_album=>[@album, album]).all.should == [artist]
-    Album.exclude(:artist=>[@artist, artist]).all.should == [album]
-    Album.exclude(:tags=>[@tag, tag]).all.should == []
-    Album.exclude(:alias_tags=>[@tag, tag]).all.should == []
-    Tag.exclude(:albums=>[@album, album]).all.should == []
-    Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == [album]
-
-    album.update(:artist => artist)
-
-    Artist.exclude(:albums=>[@album, album]).all.should == []
-    Artist.exclude(:first_album=>[@album, album]).all.should == []
-    Album.exclude(:artist=>[@artist, artist]).all.should == []
-    Album.exclude(:tags=>[@tag, tag]).all.should == []
-    Album.exclude(:alias_tags=>[@tag, tag]).all.should == []
-    Tag.exclude(:albums=>[@album, album]).all.should == []
-    Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == []
-  end
-  
-  specify "should work correctly when excluding by associations in regards to NULL values" do
-    Artist.exclude(:albums=>@album).all.should == [@artist]
-    Artist.exclude(:first_album=>@album).all.should == [@artist]
-    Album.exclude(:artist=>@artist).all.should == [@album]
-    Album.exclude(:tags=>@tag).all.should == [@album]
-    Album.exclude(:alias_tags=>@tag).all.should == [@album]
-    Tag.exclude(:albums=>@album).all.should == [@tag]
-    Album.exclude(:artist=>@artist, :tags=>@tag).all.should == [@album]
-
-    @album.update(:artist => @artist)
-    @artist.albums_dataset.exclude(:tags=>@tag).all.should == [@album]
-  end
-
-  specify "should handle NULL values in join table correctly when filtering/excluding many_to_many associations" do
-    @ins.call
-    Album.exclude(:tags=>@tag).all.should == [@album]
-    Album.exclude(:alias_tags=>@tag).all.should == [@album]
-    @album.add_tag(@tag)
-    Album.filter(:tags=>@tag).all.should == [@album]
-    Album.filter(:alias_tags=>@tag).all.should == [@album]
-    album, artist, tag = @pr.call
-    Album.exclude(:tags=>@tag).all.should == [album]
-    Album.exclude(:alias_tags=>@tag).all.should == [album]
-    Album.exclude(:tags=>tag).all.sort_by{|x| x.pk}.should == [@album, album]
-    Album.exclude(:alias_tags=>tag).all.sort_by{|x| x.pk}.should == [@album, album]
-  end
-
-  specify "should work correctly when filtering by association datasets" do
-    album, artist, tag = @pr.call
-    @album.update(:artist => @artist)
-    @album.add_tag(@tag)
-    album.add_tag(tag)
-    album.update(:artist => artist)
-
-    Artist.filter(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == [@artist, artist]
-    Artist.filter(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [artist]
-    Artist.filter(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
-    Artist.filter(:first_album=>Album.dataset).all.sort_by{|x| x.pk}.should == [@artist, artist]
-    Artist.filter(:first_album=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [artist]
-    Artist.filter(:first_album=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
-    Album.filter(:artist=>Artist.dataset).all.sort_by{|x| x.pk}.should == [@album, album]
-    Album.filter(:artist=>Artist.dataset.filter(Array(Artist.primary_key).zip(Array(artist.pk)))).all.sort_by{|x| x.pk}.should == [album]
-    Album.filter(:artist=>Artist.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
-    Album.filter(:tags=>Tag.dataset).all.sort_by{|x| x.pk}.should == [@album, album]
-    Album.filter(:tags=>Tag.dataset.filter(Array(Tag.primary_key).zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [album]
-    Album.filter(:tags=>Tag.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
-    Album.filter(:alias_tags=>Tag.dataset).all.sort_by{|x| x.pk}.should == [@album, album]
-    Album.filter(:alias_tags=>Tag.dataset.filter(Array(Tag.primary_key).zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [album]
-    Album.filter(:alias_tags=>Tag.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
-    Tag.filter(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == [@tag, tag]
-    Tag.filter(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [tag]
-    Tag.filter(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
-  end
-
-  specify "should work correctly when excluding by association datasets" do
-    album, artist, tag = @pr.call
-    @album.update(:artist => @artist)
-    @album.add_tag(@tag)
-    album.add_tag(tag)
-    album.update(:artist => artist)
-
-    Artist.exclude(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == []
-    Artist.exclude(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@artist]
-    Artist.exclude(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@artist, artist]
-    Album.exclude(:artist=>Artist.dataset).all.sort_by{|x| x.pk}.should == []
-    Album.exclude(:artist=>Artist.dataset.filter(Array(Artist.primary_key).zip(Array(artist.pk)))).all.sort_by{|x| x.pk}.should == [@album]
-    Album.exclude(:artist=>Artist.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
-    Album.exclude(:tags=>Tag.dataset).all.sort_by{|x| x.pk}.should == []
-    Album.exclude(:tags=>Tag.dataset.filter(Array(Tag.primary_key).zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [@album]
-    Album.exclude(:tags=>Tag.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
-    Album.exclude(:alias_tags=>Tag.dataset).all.sort_by{|x| x.pk}.should == []
-    Album.exclude(:alias_tags=>Tag.dataset.filter(Array(Tag.primary_key).zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [@album]
-    Album.exclude(:alias_tags=>Tag.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
-    Tag.exclude(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == []
-    Tag.exclude(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@tag]
-    Tag.exclude(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@tag, tag]
   end
 
   specify "should have working dataset associations" do
@@ -442,6 +444,30 @@ shared_examples_for "regular and composite key associations" do
     a.first.albums.first.artist.should == @artist
   end
   
+  describe "when filtering/excluding by associations" do
+    before do
+      @Artist = Artist.dataset
+      @Album = Album.dataset
+      @Tag = Tag.dataset
+    end
+
+    it_should_behave_like "filtering/excluding by associations"
+  end
+
+  describe "when filtering/excluding by associations when joining" do
+    def self_join(c)
+      c.join(c.table_name.as(:b), Array(c.primary_key).zip(Array(c.primary_key))).select_all(c.table_name)
+    end
+
+    before do
+      @Artist = self_join(Artist)
+      @Album = self_join(Album)
+      @Tag = self_join(Tag)
+    end
+
+    it_should_behave_like "filtering/excluding by associations"
+  end
+
   describe "with no :eager_limit_strategy" do
     it_should_behave_like "eager limit strategies"
   end

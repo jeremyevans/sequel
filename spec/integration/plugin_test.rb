@@ -198,6 +198,10 @@ describe "Many Through Many Plugin" do
     @db.drop_table :albums_artists, :albums, :artists
   end
   
+  def self_join(c)
+    c.join(c.table_name.as(:b), Array(c.primary_key).zip(Array(c.primary_key))).select_all(c.table_name)
+  end
+
   specify "should handle super simple case with 1 join table" do
     Artist.many_through_many :albums, [[:albums_artists, :artist_id, :album_id]]
     Artist[@artist1.id].albums.map{|x| x.name}.sort.should == %w'A D'
@@ -239,6 +243,26 @@ describe "Many Through Many Plugin" do
 
     Artist.filter(:albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'1 2 3'
     Artist.exclude(:albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'4'
+
+    c = self_join(Artist)
+    c.filter(:albums=>@album1).all.map{|a| a.name}.sort.should == %w'1 2'
+    c.filter(:albums=>@album2).all.map{|a| a.name}.sort.should == %w'3 4'
+    c.filter(:albums=>@album3).all.map{|a| a.name}.sort.should == %w'2 3'
+    c.filter(:albums=>@album4).all.map{|a| a.name}.sort.should == %w'1 4'
+
+    c.exclude(:albums=>@album1).all.map{|a| a.name}.sort.should == %w'3 4'
+    c.exclude(:albums=>@album2).all.map{|a| a.name}.sort.should == %w'1 2'
+    c.exclude(:albums=>@album3).all.map{|a| a.name}.sort.should == %w'1 4'
+    c.exclude(:albums=>@album4).all.map{|a| a.name}.sort.should == %w'2 3'
+
+    c.filter(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'1 2 3'
+    c.filter(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.should == %w'1 3 4'
+
+    c.exclude(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'4'
+    c.exclude(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.should == %w'2'
+
+    c.filter(:albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'1 2 3'
+    c.exclude(:albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'4'
   end
 
   specify "should handle typical case with 3 join tables" do
@@ -279,6 +303,23 @@ describe "Many Through Many Plugin" do
 
     Artist.filter(:related_artists=>Artist.filter(:id=>@artist1.id)).all.map{|a| a.name}.sort.should == %w'1 2 4'
     Artist.exclude(:related_artists=>Artist.filter(:id=>@artist1.id)).all.map{|a| a.name}.sort.should == %w'3'
+
+    c = self_join(Artist)
+    c.filter(:related_artists=>@artist1).all.map{|a| a.name}.sort.should == %w'1 2 4'
+    c.filter(:related_artists=>@artist2).all.map{|a| a.name}.sort.should == %w'1 2 3'
+    c.filter(:related_artists=>@artist3).all.map{|a| a.name}.sort.should == %w'2 3 4'
+    c.filter(:related_artists=>@artist4).all.map{|a| a.name}.sort.should == %w'1 3 4'
+
+    c.exclude(:related_artists=>@artist1).all.map{|a| a.name}.sort.should == %w'3'
+    c.exclude(:related_artists=>@artist2).all.map{|a| a.name}.sort.should == %w'4'
+    c.exclude(:related_artists=>@artist3).all.map{|a| a.name}.sort.should == %w'1'
+    c.exclude(:related_artists=>@artist4).all.map{|a| a.name}.sort.should == %w'2'
+
+    c.filter(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
+    c.exclude(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.should == %w''
+
+    c.filter(:related_artists=>c.filter(:artists__id=>@artist1.id)).all.map{|a| a.name}.sort.should == %w'1 2 4'
+    c.exclude(:related_artists=>c.filter(:artists__id=>@artist1.id)).all.map{|a| a.name}.sort.should == %w'3'
   end
 
   specify "should handle extreme case with 5 join tables" do
@@ -331,6 +372,26 @@ describe "Many Through Many Plugin" do
 
     Artist.filter(:related_albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'1 2 3'
     Artist.exclude(:related_albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'4'
+
+    c = self_join(Artist)
+    c.filter(:related_albums=>@album1).all.map{|a| a.name}.sort.should == %w'1 2 3'
+    c.filter(:related_albums=>@album2).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
+    c.filter(:related_albums=>@album3).all.map{|a| a.name}.sort.should == %w'1 2'
+    c.filter(:related_albums=>@album4).all.map{|a| a.name}.sort.should == %w'2 3 4'
+
+    c.exclude(:related_albums=>@album1).all.map{|a| a.name}.sort.should == %w'4'
+    c.exclude(:related_albums=>@album2).all.map{|a| a.name}.sort.should == %w''
+    c.exclude(:related_albums=>@album3).all.map{|a| a.name}.sort.should == %w'3 4'
+    c.exclude(:related_albums=>@album4).all.map{|a| a.name}.sort.should == %w'1'
+
+    c.filter(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'1 2 3'
+    c.filter(:related_albums=>[@album3, @album4]).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
+
+    c.exclude(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'4'
+    c.exclude(:related_albums=>[@album2, @album4]).all.map{|a| a.name}.sort.should == %w''
+
+    c.filter(:related_albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'1 2 3'
+    c.exclude(:related_albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'4'
   end
 end
 

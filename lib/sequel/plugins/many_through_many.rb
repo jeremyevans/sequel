@@ -255,6 +255,7 @@ module Sequel
         def many_through_many_association_filter_expression(op, ref, obj)
           lpks = ref[:left_primary_keys]
           lpks = lpks.first if lpks.length == 1
+          lpks = ref.qualify(model.table_name, lpks)
           edges = ref.edges
           first, rest = edges.first, edges[1..-1]
           last = edges.last
@@ -266,7 +267,9 @@ module Sequel
             last_join = ds.opts[:join].last
             last_join.table_alias || last_join.table
           end
-          exp = association_filter_key_expression(ref.qualify(last_alias, Array(ref[:final_edge][:left])), ref.right_primary_keys, obj)
+          meths = ref.right_primary_keys
+          meths = ref.qualify(obj.model.table_name, meths) if obj.is_a?(Sequel::Dataset)
+          exp = association_filter_key_expression(ref.qualify(last_alias, Array(ref[:final_edge][:left])), meths, obj)
           if exp == SQL::Constants::FALSE
             association_filter_handle_inversion(op, exp, Array(lpks))
           else
