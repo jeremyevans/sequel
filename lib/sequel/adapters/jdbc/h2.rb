@@ -75,7 +75,16 @@ module Sequel
           when :set_column_null
             "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} SET#{' NOT' unless op[:null]} NULL"
           when :set_column_type
-            "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(op)}"
+            if sch = schema(table)
+              if cs = sch.each{|k, v| break v if k == op[:name]; nil}
+                cs = cs.dup
+                cs[:default] = cs[:ruby_default]
+                op = cs.merge!(op)
+              end
+            end
+            sql = "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(op)}"
+            column_definition_order.each{|m| send(:"column_definition_#{m}_sql", sql, op)}
+            sql
           else
             super(table, op)
           end

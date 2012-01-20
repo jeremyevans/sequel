@@ -211,7 +211,7 @@ module Sequel
         when :set_column_null
           duplicate_table(table){|columns| columns.each{|s| s[:null] = op[:null] if s[:name].to_s == op[:name].to_s}}
         when :set_column_type
-          duplicate_table(table){|columns| columns.each{|s| s[:type] = op[:type] if s[:name].to_s == op[:name].to_s}}
+          duplicate_table(table){|columns| columns.each{|s| s.merge!(op) if s[:name].to_s == op[:name].to_s}}
         when :drop_constraint
           case op[:type]
           when :primary_key

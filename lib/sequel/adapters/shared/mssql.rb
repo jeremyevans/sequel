@@ -79,7 +79,21 @@ module Sequel
         when :rename_column
           "sp_rename #{literal("#{quote_schema_table(table)}.#{quote_identifier(op[:name])}")}, #{literal(op[:new_name].to_s)}, 'COLUMN'"
         when :set_column_type
-          "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(op)}"
+          sqls = []
+          if sch = schema(table)
+            if cs = sch.each{|k, v| break v if k == op[:name]; nil}
+              cs = cs.dup
+              if constraint = default_constraint_name(table, op[:name])
+                sqls << "ALTER TABLE #{quote_schema_table(table)} DROP CONSTRAINT #{constraint}"
+              end
+              cs[:default] = cs[:ruby_default]
+              op = cs.merge!(op)
+              default = op.delete(:default)
+            end
+          end
+          sqls << "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{column_definition_sql(op)}"
+          sqls << alter_table_sql(table, op.merge(:op=>:set_column_default, :default=>default)) if default
+          sqls
         when :set_column_null
           sch = schema(table).find{|k,v| k.to_s == op[:name].to_s}.last
           type = sch[:db_type]
@@ -122,6 +136,18 @@ module Sequel
         "CREATE TABLE #{quote_schema_table(options[:temp] ? "##{name}" : name)} (#{column_list_sql(generator)})"
       end
       
+      # The name of the constraint for setting the default value on the table and column.
+      def default_constraint_name(table, column)
+        from(:sysobjects___c_obj).
+          join(:syscomments___com, :id=>:id).
+          join(:sysobjects___t_obj, :id=>:c_obj__parent_obj).
+          join(:sysconstraints___con, :constid=>:c_obj__id).
+          join(:syscolumns___col, :id=>:t_obj__id, :colid=>:colid).
+          where{{c_obj__uid=>user_id{}}}.
+          where(:c_obj__xtype=>'D', :t_obj__name=>table.to_s, :col__name=>column.to_s).
+          get(:c_obj__name)
+      end
+
       # The SQL to drop an index for the table.
       def drop_index_sql(table, op)
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"

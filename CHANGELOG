@@ -1,5 +1,7 @@
 === HEAD
 
+* Make set_column_type not modify defaults and NULL/NOT NULL setting on MSSQL, H2, and SQLite (jeremyevans)
+
 * Qualify identifiers when filtering/excluding by associations (jeremyevans)
 
 * Make table_exists? better handle tables where you don't have permissions for all columns (jeremyevans) (#422)

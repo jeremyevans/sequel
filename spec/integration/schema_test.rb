@@ -367,6 +367,35 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:id=>"10"}, {:id=>"20"}]
   end
 
+  cspecify "should set column types without modifying NULL/NOT NULL", [:jdbc, :db2], [:db2], :oracle, :derby do
+    @db.create_table!(:items){Integer :id, :null=>false, :default=>2}
+    proc{@ds.insert(:id=>nil)}.should raise_error(Sequel::DatabaseError)
+    @db.alter_table(:items){set_column_type :id, String}
+    proc{@ds.insert(:id=>nil)}.should raise_error(Sequel::DatabaseError)
+
+    @db.create_table!(:items){Integer :id}
+    @ds.insert(:id=>nil)
+    @db.alter_table(:items){set_column_type :id, String}
+    @ds.insert(:id=>nil)
+    @ds.map(:id).should == [nil, nil]
+  end
+
+  cspecify "should set column types without modifying defaults", [:jdbc, :db2], [:db2], :oracle, :derby do
+    @db.create_table!(:items){Integer :id, :default=>0}
+    @ds.insert
+    @ds.map(:id).should == [0]
+    @db.alter_table(:items){set_column_type :id, String}
+    @ds.insert
+    @ds.map(:id).should == ['0', '0']
+
+    @db.create_table!(:items){String :id, :default=>'a'}
+    @ds.insert
+    @ds.map(:id).should == %w'a'
+    @db.alter_table(:items){set_column_type :id, String, :size=>1}
+    @ds.insert
+    @ds.map(:id).should == %w'a a'
+  end
+
   specify "should add unnamed unique constraints and foreign key table constraints correctly" do
     @db.create_table!(:items, :engine=>:InnoDB){Integer :id; Integer :item_id}
     @db.alter_table(:items) do
