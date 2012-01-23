@@ -28,6 +28,26 @@ module Sequel
         :mssql
       end
       
+      # Use the system tables to get index information
+      def indexes(table, opts={})
+        m = output_identifier_meth
+        im = input_identifier_meth
+        indexes = {}
+        metadata_dataset.from(:sys__tables___t).
+         join(:sys__indexes___i, :object_id=>:object_id).
+         join(:sys__index_columns___ic, :object_id=>:object_id, :index_id=>:index_id).
+         join(:sys__columns___c, :object_id=>:object_id, :column_id=>:column_id).
+         select(:i__name, :i__is_unique, :c__name___column).
+         where{{t__name=>im.call(table)}}.
+         where(:i__is_primary_key=>0, :i__is_disabled=>0).
+         order(:i__name, :ic__index_column_id).
+         each do |r|
+          index = indexes[m.call(r[:name])] ||= {:columns=>[], :unique=>(r[:is_unique] && r[:is_unique]!=0)}
+          index[:columns] << m.call(r[:column])
+        end
+        indexes
+      end
+
       # The version of the MSSQL server, as an integer (e.g. 10001600 for
       # SQL Server 2008 Express).
       def server_version(server=nil)

@@ -1,5 +1,9 @@
 === HEAD
 
+* Support Database#indexes in shared MSSQL adapter (jeremyevans)
+
+* Support :include option when creating indexes on MSSQL, for storing column values in the index (crawlik) (#426)
+
 * Make set_column_type not modify defaults and NULL/NOT NULL setting on MSSQL, H2, and SQLite (jeremyevans)
 
 * Qualify identifiers when filtering/excluding by associations (jeremyevans)
