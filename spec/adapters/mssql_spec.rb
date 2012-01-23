@@ -75,16 +75,16 @@ describe "MSSQL full_text_search" do
   
   specify "should support fulltext indexes and full_text_search" do
     log do
-    @db.create_table(:posts){Integer :id, :null=>false; String :title; String :body; index :id, :name=>:fts_id_idx, :unique=>true; full_text_index :title, :key_index=>:fts_id_idx; full_text_index [:title, :body], :key_index=>:fts_id_idx}
-    @db[:posts].insert(:title=>'ruby rails', :body=>'y')
-    @db[:posts].insert(:title=>'sequel', :body=>'ruby')
-    @db[:posts].insert(:title=>'ruby scooby', :body=>'x')
+      @db.create_table(:posts){Integer :id, :null=>false; String :title; String :body; index :id, :name=>:fts_id_idx, :unique=>true; full_text_index :title, :key_index=>:fts_id_idx; full_text_index [:title, :body], :key_index=>:fts_id_idx}
+      @db[:posts].insert(:title=>'ruby rails', :body=>'y')
+      @db[:posts].insert(:title=>'sequel', :body=>'ruby')
+      @db[:posts].insert(:title=>'ruby scooby', :body=>'x')
 
-    @db[:posts].full_text_search(:title, 'rails').all.should == [{:title=>'ruby rails', :body=>'y'}]
-    @db[:posts].full_text_search([:title, :body], ['sequel', 'ruby']).all.should == [{:title=>'sequel', :body=>'ruby'}]
+      @db[:posts].full_text_search(:title, 'rails').all.should == [{:title=>'ruby rails', :body=>'y'}]
+      @db[:posts].full_text_search([:title, :body], ['sequel', 'ruby']).all.should == [{:title=>'sequel', :body=>'ruby'}]
 
-    @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').should == [{:title=>'ruby rails', :body=>'y'}]
-    @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').should == [{:title=>'ruby rails', :body=>'y'}]
+      @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').should == [{:title=>'ruby rails', :body=>'y'}]
+      @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').should == [{:title=>'ruby rails', :body=>'y'}]
     end
   end
 end if false
@@ -94,8 +94,8 @@ describe "MSSQL Dataset#join_table" do
     MSSQL_DB[:items].join(:categories, [:id]).sql.should ==
       'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON ([CATEGORIES].[ID] = [ITEMS].[ID])'
     ['SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID1] = [ITEMS].[ID1]) AND ([CATEGORIES].[ID2] = [ITEMS].[ID2]))',
-     'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID2] = [ITEMS].[ID2]) AND ([CATEGORIES].[ID1] = [ITEMS].[ID1]))'].
-    should include(MSSQL_DB[:items].join(:categories, [:id1, :id2]).sql)
+      'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID2] = [ITEMS].[ID2]) AND ([CATEGORIES].[ID1] = [ITEMS].[ID1]))'].
+      should include(MSSQL_DB[:items].join(:categories, [:id1, :id2]).sql)
     MSSQL_DB[:items___i].join(:categories___c, [:id]).sql.should ==
       'SELECT * FROM [ITEMS] AS [I] INNER JOIN [CATEGORIES] AS [C] ON ([C].[ID] = [I].[ID])'
   end
@@ -520,5 +520,28 @@ describe "MSSQL::Database#mssql_unicode_strings = false" do
     ds.mssql_unicode_strings.should == true
     ds.insert(:name=>'foo')
     ds.select_map(:name).should == ['foo']
+  end
+end
+
+describe "A MSSQL database adds index with include" do
+  before :all do
+    @table_name = :test_index_include
+    @db = MSSQL_DB
+    @db.create_table! @table_name do
+      integer :col1
+      integer :col2
+      integer :col3
+    end
+  end
+
+  after :all do
+    @db.drop_table @table_name
+  end
+
+  cspecify "should be able add index with include" do
+    @db.alter_table @table_name do
+      add_index [:col1], :include => [:col2,:col3]
+    end
+    @db.indexes(@table_name).should have_key("#{@table_name}_col1_index".to_sym)
   end
 end
