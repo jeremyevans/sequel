@@ -16,6 +16,8 @@ module Sequel
     module DB2
       # Database instance methods for DB2 databases accessed via JDBC.
       module DatabaseMethods
+        PRIMARY_KEY_INDEX_RE = /\Asql\d+\z/i.freeze
+
         include Sequel::DB2::DatabaseMethods
         include Sequel::JDBC::Transactions
         IDENTITY_VAL_LOCAL = "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1".freeze
@@ -33,6 +35,11 @@ module Sequel
             rs.next
             rs.getInt(1)
           end
+        end
+        
+        # Primary key indexes appear to be named sqlNNNN on DB2
+        def primary_key_index_re
+          PRIMARY_KEY_INDEX_RE
         end
       end
       
