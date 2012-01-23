@@ -311,13 +311,17 @@ module Sequel
       # MySQL has both datetime and timestamp classes, most people are going
       # to want datetime
       def type_literal_generic_datetime(column)
-        :datetime
+        if column[:default] == Sequel::CURRENT_TIMESTAMP
+          :timestamp
+        else
+          :datetime
+        end
       end
 
       # MySQL has both datetime and timestamp classes, most people are going
       # to want datetime
       def type_literal_generic_time(column)
-        column[:only_time] ? :time : :datetime
+        column[:only_time] ? :time : type_literal_generic_datetime(column)
       end
 
       # MySQL doesn't have a true boolean class, so it uses tinyint(1)

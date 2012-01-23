@@ -1,5 +1,9 @@
 === HEAD
 
+* Make DateTime/Time columns with Sequel::CURRENT_TIMESTAMP default values use timestamp column on MySQL (jeremyevans)
+
+* Wrap column default values in extra parens on SQLite, fixes some cases (jeremyevans)
+
 * Make Database#indexes not include primary key indexes on Derby and HSQLDB (jeremyevans)
 
 * Support Database#indexes in shared MSSQL adapter (jeremyevans)

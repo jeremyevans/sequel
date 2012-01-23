@@ -674,6 +674,12 @@ describe Sequel::SQL::Constants do
     @ds.insert(:ts=>Sequel::CURRENT_TIMESTAMP)
     (Time.now - @c[@ds.get(:ts)]).should be_within(2).of(0)
   end
+
+  cspecify "should have working CURRENT_TIMESTAMP when used as a column default", [:jdbc, :sqlite] do
+    @db.create_table!(:constants){DateTime :ts, :default=>Sequel::CURRENT_TIMESTAMP}
+    @ds.insert
+    (Time.now - @c[@ds.get(:ts)]).should be_within(2).of(0)
+  end
 end
 
 describe "Sequel::Dataset#import and #multi_insert" do

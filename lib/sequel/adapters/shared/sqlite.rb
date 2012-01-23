@@ -241,6 +241,11 @@ module Sequel
         end
       end
 
+      # Surround default with parens to appease SQLite
+      def column_definition_default_sql(sql, column)
+        sql << " DEFAULT (#{literal(column[:default])})" if column.include?(:default)
+      end
+    
       # Array of PRAGMA SQL statements based on the Database options that should be applied to
       # new connections.
       def connection_pragmas
