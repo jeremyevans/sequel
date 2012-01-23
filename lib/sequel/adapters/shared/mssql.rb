@@ -264,7 +264,9 @@ module Sequel
         if index[:type] == :full_text
           "CREATE FULLTEXT INDEX ON #{quote_schema_table(table_name)} #{literal(index[:columns])} KEY INDEX #{literal(index[:key_index])}"
         else
-          "CREATE #{'UNIQUE ' if index[:unique]}#{'CLUSTERED ' if index[:type] == :clustered}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
+          "CREATE #{'UNIQUE ' if index[:unique]}#{'CLUSTERED ' if index[:type] == :clustered}INDEX #{quote_identifier(index_name)} \
+          ON #{quote_schema_table(table_name)} #{literal(index[:columns])} \
+          #{'INCLUDE ' + literal(index[:include]) if index[:include]}"
         end
       end
     end
