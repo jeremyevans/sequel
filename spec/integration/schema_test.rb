@@ -1,6 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-if INTEGRATION_DB.respond_to?(:schema_parse_table, true)
 describe "Database schema parser" do
   before do
     @iom = INTEGRATION_DB.identifier_output_method
@@ -137,14 +136,17 @@ describe "Database schema parser" do
     INTEGRATION_DB.create_table!(:items){FalseClass :number}
     INTEGRATION_DB.schema(:items).first.last[:type].should == :boolean
   end
-end
-end
+end if INTEGRATION_DB.respond_to?(:schema_parse_table, true)
 
-begin
+test_indexes = begin
   INTEGRATION_DB.drop_table(:blah) rescue nil
   INTEGRATION_DB.indexes(:blah)
+  true
 rescue Sequel::NotImplemented
+  false
 rescue
+  true
+end
 describe "Database index parsing" do
   after do
     INTEGRATION_DB.drop_table(:items)
@@ -173,8 +175,7 @@ describe "Database index parsing" do
     INTEGRATION_DB.create_table!(:items){Integer :n; Integer :a; primary_key [:n, :a]}
     INTEGRATION_DB.indexes(:items).should == {}
   end
-end
-end
+end if test_indexes
 
 describe "Database schema modifiers" do
   before do
@@ -478,10 +479,12 @@ describe "Database schema modifiers" do
   end
 end
 
-begin
+test_tables = begin
   INTEGRATION_DB.tables
+  true
 rescue Sequel::NotImplemented
-rescue
+  false
+end
 describe "Database#tables" do
   before do
     class ::String
@@ -516,13 +519,14 @@ describe "Database#tables" do
     @db.identifier_input_method = :xxxxx
     @db.tables.each{|t| t.to_s.should =~ /\Ax{5}\d+\z/}
   end
-end
-end
+end if test_tables
 
-begin
+test_views = begin
   INTEGRATION_DB.views
+  true
 rescue Sequel::NotImplemented
-rescue
+  false
+end
 describe "Database#views" do
   before do
     class ::String
@@ -557,5 +561,4 @@ describe "Database#views" do
     @db.identifier_input_method = :xxxxx
     @db.views.each{|t| t.to_s.should =~ /\Ax{5}\d+\z/}
   end
-end
-end
+end if test_views
