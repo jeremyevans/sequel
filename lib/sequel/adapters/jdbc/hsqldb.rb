@@ -6,6 +6,8 @@ module Sequel
     module HSQLDB
       # Instance methods for HSQLDB Database objects accessed via JDBC.
       module DatabaseMethods
+        PRIMARY_KEY_INDEX_RE = /\Asys_idx_sys_pk_/i.freeze
+
         include ::Sequel::JDBC::Transactions
 
         # HSQLDB uses the :hsqldb database type.
@@ -53,6 +55,11 @@ module Sequel
             rs.next
             rs.getInt(1)
           end
+        end
+        
+        # Primary key indexes appear to start with sys_idx_sys_pk_ on HSQLDB
+        def primary_key_index_re
+          PRIMARY_KEY_INDEX_RE
         end
 
         # If an :identity option is present in the column, add the necessary IDENTITY SQL.

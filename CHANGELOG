@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#indexes not include primary key indexes on Derby and HSQLDB (jeremyevans)
+
 * Support Database#indexes in shared MSSQL adapter (jeremyevans)
 
 * Support :include option when creating indexes on MSSQL, for storing column values in the index (crawlik) (#426)

@@ -6,6 +6,8 @@ module Sequel
     module Derby
       # Instance methods for Derby Database objects accessed via JDBC.
       module DatabaseMethods
+        PRIMARY_KEY_INDEX_RE = /\Asql\d+\z/i.freeze
+
         include ::Sequel::JDBC::Transactions
 
         # Derby doesn't support casting integer to varchar, only integer to char,
@@ -90,6 +92,11 @@ module Sequel
         # Derby uses RENAME TABLE syntax to rename tables.
         def rename_table_sql(name, new_name)
           "RENAME TABLE #{quote_schema_table(name)} TO #{quote_schema_table(new_name)}"
+        end
+
+        # Primary key indexes appear to be named sqlNNNN on Derby
+        def primary_key_index_re
+          PRIMARY_KEY_INDEX_RE
         end
 
         # If an :identity option is present in the column, add the necessary IDENTITY SQL.
