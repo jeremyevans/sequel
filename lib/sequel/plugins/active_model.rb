@@ -16,7 +16,14 @@ module Sequel
     #   # Make the Album class active_model compliant
     #   Album.plugin :active_model
     module ActiveModel
-      ClassMethods = ::ActiveModel::Naming
+      module ClassMethods
+        include ::ActiveModel::Naming
+        
+        # Class level cache for to_partial_path.
+        def _to_partial_path
+          @_to_partial_path ||= "#{underscore(pluralize(to_s))}/#{underscore(demodulize(to_s))}".freeze
+        end
+      end
 
       module InstanceMethods
         # The default string to join composite primary keys with in to_param.
@@ -55,6 +62,11 @@ module Sequel
           if persisted? and k = to_key
             k.join(to_param_joiner)
           end
+        end
+
+        # Returns a string identifying the path associated with the object.
+        def to_partial_path
+          model._to_partial_path
         end
         
         private

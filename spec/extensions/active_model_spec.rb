@@ -24,6 +24,11 @@ describe "ActiveModel plugin" do
           columns :id, :id2
           def delete; end
         end
+        module ::Blog
+          class Post < Sequel::Model
+             plugin :active_model
+          end
+        end
         @c = AMLintTest
         @c.plugin :active_model
         @m = @model = @c.new
@@ -33,6 +38,7 @@ describe "ActiveModel plugin" do
       def teardown
         super
         Object.send(:remove_const, :AMLintTest)
+        Object.send(:remove_const, :Blog)
       end
       include ActiveModel::Lint::Tests
 
@@ -80,6 +86,13 @@ describe "ActiveModel plugin" do
         assert_equal false, @m.persisted?
         assert_equal false, @o.persisted?
       end
+
+      # Should return self, not a proxy object
+      def test__to_partial_path
+        assert_equal 'am_lint_tests/am_lint_test', @m.to_partial_path
+        assert_equal 'blog/posts/post', Blog::Post.new.to_partial_path
+      end
+      
     end
     if defined?(MiniTest::Unit)
       tc.instance_methods.map{|x| x.to_s}.reject{|n| n !~ /\Atest_/}.each do |m|

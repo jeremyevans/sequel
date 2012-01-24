@@ -1,5 +1,7 @@
 === HEAD
 
+* Support ActiveModel 3.2 in the active_model plugin, by adding support for to_partial_path (jeremyevans)
+
 * Fix metadata methods (e.g. tables) on Oracle when custom identifier input methods are used (jeremyevans)
 
 * Fix Database#indexes on DB2 (jeremyevans)
