@@ -60,9 +60,16 @@ module Sequel
 
       # Use SYSCAT.INDEXES to get the indexes for the table
       def indexes(table, opts = {})
+        m = output_identifier_meth
+        indexes = {}
         metadata_dataset.
-          with_sql("SELECT INDNAME,UNIQUERULE,MADE_UNIQUE,SYSTEM_REQUIRED FROM SYSCAT.INDEXES WHERE TABNAME = #{literal(input_identifier_meth.call(table))}").
-          all.map{|h| Hash[ h.map{|k,v| [k.to_sym, v]} ] }
+         from(:syscat__indexes).
+         select(:indname, :uniquerule, :colnames).
+         where(:tabname=>input_identifier_meth.call(table), :system_required=>0).
+         each do |r|
+          indexes[m.call(r[:indname])] = {:unique=>(r[:uniquerule]=='U'), :columns=>r[:colnames][1..-1].split('+').map{|v| m.call(v)}}
+        end
+        indexes
       end
 
       private

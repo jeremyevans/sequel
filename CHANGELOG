@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Database#indexes on DB2 (jeremyevans)
+
 * Make DateTime/Time columns with Sequel::CURRENT_TIMESTAMP default values use timestamp column on MySQL (jeremyevans)
 
 * Wrap column default values in extra parens on SQLite, fixes some cases (jeremyevans)
