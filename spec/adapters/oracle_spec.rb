@@ -31,6 +31,24 @@ describe "An Oracle database" do
     ORACLE_DB.pool.size.should == 0
   end
 
+  specify "should have working view_exists?" do
+    begin
+      ORACLE_DB.view_exists?(:cats).should be_false
+      ORACLE_DB.create_view(:cats, ORACLE_DB[:categories])
+      ORACLE_DB.view_exists?(:cats).should be_true
+      om = ORACLE_DB.identifier_output_method
+      im = ORACLE_DB.identifier_input_method
+      ORACLE_DB.identifier_output_method = :reverse
+      ORACLE_DB.identifier_input_method = :reverse
+      ORACLE_DB.view_exists?(:STAC).should be_true
+      ORACLE_DB.view_exists?(:cats).should be_false
+    ensure
+      ORACLE_DB.identifier_output_method = om
+      ORACLE_DB.identifier_input_method = im
+      ORACLE_DB.drop_view(:cats)
+    end
+  end
+
   specify "should be able to get current sequence value with SQL" do
     begin
       ORACLE_DB.create_table!(:foo){primary_key :id}
