@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix metadata methods (e.g. tables) on Oracle when custom identifier input methods are used (jeremyevans)
+
 * Fix Database#indexes on DB2 (jeremyevans)
 
 * Make DateTime/Time columns with Sequel::CURRENT_TIMESTAMP default values use timestamp column on MySQL (jeremyevans)

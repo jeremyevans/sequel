@@ -17,7 +17,7 @@ module Sequel
       end
 
       def current_user
-        @current_user ||= get{sys_context('USERENV', 'CURRENT_USER')}
+        @current_user ||= metadata_dataset.get{sys_context('USERENV', 'CURRENT_USER')}
       end
 
       def drop_sequence(name)
@@ -30,17 +30,18 @@ module Sequel
       end
 
       def tables(opts={})
-        ds = from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'TABLE')
-        ds.map{|r| ds.send(:output_identifier, r[:tname])}
+        m = output_identifier_meth
+        metadata_dataset.from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'TABLE').map{|r| m.call(r[:tname])}
       end
 
       def views(opts={}) 
-        ds = from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'VIEW') 
-        ds.map{|r| ds.send(:output_identifier, r[:tname])} 
+        m = output_identifier_meth
+        metadata_dataset.from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'VIEW').map{|r| m.call(r[:tname])}
       end 
  
       def view_exists?(name) 
-        from(:tab).filter(:tname =>dataset.send(:input_identifier, name), :tabtype => 'VIEW').count > 0 
+        m = input_identifier_meth
+        metadata_dataset.from(:tab).filter(:tname =>m.call(name), :tabtype => 'VIEW').count > 0 
       end 
 
       private
