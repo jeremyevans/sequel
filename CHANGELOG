@@ -6,7 +6,7 @@
 
 * Wrap column default values in extra parens on SQLite, fixes some cases (jeremyevans)
 
-* Make Database#indexes not include primary key indexes on Derby, HSQLDB, and DB2 using the jdbc adapter (jeremyevans)
+* Make Database#indexes not include primary key indexes on Derby, HSQLDB, Oracle, and DB2 using the jdbc adapter (jeremyevans)
 
 * Support Database#indexes in shared MSSQL adapter (jeremyevans)
 

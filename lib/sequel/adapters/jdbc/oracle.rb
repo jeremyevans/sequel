@@ -7,6 +7,8 @@ module Sequel
     module Oracle
       # Instance methods for Oracle Database objects accessed via JDBC.
       module DatabaseMethods
+        PRIMARY_KEY_INDEX_RE = /\Asys_/i.freeze
+
         include Sequel::Oracle::DatabaseMethods
         include Sequel::JDBC::Transactions
 
@@ -37,6 +39,11 @@ module Sequel
               end
             end
           end
+        end
+
+        # Primary key indexes appear to start with sys_ on Oracle
+        def primary_key_index_re
+          PRIMARY_KEY_INDEX_RE
         end
 
         def schema_parse_table(*)
