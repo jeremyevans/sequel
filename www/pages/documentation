@@ -47,7 +47,7 @@
 
 <h3><a href="rdoc/files/doc/release_notes/">Release Notes</a></h3>
 
-<h3><a href="rdoc/files/COPYING.html">License</a></h3>
+<h3><a href="rdoc/files/MIT-LICENSE.html">License</a></h3>
 
 <h3>Presentations</h3>
 
@@ -55,7 +55,6 @@
 <li><a href="http://jeremyevans-pres.heroku.com/pgwest2011/index.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at PostgreSQL Conference West 2011</a></li>
 <li><a href="http://jeremyevans-pres.heroku.com/lsrc2009_presentation/sequel-lsrc2009.html">Jeremy Evans's &quot;Sequel: SQL in Ruby&quot; Presentation at Lone Star Ruby Conference 2009</a></li>
 <li><a href="http://jeremyevans-pres.heroku.com/rk2009_presentation/sequel-rubykaigi2009.html">Jeremy Evans's &quot;Sequel: SQL in Ruby&quot; Presentation at RubyKaigi 2009</a> (<a href="http://www.ustream.tv/recorded/1825816">Video</a>)</li>
-<li><a href="http://jeremyevans-pres.heroku.com/larc2009_presentation/sequel-larc2009-pres.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at LA Ruby Conf 2009</a> (<a href="http://larubyconf2009.confreaks.com/04-apr-2009-11-20-sequel-jeremy-evans.html">Video</a>)</li>
-<li><a href="http://jeremyevans-pres.heroku.com/mwrc2009_presentation.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at MountainWest RubyConf 2009</a> (<a href="http://mwrc2009.confreaks.com/13-mar-2009-12-30-sequel-jeremy-evans.html">Video</a>) (<a href="http://jeremyevans-pres.heroku.com/mwrc2009_presentation.txt">Transcript</a>)</li>
-<li><a href="http://assets.loriholden.com/presentations/merbcamp2008/">Lori Holden's &quot;Merb And Sequel&quot; Presentation at Merbcamp 2008</a></li>
+<li><a href="http://jeremyevans-pres.heroku.com/larc2009_presentation/sequel-larc2009-pres.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at LA Ruby Conf 2009</a> (<a href="http://confreaks.com/videos/246-larubyconf2009-sequel">Video</a>)</li>
+<li><a href="http://jeremyevans-pres.heroku.com/mwrc2009_presentation.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at MountainWest RubyConf 2009</a> (<a href="http://confreaks.com/videos/51-mwrc2009-sequel">Video</a>) (<a href="http://jeremyevans-pres.heroku.com/mwrc2009_presentation.txt">Transcript</a>)</li>
 </ul>
