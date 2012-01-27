@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Sequel.empty_array_handle_nulls setting, can be set to false for possible better performance on some databases (jeremyevans)
+
+* Change exclude(:b=>[]) to not return rows where b is NULL (jeremyevans) (#427)
+
 * Support ActiveModel 3.2 in the active_model plugin, by adding support for to_partial_path (jeremyevans)
 
 * Fix metadata methods (e.g. tables) on Oracle when custom identifier input methods are used (jeremyevans)

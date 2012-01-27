@@ -495,29 +495,42 @@ describe "Dataset#where" do
       "SELECT * FROM test WHERE (gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia')))"
   end
   
+  specify "should handle all types of IN/NOT IN queries with empty arrays" do
+    @dataset.filter(:id => []).sql.should == "SELECT * FROM test WHERE (id != id)"
+    @dataset.filter([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
+    @dataset.exclude(:id => []).sql.should == "SELECT * FROM test WHERE (id = id)"
+    @dataset.exclude([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
+  end
+
+  specify "should handle all types of IN/NOT IN queries with empty arrays" do
+    begin
+      Sequel.empty_array_handle_nulls = false
+      @dataset.filter(:id => []).sql.should == "SELECT * FROM test WHERE (1 = 0)"
+      @dataset.filter([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE (1 = 0)"
+      @dataset.exclude(:id => []).sql.should == "SELECT * FROM test WHERE (1 = 1)"
+      @dataset.exclude([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE (1 = 1)"
+    ensure
+      Sequel.empty_array_handle_nulls = true
+    end
+  end
+
   specify "should handle all types of IN/NOT IN queries" do
     @dataset.filter(:id => @d1.select(:id)).sql.should == "SELECT * FROM test WHERE (id IN (SELECT id FROM test WHERE (region = 'Asia')))"
-    @dataset.filter(:id => []).sql.should == "SELECT * FROM test WHERE (id != id)"
     @dataset.filter(:id => [1, 2]).sql.should == "SELECT * FROM test WHERE (id IN (1, 2))"
     @dataset.filter([:id1, :id2] => @d1.select(:id1, :id2)).sql.should == "SELECT * FROM test WHERE ((id1, id2) IN (SELECT id1, id2 FROM test WHERE (region = 'Asia')))"
-    @dataset.filter([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
     @dataset.filter([:id1, :id2] => [[1, 2], [3,4]].sql_array).sql.should == "SELECT * FROM test WHERE ((id1, id2) IN ((1, 2), (3, 4)))"
     @dataset.filter([:id1, :id2] => [[1, 2], [3,4]]).sql.should == "SELECT * FROM test WHERE ((id1, id2) IN ((1, 2), (3, 4)))"
 
     @dataset.exclude(:id => @d1.select(:id)).sql.should == "SELECT * FROM test WHERE (id NOT IN (SELECT id FROM test WHERE (region = 'Asia')))"
-    @dataset.exclude(:id => []).sql.should == "SELECT * FROM test WHERE (1 = 1)"
     @dataset.exclude(:id => [1, 2]).sql.should == "SELECT * FROM test WHERE (id NOT IN (1, 2))"
     @dataset.exclude([:id1, :id2] => @d1.select(:id1, :id2)).sql.should == "SELECT * FROM test WHERE ((id1, id2) NOT IN (SELECT id1, id2 FROM test WHERE (region = 'Asia')))"
-    @dataset.exclude([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE (1 = 1)"
     @dataset.exclude([:id1, :id2] => [[1, 2], [3,4]].sql_array).sql.should == "SELECT * FROM test WHERE ((id1, id2) NOT IN ((1, 2), (3, 4)))"
     @dataset.exclude([:id1, :id2] => [[1, 2], [3,4]]).sql.should == "SELECT * FROM test WHERE ((id1, id2) NOT IN ((1, 2), (3, 4)))"
   end
 
   specify "should handle IN/NOT IN queries with multiple columns and an array where the database doesn't support it" do
     @dataset.meta_def(:supports_multiple_column_in?){false}
-    @dataset.filter([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
     @dataset.filter([:id1, :id2] => [[1, 2], [3,4]].sql_array).sql.should == "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
-    @dataset.exclude([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE (1 = 1)"
     @dataset.exclude([:id1, :id2] => [[1, 2], [3,4]].sql_array).sql.should == "SELECT * FROM test WHERE (((id1 != 1) OR (id2 != 2)) AND ((id1 != 3) OR (id2 != 4)))"
   end
 
@@ -537,8 +550,23 @@ describe "Dataset#where" do
     d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
     @dataset.filter([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
     db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
-    @dataset.exclude([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (1 = 1)"
+    @dataset.exclude([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
     db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
+  end
+  
+  specify "should handle IN/NOT IN queries with multiple columns and an empty dataset where the database doesn't support it with correct NULL handling" do
+    begin
+      Sequel.empty_array_handle_nulls = false
+      @dataset.meta_def(:supports_multiple_column_in?){false}
+      db = Sequel.mock
+      d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
+      @dataset.filter([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (1 = 0)"
+      db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
+      @dataset.exclude([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (1 = 1)"
+      db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
+    ensure
+      Sequel.empty_array_handle_nulls = true
+    end
   end
   
   specify "should handle IN/NOT IN queries for datasets with row_procs" do

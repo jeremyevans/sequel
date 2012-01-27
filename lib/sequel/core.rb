@@ -25,6 +25,7 @@
 module Sequel
   @convert_two_digit_years = true
   @datetime_class = Time
+  @empty_array_handle_nulls = true
   @virtual_row_instance_eval = true
   @require_thread = nil
   
@@ -53,6 +54,27 @@ module Sequel
     # they often implement them differently (e.g. + using seconds on +Time+ and
     # days on +DateTime+).
     attr_accessor :datetime_class
+
+    # Sets whether or not to attempt to handle NULL values correctly when given
+    # an empty array.  By default:
+    #
+    #   DB[:a].filter(:b=>[])
+    #   # SELECT * FROM a WHERE (b != b)
+    #   DB[:a].exclude(:b=>[])
+    #   # SELECT * FROM a WHERE (b = b)
+    #
+    # However, some databases (e.g. MySQL) will perform very poorly
+    # with this type of query.  You can set this to false to get the
+    # following behavior:
+    #
+    #   DB[:a].filter(:b=>[])
+    #   # SELECT * FROM a WHERE 1 = 0
+    #   DB[:a].exclude(:b=>[])
+    #   # SELECT * FROM a WHERE 1 = 1
+    # 
+    # This may not handle NULLs correctly, but can be much faster on
+    # some databases.
+    attr_accessor :empty_array_handle_nulls
 
     # For backwards compatibility, has no effect.
     attr_accessor :virtual_row_instance_eval

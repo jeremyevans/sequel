@@ -1184,11 +1184,42 @@ describe "Sequel::Dataset DSL support" do
   specify "should work empty arrays with nulls" do
     @ds.insert(nil, nil)
     @ds.filter(:a=>[]).all.should == []
-    @ds.exclude(:a=>[]).all.should == [{:a=>nil, :b=>nil}]
+    @ds.exclude(:a=>[]).all.should == []
     @ds.filter([:a, :b]=>[]).all.should == []
-    @ds.exclude([:a, :b]=>[]).all.should == [{:a=>nil, :b=>nil}]
+    @ds.exclude([:a, :b]=>[]).all.should == []
+
+    unless Sequel.guarded?(:mssql, :oracle, :db2)
+      # MSSQL doesn't like boolean results in the select list
+      pr = proc{|r| r.is_a?(Integer) ? (r != 0) : r}
+      pr[@ds.get({:a=>[]}.sql_expr)].should == nil
+      pr[@ds.get(~({:a=>[]}).sql_expr)].should == nil
+      pr[@ds.get({[:a, :b]=>[]}.sql_expr)].should == nil
+      pr[@ds.get(~({[:a, :b]=>[]}).sql_expr)].should == nil
+    end
   end
   
+  specify "should work empty arrays with nulls and Sequel.empty_array_null_handling = true" do
+    begin
+      Sequel.empty_array_handle_nulls = false
+      @ds.insert(nil, nil)
+      @ds.filter(:a=>[]).all.should == []
+      @ds.exclude(:a=>[]).all.should == [{:a=>nil, :b=>nil}]
+      @ds.filter([:a, :b]=>[]).all.should == []
+      @ds.exclude([:a, :b]=>[]).all.should == [{:a=>nil, :b=>nil}]
+
+      unless Sequel.guarded?(:mssql, :oracle, :db2)
+        # MSSQL doesn't like boolean results in the select list
+        pr = proc{|r| r.is_a?(Integer) ? (r != 0) : r}
+        pr[@ds.get({:a=>[]}.sql_expr)].should == false
+        pr[@ds.get(~({:a=>[]}).sql_expr)].should == true
+        pr[@ds.get({[:a, :b]=>[]}.sql_expr)].should == false
+        pr[@ds.get(~({[:a, :b]=>[]}).sql_expr)].should == true
+      end
+    ensure
+      Sequel.empty_array_handle_nulls = true
+    end
+  end
+
   it "should work multiple conditions" do
     @ds.insert(20, 10)
     @ds.filter(:a=>20, :b=>10).all.should == [{:a=>20, :b=>10}]

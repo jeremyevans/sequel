@@ -419,14 +419,10 @@ module Sequel
           val_array = true
           empty_val_array = vals == []
         end
-        if col_array
-          if empty_val_array
-            if op == :IN
-              literal_append(sql, SQL::BooleanExpression.from_value_pairs(cols.to_a.map{|x| [x, x]}, :AND, true))
-            else
-              literal_append(sql, 1=>1)
-            end
-          elsif !supports_multiple_column_in?
+        if empty_val_array
+          literal_append(sql, empty_array_value(op, cols))
+        elsif col_array
+          if !supports_multiple_column_in?
             if val_array
               expr = SQL::BooleanExpression.new(:OR, *vals.to_a.map{|vs| SQL::BooleanExpression.from_value_pairs(cols.to_a.zip(vs).map{|c, v| [c, v]})})
               literal_append(sql, op == :IN ? expr : ~expr)
@@ -452,19 +448,11 @@ module Sequel
             sql << PAREN_CLOSE
           end
         else
-          if empty_val_array
-            if op == :IN
-              literal_append(sql, SQL::BooleanExpression.from_value_pairs([[cols, cols]], :AND, true))
-            else
-              literal_append(sql, 1=>1)
-            end
-          else
-            sql << PAREN_OPEN
-            literal_append(sql, cols)
-            sql << SPACE << op.to_s << SPACE
-            literal_append(sql, vals)
-            sql << PAREN_CLOSE
-          end
+          sql << PAREN_OPEN
+          literal_append(sql, cols)
+          sql << SPACE << op.to_s << SPACE
+          literal_append(sql, vals)
+          sql << PAREN_CLOSE
         end
       when *TWO_ARITY_OPERATORS
         sql << PAREN_OPEN
@@ -856,6 +844,11 @@ module Sequel
       :"#{DATASET_ALIAS_BASE_NAME}#{number}"
     end
     
+    # The strftime format to use when literalizing the time.
+    def default_timestamp_format
+      requires_sql_standard_datetimes? ? STANDARD_TIMESTAMP_FORMAT : TIMESTAMP_FORMAT
+    end
+
     # The order of methods to call to build the DELETE SQL statement
     def delete_clause_methods
       DELETE_CLAUSE_METHODS
@@ -877,9 +870,13 @@ module Sequel
       end
     end
     
-    # The strftime format to use when literalizing the time.
-    def default_timestamp_format
-      requires_sql_standard_datetimes? ? STANDARD_TIMESTAMP_FORMAT : TIMESTAMP_FORMAT
+    def empty_array_value(op, cols)
+      if Sequel.empty_array_handle_nulls
+        c = Array(cols)
+        SQL::BooleanExpression.from_value_pairs(c.zip(c), :AND, op == :IN)
+      else
+        {1 => ((op == :IN) ? 0 : 1)}
+      end
     end
     
     # Format the timestamp based on the default_timestamp_format, with a couple
