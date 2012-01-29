@@ -237,6 +237,23 @@ Sequel::Model:
 
   class Invoice < Sequel::Model
     many_to_one :client
+
+    # has_one :through equivalent 1
+    # eager load with :eager=>:firm option on :client association, and eager loading :client
+    def firm
+      client.firm if client
+    end
+
+    # has_one :through equivalent 2
+    # eager load the usual way
+    many_to_many :firms, :join_table=>:clients, :left_key=>:id, :left_primary_key=>:client_id, :right_key=>:firm_id
+    def firm
+      firms.first
+    end
+
+    # has_one :through equivalent 3
+    # eager loading requires custom :eager_loader proc
+    many_to_one :firm, :dataset=>proc{Firm.join(:clients, :firm_id=>:id, :id=>client_id).select_all(:firms)}
   end
 
   Firm.first.invoices
