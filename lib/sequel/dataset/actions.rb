@@ -431,6 +431,10 @@ module Sequel
     #
     #   DB[:table].select_hash([:id, :foo], [:name, :bar]) # SELECT * FROM table
     #   # {[1, 3]=>['a', 'c'], [2, 4]=>['b', 'd'], ...}
+    #
+    # When using this method, you must be sure that each expression has an alias
+    # that Sequel can determine.  Usually you can do this by calling the #as method
+    # on the expression and providing an alias.
     def select_hash(key_column, value_column)
       if key_column.is_a?(Array)
         if value_column.is_a?(Array)
@@ -461,6 +465,10 @@ module Sequel
     #
     #   DB[:table].select_map([:id, :name]) # SELECT id, name FROM table
     #   # => [[1, 'A'], [2, 'B'], [3, 'C'], ...]
+    #
+    # If you provide an array of expressions, you must be sure that each entry
+    # in the array has an alias that Sequel can determine.  Usually you can do this
+    # by calling the #as method on the expression and providing an alias.
     def select_map(column=nil, &block)
       _select_map(column, false, &block)
     end
@@ -478,6 +486,10 @@ module Sequel
     #
     #   DB[:table].select_order_map([:id, :name]) # SELECT id, name FROM table ORDER BY id, name
     #   # => [[1, 'A'], [2, 'B'], [3, 'C'], ...]
+    #
+    # If you provide an array of expressions, you must be sure that each entry
+    # in the array has an alias that Sequel can determine.  Usually you can do this
+    # by calling the #as method on the expression and providing an alias.
     def select_order_map(column=nil, &block)
       _select_map(column, true, &block)
     end
