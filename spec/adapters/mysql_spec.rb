@@ -820,7 +820,7 @@ describe "MySQL::Dataset#insert and related methods" do
     MYSQL_DB.sqls.should == ["INSERT IGNORE INTO `items` (`name`) VALUES ('ghi')"]
     @d.all.should == [{:name => 'ghi', :value => nil}]
   end
-  
+
   specify "#on_duplicate_key_update should add the ON DUPLICATE KEY UPDATE and ALL columns when no args given" do
     @d.on_duplicate_key_update.import([:name,:value], [['abc', 1], ['def',2]])
     
@@ -852,6 +852,31 @@ describe "MySQL::Dataset#insert and related methods" do
     ]
   end
   
+end
+
+describe "MySQL::Dataset#update and related methods" do
+  before do
+    MYSQL_DB.create_table(:items){String :name; Integer :value}
+    MYSQL_DB.add_index(:items, :name, :unique=>true, :name=>:unique_name)
+    @d = MYSQL_DB[:items]
+    MYSQL_DB.sqls.clear
+  end
+  after do
+    MYSQL_DB.drop_table(:items)
+  end
+  specify "#update_ignore should add the IGNORE keyword for updates" do
+    @d.update_ignore.update(:name => 'ghi')
+    MYSQL_DB.sqls.should == ["UPDATE IGNORE `items` SET `name` = 'ghi'"]
+  end
+  specify "#update_ignore should not raise error where normal update would fail" do
+    @d.insert(:name => 'cow', :value => 'moo')
+    @d.insert(:name => 'cat', :value => 'miew')
+    lambda do
+      @d.where(:value => 'miew').update(:name => 'cow')
+    end.should raise_error(Sequel::DatabaseError,"Mysql::Error: Duplicate entry 'cow' for key 'unique_name'")
+    @d.update_ignore.where(:value => 'miew').update(:name => 'cow')
+    MYSQL_DB.sqls.last.should == "UPDATE IGNORE `items` SET `name` = 'cow' WHERE (`value` = 'miew')"
+  end
 end
 
 describe "MySQL::Dataset#replace" do
