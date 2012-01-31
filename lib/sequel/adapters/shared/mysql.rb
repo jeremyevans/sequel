@@ -1,5 +1,6 @@
 module Sequel
   Dataset::NON_SQL_OPTIONS << :insert_ignore
+  Dataset::NON_SQL_OPTIONS << :update_ignore
   Dataset::NON_SQL_OPTIONS << :on_duplicate_key_update
 
   module MySQL
@@ -340,7 +341,7 @@ module Sequel
       DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'delete from where order limit')
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'insert ignore into columns values on_duplicate_key_update')
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct calc_found_rows columns from join where group having compounds order limit lock')
-      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'update table set where order limit')
+      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'update ignore table set where order limit')
       SPACE = Dataset::SPACE
       PAREN_OPEN = Dataset::PAREN_OPEN
       PAREN_CLOSE = Dataset::PAREN_CLOSE
@@ -471,6 +472,16 @@ module Sequel
       def insert_ignore
         clone(:insert_ignore=>true)
       end
+
+      # Sets up the update methods to use UPDATE IGNORE.
+      # Useful if you have a unique key and want to just skip
+      # updating rows that violate the unique key restriction.
+      #
+      #   dataset.update_ignore.update({:name => 'a', :value => 1})
+      #   # UPDATE IGNORE tablename SET name = vale
+      def update_ignore
+        clone(:update_ignore=>true)
+      end
       
       # Sets up the insert methods to use ON DUPLICATE KEY UPDATE
       # If you pass no arguments, ALL fields will be
@@ -593,6 +604,11 @@ module Sequel
       # MySQL supports INSERT IGNORE INTO
       def insert_ignore_sql(sql)
         sql << IGNORE if opts[:insert_ignore]
+      end
+
+      # MySQL supports UPDATE IGNORE
+      def update_ignore_sql(sql)
+        sql << IGNORE if opts[:update_ignore]
       end
 
       # If this is an replace instead of an insert, use replace instead
