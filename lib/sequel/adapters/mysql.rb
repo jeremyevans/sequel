@@ -29,6 +29,9 @@ module Sequel
 
     class << self
       # Whether to convert invalid date time values by default.
+      #
+      # Only applies to Sequel::Database instances created after this
+      # has been set.
       attr_accessor :convert_invalid_date_time
     end
     self.convert_invalid_date_time = false
