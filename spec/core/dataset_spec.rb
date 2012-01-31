@@ -3788,6 +3788,12 @@ describe "Sequel::Dataset#select_map" do
     @ds.db.sqls.should == ['SELECT a.b FROM t']
   end
 
+  specify "should raise if multiple arguments and can't determine alias" do
+    proc{@ds.select_map([:a.sql_function, :b])}.should raise_error(Sequel::Error)
+    proc{@ds.select_map(:a.sql_function){b}}.should raise_error(Sequel::Error)
+    proc{@ds.select_map{[a{}, b]}}.should raise_error(Sequel::Error)
+  end
+
   specify "should handle implicit aliases in arguments" do
     @ds.select_map(:a___b).should == [1, 2]
     @ds.db.sqls.should == ['SELECT a AS b FROM t']
@@ -3798,9 +3804,29 @@ describe "Sequel::Dataset#select_map" do
     @ds.db.sqls.should == ['SELECT a AS b FROM t']
   end
   
+  specify "should handle identifiers with strings" do
+    @ds.select_map([Sequel::SQL::Identifier.new('c'), :c]).should == [[1, 1], [2, 2]]
+    @ds.db.sqls.should == ['SELECT c, c FROM t']
+  end
+  
   specify "should accept a block" do
     @ds.select_map{a(t__c)}.should == [1, 2]
     @ds.db.sqls.should == ['SELECT a(t.c) FROM t']
+  end
+
+  specify "should accept a block with an array of columns" do
+    @ds.select_map{[a(t__c).as(c), a(t__c).as(c)]}.should == [[1, 1], [2, 2]]
+    @ds.db.sqls.should == ['SELECT a(t.c) AS c, a(t.c) AS c FROM t']
+  end
+
+  specify "should accept a block with a column" do
+    @ds.select_map(:c){a(t__c).as(c)}.should == [[1, 1], [2, 2]]
+    @ds.db.sqls.should == ['SELECT c, a(t.c) AS c FROM t']
+  end
+
+  specify "should accept a block and array of arguments" do
+    @ds.select_map([:c, :c]){[a(t__c).as(c), a(t__c).as(c)]}.should == [[1, 1, 1, 1], [2, 2, 2, 2]]
+    @ds.db.sqls.should == ['SELECT c, c, a(t.c) AS c, a(t.c) AS c FROM t']
   end
 
   specify "should handle an array of columns" do
@@ -3831,6 +3857,12 @@ describe "Sequel::Dataset#select_order_map" do
     @ds.db.sqls.should == ['SELECT a.b FROM t ORDER BY a.b']
   end
 
+  specify "should raise if multiple arguments and can't determine alias" do
+    proc{@ds.select_order_map([:a.sql_function, :b])}.should raise_error(Sequel::Error)
+    proc{@ds.select_order_map(:a.sql_function){b}}.should raise_error(Sequel::Error)
+    proc{@ds.select_order_map{[a{}, b]}}.should raise_error(Sequel::Error)
+  end
+
   specify "should handle implicit aliases in arguments" do
     @ds.select_order_map(:a___b).should == [1, 2]
     @ds.db.sqls.should == ['SELECT a AS b FROM t ORDER BY a']
@@ -3854,6 +3886,21 @@ describe "Sequel::Dataset#select_order_map" do
   specify "should accept a block" do
     @ds.select_order_map{a(t__c)}.should == [1, 2]
     @ds.db.sqls.should == ['SELECT a(t.c) FROM t ORDER BY a(t.c)']
+  end
+
+  specify "should accept a block with an array of columns" do
+    @ds.select_order_map{[c.desc, a(t__c).as(c)]}.should == [[1, 1], [2, 2]]
+    @ds.db.sqls.should == ['SELECT c, a(t.c) AS c FROM t ORDER BY c DESC, a(t.c)']
+  end
+
+  specify "should accept a block with a column" do
+    @ds.select_order_map(:c){a(t__c).as(c)}.should == [[1, 1], [2, 2]]
+    @ds.db.sqls.should == ['SELECT c, a(t.c) AS c FROM t ORDER BY c, a(t.c)']
+  end
+
+  specify "should accept a block and array of arguments" do
+    @ds.select_order_map([:c, :c]){[a(t__c).as(c), c.desc]}.should == [[1, 1, 1, 1], [2, 2, 2, 2]]
+    @ds.db.sqls.should == ['SELECT c, c, a(t.c) AS c, c FROM t ORDER BY c, c, a(t.c), c DESC']
   end
 
   specify "should handle an array of columns" do
@@ -3921,7 +3968,7 @@ describe "Sequel::Dataset#select_hash" do
   end
 
   specify "should raise an error if the resulting symbol cannot be determined" do
-    proc{@ds.select_hash(:c.as(:a), 'foo')}.should raise_error(Sequel::Error)
+    proc{@ds.select_hash(:c.as(:a), :b.sql_function)}.should raise_error(Sequel::Error)
   end
 end
 

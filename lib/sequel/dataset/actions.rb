@@ -648,17 +648,12 @@ module Sequel
     # Internals of +select_map+ and +select_order_map+
     def _select_map(column, order, &block)
       ds = naked.ungraphed
-      if column
-        raise(Error, ARG_BLOCK_ERROR_MSG) if block
-        columns = Array(column)
-        select_cols = order ? columns.map{|c| c.is_a?(SQL::OrderedExpression) ? c.expression : c} : columns
-        ds = ds.select(*select_cols)
-        ds = ds.order(*columns.map{|c| unaliased_identifier(c)}) if order
-      else
-        ds = ds.select(&block)
-        ds = ds.order(&block) if order
-      end
-      if column.is_a?(Array)
+      columns = Array(column)
+      virtual_row_columns(columns, block)
+      select_cols = order ? columns.map{|c| c.is_a?(SQL::OrderedExpression) ? c.expression : c} : columns
+      ds = ds.select(*select_cols)
+      ds = ds.order(*columns.map{|c| unaliased_identifier(c)}) if order
+      if column.is_a?(Array) || (columns.length > 1)
         ds._select_map_multiple(select_cols.map{|c| hash_key_symbol(c)})
       else
         ds._select_map_single
@@ -706,6 +701,8 @@ module Sequel
         hash_key_symbol(s.column)
       when SQL::AliasedExpression
         hash_key_symbol(s.aliaz)
+      when String
+        s.to_sym
       else
         raise(Error, "#{s.inspect} is not supported, should be a Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression") 
       end
