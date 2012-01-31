@@ -856,26 +856,21 @@ end
 
 describe "MySQL::Dataset#update and related methods" do
   before do
-    MYSQL_DB.create_table(:items){String :name; Integer :value}
-    MYSQL_DB.add_index(:items, :name, :unique=>true, :name=>:unique_name)
+    MYSQL_DB.create_table(:items){String :name; Integer :value; index :name, :unique=>true}
     @d = MYSQL_DB[:items]
-    MYSQL_DB.sqls.clear
   end
   after do
     MYSQL_DB.drop_table(:items)
   end
-  specify "#update_ignore should add the IGNORE keyword for updates" do
-    @d.update_ignore.update(:name => 'ghi')
-    MYSQL_DB.sqls.should == ["UPDATE IGNORE `items` SET `name` = 'ghi'"]
-  end
+
   specify "#update_ignore should not raise error where normal update would fail" do
-    @d.insert(:name => 'cow', :value => 'moo')
-    @d.insert(:name => 'cat', :value => 'miew')
-    lambda do
-      @d.where(:value => 'miew').update(:name => 'cow')
-    end.should raise_error(Sequel::DatabaseError,"Mysql::Error: Duplicate entry 'cow' for key 'unique_name'")
-    @d.update_ignore.where(:value => 'miew').update(:name => 'cow')
-    MYSQL_DB.sqls.last.should == "UPDATE IGNORE `items` SET `name` = 'cow' WHERE (`value` = 'miew')"
+    @d.insert(:name => 'cow', :value => 0)
+    @d.insert(:name => 'cat', :value => 1)
+    proc{@d.where(:value => 1).update(:name => 'cow')}.should raise_error(Sequel::DatabaseError)
+    MYSQL_DB.sqls.clear
+    @d.update_ignore.where(:value => 1).update(:name => 'cow')
+    MYSQL_DB.sqls.should == ["UPDATE IGNORE `items` SET `name` = 'cow' WHERE (`value` = 1)"]
+    @d.order(:name).all.should == [{:name => 'cat', :value => 1}, {:name => 'cow', :value => 0}]
   end
 end
 

@@ -473,16 +473,6 @@ module Sequel
         clone(:insert_ignore=>true)
       end
 
-      # Sets up the update methods to use UPDATE IGNORE.
-      # Useful if you have a unique key and want to just skip
-      # updating rows that violate the unique key restriction.
-      #
-      #   dataset.update_ignore.update({:name => 'a', :value => 1})
-      #   # UPDATE IGNORE tablename SET name = vale
-      def update_ignore
-        clone(:update_ignore=>true)
-      end
-      
       # Sets up the insert methods to use ON DUPLICATE KEY UPDATE
       # If you pass no arguments, ALL fields will be
       # updated with the new values.  If you pass the fields you
@@ -562,6 +552,16 @@ module Sequel
       # they are ignored anyway, not using them is probably best.
       def supports_timestamp_usecs?
         false
+      end
+      
+      # Sets up the update methods to use UPDATE IGNORE.
+      # Useful if you have a unique key and want to just skip
+      # updating rows that violate the unique key restriction.
+      #
+      #   dataset.update_ignore.update({:name => 'a', :value => 1})
+      #   # UPDATE IGNORE tablename SET name = 'a', value = 1
+      def update_ignore
+        clone(:update_ignore=>true)
       end
       
       private
