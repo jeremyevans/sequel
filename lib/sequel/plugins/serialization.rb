@@ -165,9 +165,9 @@ module Sequel
           super
         end
 
-        # Serialize all deserialized values
+        # Serialize deserialized values before saving
         def before_save
-          deserialized_values.each{|k,v| @values[k] = serialize_value(k, v)}
+          serialize_deserialized_values
           super
         end
         
@@ -192,6 +192,11 @@ module Sequel
             raise Sequel::Error, "no entry in deserialization_map for #{column.inspect}" unless callable = model.deserialization_map[column]
             callable.call(v)
           end
+        end
+
+        # Serialize all deserialized values
+        def serialize_deserialized_values
+          deserialized_values.each{|k,v| @values[k] = serialize_value(k, v)}
         end
 
         # Serialize the column value.  Called before saving to ensure the serialized value

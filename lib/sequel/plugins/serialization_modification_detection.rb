@@ -1,11 +1,16 @@
 module Sequel
   module Plugins
-    # Sequel's built in Serialization plugin doesn't check for modification
-    # of the serialized objects, because it requires an extra deserialization of a potentially
-    # very large object.  This plugin can detect changes in serialized values by
-    # checking whether the current deserialized value is the same as the original
-    # deserialized value.  This does require deserializing the value twice, but the
-    # original deserialized value is cached.
+    # This plugin extends the serialization plugin and enables it to detect
+    # changes in serialized values by checking whether the current
+    # deserialized value is the same as the original deserialized value.
+    # The serialization plugin does not do such checks by default, as they
+    # often aren't needed and can hurt performance.
+    #
+    # Note that for this plugin to work correctly, the values you are
+    # serializing must roundtrip correctly (i.e. deserialize(serialize(value))
+    # should equal value).  This is true in most cases, but not in all.  For
+    # example, ruby symbols round trip through yaml, but not json (as they get
+    # turned into strings in json).
     #
     # == Example
     #
@@ -29,7 +34,7 @@ module Sequel
         # show the column is modified after saving.
         def after_save
           super
-          copy_deserialized_values
+          @original_deserialized_values = {}
         end
 
         # Detect which serialized columns have changed.
@@ -41,16 +46,11 @@ module Sequel
 
         private
 
-        # For new objects, populate the original deserialized value so that we know it hasn't
-        # changed since initialization.
+        # For new objects, serialize any existing deserialized values so that changes can
+        # be detected.
         def initialize_set(values)
           super
-          copy_deserialized_values
-        end
-
-        def copy_deserialized_values
-          @original_deserialized_values = h = {}
-          @deserialized_values.each{|k, v| h[k] = deserialize_value(k, serialize_value(k, v))}
+          serialize_deserialized_values
         end
 
         # Return the original deserialized value of the column, caching it to improve performance.
