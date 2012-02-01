@@ -21,6 +21,11 @@ task :install=>[:package] do
   sh %{sudo gem install ./#{NAME}-#{VERS.call} --local}
 end
 
+desc "Install sequel gem without sudo (rvm)"
+task :rvm_install=>[:package] do
+  sh %{gem install ./#{NAME}-#{VERS.call} --local}
+end
+
 desc "Uninstall sequel gem"
 task :uninstall=>[:clean] do
   sh %{sudo gem uninstall #{NAME}}
