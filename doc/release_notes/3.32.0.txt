@@ -1,0 +1,202 @@
+= New Features
+
+* Prepared statements now support :map and :to_hash prepared
+  statement types.  The main reason for this is that certain
+  extensions (e.g. sequel_pg) optimize map/to_hash calls, and
+  there previously was not a way to use prepared statements
+  with the map/to_hash optimizations.
+
+* Sequel.empty_array_handle_nulls has been added to change how
+  IN/NOT IN operations with an empty array are handled.  See
+  the Backwards Compatibility section for details.
+
+* 5 new association options have been added that allow you to
+  define associations where the underlying columns clash with
+  standard ruby method names:
+
+    many_to_one :primary_key_method
+    one_to_many :key_method
+    one_to_many :primary_key_column
+    many_to_many :left_primary_key_column
+    many_to_many :right_primary_key_method
+
+  Using these new options, you can now define associations
+  that work correctly when the underlying primary/foreign key
+  columns clash with existing ruby method names.  See the RDoc
+  for details.
+
+* A use_after_commit_rollback setting has been added to models.
+  This defaults to true, but can be set to false for performance
+  or to allow models to be used in prepared transactions
+  (which don't support after_commit/after_rollback).
+
+* Dataset#update_ignore has been added when connecting to MySQL,
+  enabling use of the UPDATE IGNORE syntax to skip updating a row
+  if the update would cause a unique constraint to be violated.
+
+* Database#indexes is now supported when connecting to Microsoft
+  SQL Server.
+
+* On Microsoft SQL Server, the :include option is now supported
+  when creating indexes, for storing column values in the index,
+  which can be used by the query optimizer.
+
+= Other Improvements
+
+* The filtering/excluding by associations code now uses qualified
+  identifiers instead of unqualified identifiers, which allows it
+  to avoid ambiguous column names if you are doing your own joins.
+
+* Virtual row blocks that return arrays are now handled correctly
+  in Dataset#select_map/select_order_map.
+
+* Dataset#select_map/select_order_map can now take both a block
+  argument as well as a regular argument.
+
+* Dataset#select_order_map now handles virtual row blocks that
+  return ordered expressions.
+
+* Database#table_exists? should no longer generate false negatives
+  if you only have permission to retrieve some column values but
+  not all.  Note that if you lack permission to SELECT from the
+  table itself, table_exists? can still generate false negatives.
+
+* The active_model plugin now supports ActiveModel 3.2, by adding
+  support for to_partial_path.
+
+* The serialization_modification_detection plugin now handles
+  changed_columns correctly both for new objects and after saving
+  objects.
+
+* The serialization plugin now clears the deserialized values when
+  it does the automatic refresh after saving a new object, mostly for
+  consistency.  You can use the skip_create_refresh plugin to skip
+  refreshing when creating a new model object.
+
+* Column default values are now wrapped in parentheses on SQLite,
+  which fixes some cases such as when the default is an SQL function
+  call.
+
+* Alter table emulation now works correctly on SQLite when foreign
+  keys reference the table being altered.  The emulation requires
+  a renaming/deleting the existing table and creating a new table,
+  which can break foreign key references.  Sequel now disables the
+  foreign key PRAGMA when altering tables, so SQLite won't track
+  the table renames and break the foreign key relationships.
+
+* The set_column_type table alteration method no longer modifies
+  default values and NULL/NOT NULL settings on Microsoft SQL
+  Server, H2, and SQLite.
+
+* On MySQL, Time/DateTime columns now use the timestamp type if the
+  default value is Sequel::CURRENT_TIMESTAMP, since it is currently
+  impossible for MySQL to have a non-constant default for a
+  datetime column (without using a workaround like a trigger).
+
+* Metadata methods such as tables, views, and view_exists? are now
+  handled correctly on Oracle if custom identifier input methods
+  are used.
+
+* Sequel now ignores errors that occur when attempting to get
+  information on column defaults in Oracle (which can happen if you
+  lack permission to the appropriate table).  Previously, such errors
+  would cause the schema parser to raise an error, now, the schema
+  information is just returned without default information.
+
+* Database#indexes now skips the primary key index when connecting to
+  DB2, Derby, HSQLDB, and Oracle via the jdbc adapter.
+
+* Database#indexes now works correctly on DB2.
+
+* The progress adapter has been fixed, it had been broken since the
+  dataset literalization refactoring.
+
+* Dataset#naked! now works correctly.  Previously, it just returned
+  the receiver unmodified.
+
+* Dataset#paginate! has been removed, as it was broken.
+
+* The query extension no longer breaks Dataset#clone if an argument
+  is not given.
+
+* Transaction related queries are no longer logged twice in the mock
+  adapter.
+
+= Backwards Compatibility
+
+* Sequel's default handling of NOT IN operators with an empty array
+  of values has changed, which can change which rows are returned for
+  such queries.
+ 
+  Previously, Sequel was inconsistent in that it tried to handle NULL
+  values correctly in the IN case, but not in the NOT IN case.  Now,
+  it defaults to handling NULL values correctly in both cases:
+
+    # 3.31.0
+    DB[:a].where(:b=>[])
+    # SELECT * FROM a WHERE (b != b)
+    DB[:a].exclude(:b=>[])
+    # SELECT * FROM a WHERE (1 = 1)
+
+    # 3.32.0
+    DB[:a].where(:b=>[])
+    # SELECT * FROM a WHERE (b != b)
+    DB[:a].exclude(:b=>[])
+    # SELECT * FROM a WHERE (b = b)
+
+  The important change in behavior is that in the NOT IN case, if
+  the left hand argument is NULL, the filter returns NULL instead
+  of true.  This has the potential to change query results.
+
+  "Correct" here is really an opinion and not a fact, as there are
+  valid arguments for the alternative behavior:
+
+    DB[:a].where(:b=>[])
+    # SELECT * FROM a WHERE (1 = 0)
+    DB[:a].exclude(:b=>[])
+    # SELECT * FROM a WHERE (1 = 1)
+
+  The difference is that the "correct" NULL behavior is more
+  consistent with the non-empty array cases.  For example, if b is
+  NULL:
+
+    # "Correct" NULL handling
+    #  Empty array: where(:b=>[])
+    WHERE (b != b) # NULL
+    WHERE (b = b) # NULL
+    #  Non-empty array: where(:b=>[1, 2])
+    WHERE (b IN (1, 2)) # NULL
+    WHERE (b NOT IN (1, 2)) # NULL
+
+    # Static boolean handling
+    #  Empty array: where(:b=>[])
+    WHERE (1 = 0) # false
+    WHERE (1 = 1) # true
+    #  Non-empty array: where(:b=>[1, 2])
+    WHERE (b IN (1, 2)) # NULL
+    WHERE (b NOT IN (1, 2)) # NULL
+
+  Sequel chooses to default to behavior consistent with the non-empty
+  array cases (similar to SQLAlchemy).  However, there are two
+  downsides to this handling.  The first is that some databases with
+  poor optimizers (e.g. MySQL) might do a full table scan with the
+  default syntax.  The second is that the static boolean handling may
+  be generally perferable, if you believe that IN/NOT IN with an
+  empty array should always be true or false and never NULL even if
+  the left hand argument is NULL.
+
+  As there really isn't a truly correct answer in this case, Sequel
+  defaults to the "correct" NULL handling, and allows you to switch
+  to the static boolean handling via:
+
+    Sequel.empty_array_handle_nulls = false
+
+  This is currently a global setting, it may be made Database or
+  Dataset specific later if requested.  Also, it is possible the
+  default will switch in the future, so if you care about a specific
+  handling, you should set your own default.
+
+* Database#table_exists? now only rescues Sequel::DatabaseErrors
+  instead of StandardErrors, so it's possible it will raise errors
+  instead of returning false on custom adapters that don't wrap
+  their errors correctly.
