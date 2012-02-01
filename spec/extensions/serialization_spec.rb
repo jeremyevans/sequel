@@ -208,6 +208,15 @@ describe "Serialization plugin" do
     o.deserialized_values.length.should == 0
   end
   
+  it "should clear the deserialized columns when refreshing after saving a new object" do
+    @c.set_primary_key :id
+    @c.plugin :serialization, :yaml, :abc, :def
+    o = @c.new(:abc => "--- 1\n", :def => "--- hello\n")
+    o.deserialized_values.length.should == 2
+    o.save
+    o.deserialized_values.length.should == 0
+  end
+  
   it "should raise an error if calling internal serialization methods with bad columns" do
     @c.set_primary_key :id
     @c.plugin :serialization

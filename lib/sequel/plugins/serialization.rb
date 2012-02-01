@@ -171,12 +171,6 @@ module Sequel
           super
         end
         
-        # Empty the deserialized values when refreshing.
-        def refresh
-          @deserialized_values = {}
-          super
-        end
-
         # Initialization the deserialized values for objects retrieved from the database.
         def set_values(*)
           @deserialized_values ||= {}
@@ -184,6 +178,12 @@ module Sequel
         end
 
         private
+
+        # Empty the deserialized values when refreshing.
+        def _refresh(*)
+          @deserialized_values = {}
+          super
+        end
 
         # Deserialize the column value.  Called when the model column accessor is called to
         # return a deserialized value.

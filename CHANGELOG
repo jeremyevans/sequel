@@ -1,5 +1,7 @@
 === HEAD
 
+* Make refreshes after model creation clear the deserialized values in the serialization plugin (jeremyevans)
+
 * Add Dataset#update_ignore on MySQL, for using UPDATE IGNORE in queries (danielb2) (#429)
 
 * Allow select_map/select_order_map to take both a column argument and a block (jeremyevans)
