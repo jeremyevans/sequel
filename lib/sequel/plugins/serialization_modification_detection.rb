@@ -25,6 +25,13 @@ module Sequel
       end
       
       module InstanceMethods
+        # Clear the cache of original deserialized values after saving so that it doesn't
+        # show the column is modified after saving.
+        def after_save
+          super
+          copy_deserialized_values
+        end
+
         # Detect which serialized columns have changed.
         def changed_columns
           cc = super
@@ -34,11 +41,16 @@ module Sequel
 
         private
 
-        # Clear the cache of original deserialized values after saving so that it doesn't
-        # show the column is modified after saving.
-        def after_save
+        # For new objects, populate the original deserialized value so that we know it hasn't
+        # changed since initialization.
+        def initialize_set(values)
           super
-          @original_deserialized_values.clear if @original_deserialized_values
+          copy_deserialized_values
+        end
+
+        def copy_deserialized_values
+          @original_deserialized_values = h = {}
+          @deserialized_values.each{|k, v| h[k] = deserialize_value(k, serialize_value(k, v))}
         end
 
         # Return the original deserialized value of the column, caching it to improve performance.

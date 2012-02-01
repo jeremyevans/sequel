@@ -1,5 +1,7 @@
 === HEAD
 
+* Make serialization_modification_detection plugin work correctly with new objects and after saving existing objects (jeremyevans) (#432)
+
 * Make refreshes after model creation clear the deserialized values in the serialization plugin (jeremyevans)
 
 * Add Dataset#update_ignore on MySQL, for using UPDATE IGNORE in queries (danielb2) (#429)
