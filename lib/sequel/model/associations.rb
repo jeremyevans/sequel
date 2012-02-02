@@ -704,7 +704,7 @@ module Sequel
         #           singularized unless the type is :many_to_one or :one_to_one)
         # :clone :: Merge the current options and block into the options and block used in defining
         #           the given association.  Can be used to DRY up a bunch of similar associations that
-        #            all share the same options such as :class and :key, while changing the order and block used.
+        #           all share the same options such as :class and :key, while changing the order and block used.
         # :conditions :: The conditions to use to filter the association, can be any argument passed to filter.
         # :dataset :: A proc that is instance_evaled to get the base dataset
         #             to use for the _dataset method (before the other options are applied).
@@ -809,9 +809,9 @@ module Sequel
         #                 Defaults to primary key of the current table. Can use an
         #                 array of symbols for a composite key association.
         # :primary_key_column :: Similar to, and usually identical to, :primary_key, but :primary_key refers
-        #                to the model method call, where :primary_key_column refers to the underlying column.
-        #                Should only be used if the the model method differs from the primary key column, in
-        #                conjunction with defining a model alias method for the primary key column.
+        #                        to the model method call, where :primary_key_column refers to the underlying column.
+        #                        Should only be used if the the model method differs from the primary key column, in
+        #                        conjunction with defining a model alias method for the primary key column.
         # === :many_to_many
         # :graph_join_table_block :: The block to pass to +join_table+ for
         #                            the join table when eagerly loading the association via +eager_graph+.
@@ -833,17 +833,17 @@ module Sequel
         # :join_table_block :: proc that can be used to modify the dataset used in the add/remove/remove_all
         #                      methods.  Should accept a dataset argument and return a modified dataset if present.
         # :left_key :: foreign key in join table that points to current model's
-        #              primary key, as a symbol. Defaults to :"#{self.name.underscore}_id".  
+        #              primary key, as a symbol. Defaults to :"#{self.name.underscore}_id".
         #              Can use an array of symbols for a composite key association.
         # :left_primary_key :: column in current table that :left_key points to, as a symbol.
         #                      Defaults to primary key of current table.  Can use an
         #                      array of symbols for a composite key association.
         # :left_primary_key_column :: Similar to, and usually identical to, :left_primary_key, but :left_primary_key refers to
-        #                the model method to call, where :left_primary_key_column refers to the underlying column.  Should only
-        #                be used if the model method differs from the left primary key column, in conjunction
-        #                with defining a model alias method for the left primary key column.
+        #                             the model method to call, where :left_primary_key_column refers to the underlying column.  Should only
+        #                             be used if the model method differs from the left primary key column, in conjunction
+        #                             with defining a model alias method for the left primary key column.
         # :right_key :: foreign key in join table that points to associated
-        #               model's primary key, as a symbol.  Defaults to Defaults to :"#{name.to_s.singularize}_id".
+        #               model's primary key, as a symbol.  Defaults to :"#{name.to_s.singularize}_id".
         #               Can use an array of symbols for a composite key association.
         # :right_primary_key :: column in associated table that :right_key points to, as a symbol.
         #                       Defaults to primary key of the associated table.  Can use an
