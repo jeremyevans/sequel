@@ -1,3 +1,7 @@
+=== HEAD
+
+* Allow disabling use of sudo with SUDO='' when running the rake install/uninstall tasks (jeremyevans) (#433)
+
 === 3.32.0 (2012-02-01)
 
 * Make serialization_modification_detection plugin work correctly with new objects and after saving existing objects (jeremyevans) (#432)
