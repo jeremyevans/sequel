@@ -6,12 +6,12 @@ end
 unless defined?(MYSQL_DB)
   MYSQL_URL = (ENV['SEQUEL_MY_SPEC_DB']||"mysql://#{MYSQL_USER}@localhost/sandbox") unless defined? MYSQL_URL
   MYSQL_DB = Sequel.connect(MYSQL_URL)
+  MYSQL_DB.run("SET storage_engine=MyISAM;")
 end
 unless defined?(MYSQL_SOCKET_FILE)
   MYSQL_SOCKET_FILE = '/tmp/mysql.sock'
 end
 INTEGRATION_DB = MYSQL_DB unless defined?(INTEGRATION_DB)
-
 MYSQL_URI = URI.parse(MYSQL_DB.uri)
 
 MYSQL_DB.create_table! :test2 do
@@ -438,7 +438,7 @@ describe "A MySQL database" do
     end
     @db[:test2].columns.should == [:name, :value, :zyx, :ert, :xyz, :value2]
   end
-end  
+end
 
 describe "A MySQL database with table options" do
   before do
@@ -559,7 +559,7 @@ describe "A MySQL database" do
     @db << 'DELETE FROM items'
     @db[:items].first.should == nil
   end
-end  
+end
 
 # Socket tests should only be run if the MySQL server is on localhost
 if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and MYSQL_DB.adapter_scheme == :mysql
@@ -758,9 +758,9 @@ describe "MySQL::Dataset#insert and related methods" do
     ]
 
     @d.all.should == [
-      {:name => nil, :value => 1}, 
+      {:name => nil, :value => 1},
       {:name => nil, :value => 2},
-      {:name => nil, :value => 3}, 
+      {:name => nil, :value => 3},
       {:name => nil, :value => 4}
     ]
   end
@@ -779,9 +779,9 @@ describe "MySQL::Dataset#insert and related methods" do
     ]
 
     @d.all.should == [
-      {:name => nil, :value => 1}, 
+      {:name => nil, :value => 1},
       {:name => nil, :value => 2},
-      {:name => nil, :value => 3}, 
+      {:name => nil, :value => 3},
       {:name => nil, :value => 4}
     ]
   end
@@ -796,7 +796,7 @@ describe "MySQL::Dataset#insert and related methods" do
     ]
 
     @d.all.should == [
-      {:name => 'abc', :value => 1}, 
+      {:name => 'abc', :value => 1},
       {:name => 'def', :value => 2}
     ]
   end
@@ -837,7 +837,7 @@ describe "MySQL::Dataset#insert and related methods" do
   end
 
   specify "#on_duplicate_key_update should add the ON DUPLICATE KEY UPDATE and columns specified when args are given" do
-    @d.on_duplicate_key_update(:value).import([:name,:value], 
+    @d.on_duplicate_key_update(:value).import([:name,:value],
       [['abc', 1], ['def',2]]
     )
 
