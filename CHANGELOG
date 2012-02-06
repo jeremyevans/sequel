@@ -1,5 +1,7 @@
 === HEAD
 
+* Make foreign key creation work on MySQL with InnoDB engine without specifying :key option (jeremyevans)
+
 * Allow disabling use of sudo with SUDO='' when running the rake install/uninstall tasks (jeremyevans) (#433)
 
 === 3.32.0 (2012-02-01)

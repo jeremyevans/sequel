@@ -441,7 +441,9 @@ describe "Database schema modifiers" do
   end
 
   cspecify "should remove columns from tables correctly", :h2, :mssql, [:jdbc, :db2], :hsqldb do
-    @db.create_table!(:items) do
+    # MySQL with InnoDB cannot drop foreign key columns unless you know the
+    # name of the constraint, see Bug #14347
+    @db.create_table!(:items, :engine=>:MyISAM) do
       primary_key :id
       String :name
       Integer :number

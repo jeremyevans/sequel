@@ -139,6 +139,7 @@ module Sequel
           if related = op.delete(:table)
             sql = super(table, op)
             op[:table] = related
+            op[:key] ||= primary_key_from_schema(related)
             [sql, "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])})#{column_references_sql(op)}"]
           else
             super(table, op)
@@ -167,6 +168,11 @@ module Sequel
             raise(Error, "must specify constraint type via :type=>(:foreign_key|:primary_key|:unique) when dropping constraints on MySQL")
           end
           "ALTER TABLE #{quote_schema_table(table)} DROP #{type} #{quote_identifier(op[:name])}"
+        when :add_constraint
+          if op[:type] == :foreign_key
+            op[:key] ||= primary_key_from_schema(op[:table])
+          end
+          super(table, op)
         else
           super(table, op)
         end
@@ -222,11 +228,41 @@ module Sequel
         engine = options.fetch(:engine, Sequel::MySQL.default_engine)
         charset = options.fetch(:charset, Sequel::MySQL.default_charset)
         collate = options.fetch(:collate, Sequel::MySQL.default_collate)
-        generator.columns.each do |c|
-          if t = c.delete(:table)
-            generator.foreign_key([c[:name]], t, c.merge(:name=>nil, :type=>:foreign_key))
+        generator.constraints.sort_by{|c| (c[:type] == :primary_key) ? -1 : 1}
+
+        key_proc = lambda do |t|
+          if t == name 
+            if pk = generator.primary_key_name
+              [pk]
+            elsif !(pkc = generator.constraints.select{|con| con[:type] == :primary_key}).empty?
+              pkc.first[:columns]
+            end
+          else
+            primary_key_from_schema(t)
           end
         end
+
+        generator.constraints.each do |c|
+          if c[:type] == :foreign_key
+            c[:key] ||= key_proc.call(c[:table])
+          end
+        end
+
+        generator.columns.each do |c|
+          if t = c.delete(:table)
+            same_table = t == name
+            k = c[:key]
+
+            key ||= key_proc.call(t)
+
+            if same_table && !k.nil?
+              generator.constraints.unshift(:type=>:unique, :columns=>Array(k))
+            end
+
+            generator.foreign_key([c[:name]], t, c.merge(:name=>nil, :type=>:foreign_key, :key=>key))
+          end
+        end
+
         "#{super}#{" ENGINE=#{engine}" if engine}#{" DEFAULT CHARSET=#{charset}" if charset}#{" DEFAULT COLLATE=#{collate}" if collate}"
       end
 
@@ -261,6 +297,11 @@ module Sequel
         "CREATE #{index_type}INDEX #{index_name}#{using} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
       end
       
+      # Parse the schema for the given table to get an array of primary key columns
+      def primary_key_from_schema(table)
+        schema(table).select{|a| a[1][:primary_key]}.map{|a| a[0]}
+      end
+
       # Rollback the currently open XA transaction
       def rollback_transaction(conn, opts={})
         if (s = opts[:prepare]) && @transactions[conn][:savepoint_level] <= 1

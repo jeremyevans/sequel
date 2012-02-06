@@ -434,6 +434,7 @@ describe "A MySQL database" do
 
   specify "should support add_foreign_key" do
     @db.alter_table :test2 do
+      add_index :value, :unique=>true
       add_foreign_key :value2, :test2, :key=>:value
     end
     @db[:test2].columns.should == [:name, :value, :zyx, :ert, :xyz, :value2]
@@ -485,6 +486,7 @@ describe "A MySQL database" do
   end
   after do
     @db.drop_table(:items) rescue nil
+    @db.drop_table(:users) rescue nil
   end
 
   specify "should support defaults for boolean columns" do
@@ -493,14 +495,18 @@ describe "A MySQL database" do
   end
 
   specify "should correctly format CREATE TABLE statements with foreign keys" do
-    @db.create_table(:items){Integer :id; foreign_key :p_id, :items, :key => :id, :null => false, :on_delete => :cascade}
-    @db.sqls.should == ["CREATE TABLE `items` (`id` integer, `p_id` integer NOT NULL, FOREIGN KEY (`p_id`) REFERENCES `items`(`id`) ON DELETE CASCADE)"]
+    @db.create_table(:items){primary_key :id; foreign_key :p_id, :items, :key => :id, :null => false, :on_delete => :cascade}
+    @db.sqls.should == ["CREATE TABLE `items` (`id` integer PRIMARY KEY AUTO_INCREMENT, `p_id` integer NOT NULL, UNIQUE (`id`), FOREIGN KEY (`p_id`) REFERENCES `items`(`id`) ON DELETE CASCADE)"]
   end
 
   specify "should correctly format ALTER TABLE statements with foreign keys" do
     @db.create_table(:items){Integer :id}
+    @db.create_table(:users){primary_key :id}
     @db.alter_table(:items){add_foreign_key :p_id, :users, :key => :id, :null => false, :on_delete => :cascade}
-    @db.sqls.should == ["CREATE TABLE `items` (`id` integer)", "ALTER TABLE `items` ADD COLUMN `p_id` integer NOT NULL", "ALTER TABLE `items` ADD FOREIGN KEY (`p_id`) REFERENCES `users`(`id`) ON DELETE CASCADE"]
+    @db.sqls.should == ["CREATE TABLE `items` (`id` integer)",
+      "CREATE TABLE `users` (`id` integer PRIMARY KEY AUTO_INCREMENT)",
+      "ALTER TABLE `items` ADD COLUMN `p_id` integer NOT NULL",
+      "ALTER TABLE `items` ADD FOREIGN KEY (`p_id`) REFERENCES `users`(`id`) ON DELETE CASCADE"]
   end
 
   specify "should have rename_column support keep existing options" do
@@ -593,9 +599,59 @@ describe "A MySQL database" do
   end
 end
 
+describe "MySQL foreign key support" do
+  after do
+    MYSQL_DB.drop_table(:testfk) rescue nil
+    MYSQL_DB.drop_table(:testpk) rescue nil
+  end
+
+  specify "should create table without :key" do
+    MYSQL_DB.create_table!(:testpk){primary_key :id}
+    MYSQL_DB.create_table!(:testfk){foreign_key :fk, :testpk}
+  end
+
+  specify "should create table with composite keys without :key" do
+    MYSQL_DB.create_table!(:testpk){Integer :id; Integer :id2; primary_key([:id, :id2])}
+    MYSQL_DB.create_table!(:testfk){Integer :fk; Integer :fk2; foreign_key([:fk, :fk2], :testpk)}
+  end
+
+  specify "should create table with self referential without :key" do
+    MYSQL_DB.create_table!(:testfk){primary_key :id; foreign_key :fk, :testfk}
+  end
+
+  specify "should create table with self referential with composite keys without :key" do
+    MYSQL_DB.create_table!(:testfk){Integer :id; Integer :id2; Integer :fk; Integer :fk2; primary_key([:id, :id2]); foreign_key([:fk, :fk2], :testfk)}
+  end
+
+  specify "should alter table without :key" do
+    MYSQL_DB.create_table!(:testpk){primary_key :id}
+    MYSQL_DB.create_table!(:testfk){Integer :id}
+    MYSQL_DB.alter_table(:testfk){add_foreign_key :fk, :testpk}
+  end
+
+  specify "should alter table with composite keys without :key" do
+    MYSQL_DB.create_table!(:testpk){Integer :id; Integer :id2; primary_key([:id, :id2])}
+    MYSQL_DB.create_table!(:testfk){Integer :fk; Integer :fk2}
+    MYSQL_DB.alter_table(:testfk){add_foreign_key([:fk, :fk2], :testpk)}
+  end
+
+  specify "should alter table with self referential without :key" do
+    MYSQL_DB.create_table!(:testfk){primary_key :id}
+    MYSQL_DB.alter_table(:testfk){add_foreign_key :fk, :testfk}
+  end
+
+  specify "should alter table with self referential with composite keys without :key" do
+    MYSQL_DB.create_table!(:testfk){Integer :id; Integer :id2; Integer :fk; Integer :fk2; primary_key([:id, :id2])}
+    MYSQL_DB.alter_table(:testfk){add_foreign_key [:fk, :fk2], :testfk}
+  end
+end
+
 describe "A grouped MySQL dataset" do
   before do
-    MYSQL_DB[:test2].delete
+    MYSQL_DB.create_table! :test2 do
+      text :name
+      integer :value
+    end
     MYSQL_DB[:test2] << {:name => '11', :value => 10}
     MYSQL_DB[:test2] << {:name => '11', :value => 20}
     MYSQL_DB[:test2] << {:name => '11', :value => 30}
@@ -626,9 +682,9 @@ describe "A MySQL database" do
   end
 
   specify "should support fulltext indexes and full_text_search" do
-    @db.create_table(:posts){text :title; text :body; full_text_index :title; full_text_index [:title, :body]}
+    @db.create_table(:posts, :engine=>:MyISAM){text :title; text :body; full_text_index :title; full_text_index [:title, :body]}
     @db.sqls.should == [
-      "CREATE TABLE `posts` (`title` text, `body` text)",
+      "CREATE TABLE `posts` (`title` text, `body` text) ENGINE=MyISAM",
       "CREATE FULLTEXT INDEX `posts_title_index` ON `posts` (`title`)",
       "CREATE FULLTEXT INDEX `posts_title_body_index` ON `posts` (`title`, `body`)"
     ]
@@ -651,9 +707,9 @@ describe "A MySQL database" do
   end
 
   specify "should support spatial indexes" do
-    @db.create_table(:posts){point :geom, :null=>false; spatial_index [:geom]}
+    @db.create_table(:posts, :engine=>:MyISAM){point :geom, :null=>false; spatial_index [:geom]}
     @db.sqls.should == [
-      "CREATE TABLE `posts` (`geom` point NOT NULL)",
+      "CREATE TABLE `posts` (`geom` point NOT NULL) ENGINE=MyISAM",
       "CREATE SPATIAL INDEX `posts_geom_index` ON `posts` (`geom`)"
     ]
   end
