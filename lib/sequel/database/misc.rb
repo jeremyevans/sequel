@@ -159,6 +159,12 @@ module Sequel
       false
     end
 
+    # Whether the database and adapter support savepoints inside prepared transactions
+    # (two-phase commit), default is false.
+    def supports_savepoints_in_prepared_transactions?
+      supports_prepared_transactions? && supports_savepoints?
+    end
+
     # Whether the database and adapter support transaction isolation levels, false by default.
     def supports_transaction_isolation_levels?
       false

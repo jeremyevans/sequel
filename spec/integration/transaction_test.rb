@@ -156,7 +156,7 @@ describe "Database transactions" do
       @d.select_order_map(:name).should == []
     end
 
-    if INTEGRATION_DB.supports_savepoints?
+    if INTEGRATION_DB.supports_savepoints_in_prepared_transactions?
       specify "should support savepoints when using prepared transactions" do
         @db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@d << {:name => '1'}}}
         @db.commit_prepared_transaction('XYZ')
@@ -252,7 +252,7 @@ describe "Database transactions" do
       proc{@db.transaction(:prepare=>'XYZ'){@db.after_rollback{}}}.should raise_error(Sequel::Error)
     end
 
-    if INTEGRATION_DB.supports_savepoints?
+    if INTEGRATION_DB.supports_savepoints_in_prepared_transactions?
       specify "should raise an error if you attempt to use after_commit or after rollback inside a savepoint in a prepared transaction" do
         proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_commit{}}}}.should raise_error(Sequel::Error)
         proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_rollback{}}}}.should raise_error(Sequel::Error)

@@ -91,12 +91,17 @@ module Sequel
       
       # MySQL supports prepared transactions (two-phase commit) using XA
       def supports_prepared_transactions?
-        true
+        server_version >= 50000
       end
 
       # MySQL supports savepoints
       def supports_savepoints?
-        true
+        server_version >= 50000
+      end
+
+      # MySQL doesn't appear to support savepoints inside prepared transactions in 5.5
+      def supports_savepoints_in_prepared_transactions?
+        super && server_version < 50500
       end
 
       # MySQL supports transaction isolation levels
