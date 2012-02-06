@@ -1357,7 +1357,7 @@ describe "Dataset identifier methods" do
     @db.drop_table(:a)
   end
   
-  cspecify "#identifier_output_method should change how identifiers are output", [:mysql2], [:swift] do
+  cspecify "#identifier_output_method should change how identifiers are output", [:swift] do
     @ds.identifier_output_method = :upcase
     @ds.first.should == {:AB=>1}
     @ds.identifier_output_method = :uprev
