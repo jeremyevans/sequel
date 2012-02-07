@@ -106,7 +106,7 @@ These specs are broken down into two parts.  For each database, there are specif
 
 == Environment variables
 
-Sequel often uses environment variables when testing to specify either the database to be tested or specify how testing should be done.  You can also specify the databases to test by copying spec/spec_config.rb.example to spec/spec_config.rb and modifying it.  See that file for details.  It may be necessary to use spec_config.rb as opposed to an environment variable if you database connection cannot be specified by a connection string.
+Sequel often uses environment variables when testing to specify either the database to be tested or specify how testing should be done.  You can also specify the databases to test by copying spec/spec_config.rb.example to spec/spec_config.rb and modifying it.  See that file for details.  It may be necessary to use spec_config.rb as opposed to an environment variable if your database connection cannot be specified by a connection string.
 
 === Connection Strings
 
