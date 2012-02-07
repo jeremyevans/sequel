@@ -121,7 +121,7 @@ module Sequel
     def constantize(s)
       s = s.to_s
       return s.constantize if s.respond_to?(:constantize)
-      raise(NameError, "#{inspect} is not a valid constant name!") unless m = VALID_CONSTANT_NAME_REGEXP.match(s.to_s)
+      raise(NameError, "#{s.inspect} is not a valid constant name!") unless m = VALID_CONSTANT_NAME_REGEXP.match(s)
       Object.module_eval("::#{m[1]}", __FILE__, __LINE__)
     end
   
