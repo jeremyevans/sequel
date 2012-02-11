@@ -72,6 +72,10 @@ describe String do
   it "#classify should tranform table names to class names" do
     "egg_and_hams".classify.should == "EggAndHam"
     "post".classify.should == "Post"
+    "status".classify.should == "Status"
+    "octopuses".classify.should == "Octopus"
+    "Bus".classify.should == "Bus"
+    "ALIas".classify.should == "ALIas"
   end
   
   it "#foreign_key should create a foreign key name from a class name" do

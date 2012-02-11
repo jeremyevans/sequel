@@ -29,6 +29,7 @@ module Sequel
     singular(/oes$/i, 'o')
     singular(/shoes$/i, 'shoe')
     singular(/(alias|(?:stat|octop|vir|b)us)es$/i, '\1')
+    singular(/(alias|(?:stat|octop|vir|b)us)$/i, '\1')
     singular(/(vert|ind)ices$/i, '\1ex')
     singular(/matrices$/i, 'matrix')
 
