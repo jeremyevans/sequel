@@ -986,8 +986,13 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.send(:create_schema_sql, :sequel).should == 'CREATE SCHEMA sequel'
     @d.send(:drop_schema_sql, :sequel).should == 'DROP SCHEMA sequel'
     @d.send(:drop_schema_sql, :sequel, :if_exists=>true, :cascade=>true).should == 'DROP SCHEMA IF EXISTS sequel CASCADE'
-    # Make sure if exists works
-    @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true) if @d.server_version < 90000
+    @d.create_schema(:sequel)
+    @d.create_table(:sequel__test){Integer :a}
+    if @d.server_version >= 80200
+      @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true)
+    else
+      @d.drop_schema(:sequel, :cascade=>true)
+    end
   end
 
   specify "#create_trigger and #drop_trigger should create and drop triggers" do

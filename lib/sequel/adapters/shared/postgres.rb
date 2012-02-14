@@ -451,7 +451,7 @@ module Sequel
 
       # SQL for creating a schema.
       def create_schema_sql(name)
-        "CREATE SCHEMA #{name}"
+        "CREATE SCHEMA #{quote_identifier(name)}"
       end
 
       # SQL for creating a database trigger.
@@ -478,7 +478,7 @@ module Sequel
 
       # SQL for dropping a schema from the database.
       def drop_schema_sql(name, opts={})
-        "DROP SCHEMA#{' IF EXISTS' if opts[:if_exists]} #{name}#{' CASCADE' if opts[:cascade]}"
+        "DROP SCHEMA#{' IF EXISTS' if opts[:if_exists]} #{quote_identifier(name)}#{' CASCADE' if opts[:cascade]}"
       end
 
       # SQL for dropping a trigger from the database.
