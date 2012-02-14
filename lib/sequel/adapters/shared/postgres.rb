@@ -33,10 +33,10 @@ module Sequel
     # Array of exceptions that need to be converted.  JDBC
     # uses NativeExceptions, the native adapter uses PGError.
     CONVERTED_EXCEPTIONS = []
-    
+
     @client_min_messages = :warning
     @force_standard_strings = true
-    
+
     class << self
       # By default, Sequel sets the minimum level of log messages sent to the client
       # to WARNING, where PostgreSQL uses a default of NOTICE.  This is to avoid a lot
@@ -55,14 +55,14 @@ module Sequel
     # Methods shared by adapter/connection instances.
     module AdapterMethods
       attr_writer :db
-      
+
       SELECT_CURRVAL = "SELECT currval('%s')".freeze
       SELECT_CUSTOM_SEQUENCE = proc do |schema, table| <<-end_sql
-        SELECT '"' || name.nspname || '".' || CASE  
-            WHEN split_part(def.adsrc, '''', 2) ~ '.' THEN  
-              substr(split_part(def.adsrc, '''', 2),  
-                     strpos(split_part(def.adsrc, '''', 2), '.')+1) 
-            ELSE split_part(def.adsrc, '''', 2)  
+        SELECT '"' || name.nspname || '".' || CASE
+            WHEN split_part(def.adsrc, '''', 2) ~ '.' THEN
+              substr(split_part(def.adsrc, '''', 2),
+                     strpos(split_part(def.adsrc, '''', 2), '.')+1)
+            ELSE split_part(def.adsrc, '''', 2)
           END
         FROM pg_class t
         JOIN pg_namespace  name ON (t.relnamespace = name.oid)
@@ -103,11 +103,11 @@ module Sequel
           AND seq.relname = '#{table}'
       end_sql
       end
-      
+
       # Depth of the current transaction on this connection, used
       # to implement multi-level transactions with savepoints.
       attr_accessor :transaction_depth
-      
+
       # Apply connection settings for this connection. Currently, turns
       # standard_conforming_strings ON if Postgres.force_standard_strings
       # is true.
@@ -131,7 +131,7 @@ module Sequel
           return val.to_i if val
         end
       end
-      
+
       # Get the primary key for the given table.
       def primary_key(schema, table)
         sql = SELECT_PK[schema, table]
@@ -139,7 +139,7 @@ module Sequel
           return single_value(r)
         end
       end
-      
+
       # Get the primary key and sequence for the given table.
       def sequence(schema, table)
         sql = SELECT_SERIAL_SEQUENCE[schema, table]
@@ -147,14 +147,14 @@ module Sequel
           seq = single_value(r)
           return seq if seq
         end
-        
+
         sql = SELECT_CUSTOM_SEQUENCE[schema, table]
         execute(sql) do |r|
           return single_value(r)
         end
       end
     end
-    
+
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
       EXCLUDE_SCHEMAS = /pg_*|information_schema/i
@@ -191,7 +191,7 @@ module Sequel
       def create_function(name, definition, opts={})
         self << create_function_sql(name, definition, opts)
       end
-      
+
       # Create the procedural language in the database. Arguments:
       # * name : Name of the procedural language (e.g. plpgsql)
       # * opts : options hash:
@@ -202,7 +202,13 @@ module Sequel
       def create_language(name, opts={})
         self << create_language_sql(name, opts)
       end
-      
+
+      # Create a schema in the database. Arguments:
+      # * name : Name of the schema (e.g. admin)
+      def create_schema(name)
+        self << create_schema_sql(name)
+      end
+
       # Create a trigger in the database.  Arguments:
       # * table : the table on which this trigger operates
       # * name : the name of this trigger
@@ -216,7 +222,7 @@ module Sequel
       def create_trigger(table, name, function, opts={})
         self << create_trigger_sql(table, name, function, opts)
       end
-      
+
       # PostgreSQL uses the :postgres database type.
       def database_type
         :postgres
@@ -231,7 +237,7 @@ module Sequel
       def drop_function(name, opts={})
         self << drop_function_sql(name, opts)
       end
-      
+
       # Drops a procedural language from the database.  Arguments:
       # * name : name of the procedural language to drop
       # * opts : options hash:
@@ -240,7 +246,16 @@ module Sequel
       def drop_language(name, opts={})
         self << drop_language_sql(name, opts)
       end
-      
+
+      # Drops a schema from the database.  Arguments:
+      # * name : name of the schema to drop
+      # * opts : options hash:
+      #   * :cascade : Drop all objects in this schema.
+      #   * :if_exists : Don't raise an error if the schema doesn't exist.
+      def drop_schema(name, opts={})
+        self << drop_schema_sql(name, opts)
+      end
+
       # Drops a trigger from the database.  Arguments:
       # * table : table from which to drop the trigger
       # * name : name of the trigger to drop
@@ -250,7 +265,7 @@ module Sequel
       def drop_trigger(table, name, opts={})
         self << drop_trigger_sql(table, name, opts)
       end
-      
+
       # Use the pg_* system tables to determine indexes on a table
       def indexes(table, opts={})
         m = output_identifier_meth
@@ -266,11 +281,11 @@ module Sequel
           filter(:indc__relkind=>'i', :ind__indisprimary=>false, :indexprs=>nil, :indpred=>nil).
           order(:indc__relname, range.map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}.case(32, :att__attnum)).
           select(:indc__relname___name, :ind__indisunique___unique, :att__attname___column)
-        
+
         ds.join!(:pg_namespace___nsp, :oid=>:tab__relnamespace, :nspname=>schema.to_s) if schema
         ds.filter!(:indisvalid=>true) if server_version >= 80200
         ds.filter!(:indisready=>true, :indcheckxmin=>false) if server_version >= 80300
-        
+
         indexes = {}
         ds.each do |r|
           i = indexes[m.call(r[:name])] ||= {:columns=>[], :unique=>r[:unique]}
@@ -279,11 +294,11 @@ module Sequel
         indexes
       end
 
-      # Dataset containing all current database locks 
+      # Dataset containing all current database locks
       def locks
         dataset.from(:pg_class).join(:pg_locks, :relation=>:relfilenode).select(:pg_class__relname, Sequel::SQL::ColumnAll.new(:pg_locks))
       end
-      
+
       # Notifies the given channel.  See the PostgreSQL NOTIFY documentation. Options:
       #
       # :payload :: The payload string to use for the NOTIFY statement.  Only supported
@@ -304,7 +319,7 @@ module Sequel
           synchronize(opts[:server]){|con| con.primary_key(*schema_and_table(table))}
         end
       end
-      
+
       # Return the sequence providing the default for the primary key for the given table.
       def primary_key_sequence(table, opts={})
         quoted_table = quote_schema_table(table)
@@ -315,7 +330,7 @@ module Sequel
           synchronize(opts[:server]){|con| con.sequence(*schema_and_table(table))}
         end
       end
-      
+
       # Reset the primary key sequence for the given table, baseing it on the
       # maximum current value of the table's primary key.
       def reset_primary_key_sequence(table)
@@ -337,7 +352,7 @@ module Sequel
       def serial_primary_key_options
         {:primary_key => true, :serial => true, :type=>Integer}
       end
-      
+
       # The version of the PostgreSQL server, used for determining capability.
       def server_version(server=nil)
         return @server_version if @server_version
@@ -353,7 +368,7 @@ module Sequel
         end
         @server_version
       end
-      
+
       # PostgreSQL supports prepared transactions (two-phase commit) if
       # max_prepared_transactions is greater than 0.
       def supports_prepared_transactions?
@@ -378,7 +393,7 @@ module Sequel
 
       # Array of symbols specifying table names in the current database.
       # The dataset used is yielded to the block if one is provided,
-      # otherwise, an array of symbols of table names is returned.  
+      # otherwise, an array of symbols of table names is returned.
       #
       # Options:
       # * :schema - The schema to search (default_schema by default)
@@ -428,32 +443,42 @@ module Sequel
         AS #{literal(definition.to_s)}#{", #{literal(opts[:link_symbol].to_s)}" if opts[:link_symbol]}
         END
       end
-      
+
       # SQL for creating a procedural language.
       def create_language_sql(name, opts={})
         "CREATE#{' OR REPLACE' if opts[:replace] && server_version >= 90000}#{' TRUSTED' if opts[:trusted]} LANGUAGE #{name}#{" HANDLER #{opts[:handler]}" if opts[:handler]}#{" VALIDATOR #{opts[:validator]}" if opts[:validator]}"
       end
-      
-      # SQL for creating a database trigger. 
+
+      # SQL for creating a schema.
+      def create_schema_sql(name)
+        "CREATE SCHEMA #{name}"
+      end
+
+      # SQL for creating a database trigger.
       def create_trigger_sql(table, name, function, opts={})
         events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
         whence = opts[:after] ? 'AFTER' : 'BEFORE'
         "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
       end
-      
+
       # The errors that the main adapters can raise, depends on the adapter being used
       def database_error_classes
         CONVERTED_EXCEPTIONS
       end
-      
-      # SQL for dropping a function from the database. 
+
+      # SQL for dropping a function from the database.
       def drop_function_sql(name, opts={})
         "DROP FUNCTION#{' IF EXISTS' if opts[:if_exists]} #{name}#{sql_function_args(opts[:args])}#{' CASCADE' if opts[:cascade]}"
       end
-      
+
       # SQL for dropping a procedural language from the database.
       def drop_language_sql(name, opts={})
         "DROP LANGUAGE#{' IF EXISTS' if opts[:if_exists]} #{name}#{' CASCADE' if opts[:cascade]}"
+      end
+
+      # SQL for dropping a schema from the database.
+      def drop_schema_sql(name, opts={})
+        "DROP SCHEMA#{' IF EXISTS' if opts[:if_exists]} #{name}#{' CASCADE' if opts[:cascade]}"
       end
 
       # SQL for dropping a trigger from the database.
@@ -470,12 +495,12 @@ module Sequel
           ds.exclude(:pg_namespace__nspname=>EXCLUDE_SCHEMAS)
         end
       end
-      
+
       # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
       def identifier_input_method_default
         nil
       end
-      
+
       # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
       def identifier_output_method_default
         nil
@@ -485,7 +510,7 @@ module Sequel
       def index_definition_sql(table_name, index)
         cols = index[:columns]
         index_name = index[:name] || default_index_name(table_name, cols)
-        expr = if o = index[:opclass] 
+        expr = if o = index[:opclass]
           "(#{Array(cols).map{|c| "#{literal(c)} #{o}"}.join(', ')})"
         else
           literal(Array(cols))
@@ -503,7 +528,7 @@ module Sequel
         end
         "CREATE #{unique}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
       end
-      
+
       # The result of the insert for the given table and values.  If values
       # is an array, assume the first column is the primary key and return
       # that.  If values is a hash, lookup the primary key for the table.  If
@@ -533,13 +558,13 @@ module Sequel
       end
 
       # Don't log, since logging is done by the underlying connection.
-      def log_connection_execute(conn, sql) 
+      def log_connection_execute(conn, sql)
         conn.execute(sql)
       end
-      
+
       # Backbone of the tables and views support.
       def pg_class_relname(type, opts)
-        ds = metadata_dataset.from(:pg_class).filter(:relkind=>type).select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace) 
+        ds = metadata_dataset.from(:pg_class).filter(:relkind=>type).select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace)
         ds = filter_schema(ds, opts)
         m = output_identifier_meth
         block_given? ? yield(ds) : ds.map{|r| m.call(r[:relname])}
@@ -550,7 +575,7 @@ module Sequel
       def prepared_arg_placeholder
         PREPARED_ARG_PLACEHOLDER
       end
-      
+
       # Remove the cached entries for primary keys and sequences when a table is
       # changed.
       def remove_cached_schema(table)
@@ -564,7 +589,7 @@ module Sequel
       # a rename table operation, so speciying a new schema in new_name will not have an effect.
       def rename_table_sql(name, new_name)
         "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_identifier(schema_and_table(new_name).last)}"
-      end 
+      end
 
       # PostgreSQL's autoincrementing primary keys are of type integer or bigint
       # using a nextval function call as a default.
@@ -613,7 +638,7 @@ module Sequel
       def sql_function_args(args)
         "(#{Array(args).map{|a| Array(a).reverse.join(' ')}.join(', ')})"
       end
-      
+
       # Handle bigserial type if :serial option is present
       def type_literal_generic_bignum(column)
         column[:serial] ? :bigserial : super
@@ -643,7 +668,7 @@ module Sequel
         end
       end
     end
-    
+
     # Instance methods for datasets that connect to a PostgreSQL database.
     module DatasetMethods
       ACCESS_SHARE = 'ACCESS SHARE'.freeze
@@ -688,7 +713,7 @@ module Sequel
       BLOB_RE = /[\000-\037\047\134\177-\377]/n.freeze
       WINDOW = " WINDOW ".freeze
       EMPTY_STRING = ''.freeze
-      
+
       # Shared methods for prepared statements when used with PostgreSQL databases.
       module PreparedStatementMethods
         # Override insert action to use RETURNING if the server supports it.
@@ -722,7 +747,7 @@ module Sequel
       def analyze
         explain(:analyze=>true)
       end
-      
+
       # Handle converting the ruby xor operator (^) into the
       # PostgreSQL xor operator (#).
       def complex_expression_sql_append(sql, op, args)
@@ -749,12 +774,12 @@ module Sequel
       def explain(opts={})
         with_sql((opts[:analyze] ? EXPLAIN_ANALYZE : EXPLAIN) + select_sql).map(QUERY_PLAN).join(CRLF)
       end
-      
+
       # Return a cloned dataset which will use FOR SHARE to lock returned rows.
       def for_share
         lock_style(:share)
       end
-      
+
       # PostgreSQL specific full text search syntax, using tsearch2 (included
       # in 8.3 by default, and available for earlier versions as an add-on).
       def full_text_search(cols, terms, opts = {})
@@ -762,7 +787,7 @@ module Sequel
         terms = terms.join(' | ') if terms.is_a?(Array)
         filter("to_tsvector(?, ?) @@ to_tsquery(?, ?)", lang, full_text_string_join(cols), lang, terms)
       end
-      
+
       # Insert given values into the database.
       def insert(*values, &block)
         if @opts[:returning]
@@ -802,17 +827,17 @@ module Sequel
         end
         nil
       end
-      
+
       # For PostgreSQL version > 8.2, allow inserting multiple rows at once.
       def multi_insert_sql(columns, values)
         return super if server_version < 80200
-        
+
         # postgresql 8.2 introduces support for multi-row insert
         sql = LiteralString.new('VALUES ')
         expression_list_append(sql, values.map{|r| Array(r)})
         [insert_sql(columns, sql)]
       end
-      
+
       # PostgreSQL supports using the WITH clause in subqueries if it
       # supports using WITH at all (i.e. on PostgreSQL 8.4+).
       def supports_cte_in_subqueries?
@@ -823,7 +848,7 @@ module Sequel
       def supports_distinct_on?
         true
       end
-      
+
       # PostgreSQL supports modifying joined datasets
       def supports_modifying_joins?
         true
@@ -841,7 +866,7 @@ module Sequel
       def supports_timestamp_timezones?
         true
       end
-      
+
       # PostgreSQL 8.4+ supports window functions
       def supports_window_functions?
         server_version >= 80400
@@ -851,7 +876,7 @@ module Sequel
       def window(name, opts)
         clone(:window=>(@opts[:window]||[]) + [[name, SQL::Window.new(opts)]])
       end
-      
+
       protected
 
       # If returned primary keys are requested, use RETURNING unless already set on the
@@ -876,11 +901,11 @@ module Sequel
       end
 
       private
-      
+
       # PostgreSQL allows deleting from joined datasets
       def delete_clause_methods
         server_version >= 90100 ? DELETE_CLAUSE_METHODS_91 : DELETE_CLAUSE_METHODS
-      end 
+      end
 
       # Only include the primary table in the main delete clause
       def delete_from_sql(sql)
@@ -946,7 +971,7 @@ module Sequel
       def select_clause_methods
         server_version >= 80400 ? SELECT_CLAUSE_METHODS_84 : SELECT_CLAUSE_METHODS
       end
-      
+
       # PostgreSQL requires parentheses around compound datasets if they use
       # CTEs, and using them in other places doesn't hurt.
       def compound_dataset_sql_append(sql, ds)
@@ -967,7 +992,7 @@ module Sequel
           c = false
           co = COMMA
           as = AS
-          ws.map do |name, window| 
+          ws.map do |name, window|
             sql << co if c
             literal_append(sql, name)
             sql << as
@@ -976,7 +1001,7 @@ module Sequel
           end
         end
       end
-      
+
       # Use WITH RECURSIVE instead of WITH if any of the CTEs is recursive
       def select_with_sql_base
         opts[:with].any?{|w| w[:recursive]} ? SQL_WITH_RECURSIVE : super
