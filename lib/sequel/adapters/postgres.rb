@@ -215,18 +215,21 @@ module Sequel
 
       # Connects to the database.  In addition to the standard database
       # options, using the :encoding or :charset option changes the
-      # client encoding for the connection.
+      # client encoding for the connection, :connect_timeout is a
+      # connection timeout in seconds, and :sslmode sets whether postgres's
+      # sslmode.  :connect_timeout and :ssl_mode are only supported if the pg
+      # driver is used.
       def connect(server)
         opts = server_opts(server)
         conn = if SEQUEL_POSTGRES_USES_PG
           connection_params = {
             :host => opts[:host],
             :port => opts[:port] || 5432,
-            :tty => '',
             :dbname => opts[:database],
             :user => opts[:user],
             :password => opts[:password],
-            :connect_timeout => opts[:connect_timeout] || 20
+            :connect_timeout => opts[:connect_timeout] || 20,
+            :sslmode => opts[:sslmode]
           }.delete_if { |key, value| blank_object?(value) }
           Adapter.connect(connection_params)
         else
