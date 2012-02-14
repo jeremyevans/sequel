@@ -250,7 +250,7 @@ module Sequel
       # Drops a schema from the database.  Arguments:
       # * name : name of the schema to drop
       # * opts : options hash:
-      #   * :cascade : Drop other objects depending on this function.
+      #   * :cascade : Drop all objects in this schema.
       #   * :if_exists : Don't raise an error if the schema doesn't exist.
       def drop_schema(name, opts={})
         self << drop_schema_sql(name, opts)
