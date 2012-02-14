@@ -37,7 +37,7 @@ describe "A PostgreSQL database" do
   before do
     @db = POSTGRES_DB
   end
-  
+
   specify "should provide the server version" do
     @db.server_version.should > 70000
   end
@@ -59,18 +59,18 @@ describe "A PostgreSQL dataset" do
     @d = POSTGRES_DB[:test]
     @d.delete # remove all records
   end
-  
+
   specify "should quote columns and tables using double quotes if quoting identifiers" do
     @d.quote_identifiers = true
     @d.select(:name).sql.should == \
       'SELECT "name" FROM "test"'
-      
+
     @d.select('COUNT(*)'.lit).sql.should == \
       'SELECT COUNT(*) FROM "test"'
 
     @d.select(:max.sql_function(:value)).sql.should == \
       'SELECT max("value") FROM "test"'
-      
+
     @d.select(:NOW.sql_function).sql.should == \
     'SELECT NOW() FROM "test"'
 
@@ -82,13 +82,13 @@ describe "A PostgreSQL dataset" do
 
     @d.select('test.name AS item_name'.lit).sql.should == \
       'SELECT test.name AS item_name FROM "test"'
-      
+
     @d.select('"name"'.lit).sql.should == \
       'SELECT "name" FROM "test"'
 
     @d.select('max(test."name") AS "max_name"'.lit).sql.should == \
       'SELECT max(test."name") AS "max_name" FROM "test"'
-      
+
     @d.select(:test.sql_function(:abc, 'hello')).sql.should == \
       "SELECT test(\"abc\", 'hello') FROM \"test\""
 
@@ -107,7 +107,7 @@ describe "A PostgreSQL dataset" do
     @d.disable_insert_returning.insert_sql(:value => 333).should =~ \
       /\AINSERT INTO "test" \("value"\) VALUES \(333\)\z/
   end
-  
+
   specify "should quote fields correctly when reversing the order if quoting identifiers" do
     @d.quote_identifiers = true
     @d.reverse_order(:name).sql.should == \
@@ -129,7 +129,7 @@ describe "A PostgreSQL dataset" do
     @d.filter(:name => /bc/).count.should == 2
     @d.filter(:name => /^bc/).count.should == 1
   end
-  
+
   specify "should support NULLS FIRST and NULLS LAST" do
     @d << {:name => 'abc'}
     @d << {:name => 'bcd'}
@@ -138,20 +138,20 @@ describe "A PostgreSQL dataset" do
     @d.order(:value.asc(:nulls=>:last), :name).select_map(:name).should == %w[bcd abc bcd]
     @d.order(:value.asc(:nulls=>:first), :name).reverse.select_map(:name).should == %w[bcd bcd abc]
   end
-  
+
   specify "#lock should lock tables and yield if a block is given" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}
   end
-  
+
   specify "#lock should lock table if inside a transaction" do
     POSTGRES_DB.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}
   end
-  
+
   specify "#lock should return nil" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}.should == nil
     POSTGRES_DB.transaction{@d.lock('EXCLUSIVE').should == nil; @d.insert(:name=>'a')}
   end
-  
+
   specify "should raise an error if attempting to update a joined dataset with a single FROM table" do
     proc{POSTGRES_DB[:test].join(:test2, [:name]).update(:name=>'a')}.should raise_error(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
   end
@@ -169,7 +169,7 @@ describe "Dataset#distinct" do
   after do
     @db.drop_table(:a)
   end
-  
+
   it "#distinct with arguments should return results distinct on those arguments" do
     @ds.insert(20, 10)
     @ds.insert(30, 10)
@@ -194,7 +194,7 @@ if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
       POSTGRES_DB.drop_table(:items)
       POSTGRES_DB.disconnect
     end
-    
+
     specify "should handle FOR UPDATE" do
       @ds.insert(:number=>20)
       c, t = nil, nil
@@ -216,7 +216,7 @@ if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
       t.join
       c.should == {:id=>1, :number=>30, :name=>'Jim'}
     end
-  
+
     specify "should handle FOR SHARE" do
       @ds.insert(:number=>20)
       c, t = nil
@@ -285,12 +285,12 @@ describe "A PostgreSQL database" do
     @db[:test2].columns.should == [:name, :value, :xyz]
     @db[:test2] << {:name => 'mmm', :value => 111}
     @db[:test2].first[:xyz].should == '000'
-  
+
     @db[:test2].columns.should == [:name, :value, :xyz]
     @db.drop_column :test2, :xyz
-    
+
     @db[:test2].columns.should == [:name, :value]
-  
+
     @db[:test2].delete
     @db.add_column :test2, :xyz, :text, :default => '000'
     @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 'qqqq'}
@@ -299,20 +299,20 @@ describe "A PostgreSQL database" do
     @db.rename_column :test2, :xyz, :zyx
     @db[:test2].columns.should == [:name, :value, :zyx]
     @db[:test2].first[:zyx].should == 'qqqq'
-  
+
     @db.add_column :test2, :xyz, :float
     @db[:test2].delete
     @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 56.78}
     @db.set_column_type :test2, :xyz, :integer
-    
+
     @db[:test2].first[:xyz].should == 57
   end
-  
+
   specify "#locks should be a dataset returning database locks " do
     @db.locks.should be_a_kind_of(Sequel::Dataset)
     @db.locks.all.should be_a_kind_of(Array)
   end
-end  
+end
 
 describe "A PostgreSQL database" do
   before do
@@ -323,7 +323,7 @@ describe "A PostgreSQL database" do
   after do
     @db.drop_table(:posts) rescue nil
   end
-  
+
   specify "should support resetting the primary key sequence" do
     @db.create_table(:posts){primary_key :a}
     @db[:posts].insert(:a=>20).should == 20
@@ -334,7 +334,7 @@ describe "A PostgreSQL database" do
     @db[:posts].insert.should == 21
     @db[:posts].order(:a).map(:a).should == [1, 2, 10, 20, 21]
   end
-  
+
   specify "should support specifying Integer/Bignum/Fixnum types in primary keys and have them be auto incrementing" do
     @db.create_table(:posts){primary_key :a, :type=>Integer}
     @db[:posts].insert.should == 1
@@ -351,7 +351,7 @@ describe "A PostgreSQL database" do
     @db.create_table(:posts){Integer :a}
     @db.reset_primary_key_sequence(:posts).should == nil
   end
-  
+
   specify "should support opclass specification" do
     @db.create_table(:posts){text :title; text :body; integer :user_id; index(:user_id, :opclass => :int4_ops, :type => :btree)}
     @db.sqls.should == [
@@ -392,7 +392,7 @@ describe "A PostgreSQL database" do
       'CREATE INDEX "posts_geom_index" ON "posts" USING gist ("geom")'
     ]
   end
-  
+
   specify "should support indexes with index type" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'hash'}
     @db.sqls.should == [
@@ -400,7 +400,7 @@ describe "A PostgreSQL database" do
       'CREATE INDEX "posts_title_index" ON "posts" USING hash ("title")'
     ]
   end
-  
+
   specify "should support unique indexes with index type" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'btree', :unique => true}
     @db.sqls.should == [
@@ -408,7 +408,7 @@ describe "A PostgreSQL database" do
       'CREATE UNIQUE INDEX "posts_title_index" ON "posts" USING btree ("title")'
     ]
   end
-  
+
   specify "should support partial indexes" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
     @db.sqls.should == [
@@ -416,7 +416,7 @@ describe "A PostgreSQL database" do
       'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
     ]
   end
-  
+
   specify "should support identifiers for table names in indicies" do
     @db.create_table(Sequel::SQL::Identifier.new(:posts)){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
     @db.sqls.should == [
@@ -424,7 +424,7 @@ describe "A PostgreSQL database" do
       'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
     ]
   end
-  
+
   specify "should support renaming tables" do
     @db.create_table!(:posts1){primary_key :a}
     @db.rename_table(:posts1, :posts)
@@ -441,45 +441,45 @@ describe "Postgres::Dataset#import" do
   after do
     @db.drop_table(:test) rescue nil
   end
-  
+
   specify "#import should return separate insert statements if server_version < 80200" do
     @ds.meta_def(:server_version){80199}
     @ds.import([:x, :y], [[1, 2], [3, 4]])
     @db.sqls.should == ['BEGIN', 'INSERT INTO "test" ("x", "y") VALUES (1, 2)', 'INSERT INTO "test" ("x", "y") VALUES (3, 4)', 'COMMIT']
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
-  
+
   specify "#import should a single insert statement if server_version >= 80200" do
     @ds.meta_def(:server_version){80200}
     @ds.import([:x, :y], [[1, 2], [3, 4]])
     @db.sqls.should == ['BEGIN', 'INSERT INTO "test" ("x", "y") VALUES (1, 2), (3, 4)', 'COMMIT']
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
-  
+
   specify "#import should work correctly when returning primary keys for server_version < 80200" do
     @ds.meta_def(:server_version){80199}
     @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key).should == [1, 3]
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
-  
+
   specify "#import should work correctly when returning primary keys for server_version >= 80200" do
     @ds.meta_def(:server_version){80200}
     @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key).should == [1, 3]
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
-  
+
   specify "#import should work correctly when returning primary keys with :slice option for server_version < 80200" do
     @ds.meta_def(:server_version){80199}
     @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key, :slice=>1).should == [1, 3]
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
-  
+
   specify "#import should work correctly when returning primary keys with :slice option for server_version >= 80200" do
     @ds.meta_def(:server_version){80200}
     @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key, :slice=>1).should == [1, 3]
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
-  
+
   specify "#import should work correctly with an arbitrary returning value" do
     @ds.meta_def(:server_version){80200}
     @ds.returning(:y, :x).import([:x, :y], [[1, 2], [3, 4]]).should == [{:y=>2, :x=>1}, {:y=>4, :x=>3}]
@@ -509,7 +509,7 @@ describe "Postgres::Dataset#insert" do
     @ds.disable_insert_returning.insert(:value=>20).should == 2
     @ds.meta_def(:server_version){80100}
     @ds.insert(:value=>13).should == 3
-    
+
     @db.sqls.reject{|x| x =~ /pg_class/}.should == [
       'INSERT INTO "test5" ("value") VALUES (10) RETURNING "xid"',
       'INSERT INTO "test5" ("value") VALUES (20)',
@@ -519,7 +519,7 @@ describe "Postgres::Dataset#insert" do
     ]
     @ds.all.should == [{:xid=>1, :value=>10}, {:xid=>2, :value=>20}, {:xid=>3, :value=>13}]
   end
-  
+
   specify "should insert correctly if server_version < 80200" do
     @ds.meta_def(:server_version){80100}
     @ds.insert(:value=>10).should == 1
@@ -586,7 +586,7 @@ describe "Postgres::Database schema qualified tables" do
     POSTGRES_DB << "DROP SCHEMA schema_test CASCADE"
     POSTGRES_DB.default_schema = nil
   end
-  
+
   specify "should be able to create, drop, select and insert into tables in a given schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
     POSTGRES_DB[:schema_test__schema_test].first.should == nil
@@ -599,19 +599,19 @@ describe "Postgres::Database schema qualified tables" do
     POSTGRES_DB.from('schema_test.schema_test'.lit).first.should == nil
     POSTGRES_DB.drop_table(:schema_test.qualify(:schema_test))
   end
-  
+
   specify "#tables should not include tables in a default non-public schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
     POSTGRES_DB.tables.should include(:schema_test)
     POSTGRES_DB.tables.should_not include(:pg_am)
     POSTGRES_DB.tables.should_not include(:domain_udt_usage)
   end
-  
+
   specify "#tables should return tables in the schema provided by the :schema argument" do
     POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
     POSTGRES_DB.tables(:schema=>:schema_test).should == [:schema_test]
   end
-  
+
   specify "#schema should not include columns from tables in a default non-public schema" do
     POSTGRES_DB.create_table(:schema_test__domains){integer :i}
     sch = POSTGRES_DB.schema(:domains)
@@ -619,7 +619,7 @@ describe "Postgres::Database schema qualified tables" do
     cs.should include(:i)
     cs.should_not include(:data_type)
   end
-  
+
   specify "#schema should only include columns from the table in the given :schema argument" do
     POSTGRES_DB.create_table!(:domains){integer :d}
     POSTGRES_DB.create_table(:schema_test__domains){integer :i}
@@ -629,7 +629,7 @@ describe "Postgres::Database schema qualified tables" do
     cs.should_not include(:d)
     POSTGRES_DB.drop_table(:domains)
   end
-  
+
   specify "#schema should raise an exception if columns from tables in two separate schema are returned" do
     POSTGRES_DB.create_table!(:public__domains){integer :d}
     POSTGRES_DB.create_table(:schema_test__domains){integer :i}
@@ -641,41 +641,41 @@ describe "Postgres::Database schema qualified tables" do
       POSTGRES_DB.drop_table(:public__domains)
     end
   end
-  
+
   specify "#table_exists? should see if the table is in a given schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
     POSTGRES_DB.table_exists?(:schema_test__schema_test).should == true
   end
-  
+
   specify "should be able to get primary keys for tables in a given schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
     POSTGRES_DB.primary_key(:schema_test__schema_test).should == 'i'
   end
-  
+
   specify "should be able to get serial sequences for tables in a given schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
     POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test".schema_test_i_seq'
   end
-  
+
   specify "should be able to get serial sequences for tables that have spaces in the name in a given schema" do
     POSTGRES_DB.quote_identifiers = true
     POSTGRES_DB.create_table(:"schema_test__schema test"){primary_key :i}
     POSTGRES_DB.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."schema test_i_seq"'
   end
-  
+
   specify "should be able to get custom sequences for tables in a given schema" do
     POSTGRES_DB << "CREATE SEQUENCE schema_test.kseq"
     POSTGRES_DB.create_table(:schema_test__schema_test){integer :j; primary_key :k, :type=>:integer, :default=>"nextval('schema_test.kseq'::regclass)".lit}
     POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test".kseq'
   end
-  
+
   specify "should be able to get custom sequences for tables that have spaces in the name in a given schema" do
     POSTGRES_DB.quote_identifiers = true
     POSTGRES_DB << "CREATE SEQUENCE schema_test.\"ks eq\""
     POSTGRES_DB.create_table(:"schema_test__schema test"){integer :j; primary_key :k, :type=>:integer, :default=>"nextval('schema_test.\"ks eq\"'::regclass)".lit}
     POSTGRES_DB.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."ks eq"'
   end
-  
+
   specify "#default_schema= should change the default schema used from public" do
     POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
     POSTGRES_DB.default_schema = :schema_test
@@ -692,12 +692,12 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
     @db.run "DROP SCHEMA s CASCADE" rescue nil
     @db.run "CREATE SCHEMA s"
     @db.quote_identifiers = true
-    
+
     @db.create_table(:s__bands){primary_key :id; String :name}
     @db.create_table(:s__albums){primary_key :id; String :name; foreign_key :band_id, :s__bands}
     @db.create_table(:s__tracks){primary_key :id; String :name; foreign_key :album_id, :s__albums}
     @db.create_table(:s__members){primary_key :id; String :name; foreign_key :band_id, :s__bands}
-    
+
     @Band = Class.new(Sequel::Model(:s__bands))
     @Album = Class.new(Sequel::Model(:s__albums))
     @Track = Class.new(Sequel::Model(:s__tracks))
@@ -706,17 +706,17 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
     def @Album.name; :Album; end
     def @Track.name; :Track; end
     def @Member.name; :Member; end
-    
+
     @Band.one_to_many :albums, :class=>@Album, :order=>:name
     @Band.one_to_many :members, :class=>@Member, :order=>:name
     @Album.many_to_one :band, :class=>@Band, :order=>:name
     @Album.one_to_many :tracks, :class=>@Track, :order=>:name
     @Track.many_to_one :album, :class=>@Album, :order=>:name
     @Member.many_to_one :band, :class=>@Band, :order=>:name
-    
+
     @Member.many_to_many :members, :class=>@Member, :join_table=>:s__bands, :right_key=>:id, :left_key=>:id, :left_primary_key=>:band_id, :right_primary_key=>:band_id, :order=>:name
     @Band.many_to_many :tracks, :class=>@Track, :join_table=>:s__albums, :right_key=>:id, :right_primary_key=>:album_id, :order=>:name
-    
+
     @b1 = @Band.create(:name=>"BM")
     @b2 = @Band.create(:name=>"J")
     @a1 = @Album.create(:name=>"BM1", :band=>@b1)
@@ -736,7 +736,7 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
     @db.quote_identifiers = false
     @db.run "DROP SCHEMA s CASCADE"
   end
-  
+
   specify "should return all eager graphs correctly" do
     bands = @Band.order(:bands__name).eager_graph(:albums).all
     bands.should == [@b1, @b2]
@@ -918,7 +918,7 @@ if POSTGRES_DB.dataset.supports_window_functions?
     after do
       @db.drop_table(:i1)
     end
-    
+
     specify "should give correct results for window functions" do
       @ds.window(:win, :partition=>:group_id, :order=>:id).select(:id){sum(:over, :args=>amount, :window=>win){}}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
@@ -932,7 +932,7 @@ if POSTGRES_DB.dataset.supports_window_functions?
   end
 end
 
-describe "Postgres::Database functions, languages, and triggers" do
+describe "Postgres::Database functions, languages, schemas, and triggers" do
   before do
     @d = POSTGRES_DB
   end
@@ -940,6 +940,7 @@ describe "Postgres::Database functions, languages, and triggers" do
     @d.drop_function('tf', :if_exists=>true, :cascade=>true)
     @d.drop_function('tf', :if_exists=>true, :cascade=>true, :args=>%w'integer integer')
     @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true) if @d.server_version < 90000
+    @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true)
     @d.drop_table(:test) rescue nil
   end
 
@@ -953,7 +954,7 @@ describe "Postgres::Database functions, languages, and triggers" do
     @d.drop_function('tf')
     proc{@d['SELECT tf()'].all}.should raise_error(Sequel::DatabaseError)
   end
-  
+
   specify "#create_function and #drop_function should support options" do
     args = ['tf', 'SELECT $1 + $2', {:args=>[[:integer, :a], :integer], :replace=>true, :returns=>:integer, :language=>'SQL', :behavior=>:immutable, :strict=>true, :security_definer=>true, :cost=>2, :set=>{:search_path => 'public'}}]
     @d.send(:create_function_sql,*args).should =~ /\A\s*CREATE OR REPLACE FUNCTION tf\(a integer, integer\)\s+RETURNS integer\s+LANGUAGE SQL\s+IMMUTABLE\s+STRICT\s+SECURITY DEFINER\s+COST 2\s+SET search_path = public\s+AS 'SELECT \$1 \+ \$2'\s*\z/
@@ -967,7 +968,7 @@ describe "Postgres::Database functions, languages, and triggers" do
     # Make sure if exists works
     @d.drop_function(*args)
   end
-  
+
   specify "#create_language and #drop_language should create and drop languages" do
     @d.send(:create_language_sql, :plpgsql).should == 'CREATE LANGUAGE plpgsql'
     @d.create_language(:plpgsql, :replace=>true) if @d.server_version < 90000
@@ -980,7 +981,15 @@ describe "Postgres::Database functions, languages, and triggers" do
     # Make sure if exists works
     @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true) if @d.server_version < 90000
   end
-  
+
+  specify "#create_schema and #drop_schema should create and drop schemas" do
+    @d.send(:create_schema_sql, :sequel).should == 'CREATE SCHEMA sequel'
+    @d.send(:drop_schema_sql, :sequel).should == 'DROP SCHEMA sequel'
+    @d.send(:drop_schema_sql, :sequel, :if_exists=>true, :cascade=>true).should == 'DROP SCHEMA IF EXISTS sequel CASCADE'
+    # Make sure if exists works
+    @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true) if @d.server_version < 90000
+  end
+
   specify "#create_trigger and #drop_trigger should create and drop triggers" do
     @d.create_language(:plpgsql) if @d.server_version < 90000
     @d.create_function(:tf, 'BEGIN IF NEW.value IS NULL THEN RAISE EXCEPTION \'Blah\'; END IF; RETURN NEW; END;', :language=>:plpgsql, :returns=>:trigger)
@@ -1014,11 +1023,11 @@ if POSTGRES_DB.adapter_scheme == :postgres
     after(:all) do
       @db.drop_table(:test_cursor) rescue nil
     end
-  
+
     specify "should return the same results as the non-cursor use" do
       @ds.all.should == @ds.use_cursor.all
     end
-    
+
     specify "should respect the :rows_per_fetch option" do
       @db.sqls.clear
       @ds.use_cursor.all
@@ -1027,7 +1036,7 @@ if POSTGRES_DB.adapter_scheme == :postgres
       @ds.use_cursor(:rows_per_fetch=>100).all
       @db.sqls.length.should == 15
     end
-    
+
     specify "should handle returning inside block" do
       def @ds.check_return
         use_cursor.each{|r| return}
@@ -1044,7 +1053,7 @@ if POSTGRES_DB.adapter_scheme == :postgres
       @db.instance_eval do
         disconnect
         @conversion_procs = nil
-      end 
+      end
     end
     after do
       Sequel::Postgres::PG_NAMED_TYPES.delete(:interval)
@@ -1075,7 +1084,7 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
     after(:all) do
       @db.drop_table(:test_copy) rescue nil
     end
-  
+
     specify "without a block or options should return a text version of the table as a single string" do
       @db.copy_table(:test_copy).should == "1\t2\n3\t4\n"
     end
@@ -1083,35 +1092,35 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
     specify "without a block and with :format=>:csv should return a csv version of the table as a single string" do
       @db.copy_table(:test_copy, :format=>:csv).should == "1,2\n3,4\n"
     end
-  
+
     specify "should treat string as SQL code" do
       @db.copy_table('COPY "test_copy" TO STDOUT').should == "1\t2\n3\t4\n"
     end
-  
+
     specify "should respect given :options options" do
       @db.copy_table(:test_copy, :options=>"FORMAT csv, HEADER TRUE").should == "x,y\n1,2\n3,4\n"
     end
-  
+
     specify "should respect given :options options when :format is used" do
       @db.copy_table(:test_copy, :format=>:csv, :options=>"QUOTE '''', FORCE_QUOTE *").should == "'1','2'\n'3','4'\n"
     end
-  
+
     specify "should accept dataset as first argument" do
       @db.copy_table(@db[:test_copy].cross_join(:test_copy___tc).order(1, 2, 3, 4)).should == "1\t2\t1\t2\n1\t2\t3\t4\n3\t4\t1\t2\n3\t4\t3\t4\n"
     end
-  
+
     specify "with a block and no options should yield each row as a string in text format" do
       buf = []
       @db.copy_table(:test_copy){|b| buf << b}
       buf.should == ["1\t2\n", "3\t4\n"]
     end
-  
+
     specify "with a block and :format=>:csv should yield each row as a string in csv format" do
       buf = []
       @db.copy_table(:test_copy, :format=>:csv){|b| buf << b}
       buf.should == ["1,2\n", "3,4\n"]
     end
-  
+
     specify "should work fine when using a block that is terminated early with a following copy_table" do
       buf = []
       proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; break}}.should raise_error(Sequel::DatabaseDisconnectError)
@@ -1123,7 +1132,7 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
       @db.copy_table(:test_copy){|b| buf << b}
       buf.should == ["1\t2\n", "3\t4\n"]
     end
-  
+
     specify "should work fine when using a block that is terminated early with a following regular query" do
       buf = []
       proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; break}}.should raise_error(Sequel::DatabaseDisconnectError)
@@ -1133,13 +1142,13 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
       buf.should == ["1,2\n"]
       @db[:test_copy].select_order_map(:x).should == [1, 3]
     end
-  end  
+  end
 
   describe "Postgres::Database LISTEN/NOTIFY" do
     before(:all) do
       @db = POSTGRES_DB
     end
-  
+
     specify "should support listen and notify" do
       notify_pid = @db.synchronize{|conn| conn.backend_pid}
 
