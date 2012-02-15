@@ -30,13 +30,13 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     @sleep_time = Float(opts[:pool_sleep_time] || 0.001)
   end
   
-  # The total number of connections opened for the given server, should
-  # be equal to available_connections.length + allocated.length.
+  # The total number of connections opened, either available or allocated.
+  # This may not be completely accurate as it isn't protected by the mutex.
   def size
     @allocated.length + @available_connections.length
   end
   
-  # Removes all connections currently available on all servers, optionally
+  # Removes all connections currently available, optionally
   # yielding each connection to the given block. This method has the effect of 
   # disconnecting from the database, assuming that no connections are currently
   # being used.  If you want to be able to disconnect connections that are
@@ -54,7 +54,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     end
   end
   
-  # Chooses the first available connection to the given server, or if none are
+  # Chooses the first available connection, or if none are
   # available, creates a new connection.  Passes the connection to the supplied
   # block:
   # 
@@ -98,7 +98,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   
   private
 
-  # Assigns a connection to the supplied thread for the given server, if one
+  # Assigns a connection to the supplied thread, if one
   # is available. The calling code should NOT already have the mutex when
   # calling this.
   def acquire(thread)
@@ -109,7 +109,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     end
   end
   
-  # Returns an available connection to the given server. If no connection is
+  # Returns an available connection. If no connection is
   # available, tries to create a new connection. The calling code should already
   # have the mutex before calling this.
   def available
@@ -130,15 +130,13 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     super if (n || size) < @max_size
   end
   
-  # Returns the connection owned by the supplied thread for the given server,
+  # Returns the connection owned by the supplied thread,
   # if any. The calling code should NOT already have the mutex before calling this.
   def owned_connection(thread)
     sync{@allocated[thread]}
   end
   
-  # Releases the connection assigned to the supplied thread and server. If the
-  # server or connection given is scheduled for disconnection, remove the
-  # connection instead of releasing it back to the pool.
+  # Releases the connection assigned to the supplied thread back to the pool.
   # The calling code should already have the mutex before calling this.
   def release(thread)
     @available_connections << @allocated.delete(thread)
