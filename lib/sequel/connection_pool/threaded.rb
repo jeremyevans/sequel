@@ -39,7 +39,10 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # Removes all connections currently available on all servers, optionally
   # yielding each connection to the given block. This method has the effect of 
   # disconnecting from the database, assuming that no connections are currently
-  # being used.
+  # being used.  If you want to be able to disconnect connections that are
+  # currently in use, use the ShardedThreadedConnectionPool, which can do that.
+  # This connection pool does not, for performance reasons. To use the sharded pool,
+  # pass the <tt>:servers=>{}</tt> option when connecting to the database.
   # 
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database.
