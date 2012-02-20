@@ -1210,3 +1210,30 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
     end
   end
 end
+
+describe 'POSTGRES special float handling' do
+  before do
+    @db = POSTGRES_DB
+    @db.create_table!(:test5){Float :value}
+    @db.sqls.clear
+    @ds = @db[:test5]
+  end
+  after do
+    @db.drop_table(:test5) rescue nil
+  end
+
+  specify 'should quote NaN' do
+    nan = 0.0/0.0
+    @ds.insert_sql(:value => nan).should == %q{INSERT INTO test5 (value) VALUES ('NaN')}
+  end
+
+  specify 'should quote +Infinity' do
+    inf = 1.0/0.0
+    @ds.insert_sql(:value => inf).should == %q{INSERT INTO test5 (value) VALUES ('Infinity')}
+  end
+
+  specify 'should quote -Infinity' do
+    inf = -1.0/0.0
+    @ds.insert_sql(:value => inf).should == %q{INSERT INTO test5 (value) VALUES ('-Infinity')}
+  end
+end

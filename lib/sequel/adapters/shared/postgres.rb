@@ -956,6 +956,21 @@ module Sequel
       def literal_false
         BOOL_FALSE
       end
+      
+      # SQL fragment for Float
+      # PostgreSQL quotes NaN and Infinity
+      def literal_float(v)
+        value = v.to_s
+        if value == "NaN"
+          value = %{'NaN'}
+        elsif value == 'Infinity'
+          value = %q{'Infinity'}
+        elsif value == '-Infinity'
+          value = %q{'-Infinity'}
+        else
+          value
+        end
+      end
 
       # Assume that SQL standard quoting is on, per Sequel's defaults
       def literal_string_append(sql, v)
