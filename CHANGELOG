@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle NaN, Infinity, and -Infinity floats on PostgreSQL (kf8a, jeremyevans) (#444)
+
 * Support an :sslmode option when using the postgres adapter with the pg driver (jeremyevans)
 
 * Add Database#create_schema and #drop_schema to the shared postgres adapter (tkellen, jeremyevans) (#440)

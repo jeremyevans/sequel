@@ -957,8 +957,7 @@ module Sequel
         BOOL_FALSE
       end
       
-      # SQL fragment for Float
-      # PostgreSQL quotes NaN and Infinity
+      # PostgreSQL quotes NaN and Infinity.
       def literal_float(value)
         if value.finite?
           super

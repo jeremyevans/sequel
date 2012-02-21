@@ -97,11 +97,12 @@ module Sequel
       def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
       def integer(s) s.to_i end
       def float(s) 
-        if s == 'NaN'
+        case s
+        when 'NaN'
           NAN
-        elsif s == 'Infinity'
+        when 'Infinity'
           PLUS_INFINITY
-        elsif s == '-Infinity'
+        when '-Infinity'
           MINUS_INFINITY
         else
           s.to_f 
