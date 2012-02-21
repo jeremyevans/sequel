@@ -1,9 +1,4 @@
 require 'sqlite3'
-begin
-  SQLite3::Database.instance_method(:type_translation)
-rescue
-  raise(Sequel::Error, "SQLite3::Database#type_translation is not defined.  If you are using the sqlite3 gem, please install the sqlite3-ruby gem.")
-end
 Sequel.require 'adapters/shared/sqlite'
 
 module Sequel
