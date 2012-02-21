@@ -1,5 +1,7 @@
 === HEAD
 
+* In the instance_hooks plugin, (before|after)_*_hook instance methods now return self (jeremyevans)
+
 * Handle NaN, Infinity, and -Infinity floats on PostgreSQL (kf8a, jeremyevans) (#444)
 
 * Support an :sslmode option when using the postgres adapter with the pg driver (jeremyevans)
