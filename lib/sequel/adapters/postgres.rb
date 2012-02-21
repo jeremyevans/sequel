@@ -88,11 +88,25 @@ module Sequel
   module Postgres
     CONVERTED_EXCEPTIONS << PGError
     
+    NAN             = 0.0/0.0
+    PLUS_INFINITY   = 1.0/0.0
+    MINUS_INFINITY  = -1.0/0.0
+    
     TYPE_TRANSLATOR = tt = Class.new do
       def boolean(s) s == 't' end
       def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
       def integer(s) s.to_i end
-      def float(s) s.to_f end
+      def float(s) 
+        if s == 'NaN'
+          NAN
+        elsif s == 'Infinity'
+          PLUS_INFINITY
+        elsif s == '-Infinity'
+          MINUS_INFINITY
+        else
+          s.to_f 
+        end
+      end
       def date(s) ::Date.new(*s.split("-").map{|x| x.to_i}) end
     end.new
 

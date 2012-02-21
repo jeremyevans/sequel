@@ -1236,4 +1236,22 @@ describe 'POSTGRES special float handling' do
     inf = -1.0/0.0
     @ds.insert_sql(:value => inf).should == %q{INSERT INTO test5 (value) VALUES ('-Infinity')}
   end
+
+  specify 'inserts NaN' do
+    nan = 0.0/0.0
+    @ds.insert(:value=>nan).should == nil
+    @ds.all[0][:value].nan?.should be_true
+  end
+
+  specify 'inserts +Infinity' do
+    inf = 1.0/0.0
+    @ds.insert(:value=>inf).should == nil
+    @ds.all[0][:value].infinite?.should > 0
+  end
+
+  specify 'inserts -Infinity' do
+    inf = -1.0/0.0
+    @ds.insert(:value=>inf).should == nil
+    @ds.all[0][:value].infinite?.should < 0
+  end
 end
