@@ -139,6 +139,93 @@ describe "An SQLite database" do
   end
 end
 
+describe "SQLite type conversion" do
+  before do
+    @db = SQLITE_DB
+    @integer_booleans = @db.integer_booleans
+    @db.integer_booleans = true
+    @ds = @db[:items]
+    @db.drop_table(:items) rescue nil
+  end
+  after do
+    @db.integer_booleans = @integer_booleans
+    Sequel.datetime_class = Time
+    @db.drop_table(:items)
+  end
+  
+  specify "should handle integers in boolean columns" do
+    @db.create_table(:items){TrueClass :a}
+    @db[:items].insert(false)
+    @db[:items].select_map(:a).should == [false]
+    @db[:items].select_map(:a+:a).should == [0]
+    @db[:items].update(:a=>true)
+    @db[:items].select_map(:a).should == [true]
+    @db[:items].select_map(:a+:a).should == [2]
+  end
+  
+  specify "should handle integers/floats/strings/decimals in numeric/decimal columns" do
+    @db.create_table(:items){Numeric :a}
+    @db[:items].insert(100)
+    @db[:items].select_map(:a).should == [BigDecimal.new('100')]
+    @db[:items].get(:a).should be_a_kind_of(BigDecimal)
+
+    @db[:items].update(:a=>100.1)
+    @db[:items].select_map(:a).should == [BigDecimal.new('100.1')]
+    @db[:items].get(:a).should be_a_kind_of(BigDecimal)
+
+    @db[:items].update(:a=>'100.1')
+    @db[:items].select_map(:a).should == [BigDecimal.new('100.1')]
+    @db[:items].get(:a).should be_a_kind_of(BigDecimal)
+
+    @db[:items].update(:a=>BigDecimal.new('100.1'))
+    @db[:items].select_map(:a).should == [BigDecimal.new('100.1')]
+    @db[:items].get(:a).should be_a_kind_of(BigDecimal)
+  end
+
+  specify "should handle integer/float date columns as julian date" do
+    @db.create_table(:items){Date :a}
+    i = 2455979
+    @db[:items].insert(i)
+    @db[:items].first.should == {:a=>Date.jd(i)}
+    @db[:items].update(:a=>2455979.1)
+    @db[:items].first.should == {:a=>Date.jd(i)}
+  end
+
+  specify "should handle integer/float time columns as seconds" do
+    @db.create_table(:items){Time :a, :only_time=>true}
+    @db[:items].insert(3661)
+    @db[:items].first.should == {:a=>Sequel::SQLTime.create(1, 1, 1)}
+    @db[:items].update(:a=>3661.000001)
+    @db[:items].first.should == {:a=>Sequel::SQLTime.create(1, 1, 1, 1)}
+  end
+
+  specify "should handle integer datetime columns as unix timestamp" do
+    @db.create_table(:items){DateTime :a}
+    i = 1329860756
+    @db[:items].insert(i)
+    @db[:items].first.should == {:a=>Time.at(i)}
+    Sequel.datetime_class = DateTime
+    @db[:items].first.should == {:a=>DateTime.strptime(i.to_s, '%s')}
+  end
+
+  specify "should handle float datetime columns as julian date" do
+    @db.create_table(:items){DateTime :a}
+    i = 2455979.5
+    @db[:items].insert(i)
+    @db[:items].first.should == {:a=>Time.at(1329825600)}
+    Sequel.datetime_class = DateTime
+    @db[:items].first.should == {:a=>DateTime.jd(2455979.5)}
+  end
+
+  specify "should handle integer/float blob columns" do
+    @db.create_table(:items){File :a}
+    @db[:items].insert(1)
+    @db[:items].first.should == {:a=>Sequel::SQL::Blob.new('1')}
+    @db[:items].update(:a=>'1.1')
+    @db[:items].first.should == {:a=>Sequel::SQL::Blob.new(1.1.to_s)}
+  end
+end if SQLITE_DB.adapter_scheme == :sqlite
+
 describe "An SQLite dataset" do
   before do
     @d = SQLITE_DB[:items]

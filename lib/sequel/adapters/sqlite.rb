@@ -6,23 +6,69 @@ module Sequel
   # for Sequel.
   module SQLite
     TYPE_TRANSLATOR = tt = Class.new do
-      FALSE_VALUES = %w'0 false f no n'.freeze
-      def boolean(s) !FALSE_VALUES.include?(s.downcase) end
-      def integer(s) s.to_i end
-      def float(s) s.to_f end
-      def numeric(s) ::BigDecimal.new(s) rescue s end
+      FALSE_VALUES = (%w'0 false f no n' + [0]).freeze
+
+      def blob(s)
+        Sequel::SQL::Blob.new(s.to_s)
+      end
+
+      def boolean(s)
+        s = s.downcase if s.is_a?(String)
+        !FALSE_VALUES.include?(s)
+      end
+
+      def date(s)
+        case s
+        when String
+          Sequel.string_to_date(s)
+        when Integer
+          Date.jd(s)
+        when Float
+          Date.jd(s.to_i)
+        else
+          raise Sequel::Error, "unhandled type when converting to date: #{s.inspect} (#{s.class.inspect})"
+        end
+      end
+
+      def integer(s)
+        s.to_i
+      end
+
+      def float(s)
+        s.to_f
+      end
+
+      def numeric(s)
+        s = s.to_s unless s.is_a?(String)
+        ::BigDecimal.new(s) rescue s
+      end
+
+      def time(s)
+        case s
+        when String
+          Sequel.string_to_time(s)
+        when Integer
+          Sequel::SQLTime.create(s/3600, (s % 3600)/60, s % 60)
+        when Float
+          s, f = s.divmod(1)
+          Sequel::SQLTime.create(s/3600, (s % 3600)/60, s % 60, (f*1000000).round)
+        else
+          raise Sequel::Error, "unhandled type when converting to date: #{s.inspect} (#{s.class.inspect})"
+        end
+      end
+
     end.new
 
     # Hash with string keys and callable values for converting SQLite types.
     SQLITE_TYPES = {}
     {
-      %w'date' => ::Sequel.method(:string_to_date),
-      %w'time' => ::Sequel.method(:string_to_time),
+      %w'date' => tt.method(:date),
+      %w'time' => tt.method(:time),
       %w'bit bool boolean' => tt.method(:boolean),
       %w'integer smallint mediumint int bigint' => tt.method(:integer),
       %w'numeric decimal money' => tt.method(:numeric),
       %w'float double real dec fixed' + ['double precision'] => tt.method(:float),
-      %w'blob' => ::Sequel::SQL::Blob.method(:new)
+      %w'blob' => tt.method(:blob)
     }.each do |k,v|
       k.each{|n| SQLITE_TYPES[n] = v}
     end
@@ -48,8 +94,8 @@ module Sequel
       def initialize(opts={})
         super
         @conversion_procs = SQLITE_TYPES.dup
-        @conversion_procs['timestamp'] = method(:to_application_timestamp)
-        @conversion_procs['datetime'] = method(:to_application_timestamp)
+        @conversion_procs['datetime'] = @conversion_procs['timestamp'] = method(:to_application_timestamp)
+        set_integer_booleans
       end
       
       # Connect to the database.  Since SQLite is a file based database,
@@ -103,6 +149,20 @@ module Sequel
         _execute(:single_value, sql, opts)
       end
       
+      # Handle Integer and Float arguments, since SQLite can store timestamps as integers and floats.
+      def to_application_timestamp(s)
+        case s
+        when String
+          super
+        when Integer
+          super(Time.at(s).to_s)
+        when Float
+          super(DateTime.jd(s).to_s)
+        else
+          raise Sequel::Error, "unhandled type when converting to : #{s.inspect} (#{s.class.inspect})"
+        end
+      end
+
       private
       
       # Yield an available connection.  Rescue
@@ -298,7 +358,7 @@ module Sequel
             row = {}
             cols.each do |name,i,type_proc|
               v = values[i]
-              if type_proc && v.is_a?(String)
+              if type_proc && v
                 v = type_proc.call(v)
               end
               row[name] = v

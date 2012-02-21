@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Database#integer_booleans setting on SQLite to store booleans as integers (jeremyevans)
+
+* Typecast columns stored as integers/floats in the SQLite adapter (jeremyevans)
+
 * In the instance_hooks plugin, (before|after)_*_hook instance methods now return self (jeremyevans)
 
 * Handle NaN, Infinity, and -Infinity floats on PostgreSQL (kf8a, jeremyevans) (#444)

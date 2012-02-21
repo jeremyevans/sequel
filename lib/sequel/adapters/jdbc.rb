@@ -47,6 +47,7 @@ module Sequel
         Sequel.ts_require 'adapters/jdbc/sqlite'
         db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::SQLite::Dataset
+        db.set_integer_booleans
         JDBC.load_gem('sqlite3')
         org.sqlite.JDBC
       end,

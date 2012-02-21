@@ -30,6 +30,7 @@ module Sequel
         Sequel.ts_require 'adapters/do/sqlite'
         db.extend(Sequel::DataObjects::SQLite::DatabaseMethods)
         db.dataset_class = Sequel::DataObjects::SQLite::Dataset
+        db.set_integer_booleans
       end
     }
       

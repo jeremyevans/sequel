@@ -11,6 +11,10 @@ module Sequel
       TEMP_STORE = [:default, :file, :memory].freeze
       VIEWS_FILTER = "type = 'view'".freeze
 
+      # Whether to use integers for booleans in the database.  SQLite recommends
+      # booleans be stored as integers, but historically Sequel has used 't'/'f'.
+      attr_accessor :integer_booleans
+
       # A symbol signifying the value of the auto_vacuum PRAGMA.
       def auto_vacuum
         AUTO_VACUUM[pragma_get(:auto_vacuum).to_i]
@@ -88,6 +92,11 @@ module Sequel
       # an option provided when creating the Database object.
       def pragma_set(name, value)
         execute_ddl("PRAGMA #{name} = #{value}")
+      end
+
+      # Set the integer_booleans option using the passed in :integer_boolean option.
+      def set_integer_booleans
+        @integer_booleans = typecast_value_boolean(@opts[:integer_booleans])
       end
       
       # The version of the server as an integer, where 3.6.19 = 30619.
@@ -555,6 +564,16 @@ module Sequel
       # SQLite uses a preceding X for hex escaping strings
       def literal_blob_append(sql, v)
         sql << BLOB_START << v.unpack(HSTAR).first << APOS
+      end
+
+      # Respect the database integer_booleans setting, using 0 or 'f'.
+      def literal_false
+        @db.integer_booleans ? '0' : "'f'"
+      end
+
+      # Respect the database integer_booleans setting, using 1 or 't'.
+      def literal_true
+        @db.integer_booleans ? '1' : "'t'"
       end
 
       # SQLite does not support the SQL WITH clause

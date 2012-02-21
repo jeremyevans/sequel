@@ -29,6 +29,7 @@ module Sequel
         db.extend(Sequel::Swift::SQLite::DatabaseMethods)
         db.dataset_class = Sequel::Swift::SQLite::Dataset
         db.swift_class = ::Swift::DB::Sqlite3
+        db.set_integer_booleans
       end,
     }
       
