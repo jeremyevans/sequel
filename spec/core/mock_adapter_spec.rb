@@ -406,14 +406,26 @@ describe "Sequel Mock Adapter" do
   end
 
   specify "should be able to load dialects based on the database name" do
-    Sequel.mock(:host=>'access').select(Date.new(2011, 12, 13)).sql.should == 'SELECT #2011-12-13#'
-    Sequel.mock(:host=>'db2').select(1).sql.should == 'SELECT 1 FROM "SYSIBM"."SYSDUMMY1"'
-    Sequel.mock(:host=>'firebird')[:a].distinct.limit(1, 2).sql.should == 'SELECT DISTINCT FIRST 1 SKIP 2 * FROM a'
-    Sequel.mock(:host=>'informix')[:a].distinct.limit(1, 2).sql.should == 'SELECT SKIP 2 FIRST 1 DISTINCT * FROM a'
-    Sequel.mock(:host=>'mssql', :quote_identifiers=>true, :identifier_input_method=>:upcase)[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM [A] WHERE (CONTAINS ([B], 'c'))"
-    Sequel.mock(:host=>'mysql', :quote_identifiers=>true)[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM `a` WHERE (MATCH (`b`) AGAINST ('c'))"
-    Sequel.mock(:host=>'oracle', :quote_identifiers=>true)[:a].limit(1).sql.should == 'SELECT * FROM (SELECT * FROM "a") "t1" WHERE (ROWNUM <= 1)'
-    Sequel.mock(:host=>'postgres', :quote_identifiers=>true)[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM \"a\" WHERE (to_tsvector('simple', (COALESCE(\"b\", ''))) @@ to_tsquery('simple', 'c'))"
-    Sequel.mock(:host=>'sqlite', :quote_identifiers=>true)[:a___b].sql.should == "SELECT * FROM `a` AS 'b'"
+    begin
+      qi = class Sequel::Database; @@quote_identifiers; end
+      ii = class Sequel::Database; @@identifier_input_method; end
+      io = class Sequel::Database; @@identifier_output_method; end
+      Sequel.quote_identifiers = nil
+      class Sequel::Database; @@identifier_input_method=nil; end
+      class Sequel::Database; @@identifier_output_method=nil; end
+      Sequel.mock(:host=>'access').select(Date.new(2011, 12, 13)).sql.should == 'SELECT #2011-12-13#'
+      Sequel.mock(:host=>'db2').select(1).sql.should == 'SELECT 1 FROM "SYSIBM"."SYSDUMMY1"'
+      Sequel.mock(:host=>'firebird')[:a].distinct.limit(1, 2).sql.should == 'SELECT DISTINCT FIRST 1 SKIP 2 * FROM "A"'
+      Sequel.mock(:host=>'informix')[:a].distinct.limit(1, 2).sql.should == 'SELECT SKIP 2 FIRST 1 DISTINCT * FROM A'
+      Sequel.mock(:host=>'mssql')[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM [A] WHERE (CONTAINS ([B], 'c'))"
+      Sequel.mock(:host=>'mysql')[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM `a` WHERE (MATCH (`b`) AGAINST ('c'))"
+      Sequel.mock(:host=>'oracle')[:a].limit(1).sql.should == 'SELECT * FROM (SELECT * FROM "A") "T1" WHERE (ROWNUM <= 1)'
+      Sequel.mock(:host=>'postgres')[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM \"a\" WHERE (to_tsvector('simple', (COALESCE(\"b\", ''))) @@ to_tsquery('simple', 'c'))"
+      Sequel.mock(:host=>'sqlite')[:a___b].sql.should == "SELECT * FROM `a` AS 'b'"
+    ensure
+      Sequel.quote_identifiers = qi
+      Sequel::Database.send(:class_variable_set, :@@identifier_input_method, ii)
+      Sequel::Database.send(:class_variable_set, :@@identifier_output_method, io)
+    end
   end
 end

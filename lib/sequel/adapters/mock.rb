@@ -110,6 +110,7 @@ module Sequel
         super
         opts = @opts
         if mod_name = SHARED_ADAPTERS[opts[:host]]
+          @shared_adapter = true
           require "sequel/adapters/shared/#{opts[:host]}"
           extend Sequel.const_get(mod_name)::DatabaseMethods
           extend_datasets Sequel.const_get(mod_name)::DatasetMethods
@@ -155,7 +156,7 @@ module Sequel
 
       # Enable use of savepoints.
       def supports_savepoints?
-        true
+        shared_adapter? ? super : true
       end
 
       private
@@ -281,15 +282,19 @@ module Sequel
       end
 
       def quote_identifiers_default
-        false
+        shared_adapter? ? super : false
       end
 
       def identifier_input_method_default
-        nil
+        shared_adapter? ? super : nil
       end
 
       def identifier_output_method_default
-        nil
+        shared_adapter? ? super : nil
+      end
+
+      def shared_adapter?
+        @shared_adapter
       end
     end
 
