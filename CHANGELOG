@@ -14,7 +14,7 @@
 
 * Add Database#create_schema and #drop_schema to the shared postgres adapter (tkellen, jeremyevans) (#440)
 
-* Add Database#supports_savepoints_in_prepared_transactions?, false on MySQL 5.5 (jeremyevans) (#437)
+* Add Database#supports_savepoints_in_prepared_transactions?, false on MySQL >=5.5.12 (jeremyevans) (#437)
 
 * Support an identifier output method in the mysql2 adapter (jeremyevans)
 
