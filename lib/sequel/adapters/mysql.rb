@@ -268,6 +268,10 @@ module Sequel
       include Sequel::MySQL::PreparedStatements::DatasetMethods
 
       Database::DatasetClass = self
+
+      # Regular expression used for getting accurate number of rows
+      # matched by an update statement.
+      AFFECTED_ROWS_RE = /Rows matched:\s+(\d+)\s+Changed:\s+\d+\s+Warnings:\s+\d+/.freeze
       
       # Delete rows matching this dataset
       def delete
@@ -311,6 +315,12 @@ module Sequel
         execute_dui(insert_sql(*values)){|c| return c.insert_id}
       end
       
+      # You can parse out the correct number of rows matched using the query info,
+      # even though affected_rows doesn't provide an accurate number.
+      def provides_accurate_rows_matched?
+        true
+      end
+
       # Replace (update or insert) the matching row.
       def replace(*args)
         execute_dui(replace_sql(*args)){|c| return c.insert_id}
@@ -334,11 +344,23 @@ module Sequel
       
       # Update the matching rows.
       def update(values={})
-        execute_dui(update_sql(values)){|c| return c.affected_rows}
+        execute_dui(update_sql(values)){|c| return affected_rows(c)}
       end
       
       private
       
+      # Try to get an accurate number of rows matched using the query
+      # info.  Fall back to affected_rows if there was no match, but
+      # that may be inaccurate.
+      def affected_rows(conn)
+        s = conn.info
+        if s && s =~ AFFECTED_ROWS_RE
+          $1.to_i
+        else
+          conn.affected_rows
+        end
+      end
+
       # Set the :type option to :select if it hasn't been set.
       def execute(sql, opts={}, &block)
         super(sql, {:type=>:select}.merge(opts), &block)
