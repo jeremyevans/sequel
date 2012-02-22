@@ -1179,9 +1179,9 @@ describe "List plugin without a scope" do
   end
   before do
     @c.delete
-    @c.create :name => "hig", :position => 3
-    @c.create :name => "def", :position => 2
-    @c.create :name => "abc", :position => 1
+    @c.create :name => "abc"
+    @c.create :name => "def"
+    @c.create :name => "hig"
   end
   after(:all) do
     @db.drop_table(:sites)
@@ -1254,12 +1254,12 @@ describe "List plugin with a scope" do
   end
   before do
     @c.delete
-    p1 = @c.create :name => "Hm", :pos => 1, :parent_id => 0
-    p2 = @c.create :name => "Ps", :pos => 1, :parent_id => p1.id
-    @c.create :name => "P1", :pos => 1, :parent_id => p2.id
-    @c.create :name => "P2", :pos => 2, :parent_id => p2.id
-    @c.create :name => "P3", :pos => 3, :parent_id => p2.id
-    @c.create :name => "Au", :pos => 2, :parent_id => p1.id
+    p1 = @c.create :name => "Hm", :parent_id => 0
+    p2 = @c.create :name => "Ps", :parent_id => p1.id
+    @c.create :name => "P1", :parent_id => p2.id
+    @c.create :name => "P2", :parent_id => p2.id
+    @c.create :name => "P3", :parent_id => p2.id
+    @c.create :name => "Au", :parent_id => p1.id
   end
   after(:all) do
     @db.drop_table(:pages)

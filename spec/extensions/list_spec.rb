@@ -75,6 +75,37 @@ describe "List plugin" do
       "SELECT * FROM items WHERE ((scope_id = 5) AND (position = 20)) ORDER BY scope_id, position LIMIT 1"]
   end
 
+  it "should have position field set to max+1 when creating if not already set" do
+    @c.dataset._fetch = [[{:pos=>nil}], [{:id=>1, :position=>1}], [{:pos=>1}], [{:id=>2, :position=>2}]]
+    @c.dataset.autoid = 1
+    @c.create.values.should == {:id=>1, :position=>1}
+    @c.create.values.should == {:id=>2, :position=>2}
+    @db.sqls.should == ["SELECT max(position) FROM items LIMIT 1",
+      "INSERT INTO items (position) VALUES (1)", 
+      "SELECT * FROM items WHERE (id = 1) ORDER BY position LIMIT 1",
+      "SELECT max(position) FROM items LIMIT 1",
+      "INSERT INTO items (position) VALUES (2)", 
+      "SELECT * FROM items WHERE (id = 2) ORDER BY position LIMIT 1"]
+  end
+
+  it "should have position field set to max+1 in scope when creating if not already set" do
+    @sc.dataset._fetch = [[{:pos=>nil}], [{:id=>1, :scope_id=>1, :position=>1}], [{:pos=>1}], [{:id=>2, :scope_id=>1, :position=>2}], [{:pos=>nil}], [{:id=>3, :scope_id=>2, :position=>1}]]
+    @sc.dataset.autoid = 1
+    @sc.create(:scope_id=>1).values.should == {:id=>1, :scope_id=>1, :position=>1}
+    @sc.create(:scope_id=>1).values.should == {:id=>2, :scope_id=>1, :position=>2}
+    @sc.create(:scope_id=>2).values.should == {:id=>3, :scope_id=>2, :position=>1}
+    sqls = @db.sqls
+    sqls.slice!(7).should =~ /INSERT INTO items \((scope_id|position), (scope_id|position)\) VALUES \([12], [12]\)/
+    sqls.slice!(4).should =~ /INSERT INTO items \((scope_id|position), (scope_id|position)\) VALUES \([12], [12]\)/
+    sqls.slice!(1).should =~ /INSERT INTO items \((scope_id|position), (scope_id|position)\) VALUES \(1, 1\)/
+    sqls.should == ["SELECT max(position) FROM items WHERE (scope_id = 1) LIMIT 1",
+      "SELECT * FROM items WHERE (id = 1) ORDER BY scope_id, position LIMIT 1",
+      "SELECT max(position) FROM items WHERE (scope_id = 1) LIMIT 1",
+      "SELECT * FROM items WHERE (id = 2) ORDER BY scope_id, position LIMIT 1",
+      "SELECT max(position) FROM items WHERE (scope_id = 2) LIMIT 1",
+      "SELECT * FROM items WHERE (id = 3) ORDER BY scope_id, position LIMIT 1"]
+  end
+
   it "should have last_position return the last position in the list" do
     @c.dataset._fetch  = {:max=>10}
     @o.last_position.should == 10

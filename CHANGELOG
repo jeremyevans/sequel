@@ -1,5 +1,7 @@
 === HEAD
 
+* Make list plugin automatically set position field value on creation if not already set (jeremyevans)
+
 * Add Database#integer_booleans setting on SQLite to store booleans as integers (jeremyevans)
 
 * Typecast columns stored as integers/floats in the SQLite adapter (jeremyevans)

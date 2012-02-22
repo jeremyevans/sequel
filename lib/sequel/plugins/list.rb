@@ -39,9 +39,11 @@ module Sequel
     #   Item.plugin :list, :scope=>:user_id
     # 
     # Note that using this plugin modifies the order of the model's dataset to
-    # sort by the position and scope fields.
+    # sort by the position and scope fields.  Also note that this plugin is subject to
+    # race conditions, and is not safe when concurrent modifications are made
+    # to the same list.
     #
-    # Also note that unlike ruby arrays, the list plugin assumes that the
+    # Additionally, note that unlike ruby arrays, the list plugin assumes that the
     # first entry in the list has position 1, not position 0.
     #
     # Copyright (c) 2007-2010 Sharon Rosner, Wayne E. Seguin, Aman Gupta, Adrian Madrid, Jeremy Evans
@@ -88,6 +90,14 @@ module Sequel
         # The model object at the given position in the list containing this instance.
         def at_position(p)
           list_dataset.first(position_field => p)
+        end
+
+        # Set the value of the position_field to the maximum value plus 1 unless the
+        # position field already has a value.
+        def before_create
+          unless send(position_field)
+            send("#{position_field}=", list_dataset.max(position_field).to_i+1)
+          end
         end
 
         # Find the last position in the list containing this instance.
