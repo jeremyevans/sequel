@@ -45,6 +45,7 @@ module Sequel
         opts = server_opts(server)
         opts[:host] ||= 'localhost'
         opts[:username] ||= opts[:user]
+        opts[:flags] = ::Mysql2::Client::FOUND_ROWS if ::Mysql2::Client.const_defined?(:FOUND_ROWS)
         conn = ::Mysql2::Client.new(opts)
 
         sqls = []

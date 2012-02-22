@@ -1,5 +1,7 @@
 === HEAD
 
+* Use Mysql2::Client::FOUND_ROWS to get accurate number of rows matched in the mysql2 adapter (jeremyevans)
+
 * Use Mysql#info to get accurate number of rows matched in the mysql adapter (jeremyevans)
 
 * Make mock adapter with specific SQL dialect use appropriate defaults for quoting identifiers (jeremyevans)
