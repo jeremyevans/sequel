@@ -1,5 +1,7 @@
 === HEAD
 
+* Respect :collate column option on MySQL (jeremyevans) (#445)
+
 * Use Mysql2::Client::FOUND_ROWS to get accurate number of rows matched in the mysql2 adapter (jeremyevans)
 
 * Use Mysql#info to get accurate number of rows matched in the mysql adapter (jeremyevans)
