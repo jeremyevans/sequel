@@ -178,7 +178,7 @@ module Sequel
       def _execute(c, sql, opts={}, &block)
         sql += " -- args: #{opts[:arguments].inspect}" if opts[:arguments]
         sql += " -- #{@opts[:append]}" if @opts[:append]
-        sql += " -- #{c.server}" if c.server != :default
+        sql += " -- #{c.server.is_a?(Symbol) ? c.server : c.server.inspect}" if c.server != :default
         log_info(sql)
         @sqls << sql 
 
