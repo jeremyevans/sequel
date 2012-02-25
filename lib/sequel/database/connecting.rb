@@ -254,6 +254,8 @@ module Sequel
         else
           raise Error, 'Server opts should be a hash or proc'
         end
+      elsif server.is_a?(Hash)
+        @opts.merge(server)
       else
         @opts.dup
       end

@@ -1396,6 +1396,11 @@ describe "Database#server_opts" do
     opts = {:host=>1, :database=>2, :servers=>{:server1=>2}}
     proc{Sequel::Database.new(opts).send(:server_opts, :server1)}.should raise_error(Sequel::Error)
   end
+
+  specify "should return the general opts merged with given opts if given opts is a Hash" do
+    opts = {:host=>1, :database=>2}
+    Sequel::Database.new(opts).send(:server_opts, :host=>2)[:host].should == 2
+  end
 end
 
 describe "Database#add_servers" do
