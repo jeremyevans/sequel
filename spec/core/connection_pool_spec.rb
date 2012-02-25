@@ -787,6 +787,20 @@ shared_examples_for "All connection pools classes" do
     y.should == 123
   end
   
+  specify "should have a reentrent hold method" do
+    o = Object.new
+    c = @class.new({}){o}
+    c.hold do |x|
+      x.should == o
+      c.hold do |x1|
+        x1.should == o
+        c.hold do |x2|
+          x2.should == o
+        end
+      end
+    end
+  end
+  
   specify "should have a servers method that returns an array of shard/server symbols" do
     @class.new({}){123}.servers.should == [:default]
   end
