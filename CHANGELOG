@@ -1,5 +1,9 @@
 === HEAD
 
+* Add arbitrary_servers extension to allow the use of arbitrary servers/shards by providing a hash of options as the server (jeremyevans)
+
+* Add server_block extension to scope database access inside the block to a specific default server/shard (jeremyevans)
+
 * Respect :collate column option on MySQL (jeremyevans) (#445)
 
 * Use Mysql2::Client::FOUND_ROWS to get accurate number of rows matched in the mysql2 adapter (jeremyevans)
