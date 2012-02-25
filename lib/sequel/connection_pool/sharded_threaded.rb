@@ -94,7 +94,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # connection can be acquired, a Sequel::PoolTimeout is 
   # raised.
   def hold(server=:default)
-    sync{server = @servers[server]}
+    server = pick_server(server)
     t = Thread.current
     if conn = owned_connection(t, server)
       return yield(conn)
@@ -189,6 +189,11 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # if any. The calling code should NOT already have the mutex before calling this.
   def owned_connection(thread, server)
     sync{@allocated[server][thread]}
+  end
+
+  # If the server given is in the hash, return it, otherwise, return the default server.
+  def pick_server(server)
+    sync{@servers[server]}
   end
   
   # Releases the connection assigned to the supplied thread and server. If the

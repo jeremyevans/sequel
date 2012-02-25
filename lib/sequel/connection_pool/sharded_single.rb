@@ -45,7 +45,7 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   # This method simulates the ConnectionPool#hold API.
   def hold(server=:default)
     begin
-      server = @servers[server]
+      server = pick_server(server)
       yield(@conns[server] ||= make_new(server))
     rescue Sequel::DatabaseDisconnectError
       disconnect_server(server, &@disconnection_proc)
@@ -82,6 +82,11 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
     if conn = @conns.delete(server)
       block.call(conn) if block
     end
+  end
+
+  # If the server given is in the hash, return it, otherwise, return the default server.
+  def pick_server(server)
+    @servers[server]
   end
   
   CONNECTION_POOL_MAP[[true, true]] = self

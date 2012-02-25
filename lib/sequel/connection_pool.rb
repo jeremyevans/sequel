@@ -80,7 +80,7 @@ class Sequel::ConnectionPool
   
   # An array of symbols for all shards/servers, which is a single <tt>:default</tt> by default.
   def servers
-    [:default]
+    [DEFAULT_SERVER]
   end
   
   private

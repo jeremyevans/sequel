@@ -88,6 +88,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pretty_table_rb.html">pretty_table</a>: Adds Dataset#print for printing a dataset as a simple plain-text table.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/query_rb.html">query</a>: Adds Dataset#query for a different interface to creating queries that doesn't use method chaining.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/server_block_rb.html">server_block</a>: Adds Database#with_server method that makes access inside the passed block use the specified shard by default.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_expr_rb.html">sql_expr</a>: Adds sql_expr method to all objects, allowing easy use of Sequel's DSL.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/string_date_time_rb.html">string_date_time</a>: Adds instance methods to String for converting the string into a Date/Time/DateTime.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/thread_local_timezones_rb.html">thread_local_timezones</a>: Allows for per-thread overrides of the global timezone settings.</li>
