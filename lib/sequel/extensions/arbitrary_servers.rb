@@ -33,11 +33,21 @@
 # extension:
 #
 #   DB.with_server(:host=>'...', :database=>'...') do
-#     # All of these use the host/database given to with_server
-#     DB[:table].insert(...)
-#     DB[:table].update(...)
-#     DB.tables
-#     DB[:table].all
+#     DB.synchronize do
+#       # All of these use the host/database given to with_server
+#       DB[:table].insert(...)
+#       DB[:table].update(...)
+#       DB.tables
+#       DB[:table].all
+#     end
+#   end
+#
+# Anyone using this extension in conjunction with the server_block
+# extension may want to do the following to so that you don't need
+# to call synchronize separately:
+#
+#   def DB.with_server(*)
+#     super{synchronize{yield}}
 #   end
 #
 # Note that this extension only works with the sharded threaded connection
