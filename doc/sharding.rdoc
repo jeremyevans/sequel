@@ -8,13 +8,23 @@ that ship with Sequel.
 
 == The :servers Database option
 
-Both features use the :servers Database option.  The :servers option should
-be a hash with symbol keys and values that are either hashes or procs that
-return hashes. These hashes are merged into the Database object's default
-options hash to get the connection options for the shard, so you don't need
-to override all options, just the ones that need to be modified.  For example,
-if you are using the same user, password, and database name and just the
-host is changing, you only need a :host entry in each shard's hash.
+Sharding and read_only support are both enabled via the :servers database
+option.  Using the :servers database option makes Sequel use a connection pool
+class that supports sharding, and the minimum required to enable sharding
+support is to use the empty hash:
+
+  DB=Sequel.connect('postgres://master_server/database', :servers=>{})
+
+In most cases, you are probably not going to want to use an empty hash,
+so you'll want to have entries in the hash.  Keys in the server hash are
+not restricted to type, but the general recommendation is to use a symbol
+unless you have special requirements. Values in the server hash should be
+either hashes or procs that return hashes. These hashes are merged into
+the Database object's default options hash to get the connection options
+for the shard, so you don't need to override all options, just the ones
+that need to be modified.  For example, if you are using the same user,
+password, and database name and just the host is changing, you only need
+a :host entry in each shard's hash.
 
 Note that all servers should have the same schema for all
 tables you are accessing, unless you really know what you are doing.
@@ -159,3 +169,75 @@ work well with shards.  You just need to remember to set to model to use the plu
 If all of your models are sharded, you can set all models to use the plugin via:
 
   Sequel::Model.plugin :sharding
+
+=== server_block Extension
+
+By default, you must specify the server/shard you want to use for every dataset/action,
+or Sequel will use the default shard.  If you have a group of queries that should use the
+same shard, it can get a bit redundent to specify the same shard for all of them.
+
+The server_block extension adds a Database#with_server method that scopes all database
+access inside the block to the given shard by default:
+
+  Sequel.extension :server_block
+  DB.extend Sequel::ServerBlock
+  DB.with_server(:a) do
+    # this SELECT query uses the "a" shard
+    if r = Rainbow.first(:hash=>/31337/)
+      r.count += 1
+      # this UPDATE query also uses the "a" shard
+      r.save
+    end
+  end
+
+The server_block extension doesn't currently integrate with the sharding plugin, as it
+ties into the Dataset#server method.  This restriction can be lifted later if there is
+sufficient user demand.
+
+=== arbitrary_servers Extension
+
+By default, Sequel's sharding support is designed to work with predefined shards.  It ships
+with Database#add_servers and Database#remove_servers methods to modify these predefined
+shards on the fly, but it is a bit cumbersome to work with truly arbitrary servers
+(requiring you to call add_servers before use, then remove_servers after use).
+
+The arbitrary_servers extension allows you to pass a server/shard options hash as the
+server to use, and those options will be merged directly into the database's default options:
+
+  Sequel.extension :arbitrary_servers
+  DB.pool.extend Sequel::ArbitraryServers
+  DB[:rainbows].server(:host=>'hash_host_a').all
+  # or
+  DB[:rainbows].server(:host=>'hash_host_b', :database=>'backup').all
+
+arbitrary_servers is designed to work well in conjunction with the server_block extension:
+
+  DB.with_server(:host=>'hash_host_b', :database=>'backup') do
+    DB.synchronize do
+      # All queries here default to the backup database on hash_host_b
+    end
+  end
+
+If you are using arbitrary_servers with server_block, you may want to
+define the following method (or something similar) so that you don't
+need to call synchronize separately:
+
+  def DB.with_server(*)
+    super{synchronize{yield}}
+  end
+
+The reason for the synchronize method is that it checks out a connection
+and makes the same connection available for the duration of the block.
+If you don't do that, Sequel will probably disconnect from the database
+and reconnect to the database on each request, since connections to
+arbitrary servers are not cached.
+
+Note that this extension only works with the sharded threaded connection
+pool.  If you are using the sharded single connection pool, you need
+to switch to the sharded threaded connection pool before using this
+extension.  If you are passing the :single_threaded option to
+the Database, just remove that option.  If you are setting:
+
+  Sequel.single_threaded = true 
+
+just remove or comment out that code.
