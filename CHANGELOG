@@ -1,5 +1,11 @@
 === HEAD
 
+* Add ability to force or disable transactions completely in the migrators using the :use_transactions option (jeremyevans)
+
+* Add ability to turn off transactions for migrations by calling no_transaction inside the Sequel.migration block (jeremyevans)
+
+* Allow specifically choosing which migrator to use via TimestampMigrator.apply or IntegerMigrator.apply (jeremyevans)
+
 * Add arbitrary_servers extension to allow the use of arbitrary servers/shards by providing a hash of options as the server (jeremyevans)
 
 * Add server_block extension to scope database access inside the block to a specific default server/shard (jeremyevans)

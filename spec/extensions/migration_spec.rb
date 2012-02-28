@@ -311,6 +311,30 @@ describe "Sequel::IntegerMigrator" do
     Sequel::Migrator.apply(@db, @dirname, 0).should == 0
     Sequel::Migrator.apply(@db, @dirname).should == 3
   end
+
+  specify "should use IntegerMigrator if IntegerMigrator.apply called, even for timestamped migration directory" do
+    proc{Sequel::IntegerMigrator.apply(@db, "spec/files/timestamped_migrations")}.should raise_error(Sequel::Migrator::Error)
+  end
+
+  specify "should use transactions by default" do
+    Sequel::Migrator.apply(@db, "spec/files/transaction_migrations")
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2", "COMMIT"]
+  end
+
+  specify "should not use transactions for migrations that disable it" do
+    Sequel::Migrator.apply(@db, "spec/files/transactionless_migrations")
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2"]
+  end
+
+  specify "should force transactions if enabled in the migrator" do
+    Sequel::Migrator.run(@db, "spec/files/transactionless_migrations", :use_transactions=>true)
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2", "COMMIT"]
+  end
+
+  specify "should not use transactions if disabled in the migrator" do
+    Sequel::Migrator.run(@db, "spec/files/transaction_migrations", :use_transactions=>false)
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2"]
+  end
 end
 
 describe "Sequel::TimestampMigrator" do
@@ -322,6 +346,7 @@ describe "Sequel::TimestampMigrator" do
       define_method(:sequel_migration_version=){|v| sequel_migration_version = v}
 
       def columns
+        super
         case opts[:from].first
         when :schema_info, 'schema_info'
           [:version]
@@ -333,6 +358,7 @@ describe "Sequel::TimestampMigrator" do
       end
 
       def fetch_rows(sql)
+        super
         case opts[:from].first
         when :schema_info, 'schema_info'
           yield({:version=>sequel_migration_version})
@@ -344,6 +370,7 @@ describe "Sequel::TimestampMigrator" do
       end
 
       def insert(h={})
+        super
         case opts[:from].first
         when :schema_info, 'schema_info'
           self.sequel_migration_version = h.values.first
@@ -353,6 +380,7 @@ describe "Sequel::TimestampMigrator" do
       end
 
       def update(h={})
+        super
         case opts[:from].first
         when :schema_info, 'schema_info'
           self.sequel_migration_version = h.values.first
@@ -360,6 +388,7 @@ describe "Sequel::TimestampMigrator" do
       end
 
       def delete
+        super
         case opts[:from].first
         when :schema_migrations, :sm, 'schema_migrations', 'sm'
           self.class::FILES.delete(opts[:where].args.last)
@@ -367,11 +396,14 @@ describe "Sequel::TimestampMigrator" do
       end
     end
     dbc = Class.new(Sequel::Mock::Database) do
-      tables = {}
+      self::Tables = tables= {}
       define_method(:dataset){|*a| dsc.new(self, *a)}
-      define_method(:create_table){|name, *args| tables[name.to_sym] = true}
-      define_method(:drop_table){|*names| names.each{|n| tables.delete(n.to_sym)}}
-      define_method(:table_exists?){|name| tables.has_key?(name.to_sym)}
+      def create_table(name, *args, &block)
+        super
+        self.class::Tables[name.to_sym] = true
+      end
+      define_method(:drop_table){|*names| super(*names); names.each{|n| tables.delete(n.to_sym)}}
+      define_method(:table_exists?){|name| super(name); tables.has_key?(name.to_sym)}
     end
     @db = dbc.new
     @m = Sequel::Migrator
@@ -558,5 +590,30 @@ describe "Sequel::TimestampMigrator" do
     @m.apply(@db, @dir, 1273253850).should == nil
     @m.apply(@db, @dir, 0).should == nil
     @m.apply(@db, @dir).should == nil
+  end
+
+  specify "should use TimestampMigrator if TimestampMigrator.apply is called even for integer migrations directory" do
+    Sequel::TimestampMigrator.apply(@db, "spec/files/integer_migrations")
+    @db.sqls.should == ["SELECT NULL FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "BEGIN", "CREATE TABLE sm1111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_sessions.rb')", "COMMIT", "BEGIN", "CREATE TABLE sm2222 (smc2 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_nodes.rb')", "COMMIT", "BEGIN", "CREATE TABLE sm3333 (smc3 integer)", "INSERT INTO schema_migrations (filename) VALUES ('003_3_create_users.rb')", "COMMIT"]
+  end
+
+  specify "should use transactions by default" do
+    Sequel::TimestampMigrator.apply(@db, "spec/files/transaction_migrations")
+    @db.sqls.should == ["SELECT NULL FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')", "COMMIT"]
+  end
+
+  specify "should not use transactions for migrations that disable it" do
+    Sequel::TimestampMigrator.apply(@db, "spec/files/transactionless_migrations")
+    @db.sqls.should == ["SELECT NULL FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')"]
+  end
+
+  specify "should force transactions if enabled by the migrator" do
+    Sequel::TimestampMigrator.run(@db, "spec/files/transactionless_migrations", :use_transactions=>true)
+    @db.sqls.should == ["SELECT NULL FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')", "COMMIT"]
+  end
+
+  specify "should not use transactions if disabled in the migrator" do
+    Sequel::TimestampMigrator.run(@db, "spec/files/transaction_migrations", :use_transactions=>false)
+    @db.sqls.should == ["SELECT NULL FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')"]
   end
 end

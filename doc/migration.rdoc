@@ -2,7 +2,6 @@
 
 This guide is based on http://guides.rubyonrails.org/migrations.html
 
-
 == Overview
 
 Migrations make it easy to alter your database's schema in a systematic manner.
@@ -182,6 +181,31 @@ need to update the database by hand.
 It's recommended to always run migrations on a test database and ensure they work
 before running them on any production database.
 
+== Transactions
+
+As mentioned above, Sequel attempts to run migrations inside of a transaction by default.
+However, you can disable this on a per migration basis by calling +no_transaction+ inside
+of the Sequel.migration block:
+
+  Sequel.migration do
+    no_transaction
+    change do
+      # ...
+    end
+  end
+
+This is necessary in some cases, such as when attempting to use CREATE INDEX CONCURRENTLY
+on PostgreSQL.
+
+You can also override the transactions setting at the migrator level, either by forcing
+transactions even if no_transaction is set, or by disabling transactions all together:
+
+  # Force transaction use
+  Sequel::Migrator.run(DB, '/path/to/migrations/dir', :use_transactions=>true)
+
+  # Disable use of transactions
+  Sequel::Migrator.run(DB, '/path/to/migrations/dir', :use_transactions=>false)
+
 == Migration files
 
 While you can create migration objects yourself and apply them manually, most of the
@@ -286,6 +310,9 @@ be difficult to unapply some the affected migrations correctly.
 
 The +TimestampMigrator+ will be used if any filename in the migrations directory has a version
 greater than 20000101.  Otherwise, the +IntegerMigrator+ will be used.
+
+You can force the use of the +TimestampMigrator+ in the API by calling TimestampMigrator.apply
+instead of Migrator.apply.
 
 === How to choose
 

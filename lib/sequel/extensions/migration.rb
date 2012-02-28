@@ -22,7 +22,7 @@ module Sequel
   #
   # Part of the +migration+ extension.
   class Migration
-    # Creates a new instance of the migration and sets the @db attribute.
+    # Set the database associated with this migration.
     def initialize(db)
       @db = db
     end
@@ -42,6 +42,11 @@ module Sequel
     # Adds the new migration class to the list of Migration descendants.
     def self.inherited(base)
       descendants << base
+    end
+
+    # Always use transactions for old-style migrations.
+    def self.use_transactions
+      true
     end
     
     # The default down action does nothing
@@ -68,6 +73,14 @@ module Sequel
 
     # Proc used for the up action
     attr_accessor :up
+
+    # Whether to use transactions for this migration, true by default.
+    attr_accessor :use_transactions
+
+    # Use transactions by default
+    def initialize
+      @use_transactions = true
+    end
 
     # Apply the appropriate block on the +Database+
     # instance using instance_eval.
@@ -98,6 +111,11 @@ module Sequel
     # Defines the migration's down action.
     def down(&block)
       migration.down = block
+    end
+
+    # Disable the use of transactions for the related migration
+    def no_transaction
+      migration.use_transactions = false
     end
 
     # Defines the migration's up action.
@@ -337,11 +355,15 @@ module Sequel
     # if the version number appears to be a unix time integer for a year
     # after 2005, otherwise uses the IntegerMigrator.
     def self.migrator_class(directory)
-      Dir.new(directory).each do |file|
-        next unless MIGRATION_FILE_PATTERN.match(file)
-        return TimestampMigrator if file.split(MIGRATION_SPLITTER, 2).first.to_i > MINIMUM_TIMESTAMP
+      if self.equal?(Migrator)
+        Dir.new(directory).each do |file|
+          next unless MIGRATION_FILE_PATTERN.match(file)
+          return TimestampMigrator if file.split(MIGRATION_SPLITTER, 2).first.to_i > MINIMUM_TIMESTAMP
+        end
+        IntegerMigrator
+      else
+        self
       end
-      IntegerMigrator
     end
     private_class_method :migrator_class
     
@@ -380,9 +402,22 @@ module Sequel
       @table = schema ? Sequel::SQL::QualifiedIdentifier.new(schema, table) : table
       @column = opts[:column] || self.class.const_get(:DEFAULT_SCHEMA_COLUMN)
       @ds = schema_dataset
+      @use_transactions = opts[:use_transactions]
     end
 
     private
+
+    # If transactions should be used for the migration, yield to the block
+    # inside a transaction.  Otherwise, just yield to the block.
+    def checked_transaction(migration, &block)
+      if @use_transactions == false
+        yield
+      elsif migration.use_transactions || @use_transactions
+        db.transaction(&block)
+      else
+        yield
+      end
+    end
 
     # Remove all migration classes.  Done by the migrator to ensure that
     # the correct migration classes are picked up.
@@ -437,7 +472,7 @@ module Sequel
         t = Time.now
         lv = up? ? v : v + 1
         db.log_info("Begin applying migration version #{lv}, direction: #{direction}")
-        db.transaction do
+        checked_transaction(m) do
           m.apply(db, direction)
           set_migration_version(v)
         end
@@ -461,6 +496,9 @@ module Sequel
       Dir.new(directory).each do |file|
         next unless MIGRATION_FILE_PATTERN.match(file)
         version = migration_version_from_file(file)
+        if version >= 20000101
+          raise Migrator::Error, "Migration number too large, must use TimestampMigrator: #{file}"
+        end
         raise(Error, "Duplicate migration version: #{version}") if files[version]
         files[version] = File.join(directory, file)
       end
@@ -550,7 +588,7 @@ module Sequel
       migration_tuples.each do |m, f, direction|
         t = Time.now
         db.log_info("Begin applying migration #{f}, direction: #{direction}")
-        db.transaction do
+        checked_transaction(m) do
           m.apply(db, direction)
           fi = f.downcase
           direction == :up ? ds.insert(column=>fi) : ds.filter(column=>fi).delete
