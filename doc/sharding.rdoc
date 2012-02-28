@@ -191,8 +191,12 @@ access inside the block to the given shard by default:
   end
 
 The server_block extension doesn't currently integrate with the sharding plugin, as it
-ties into the Dataset#server method.  This restriction can be lifted later if there is
-sufficient user demand.
+ties into the Dataset#server method.  This shouldn't present a problem in practice as
+long as you just access the models inside the with_server block, since they will use
+the shard set by with_server by default.  However, you will probably have issues if
+you retrieve the models inside the block and save them outside of the block.  If you
+need to do that, call the server method explicitly on the dataset used to retrieve the
+model objects.
 
 === arbitrary_servers Extension
 
