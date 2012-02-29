@@ -149,7 +149,7 @@ module Sequel
         #             to include in the JSON output.  Using a nested
         #             hash, you can pass options to associations
         #             to affect the JSON used for associated objects.
-        # :naked :: Not to add the JSON.create_id key to the JSON
+        # :naked :: Not to add the JSON.create_id (json_class) key to the JSON
         #           output hash, so when the JSON is parsed, it
         #           will yield a hash instead of a model object.
         # :only :: Symbol or Array of Symbols of columns to only
