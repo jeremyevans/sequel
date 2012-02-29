@@ -1220,6 +1220,13 @@ describe 'POSTGRES handling ONLY' do
     POSTGRES_DB[:public__test2.pg_only].first
     POSTGRES_DB.sqls.last.should =~ /from\s+only\s+"?public"?."?test2"?/i
   end
+
+  specify 'ONLY should not lag on join' do
+    POSTGRES_DB[:test2.pg_only].join(:test4.pg_only, :name => :name).first
+    POSTGRES_DB.sqls.last.should =~
+        /from\s+only\s+"?test2"?\s+(inner\s+)?join\s+only\s+"?test4"?\s+
+         on\s+(\(\s*)?"?test4"?\."?name"?\s*=\s*"?test2"?\."?name"?(\s*\))?/ix
+  end
 end
 
 describe 'POSTGRES special float handling' do
