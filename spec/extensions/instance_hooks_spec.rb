@@ -231,21 +231,21 @@ describe "InstanceHooks plugin with transactions" do
   end
 
   it "should have *_hook methods return self "do
-    @o.before_destroy_hook{r 1}.should eql(@o)
-    @o.before_validation_hook{r 1}.should eql(@o)
-    @o.before_save_hook{r 1}.should eql(@o)
-    @o.before_update_hook{r 1}.should eql(@o)
-    @o.before_create_hook{r 1}.should eql(@o)
+    @o.before_destroy_hook{r 1}.should equal(@o)
+    @o.before_validation_hook{r 1}.should equal(@o)
+    @o.before_save_hook{r 1}.should equal(@o)
+    @o.before_update_hook{r 1}.should equal(@o)
+    @o.before_create_hook{r 1}.should equal(@o)
 
-    @o.after_destroy_hook{r 1}.should eql(@o)
-    @o.after_validation_hook{r 1}.should eql(@o)
-    @o.after_save_hook{r 1}.should eql(@o)
-    @o.after_update_hook{r 1}.should eql(@o)
-    @o.after_create_hook{r 1}.should eql(@o)
-    @o.after_commit_hook{r 1}.should eql(@o)
-    @o.after_rollback_hook{r 1}.should eql(@o)
-    @o.after_destroy_commit_hook{r 1}.should eql(@o)
-    @o.after_destroy_rollback_hook{r 1}.should eql(@o)
+    @o.after_destroy_hook{r 1}.should equal(@o)
+    @o.after_validation_hook{r 1}.should equal(@o)
+    @o.after_save_hook{r 1}.should equal(@o)
+    @o.after_update_hook{r 1}.should equal(@o)
+    @o.after_create_hook{r 1}.should equal(@o)
+    @o.after_commit_hook{r 1}.should equal(@o)
+    @o.after_rollback_hook{r 1}.should equal(@o)
+    @o.after_destroy_commit_hook{r 1}.should equal(@o)
+    @o.after_destroy_rollback_hook{r 1}.should equal(@o)
   end
 
 end
