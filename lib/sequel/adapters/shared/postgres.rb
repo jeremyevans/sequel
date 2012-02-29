@@ -687,6 +687,7 @@ module Sequel
       INSERT_CLAUSE_METHODS_91 = Dataset.clause_methods(:insert, %w'with insert into columns values returning')
       LOCK = 'LOCK TABLE %s IN %s MODE'.freeze
       NULL = LiteralString.new('NULL').freeze
+      ONLY = ' ONLY '.freeze
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
       QUERY_PLAN = 'QUERY PLAN'.to_sym
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
@@ -762,6 +763,26 @@ module Sequel
           end
         else
           super
+        end
+      end
+
+      # Skip ONLY when writting qualified identifier
+      def qualified_identifier_sql_append(sql, qcr)
+        unless SQL::OnlyIdentifier === qcr.table
+          super
+        else
+          super(sql, SQL::QualifiedIdentifier.new(qcr.table.table, qcr.column))
+        end
+      end
+
+      # SQL fragment for selection from ONLY table in PostgreSQL
+      def only_identifier_sql_append(sql, only)
+        sql << ONLY
+        case t = only.table
+        when Symbol, SQL::QualifiedIdentifier, SQL::Identifier
+          literal_append(sql, t)
+        else
+          quote_identifier_append(sql, t)
         end
       end
 

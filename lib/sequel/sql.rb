@@ -954,7 +954,6 @@ module Sequel
 
       # Set the table and column to the given arguments
       def initialize(table, column)
-        table = table.table if OnlyIdentifier === table
         @table, @column = table, column
       end
       
