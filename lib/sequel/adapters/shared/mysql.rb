@@ -550,12 +550,6 @@ module Sequel
         [insert_sql(columns, sql)]
       end
       
-      # MySQL uses the number of rows actually modified in the update,
-      # instead of the number of matched by the filter.
-      def provides_accurate_rows_matched?
-        false
-      end
-      
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
         sql << BACKTICK << c.to_s << BACKTICK

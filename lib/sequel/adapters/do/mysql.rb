@@ -30,6 +30,12 @@ module Sequel
         APOS_RE = Dataset::APOS_RE
         DOUBLE_APOS = Dataset::DOUBLE_APOS
         
+        # The DataObjects MySQL driver uses the number of rows actually modified in the update,
+        # instead of the number of matched by the filter.
+        def provides_accurate_rows_matched?
+          false
+        end
+      
         # Use execute_insert to execute the replace_sql.
         def replace(*args)
           execute_insert(replace_sql(*args))
