@@ -461,6 +461,17 @@ module Sequel
       end
     end
 
+    # Includes a +pg_only+ method that created <tt>OnlyIdentifier</tt>s, used for selection from ONLY in PostgreSQL
+    module OnlyingMethods
+      # Add to a reciever prefix ONLY for using in PostgreSQL inheritance
+      #
+      #   :table.pg_only  # ONLY "table"
+      #   :table.qualify(:schema).pg_only  # ONLY "schema"."table"
+      def pg_only
+        OnlyIdentifier.new(self)
+      end
+    end
+
     # This module includes the +like+ and +ilike+ methods used for pattern matching that are defined on objects that can be 
     # used in a string context in SQL (+Symbol+, +LiteralString+, <tt>SQL::GenericExpression</tt>).
     module StringMethods
@@ -783,6 +794,7 @@ module Sequel
     # split, or for creating an identifier without using a symbol.
     class Identifier < GenericExpression
       include QualifyingMethods
+      include OnlyingMethods
 
       # The table or column to reference
       attr_reader :value
@@ -932,6 +944,7 @@ module Sequel
     # Represents a qualified identifier (column with table or table with schema).
     class QualifiedIdentifier < GenericExpression
       include QualifyingMethods
+      include OnlyingMethods
 
       # The column/table referenced
       attr_reader :column
@@ -945,6 +958,18 @@ module Sequel
       end
       
       to_s_method :qualified_identifier_sql
+    end
+
+    # Represents a selection ONLY from table (PostgreSQL inheritance)
+    class OnlyIdentifier < GenericExpression
+      # Reference to a table
+      attr_reader :table
+
+      def initialize(table)
+        @table = table
+      end
+
+      to_s_method :only_identifier_sql
     end
     
     # Subclass of +ComplexExpression+ where the expression results

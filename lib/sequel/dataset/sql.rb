@@ -248,6 +248,7 @@ module Sequel
     OFFSET = " OFFSET ".freeze
     ON = ' ON '.freeze
     ON_PAREN = " ON (".freeze
+    ONLY = ' ONLY '.freeze
     ORDER_BY = " ORDER BY ".freeze
     ORDER_BY_NS = "ORDER BY ".freeze
     OVER = ' OVER '.freeze
@@ -596,6 +597,17 @@ module Sequel
         literal_append(sql, c) 
       else
         quote_identifier_append(sql, c)
+      end
+    end
+
+    # SQL fragment for selection from ONLY table in PostgreSQL
+    def only_identifier_sql_append(sql, only)
+      sql << ONLY
+      case t = only.table
+      when Symbol, SQL::QualifiedIdentifier, SQL::Identifier
+        literal_append(sql, t)
+      else
+        quote_identifier_append(sql, t)
       end
     end
 

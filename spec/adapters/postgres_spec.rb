@@ -1211,6 +1211,17 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
   end
 end
 
+describe 'POSTGRES handling ONLY' do
+  specify 'should correctly insert ONLY' do
+    POSTGRES_DB[:test2.pg_only].first
+    POSTGRES_DB.sqls.last.should =~ /from\s+only\s+"?test2"?/i
+    POSTGRES_DB[:test2.qualify(:public).pg_only].first
+    POSTGRES_DB.sqls.last.should =~ /from\s+only\s+"?public"?."?test2"?/i
+    POSTGRES_DB[:public__test2.pg_only].first
+    POSTGRES_DB.sqls.last.should =~ /from\s+only\s+"?public"?."?test2"?/i
+  end
+end
+
 describe 'POSTGRES special float handling' do
   before do
     @db = POSTGRES_DB

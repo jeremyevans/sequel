@@ -222,6 +222,7 @@ class Symbol
   include Sequel::SQL::SubscriptMethods
   include Sequel::SQL::ComplexExpressionMethods
   include Sequel::SQL::InequalityMethods if RUBY_VERSION < '1.9.0'
+  include Sequel::SQL::OnlyingMethods
 
   # If no argument is given, returns a <tt>Sequel::SQL::ColumnAll</tt> object specifying all
   # columns for this table.
