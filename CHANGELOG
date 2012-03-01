@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.33.0 (2012-03-01)
 
 * Add ability to force or disable transactions completely in the migrators using the :use_transactions option (jeremyevans)
 

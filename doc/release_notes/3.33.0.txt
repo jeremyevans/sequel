@@ -1,0 +1,157 @@
+= New Features
+
+* A server_block extension has been added that makes Sequel's
+  sharding support easier to use by scoping database access inside
+  the block to a given server/shard:
+
+    Sequel.extension :server_block
+    DB.extend Sequel::ServerBlock
+    DB.with_server(:shard_1) do
+      # All of these will execute against shard_1
+      DB.tables
+      DB[:table].all
+      DB.run 'SOME SQL'
+    end
+
+* An arbitrary_servers extension has been added that extends
+  Sequel's sharding support so that you can use arbitrary
+  connection options instead of referencing an existing, predefined
+  server/shard:
+
+    Sequel.extension :arbitrary_servers
+    DB.pool.extend Sequel::ArbitraryServers
+    DB[:table].server(:host=>'foo', :database=>'bar').all
+
+  You can use this extension in conjunction with the server_block
+  extension:
+
+    DB.with_server(:host=>'foo', :database=>'bar') do
+      DB.synchronize do
+        # All of these will execute on host foo, database bar
+        DB.tables
+        DB[:table].all
+        DB.run 'SOME SQL'
+      end
+    end
+
+  The combination of these two extensions makes it pretty easy to
+  write a thread-safe Rack middleware that scopes each request
+  to an arbitrary database.
+
+* The sqlite adapter now supports an integer_booleans setting
+  for using 1/0 for true/false values, instead of the the 't'/'f'
+  values used by default.  As SQLite recommends using integers to
+  store booleans, converting your existing database and enabling
+  this setting is recommended, but for backwards compatibility it
+  is set to false.  You can convert you existing database by doing
+  the following for each table/column that has booleans:
+
+    DB[:table].update(:boolean_column=>{'t'=>1}.
+                        case(0, :boolean_column))
+
+  The integer_booleans default setting may change in a future
+  version of Sequel, so you should set it manually to false if you
+  prefer the current default.
+
+* You can now disable transaction use in migrations, in one of two
+  ways.  You generally only need to do this if you are using an
+  SQL query inside a migration that is specifically not supported
+  inside a transaction, such as CREATE INDEX CONCURRENTLY on
+  PostgreSQL.
+  
+  The first way to disable transactions is on a per-migration basis
+  by calling the no_transaction method inside the Sequel.migration
+  block:
+
+    Sequel.migration do
+      no_transaction
+      change do
+        # ...
+      end
+    end
+
+  That will make it so that a transaction is not used for that
+  particular migration.  The second way is passing the
+  :use_tranctions=>false option when calling Migrator.run (using
+  the API), which will completely disable transactions for all
+  migrations during the migrator run.
+
+* The postgres adapter now respects an :sslmode option when using
+  pg as the underlying driver, you can set the value of this option to
+  disable, allow, prefer, or require.
+
+* Database#create_schema and #drop_schema are now defined when
+  connecting to PostgreSQL.
+
+* Database#supports_savepoints_in_prepared_transactions? has been
+  added for checking if savepoints are supported inside prepared
+  transactions.  This is true if both savepoints and prepared
+  transactions are both supported, except on MySQL > 5.5.12 (due to
+  MySQL bug 64374).
+
+= Other Improvements
+
+* The mysql and mysql2 adapters now both provide an accurate number
+  of rows matched, so Sequel::Model usage on those adapters will now
+  raise a NoExistingObject exception by default if you attempt to
+  delete or update an instance that no longer exists in the database.
+
+* Foreign key creation now works correctly without specifying the
+  :key option when using MySQL with the InnoDB table engine.  InnoDB
+  requires that you list the column explicitly, even if you are
+  referencing the primary key of the table, so if the :key option is
+  not given, the database schema is introspected to find the primary
+  key for the table.  If you are attempting to create a table with
+  a self-referential foreign key, it introspects the generator to
+  get the primary key for the table.
+
+* The sqlite adapter will now return 1/0 stored in boolean columns as
+  true/false.  It will convert dates stored as Integers/Floats to
+  Date objects by assuming they represent the julian date.  It will
+  convert times stored as Integers/Floats to Sequel::SQLTime objects
+  by assuming they represent a number of seconds. It will convert
+  datetimes stored as Integers by assuming they represent a unix
+  epoch time integer, and datetimes stored as Floats by assuming the
+  represent the julian date (with fractional part representing the
+  time of day).  These changes make Sequel handle SQLite's
+  recommendations for boolean/date/time storage.
+
+* The instance_hooks plugin's (before|after)_*_hook methods now return
+  self so they can be used in a method chain.
+
+* The list plugin now automatically adds new entries to the end of the
+  list when creating the entries, if the position field is not
+  specifically set.
+
+* An identifier_output_method is now respected in the mysql2 adapter.
+
+* NaN/Infinity Float values are now quoted correctly for input on
+  PostgreSQL, and the postgres adapter correctly handles them on
+  retrieval from the database.
+
+* The :collate column option is now respected when creating tables or
+  altering columns on MySQL.
+
+* You can now force use of the TimestampMigrator when the
+  IntegerMigrator would be used by default by calling
+  TimestampMigrator.apply or .run.
+
+* Mock adapter usage with a specific SQL dialect now uses the
+  appropriate defaults for quoting identifiers.
+
+* You can now disable the use of sudo in the rake install/uninstall
+  tasks using the SUDO='' environment variable.
+
+* A very misleading error message has been fixed when attempting
+  to constantize an invalid string in the model inflector.
+
+= Backwards Compatibility
+
+* The sqlite adapter now typecasts columns that SQLite stores as
+  INTEGER/REAL.  Previously, it only typecasted columns that
+  SQLite stored as TEXT/BLOB.  For details about SQLite storage, see
+  http://www.sqlite.org/datatype3.html.
+
+  Any custom type conversion procs used with the sqlite adapter should
+  be modified to work with Integer/Float objects in addition to String
+  objects.
