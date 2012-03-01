@@ -193,7 +193,7 @@ module Sequel
       # Execute the given SQL with this connection.  If a block is given,
       # yield the results, otherwise, return the number of changed rows.
       def execute(sql, args=nil)
-        q = check_disconnect_errors{@db.log_yield(sql, args){args ? async_exec(sql, args) : async_exec(sql)}}
+        q = check_disconnect_errors{execute_query(sql, args)}
         begin
           block_given? ? yield(q) : q.cmd_tuples
         ensure
@@ -202,6 +202,12 @@ module Sequel
       end
 
       private
+
+      # Return the PGResult object that is returned by executing the given
+      # sql and args.
+      def execute_query(sql, args)
+        @db.log_yield(sql, args){args ? async_exec(sql, args) : async_exec(sql)}
+      end
       
       # Return the requested values for the given row.
       def single_value(r)
