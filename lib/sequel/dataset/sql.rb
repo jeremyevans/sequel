@@ -802,7 +802,7 @@ module Sequel
 
     # Prepare an SQL statement by calling all clause methods for the given statement type.
     def clause_sql(type)
-      sql = @opts[:append_sql] || ''
+      sql = @opts[:append_sql] || sql_string_origin
       send("#{type}_clause_methods").each{|x| send(x, sql)}
       sql
     end
@@ -869,7 +869,7 @@ module Sequel
         c ||= true
       end
     end
-    
+
     def empty_array_value(op, cols)
       if Sequel.empty_array_handle_nulls
         c = Array(cols)
@@ -1323,6 +1323,12 @@ module Sequel
       end
     end
 
+    # The string that is appended to to create the SQL query, the empty
+    # string by default
+    def sql_string_origin
+      ''
+    end
+    
     # SQL to use if this dataset uses static SQL.  Since static SQL
     # can be a PlaceholderLiteralString in addition to a String,
     # we literalize nonstrings.
