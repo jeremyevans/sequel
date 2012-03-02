@@ -413,6 +413,13 @@ describe "Database#extend_datasets" do
     @db.extend_datasets(@m)
   end
   
+  specify "should clear a cached dataset" do
+    @db = Sequel::Database.new
+    @db.literal(1).should == '1'
+    @db.extend_datasets{def literal(v) '2' end}
+    @db.literal(1).should == '2'
+  end
+
   specify "should change the dataset class to a subclass the first time it is called" do
     @db.dataset_class.superclass.should == Sequel::Dataset
   end

@@ -88,6 +88,7 @@ module Sequel
     #   end
     def extend_datasets(mod=nil, &block)
       raise(Error, "must provide either mod or block, not both") if mod && block
+      reset_schema_utility_dataset
       mod = Module.new(&block) if block
       if @dataset_modules.empty?
        @dataset_modules = [mod]
