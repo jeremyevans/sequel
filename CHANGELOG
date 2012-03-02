@@ -1,5 +1,7 @@
 === HEAD
 
+* Add pg_auto_parameterize extension, for automatically parameterizing queries when using postgres adapter with pg driver (jeremyevans)
+
 * Add ConnectionPool#disconnection_proc= method, to modify disconnection_proc after the pool has been created (jeremyevans)
 
 * Add ConnectionPool#after_connect= method, to modify after_connect proc after the pool has been created (jeremyevans)
