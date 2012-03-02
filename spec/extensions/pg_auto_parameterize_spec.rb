@@ -55,7 +55,7 @@ describe "pg_auto_parameterize extension" do
   end
 
   it "should not automatically parameterize prepared statements" do
-    @db[:table].filter(:a=>1, :b=>:$b).prepare(:select).sql.should == 'SELECT * FROM table WHERE ((a = 1) AND (b = $b))'
+    @db[:table].filter(:a=>1, :b=>:$b).prepare(:select).sql.should =~ /SELECT \* FROM table WHERE \(\((a = 1|b = \$b)\) AND \((a = 1|b = \$b)\)\)/
   end
 
   it "should show args with string when inspecting SQL " do
