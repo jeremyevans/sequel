@@ -1,6 +1,10 @@
 === HEAD
 
-* Add #all_connections method to the connection pools, which yields all available connections in the pool (jeremyevans)
+* Add ConnectionPool#disconnection_proc= method, to modify disconnection_proc after the pool has been created (jeremyevans)
+
+* Add ConnectionPool#after_connect= method, to modify after_connect proc after the pool has been created (jeremyevans)
+
+* Add ConnectionPool#all_connections method, which yields all available connections in the pool (jeremyevans)
 
 === 3.33.0 (2012-03-01)
 

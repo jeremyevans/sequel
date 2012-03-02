@@ -794,6 +794,27 @@ shared_examples_for "All connection pools classes" do
     p.hold{|c| p.all_connections{|c1| c.should == c1}}
   end
 
+  specify "should be able to modify after_connect proc after the pool is created" do
+    a = []
+    p = @class.new({}){123}
+    p.after_connect = pr = proc{|c| a << c}
+    p.after_connect.should == pr
+    a.should == []
+    p.hold{}
+    a.should == [123]
+  end
+
+  specify "should be able to modify disconnection_proc after the pool is created" do
+    a = []
+    p = @class.new({}){123}
+    p.disconnection_proc = pr = proc{|c| a << c}
+    p.disconnection_proc.should == pr
+    p.hold{}
+    a.should == []
+    p.disconnect
+    a.should == [123]
+  end
+
   specify "should not raise an error when disconnecting twice" do
     c = @class.new({}){123}
     proc{c.disconnect}.should_not raise_error
