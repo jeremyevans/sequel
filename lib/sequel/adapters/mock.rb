@@ -51,6 +51,7 @@ module Sequel
           db.instance_eval do
             @server_version = 90103
             @primary_keys = {}
+            @primary_key_sequences = {}
             def primary_key(table)
               :id
             end
