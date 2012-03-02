@@ -36,6 +36,20 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     @allocated.length + @available_connections.length
   end
   
+  # Yield all of the available connections, and the one currently allocated to
+  # this thread.  This will not yield connections currently allocated to other
+  # threads, as it is not safe to operate on them.  This holds the mutex while
+  # it is yielding all of the available connections, which means that until
+  # the method's block returns, the pool is locked.
+  def all_connections
+    hold do |c|
+      sync do
+        yield c
+        @available_connections.each{|c| yield c}
+      end
+    end
+  end
+  
   # Removes all connections currently available, optionally
   # yielding each connection to the given block. This method has the effect of 
   # disconnecting from the database, assuming that no connections are currently

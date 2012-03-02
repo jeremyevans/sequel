@@ -8,6 +8,11 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
     @conn ? 1 : 0
   end
   
+  # Yield the connection if one has been made.
+  def all_connections
+    yield @conn if @conn
+  end
+  
   # Disconnect the connection from the database.
   def disconnect(opts=nil, &block)
     return unless @conn

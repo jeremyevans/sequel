@@ -228,6 +228,45 @@ describe "A connection pool with a max size of 1" do
 end
 
 shared_examples_for "A threaded connection pool" do  
+  specify "should not have all_connections yield connections allocated to other threads" do
+    pool = Sequel::ConnectionPool.get_pool(@cp_opts.merge(:max_connections=>2, :pool_timeout=>0)) {@invoked_count += 1}
+    q, q1 = Queue.new, Queue.new
+    t = Thread.new do
+      pool.hold do |c1|
+        q1.push nil
+        q.pop
+      end
+    end
+    pool.hold do |c1|
+      q1.pop
+      pool.all_connections{|c| c.should == c1}
+      q.push nil
+    end
+    t.join
+  end
+
+  specify "should not have all_connections yield all available connections" do
+    pool = Sequel::ConnectionPool.get_pool(@cp_opts.merge(:max_connections=>2, :pool_timeout=>0)){@invoked_count += 1}
+    q, q1 = Queue.new, Queue.new
+    b = []
+    t = Thread.new do
+      pool.hold do |c1|
+        b << c1
+        q1.push nil
+        q.pop
+      end
+    end
+    pool.hold do |c1|
+      q1.pop
+      b << c1
+      q.push nil
+    end
+    t.join
+    a = []
+    pool.all_connections{|c| a << c}
+    a.sort.should == b.sort
+  end
+
   specify "should raise a PoolTimeout error if a connection couldn't be acquired before timeout" do
     x = nil
     q, q1 = Queue.new, Queue.new
@@ -368,6 +407,16 @@ describe "A connection pool with multiple servers" do
   before do
     @invoked_counts = Hash.new(0)
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:servers=>{:read_only=>{}})){|server| "#{server}#{@invoked_counts[server] += 1}"}
+  end
+  
+  specify "#all_connections should return connections for all servers" do
+    @pool.hold{}
+    @pool.all_connections{|c1| c1.should == "default1"}
+    a = []
+    @pool.hold(:read_only) do |c|
+      @pool.all_connections{|c1| a << c1}
+    end
+    a.sort_by{|c| c.to_s}.should == ["default1", "read_only1"]
   end
   
   specify "#servers should return symbols for all servers" do
@@ -624,6 +673,16 @@ describe "A single threaded pool with multiple servers" do
     @pool = Sequel::ConnectionPool.get_pool(ST_CONNECTION_POOL_DEFAULTS.merge(:disconnection_proc=>proc{|c| @max_size=3}, :servers=>{:read_only=>{}})){|server| server}
   end
   
+  specify "#all_connections should return connections for all servers" do
+    @pool.hold{}
+    @pool.all_connections{|c1| c1.should == :default}
+    a = []
+    @pool.hold(:read_only) do
+      @pool.all_connections{|c1| a << c1}
+    end
+    a.sort_by{|c| c.to_s}.should == [:default, :read_only]
+  end
+  
   specify "#servers should return symbols for all servers" do
     @pool.servers.sort_by{|s| s.to_s}.should == [:default, :read_only]
   end
@@ -730,6 +789,11 @@ describe "A single threaded pool with multiple servers" do
 end
 
 shared_examples_for "All connection pools classes" do
+  specify "should have all_connections yield current and available connections" do
+    p = @class.new({}){123}
+    p.hold{|c| p.all_connections{|c1| c.should == c1}}
+  end
+
   specify "should not raise an error when disconnecting twice" do
     c = @class.new({}){123}
     proc{c.disconnect}.should_not raise_error

@@ -26,6 +26,11 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   def add_servers(servers)
     servers.each{|s| @servers[s] = s}
   end
+
+  # Yield all of the currently established connections
+  def all_connections
+    @conns.values.each{|c| yield c}
+  end
   
   # The connection for the given server.
   def conn(server=:default)

@@ -1,3 +1,7 @@
+=== HEAD
+
+* Add #all_connections method to the connection pools, which yields all available connections in the pool (jeremyevans)
+
 === 3.33.0 (2012-03-01)
 
 * Add ability to force or disable transactions completely in the migrators using the :use_transactions option (jeremyevans)

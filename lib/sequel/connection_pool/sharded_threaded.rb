@@ -45,6 +45,23 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     @allocated[server]
   end
   
+  # Yield all of the available connections, and the ones currently allocated to
+  # this thread.  This will not yield connections currently allocated to other
+  # threads, as it is not safe to operate on them.  This holds the mutex while
+  # it is yielding all of the connections, which means that until
+  # the method's block returns, the pool is locked.
+  def all_connections
+    t = Thread.current
+    sync do
+      @allocated.values.each do |threads|
+        threads.each do |thread, conn|
+          yield conn if t == thread
+        end
+      end
+      @available_connections.values.each{|v| v.each{|c| yield c}}
+    end
+  end
+  
   # An array of connections opened but not currently used, for the given
   # server. Nonexistent servers will return nil. Treat this as read only, do
   # not modify the resulting object.
