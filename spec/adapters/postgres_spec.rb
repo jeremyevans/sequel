@@ -6,6 +6,14 @@ unless defined?(POSTGRES_DB)
 end
 INTEGRATION_DB = POSTGRES_DB unless defined?(INTEGRATION_DB)
 
+# Automatic parameterization changes the SQL used, so don't check
+# for expected SQL if it is being used.
+if defined?(Sequel::Postgres::AutoParameterize)
+  check_sqls = false
+else
+  check_sqls = true
+end
+
 def POSTGRES_DB.sqls
   (@sqls ||= [])
 end
@@ -61,7 +69,6 @@ describe "A PostgreSQL dataset" do
   end
 
   specify "should quote columns and tables using double quotes if quoting identifiers" do
-    @d.quote_identifiers = true
     @d.select(:name).sql.should == \
       'SELECT "name" FROM "test"'
 
@@ -89,27 +96,28 @@ describe "A PostgreSQL dataset" do
     @d.select('max(test."name") AS "max_name"'.lit).sql.should == \
       'SELECT max(test."name") AS "max_name" FROM "test"'
 
-    @d.select(:test.sql_function(:abc, 'hello')).sql.should == \
-      "SELECT test(\"abc\", 'hello') FROM \"test\""
-
-    @d.select(:test.sql_function(:abc__def, 'hello')).sql.should == \
-      "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
-
-    @d.select(:test.sql_function(:abc__def, 'hello').as(:x2)).sql.should == \
-      "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
-
-    @d.insert_sql(:value => 333).should =~ \
-      /\AINSERT INTO "test" \("value"\) VALUES \(333\)( RETURNING NULL)?\z/
-
     @d.insert_sql(:x => :y).should =~ \
       /\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/
 
-    @d.disable_insert_returning.insert_sql(:value => 333).should =~ \
-      /\AINSERT INTO "test" \("value"\) VALUES \(333\)\z/
+    if check_sqls
+      @d.select(:test.sql_function(:abc, 'hello')).sql.should == \
+        "SELECT test(\"abc\", 'hello') FROM \"test\""
+
+      @d.select(:test.sql_function(:abc__def, 'hello')).sql.should == \
+        "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
+
+      @d.select(:test.sql_function(:abc__def, 'hello').as(:x2)).sql.should == \
+        "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
+
+      @d.insert_sql(:value => 333).should =~ \
+        /\AINSERT INTO "test" \("value"\) VALUES \(333\)( RETURNING NULL)?\z/
+
+      @d.disable_insert_returning.insert_sql(:value => 333).should =~ \
+        /\AINSERT INTO "test" \("value"\) VALUES \(333\)\z/
+    end
   end
 
   specify "should quote fields correctly when reversing the order if quoting identifiers" do
-    @d.quote_identifiers = true
     @d.reverse_order(:name).sql.should == \
       'SELECT * FROM "test" ORDER BY "name" DESC'
 
@@ -364,9 +372,9 @@ describe "A PostgreSQL database" do
     @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french'}
     @db.sqls.should == [
       %{CREATE TABLE "posts" ("title" text, "body" text)},
-      %{CREATE INDEX "posts_title_body_index" ON "posts" USING gin (to_tsvector('simple', (COALESCE("title", '') || ' ' || COALESCE("body", ''))))},
-      %{CREATE INDEX "posts_title_index" ON "posts" USING gin (to_tsvector('french', (COALESCE("title", ''))))}
-    ]
+      %{CREATE INDEX "posts_title_body_index" ON "posts" USING gin (to_tsvector('simple'::regconfig, (COALESCE("title", '') || ' ' || COALESCE("body", ''))))},
+      %{CREATE INDEX "posts_title_index" ON "posts" USING gin (to_tsvector('french'::regconfig, (COALESCE("title", ''))))}
+    ] if check_sqls
 
     @db[:posts].insert(:title=>'ruby rails', :body=>'yowsa')
     @db[:posts].insert(:title=>'sequel', :body=>'ruby')
@@ -377,9 +385,9 @@ describe "A PostgreSQL database" do
     @db[:posts].full_text_search([:title, :body], ['yowsa', 'rails']).all.should == [:title=>'ruby rails', :body=>'yowsa']
     @db[:posts].full_text_search(:title, 'scooby', :language => 'french').all.should == [{:title=>'ruby scooby', :body=>'x'}]
     @db.sqls.should == [
-      %{SELECT * FROM "posts" WHERE (to_tsvector('simple', (COALESCE("title", ''))) @@ to_tsquery('simple', 'rails'))},
-      %{SELECT * FROM "posts" WHERE (to_tsvector('simple', (COALESCE("title", '') || ' ' || COALESCE("body", ''))) @@ to_tsquery('simple', 'yowsa | rails'))},
-      %{SELECT * FROM "posts" WHERE (to_tsvector('french', (COALESCE("title", ''))) @@ to_tsquery('french', 'scooby'))}]
+      %{SELECT * FROM "posts" WHERE (to_tsvector('simple'::regconfig, (COALESCE("title", ''))) @@ to_tsquery('simple'::regconfig, 'rails'))},
+      %{SELECT * FROM "posts" WHERE (to_tsvector('simple'::regconfig, (COALESCE("title", '') || ' ' || COALESCE("body", ''))) @@ to_tsquery('simple'::regconfig, 'yowsa | rails'))},
+      %{SELECT * FROM "posts" WHERE (to_tsvector('french'::regconfig, (COALESCE("title", ''))) @@ to_tsquery('french'::regconfig, 'scooby'))}] if check_sqls
 
     @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
     @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
@@ -445,7 +453,7 @@ describe "Postgres::Dataset#import" do
   specify "#import should return separate insert statements if server_version < 80200" do
     @ds.meta_def(:server_version){80199}
     @ds.import([:x, :y], [[1, 2], [3, 4]])
-    @db.sqls.should == ['BEGIN', 'INSERT INTO "test" ("x", "y") VALUES (1, 2)', 'INSERT INTO "test" ("x", "y") VALUES (3, 4)', 'COMMIT']
+    @db.sqls.should == ['BEGIN', 'INSERT INTO "test" ("x", "y") VALUES (1, 2)', 'INSERT INTO "test" ("x", "y") VALUES (3, 4)', 'COMMIT'] if check_sqls
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
 
@@ -516,7 +524,7 @@ describe "Postgres::Dataset#insert" do
       "SELECT currval('\"public\".test5_xid_seq')",
       'INSERT INTO "test5" ("value") VALUES (13)',
       "SELECT currval('\"public\".test5_xid_seq')"
-    ]
+    ] if check_sqls
     @ds.all.should == [{:xid=>1, :value=>10}, {:xid=>2, :value=>20}, {:xid=>3, :value=>13}]
   end
 
@@ -540,7 +548,7 @@ describe "Postgres::Dataset#insert" do
   specify "should use INSERT RETURNING if server_version >= 80200" do
     @ds.meta_def(:server_version){80201}
     @ds.insert(:value=>10).should == 1
-    @db.sqls.last.should == 'INSERT INTO "test5" ("value") VALUES (10) RETURNING "xid"'
+    @db.sqls.last.should == 'INSERT INTO "test5" ("value") VALUES (10) RETURNING "xid"' if check_sqls
   end
 
   specify "should have insert_select return nil if server_version < 80200" do
@@ -582,7 +590,6 @@ describe "Postgres::Database schema qualified tables" do
     POSTGRES_DB.instance_variable_set(:@primary_key_sequences, {})
   end
   after do
-    POSTGRES_DB.quote_identifiers = false
     POSTGRES_DB << "DROP SCHEMA schema_test CASCADE"
     POSTGRES_DB.default_schema = nil
   end
@@ -658,7 +665,6 @@ describe "Postgres::Database schema qualified tables" do
   end
 
   specify "should be able to get serial sequences for tables that have spaces in the name in a given schema" do
-    POSTGRES_DB.quote_identifiers = true
     POSTGRES_DB.create_table(:"schema_test__schema test"){primary_key :i}
     POSTGRES_DB.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."schema test_i_seq"'
   end
@@ -670,7 +676,6 @@ describe "Postgres::Database schema qualified tables" do
   end
 
   specify "should be able to get custom sequences for tables that have spaces in the name in a given schema" do
-    POSTGRES_DB.quote_identifiers = true
     POSTGRES_DB << "CREATE SEQUENCE schema_test.\"ks eq\""
     POSTGRES_DB.create_table(:"schema_test__schema test"){integer :j; primary_key :k, :type=>:integer, :default=>"nextval('schema_test.\"ks eq\"'::regclass)".lit}
     POSTGRES_DB.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."ks eq"'
@@ -691,7 +696,6 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
     @db = POSTGRES_DB
     @db.run "DROP SCHEMA s CASCADE" rescue nil
     @db.run "CREATE SCHEMA s"
-    @db.quote_identifiers = true
 
     @db.create_table(:s__bands){primary_key :id; String :name}
     @db.create_table(:s__albums){primary_key :id; String :name; foreign_key :band_id, :s__bands}
@@ -733,7 +737,6 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
     @m4 = @Member.create(:name=>"JC", :band=>@b2)
   end
   after(:all) do
-    @db.quote_identifiers = false
     @db.run "DROP SCHEMA s CASCADE"
   end
 
@@ -983,9 +986,9 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
   end
 
   specify "#create_schema and #drop_schema should create and drop schemas" do
-    @d.send(:create_schema_sql, :sequel).should == 'CREATE SCHEMA sequel'
-    @d.send(:drop_schema_sql, :sequel).should == 'DROP SCHEMA sequel'
-    @d.send(:drop_schema_sql, :sequel, :if_exists=>true, :cascade=>true).should == 'DROP SCHEMA IF EXISTS sequel CASCADE'
+    @d.send(:create_schema_sql, :sequel).should == 'CREATE SCHEMA "sequel"'
+    @d.send(:drop_schema_sql, :sequel).should == 'DROP SCHEMA "sequel"'
+    @d.send(:drop_schema_sql, :sequel, :if_exists=>true, :cascade=>true).should == 'DROP SCHEMA IF EXISTS "sequel" CASCADE'
     @d.create_schema(:sequel)
     @d.create_table(:sequel__test){Integer :a}
     if @d.server_version >= 80200
@@ -998,7 +1001,7 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
   specify "#create_trigger and #drop_trigger should create and drop triggers" do
     @d.create_language(:plpgsql) if @d.server_version < 90000
     @d.create_function(:tf, 'BEGIN IF NEW.value IS NULL THEN RAISE EXCEPTION \'Blah\'; END IF; RETURN NEW; END;', :language=>:plpgsql, :returns=>:trigger)
-    @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true).should == 'CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON test FOR EACH ROW EXECUTE PROCEDURE tf()'
+    @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true).should == 'CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW EXECUTE PROCEDURE tf()'
     @d.create_table(:test){String :name; Integer :value}
     @d.create_trigger(:test, :identity, :tf, :each_row=>true)
     @d[:test].insert(:name=>'a', :value=>1)
@@ -1007,10 +1010,10 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>1}]
     @d[:test].filter(:name=>'a').update(:value=>3)
     @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>3}]
-    @d.send(:drop_trigger_sql, :test, :identity).should == 'DROP TRIGGER identity ON test'
+    @d.send(:drop_trigger_sql, :test, :identity).should == 'DROP TRIGGER identity ON "test"'
     @d.drop_trigger(:test, :identity)
-    @d.send(:create_trigger_sql, :test, :identity, :tf, :after=>true, :events=>:insert, :args=>[1, 'a']).should == 'CREATE TRIGGER identity AFTER INSERT ON test EXECUTE PROCEDURE tf(1, \'a\')'
-    @d.send(:drop_trigger_sql, :test, :identity, :if_exists=>true, :cascade=>true).should == 'DROP TRIGGER IF EXISTS identity ON test CASCADE'
+    @d.send(:create_trigger_sql, :test, :identity, :tf, :after=>true, :events=>:insert, :args=>[1, 'a']).should == 'CREATE TRIGGER identity AFTER INSERT ON "test" EXECUTE PROCEDURE tf(1, \'a\')'
+    @d.send(:drop_trigger_sql, :test, :identity, :if_exists=>true, :cascade=>true).should == 'DROP TRIGGER IF EXISTS identity ON "test" CASCADE'
     # Make sure if exists works
     @d.drop_trigger(:test, :identity, :if_exists=>true, :cascade=>true)
   end
@@ -1071,7 +1074,7 @@ if POSTGRES_DB.adapter_scheme == :postgres
 
     specify "should look up conversion procs by name" do
       @db.create_table!(:foo){interval :bar}
-      @db[:foo].insert('21 days')
+      @db[:foo].insert('21 days'.cast(:interval))
       @db[:foo].get(:bar).should == 'syad 12'
     end
   end
@@ -1222,19 +1225,21 @@ describe 'POSTGRES special float handling' do
     @db.drop_table(:test5) rescue nil
   end
 
-  specify 'should quote NaN' do
-    nan = 0.0/0.0
-    @ds.insert_sql(:value => nan).should == %q{INSERT INTO test5 (value) VALUES ('NaN')}
-  end
+  if check_sqls
+    specify 'should quote NaN' do
+      nan = 0.0/0.0
+      @ds.insert_sql(:value => nan).should == %q{INSERT INTO "test5" ("value") VALUES ('NaN')}
+    end
 
-  specify 'should quote +Infinity' do
-    inf = 1.0/0.0
-    @ds.insert_sql(:value => inf).should == %q{INSERT INTO test5 (value) VALUES ('Infinity')}
-  end
+    specify 'should quote +Infinity' do
+      inf = 1.0/0.0
+      @ds.insert_sql(:value => inf).should == %q{INSERT INTO "test5" ("value") VALUES ('Infinity')}
+    end
 
-  specify 'should quote -Infinity' do
-    inf = -1.0/0.0
-    @ds.insert_sql(:value => inf).should == %q{INSERT INTO test5 (value) VALUES ('-Infinity')}
+    specify 'should quote -Infinity' do
+      inf = -1.0/0.0
+      @ds.insert_sql(:value => inf).should == %q{INSERT INTO "test5" ("value") VALUES ('-Infinity')}
+    end
   end
 
   if POSTGRES_DB.adapter_scheme == :postgres

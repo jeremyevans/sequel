@@ -521,7 +521,7 @@ module Sequel
         filter = " WHERE #{filter_expr(filter)}" if filter
         case index_type
         when :full_text
-          expr = "(to_tsvector(#{literal(index[:language] || 'simple')}, #{literal(dataset.send(:full_text_string_join, cols))}))"
+          expr = "(to_tsvector(#{literal(index[:language] || 'simple')}::regconfig, #{literal(dataset.send(:full_text_string_join, cols))}))"
           index_type = :gin
         when :spatial
           index_type = :gist
@@ -785,7 +785,7 @@ module Sequel
       def full_text_search(cols, terms, opts = {})
         lang = opts[:language] || 'simple'
         terms = terms.join(' | ') if terms.is_a?(Array)
-        filter("to_tsvector(?, ?) @@ to_tsquery(?, ?)", lang, full_text_string_join(cols), lang, terms)
+        filter("to_tsvector(?::regconfig, ?) @@ to_tsquery(?::regconfig, ?)", lang, full_text_string_join(cols), lang, terms)
       end
 
       # Insert given values into the database.

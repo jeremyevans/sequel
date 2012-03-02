@@ -427,7 +427,7 @@ describe "Sequel Mock Adapter" do
       Sequel.mock(:host=>'mssql')[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM [A] WHERE (CONTAINS ([B], 'c'))"
       Sequel.mock(:host=>'mysql')[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM `a` WHERE (MATCH (`b`) AGAINST ('c'))"
       Sequel.mock(:host=>'oracle')[:a].limit(1).sql.should == 'SELECT * FROM (SELECT * FROM "A") "T1" WHERE (ROWNUM <= 1)'
-      Sequel.mock(:host=>'postgres')[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM \"a\" WHERE (to_tsvector('simple', (COALESCE(\"b\", ''))) @@ to_tsquery('simple', 'c'))"
+      Sequel.mock(:host=>'postgres')[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM \"a\" WHERE (to_tsvector('simple'::regconfig, (COALESCE(\"b\", ''))) @@ to_tsquery('simple'::regconfig, 'c'))"
       Sequel.mock(:host=>'sqlite')[:a___b].sql.should == "SELECT * FROM `a` AS 'b'"
     ensure
       Sequel.quote_identifiers = qi
