@@ -41,12 +41,12 @@
 #    be rejected.  For example, the following works without
 #    automatic parameterization, but fails with it:
 #
-#      DB[:table].select(:date + '1 day')
+#      DB[:table].insert(:interval=>'1 day')
 #
 #    To work around this, you can just add the necessary casts
 #    manually:
 #
-#      DB[:table].select(:date + '1 day'.cast(:interval))
+#      DB[:table].insert(:interval=>'1 day'.cast(:interval))
 #
 # You can also work around any issues that come up by disabling automatic
 # parameterization by calling the no_auto_parameterize method on the
