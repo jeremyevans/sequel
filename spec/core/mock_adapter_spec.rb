@@ -299,6 +299,13 @@ describe "Sequel Mock Adapter" do
     Sequel.mock.send(:quote_identifiers_default).should be_false
   end
 
+  specify "should allow overriding of server_version" do
+    db = Sequel.mock
+    db.server_version.should == nil
+    db.server_version = 80102
+    db.server_version.should == 80102
+  end
+
   specify "should not have identifier input/output methods by default" do
     Sequel.mock.send(:identifier_input_method_default).should be_nil
     Sequel.mock.send(:identifier_output_method_default).should be_nil
@@ -427,5 +434,9 @@ describe "Sequel Mock Adapter" do
       Sequel::Database.send(:class_variable_set, :@@identifier_input_method, ii)
       Sequel::Database.send(:class_variable_set, :@@identifier_output_method, io)
     end
+  end
+
+  specify "should automatically set version for postgres" do
+    Sequel.mock(:host=>'postgres').server_version.should == 90103
   end
 end
