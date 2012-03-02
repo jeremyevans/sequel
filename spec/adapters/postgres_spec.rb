@@ -247,7 +247,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
   cspecify "should store milliseconds in time fields for Time objects", :do do
     t = Time.now
     @d << {:value=>1, :time=>t}
-    t2 = @d[:value =>'1'][:time]
+    t2 = @d[:value =>1][:time]
     @d.literal(t2).should == @d.literal(t)
     t2.strftime('%Y-%m-%d %H:%M:%S').should == t.strftime('%Y-%m-%d %H:%M:%S')
     t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000 == t.usec
@@ -256,7 +256,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
   cspecify "should store milliseconds in time fields for DateTime objects", :do do
     t = DateTime.now
     @d << {:value=>1, :time=>t}
-    t2 = @d[:value =>'1'][:time]
+    t2 = @d[:value =>1][:time]
     @d.literal(t2).should == @d.literal(t)
     t2.strftime('%Y-%m-%d %H:%M:%S').should == t.strftime('%Y-%m-%d %H:%M:%S')
     t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000 == t.strftime('%N').to_i/1000
@@ -1111,7 +1111,7 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
     end
 
     specify "should accept dataset as first argument" do
-      @db.copy_table(@db[:test_copy].cross_join(:test_copy___tc).order(1, 2, 3, 4)).should == "1\t2\t1\t2\n1\t2\t3\t4\n3\t4\t1\t2\n3\t4\t3\t4\n"
+      @db.copy_table(@db[:test_copy].cross_join(:test_copy___tc).order(:test_copy__x, :test_copy__y, :tc__x, :tc__y)).should == "1\t2\t1\t2\n1\t2\t3\t4\n3\t4\t1\t2\n3\t4\t3\t4\n"
     end
 
     specify "with a block and no options should yield each row as a string in text format" do
