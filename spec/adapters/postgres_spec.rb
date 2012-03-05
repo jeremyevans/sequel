@@ -21,7 +21,7 @@ logger = Object.new
 def logger.method_missing(m, msg)
   POSTGRES_DB.sqls << msg
 end
-POSTGRES_DB.loggers = [logger]
+POSTGRES_DB.loggers << logger
 
 #POSTGRES_DB.instance_variable_set(:@server_version, 80100)
 POSTGRES_DB.create_table! :test do
