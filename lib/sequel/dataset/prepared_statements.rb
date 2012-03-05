@@ -18,10 +18,6 @@ module Sequel
       # The bind arguments to use for running this prepared statement
       attr_accessor :bind_arguments
 
-      # Whether to log the full SQL query.  By default, just the prepared statement
-      # name is generally logged.
-      attr_accessor :log_sql
-      
       # Set the bind arguments based on the hash and call super.
       def call(bind_vars={}, &block)
         ds = bind(bind_vars)
@@ -49,6 +45,10 @@ module Sequel
     # from using the dataset without bind variables.
     module PreparedStatementMethods
       PLACEHOLDER_RE = /\A\$(.*)\z/
+      
+      # Whether to log the full SQL query.  By default, just the prepared statement
+      # name is generally logged on adapters that support native prepared statements.
+      attr_accessor :log_sql
       
       # The type of prepared statement, should be one of :select, :first,
       # :insert, :update, or :delete
