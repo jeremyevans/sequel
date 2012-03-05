@@ -136,11 +136,17 @@ module Sequel
           end
         end
         unless cursor
-          cursor = log_yield("Preparing #{name}: #{sql}"){conn.parse(sql)}
+          cursor = log_yield("PREPARE #{name}: #{sql}"){conn.parse(sql)}
           conn.prepared_statements[name] = [cursor, sql]
         end
         args = cursor_bind_params(conn, cursor, opts[:arguments])
-        r = log_yield("Executing #{name}", args){cursor.exec}
+        log_sql = "EXECUTE #{name}"
+        if ps.log_sql
+          log_sql << " ("
+          log_sql << sql
+          log_sql << ")"
+        end
+        r = log_yield(log_sql, args){cursor.exec}
         if block_given?
           yield(cursor)
         elsif type == :insert

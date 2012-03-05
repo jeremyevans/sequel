@@ -1,5 +1,9 @@
 === HEAD
 
+* Log full SQL string by default for prepared statements created automatically by model prepared_statements* plugins (jeremyevans)
+
+* Add ability for prepared statements to log full SQL string (jeremyevans)
+
 * Add pg_statement_cache extension, for automatically preparing queries when using postgres adapter with pg driver (jeremyevans)
 
 * Add pg_auto_parameterize extension, for automatically parameterizing queries when using postgres adapter with pg driver (jeremyevans)

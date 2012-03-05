@@ -82,7 +82,7 @@ module Sequel
       # yield the connection if a block is given.
       def _execute(conn, sql, opts)
         begin
-          r = log_yield(sql){conn.query(sql, :symbolize_keys => true, :database_timezone => timezone, :application_timezone => Sequel.application_timezone)}
+          r = log_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql){conn.query(sql, :symbolize_keys => true, :database_timezone => timezone, :application_timezone => Sequel.application_timezone)}
           if opts[:type] == :select
             yield r if r
           elsif block_given?

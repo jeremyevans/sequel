@@ -449,7 +449,13 @@ module Sequel
             conn.prepared_statements[ps_name] = sql
             conn.check_disconnect_errors{log_yield("PREPARE #{ps_name} AS #{sql}"){conn.prepare(ps_name, sql)}}
           end
-          q = conn.check_disconnect_errors{log_yield("EXECUTE #{ps_name}", args){conn.exec_prepared(ps_name, args)}}
+          log_sql = "EXECUTE #{ps_name}"
+          if ps.log_sql
+            log_sql << " ("
+            log_sql << sql
+            log_sql << ")"
+          end
+          q = conn.check_disconnect_errors{log_yield(log_sql, args){conn.exec_prepared(ps_name, args)}}
           if opts[:table] && opts[:values]
             insert_result(conn, opts[:table], opts[:values])
           else

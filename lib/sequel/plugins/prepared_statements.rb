@@ -46,7 +46,9 @@ module Sequel
         # Create a prepared statement based on the given dataset with a unique name for the given
         # type of query and values.
         def prepare_statement(ds, type, vals={})
-          ds.prepare(type, :"smpsp_#{NEXT.call}", vals)
+          ps = ds.prepare(type, :"smpsp_#{NEXT.call}", vals)
+          ps.log_sql = true
+          ps
         end
 
         # Return a sorted array of columns for use as a hash key.

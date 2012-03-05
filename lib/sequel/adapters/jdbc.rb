@@ -343,13 +343,18 @@ module Sequel
           if name and cps = conn.prepared_statements[name] and cps[0] == sql
             cps = cps[1]
           else
-            log_yield("Closing #{name}"){cps[1].close} if cps
-            cps = log_yield("Preparing#{" #{name}:" if name} #{sql}"){conn.prepareStatement(sql)}
+            log_yield("CLOSE #{name}"){cps[1].close} if cps
+            cps = log_yield("PREPARE#{" #{name}:" if name} #{sql}"){conn.prepareStatement(sql)}
             conn.prepared_statements[name] = [sql, cps] if name
           end
           i = 0
           args.each{|arg| set_ps_arg(cps, arg, i+=1)}
-          msg = "Executing#{" #{name}" if name}"
+          msg = "EXECUTE#{" #{name}" if name}"
+          if ps.log_sql
+            msg << " ("
+            msg << sql
+            msg << ")"
+          end
           begin
             if block_given?
               yield log_yield(msg, args){cps.executeQuery}

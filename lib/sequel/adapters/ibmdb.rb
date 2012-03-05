@@ -231,11 +231,16 @@ module Sequel
         sql = ps.prepared_sql
         synchronize(opts[:server]) do |conn|
           unless conn.prepared_statements.fetch(ps_name, []).first == sql
-            log_yield("Preparing #{ps_name}: #{sql}"){conn.prepare(sql, ps_name)}
+            log_yield("PREPARE #{ps_name}: #{sql}"){conn.prepare(sql, ps_name)}
           end
           args = args.map{|v| v.nil? ? nil : prepared_statement_arg(v)}
-          stmt = log_yield("Executing #{ps_name}: #{args.inspect}"){conn.execute_prepared(ps_name, *args)}
-
+          log_sql = "EXECUTE #{ps_name}"
+          if ps.log_sql
+            log_sql << " ("
+            log_sql << sql
+            log_sql << ")"
+          end
+          stmt = log_yield(log_sql, args){conn.execute_prepared(ps_name, *args)}
           if block_given?
             begin
               yield(stmt)

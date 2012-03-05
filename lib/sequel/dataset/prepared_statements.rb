@@ -17,6 +17,10 @@ module Sequel
       
       # The bind arguments to use for running this prepared statement
       attr_accessor :bind_arguments
+
+      # Whether to log the full SQL query.  By default, just the prepared statement
+      # name is generally logged.
+      attr_accessor :log_sql
       
       # Set the bind arguments based on the hash and call super.
       def call(bind_vars={}, &block)

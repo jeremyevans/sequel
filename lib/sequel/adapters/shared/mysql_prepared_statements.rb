@@ -50,6 +50,7 @@ module Sequel
             end
             i = 0
             _execute(conn, "SET " + args.map {|arg| "@sequel_arg_#{i+=1} = #{literal(arg)}"}.join(", "), opts) unless args.empty?
+            opts = opts.merge(:log_sql=>" (#{sql})") if ps.log_sql
             _execute(conn, "EXECUTE #{ps_name}#{" USING #{(1..i).map{|j| "@sequel_arg_#{j}"}.join(', ')}" unless i == 0}", opts, &block)
           end
         end

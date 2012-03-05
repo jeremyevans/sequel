@@ -229,13 +229,19 @@ module Sequel
           end
         end
         unless cps
-          cps = log_yield("Preparing #{name}: #{sql}"){conn.prepare(sql)}
+          cps = log_yield("PREPARE #{name}: #{sql}"){conn.prepare(sql)}
           conn.prepared_statements[name] = [cps, sql]
         end
+        log_sql = "EXECUTE #{name}"
+        if ps.log_sql
+          log_sql << " ("
+          log_sql << sql
+          log_sql << ")"
+        end
         if block
-          log_yield("Executing prepared statement #{name}", args){cps.execute(ps_args, &block)}
+          log_yield(log_sql, args){cps.execute(ps_args, &block)}
         else
-          log_yield("Executing prepared statement #{name}", args){cps.execute!(ps_args){|r|}}
+          log_yield(log_sql, args){cps.execute!(ps_args){|r|}}
           case type
           when :insert
             conn.last_insert_row_id
