@@ -424,6 +424,8 @@ module Sequel
       NUMERIC = 'NUMERIC'.freeze
       INTEGER = 'INTEGER'.freeze
       BACKTICK = '`'.freeze
+      BACKTICK_RE = /`/.freeze
+      DOUBLE_BACKTICK = '``'.freeze
       BLOB_START = "X'".freeze
       HSTAR = "H*".freeze
 
@@ -488,7 +490,7 @@ module Sequel
       
       # SQLite uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
-        sql << BACKTICK << c.to_s << BACKTICK
+        sql << BACKTICK << c.to_s.gsub(BACKTICK_RE, DOUBLE_BACKTICK) << BACKTICK
       end
       
       # When a qualified column is selected on SQLite and the qualifier

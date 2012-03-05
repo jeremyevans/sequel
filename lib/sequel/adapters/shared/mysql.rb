@@ -407,6 +407,8 @@ module Sequel
       STRAIGHT_JOIN = 'STRAIGHT_JOIN'.freeze
       NATURAL_LEFT_JOIN = 'NATURAL LEFT JOIN'.freeze
       BACKTICK = '`'.freeze
+      BACKTICK_RE = /`/.freeze
+      DOUBLE_BACKTICK = '``'.freeze
       EMPTY_COLUMNS = " ()".freeze
       EMPTY_VALUES = " VALUES ()".freeze
       IGNORE = " IGNORE".freeze
@@ -552,7 +554,7 @@ module Sequel
       
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
-        sql << BACKTICK << c.to_s << BACKTICK
+        sql << BACKTICK << c.to_s.gsub(BACKTICK_RE, DOUBLE_BACKTICK) << BACKTICK
       end
       
       # MySQL specific syntax for REPLACE (aka UPSERT, or update if exists,

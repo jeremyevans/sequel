@@ -455,7 +455,8 @@ module Sequel
         mutation_method(:output, into, values)
       end
 
-      # MSSQL uses [] to quote identifiers
+      # MSSQL uses [] to quote identifiers.  MSSQL does not support
+      # escaping of ], so you cannot use that character in an identifier.
       def quoted_identifier_append(sql, name)
         sql << BRACKET_OPEN << name.to_s << BRACKET_CLOSE
       end

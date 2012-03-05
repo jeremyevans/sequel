@@ -172,6 +172,28 @@ describe "Simple Dataset operations" do
   end
 end
 
+describe "Simple dataset operations with nasty table names" do
+  before do
+    @db = INTEGRATION_DB
+    @table = :"i`t' [e]\"m\\s" 
+  end
+
+  cspecify "should work correctly", :mssql, :oracle do
+    @db.create_table!(@table) do
+      primary_key :id
+      Integer :number
+    end
+    @ds = @db[@table]
+    @ds.insert(:number=>10).should == 1
+    @ds.all.should == [{:id=>1, :number=>10}]
+    @ds.update(:number=>20).should == 1 
+    @ds.all.should == [{:id=>1, :number=>20}]
+    @ds.delete.should == 1
+    @ds.count.should == 0
+    proc{@db.drop_table?(@table)}.should_not raise_error
+  end 
+end
+
 describe Sequel::Dataset do
   before do
     INTEGRATION_DB.create_table!(:test) do

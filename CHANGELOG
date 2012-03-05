@@ -1,5 +1,9 @@
 === HEAD
 
+* Escape table and schema names when getting primary key or sequence information on PostgreSQL (jeremyevans)
+
+* Escape identifiers when quoting on MySQL and SQLite (jeremyevans)
+
 * Add Database#supports_drop_table_if_exists? for checking if DROP TABLE supports IF EXISTS (jeremyevans)
 
 * Add Database#drop_table? for dropping a table if it already exists (jeremyevans)

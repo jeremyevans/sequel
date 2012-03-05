@@ -57,7 +57,7 @@ module Sequel
       attr_writer :db
 
       SELECT_CURRVAL = "SELECT currval('%s')".freeze
-      SELECT_CUSTOM_SEQUENCE = proc do |schema, table| <<-end_sql
+      SELECT_CUSTOM_SEQUENCE_SQL = (<<-end_sql
         SELECT '"' || name.nspname || '".' || CASE
             WHEN split_part(def.adsrc, '''', 2) ~ '.' THEN
               substr(split_part(def.adsrc, '''', 2),
@@ -71,11 +71,10 @@ module Sequel
         JOIN pg_constraint cons ON (conrelid = adrelid AND adnum = conkey[1])
         WHERE cons.contype = 'p'
           AND def.adsrc ~* 'nextval'
-          #{"AND name.nspname = '#{schema}'" if schema}
-          AND t.relname = '#{table}'
       end_sql
-      end
-      SELECT_PK = proc do |schema, table| <<-end_sql
+      ).strip.gsub(/\s+/, ' ').freeze
+
+      SELECT_PK_SQL = (<<-end_sql
         SELECT pg_attribute.attname
         FROM pg_class, pg_attribute, pg_index, pg_namespace
         WHERE pg_class.oid = pg_attribute.attrelid
@@ -83,11 +82,10 @@ module Sequel
           AND pg_class.oid = pg_index.indrelid
           AND pg_index.indkey[0] = pg_attribute.attnum
           AND pg_index.indisprimary = 't'
-          #{"AND pg_namespace.nspname = '#{schema}'" if schema}
-          AND pg_class.relname = '#{table}'
       end_sql
-      end
-      SELECT_SERIAL_SEQUENCE = proc do |schema, table| <<-end_sql
+      ).strip.gsub(/\s+/, ' ').freeze
+
+      SELECT_SERIAL_SEQUENCE_SQL = (<<-end_sql
         SELECT  '"' || name.nspname || '".' || seq.relname || ''
         FROM pg_class seq, pg_attribute attr, pg_depend dep,
           pg_namespace name, pg_constraint cons
@@ -99,10 +97,8 @@ module Sequel
           AND attr.attrelid = cons.conrelid
           AND attr.attnum = cons.conkey[1]
           AND cons.contype = 'p'
-          #{"AND name.nspname = '#{schema}'" if schema}
-          AND seq.relname = '#{table}'
       end_sql
-      end
+      ).strip.gsub(/\s+/, ' ').freeze
 
       # Depth of the current transaction on this connection, used
       # to implement multi-level transactions with savepoints.
@@ -134,7 +130,8 @@ module Sequel
 
       # Get the primary key for the given table.
       def primary_key(schema, table)
-        sql = SELECT_PK[schema, table]
+        sql = "#{SELECT_PK_SQL} AND pg_class.relname = '#{escape_string(table)}'"
+        sql << "AND pg_namespace.nspname = '#{escape_string(schema)}'" if schema
         execute(sql) do |r|
           return single_value(r)
         end
@@ -142,13 +139,15 @@ module Sequel
 
       # Get the primary key and sequence for the given table.
       def sequence(schema, table)
-        sql = SELECT_SERIAL_SEQUENCE[schema, table]
+        sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND seq.relname = '#{escape_string(table)}'"
+        sql << " AND name.nspname = '#{escape_string(schema)}'" if schema
         execute(sql) do |r|
           seq = single_value(r)
           return seq if seq
         end
 
-        sql = SELECT_CUSTOM_SEQUENCE[schema, table]
+        sql = "#{SELECT_CUSTOM_SEQUENCE_SQL} AND t.relname = '#{escape_string(table)}'"
+        sql << " AND name.nspname = '#{escape_string(schema)}'" if schema
         execute(sql) do |r|
           return single_value(r)
         end
