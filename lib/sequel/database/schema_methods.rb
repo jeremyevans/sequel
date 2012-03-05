@@ -106,7 +106,7 @@ module Sequel
     #   # DROP TABLE a -- drop table if already exists
     #   # CREATE TABLE a (a integer)
     def create_table!(name, options={}, &block)
-      drop_table(name) if table_exists?(name)
+      drop_table?(name)
       create_table(name, options, &block)
     end
     
