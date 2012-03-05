@@ -3,15 +3,14 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 describe "Database transactions" do
   before(:all) do
     @db = INTEGRATION_DB
-    @db.drop_table(:items) if @db.table_exists?(:items)
-    @db.create_table(:items, :engine=>'InnoDB'){String :name; Integer :value}
+    @db.create_table!(:items, :engine=>'InnoDB'){String :name; Integer :value}
     @d = @db[:items]
   end
   before do
     @d.delete
   end
   after(:all) do
-    @db.drop_table(:items) if @db.table_exists?(:items)
+    @db.drop_table?(:items)
   end
 
   specify "should support transactions" do
@@ -265,12 +264,11 @@ if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or (RUBY_ENGINE == 'rbx' &&
   describe "Database transactions and Thread#kill" do
     before do
       @db = INTEGRATION_DB
-      @db.drop_table(:items) if @db.table_exists?(:items)
-      @db.create_table(:items, :engine=>'InnoDB'){String :name; Integer :value}
+      @db.create_table!(:items, :engine=>'InnoDB'){String :name; Integer :value}
       @d = @db[:items]
     end
     after do
-      @db.drop_table(:items) if @db.table_exists?(:items)
+      @db.drop_table?(:items)
     end
 
     specify "should handle transactions inside threads" do

@@ -13,7 +13,7 @@ describe "Prepared Statements and Bound Arguments" do
     @pr = @ds.requires_placeholder_type_specifiers? ? proc{|i| :"#{i}__integer"} : proc{|i| i}
   end
   after do
-    @db.drop_table(:items)
+    @db.drop_table?(:items)
   end
   
   specify "should support bound variables when selecting" do
@@ -261,7 +261,7 @@ describe "Bound Argument Types" do
     Sequel.datetime_class = Time
   end
   after(:all) do
-    @db.drop_table(:items)
+    @db.drop_table?(:items)
   end
 
   cspecify "should handle date type", [:do, :sqlite], :mssql, [:jdbc, :sqlite], :oracle do 
@@ -306,7 +306,7 @@ describe "Dataset#unbind" do
     @u = proc{|ds| ds, bv = ds.unbind; ds.call(:first, bv)}
   end
   after do
-    INTEGRATION_DB.drop_table(:items) rescue nil
+    INTEGRATION_DB.drop_table?(:items)
   end
   
   specify "should unbind values assigned to equality and inequality statements" do

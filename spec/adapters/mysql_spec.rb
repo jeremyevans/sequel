@@ -26,9 +26,7 @@ def logger.method_missing(m, msg)
   MYSQL_DB.sqls << msg
 end
 MYSQL_DB.loggers = [logger]
-MYSQL_DB.drop_table(:items) rescue nil
-MYSQL_DB.drop_table(:dolls) rescue nil
-MYSQL_DB.drop_table(:booltest) rescue nil
+MYSQL_DB.drop_table?(:items, :dolls, :booltest)
 
 SQL_BEGIN = 'BEGIN'
 SQL_ROLLBACK = 'ROLLBACK'
@@ -40,7 +38,7 @@ describe "MySQL", '#create_table' do
     MYSQL_DB.sqls.clear
   end
   after do
-    @db.drop_table(:dolls) rescue nil
+    @db.drop_table?(:dolls)
   end
 
   specify "should allow to specify options for MySQL" do
@@ -113,7 +111,7 @@ if MYSQL_DB.adapter_scheme == :mysql
     end
     after do
       @db.convert_tinyint_to_bool = true
-      @db.drop_table(:booltest)
+      @db.drop_table?(:booltest)
     end
 
     specify "should consider tinyint(1) datatypes as boolean if set, but not larger tinyints" do
@@ -161,7 +159,7 @@ describe "A MySQL dataset" do
     MYSQL_DB.sqls.clear
   end
   after do
-    MYSQL_DB.drop_table(:items)
+    MYSQL_DB.drop_table?(:items)
   end
 
   specify "should quote columns and tables using back-ticks if quoting identifiers" do
@@ -285,7 +283,7 @@ describe "Dataset#distinct" do
     @ds = @db[:a]
   end
   after do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
 
   it "#distinct with arguments should return results distinct on those arguments" do
@@ -450,12 +448,12 @@ describe "A MySQL database with table options" do
     Sequel::MySQL.default_collate = 'utf8_general_ci'
 
     @db = MYSQL_DB
-    @db.drop_table(:items) rescue nil
+    @db.drop_table?(:items)
 
     MYSQL_DB.sqls.clear
   end
   after do
-    @db.drop_table(:items) rescue nil
+    @db.drop_table?(:items)
 
     Sequel::MySQL.default_engine = nil
     Sequel::MySQL.default_charset = nil
@@ -481,12 +479,11 @@ end
 describe "A MySQL database" do
   before do
     @db = MYSQL_DB
-    @db.drop_table(:items) rescue nil
+    @db.drop_table?(:items)
     MYSQL_DB.sqls.clear
   end
   after do
-    @db.drop_table(:items) rescue nil
-    @db.drop_table(:users) rescue nil
+    @db.drop_table?(:items, :users)
   end
 
   specify "should support defaults for boolean columns" do
@@ -601,8 +598,7 @@ end
 
 describe "MySQL foreign key support" do
   after do
-    MYSQL_DB.drop_table(:testfk) rescue nil
-    MYSQL_DB.drop_table(:testpk) rescue nil
+    MYSQL_DB.drop_table?(:testfk, :testpk)
   end
 
   specify "should create table without :key" do
@@ -674,11 +670,11 @@ end
 describe "A MySQL database" do
   before do
     @db = MYSQL_DB
-    @db.drop_table(:posts) rescue nil
+    @db.drop_table?(:posts)
     @db.sqls.clear
   end
   after do
-    @db.drop_table(:posts) rescue nil
+    @db.drop_table?(:posts)
   end
 
   specify "should support fulltext indexes and full_text_search" do
@@ -750,7 +746,7 @@ describe "MySQL::Dataset#insert and related methods" do
     MYSQL_DB.sqls.clear
   end
   after do
-    MYSQL_DB.drop_table(:items)
+    MYSQL_DB.drop_table?(:items)
   end
 
   specify "#insert should insert record with default values when no arguments given" do
@@ -916,7 +912,7 @@ describe "MySQL::Dataset#update and related methods" do
     @d = MYSQL_DB[:items]
   end
   after do
-    MYSQL_DB.drop_table(:items)
+    MYSQL_DB.drop_table?(:items)
   end
 
   specify "#update_ignore should not raise error where normal update would fail" do
@@ -937,7 +933,7 @@ describe "MySQL::Dataset#replace" do
     MYSQL_DB.sqls.clear
   end
   after do
-    MYSQL_DB.drop_table(:items)
+    MYSQL_DB.drop_table?(:items)
   end
 
   specify "should use default values if they exist" do
@@ -1005,7 +1001,7 @@ describe "MySQL::Dataset#calc_found_rows" do
     MYSQL_DB.create_table!(:items){Integer :a}
   end
   after do
-    MYSQL_DB.drop_table(:items)
+    MYSQL_DB.drop_table?(:items)
   end
 
   specify "should add the SQL_CALC_FOUND_ROWS keyword when selecting" do
@@ -1035,7 +1031,7 @@ if MYSQL_DB.adapter_scheme == :mysql or MYSQL_DB.adapter_scheme == :jdbc or MYSQ
       MYSQL_DB.sqls.clear
     end
     after do
-      MYSQL_DB.drop_table(:items)
+      MYSQL_DB.drop_table?(:items)
       MYSQL_DB.execute('DROP PROCEDURE test_sproc')
     end
 
@@ -1126,7 +1122,7 @@ if MYSQL_DB.adapter_scheme == :mysql
       MYSQL_DB[:b].insert(25)
     end
     after do
-      MYSQL_DB.drop_table(:a, :b)
+      MYSQL_DB.drop_table?(:a, :b)
     end
 
     specify "should combine all results by default" do

@@ -7,7 +7,7 @@ describe Sequel::Migrator do
     @m = Sequel::Migrator
   end
   after do
-    [:schema_info, :schema_migrations, :sm1111, :sm1122, :sm2222, :sm2233, :sm3333, :sm11111, :sm22222].each{|n| @db.drop_table(n) rescue nil}
+    @db.drop_table?(:schema_info, :schema_migrations, :sm1111, :sm1122, :sm2222, :sm2233, :sm3333, :sm11111, :sm22222)
   end
   
   specify "should be able to migrate up and down all the way successfully" do
@@ -187,8 +187,7 @@ describe Sequel::Migrator do
 
   specify "should handle reversible migrations" do
     @dir = 'spec/files/reversible_migrations'
-    @db.drop_table(:a) rescue nil
-    @db.drop_table(:b) rescue nil
+    @db.drop_table?(:a, :b)
     @m.apply(@db, @dir, 1)
     [:schema_info, :a].each{|n| @db.table_exists?(n).should be_true}
     [:schema_migrations, :b].each{|n| @db.table_exists?(n).should be_false}

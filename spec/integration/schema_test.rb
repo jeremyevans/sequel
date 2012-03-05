@@ -12,7 +12,7 @@ describe "Database schema parser" do
     INTEGRATION_DB.identifier_input_method = @iim
     INTEGRATION_DB.default_schema = @defsch
     INTEGRATION_DB.quote_identifiers = @qi
-    INTEGRATION_DB.drop_table(:items) if INTEGRATION_DB.table_exists?(:items)
+    INTEGRATION_DB.drop_table?(:items)
   end
 
   specify "should handle a database with a identifier methods" do
@@ -139,7 +139,7 @@ describe "Database schema parser" do
 end if INTEGRATION_DB.respond_to?(:schema_parse_table, true)
 
 test_indexes = begin
-  INTEGRATION_DB.drop_table(:blah) rescue nil
+  INTEGRATION_DB.drop_table?(:blah)
   INTEGRATION_DB.indexes(:blah)
   true
 rescue Sequel::NotImplemented
@@ -149,7 +149,7 @@ rescue
 end
 describe "Database index parsing" do
   after do
-    INTEGRATION_DB.drop_table(:items)
+    INTEGRATION_DB.drop_table?(:items)
   end
 
   specify "should parse indexes into a hash" do
@@ -183,7 +183,7 @@ describe "Database schema modifiers" do
     @ds = @db[:items]
   end
   after do
-    @db.drop_table(:items) if @db.table_exists?(:items)
+    @db.drop_table?(:items)
   end
 
   specify "should create tables correctly" do
@@ -202,7 +202,7 @@ describe "Database schema modifiers" do
     @db.create_table!(:items){String :a}
     @db.create_table?(:items){String :b}
     @db[:items].columns.should == [:a]
-    @db.drop_table(:items) rescue nil
+    @db.drop_table?(:items)
     @db.create_table?(:items){String :b}
     @db[:items].columns.should == [:b]
   end
@@ -211,13 +211,13 @@ describe "Database schema modifiers" do
     @db.create_table!(:items){String :a, :index=>true}
     @db.create_table?(:items){String :b, :index=>true}
     @db[:items].columns.should == [:a]
-    @db.drop_table(:items) rescue nil
+    @db.drop_table?(:items)
     @db.create_table?(:items){String :b, :index=>true}
     @db[:items].columns.should == [:b]
   end
 
   specify "should rename tables correctly" do
-    @db.drop_table(:items) rescue nil
+    @db.drop_table?(:items)
     @db.create_table!(:items2){Integer :number}
     @db.rename_table(:items2, :items)
     @db.table_exists?(:items).should == true

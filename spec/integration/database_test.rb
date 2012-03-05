@@ -13,7 +13,7 @@ describe Sequel::Database do
     INTEGRATION_DB[:items].prepare(:first, :a).call
     INTEGRATION_DB.disconnect
     INTEGRATION_DB.pool.size.should == 0
-    INTEGRATION_DB.drop_table(:items) rescue nil
+    INTEGRATION_DB.drop_table?(:items)
   end
 
   specify "should raise Sequel::DatabaseError on invalid SQL" do

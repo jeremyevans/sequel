@@ -78,7 +78,7 @@ describe "An SQLite database" do
   end
   
   specify "should provide a list of existing tables" do
-    @db.drop_table(:testing) rescue nil
+    @db.drop_table?(:testing)
     @db.tables.should be_a_kind_of(Array)
     @db.tables.should_not include(:testing)
     @db.create_table! :testing do
@@ -145,12 +145,12 @@ describe "SQLite type conversion" do
     @integer_booleans = @db.integer_booleans
     @db.integer_booleans = true
     @ds = @db[:items]
-    @db.drop_table(:items) rescue nil
+    @db.drop_table?(:items)
   end
   after do
     @db.integer_booleans = @integer_booleans
     Sequel.datetime_class = Time
-    @db.drop_table(:items)
+    @db.drop_table?(:items)
   end
   
   specify "should handle integers in boolean columns" do
@@ -352,7 +352,7 @@ describe "SQLite dataset" do
     @d << {:name => 'ghi', :value => 7.89}
   end
   after do
-    SQLITE_DB.drop_table(:test, :items)
+    SQLITE_DB.drop_table?(:test, :items)
   end
   
   specify "should be able to insert from a subquery" do
@@ -457,7 +457,7 @@ describe "A SQLite database" do
       @db[:test].filter(:name => 'foo').update(:id=>100)
       @db[:test3][:name => 'abc'][:test_id].should == 100
 
-      @db.drop_table :test, :test3
+      @db.drop_table? :test, :test3
     end
   end
 
@@ -495,7 +495,7 @@ describe "A SQLite database" do
   specify "should handle quoted tables when dropping or renaming columns" do
     @db.quote_identifiers = true
     table_name = "T T"
-    @db.drop_table(table_name) rescue nil
+    @db.drop_table?(table_name)
     @db.create_table! table_name do
       Integer :"s s"
       Integer :"i i"

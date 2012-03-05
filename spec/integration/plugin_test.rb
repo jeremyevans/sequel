@@ -8,7 +8,7 @@ describe "Class Table Inheritance Plugin" do
   before(:all) do
     @db = INTEGRATION_DB
     @db.instance_variable_set(:@schemas, {})
-    [:staff, :executives, :managers, :employees].each{|t| @db.drop_table(t) if @db.table_exists?(t)}
+    @db.drop_table?(:staff, :executives, :managers, :employees)
     @db.create_table(:employees) do
       primary_key :id
       String :name
@@ -54,7 +54,7 @@ describe "Class Table Inheritance Plugin" do
     [:Executive, :Manager, :Staff, :Employee].each{|s| Object.send(:remove_const, s)}
   end
   after(:all) do
-    @db.drop_table :staff, :executives, :managers, :employees
+    @db.drop_table? :staff, :executives, :managers, :employees
   end
 
   specify "should return rows as subclass instances" do
@@ -151,7 +151,7 @@ describe "Many Through Many Plugin" do
   before(:all) do
     @db = INTEGRATION_DB
     @db.instance_variable_set(:@schemas, {})
-    [:albums_artists, :albums, :artists].each{|t| @db.drop_table(t) if @db.table_exists?(t)}
+    @db.drop_table?(:albums_artists, :albums, :artists)
     @db.create_table(:albums) do
       primary_key :id
       String :name
@@ -195,7 +195,7 @@ describe "Many Through Many Plugin" do
     [:Album, :Artist].each{|s| Object.send(:remove_const, s)}
   end
   after(:all) do
-    @db.drop_table :albums_artists, :albums, :artists
+    @db.drop_table? :albums_artists, :albums, :artists
   end
   
   def self_join(c)
@@ -410,7 +410,7 @@ describe "Lazy Attributes plugin" do
     Item.create(:name=>'J', :num=>1)
   end
   after(:all) do
-    @db.drop_table(:items)
+    @db.drop_table?(:items)
     Object.send(:remove_const, :Item)
   end
   
@@ -480,7 +480,7 @@ describe "Tactical Eager Loading Plugin" do
     [:Album, :Artist].each{|s| Object.send(:remove_const, s)}
   end
   after(:all) do
-    @db.drop_table :albums, :artists
+    @db.drop_table? :albums, :artists
   end
 
   specify "should eagerly load associations for all items when accessing any item" do
@@ -510,7 +510,7 @@ describe "Identity Map plugin" do
     Item.create(:name=>'J', :num=>3)
   end
   after do
-    @db.drop_table(:items)
+    @db.drop_table?(:items)
     Object.send(:remove_const, :Item)
   end
 
@@ -561,7 +561,7 @@ describe "Touch plugin" do
     [:Album, :Artist].each{|s| Object.send(:remove_const, s)}
   end
   after(:all) do
-    @db.drop_table :albums, :artists
+    @db.drop_table? :albums, :artists
   end
 
   specify "should update the timestamp column when touching the record" do
@@ -601,7 +601,7 @@ describe "Serialization plugin" do
     end
   end
   after do
-    @db.drop_table(:items)
+    @db.drop_table?(:items)
     Object.send(:remove_const, :Item)
   end
 
@@ -633,7 +633,7 @@ describe "OptimisticLocking plugin" do
     @p = Person.create(:name=>'John')
   end
   after(:all) do
-    @db.drop_table(:people)
+    @db.drop_table?(:people)
     Object.send(:remove_const, :Person)
   end
 
@@ -684,7 +684,7 @@ describe "Composition plugin" do
     @e2 = Event.create(:year=>nil)
   end
   after do
-    @db.drop_table(:events)
+    @db.drop_table?(:events)
     Object.send(:remove_const, :Event)
   end
 
@@ -744,7 +744,7 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       @nodes.each{|n| n.associations.clear}
     end
     after(:all) do
-      @db.drop_table :nodes
+      @db.drop_table? :nodes
       Object.send(:remove_const, :Node)
     end
     
@@ -965,7 +965,7 @@ describe "Instance Filters plugin" do
     @i.set(:name=>'K')
   end
   after(:all) do
-    @db.drop_table(:items)
+    @db.drop_table?(:items)
     Object.send(:remove_const, :Item)
   end
   
@@ -1026,7 +1026,7 @@ describe "UpdatePrimaryKey plugin" do
     @ds.insert(:a=>1, :b=>3)
   end
   after(:all) do
-    @db.drop_table(:t)
+    @db.drop_table?(:t)
   end
 
   specify "should handle regular updates" do
@@ -1069,7 +1069,7 @@ end
 describe "AssociationPks plugin" do 
   before(:all) do
     @db = INTEGRATION_DB
-    [:albums_tags, :tags, :albums, :artists].each{|t| @db.drop_table(t) if @db.table_exists?(t)}
+    @db.drop_table?(:albums_tags, :tags, :albums, :artists)
     @db.create_table(:artists) do
       primary_key :id
       String :name
@@ -1113,7 +1113,7 @@ describe "AssociationPks plugin" do
     end
   end
   after(:all) do
-    @db.drop_table :albums_tags, :tags, :albums, :artists
+    @db.drop_table? :albums_tags, :tags, :albums, :artists
     [:Artist, :Album, :Tag].each{|s| Object.send(:remove_const, s)}
   end
 
@@ -1184,7 +1184,7 @@ describe "List plugin without a scope" do
     @c.create :name => "hig"
   end
   after(:all) do
-    @db.drop_table(:sites)
+    @db.drop_table?(:sites)
   end
 
   it "should return rows in order of position" do
@@ -1262,7 +1262,7 @@ describe "List plugin with a scope" do
     @c.create :name => "Au", :parent_id => p1.id
   end
   after(:all) do
-    @db.drop_table(:pages)
+    @db.drop_table?(:pages)
   end
 
   it "should return rows in order of position" do
@@ -1350,7 +1350,7 @@ describe "Sequel::Plugins::Tree" do
       end
     end
     after(:all) do
-      @db.drop_table(:nodes)
+      @db.drop_table?(:nodes)
       Object.send(:remove_const, :Node)
     end
 
@@ -1466,7 +1466,7 @@ describe "Sequel::Plugins::Tree" do
       end
     end
     after(:all) do
-      @db.drop_table(:lorems)
+      @db.drop_table?(:lorems)
       Object.send(:remove_const, :Lorem)
     end
 
@@ -1499,7 +1499,7 @@ describe "Sequel::Plugins::PreparedStatements" do
     @bar = @c.create(:name=>'bar', :i=>20)
   end
   after(:all) do
-    @db.drop_table(:ps_test)
+    @db.drop_table?(:ps_test)
   end
 
   it "should work with looking up using Model.[]" do 

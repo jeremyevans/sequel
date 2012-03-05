@@ -247,7 +247,7 @@ end
 describe "A Firebird database" do
   before do
     @db = FIREBIRD_DB
-    @db.drop_table(:posts) rescue nil
+    @db.drop_table?(:posts)
     @db.sqls.clear
   end
 

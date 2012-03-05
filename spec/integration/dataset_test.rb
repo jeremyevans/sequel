@@ -11,7 +11,7 @@ describe "Simple Dataset operations" do
     @ds.insert(:number=>10)
   end
   after do
-    @db.drop_table(:items)
+    @db.drop_table?(:items)
   end
 
   specify "should support sequential primary keys" do
@@ -181,7 +181,7 @@ describe Sequel::Dataset do
     @d = INTEGRATION_DB[:test]
   end
   after do
-    INTEGRATION_DB.drop_table(:test)
+    INTEGRATION_DB.drop_table?(:test)
   end
 
   specify "should return the correct record count" do
@@ -267,7 +267,7 @@ describe Sequel::Database do
 
   specify "should have a working table_exists?" do
     t = :basdfdsafsaddsaf
-    INTEGRATION_DB.drop_table(t) rescue nil
+    INTEGRATION_DB.drop_table?(t)
     INTEGRATION_DB.table_exists?(t).should == false
     INTEGRATION_DB.create_table(t){Integer :a}
     begin
@@ -290,7 +290,7 @@ describe Sequel::Dataset do
     @d << {:value => 789}
   end 
   after do
-    INTEGRATION_DB.drop_table(:items)
+    INTEGRATION_DB.drop_table?(:items)
   end 
   
   specify "should correctly return avg" do
@@ -319,7 +319,7 @@ describe "Simple Dataset operations" do
     @ds = INTEGRATION_DB[:items]
   end
   after do
-    INTEGRATION_DB.drop_table(:items)
+    INTEGRATION_DB.drop_table?(:items)
   end
 
   specify "should deal with boolean conditions correctly" do
@@ -345,7 +345,7 @@ describe "Simple Dataset operations in transactions" do
     @ds = INTEGRATION_DB[:items]
   end
   after do
-    INTEGRATION_DB.drop_table(:items)
+    INTEGRATION_DB.drop_table?(:items)
   end
 
   cspecify "should insert correctly with a primary key specified inside a transaction", :db2, :mssql do
@@ -456,7 +456,7 @@ if INTEGRATION_DB.dataset.supports_cte?
       @ds.insert(:id=>6, :parent_id=>5)
     end
     after(:all) do
-      @db.drop_table(:i1)
+      @db.drop_table?(:i1)
     end
     
     specify "should give correct results for WITH" do
@@ -508,7 +508,7 @@ if INTEGRATION_DB.dataset.supports_cte?(:update) # Assume INSERT and DELETE supp
       @ds.insert(:id=>2)
     end
     after do
-      @db.drop_table(:i1)
+      @db.drop_table?(:i1)
     end
     
     specify "should give correct results for WITH" do
@@ -530,7 +530,7 @@ if INTEGRATION_DB.dataset.supports_returning?(:insert)
       @ds = @db[:i1]
     end
     after do
-      @db.drop_table(:i1)
+      @db.drop_table?(:i1)
     end
     
     specify "should give correct results" do
@@ -556,7 +556,7 @@ if INTEGRATION_DB.dataset.supports_returning?(:update) # Assume DELETE support a
       @ds.insert(1, 2)
     end
     after do
-      @db.drop_table(:i1)
+      @db.drop_table?(:i1)
     end
     
     specify "should give correct results" do
@@ -597,7 +597,7 @@ if INTEGRATION_DB.dataset.supports_window_functions?
       @ds.insert(:id=>6, :group_id=>2, :amount=>100000)
     end
     after(:all) do
-      @db.drop_table(:i1)
+      @db.drop_table?(:i1)
     end
     
     specify "should give correct results for aggregate window functions" do
@@ -652,7 +652,7 @@ describe Sequel::SQL::Constants do
     @c2 = proc{|v| v.is_a?(Date) ? v : Date.parse(v) }
   end
   after do
-    @db.drop_table(:constants) if @db.table_exists?(:constants)
+    @db.drop_table?(:constants)
   end
   
   cspecify "should have working CURRENT_DATE", [:odbc, :mssql], [:jdbc, :sqlite], :oracle do
@@ -692,7 +692,7 @@ describe "Sequel::Dataset#import and #multi_insert" do
     @ids.delete
   end
   after(:all) do
-    @db.drop_table(:imp)
+    @db.drop_table?(:imp)
   end
 
   it "should import with multi_insert and an array of hashes" do
@@ -732,7 +732,7 @@ describe "Sequel::Dataset#import and #multi_insert :return=>:primary_key " do
     @ds = @db[:imp]
   end
   after do
-    @db.drop_table(:imp)
+    @db.drop_table?(:imp)
   end
 
   specify "should return primary key values " do
@@ -760,7 +760,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.insert(2, 4, 6)
   end
   after(:all) do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
   
   it "#group_rollup should include hierarchy of groupings" do
@@ -784,7 +784,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.delete
   end
   after(:all) do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
   
   it "#[]= should update matching rows" do
@@ -862,7 +862,7 @@ describe "Sequel::Dataset main SQL methods" do
     @ds.delete
   end
   after(:all) do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
   
   it "#exists should return a usable exists clause" do
@@ -935,7 +935,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.insert(5, 6, 7, 8)
   end
   after(:all) do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
   
   specify "should have working #map" do
@@ -1009,7 +1009,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.delete
   end
   after(:all) do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
   
   it "should work with standard mathematical operators" do
@@ -1237,7 +1237,7 @@ describe "SQL Extract Function" do
     @ds = @db[:a].order(:a)
   end
   after do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
   
   specify "should return the part of the datetime asked for" do
@@ -1270,7 +1270,7 @@ describe "Dataset string methods" do
     @ds.delete
   end
   after(:all) do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
   
   it "#grep should return matching rows" do
@@ -1354,7 +1354,7 @@ describe "Dataset identifier methods" do
     @ds = @db[:a].order(:ab)
   end
   after(:all) do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
   
   cspecify "#identifier_output_method should change how identifiers are output", [:swift] do
@@ -1385,7 +1385,7 @@ describe "Dataset defaults and overrides" do
     @ds.delete
   end
   after(:all) do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
   
   it "#set_defaults should set defaults that can be overridden" do
@@ -1419,7 +1419,7 @@ if INTEGRATION_DB.dataset.supports_modifying_joins?
       @db[:c].insert(7, 8)
     end
     after do
-      @db.drop_table(:a, :b, :c)
+      @db.drop_table?(:a, :b, :c)
     end
     
     it "#update should allow updating joined datasets" do

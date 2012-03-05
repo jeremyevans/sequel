@@ -175,7 +175,7 @@ describe "Dataset#distinct" do
     @ds = @db[:a]
   end
   after do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
 
   it "#distinct with arguments should return results distinct on those arguments" do
@@ -199,7 +199,7 @@ if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
       @ds = POSTGRES_DB[:items]
     end
     after do
-      POSTGRES_DB.drop_table(:items)
+      POSTGRES_DB.drop_table?(:items)
       POSTGRES_DB.disconnect
     end
 
@@ -325,11 +325,11 @@ end
 describe "A PostgreSQL database" do
   before do
     @db = POSTGRES_DB
-    @db.drop_table(:posts) rescue nil
+    @db.drop_table?(:posts)
     @db.sqls.clear
   end
   after do
-    @db.drop_table(:posts) rescue nil
+    @db.drop_table?(:posts)
   end
 
   specify "should support resetting the primary key sequence" do
@@ -447,7 +447,7 @@ describe "Postgres::Dataset#import" do
     @ds = @db[:test]
   end
   after do
-    @db.drop_table(:test) rescue nil
+    @db.drop_table?(:test)
   end
 
   specify "#import should return separate insert statements if server_version < 80200" do
@@ -503,7 +503,7 @@ describe "Postgres::Dataset#insert" do
     @ds = @db[:test5]
   end
   after do
-    @db.drop_table(:test5) rescue nil
+    @db.drop_table?(:test5)
   end
 
   specify "should work with static SQL" do
@@ -645,7 +645,7 @@ describe "Postgres::Database schema qualified tables" do
       POSTGRES_DB.schema(:public__domains).map{|x| x.first}.should == [:d]
       POSTGRES_DB.schema(:schema_test__domains).map{|x| x.first}.should == [:i]
     ensure
-      POSTGRES_DB.drop_table(:public__domains)
+      POSTGRES_DB.drop_table?(:public__domains)
     end
   end
 
@@ -919,7 +919,7 @@ if POSTGRES_DB.dataset.supports_window_functions?
       @ds.insert(:id=>6, :group_id=>2, :amount=>100000)
     end
     after do
-      @db.drop_table(:i1)
+      @db.drop_table?(:i1)
     end
 
     specify "should give correct results for window functions" do
@@ -944,7 +944,7 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.drop_function('tf', :if_exists=>true, :cascade=>true, :args=>%w'integer integer')
     @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true) if @d.server_version < 90000
     @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true)
-    @d.drop_table(:test) rescue nil
+    @d.drop_table?(:test)
   end
 
   specify "#create_function and #drop_function should create and drop functions" do
@@ -1029,7 +1029,7 @@ if POSTGRES_DB.adapter_scheme == :postgres
       @db.transaction{1001.times{|i| @ds.insert(i)}}
     end
     after(:all) do
-      @db.drop_table(:test_cursor) rescue nil
+      @db.drop_table?(:test_cursor)
     end
 
     specify "should return the same results as the non-cursor use" do
@@ -1069,7 +1069,7 @@ if POSTGRES_DB.adapter_scheme == :postgres
         disconnect
         @conversion_procs = nil
       end
-      @db.drop_table(:foo)
+      @db.drop_table?(:foo)
     end
 
     specify "should look up conversion procs by name" do
@@ -1090,7 +1090,7 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
       ds.insert(3, 4)
     end
     after(:all) do
-      @db.drop_table(:test_copy) rescue nil
+      @db.drop_table?(:test_copy)
     end
 
     specify "without a block or options should return a text version of the table as a single string" do
@@ -1222,7 +1222,7 @@ describe 'POSTGRES special float handling' do
     @ds = @db[:test5]
   end
   after do
-    @db.drop_table(:test5) rescue nil
+    @db.drop_table?(:test5)
   end
 
   if check_sqls

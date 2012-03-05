@@ -67,10 +67,10 @@ end
 describe "MSSQL full_text_search" do
   before do
     @db = MSSQL_DB
-    @db.drop_table(:posts) rescue nil
+    @db.drop_table?(:posts)
   end
   after do
-    @db.drop_table(:posts) rescue nil
+    @db.drop_table?(:posts)
   end
   
   specify "should support fulltext indexes and full_text_search" do
@@ -109,8 +109,7 @@ describe "MSSQL Dataset#output" do
     @ds = @db[:items]
   end
   after do
-    @db.drop_table(:items)
-    @db.drop_table(:out)
+    @db.drop_table?(:items, :out)
   end
 
   specify "should format OUTPUT clauses without INTO for DELETE statements" do
@@ -256,7 +255,7 @@ describe "MSSQL::Dataset#import" do
     @ds = @db[:test]
   end
   after do
-    @db.drop_table(:test) rescue nil
+    @db.drop_table?(:test)
   end
   
   specify "#import should work correctly with an arbitrary output value" do
@@ -291,7 +290,7 @@ describe "Offset support" do
     @ds.import [:id, :parent_id], [[1,nil],[2,nil],[3,1],[4,1],[5,3],[6,5]]
   end
   after do
-    @db.drop_table(:i)
+    @db.drop_table?(:i)
   end
   
   specify "should return correct rows" do
@@ -314,8 +313,7 @@ describe "Common Table Expressions" do
     @ds.import [:id, :parent_id], [[1,nil],[2,nil],[3,1],[4,1],[5,3],[6,5]]
   end
   after do
-    @db.drop_table(:i1)
-    @db.drop_table(:i2)
+    @db.drop_table?(:i1, :i2)
   end
 
   specify "using #with should be able to update" do
@@ -385,7 +383,7 @@ describe "MSSSQL::Dataset#insert" do
     @ds = @db[:test5]
   end
   after do
-    @db.drop_table(:test5) rescue nil
+    @db.drop_table?(:test5)
   end
 
   specify "should have insert_select return nil if disable_insert_output is used" do
@@ -424,8 +422,7 @@ describe "MSSSQL::Dataset#into" do
     @db[:t].insert(:id => 1, :value => "test")
     @db << @db[:t].into(:new).select_sql
     @db[:new].all.should == [{:id => 1, :value => "test"}]
-    @db.drop_table(:t)
-    @db.drop_table(:new)
+    @db.drop_table?(:t, :new)
   end
 end
 
@@ -434,7 +431,7 @@ describe "A MSSQL database" do
     @db = MSSQL_DB
   end
   after do
-    @db.drop_table(:a)
+    @db.drop_table?(:a)
   end
   
   specify "should handle many existing types for set_column_allow_null" do
@@ -461,7 +458,7 @@ describe "MSSQL::Database#rename_table" do
     MSSQL_DB.create_table! :'foo bar' do
       text :name
     end
-    MSSQL_DB.drop_table :baz rescue nil
+    MSSQL_DB.drop_table? :baz
     proc { MSSQL_DB.rename_table 'foo bar', 'baz' }.should_not raise_error
   end
   
@@ -501,7 +498,7 @@ describe "MSSQL::Database#mssql_unicode_strings = false" do
     MSSQL_DB.mssql_unicode_strings = false
   end
   after do
-    MSSQL_DB.drop_table(:items)
+    MSSQL_DB.drop_table?(:items)
     MSSQL_DB.mssql_unicode_strings = true
   end
 
@@ -535,7 +532,7 @@ describe "A MSSQL database adds index with include" do
   end
 
   after :all do
-    @db.drop_table @table_name
+    @db.drop_table? @table_name
   end
 
   cspecify "should be able add index with include" do

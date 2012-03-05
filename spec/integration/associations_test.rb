@@ -536,7 +536,7 @@ end
 describe "Sequel::Model Simple Associations" do
   before(:all) do
     @db = INTEGRATION_DB
-    [:albums_tags, :tags, :albums, :artists].each{|t| @db.drop_table(t) rescue nil}
+    @db.drop_table?(:albums_tags, :tags, :albums, :artists)
     @db.create_table(:artists) do
       primary_key :id
       String :name
@@ -598,7 +598,7 @@ describe "Sequel::Model Simple Associations" do
     [:Tag, :Album, :Artist].each{|x| Object.send(:remove_const, x)}
   end
   after(:all) do
-    @db.drop_table(:albums_tags, :tags, :albums, :artists)
+    @db.drop_table?(:albums_tags, :tags, :albums, :artists)
   end
   
   it_should_behave_like "regular and composite key associations"
@@ -733,7 +733,7 @@ end
 describe "Sequel::Model Composite Key Associations" do
   before(:all) do
     @db = INTEGRATION_DB
-    [:albums_tags, :tags, :albums, :artists].each{|t| @db.drop_table(t) rescue nil}
+    @db.drop_table?(:albums_tags, :tags, :albums, :artists)
     @db.create_table(:artists) do
       Integer :id1
       Integer :id2
@@ -813,7 +813,7 @@ describe "Sequel::Model Composite Key Associations" do
     [:Tag, :Album, :Artist].each{|x| Object.send(:remove_const, x)}
   end
   after(:all) do
-    @db.drop_table(:albums_tags, :tags, :albums, :artists)
+    @db.drop_table?(:albums_tags, :tags, :albums, :artists)
   end
 
   it_should_behave_like "regular and composite key associations"
@@ -868,7 +868,7 @@ end
 describe "Sequel::Model Associations with clashing column names" do
   before(:all) do
     @db = INTEGRATION_DB
-    [:bars_foos, :bars, :foos].each{|t| @db.drop_table(t) rescue nil}
+    @db.drop_table?(:bars_foos, :bars, :foos)
     @db.create_table(:foos) do
       primary_key :id
       Integer :object_id
@@ -899,7 +899,7 @@ describe "Sequel::Model Associations with clashing column names" do
     @Foo.db[:bars_foos].insert(2, 2)
   end
   after(:all) do
-    @db.drop_table(:bars_foos, :bars, :foos)
+    @db.drop_table?(:bars_foos, :bars, :foos)
   end
 
   it "should have working regular association methods" do

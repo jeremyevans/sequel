@@ -86,9 +86,21 @@ describe Sequel::Model, "drop_table" do
     MODEL_DB.reset
   end
 
-  it "should get the drop table SQL for the associated table and then execute the SQL." do
+  it "should drop the related table" do
     @model.drop_table
     MODEL_DB.sqls.should == ['DROP TABLE items']
+  end
+end
+
+describe Sequel::Model, "drop_table?" do
+  before do
+    @model = Class.new(Sequel::Model(:items))
+    MODEL_DB.reset
+  end
+
+  it "should drop the table if it exists" do
+    @model.drop_table?
+    MODEL_DB.sqls.should == ["SELECT NULL FROM items LIMIT 1", 'DROP TABLE items']
   end
 end
 
@@ -100,7 +112,7 @@ describe Sequel::Model, "create_table!" do
   
   it "should drop table if it exists and then create the table" do
     @model.create_table!
-    MODEL_DB.sqls.should == ['DROP TABLE items', 'CREATE TABLE items ()']
+    MODEL_DB.sqls.should == ["SELECT NULL FROM items LIMIT 1", 'DROP TABLE items', 'CREATE TABLE items ()']
   end
 end
 
