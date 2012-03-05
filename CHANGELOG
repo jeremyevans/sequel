@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Database#supports_drop_table_if_exists? for checking if DROP TABLE supports IF EXISTS (jeremyevans)
+
+* Add Database#drop_table? for dropping a table if it already exists (jeremyevans)
+
 * Log full SQL string by default for prepared statements created automatically by model prepared_statements* plugins (jeremyevans)
 
 * Add ability for prepared statements to log full SQL string (jeremyevans)

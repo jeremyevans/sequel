@@ -148,6 +148,12 @@ module Sequel
       false
     end
 
+    # Whether the database supports DROP TABLE IF EXISTS syntax,
+    # default is the same as #supports_create_table_if_not_exists?.
+    def supports_drop_table_if_exists?
+      supports_create_table_if_not_exists?
+    end
+
     # Whether the database and adapter support prepared transactions
     # (two-phase commit), false by default.
     def supports_prepared_transactions?

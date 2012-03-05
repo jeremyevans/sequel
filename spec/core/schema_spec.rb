@@ -590,6 +590,48 @@ describe "DB#drop_table" do
   end
 end
 
+describe "DB#drop_table?" do
+  before do
+    @db = Sequel.mock
+  end
+  
+  specify "should drop the table if it exists" do
+    @db.meta_def(:table_exists?){|a| true}
+    @db.drop_table?(:cats)
+    @db.sqls.should == ["DROP TABLE cats"]
+  end
+  
+  specify "should do nothing if the table does not exist" do
+    @db.meta_def(:table_exists?){|a| false}
+    @db.drop_table?(:cats)
+    @db.sqls.should == []
+  end
+  
+  specify "should operate on multiple tables at once" do
+    @db.meta_def(:table_exists?){|a| a == :cats}
+    @db.drop_table? :cats, :dogs
+    @db.sqls.should == ['DROP TABLE cats']
+  end
+
+  specify "should take an options hash and support the :cascade option" do
+    @db.meta_def(:table_exists?){|a| true}
+    @db.drop_table? :cats, :dogs, :cascade=>true
+    @db.sqls.should == ['DROP TABLE cats CASCADE', 'DROP TABLE dogs CASCADE']
+  end
+
+  specify "should use IF NOT EXISTS if the database supports that" do
+    @db.meta_def(:supports_drop_table_if_exists?){true}
+    @db.drop_table? :cats, :dogs
+    @db.sqls.should == ['DROP TABLE IF EXISTS cats', 'DROP TABLE IF EXISTS dogs']
+  end
+
+  specify "should use IF NOT EXISTS with CASCADE if the database supports that" do
+    @db.meta_def(:supports_drop_table_if_exists?){true}
+    @db.drop_table? :cats, :dogs, :cascade=>true
+    @db.sqls.should == ['DROP TABLE IF EXISTS cats CASCADE', 'DROP TABLE IF EXISTS dogs CASCADE']
+  end
+end
+
 describe "DB#alter_table" do
   before do
     @db = Sequel.mock

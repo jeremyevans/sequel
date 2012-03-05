@@ -102,7 +102,7 @@ module Sequel
     # Forcibly create a table, attempting to drop it if it already exists, then creating it.
     # 
     #   DB.create_table!(:a){Integer :a} 
-    #   # SELECT * FROM a LIMIT a -- check existence
+    #   # SELECT NULL FROM a LIMIT 1 -- check existence
     #   # DROP TABLE a -- drop table if already exists
     #   # CREATE TABLE a (a integer)
     def create_table!(name, options={}, &block)
@@ -113,7 +113,7 @@ module Sequel
     # Creates the table unless the table already exists.
     # 
     #   DB.create_table?(:a){Integer :a} 
-    #   # SELECT * FROM a LIMIT a -- check existence
+    #   # SELECT NULL FROM a LIMIT 1 -- check existence
     #   # CREATE TABLE a (a integer) -- if it doesn't already exist
     def create_table?(name, options={}, &block)
       if supports_create_table_if_not_exists?
@@ -174,6 +174,26 @@ module Sequel
         remove_cached_schema(n)
       end
       nil
+    end
+    
+    # Drops the table if it already exists.  If it doesn't exist,
+    # does nothing.
+    # 
+    #   DB.drop_table?(:a)
+    #   # SELECT NULL FROM a LIMIT 1 -- check existence
+    #   # DROP TABLE a -- if it already exists
+    def drop_table?(*names)
+      options = names.last.is_a?(Hash) ? names.pop : {}
+      if supports_drop_table_if_exists?
+        options = options.merge(:if_exists=>true)
+        names.each do |name|
+          drop_table(name, options)
+        end
+      else
+        names.each do |name|
+          drop_table(name, options) if table_exists?(name)
+        end
+      end
     end
     
     # Drops one or more views corresponding to the given names:
@@ -408,7 +428,7 @@ module Sequel
 
     # SQL DDL statement to drop the table with the given name.
     def drop_table_sql(name, options)
-      "DROP TABLE #{quote_schema_table(name)}#{' CASCADE' if options[:cascade]}"
+      "DROP TABLE#{' IF EXISTS' if options[:if_exists]} #{quote_schema_table(name)}#{' CASCADE' if options[:cascade]}"
     end
     
     # SQL DDL statement to drop a view with the given name.
