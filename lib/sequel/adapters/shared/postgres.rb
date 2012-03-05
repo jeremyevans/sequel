@@ -381,6 +381,11 @@ module Sequel
         server_version >= 90100
       end
 
+      # PostgreSQL supports DROP TABLE IF EXISTS on 8.2+
+      def supports_drop_table_if_exists?
+        server_version >= 80200
+      end
+
       # PostgreSQL supports savepoints
       def supports_savepoints?
         true
