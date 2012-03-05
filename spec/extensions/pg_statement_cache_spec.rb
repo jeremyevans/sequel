@@ -14,10 +14,12 @@ describe "pg_statement_cache and pg_auto_parameterize extensions" do
             end
             def prepare(name, sql)
               raise Sequel::Postgres::StatementCache::PGError if sql =~ /prepare_raise/
+              @ps ||= {}
+              @ps[name] = sql
               @db._sqls << "PREPARE #{name} AS #{sql}"
             end
             def exec_prepared(name, args=nil)
-              @db._sqls << "EXECUTE #{name}#{" -- args: #{args.inspect}" if args}"
+              @db._sqls << "EXECUTE #{name} (#{@ps[name]})#{" -- args: #{args.inspect}" if args}"
             end
           end)
         end)
@@ -46,8 +48,8 @@ describe "pg_statement_cache and pg_auto_parameterize extensions" do
     @db.sqls.should == ["SELECT * FROM table WHERE (b = $1::int4) -- args: [2]",
       "SELECT * FROM table WHERE (a = $1::int4) -- args: [0]",
       "PREPARE sequel_pgap_2 AS SELECT * FROM table WHERE (a = $1::int4)",
-      "EXECUTE sequel_pgap_2 -- args: [1]",
-      "EXECUTE sequel_pgap_2 -- args: [2]"]
+      "EXECUTE sequel_pgap_2 (SELECT * FROM table WHERE (a = $1::int4)) -- args: [1]",
+      "EXECUTE sequel_pgap_2 (SELECT * FROM table WHERE (a = $1::int4)) -- args: [2]"]
   end
 
   it "should work correctly for queries without parameters" do
@@ -56,8 +58,8 @@ describe "pg_statement_cache and pg_auto_parameterize extensions" do
     @db.sqls.should == ["SELECT * FROM table WHERE b",
       "SELECT * FROM table WHERE a",
       "PREPARE sequel_pgap_2 AS SELECT * FROM table WHERE a",
-      "EXECUTE sequel_pgap_2",
-      "EXECUTE sequel_pgap_2"]
+      "EXECUTE sequel_pgap_2 (SELECT * FROM table WHERE a)",
+      "EXECUTE sequel_pgap_2 (SELECT * FROM table WHERE a)"]
   end
 
   it "should correctly return the size of the cache" do
@@ -166,8 +168,8 @@ describe "pg_statement_cache and pg_auto_parameterize extensions" do
     @db.sqls.should == ["SELECT * FROM table WHERE (a = $1::int4) -- args: [0]",
       "SELECT * FROM table WHERE (a = $1::int4) -- args: [1]",
       "PREPARE sequel_pgap_1 AS SELECT * FROM table WHERE (a = $1::int4)",
-      "EXECUTE sequel_pgap_1 -- args: [2]",
-      "EXECUTE sequel_pgap_1 -- args: [3]"]
+      "EXECUTE sequel_pgap_1 (SELECT * FROM table WHERE (a = $1::int4)) -- args: [2]",
+      "EXECUTE sequel_pgap_1 (SELECT * FROM table WHERE (a = $1::int4)) -- args: [3]"]
   end
 
   it "should have a configurable sorter" do
@@ -200,8 +202,8 @@ describe "pg_statement_cache and pg_auto_parameterize extensions" do
     @db.statement_cache.clear
     @db.sqls.should == ["SELECT * FROM table WHERE (a = $1::int4) -- args: [1]",
       "PREPARE sequel_pgap_1 AS SELECT * FROM table WHERE (a = $1::int4)",
-      "EXECUTE sequel_pgap_1 -- args: [1]",
-      "EXECUTE sequel_pgap_1 -- args: [1]"]
+      "EXECUTE sequel_pgap_1 (SELECT * FROM table WHERE (a = $1::int4)) -- args: [1]",
+      "EXECUTE sequel_pgap_1 (SELECT * FROM table WHERE (a = $1::int4)) -- args: [1]"]
   end
 
 end

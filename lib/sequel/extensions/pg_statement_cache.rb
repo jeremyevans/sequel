@@ -256,9 +256,9 @@ module Sequel
           if sql =~ DML_RE
             if name = statement_cache.fetch(sql){|stmt_name| sequel_db.log_yield("PREPARE #{stmt_name} AS #{sql}"){prepare(stmt_name, sql)}}
               if args
-                sequel_db.log_yield("EXECUTE #{name}", args){exec_prepared(name, args)}
+                sequel_db.log_yield("EXECUTE #{name} (#{sql})", args){exec_prepared(name, args)}
               else
-                sequel_db.log_yield("EXECUTE #{name}"){exec_prepared(name)}
+                sequel_db.log_yield("EXECUTE #{name} (#{sql})"){exec_prepared(name)}
               end
             else
               super
