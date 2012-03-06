@@ -111,13 +111,14 @@ module Sequel
       def date(s) ::Date.new(*s.split("-").map{|x| x.to_i}) end
     end.new
 
-    # Hash with type name symbols and callable values for converting PostgreSQL types.
+    # Hash with type name strings/symbols and callable values for converting PostgreSQL types.
     # Non-builtin types that don't have fixed numbers should use this to register
     # conversion procs.
-    PG_NAMED_TYPES = {}
+    PG_NAMED_TYPES = {} unless defined?(PG_NAMED_TYPES)
 
     # Hash with integer keys and callable values for converting PostgreSQL types.
-    PG_TYPES = {}
+    PG_TYPES = {} unless defined?(PG_TYPES)
+
     {
       [16] => tt.method(:boolean),
       [17] => tt.method(:bytea),
