@@ -128,26 +128,30 @@ module Sequel
         end
       end
 
-      # Get the primary key for the given table.
+      # Get the primary key for the given table and schema.  Both
+      # should be provided as literal SQL strings, with schema
+      # optionally nil.
       def primary_key(schema, table)
-        sql = "#{SELECT_PK_SQL} AND pg_class.relname = '#{escape_string(table)}'"
-        sql << "AND pg_namespace.nspname = '#{escape_string(schema)}'" if schema
+        sql = "#{SELECT_PK_SQL} AND pg_class.relname = #{table}"
+        sql << "AND pg_namespace.nspname = #{schema}" if schema
         execute(sql) do |r|
           return single_value(r)
         end
       end
 
-      # Get the primary key and sequence for the given table.
+      # Get the primary key and sequence for the given table and schema.
+      # Both should be provided as literal SQL strings, with schema
+      # optionally nil.
       def sequence(schema, table)
-        sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND seq.relname = '#{escape_string(table)}'"
-        sql << " AND name.nspname = '#{escape_string(schema)}'" if schema
+        sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND seq.relname = #{table}"
+        sql << " AND name.nspname = #{schema}" if schema
         execute(sql) do |r|
           seq = single_value(r)
           return seq if seq
         end
 
-        sql = "#{SELECT_CUSTOM_SEQUENCE_SQL} AND t.relname = '#{escape_string(table)}'"
-        sql << " AND name.nspname = '#{escape_string(schema)}'" if schema
+        sql = "#{SELECT_CUSTOM_SEQUENCE_SQL} AND t.relname = #{table}"
+        sql << " AND name.nspname = #{schema}" if schema
         execute(sql) do |r|
           return single_value(r)
         end
@@ -313,9 +317,9 @@ module Sequel
         quoted_table = quote_schema_table(table)
         return @primary_keys[quoted_table] if @primary_keys.include?(quoted_table)
         @primary_keys[quoted_table] = if conn = opts[:conn]
-          conn.primary_key(*schema_and_table(table))
+          conn.primary_key(*schema_and_table_quoted_strings(table))
         else
-          synchronize(opts[:server]){|con| con.primary_key(*schema_and_table(table))}
+          synchronize(opts[:server]){|con| con.primary_key(*schema_and_table_quoted_strings(table))}
         end
       end
 
@@ -324,9 +328,9 @@ module Sequel
         quoted_table = quote_schema_table(table)
         return @primary_key_sequences[quoted_table] if @primary_key_sequences.include?(quoted_table)
         @primary_key_sequences[quoted_table] = if conn = opts[:conn]
-          conn.sequence(*schema_and_table(table))
+          conn.sequence(*schema_and_table_quoted_strings(table))
         else
-          synchronize(opts[:server]){|con| con.sequence(*schema_and_table(table))}
+          synchronize(opts[:server]){|con| con.sequence(*schema_and_table_quoted_strings(table))}
         end
       end
 
@@ -593,6 +597,13 @@ module Sequel
       # a rename table operation, so speciying a new schema in new_name will not have an effect.
       def rename_table_sql(name, new_name)
         "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_identifier(schema_and_table(new_name).last)}"
+      end
+
+      # Split the table into a schema and table, and return the values as quoted strings for usage
+      # in querying the system tables.
+      def schema_and_table_quoted_strings(table)
+        schema, table = schema_and_table(table)
+        [(literal(schema) if schema), literal(table)]
       end
 
       # PostgreSQL's autoincrementing primary keys are of type integer or bigint
