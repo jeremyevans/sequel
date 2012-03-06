@@ -286,11 +286,11 @@ module Sequel
       if supports_savepoints?
         unless @transactions[conn]
           @transactions[conn] = {:savepoint_level=>0}
-          @transactions[conn][:prepare] = opts[:prepare] if supports_prepared_transactions?
+          @transactions[conn][:prepare] = opts[:prepare] if opts[:prepare] && supports_prepared_transactions?
         end
       else
         @transactions[conn] = {}
-        @transactions[conn][:prepare] = opts[:prepare] if supports_prepared_transactions?
+        @transactions[conn][:prepare] = opts[:prepare] if opts[:prepare] && supports_prepared_transactions?
       end
     end    
 
