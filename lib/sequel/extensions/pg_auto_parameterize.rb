@@ -116,16 +116,6 @@ module Sequel
           clone(:no_auto_parameterize=>true)
         end
 
-        protected
-
-        # Disable automatic parameterization for prepared statements,
-        # since they will use manual parameterization.
-        def to_prepared_statement(*a)
-          opts[:no_auto_parameterize] ? super : no_auto_parameterize.to_prepared_statement(*a)
-        end
-
-        private
-
         # For strings, numeric arguments, and date/time arguments, add
         # them as parameters to the query instead of literalizing them
         # into the SQL.
@@ -166,6 +156,16 @@ module Sequel
             super
           end
         end
+
+        protected
+
+        # Disable automatic parameterization for prepared statements,
+        # since they will use manual parameterization.
+        def to_prepared_statement(*a)
+          opts[:no_auto_parameterize] ? super : no_auto_parameterize.to_prepared_statement(*a)
+        end
+
+        private
 
         # Unless auto parameterization is turned off, use a string that
         # can store the parameterized arguments.
