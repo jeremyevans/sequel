@@ -475,15 +475,14 @@ module Sequel
         end
       end
 
-      # Return the conversion procs hash to use for this database
+      # Return the conversion procs hash to use for this database.
       def get_conversion_procs(conn)
         procs = PG_TYPES.dup
-        procs[1114] = method(:to_application_timestamp)
-        procs[1184] = method(:to_application_timestamp)
-        conn.execute("SELECT oid, typname FROM pg_type where typtype = 'b'") do |res|
-          res.ntuples.times do |recnum|
-            if pr = PG_NAMED_TYPES[res.getvalue(recnum, 1).untaint.to_sym]
-              procs[res.getvalue(recnum, 0).to_i] ||= pr
+        procs[1184] = procs[1114] = method(:to_application_timestamp)
+        unless (pgnt = PG_NAMED_TYPES).empty?
+          conn.execute("SELECT oid, typname FROM pg_type where typtype = 'b' AND typname IN ('#{pgnt.keys.map{|type| conn.escape_string(type.to_s)}.join("', '")}')") do |res|
+            res.ntuples.times do |i|
+              procs[res.getvalue(i, 0).to_i] ||= pgnt[res.getvalue(i, 1).untaint.to_sym]
             end
           end
         end
