@@ -176,6 +176,11 @@ describe "Simple dataset operations with nasty table names" do
   before do
     @db = INTEGRATION_DB
     @table = :"i`t' [e]\"m\\s" 
+    @qi = @db.quote_identifiers?
+    @db.quote_identifiers = true
+  end
+  after do
+    @db.quote_identifiers = @qi
   end
 
   cspecify "should work correctly", :mssql, :oracle do
