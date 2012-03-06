@@ -88,6 +88,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pagination_rb.html">pagination</a>: Adds Dataset#paginate for easier pagination of datasets.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pretty_table_rb.html">pretty_table</a>: Adds Dataset#print for printing a dataset as a simple plain-text table.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/query_rb.html">query</a>: Adds Dataset#query for a different interface to creating queries that doesn't use method chaining.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_rb.html">pg_array</a>: Add support for string and numeric PostgreSQL arrays.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_auto_parameterize_rb.html">pg_auto_parameterize</a>: Automatically parameterize queries when using the postgres adapter with the pg driver.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_statement_cache_rb.html">pg_statement_cache</a>: Automatically use prepared statements for most queries when using postgres adapter with the pg driver.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
@@ -106,7 +107,6 @@
 <li><a href='http://github.com/pk/merb_sequel'>merb_sequel</a>: Merb plugin that provides support for Sequel models.</li>
 <li><a href='http://github.com/pusewicz/rails_sequel/'>rails_sequel</a>: Rails 2 plugin that allows you to use Sequel instead of ActiveRecord.</li>
 <li><a href='http://github.com/openhood/rspec_sequel_matchers'>rspec_sequel_matchers</a>: RSpec matchers for Sequel validations, associations, and columns.</li>
-<li><a href='http://github.com/gucki/sequel_column_type_array'>sequel_column_type_array</a>: Support for PostgreSQL Arrays.</li>
 <li><a href='http://github.com/gyordanov/sequel_extjs'>sequel_extjs</a>: Generates JSON from datasets that is consumable by the ExtJS JsonStore.</li>
 <li><a href='http://github.com/knaveofdiamonds/sequel_fast_columns'>sequel_fast_columns</a>: Attempts to determine columns without issuing a database query.</li>
 <li><a href='http://github.com/jeremyevans/sequel_pg'>sequel_pg</a>: Faster SELECTs when using Sequel with pg.</li>

@@ -1,7 +1,7 @@
-# The pg_array extension allows Sequel's postgres adapter to handle
+# The pg_array extension adds support for Sequel to handle
 # PostgreSQL's string and numeric array types.  It supports both
-# single dimensional and multi-dimensional arrays.  For integer and
-# float arrays, it uses a JSON-based parser which is written in C
+# single and multi-dimensional arrays.  For integer and
+# float arrays, it uses a JSON-based parser which is usually written in C
 # and should be fairly fast.  For string and decimal arrays, it uses
 # a hand coded parser written in ruby that is unoptimized and probably
 # slow.
@@ -32,7 +32,7 @@
 #
 # This extension requires both the json and delegate libraries.
 #
-# ## Additional License
+# == Additional License
 #
 # PGArray::Parser code was translated from Javascript code in the
 # node-postgres project and has the following license:
