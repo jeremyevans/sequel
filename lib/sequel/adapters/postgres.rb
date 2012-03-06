@@ -409,6 +409,12 @@ module Sequel
           end
         end
       end
+
+      # Reset the database's conversion procs, requires a server query if there
+      # any named types.
+      def reset_conversion_procs
+        synchronize{|conn| @conversion_procs = get_conversion_procs(conn)}
+      end
         
       private
       

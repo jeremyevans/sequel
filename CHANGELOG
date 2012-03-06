@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#reset_conversion_procs to the postgres adapter, for use with extensions with modify default conversion procs (jeremyevans)
+
 * Escape table and schema names when getting primary key or sequence information on PostgreSQL (jeremyevans)
 
 * Escape identifiers when quoting on MySQL and SQLite (jeremyevans)
