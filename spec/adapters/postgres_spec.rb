@@ -1261,8 +1261,9 @@ describe 'PostgreSQL array handling' do
   before(:all) do
     Sequel.extension :pg_array
     @db = POSTGRES_DB
-    @db.reset_conversion_procs
+    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
     @ds = @db[:items]
+    @native = POSTGRES_DB.adapter_scheme == :postgres
   end
   after do
     @db.drop_table?(:items)
@@ -1277,23 +1278,26 @@ describe 'PostgreSQL array handling' do
       column :dp, 'double precision[]'
     end
     @ds.insert([1].pg_array(:int2), [nil, 2].pg_array(:int4), [3, nil].pg_array(:int8), [4, nil, 4.5].pg_array(:real), [5, nil, 5.5].pg_array("double precision"))
-    rs = @ds.all
-    rs.should == [{:i2=>[1], :i4=>[nil, 2], :i8=>[3, nil], :r=>[4.0, nil, 4.5], :dp=>[5.0, nil, 5.5]}]
-    rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-    rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
-    @ds.delete
-    @ds.insert(rs.first)
-    @ds.all.should == rs
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      rs.should == [{:i2=>[1], :i4=>[nil, 2], :i8=>[3, nil], :r=>[4.0, nil, 4.5], :dp=>[5.0, nil, 5.5]}]
+      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
+      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
 
-    @ds.delete
-    @ds.insert([[1], [2]].pg_array(:int2), [[nil, 2], [3, 4]].pg_array(:int4), [[3, nil], [nil, nil]].pg_array(:int8), [[4, nil], [nil, 4.5]].pg_array(:real), [[5, nil], [nil, 5.5]].pg_array("double precision"))
-    rs = @ds.all
-    rs.should == [{:i2=>[[1], [2]], :i4=>[[nil, 2], [3, 4]], :i8=>[[3, nil], [nil, nil]], :r=>[[4, nil], [nil, 4.5]], :dp=>[[5, nil], [nil, 5.5]]}]
-    rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-    rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
-    @ds.delete
-    @ds.insert(rs.first)
-    @ds.all.should == rs
+      @ds.delete
+      @ds.insert([[1], [2]].pg_array(:int2), [[nil, 2], [3, 4]].pg_array(:int4), [[3, nil], [nil, nil]].pg_array(:int8), [[4, nil], [nil, 4.5]].pg_array(:real), [[5, nil], [nil, 5.5]].pg_array("double precision"))
+      rs = @ds.all
+      rs.should == [{:i2=>[[1], [2]], :i4=>[[nil, 2], [3, 4]], :i8=>[[3, nil], [nil, nil]], :r=>[[4, nil], [nil, 4.5]], :dp=>[[5, nil], [nil, 5.5]]}]
+      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
+      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
   end
 
   specify 'insert and retrieve decimal arrays' do
@@ -1301,23 +1305,26 @@ describe 'PostgreSQL array handling' do
       column :n, 'numeric[]'
     end
     @ds.insert([BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')].pg_array(:numeric))
-    rs = @ds.all
-    rs.should == [{:n=>[BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')]}]
-    rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-    rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
-    @ds.delete
-    @ds.insert(rs.first)
-    @ds.all.should == rs
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      rs.should == [{:n=>[BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')]}]
+      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
+      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
 
-    @ds.delete
-    @ds.insert([[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]].pg_array(:numeric))
-    rs = @ds.all
-    rs.should == [{:n=>[[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]]}]
-    rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-    rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
-    @ds.delete
-    @ds.insert(rs.first)
-    @ds.all.should == rs
+      @ds.delete
+      @ds.insert([[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]].pg_array(:numeric))
+      rs = @ds.all
+      rs.should == [{:n=>[[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]]}]
+      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
+      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
   end
 
   specify 'insert and retrieve string arrays' do
@@ -1327,22 +1334,42 @@ describe 'PostgreSQL array handling' do
       column :t, 'text[]'
     end
     @ds.insert(['a', nil, 'NULL', 'b"\'c'].pg_array('char(4)'), ['a', nil, 'NULL', 'b"\'c'].pg_array(:varchar), ['a', nil, 'NULL', 'b"\'c'].pg_array(:text))
-    rs = @ds.all
-    rs.should == [{:c=>['a   ', nil, 'NULL', 'b"\'c'], :vc=>['a', nil, 'NULL', 'b"\'c'], :t=>['a', nil, 'NULL', 'b"\'c']}]
-    rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-    rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
-    @ds.delete
-    @ds.insert(rs.first)
-    @ds.all.should == rs
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      rs.should == [{:c=>['a   ', nil, 'NULL', 'b"\'c'], :vc=>['a', nil, 'NULL', 'b"\'c'], :t=>['a', nil, 'NULL', 'b"\'c']}]
+      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
+      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
 
-    @ds.delete
-    @ds.insert([[['a'], [nil]], [['NULL'], ['b"\'c']]].pg_array('char(4)'), [[['a'], ['']], [['NULL'], ['b"\'c']]].pg_array(:varchar), [[['a'], [nil]], [['NULL'], ['b"\'c']]].pg_array(:text))
-    rs = @ds.all
-    rs.should == [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
-    rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-    rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
-    @ds.delete
-    @ds.insert(rs.first)
-    @ds.all.should == rs
+      @ds.delete
+      @ds.insert([[['a'], [nil]], [['NULL'], ['b"\'c']]].pg_array('char(4)'), [[['a'], ['']], [['NULL'], ['b"\'c']]].pg_array(:varchar), [[['a'], [nil]], [['NULL'], ['b"\'c']]].pg_array(:text))
+      rs = @ds.all
+      rs.should == [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
+      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
+      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
   end
-end if POSTGRES_DB.adapter_scheme == :postgres
+
+  specify 'with models' do
+    @db.create_table!(:items) do
+      primary_key :id
+      column :i, 'integer[]'
+      column :f, 'double precision[]'
+      column :d, 'numeric[]'
+      column :t, 'text[]'
+    end
+    c = Class.new(Sequel::Model(@db[:items]))
+    c.plugin :typecast_on_load, :i, :f, :d, :t unless @native
+    o = c.create(:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal.new('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']])
+    o.i.should == [1, 2, nil]
+    o.f.should == [[1, 2.5], [3, 4.5]]
+    o.d.should == [BigDecimal.new('1'), BigDecimal.new('1.000000000000000000001')]
+    o.t.should == [%w'a b c', ['NULL', nil, '1']]
+  end
+end

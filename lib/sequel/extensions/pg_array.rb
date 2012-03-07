@@ -30,12 +30,22 @@
 #
 #   DB[:table].insert(:column=>[1, 2, 3].pg_array)
 #
+# If you would like to use PostgreSQL arrays in your model objects, you
+# probably want to modify the schema parsing/typecasting so that it
+# recognizes and correctly handles the arrays, which you can do by:
+#
+#   DB.extend Sequel::Postgres::PGArray::DatabaseMethods
+#
+# If you are not using the native postgres adapter, you probably
+# also want to use the typecast_on_load plugin in the model, and
+# set it to typecast the array column(s) on load.
+#
 # This extension requires both the json and delegate libraries.
 #
 # == Additional License
 #
 # PGArray::Parser code was translated from Javascript code in the
-# node-postgres project and has the following license:
+# node-postgres project and has the following additional license:
 # 
 # Copyright (c) 2010 Brian Carlson (brian.m.carlson@gmail.com)
 # 
@@ -79,6 +89,56 @@ module Sequel
       CLOSE_BRACE = '}'.freeze
       NULL = 'NULL'.freeze
       QUOTE = '"'.freeze
+
+      module DatabaseMethods
+        # Reset the conversion procs when extending the Database object, so
+        # it will pick up the array convertors.  This is only done for the native
+        # postgres adapter.
+        def self.extended(db)
+          db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)
+        end
+
+        # Make the column type detection deal with string and numeric array types.
+        def schema_column_type(db_type)
+          case db_type
+          when /\A(character( varying)?|text).*\[\]\z/io
+            :string_array
+          when /\A(integer|bigint|smallint)\[\]\z/io
+            :integer_array
+          when /\A(real|double precision)\[\]\z/io
+            :float_array
+          when /\Anumeric.*\[\]\z/io
+            :decimal_array
+          else
+            super
+          end
+        end
+
+        private
+
+        # Given a value to typecast and the type of PGArray subclass:
+        # * If given a PGArray, just return the value (even if different subclass)
+        # * If given an Array, create a new instance of the subclass
+        # * If given a String, call the parser for the subclass with it.
+        def typecast_value_pg_array(value, klass)
+          case value
+          when PGArray
+            value
+          when Array
+            klass.new(value)
+          when String
+            klass.parse(value)
+          else
+            raise Sequel::InvalidValue, "invalid value for #{klass}: #{value.inspect}"
+          end
+        end
+
+        # Create typecast methods for the supported array types that
+        # delegate to typecast_value_pg_array with the related class.
+        %w'string integer float decimal'.each do |t|
+          class_eval("def typecast_value_#{t}_array(v) typecast_value_pg_array(v, PG#{t.capitalize}Array) end", __FILE__, __LINE__)
+        end
+      end
 
       # PostgreSQL array parser that handles both text and numeric
       # input.  Because PostgreSQL arrays can contain objects that

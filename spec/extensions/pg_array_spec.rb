@@ -157,5 +157,29 @@ describe "pg_array extension" do
     @db.literal([1, 2].pg_array(:int4)).should == 'ARRAY[1,2]::int4[]'
     @db.literal([[[1], [2]], [[3], [4]]].pg_array(:real)).should == 'ARRAY[[[1],[2]],[[3],[4]]]::real[]'
   end
+
+  it "should parse array types from the schema correctly" do
+    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
+    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'integer[]'}, {:name=>'f', :db_type=>'real[]'}, {:name=>'d', :db_type=>'numeric[]'}, {:name=>'t', :db_type=>'text[]'}]
+    @db.schema(:items).map{|e| e[1][:type]}.should == [:integer, :integer_array, :float_array, :decimal_array, :string_array]
+  end
+
+  it "should support typecasting of the various array types" do
+    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
+    a = [1, 2]
+    o = a.pg_array
+    %w[integer float decimal string].each do |x|
+      @db.typecast_value(:"#{x}_array", o).should equal(o)
+      @db.typecast_value(:"#{x}_array", a).should == a
+      @db.typecast_value(:"#{x}_array", a).should be_a_kind_of(eval("Sequel::Postgres::PG#{x.capitalize}Array"))
+      @db.typecast_value(:"#{x}_array", '{}').should == []
+      @db.typecast_value(:"#{x}_array", '{}').should be_a_kind_of(eval("Sequel::Postgres::PG#{x.capitalize}Array"))
+    end
+    @db.typecast_value(:integer_array, '{1}').should == [1]
+    @db.typecast_value(:float_array, '{1}').should == [1.0]
+    @db.typecast_value(:decimal_array, '{1}').should == [BigDecimal.new('1')]
+    @db.typecast_value(:string_array, '{1}').should == ['1']
+    proc{@db.typecast_value(:integer_array, {})}.should raise_error(Sequel::InvalidValue)
+  end
 end
 end
