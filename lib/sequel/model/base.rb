@@ -1391,7 +1391,7 @@ module Sequel
       def _insert
         ds = _insert_dataset
         if !ds.opts[:select] and ds.supports_insert_select? and h = _insert_select_raw(ds)
-          @values = h
+          set_values(h)
           nil
         else
           iid = _insert_raw(ds)
