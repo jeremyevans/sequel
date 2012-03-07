@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.cache_anonymous_models accessor so you can disable the caching of classes created by Sequel::Model() (jeremyevans)
+
 * Convert PostgreSQL JDBC arrays to Ruby arrays in the jdbc/postgres adapter (jeremyevans)
 
 * The typecast_on_load extension now works correctly when saving new model objects when insert_select is enabled (jeremyevans)

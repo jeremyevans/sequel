@@ -203,7 +203,7 @@ describe "Sequel::Model with no existing table" do
   specify "should not raise an error when setting the dataset" do
     db = INTEGRATION_DB
     db.drop_table?(:items)
-    proc{class ::Item < Sequel::Model(db); end}.should_not raise_error
+    proc{class ::Item < Sequel::Model(db); end; Object.send(:remove_const, :Item)}.should_not raise_error
     proc{c = Class.new(Sequel::Model); c.set_dataset(db[:items])}.should_not raise_error
   end
 end

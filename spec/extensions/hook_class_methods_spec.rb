@@ -402,7 +402,7 @@ end
 
 describe "Model#add_hook_type" do
   before do
-    class Foo < Sequel::Model(:items)
+    class ::Foo < Sequel::Model(:items)
       add_hook_type :before_bar, :after_bar
 
       def bar
@@ -412,6 +412,9 @@ describe "Model#add_hook_type" do
       end
     end
     @f = Class.new(Foo)
+  end
+  after do
+    Object.send(:remove_const, :Foo)
   end
 
   specify "should have before_bar and after_bar class methods" do

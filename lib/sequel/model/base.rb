@@ -13,6 +13,11 @@ module Sequel
       # Which columns should be the only columns allowed in a call to a mass assignment method (e.g. set)
       # (default: not set, so all columns not otherwise restricted are allowed).
       attr_reader :allowed_columns
+
+      # Whether to cache the anonymous models created by Sequel::Model().  This is
+      # required for reloading them correctly (avoiding the superclass mismatch).  True
+      # by default for backwards compatibility.
+      attr_accessor :cache_anonymous_models
   
       # Array of modules that extend this model's dataset.  Stored
       # so that if the model's dataset is changed, it will be extended

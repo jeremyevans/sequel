@@ -35,13 +35,18 @@ module Sequel
   #     dataset # => DB1[:comments]
   #   end
   def self.Model(source)
-    Model::ANONYMOUS_MODEL_CLASSES[source] ||= if source.is_a?(Database)
+    if Sequel::Model.cache_anonymous_models && (klass = Model::ANONYMOUS_MODEL_CLASSES[source])
+      return klass
+    end
+    klass = if source.is_a?(Database)
       c = Class.new(Model)
       c.db = source
       c
     else
       Class.new(Model).set_dataset(source)
     end
+    Model::ANONYMOUS_MODEL_CLASSES[source] = klass if Sequel::Model.cache_anonymous_models
+    klass
   end
 
   # <tt>Sequel::Model</tt> is an object relational mapper built on top of Sequel core.  Each
@@ -58,6 +63,9 @@ module Sequel
   # You can set the +SEQUEL_NO_ASSOCIATIONS+ constant or environment variable to
   # make Sequel not load the associations plugin by default.
   class Model
+    # Cache anonymous models created by Sequel::Model()
+    @cache_anonymous_models = true
+
     # Map that stores model classes created with <tt>Sequel::Model()</tt>, to allow the reopening
     # of classes when dealing with code reloading.
     ANONYMOUS_MODEL_CLASSES = {}
