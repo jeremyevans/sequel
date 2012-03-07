@@ -1,5 +1,7 @@
 === HEAD
 
+* Convert PostgreSQL JDBC arrays to Ruby arrays in the jdbc/postgres adapter (jeremyevans)
+
 * The typecast_on_load extension now works correctly when saving new model objects when insert_select is enabled (jeremyevans)
 
 * Add pg_array extension, for dealing with string and numeric PostgreSQL arrays (jeremyevans)

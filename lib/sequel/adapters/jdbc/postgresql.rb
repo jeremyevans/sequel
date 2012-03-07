@@ -75,6 +75,38 @@ module Sequel
         include Sequel::Postgres::DatasetMethods
         APOS = Dataset::APOS
 
+        class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
+          # Convert Java::OrgPostgresqlJdbc4::Jdbc4Array to regular ruby arrays
+          def pg_array(v)
+            _pg_array(v.array)
+          end
+
+          private
+
+          # Handle multi-dimensional Java arrays by recursively mapping them
+          # to ruby arrays.
+          def _pg_array(v)
+            v.to_ary.map do |i|
+              if i.respond_to?(:to_ary)
+                _pg_array(i)
+              else
+                i
+              end
+            end
+          end
+        end
+
+        PG_ARRAY_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:pg_array)
+      
+        # Handle PostgreSQL array types.
+        def convert_type_proc(v)
+          if v.is_a?(Java::OrgPostgresqlJdbc4::Jdbc4Array)
+            PG_ARRAY_METHOD
+          else
+            super
+          end
+        end
+        
         # Add the shared PostgreSQL prepared statement methods
         def prepare(*args)
           ps = super
