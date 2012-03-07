@@ -888,9 +888,10 @@ module Sequel
         # If the column isn't in @values, we can't assume it is
         # NULL in the database, so assume it has changed.
         v = typecast_value(column, value)
-        if new? || !@values.include?(column) || v != (c = @values[column]) || v.class != c.class
+        vals = @values
+        if new? || !vals.include?(column) || v != (c = vals[column]) || v.class != c.class
           changed_columns << column unless changed_columns.include?(column)
-          @values[column] = v
+          vals[column] = v
         end
       end
   
@@ -1106,7 +1107,12 @@ module Sequel
       #   Artist[[1, 2]].pk # => [1, 2]
       def pk
         raise(Error, "No primary key is associated with this model") unless key = primary_key
-        key.is_a?(Array) ? key.map{|k| @values[k]} : @values[key]
+        if key.is_a?(Array)
+          vals = @values
+          key.map{|k| vals[k]}
+        else
+          @values[key]
+        end
       end
       
       # Returns a hash identifying mapping the receivers primary key column(s) to their values.
@@ -1397,8 +1403,8 @@ module Sequel
           iid = _insert_raw(ds)
           # if we have a regular primary key and it's not set in @values,
           # we assume it's the last inserted id
-          if (pk = autoincrementing_primary_key) && pk.is_a?(Symbol) && !@values[pk]
-            @values[pk] = iid
+          if (pk = autoincrementing_primary_key) && pk.is_a?(Symbol) && !(vals = @values)[pk]
+            vals[pk] = iid
           end
           pk
         end
