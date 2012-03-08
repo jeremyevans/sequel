@@ -1372,4 +1372,59 @@ describe 'PostgreSQL array handling' do
     o.d.should == [BigDecimal.new('1'), BigDecimal.new('1.000000000000000000001')]
     o.t.should == [%w'a b c', ['NULL', nil, '1']]
   end
+
+  specify 'operations/functions with pg_array_ops' do
+    Sequel.extension :pg_array_ops
+    @db.create_table!(:items){column :i, 'integer[]'; column :i2, 'integer[]'; column :i3, 'integer[]'; column :i4, 'integer[]'; column :i5, 'integer[]'}
+    @ds.insert([1, 2, 3].pg_array, [2, 1].pg_array, [4, 4].pg_array, [[5, 5], [4, 3]].pg_array, [1, nil, 5].pg_array)
+    op = :i
+
+    @ds.get(:i.pg_array > :i3).should be_false
+    @ds.get(:i3.pg_array > :i).should be_true
+
+    @ds.get(:i.pg_array >= :i3).should be_false
+    @ds.get(:i.pg_array >= :i).should be_true
+
+    @ds.get(:i3.pg_array < :i).should be_false
+    @ds.get(:i.pg_array < :i3).should be_true
+
+    @ds.get(:i3.pg_array <= :i).should be_false
+    @ds.get(:i.pg_array <= :i).should be_true
+
+    @ds.get({5=>:i.pg_array.any}.sql_expr).should be_false
+    @ds.get({1=>:i.pg_array.any}.sql_expr).should be_true
+
+    @ds.get({1=>:i3.pg_array.all}.sql_expr).should be_false
+    @ds.get({4=>:i3.pg_array.all}.sql_expr).should be_true
+
+    @ds.get(:i2.pg_array[1]).should == 2
+    @ds.get(:i2.pg_array[2]).should == 1
+
+    @ds.get(:i4.pg_array[2][1]).should == 4
+    @ds.get(:i4.pg_array[2][2]).should == 3
+
+    @ds.get(:i.pg_array.contains(:i2)).should be_true
+    @ds.get(:i.pg_array.contains(:i3)).should be_false
+
+    @ds.get(:i2.pg_array.contained_by(:i)).should be_true
+    @ds.get(:i.pg_array.contained_by(:i2)).should be_false
+
+    @ds.get(:i.pg_array.overlaps(:i2)).should be_true
+    @ds.get(:i2.pg_array.overlaps(:i3)).should be_false
+
+    @ds.get(:i.pg_array.dims).should == '[1:3]'
+    @ds.get(:i.pg_array.length).should == 3
+    @ds.get(:i.pg_array.lower).should == 1
+
+    @ds.get(:i5.pg_array.join).should == '15'
+    @ds.get(:i5.pg_array.join(':')).should == '1:5'
+    @ds.get(:i5.pg_array.join(':', '*')).should == '1:*:5'
+    @ds.select(:i.pg_array.unnest).from_self.count.should == 3
+
+    if @native
+      @ds.get(:i.pg_array.push(4)).should == [1, 2, 3, 4]
+      @ds.get(:i.pg_array.unshift(4)).should == [4, 1, 2, 3]
+      @ds.get(:i.pg_array.concat(:i2)).should == [1, 2, 3, 2, 1]
+    end
+  end
 end

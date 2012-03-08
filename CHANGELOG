@@ -1,5 +1,7 @@
 === HEAD
 
+* Add pg_array_ops extension, for easily calling PostgreSQL array functions and operators (jeremyevans)
+
 * Add SQL::Subscript#[] for using nested subscripts (accessing member of multi-dimensional array) (jeremyevans)
 
 * Add Model.cache_anonymous_models accessor so you can disable the caching of classes created by Sequel::Model() (jeremyevans)

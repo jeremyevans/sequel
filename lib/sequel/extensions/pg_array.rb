@@ -40,6 +40,9 @@
 # also want to use the typecast_on_load plugin in the model, and
 # set it to typecast the array column(s) on load.
 #
+# If you want an easy way to call PostgreSQL array functions and
+# operators, look into the pg_array_ops extension.
+#
 # This extension requires both the json and delegate libraries.
 #
 # == Additional License
