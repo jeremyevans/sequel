@@ -441,3 +441,14 @@ describe "Expression" do
     h[b].should == 2
   end
 end
+
+describe "Sequel::SQLTime" do
+  before do
+    @db = Sequel.mock
+  end
+
+  specify ".create should create from hour, minutes, seconds and optional microseconds" do
+    @db.literal(Sequel::SQLTime.create(1, 2, 3)).should == "'01:02:03.000000'"
+    @db.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).should == "'01:02:03.500000'"
+  end
+end
