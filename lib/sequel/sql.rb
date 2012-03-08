@@ -1023,8 +1023,20 @@ module Sequel
 
       # Create a new +Subscript+ appending the given subscript(s)
       # the the current array of subscripts.
+      #
+      #   :a.sql_subscript(2) # a[2]
+      #   :a.sql_subscript(2) | 1 # a[2, 1]
       def |(sub)
         Subscript.new(@f, @sub + Array(sub))
+      end
+
+      # Create a new +Subscript+ by accessing a subarray of a multidimensional
+      # array.
+      #
+      #   :a.sql_subscript(2) # a[2]
+      #   :a.sql_subscript(2)[1] # a[2][1]
+      def [](sub)
+        Subscript.new(self, Array(sub))
       end
       
       to_s_method :subscript_sql
