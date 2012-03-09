@@ -252,10 +252,10 @@ describe "Bound Argument Types" do
     end
     @ds = @db[:items]
     @vs = {:d=>Date.civil(2010, 10, 11), :dt=>DateTime.civil(2010, 10, 12, 13, 14, 15), :f=>1.0, :s=>'str', :t=>Time.at(20101010), :file=>Sequel::SQL::Blob.new('blob'), :b=>true}
+  end
+  before do
+    @ds.delete
     @ds.insert(@vs)
-    @ds.meta_def(:ba) do |sym, type|
-      prepared_arg_placeholder == '$' ? :"#{sym}__#{type}" : sym
-    end
   end
   after do
     Sequel.datetime_class = Time
@@ -273,12 +273,31 @@ describe "Bound Argument Types" do
     @ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>@vs[:dt])[:dt].should == @vs[:dt]
   end
 
+  cspecify "should handle datetime type with fractional seconds", [:do], [:mysql2], [:swift], [:jdbc, :sqlite], [:tinytds], [:oracle] do
+    Sequel.datetime_class = DateTime
+    fract_time = DateTime.parse('2010-10-12 13:14:15.5')
+    @ds.prepare(:update, :ps_datetime_up, :dt=>:$x).call(:x=>fract_time)
+    @ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>fract_time)[:dt].should == fract_time
+  end
+
   cspecify "should handle time type", [:do], [:jdbc, :sqlite], [:oracle] do
     @ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
   end
 
+  cspecify "should handle time type with fractional seconds", [:do], [:jdbc, :sqlite], [:oracle] do
+    fract_time = @vs[:t] + 0.5
+    @ds.prepare(:update, :ps_time_up, :t=>:$x).call(:x=>fract_time)
+    @ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>fract_time)[:t].should == fract_time
+  end
+
   cspecify "should handle blob type", [:swift], [:odbc], [:jdbc, :db2], :oracle, :derby do
     @ds.filter(:file=>:$x).prepare(:first, :ps_blob).call(:x=>@vs[:file])[:file].should == @vs[:file]
+  end
+
+  cspecify "should handle blob type with embedded zeros", [:swift], [:odbc], [:jdbc, :db2], :oracle, :derby do
+    zero_blob = Sequel::SQL::Blob.new("a\0"*100)
+    @ds.prepare(:update, :ps_blob_up, :file=>:$x).call(:x=>zero_blob)
+    @ds.filter(:file=>:$x).prepare(:first, :ps_blob).call(:x=>zero_blob)[:file].should == zero_blob
   end
 
   cspecify "should handle float type", [:swift, :sqlite] do

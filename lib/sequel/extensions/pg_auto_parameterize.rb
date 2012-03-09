@@ -127,9 +127,7 @@ module Sequel
               when LiteralString
                 super
               when Sequel::SQL::Blob
-                # PostgreSQL appears to require the blobs are escaped,
-                # otherwise it misses stuff after "\0".
-                sql.add_arg(db.synchronize{|c| c.escape_bytea(v)}, :bytea)
+                sql.add_arg(v, :bytea)
               else
                 sql.add_arg(v, :text)
               end
@@ -142,11 +140,9 @@ module Sequel
             when BigDecimal
               sql.add_arg(v, :numeric)
             when Sequel::SQLTime
-              # Default pg code will not get fractional seconds
-              sql.add_arg(literal(v)[1...-1], :time)
+              sql.add_arg(v, :time)
             when Time, DateTime
-              # Default pg code will not get fractional seconds
-              sql.add_arg(literal(v)[1...-1], :timestamp)
+              sql.add_arg(v, :timestamp)
             when Date
               sql.add_arg(v, :date)
             else

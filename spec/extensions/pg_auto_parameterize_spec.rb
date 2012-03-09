@@ -20,12 +20,12 @@ describe "pg_auto_parameterize extension" do
     pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::double precision)', 1.1)
     pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::numeric)', BigDecimal.new('1.01'))
     pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::text)', "a")
-    pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::bytea)', "a\0b".to_sequel_blob, "a\0ba\0b")
+    pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::bytea)', "a\0b".to_sequel_blob)
     pr.call(@db[:table], 'SELECT * FROM table WHERE (a = 1)', '1'.lit, :nil)
-    pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::time)', Sequel::SQLTime.create(1, 2, 3, 500000), "01:02:03.500000")
+    pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::time)', Sequel::SQLTime.create(1, 2, 3, 500000))
     pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::date)', Date.today)
-    pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::timestamp)', DateTime.new(2012, 1, 2, 3, 4, 5), "2012-01-02 03:04:05.000000+0000")
-    pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::timestamp)', Time.utc(2012, 1, 2, 3, 4, 5), "2012-01-02 03:04:05.000000+0000")
+    pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::timestamp)', DateTime.new(2012, 1, 2, 3, 4, 5))
+    pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::timestamp)', Time.utc(2012, 1, 2, 3, 4, 5))
   end
 
   it "should extract parameters from query string when executing" do

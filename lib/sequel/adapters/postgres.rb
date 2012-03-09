@@ -194,6 +194,7 @@ module Sequel
       # Execute the given SQL with this connection.  If a block is given,
       # yield the results, otherwise, return the number of changed rows.
       def execute(sql, args=nil)
+        args = args.map{|v| @db.bound_variable_arg(v, self)} if args
         q = check_disconnect_errors{execute_query(sql, args)}
         begin
           block_given? ? yield(q) : q.cmd_tuples
@@ -233,6 +234,23 @@ module Sequel
         super
         @primary_keys = {}
         @primary_key_sequences = {}
+      end
+
+      # Convert given argument so that it can be used directly by pg.  Currently, pg doesn't
+      # handle fractional seconds in Time/DateTime or blobs with "\0", and it won't ever
+      # handle Sequel::SQLTime values correctly.  Only public for use by the adapter, shouldn't
+      # be used by external code.
+      def bound_variable_arg(arg, conn)
+        case arg
+        when Sequel::SQL::Blob
+          conn.escape_bytea(arg)
+        when Sequel::SQLTime
+          literal(arg)
+        when DateTime, Time
+          literal(arg)
+        else
+          arg
+        end
       end
 
       # Connects to the database.  In addition to the standard database
@@ -447,8 +465,11 @@ module Sequel
         ps = prepared_statements[name]
         sql = ps.prepared_sql
         ps_name = name.to_s
-        args = opts[:arguments]
         synchronize(opts[:server]) do |conn|
+          if args = opts[:arguments]
+            args = args.map{|arg| bound_variable_arg(arg, conn)}
+          end
+
           unless conn.prepared_statements[ps_name] == sql
             if conn.prepared_statements.include?(ps_name)
               conn.execute("DEALLOCATE #{ps_name}") unless conn.prepared_statements[ps_name] == sql
@@ -456,12 +477,14 @@ module Sequel
             conn.prepared_statements[ps_name] = sql
             conn.check_disconnect_errors{log_yield("PREPARE #{ps_name} AS #{sql}"){conn.prepare(ps_name, sql)}}
           end
+
           log_sql = "EXECUTE #{ps_name}"
           if ps.log_sql
             log_sql << " ("
             log_sql << sql
             log_sql << ")"
           end
+
           q = conn.check_disconnect_errors{log_yield(log_sql, args){conn.exec_prepared(ps_name, args)}}
           if opts[:table] && opts[:values]
             insert_result(conn, opts[:table], opts[:values])
