@@ -179,7 +179,7 @@ module Sequel
       include EmulateOffsetWithRowNumber
 
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with select distinct columns from join where group having compounds order lock')
-      ROW_NUMBER_EXPRESSION = 'ROWNUM'.lit.freeze
+      ROW_NUMBER_EXPRESSION = LiteralString.new('ROWNUM').freeze
       SPACE = Dataset::SPACE
       APOS = Dataset::APOS
       APOS_RE = Dataset::APOS_RE

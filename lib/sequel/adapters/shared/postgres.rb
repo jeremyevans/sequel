@@ -340,7 +340,7 @@ module Sequel
         pk = SQL::Identifier.new(primary_key(table))
         return unless seq = primary_key_sequence(table)
         db = self
-        seq_ds = db.from(seq.lit)
+        seq_ds = db.from(LiteralString.new(seq))
         get{setval(seq, db[table].select{coalesce(max(pk)+seq_ds.select{:increment_by}, seq_ds.select(:min_value))}, false)}
       end
 

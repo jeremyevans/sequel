@@ -63,7 +63,7 @@ module Sequel
 
       if values.is_a?(Array) && values.empty? && !insert_supports_empty_values? 
         columns = [columns().last]
-        values = ['DEFAULT'.lit]
+        values = [DEFAULT]
       end
       clone(:columns=>columns, :values=>values)._insert_sql
     end
@@ -182,6 +182,7 @@ module Sequel
       clauses.map{|clause| :"#{type}_#{clause}_sql"}.freeze
     end
 
+    WILDCARD = LiteralString.new('*').freeze
     ALL = ' ALL'.freeze
     AND_SEPARATOR = " AND ".freeze
     APOS = "'".freeze
@@ -209,8 +210,9 @@ module Sequel
     CONDITION_FALSE = '(1 = 0)'.freeze
     CONDITION_TRUE = '(1 = 1)'.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
-    COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, LiteralString.new('*'.freeze)).as(:count)
+    COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, WILDCARD).as(:count)
     DATASET_ALIAS_BASE_NAME = 't'.freeze
+    DEFAULT = LiteralString.new('DEFAULT').freeze
     DEFAULT_VALUES = " DEFAULT VALUES".freeze
     DELETE = 'DELETE'.freeze
     DELETE_CLAUSE_METHODS = clause_methods(:delete, %w'delete from where')
@@ -277,7 +279,6 @@ module Sequel
     USING = ' USING ('.freeze
     VALUES = " VALUES ".freeze
     WHERE = " WHERE ".freeze
-    WILDCARD = LiteralString.new('*').freeze
 
     PUBLIC_APPEND_METHODS = (<<-END).split.map{|x| x.to_sym}
       literal
