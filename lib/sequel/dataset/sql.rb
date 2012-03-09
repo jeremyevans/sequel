@@ -20,7 +20,7 @@ module Sequel
     #   DB.select(1).where(DB[:items].exists)
     #   # SELECT 1 WHERE (EXISTS (SELECT * FROM items))
     def exists
-      SQL::PlaceholderLiteralString.new("EXISTS ?", [self], true)
+      SQL::PlaceholderLiteralString.new(EXISTS, [self], true)
     end
     
     # Returns an INSERT SQL query string.  See +insert+.
@@ -223,6 +223,7 @@ module Sequel
     DOUBLE_QUOTE = '""'.freeze
     EQUAL = ' = '.freeze
     EXTRACT = 'extract('.freeze
+    EXISTS = ['EXISTS '.freeze].freeze
     FOR_UPDATE = ' FOR UPDATE'.freeze
     FORMAT_DATE = "'%Y-%m-%d'".freeze
     FORMAT_DATE_STANDARD = "DATE '%Y-%m-%d'".freeze
@@ -278,6 +279,8 @@ module Sequel
     UPDATE_CLAUSE_METHODS = clause_methods(:update, %w'update table set where')
     USING = ' USING ('.freeze
     VALUES = " VALUES ".freeze
+    V187 = '1.8.7'.freeze
+    V190 = '1.9.0'.freeze
     WHERE = " WHERE ".freeze
 
     PUBLIC_APPEND_METHODS = (<<-END).split.map{|x| x.to_sym}
@@ -551,11 +554,11 @@ module Sequel
     # SQL fragment for a literal string with placeholders
     def placeholder_literal_string_sql_append(sql, pls)
       args = pls.args
+      str = pls.str
       sql << PAREN_OPEN if pls.parens
       if args.is_a?(Hash)
         re = /:(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join('|')})\b/
-        if RUBY_VERSION >= '1.8.7'
-          str = pls.str
+        if RUBY_VERSION >= V187
           loop do
             previous, q, str = str.partition(re)
             sql << previous
@@ -563,12 +566,17 @@ module Sequel
             break if str.empty?
           end
         else
-          sql << pls.str.gsub(re){literal(args[$1.to_sym])}
+          sql << str.gsub(re){literal(args[$1.to_sym])}
+        end
+      elsif str.is_a?(Array)
+        len = args.length
+        str.each_with_index do |s, i|
+          sql << s
+          literal_append(sql, args[i]) unless i == len
         end
       else
         i = -1
-        if RUBY_VERSION >= '1.8.7'
-          str = pls.str
+        if RUBY_VERSION >= V187
           loop do
             previous, q, str = str.partition(QUESTION_MARK)
             sql << previous
@@ -576,7 +584,7 @@ module Sequel
             break if str.empty?
           end
         else
-          sql << pls.str.gsub(QUESTION_MARK_RE){literal(args.at(i+=1))}
+          sql << str.gsub(QUESTION_MARK_RE){literal(args.at(i+=1))}
         end
       end
       sql << PAREN_CLOSE if pls.parens
@@ -888,7 +896,7 @@ module Sequel
       v2 = db.from_application_timestamp(v)
       fmt = default_timestamp_format.gsub(FORMAT_TIMESTAMP_RE) do |m|
         if m == FORMAT_USEC
-          format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(RUBY_VERSION < '1.9.0' ? 86400000000 : 1000000) : v.usec) if supports_timestamp_usecs?
+          format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(RUBY_VERSION < V190 ? 86400000000 : 1000000) : v.usec) if supports_timestamp_usecs?
         else
           if supports_timestamp_timezones?
             # Would like to just use %z format, but it doesn't appear to work on Windows

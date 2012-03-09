@@ -124,7 +124,7 @@ module Sequel
         HSTAR = "H*".freeze
         BITCOMP_OPEN = "((0 - ".freeze
         BITCOMP_CLOSE = ") - 1)".freeze
-        ILIKE_PLACEHOLDER = "CAST(? AS VARCHAR_IGNORECASE)".freeze
+        ILIKE_PLACEHOLDER = ["CAST(".freeze, " AS VARCHAR_IGNORECASE)".freeze].freeze
         TIME_FORMAT = "'%H:%M:%S'".freeze
         
         # Emulate the case insensitive LIKE operator and the bitwise operators.

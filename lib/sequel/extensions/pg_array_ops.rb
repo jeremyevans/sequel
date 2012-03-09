@@ -47,10 +47,10 @@ module Sequel
     #
     #   array_op = :array.pg_array
     class ArrayOp < Sequel::SQL::GenericExpression
-      CONCAT = "(? || ?)".freeze
-      CONTAINS = "(? @> ?)".freeze
-      CONTAINED_BY = "(? <@ ?)".freeze
-      OVERLAPS = "(? && ?)".freeze
+      CONCAT = ["(".freeze, " || ".freeze, ")".freeze].freeze
+      CONTAINS = ["(".freeze, " @> ".freeze, ")".freeze].freeze
+      CONTAINED_BY = ["(".freeze, " <@ ".freeze, ")".freeze].freeze
+      OVERLAPS = ["(".freeze, " && ".freeze, ")".freeze].freeze
 
       # The underlying value wrapped by this object.
       attr_reader :value

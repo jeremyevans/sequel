@@ -417,6 +417,8 @@ module Sequel
       EQ_VALUES = '=VALUES('.freeze
       EQ = '='.freeze
       WITH_ROLLUP = ' WITH ROLLUP'.freeze
+      MATCH_AGAINST = ["(MATCH ".freeze, " AGAINST (".freeze, "))".freeze].freeze
+      MATCH_AGAINST_BOOLEAN = ["(MATCH ".freeze, " AGAINST (".freeze, " IN BOOLEAN MODE))".freeze].freeze
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
@@ -481,7 +483,7 @@ module Sequel
       # MySQL specific full text search syntax.
       def full_text_sql(cols, terms, opts = {})
         terms = terms.join(' ') if terms.is_a?(Array)
-        SQL::PlaceholderLiteralString.new("MATCH ? AGAINST (?#{" IN BOOLEAN MODE" if opts[:boolean]})", [Array(cols), terms], true)
+        SQL::PlaceholderLiteralString.new((opts[:boolean] ? MATCH_AGAINST_BOOLEAN : MATCH_AGAINST), [Array(cols), terms])
       end
 
       # MySQL allows HAVING clause on ungrouped datasets.

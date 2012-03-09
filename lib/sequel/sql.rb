@@ -856,7 +856,8 @@ module Sequel
       # substituted for :key phrases).
       attr_reader :args
 
-      # The literal string containing placeholders
+      # The literal string containing placeholders.  This can also be an array
+      # of strings, where each arg in args goes between the string elements. 
       attr_reader :str
 
       # Whether to surround the expression with parantheses
@@ -1110,6 +1111,8 @@ module Sequel
       QUESTION_MARK = LiteralString.new('?').freeze
       COMMA_SEPARATOR = LiteralString.new(', ').freeze
       DOUBLE_UNDERSCORE = '__'.freeze
+      DISTINCT = ["DISTINCT ".freeze].freeze
+      COMMA_ARRAY = [COMMA_SEPARATOR].freeze
 
       # Return an +Identifier+, +QualifiedIdentifier+, +Function+, or +WindowFunction+, depending
       # on arguments and whether a block is provided.  Does not currently call the block.
@@ -1123,7 +1126,7 @@ module Sequel
             when :*
               Function.new(m, WILDCARD)
             when :distinct
-              Function.new(m, PlaceholderLiteralString.new("DISTINCT #{args.map{QUESTION_MARK}.join(COMMA_SEPARATOR)}", args))
+              Function.new(m, PlaceholderLiteralString.new(DISTINCT + COMMA_ARRAY * (args.length-1), args))
             when :over
               opts = args.shift || {}
               fun_args = ::Kernel.Array(opts[:*] ? WILDCARD : opts[:args])

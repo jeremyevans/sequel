@@ -1105,6 +1105,17 @@ describe "Dataset#literal" do
     @dataset.literal(BigDecimal.new("-Infinity")).should == "'-Infinity'"
   end
 
+  specify "should literalize PlaceholderLiteralStrings correctly" do
+    @dataset.literal(Sequel::SQL::PlaceholderLiteralString.new('? = ?', [1, 2])).should == '1 = 2'
+    @dataset.literal(Sequel::SQL::PlaceholderLiteralString.new('? = ?', [1, 2], true)).should == '(1 = 2)'
+    @dataset.literal(Sequel::SQL::PlaceholderLiteralString.new(':a = :b', :a=>1, :b=>2)).should == '1 = 2'
+    @dataset.literal(Sequel::SQL::PlaceholderLiteralString.new(':a = :b', {:a=>1, :b=>2}, true)).should == '(1 = 2)'
+    @dataset.literal(Sequel::SQL::PlaceholderLiteralString.new(['', ' = ', ''], [1, 2])).should == '1 = 2'
+    @dataset.literal(Sequel::SQL::PlaceholderLiteralString.new(['', ' = ', ''], [1, 2], true)).should == '(1 = 2)'
+    @dataset.literal(Sequel::SQL::PlaceholderLiteralString.new(['', ' = '], [1, 2])).should == '1 = 2'
+    @dataset.literal(Sequel::SQL::PlaceholderLiteralString.new(['', ' = '], [1, 2], true)).should == '(1 = 2)'
+  end
+
   specify "should raise an Error if the object can't be literalized" do
     proc{@dataset.literal(Object.new)}.should raise_error(Sequel::Error)
   end
