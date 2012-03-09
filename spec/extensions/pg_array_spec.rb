@@ -160,6 +160,14 @@ describe "pg_array extension" do
 
   it "should parse array types from the schema correctly" do
     @db.extend Sequel::Postgres::PGArray::DatabaseMethods
+    @db.bound_variable_arg([1,2], nil).should == '{1,2}'
+    @db.bound_variable_arg([[1,2]], nil).should == '{{1,2}}'
+    @db.bound_variable_arg([1.0,2.0], nil).should == '{1.0,2.0}'
+    @db.bound_variable_arg(["\\ \"", 'NULL', nil], nil).should == '{"\\\\ \\"","NULL",NULL}'
+  end
+
+  it "should parse array types from the schema correctly" do
+    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
     @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'integer[]'}, {:name=>'f', :db_type=>'real[]'}, {:name=>'d', :db_type=>'numeric[]'}, {:name=>'t', :db_type=>'text[]'}]
     @db.schema(:items).map{|e| e[1][:type]}.should == [:integer, :integer_array, :float_array, :decimal_array, :string_array]
   end

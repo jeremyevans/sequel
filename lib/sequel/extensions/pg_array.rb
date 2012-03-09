@@ -101,6 +101,18 @@ module Sequel
           db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)
         end
 
+        # Handle arrays in bound variables
+        def bound_variable_arg(arg, conn)
+          case arg
+          when PGArray
+            bound_variable_array(arg.value)
+          when Array
+            bound_variable_array(arg)
+          else
+            super
+          end
+        end
+
         # Make the column type detection deal with string and numeric array types.
         def schema_column_type(db_type)
           case db_type
@@ -118,6 +130,18 @@ module Sequel
         end
 
         private
+
+        # Format arrays used in bound variables.
+        def bound_variable_array(a)
+          case a
+          when Array
+            "{#{a.map{|i| bound_variable_array(i)}.join(',')}}"
+          when String
+            "\"#{a.gsub(/"|\\/){|m| "\\#{m}"}}\""
+          else
+            literal(a)
+          end
+        end
 
         # Given a value to typecast and the type of PGArray subclass:
         # * If given a PGArray, just return the value (even if different subclass)

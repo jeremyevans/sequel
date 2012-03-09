@@ -1356,6 +1356,25 @@ describe 'PostgreSQL array handling' do
     end
   end
 
+  specify 'use arrays in bound variables' do
+    @db.create_table!(:items) do
+      column :i, 'int4[]'
+    end
+    @ds.call(:insert, {:i=>[1,2]}, {:i=>:$i})
+    @ds.get(:i).should == [1, 2]
+    @ds.filter(:i=>:$i).call(:first, :i=>[1,2]).should == {:i=>[1,2]}
+    @ds.filter(:i=>:$i).call(:first, :i=>[1,3]).should == nil
+
+    @db.create_table!(:items) do
+      column :i, 'text[]'
+    end
+    a = ["\"\\\\\"{}\n\t\r \v\b123afP", 'NULL', nil, '']
+    @ds.call(:insert, {:i=>:$i}, :i=>a.pg_array)
+    @ds.get(:i).should == a
+    @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
+    @ds.filter(:i=>:$i).call(:first, :i=>['', nil, nil, 'a']).should == nil
+  end if POSTGRES_DB.adapter_scheme == :postgres
+
   specify 'with models' do
     @db.create_table!(:items) do
       primary_key :id
