@@ -1373,7 +1373,7 @@ describe 'PostgreSQL array handling' do
     @ds.get(:i).should == a
     @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
     @ds.filter(:i=>:$i).call(:first, :i=>['', nil, nil, 'a']).should == nil
-  end if POSTGRES_DB.adapter_scheme == :postgres
+  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models' do
     @db.create_table!(:items) do

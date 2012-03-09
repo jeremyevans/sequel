@@ -275,9 +275,9 @@ describe "Bound Argument Types" do
 
   cspecify "should handle datetime type with fractional seconds", [:do], [:mysql2], [:swift], [:jdbc, :sqlite], [:tinytds], [:oracle] do
     Sequel.datetime_class = DateTime
-    fract_time = DateTime.parse('2010-10-12 13:14:15.5')
+    fract_time = DateTime.parse('2010-10-12 13:14:15.500000')
     @ds.prepare(:update, :ps_datetime_up, :dt=>:$x).call(:x=>fract_time)
-    @ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>fract_time)[:dt].should == fract_time
+    @ds.literal(@ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>fract_time)[:dt]).should == @ds.literal(fract_time)
   end
 
   cspecify "should handle time type", [:do], [:jdbc, :sqlite], [:oracle] do
@@ -287,7 +287,7 @@ describe "Bound Argument Types" do
   cspecify "should handle time type with fractional seconds", [:do], [:jdbc, :sqlite], [:oracle] do
     fract_time = @vs[:t] + 0.5
     @ds.prepare(:update, :ps_time_up, :t=>:$x).call(:x=>fract_time)
-    @ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>fract_time)[:t].should == fract_time
+    @ds.literal(@ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>fract_time)[:t]).should == @ds.literal(fract_time)
   end
 
   cspecify "should handle blob type", [:swift], [:odbc], [:jdbc, :db2], :oracle, :derby do
