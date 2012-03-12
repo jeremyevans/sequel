@@ -1180,6 +1180,20 @@ module Sequel
 
       to_s_method :window_function_sql, '@function, @window'
     end
+
+    # A +Wrapper+ is a simple way to wrap an existing object so that it supports
+    # the Sequel DSL.
+    class Wrapper < GenericExpression
+      # The underlying value wrapped by this object.
+      attr_reader :value
+
+      # Set the value wrapped by the object.
+      def initialize(value)
+        @value = value
+      end
+
+      to_s_method :literal, '@value'
+    end
   end
 
   # +LiteralString+ is used to represent literal SQL expressions. A 

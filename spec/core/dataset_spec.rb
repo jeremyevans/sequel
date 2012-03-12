@@ -3438,6 +3438,10 @@ describe "Sequel::Dataset#qualify_to_first_source" do
     @ds.filter(':a > :b', :a=>:c, :b=>1).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.c > 1)'
   end
 
+  specify "should handle SQL::Wrappers" do
+    @ds.filter(Sequel::SQL::Wrapper.new(:a)).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE t.a'
+  end
+
   specify "should handle SQL::WindowFunctions" do
     @ds.meta_def(:supports_window_functions?){true}
     @ds.select{sum(:over, :args=>:a, :partition=>:b, :order=>:c){}}.qualify_to_first_source.sql.should == 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
@@ -3494,6 +3498,10 @@ describe "Sequel::Dataset#unbind" do
 
   specify "should handle QualifiedIdentifiers" do
     @u[@ds.filter{foo__bar > 1}].should == ["SELECT * FROM t WHERE (foo.bar > $foo.bar)", {:"foo.bar"=>1}]
+  end
+
+  specify "should handle wrapped objects" do
+    @u[@ds.filter{Sequel::SQL::Wrapper.new(foo__bar) > Sequel::SQL::Wrapper.new(1)}].should == ["SELECT * FROM t WHERE (foo.bar > $foo.bar)", {:"foo.bar"=>1}]
   end
 
   specify "should handle deep nesting" do

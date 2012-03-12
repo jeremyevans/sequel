@@ -66,6 +66,8 @@ module Sequel
         SQL::JoinUsingClause.new(v(o.using), o.join_type, v(o.table), v(o.table_alias))
       when SQL::JoinClause
         SQL::JoinClause.new(o.join_type, v(o.table), v(o.table_alias))
+      when SQL::Wrapper
+        SQL::Wrapper.new(v(o.value))
       else
         o
       end
@@ -172,6 +174,8 @@ module Sequel
     def v(o)
       if o.is_a?(SQL::ComplexExpression) && UNBIND_OPS.include?(o.op)
         l, r = o.args
+        l = l.value if l.is_a?(Sequel::SQL::Wrapper)
+        r = r.value if r.is_a?(Sequel::SQL::Wrapper)
         if UNBIND_KEY_CLASSES.any?{|c| l.is_a?(c)} && UNBIND_VALUE_CLASSES.any?{|c| r.is_a?(c)} && !r.is_a?(LiteralString)
           key = bind_key(l)
           if (old = binds[key]) && old != r

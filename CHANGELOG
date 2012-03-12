@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel::SQL::Wrapper class for easier dealing with wrapper objects (jeremyevans)
+
 * Add pg_hstore extension, for dealing with the PostgreSQL hstore (key/value table) type (jeremyevans)
 
 * Add Database#type_supported? method on PostgreSQL for checking if the given type symbol/string is supported (jeremyevans)

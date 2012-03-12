@@ -46,19 +46,11 @@ module Sequel
     # In the method documentation examples, assume that:
     #
     #   array_op = :array.pg_array
-    class ArrayOp < Sequel::SQL::GenericExpression
+    class ArrayOp < Sequel::SQL::Wrapper
       CONCAT = ["(".freeze, " || ".freeze, ")".freeze].freeze
       CONTAINS = ["(".freeze, " @> ".freeze, ")".freeze].freeze
       CONTAINED_BY = ["(".freeze, " <@ ".freeze, ")".freeze].freeze
       OVERLAPS = ["(".freeze, " && ".freeze, ")".freeze].freeze
-
-      # The underlying value wrapped by this object.
-      attr_reader :value
-
-      # Set the value wrapped by the object.
-      def initialize(value)
-        @value = value
-      end
 
       # Access a member of the array, returns an SQL::Subscript instance:
       #
@@ -172,11 +164,6 @@ module Sequel
       #   array_op.unshift(:a) # (a || array)
       def unshift(other)
         array_op(CONCAT, [other, self])
-      end
-
-      # Append the literalized version of contained value to the sql.
-      def to_s_append(ds, sql)
-        ds.literal_append(sql, value)
       end
 
       private

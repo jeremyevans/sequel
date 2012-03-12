@@ -452,3 +452,25 @@ describe "Sequel::SQLTime" do
     @db.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).should == "'01:02:03.500000'"
   end
 end
+
+describe "Sequel::SQL::Wrapper" do
+  before do
+    @ds = Sequel.mock.dataset
+  end
+
+  specify "should wrap objects so they can be used by the Sequel DSL" do
+    o = Object.new
+    def o.sql_literal(ds) 'foo' end
+    s = Sequel::SQL::Wrapper.new(o)
+    @ds.literal(s).should == "foo"
+    @ds.literal(s+1).should == "(foo + 1)"
+    @ds.literal(s & true).should == "(foo AND 't')"
+    @ds.literal(s < 1).should == "(foo < 1)"
+    @ds.literal(s.sql_subscript(1)).should == "foo[1]"
+    @ds.literal(s.like('a')).should == "(foo LIKE 'a')"
+    @ds.literal(s.as(:a)).should == "foo AS a"
+    @ds.literal(s.cast(Integer)).should == "CAST(foo AS integer)"
+    @ds.literal(s.desc).should == "foo DESC"
+    @ds.literal(s.sql_string + '1').should == "(foo || '1')"
+  end
+end
