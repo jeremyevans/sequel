@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#type_supported? method on PostgreSQL for checking if the given type symbol/string is supported (jeremyevans)
+
 * Convert Java::OrgPostgresqlUtil::PGobject instances to ruby strings in jdbc/postgres type conversion (jeremyevans)
 
 * Allow PlaceholderLiteralString objects to store placeholder string as an array for improved performance (jeremyevans)

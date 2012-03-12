@@ -410,6 +410,13 @@ module Sequel
         pg_class_relname('r', opts, &block)
       end
 
+      # Check whether the given type name string/symbol (e.g. :hstore) is supported by
+      # the database.
+      def type_supported?(type)
+        @supported_types ||= {}
+        @supported_types.fetch(type){@supported_types[type] = (from(:pg_type).filter(:typtype=>'b', :typname=>type.to_s).count > 0)}
+      end
+
       # Array of symbols specifying view names in the current database.
       #
       # Options:
