@@ -76,9 +76,14 @@ module Sequel
         APOS = Dataset::APOS
 
         class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
-          # Convert Java::OrgPostgresqlJdbc4::Jdbc4Array to regular ruby arrays
+          # Convert Java::OrgPostgresqlJdbc4::Jdbc4Array to ruby arrays
           def pg_array(v)
             _pg_array(v.array)
+          end
+
+          # Convert Java::OrgPostgresqlUtil::PGobject to ruby strings
+          def pg_object(v)
+            v.to_string
           end
 
           private
@@ -97,11 +102,17 @@ module Sequel
         end
 
         PG_ARRAY_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:pg_array)
+        PG_OBJECT_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:pg_object)
       
-        # Handle PostgreSQL array types.
+        # Handle PostgreSQL array and object types. Object types are just
+        # turned into strings, similarly to how the native adapter treats
+        # the types.
         def convert_type_proc(v)
-          if v.is_a?(Java::OrgPostgresqlJdbc4::Jdbc4Array)
+          case v
+          when Java::OrgPostgresqlJdbc4::Jdbc4Array
             PG_ARRAY_METHOD
+          when Java::OrgPostgresqlUtil::PGobject
+            PG_OBJECT_METHOD
           else
             super
           end

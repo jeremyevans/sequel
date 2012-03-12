@@ -1,5 +1,7 @@
 === HEAD
 
+* Convert Java::OrgPostgresqlUtil::PGobject instances to ruby strings in jdbc/postgres type conversion (jeremyevans)
+
 * Allow PlaceholderLiteralString objects to store placeholder string as an array for improved performance (jeremyevans)
 
 * Work around ruby-pg bugs 111 (Time/DateTime fractional seconds) and 112 ("\0" in bytea) in bound variable arguments (jeremyevans) (#450)
