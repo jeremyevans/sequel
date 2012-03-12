@@ -1447,3 +1447,63 @@ describe 'PostgreSQL array handling' do
     end
   end
 end
+
+describe 'PostgreSQL hstore handling' do
+  before(:all) do
+    Sequel.extension :pg_hstore
+    @db = POSTGRES_DB
+    @db.extend Sequel::Postgres::HStore::DatabaseMethods
+    @ds = @db[:items]
+    @h = {'a'=>'b', 'c'=>nil, 'd'=>'NULL', 'e'=>'\\\\" \\\' ,=>'}
+    @native = POSTGRES_DB.adapter_scheme == :postgres
+  end
+  after do
+    @db.drop_table?(:items)
+  end
+
+  specify 'insert and retrieve hstore values' do
+    @db.create_table!(:items) do
+      column :h, :hstore
+    end
+    @ds.insert(@h.hstore)
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      v = rs.first[:h]
+      v.should_not be_a_kind_of(Hash)
+      v.to_hash.should be_a_kind_of(Hash)
+      v.to_hash.should == @h
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+  end
+
+  specify 'use hstore in bound variables' do
+    @db.create_table!(:items) do
+      column :i, :hstore
+    end
+    @ds.call(:insert, {:i=>@h.hstore}, {:i=>:$i})
+    @ds.get(:i).should == @h
+    @ds.filter(:i=>:$i).call(:first, :i=>@h.hstore).should == {:i=>@h}
+    @ds.filter(:i=>:$i).call(:first, :i=>{}.hstore).should == nil
+
+    @ds.delete
+    @ds.call(:insert, {:i=>@h}, {:i=>:$i})
+    @ds.get(:i).should == @h
+    @ds.filter(:i=>:$i).call(:first, :i=>@h).should == {:i=>@h}
+    @ds.filter(:i=>:$i).call(:first, :i=>{}).should == nil
+  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+
+  specify 'with models' do
+    @db.create_table!(:items) do
+      primary_key :id
+      column :h, :hstore
+    end
+    c = Class.new(Sequel::Model(@db[:items]))
+    c.plugin :typecast_on_load, :h unless @native
+    c.create(:h=>@h.hstore).h.should == @h
+  end
+
+
+end if POSTGRES_DB.type_supported?(:hstore)
