@@ -8,6 +8,7 @@ else
 describe "pg_array extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
     @m = Sequel::Postgres
   end
 
@@ -158,8 +159,10 @@ describe "pg_array extension" do
     @db.literal([[[1], [2]], [[3], [4]]].pg_array(:real)).should == 'ARRAY[[[1],[2]],[[3],[4]]]::real[]'
   end
 
-  it "should parse array types from the schema correctly" do
+  it "should support using arrays as bound variables" do
     @db.extend Sequel::Postgres::PGArray::DatabaseMethods
+    @db.bound_variable_arg(1, nil).should == 1
+    @db.bound_variable_arg([1,2].pg_array, nil).should == '{1,2}'
     @db.bound_variable_arg([1,2], nil).should == '{1,2}'
     @db.bound_variable_arg([[1,2]], nil).should == '{{1,2}}'
     @db.bound_variable_arg([1.0,2.0], nil).should == '{1.0,2.0}'

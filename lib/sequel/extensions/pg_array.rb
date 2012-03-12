@@ -94,6 +94,9 @@ module Sequel
       QUOTE = '"'.freeze
 
       module DatabaseMethods
+        ESCAPE_RE = /("|\\)/.freeze
+        ESCAPE_REPLACEMENT = '\\\\\1'.freeze
+
         # Reset the conversion procs when extending the Database object, so
         # it will pick up the array convertors.  This is only done for the native
         # postgres adapter.
@@ -105,7 +108,7 @@ module Sequel
         def bound_variable_arg(arg, conn)
           case arg
           when PGArray
-            bound_variable_array(arg.value)
+            bound_variable_array(arg.to_a)
           when Array
             bound_variable_array(arg)
           else
@@ -135,9 +138,9 @@ module Sequel
         def bound_variable_array(a)
           case a
           when Array
-            "{#{a.map{|i| bound_variable_array(i)}.join(',')}}"
+            "{#{a.map{|i| bound_variable_array(i)}.join(COMMA)}}"
           when String
-            "\"#{a.gsub(/"|\\/){|m| "\\#{m}"}}\""
+            "\"#{a.gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)}\""
           else
             literal(a)
           end
