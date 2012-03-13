@@ -593,18 +593,18 @@ module Sequel
     # SQL fragment for the qualifed identifier, specifying
     # a table and a column (or schema and table).
     def qualified_identifier_sql_append(sql, qcr)
-      case t = qcr.table
-      when Symbol, SQL::QualifiedIdentifier, SQL::Identifier
-        literal_append(sql, t) 
-      else
+      t = qcr.table
+      if t.is_a?(String)
         quote_identifier_append(sql, t)
+      else
+        literal_append(sql, t) 
       end
       sql << DOT
-      case c = qcr.column
-      when Symbol, SQL::QualifiedIdentifier, SQL::Identifier
-        literal_append(sql, c) 
-      else
+      c = qcr.column
+      if c.is_a?(String)
         quote_identifier_append(sql, c)
+      else
+        literal_append(sql, c) 
       end
     end
 

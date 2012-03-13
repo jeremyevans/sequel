@@ -285,6 +285,12 @@ describe "Symbol" do
     @oe.class.should == Sequel::SQL::OrderedExpression
     @oe.descending.should == false
   end
+
+  specify "should work correctly with objects" do
+    o = Object.new
+    def o.sql_literal(ds) "(foo)" end
+    @ds.literal(:column.qualify(o)).should == '(foo)."COLUMN"'
+  end
 end
 
 describe "Dataset#literal" do
