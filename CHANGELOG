@@ -1,5 +1,7 @@
 === HEAD
 
+* Add pg_hstore_ops extension, for easily calling PostgreSQL hstore functions and operators (jeremyevans)
+
 * Add Sequel::SQL::Wrapper class for easier dealing with wrapper objects (jeremyevans)
 
 * Add pg_hstore extension, for dealing with the PostgreSQL hstore (key/value table) type (jeremyevans)
