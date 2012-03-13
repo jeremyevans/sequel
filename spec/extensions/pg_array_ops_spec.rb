@@ -91,7 +91,7 @@ describe "Sequel::Postgres::ArrayOp" do
     @db.literal(:a.sql_function(:b).pg_array.push(3)).should == "(a(b) || 3)"
   end
 
-  it "should be able to turn literal strings into array opts using pg_array" do
+  it "should be able to turn literal strings into array ops using pg_array" do
     @db.literal('a'.lit.pg_array.unnest).should == "unnest(a)"
   end
 
