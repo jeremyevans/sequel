@@ -201,7 +201,6 @@ module Sequel
     CASE_THEN = " THEN ".freeze
     CASE_WHEN = " WHEN ".freeze
     CAST_OPEN = 'CAST('.freeze
-    COLUMN_ALL = '.*'.freeze
     COLUMN_REF_RE1 = /\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/.freeze
     COLUMN_REF_RE2 = /\A((?:(?!___).)+)___(.+)\z/.freeze
     COLUMN_REF_RE3 = /\A((?:(?!__).)+)__(.+)\z/.freeze
@@ -396,10 +395,10 @@ module Sequel
 
     # SQL fragment for specifying all columns in a given table
     def column_all_sql_append(sql, ca)
-      quote_schema_table_append(sql, ca.table)
-      sql << COLUMN_ALL
+      qualified_identifier_sql_append(sql, ca.table, WILDCARD)
     end
 
+    # SQL fragment for the complex expression.
     def complex_expression_sql_append(sql, op, args)
       case op
       when *IS_OPERATORS
@@ -592,19 +591,19 @@ module Sequel
 
     # SQL fragment for the qualifed identifier, specifying
     # a table and a column (or schema and table).
-    def qualified_identifier_sql_append(sql, qcr)
-      t = qcr.table
-      if t.is_a?(String)
-        quote_identifier_append(sql, t)
+    # If 3 arguments are given, the 2nd should be the table/qualifier and the third should be
+    # column/qualified.  If 2 arguments are given, the 2nd should be an SQL::QualifiedIdentifier.
+    def qualified_identifier_sql_append(sql, table, column=(c = table.column; table = table.table; c))
+      if table.is_a?(String)
+        quote_identifier_append(sql, table)
       else
-        literal_append(sql, t) 
+        literal_append(sql, table) 
       end
       sql << DOT
-      c = qcr.column
-      if c.is_a?(String)
-        quote_identifier_append(sql, c)
+      if column.is_a?(String)
+        quote_identifier_append(sql, column)
       else
-        literal_append(sql, c) 
+        literal_append(sql, column) 
       end
     end
 

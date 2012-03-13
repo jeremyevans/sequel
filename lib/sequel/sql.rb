@@ -945,7 +945,7 @@ module Sequel
         @table, @column = table, column
       end
       
-      to_s_method :qualified_identifier_sql
+      to_s_method :qualified_identifier_sql, "@table, @column"
     end
     
     # Subclass of +ComplexExpression+ where the expression results
