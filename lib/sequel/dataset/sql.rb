@@ -594,17 +594,9 @@ module Sequel
     # If 3 arguments are given, the 2nd should be the table/qualifier and the third should be
     # column/qualified.  If 2 arguments are given, the 2nd should be an SQL::QualifiedIdentifier.
     def qualified_identifier_sql_append(sql, table, column=(c = table.column; table = table.table; c))
-      if table.is_a?(String)
-        quote_identifier_append(sql, table)
-      else
-        literal_append(sql, table) 
-      end
+      identifier_append(sql, table)
       sql << DOT
-      if column.is_a?(String)
-        quote_identifier_append(sql, column)
-      else
-        literal_append(sql, column) 
-      end
+      identifier_append(sql, column)
     end
 
     # Adds quoting to identifiers (columns and tables). If identifiers are not
@@ -919,6 +911,24 @@ module Sequel
       sprintf(FORMAT_TIMESTAMP_USEC, usec)
     end
 
+    # Append the value, but special case regular (non-literal, non-blob) strings
+    # so that they are considered as identifiers and not SQL strings.
+    def identifier_append(sql, v)
+      if v.is_a?(String)
+        case v
+        when LiteralString
+          sql << v
+        when SQL::Blob
+          literal_append(sql, v)
+        else
+          quote_identifier_append(sql, v)
+        end
+      else
+        literal_append(sql, v)
+      end
+    end
+    alias table_ref_append identifier_append 
+    
     # Modify the identifier returned from the database based on the
     # identifier_output_method.
     def input_identifier(v)
@@ -945,11 +955,7 @@ module Sequel
         co = COMMA
         columns.each do |col|
           sql << co if c
-          if col.is_a?(String) && !col.is_a?(LiteralString)
-            quote_identifier_append(sql, col)
-          else
-            literal_append(sql, col)
-          end
+          identifier_append(sql, col)
           c ||= true
         end
         sql << PAREN_CLOSE
@@ -1066,7 +1072,7 @@ module Sequel
     def literal_integer(v)
       v.to_s
     end
-    
+
     # SQL fragment for nil
     def literal_nil
       NULL
@@ -1361,16 +1367,6 @@ module Sequel
       ds.clone(:append_sql=>sql).sql
     end
 
-    # SQL fragment specifying a table name.
-    def table_ref_append(sql, t)
-      if t.is_a?(String)
-        quote_identifier_append(sql, t)
-      else
-        literal_append(sql, t)
-      end
-    end
-    alias identifier_append table_ref_append
-    
     # The order of methods to call to build the UPDATE SQL statement
     def update_clause_methods
       UPDATE_CLAUSE_METHODS
