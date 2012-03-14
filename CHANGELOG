@@ -1,5 +1,7 @@
 === HEAD
 
+* Double speed of Model#new with empty hash, and quadruple speed of Model#set with empty hash (jeremyevans)
+
 * Allow SQL::QualifiedIdentifier objects to contain arbitrary Sequel expressions (jeremyevans)
 
 * Add pg_hstore_ops extension, for easily calling PostgreSQL hstore functions and operators (jeremyevans)

@@ -1608,7 +1608,7 @@ module Sequel
       # exists so it can be overridden.  This is called only for new records, before
       # changed_columns is cleared.
       def initialize_set(h)
-        set(h)
+        set(h) unless h.empty?
       end
 
       # Default inspection output for the values hash, overwrite to change what #inspect displays.
@@ -1632,6 +1632,7 @@ module Sequel
   
       # Set the columns, filtered by the only and except arrays.
       def set_restricted(hash, only, except)
+        return self if hash.empty?
         meths = if only.nil? && except.nil? && !@singleton_setter_added
           model.setter_methods
         else
