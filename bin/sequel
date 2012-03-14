@@ -14,6 +14,7 @@ migrate_dir = nil
 migrate_ver = nil
 backtrace = nil
 load_dirs = []
+exclusive_options = []
 
 opts = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
@@ -39,10 +40,12 @@ opts = OptionParser.new do |opts|
   
   opts.on("-d", "--dump-migration", "print database migration to STDOUT") do 
     dump_migration = true
+    exclusive_options << :d
   end
   
   opts.on("-D", "--dump-migration-same-db", "print database migration to STDOUT without type translation") do
     dump_migration = :same_db
+    exclusive_options << :D
   end
 
   opts.on("-e", "--env ENV", "use environment config for database") do |v|
@@ -67,6 +70,7 @@ opts = OptionParser.new do |opts|
   
   opts.on("-m", "--migrate-directory DIR", "run the migrations in directory") do |v|
     migrate_dir = v
+    exclusive_options << :m
   end
   
   opts.on("-M", "--migrate-version VER", "migrate the database to version given") do |v|
@@ -100,8 +104,7 @@ error_proc = lambda do |msg|
 end
 
 error_proc["Error: Must specify -m if using -M"] if migrate_ver && !migrate_dir
-error_proc["Error: Cannot specify -D or -d with -m"] if dump_migration && migrate_dir
-error_proc["Error: Cannot specify -C with -d, -D, or -m"] if copy_databases && (dump_migration || migrate_dir)
+error_proc["Error: Cannot specify #{exclusive_options.map{|v| "-#{v}"}.join(' and ')} together"] if exclusive_options.length > 1
 
 if logfile || echo
   require 'logger'
