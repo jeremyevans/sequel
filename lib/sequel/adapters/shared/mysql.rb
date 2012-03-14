@@ -565,8 +565,7 @@ module Sequel
         clone(:replace=>true).insert_sql(*values)
       end
 
-      # MySQL specific syntax for REPLACE (aka UPSERT, or update if exists,
-      # insert if it doesn't).
+      # Replace multiple rows in a single query.
       def multi_replace(*values)
         clone(:replace=>true).multi_insert(*values)
       end

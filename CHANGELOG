@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#multi_replace on MySQL, allowing you to REPLACE multiple rows in a single query (danielb2) (#452)
+
 * Double speed of Model#new with empty hash, and quadruple speed of Model#set with empty hash (jeremyevans)
 
 * Allow SQL::QualifiedIdentifier objects to contain arbitrary Sequel expressions (jeremyevans)
