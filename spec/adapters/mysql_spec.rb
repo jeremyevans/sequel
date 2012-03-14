@@ -782,6 +782,62 @@ describe "MySQL::Dataset#insert and related methods" do
     @d.all.should == [{:name => 'abc', :value => 6}, {:name => 'def', :value => 2}]
   end
 
+  specify "#multi_replace should insert multiple records in a single statement" do
+    @d.multi_replace([{:name => 'abc'}, {:name => 'def'}])
+
+    MYSQL_DB.sqls.should == [
+      SQL_BEGIN,
+      "REPLACE INTO `items` (`name`) VALUES ('abc'), ('def')",
+      SQL_COMMIT
+    ]
+
+    @d.all.should == [
+      {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
+    ]
+  end
+
+  specify "#multi_replace should split the list of records into batches if :commit_every option is given" do
+    @d.multi_replace([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
+      :commit_every => 2)
+
+    MYSQL_DB.sqls.should == [
+      SQL_BEGIN,
+      "REPLACE INTO `items` (`value`) VALUES (1), (2)",
+      SQL_COMMIT,
+      SQL_BEGIN,
+      "REPLACE INTO `items` (`value`) VALUES (3), (4)",
+      SQL_COMMIT
+    ]
+
+    @d.all.should == [
+      {:name => nil, :value => 1}, 
+      {:name => nil, :value => 2},
+      {:name => nil, :value => 3}, 
+      {:name => nil, :value => 4}
+    ]
+  end
+
+  specify "#multi_replace should split the list of records into batches if :slice option is given" do
+    @d.multi_replace([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
+      :slice => 2)
+
+    MYSQL_DB.sqls.should == [
+      SQL_BEGIN,
+      "REPLACE INTO `items` (`value`) VALUES (1), (2)",
+      SQL_COMMIT,
+      SQL_BEGIN,
+      "REPLACE INTO `items` (`value`) VALUES (3), (4)",
+      SQL_COMMIT
+    ]
+
+    @d.all.should == [
+      {:name => nil, :value => 1}, 
+      {:name => nil, :value => 2},
+      {:name => nil, :value => 3}, 
+      {:name => nil, :value => 4}
+    ]
+  end
+
   specify "#multi_insert should insert multiple records in a single statement" do
     @d.multi_insert([{:name => 'abc'}, {:name => 'def'}])
 
