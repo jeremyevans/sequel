@@ -564,6 +564,12 @@ module Sequel
       def replace_sql(*values)
         clone(:replace=>true).insert_sql(*values)
       end
+
+      # MySQL specific syntax for REPLACE (aka UPSERT, or update if exists,
+      # insert if it doesn't).
+      def multi_replace(*values)
+        clone(:replace=>true).multi_insert(*values)
+      end
       
       # MySQL can emulate DISTINCT ON with its non-standard GROUP BY implementation,
       # though the rows returned cannot be made deterministic through ordering.
