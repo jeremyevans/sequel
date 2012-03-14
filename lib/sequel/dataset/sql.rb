@@ -512,7 +512,7 @@ module Sequel
       table_alias = jc.table_alias
       table_alias = nil if table == table_alias
       sql << SPACE << join_type_sql(jc.join_type) << SPACE
-      table_ref_append(sql, table)
+      identifier_append(sql, table)
       as_sql_append(sql, table_alias) if table_alias
     end
 
@@ -1314,7 +1314,7 @@ module Sequel
       co = COMMA
       sources.each do |s|
         sql << co if c
-        table_ref_append(sql, s)
+        identifier_append(sql, s)
         c ||= true
       end
     end

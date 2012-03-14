@@ -631,7 +631,7 @@ module Sequel
       def select_into_sql(sql)
         if i = @opts[:into]
           sql << INTO
-          table_ref_append(sql, i)
+          identifier_append(sql, i)
         end
       end
 
@@ -670,7 +670,7 @@ module Sequel
         column_list_append(sql, output[:select_list])
         if into = output[:into]
           sql << INTO
-          table_ref_append(sql, into)
+          identifier_append(sql, into)
           if column_list = output[:column_list]
             sql << PAREN_SPACE_OPEN
             source_list_append(sql, column_list)
