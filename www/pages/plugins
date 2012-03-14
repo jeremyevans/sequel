@@ -94,6 +94,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html">pg_hstore</a>: Add support for the PostgreSQL hstore type.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_ops_rb.html">pg_hstore_ops</a>: Adds DSL support for calling PostgreSQL hstore operators and functions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_statement_cache_rb.html">pg_statement_cache</a>: Automatically use prepared statements for most queries when using postgres adapter with the pg driver.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_caching_rb.html">schema_caching</a>: Speed up loading a large number of models by caching database schema and loading it from a file.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/server_block_rb.html">server_block</a>: Adds Database#with_server method that makes access inside the passed block use the specified shard by default.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_expr_rb.html">sql_expr</a>: Adds sql_expr method to all objects, allowing easy use of Sequel's DSL.</li>

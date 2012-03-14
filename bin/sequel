@@ -7,6 +7,7 @@ require 'sequel'
 db_opts = {:test=>true}
 copy_databases = nil
 dump_migration = nil
+dump_schema = nil
 echo = nil
 env = nil
 logfile = nil
@@ -85,6 +86,11 @@ opts = OptionParser.new do |opts|
     load_dirs << [v]
   end
 
+  opts.on("-S", "--dump-schema filename", "dump the schema for all tables to the file") do |v|
+    dump_schema = v
+    exclusive_options << :S
+  end
+
   opts.on("-t", "--trace", "Output the full backtrace if an exception is raised") do
     backtrace = true
   end
@@ -140,6 +146,12 @@ begin
   if dump_migration
     Sequel.extension :schema_dumper
     puts DB.dump_schema_migration(:same_db=>dump_migration==:same_db)
+    exit
+  end
+  if dump_schema
+    Sequel.extension :schema_caching
+    DB.tables.each{|t| DB.schema(Sequel::SQL::Identifier.new(t))}
+    DB.dump_schema_cache(dump_schema)
     exit
   end
   if copy_databases
