@@ -1,5 +1,7 @@
 === HEAD
 
+* Add null_dataset extension, for creating a dataset that never issues a database query (jeremyevans)
+
 * Database#uri and #url now return nil if a connection string was not used when connecting (jeremyevans) (#453)
 
 * Add schema_caching extension, to speed up loading a large number of models by loading cached schema information from a file (jeremyevans)
