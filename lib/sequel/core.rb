@@ -1,4 +1,4 @@
-%w'bigdecimal date thread time uri'.each{|f| require f}
+%w'bigdecimal date thread time uri cgi'.each{|f| require f}
 
 # Top level module for Sequel
 #

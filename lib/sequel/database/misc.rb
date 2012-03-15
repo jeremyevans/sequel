@@ -224,7 +224,7 @@ module Sequel
         nil
       )
       uri.user = @opts[:user]
-      uri.password = @opts[:password] if uri.user
+      uri.password = CGI.escape(@opts[:password]) if uri.user
       uri.to_s
     end
     
