@@ -92,9 +92,9 @@ module Sequel
       #          or not allowing NULL values (if false).  If unspecified, will default
       #          to whatever the database default is.
       # :on_delete :: Specify the behavior of this column when being deleted
-      #               (:restrict, cascade, :set_null, :set_default, :no_action).
+      #               (:restrict, :cascade, :set_null, :set_default, :no_action).
       # :on_update :: Specify the behavior of this column when being updated
-      #               (:restrict, cascade, :set_null, :set_default, :no_action).
+      #               (:restrict, :cascade, :set_null, :set_default, :no_action).
       # :primary_key :: Make the column as a single primary key column.  This should only
       #                 be used if you have a single, nonautoincrementing primary key column.
       # :size :: The size of the column, generally used with string
