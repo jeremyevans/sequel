@@ -121,10 +121,14 @@ module Sequel
     end
 
     # Returns a string representation of the database object including the
-    # class name and the connection URI (or the opts if the URI
-    # cannot be constructed).
+    # class name and connection URI and options used when connecting (if any).
     def inspect
-      "#<#{self.class}: #{(uri rescue opts).inspect}>" 
+      a = []
+      a << uri.inspect if uri
+      if (oo = opts[:orig_opts]) && !oo.empty?
+        a << oo.inspect
+      end
+      "#<#{self.class}: #{a.join(' ')}>"
     end
 
     # Proxy the literal call to the dataset.
@@ -203,29 +207,10 @@ module Sequel
       end
     end
     
-    # Returns the URI identifying the database, which may not be the
-    # same as the URI used when connecting.
-    # This method can raise an error if the database used options
-    # instead of a connection string, and will not include uri
-    # parameters.
-    #
-    #   Sequel.connect('postgres://localhost/db?user=billg').url
-    #   # => "postgres://billg@localhost/db"
+    # Returns the URI use to connect to the database.  If a URI
+    # was not used when connecting, returns nil.
     def uri
-      uri = URI::Generic.new(
-        adapter_scheme.to_s,
-        nil,
-        @opts[:host],
-        @opts[:port],
-        nil,
-        "/#{@opts[:database]}",
-        nil,
-        nil,
-        nil
-      )
-      uri.user = @opts[:user]
-      uri.password = @opts[:password] if uri.user
-      uri.to_s
+      opts[:uri]
     end
     
     # Explicit alias of uri for easier subclassing.

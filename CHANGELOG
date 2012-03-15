@@ -1,5 +1,7 @@
 === HEAD
 
+* Database#uri and #url now return nil if a connection string was not used when connecting (jeremyevans) (#453)
+
 * Add schema_caching extension, to speed up loading a large number of models by loading cached schema information from a file (jeremyevans)
 
 * Add Dataset#multi_replace on MySQL, allowing you to REPLACE multiple rows in a single query (danielb2) (#452)

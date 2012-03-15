@@ -325,6 +325,10 @@ describe "Database#uri" do
     @db.uri.should == 'mau://user:pass@localhost:9876/maumau'
   end
   
+  specify "should return nil if a connection uri was not used" do
+    Sequel.mock.uri.should be_nil
+  end
+  
   specify "should be aliased as #url" do
     @db.url.should == 'mau://user:pass@localhost:9876/maumau'
   end
@@ -1068,21 +1072,20 @@ describe "A Database adapter with a scheme" do
     proc {Sequel.ccc('abc', 'def')}.should raise_error(Sequel::Error)
     
     c = Sequel.ccc('mydb')
-    p = proc{c.opts.delete_if{|k,v| k == :disconnection_proc || k == :single_threaded}}
     c.should be_a_kind_of(@ccc)
-    p.call.should == {:adapter=>:ccc, :database => 'mydb', :adapter_class=>@ccc}
+    c.opts.values_at(:adapter, :database, :adapter_class).should == [:ccc, 'mydb', @ccc]
     
     c = Sequel.ccc('mydb', :host => 'localhost')
     c.should be_a_kind_of(@ccc)
-    p.call.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost', :adapter_class=>@ccc}
+    c.opts.values_at(:adapter, :database, :host, :adapter_class).should == [:ccc, 'mydb', 'localhost', @ccc]
     
     c = Sequel.ccc
     c.should be_a_kind_of(@ccc)
-    p.call.should == {:adapter=>:ccc, :adapter_class=>@ccc}
+    c.opts.values_at(:adapter, :adapter_class).should == [:ccc, @ccc]
     
     c = Sequel.ccc(:database => 'mydb', :host => 'localhost')
     c.should be_a_kind_of(@ccc)
-    p.call.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost', :adapter_class=>@ccc}
+    c.opts.values_at(:adapter, :database, :host, :adapter_class).should == [:ccc, 'mydb', 'localhost', @ccc]
   end
   
   specify "should be accessible through Sequel.connect with options" do
@@ -1342,6 +1345,14 @@ end
 describe "Database#inspect" do
   specify "should include the class name and the connection url" do
     Sequel.connect('mock://foo/bar').inspect.should == '#<Sequel::Mock::Database: "mock://foo/bar">'
+  end
+
+  specify "should include the class name and the connection options if an options hash was given" do
+    Sequel.connect(:adapter=>:mock).inspect.should =~ /#<Sequel::Mock::Database: \{:adapter=>:mock\}>/
+  end
+
+  specify "should include the class name, uri, and connection options if uri and options hash was given" do
+    Sequel.connect('mock://foo', :database=>'bar').inspect.should =~ /#<Sequel::Mock::Database: "mock:\/\/foo" \{:database=>"bar"\}>/
   end
 end
 

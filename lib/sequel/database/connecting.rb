@@ -46,6 +46,7 @@ module Sequel
       when String
         if match = /\A(jdbc|do):/o.match(conn_string)
           c = adapter_class(match[1].to_sym)
+          opts = opts.merge(:orig_opts=>opts.dup)
           opts = {:uri=>conn_string}.merge(opts)
         else
           uri = URI.parse(conn_string)
@@ -55,11 +56,14 @@ module Sequel
           uri_options = c.send(:uri_to_options, uri)
           uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v if k && !k.empty?} unless uri.query.to_s.strip.empty?
           uri_options.to_a.each{|k,v| uri_options[k] = URI.unescape(v) if v.is_a?(String)}
+          opts = opts.merge(:orig_opts=>opts.dup)
+          opts[:uri] = conn_string
           opts = uri_options.merge(opts)
           opts[:adapter] = scheme
         end
       when Hash
         opts = conn_string.merge(opts)
+        opts = opts.merge(:orig_opts=>opts.dup)
         c = adapter_class(opts[:adapter_class] || opts[:adapter] || opts['adapter'])
       else
         raise Error, "Sequel::Database.connect takes either a Hash or a String, given: #{conn_string.inspect}"
