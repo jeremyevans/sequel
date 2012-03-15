@@ -120,7 +120,7 @@ END_MIG
       case t = schema[:db_type].downcase
       when /\A(?:medium|small)?int(?:eger)?(?:\((?:\d+)\))?(?: unsigned)?\z/o
         {:type=>Integer}
-      when /\Atinyint(?:\((\d+)\))?\z/o
+      when /\Atinyint(?:\((\d+)\))?(?: unsigned)?\z/o
         {:type =>schema[:type] == :boolean ? TrueClass : Integer}
       when /\Abigint(?:\((?:\d+)\))?(?: unsigned)?\z/o
         {:type=>Bignum}
