@@ -1,5 +1,7 @@
 === HEAD
 
+* Change formatting and return value of Dataset#explain on SQLite (jeremyevans)
+
 * Recognize unsigned tinyint types in the schema dumper (jeremyevans)
 
 * Add null_dataset extension, for creating a dataset that never issues a database query (jeremyevans)

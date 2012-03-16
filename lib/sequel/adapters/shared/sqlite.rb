@@ -476,10 +476,15 @@ module Sequel
       end
       
       # Return an array of strings specifying a query explanation for a SELECT of the
-      # current dataset.
-      def explain
-        db.send(:metadata_dataset).clone(:sql=>"EXPLAIN #{select_sql}").
-          map{|x| "#{x[:addr]}|#{x[:opcode]}|#{(1..5).map{|i| x[:"p#{i}"]}.join('|')}|#{x[:comment]}"}
+      # current dataset. Currently, the options are ignore, but it accepts options
+      # to be compatible with other adapters.
+      def explain(opts=nil)
+        # Load the PrettyTable class, needed for explain output
+        Sequel.extension(:_pretty_table) unless defined?(Sequel::PrettyTable)
+
+        ds = db.send(:metadata_dataset).clone(:sql=>"EXPLAIN #{select_sql}")
+        rows = ds.all
+        Sequel::PrettyTable.string(rows, ds.columns)
       end
       
       # HAVING requires GROUP BY on SQLite

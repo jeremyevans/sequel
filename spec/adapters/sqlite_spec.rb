@@ -363,13 +363,13 @@ describe "SQLite dataset" do
   end
     
   specify "should support #explain" do
-    SQLITE_DB[:test].explain.should be_a_kind_of(Array)
+    SQLITE_DB[:test].explain.should be_a_kind_of(String)
   end
   
   specify "should have #explain work when identifier_output_method is modified" do
     ds = SQLITE_DB[:test]
     ds.identifier_output_method = :upcase
-    ds.explain.should be_a_kind_of(Array)
+    ds.explain.should be_a_kind_of(String)
   end
 end
 
