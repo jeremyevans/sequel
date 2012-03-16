@@ -184,6 +184,10 @@ module Sequel
       @actions << [:alter_table, table, MigrationAlterTableReverser.new.reverse(&block)]
     end
 
+    def create_join_table(*args)
+      @actions << [:drop_join_table, *args]
+    end
+
     def create_table(*args)
       @actions << [:drop_table, args.first]
     end

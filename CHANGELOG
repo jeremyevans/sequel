@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#create_join_table and #drop_join_table for easily creating simple join tables for models (jeremyevans)
+
 * Fix Dataset#group_rollup/#group_cube on Microsoft SQL Server 2005 (jeremyevans)
 
 * Add Dataset#explain on MySQL (jeremyevans)

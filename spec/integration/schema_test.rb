@@ -194,6 +194,19 @@ describe "Database schema modifiers" do
     @ds.columns!.should == [:number]
   end
   
+  specify "should create join tables correctly" do
+    begin
+      @db.create_table(:cats){primary_key :id}
+      @db.create_table(:dogs){primary_key :id}
+      @db.create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
+      @db.table_exists?(:cats_dogs).should == true
+    ensure
+      @db.drop_join_table(:cat_id=>:cats, :dog_id=>:dogs)
+      @db.drop_table(:cats, :dogs)
+      @db.table_exists?(:cats_dogs).should == false
+    end
+  end
+
   specify "should create temporary tables without raising an exception" do
     @db.create_table!(:items, :temp=>true){Integer :number}
   end

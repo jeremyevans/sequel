@@ -569,6 +569,72 @@ describe "DB#create_table?" do
   end
 end
 
+describe "DB#create_join_table" do
+  before do
+    @db = Sequel.mock
+  end
+  
+  specify "should take a hash with foreign keys and table name values" do
+    @db.create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
+  end
+  
+  specify "should be able to have values be a hash of options" do
+    @db.create_join_table(:cat_id=>{:table=>:cats, :null=>true}, :dog_id=>{:table=>:dogs, :default=>0})
+    @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NULL REFERENCES cats, dog_id integer DEFAULT 0 NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
+  end
+  
+  specify "should be able to pass a second hash of table options" do
+    @db.create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :temp=>true)
+    @db.sqls.should == ['CREATE TEMPORARY TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
+  end
+  
+  specify "should recognize :name option in table options for the table to drop" do
+    @db.create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :name=>:f)
+    @db.sqls.should == ['CREATE TABLE f (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX f_dog_id_cat_id_index ON f (dog_id, cat_id)']
+  end
+  
+  specify "should raise an error if the hash doesn't have 2 entries with table names" do
+    proc{@db.create_join_table({})}.should raise_error(Sequel::Error)
+    proc{@db.create_join_table({:cat_id=>:cats})}.should raise_error(Sequel::Error)
+    proc{@db.create_join_table({:cat_id=>:cats, :human_id=>:humans, :dog_id=>:dog})}.should raise_error(Sequel::Error)
+    proc{@db.create_join_table({:cat_id=>:cats, :dog_id=>{}})}.should raise_error(Sequel::Error)
+  end
+end
+  
+describe "DB#drop_join_table" do
+  before do
+    @db = Sequel.mock
+  end
+  
+  specify "should take a hash with foreign keys and table name values and drop the table" do
+    @db.drop_join_table(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.sqls.should == ['DROP TABLE cats_dogs']
+  end
+  
+  specify "should be able to have values be a hash of options" do
+    @db.drop_join_table(:cat_id=>{:table=>:cats, :null=>true}, :dog_id=>{:table=>:dogs, :default=>0})
+    @db.sqls.should == ['DROP TABLE cats_dogs']
+  end
+
+  specify "should respect a second hash of table options" do
+    @db.drop_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :cascade=>true)
+    @db.sqls.should == ['DROP TABLE cats_dogs CASCADE']
+  end
+
+  specify "should respect :name option for table name" do
+    @db.drop_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :name=>:f)
+    @db.sqls.should == ['DROP TABLE f']
+  end
+  
+  specify "should raise an error if the hash doesn't have 2 entries with table names" do
+    proc{@db.drop_join_table({})}.should raise_error(Sequel::Error)
+    proc{@db.drop_join_table({:cat_id=>:cats})}.should raise_error(Sequel::Error)
+    proc{@db.drop_join_table({:cat_id=>:cats, :human_id=>:humans, :dog_id=>:dog})}.should raise_error(Sequel::Error)
+    proc{@db.drop_join_table({:cat_id=>:cats, :dog_id=>{}})}.should raise_error(Sequel::Error)
+  end
+end
+
 describe "DB#drop_table" do
   before do
     @db = Sequel.mock

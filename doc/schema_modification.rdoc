@@ -253,6 +253,21 @@ and it creates an unnamed constraint
     check{char_length(name) > 2}
   end
   
+== +create_join_table+
+
++create_join_table+ is a shortcut that you can use to create simple many-to-many join tables:
+
+  create_join_table(:artist_id=>:artists, :album_id=>:albums)
+
+which expands to:
+
+  create_table(:albums_artists) do
+    foreign_key :album_id, :albums, :null=>false
+    foreign_key :artist_id, :artists, :null=>false
+    primary_key [:album_id, :artist_id]
+    index [:artist_id, :album_id]
+  end
+
 == +alter_table+
 
 +alter_table+ is used to alter existing tables, changing their columns, indexes,

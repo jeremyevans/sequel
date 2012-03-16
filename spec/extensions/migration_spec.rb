@@ -129,6 +129,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
         rename_column :e, :g
       end
       create_view(:c, 'SELECT * FROM b')
+      create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
     end
   end
   
@@ -150,13 +151,16 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
         [:add_spatial_index, :e, {:name=>"e_s"}],
         [:rename_column, :e, :g]]
       ],
-      [:create_view, :c, "SELECT * FROM b"]]
+      [:create_view, :c, "SELECT * FROM b"],
+      [:create_join_table, {:cat_id=>:cats, :dog_id=>:dogs}]]
   end
 
   specify "should execute down with reversing actions in reverse order" do
     p = @p
     Sequel.migration{change(&p)}.apply(@db, :down)
-    @db.actions.should == [[:drop_view, :c],
+    @db.actions.should == [
+      [:drop_join_table, {:cat_id=>:cats, :dog_id=>:dogs}],
+      [:drop_view, :c],
       [:alter_table, [
         [:rename_column, :g, :e],
         [:drop_index, :e, {:name=>"e_s"}],

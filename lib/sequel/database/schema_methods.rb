@@ -23,6 +23,9 @@ module Sequel
     # The order of column modifiers to use when defining a column.
     COLUMN_DEFINITION_ORDER = [:collate, :default, :null, :unique, :primary_key, :auto_increment, :references]
 
+    # The default options for join table columns.
+    DEFAULT_JOIN_TABLE_COLUMN_OPTIONS = {:null=>false}
+
     # Adds a column to the specified table. This method expects a column name,
     # a datatype and optionally a hash with additional constraints and options:
     #
@@ -74,6 +77,53 @@ module Sequel
       remove_cached_schema(name)
       apply_alter_table(name, generator.operations)
       nil
+    end
+
+    # Create a join table using a hash of foreign keys to referenced
+    # table names.  Example:
+    #
+    #   create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
+    #   # CREATE TABLE cats_dogs (
+    #   #  cat_id integer NOT NULL REFERENCES cats,
+    #   #  dog_id integer NOT NULL REFERENCES dogs,
+    #   #  PRIMARY KEY (cat_id, dog_id)
+    #   # )
+    #   # CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs(dog_id, cat_id)
+    #
+    # The primary key and index are used so that almost all operations
+    # on the table can benefit from one of the two indexes, and the primary
+    # key ensures that entries in the table are unique, which is the typical
+    # desire for a join table.  If you don't want to use a primary key or have
+    # the second index created, use #create_table manually instead of this method.
+    #
+    # You can provide column options by making the values in the hash
+    # be option hashes, so long as the option hashes have a :table
+    # entry giving the table referenced:
+    #
+    #   create_join_table(:cat_id=>{:table=>:cats, :type=>Bignum}, :dog_id=>:dogs)
+    #   
+    # You can provide a second argument which is a table options hash:
+    #
+    #   create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :temp=>true)
+    #
+    # If you want to override the default join table name used, you can
+    # pass a :name entry with the table options:
+    #
+    #   create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :names=>:dogs2cats)
+    def create_join_table(hash, options={})
+      keys = hash.keys.sort_by{|k| k.to_s}
+      create_table(join_table_name(hash, options), options) do
+        keys.each do |key|
+          v = hash[key]
+          unless v.is_a?(Hash)
+            v = {:table=>v}
+          end
+          v = DEFAULT_JOIN_TABLE_COLUMN_OPTIONS.merge(v)
+          foreign_key(key, v)
+        end
+        primary_key keys
+        index keys.reverse
+      end
     end
 
     # Creates a table with the columns given in the provided block:
@@ -161,10 +211,19 @@ module Sequel
     def drop_index(table, columns, options={})
       alter_table(table){drop_index(columns, options)}
     end
+
+    # Drop the join table that would have been created with the
+    # same arguments to create_join_table:
+    #
+    #   drop_join_table(:cat_id=>:cats, :dog_id=>:dogs)
+    #   # DROP TABLE cats_dogs
+    def drop_join_table(hash, options={})
+      drop_table(join_table_name(hash, options), options)
+    end
     
     # Drops one or more tables corresponding to the given names:
     #
-    #   DB.drop_table(:posts)
+    #   DB.drop_table(:posts) # DROP TABLE posts
     #   DB.drop_table(:posts, :comments)
     #   DB.drop_table(:posts, :comments, :cascade=>true)
     def drop_table(*names)
@@ -460,6 +519,32 @@ module Sequel
       indexes.map{|i| index_definition_sql(table_name, i)}
     end
 
+    # Extract the join table name from the arguments given to create_join_table.
+    # Also does argument validation for the create_join_table method.
+    def join_table_name(hash, options)
+      entries = hash.values
+      raise Error, "must have 2 entries in hash given to (create|drop)_join_table" unless entries.length == 2
+      if options[:name]
+        options[:name]
+      else
+        table_names = entries.map{|e| join_table_name_extract(e)}
+        table_names.map{|t| t.to_s}.sort.join('_')
+      end
+    end
+
+    # Extract an individual join table name, which should either be a string
+    # or symbol, or a hash containing one of those as the value for :table.
+    def join_table_name_extract(entry)
+      case entry
+      when Symbol, String
+        entry
+      when Hash
+        join_table_name_extract(entry[:table])
+      else
+        raise Error, "can't extract table name from #{entry.inspect}"
+      end
+    end
+    
     # SQL DDL ON DELETE fragment to use, based on the given action.
     # The following actions are recognized:
     # 
