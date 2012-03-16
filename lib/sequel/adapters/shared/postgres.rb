@@ -765,7 +765,7 @@ module Sequel
         mod.def_mutation_method(:disable_insert_returning)
       end
 
-      # Return the results of an ANALYZE query as a string
+      # Return the results of an EXPLAIN ANALYZE query as a string
       def analyze
         explain(:analyze=>true)
       end
