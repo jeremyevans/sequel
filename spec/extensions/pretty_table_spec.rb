@@ -63,6 +63,12 @@ describe "PrettyTable" do
       /\n(\|x\|y\|)|(\|y\|x\|)\n/
   end
   
+  specify "should have #string return the string without printing" do
+    Sequel::PrettyTable.string(@data1).should =~ /\n(\|x\|y\|)|(\|y\|x\|)\n/
+    @output.rewind
+    @output.read.should == ''
+  end
+  
   specify "should calculate the maximum width of each column correctly" do
     Sequel::PrettyTable.print(@data2, [:a, :b])
     @output.rewind
