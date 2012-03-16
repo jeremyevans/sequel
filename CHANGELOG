@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Dataset#group_rollup/#group_cube on Microsoft SQL Server 2005 (jeremyevans)
+
 * Add Dataset#explain on MySQL (jeremyevans)
 
 * Change formatting and return value of Dataset#explain on SQLite (jeremyevans)

@@ -165,5 +165,10 @@ module Sequel
     def uses_returning?(type)
       opts[:returning] && !@opts[:sql] && supports_returning?(type)
     end
+    
+    # Whether the dataset uses WITH ROLLUP/CUBE instead of ROLLUP()/CUBE().
+    def uses_with_rollup?
+      false
+    end
   end
 end

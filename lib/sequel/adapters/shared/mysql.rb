@@ -752,15 +752,6 @@ module Sequel
         SELECT_CLAUSE_METHODS
       end
       
-      # MySQL supports ROLLUP via nonstandard SQL syntax
-      def select_group_sql(sql)
-        if group = @opts[:group]
-          sql << GROUP_BY
-          expression_list_append(sql, group)
-          sql << WITH_ROLLUP if @opts[:group_options] == :rollup
-        end
-      end
-
       # Support FOR SHARE locking when using the :share lock style.
       def select_lock_sql(sql)
         @opts[:lock] == :share ? (sql << FOR_SHARE) : super
@@ -774,6 +765,11 @@ module Sequel
       # MySQL supports the ORDER BY and LIMIT clauses for UPDATE statements
       def update_clause_methods
         UPDATE_CLAUSE_METHODS
+      end
+
+      # MySQL uses WITH ROLLUP syntax.
+      def uses_with_rollup?
+        true
       end
     end
   end

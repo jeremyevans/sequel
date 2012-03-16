@@ -547,8 +547,14 @@ module Sequel
 
       private
 
+      # Whether we are using SQL Server 2005 or later.
       def is_2005_or_later?
         server_version >= 9000000
+      end
+
+      # Whether we are using SQL Server 2008 or later.
+      def is_2008_or_later?
+        server_version >= 10000000
       end
 
       # MSSQL supports the OUTPUT clause for DELETE statements.
@@ -691,6 +697,10 @@ module Sequel
       def update_table_sql(sql)
         sql << SPACE
         source_list_append(sql, @opts[:from][0..0])
+      end
+
+      def uses_with_rollup?
+        !is_2008_or_later?
       end
     end
   end

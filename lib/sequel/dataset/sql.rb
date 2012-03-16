@@ -269,6 +269,7 @@ module Sequel
     SET = ' SET '.freeze
     SPACE = ' '.freeze
     SQL_WITH = "WITH ".freeze
+    SPACE_WITH = " WITH ".freeze
     TILDE = '~'.freeze
     TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S%N%z'".freeze
     STANDARD_TIMESTAMP_FORMAT = "TIMESTAMP #{TIMESTAMP_FORMAT}".freeze
@@ -1208,11 +1209,17 @@ module Sequel
       if group = @opts[:group]
         sql << GROUP_BY
         if go = @opts[:group_options]
-          sql << go.to_s.upcase
-          sql << PAREN_OPEN
+          if uses_with_rollup?
+            expression_list_append(sql, group)
+            sql << SPACE_WITH << go.to_s.upcase
+          else
+            sql << go.to_s.upcase << PAREN_OPEN
+            expression_list_append(sql, group)
+            sql << PAREN_CLOSE
+          end
+        else
+          expression_list_append(sql, group)
         end
-        expression_list_append(sql, group)
-        sql << PAREN_CLOSE if go
       end
     end
 

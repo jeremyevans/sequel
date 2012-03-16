@@ -914,12 +914,18 @@ describe "Dataset#group_by" do
     @dataset.meta_def(:supports_group_rollup?){true}
     @dataset.group(:type_id).group_rollup.select_sql.should == "SELECT * FROM test GROUP BY ROLLUP(type_id)"
     @dataset.group(:type_id, :b).group_rollup.select_sql.should == "SELECT * FROM test GROUP BY ROLLUP(type_id, b)"
+    @dataset.meta_def(:uses_with_rollup?){true}
+    @dataset.group(:type_id).group_rollup.select_sql.should == "SELECT * FROM test GROUP BY type_id WITH ROLLUP"
+    @dataset.group(:type_id, :b).group_rollup.select_sql.should == "SELECT * FROM test GROUP BY type_id, b WITH ROLLUP"
   end
 
   specify "should support a #group_cube method if the database supports it" do
     @dataset.meta_def(:supports_group_cube?){true}
     @dataset.group(:type_id).group_cube.select_sql.should == "SELECT * FROM test GROUP BY CUBE(type_id)"
     @dataset.group(:type_id, :b).group_cube.select_sql.should == "SELECT * FROM test GROUP BY CUBE(type_id, b)"
+    @dataset.meta_def(:uses_with_rollup?){true}
+    @dataset.group(:type_id).group_cube.select_sql.should == "SELECT * FROM test GROUP BY type_id WITH CUBE"
+    @dataset.group(:type_id, :b).group_cube.select_sql.should == "SELECT * FROM test GROUP BY type_id, b WITH CUBE"
   end
 
   specify "should have #group_cube and #group_rollup methods raise an Error if not supported it" do
