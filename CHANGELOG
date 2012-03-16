@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#explain on MySQL (jeremyevans)
+
 * Change formatting and return value of Dataset#explain on SQLite (jeremyevans)
 
 * Recognize unsigned tinyint types in the schema dumper (jeremyevans)

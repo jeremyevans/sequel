@@ -419,6 +419,8 @@ module Sequel
       WITH_ROLLUP = ' WITH ROLLUP'.freeze
       MATCH_AGAINST = ["(MATCH ".freeze, " AGAINST (".freeze, "))".freeze].freeze
       MATCH_AGAINST_BOOLEAN = ["(MATCH ".freeze, " AGAINST (".freeze, " IN BOOLEAN MODE))".freeze].freeze
+      EXPLAIN = 'EXPLAIN '.freeze
+      EXPLAIN_EXTENDED = 'EXPLAIN EXTENDED '.freeze
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
@@ -470,6 +472,17 @@ module Sequel
         clone(:calc_found_rows => true)
       end
       
+      # Return the results of an EXPLAIN query as a string. Options:
+      # :extended :: Use EXPLAIN EXPTENDED instead of EXPLAIN if true.
+      def explain(opts={})
+        # Load the PrettyTable class, needed for explain output
+        Sequel.extension(:_pretty_table) unless defined?(Sequel::PrettyTable)
+
+        ds = db.send(:metadata_dataset).with_sql((opts[:extended] ? EXPLAIN_EXTENDED : EXPLAIN) + select_sql).naked
+        rows = ds.all
+        Sequel::PrettyTable.string(rows, ds.columns)
+      end
+
       # Return a cloned dataset which will use LOCK IN SHARE MODE to lock returned rows.
       def for_share
         lock_style(:share)

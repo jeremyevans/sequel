@@ -239,6 +239,12 @@ describe "A MySQL dataset" do
     @d.filter(:name => /^bc/).count.should == 1
   end
 
+  specify "should have explain output" do
+    @d.explain.should be_a_kind_of(String)
+    @d.explain(:extended=>true).should be_a_kind_of(String)
+    @d.explain.should_not == @d.explain(:extended=>true)
+  end
+
   specify "should correctly literalize strings with comment backslashes in them" do
     @d.delete
     proc {@d << {:name => ':\\'}}.should_not raise_error
