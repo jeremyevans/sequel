@@ -221,17 +221,27 @@ module Sequel
     # pg, postgres, or postgres-pr driver.
     class Database < Sequel::Database
       include Sequel::Postgres::DatabaseMethods
+
+      INFINITE_TIMESTAMP_STRINGS = ['infinity'.freeze, '-infinity'.freeze].freeze
+      INFINITE_DATETIME_VALUES = ([1.0/0.0, -1.0/0.0] + INFINITE_TIMESTAMP_STRINGS).freeze
       
       set_adapter_scheme :postgres
 
       # A hash of conversion procs, keyed by type integer (oid) and
       # having callable values for the conversion proc for that type.
       attr_reader :conversion_procs
+
+      # Whether infinite timestamps should be converted on retrieval.  By default, no
+      # conversion is done, so an error is raised if you attempt to retrieve an infinite
+      # timestamp.  You can set this to :nil to convert to nil, :string to leave
+      # as a string, or :float to convert to an infinite float.
+      attr_accessor :convert_infinite_timestamps
       
       # Add the primary_keys and primary_key_sequences instance variables,
       # so we can get the correct return values for inserted rows.
       def initialize(*args)
         super
+        @convert_infinite_timestamps = false
         @primary_keys = {}
         @primary_key_sequences = {}
       end
@@ -433,9 +443,24 @@ module Sequel
       def reset_conversion_procs
         synchronize{|conn| @conversion_procs = get_conversion_procs(conn)}
       end
+
+      # If convert_infinite_timestamps is true and the value is infinite, return an appropriate
+      # value based on the convert_infinite_timestamps setting.
+      def to_application_timestamp(value)
+        if c = convert_infinite_timestamps
+          case value
+          when *INFINITE_TIMESTAMP_STRINGS
+            infinite_timestamp_value(value)
+          else
+            super
+          end
+        else
+          super
+        end
+      end
         
       private
-      
+
       # Convert exceptions raised from the block into DatabaseErrors.
       def check_database_errors
         begin
@@ -510,6 +535,35 @@ module Sequel
           end
         end
         procs
+      end
+
+      # Return an appropriate value for the given infinite timestamp string.
+      def infinite_timestamp_value(value)
+        case convert_infinite_timestamps
+        when :nil
+          nil
+        when :string
+          value
+        else
+          value == 'infinity' ? PLUS_INFINITY : MINUS_INFINITY
+        end
+      end
+      
+
+      # If the value is an infinite value (either an infinite float or a string returned by
+      # by PostgreSQL for an infinite timestamp), return it without converting it if
+      # convert_infinite_timestamps is set.
+      def typecast_value_datetime(value)
+        if convert_infinite_timestamps
+          case value
+          when *INFINITE_DATETIME_VALUES
+            value
+          else
+            super
+          end
+        else
+          super
+        end
       end
     end
     

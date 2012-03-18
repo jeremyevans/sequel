@@ -1,6 +1,8 @@
 === HEAD
 
-* Add Database#create_join_table and #drop_join_table for easily creating simple join tables for models (jeremyevans)
+* Add Database#convert_infinite_timestamps to the postgres adapter, can be set to :nil, :string, or :float (jeremyevans) (#454)
+
+* Add Database#create_join_table and #drop_join_table for easily creating many-to-many join tables (jeremyevans)
 
 * Fix Dataset#group_rollup/#group_cube on Microsoft SQL Server 2005 (jeremyevans)
 

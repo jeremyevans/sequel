@@ -248,8 +248,12 @@ end
 
 describe "A PostgreSQL dataset with a timestamp field" do
   before do
-    @d = POSTGRES_DB[:test3]
+    @db = POSTGRES_DB
+    @d = @db[:test3]
     @d.delete
+  end
+  after do
+    @db.convert_infinite_timestamps = false if @db.adapter_scheme == :postgres
   end
 
   cspecify "should store milliseconds in time fields for Time objects", :do do
@@ -268,6 +272,35 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @d.literal(t2).should == @d.literal(t)
     t2.strftime('%Y-%m-%d %H:%M:%S').should == t.strftime('%Y-%m-%d %H:%M:%S')
     t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000 == t.strftime('%N').to_i/1000
+  end
+
+  if POSTGRES_DB.adapter_scheme == :postgres
+    specify "should handle infinite timestamps if convert_infinite_timestamps is set" do
+      @d << {:time=>'infinity'}
+      @db.convert_infinite_timestamps = :nil
+      @db[:test3].get(:time).should == nil
+      @db.convert_infinite_timestamps = :string
+      @db[:test3].get(:time).should == 'infinity'
+      @db.convert_infinite_timestamps = :float
+      @db[:test3].get(:time).should == 1.0/0.0
+
+      @d.update(:time=>'-infinity')
+      @db.convert_infinite_timestamps = :nil
+      @db[:test3].get(:time).should == nil
+      @db.convert_infinite_timestamps = :string
+      @db[:test3].get(:time).should == '-infinity'
+      @db.convert_infinite_timestamps = :float
+      @db[:test3].get(:time).should == -1.0/0.0
+    end
+
+    specify "should handle conversions from infinite strings/floats in models" do
+      c = Class.new(Sequel::Model(:test3))
+      @db.convert_infinite_timestamps = :float
+      c.new(:time=>'infinity').time.should == 'infinity'
+      c.new(:time=>'-infinity').time.should == '-infinity'
+      c.new(:time=>1.0/0.0).time.should == 1.0/0.0
+      c.new(:time=>-1.0/0.0).time.should == -1.0/0.0
+    end
   end
 end
 
