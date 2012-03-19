@@ -896,6 +896,34 @@ describe Sequel::Model, "#set_fields" do
     @o1.values.should == {:x => 9, :y => 8, :id=>7}
     MODEL_DB.sqls.should == []
   end
+
+  it "should lookup into the hash without checking if the entry exists" do
+    @o1.set_fields({:x => 1}, [:x, :y])
+    @o1.values.should == {:x => 1, :y => nil}
+    @o1.set_fields(Hash.new(2), [:x, :y])
+    @o1.values.should == {:x => 2, :y => 2}
+  end
+
+  it "should skip missing fields if :missing=>:skip option is used" do
+    @o1.set_fields({:x => 3}, [:x, :y], :missing=>:skip)
+    @o1.values.should == {:x => 3}
+    @o1.set_fields({"x" => 4}, [:x, :y], :missing=>:skip)
+    @o1.values.should == {:x => 4}
+    @o1.set_fields(Hash.new(2).merge(:x=>2), [:x, :y], :missing=>:skip)
+    @o1.values.should == {:x => 2}
+    @o1.set_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y], :missing=>:skip)
+    @o1.values.should == {:x => 1, :y => 2}
+  end
+
+  it "should raise for missing fields if :missing=>:raise option is used" do
+    proc{@o1.set_fields({:x => 1}, [:x, :y], :missing=>:raise)}.should raise_error(Sequel::Error)
+    proc{@o1.set_fields(Hash.new(2).merge(:x=>2), [:x, :y], :missing=>:raise)}.should raise_error(Sequel::Error)
+    proc{@o1.set_fields({"x" => 1}, [:x, :y], :missing=>:raise)}.should raise_error(Sequel::Error)
+    @o1.set_fields({:x => 5, "y"=>2}, [:x, :y], :missing=>:raise)
+    @o1.values.should == {:x => 5, :y => 2}
+    @o1.set_fields({:x => 1, :y => 3, :z=>3, :id=>4}, [:x, :y], :missing=>:raise)
+    @o1.values.should == {:x => 1, :y => 3}
+  end
 end
 
 describe Sequel::Model, "#update_fields" do
@@ -919,6 +947,16 @@ describe Sequel::Model, "#update_fields" do
     @o1.update_fields({:x => 1, :y => 5, :z=>6, :id=>7}, [:x, :y])
     @o1.values.should == {:x => 1, :y => 5, :id=>1}
     MODEL_DB.sqls.should == ["UPDATE items SET y = 5 WHERE (id = 1)"]
+  end
+
+  it "should support :missing=>:skip option" do
+    @o1.update_fields({:x => 1, :z=>3, :id=>4}, [:x, :y], :missing=>:skip)
+    @o1.values.should == {:x => 1, :id=>1}
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 1 WHERE (id = 1)"]
+  end
+
+  it "should support :missing=>:raise option" do
+    proc{@o1.update_fields({:x => 1}, [:x, :y], :missing=>:raise)}.should raise_error(Sequel::Error)
   end
 end
 

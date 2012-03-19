@@ -1,5 +1,7 @@
 === HEAD
 
+* Model#set_fields and #update_fields now respect :missing=>:skip and :missing=>:raise options for handling missing values (jeremyevans)
+
 * The :on_update and :on_delete entries for foreign key can now take strings, which are used literally (jeremyevans)
 
 * Add Database#convert_infinite_timestamps to the postgres adapter, can be set to :nil, :string, or :float (jeremyevans) (#454)

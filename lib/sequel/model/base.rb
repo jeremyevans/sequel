@@ -1231,14 +1231,56 @@ module Sequel
       # For each of the fields in the given array +fields+, call the setter
       # method with the value of that +hash+ entry for the field. Returns self.
       #
+      # You can provide an options hash, with the following options currently respected:
+      # :missing :: Can be set to :skip to skip missing entries or :raise to raise an
+      #             Error for missing entries.  The default behavior is not to check for
+      #             missing entries, in which case the default value is used.  To be
+      #             friendly with most web frameworks, the missing check will also check
+      #             for the string version of the argument in the hash if given a symbol.
+      #
+      # Examples:
+      #
       #   artist.set_fields({:name=>'Jim'}, [:name])
       #   artist.name # => 'Jim'
       #
       #   artist.set_fields({:hometown=>'LA'}, [:name])
       #   artist.name # => nil
       #   artist.hometown # => 'Sac'
-      def set_fields(hash, fields)
-        fields.each{|f| send("#{f}=", hash[f])}
+      #
+      #   artist.name # => 'Jim'
+      #   artist.set_fields({}, [:name], :missing=>:skip)
+      #   artist.name # => 'Jim'
+      #
+      #   artist.name # => 'Jim'
+      #   artist.set_fields({}, [:name], :missing=>:raise)
+      #   # Sequel::Error raised
+      def set_fields(hash, fields, opts=nil)
+        if opts
+          case opts[:missing]
+          when :skip
+            fields.each do |f|
+              if hash.has_key?(f) 
+                send("#{f}=", hash[f])
+              elsif f.is_a?(Symbol) && hash.has_key?(sf = f.to_s)
+                send("#{sf}=", hash[sf])
+              end
+            end
+          when :raise
+            fields.each do |f|
+              if hash.has_key?(f)
+                send("#{f}=", hash[f])
+              elsif f.is_a?(Symbol) && hash.has_key?(sf = f.to_s)
+                send("#{sf}=", hash[sf])
+              else
+                raise(Sequel::Error, "missing field in hash: #{f.inspect} not in #{hash.inspect}")
+              end
+            end
+          else
+            fields.each{|f| send("#{f}=", hash[f])}
+          end
+        else
+          fields.each{|f| send("#{f}=", hash[f])}
+        end
         self
       end
   
@@ -1307,16 +1349,16 @@ module Sequel
         update_restricted(hash, false, except.flatten)
       end
   
-      # Update the instances values by calling +set_fields+ with the +hash+
-      # and +fields+, then save any changes to the record.  Returns self.
+      # Update the instances values by calling +set_fields+ with the arguments, then
+      # saves any changes to the record.  Returns self.
       #
       #   artist.update_fields({:name=>'Jim'}, [:name])
       #   # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       #
       #   artist.update_fields({:hometown=>'LA'}, [:name])
       #   # UPDATE artists SET name = NULL WHERE (id = 1)
-      def update_fields(hash, fields)
-        set_fields(hash, fields)
+      def update_fields(hash, fields, opts=nil)
+        set_fields(hash, fields, opts)
         save_changes
       end
 
