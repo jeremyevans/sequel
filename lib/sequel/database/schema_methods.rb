@@ -93,8 +93,7 @@ module Sequel
     # The primary key and index are used so that almost all operations
     # on the table can benefit from one of the two indexes, and the primary
     # key ensures that entries in the table are unique, which is the typical
-    # desire for a join table.  If you don't want to use a primary key or have
-    # the second index created, use #create_table manually instead of this method.
+    # desire for a join table.
     #
     # You can provide column options by making the values in the hash
     # be option hashes, so long as the option hashes have a :table
@@ -106,10 +105,12 @@ module Sequel
     #
     #   create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :temp=>true)
     #
-    # If you want to override the default join table name used, you can
-    # pass a :name entry with the table options:
+    # Some table options are handled specially:
     #
-    #   create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :names=>:dogs2cats)
+    # :index_options :: The options to pass to the index
+    # :name :: The name of the table to create
+    # :no_index :: Set to true not to create the second index.
+    # :no_primary_key :: Set to true to not create the primary key.
     def create_join_table(hash, options={})
       keys = hash.keys.sort_by{|k| k.to_s}
       create_table(join_table_name(hash, options), options) do
@@ -121,8 +122,8 @@ module Sequel
           v = DEFAULT_JOIN_TABLE_COLUMN_OPTIONS.merge(v)
           foreign_key(key, v)
         end
-        primary_key keys
-        index keys.reverse
+        primary_key(keys) unless options[:no_primary_key]
+        index(keys.reverse, options[:index_options] || {}) unless options[:no_index]
       end
     end
 

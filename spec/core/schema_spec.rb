@@ -589,9 +589,24 @@ describe "DB#create_join_table" do
     @db.sqls.should == ['CREATE TEMPORARY TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
   end
   
-  specify "should recognize :name option in table options for the table to drop" do
+  specify "should recognize :name option in table options" do
     @db.create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :name=>:f)
     @db.sqls.should == ['CREATE TABLE f (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX f_dog_id_cat_id_index ON f (dog_id, cat_id)']
+  end
+  
+  specify "should recognize :index_options option in table options" do
+    @db.create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :index_options=>{:name=>:foo_index})
+    @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX foo_index ON cats_dogs (dog_id, cat_id)']
+  end
+  
+  specify "should recognize :no_index option in table options" do
+    @db.create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :no_index=>true)
+    @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))']
+  end
+  
+  specify "should recognize :no_primary_key option in table options" do
+    @db.create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :no_primary_key=>true)
+    @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs)', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
   end
   
   specify "should raise an error if the hash doesn't have 2 entries with table names" do
