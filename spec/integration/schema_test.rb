@@ -194,16 +194,18 @@ describe "Database schema modifiers" do
     @ds.columns!.should == [:number]
   end
   
-  specify "should create join tables correctly" do
-    begin
-      @db.create_table(:cats){primary_key :id}
-      @db.create_table(:dogs){primary_key :id}
-      @db.create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
-      @db.table_exists?(:cats_dogs).should == true
-    ensure
-      @db.drop_join_table(:cat_id=>:cats, :dog_id=>:dogs)
+  describe "join tables" do
+    after do
+      @db.drop_join_table(:cat_id=>:cats, :dog_id=>:dogs) if @db.table_exists?(:cats_dogs)
       @db.drop_table(:cats, :dogs)
       @db.table_exists?(:cats_dogs).should == false
+    end
+
+    specify "should create join tables correctly" do
+      @db.create_table!(:cats){primary_key :id}
+      @db.create_table!(:dogs){primary_key :id}
+      @db.create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
+      @db.table_exists?(:cats_dogs).should == true
     end
   end
 

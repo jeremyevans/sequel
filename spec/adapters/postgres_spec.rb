@@ -276,7 +276,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
 
   if POSTGRES_DB.adapter_scheme == :postgres
     specify "should handle infinite timestamps if convert_infinite_timestamps is set" do
-      @d << {:time=>'infinity'}
+      @d << {:time=>'infinity'.cast(:timestamp)}
       @db.convert_infinite_timestamps = :nil
       @db[:test3].get(:time).should == nil
       @db.convert_infinite_timestamps = :string
@@ -284,7 +284,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
       @db.convert_infinite_timestamps = :float
       @db[:test3].get(:time).should == 1.0/0.0
 
-      @d.update(:time=>'-infinity')
+      @d.update(:time=>'-infinity'.cast(:timestamp))
       @db.convert_infinite_timestamps = :nil
       @db[:test3].get(:time).should == nil
       @db.convert_infinite_timestamps = :string
