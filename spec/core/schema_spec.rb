@@ -227,6 +227,11 @@ describe "DB#create_table" do
       foreign_key :project_id, :table => :projects, :on_delete => :set_default
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON DELETE SET DEFAULT)"]
+
+    @db.create_table(:cats) do
+      foreign_key :project_id, :table => :projects, :on_delete => 'NO ACTION FOO'
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON DELETE NO ACTION FOO)"]
   end
 
   specify "should accept foreign keys with ON UPDATE clause" do
@@ -254,6 +259,11 @@ describe "DB#create_table" do
       foreign_key :project_id, :table => :projects, :on_update => :set_default
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE SET DEFAULT)"]
+
+    @db.create_table(:cats) do
+      foreign_key :project_id, :table => :projects, :on_update => 'SET DEFAULT FOO'
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE SET DEFAULT FOO)"]
   end
   
   specify "should accept foreign keys with deferrable option" do

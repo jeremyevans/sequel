@@ -6,15 +6,10 @@ module Sequel
     # ---------------------
 
     AUTOINCREMENT = 'AUTOINCREMENT'.freeze
-    CASCADE = 'CASCADE'.freeze
     COMMA_SEPARATOR = ', '.freeze
-    NO_ACTION = 'NO ACTION'.freeze
     NOT_NULL = ' NOT NULL'.freeze
     NULL = ' NULL'.freeze
     PRIMARY_KEY = ' PRIMARY KEY'.freeze
-    RESTRICT = 'RESTRICT'.freeze
-    SET_DEFAULT = 'SET DEFAULT'.freeze
-    SET_NULL = 'SET NULL'.freeze
     TEMPORARY = 'TEMPORARY '.freeze
     UNDERSCORE = '_'.freeze
     UNIQUE = ' UNIQUE'.freeze
@@ -423,7 +418,7 @@ module Sequel
       sql = " REFERENCES #{quote_schema_table(column[:table])}"
       sql << "(#{Array(column[:key]).map{|x| quote_identifier(x)}.join(COMMA_SEPARATOR)})" if column[:key]
       sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
-      sql << " ON UPDATE #{on_delete_clause(column[:on_update])}" if column[:on_update]
+      sql << " ON UPDATE #{on_update_clause(column[:on_update])}" if column[:on_update]
       sql << " DEFERRABLE INITIALLY DEFERRED" if column[:deferrable]
       sql
     end
@@ -556,19 +551,15 @@ module Sequel
     #   but do not allow deferring the integrity check.
     # * :set_default - Set columns referencing this row to their default value.
     # * :set_null - Set columns referencing this row to NULL.
+    #
+    # Any other object given is just converted to a string, with "_" converted to " " and upcased.
     def on_delete_clause(action)
-      case action
-      when :restrict
-        RESTRICT
-      when :cascade
-        CASCADE
-      when :set_null
-        SET_NULL
-      when :set_default
-        SET_DEFAULT
-      else
-        NO_ACTION
-      end
+      action.to_s.gsub("_", " ").upcase
+    end
+
+    # Alias of #on_delete_clause, since the two usually behave the same.
+    def on_update_clause(action)
+      on_delete_clause(action)
     end
     
     # Proxy the quote_schema_table method to the dataset

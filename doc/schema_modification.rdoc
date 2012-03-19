@@ -143,9 +143,10 @@ as it's third argument.  A simple example is:
         on most databases.
 :on_delete :: Specify the behavior of this foreign key column when the row with the primary key
               it references is deleted , can be :restrict, :cascade, :set_null, or :set_default.
+              You can also use a string, which is used literally.
 :on_update :: Specify the behavior of this foreign key column when the row with the primary key
-              it references modifies the value of the primary key, can be
-              :restrict, :cascade, :set_null, or :set_default.
+              it references modifies the value of the primary key.  Takes the same options as
+              :on_delete.
 
 Like +primary_key+, if you provide +foreign_key+ with an array of symbols, it will not create a
 column, but create a foreign key constraint:
