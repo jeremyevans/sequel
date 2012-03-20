@@ -495,6 +495,12 @@ describe "Database#indexes" do
   end
 end
 
+describe "Database#foreign_key_list" do
+  specify "should raise Sequel::NotImplemented" do
+    proc {Sequel::Database.new.foreign_key_list(:table)}.should raise_error(Sequel::NotImplemented)
+  end
+end
+
 describe "Database#run" do
   before do
     @db = Sequel.mock(:servers=>{:s1=>{}})

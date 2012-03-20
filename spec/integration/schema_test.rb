@@ -177,6 +177,62 @@ describe "Database index parsing" do
   end
 end if test_indexes
 
+test_foreign_key_list = begin
+  INTEGRATION_DB.drop_table?(:blah)
+  INTEGRATION_DB.foreign_key_list(:blah)
+  true
+rescue Sequel::NotImplemented
+  false
+rescue
+  true
+end
+describe "Database foreign key parsing" do
+  before do
+    @db = INTEGRATION_DB
+    @pr = lambda do |table, *expected|
+      actual = @db.foreign_key_list(table).sort_by{|c| c[:columns].map{|s| s.to_s}.join << (c[:key]||[]).map{|s| s.to_s}.join}.map{|v| v.values_at(:columns, :table, :key)}
+      actual.zip(expected).each do |a, e|
+        if e.last.first == :pk
+          if a.last == nil
+            a.pop
+            e.pop
+          else
+           e.last.shift
+          end
+        end
+        a.should == e
+      end
+      actual.length.should == expected.length
+    end
+  end
+  after do
+    @db.drop_table?(:b, :a)
+  end
+
+  specify "should parse foreign key information into an array of hashes" do
+    @db.create_table!(:a, :engine=>:InnoDB){primary_key :c; Integer :d; index :d, :unique=>true}
+    @db.create_table!(:b, :engine=>:InnoDB){foreign_key :e, :a}
+    @pr[:a]
+    @pr[:b, [[:e], :a, [:pk, :c]]]
+
+    @db.alter_table(:b){add_foreign_key :f, :a, :key=>[:d]}
+    @pr[:b, [[:e], :a, [:pk, :c]], [[:f], :a, [:d]]]
+
+    @db.alter_table(:b){add_foreign_key [:f], :a, :key=>[:c]}
+    @pr[:b, [[:e], :a, [:pk, :c]], [[:f], :a, [:c]], [[:f], :a, [:d]]]
+
+    @db.alter_table(:a){add_index [:d, :c], :unique=>true}
+    @db.alter_table(:b){add_foreign_key [:f, :e], :a, :key=>[:d, :c]}
+    @pr[:b, [[:e], :a, [:pk, :c]], [[:f], :a, [:c]], [[:f], :a, [:d]], [[:f, :e], :a, [:d, :c]]]
+  end
+
+  specify "should handle composite foreign and primary keys" do
+    @db.create_table!(:a, :engine=>:InnoDB){Integer :b; Integer :c; primary_key [:b, :c]; index [:c, :b], :unique=>true}
+    @db.create_table!(:b, :engine=>:InnoDB){Integer :e; Integer :f; foreign_key [:e, :f], :a; foreign_key [:f, :e], :a, :key=>[:c, :b]}
+    @pr[:b, [[:e, :f], :a, [:pk, :b, :c]], [[:f, :e], :a, [:c, :b]]]
+  end
+end if test_foreign_key_list
+
 describe "Database schema modifiers" do
   before do
     @db = INTEGRATION_DB

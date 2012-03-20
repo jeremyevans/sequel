@@ -1,5 +1,11 @@
 === HEAD
 
+* Don't raise an error when no indexes exist for a table when calling Database#indexes on the jdbc/sqlite adapter (jeremyevans)
+
+* Copy composite foreign key constraints when emulating alter_table on SQLite (jeremyevans)
+
+* Add Database#foreign_key_list for getting foreign key metadata for a given table on SQLite, MySQL, and PostgreSQL (jeremyevans)
+
 * Add Dataset#to_hash_groups and #select_hash_groups for getting a hash with arrays of matching values (jeremyevans)
 
 * Model#set_fields and #update_fields now respect :missing=>:skip and :missing=>:raise options for handling missing values (jeremyevans)

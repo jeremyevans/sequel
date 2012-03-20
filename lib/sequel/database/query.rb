@@ -81,6 +81,24 @@ module Sequel
       execute_dui(sql, opts, &block)
     end
 
+    # Returns an array of hashes containing foreign key information from the
+    # table.  Each hash will contain at least the following fields:
+    #
+    # :columns :: An array of columns in the given table
+    # :table :: The table referenced by the columns
+    # :key :: An array of columns referenced (in the table specified by :table),
+    #         but can be nil on certain adapters if the primary key is referenced.
+    #
+    # The hash may also contain entries for:
+    #
+    # :deferrable :: Whether the constraint is deferrable
+    # :name :: The name of the constraint
+    # :on_delete :: The action to take ON DELETE
+    # :on_update :: The action to take ON UPDATE
+    def foreign_key_list(table, opts={})
+      raise NotImplemented, "#foreign_key_list should be overridden by adapters"
+    end
+    
     # Returns a single value from the database, e.g.:
     #
     #   DB.get(1) # SELECT 1

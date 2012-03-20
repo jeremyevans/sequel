@@ -164,6 +164,7 @@ module Sequel
       PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
+      FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'.freeze=>:no_action, 'r'.freeze=>:restrict, 'c'.freeze=>:cascade, 'n'.freeze=>:set_null, 'd'.freeze=>:set_default}.freeze
 
       # Commit an existing prepared transaction with the given transaction
       # identifier string.
@@ -267,6 +268,64 @@ module Sequel
       #   * :if_exists : Don't raise an error if the function doesn't exist.
       def drop_trigger(table, name, opts={})
         self << drop_trigger_sql(table, name, opts)
+      end
+
+      # Return full foreign key information using the pg system tables, including
+      # :name, :on_delete, :on_update, and :deferrable entries in the hashes.
+      def foreign_key_list(table, opts={})
+        m = output_identifier_meth
+        im = input_identifier_meth
+        schema, table = schema_and_table(table)
+        range = 0...32
+
+        base_ds = metadata_dataset.
+          where(:cl__relkind=>'r', :co__contype=>'f', :cl__relname=>im.call(table)).
+          from(:pg_constraint___co).
+          join(:pg_class___cl, :oid=>:conrelid)
+
+        # We split the parsing into two separate queries, which are merged manually later.
+        # This is because PostgreSQL stores both the referencing and referenced columns in
+        # arrays, and I don't know a simple way to not create a cross product, as PostgreSQL
+        # doesn't appear to have a function that takes an array and element and gives you
+        # the index of that element in the array.
+
+        ds = base_ds.
+          join(:pg_attribute___att, :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, :co__conkey)).
+          order(:co__conname, range.map{|x| [SQL::Subscript.new(:co__conkey, [x]), x]}.case(32, :att__attnum)).
+          select(:co__conname___name, :att__attname___column, :co__confupdtype___on_update, :co__confdeltype___on_delete,
+                 SQL::BooleanExpression.new(:AND, :co__condeferrable, :co__condeferred).as(:deferrable))
+
+        ref_ds = base_ds.
+          join(:pg_class___cl2, :oid=>:co__confrelid).
+          join(:pg_attribute___att2, :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, :co__confkey)).
+          order(:co__conname, range.map{|x| [SQL::Subscript.new(:co__conkey, [x]), x]}.case(32, :att2__attnum)).
+          select(:co__conname___name, :cl2__relname___table, :att2__attname___refcolumn)
+
+        # If a schema is given, we only search in that schema, and the returned :table
+        # entry is schema qualified as well.
+        if schema
+          ds.join!(:pg_namespace___nsp, :oid=>:cl__relnamespace).
+            where(:nsp___nspname=>im.call(schema))
+          ref_ds.join!(:pg_namespace___nsp2, :oid=>:cl2__relnamespace).
+            select_more(:nsp2__nspname___schema)
+        end
+
+        h = {}
+        fklod_map = FOREIGN_KEY_LIST_ON_DELETE_MAP 
+        ds.each do |row|
+          if r = h[row[:name]]
+            r[:columns] << m.call(row[:column])
+          else
+            h[row[:name]] = {:name=>m.call(row[:name]), :columns=>[m.call(row[:column])], :on_update=>fklod_map[row[:on_update]], :on_delete=>fklod_map[row[:on_delete]], :deferrable=>row[:deferrable]}
+          end
+        end
+        ref_ds.each do |row|
+          r = h[row[:name]]
+          r[:table] ||= m.call(schema ? SQL::QualifiedIdentifier.new(row[:schema], row[:table]) : row[:table])
+          r[:key] ||= []
+          r[:key] << m.call(row[:refcolumn])
+        end
+        h.values
       end
 
       # Use the pg_* system tables to determine indexes on a table

@@ -4,9 +4,9 @@ Sequel supports reflection information in multiple ways.
 
 == Adapter in Use
 
-You can get the adapter in use using Database.adapter_scheme.  As this is a class method, you generally need to do DB.class.adapter_scheme:
+You can get the adapter in use using Database#adapter_scheme:
 
-  DB.class.adapter_scheme # e.g. :postgres, :jdbc, :odbc
+  DB.adapter_scheme # e.g. :postgres, :jdbc, :odbc
 
 == Database Connected To
 
@@ -33,6 +33,26 @@ Database#indexes takes a table name gives a hash of index information.  Keys are
   DB.indexes(:table1) # {:index1=>{:columns=>[:column1], :unique=>false}, :index2=>{:columns=>[:column2, :column3], :unique=>true}}
 
 Index information generally does not include partial indexes, functional indexes, or indexes on the primary key of the table.
+
+== Foreign Key Information for a Table
+
+Database#foreign_key_list takes a table name and gives an array of hashes of foreign key information:
+
+  DB.foreign_key_list(:table1) # [{:columns=>[:column1], :table=>:referenced_table, :key=>[:referenced_column1]}]
+
+At least the following entries will be present in the hash:
+
+:columns :: An array of columns in the given table
+:table :: The table referenced by the columns
+:key :: An array of columns referenced (in the table specified by :table), but can be nil on certain adapters
+        if the primary key is referenced.
+
+The hash may also contain entries for:
+
+:deferrable :: Whether the constraint is deferrable
+:name :: The name of the constraint
+:on_delete :: The action to take ON DELETE
+:on_update :: The action to take ON UPDATE
 
 == Column Information for a Table
 

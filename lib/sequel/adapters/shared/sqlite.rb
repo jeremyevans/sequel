@@ -59,22 +59,33 @@ module Sequel
         pragma_set(:foreign_keys, !!value ? 'on' : 'off') if sqlite_version >= 30619
       end
 
+      # Return the array of foreign key info hashes using the foreign_key_list PRAGMA,
+      # including information for the :on_update and :on_delete entries.
+      def foreign_key_list(table, opts={})
+        m = output_identifier_meth
+        h = {}
+        metadata_dataset.with_sql("PRAGMA foreign_key_list(?)", input_identifier_meth.call(table)).each do |row|
+          if r = h[row[:id]]
+            r[:columns] << m.call(row[:from])
+            r[:key] << m.call(row[:to]) if r[:key]
+          else
+            h[row[:id]] = {:columns=>[m.call(row[:from])], :table=>m.call(row[:table]), :key=>([m.call(row[:to])] if row[:to]), :on_update=>on_delete_sql_to_sym(row[:on_update]), :on_delete=>on_delete_sql_to_sym(row[:on_delete])}
+          end
+        end
+        h.values
+      end
+
       # Use the index_list and index_info PRAGMAs to determine the indexes on the table.
       def indexes(table, opts={})
         m = output_identifier_meth
         im = input_identifier_meth
         indexes = {}
-        begin
-          metadata_dataset.with_sql("PRAGMA index_list(?)", im.call(table)).each do |r|
-            next if r[:name] =~ PRIMARY_KEY_INDEX_RE
-            indexes[m.call(r[:name])] = {:unique=>r[:unique].to_i==1}
-          end
-        rescue Sequel::DatabaseError
-          nil
-        else
-          indexes.each do |k, v|
-            v[:columns] = metadata_dataset.with_sql("PRAGMA index_info(?)", im.call(k)).map(:name).map{|x| m.call(x)}
-          end
+        metadata_dataset.with_sql("PRAGMA index_list(?)", im.call(table)).each do |r|
+          next if r[:name] =~ PRIMARY_KEY_INDEX_RE
+          indexes[m.call(r[:name])] = {:unique=>r[:unique].to_i==1}
+        end
+        indexes.each do |k, v|
+          v[:columns] = metadata_dataset.with_sql("PRAGMA index_info(?)", im.call(k)).map(:name).map{|x| m.call(x)}
         end
         indexes
       end
@@ -226,7 +237,7 @@ module Sequel
           when :primary_key
             duplicate_table(table){|columns| columns.each{|s| s[:primary_key] = nil}}
           when :foreign_key
-            duplicate_table(table){|columns| columns.each{|s| s[:table] = nil}}
+            duplicate_table(table, :no_foreign_keys=>true)
           when :unique
             duplicate_table(table)
           else
@@ -283,20 +294,6 @@ module Sequel
           nono= Array(opts[:except]).compact.map{|n| n.to_s}
           cols.reject!{|c| nono.include? c[:name] }
         end
-
-        begin
-          metadata_dataset.with_sql("PRAGMA foreign_key_list(?)", input_identifier_meth.call(table)).each do |row|
-            c = cols.find {|co| co[:name] == row[:from] } or next
-            c[:table] = row[:table]
-            c[:key] = row[:to]
-            c[:on_update] = on_delete_sql_to_sym(row[:on_update])
-            c[:on_delete] = on_delete_sql_to_sym(row[:on_delete])
-            # is there any way to get deferrable status?
-          end
-        rescue Sequel::DatabaseError
-          # Doesn't work correctly on some versions of JDBC SQLite,
-          # giving a "query does not return ResultSet" error.
-        end
         cols
       end
 
@@ -317,6 +314,20 @@ module Sequel
         if pks.length > 1
           constraints << {:type=>:primary_key, :columns=>pks}
           def_columns.each{|c| c[:primary_key] = false if c[:primary_key]}
+        end
+
+        # If dropping a foreign key constraint, drop all foreign key constraints,
+        # as there is no way to determine which one to drop.
+        unless opts[:no_foreign_keys]
+          fks = foreign_key_list(table)
+
+          # If dropping a column, if there is a foreign key with that
+          # column, don't include it when building a copy of the table.
+          if ocp = opts[:old_columns_proc]
+            fks.delete_if{|c| ocp.call(c[:columns].dup) != c[:columns]}
+          end
+
+          constraints.concat(fks.each{|h| h[:type] = :foreign_key})
         end
 
         def_columns_str = (def_columns.map{|c| column_definition_sql(c)} + constraints.map{|c| constraint_definition_sql(c)}).join(', ')

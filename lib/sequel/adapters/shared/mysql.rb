@@ -51,6 +51,31 @@ module Sequel
         :mysql
       end
 
+      # Use the Information Schema's KEY_COLUMN_USAGE table to get
+      # basic information on foreign key columns, but include the
+      # constraint name.
+      def foreign_key_list(table, opts={})
+        m = output_identifier_meth
+        im = input_identifier_meth
+        ds = metadata_dataset.
+          from(:INFORMATION_SCHEMA__KEY_COLUMN_USAGE).
+          where(:TABLE_NAME=>im.call(table)).
+          exclude(:CONSTRAINT_NAME=>'PRIMARY').
+          exclude(:REFERENCED_TABLE_NAME=>nil).
+          select(:CONSTRAINT_NAME___name, :COLUMN_NAME___column, :REFERENCED_TABLE_NAME___table, :REFERENCED_COLUMN_NAME___key)
+        
+        h = {}
+        ds.each do |row|
+          if r = h[row[:name]]
+            r[:columns] << m.call(row[:column])
+            r[:key] << m.call(row[:key])
+          else
+            h[row[:name]] = {:name=>m.call(row[:name]), :columns=>[m.call(row[:column])], :table=>m.call(row[:table]), :key=>[m.call(row[:key])]}
+          end
+        end
+        h.values
+      end
+
       # Use SHOW INDEX FROM to get the index information for the
       # table.
       #
