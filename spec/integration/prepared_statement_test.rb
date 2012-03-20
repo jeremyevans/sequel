@@ -22,6 +22,7 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:numb=>:$n).call(:first, :n=>10).should == {:id=>1, :numb=>10}
     @ds.filter(:numb=>:$n).call([:map, :numb], :n=>10).should == [10]
     @ds.filter(:numb=>:$n).call([:to_hash, :id, :numb], :n=>10).should == {1=>10}
+    @ds.filter(:numb=>:$n).call([:to_hash_groups, :id, :numb], :n=>10).should == {1=>[10]}
   end
     
   specify "should support blocks for select, all, and map " do

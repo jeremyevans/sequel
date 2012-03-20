@@ -1737,7 +1737,45 @@ describe "Dataset#to_hash" do
     @d.to_hash(:b).should == {4 => {:a => 2, :b => 4}, 8 => {:a => 6, :b => 8}, 12 => {:a => 10, :b => 12}}
     @d.to_hash([:a, :b]).should == {[2, 4] => {:a => 2, :b => 4}, [6, 8] => {:a => 6, :b => 8}, [10, 12] => {:a => 10, :b => 12}}
   end
+end
+
+describe "Dataset#to_hash_groups" do
+  before do
+    @d = Sequel.mock(:fetch=>[{:a => 1, :b => 2}, {:a => 3, :b => 4}, {:a => 1, :b => 6}, {:a => 7, :b => 4}])[:items]
+  end
   
+  specify "should provide a hash with the first column as key and the second as value" do
+    @d.to_hash_groups(:a, :b).should == {1 => [2, 6], 3 => [4], 7 => [4]}
+    @d.to_hash_groups(:b, :a).should == {2 => [1], 4=>[3, 7], 6=>[1]}
+  end
+  
+  specify "should provide a hash with the first column as key and the entire hash as value if the value column is blank or nil" do
+    @d.to_hash_groups(:a).should == {1 => [{:a => 1, :b => 2}, {:a => 1, :b => 6}], 3 => [{:a => 3, :b => 4}], 7 => [{:a => 7, :b => 4}]}
+    @d.to_hash_groups(:b).should == {2 => [{:a => 1, :b => 2}], 4 => [{:a => 3, :b => 4}, {:a => 7, :b => 4}], 6 => [{:a => 1, :b => 6}]}
+  end
+
+  specify "should support using an array of columns as either the key or the value" do
+    @d.to_hash_groups([:a, :b], :b).should == {[1, 2] => [2], [3, 4] => [4], [1, 6] => [6], [7, 4]=>[4]}
+    @d.to_hash_groups(:b, [:a, :b]).should == {2 => [[1, 2]], 4 => [[3, 4], [7, 4]], 6 => [[1, 6]]}
+    @d.to_hash_groups([:b, :a], [:a, :b]).should == {[2, 1] => [[1, 2]], [4, 3] => [[3, 4]], [6, 1] => [[1, 6]], [4, 7]=>[[7, 4]]}
+    @d.to_hash_groups([:a, :b]).should == {[1, 2] => [{:a => 1, :b => 2}], [3, 4] => [{:a => 3, :b => 4}], [1, 6] => [{:a => 1, :b => 6}], [7, 4] => [{:a => 7, :b => 4}]}
+  end
+
+  specify "should not call the row_proc if two arguments are given" do
+    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d.to_hash_groups(:a, :b).should == {1 => [2, 6], 3 => [4], 7 => [4]}
+    @d.to_hash_groups(:b, :a).should == {2 => [1], 4=>[3, 7], 6=>[1]}
+    @d.to_hash_groups([:a, :b], :b).should == {[1, 2] => [2], [3, 4] => [4], [1, 6] => [6], [7, 4]=>[4]}
+    @d.to_hash_groups(:b, [:a, :b]).should == {2 => [[1, 2]], 4 => [[3, 4], [7, 4]], 6 => [[1, 6]]}
+    @d.to_hash_groups([:b, :a], [:a, :b]).should == {[2, 1] => [[1, 2]], [4, 3] => [[3, 4]], [6, 1] => [[1, 6]], [4, 7]=>[[7, 4]]}
+  end
+
+  specify "should call the row_proc if only a single argument is given" do
+    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d.to_hash_groups(:a).should == {2 => [{:a => 2, :b => 4}, {:a => 2, :b => 12}], 6 => [{:a => 6, :b => 8}], 14 => [{:a => 14, :b => 8}]}
+    @d.to_hash_groups(:b).should == {4 => [{:a => 2, :b => 4}], 8 => [{:a => 6, :b => 8}, {:a => 14, :b => 8}], 12 => [{:a => 2, :b => 12}]}
+    @d.to_hash_groups([:a, :b]).should == {[2, 4] => [{:a => 2, :b => 4}], [6, 8] => [{:a => 6, :b => 8}], [2, 12] => [{:a => 2, :b => 12}], [14, 8] => [{:a => 14, :b => 8}]}
+  end
 end
 
 describe "Dataset#distinct" do
@@ -3153,12 +3191,14 @@ describe "Dataset prepared statements and bound variables " do
     @ds.filter(:num=>:$n).call(:select, :n=>1)
     @ds.filter(:num=>:$n).call([:map, :a], :n=>1)
     @ds.filter(:num=>:$n).call([:to_hash, :a, :b], :n=>1)
+    @ds.filter(:num=>:$n).call([:to_hash_groups, :a, :b], :n=>1)
     @ds.filter(:num=>:$n).call(:first, :n=>1)
     @ds.filter(:num=>:$n).call(:delete, :n=>1)
     @ds.filter(:num=>:$n).call(:update, {:n=>1, :n2=>2}, :num=>:$n2)
     @ds.call(:insert, {:n=>1}, :num=>:$n)
     @ds.call(:insert_select, {:n=>1}, :num=>:$n)
     @db.sqls.should == ['SELECT * FROM items WHERE (num = 1)',
+      'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1) LIMIT 1',
@@ -3173,22 +3213,25 @@ describe "Dataset prepared statements and bound variables " do
     pss << @ds.filter(:num=>:$n).prepare(:select, :sn)
     pss << @ds.filter(:num=>:$n).prepare([:map, :a], :sm)
     pss << @ds.filter(:num=>:$n).prepare([:to_hash, :a, :b], :sh)
+    pss << @ds.filter(:num=>:$n).prepare([:to_hash_groups, :a, :b], :shg)
     pss << @ds.filter(:num=>:$n).prepare(:first, :fn)
     pss << @ds.filter(:num=>:$n).prepare(:delete, :dn)
     pss << @ds.filter(:num=>:$n).prepare(:update, :un, :num=>:$n2)
     pss << @ds.prepare(:insert, :in, :num=>:$n)
     pss << @ds.prepare(:insert_select, :ins, :num=>:$n)
-    @db.prepared_statements.keys.sort_by{|k| k.to_s}.should == [:dn, :fn, :in, :ins, :sh, :sm, :sn, :un]
-    [:sn, :sm, :sh, :fn, :dn, :un, :in, :ins].each_with_index{|x, i| @db.prepared_statements[x].should == pss[i]}
+    @db.prepared_statements.keys.sort_by{|k| k.to_s}.should == [:dn, :fn, :in, :ins, :sh, :shg, :sm, :sn, :un]
+    [:sn, :sm, :sh, :shg, :fn, :dn, :un, :in, :ins].each_with_index{|x, i| @db.prepared_statements[x].should == pss[i]}
     @db.call(:sn, :n=>1)
     @db.call(:sm, :n=>1)
     @db.call(:sh, :n=>1)
+    @db.call(:shg, :n=>1)
     @db.call(:fn, :n=>1)
     @db.call(:dn, :n=>1)
     @db.call(:un, :n=>1, :n2=>2)
     @db.call(:in, :n=>1)
     @db.call(:ins, :n=>1)
     @db.sqls.should == ['SELECT * FROM items WHERE (num = 1)',
+      'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1) LIMIT 1',
@@ -3994,6 +4037,62 @@ describe "Sequel::Dataset#select_hash" do
 
   specify "should raise an error if the resulting symbol cannot be determined" do
     proc{@ds.select_hash(:c.as(:a), :b.sql_function)}.should raise_error(Sequel::Error)
+  end
+end
+
+describe "Sequel::Dataset#select_hash_groups" do
+  before do
+    @db = Sequel.mock(:fetch=>[{:a=>1, :b=>2}, {:a=>3, :b=>4}])
+    @ds = @db[:t]
+  end
+
+  specify "should do select and to_hash in one step" do
+    @ds.select_hash_groups(:a, :b).should == {1=>[2], 3=>[4]}
+    @ds.db.sqls.should == ['SELECT a, b FROM t']
+  end
+
+  specify "should handle implicit qualifiers in arguments" do
+    @ds.select_hash_groups(:t__a, :t__b).should == {1=>[2], 3=>[4]}
+    @ds.db.sqls.should == ['SELECT t.a, t.b FROM t']
+  end
+
+  specify "should handle implicit aliases in arguments" do
+    @ds.select_hash_groups(:c___a, :d___b).should == {1=>[2], 3=>[4]}
+    @ds.db.sqls.should == ['SELECT c AS a, d AS b FROM t']
+  end
+
+  specify "should handle implicit qualifiers and aliases in arguments" do
+    @ds.select_hash_groups(:t__c___a, :t__d___b).should == {1=>[2], 3=>[4]}
+    @ds.db.sqls.should == ['SELECT t.c AS a, t.d AS b FROM t']
+  end
+
+  specify "should handle SQL::Identifiers in arguments" do
+    @ds.select_hash_groups(:a.identifier, :b.identifier).should == {1=>[2], 3=>[4]}
+    @ds.db.sqls.should == ['SELECT a, b FROM t']
+  end
+
+  specify "should handle SQL::QualifiedIdentifiers in arguments" do
+    @ds.select_hash_groups(:a.qualify(:t), :b.identifier.qualify(:t)).should == {1=>[2], 3=>[4]}
+    @ds.db.sqls.should == ['SELECT t.a, t.b FROM t']
+  end
+
+  specify "should handle SQL::AliasedExpressions in arguments" do
+    @ds.select_hash_groups(:c.as(:a), :t.as(:b)).should == {1=>[2], 3=>[4]}
+    @ds.db.sqls.should == ['SELECT c AS a, t AS b FROM t']
+  end
+
+  specify "should work with arrays of columns" do
+    @db.fetch = [{:a=>1, :b=>2, :c=>3}, {:a=>4, :b=>5, :c=>6}]
+    @ds.select_hash_groups([:a, :c], :b).should == {[1, 3]=>[2], [4, 6]=>[5]}
+    @ds.db.sqls.should == ['SELECT a, c, b FROM t']
+    @ds.select_hash_groups(:a, [:b, :c]).should == {1=>[[2, 3]], 4=>[[5, 6]]}
+    @ds.db.sqls.should == ['SELECT a, b, c FROM t']
+    @ds.select_hash_groups([:a, :b], [:b, :c]).should == {[1, 2]=>[[2, 3]], [4, 5]=>[[5, 6]]}
+    @ds.db.sqls.should == ['SELECT a, b, b, c FROM t']
+  end
+
+  specify "should raise an error if the resulting symbol cannot be determined" do
+    proc{@ds.select_hash_groups(:c.as(:a), :b.sql_function)}.should raise_error(Sequel::Error)
   end
 end
 

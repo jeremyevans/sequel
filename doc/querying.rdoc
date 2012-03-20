@@ -167,17 +167,26 @@ It's also common to want to order such a map, so Sequel provides a
 Sequel makes it easy to take an SQL query and return it as a ruby hash,
 using the +to_hash+ method:
 
-  artist_names = Artist.to_hash(:name, :id)
+  artist_names = Artist.to_hash(:id, :name)
   # SELECT * FROM artists
-  => {"YJM"=>1, "AS"=>2}
+  => {1=>"YJM", 2=>"AS"}
 
 As you can see, the +to_hash+ method uses the first symbol as the key
 and the second symbol as the value.  So if you swap the two arguments the hash
 will have its keys and values transposed:
 
-  artist_names = Artist.to_hash(:id, :name)
+  artist_names = Artist.to_hash(:name, :id)
   # SELECT * FROM artists
-  => {1=>"YJM", 2=>"AS"}
+  => {"YJM"=>1, "AS"=>2}
+
+Now what if you have multiple values for the same key?  By default, +to_hash+
+will just have the last matching value.  If you care about all matching values,
+use +to_hash_groups+, which makes the values of the array an array of matching
+values, in the order they were received:
+
+  artist_names = Artist.to_hash_groups(:name, :id)
+  # SELECT * FROM artists
+  => {"YJM"=>[1, 10, ...], "AS"=>[2, 20, ...]}
 
 If you only provide one argument to +to_hash+, it uses the entire hash
 or model object as the value:
@@ -185,6 +194,12 @@ or model object as the value:
   artist_names = DB[:artists].to_hash(:name)
   # SELECT * FROM artists
   => {"YJM"=>{:id=>1, :name=>"YJM"}, "AS"=>{:id=>2, :name=>"AS"}}
+
+and +to_hash_groups+ works similarly:
+
+  artist_names = DB[:artists].to_hash_groups(:name)
+  # SELECT * FROM artists
+  => {"YJM"=>[{:id=>1, :name=>"YJM"}, {:id=>10, :name=>"YJM"}], ...}
 
 Model datasets have a +to_hash+ method that can be called without any
 arguments, in which case it will use the primary key as the key and
@@ -196,6 +211,9 @@ identity map:
   => {1=>#<Artist @values={:id=>1, :name=>"YGM"}>,
       2=>#<Artist @values={:id=>2, :name=>"AS"}>}
 
+There is no equivalent handling to +to_hash_groups+, since there would
+only be one matching record, as the primary key must be unique.
+
 Note that +to_hash+ never modifies the columns selected.  However, just
 like Sequel has a +select_map+ method to modify the columns selected and
 return an array, Sequel also has a +select_hash+ method to modify the
@@ -204,6 +222,12 @@ columns selected and return a hash:
   artist_names = Artist.select_hash(:name, :id)
   # SELECT name, id FROM artists
   => {"YJM"=>1, "AS"=>2}
+
+Likewise, +select_hash_groups+ also exists:
+
+  artist_names = Artist.select_hash_groups(:name, :id)
+  # SELECT name, id FROM artists
+  => {"YJM"=>[1, 10, ...], "AS"=>[2, 20, ...]}
 
 == Modifying datasets 
 

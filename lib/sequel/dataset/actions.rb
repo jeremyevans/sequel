@@ -11,8 +11,8 @@ module Sequel
     ACTION_METHODS = (<<-METHS).split.map{|x| x.to_sym}
       << [] []= all avg count columns columns! delete each
       empty? fetch_rows first get import insert insert_multiple interval last
-      map max min multi_insert range select_hash select_map select_order_map
-      set single_record single_value sum to_csv to_hash truncate update
+      map max min multi_insert range select_hash select_hash_groups select_map select_order_map
+      set single_record single_value sum to_csv to_hash to_hash_groups truncate update
     METHS
 
     # Inserts the given argument into the database.  Returns self so it
@@ -421,7 +421,7 @@ module Sequel
     end
     
     # Returns a hash with key_column values as keys and value_column values as
-    # values.  Similar to to_hash, but only selects the two columns.
+    # values.  Similar to to_hash, but only selects the columns given.
     #
     #   DB[:table].select_hash(:id, :name) # SELECT id, name FROM table
     #   # => {1=>'a', 2=>'b', ...}
@@ -436,19 +436,28 @@ module Sequel
     # that Sequel can determine.  Usually you can do this by calling the #as method
     # on the expression and providing an alias.
     def select_hash(key_column, value_column)
-      if key_column.is_a?(Array)
-        if value_column.is_a?(Array)
-          select(*(key_column + value_column)).to_hash(key_column.map{|c| hash_key_symbol(c)}, value_column.map{|c| hash_key_symbol(c)})
-        else
-          select(*(key_column + [value_column])).to_hash(key_column.map{|c| hash_key_symbol(c)}, hash_key_symbol(value_column))
-        end
-      elsif value_column.is_a?(Array)
-        select(key_column, *value_column).to_hash(hash_key_symbol(key_column), value_column.map{|c| hash_key_symbol(c)})
-      else
-        select(key_column, value_column).to_hash(hash_key_symbol(key_column), hash_key_symbol(value_column))
-      end
+      _select_hash(:to_hash, key_column, value_column)
     end
     
+    # Returns a hash with key_column values as keys and an array of value_column values.
+    # Similar to to_hash_groups, but only selects the columns given.
+    #
+    #   DB[:table].select_hash(:name, :id) # SELECT id, name FROM table
+    #   # => {'a'=>[1, 4, ...], 'b'=>[2, ...], ...}
+    #
+    # You can also provide an array of column names for either the key_column,
+    # the value column, or both:
+    #
+    #   DB[:table].select_hash([:first, :middle], [:last, :id]) # SELECT * FROM table
+    #   # {['a', 'b']=>[['c', 1], ['d', 2], ...], ...}
+    #
+    # When using this method, you must be sure that each expression has an alias
+    # that Sequel can determine.  Usually you can do this by calling the #as method
+    # on the expression and providing an alias.
+    def select_hash_groups(key_column, value_column)
+      _select_hash(:to_hash_groups, key_column, value_column)
+    end
+
     # Selects the column given (either as an argument or as a block), and
     # returns an array of all values of that column in the dataset.  If you
     # give a block argument that returns an array with multiple entries,
@@ -472,7 +481,6 @@ module Sequel
     def select_map(column=nil, &block)
       _select_map(column, false, &block)
     end
-
     
     # The same as select_map, but in addition orders the array by the column.
     #
@@ -591,6 +599,49 @@ module Sequel
       h
     end
 
+    # Returns a hash with one column used as key and the values being an
+    # array of column values. If the value_column is not given or nil, uses
+    # the entire hash as the value.
+    #
+    #   DB[:table].to_hash(:name, :id) # SELECT * FROM table
+    #   # {'Jim'=>[1, 4, 16, ...], 'Bob'=>[2], ...}
+    #
+    #   DB[:table].to_hash(:name) # SELECT * FROM table
+    #   # {'Jim'=>[{:id=>1, :name=>'Jim'}, {:id=>4, :name=>'Jim'}, ...], 'Bob'=>[{:id=>2, :name=>'Bob'}], ...}
+    #
+    # You can also provide an array of column names for either the key_column,
+    # the value column, or both:
+    #
+    #   DB[:table].to_hash([:first, :middle], [:last, :id]) # SELECT * FROM table
+    #   # {['Jim', 'Bob']=>[['Smith', 1], ['Jackson', 4], ...], ...}
+    #
+    #   DB[:table].to_hash([:first, :middle]) # SELECT * FROM table
+    #   # {['Jim', 'Bob']=>[{:id=>1, :first=>'Jim', :middle=>'Bob', :last=>'Smith'}, ...], ...}
+    def to_hash_groups(key_column, value_column = nil)
+      h = {}
+      if value_column
+        return naked.to_hash_groups(key_column, value_column) if row_proc
+        if value_column.is_a?(Array)
+          if key_column.is_a?(Array)
+            each{|r| (h[r.values_at(*key_column)] ||= []) << r.values_at(*value_column)}
+          else
+            each{|r| (h[r[key_column]] ||= []) << r.values_at(*value_column)}
+          end
+        else
+          if key_column.is_a?(Array)
+            each{|r| (h[r.values_at(*key_column)] ||= []) << r[value_column]}
+          else
+            each{|r| (h[r[key_column]] ||= []) << r[value_column]}
+          end
+        end
+      elsif key_column.is_a?(Array)
+        each{|r| (h[r.values_at(*key_column)] ||= []) << r}
+      else
+        each{|r| (h[r[key_column]] ||= []) << r}
+      end
+      h
+    end
+
     # Truncates the dataset.  Returns nil.
     #
     #   DB[:table].truncate # TRUNCATE table
@@ -644,6 +695,21 @@ module Sequel
     end
   
     private
+    
+    # Internals of +select_hash+ and +select_hash_groups+
+    def _select_hash(meth, key_column, value_column)
+      if key_column.is_a?(Array)
+        if value_column.is_a?(Array)
+          select(*(key_column + value_column)).send(meth, key_column.map{|c| hash_key_symbol(c)}, value_column.map{|c| hash_key_symbol(c)})
+        else
+          select(*(key_column + [value_column])).send(meth, key_column.map{|c| hash_key_symbol(c)}, hash_key_symbol(value_column))
+        end
+      elsif value_column.is_a?(Array)
+        select(key_column, *value_column).send(meth, hash_key_symbol(key_column), value_column.map{|c| hash_key_symbol(c)})
+      else
+        select(key_column, value_column).send(meth, hash_key_symbol(key_column), hash_key_symbol(value_column))
+      end
+    end
     
     # Internals of +select_map+ and +select_order_map+
     def _select_map(column, order, &block)

@@ -982,6 +982,19 @@ describe "Sequel::Dataset convenience methods" do
     @ds.to_hash([:a, :c], [:b, :d]).should == {[1, 3]=>[2, 4], [5, 7]=>[6, 8]}
   end
 
+  specify "should have working #to_hash_groups" do
+    ds = @ds.order(*@ds.columns)
+    ds.insert(1, 2, 3, 9)
+    ds.to_hash_groups(:a).should == {1=>[{:a=>1, :b=>2, :c=>3, :d=>4}, {:a=>1, :b=>2, :c=>3, :d=>9}], 5=>[{:a=>5, :b=>6, :c=>7, :d=>8}]}
+    ds.to_hash_groups(:b).should == {2=>[{:a=>1, :b=>2, :c=>3, :d=>4}, {:a=>1, :b=>2, :c=>3, :d=>9}], 6=>[{:a=>5, :b=>6, :c=>7, :d=>8}]}
+    ds.to_hash_groups([:a, :b]).should == {[1, 2]=>[{:a=>1, :b=>2, :c=>3, :d=>4}, {:a=>1, :b=>2, :c=>3, :d=>9}], [5, 6]=>[{:a=>5, :b=>6, :c=>7, :d=>8}]}
+
+    ds.to_hash_groups(:a, :d).should == {1=>[4, 9], 5=>[8]}
+    ds.to_hash_groups([:a, :c], :d).should == {[1, 3]=>[4, 9], [5, 7]=>[8]}
+    ds.to_hash_groups(:a, [:b, :d]).should == {1=>[[2, 4], [2, 9]], 5=>[[6, 8]]}
+    ds.to_hash_groups([:a, :c], [:b, :d]).should == {[1, 3]=>[[2, 4], [2, 9]], [5, 7]=>[[6, 8]]}
+  end
+
   specify "should have working #select_map" do
     @ds.select_map(:a).should == [1, 5]
     @ds.select_map(:b).should == [2, 6]
@@ -1023,6 +1036,19 @@ describe "Sequel::Dataset convenience methods" do
     @ds.select_hash([:a, :c], :b).should == {[1, 3]=>2, [5, 7]=>6}
     @ds.select_hash(:a, [:b, :c]).should == {1=>[2, 3], 5=>[6, 7]}
     @ds.select_hash([:a, :c], [:b, :d]).should == {[1, 3]=>[2, 4], [5, 7]=>[6, 8]}
+  end
+
+  specify "should have working #select_hash_groups" do
+    ds = @ds.order(*@ds.columns)
+    ds.insert(1, 2, 3, 9)
+    ds.select_hash_groups(:a, :d).should == {1=>[4, 9], 5=>[8]}
+    ds.select_hash_groups(:a__a___e, :d).should == {1=>[4, 9], 5=>[8]}
+    ds.select_hash_groups(:a__a.as(:e), :d).should == {1=>[4, 9], 5=>[8]}
+    ds.select_hash_groups(:a.qualify(:a).as(:e), :d).should == {1=>[4, 9], 5=>[8]}
+    ds.select_hash_groups(:a.identifier.qualify(:a).as(:e), :d).should == {1=>[4, 9], 5=>[8]}
+    ds.select_hash_groups([:a, :c], :d).should == {[1, 3]=>[4, 9], [5, 7]=>[8]}
+    ds.select_hash_groups(:a, [:b, :d]).should == {1=>[[2, 4], [2, 9]], 5=>[[6, 8]]}
+    ds.select_hash_groups([:a, :c], [:b, :d]).should == {[1, 3]=>[[2, 4], [2, 9]], [5, 7]=>[[6, 8]]}
   end
 end
 

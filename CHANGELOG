@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#to_hash_groups and #select_hash_groups for getting a hash with arrays of matching values (jeremyevans)
+
 * Model#set_fields and #update_fields now respect :missing=>:skip and :missing=>:raise options for handling missing values (jeremyevans)
 
 * The :on_update and :on_delete entries for foreign key can now take strings, which are used literally (jeremyevans)

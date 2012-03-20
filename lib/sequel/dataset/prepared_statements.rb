@@ -143,7 +143,7 @@ module Sequel
           delete
         when Array
           case @prepared_type.at(0)
-          when :map, :to_hash
+          when :map, :to_hash, :to_hash_groups
             send(*@prepared_type, &block) 
           end
         else
