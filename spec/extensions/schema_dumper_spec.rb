@@ -73,15 +73,8 @@ describe "Sequel::Database dump methods" do
       when :t2
         [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>false}],
          [:c2, {:db_type=>'numeric', :primary_key=>true, :allow_null=>false}]]
-      when :t3
-        [[:c1, {:db_type=>'date', :default=>"'now()'", :allow_null=>true}],
-         [:c2, {:db_type=>'datetime', :allow_null=>false}]]
       when :t5
         [[:c1, {:db_type=>'blahblah', :allow_null=>true}]]
-      when :t6
-        [[:c1, {:db_type=>'bigint', :primary_key=>true, :allow_null=>true}]]
-      when :t7
-        [[:c1, {:db_type=>'somedbspecifictype', :primary_key=>true, :allow_null=>false}]]
       end
     end
   end
@@ -99,15 +92,84 @@ describe "Sequel::Database dump methods" do
   end
 
   it "should dump non-Integer primary key columns with explicit :type" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'bigint', :primary_key=>true, :allow_null=>true}]]}
     @d.dump_table_schema(:t6).should == "create_table(:t6) do\n  primary_key :c1, :type=>Bignum\nend"
   end
 
+  it "should handle foreign keys" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :allow_null=>true}]]}
+    @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2]}]}
+    @d.dump_table_schema(:t6).should == "create_table(:t6) do\n  foreign_key :c1, :t2, :key=>[:c2]\nend"
+  end
+
+  it "should handle primary keys that are also foreign keys" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true}]]}
+    @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2]}]}
+    s = @d.dump_table_schema(:t6)
+    s.should =~ /create_table\(:t6\) do\n  primary_key :c1, /
+    s.should =~ /:table=>:t2/
+    s.should =~ /:key=>\[:c2\]/
+  end
+
+  it "should handle foreign key options" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :allow_null=>true}]]}
+    @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:restrict, :on_update=>:set_null, :deferrable=>true}]}
+    s = @d.dump_table_schema(:t6)
+    s.should =~ /create_table\(:t6\) do\n  foreign_key :c1, :t2, /
+    s.should =~ /:key=>\[:c2\]/
+    s.should =~ /:on_delete=>:restrict/
+    s.should =~ /:on_update=>:set_null/
+    s.should =~ /:deferrable=>true/
+  end
+
+  it "should handle foreign key options in the primary key" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true}]]}
+    @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:restrict, :on_update=>:set_null, :deferrable=>true}]}
+    s = @d.dump_table_schema(:t6)
+    s.should =~ /create_table\(:t6\) do\n  primary_key :c1, /
+    s.should =~ /:table=>:t2/
+    s.should =~ /:key=>\[:c2\]/
+    s.should =~ /:on_delete=>:restrict/
+    s.should =~ /:on_update=>:set_null/
+    s.should =~ /:deferrable=>true/
+  end
+
+  it "should omit foreign key options that are the same as defaults" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :allow_null=>true}]]}
+    @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:no_action, :on_update=>:no_action, :deferrable=>false}]}
+    s = @d.dump_table_schema(:t6)
+    s.should =~ /create_table\(:t6\) do\n  foreign_key :c1, :t2, /
+    s.should =~ /:key=>\[:c2\]/
+    s.should_not =~ /:on_delete/
+    s.should_not =~ /:on_update/
+    s.should_not =~ /:deferrable/
+  end
+
+  it "should omit foreign key options that are the same as defaults in the primary key" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true}]]}
+    @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:no_action, :on_update=>:no_action, :deferrable=>false}]}
+    s = @d.dump_table_schema(:t6)
+    s.should =~ /create_table\(:t6\) do\n  primary_key :c1, /
+    s.should =~ /:table=>:t2/
+    s.should =~ /:key=>\[:c2\]/
+    s.should_not =~ /:on_delete/
+    s.should_not =~ /:on_update/
+    s.should_not =~ /:deferrable/
+  end
+
   it "should dump primary key columns with explicit :type equal to the database type when :same_db option is passed" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'somedbspecifictype', :primary_key=>true, :allow_null=>false}]]}
     @d.dump_table_schema(:t7, :same_db => true).should == "create_table(:t7) do\n  primary_key :c1, :type=>\"somedbspecifictype\"\nend"
   end
 
   it "should use a composite primary_key calls if there is a composite primary key" do
     @d.dump_table_schema(:t2).should == "create_table(:t2) do\n  Integer :c1, :null=>false\n  BigDecimal :c2, :null=>false\n  \n  primary_key [:c1, :c2]\nend"
+  end
+
+  it "should use a composite foreign_key calls if there is a composite foreign key" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer'}], [:c2, {:db_type=>'integer'}]]}
+    @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1, :c2], :table=>:t2, :key=>[:c3, :c4]}]}
+    @d.dump_table_schema(:t1).should == "create_table(:t1) do\n  Integer :c1\n  Integer :c2\n  \n  foreign_key [:c1, :c2], :t2, :key=>[:c3, :c4]\nend"
   end
 
   it "should include index information if available" do
@@ -136,7 +198,7 @@ Sequel.migration do
   end
   
   down do
-    drop_table(:t1, :t2)
+    drop_table(:t2, :t1)
   end
 end
 END_MIG
@@ -157,6 +219,92 @@ Sequel.migration do
       BigDecimal :c2, :null=>false
       
       primary_key [:c1, :c2]
+    end
+  end
+  
+  down do
+    drop_table(:t2, :t1)
+  end
+end
+END_MIG
+  end
+
+  it "should sort table names topologically when dumping a migration with foreign keys" do
+    @d.meta_def(:tables){|o| [:t1, :t2]}
+    @d.meta_def(:schema) do |t|
+      t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer', :primary_key=>true}]]
+    end
+    @d.meta_def(:foreign_key_list) do |t|
+      t == :t1 ? [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}] : []
+    end
+    @d.dump_schema_migration.should == <<-END_MIG
+Sequel.migration do
+  up do
+    create_table(:t2) do
+      primary_key :c1
+    end
+    
+    create_table(:t1) do
+      foreign_key :c2, :t2, :key=>[:c1]
+    end
+  end
+  
+  down do
+    drop_table(:t1, :t2)
+  end
+end
+END_MIG
+  end
+
+  it "should handle circular dependencies when dumping a migration with foreign keys" do
+    @d.meta_def(:tables){|o| [:t1, :t2]}
+    @d.meta_def(:schema) do |t|
+      t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer'}]]
+    end
+    @d.meta_def(:foreign_key_list) do |t|
+      t == :t1 ? [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}] : [{:columns=>[:c1], :table=>:t1, :key=>[:c2]}]
+    end
+    @d.dump_schema_migration.should == <<-END_MIG
+Sequel.migration do
+  up do
+    create_table(:t1) do
+      Integer :c2
+    end
+    
+    create_table(:t2) do
+      foreign_key :c1, :t1, :key=>[:c2]
+    end
+    
+    alter_table(:t1) do
+      add_foreign_key [:c2], :t2, :key=>[:c1]
+    end
+  end
+  
+  down do
+    drop_table(:t2, :t1)
+  end
+end
+END_MIG
+  end
+
+  it "should sort topologically even if the database raises an error when trying to parse foreign keys for a non-existent table" do
+    @d.meta_def(:tables){|o| [:t1, :t2]}
+    @d.meta_def(:schema) do |t|
+      t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer', :primary_key=>true}]]
+    end
+    @d.meta_def(:foreign_key_list) do |t|
+      raise Sequel::DatabaseError unless [:t1, :t2].include?(t)
+      t == :t1 ? [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}] : []
+    end
+    @d.dump_schema_migration.should == <<-END_MIG
+Sequel.migration do
+  up do
+    create_table(:t2) do
+      primary_key :c1
+    end
+    
+    create_table(:t1) do
+      foreign_key :c2, :t2, :key=>[:c1]
     end
   end
   
@@ -186,7 +334,7 @@ Sequel.migration do
   end
   
   down do
-    drop_table(:t1, :t2)
+    drop_table(:t2, :t1)
   end
 end
 END_MIG
@@ -215,10 +363,24 @@ Sequel.migration do
   end
   
   down do
-    drop_table(:t1, :t2)
+    drop_table(:t2, :t1)
   end
 end
 END_MIG
+  end
+
+  it "should have :indexes => false option disable foreign keys as well when dumping a whole migration" do
+    @d.meta_def(:foreign_key_list) do |t|
+      t == :t1 ? [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}] : []
+    end
+    @d.dump_schema_migration(:indexes=>false).should_not =~ /foreign_key/
+  end
+
+  it "should have :foreign_keys option override :indexes => false disabling of foreign keys" do
+    @d.meta_def(:foreign_key_list) do |t|
+      t == :t1 ? [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}] : []
+    end
+    @d.dump_schema_migration(:indexes=>false, :foreign_keys=>true).should =~ /foreign_key/
   end
 
   it "should support dumping just indexes as a migration" do
@@ -242,7 +404,64 @@ end
 END_MIG
   end
 
+  it "should handle missing index parsing support when dumping index migration" do
+    @d.meta_def(:tables){|o| [:t1]}
+    @d.dump_indexes_migration.should == <<-END_MIG
+Sequel.migration do
+  up do
+    
+  end
+  
+  down do
+    
+  end
+end
+END_MIG
+  end
+
+  it "should handle missing foreign key parsing support when dumping foreign key migration" do
+    @d.meta_def(:tables){|o| [:t1]}
+    @d.dump_foreign_key_migration.should == <<-END_MIG
+Sequel.migration do
+  up do
+    
+  end
+end
+END_MIG
+  end
+
+  it "should support dumping just foreign_keys as a migration" do
+    @d.meta_def(:tables){|o| [:t1, :t2, :t3]}
+    @d.meta_def(:schema) do |t|
+      t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer'}]]
+    end
+    @d.meta_def(:foreign_key_list) do |t, *a|
+      case t
+      when :t1
+        [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}]
+      when :t2
+        [{:columns=>[:c1, :c3], :table=>:t1, :key=>[:c2, :c4]}]
+      else
+        []
+      end
+    end
+    @d.dump_foreign_key_migration.should == <<-END_MIG
+Sequel.migration do
+  up do
+    alter_table(:t1) do
+      add_foreign_key [:c2], :t2, :key=>[:c1]
+    end
+    
+    alter_table(:t2) do
+      add_foreign_key [:c1, :c3], :t1, :key=>[:c2, :c4]
+    end
+  end
+end
+END_MIG
+  end
+
   it "should handle not null values and defaults" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'date', :default=>"'now()'", :allow_null=>true}], [:c2, {:db_type=>'datetime', :allow_null=>false}]]}
     @d.dump_table_schema(:t3).should == "create_table(:t3) do\n  Date :c1\n  DateTime :c2, :null=>false\nend"
   end
   

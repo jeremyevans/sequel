@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Database#dump_foreign_key_migration for just dumping foreign key constraints to the schema dumper extension (jeremyevans)
+
+* Dump foreign key constraints by default when using the schema dumper extension (jeremyevans)
+
 * Don't raise an error when no indexes exist for a table when calling Database#indexes on the jdbc/sqlite adapter (jeremyevans)
 
 * Copy composite foreign key constraints when emulating alter_table on SQLite (jeremyevans)
