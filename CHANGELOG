@@ -1,5 +1,7 @@
 === HEAD
 
+* Use bigint type instead of integer for Bignum generic type on SQLite (jeremyevans)
+
 * Add Database#dump_foreign_key_migration for just dumping foreign key constraints to the schema dumper extension (jeremyevans)
 
 * Dump foreign key constraints by default when using the schema dumper extension (jeremyevans)

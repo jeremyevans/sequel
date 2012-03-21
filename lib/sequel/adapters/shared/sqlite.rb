@@ -410,14 +410,6 @@ module Sequel
         m = output_identifier_meth
         metadata_dataset.from(:sqlite_master).server(opts[:server]).filter(filter).map{|r| m.call(r[:name])}
       end
-      
-      # SQLite uses the integer data type even for bignums.  This is because they
-      # are both stored internally as text, and converted when returned from
-      # the database.  Using an integer type instead of bigint makes it more likely
-      # that software will automatically return the column as an integer.
-      def type_literal_generic_bignum(column)
-        :integer
-      end
     end
     
     # Instance methods for datasets that connect to an SQLite database

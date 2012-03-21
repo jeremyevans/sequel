@@ -33,7 +33,7 @@ describe "Supported types" do
     ds.all.should == [{:number=>2}]
   end
   
-  specify "should support generic bignum type" do
+  cspecify "should support generic bignum type", [:swift, :sqlite] do
     ds = create_items_table_with_column(:number, Bignum)
     ds.insert(:number => 2**34)
     ds.all.should == [{:number=>2**34}]
