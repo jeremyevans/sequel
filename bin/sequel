@@ -166,6 +166,7 @@ begin
     puts "Databases connections successful"
     schema_migration = eval(DB.dump_schema_migration(:indexes=>false, :same_db=>same_db))
     index_migration = eval(DB.dump_indexes_migration(:same_db=>same_db))
+    fk_migration = eval(DB.dump_foreign_key_migration(:same_db=>same_db))
     puts "Migrations dumped successfully"
 
     schema_migration.apply(TO_DB, :up)
@@ -196,6 +197,10 @@ begin
     puts "Begin creating indexes"
     index_migration.apply(TO_DB, :up)
     puts "Finished creating indexes"
+
+    puts "Begin adding foreign key constraints"
+    fk_migration.apply(TO_DB, :up)
+    puts "Finished adding foreign key constraints"
 
     if TO_DB.database_type == :postgres
       TO_DB.tables.each{|t| TO_DB.reset_primary_key_sequence(t)}
