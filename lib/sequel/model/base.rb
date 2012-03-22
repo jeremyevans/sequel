@@ -823,7 +823,7 @@ module Sequel
       # same name, caching the result in an instance variable.  Define
       # standard attr_writer method for modifying that instance variable.
       def self.class_attr_overridable(*meths) # :nodoc:
-        meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (@#{meth} = self.class.#{meth}) : @#{meth} end", __FILE__, __LINE__)}
+        meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (frozen? ? self.class.#{meth} : (@#{meth} = self.class.#{meth})) : @#{meth} end", __FILE__, __LINE__)}
         attr_writer(*meths) 
       end 
     
@@ -832,7 +832,7 @@ module Sequel
       #   
       #   define_method(meth){self.class.send(meth)}
       def self.class_attr_reader(*meths) # :nodoc:
-        meths.each{|meth| class_eval("def #{meth}; model.#{meth} end", __FILE__, __LINE__)}
+        meths.each{|meth| class_eval("def #{meth}; self.class.#{meth} end", __FILE__, __LINE__)}
       end
 
       private_class_method :class_attr_overridable, :class_attr_reader
@@ -951,6 +951,7 @@ module Sequel
       #   Artist[1].delete # DELETE FROM artists WHERE (id = 1)
       #   # => #<Artist {:id=>1, ...}>
       def delete
+        raise Sequel::Error, "can't delete frozen object" if frozen?
         _delete
         self
       end
@@ -965,6 +966,7 @@ module Sequel
       #   Artist[1].destroy # BEGIN; DELETE FROM artists WHERE (id = 1); COMMIT;
       #   # => #<Artist {:id=>1, ...}>
       def destroy(opts = {})
+        raise Sequel::Error, "can't destroy frozen object" if frozen?
         checked_save_failure(opts){checked_transaction(opts){_destroy(opts)}}
       end
 
@@ -1010,6 +1012,19 @@ module Sequel
       # module may contain setter methods.
       def extend(mod)
         @singleton_setter_added = true
+        super
+      end
+
+      # Freeze the object in such a way that it is still usable but not modifiable.
+      # Once an object is frozen, you cannot modify it's values, changed_columns,
+      # errors, or dataset.
+      def freeze
+        values.freeze
+        changed_columns.freeze
+        errors
+        validate
+        errors.freeze
+        this.freeze unless new?
         super
       end
   
@@ -1141,6 +1156,7 @@ module Sequel
       #   a.refresh
       #   a.name # => 'Bob'
       def refresh
+        raise Sequel::Error, "can't refresh frozen object" if frozen?
         _refresh(this)
       end
 
@@ -1177,6 +1193,7 @@ module Sequel
       #                 +use_transactions+ setting
       # :validate :: set to false to skip validation
       def save(*columns)
+        raise Sequel::Error, "can't save frozen object" if frozen?
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
         set_server(opts[:server]) if opts[:server] 
         if opts[:validate] != false
@@ -1601,6 +1618,7 @@ module Sequel
       # failures will be raised as HookFailure exceptions.  If it is
       # +false+, +false+ will be returned instead.
       def _valid?(raise_errors, opts)
+        return errors.empty? if frozen?
         errors.clear
         called = false
         error = false

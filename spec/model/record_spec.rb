@@ -332,6 +332,73 @@ describe "Model#set_server" do
   end
 end
 
+describe "Model#freeze" do
+  before do
+    class ::Album < Sequel::Model
+      columns :id
+      class B < Sequel::Model
+        columns :id, :album_id
+        many_to_one :album, :class=>Album
+      end
+      one_to_one :b, :key=>:album_id, :class=>B
+    end
+    @o = Album.load(:id=>1).freeze
+    MODEL_DB.sqls
+  end
+  after do
+    Object.send(:remove_const, :Album)
+  end
+
+  it "should freeze the object" do
+    @o.frozen?.should be_true
+  end
+
+  it "should freeze the object's values, associations, changed_columns, errors, and this" do
+    @o.values.frozen?.should be_true
+    @o.associations.frozen?.should be_true
+    @o.changed_columns.frozen?.should be_true
+    @o.errors.frozen?.should be_true
+    @o.this.frozen?.should be_true
+  end
+
+  it "should still have working class attr overriddable methods" do
+    Sequel::Model::BOOLEAN_SETTINGS.each{|m| @o.send(m) == Album.send(m)}
+  end
+
+  it "should not break associations getters" do
+    Album::B.dataset._fetch = {:album_id=>1, :id=>2}
+    @o.b.should == Album::B.load(:id=>2, :album_id=>1)
+    @o.associations[:b].should be_nil
+  end
+
+  it "should not break reciprocal associations" do
+    b = Album::B.load(:id=>2, :album_id=>nil)
+    b.album = @o
+    @o.associations[:b].should be_nil
+  end
+
+  it "should have working new? method" do
+    @o.new?.should be_false
+    Album.new.freeze.new?.should be_true
+  end
+
+  it "should have working valid? method" do
+    @o.valid?.should be_true
+    o = Album.new
+    def o.validate() errors.add(:foo, '') end
+    o.freeze
+    o.valid?.should be_false
+  end
+
+  it "should raise an Error if trying to save/destroy/delete/refresh" do
+    proc{@o.save}.should raise_error(Sequel::Error)
+    proc{@o.destroy}.should raise_error(Sequel::Error)
+    proc{@o.delete}.should raise_error(Sequel::Error)
+    proc{@o.refresh}.should raise_error(Sequel::Error)
+    @o.db.sqls.should == []
+  end
+end
+
 describe "Model#marshallable" do
   before do
     class ::Album < Sequel::Model

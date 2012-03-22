@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model#freeze implementation to get a working frozen model object (jeremyevans)
+
 * Add many_to_one_pk_lookup plugin, for using a simple primary key lookup for many_to_one associations (great with caching) (jeremyevans)
 
 * Use bigint type instead of integer for Bignum generic type on SQLite (jeremyevans)

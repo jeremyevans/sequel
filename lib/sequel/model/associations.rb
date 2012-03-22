@@ -1373,6 +1373,14 @@ module Sequel
         def associations
           @associations ||= {}
         end
+
+        # Freeze the associations cache when freezing the object.  Note that
+        # retrieving associations after freezing will still work in most cases,
+        # but the associations will not be cached in the association cache.
+        def freeze
+          associations.freeze
+          super
+        end
       
         # Formally used internally by the associations code, like pk but doesn't raise
         # an Error if the model has no primary key.  Not used any longer, deprecated.
@@ -1480,6 +1488,7 @@ module Sequel
 
         # Add/Set the current object to/as the given object's reciprocal association.
         def add_reciprocal_object(opts, o)
+          return if o.frozen?
           return unless reciprocal = opts.reciprocal
           if opts.reciprocal_array?
             if array = o.associations[reciprocal] and !array.include?(self)
@@ -1528,9 +1537,14 @@ module Sequel
                 add_reciprocal_object(opts, objs)
               end
             end
-            associations[name] = objs
+
+            # If the current object is frozen, you can't update the associations
+            # cache.  This can cause issues for after_load procs that expect
+            # the objects to be already cached in the associations, but
+            # unfortunately that case cannot be handled.
+            associations[name] = objs unless frozen?
             run_association_callbacks(opts, :after_load, objs)
-            associations[name]
+            frozen? ? objs : associations[name]
           end
         end
 
