@@ -1424,15 +1424,29 @@ module Sequel
           opts[:join_table_block] ? opts[:join_table_block].call(ds) : ds
         end
 
+        # Return the associated single object for the given association reflection and dynamic options
+        # (or nil if no associated object).
+        def _load_associated_object(opts, dynamic_opts)
+          _load_associated_object_array(opts, dynamic_opts).first
+        end
+
+        # Load the associated objects for the given association reflection and dynamic options
+        # as an array.
+        def _load_associated_object_array(opts, dynamic_opts)
+          _associated_dataset(opts, dynamic_opts).all
+        end
+
         # Return the associated objects from the dataset, without association callbacks, reciprocals, and caching.
         # Still apply the dynamic callback if present.
         def _load_associated_objects(opts, dynamic_opts={})
-          if opts.returns_array?
-            opts.can_have_associated_objects?(self) ? _associated_dataset(opts, dynamic_opts).all : []
-          else
-            if opts.can_have_associated_objects?(self)
-              _associated_dataset(opts, dynamic_opts).all.first
+          if opts.can_have_associated_objects?(self)
+            if opts.returns_array?
+              _load_associated_object_array(opts, dynamic_opts)
+            else
+              _load_associated_object(opts, dynamic_opts)
             end
+          else
+            [] if opts.returns_array?
           end
         end
         
