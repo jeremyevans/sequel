@@ -25,6 +25,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/LazyAttributes.html">lazy_attributes</a>: Allows you to set some attributes that should not be loaded by default, but only loaded when an object requests them.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/List.html">list</a>: Allows you to treat model objects as being part of a list, so you can move them up/down and get next/previous entries.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ManyThroughMany.html">many_through_many</a>: Allows you to create an association to multiple objects through multiple join tables.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/ManyToOnePkLookup.html">many_to_one_pk_lookup</a>: Uses optimized simple primary key lookups for most many_to_one associations (great if associated class uses caching).</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/NestedAttributes.html">nested_attributes</a>: Allows you to modified associated objects directly through a model object, similar to ActiveRecord's Nested Attributes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking</a>: Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatements.html">prepared_statements</a>: Makes models use prepared statements for deletes, inserts, updates, and lookups by primary key.</li>

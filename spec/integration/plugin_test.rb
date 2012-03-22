@@ -1554,3 +1554,45 @@ describe "Sequel::Plugins::PreparedStatements" do
     @c[o.id].should == @c.load(:id=>o.id, :name=>nil, :i=>40)
   end
 end
+
+describe "Caching plugins" do
+  before(:all) do
+    @db = INTEGRATION_DB
+    @db.drop_table?(:albums, :artists)
+    @db.create_table(:artists) do
+      primary_key :id
+    end
+    @db.create_table(:albums) do
+      primary_key :id
+      foreign_key :artist_id, :artists
+    end
+    @db[:artists].insert
+    @db[:albums].insert(:artist_id=>1)
+    @cache_class = Class.new(Hash) do
+      def set(k, v, ttl) self[k] = v end
+      alias get []
+    end
+    @cache = @cache_class.new
+
+    @Artist = Class.new(Sequel::Model(@db[:artists]))
+    @Album = Class.new(Sequel::Model(@db[:albums]))
+    @Artist.plugin :caching, @cache
+    @Album.plugin :many_to_one_pk_lookup
+    @Album.many_to_one :artist, :class=>@Artist
+  end
+  after(:all) do
+    @db.drop_table?(:albums, :artists)
+  end
+
+  it "should work with looking up using Model.[]" do 
+    @Artist[1].should equal(@Artist[1])
+    @Artist[:id=>1].should == @Artist[1]
+    @Artist[0].should == nil
+    @Artist[nil].should == nil
+  end
+
+  it "should work with lookup up many_to_one associated objects" do 
+    a = @Artist[1]
+    @Album.first.artist.should equal(a)
+  end
+end
