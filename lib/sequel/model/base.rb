@@ -112,8 +112,8 @@ module Sequel
       #   Artist[:name=>'Bob'] # SELECT * FROM artists WHERE (name = 'Bob') LIMIT 1
       #   # => #<Artist {:name=>'Bob', ...}>
       def [](*args)
-        args = args.first if (args.size == 1)
-        args.is_a?(Hash) ? dataset[args] : primary_key_lookup(args)
+        args = args.first if args.size <= 1
+        args.is_a?(Hash) ? dataset[args] : (primary_key_lookup(args) unless args.nil?)
       end
 
       # Initializes a model instance as an existing record. This constructor is
@@ -774,6 +774,10 @@ module Sequel
   
       # Find the row in the dataset that matches the primary key.  Uses
       # a static SQL optimization if the table and primary key are simple.
+      #
+      # This method should not be called with a nil primary key, in case
+      # it is overridden by plugins which assume that the passed argument
+      # is valid.
       def primary_key_lookup(pk)
         if t = simple_table and p = simple_pk
           with_sql("SELECT * FROM #{t} WHERE #{p} = #{dataset.literal(pk)}").first

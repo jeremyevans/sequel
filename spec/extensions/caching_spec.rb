@@ -161,6 +161,11 @@ describe Sequel::Model, "caching" do
     m2.should == m
     m2.values.should == {:name=>"sharon", :id=>1}
   end
+
+  it "should handle lookups by nil primary keys" do
+    @c[nil].should == nil
+    @c.db.sqls.should == []
+  end
   
   it "should delete the cache when writing to the database" do
     m = @c[1]
