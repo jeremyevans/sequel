@@ -228,7 +228,7 @@ module Sequel
         # key option has a value and the association uses the primary key of
         # the associated class as the :primary_key option, check the identity
         # map for the associated object and return it if present.
-        def _load_associated_object(opts, dynamic_opts={})
+        def _load_associated_object(opts, dynamic_opts)
           klass = opts.associated_class
           cache_lookup = opts.fetch(:idm_cache_lookup) do 
             opts[:idm_cache_lookup] = klass.respond_to?(:identity_map) &&
