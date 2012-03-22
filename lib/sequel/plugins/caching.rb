@@ -53,9 +53,21 @@ module Sequel
         # The time to live for the cache store, in seconds.
         attr_reader :cache_ttl
 
-        # Set the time to live for the cache store, in seconds (default is 3600, # so 1 hour).
-        def set_cache_ttl(ttl)
-          @cache_ttl = ttl
+        # Delete the cached object with the given primary key.
+        def cache_delete_pk(pk)
+          cache_delete(cache_key(pk))
+        end
+
+        # Return the cached object with the given primary key,
+        # or nil if no such object is in the cache.
+        def cache_get_pk(pk)
+          cache_get(cache_key(pk))
+        end
+
+        # Return a key string for the given primary key.
+        def cache_key(pk)
+          raise(Error, 'no primary key for this record') unless pk.is_a?(Array) ? pk.all? : pk
+          "#{self}:#{Array(pk).join(',')}"
         end
         
         # Copy the necessary class instance variables to the subclass.
@@ -69,8 +81,13 @@ module Sequel
             @cache_ttl = ttl
             @cache_ignore_exceptions = cache_ignore_exceptions
           end
-        end
+        end 
 
+        # Set the time to live for the cache store, in seconds (default is 3600, # so 1 hour).
+        def set_cache_ttl(ttl)
+          @cache_ttl = ttl
+        end
+        
         private
     
         # Delete the entry with the matching key from the cache
@@ -79,6 +96,8 @@ module Sequel
           nil
         end
         
+        # Returned the cached object, or nil if the object was not
+        # in the cached
         def cache_get(ck)
           if @cache_ignore_exceptions
             @cache_store.get(ck) rescue nil
@@ -87,11 +106,6 @@ module Sequel
           end
         end
     
-        # Return a key string for the pk
-        def cache_key(pk)
-          "#{self}:#{Array(pk).join(',')}"
-        end
-        
         # Set the object in the cache_store with the given key for cache_ttl seconds.
         def cache_set(ck, obj)
           @cache_store.set(ck, obj, @cache_ttl)
@@ -120,14 +134,7 @@ module Sequel
         # primary key value(s) for the object.  If the model does not have a primary
         # key, raise an Error.
         def cache_key
-          raise(Error, "No primary key is associated with this model") unless key = primary_key
-          pk = case key
-          when Array
-            key.collect{|k| @values[k]}
-          else
-            @values[key] || (raise Error, 'no primary key for this record')
-          end
-          model.send(:cache_key, pk)
+          model.cache_key(pk)
         end
     
         # Remove the object from the cache when deleting
@@ -140,7 +147,7 @@ module Sequel
     
         # Delete this object from the cache
         def cache_delete
-          model.send(:cache_delete, cache_key)
+          model.cache_delete_pk(pk)
         end
       end
     end
