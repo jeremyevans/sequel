@@ -230,8 +230,14 @@ module Sequel
         # map for the associated object and return it if present.
         def _load_associated_objects(opts, dynamic_opts={})
           klass = opts.associated_class
-          if !dynamic_opts[:callback] && klass.respond_to?(:identity_map) && idm = klass.identity_map and opts[:type] == :many_to_one and opts.primary_key == klass.primary_key and
-           opts[:key] and pk = _associated_object_pk(opts[:key]) and o = idm[klass.identity_map_key(pk)]
+          if !dynamic_opts[:callback] && 
+             klass.respond_to?(:identity_map) &&
+             (idm = klass.identity_map) &&
+             opts[:type] == :many_to_one &&
+             opts.primary_key == klass.primary_key &&
+             opts[:key] &&
+             (pk = _associated_object_pk(opts[:key])) &&
+             (o = idm[klass.identity_map_key(pk)])
             o
           else
             super
