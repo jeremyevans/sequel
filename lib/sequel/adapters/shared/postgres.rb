@@ -428,6 +428,7 @@ module Sequel
             0
           end
         end
+        warn 'Sequel support for PostgreSQL <8.2 is deprecated and will be removed in 3.35.0' if @server_version < 80200
         @server_version
       end
 
