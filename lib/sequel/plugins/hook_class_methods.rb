@@ -90,9 +90,9 @@ module Sequel
 
         # Make a copy of the current class's hooks for the subclass.
         def inherited(subclass)
-          super
           hooks = subclass.instance_variable_set(:@hooks, {}) 
           instance_variable_get(:@hooks).each{|k,v| hooks[k] = v.dup}
+          super
         end
     
         private

@@ -60,7 +60,6 @@ module Sequel
 
         # Setup the validations and validation_reflections hash in the subclass.
         def inherited(subclass)
-          super
           vr = @validation_reflections
           subclass.class_eval do
             @validation_mutex = Mutex.new
@@ -69,6 +68,7 @@ module Sequel
             vr.each{|k,v| h[k] = v.dup}
             @validation_reflections = h
           end
+          super
         end
     
         # Instructs the model to skip validations defined in superclasses
