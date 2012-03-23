@@ -1568,31 +1568,52 @@ describe "Caching plugins" do
     end
     @db[:artists].insert
     @db[:albums].insert(:artist_id=>1)
-    @cache_class = Class.new(Hash) do
-      def set(k, v, ttl) self[k] = v end
-      alias get []
-    end
-    @cache = @cache_class.new
-
-    @Artist = Class.new(Sequel::Model(@db[:artists]))
+  end
+  before do
     @Album = Class.new(Sequel::Model(@db[:albums]))
-    @Artist.plugin :caching, @cache
     @Album.plugin :many_to_one_pk_lookup
-    @Album.many_to_one :artist, :class=>@Artist
   end
   after(:all) do
     @db.drop_table?(:albums, :artists)
   end
 
-  it "should work with looking up using Model.[]" do 
-    @Artist[1].should equal(@Artist[1])
-    @Artist[:id=>1].should == @Artist[1]
-    @Artist[0].should == nil
-    @Artist[nil].should == nil
+  shared_examples_for "a caching plugin" do
+    it "should work with looking up using Model.[]" do 
+      @Artist[1].should equal(@Artist[1])
+      @Artist[:id=>1].should == @Artist[1]
+      @Artist[0].should == nil
+      @Artist[nil].should == nil
+    end
+
+    it "should work with lookup up many_to_one associated objects" do 
+      a = @Artist[1]
+      @Album.first.artist.should equal(a)
+    end
   end
 
-  it "should work with lookup up many_to_one associated objects" do 
-    a = @Artist[1]
-    @Album.first.artist.should equal(a)
+  describe "caching plugin" do
+    before do
+      @cache_class = Class.new(Hash) do
+        def set(k, v, ttl) self[k] = v end
+        alias get []
+      end
+      @cache = @cache_class.new
+
+      @Artist = Class.new(Sequel::Model(@db[:artists]))
+      @Artist.plugin :caching, @cache
+      @Album.many_to_one :artist, :class=>@Artist
+    end
+
+    it_should_behave_like "a caching plugin"
+  end
+
+  describe "static_cache plugin" do
+    before do
+      @Artist = Class.new(Sequel::Model(@db[:artists]))
+      @Artist.plugin :static_cache
+      @Album.many_to_one :artist, :class=>@Artist
+    end
+
+    it_should_behave_like "a caching plugin"
   end
 end

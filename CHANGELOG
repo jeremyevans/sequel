@@ -1,5 +1,7 @@
 === HEAD
 
+* Add static_cache plugin, for staticly caching all model instances, useful for model tables that don't change (jeremyevans)
+
 * Add Model#freeze implementation to get a working frozen model object (jeremyevans)
 
 * Add many_to_one_pk_lookup plugin, for using a simple primary key lookup for many_to_one associations (great with caching) (jeremyevans)
