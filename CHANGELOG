@@ -1,5 +1,7 @@
 === HEAD
 
+* Add select_remove extension which adds Dataset#select_remove for removing columns/expressions from a dataset selection (jeremyevans)
+
 * Add static_cache plugin, for staticly caching all model instances, useful for model tables that don't change (jeremyevans)
 
 * Add Model#freeze implementation to get a working frozen model object (jeremyevans)
