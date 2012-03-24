@@ -159,7 +159,7 @@ module Sequel
         # is not found and the :strict option is not false, raise an Error.
         def nested_attributes_find(reflection, pk)
           pk = pk.to_s
-          unless obj = Array(associated_objects = send(reflection[:name])).find{|x| x.pk.to_s == pk}
+          unless obj = Array(send(reflection[:name])).find{|x| x.pk.to_s == pk}
             raise(Error, "no matching associated object with given primary key (association: #{reflection[:name]}, pk: #{pk})") unless reflection[:nested_attributes][:strict] == false
           end
           obj
