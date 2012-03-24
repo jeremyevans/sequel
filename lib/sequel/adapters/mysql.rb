@@ -281,7 +281,7 @@ module Sequel
       # Yield all rows matching this dataset.  If the dataset is set to
       # split multiple statements, yield arrays of hashes one per statement
       # instead of yielding results for all statements as hashes.
-      def fetch_rows(sql, &block)
+      def fetch_rows(sql)
         execute(sql) do |r|
           i = -1
           cps = db.conversion_procs
@@ -298,7 +298,7 @@ module Sequel
             yield_rows(r, cols){|h| s << h}
             yield s
           else
-            yield_rows(r, cols, &block)
+            yield_rows(r, cols){|h| yield h}
           end
         end
         self

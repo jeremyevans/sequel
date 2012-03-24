@@ -576,9 +576,9 @@ module Sequel
       
       # Yield all rows returned by executing the given SQL and converting
       # the types.
-      def fetch_rows(sql, &block)
-        return cursor_fetch_rows(sql, &block) if @opts[:cursor]
-        execute(sql){|res| yield_hash_rows(res, fetch_rows_set_cols(res), &block)}
+      def fetch_rows(sql)
+        return cursor_fetch_rows(sql){|h| yield h} if @opts[:cursor]
+        execute(sql){|res| yield_hash_rows(res, fetch_rows_set_cols(res)){|h| yield h}}
       end
       
       # Uses a cursor for fetching records, instead of fetching the entire result
@@ -725,7 +725,7 @@ module Sequel
       private
       
       # Use a cursor to fetch groups of records at a time, yielding them to the block.
-      def cursor_fetch_rows(sql, &block)
+      def cursor_fetch_rows(sql)
         server_opts = {:server=>@opts[:server] || :read_only}
         db.transaction(server_opts) do 
           begin
@@ -737,12 +737,12 @@ module Sequel
             # Load columns only in the first fetch, so subsequent fetches are faster
             execute(fetch_sql) do |res|
               cols = fetch_rows_set_cols(res)
-              yield_hash_rows(res, cols, &block)
+              yield_hash_rows(res, cols){|h| yield h}
               return if res.ntuples < rows_per_fetch
             end
             loop do
               execute(fetch_sql) do |res|
-                yield_hash_rows(res, cols, &block)
+                yield_hash_rows(res, cols){|h| yield h}
                 return if res.ntuples < rows_per_fetch
               end
             end

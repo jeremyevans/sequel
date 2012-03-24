@@ -136,10 +136,10 @@ module Sequel
       Database::DatasetClass = self
 
       # Set the columns and yield the hashes to the block.
-      def fetch_rows(sql, &block)
+      def fetch_rows(sql)
         execute(sql) do |res|
           @columns = res.fields
-          res.each(&block)
+          res.each{|h| yield h}
         end
         self
       end

@@ -137,7 +137,7 @@ module Sequel
       end
 
       # Yield all rows matching this dataset.
-      def fetch_rows(sql, &block)
+      def fetch_rows(sql)
         execute(sql) do |r|
           if identifier_output_method
             cols = r.fields
@@ -152,7 +152,7 @@ module Sequel
             end
           else
             @columns = r.fields
-            r.each(:cast_booleans => db.convert_tinyint_to_bool, &block)
+            r.each(:cast_booleans => db.convert_tinyint_to_bool){|h| yield h}
           end
         end
         self

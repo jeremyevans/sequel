@@ -124,13 +124,13 @@ module Sequel
     # running additional queries inside the provided block.  If you are
     # running queries inside the block, you should use +all+ instead of +each+
     # for the outer queries, or use a separate thread or shard inside +each+:
-    def each(&block)
+    def each
       if @opts[:graph]
-        graph_each(&block)
+        graph_each{|r| yield r}
       elsif row_proc = @row_proc
         fetch_rows(select_sql){|r| yield row_proc.call(r)}
       else
-        fetch_rows(select_sql, &block)
+        fetch_rows(select_sql){|r| yield r}
       end
       self
     end
