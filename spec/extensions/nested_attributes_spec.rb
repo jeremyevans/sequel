@@ -110,11 +110,31 @@ describe "NestedAttributes plugin" do
     @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "UPDATE albums SET name = 'Al2' WHERE (id = 10)"]
   end
   
+  it "should support updating one_to_many objects with _delete/_remove flags set to false" do
+    al = @Album.load(:id=>10, :name=>'Al')
+    ar = @Artist.load(:id=>20, :name=>'Ar')
+    ar.associations[:albums] = [al]
+    ar.set(:albums_attributes=>[{:id=>10, :name=>'Al2', :_delete => 'f', :_remove => '0'}])
+    @db.sqls.should == []
+    ar.save
+    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "UPDATE albums SET name = 'Al2' WHERE (id = 10)"]
+  end
+  
   it "should support updating many_to_many objects" do
     a = @Album.load(:id=>10, :name=>'Al')
     t = @Tag.load(:id=>20, :name=>'T')
     a.associations[:tags] = [t]
     a.set(:tags_attributes=>[{:id=>20, :name=>'T2'}])
+    @db.sqls.should == []
+    a.save
+    @db.sqls.should == ["UPDATE albums SET name = 'Al' WHERE (id = 10)", "UPDATE tags SET name = 'T2' WHERE (id = 20)"]
+  end
+  
+  it "should support updating many_to_many objects with _delete/_remove flags set to false" do
+    a = @Album.load(:id=>10, :name=>'Al')
+    t = @Tag.load(:id=>20, :name=>'T')
+    a.associations[:tags] = [t]
+    a.set(:tags_attributes=>[{:id=>20, :name=>'T2', '_delete' => false, '_remove' => 'F'}])
     @db.sqls.should == []
     a.save
     @db.sqls.should == ["UPDATE albums SET name = 'Al' WHERE (id = 10)", "UPDATE tags SET name = 'T2' WHERE (id = 20)"]

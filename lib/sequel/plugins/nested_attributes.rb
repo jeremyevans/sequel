@@ -218,9 +218,10 @@ module Sequel
           modified!
           klass = reflection.associated_class
           if pk = attributes.delete(klass.primary_key) || attributes.delete(klass.primary_key.to_s)
-            if klass.db.send(:typecast_value_boolean, attributes[:_delete] || attributes['_delete']) && reflection[:nested_attributes][:destroy]
+            attributes = attributes.dup
+            if reflection[:nested_attributes][:destroy] && klass.db.send(:typecast_value_boolean, attributes.delete(:_delete) || attributes.delete('_delete'))
               nested_attributes_remove(reflection, pk, :destroy=>true)
-            elsif klass.db.send(:typecast_value_boolean, attributes[:_remove] || attributes['_remove']) && reflection[:nested_attributes][:remove]
+            elsif reflection[:nested_attributes][:remove] && klass.db.send(:typecast_value_boolean, attributes.delete(:_remove) || attributes.delete('_remove'))
               nested_attributes_remove(reflection, pk)
             else
               nested_attributes_update(reflection, pk, attributes)
