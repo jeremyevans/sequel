@@ -799,7 +799,7 @@ module Sequel
       # Shared methods for prepared statements when used with PostgreSQL databases.
       module PreparedStatementMethods
         # Override insert action to use RETURNING if the server supports it.
-        def run(&block)
+        def run
           if @prepared_type == :insert && supports_insert_select?
             fetch_rows(prepared_sql){|r| return r.values.first}
           else
@@ -871,7 +871,7 @@ module Sequel
       end
 
       # Insert given values into the database.
-      def insert(*values, &block)
+      def insert(*values)
         if @opts[:returning]
           super
         elsif !@opts[:sql] && supports_insert_select?

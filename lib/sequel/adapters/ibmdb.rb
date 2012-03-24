@@ -174,7 +174,7 @@ module Sequel
       # REORG the related table whenever it is altered.  This is not always
       # required, but it is necessary for compatibilty with other Sequel
       # code in many cases.
-      def alter_table(name, generator=nil, &block)
+      def alter_table(name, generator=nil)
         res = super
         reorg(name)
         res
