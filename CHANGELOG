@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix connection failures when connecting to PostgreSQL with newer versions of swift (jeremyevans)
+
 * Fix using a bound variable for a limit in the ibmdb adapter on ruby 1.9 (jeremyevans)
 
 * primary_key :column, :type=>Bignum now works correctly on H2 (jeremyevans)

@@ -85,6 +85,16 @@ module Sequel
         def log_connection_execute(conn, sql)
           conn.execute(sql)
         end
+
+        # Remove all other options except for ones specifically handled, as
+        # otherwise swift passes them to dbic++ which passes them to PostgreSQL
+        # which can raise an error.
+        def server_opts(o)
+          o = super
+          so = {}
+          [:db, :user, :password, :host, :port].each{|s| so[s] = o[s] if o.has_key?(s)}
+          so
+        end
       
         # Extend the adapter with the Swift PostgreSQL AdapterMethods.
         def setup_connection(conn)
