@@ -407,16 +407,16 @@ module Sequel
       # require the plugin from either sequel/plugins/#{plugin} or
       # sequel_#{plugin}, and then attempt to load the module using a
       # the camelized plugin name under Sequel::Plugins.
-      def plugin(plugin, *args, &blk)
+      def plugin(plugin, *args, &block)
         m = plugin.is_a?(Module) ? plugin : plugin_module(plugin)
         unless @plugins.include?(m)
           @plugins << m
-          m.apply(self, *args, &blk) if m.respond_to?(:apply)
+          m.apply(self, *args, &block) if m.respond_to?(:apply)
           include(m::InstanceMethods) if plugin_module_defined?(m, :InstanceMethods)
           extend(m::ClassMethods)if plugin_module_defined?(m, :ClassMethods)
           dataset_extend(m::DatasetMethods) if plugin_module_defined?(m, :DatasetMethods)
         end
-        m.configure(self, *args, &blk) if m.respond_to?(:configure)
+        m.configure(self, *args, &block) if m.respond_to?(:configure)
       end
 
       # Returns primary key attribute hash.  If using a composite primary key
