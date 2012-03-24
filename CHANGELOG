@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix using a bound variable for a limit in the ibmdb adapter on ruby 1.9 (jeremyevans)
+
 * primary_key :column, :type=>Bignum now works correctly on H2 (jeremyevans)
 
 * Add query_literals extension for treating regular strings like literal strings in select, group, and order methods (jeremyevans)

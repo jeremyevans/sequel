@@ -310,7 +310,7 @@ module Sequel
         if l = @opts[:limit]
           if l == 1
             sql << FETCH_FIRST_ROW_ONLY
-          elsif l > 1
+          else
             sql << FETCH_FIRST
             literal_append(sql, l)
             sql << ROWS_ONLY
