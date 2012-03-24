@@ -1,5 +1,7 @@
 === HEAD
 
+* Double speed of Model[pk] for models with simple datasets (most models) (jeremyevans)
+
 * Support for ruby <1.8.7 and PostgreSQL <8.2 is now deprecated and will be removed after 3.34.0 is released (jeremyevans)
 
 * Add select_remove extension which adds Dataset#select_remove for removing columns/expressions from a dataset selection (jeremyevans)

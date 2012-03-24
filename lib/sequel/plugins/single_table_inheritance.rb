@@ -117,7 +117,7 @@ module Sequel
             @sti_dataset = sd
             @sti_key_map = skm
             @sti_model_map = smm
-            @simple_table = nil
+            self.simple_table = nil
           end
         end
 

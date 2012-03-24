@@ -399,7 +399,7 @@ module Sequel
       #   Artist.primary_key # => nil
       def no_primary_key
         clear_setter_methods_cache
-        @simple_pk = @primary_key = nil
+        self.simple_pk = @primary_key = nil
       end
       
       # Loads a plugin for use with the model class, passing optional arguments
@@ -503,10 +503,10 @@ module Sequel
         inherited = opts[:inherited]
         @dataset = case ds
         when Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, LiteralString
-          @simple_table = db.literal(ds)
+          self.simple_table = db.literal(ds)
           db.from(ds)
         when Dataset
-          @simple_table = if ds.send(:simple_select_all?)
+          self.simple_table = if ds.send(:simple_select_all?)
             ds.literal(ds.first_source_table)
           else
             nil
@@ -519,7 +519,7 @@ module Sequel
         @dataset.row_proc = self
         @require_modification = Sequel::Model.require_modification.nil? ? @dataset.provides_accurate_rows_matched? : Sequel::Model.require_modification
         if inherited
-          @simple_table = superclass.simple_table
+          self.simple_table = superclass.simple_table
           @columns = @dataset.columns rescue nil
         else
           @dataset_method_modules.each{|m| @dataset.extend(m)} if @dataset_method_modules
@@ -547,7 +547,7 @@ module Sequel
       def set_primary_key(*key)
         clear_setter_methods_cache
         key = key.flatten
-        @simple_pk = if key.length == 1
+        self.simple_pk = if key.length == 1
           (@dataset || db).literal(key.first)
         else 
           nil 
@@ -779,10 +779,21 @@ module Sequel
       # it is overridden by plugins which assume that the passed argument
       # is valid.
       def primary_key_lookup(pk)
-        if t = simple_table and p = simple_pk
-          with_sql("SELECT * FROM #{t} WHERE #{p} = #{dataset.literal(pk)}").first
+        if sql = @fast_pk_lookup_sql
+          sql = sql.dup
+          dataset.literal_append(sql, pk)
+          dataset.fetch_rows(sql){|r| return call(r)}
+          nil
         else
           dataset[primary_key_hash(pk)]
+        end
+      end
+
+      # Reset the cached fast primary lookup SQL if a simple table and primary key
+      # are used, or set it to nil if not used.
+      def reset_fast_pk_lookup_sql
+        @fast_pk_lookup_sql = if @simple_table && @simple_pk
+          "SELECT * FROM #@simple_table WHERE #@simple_pk = ".freeze
         end
       end
   
@@ -791,6 +802,18 @@ module Sequel
         @columns = new_columns
         def_column_accessor(*new_columns) if new_columns
         @columns
+      end
+
+      # Reset the fast primary key lookup SQL when the simple_pk value changes.
+      def simple_pk=(pk)
+        @simple_pk = pk
+        reset_fast_pk_lookup_sql
+      end
+
+      # Reset the fast primary key lookup SQL when the simple_table value changes.
+      def simple_table=(t)
+        @simple_table = t
+        reset_fast_pk_lookup_sql
       end
 
       # Add model methods that call dataset methods
