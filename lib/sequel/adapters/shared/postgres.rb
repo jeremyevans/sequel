@@ -849,6 +849,7 @@ module Sequel
 
       # Disable the use of INSERT RETURNING, even if the server supports it
       def disable_insert_returning
+        warn("disable_insert_returning is deprecated and will be removed in Sequel 3.35.0")
         clone(:disable_insert_returning=>true)
       end
 
