@@ -12,6 +12,10 @@ describe "Sequel core extensions" do
     puts usage unless usage.empty?
     usage.should be_empty
   end
+
+  specify "should have Sequel.core_extensions? be true if enabled" do
+    Sequel.core_extensions?.should be_true
+  end
 end
 
 describe "Array#all_two_pairs?" do

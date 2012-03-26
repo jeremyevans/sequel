@@ -141,6 +141,20 @@ module Sequel
   def self.connect(*args, &block)
     Database.connect(*args, &block)
   end
+
+  if !defined?(::SEQUEL_NO_CORE_EXTENSIONS) && !ENV.has_key?('SEQUEL_NO_CORE_EXTENSIONS')
+    # Whether the core extensions are enabled.  The core extensions are enabled by
+    # default for backwards compatibility, but can be disabled using the SEQUEL_NO_CORE_EXTENSIONS
+    # constant or environment variable.
+    def self.core_extensions?
+      true
+    end
+  else
+    def self.core_extensions?
+      false
+    end
+  end
+
   
   # Convert the +exception+ to the given class.  The given class should be
   # <tt>Sequel::Error</tt> or a subclass.  Returns an instance of +klass+ with
@@ -357,7 +371,7 @@ module Sequel
   private_class_method :adapter_method, :def_adapter_method
   
   require(%w"metaprogramming sql connection_pool exceptions dataset database timezones ast_transformer version")
-  require('core_sql') if !defined?(::SEQUEL_NO_CORE_EXTENSIONS) && !ENV.has_key?('SEQUEL_NO_CORE_EXTENSIONS')
+  require('core_sql') if Sequel.core_extensions?
 
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)

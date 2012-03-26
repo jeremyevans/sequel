@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel.core_extensions? for checking if the core extensions are enabled (jeremyevans)
+
 * Increase speed of Model#this by about 85% (jeremyevans)
 
 * Increase speed of Model#delete and #destroy by about 75% for models with simple datasets (jeremyevans)
