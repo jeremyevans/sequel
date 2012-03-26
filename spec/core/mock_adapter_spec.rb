@@ -17,13 +17,16 @@ describe "Sequel Mock Adapter" do
     called.should be_false
   end
 
-  specify "should return 0 for update and delete by default" do
+  specify "should return 0 for update/delete/with_sql_delete/execute_dui by default" do
     Sequel.mock[:t].update(:a=>1).should == 0
     Sequel.mock[:t].delete.should == 0
+    Sequel.mock[:t].with_sql_delete('DELETE FROM t').should == 0
+    Sequel.mock.execute_dui('DELETE FROM t').should == 0
   end
 
-  specify "should return nil for insert by default" do
+  specify "should return nil for insert/execute_insert by default" do
     Sequel.mock[:t].insert(:a=>1).should be_nil
+    Sequel.mock.execute_insert('INSERT INTO a () DEFAULT VALUES').should be_nil
   end
 
   specify "should be able to set the rows returned by each using :fetch option with a single hash" do

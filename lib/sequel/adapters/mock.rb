@@ -207,12 +207,12 @@ module Sequel
         begin
           if block
             columns(ds, sql) if ds
-            _fetch(sql, ds._fetch || @fetch, &block)
+            _fetch(sql, (ds._fetch if ds) || @fetch, &block)
           elsif meth = opts[:meth]
             if meth == :numrows
-              _numrows(sql, ds.numrows || @numrows)
+              _numrows(sql, (ds.numrows if ds) || @numrows)
             else
-              v = ds.autoid
+              v = ds.autoid if ds
               _autoid(sql, v || @autoid, (ds if v))
             end
           end
