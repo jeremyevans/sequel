@@ -475,7 +475,7 @@ module Sequel
       # Since we want to always return the count of records, add a condition
       # that is always true and then delete.
       def delete
-        @opts[:where] ? super : filter(1=>1).delete
+        @opts[:where] ? super : where(1=>1).delete
       end
       
       # Return an array of strings specifying a query explanation for a SELECT of the
