@@ -3017,3 +3017,89 @@ describe "Sequel::Model Associations with clashing column names" do
     @bar.mtmfoos.should == []
   end
 end 
+
+describe "Model#pk_or_nil" do
+  before do
+    @m = Class.new(Sequel::Model)
+    @m.columns :id, :x, :y
+  end
+  
+  it "should be default return the value of the :id column" do
+    m = @m.load(:id => 111, :x => 2, :y => 3)
+    m.pk_or_nil.should == 111
+  end
+
+  it "should be return the primary key value for custom primary key" do
+    @m.set_primary_key :x
+    m = @m.load(:id => 111, :x => 2, :y => 3)
+    m.pk_or_nil.should == 2
+  end
+
+  it "should be return the primary key value for composite primary key" do
+    @m.set_primary_key [:y, :x]
+    m = @m.load(:id => 111, :x => 2, :y => 3)
+    m.pk_or_nil.should == [3, 2]
+  end
+
+  it "should raise if no primary key" do
+    @m.set_primary_key nil
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pk_or_nil.should be_nil
+
+    @m.no_primary_key
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pk_or_nil.should be_nil
+  end
+end
+
+describe Sequel::Model, "#refresh" do
+  before do
+    @c = Class.new(Sequel::Model(:items)) do
+      unrestrict_primary_key
+      columns :id, :x
+    end
+    MODEL_DB.reset
+  end
+
+  specify "should remove cached associations" do
+    @c.many_to_one :node, :class=>@c
+    @m = @c.new(:id => 555)
+    @m.associations[:node] = 15
+    @m.reload
+    @m.associations.should == {}
+  end
+end
+
+describe "Model#freeze" do
+  before do
+    class ::Album < Sequel::Model
+      columns :id
+      class B < Sequel::Model
+        columns :id, :album_id
+        many_to_one :album, :class=>Album
+      end
+      one_to_one :b, :key=>:album_id, :class=>B
+    end
+    @o = Album.load(:id=>1).freeze
+    MODEL_DB.sqls
+  end
+  after do
+    Object.send(:remove_const, :Album)
+  end
+
+  it "should freeze the object's associations" do
+    @o.associations.frozen?.should be_true
+  end
+
+  it "should not break associations getters" do
+    Album::B.dataset._fetch = {:album_id=>1, :id=>2}
+    @o.b.should == Album::B.load(:id=>2, :album_id=>1)
+    @o.associations[:b].should be_nil
+  end
+
+  it "should not break reciprocal associations" do
+    b = Album::B.load(:id=>2, :album_id=>nil)
+    b.album = @o
+    @o.associations[:b].should be_nil
+  end
+end

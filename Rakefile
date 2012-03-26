@@ -139,11 +139,18 @@ begin
   spec_with_cov.call("spec", Dir["spec/{core,model}/*_spec.rb"], "Run core and model specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/adapters/([a-ln-z]|m[a-np-z])"')}
   spec.call("spec_core", Dir["spec/core/*_spec.rb"], "Run core specs")
   spec.call("spec_model", Dir["spec/model/*_spec.rb"], "Run model specs")
+  spec.call("_spec_model_no_assoc", Dir["spec/model/*_spec.rb"].delete_if{|f| f =~ /association|eager_loading/}, '')
   spec_with_cov.call("spec_plugin", Dir["spec/extensions/*_spec.rb"], "Run extension/plugin specs")
   spec_with_cov.call("spec_integration", Dir["spec/integration/*_test.rb"], "Run integration tests")
   
   %w'postgres sqlite mysql informix oracle firebird mssql db2'.each do |adapter|
     spec_with_cov.call("spec_#{adapter}", ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"], "Run #{adapter} specs")
+  end
+
+  desc "Run model specs without the associations code"
+  task :spec_model_no_assoc do
+    ENV['SEQUEL_NO_ASSOCIATIONS'] = '1'
+    Rake::Task['_spec_model_no_assoc'].invoke
   end
 rescue LoadError
   task :default do

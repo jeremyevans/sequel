@@ -338,9 +338,7 @@ describe "Model#freeze" do
       columns :id
       class B < Sequel::Model
         columns :id, :album_id
-        many_to_one :album, :class=>Album
       end
-      one_to_one :b, :key=>:album_id, :class=>B
     end
     @o = Album.load(:id=>1).freeze
     MODEL_DB.sqls
@@ -355,7 +353,6 @@ describe "Model#freeze" do
 
   it "should freeze the object's values, associations, changed_columns, errors, and this" do
     @o.values.frozen?.should be_true
-    @o.associations.frozen?.should be_true
     @o.changed_columns.frozen?.should be_true
     @o.errors.frozen?.should be_true
     @o.this.frozen?.should be_true
@@ -363,18 +360,6 @@ describe "Model#freeze" do
 
   it "should still have working class attr overriddable methods" do
     Sequel::Model::BOOLEAN_SETTINGS.each{|m| @o.send(m) == Album.send(m)}
-  end
-
-  it "should not break associations getters" do
-    Album::B.dataset._fetch = {:album_id=>1, :id=>2}
-    @o.b.should == Album::B.load(:id=>2, :album_id=>1)
-    @o.associations[:b].should be_nil
-  end
-
-  it "should not break reciprocal associations" do
-    b = Album::B.load(:id=>2, :album_id=>nil)
-    b.album = @o
-    @o.associations[:b].should be_nil
   end
 
   it "should have working new? method" do
@@ -706,40 +691,6 @@ describe "Model#pk" do
     @m.no_primary_key
     m = @m.new(:id => 111, :x => 2, :y => 3)
     proc {m.pk}.should raise_error(Sequel::Error)
-  end
-end
-
-describe "Model#pk_or_nil" do
-  before do
-    @m = Class.new(Sequel::Model)
-    @m.columns :id, :x, :y
-  end
-  
-  it "should be default return the value of the :id column" do
-    m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.pk_or_nil.should == 111
-  end
-
-  it "should be return the primary key value for custom primary key" do
-    @m.set_primary_key :x
-    m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.pk_or_nil.should == 2
-  end
-
-  it "should be return the primary key value for composite primary key" do
-    @m.set_primary_key [:y, :x]
-    m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.pk_or_nil.should == [3, 2]
-  end
-
-  it "should raise if no primary key" do
-    @m.set_primary_key nil
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    m.pk_or_nil.should be_nil
-
-    @m.no_primary_key
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    m.pk_or_nil.should be_nil
   end
 end
 
@@ -1493,14 +1444,6 @@ describe Sequel::Model, "#refresh" do
     @m.reload
     @m[:x].should == 'kaboom'
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
-  end
-
-  specify "should remove cached associations" do
-    @c.many_to_one :node, :class=>@c
-    @m = @c.new(:id => 555)
-    @m.associations[:node] = 15
-    @m.reload
-    @m.associations.should == {}
   end
 end
 
