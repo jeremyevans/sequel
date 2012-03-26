@@ -102,7 +102,7 @@ END_MIG
       if default.is_a?(String) && options[:same_db] && use_column_schema_to_ruby_default_fallback?
         default = default.to_s
         def default.inspect
-          "#{super}.lit"
+          "#{super}.lit"  # core_sql use
         end
         default
       end

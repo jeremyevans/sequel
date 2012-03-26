@@ -47,7 +47,7 @@ module Sequel
       @stack.push(@i)
       case e
       when LiteralString
-        dot "#{e.inspect}.lit"
+        dot "#{e.inspect}.lit" # core_sql use
       when Symbol, Numeric, String, Class, TrueClass, FalseClass, NilClass
         dot e.inspect
       when Array

@@ -291,14 +291,14 @@ module Sequel
 
         ds = base_ds.
           join(:pg_attribute___att, :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, :co__conkey)).
-          order(:co__conname, range.map{|x| [SQL::Subscript.new(:co__conkey, [x]), x]}.case(32, :att__attnum)).
+          order(:co__conname, SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(:co__conkey, [x]), x]}, 32, :att__attnum)).
           select(:co__conname___name, :att__attname___column, :co__confupdtype___on_update, :co__confdeltype___on_delete,
                  SQL::BooleanExpression.new(:AND, :co__condeferrable, :co__condeferred).as(:deferrable))
 
         ref_ds = base_ds.
           join(:pg_class___cl2, :oid=>:co__confrelid).
           join(:pg_attribute___att2, :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, :co__confkey)).
-          order(:co__conname, range.map{|x| [SQL::Subscript.new(:co__conkey, [x]), x]}.case(32, :att2__attnum)).
+          order(:co__conname, SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(:co__conkey, [x]), x]}, 32, :att2__attnum)).
           select(:co__conname___name, :cl2__relname___table, :att2__attname___refcolumn)
 
         # If a schema is given, we only search in that schema, and the returned :table
@@ -341,7 +341,7 @@ module Sequel
           join(:pg_class___indc, :oid=>:indexrelid).
           join(:pg_attribute___att, :attrelid=>:tab__oid, :attnum=>attnums).
           filter(:indc__relkind=>'i', :ind__indisprimary=>false, :indexprs=>nil, :indpred=>nil).
-          order(:indc__relname, range.map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}.case(32, :att__attnum)).
+          order(:indc__relname, SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}, 32, :att__attnum)).
           select(:indc__relname___name, :ind__indisunique___unique, :att__attname___column)
 
         ds.join!(:pg_namespace___nsp, :oid=>:tab__relnamespace, :nspname=>schema.to_s) if schema
