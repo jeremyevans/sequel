@@ -597,6 +597,11 @@ module Sequel
         sql << BACKTICK << c.to_s.gsub(BACKTICK_RE, DOUBLE_BACKTICK) << BACKTICK
       end
       
+      # Execute a REPLACE statement on the database.
+      def replace(*values)
+        execute_insert(replace_sql(*values))
+      end
+
       # MySQL specific syntax for REPLACE (aka UPSERT, or update if exists,
       # insert if it doesn't).
       def replace_sql(*values)

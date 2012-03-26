@@ -43,6 +43,10 @@ module Sequel
       
       # Mysql::Error messages that indicate the current connection should be disconnected
       MYSQL_DATABASE_DISCONNECT_ERRORS = /\A(Commands out of sync; you can't run this command now|Can't connect to local MySQL server through socket|MySQL server has gone away|Lost connection to MySQL server during query)/
+       
+      # Regular expression used for getting accurate number of rows
+      # matched by an update statement.
+      AFFECTED_ROWS_RE = /Rows matched:\s+(\d+)\s+Changed:\s+\d+\s+Warnings:\s+\d+/.freeze
       
       set_adapter_scheme :mysql
 
@@ -155,6 +159,16 @@ module Sequel
         @convert_tinyint_to_bool = v
       end
 
+      # Return the number of matched rows when executing a delete/update statement.
+      def execute_dui(sql, opts={})
+        execute(sql, opts){|c| return affected_rows(c)}
+      end
+
+      # Return the last inserted id when executing an insert statement.
+      def execute_insert(sql, opts={})
+        execute(sql, opts){|c| return c.insert_id}
+      end
+
       # Return the version of the MySQL server two which we are connecting.
       def server_version(server=nil)
         @server_version ||= (synchronize(server){|conn| conn.server_version if conn.respond_to?(:server_version)} || super)
@@ -209,6 +223,18 @@ module Sequel
         end
       end
       
+      # Try to get an accurate number of rows matched using the query
+      # info.  Fall back to affected_rows if there was no match, but
+      # that may be inaccurate.
+      def affected_rows(conn)
+        s = conn.info
+        if s && s =~ AFFECTED_ROWS_RE
+          $1.to_i
+        else
+          conn.affected_rows
+        end
+      end
+
       # MySQL connections use the query method to execute SQL without a result
       def connection_execute_method
         :query
@@ -269,15 +295,6 @@ module Sequel
 
       Database::DatasetClass = self
 
-      # Regular expression used for getting accurate number of rows
-      # matched by an update statement.
-      AFFECTED_ROWS_RE = /Rows matched:\s+(\d+)\s+Changed:\s+\d+\s+Warnings:\s+\d+/.freeze
-      
-      # Delete rows matching this dataset
-      def delete
-        execute_dui(delete_sql){|c| return c.affected_rows}
-      end
-      
       # Yield all rows matching this dataset.  If the dataset is set to
       # split multiple statements, yield arrays of hashes one per statement
       # instead of yielding results for all statements as hashes.
@@ -310,22 +327,6 @@ module Sequel
         super
       end
       
-      # Insert a new value into this dataset
-      def insert(*values)
-        execute_dui(insert_sql(*values)){|c| return c.insert_id}
-      end
-      
-      # You can parse out the correct number of rows matched using the query info,
-      # even though affected_rows doesn't provide an accurate number.
-      def provides_accurate_rows_matched?
-        true
-      end
-
-      # Replace (update or insert) the matching row.
-      def replace(*args)
-        execute_dui(replace_sql(*args)){|c| return c.insert_id}
-      end
-      
       # Makes each yield arrays of rows, with each array containing the rows
       # for a given result set.  Does not work with graphing.  So you can submit
       # SQL with multiple statements and easily determine which statement
@@ -342,33 +343,11 @@ module Sequel
         ds
       end
       
-      # Update the matching rows.
-      def update(values={})
-        execute_dui(update_sql(values)){|c| return affected_rows(c)}
-      end
-      
       private
       
-      # Try to get an accurate number of rows matched using the query
-      # info.  Fall back to affected_rows if there was no match, but
-      # that may be inaccurate.
-      def affected_rows(conn)
-        s = conn.info
-        if s && s =~ AFFECTED_ROWS_RE
-          $1.to_i
-        else
-          conn.affected_rows
-        end
-      end
-
       # Set the :type option to :select if it hasn't been set.
       def execute(sql, opts={}, &block)
         super(sql, {:type=>:select}.merge(opts), &block)
-      end
-      
-      # Set the :type option to :dui if it hasn't been set.
-      def execute_dui(sql, opts={}, &block)
-        super(sql, {:type=>:dui}.merge(opts), &block)
       end
       
       # Handle correct quoting of strings using ::MySQL.quote.

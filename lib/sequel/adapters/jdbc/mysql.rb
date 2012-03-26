@@ -66,11 +66,6 @@ module Sequel
       # Dataset class for MySQL datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::MySQL::DatasetMethods
-        
-        # Use execute_insert to execute the replace_sql.
-        def replace(*args)
-          execute_insert(replace_sql(*args))
-        end
       end
     end
   end

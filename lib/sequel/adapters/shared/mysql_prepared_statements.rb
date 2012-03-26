@@ -95,6 +95,11 @@ module Sequel
           def execute_dui(sql, opts={}, &block)
             super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
           end
+          
+          # Same as execute, explicit due to intricacies of alias and super.
+          def execute_insert(sql, opts={}, &block)
+            super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
+          end
         end
         
         # Methods for MySQL stored procedures using the native driver.

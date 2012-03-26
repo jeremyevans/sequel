@@ -36,11 +36,6 @@ module Sequel
           false
         end
       
-        # Use execute_insert to execute the replace_sql.
-        def replace(*args)
-          execute_insert(replace_sql(*args))
-        end
-        
         private
         
         # do_mysql sets NO_BACKSLASH_ESCAPES, so use standard SQL string escaping

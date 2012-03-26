@@ -70,6 +70,16 @@ module Sequel
         conn
       end
 
+      # Return the number of matched rows when executing a delete/update statement.
+      def execute_dui(sql, opts={})
+        execute(sql, opts){|c| return c.affected_rows}
+      end
+
+      # Return the last inserted id when executing an insert statement.
+      def execute_insert(sql, opts={})
+        execute(sql, opts){|c| return c.last_id}
+      end
+
       # Return the version of the MySQL server two which we are connecting.
       def server_version(server=nil)
         @server_version ||= (synchronize(server){|conn| conn.server_info[:id]} || super)
@@ -131,11 +141,6 @@ module Sequel
 
       Database::DatasetClass = self
 
-      # Delete rows matching this dataset
-      def delete
-        execute_dui(delete_sql){|c| return c.affected_rows}
-      end
-
       # Yield all rows matching this dataset.
       def fetch_rows(sql)
         execute(sql) do |r|
@@ -158,31 +163,11 @@ module Sequel
         self
       end
 
-      # Insert a new value into this dataset
-      def insert(*values)
-        execute_dui(insert_sql(*values)){|c| return c.last_id}
-      end
-
-      # Replace (update or insert) the matching row.
-      def replace(*args)
-        execute_dui(replace_sql(*args)){|c| return c.last_id}
-      end
-
-      # Update the matching rows.
-      def update(values={})
-        execute_dui(update_sql(values)){|c| return c.affected_rows}
-      end
-
       private
 
       # Set the :type option to :select if it hasn't been set.
       def execute(sql, opts={}, &block)
         super(sql, {:type=>:select}.merge(opts), &block)
-      end
-
-      # Set the :type option to :dui if it hasn't been set.
-      def execute_dui(sql, opts={}, &block)
-        super(sql, {:type=>:dui}.merge(opts), &block)
       end
 
       # Handle correct quoting of strings using ::Mysql2::Client#escape.
