@@ -3132,7 +3132,7 @@ describe "Dataset#grep" do
   end
 end
 
-describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #execute" do
+describe "Dataset default #fetch_rows, #insert, #update, #delete, #with_sql_delete, #truncate, #execute" do
   before do
     @db = Sequel::Database.new
     @ds = @db[:items]
@@ -3147,6 +3147,14 @@ describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #ex
     @ds.delete
     @db.should_receive(:execute_dui).once.with('DELETE FROM items', :server=>:default)
     @ds.delete
+  end
+
+  specify "#with_sql_delete should execute delete SQL" do
+    sql = 'DELETE FROM foo'
+    @db.should_receive(:execute).once.with(sql, :server=>:default)
+    @ds.with_sql_delete(sql)
+    @db.should_receive(:execute_dui).once.with(sql, :server=>:default)
+    @ds.with_sql_delete(sql)
   end
 
   specify "#insert should execute insert SQL" do

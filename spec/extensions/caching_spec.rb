@@ -188,13 +188,13 @@ describe Sequel::Model, "caching" do
     @cache[m.cache_key].should == m
     m.delete
     @cache.has_key?(m.cache_key).should be_false
-    @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "DELETE FROM items WHERE (id = 1)"]
+    @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "DELETE FROM items WHERE id = 1"]
 
     m = @c2[1]
     @cache[m.cache_key].should == m
     m.delete
     @cache.has_key?(m.cache_key).should be_false
-    @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "DELETE FROM items WHERE (id = 1)"]
+    @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "DELETE FROM items WHERE id = 1"]
   end
   
   it "should support #[] as a shortcut to #find with hash" do

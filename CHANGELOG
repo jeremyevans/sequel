@@ -1,5 +1,7 @@
 === HEAD
 
+* Increase speed of Model#delete and #destroy by about 75% for models with simple datasets (jeremyevans)
+
 * Make nested_attributes plugin work when destroying/removing associated objects when strict_param_setting is true (r-stu31) (#455)
 
 * Dataset#disable_insert_returning on PostgreSQL is now deprecated and will be removed after 3.34.0 is released (jeremyevans)

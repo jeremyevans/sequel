@@ -234,7 +234,7 @@ describe Sequel::Model, "dataset & schema" do
     MODEL_DB.sqls
     ds._fetch = [{:id=>1}, {:id=>2}]
     ds.destroy.should == 2
-    MODEL_DB.sqls.should == ["SELECT * FROM foo", "DELETE FROM foo WHERE (id = 1)", "DELETE FROM foo WHERE (id = 2)"]
+    MODEL_DB.sqls.should == ["SELECT * FROM foo", "DELETE FROM foo WHERE id = 1", "DELETE FROM foo WHERE id = 2"]
   end
 
   it "set_dataset should add the destroy method that respects sharding with transactions" do

@@ -105,7 +105,7 @@ describe "Touch plugin" do
     @Album.touch_associations(:artist, {:followup_albums=>:modified_on})
     @Album.load(:id=>4, :artist_id=>1).destroy
     sqls = MODEL_DB.sqls
-    sqls.shift.should == "DELETE FROM albums WHERE (id = 4)"
+    sqls.shift.should == "DELETE FROM albums WHERE id = 4"
     sqls.sort.should == ["UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
       "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 1)"]
   end

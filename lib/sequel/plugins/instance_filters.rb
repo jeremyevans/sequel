@@ -68,6 +68,16 @@ module Sequel
       
         private
         
+        # If there are any instance filters, make sure not to use the
+        # instance delete optimization.
+        def _delete_without_checking
+          if @instance_filters && !@instance_filters.empty?
+            _delete_dataset.delete 
+          else
+            super
+          end
+        end
+
         # Lazily initialize the instance filter array.
         def instance_filters
           @instance_filters ||= []

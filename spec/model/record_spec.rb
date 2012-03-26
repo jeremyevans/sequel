@@ -1054,6 +1054,35 @@ describe Sequel::Model, "#(set|update)_(all|except|only)" do
   end
 end
 
+describe Sequel::Model, "#destroy with filtered dataset" do
+  before do
+    @model = Class.new(Sequel::Model(MODEL_DB[:items].where(:a=>1)))
+    @model.columns :id, :a
+    @instance = @model.load(:id => 1234)
+    MODEL_DB.reset
+  end
+
+  it "should raise a NoExistingObject exception if the dataset delete call doesn't return 1" do
+    @instance.this.meta_def(:execute_dui){|*a| 0}
+    proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
+    @instance.this.meta_def(:execute_dui){|*a| 2}
+    proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
+    @instance.this.meta_def(:execute_dui){|*a| 1}
+    proc{@instance.delete}.should_not raise_error
+    
+    @instance.require_modification = false
+    @instance.this.meta_def(:execute_dui){|*a| 0}
+    proc{@instance.delete}.should_not raise_error
+    @instance.this.meta_def(:execute_dui){|*a| 2}
+    proc{@instance.delete}.should_not raise_error
+  end
+
+  it "should include WHERE clause when deleting" do
+    @instance.destroy
+    MODEL_DB.sqls.should == ["DELETE FROM items WHERE ((a = 1) AND (id = 1234))"]
+  end
+end
+
 describe Sequel::Model, "#destroy" do
   before do
     @model = Class.new(Sequel::Model(:items))
@@ -1068,49 +1097,49 @@ describe Sequel::Model, "#destroy" do
   end
   
   it "should raise a NoExistingObject exception if the dataset delete call doesn't return 1" do
-    @instance.this.meta_def(:delete){|*a| 0}
+    @model.dataset.meta_def(:execute_dui){|*a| 0}
     proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
-    @instance.this.meta_def(:delete){|*a| 2}
+    @model.dataset.meta_def(:execute_dui){|*a| 2}
     proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
-    @instance.this.meta_def(:delete){|*a| 1}
+    @model.dataset.meta_def(:execute_dui){|*a| 1}
     proc{@instance.delete}.should_not raise_error
     
     @instance.require_modification = false
-    @instance.this.meta_def(:delete){|*a| 0}
+    @model.dataset.meta_def(:execute_dui){|*a| 0}
     proc{@instance.delete}.should_not raise_error
-    @instance.this.meta_def(:delete){|*a| 2}
+    @model.dataset.meta_def(:execute_dui){|*a| 2}
     proc{@instance.delete}.should_not raise_error
   end
 
   it "should run within a transaction if use_transactions is true" do
     @instance.use_transactions = true
     @instance.destroy
-    MODEL_DB.sqls.should == ["BEGIN", "DELETE FROM items WHERE (id = 1234)", "COMMIT"]
+    MODEL_DB.sqls.should == ["BEGIN", "DELETE FROM items WHERE id = 1234", "COMMIT"]
   end
 
   it "should not run within a transaction if use_transactions is false" do
     @instance.use_transactions = false
     @instance.destroy
-    MODEL_DB.sqls.should == ["DELETE FROM items WHERE (id = 1234)"]
+    MODEL_DB.sqls.should == ["DELETE FROM items WHERE id = 1234"]
   end
 
   it "should run within a transaction if :transaction option is true" do
     @instance.use_transactions = false
     @instance.destroy(:transaction => true)
-    MODEL_DB.sqls.should == ["BEGIN", "DELETE FROM items WHERE (id = 1234)", "COMMIT"]
+    MODEL_DB.sqls.should == ["BEGIN", "DELETE FROM items WHERE id = 1234", "COMMIT"]
   end
 
   it "should not run within a transaction if :transaction option is false" do
     @instance.use_transactions = true
     @instance.destroy(:transaction => false)
-    MODEL_DB.sqls.should == ["DELETE FROM items WHERE (id = 1234)"]
+    MODEL_DB.sqls.should == ["DELETE FROM items WHERE id = 1234"]
   end
 
   it "should run before_destroy and after_destroy hooks" do
     @model.send(:define_method, :before_destroy){MODEL_DB.execute('before blah')}
     @model.send(:define_method, :after_destroy){MODEL_DB.execute('after blah')}
     @instance.destroy
-    MODEL_DB.sqls.should == ["before blah", "DELETE FROM items WHERE (id = 1234)", "after blah"]
+    MODEL_DB.sqls.should == ["before blah", "DELETE FROM items WHERE id = 1234", "after blah"]
   end
 end
 

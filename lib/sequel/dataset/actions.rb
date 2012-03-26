@@ -669,6 +669,13 @@ module Sequel
       end
     end
 
+    # Execute the given SQL and return the number of rows deleted.  This exists
+    # solely as an optimization, replacing with_sql(sql).delete.  It's significantly
+    # faster as it does not require cloning the current dataset.
+    def with_sql_delete(sql)
+      execute_dui(sql)
+    end
+
     protected
 
     # Internals of #import.  If primary key values are requested, use

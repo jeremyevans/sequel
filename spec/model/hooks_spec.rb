@@ -156,7 +156,7 @@ describe "Model#before_destroy && Model#after_destroy" do
     @c.send(:define_method, :before_destroy){MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.destroy
-    MODEL_DB.sqls.should == ['BLAH before', 'DELETE FROM items WHERE (id = 2233)', 'BLAH after']
+    MODEL_DB.sqls.should == ['BLAH before', 'DELETE FROM items WHERE id = 2233', 'BLAH after']
   end
 
   specify "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_save_failure is true" do
@@ -274,7 +274,7 @@ describe "Model around filters" do
       end
     end
     @c.load(:id=>1, :x => 2).destroy
-    MODEL_DB.sqls.should == ['ad_before', 'DELETE FROM items WHERE (id = 1)', 'ad_after']
+    MODEL_DB.sqls.should == ['ad_before', 'DELETE FROM items WHERE id = 1', 'ad_after']
   end
   
   specify "around_update should be called around updating existing records" do

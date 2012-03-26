@@ -308,7 +308,7 @@ describe "Model#before_destroy && Model#after_destroy" do
     @c.before_destroy {MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.destroy
-    MODEL_DB.sqls.should == ['BLAH before', "DELETE FROM items WHERE (id = 2233)", 'BLAH after']
+    MODEL_DB.sqls.should == ['BLAH before', "DELETE FROM items WHERE id = 2233", 'BLAH after']
   end
 
   specify "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_save_failure is true" do

@@ -29,6 +29,10 @@ module Sequel
       # will be applied to the new dataset.
       attr_reader :dataset_methods
 
+      # SQL string fragment used for faster DELETE statement creation when deleting/destroying
+      # model instances, or nil if the optimization should not be used.
+      attr_reader :fast_instance_delete_sql
+
       # Array of plugin modules loaded by this class
       #
       #   Sequel::Model.plugins
@@ -557,7 +561,7 @@ module Sequel
   
       # Set the columns to restrict when using mass assignment (e.g. +set+).  Using this means that
       # attempts to call setter methods for the columns listed here will cause an
-      # exception or be silently skipped (based on the +strict_param_setting+ setting.
+      # exception or be silently skipped (based on the +strict_param_setting+ setting).
       # If you have any virtual setter methods (methods that end in =) that you
       # want not to be used during mass assignment, they need to be listed here as well (without the =).
       #
@@ -794,6 +798,9 @@ module Sequel
       def reset_fast_pk_lookup_sql
         @fast_pk_lookup_sql = if @simple_table && @simple_pk
           "SELECT * FROM #@simple_table WHERE #@simple_pk = ".freeze
+        end
+        @fast_instance_delete_sql = if @simple_table && @simple_pk
+          "DELETE FROM #@simple_table WHERE #@simple_pk = ".freeze
         end
       end
   
@@ -1455,14 +1462,20 @@ module Sequel
       # Actually do the deletion of the object's dataset.  Return the
       # number of rows modified.
       def _delete_without_checking
-        _delete_dataset.delete
+        if sql = (m = model).fast_instance_delete_sql
+          sql = sql.dup
+          (ds = m.dataset).literal_append(sql, pk)
+          ds.with_sql_delete(sql)
+        else
+          _delete_dataset.delete 
+        end
       end
 
       # Internal destroy method, separted from destroy to
       # allow running inside a transaction
       def _destroy(opts)
         sh = {:server=>this_server}
-        db.after_rollback(sh){after_destroy_rollback} if use_after_commit_rollback
+        db.after_rollback(sh){after_destroy_rollback} if uacr = use_after_commit_rollback
         called = false
         around_destroy do
           called = true
@@ -1472,7 +1485,7 @@ module Sequel
           true
         end
         raise_hook_failure(:destroy) unless called
-        db.after_commit(sh){after_destroy_commit} if use_after_commit_rollback
+        db.after_commit(sh){after_destroy_commit} if uacr
         self
       end
       
@@ -1534,7 +1547,7 @@ module Sequel
       # it's own transaction.
       def _save(columns, opts)
         sh = {:server=>this_server}
-        db.after_rollback(sh){after_rollback} if use_after_commit_rollback
+        db.after_rollback(sh){after_rollback} if uacr = use_after_commit_rollback
         was_new = false
         pk = nil
         called_save = false
@@ -1588,7 +1601,7 @@ module Sequel
           @columns_updated = nil
         end
         @modified = false
-        db.after_commit(sh){after_commit} if use_after_commit_rollback
+        db.after_commit(sh){after_commit} if uacr
         self
       end
 
@@ -1778,7 +1791,13 @@ module Sequel
       # The server/shard that the model object's dataset uses, or :default if the
       # model object's dataset does not have an associated shard.
       def this_server
-        primary_key ? (this.opts[:server] || :default) : (model.dataset.opts[:server] || :default)
+        if (s = @server)
+          s
+        elsif (t = @this)
+          t.opts[:server] || :default
+        else
+          model.dataset.opts[:server] || :default
+        end
       end
   
       # Typecast the value to the column's type if typecasting.  Calls the database's
