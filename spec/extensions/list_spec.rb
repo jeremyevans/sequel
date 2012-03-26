@@ -76,8 +76,8 @@ describe "List plugin" do
   end
 
   it "should have position field set to max+1 when creating if not already set" do
-    @c.dataset._fetch = [[{:pos=>nil}], [{:id=>1, :position=>1}], [{:pos=>1}], [{:id=>2, :position=>2}]]
-    @c.dataset.autoid = 1
+    @c.instance_dataset._fetch = @c.dataset._fetch = [[{:pos=>nil}], [{:id=>1, :position=>1}], [{:pos=>1}], [{:id=>2, :position=>2}]]
+    @c.instance_dataset.autoid = @c.dataset.autoid = 1
     @c.create.values.should == {:id=>1, :position=>1}
     @c.create.values.should == {:id=>2, :position=>2}
     @db.sqls.should == ["SELECT max(position) FROM items LIMIT 1",
@@ -89,8 +89,8 @@ describe "List plugin" do
   end
 
   it "should have position field set to max+1 in scope when creating if not already set" do
-    @sc.dataset._fetch = [[{:pos=>nil}], [{:id=>1, :scope_id=>1, :position=>1}], [{:pos=>1}], [{:id=>2, :scope_id=>1, :position=>2}], [{:pos=>nil}], [{:id=>3, :scope_id=>2, :position=>1}]]
-    @sc.dataset.autoid = 1
+    @sc.instance_dataset._fetch = @sc.dataset._fetch = [[{:pos=>nil}], [{:id=>1, :scope_id=>1, :position=>1}], [{:pos=>1}], [{:id=>2, :scope_id=>1, :position=>2}], [{:pos=>nil}], [{:id=>3, :scope_id=>2, :position=>1}]]
+    @sc.instance_dataset.autoid = @sc.dataset.autoid = 1
     @sc.create(:scope_id=>1).values.should == {:id=>1, :scope_id=>1, :position=>1}
     @sc.create(:scope_id=>1).values.should == {:id=>2, :scope_id=>1, :position=>2}
     @sc.create(:scope_id=>2).values.should == {:id=>3, :scope_id=>2, :position=>1}

@@ -407,7 +407,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     i.set(:x => 4, :y => 5, :z => 6)
     i.values.should == {:x => 4, :y => 5}
 
-    @c.dataset._fetch = {:x => 7}
+    @c.instance_dataset._fetch = @c.dataset._fetch = {:x => 7}
     i = @c.new
     i.update(:x => 7, :z => 9)
     i.values.should == {:x => 7}
@@ -421,7 +421,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     i.set(:x => 4, :y => 5, :z => 6)
     i.values.should == {:x => 4, :y => 5}
 
-    @c.dataset._fetch = {:x => 7}
+    @c.instance_dataset._fetch = @c.dataset._fetch = {:x => 7}
     i = @c.new
     i.update(:x => 7, :z => 9)
     i.values.should == {:x => 7}
@@ -436,7 +436,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     i.set(:x => 4, :y => 5, :z => 6)
     i.values.should == {:x => 4, :y => 5}
 
-    @c.dataset._fetch = {:y => 7}
+    @c.instance_dataset._fetch = @c.dataset._fetch = {:y => 7}
     i = @c.new
     i.update(:y => 7, :z => 9)
     i.values.should == {:y => 7}
@@ -610,7 +610,7 @@ describe Sequel::Model, ".[] optimization" do
 
   it "should use Dataset#with_sql if simple_table and simple_pk are true" do
     @c.set_dataset :a
-    @c.dataset._fetch = {:id => 1}
+    @c.instance_dataset._fetch = @c.dataset._fetch = {:id => 1}
     @c[1].should == @c.load(:id=>1)
     @db.sqls.should == ['SELECT * FROM "a" WHERE "id" = 1']
   end

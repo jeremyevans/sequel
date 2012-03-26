@@ -30,8 +30,12 @@ module Sequel
       attr_reader :dataset_methods
 
       # SQL string fragment used for faster DELETE statement creation when deleting/destroying
-      # model instances, or nil if the optimization should not be used.
+      # model instances, or nil if the optimization should not be used. For internal use only.
       attr_reader :fast_instance_delete_sql
+
+      # The dataset that instance datasets (#this) are based on.  Generally a naked version of
+      # the model's dataset limited to one row.  For internal use only.
+      attr_reader :instance_dataset
 
       # Array of plugin modules loaded by this class
       #
@@ -531,6 +535,7 @@ module Sequel
         end
         @dataset.model = self if @dataset.respond_to?(:model=)
         check_non_connection_error{@db_schema = (inherited ? superclass.db_schema : get_db_schema)}
+        @instance_dataset = @dataset.limit(1).naked
         self
       end
 
@@ -1372,7 +1377,7 @@ module Sequel
       #   Artist[1].this
       #   # SELECT * FROM artists WHERE (id = 1) LIMIT 1
       def this
-        @this ||= use_server(model.dataset.filter(pk_hash).limit(1).naked)
+        @this ||= use_server(model.instance_dataset.filter(pk_hash))
       end
       
       # Runs #set with the passed hash and then runs save_changes.
@@ -1517,7 +1522,7 @@ module Sequel
       # The dataset to use when inserting a new object.   The same as the model's
       # dataset by default.
       def _insert_dataset
-        use_server(model.dataset)
+        use_server(model.instance_dataset)
       end
   
       # Insert into the given dataset and return the primary key created (if any).

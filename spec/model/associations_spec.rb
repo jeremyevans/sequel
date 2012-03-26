@@ -653,7 +653,7 @@ describe Sequel::Model, "one_to_one" do
   it "should add a setter method" do
     @c2.one_to_one :attribute, :class => @c1
     attrib = @c1.new(:id=>3)
-    @c1.dataset._fetch = {:id=>3}
+    @c1.dataset._fetch = @c1.instance_dataset._fetch = {:id=>3}
     @c2.new(:id => 1234).attribute = attrib
     sqls = MODEL_DB.sqls
     ['INSERT INTO attributes (node_id, id) VALUES (1234, 3)',
@@ -692,7 +692,7 @@ describe Sequel::Model, "one_to_one" do
   it "should have the setter method respect the :primary_key option" do
     @c2.one_to_one :attribute, :class => @c1, :primary_key=>:xxx
     attrib = @c1.new(:id=>3)
-    @c1.dataset._fetch = {:id=>3}
+    @c1.dataset._fetch = @c1.instance_dataset._fetch = {:id=>3}
     @c2.new(:id => 1234, :xxx=>5).attribute = attrib
     sqls = MODEL_DB.sqls
     ['INSERT INTO attributes (node_id, id) VALUES (5, 3)',
@@ -836,7 +836,7 @@ describe Sequel::Model, "one_to_one" do
 
     d = @c2.new(:id => 1)
     f = @c2.new(:id => 3, :node_id=> 4321)
-    @c2.dataset._fetch = {:id => 3, :node_id=>1}
+    @c2.dataset._fetch = @c2.instance_dataset._fetch = {:id => 3, :node_id=>1}
     d.parent = f
     f.values.should == {:id => 3, :node_id=>1}
     d.parent.should == f
@@ -854,7 +854,7 @@ describe Sequel::Model, "one_to_one" do
     @c2.one_to_one :parent, :class => @c2, :primary_key=>:blah
     d = @c2.new(:id => 1, :blah => 3)
     e = @c2.new(:id => 4321, :node_id=>444)
-    @c2.dataset._fetch = {:id => 4321, :node_id => 3}
+    @c2.dataset._fetch = @c2.instance_dataset._fetch = {:id => 4321, :node_id => 3}
     d.parent = e
     e.values.should == {:id => 4321, :node_id => 3}
     sqls = MODEL_DB.sqls
@@ -867,7 +867,7 @@ describe Sequel::Model, "one_to_one" do
     @c2.one_to_one :parent, :class => @c2, :key=>:blah
     d = @c2.new(:id => 3)
     e = @c2.new(:id => 4321, :blah=>444)
-    @c2.dataset._fetch = {:id => 4321, :blah => 3}
+    @c2.dataset._fetch = @c2.instance_dataset._fetch = {:id => 4321, :blah => 3}
     d.parent = e
     e.values.should == {:id => 4321, :blah => 3}
     sqls = MODEL_DB.sqls
@@ -1181,7 +1181,7 @@ describe Sequel::Model, "one_to_many" do
     
     n = @c2.load(:id => 1234)
     a = @c1.new(:id => 234)
-    @c1.dataset._fetch = {:node_id => 1234, :id => 234}
+    @c1.dataset._fetch = @c1.instance_dataset._fetch = {:node_id => 1234, :id => 234}
     a.should == n.add_attribute(a)
     sqls = MODEL_DB.sqls
     sqls.shift.should =~ /INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/
@@ -1213,7 +1213,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
-    @c1.dataset._fetch = {:node_id => 1234, :id => 234}
+    @c1.dataset._fetch = @c1.instance_dataset._fetch = {:node_id => 1234, :id => 234}
     n.add_attribute(:id => 234).should == @c1.load(:node_id => 1234, :id => 234)
     sqls = MODEL_DB.sqls
     sqls.shift.should =~ /INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/
@@ -1969,7 +1969,7 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1
     
     n = @c2.load(:id => 1234)
-    @c1.dataset._fetch = {:id=>1}
+    @c1.dataset._fetch = @c1.instance_dataset._fetch = {:id=>1}
     n.add_attribute(:id => 1).should == @c1.load(:id => 1)
     sqls = MODEL_DB.sqls
     ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 1)',

@@ -32,6 +32,10 @@ describe "prepared_statements plugin" do
   end
 
   specify "should correctly create instance if dataset supports insert_select" do
+    ds = @c.instance_dataset 
+    def ds.supports_insert_select?
+      true
+    end
     def @ds.supports_insert_select?
       true
     end

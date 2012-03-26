@@ -26,7 +26,7 @@ describe "Model#save" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :id, :x, :y
     end
-    @c.dataset.autoid = 13
+    @c.instance_dataset.autoid = @c.dataset.autoid = 13
     MODEL_DB.reset
   end
   
@@ -37,7 +37,7 @@ describe "Model#save" do
   end
 
   it "should use dataset's insert_select method if present" do
-    ds = @c.dataset = @c.dataset.clone
+    ds = @c.instance_dataset
     ds._fetch = {:y=>2}
     def ds.supports_insert_select?() true end
     def ds.insert_select(hash)
@@ -1146,7 +1146,7 @@ end
 describe Sequel::Model, "#exists?" do
   before do
     @model = Class.new(Sequel::Model(:items))
-    @model.dataset._fetch = proc{|sql| {:x=>1} if sql =~ /id = 1/}
+    @model.instance_dataset._fetch = @model.dataset._fetch = proc{|sql| {:x=>1} if sql =~ /id = 1/}
     MODEL_DB.reset
   end
 
@@ -1454,7 +1454,7 @@ describe Sequel::Model, "#refresh" do
   specify "should reload the instance values from the database" do
     @m = @c.new(:id => 555)
     @m[:x] = 'blah'
-    @c.dataset._fetch = {:x => 'kaboom', :id => 555}
+    @c.instance_dataset._fetch = @c.dataset._fetch = {:x => 'kaboom', :id => 555}
     @m.refresh
     @m[:x].should == 'kaboom'
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
@@ -1462,14 +1462,14 @@ describe Sequel::Model, "#refresh" do
   
   specify "should raise if the instance is not found" do
     @m = @c.new(:id => 555)
-    @c.dataset._fetch = []
+    @c.instance_dataset._fetch =@c.dataset._fetch = []
     proc {@m.refresh}.should raise_error(Sequel::Error)
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
   end
   
   specify "should be aliased by #reload" do
     @m = @c.new(:id => 555)
-    @c.dataset._fetch = {:x => 'kaboom', :id => 555}
+    @c.instance_dataset._fetch =@c.dataset._fetch = {:x => 'kaboom', :id => 555}
     @m.reload
     @m[:x].should == 'kaboom'
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]

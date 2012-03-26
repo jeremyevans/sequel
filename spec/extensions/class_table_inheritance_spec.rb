@@ -130,10 +130,10 @@ describe "class_table_inheritance plugin" do
   end
 
   it "should lazily load attributes for columns in subclass tables" do
-    Manager.dataset._fetch = {:id=>1, :name=>'J', :kind=>'Executive', :num_staff=>2}
+    Manager.instance_dataset._fetch = Manager.dataset._fetch = {:id=>1, :name=>'J', :kind=>'Executive', :num_staff=>2}
     m = Manager[1]
     @db.sqls.should == ['SELECT * FROM employees INNER JOIN managers USING (id) WHERE (id = 1) LIMIT 1']
-    Executive.dataset._fetch = {:num_managers=>3}
+    Executive.instance_dataset._fetch = Executive.dataset._fetch = {:num_managers=>3}
     m.num_managers.should == 3
     @db.sqls.should == ['SELECT num_managers FROM employees INNER JOIN managers USING (id) INNER JOIN executives USING (id) WHERE (id = 1) LIMIT 1']
     m.values.should == {:id=>1, :name=>'J', :kind=>'Executive', :num_staff=>2, :num_managers=>3}

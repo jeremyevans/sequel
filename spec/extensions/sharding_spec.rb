@@ -5,19 +5,19 @@ describe "sharding plugin" do
     @db = Sequel.mock(:numrows=>1, :autoid=>proc{1}, :servers=>{:s1=>{}, :s2=>{}, :s3=>{}, :s4=>{}})
     @Artist = Class.new(Sequel::Model(@db[:artists]))
     @Artist.class_eval do
-      dataset._fetch = {:id=>2, :name=>'YJM'}
+      instance_dataset._fetch = dataset._fetch = {:id=>2, :name=>'YJM'}
       columns :id, :name
       plugin :sharding
     end
     @Album = Class.new(Sequel::Model(@db[:albums]))
     @Album.class_eval do
-      dataset._fetch = {:id=>1, :name=>'RF', :artist_id=>2}
+      instance_dataset._fetch = dataset._fetch = {:id=>1, :name=>'RF', :artist_id=>2}
       columns :id, :artist_id, :name
       plugin :sharding
     end
     @Tag = Class.new(Sequel::Model(@db[:tags]))
     @Tag.class_eval do
-      dataset._fetch = {:id=>3, :name=>'M'}
+      instance_dataset._fetch = dataset._fetch = {:id=>3, :name=>'M'}
       columns :id, :name
       plugin :sharding
     end
@@ -67,7 +67,7 @@ describe "sharding plugin" do
   end 
 
   specify "should not use current dataset's shard when eager loading if eagerly loaded dataset has its own shard" do
-    @Artist.dataset.opts[:server] = :s2
+    @Artist.instance_dataset.opts[:server] = @Artist.dataset.opts[:server] = :s2
     albums = @Album.server(:s1).eager(:artist).all
     @db.sqls.should == ["SELECT * FROM albums -- s1", "SELECT * FROM artists WHERE (artists.id IN (2)) -- s2"]
     albums.length.should == 1
@@ -86,7 +86,7 @@ describe "sharding plugin" do
   end 
 
   specify "should not use current dataset's shard when eager graphing if eagerly graphed dataset has its own shard" do
-    @Artist.dataset.opts[:server] = :s2
+    @Artist.instance_dataset.opts[:server] = @Artist.dataset.opts[:server] = :s2
     ds = @Album.server(:s1).eager_graph(:artist)
     ds._fetch = {:id=>1, :artist_id=>2, :name=>'RF', :artist_id_0=>2, :artist_name=>'YJM'}
     albums = ds.all
@@ -97,7 +97,7 @@ describe "sharding plugin" do
   end 
 
   specify "should use eagerly graphed dataset shard for eagerly graphed objects even if current dataset does not have a shard" do
-    @Artist.dataset.opts[:server] = :s2
+    @Artist.instance_dataset.opts[:server] = @Artist.dataset.opts[:server] = :s2
     ds = @Album.eager_graph(:artist)
     ds._fetch = {:id=>1, :artist_id=>2, :name=>'RF', :artist_id_0=>2, :artist_name=>'YJM'}
     albums = ds.all

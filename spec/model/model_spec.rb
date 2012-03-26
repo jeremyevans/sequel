@@ -339,8 +339,8 @@ describe Sequel::Model, "new" do
   end
 
   it "should use the last inserted id as primary key if not in values" do
-    @m.dataset._fetch = {:x => 1, :id => 1234}
-    @m.dataset.autoid = 1234
+    @m.instance_dataset._fetch = @m.dataset._fetch = {:x => 1, :id => 1234}
+    @m.instance_dataset.autoid = @m.dataset.autoid = 1234
 
     o = @m.new(:x => 1)
     o.save
@@ -438,8 +438,8 @@ describe Sequel::Model, ".find_or_create" do
   end
   
   it "should create the record if not found" do
-    @c.dataset._fetch = [[], {:x=>1, :id=>1}]
-    @c.dataset.autoid = 1
+    @c.instance_dataset._fetch = @c.dataset._fetch = [[], {:x=>1, :id=>1}]
+    @c.instance_dataset.autoid = @c.dataset.autoid = 1
     @c.find_or_create(:x => 1).should == @c.load(:x=>1, :id=>1)
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1",
       "INSERT INTO items (x) VALUES (1)",
@@ -447,8 +447,8 @@ describe Sequel::Model, ".find_or_create" do
   end
 
   it "should pass the new record to be created to the block if no record is found" do
-    @c.dataset._fetch = [[], {:x=>1, :id=>1}]
-    @c.dataset.autoid = 1
+    @c.instance_dataset._fetch = @c.dataset._fetch = [[], {:x=>1, :id=>1}]
+    @c.instance_dataset.autoid = @c.dataset.autoid = 1
     @c.find_or_create(:x => 1){|x| x[:y] = 2}.should == @c.load(:x=>1, :id=>1)
     sqls = MODEL_DB.sqls
     sqls.first.should == "SELECT * FROM items WHERE (x = 1) LIMIT 1"

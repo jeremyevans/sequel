@@ -5,7 +5,7 @@ describe "Sequel::Plugins::SkipCreateRefresh" do
     c = Class.new(Sequel::Model(:a))
     c.columns :id, :x
     c.db.reset
-    c.dataset.meta_def(:insert){|*a| super(*a); 2}
+    c.instance_dataset.meta_def(:insert){|*a| super(*a); 2}
     c.create(:x=>1)
     c.db.sqls.should == ['INSERT INTO a (x) VALUES (1)', 'SELECT * FROM a WHERE (id = 2) LIMIT 1']
 

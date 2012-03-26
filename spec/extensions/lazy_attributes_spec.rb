@@ -11,7 +11,7 @@ describe "Sequel::Plugins::LazyAttributes" do
       meta_def(:columns){[:id, :name]}
       lazy_attributes :name
       meta_def(:columns){[:id]}
-      dataset._fetch = proc do |sql|
+      instance_dataset._fetch = dataset._fetch = proc do |sql|
         if sql !~ /WHERE/
           if sql =~ /name/
             [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
@@ -133,7 +133,7 @@ describe "Sequel::Plugins::LazyAttributes" do
 
   it "should work with the serialization plugin" do
     @c.plugin :serialization, :yaml, :name
-    @ds._fetch = [[{:id=>1}, {:id=>2}], [{:id=>1, :name=>"--- 3\n"}, {:id=>2, :name=>"--- 6\n"}], [{:id=>1}], [{:name=>"--- 3\n"}]]
+    @c.instance_dataset._fetch = @ds._fetch = [[{:id=>1}, {:id=>2}], [{:id=>1, :name=>"--- 3\n"}, {:id=>2, :name=>"--- 6\n"}], [{:id=>1}], [{:name=>"--- 3\n"}]]
     @c.with_identity_map do
       ms = @ds.all
       ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
