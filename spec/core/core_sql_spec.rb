@@ -6,7 +6,7 @@ describe "Sequel core extensions" do
     match_re = /(\.(all_two_pairs\?|sql_value_list|sql_array|sql_expr|sql_negate|sql_or|sql_string_join|lit|to_sequel_blob|case|sql_expr_if_all_two_pairs)\W)|:\w+\.(qualify|identifier|as|cast|asc|desc|sql_subscript|\*|sql_function)\W/
     comment_re = /^\s*#|# core_sql use/
     Dir['lib/sequel/**/*.rb'].each do |f|
-      lines = File.read(f).lines.grep(match_re).delete_if{|l| l =~ comment_re}
+      lines = File.read(f).split("\n").grep(match_re).delete_if{|l| l =~ comment_re}
       usage << [f, lines] unless lines.empty?
     end
     puts usage unless usage.empty?
