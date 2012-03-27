@@ -1,3 +1,8 @@
+# These are extensions to core classes that Sequel enables by default.
+# They make using Sequel's DSL easier by adding methods to Array,
+# Hash, String, and Symbol to add methods that return Sequel
+# expression objects.
+
 # Sequel extends +Array+ to add methods to implement the SQL DSL.
 # Most of these methods require that the array not be empty and that it
 # must consist solely of other arrays that have exactly two elements.

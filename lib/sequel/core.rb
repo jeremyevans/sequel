@@ -371,7 +371,7 @@ module Sequel
   private_class_method :adapter_method, :def_adapter_method
   
   require(%w"metaprogramming sql connection_pool exceptions dataset database timezones ast_transformer version")
-  require('core_sql') if Sequel.core_extensions?
+  extension(:core_extensions) if Sequel.core_extensions?
 
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)

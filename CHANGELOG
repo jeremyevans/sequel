@@ -1,5 +1,7 @@
 === HEAD
 
+* The core extensions have now been made a real Sequel extension (still loaded by default) (jeremyevans)
+
 * VirtualRow#` has been added for creating literal strings (jeremyevans)
 
 * VirtualRow instances now have operator methods defined {+,-,*,/,&,|,~,>,<,>=,<=} (jeremyevans)
