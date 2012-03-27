@@ -714,3 +714,250 @@ describe Sequel::SQL::VirtualRow do
     @d.l{a > adsoiwemlsdaf2}.should == '("a" > "adsoiwemlsdaf2")'
   end
 end
+
+describe "Sequel core extension replacements" do
+  before do
+    @db = Sequel::Database.new
+    @o = Object.new
+    def @o.sql_literal(ds) 'foo' end
+  end
+
+  def l(arg, should)
+    @db.literal(arg).should == should
+  end
+
+  it "Sequel.expr should return an appropriate wrapped object" do
+    l(Sequel.expr(1) + 1, "(1 + 1)")
+    l(Sequel.expr('a') + 'b', "('a' || 'b')")
+    l(Sequel.expr(:b) & nil, "(b AND NULL)")
+    l(Sequel.expr(nil) & true, "(NULL AND 't')")
+    l(Sequel.expr(false) & true, "('f' AND 't')")
+    l(Sequel.expr(true) | false, "('t' OR 'f')")
+    l(Sequel.expr(@o) + 1, "(foo + 1)")
+  end
+
+  it "Sequel.expr should handle condition specifiers" do
+    l(Sequel.expr(:a=>1) & nil, "((a = 1) AND NULL)")
+    l(Sequel.expr([[:a, 1]]) & nil, "((a = 1) AND NULL)")
+    l(Sequel.expr([[:a, 1], [:b, 2]]) & nil, "((a = 1) AND (b = 2) AND NULL)")
+  end
+
+  it "Sequel.expr should treat blocks/procs as virtual rows and wrap the output" do
+    l(Sequel.expr{1} + 1, "(1 + 1)")
+    l(Sequel.expr{o__a} + 1, "(o.a + 1)")
+    l(Sequel.expr{[[:a, 1]]} & nil, "((a = 1) AND NULL)")
+    l(Sequel.expr{|v| @o} + 1, "(foo + 1)")
+
+    l(Sequel.expr(proc{1}) + 1, "(1 + 1)")
+    l(Sequel.expr(proc{o__a}) + 1, "(o.a + 1)")
+    l(Sequel.expr(proc{[[:a, 1]]}) & nil, "((a = 1) AND NULL)")
+    l(Sequel.expr(proc{|v| @o}) + 1, "(foo + 1)")
+  end
+
+  it "Sequel.expr should raise an error if given an argument and a block" do
+    proc{Sequel.expr(nil){}}.should raise_error(Sequel::Error)
+  end
+
+  it "Sequel.expr should raise an error if given neither an argument nor a block" do
+    proc{Sequel.expr}.should raise_error(Sequel::Error)
+  end
+
+  it "Sequel.expr should return existing Sequel expressions directly" do
+    o = Sequel.expr(1)
+    Sequel.expr(o).should equal(o)
+    o = Sequel.lit('1')
+    Sequel.expr(o).should equal(o)
+  end
+
+  it "Sequel.~ should invert the given object" do
+    l(Sequel.~(nil), 'NOT NULL')
+    l(Sequel.~(:a=>1), "(a != 1)")
+    l(Sequel.~([[:a, 1]]), "(a != 1)")
+    l(Sequel.~([[:a, 1], [:b, 2]]), "((a != 1) OR (b != 2))")
+    l(Sequel.~(Sequel.expr([[:a, 1], [:b, 2]]) & nil), "((a != 1) OR (b != 2) OR NOT NULL)")
+  end
+
+  it "Sequel.case should use a CASE expression" do
+    l(Sequel.case({:a=>1}, 2), "(CASE WHEN a THEN 1 ELSE 2 END)")
+    l(Sequel.case({:a=>1}, 2, :b), "(CASE b WHEN a THEN 1 ELSE 2 END)")
+    l(Sequel.case([[:a, 1]], 2), "(CASE WHEN a THEN 1 ELSE 2 END)")
+    l(Sequel.case([[:a, 1]], 2, :b), "(CASE b WHEN a THEN 1 ELSE 2 END)")
+    l(Sequel.case([[:a, 1], [:c, 3]], 2), "(CASE WHEN a THEN 1 WHEN c THEN 3 ELSE 2 END)")
+    l(Sequel.case([[:a, 1], [:c, 3]], 2, :b), "(CASE b WHEN a THEN 1 WHEN c THEN 3 ELSE 2 END)")
+  end
+
+  it "Sequel.case should raise an error if not given a condition specifier" do
+    proc{Sequel.case(1, 2)}.should raise_error(Sequel::Error)
+  end
+
+  it "Sequel.value_list should use an SQL value list" do
+    l(Sequel.value_list([[1, 2]]), "((1, 2))")
+  end
+
+  it "Sequel.value_list raise an error if not given an array" do
+    proc{Sequel.value_list(1)}.should raise_error(Sequel::Error)
+  end
+
+  it "Sequel.negate should negate all entries in conditions specifier and join with AND" do
+    l(Sequel.negate(:a=>1), "(a != 1)")
+    l(Sequel.negate([[:a, 1]]), "(a != 1)")
+    l(Sequel.negate([[:a, 1], [:b, 2]]), "((a != 1) AND (b != 2))")
+  end
+
+  it "Sequel.negate should raise an error if not given a conditions specifier" do
+    proc{Sequel.negate(1)}.should raise_error(Sequel::Error)
+  end
+
+  it "Sequel.or should join all entries in conditions specifier with OR" do
+    l(Sequel.or(:a=>1), "(a = 1)")
+    l(Sequel.or([[:a, 1]]), "(a = 1)")
+    l(Sequel.or([[:a, 1], [:b, 2]]), "((a = 1) OR (b = 2))")
+  end
+
+  it "Sequel.or should raise an error if not given a conditions specifier" do
+    proc{Sequel.or(1)}.should raise_error(Sequel::Error)
+  end
+
+  it "Sequel.join should should use SQL string concatenation to join array" do
+    l(Sequel.join([]), "''")
+    l(Sequel.join(['a']), "('a')")
+    l(Sequel.join(['a', 'b']), "('a' || 'b')")
+    l(Sequel.join(['a', 'b'], 'c'), "('a' || 'c' || 'b')")
+    l(Sequel.join([true, :b], :c), "('t' || c || b)")
+    l(Sequel.join([false, nil], Sequel.lit('c')), "('f' || c || NULL)")
+    l(Sequel.join([Sequel.expr('a'), Sequel.lit('d')], 'c'), "('a' || 'c' || d)")
+  end
+
+  it "Sequel.join should raise an error if not given an array" do
+    proc{Sequel.join(1)}.should raise_error(Sequel::Error)
+  end
+
+  it "Sequel.& should join all arguments given with AND" do
+    l(Sequel.&(:a), "(a)")
+    l(Sequel.&(:a, :b=>:c), "(a AND (b = c))")
+    l(Sequel.&(:a, {:b=>:c}, Sequel.lit('d')), "(a AND (b = c) AND d)")
+  end
+
+  it "Sequel.& should raise an error if given no arguments" do
+    proc{Sequel.&}.should raise_error(Sequel::Error)
+  end
+
+  it "Sequel.| should join all arguments given with OR" do
+    l(Sequel.|(:a), "(a)")
+    l(Sequel.|(:a, :b=>:c), "(a OR (b = c))")
+    l(Sequel.|(:a, {:b=>:c}, Sequel.lit('d')), "(a OR (b = c) OR d)")
+  end
+
+  it "Sequel.| should raise an error if given no arguments" do
+    proc{Sequel.|}.should raise_error(Sequel::Error)
+  end
+
+  it "Sequel.as should return an aliased expression" do
+    l(Sequel.as(:a, :b), "a AS b")
+  end
+
+  it "Sequel.cast should return a CAST expression" do
+    l(Sequel.cast(:a, :int), "CAST(a AS int)")
+    l(Sequel.cast(:a, Integer), "CAST(a AS integer)")
+  end
+
+  it "Sequel.cast_numeric should return a CAST expression treated as a number" do
+    l(Sequel.cast_numeric(:a), "CAST(a AS integer)")
+    l(Sequel.cast_numeric(:a, :int), "CAST(a AS int)")
+    l(Sequel.cast_numeric(:a) << 2, "(CAST(a AS integer) << 2)")
+  end
+
+  it "Sequel.cast_string should return a CAST expression treated as a string" do
+    l(Sequel.cast_string(:a), "CAST(a AS varchar(255))")
+    l(Sequel.cast_string(:a, :text), "CAST(a AS text)")
+    l(Sequel.cast_string(:a) + 'a', "(CAST(a AS varchar(255)) || 'a')")
+  end
+
+  it "Sequel.lit should return a literal string" do
+    l(Sequel.lit('a'), "a")
+  end
+
+  it "Sequel.lit should return the argument if given a single literal string" do
+    o = Sequel.lit('a')
+    Sequel.lit(o).should equal(o)
+  end
+
+  it "Sequel.lit should accept multiple arguments for a placeholder literal string" do
+    l(Sequel.lit('a = ?', 1), "a = 1")
+    l(Sequel.lit('? = ?', :a, 1), "a = 1")
+    l(Sequel.lit('a = :a', :a=>1), "a = 1")
+  end
+
+  it "Sequel.lit should work with an array for the placeholder string" do
+    l(Sequel.lit(['a = '], 1), "a = 1")
+    l(Sequel.lit(['', ' = '], :a, 1), "a = 1")
+  end
+
+  it "Sequel.blob should return an SQL::Blob" do
+    l(Sequel.blob('a'), "'a'")
+    Sequel.blob('a').should be_a_kind_of(Sequel::SQL::Blob)
+  end
+
+  it "Sequel.blob should return the given argument if given a blob" do
+    o = Sequel.blob('a')
+    Sequel.blob(o).should equal(o)
+  end
+
+  it "Sequel.qualify should return a qualified identifier" do
+    l(Sequel.qualify(:t, :c), "t.c")
+  end
+
+  it "Sequel.identifier should return an identifier" do
+    l(Sequel.identifier(:t__c), "t__c")
+  end
+
+  it "Sequel.asc should return an ASC ordered expression" do
+    l(Sequel.asc(:a), "a ASC")
+    l(Sequel.asc(:a, :nulls=>:first), "a ASC NULLS FIRST")
+  end
+
+  it "Sequel.desc should return a DESC ordered expression " do
+    l(Sequel.desc(:a), "a DESC")
+    l(Sequel.desc(:a, :nulls=>:last), "a DESC NULLS LAST")
+  end
+
+  it "Sequel.{+,-,*,/} should accept arguments and use the appropriate operator" do
+    %w'+ - * /'.each do |op|
+      l(Sequel.send(op, 1), '(1)')
+      l(Sequel.send(op, 1, 2), "(1 #{op} 2)")
+      l(Sequel.send(op, 1, 2, 3), "(1 #{op} 2 #{op} 3)")
+    end
+  end
+
+  it "Sequel.{+,-,*,/} should raise if given no arguments" do
+    %w'+ - * /'.each do |op|
+      proc{Sequel.send(op)}.should raise_error(Sequel::Error)
+    end
+  end
+
+  it "Sequel.like should use a LIKE expression" do
+    l(Sequel.like('a', 'b'), "('a' LIKE 'b')")
+    l(Sequel.like(:a, :b), "(a LIKE b)")
+    l(Sequel.like(:a, /b/), "(a ~ 'b')")
+    l(Sequel.like(:a, 'c', /b/), "((a LIKE 'c') OR (a ~ 'b'))")
+  end
+
+  it "Sequel.ilike should use an ILIKE expression" do
+    l(Sequel.ilike('a', 'b'), "('a' ILIKE 'b')")
+    l(Sequel.ilike(:a, :b), "(a ILIKE b)")
+    l(Sequel.ilike(:a, /b/), "(a ~* 'b')")
+    l(Sequel.ilike(:a, 'c', /b/), "((a ILIKE 'c') OR (a ~* 'b'))")
+  end
+
+  it "Sequel.subscript should use an SQL subscript" do
+    l(Sequel.subscript(:a, 1), 'a[1]')
+    l(Sequel.subscript(:a, 1, 2), 'a[1, 2]')
+    l(Sequel.subscript(:a, [1, 2]), 'a[1, 2]')
+  end
+
+  it "Sequel.function should return an SQL function" do
+    l(Sequel.function(:a), 'a()')
+    l(Sequel.function(:a, 1), 'a(1)')
+    l(Sequel.function(:a, :b, 2), 'a(b, 2)')
+  end
+end

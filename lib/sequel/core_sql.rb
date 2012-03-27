@@ -80,7 +80,7 @@ class Array
     sql_expr_if_all_two_pairs(:OR)
   end
 
-  # Return a <tt>Sequel::SQL::BooleanExpression</tt> representing an SQL string made up of the
+  # Return a <tt>Sequel::SQL::StringExpression</tt> representing an SQL string made up of the
   # concatenation of this array's elements.  If an argument is passed
   # it is used in between each element of the array in the SQL
   # concatenation.
