@@ -281,6 +281,285 @@ module Sequel
       end
     end
 
+    # These methods are designed as replacements for the core extensions, so that
+    # Sequel is still easy to use if the core extensions are not enabled.
+    module Builders
+      # Create an SQL::AliasedExpression for the given expression and alias.
+      #
+      #   Sequel.as(:column, :alias) # "column" AS "alias"
+      def as(exp, aliaz)
+        SQL::AliasedExpression.new(exp, aliaz)
+      end
+
+      # Order the given argument ascending.
+      # Options:
+      #
+      # :nulls :: Set to :first to use NULLS FIRST (so NULL values are ordered
+      #           before other values), or :last to use NULLS LAST (so NULL values
+      #           are ordered after other values).
+      #
+      #   Sequel.asc(:a) # a ASC
+      #   Sequel.asc(:b, :nulls=>:last) # b ASC NULLS LAST
+      def asc(arg, opts={})
+        SQL::OrderedExpression.new(arg, false, opts)
+      end
+
+      # Return an <tt>SQL::Blob</tt> that holds the same data as this string.
+      # Blobs provide proper escaping of binary data.  If given a blob, returns it
+      # directly.
+      def blob(s)
+        if s.is_a?(SQL::Blob)
+          s
+        else
+          SQL::Blob.new(s)
+        end
+      end
+
+      # Return an <tt>SQL::CaseExpression</tt> created with the given arguments.
+      #
+      #   Sequel.case([[{:a=>[2,3]}, 1]], 0) # SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END
+      #   Sequel.case({:a=>1}, 0, :b) # SQL: CASE b WHEN a THEN 1 ELSE 0 END
+      def case(*args) # core_sql ignore
+        SQL::CaseExpression.new(*args)
+      end
+
+      # Cast the reciever to the given SQL type.  You can specify a ruby class as a type,
+      # and it is handled similarly to using a database independent type in the schema methods.
+      #
+      #   Sequel.cast(:a, :integer) # CAST(a AS integer)
+      #   Sequel.cast(:a, String) # CAST(a AS varchar(255))
+      def cast(arg, sql_type)
+        SQL::Cast.new(arg, sql_type)
+      end
+
+      # Cast the reciever to the given SQL type (or the database's default Integer type if none given),
+      # and return the result as a +NumericExpression+, so you can use the bitwise operators
+      # on the result. 
+      #
+      #   Sequel.cast_numeric(:a) # CAST(a AS integer)
+      #   Sequel.cast_numeric(:a, Float) # CAST(a AS double precision)
+      def cast_numeric(arg, sql_type = nil)
+        cast(arg, sql_type || Integer).sql_number
+      end
+
+      # Cast the reciever to the given SQL type (or the database's default String type if none given),
+      # and return the result as a +StringExpression+, so you can use +
+      # directly on the result for SQL string concatenation.
+      #
+      #   Sequel.cast_string(:a) # CAST(a AS varchar(255))
+      #   Sequel.cast_string(:a, :text) # CAST(a AS text)
+      def cast_string(arg, sql_type = nil)
+        cast(arg, sql_type || String).sql_string
+      end
+
+      # Order the given argument descending.
+      # Options:
+      #
+      # :nulls :: Set to :first to use NULLS FIRST (so NULL values are ordered
+      #           before other values), or :last to use NULLS LAST (so NULL values
+      #           are ordered after other values).
+      #
+      #   Sequel.desc(:a) # b DESC
+      #   Sequel.desc(:b, :nulls=>:first) # b DESC NULLS FIRST
+      def desc(arg, opts={})
+        SQL::OrderedExpression.new(arg, true, opts)
+      end
+
+      # Wraps the given object in an appropriate Sequel wrapper.
+      # If the given object is already a Sequel object, return it directly.
+      # For condition specifiers (hashes and arrays of two pairs), true, and false,
+      # return a boolean expressions.  For numeric objects, return a numeric
+      # expression.  For strings, return a string expression.  For procs or when
+      # the method is passed a block, evaluate it as a virtual row and wrap it
+      # appropriately.  In all other cases, use a generic wrapper.
+      #
+      # This method allows you to construct SQL expressions that are difficult
+      # to construct via other methods.  For example:
+      #
+      #   Sequel.expr(1) - :a # SQL: (1 - a)
+      def expr(arg=(no_arg=true), &block)
+        if block_given?
+          if no_arg
+            return expr(block)
+          else
+            raise Error, 'cannot provide both an argument and a block to Sequel.expr'
+          end
+        elsif no_arg
+          raise Error, 'must provide either an argument or a block to Sequel.expr'
+        end
+
+        case arg
+        when SQL::Expression, LiteralString, SQL::Blob
+          arg
+        when Hash
+          SQL::BooleanExpression.from_value_pairs(arg, :AND)
+        when Array
+          if condition_specifier?(arg)
+            SQL::BooleanExpression.from_value_pairs(arg, :AND)
+          else
+            SQL::Wrapper.new(arg)
+          end
+        when Numeric
+          SQL::NumericExpression.new(:NOOP, arg)
+        when String
+          SQL::StringExpression.new(:NOOP, arg)
+        when TrueClass, FalseClass
+          SQL::BooleanExpression.new(:NOOP, arg)
+        when Proc
+          expr(virtual_row(&arg))
+        else
+          SQL::Wrapper.new(arg)
+        end
+      end
+
+      # Returns a <tt>Sequel::SQL::Function</tt> with the function name
+      # and the given arguments.
+      #
+      #   Sequel.function(:now) # SQL: now()
+      #   Sequel.function(:substr, :a, 1) # SQL: substr(a, 1)
+      def function(name, *args)
+        SQL::Function.new(name, *args)
+      end
+
+      # Return the argument wrapped as an <tt>SQL::Identifier</tt>.
+      #
+      #   Sequel.identifier(:a__b) # "a__b"
+      def identifier(name)
+        SQL::Identifier.new(name)
+      end
+
+      # Return a <tt>Sequel::SQL::StringExpression</tt> representing an SQL string made up of the
+      # concatenation of the given array's elements.  If an argument is passed,
+      # it is used in between each element of the array in the SQL
+      # concatenation.
+      #
+      #   Sequel.join([:a]) # SQL: a
+      #   Sequel.join([:a, :b]) # SQL: a || b
+      #   Sequel.join([:a, 'b']) # SQL: a || 'b'
+      #   Sequel.join(['a', :b], ' ') # SQL: 'a' || ' ' || b
+      def join(args, joiner=nil)
+        raise Error, 'argument to Sequel.join must be an array' unless args.is_a?(Array)
+        if joiner
+          args = args.zip([joiner]*args.length).flatten
+          args.pop
+        end
+
+        return SQL::StringExpression.new(:NOOP, '') if args.empty?
+
+        args = args.map do |a|
+          case a
+          when Symbol, ::Sequel::SQL::Expression, ::Sequel::LiteralString, TrueClass, FalseClass, NilClass
+            a
+          else
+            a.to_s
+          end
+        end
+        SQL::StringExpression.new(:'||', *args)
+      end
+
+      # Create a <tt>BooleanExpression</tt> case insensitive (if the database supports it) pattern match of the receiver with
+      # the given patterns.  See <tt>SQL::StringExpression.like</tt>.
+      #
+      #   Sequel.ilike(:a, 'A%') # "a" ILIKE 'A%'
+      def ilike(*args)
+        SQL::StringExpression.like(*(args << {:case_insensitive=>true}))
+      end
+
+      # Create a <tt>SQL::BooleanExpression</tt> case sensitive (if the database supports it) pattern match of the receiver with
+      # the given patterns.  See <tt>SQL::StringExpression.like</tt>.
+      #
+      #   Sequel.like(:a, 'A%') # "a" LIKE 'A%'
+      def like(*args)
+        SQL::StringExpression.like(*args)
+      end
+
+      # Converts a string into a <tt>Sequel::LiteralString</tt>, in order to override string
+      # literalization, e.g.:
+      #
+      #   DB[:items].filter(:abc => 'def').sql #=>
+      #     "SELECT * FROM items WHERE (abc = 'def')"
+      #
+      #   DB[:items].filter(:abc => Sequel.lit('def')).sql #=>
+      #     "SELECT * FROM items WHERE (abc = def)"
+      #
+      # You can also provide arguments, to create a <tt>Sequel::SQL::PlaceholderLiteralString</tt>:
+      #
+      #    DB[:items].select{|o| o.count(Sequel.lit('DISTINCT ?', :a))}.sql #=>
+      #      "SELECT count(DISTINCT a) FROM items"
+      def lit(s, *args) # core_sql ignore
+        if args.empty?
+          if s.is_a?(LiteralString)
+            s
+          else
+            LiteralString.new(s)
+          end
+        else
+          SQL::PlaceholderLiteralString.new(s, args) 
+        end
+      end
+
+      # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from the condition
+      # specifier, matching none of the conditions.
+      #
+      #   Sequel.negate(:a=>true) # SQL: a IS NOT TRUE
+      #   Sequel.negate([[:a, true]]) # SQL: a IS NOT TRUE
+      #   Sequel.negate([[:a, 1], [:b, 2]]) # SQL: ((a != 1) AND (b != 2))
+      def negate(arg)
+        if condition_specifier?(arg)
+          SQL::BooleanExpression.from_value_pairs(arg, :AND, true)
+        else
+          raise Error, 'must pass a conditions specifier to Sequel.negate'
+        end
+      end
+
+      # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from the condition
+      # specifier, matching any of the conditions.
+      #
+      #   Sequel.or(:a=>true) # SQL: a IS TRUE
+      #   Sequel.or([[:a, true]]) # SQL: a IS TRUE
+      #   Sequel.or([[:a, 1], [:b, 2]]) # SQL: ((a = 1) OR (b = 2))
+      def or(arg)
+        if condition_specifier?(arg)
+          SQL::BooleanExpression.from_value_pairs(arg, :OR, false)
+        else
+          raise Error, 'must pass a conditions specifier to Sequel.or'
+        end
+      end
+
+      # Create a qualified identifier with the given qualifier and identifier
+      #
+      #   Sequel.qualify(:table, :column) # "table"."column"
+      #   Sequel.qualify(:schema, :table) # "schema"."table"
+      #   Sequel.qualify(:table, :column).qualify(:schema) # "schema"."table"."column"
+      def qualify(qualifier, identifier)
+        SQL::QualifiedIdentifier.new(qualifier, identifier)
+      end
+
+      # Return an <tt>SQL::Subscript</tt> with the given arguments, representing an
+      # SQL array access.
+      #
+      #   Sequel.subscript(:array, 1) # array[1]
+      #   Sequel.subscript(:array, 1, 2) # array[1, 2]
+      #   Sequel.subscript(:array, [1, 2]) # array[1, 2]
+      def subscript(exp, *subs)
+        SQL::Subscript.new(exp, subs.flatten)
+      end
+
+      # Return a <tt>SQL::ValueList</tt> created from the given array.  Used if the array contains
+      # all two element arrays and you want it treated as an SQL value list (IN predicate) 
+      # instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using
+      # this array as a value in a filter, but may be necessary if you are using it as a
+      # value with placeholder SQL:
+      #
+      #   DB[:a].filter([:a, :b]=>[[1, 2], [3, 4]]) # SQL: (a, b) IN ((1, 2), (3, 4))
+      #   DB[:a].filter('(a, b) IN ?', [[1, 2], [3, 4]]) # SQL: (a, b) IN ((1 = 2) AND (3 = 4))
+      #   DB[:a].filter('(a, b) IN ?', Sequel.value_list([[1, 2], [3, 4]])) # SQL: (a, b) IN ((1, 2), (3, 4))
+      def value_list(arg)
+        raise Error, 'argument to Sequel.value_list must be an array' unless arg.is_a?(Array)
+        SQL::ValueList.new(arg)
+      end
+    end
+
     # Holds methods that are used to cast objects to different SQL types.
     module CastMethods 
       # Cast the reciever to the given SQL type.  You can specify a ruby class as a type,
@@ -420,6 +699,46 @@ module Sequel
           StringExpression.new(:'||', self, ce)
         else
           NumericExpression.new(:+, self, ce)
+        end
+      end
+    end
+
+    # These methods are designed as replacements for the core extension operator
+    # methods, so that Sequel is still easy to use if the core extensions are not
+    # enabled.
+    #
+    # The following methods are defined via metaprogramming: +, -, *, /, &, |.
+    # The +, -, *, and / operators return numeric expressions combining all the
+    # arguments with the appropriate operator, and the & and | operators return
+    # boolean expressions combining all of the arguments with either AND or OR.
+    module OperatorBuilders
+      %w'+ - * /'.each do |op|
+        class_eval(<<-END, __FILE__, __LINE__ + 1)
+          def #{op}(*args)
+            SQL::NumericExpression.new(:#{op}, *args)
+          end
+        END
+      end
+
+      {'&'=>'AND', '|'=>'OR'}.each do |m, op|
+        class_eval(<<-END, __FILE__, __LINE__ + 1)
+          def #{m}(*args)
+            SQL::BooleanExpression.new(:#{op}, *args)
+          end
+        END
+      end
+      
+      # Invert the given expression.  Returns a <tt>Sequel::SQL::BooleanExpression</tt>
+      # created from this argument, not matching all of the conditions.
+      #
+      #   Sequel.~(nil) # SQL: NOT NULL
+      #   Sequel.~([[:a, true]]) # SQL: a IS NOT TRUE
+      #   Sequel.~([[:a, 1], [:b, [2, 3]]]) # SQL: a != 1 OR b NOT IN (2, 3)
+      def ~(arg)
+        if condition_specifier?(arg)
+          SQL::BooleanExpression.from_value_pairs(arg, :OR, true)
+        else
+          SQL::BooleanExpression.invert(arg)
         end
       end
     end
@@ -1089,21 +1408,47 @@ module Sequel
     # Examples:
     #
     #   ds = DB[:t]
+    #
     #   # Argument yielded to block
     #   ds.filter{|r| r.name < 2} # SELECT * FROM t WHERE (name < 2)
+    #
     #   # Block without argument (instance_eval)
     #   ds.filter{name < 2} # SELECT * FROM t WHERE (name < 2)
+    #
     #   # Qualified identifiers
     #   ds.filter{table__column + 1 < 2} # SELECT * FROM t WHERE ((table.column + 1) < 2)
+    #
     #   # Functions
     #   ds.filter{is_active(1, 'arg2')} # SELECT * FROM t WHERE is_active(1, 'arg2')
     #   ds.select{version{}} # SELECT version() FROM t
     #   ds.select{count(:*){}} # SELECT count(*) FROM t
     #   ds.select{count(:distinct, col1){}} # SELECT count(DISTINCT col1) FROM t
+    #
     #   # Window Functions
     #   ds.select{rank(:over){}} # SELECT rank() OVER () FROM t
     #   ds.select{count(:over, :*=>true){}} # SELECT count(*) OVER () FROM t
     #   ds.select{sum(:over, :args=>col1, :partition=>col2, :order=>col3){}} # SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3) FROM t
+    #
+    #   # Math Operators
+    #   ds.select{|o| o.+(1, :a).as(:b)} # SELECT (1 + a) AS b FROM t
+    #   ds.select{|o| o.-(2, :a).as(:b)} # SELECT (2 - a) AS b FROM t
+    #   ds.select{|o| o.*(3, :a).as(:b)} # SELECT (3 * a) AS b FROM t
+    #   ds.select{|o| o./(4, :a).as(:b)} # SELECT (4 / a) AS b FROM t
+    #
+    #   # Boolean Operators
+    #   ds.filter{|o| o.&({:a=>1}, :b)}    # SELECT * FROM t WHERE ((a = 1) AND b)
+    #   ds.filter{|o| o.|({:a=>1}, :b)}    # SELECT * FROM t WHERE ((a = 1) OR b)
+    #   ds.filter{|o| o.~({:a=>1})}        # SELECT * FROM t WHERE (a != 1)
+    #   ds.filter{|o| o.~({:a=>1, :b=>2})} # SELECT * FROM t WHERE ((a != 1) OR (b != 2))
+    #
+    #   # Inequality Operators
+    #   ds.filter{|o| o.>(1, :a)}  # SELECT * FROM t WHERE (1 > a)
+    #   ds.filter{|o| o.<(2, :a)}  # SELECT * FROM t WHERE (2 < a)
+    #   ds.filter{|o| o.>=(3, :a)} # SELECT * FROM t WHERE (3 >= a)
+    #   ds.filter{|o| o.<=(4, :a)} # SELECT * FROM t WHERE (4 <= a)
+    #
+    #   # Literal Strings
+    #   ds.filter{{a=>`some SQL`}} # SELECT * FROM t WHERE (a = some SQL)
     #
     # For a more detailed explanation, see the {Virtual Rows guide}[link:files/doc/virtual_rows_rdoc.html].
     class VirtualRow < BasicObject
@@ -1113,6 +1458,21 @@ module Sequel
       DOUBLE_UNDERSCORE = '__'.freeze
       DISTINCT = ["DISTINCT ".freeze].freeze
       COMMA_ARRAY = [COMMA_SEPARATOR].freeze
+
+      include OperatorBuilders
+
+      %w'> < >= <='.each do |op|
+        class_eval(<<-END, __FILE__, __LINE__ + 1)
+          def #{op}(*args)
+            SQL::BooleanExpression.new(:#{op}, *args)
+          end
+        END
+      end
+
+      # Return a literal string created with the given string.
+      def `(s)
+        Sequel::LiteralString.new(s)
+      end
 
       # Return an +Identifier+, +QualifiedIdentifier+, +Function+, or +WindowFunction+, depending
       # on arguments and whether a block is provided.  Does not currently call the block.
@@ -1224,326 +1584,6 @@ module Sequel
   end
   
   include SQL::Constants
-
-  # These methods are designed as replacements for the core extension operator
-  # methods, so that Sequel is still easy to use if the core extensions are not
-  # enabled.
-  #
-  # The following methods are defined via metaprogramming: +, -, *, /, &, |.
-  # The +, -, *, and / operators return numeric expressions combining all the
-  # arguments with the appropriate operator, and the & and | operators return
-  # boolean expressions combining all of the arguments with either AND or OR.
-  module SQL::OperatorBuilders
-    %w'+ - * /'.each do |op|
-      class_eval(<<-END, __FILE__, __LINE__ + 1)
-        def #{op}(*args)
-          SQL::NumericExpression.new(:#{op}, *args)
-        end
-      END
-    end
-
-    {'&'=>'AND', '|'=>'OR'}.each do |m, op|
-      class_eval(<<-END, __FILE__, __LINE__ + 1)
-        def #{m}(*args)
-          SQL::BooleanExpression.new(:#{op}, *args)
-        end
-      END
-    end
-    
-    # Invert the given expression.  Returns a <tt>Sequel::SQL::BooleanExpression</tt>
-    # created from this argument, not matching all of the conditions.
-    #
-    #   Sequel.~(nil) # SQL: NOT NULL
-    #   Sequel.~([[:a, true]]) # SQL: a IS NOT TRUE
-    #   Sequel.~([[:a, 1], [:b, [2, 3]]]) # SQL: a != 1 OR b NOT IN (2, 3)
-    def ~(arg)
-      if condition_specifier?(arg)
-        SQL::BooleanExpression.from_value_pairs(arg, :OR, true)
-      else
-        SQL::BooleanExpression.invert(arg)
-      end
-    end
-  end
-
-  # These methods are designed as replacements for the core extensions, so that
-  # Sequel is still easy to use if the core extensions are not enabled.
-  module SQL::Builders
-    # Create an SQL::AliasedExpression for the given expression and alias.
-    #
-    #   Sequel.as(:column, :alias) # "column" AS "alias"
-    def as(exp, aliaz)
-      SQL::AliasedExpression.new(exp, aliaz)
-    end
-
-    # Order the given argument ascending.
-    # Options:
-    #
-    # :nulls :: Set to :first to use NULLS FIRST (so NULL values are ordered
-    #           before other values), or :last to use NULLS LAST (so NULL values
-    #           are ordered after other values).
-    #
-    #   Sequel.asc(:a) # a ASC
-    #   Sequel.asc(:b, :nulls=>:last) # b ASC NULLS LAST
-    def asc(arg, opts={})
-      SQL::OrderedExpression.new(arg, false, opts)
-    end
-
-    # Return an <tt>SQL::Blob</tt> that holds the same data as this string.
-    # Blobs provide proper escaping of binary data.  If given a blob, returns it
-    # directly.
-    def blob(s)
-      if s.is_a?(SQL::Blob)
-        s
-      else
-        SQL::Blob.new(s)
-      end
-    end
-
-    # Return an <tt>SQL::CaseExpression</tt> created with the given arguments.
-    #
-    #   Sequel.case([[{:a=>[2,3]}, 1]], 0) # SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END
-    #   Sequel.case({:a=>1}, 0, :b) # SQL: CASE b WHEN a THEN 1 ELSE 0 END
-    def case(*args) # core_sql ignore
-      SQL::CaseExpression.new(*args)
-    end
-
-    # Cast the reciever to the given SQL type.  You can specify a ruby class as a type,
-    # and it is handled similarly to using a database independent type in the schema methods.
-    #
-    #   Sequel.cast(:a, :integer) # CAST(a AS integer)
-    #   Sequel.cast(:a, String) # CAST(a AS varchar(255))
-    def cast(arg, sql_type)
-      SQL::Cast.new(arg, sql_type)
-    end
-
-    # Cast the reciever to the given SQL type (or the database's default Integer type if none given),
-    # and return the result as a +NumericExpression+, so you can use the bitwise operators
-    # on the result. 
-    #
-    #   Sequel.cast_numeric(:a) # CAST(a AS integer)
-    #   Sequel.cast_numeric(:a, Float) # CAST(a AS double precision)
-    def cast_numeric(arg, sql_type = nil)
-      cast(arg, sql_type || Integer).sql_number
-    end
-
-    # Cast the reciever to the given SQL type (or the database's default String type if none given),
-    # and return the result as a +StringExpression+, so you can use +
-    # directly on the result for SQL string concatenation.
-    #
-    #   Sequel.cast_string(:a) # CAST(a AS varchar(255))
-    #   Sequel.cast_string(:a, :text) # CAST(a AS text)
-    def cast_string(arg, sql_type = nil)
-      cast(arg, sql_type || String).sql_string
-    end
-
-    # Order the given argument descending.
-    # Options:
-    #
-    # :nulls :: Set to :first to use NULLS FIRST (so NULL values are ordered
-    #           before other values), or :last to use NULLS LAST (so NULL values
-    #           are ordered after other values).
-    #
-    #   Sequel.desc(:a) # b DESC
-    #   Sequel.desc(:b, :nulls=>:first) # b DESC NULLS FIRST
-    def desc(arg, opts={})
-      SQL::OrderedExpression.new(arg, true, opts)
-    end
-
-    # Wraps the given object in an appropriate Sequel wrapper.
-    # If the given object is already a Sequel object, return it directly.
-    # For condition specifiers (hashes and arrays of two pairs), true, and false,
-    # return a boolean expressions.  For numeric objects, return a numeric
-    # expression.  For strings, return a string expression.  For procs or when
-    # the method is passed a block, evaluate it as a virtual row and wrap it
-    # appropriately.  In all other cases, use a generic wrapper.
-    #
-    # This method allows you to construct SQL expressions that are difficult
-    # to construct via other methods.  For example:
-    #
-    #   Sequel.expr(1) - :a # SQL: (1 - a)
-    def expr(arg=(no_arg=true), &block)
-      if block_given?
-        if no_arg
-          return expr(block)
-        else
-          raise Error, 'cannot provide both an argument and a block to Sequel.expr'
-        end
-      elsif no_arg
-        raise Error, 'must provide either an argument or a block to Sequel.expr'
-      end
-
-      case arg
-      when SQL::Expression, LiteralString, SQL::Blob
-        arg
-      when Hash
-        SQL::BooleanExpression.from_value_pairs(arg, :AND)
-      when Array
-        if condition_specifier?(arg)
-          SQL::BooleanExpression.from_value_pairs(arg, :AND)
-        else
-          SQL::Wrapper.new(arg)
-        end
-      when Numeric
-        SQL::NumericExpression.new(:NOOP, arg)
-      when String
-        SQL::StringExpression.new(:NOOP, arg)
-      when TrueClass, FalseClass
-        SQL::BooleanExpression.new(:NOOP, arg)
-      when Proc
-        expr(virtual_row(&arg))
-      else
-        SQL::Wrapper.new(arg)
-      end
-    end
-
-    # Returns a <tt>Sequel::SQL::Function</tt> with the function name
-    # and the given arguments.
-    #
-    #   Sequel.function(:now) # SQL: now()
-    #   Sequel.function(:substr, :a, 1) # SQL: substr(a, 1)
-    def function(name, *args)
-      SQL::Function.new(name, *args)
-    end
-
-    # Return the argument wrapped as an <tt>SQL::Identifier</tt>.
-    #
-    #   Sequel.identifier(:a__b) # "a__b"
-    def identifier(name)
-      SQL::Identifier.new(name)
-    end
-
-    # Return a <tt>Sequel::SQL::StringExpression</tt> representing an SQL string made up of the
-    # concatenation of the given array's elements.  If an argument is passed,
-    # it is used in between each element of the array in the SQL
-    # concatenation.
-    #
-    #   Sequel.join([:a]) # SQL: a
-    #   Sequel.join([:a, :b]) # SQL: a || b
-    #   Sequel.join([:a, 'b']) # SQL: a || 'b'
-    #   Sequel.join(['a', :b], ' ') # SQL: 'a' || ' ' || b
-    def join(args, joiner=nil)
-      raise Error, 'argument to Sequel.join must be an array' unless args.is_a?(Array)
-      if joiner
-        args = args.zip([joiner]*args.length).flatten
-        args.pop
-      end
-
-      return SQL::StringExpression.new(:NOOP, '') if args.empty?
-
-      args = args.map do |a|
-        case a
-        when Symbol, ::Sequel::SQL::Expression, ::Sequel::LiteralString, TrueClass, FalseClass, NilClass
-          a
-        else
-          a.to_s
-        end
-      end
-      SQL::StringExpression.new(:'||', *args)
-    end
-
-    # Create a <tt>BooleanExpression</tt> case insensitive (if the database supports it) pattern match of the receiver with
-    # the given patterns.  See <tt>SQL::StringExpression.like</tt>.
-    #
-    #   Sequel.ilike(:a, 'A%') # "a" ILIKE 'A%'
-    def ilike(*args)
-      SQL::StringExpression.like(*(args << {:case_insensitive=>true}))
-    end
-
-    # Create a <tt>SQL::BooleanExpression</tt> case sensitive (if the database supports it) pattern match of the receiver with
-    # the given patterns.  See <tt>SQL::StringExpression.like</tt>.
-    #
-    #   Sequel.like(:a, 'A%') # "a" LIKE 'A%'
-    def like(*args)
-      SQL::StringExpression.like(*args)
-    end
-
-    # Converts a string into a <tt>Sequel::LiteralString</tt>, in order to override string
-    # literalization, e.g.:
-    #
-    #   DB[:items].filter(:abc => 'def').sql #=>
-    #     "SELECT * FROM items WHERE (abc = 'def')"
-    #
-    #   DB[:items].filter(:abc => Sequel.lit('def')).sql #=>
-    #     "SELECT * FROM items WHERE (abc = def)"
-    #
-    # You can also provide arguments, to create a <tt>Sequel::SQL::PlaceholderLiteralString</tt>:
-    #
-    #    DB[:items].select{|o| o.count(Sequel.lit('DISTINCT ?', :a))}.sql #=>
-    #      "SELECT count(DISTINCT a) FROM items"
-    def lit(s, *args) # core_sql ignore
-      if args.empty?
-        if s.is_a?(LiteralString)
-          s
-        else
-          LiteralString.new(s)
-        end
-      else
-        SQL::PlaceholderLiteralString.new(s, args) 
-      end
-    end
-
-    # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from the condition
-    # specifier, matching none of the conditions.
-    #
-    #   Sequel.negate(:a=>true) # SQL: a IS NOT TRUE
-    #   Sequel.negate([[:a, true]]) # SQL: a IS NOT TRUE
-    #   Sequel.negate([[:a, 1], [:b, 2]]) # SQL: ((a != 1) AND (b != 2))
-    def negate(arg)
-      if condition_specifier?(arg)
-        SQL::BooleanExpression.from_value_pairs(arg, :AND, true)
-      else
-        raise Error, 'must pass a conditions specifier to Sequel.negate'
-      end
-    end
-
-    # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from the condition
-    # specifier, matching any of the conditions.
-    #
-    #   Sequel.or(:a=>true) # SQL: a IS TRUE
-    #   Sequel.or([[:a, true]]) # SQL: a IS TRUE
-    #   Sequel.or([[:a, 1], [:b, 2]]) # SQL: ((a = 1) OR (b = 2))
-    def or(arg)
-      if condition_specifier?(arg)
-        SQL::BooleanExpression.from_value_pairs(arg, :OR, false)
-      else
-        raise Error, 'must pass a conditions specifier to Sequel.or'
-      end
-    end
-
-    # Create a qualified identifier with the given qualifier and identifier
-    #
-    #   Sequel.qualify(:table, :column) # "table"."column"
-    #   Sequel.qualify(:schema, :table) # "schema"."table"
-    #   Sequel.qualify(:table, :column).qualify(:schema) # "schema"."table"."column"
-    def qualify(qualifier, identifier)
-      SQL::QualifiedIdentifier.new(qualifier, identifier)
-    end
-
-    # Return an <tt>SQL::Subscript</tt> with the given arguments, representing an
-    # SQL array access.
-    #
-    #   Sequel.subscript(:array, 1) # array[1]
-    #   Sequel.subscript(:array, 1, 2) # array[1, 2]
-    #   Sequel.subscript(:array, [1, 2]) # array[1, 2]
-    def subscript(exp, *subs)
-      SQL::Subscript.new(exp, subs.flatten)
-    end
-
-    # Return a <tt>SQL::ValueList</tt> created from the given array.  Used if the array contains
-    # all two element arrays and you want it treated as an SQL value list (IN predicate) 
-    # instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using
-    # this array as a value in a filter, but may be necessary if you are using it as a
-    # value with placeholder SQL:
-    #
-    #   DB[:a].filter([:a, :b]=>[[1, 2], [3, 4]]) # SQL: (a, b) IN ((1, 2), (3, 4))
-    #   DB[:a].filter('(a, b) IN ?', [[1, 2], [3, 4]]) # SQL: (a, b) IN ((1 = 2) AND (3 = 4))
-    #   DB[:a].filter('(a, b) IN ?', Sequel.value_list([[1, 2], [3, 4]])) # SQL: (a, b) IN ((1, 2), (3, 4))
-    def value_list(arg)
-      raise Error, 'argument to Sequel.value_list must be an array' unless arg.is_a?(Array)
-      SQL::ValueList.new(arg)
-    end
-  end
-
-  extend SQL::OperatorBuilders
   extend SQL::Builders
+  extend SQL::OperatorBuilders
 end

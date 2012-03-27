@@ -713,6 +713,26 @@ describe Sequel::SQL::VirtualRow do
     Sequel::BasicObject.remove_methods!
     @d.l{a > adsoiwemlsdaf2}.should == '("a" > "adsoiwemlsdaf2")'
   end
+
+  it "should have operator methods defined that produce Sequel expression objects" do
+    @d.l{|o| o.&({:a=>1}, :b)}.should == '(("a" = 1) AND "b")'
+    @d.l{|o| o.|({:a=>1}, :b)}.should == '(("a" = 1) OR "b")'
+    @d.l{|o| o.+(1, :b) > 2}.should == '((1 + "b") > 2)'
+    @d.l{|o| o.-(1, :b) < 2}.should == '((1 - "b") < 2)'
+    @d.l{|o| o.*(1, :b) >= 2}.should == '((1 * "b") >= 2)'
+    @d.l{|o| o./(1, :b) <= 2}.should == '((1 / "b") <= 2)'
+    @d.l{|o| o.~(:a=>1)}.should == '("a" != 1)'
+    @d.l{|o| o.~([[:a, 1], [:b, 2]])}.should == '(("a" != 1) OR ("b" != 2))'
+    @d.l{|o| o.<(1, :b)}.should == '(1 < "b")'
+    @d.l{|o| o.>(1, :b)}.should == '(1 > "b")'
+    @d.l{|o| o.<=(1, :b)}.should == '(1 <= "b")'
+    @d.l{|o| o.>=(1, :b)}.should == '(1 >= "b")'
+  end
+
+  it "should have have ` produce literal strings" do
+    @d.l{a > `some SQL`}.should == '("a" > some SQL)'
+    @d.l{|o| o.a > o.`('some SQL')}.should == '("a" > some SQL)' #`
+  end
 end
 
 describe "Sequel core extension replacements" do

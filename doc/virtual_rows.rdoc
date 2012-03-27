@@ -205,6 +205,55 @@ call, with an optional hash as the second argument: Here are some examples of us
   ds.select{sum(:over, :args=>col1, :partition=>col2, :order=>col3){}}
   # SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)
 
+== Operators
+
+VirtualRows use method_missing to handle almost all method calls.  However, they
+have special handling of some operator methods to make certain things easier. The
+operators all use a prefix form.
+
+=== Math Operators
+
+The standard +, -, *, and / mathematical operators are defined:
+
+  ds.select{|o| o.-(1, o.a).as(b)}
+  ds.select{self.-(1, a).as(b)}
+  # SELECT (1 - a) AS b
+
+=== Boolean Operators
+
+The & and | methods are defined to use AND and OR:
+
+  ds.where{|o| o.&({:a=>:b}, :c)}
+  ds.where{self.&({:a=>:b}, :c)}
+  # WHERE ((a = b) AND c)
+
+The ~ method is defined to do inversion:
+
+  ds.where{|o| o.~({:a=>1, :b=>2})}
+  ds.where{self.~({:a=>1, :b=>2})}
+  # WHERE ((a != 1) OR (b != 2))
+
+=== Inequality Operators
+
+The standard >, <, >=, and <= inequality operators are defined:
+
+  ds.where{|o| o.>(1, :c)}
+  ds.where{self.>(1, :c)}
+  # WHERE (1 > c)
+
+== Literal Strings
+
+The backtick operator can be used inside an instance-evaled
+virtual row block to create a literal string:
+
+  ds.where{a > `some SQL`}
+  # WHERE (a > some SQL)
+
+You can use this on a regular virtual row block too, but it
+doesn't look as nice:
+
+  ds.where{|o| o.>(:a, o.`('some SQL')}
+
 == Returning multiple values
 
 It's common when using select and order virtual row blocks to want to
