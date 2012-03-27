@@ -219,7 +219,12 @@ if !ARGV.empty?
 elsif !$stdin.isatty
   eval($stdin.read)
 else
-  require 'irb'
+  console = if defined? Pry
+    Pry
+  else
+    require 'irb'
+    IRB
+  end
   puts "Your database is stored in DB..."
-  IRB.start
+  console.start
 end
