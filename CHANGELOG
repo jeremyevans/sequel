@@ -1,5 +1,7 @@
 === HEAD
 
+* Array#all_two_pairs? is now deprecated and will be removed after 3.34.0 is released (jeremyevans)
+
 * All of Sequel's core extensions now have equivalent methods defined on the Sequel module (jeremyevans)
 
 * Add Sequel.core_extensions? for checking if the core extensions are enabled (jeremyevans)
