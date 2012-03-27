@@ -3,6 +3,11 @@
 # Hash, String, and Symbol to add methods that return Sequel
 # expression objects.
 
+# This extension loads the core extensions.
+def Sequel.core_extensions?
+  true
+end
+
 # Sequel extends +Array+ to add methods to implement the SQL DSL.
 # Most of these methods require that the array not be empty and that it
 # must consist solely of other arrays that have exactly two elements.

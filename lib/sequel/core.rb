@@ -18,8 +18,10 @@ warn 'Sequel support for ruby <1.8.7 is deprecated and will be removed in 3.35.0
 #
 #   Sequel.sqlite('blog.db'){|db| puts db[:users].count} 
 #
-# You can set the +SEQUEL_NO_CORE_EXTENSIONS+ constant or environment variable to have
-# Sequel not extend the core classes.
+# Sequel currently adds methods to the Array, Hash, String and Symbol classes by
+# default.  You can either require 'sequel/no_core_ext' or set the
+# +SEQUEL_NO_CORE_EXTENSIONS+ constant or environment variable before requiring
+# sequel to have # Sequel not add methods to those classes.
 #
 # For a more expanded introduction, see the {README}[link:files/README_rdoc.html].
 # For a quicker introduction, see the {cheat sheet}[link:files/doc/cheat_sheet_rdoc.html].
@@ -147,6 +149,10 @@ module Sequel
     # default for backwards compatibility, but can be disabled using the SEQUEL_NO_CORE_EXTENSIONS
     # constant or environment variable.
     def self.core_extensions?
+      # We override this method to return true inside the core_extensions.rb file,
+      # but we also set it here because that file is not loaded until most of Sequel
+      # is finished loading, and parts of Sequel check whether the core extensions
+      # are loaded.
       true
     end
   else
