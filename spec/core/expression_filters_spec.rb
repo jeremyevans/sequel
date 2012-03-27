@@ -981,3 +981,96 @@ describe "Sequel core extension replacements" do
     l(Sequel.function(:a, :b, 2), 'a(b, 2)')
   end
 end
+
+describe "Sequel::SQL::Function#==" do
+  specify "should be true for functions with the same name and arguments, false otherwise" do
+    a = :date.sql_function(:t)
+    b = :date.sql_function(:t)
+    a.should == b
+    (a == b).should == true
+    c = :date.sql_function(:c)
+    a.should_not == c
+    (a == c).should == false
+    d = :time.sql_function(:c)
+    a.should_not == d
+    c.should_not == d
+    (a == d).should == false
+    (c == d).should == false
+  end
+end
+
+describe "Sequel::SQL::OrderedExpression" do
+  specify "should #desc" do
+    @oe = Sequel.asc(:column)
+    @oe.descending.should == false
+    @oe.desc.descending.should == true
+  end
+
+  specify "should #asc" do
+    @oe = Sequel.desc(:column)
+    @oe.descending.should == true
+    @oe.asc.descending.should == false
+  end
+
+  specify "should #invert" do
+    @oe = Sequel.desc(:column)
+    @oe.invert.descending.should == false
+    @oe.invert.invert.descending.should == true
+  end
+end
+
+describe "Expression" do
+  specify "should consider objects == only if they have the same attributes" do
+    :column.qualify(:table).cast(:type).*(:numeric_column).asc.should == :column.qualify(:table).cast(:type).*(:numeric_column).asc
+    :other_column.qualify(:table).cast(:type).*(:numeric_column).asc.should_not == :column.qualify(:table).cast(:type).*(:numeric_column).asc
+
+    :column.qualify(:table).cast(:type).*(:numeric_column).asc.should eql(:column.qualify(:table).cast(:type).*(:numeric_column).asc)
+    :other_column.qualify(:table).cast(:type).*(:numeric_column).asc.should_not eql(:column.qualify(:table).cast(:type).*(:numeric_column).asc)
+  end
+
+  specify "should use the same hash value for objects that have the same attributes" do
+    :column.qualify(:table).cast(:type).*(:numeric_column).asc.hash.should == :column.qualify(:table).cast(:type).*(:numeric_column).asc.hash
+    :other_column.qualify(:table).cast(:type).*(:numeric_column).asc.hash.should_not == :column.qualify(:table).cast(:type).*(:numeric_column).asc.hash
+
+    h = {}
+    a = :column.qualify(:table).cast(:type).*(:numeric_column).asc
+    b = :column.qualify(:table).cast(:type).*(:numeric_column).asc
+    h[a] = 1
+    h[b] = 2
+    h[a].should == 2
+    h[b].should == 2
+  end
+end
+
+describe "Sequel::SQLTime" do
+  before do
+    @db = Sequel.mock
+  end
+
+  specify ".create should create from hour, minutes, seconds and optional microseconds" do
+    @db.literal(Sequel::SQLTime.create(1, 2, 3)).should == "'01:02:03.000000'"
+    @db.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).should == "'01:02:03.500000'"
+  end
+end
+
+describe "Sequel::SQL::Wrapper" do
+  before do
+    @ds = Sequel.mock.dataset
+  end
+
+  specify "should wrap objects so they can be used by the Sequel DSL" do
+    o = Object.new
+    def o.sql_literal(ds) 'foo' end
+    s = Sequel::SQL::Wrapper.new(o)
+    @ds.literal(s).should == "foo"
+    @ds.literal(s+1).should == "(foo + 1)"
+    @ds.literal(s & true).should == "(foo AND 't')"
+    @ds.literal(s < 1).should == "(foo < 1)"
+    @ds.literal(s.sql_subscript(1)).should == "foo[1]"
+    @ds.literal(s.like('a')).should == "(foo LIKE 'a')"
+    @ds.literal(s.as(:a)).should == "foo AS a"
+    @ds.literal(s.cast(Integer)).should == "CAST(foo AS integer)"
+    @ds.literal(s.desc).should == "foo DESC"
+    @ds.literal(s.sql_string + '1').should == "(foo || '1')"
+  end
+end

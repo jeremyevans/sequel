@@ -943,6 +943,42 @@ end
 
 describe "Dataset#literal" do
   before do
+    @ds = Sequel::Database.new.dataset
+  end
+  
+  specify "should convert qualified symbol notation into dot notation" do
+    @ds.literal(:abc__def).should == 'abc.def'
+  end
+  
+  specify "should convert AS symbol notation into SQL AS notation" do
+    @ds.literal(:xyz___x).should == 'xyz AS x'
+    @ds.literal(:abc__def___x).should == 'abc.def AS x'
+  end
+  
+  specify "should support names with digits" do
+    @ds.literal(:abc2).should == 'abc2'
+    @ds.literal(:xx__yy3).should == 'xx.yy3'
+    @ds.literal(:ab34__temp3_4ax).should == 'ab34.temp3_4ax'
+    @ds.literal(:x1___y2).should == 'x1 AS y2'
+    @ds.literal(:abc2__def3___ggg4).should == 'abc2.def3 AS ggg4'
+  end
+  
+  specify "should support upper case and lower case" do
+    @ds.literal(:ABC).should == 'ABC'
+    @ds.literal(:Zvashtoy__aBcD).should == 'Zvashtoy.aBcD'
+  end
+
+  specify "should support spaces inside column names" do
+    @ds.quote_identifiers = true
+    @ds.literal(:"AB C").should == '"AB C"'
+    @ds.literal(:"Zvas htoy__aB cD").should == '"Zvas htoy"."aB cD"'
+    @ds.literal(:"aB cD___XX XX").should == '"aB cD" AS "XX XX"'
+    @ds.literal(:"Zva shtoy__aB cD___XX XX").should == '"Zva shtoy"."aB cD" AS "XX XX"'
+  end
+end
+
+describe "Dataset#literal" do
+  before do
     @dataset = Sequel::Database.new.from(:test)
   end
   
