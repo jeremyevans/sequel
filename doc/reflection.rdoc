@@ -24,7 +24,7 @@ Database#tables gives an array of table name symbols:
 
 Database#views and gives an array of view name symbols:
 
-  DB.tables # [:table1, :table2, :table3, ...]
+  DB.views # [:view1, :view2, :view3, ...]
 
 == Indexes on a table
 
