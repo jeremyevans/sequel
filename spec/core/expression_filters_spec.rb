@@ -980,6 +980,10 @@ describe "Sequel core extension replacements" do
     l(Sequel.function(:a, 1), 'a(1)')
     l(Sequel.function(:a, :b, 2), 'a(b, 2)')
   end
+
+  it "Sequel.extract should use a date/time extraction" do
+    l(Sequel.extract(:year, :a), 'extract(year FROM a)')
+  end
 end
 
 describe "Sequel::SQL::Function#==" do

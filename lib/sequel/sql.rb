@@ -412,6 +412,14 @@ module Sequel
         end
       end
 
+      # Extract a datetime_part (e.g. year, month) from the given
+      # expression:
+      #
+      #   Sequel.extract(:year, :date) # extract(year FROM "date")
+      def extract(datetime_part, exp)
+        SQL::NumericExpression.new(:extract, datetime_part, exp)
+      end
+
       # Returns a <tt>Sequel::SQL::Function</tt> with the function name
       # and the given arguments.
       #
@@ -612,10 +620,6 @@ module Sequel
       #
       # Also has the benefit of returning the result as a
       # NumericExpression instead of a generic ComplexExpression.
-      #
-      # The extract function is in the SQL standard, but it doesn't
-      # doesn't use the standard function calling convention, and it
-      # doesn't work on all databases.
       def extract(datetime_part)
         NumericExpression.new(:extract, datetime_part, self)
       end
