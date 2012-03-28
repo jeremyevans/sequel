@@ -11,7 +11,7 @@
 #
 # Usage:
 #
-#   ds = DB[;items].nullify.where(:a=>:b).select(:c)
+#   ds = DB[:items].nullify.where(:a=>:b).select(:c)
 #   ds.sql # => "SELECT c FROM items WHERE (a = b)"
 #   ds.all # => [] # no query sent to the database
 #
