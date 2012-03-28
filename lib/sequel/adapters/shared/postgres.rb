@@ -759,6 +759,7 @@ module Sequel
       BOOL_TRUE = 'true'.freeze
       COMMA_SEPARATOR = ', '.freeze
       DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'delete from using where')
+      DELETE_CLAUSE_METHODS_82 = Dataset.clause_methods(:delete, %w'delete from using where returning')
       DELETE_CLAUSE_METHODS_91 = Dataset.clause_methods(:delete, %w'with delete from using where returning')
       EXCLUSIVE = 'EXCLUSIVE'.freeze
       EXPLAIN = 'EXPLAIN '.freeze
@@ -780,6 +781,7 @@ module Sequel
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
       SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'update table set from where')
+      UPDATE_CLAUSE_METHODS_82 = Dataset.clause_methods(:update, %w'update table set from where returning')
       UPDATE_CLAUSE_METHODS_91 = Dataset.clause_methods(:update, %w'with update table set from where returning')
       SPACE = Dataset::SPACE
       FROM = Dataset::FROM
@@ -987,7 +989,13 @@ module Sequel
 
       # PostgreSQL allows deleting from joined datasets
       def delete_clause_methods
-        server_version >= 90100 ? DELETE_CLAUSE_METHODS_91 : DELETE_CLAUSE_METHODS
+        if (sv = server_version) >= 90100
+          DELETE_CLAUSE_METHODS_91
+        elsif sv >= 80200
+          DELETE_CLAUSE_METHODS_82
+        else
+          DELETE_CLAUSE_METHODS
+        end
       end
 
       # Only include the primary table in the main delete clause
@@ -1118,7 +1126,13 @@ module Sequel
 
       # PostgreSQL splits the main table from the joined tables
       def update_clause_methods
-        server_version >= 90100 ? UPDATE_CLAUSE_METHODS_91 : UPDATE_CLAUSE_METHODS
+        if (sv = server_version) >= 90100
+          UPDATE_CLAUSE_METHODS_91
+        elsif sv >= 80200
+          UPDATE_CLAUSE_METHODS_82
+        else
+          UPDATE_CLAUSE_METHODS
+        end
       end
 
       # Use FROM to specify additional tables in an update query

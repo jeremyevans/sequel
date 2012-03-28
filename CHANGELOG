@@ -1,5 +1,7 @@
 === HEAD
 
+* Actually use RETURNING for deletes/updates on PostgreSQL 8.2-9.0 (jeremyevans)
+
 * You can now require 'sequel/no_core_ext' to load Sequel without the core extensions (jeremyevans)
 
 * The core extensions have now been made a real Sequel extension (still loaded by default) (jeremyevans)
