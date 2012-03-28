@@ -45,7 +45,16 @@
 
 <h3><a href="rdoc/files/CHANGELOG.html">Change Log</a></h3>
 
-<h3><a href="rdoc/files/doc/release_notes/">Release Notes</a></h3>
+<h3>Release Notes</h3>
+<ul>
+  <% %w'3 2 1'.each do |i| %>
+    <li>
+      <% Dir["../doc/release_notes/#{i}.*.txt"].map{|f| File.basename(f)}.sort_by{|f| f.split('.').map{|x| x.to_i}}.reverse.each do |f| %>
+        <a href="rdoc/files/doc/release_notes/<%= f.gsub('.', '_') %>.html"><%= f.sub(/\.txt$/, '').sub(/(..)\.0$/, '\\1') %></a> |
+      <% end %>
+    </li>
+  <% end %>
+</ul>
 
 <h3><a href="rdoc/files/MIT-LICENSE.html">License</a></h3>
 
