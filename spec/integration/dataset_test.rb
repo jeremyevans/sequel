@@ -23,6 +23,16 @@ describe "Simple Dataset operations" do
       {:id => 3, :number=>30} ]   
   end 
 
+  specify "should support sequential primary keys with a Bignum" do
+    @db.create_table!(:items) do
+      primary_key :id, :type=>Bignum
+      Integer :number
+    end
+    @ds << {:number=>20}
+    @ds << {:number=>30}
+    @ds.order(:number).all.should == [{:id => 1, :number=>20}, {:id => 2, :number=>30}]   
+  end 
+
   cspecify "should insert with a primary key specified", :db2, :mssql do
     @ds.insert(:id=>100, :number=>20)
     @ds.count.should == 2

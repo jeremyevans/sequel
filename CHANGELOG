@@ -1,5 +1,7 @@
 === HEAD
 
+* primary_key :column, :type=>Bignum now works correctly on H2 (jeremyevans)
+
 * Add query_literals extension for treating regular strings like literal strings in select, group, and order methods (jeremyevans)
 
 * Actually use RETURNING for deletes/updates on PostgreSQL 8.2-9.0 (jeremyevans)
@@ -38,7 +40,7 @@
 
 * Add many_to_one_pk_lookup plugin, for using a simple primary key lookup for many_to_one associations (great with caching) (jeremyevans)
 
-* Use bigint type instead of integer for Bignum generic type on SQLite (jeremyevans)
+* Use bigint type instead of integer for Bignum generic type on SQLite, except for auto incrementing primary keys (jeremyevans)
 
 * Add Database#dump_foreign_key_migration for just dumping foreign key constraints to the schema dumper extension (jeremyevans)
 

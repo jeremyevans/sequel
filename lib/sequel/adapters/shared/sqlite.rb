@@ -410,6 +410,13 @@ module Sequel
         m = output_identifier_meth
         metadata_dataset.from(:sqlite_master).server(opts[:server]).filter(filter).map{|r| m.call(r[:name])}
       end
+
+      # SQLite only supports AUTOINCREMENT on integer columns, not
+      # bigint columns, so use integer instead of bigint for those
+      # columns.
+      def type_literal_generic_bignum(column)
+        column[:auto_increment] ? :integer : super
+      end
     end
     
     # Instance methods for datasets that connect to an SQLite database

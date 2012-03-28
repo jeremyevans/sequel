@@ -25,7 +25,7 @@ module Sequel
 
         # H2 uses an IDENTITY type
         def serial_primary_key_options
-          {:primary_key => true, :type => :identity}
+          {:primary_key => true, :type => :identity, :identity=>true}
         end
 
         # H2 supports CREATE TABLE IF NOT EXISTS syntax.
@@ -113,6 +113,12 @@ module Sequel
         # Treat clob as string instead of blob
         def schema_column_type(db_type)
           db_type == 'clob' ? :string : super
+        end
+
+        # Use BIGINT IDENTITY for identity columns that use bigint, fixes
+        # the case where primary_key :column, :type=>Bignum is used.
+        def type_literal_generic_bignum(column)
+          column[:identity] ? 'BIGINT IDENTITY' : super
         end
       end
       
