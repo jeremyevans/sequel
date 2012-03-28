@@ -1,5 +1,7 @@
 === HEAD
 
+* Add query_literals extension for treating regular strings like literal strings in select, group, and order methods (jeremyevans)
+
 * Actually use RETURNING for deletes/updates on PostgreSQL 8.2-9.0 (jeremyevans)
 
 * You can now require 'sequel/no_core_ext' to load Sequel without the core extensions (jeremyevans)

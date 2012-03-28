@@ -92,6 +92,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pagination_rb.html">pagination</a>: Adds Dataset#paginate for easier pagination of datasets.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pretty_table_rb.html">pretty_table</a>: Adds Dataset#print for printing a dataset as a simple plain-text table.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/query_rb.html">query</a>: Adds Dataset#query for a different interface to creating queries that doesn't use method chaining.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/query_literals_rb.html">query_literals</a>: Automatically uses literal strings for regular strings in select, group, and order methods (similar to filter methods).</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_rb.html">pg_array</a>: Add support for string and numeric PostgreSQL arrays.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_ops_rb.html">pg_array_ops</a>: Adds DSL support for calling PostgreSQL array operators and functions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_auto_parameterize_rb.html">pg_auto_parameterize</a>: Automatically parameterize queries when using the postgres adapter with the pg driver.</li>
