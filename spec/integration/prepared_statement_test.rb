@@ -281,7 +281,7 @@ describe "Bound Argument Types" do
     @ds.literal(@ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>fract_time)[:dt]).should == @ds.literal(fract_time)
   end
 
-  cspecify "should handle time type", [:do], [:jdbc, :sqlite], [:oracle] do
+  cspecify "should handle time type", [:do], [:jdbc, :sqlite], [:swift], [:oracle] do
     @ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
   end
 
@@ -354,7 +354,7 @@ describe "Dataset#unbind" do
     @u[@ds.filter{c > 0}].should == {:c=>BigDecimal.new('1.1')}
   end
 
-  cspecify "should handle dates and times", [:do], [:jdbc, :mssql], [:jdbc, :sqlite], [:tinytds], :oracle do
+  cspecify "should handle dates and times", [:do], [:jdbc, :mssql], [:jdbc, :sqlite], [:swift], [:tinytds], :oracle do
     @ct[Date, Date.today]
     @u[@ds.filter(:c=>Date.today)].should == {:c=>Date.today}
     t = Time.now

@@ -256,7 +256,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @db.convert_infinite_timestamps = false if @db.adapter_scheme == :postgres
   end
 
-  cspecify "should store milliseconds in time fields for Time objects", :do do
+  cspecify "should store milliseconds in time fields for Time objects", :do, :swift do
     t = Time.now
     @d << {:value=>1, :time=>t}
     t2 = @d[:value =>1][:time]
@@ -265,7 +265,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000 == t.usec
   end
 
-  cspecify "should store milliseconds in time fields for DateTime objects", :do do
+  cspecify "should store milliseconds in time fields for DateTime objects", :do, :swift do
     t = DateTime.now
     @d << {:value=>1, :time=>t}
     t2 = @d[:value =>1][:time]
@@ -1467,10 +1467,12 @@ describe 'PostgreSQL array handling' do
     @ds.get(:i.pg_array.length).should == 3
     @ds.get(:i.pg_array.lower).should == 1
 
-    @ds.get(:i5.pg_array.join).should == '15'
-    @ds.get(:i5.pg_array.join(':')).should == '1:5'
-    @ds.get(:i5.pg_array.join(':', '*')).should == '1:*:5'
-    @ds.select(:i.pg_array.unnest).from_self.count.should == 3
+    if @db.server_version >= 90000
+      @ds.get(:i5.pg_array.join).should == '15'
+      @ds.get(:i5.pg_array.join(':')).should == '1:5'
+      @ds.get(:i5.pg_array.join(':', '*')).should == '1:*:5'
+    end
+    @ds.select(:i.pg_array.unnest).from_self.count.should == 3 if @db.server_version >= 80400
 
     if @native
       @ds.get(:i.pg_array.push(4)).should == [1, 2, 3, 4]
