@@ -295,21 +295,6 @@ module Sequel
         end
       end
 
-      module_eval(if RUBY_VERSION < '1.8.7'
-        <<-END
-          def def_model_dataset_method_block(arg)
-            meta_def(arg){|*args| dataset.send(arg, *args)}
-          end
-        END
-      else
-        <<-END
-          def def_model_dataset_method_block(arg)
-            meta_def(arg){|*args, &block| dataset.send(arg, *args, &block)}
-          end
-        END
-      end, __FILE__, __LINE__ - 4)
-      private :def_model_dataset_method_block
-
       # Finds a single record according to the supplied filter.
       # You are encouraged to use Model.[] or Model.first instead of this method.
       #
@@ -685,6 +670,13 @@ module Sequel
         end
       end
   
+      # Define a model method that calls the dataset method with the same name,
+      # only used for methods with names that can't be presented directly in
+      # ruby code.
+      def def_model_dataset_method_block(arg)
+        meta_def(arg){|*args, &block| dataset.send(arg, *args, &block)}
+      end
+
       # Get the schema from the database, fall back on checking the columns
       # via the database if that will return inaccurate results or if
       # it raises an error.

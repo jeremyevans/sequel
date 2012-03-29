@@ -693,12 +693,10 @@ describe "Sequel::Model Simple Associations" do
     @album.artist(proc{|ds| ds.exclude(:id=>@artist.id)}).should == nil
     @album.artist(proc{|ds| ds.filter(:id=>@artist.id)}).should == @artist
 
-    if RUBY_VERSION >= '1.8.7'
-      @artist.albums{|ds| ds.exclude(:id=>@album.id)}.should == []
-      @artist.albums{|ds| ds.filter(:id=>@album.id)}.should == [@album]
-      @album.artist{|ds| ds.exclude(:id=>@artist.id)}.should == nil
-      @album.artist{|ds| ds.filter(:id=>@artist.id)}.should == @artist
-    end
+    @artist.albums{|ds| ds.exclude(:id=>@album.id)}.should == []
+    @artist.albums{|ds| ds.filter(:id=>@album.id)}.should == [@album]
+    @album.artist{|ds| ds.exclude(:id=>@artist.id)}.should == nil
+    @album.artist{|ds| ds.filter(:id=>@artist.id)}.should == @artist
   end
   
   specify "should handle dynamic callbacks for eager loading via eager and eager_graph" do

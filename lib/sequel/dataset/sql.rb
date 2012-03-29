@@ -279,7 +279,6 @@ module Sequel
     UPDATE_CLAUSE_METHODS = clause_methods(:update, %w'update table set where')
     USING = ' USING ('.freeze
     VALUES = " VALUES ".freeze
-    V187 = '1.8.7'.freeze
     V190 = '1.9.0'.freeze
     WHERE = " WHERE ".freeze
 
@@ -558,15 +557,11 @@ module Sequel
       sql << PAREN_OPEN if pls.parens
       if args.is_a?(Hash)
         re = /:(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join('|')})\b/
-        if RUBY_VERSION >= V187
-          loop do
-            previous, q, str = str.partition(re)
-            sql << previous
-            literal_append(sql, args[($1||q[1..-1].to_s).to_sym]) unless q.empty?
-            break if str.empty?
-          end
-        else
-          sql << str.gsub(re){literal(args[$1.to_sym])}
+        loop do
+          previous, q, str = str.partition(re)
+          sql << previous
+          literal_append(sql, args[($1||q[1..-1].to_s).to_sym]) unless q.empty?
+          break if str.empty?
         end
       elsif str.is_a?(Array)
         len = args.length
@@ -576,15 +571,11 @@ module Sequel
         end
       else
         i = -1
-        if RUBY_VERSION >= V187
-          loop do
-            previous, q, str = str.partition(QUESTION_MARK)
-            sql << previous
-            literal_append(sql, args.at(i+=1)) unless q.empty?
-            break if str.empty?
-          end
-        else
-          sql << str.gsub(QUESTION_MARK_RE){literal(args.at(i+=1))}
+        loop do
+          previous, q, str = str.partition(QUESTION_MARK)
+          sql << previous
+           literal_append(sql, args.at(i+=1)) unless q.empty?
+          break if str.empty?
         end
       end
       sql << PAREN_CLOSE if pls.parens

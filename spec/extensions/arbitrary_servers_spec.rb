@@ -1,6 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-if RUBY_VERSION >= '1.8.7'
 describe "arbtirary servers" do
   before do
     @db = Sequel.mock(:servers=>{})
@@ -108,7 +107,4 @@ describe "arbtirary servers" do
     @db.sqls.should == ['SELECT * FROM t', 'SELECT * FROM t -- {:host=>"a"}', 'SELECT * FROM t', 'SELECT * FROM t -- {:host=>"c"}', 'SELECT * FROM t -- {:host=>"d"}',
       'SELECT * FROM t -- {:host=>"b"}', 'SELECT * FROM t -- {:host=>"a"}', 'SELECT * FROM t', 'SELECT * FROM t -- {:host=>"c"}', 'SELECT * FROM t']
   end
-end
-else
-  skip_warn "arbitrary_servers plugin: only works on ruby 1.8.7+"
 end

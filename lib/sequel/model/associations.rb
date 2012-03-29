@@ -1047,20 +1047,9 @@ module Sequel
           def_association_method(opts)
         end
 
-        # Adds the association method to the association methods module. Be backwards
-        # compatible with ruby 1.8.6, which doesn't support blocks taking block arguments.
-        if RUBY_VERSION >= '1.8.7'
-          class_eval <<-END, __FILE__, __LINE__+1
-            def def_association_method(opts)
-              association_module_def(opts.association_method, opts){|*dynamic_opts, &block| load_associated_objects(opts, dynamic_opts[0], &block)}
-            end
-          END
-        else
-          class_eval <<-END, __FILE__, __LINE__+1
-            def def_association_method(opts)
-              association_module_def(opts.association_method, opts){|*dynamic_opts| load_associated_objects(opts, dynamic_opts[0])}
-            end
-          END
+        # Adds the association method to the association methods module.
+        def def_association_method(opts)
+          association_module_def(opts.association_method, opts){|*dynamic_opts, &block| load_associated_objects(opts, dynamic_opts[0], &block)}
         end
       
         # Configures many_to_many association reflection and adds the related association methods
