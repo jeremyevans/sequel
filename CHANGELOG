@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.34.0 (2012-04-02)
 
 * Fix connection failures when connecting to PostgreSQL with newer versions of swift (jeremyevans)
 
