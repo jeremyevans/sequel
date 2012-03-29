@@ -7,32 +7,6 @@ module Sequel
     # Adapter, Database, and Dataset support for accessing a PostgreSQL
     # database via JDBC.
     module Postgres
-      # Methods to add to the JDBC adapter/connection to allow it to work
-      # with the shared PostgreSQL code.
-      module AdapterMethods
-        include Sequel::Postgres::AdapterMethods
-        
-        # Give the JDBC adapter a direct execute method, which creates
-        # a statement with the given sql and executes it.
-        def execute(sql, args=nil)
-          method = block_given? ? :executeQuery : :execute
-          @db.send(:statement, self) do |stmt|
-            rows = @db.log_yield(sql){stmt.send(method, sql)}
-            yield(rows) if block_given?
-          end
-        end
-        
-        private
-        
-        # JDBC specific method of getting specific values from a result set.
-        def single_value(r)
-          unless r.nil?
-            r.next
-            r.getString(1) unless r.getRow == 0
-          end
-        end
-      end
-    
       # Methods to add to Database instances that access PostgreSQL via
       # JDBC.
       module DatabaseMethods
@@ -55,18 +29,13 @@ module Sequel
           arg.nil? ? cps.setNull(i, JavaSQL::Types::NULL) : super
         end
 
-        # Extend the adapter with the JDBC PostgreSQL AdapterMethods
+        # Execute the connection configuration SQL queries on the connection.
         def setup_connection(conn)
           conn = super(conn)
-          conn.extend(Sequel::JDBC::Postgres::AdapterMethods)
-          conn.db = self
-          conn.apply_connection_settings
+          statement(conn) do |stmt|
+            connection_configuration_sqls.each{|sql| log_yield(sql){stmt.execute(sql)}}
+          end
           conn
-        end
-        
-        # Call insert_result with the table and values specified in the opts.
-        def last_insert_id(conn, opts)
-          insert_result(conn, opts[:table], opts[:values])
         end
       end
       

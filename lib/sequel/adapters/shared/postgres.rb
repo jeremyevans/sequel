@@ -1,6 +1,4 @@
 module Sequel
-  Dataset::NON_SQL_OPTIONS << :disable_insert_returning
-
   # Top level module for holding all PostgreSQL-related modules and classes
   # for Sequel.  There are a few module level accessors that are added via
   # metaprogramming.  These are:
@@ -45,25 +43,32 @@ module Sequel
       attr_accessor :client_min_messages
 
       # By default, Sequel forces the use of standard strings, so that
-      # '\\' is interpreted as \\ and not \.  While PostgreSQL defaults
-      # to interpreting plain strings as extended strings, this will change
-      # in a future version of PostgreSQL.  Sequel assumes that SQL standard
-      # strings will be used.
+      # '\\' is interpreted as \\ and not \.  While PostgreSQL <9.1 defaults
+      # to interpreting plain strings, newer versions use standard strings by
+      # default.  Sequel assumes that SQL standard strings will be used.  Setting
+      # this to false means Sequel will use the database's default.
       attr_accessor :force_standard_strings
     end
 
-    # Methods shared by adapter/connection instances.
-    module AdapterMethods
-      attr_writer :db
+    # Methods shared by Database instances that connect to PostgreSQL.
+    module DatabaseMethods
+      EXCLUDE_SCHEMAS = /pg_*|information_schema/i
+      PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
+      RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
+      SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
+      FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'.freeze=>:no_action, 'r'.freeze=>:restrict, 'c'.freeze=>:cascade, 'n'.freeze=>:set_null, 'd'.freeze=>:set_default}.freeze
 
-      SELECT_CURRVAL = "SELECT currval('%s')".freeze
+      # SQL fragment for custom sequences (ones not created by serial primary key),
+      # Returning the schema and literal form of the sequence name, by parsing
+      # the column defaults table.
       SELECT_CUSTOM_SEQUENCE_SQL = (<<-end_sql
-        SELECT '"' || name.nspname || '".' || CASE
+        SELECT name.nspname AS "schema",
+            CASE
             WHEN split_part(def.adsrc, '''', 2) ~ '.' THEN
               substr(split_part(def.adsrc, '''', 2),
                      strpos(split_part(def.adsrc, '''', 2), '.')+1)
             ELSE split_part(def.adsrc, '''', 2)
-          END
+          END AS "sequence"
         FROM pg_class t
         JOIN pg_namespace  name ON (t.relnamespace = name.oid)
         JOIN pg_attribute  attr ON (t.oid = attrelid)
@@ -74,8 +79,10 @@ module Sequel
       end_sql
       ).strip.gsub(/\s+/, ' ').freeze
 
+      # SQL fragment for determining primary key column for the given table.  Only
+      # returns the first primary key if the table has a composite primary key.
       SELECT_PK_SQL = (<<-end_sql
-        SELECT pg_attribute.attname
+        SELECT pg_attribute.attname AS pk
         FROM pg_class, pg_attribute, pg_index, pg_namespace
         WHERE pg_class.oid = pg_attribute.attrelid
           AND pg_class.relnamespace  = pg_namespace.oid
@@ -85,8 +92,10 @@ module Sequel
       end_sql
       ).strip.gsub(/\s+/, ' ').freeze
 
+      # SQL fragment for getting sequence associated with table's
+      # primary key, assuming it was a serial primary key column.
       SELECT_SERIAL_SEQUENCE_SQL = (<<-end_sql
-        SELECT  '"' || name.nspname || '".' || seq.relname || ''
+        SELECT  name.nspname AS "schema", seq.relname AS "sequence"
         FROM pg_class seq, pg_attribute attr, pg_depend dep,
           pg_namespace name, pg_constraint cons
         WHERE seq.oid = dep.objid
@@ -99,72 +108,6 @@ module Sequel
           AND cons.contype = 'p'
       end_sql
       ).strip.gsub(/\s+/, ' ').freeze
-
-      # Depth of the current transaction on this connection, used
-      # to implement multi-level transactions with savepoints.
-      attr_accessor :transaction_depth
-
-      # Apply connection settings for this connection. Currently, turns
-      # standard_conforming_strings ON if Postgres.force_standard_strings
-      # is true.
-      def apply_connection_settings
-        if Postgres.force_standard_strings
-          # This setting will only work on PostgreSQL 8.2 or greater
-          # and we don't know the server version at this point, so
-          # try it unconditionally and rescue any errors.
-          execute("SET standard_conforming_strings = ON") rescue nil
-        end
-        if cmm = Postgres.client_min_messages
-          execute("SET client_min_messages = '#{cmm.to_s.upcase}'")
-        end
-      end
-
-      # Get the last inserted value for the given sequence.
-      def last_insert_id(sequence)
-        sql = SELECT_CURRVAL % sequence
-        execute(sql) do |r|
-          val = single_value(r)
-          return val.to_i if val
-        end
-      end
-
-      # Get the primary key for the given table and schema.  Both
-      # should be provided as literal SQL strings, with schema
-      # optionally nil.
-      def primary_key(schema, table)
-        sql = "#{SELECT_PK_SQL} AND pg_class.relname = #{table}"
-        sql << "AND pg_namespace.nspname = #{schema}" if schema
-        execute(sql) do |r|
-          return single_value(r)
-        end
-      end
-
-      # Get the primary key and sequence for the given table and schema.
-      # Both should be provided as literal SQL strings, with schema
-      # optionally nil.
-      def sequence(schema, table)
-        sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND seq.relname = #{table}"
-        sql << " AND name.nspname = #{schema}" if schema
-        execute(sql) do |r|
-          seq = single_value(r)
-          return seq if seq
-        end
-
-        sql = "#{SELECT_CUSTOM_SEQUENCE_SQL} AND t.relname = #{table}"
-        sql << " AND name.nspname = #{schema}" if schema
-        execute(sql) do |r|
-          return single_value(r)
-        end
-      end
-    end
-
-    # Methods shared by Database instances that connect to PostgreSQL.
-    module DatabaseMethods
-      EXCLUDE_SCHEMAS = /pg_*|information_schema/i
-      PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
-      RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
-      SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
-      FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'.freeze=>:no_action, 'r'.freeze=>:restrict, 'c'.freeze=>:cascade, 'n'.freeze=>:set_null, 'd'.freeze=>:set_default}.freeze
 
       # Commit an existing prepared transaction with the given transaction
       # identifier string.
@@ -340,12 +283,11 @@ module Sequel
           join(:pg_index___ind, :indrelid=>:oid, im.call(table)=>:relname).
           join(:pg_class___indc, :oid=>:indexrelid).
           join(:pg_attribute___att, :attrelid=>:tab__oid, :attnum=>attnums).
-          filter(:indc__relkind=>'i', :ind__indisprimary=>false, :indexprs=>nil, :indpred=>nil).
+          filter(:indc__relkind=>'i', :ind__indisprimary=>false, :indexprs=>nil, :indpred=>nil, :indisvalid=>true).
           order(:indc__relname, SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}, 32, :att__attnum)).
           select(:indc__relname___name, :ind__indisunique___unique, :att__attname___column)
 
         ds.join!(:pg_namespace___nsp, :oid=>:tab__relnamespace, :nspname=>schema.to_s) if schema
-        ds.filter!(:indisvalid=>true) if server_version >= 80200
         ds.filter!(:indisready=>true, :indcheckxmin=>false) if server_version >= 80300
 
         indexes = {}
@@ -374,30 +316,39 @@ module Sequel
       # Return primary key for the given table.
       def primary_key(table, opts={})
         quoted_table = quote_schema_table(table)
-        return @primary_keys[quoted_table] if @primary_keys.include?(quoted_table)
-        @primary_keys[quoted_table] = if conn = opts[:conn]
-          conn.primary_key(*schema_and_table_quoted_strings(table))
-        else
-          synchronize(opts[:server]){|con| con.primary_key(*schema_and_table_quoted_strings(table))}
+        @primary_keys.fetch(quoted_table) do
+          schema, table = schema_and_table(table)
+          sql = "#{SELECT_PK_SQL} AND pg_class.relname = #{literal(table)}"
+          sql << "AND pg_namespace.nspname = #{literal(schema)}" if schema
+          @primary_keys[quoted_table] = fetch(sql).single_value
         end
       end
 
       # Return the sequence providing the default for the primary key for the given table.
       def primary_key_sequence(table, opts={})
         quoted_table = quote_schema_table(table)
-        return @primary_key_sequences[quoted_table] if @primary_key_sequences.include?(quoted_table)
-        @primary_key_sequences[quoted_table] = if conn = opts[:conn]
-          conn.sequence(*schema_and_table_quoted_strings(table))
-        else
-          synchronize(opts[:server]){|con| con.sequence(*schema_and_table_quoted_strings(table))}
+        @primary_key_sequences.fetch(quoted_table) do
+          schema, table = schema_and_table(table)
+          table = literal(table)
+          sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND seq.relname = #{table}"
+          sql << " AND name.nspname = #{literal(schema)}" if schema
+          unless pks = fetch(sql).single_record
+            sql = "#{SELECT_CUSTOM_SEQUENCE_SQL} AND t.relname = #{table}"
+            sql << " AND name.nspname = #{literal(schema)}" if schema
+            pks = fetch(sql).single_record
+          end
+
+          @primary_key_sequences[quoted_table] = if pks
+            literal(SQL::QualifiedIdentifier.new(pks[:schema], LiteralString.new(pks[:sequence])))
+          end
         end
       end
 
       # Reset the primary key sequence for the given table, baseing it on the
       # maximum current value of the table's primary key.
       def reset_primary_key_sequence(table)
-        pk = SQL::Identifier.new(primary_key(table))
         return unless seq = primary_key_sequence(table)
+        pk = SQL::Identifier.new(primary_key(table))
         db = self
         seq_ds = db.from(LiteralString.new(seq))
         get{setval(seq, db[table].select{coalesce(max(pk)+seq_ds.select{:increment_by}, seq_ds.select(:min_value))}, false)}
@@ -428,7 +379,7 @@ module Sequel
             0
           end
         end
-        warn 'Sequel support for PostgreSQL <8.2 is deprecated and will be removed in 3.35.0' if @server_version < 80200
+        warn 'Sequel no longer supports PostgreSQL <8.2, some things may not work' if @server_version < 80200
         @server_version
       end
 
@@ -444,9 +395,9 @@ module Sequel
         server_version >= 90100
       end
 
-      # PostgreSQL supports DROP TABLE IF EXISTS on 8.2+
+      # PostgreSQL supports DROP TABLE IF EXISTS
       def supports_drop_table_if_exists?
-        server_version >= 80200
+        true
       end
 
       # PostgreSQL supports savepoints
@@ -496,6 +447,16 @@ module Sequel
         else
           super
         end
+      end
+
+      # The SQL queries to execute when starting a new connection.
+      def connection_configuration_sqls
+        sqls = []
+        sqls << "SET standard_conforming_strings = ON" if Postgres.force_standard_strings
+        if cmm = Postgres.client_min_messages
+          sqls << "SET client_min_messages = '#{cmm.to_s.upcase}'"
+        end
+        sqls
       end
 
       # SQL statement to create database function.
@@ -604,39 +565,6 @@ module Sequel
         "CREATE #{unique}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
       end
 
-      # The result of the insert for the given table and values.  If values
-      # is an array, assume the first column is the primary key and return
-      # that.  If values is a hash, lookup the primary key for the table.  If
-      # the primary key is present in the hash, return its value.  Otherwise,
-      # look up the sequence for the table's primary key.  If one exists,
-      # return the last value the of the sequence for the connection.
-      def insert_result(conn, table, values)
-        case values
-        when Hash
-          return nil unless pk = primary_key(table, :conn=>conn)
-          if pk and pkv = values[pk.to_sym]
-            pkv
-          else
-            begin
-              if seq = primary_key_sequence(table, :conn=>conn)
-                conn.last_insert_id(seq)
-              end
-            rescue Exception => e
-              raise_error(e, :classes=>CONVERTED_EXCEPTIONS) unless RE_CURRVAL_ERROR.match(e.message)
-            end
-          end
-        when Array
-          values.first
-        else
-          nil
-        end
-      end
-
-      # Don't log, since logging is done by the underlying connection.
-      def log_connection_execute(conn, sql)
-        conn.execute(sql)
-      end
-
       # Backbone of the tables and views support.
       def pg_class_relname(type, opts)
         ds = metadata_dataset.from(:pg_class).filter(:relkind=>type).select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace)
@@ -664,13 +592,6 @@ module Sequel
       # a rename table operation, so speciying a new schema in new_name will not have an effect.
       def rename_table_sql(name, new_name)
         "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_identifier(schema_and_table(new_name).last)}"
-      end
-
-      # Split the table into a schema and table, and return the values as quoted strings for usage
-      # in querying the system tables.
-      def schema_and_table_quoted_strings(table)
-        schema, table = schema_and_table(table)
-        [(literal(schema) if schema), literal(table)]
       end
 
       # PostgreSQL's autoincrementing primary keys are of type integer or bigint
@@ -758,15 +679,13 @@ module Sequel
       BOOL_FALSE = 'false'.freeze
       BOOL_TRUE = 'true'.freeze
       COMMA_SEPARATOR = ', '.freeze
-      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'delete from using where')
-      DELETE_CLAUSE_METHODS_82 = Dataset.clause_methods(:delete, %w'delete from using where returning')
+      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'delete from using where returning')
       DELETE_CLAUSE_METHODS_91 = Dataset.clause_methods(:delete, %w'with delete from using where returning')
       EXCLUSIVE = 'EXCLUSIVE'.freeze
       EXPLAIN = 'EXPLAIN '.freeze
       EXPLAIN_ANALYZE = 'EXPLAIN ANALYZE '.freeze
       FOR_SHARE = ' FOR SHARE'.freeze
-      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'insert into columns values')
-      INSERT_CLAUSE_METHODS_82 = Dataset.clause_methods(:insert, %w'insert into columns values returning')
+      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'insert into columns values returning')
       INSERT_CLAUSE_METHODS_91 = Dataset.clause_methods(:insert, %w'with insert into columns values returning')
       LOCK = 'LOCK TABLE %s IN %s MODE'.freeze
       NULL = LiteralString.new('NULL').freeze
@@ -780,8 +699,7 @@ module Sequel
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
       SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
-      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'update table set from where')
-      UPDATE_CLAUSE_METHODS_82 = Dataset.clause_methods(:update, %w'update table set from where returning')
+      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'update table set from where returning')
       UPDATE_CLAUSE_METHODS_91 = Dataset.clause_methods(:update, %w'with update table set from where returning')
       SPACE = Dataset::SPACE
       FROM = Dataset::FROM
@@ -802,7 +720,7 @@ module Sequel
       module PreparedStatementMethods
         # Override insert action to use RETURNING if the server supports it.
         def run
-          if @prepared_type == :insert && supports_insert_select?
+          if @prepared_type == :insert
             fetch_rows(prepared_sql){|r| return r.values.first}
           else
             super
@@ -811,20 +729,10 @@ module Sequel
 
         def prepared_sql
           return @prepared_sql if @prepared_sql
-          @opts[:returning] = insert_pk if @prepared_type == :insert && supports_insert_select?
+          @opts[:returning] = insert_pk if @prepared_type == :insert
           super
           @prepared_sql
         end
-      end
-
-      # Add the disable_insert_returning! mutation method
-      def self.extended(obj)
-        obj.def_mutation_method(:disable_insert_returning)
-      end
-
-      # Add the disable_insert_returning! mutation method
-      def self.included(mod)
-        mod.def_mutation_method(:disable_insert_returning)
       end
 
       # Return the results of an EXPLAIN ANALYZE query as a string
@@ -849,12 +757,6 @@ module Sequel
         end
       end
 
-      # Disable the use of INSERT RETURNING, even if the server supports it
-      def disable_insert_returning
-        warn("disable_insert_returning is deprecated and will be removed in Sequel 3.35.0")
-        clone(:disable_insert_returning=>true)
-      end
-
       # Return the results of an EXPLAIN query as a string
       def explain(opts={})
         with_sql((opts[:analyze] ? EXPLAIN_ANALYZE : EXPLAIN) + select_sql).map(QUERY_PLAN).join(CRLF)
@@ -876,26 +778,23 @@ module Sequel
       # Insert given values into the database.
       def insert(*values)
         if @opts[:returning]
+          # already know which columns to return, let the standard code
+          # handle it
           super
-        elsif !@opts[:sql] && supports_insert_select?
-          returning(insert_pk).insert(*values){|r| return r.values.first}
-        elsif (f = opts[:from]) && !f.empty?
-          v = if values.size == 1
-            values.first
-          elsif values.size == 2 && values.all?{|v0| v0.is_a?(Array)}
-            Hash[*values.first.zip(values.last).flatten]
-          else
-            values
-          end
-          execute_insert(insert_sql(*values), :table=>f.first, :values=>v)
+        elsif @opts[:sql]
+          # raw SQL used, so don't know which table is being inserted
+          # into, and therefore can't determine primary key.  Run the
+          # insert statement and return nil.
+          super
+          nil
         else
-          super
+          # Force the use of RETURNING with the primary key value.
+          returning(insert_pk).insert(*values){|r| return r.values.first}
         end
       end
 
       # Insert a record returning the record inserted
       def insert_select(*values)
-        return unless supports_insert_select?
         returning.insert(*values){|r| return r}
       end
 
@@ -913,11 +812,8 @@ module Sequel
         nil
       end
 
-      # For PostgreSQL version > 8.2, allow inserting multiple rows at once.
+      # PostgreSQL allows inserting multiple rows at once.
       def multi_insert_sql(columns, values)
-        return super if server_version < 80200
-
-        # postgresql 8.2 introduces support for multi-row insert
         sql = LiteralString.new('VALUES ')
         expression_list_append(sql, values.map{|r| Array(r)})
         [insert_sql(columns, sql)]
@@ -939,12 +835,9 @@ module Sequel
         true
       end
 
+      # Returning is always supported.
       def supports_returning?(type)
-        if type == :insert
-          server_version >= 80200 && !opts[:disable_insert_returning]
-        else
-          server_version >= 80200
-        end
+        true
       end
 
       # PostgreSQL supports timezones in literal timestamps
@@ -969,17 +862,13 @@ module Sequel
       # is only set to return a single columns, return an array of just that column.
       # Otherwise, return an array of hashes.
       def _import(columns, values, opts={})
-        if server_version >= 80200
-          if opts[:return] == :primary_key && !@opts[:returning]
-            returning(insert_pk)._import(columns, values, opts)
-          elsif @opts[:returning]
-            statements = multi_insert_sql(columns, values)
-            @db.transaction(opts.merge(:server=>@opts[:server])) do
-              statements.map{|st| returning_fetch_rows(st)}
-            end.first.map{|v| v.length == 1 ? v.values.first : v}
-          else
-            super
-          end
+        if @opts[:returning]
+          statements = multi_insert_sql(columns, values)
+          @db.transaction(opts.merge(:server=>@opts[:server])) do
+            statements.map{|st| returning_fetch_rows(st)}
+          end.first.map{|v| v.length == 1 ? v.values.first : v}
+        elsif opts[:return] == :primary_key
+          returning(insert_pk)._import(columns, values, opts)
         else
           super
         end
@@ -989,10 +878,8 @@ module Sequel
 
       # PostgreSQL allows deleting from joined datasets
       def delete_clause_methods
-        if (sv = server_version) >= 90100
+        if server_version >= 90100
           DELETE_CLAUSE_METHODS_91
-        elsif sv >= 80200
-          DELETE_CLAUSE_METHODS_82
         else
           DELETE_CLAUSE_METHODS
         end
@@ -1013,8 +900,6 @@ module Sequel
       def insert_clause_methods
         if server_version >= 90100
           INSERT_CLAUSE_METHODS_91
-        elsif server_version >= 80200
-          INSERT_CLAUSE_METHODS_82
         else
           INSERT_CLAUSE_METHODS
         end
@@ -1022,8 +907,9 @@ module Sequel
 
       # Return the primary key to use for RETURNING in an INSERT statement
       def insert_pk
-        pk = db.primary_key(opts[:from].first) if opts[:from] && !opts[:from].empty?
-        pk ? Sequel::SQL::Identifier.new(pk) : NULL
+        if (f = opts[:from]) && !f.empty? && (pk = db.primary_key(f.first))
+          Sequel::SQL::Identifier.new(pk)
+        end
       end
 
       # For multiple table support, PostgreSQL requires at least
@@ -1126,10 +1012,8 @@ module Sequel
 
       # PostgreSQL splits the main table from the joined tables
       def update_clause_methods
-        if (sv = server_version) >= 90100
+        if server_version >= 90100
           UPDATE_CLAUSE_METHODS_91
-        elsif sv >= 80200
-          UPDATE_CLAUSE_METHODS_82
         else
           UPDATE_CLAUSE_METHODS
         end

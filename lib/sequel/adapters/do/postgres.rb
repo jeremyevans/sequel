@@ -7,40 +7,6 @@ module Sequel
     # Adapter, Database, and Dataset support for accessing a PostgreSQL
     # database via DataObjects.
     module Postgres
-      # Methods to add to the DataObjects adapter/connection to allow it to work
-      # with the shared PostgreSQL code.
-      module AdapterMethods
-        include Sequel::Postgres::AdapterMethods
-        
-        # Give the DataObjects adapter a direct execute method, which creates
-        # a statement with the given sql and executes it.
-        def execute(sql, args=nil)
-          command = create_command(sql)
-          begin
-            if block_given?
-              begin
-                yield(reader = @db.log_yield(sql){command.execute_reader})
-              ensure
-                reader.close if reader
-              end
-            else
-              @db.log_yield(sql){command.execute_non_query}
-            end
-          rescue ::DataObjects::Error => e
-            @db.send(:raise_error, e)
-          end
-        end
-        
-        private
-        
-        # DataObjects specific method of getting specific values from a result set.
-        def single_value(reader)
-          while(reader.next!) do
-            return reader.values.at(0)
-          end
-        end
-      end
-    
       # Methods to add to Database instances that access PostgreSQL via
       # DataObjects.
       module DatabaseMethods
@@ -55,24 +21,12 @@ module Sequel
           end
         end
         
-        # Run the INSERT sql on the database and return the primary key
-        # for the record.
-        def execute_insert(sql, opts={})
-          synchronize(opts[:server]) do |conn|
-            com = conn.create_command(sql)
-            log_yield(sql){com.execute_non_query}
-            insert_result(conn, opts[:table], opts[:values])
-          end
-        end
-        
         private
         
         # Extend the adapter with the DataObjects PostgreSQL AdapterMethods
         def setup_connection(conn)
           conn = super(conn)
-          conn.extend(Sequel::DataObjects::Postgres::AdapterMethods)
-          conn.db = self
-          conn.apply_connection_settings
+          connection_configuration_sqls.each{|sql| log_yield(sql){conn.create_command(sql).execute_non_query}}
           conn
         end
       end

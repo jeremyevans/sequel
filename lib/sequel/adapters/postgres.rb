@@ -12,7 +12,7 @@ rescue LoadError => e
     class PGconn
       unless method_defined?(:escape_string)
         if self.respond_to?(:escape)
-          # If there is no escape_string instead method, but there is an
+          # If there is no escape_string instance method, but there is an
           # escape class method, use that instead.
           def escape_string(str)
             Sequel::Postgres.force_standard_strings ? str.gsub("'", "''") : self.class.escape(str)
@@ -91,24 +91,29 @@ module Sequel
     NAN             = 0.0/0.0
     PLUS_INFINITY   = 1.0/0.0
     MINUS_INFINITY  = -1.0/0.0
+    NAN_STR             = 'NaN'.freeze
+    PLUS_INFINITY_STR   = 'Infinity'.freeze
+    MINUS_INFINITY_STR  = '-Infinity'.freeze
+    TRUE_STR = 't'.freeze
+    DASH_STR = '-'.freeze
     
     TYPE_TRANSLATOR = tt = Class.new do
-      def boolean(s) s == 't' end
+      def boolean(s) s == TRUE_STR end
       def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
       def integer(s) s.to_i end
       def float(s) 
         case s
-        when 'NaN'
+        when NAN_STR
           NAN
-        when 'Infinity'
+        when PLUS_INFINITY_STR
           PLUS_INFINITY
-        when '-Infinity'
+        when MINUS_INFINITY_STR
           MINUS_INFINITY
         else
           s.to_f 
         end
       end
-      def date(s) ::Date.new(*s.split("-").map{|x| x.to_i}) end
+      def date(s) ::Date.new(*s.split(DASH_STR).map{|x| x.to_i}) end
     end.new
 
     # Hash with type name strings/symbols and callable values for converting PostgreSQL types.
@@ -149,8 +154,6 @@ module Sequel
     class Adapter < ::PGconn
       DISCONNECT_ERROR_RE = /\Acould not receive data from server: Software caused connection abort/
       
-      include Sequel::Postgres::AdapterMethods
-
       self.translate_results = false if respond_to?(:translate_results=)
       
       # Hash of prepared statements for this connection.  Keys are
@@ -158,18 +161,6 @@ module Sequel
       # are SQL strings.
       attr_reader(:prepared_statements) if SEQUEL_POSTGRES_USES_PG
       
-      # Apply connection settings for this connection.  Current sets
-      # the date style to ISO in order make Date object creation in ruby faster,
-      # if Postgres.use_iso_date_format is true.
-      def apply_connection_settings
-        super
-        if Postgres.use_iso_date_format
-          sql = "SET DateStyle = 'ISO'"
-          execute(sql)
-        end
-        @prepared_statements = {} if SEQUEL_POSTGRES_USES_PG
-      end
-
       # Raise a Sequel::DatabaseDisconnectError if a PGError is raised and
       # the connection status cannot be determined or it is not OK.
       def check_disconnect_errors
@@ -210,11 +201,6 @@ module Sequel
       def execute_query(sql, args)
         @db.log_yield(sql, args){args ? async_exec(sql, args) : async_exec(sql)}
       end
-      
-      # Return the requested values for the given row.
-      def single_value(r)
-        r.getvalue(0, 0) unless r.nil? || (r.ntuples == 0)
-      end
     end
     
     # Database class for PostgreSQL databases used with Sequel and the
@@ -223,7 +209,7 @@ module Sequel
       include Sequel::Postgres::DatabaseMethods
 
       INFINITE_TIMESTAMP_STRINGS = ['infinity'.freeze, '-infinity'.freeze].freeze
-      INFINITE_DATETIME_VALUES = ([1.0/0.0, -1.0/0.0] + INFINITE_TIMESTAMP_STRINGS).freeze
+      INFINITE_DATETIME_VALUES = ([PLUS_INFINITY, MINUS_INFINITY] + INFINITE_TIMESTAMP_STRINGS).freeze
       
       set_adapter_scheme :postgres
 
@@ -299,8 +285,9 @@ module Sequel
             conn.async_exec("set client_encoding to '#{encoding}'")
           end
         end
-        conn.db = self
-        conn.apply_connection_settings
+        conn.instance_variable_set(:@db, self)
+        conn.instance_variable_set(:@prepared_statements, {}) if SEQUEL_POSTGRES_USES_PG
+        connection_configuration_sqls.each{|sql| conn.execute(sql)}
         @conversion_procs ||= get_conversion_procs(conn)
         conn
       end
@@ -312,19 +299,7 @@ module Sequel
           synchronize(opts[:server]){|conn| conn.execute(sql, opts[:arguments], &block)}
         end
       end
-      
-      # Insert the values into the table and return the primary key (if
-      # automatically generated).
-      def execute_insert(sql, opts={})
-        return execute(sql, opts) if Symbol === sql
-        check_database_errors do
-          synchronize(opts[:server]) do |conn|
-            conn.execute(sql, opts[:arguments])
-            insert_result(conn, opts[:table], opts[:values])
-          end
-        end
-      end
-      
+
       if SEQUEL_POSTGRES_USES_PG
         # +copy_table+ uses PostgreSQL's +COPY+ SQL statement to return formatted
         # results directly to the caller.  This method is only supported if pg is the
@@ -470,6 +445,13 @@ module Sequel
         end
       end
 
+      # Set the DateStyle to ISO if configured, for faster date parsing.
+      def connection_configuration_sqls
+        sqls = super
+        sqls << "SET DateStyle = 'ISO'" if Postgres.use_iso_date_format
+        sqls
+      end
+
       # Disconnect given connection
       def disconnect_connection(conn)
         begin
@@ -511,14 +493,10 @@ module Sequel
           end
 
           q = conn.check_disconnect_errors{log_yield(log_sql, args){conn.exec_prepared(ps_name, args)}}
-          if opts[:table] && opts[:values]
-            insert_result(conn, opts[:table], opts[:values])
-          else
-            begin
-              block_given? ? yield(q) : q.cmd_tuples
-            ensure
-              q.clear
-            end
+          begin
+            block_given? ? yield(q) : q.cmd_tuples
+          ensure
+            q.clear
           end
         end
       end
@@ -549,6 +527,10 @@ module Sequel
         end
       end
       
+      # Don't log, since logging is done by the underlying connection.
+      def log_connection_execute(conn, sql)
+        conn.execute(sql)
+      end
 
       # If the value is an infinite value (either an infinite float or a string returned by
       # by PostgreSQL for an infinite timestamp), return it without converting it if
@@ -573,6 +555,7 @@ module Sequel
       include Sequel::Postgres::DatasetMethods
 
       Database::DatasetClass = self
+      APOS = Sequel::Dataset::APOS
       
       # Yield all rows returned by executing the given SQL and converting
       # the types.
@@ -766,12 +749,12 @@ module Sequel
       
       # Use the driver's escape_bytea
       def literal_blob_append(sql, v)
-        sql << "'" << db.synchronize{|c| c.escape_bytea(v)} << "'"
+        sql << APOS << db.synchronize{|c| c.escape_bytea(v)} << APOS
       end
       
       # Use the driver's escape_string
       def literal_string_append(sql, v)
-        sql << "'" << db.synchronize{|c| c.escape_string(v)} << "'"
+        sql << APOS << db.synchronize{|c| c.escape_string(v)} << APOS
       end
       
       # For each row in the result set, yield a hash with column name symbol

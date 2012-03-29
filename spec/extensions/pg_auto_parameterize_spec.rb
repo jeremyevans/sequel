@@ -44,10 +44,6 @@ describe "pg_auto_parameterize extension" do
 
     @db[:table].insert(:a=>1).should == 1
     @db.sqls.should == ['INSERT INTO table (a) VALUES ($1::int4) RETURNING id -- args: [1]']
-
-    @db.server_version = 80000
-    @db[:table].insert(:a=>1).should == 1
-    @db.sqls.should == ['INSERT INTO table (a) VALUES ($1::int4) -- args: [1]']
   end
 
   it "should not automatically paramiterize if no_auto_parameterize is used" do
