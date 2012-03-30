@@ -81,7 +81,7 @@ describe "MySQL", '#create_table' do
     @db.schema(:dolls).map{|k, v| v[:auto_increment]}.should == [nil, nil, true]
   end
 
-  specify "should support collate with various other column options" do
+  cspecify "should support collate with various other column options", :swift do
     @db.create_table!(:dolls){ String :name, :size=>128, :collate=>:utf8_bin, :default=>'foo', :null=>false, :unique=>true}
     @db[:dolls].insert
     @db[:dolls].select_map(:name).should == ["foo"]
