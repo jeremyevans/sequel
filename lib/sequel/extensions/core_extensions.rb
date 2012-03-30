@@ -21,20 +21,6 @@ class Array
     Sequel.~(self)
   end
 
-  # +true+ if the array is not empty and all of its elements are
-  # arrays of size 2, +false+ otherwise.  This is used to determine if the array
-  # could be a specifier of conditions, used similarly to a hash
-  # but allowing for duplicate keys and a specific order.
-  #
-  #    [].to_a.all_two_pairs? # => false
-  #    [:a].to_a.all_two_pairs? # => false
-  #    [[:b]].to_a.all_two_pairs? # => false
-  #    [[:a, 1]].to_a.all_two_pairs? # => true
-  def all_two_pairs?
-    warn('Array#all_two_pairs? is deprecated and will be removed in Sequel 3.35.0')
-    !empty? && all?{|i| (Array === i) && (i.length == 2)}
-  end
-
   # Return a <tt>Sequel::SQL::CaseExpression</tt> with this array as the conditions and the given
   # default value and expression.
   #
@@ -102,15 +88,6 @@ class Array
   #   ['a', :b].sql_string_join(' ') # SQL: 'a' || ' ' || b
   def sql_string_join(joiner=nil)
     Sequel.join(self, joiner)
-  end
-
-  private
-
-  # Raise an error if this array is not made up all two element arrays, otherwise create a <tt>Sequel::SQL::BooleanExpression</tt> from this array.
-  def sql_expr_if_all_two_pairs(*args)
-    warn('Array#sql_expr_if_all_two_pairs? is deprecated and will be removed in Sequel 3.35.0')
-    raise(Sequel::Error, 'Not all elements of the array are arrays of size 2, so it cannot be converted to an SQL expression') unless all_two_pairs?
-    ::Sequel::SQL::BooleanExpression.from_value_pairs(self, *args)
   end
 end
 

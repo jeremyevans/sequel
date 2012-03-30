@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 describe "Sequel core extensions" do
   specify "should not be used inside Sequel, to insure Sequel works without them" do
     usage = []
-    match_re = /(\.(all_two_pairs\?|sql_value_list|sql_array|sql_expr|sql_negate|sql_or|sql_string_join|lit|to_sequel_blob|case|sql_expr_if_all_two_pairs)\W)|:\w+\.(qualify|identifier|as|cast|asc|desc|sql_subscript|\*|sql_function)\W/
+    match_re = /(\.(sql_value_list|sql_array|sql_expr|sql_negate|sql_or|sql_string_join|lit|to_sequel_blob|case)\W)|:\w+\.(qualify|identifier|as|cast|asc|desc|sql_subscript|\*|sql_function)\W/
     comment_re = /^\s*#|# core_sql/
     Dir['lib/sequel/**/*.rb'].each do |f|
       lines = File.read(f).split("\n").grep(match_re).delete_if{|l| l =~ comment_re}
@@ -18,29 +18,6 @@ describe "Sequel core extensions" do
   end
 end
 
-describe "Array#all_two_pairs?" do
-  specify "should return false if empty" do
-    [].all_two_pairs?.should == false
-  end
-
-  specify "should return false if any of the elements is not an array" do
-    [1].all_two_pairs?.should == false
-    [[1,2],1].all_two_pairs?.should == false
-  end
-
-  specify "should return false if any of the elements has a length other than two" do
-    [[1,2],[]].all_two_pairs?.should == false
-    [[1,2],[1]].all_two_pairs?.should == false
-    [[1,2],[1,2,3]].all_two_pairs?.should == false
-  end
-
-  specify "should return true if all of the elements are arrays with a length of two" do
-    [[1,2]].all_two_pairs?.should == true
-    [[1,2],[1,2]].all_two_pairs?.should == true
-    [[1,2],[1,2],[1,2]].all_two_pairs?.should == true
-  end
-end
-  
 describe "Array#case and Hash#case" do
   before do
     @d = Sequel::Dataset.new(nil)
