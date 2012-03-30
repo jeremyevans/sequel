@@ -35,7 +35,7 @@ module Sequel
     # will be instance_evaled before saving.  The above example could
     # also be implemented as:
     #
-    #   Album.composition, :date,
+    #   Album.composition :date,
     #     :composer=>proc{Date.new(year, month, day) if year || month || day},
     #     :decomposer=>(proc do
     #       if d = compositions[:date]
