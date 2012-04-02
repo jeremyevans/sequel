@@ -616,7 +616,7 @@ module Sequel
       # backslashes.
       def literal_string_append(sql, v)
         sql << (mssql_unicode_strings ? UNICODE_STRING_START : APOS)
-        sql << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
+        sql << v.gsub(APOS_RE, DOUBLE_APOS).sub(/(\x5C)((?:\x0D\x0A)|\x0A)\z/, '\1\1\2\2') << APOS
       end
       
       # Use 0 for false on MSSQL
