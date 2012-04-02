@@ -1,3 +1,13 @@
+=== HEAD
+
+* Remove Array#all_two_pairs? (jeremyevans)
+
+* Remove Dataset#disable_insert_returning on PostgreSQL (jeremyevans)
+
+* Remove support for PostgreSQL <8.2 (jeremyevans)
+
+* Remove support for Ruby <1.8.7 (jeremyevans)
+
 === 3.34.0 (2012-04-02)
 
 * Fix connection failures when connecting to PostgreSQL with newer versions of swift (jeremyevans)
