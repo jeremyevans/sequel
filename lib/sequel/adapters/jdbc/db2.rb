@@ -42,11 +42,6 @@ module Sequel
           PRIMARY_KEY_INDEX_RE
         end
       end
-      
-      # Dataset class for DB2 datasets accessed via JDBC.
-      class Dataset < JDBC::Dataset
-        include Sequel::DB2::DatasetMethods
-      end
     end
   end
 end

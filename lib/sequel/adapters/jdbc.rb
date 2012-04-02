@@ -39,14 +39,14 @@ module Sequel
       :mysql=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/mysql'
         db.extend(Sequel::JDBC::MySQL::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::MySQL::Dataset
+        db.extend_datasets Sequel::MySQL::DatasetMethods
         JDBC.load_gem('mysql')
         com.mysql.jdbc.Driver
       end,
       :sqlite=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/sqlite'
         db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::SQLite::Dataset
+        db.extend_datasets Sequel::SQLite::DatasetMethods
         db.set_integer_booleans
         JDBC.load_gem('sqlite3')
         org.sqlite.JDBC
@@ -60,13 +60,13 @@ module Sequel
       :sqlserver=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/sqlserver'
         db.extend(Sequel::JDBC::SQLServer::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::SQLServer::Dataset
+        db.extend_datasets Sequel::MSSQL::DatasetMethods
         db.send(:set_mssql_unicode_strings)
         com.microsoft.sqlserver.jdbc.SQLServerDriver
       end,
       :jtds=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/jtds'
-        db.extend(Sequel::JDBC::JTDS::DatabaseMethods)
+        db.extend(Sequel::JDBC::MSSQL::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::JTDS::Dataset
         db.send(:set_mssql_unicode_strings)
         JDBC.load_gem('jtds')
@@ -102,19 +102,19 @@ module Sequel
       :"informix-sqli"=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/informix'
         db.extend(Sequel::JDBC::Informix::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::Informix::Dataset
+        db.extend_datasets Sequel::Informix::DatasetMethods
         com.informix.jdbc.IfxDriver
       end,
       :db2=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/db2'
         db.extend(Sequel::JDBC::DB2::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::DB2::Dataset
+        db.extend_datasets Sequel::DB2::DatasetMethods
         com.ibm.db2.jcc.DB2Driver
       end,
       :firebirdsql=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/firebird'
         db.extend(Sequel::JDBC::Firebird::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::Firebird::Dataset
+        db.extend_datasets Sequel::Firebird::DatasetMethods
         org.firebirdsql.jdbc.FBDriver
       end
     }

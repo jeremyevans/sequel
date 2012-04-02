@@ -30,11 +30,6 @@ module Sequel
           conn
         end
       end
-      
-      # Dataset subclass used for datasets that connect to PostgreSQL via DataObjects.
-      class Dataset < DataObjects::Dataset
-        include Sequel::Postgres::DatasetMethods
-      end
     end
   end
 end

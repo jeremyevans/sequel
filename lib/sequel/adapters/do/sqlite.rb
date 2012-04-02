@@ -25,11 +25,6 @@ module Sequel
           super
         end
       end
-      
-      # Dataset class for SQLite datasets accessed via DataObjects.
-      class Dataset < DataObjects::Dataset
-        include Sequel::SQLite::DatasetMethods
-      end
     end
   end
 end

@@ -15,16 +15,16 @@ module Sequel
         when 'mssql'
           Sequel.ts_require 'adapters/odbc/mssql'
           extend Sequel::ODBC::MSSQL::DatabaseMethods
-          @dataset_class = Sequel::ODBC::MSSQL::Dataset
+          extend_datasets Sequel::MSSQL::DatasetMethods
           set_mssql_unicode_strings
         when 'progress'
           Sequel.ts_require 'adapters/shared/progress'
           extend Sequel::Progress::DatabaseMethods
           extend_datasets(Sequel::Progress::DatasetMethods)
         when 'db2'
-          Sequel.ts_require 'adapters/odbc/db2'
-          extend Sequel::ODBC::DB2::DatabaseMethods
-          @dataset_class = Sequel::ODBC::DB2::Dataset
+          Sequel.ts_require 'adapters/shared/db2'
+          extend ::Sequel::DB2::DatabaseMethods
+          extend_datasets ::Sequel::DB2::DatasetMethods
         end
       end
 

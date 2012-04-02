@@ -17,7 +17,7 @@ module Sequel
         Sequel.tsk_require 'do_postgres'
         Sequel.ts_require 'adapters/do/postgres'
         db.extend(Sequel::DataObjects::Postgres::DatabaseMethods)
-        db.dataset_class = Sequel::DataObjects::Postgres::Dataset
+        db.extend_datasets Sequel::Postgres::DatasetMethods
       end,
       :mysql=>proc do |db|
         Sequel.tsk_require 'do_mysql'
@@ -29,7 +29,7 @@ module Sequel
         Sequel.tsk_require 'do_sqlite3'
         Sequel.ts_require 'adapters/do/sqlite'
         db.extend(Sequel::DataObjects::SQLite::DatabaseMethods)
-        db.dataset_class = Sequel::DataObjects::SQLite::Dataset
+        db.extend_datasets Sequel::SQLite::DatasetMethods
         db.set_integer_booleans
       end
     }

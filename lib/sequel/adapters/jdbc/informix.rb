@@ -16,11 +16,6 @@ module Sequel
           nil
         end
       end
-      
-      # Dataset class for Informix datasets accessed via JDBC.
-      class Dataset < JDBC::Dataset
-        include Sequel::Informix::DatasetMethods
-      end
     end
   end
 end

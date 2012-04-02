@@ -28,10 +28,6 @@ module Sequel
           end
         end
       end
-      
-      class Dataset < ODBC::Dataset
-        include Sequel::MSSQL::DatasetMethods
-      end
     end
   end
 end

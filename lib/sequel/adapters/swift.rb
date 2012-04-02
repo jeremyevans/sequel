@@ -15,7 +15,7 @@ module Sequel
     DATABASE_SETUP = {:postgres=>proc do |db|
         Sequel.ts_require 'adapters/swift/postgres'
         db.extend(Sequel::Swift::Postgres::DatabaseMethods)
-        db.dataset_class = Sequel::Swift::Postgres::Dataset
+        db.extend_datasets Sequel::Postgres::DatasetMethods
         db.swift_class = ::Swift::DB::Postgres
       end,
       :mysql=>proc do |db|

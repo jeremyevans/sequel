@@ -39,10 +39,6 @@ module Sequel
           conn
         end
       end
-      
-      class Dataset < Swift::Dataset
-        include Sequel::Postgres::DatasetMethods
-      end
     end
   end
 end

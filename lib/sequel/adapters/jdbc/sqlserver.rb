@@ -61,11 +61,6 @@ module Sequel
           super.extend(MetadataDatasetMethods)
         end
       end
-      
-      # Dataset class for SQLServer datasets accessed via JDBC.
-      class Dataset < JDBC::Dataset
-        include Sequel::MSSQL::DatasetMethods
-      end
     end
   end
 end

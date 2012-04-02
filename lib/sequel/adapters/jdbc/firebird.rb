@@ -19,11 +19,6 @@ module Sequel
           end
         end
       end
-      
-      # Dataset class for Firebird datasets accessed via JDBC.
-      class Dataset < JDBC::Dataset
-        include Sequel::Firebird::DatasetMethods
-      end
     end
   end
 end

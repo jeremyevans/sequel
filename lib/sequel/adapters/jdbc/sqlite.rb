@@ -54,11 +54,6 @@ module Sequel
           conn
         end
       end
-      
-      # Dataset class for SQLite datasets accessed via JDBC.
-      class Dataset < JDBC::Dataset
-        include Sequel::SQLite::DatasetMethods
-      end
     end
   end
 end

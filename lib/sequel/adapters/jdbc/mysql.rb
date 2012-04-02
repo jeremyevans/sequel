@@ -62,11 +62,6 @@ module Sequel
           conn
         end
       end
-      
-      # Dataset class for MySQL datasets accessed via JDBC.
-      class Dataset < JDBC::Dataset
-        include Sequel::MySQL::DatasetMethods
-      end
     end
   end
 end
