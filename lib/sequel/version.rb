@@ -6,7 +6,7 @@ module Sequel
   MINOR = 34
   # The tiny version of Sequel.  Usually 0, only bumped for bugfix
   # releases that fix regressions from previous versions.
-  TINY  = 0
+  TINY  = 1
   
   # The version of Sequel you are using, as a string (e.g. "2.11.0")
   VERSION = [MAJOR, MINOR, TINY].join('.')
