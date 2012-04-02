@@ -782,8 +782,9 @@ module Sequel
       def primary_key_lookup(pk)
         if sql = @fast_pk_lookup_sql
           sql = sql.dup
-          dataset.literal_append(sql, pk)
-          dataset.fetch_rows(sql){|r| return call(r)}
+          ds = dataset
+          ds.literal_append(sql, pk)
+          ds.fetch_rows(sql){|r| return ds.row_proc.call(r)}
           nil
         else
           dataset[primary_key_hash(pk)]

@@ -42,6 +42,11 @@ describe Sequel::Model, "#sti_key" do
     StiTest.all.collect{|x| x.class}.should == [StiTest, StiTestSub1, StiTestSub2]
   end 
 
+  it "should return rows with the correct class based on the polymorphic_key value when retreiving by primary key" do
+    @ds._fetch = [{:kind=>'StiTestSub1'}]
+    StiTest[1].class.should == StiTestSub1
+  end 
+
   it "should return rows with the correct class for subclasses based on the polymorphic_key value" do
     class ::StiTestSub1Sub < StiTestSub1; end 
     StiTestSub1.dataset._fetch = [{:kind=>'StiTestSub1'}, {:kind=>'StiTestSub1Sub'}]
