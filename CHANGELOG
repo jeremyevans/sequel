@@ -1,3 +1,7 @@
+=== 3.34.1 (2012-04-02)
+
+* Fix bug in optimization of primary key lookup (jeremyevans) (#460)
+
 === 3.34.0 (2012-04-02)
 
 * Fix connection failures when connecting to PostgreSQL with newer versions of swift (jeremyevans)
