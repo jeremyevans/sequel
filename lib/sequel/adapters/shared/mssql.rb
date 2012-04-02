@@ -325,6 +325,8 @@ module Sequel
       OUTPUT_INSERTED = " OUTPUT INSERTED.*".freeze
       HEX_START = '0x'.freeze
       UNICODE_STRING_START = "N'".freeze
+      BACKSLASH_CRLF_RE = /\\((?:\r\n)|\n)/.freeze
+      BACKSLASH_CRLF_REPLACE = '\\\\\\\\\\1\\1'.freeze
       TOP_PAREN = " TOP (".freeze
       TOP = " TOP ".freeze
       OUTPUT = " OUTPUT ".freeze
@@ -616,7 +618,7 @@ module Sequel
       # backslashes.
       def literal_string_append(sql, v)
         sql << (mssql_unicode_strings ? UNICODE_STRING_START : APOS)
-        sql << v.gsub(APOS_RE, DOUBLE_APOS).sub(/(\x5C)((?:\x0D\x0A)|\x0A)\z/, '\1\1\2\2') << APOS
+        sql << v.gsub(APOS_RE, DOUBLE_APOS).gsub(BACKSLASH_CRLF_RE, BACKSLASH_CRLF_REPLACE) << APOS
       end
       
       # Use 0 for false on MSSQL

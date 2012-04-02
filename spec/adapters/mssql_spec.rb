@@ -520,51 +520,6 @@ describe "MSSQL::Database#mssql_unicode_strings = false" do
   end
 end
 
-describe "MSSQL::Dataset#literal" do
-  before do
-    @db = MSSQL_DB
-    @db.create_table!(:test_literal){String :name}
-    @ds = MSSQL_DB[:test_literal]
-  end
-  after do
-    @db.drop_table? :test_literal
-  end
-    
-  context "when value ends with backslash + crlf/lf" do
-    specify "should escape" do
-      @ds.literal("\\").should == "N'\\'"
-      @ds.literal("\\\r").should == "N'\\\r'"
-      @ds.literal("\\\r\r").should == "N'\\\r\r'"
-      @ds.literal("\\\n\r").should == "N'\\\n\r'"
-      @ds.literal("\\\r\nX").should == "N'\\\r\nX'"
-      @ds.literal("\\\r\n\n").should == "N'\\\r\n\n'"
-      @ds.literal("\\\r\n\r").should == "N'\\\r\n\r'"
-      
-      @ds.literal("\\\n").should == "N'\\\\\n\n'"
-      @ds.literal("\\\r\n").should == "N'\\\\\r\n\r\n'"
-    end
-    specify "makes roundtrip" do
-      ["\\\n",
-       "\\\\\n",
-       "\\\r\n",
-       "\\\\\r\n"].each do |str|
-        @ds.delete
-        @ds.insert(:name => str)
-        @ds.select_map(:name).should == [str]
-      end
-    end
-    specify "allows values with escape sequence" do
-      pending("need to the fastest way to detect this case")
-      ["\\\\\n\n", 
-       "\\\\\r\n\r\n"].each do |str|
-        @ds.delete
-        @ds.insert(:name => str)
-        @ds.select_map(:name).should == [str]
-      end
-    end
-  end
-end
-
 describe "A MSSQL database adds index with include" do
   before :all do
     @table_name = :test_index_include

@@ -258,8 +258,8 @@ module Sequel
       
       # Properly escape the given string +v+.
       def literal_string_append(sql, v)
-        sql << 'N' if mssql_unicode_strings
-        sql << "'" << db.synchronize{|c| c.escape(v)} << "'"
+        sql << (mssql_unicode_strings ? UNICODE_STRING_START : APOS)
+        sql << db.synchronize{|c| c.escape(v)}.gsub(BACKSLASH_CRLF_RE, BACKSLASH_CRLF_REPLACE) << APOS
       end
     end
   end

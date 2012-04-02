@@ -291,15 +291,31 @@ end
 
 describe Sequel::Database do
   specify "should correctly escape strings" do
-    INTEGRATION_DB.get("\\dingo".as(:a)) == "\\dingo"
+    INTEGRATION_DB.get("\\dingo".as(:a)).should == "\\dingo"
   end
 
   specify "should correctly escape strings with quotes" do
-    INTEGRATION_DB.get("\\'dingo".as(:a)) == "\\'dingo"
+    INTEGRATION_DB.get("\\'dingo".as(:a)).should == "\\'dingo"
+  end
+
+  specify "should correctly escape strings with backslash/carriage return/line feed" do
+    [ "\\\n",
+     "\\\\\n",
+     "\\\r\n",
+     "\\\\\r\n",
+     "\\\\\n\n", 
+     "\\\\\r\n\r\n",
+    ].each do |str|
+      INTEGRATION_DB.get(str.as(:a)).should == str
+      str = "1#{str}1"
+      INTEGRATION_DB.get(str.as(:a)).should == str
+      str = "#{str}#{str}"
+      INTEGRATION_DB.get(str.as(:a)).should == str
+    end
   end
 
   specify "should properly escape binary data" do
-    INTEGRATION_DB.get("\1\2\3".to_sequel_blob.as(:a)) == "\1\2\3"
+    INTEGRATION_DB.get("\1\2\3".to_sequel_blob.as(:a)).should == "\1\2\3"
   end
 
   specify "should have a working table_exists?" do

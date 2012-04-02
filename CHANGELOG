@@ -1,5 +1,7 @@
 === HEAD
 
+* Escape blackslash-carriage return-line feed in strings on Microsoft SQL Server (mluu, jeremyevans) (#462, #461)
+
 * Remove Array#all_two_pairs? (jeremyevans)
 
 * Remove Dataset#disable_insert_returning on PostgreSQL (jeremyevans)
