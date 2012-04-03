@@ -1,5 +1,9 @@
 === HEAD
 
+* Don't use auto parameterization when using cursors in the pg_auto_parameterize extension (jeremyevans) (#463)
+
+* No longer escape backslashes in strings by default, fixes doubled backslashes on some adapters (jeremyevans)
+
 * Escape blackslash-carriage return-line feed in strings on Microsoft SQL Server (mluu, jeremyevans) (#462, #461)
 
 * Remove Array#all_two_pairs? (jeremyevans)

@@ -153,6 +153,10 @@ module Sequel
           end
         end
 
+        def use_cursor(*)
+          super.no_auto_parameterize
+        end
+
         protected
 
         # Disable automatic parameterization for prepared statements,

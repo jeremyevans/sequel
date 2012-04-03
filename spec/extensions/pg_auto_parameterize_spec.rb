@@ -3,8 +3,9 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "pg_auto_parameterize extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
-    @db.extend Sequel::Postgres::AutoParameterize::DatabaseMethods
     @db.synchronize{|c| def c.escape_bytea(v) v*2 end}
+    @db.extend_datasets{def use_cursor(*) clone end}
+    @db.extend Sequel::Postgres::AutoParameterize::DatabaseMethods
   end
 
   it "should automatically parameterize queries strings, blobs, numerics, dates, and times" do
@@ -56,5 +57,9 @@ describe "pg_auto_parameterize extension" do
 
   it "should show args with string when inspecting SQL " do
     @db[:table].filter(:a=>1).sql.inspect.should == '"SELECT * FROM table WHERE (a = $1::int4); [1]"'
+  end
+
+  it "should not auto parameterize when using cursors" do
+    @db[:table].filter(:a=>1).use_cursor.opts[:no_auto_parameterize].should be_true
   end
 end
