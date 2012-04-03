@@ -914,7 +914,7 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       nodes[0].associations.fetch(:parent, 1).should == nil
       nodes[1].associations[:parent].should == @aa
       nodes[1].associations[:parent].associations[:parent].should == @a
-      nodes[1].associations[:parent].associations[:parent].associations.fetch(:parent, 1) == nil
+      nodes[1].associations[:parent].associations[:parent].associations.fetch(:parent, 1).should == nil
       nodes[2].associations[:parent].should == @aaaa
       nodes[2].associations[:parent].associations[:parent].should == @aaa
       nodes[2].associations[:parent].associations[:parent].associations[:parent].should == @aa

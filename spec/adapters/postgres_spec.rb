@@ -259,7 +259,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     t2 = @d[:value =>1][:time]
     @d.literal(t2).should == @d.literal(t)
     t2.strftime('%Y-%m-%d %H:%M:%S').should == t.strftime('%Y-%m-%d %H:%M:%S')
-    t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000 == t.usec
+    (t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000).should == t.usec
   end
 
   cspecify "should store milliseconds in time fields for DateTime objects", :do, :swift do
@@ -268,7 +268,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     t2 = @d[:value =>1][:time]
     @d.literal(t2).should == @d.literal(t)
     t2.strftime('%Y-%m-%d %H:%M:%S').should == t.strftime('%Y-%m-%d %H:%M:%S')
-    t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000 == t.strftime('%N').to_i/1000
+    (t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000).should == t.strftime('%N').to_i/1000
   end
 
   if POSTGRES_DB.adapter_scheme == :postgres

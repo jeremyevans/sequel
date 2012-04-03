@@ -31,13 +31,13 @@ describe "Sequel::Plugins::AssociationProxies" do
   
   it "should reload the cached association if sent an array method and the reload flag was given" do
     @t.select{|x| false}.should == []
-    Item.db.sqls.length == 1
+    Item.db.sqls.length.should == 1
     @t.select{|x| false}.should == []
-    Item.db.sqls.length == 1
+    Item.db.sqls.length.should == 0
     @i.tags(true).select{|x| false}.should == []
-    Item.db.sqls.length == 2
+    Item.db.sqls.length.should == 1
     @t.filter(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
-    Item.db.sqls.length == 2
+    Item.db.sqls.length.should == 0
   end
   
   it "should not return a proxy object for associations that do not return an array" do

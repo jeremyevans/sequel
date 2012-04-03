@@ -8,7 +8,7 @@ describe Sequel::Schema::Generator do
       foreign_key :parent_id
       primary_key :id
       check 'price > 100'
-      constraint(:xxx) {:yyy == :zzz}
+      constraint(:xxx) {{:yyy => :zzz}}
       index :title
       index [:title, :body], :unique => true
       foreign_key :node_id, :nodes

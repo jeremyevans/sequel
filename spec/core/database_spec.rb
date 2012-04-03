@@ -193,8 +193,7 @@ describe "A new Database" do
   end
 
   specify "should populate :adapter option when using connection string" do
-    Sequel::Database.should_receive(:adapter_class).once.with(:do).and_return(Sequel::Database)
-    Sequel.connect('do:test://host/db_name').opts[:adapter] == :do
+    Sequel.connect('mock:/').opts[:adapter].should == "mock"
   end
 end
 
