@@ -309,7 +309,7 @@ describe Sequel::Database do
     end
   end
 
-  cspecify "should properly escape binary data", [:odbc], [:jdbc, :hsqldb], [:swift] do
+  cspecify "should properly escape binary data", [:odbc], [:jdbc, :hsqldb], [:swift], :oracle do
     INTEGRATION_DB.get("\1\2\3".to_sequel_blob.cast(File).as(:a)).should == "\1\2\3"
   end
 
