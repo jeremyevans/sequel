@@ -250,6 +250,12 @@ describe "Database schema modifiers" do
     @ds.columns!.should == [:number]
   end
   
+  specify "should handle create table in a rolled back transaction" do
+    @db.drop_table?(:items)
+    @db.transaction(:rollback=>:always){@db.create_table(:items){Integer :number}}
+    @db.table_exists?(:items).should be_false
+  end if INTEGRATION_DB.supports_transactional_ddl?
+  
   describe "join tables" do
     after do
       @db.drop_join_table(:cat_id=>:cats, :dog_id=>:dogs) if @db.table_exists?(:cats_dogs)

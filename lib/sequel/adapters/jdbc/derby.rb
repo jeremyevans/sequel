@@ -37,6 +37,11 @@ module Sequel
           end
         end
         
+        # Derby supports transaction DDL statements.
+        def supports_transactional_ddl?
+          true
+        end
+
         private
         
         # Derby optimizes away Sequel's default check of SELECT NULL FROM table,

@@ -180,6 +180,11 @@ module Sequel
       false
     end
 
+    # Whether DDL statements work correctly in transactions, false by default.
+    def supports_transactional_ddl?
+      false
+    end
+
     # The timezone to use for this database, defaulting to <tt>Sequel.database_timezone</tt>.
     def timezone
       @timezone || Sequel.database_timezone

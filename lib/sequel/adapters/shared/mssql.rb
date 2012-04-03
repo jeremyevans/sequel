@@ -72,6 +72,11 @@ module Sequel
         true
       end
 
+      # MSSQL supports transaction DDL statements.
+      def supports_transactional_ddl?
+        true
+      end
+
       # Microsoft SQL Server supports using the INFORMATION_SCHEMA to get
       # information on tables.
       def tables(opts={})

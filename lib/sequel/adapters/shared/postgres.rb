@@ -383,13 +383,6 @@ module Sequel
         @server_version
       end
 
-      # PostgreSQL supports prepared transactions (two-phase commit) if
-      # max_prepared_transactions is greater than 0.
-      def supports_prepared_transactions?
-        return @supports_prepared_transactions if defined?(@supports_prepared_transactions)
-        @supports_prepared_transactions = self['SHOW max_prepared_transactions'].get.to_i > 0
-      end
-
       # PostgreSQL supports CREATE TABLE IF NOT EXISTS on 9.1+
       def supports_create_table_if_not_exists?
         server_version >= 90100
@@ -400,6 +393,13 @@ module Sequel
         true
       end
 
+      # PostgreSQL supports prepared transactions (two-phase commit) if
+      # max_prepared_transactions is greater than 0.
+      def supports_prepared_transactions?
+        return @supports_prepared_transactions if defined?(@supports_prepared_transactions)
+        @supports_prepared_transactions = self['SHOW max_prepared_transactions'].get.to_i > 0
+      end
+
       # PostgreSQL supports savepoints
       def supports_savepoints?
         true
@@ -407,6 +407,11 @@ module Sequel
 
       # PostgreSQL supports transaction isolation levels
       def supports_transaction_isolation_levels?
+        true
+      end
+
+      # PostgreSQL supports transaction DDL statements.
+      def supports_transactional_ddl?
         true
       end
 

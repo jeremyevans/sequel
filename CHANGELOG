@@ -1,5 +1,9 @@
 === HEAD
 
+* Make the migrators only use transactions by default if the database supports transactional DDL (jeremyevans)
+
+* Add Database#supports_transactional_ddl? for checking if DDL statements can be rolled back in transactions (jeremyevans)
+
 * Don't use auto parameterization when using cursors in the pg_auto_parameterize extension (jeremyevans) (#463)
 
 * No longer escape backslashes in strings by default, fixes doubled backslashes on some adapters (jeremyevans)

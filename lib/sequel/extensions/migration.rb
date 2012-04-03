@@ -44,9 +44,9 @@ module Sequel
       descendants << base
     end
 
-    # Always use transactions for old-style migrations.
+    # Don't allow transaction overriding in old migrations.
     def self.use_transactions
-      true
+      nil
     end
     
     # The default down action does nothing
@@ -74,12 +74,13 @@ module Sequel
     # Proc used for the up action
     attr_accessor :up
 
-    # Whether to use transactions for this migration, true by default.
+    # Whether to use transactions for this migration, default depends on the
+    # database.
     attr_accessor :use_transactions
 
-    # Use transactions by default
+    # Don't set transaction use by default.
     def initialize
-      @use_transactions = true
+      @use_transactions = nil
     end
 
     # Apply the appropriate block on the +Database+
@@ -116,6 +117,11 @@ module Sequel
     # Disable the use of transactions for the related migration
     def no_transaction
       migration.use_transactions = false
+    end
+
+    # Enable the use of transactions for the related migration
+    def transaction
+      migration.use_transactions = true
     end
 
     # Defines the migration's up action.
@@ -414,9 +420,17 @@ module Sequel
     # If transactions should be used for the migration, yield to the block
     # inside a transaction.  Otherwise, just yield to the block.
     def checked_transaction(migration, &block)
-      if @use_transactions == false
-        yield
-      elsif migration.use_transactions || @use_transactions
+      use_trans = if @use_transactions.nil?
+        if migration.use_transactions.nil?
+          @db.supports_transactional_ddl?
+        else
+          migration.use_transactions
+        end
+      else
+        @use_transactions
+      end
+
+      if use_trans
         db.transaction(&block)
       else
         yield

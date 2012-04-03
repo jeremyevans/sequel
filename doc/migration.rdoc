@@ -173,9 +173,10 @@ which just executes the code on the underlying database.
 
 == Errors when running migrations
 
-Sequel attempts to run migrations inside of a transaction.  Some databases do not support
-schema modifications made in transactions, and if the migration raises an error, it will
-not rollback the previous schema changes made by the migration.  In that case, you will
+Sequel attempts to run migrations inside of a transaction if the database supports
+transactional DDL statements.  On the databases that don't support transactional DDL
+statements, if there is an error while running a migration, it will not rollback the
+previous schema changes made by the migration.  In that case, you will
 need to update the database by hand.
 
 It's recommended to always run migrations on a test database and ensure they work
@@ -183,9 +184,18 @@ before running them on any production database.
 
 == Transactions
 
-As mentioned above, Sequel attempts to run migrations inside of a transaction by default.
-However, you can disable this on a per migration basis by calling +no_transaction+ inside
-of the Sequel.migration block:
+You can manually specify to use transactions on a per migration basis.  For example,
+if you want to force transaction use for a particular migration, call the transaction
+method in the Sequel.migration block:
+
+  Sequel.migration do
+    transaction
+    change do
+      # ...
+    end
+  end
+
+Likewise, you can disable transaction use via no_transaction:
 
   Sequel.migration do
     no_transaction
@@ -195,7 +205,8 @@ of the Sequel.migration block:
   end
 
 This is necessary in some cases, such as when attempting to use CREATE INDEX CONCURRENTLY
-on PostgreSQL.
+on PostgreSQL (which supports transactional schema, but not that statement inside a
+transaction).
 
 You can also override the transactions setting at the migrator level, either by forcing
 transactions even if no_transaction is set, or by disabling transactions all together:

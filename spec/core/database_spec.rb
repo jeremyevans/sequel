@@ -1951,6 +1951,12 @@ describe "Database#schema_autoincrementing_primary_key?" do
   end
 end
 
+describe "Database#supports_transactional_ddl?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_transactional_ddl?.should == false
+  end
+end
+
 describe "Database#supports_savepoints?" do
   specify "should be false by default" do
     Sequel::Database.new.supports_savepoints?.should == false
