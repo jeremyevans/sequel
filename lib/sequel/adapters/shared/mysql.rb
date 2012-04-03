@@ -414,6 +414,9 @@ module Sequel
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'insert ignore into columns values on_duplicate_key_update')
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct calc_found_rows columns from join where group having compounds order limit lock')
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'update ignore table set where order limit')
+      APOS = Dataset::APOS
+      APOS_RE = Dataset::APOS_RE
+      DOUBLE_APOS = Dataset::DOUBLE_APOS
       SPACE = Dataset::SPACE
       PAREN_OPEN = Dataset::PAREN_OPEN
       PAREN_CLOSE = Dataset::PAREN_CLOSE
@@ -446,6 +449,8 @@ module Sequel
       MATCH_AGAINST_BOOLEAN = ["(MATCH ".freeze, " AGAINST (".freeze, " IN BOOLEAN MODE))".freeze].freeze
       EXPLAIN = 'EXPLAIN '.freeze
       EXPLAIN_EXTENDED = 'EXPLAIN EXTENDED '.freeze
+      BACKSLASH_RE = /\\/.freeze
+      QUAD_BACKSLASH = "\\\\\\\\".freeze
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
@@ -770,6 +775,11 @@ module Sequel
       # Use 0 for false on MySQL
       def literal_false
         BOOL_FALSE
+      end
+
+      # SQL fragment for String.  Doubles \ and ' by default.
+      def literal_string_append(sql, v)
+        sql << APOS << v.gsub(BACKSLASH_RE, QUAD_BACKSLASH).gsub(APOS_RE, DOUBLE_APOS) << APOS
       end
 
       # Use 1 for true on MySQL

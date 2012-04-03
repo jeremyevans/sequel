@@ -190,7 +190,6 @@ module Sequel
     ARRAY_EMPTY = '(NULL)'.freeze
     AS = ' AS '.freeze
     ASC = ' ASC'.freeze
-    BACKSLASH_RE = /\\/.freeze
     BOOL_FALSE = "'f'".freeze
     BOOL_TRUE = "'t'".freeze
     BRACKET_CLOSE =  ']'.freeze
@@ -257,7 +256,6 @@ module Sequel
     PAREN_OPEN = '('.freeze
     PAREN_SPACE_OPEN = ' ('.freeze
     PARTITION_BY = "PARTITION BY ".freeze
-    QUAD_BACKSLASH = "\\\\\\\\".freeze
     QUALIFY_KEYS = [:select, :where, :having, :order, :group]
     QUESTION_MARK = '?'.freeze
     QUESTION_MARK_RE = /\?/.freeze
@@ -1093,7 +1091,7 @@ module Sequel
 
     # SQL fragment for String.  Doubles \ and ' by default.
     def literal_string_append(sql, v)
-      sql << APOS << v.gsub(BACKSLASH_RE, QUAD_BACKSLASH).gsub(APOS_RE, DOUBLE_APOS) << APOS
+      sql << APOS << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
     end
 
     # Converts a symbol into a column name. This method supports underscore
