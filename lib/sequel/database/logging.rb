@@ -17,6 +17,11 @@ module Sequel
     # is :info, it can be set to :debug to log at DEBUG level.
     attr_accessor :sql_log_level
 
+    # Log a message at error level, with information about the exception.
+    def log_exception(exception, message)
+      log_each(:error, "#{exception.class}: #{exception.message.strip}: #{message}")
+    end
+
     # Log a message at level info to all loggers.
     def log_info(message, args=nil)
       log_each(:info, args ? "#{message}; #{args.inspect}" : message)
@@ -31,7 +36,7 @@ module Sequel
       begin
         yield
       rescue => e
-        log_each(:error, "#{e.class}: #{e.message.strip}: #{sql}")
+        log_exception(e, sql)
         raise
       ensure
         log_duration(Time.now - start, sql) unless e

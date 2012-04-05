@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#log_exception, which logs when a query raises an exception, for easier overriding (jeremyevans) (#465)
+
 * Make the migrators only use transactions by default if the database supports transactional DDL (jeremyevans)
 
 * Add Database#supports_transactional_ddl? for checking if DDL statements can be rolled back in transactions (jeremyevans)
