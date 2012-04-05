@@ -28,6 +28,23 @@ module Sequel
           end
         end
       end
+      class Dataset < ODBC::Dataset
+        include Sequel::MSSQL::DatasetMethods
+
+        private
+
+        # Use ODBC format, not Microsoft format, as the ODBC layer does
+        # some translation.
+        def default_timestamp_format
+          TIMESTAMP_FORMAT
+        end
+
+        # Use ODBC format, not Microsoft format, as the ODBC layer does
+        # some translation.
+        def literal_date(v)
+          v.strftime(ODBC_DATE_FORMAT)
+        end
+      end
     end
   end
 end

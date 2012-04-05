@@ -1,5 +1,7 @@
 === HEAD
 
+* Use date and timestamp formats that are multilanguage and not DATEFORMAT dependent on Microsoft SQL Server (jeremyevans)
+
 * Add Database#log_exception, which logs when a query raises an exception, for easier overriding (jeremyevans) (#465)
 
 * Make the migrators only use transactions by default if the database supports transactional DDL (jeremyevans)

@@ -15,7 +15,7 @@ module Sequel
         when 'mssql'
           Sequel.ts_require 'adapters/odbc/mssql'
           extend Sequel::ODBC::MSSQL::DatabaseMethods
-          extend_datasets Sequel::MSSQL::DatasetMethods
+          @dataset_class = Sequel::ODBC::MSSQL::Dataset
           set_mssql_unicode_strings
         when 'progress'
           Sequel.ts_require 'adapters/shared/progress'

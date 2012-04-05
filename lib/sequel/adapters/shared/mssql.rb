@@ -338,6 +338,8 @@ module Sequel
       HSTAR = "H*".freeze
       CASE_SENSITIVE_COLLATION = 'Latin1_General_CS_AS'.freeze
       CASE_INSENSITIVE_COLLATION = 'Latin1_General_CI_AS'.freeze
+      DEFAULT_TIMESTAMP_FORMAT = "'%Y-%m-%dT%H:%M:%S%N%z'".freeze
+      FORMAT_DATE = "'%Y%m%d'".freeze
 
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
       attr_accessor :mssql_unicode_strings
@@ -564,6 +566,13 @@ module Sequel
         server_version >= 10000000
       end
 
+      # Use strict ISO-8601 format with T between date and time,
+      # since that is the format that is multilanguage and not
+      # DATEFORMAT dependent.
+      def default_timestamp_format
+        DEFAULT_TIMESTAMP_FORMAT
+      end
+
       # MSSQL supports the OUTPUT clause for DELETE statements.
       # It also allows prepending a WITH clause.
       def delete_clause_methods
@@ -619,6 +628,17 @@ module Sequel
         sql << HEX_START << v.unpack(HSTAR).first
       end
       
+      # Use YYYYmmdd format, since that's the only want that is
+      # multilanguage and not DATEFORMAT dependent.
+      def literal_date(v)
+        v.strftime(FORMAT_DATE)
+      end
+
+      # Use 0 for false on MSSQL
+      def literal_false
+        BOOL_FALSE
+      end
+
       # Optionally use unicode string syntax for all strings. Don't double
       # backslashes.
       def literal_string_append(sql, v)
@@ -626,11 +646,6 @@ module Sequel
         sql << v.gsub(APOS_RE, DOUBLE_APOS).gsub(BACKSLASH_CRLF_RE, BACKSLASH_CRLF_REPLACE) << APOS
       end
       
-      # Use 0 for false on MSSQL
-      def literal_false
-        BOOL_FALSE
-      end
-
       # Use 1 for true on MSSQL
       def literal_true
         BOOL_TRUE
