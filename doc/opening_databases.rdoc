@@ -338,6 +338,9 @@ Requires: pg (or postgres if pg is not available)
 
 The Sequel postgres adapter works with the pg, postgres, and postgres-pr ruby libraries.
 The pg library is the best supported, as it supports real bound variables and prepared statements.
+If the pg library is being used, Sequel will also attempt to load the sequel_pg library, which is
+a C extension that optimizes performance when Sequel is used with pg.  All users of Sequel who
+use pg are encouraged to install sequel_pg.
 
 The following additional options are supported:
 
