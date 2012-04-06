@@ -151,6 +151,8 @@ module Sequel
       # uri, since JDBC requires one.
       def initialize(opts)
         super
+        @connection_prepared_statements = {}
+        @connection_prepared_statements_mutex = Mutex.new
         @convert_types = typecast_value_boolean(@opts.fetch(:convert_types, true))
         raise(Error, "No connection string specified") unless uri
         
@@ -312,8 +314,15 @@ module Sequel
 
       private
          
-      # Close given adapter connections
+      # Yield the native prepared statements hash for the given connection
+      # to the block in a thread-safe manner.
+      def cps_sync(conn, &block)
+        @connection_prepared_statements_mutex.synchronize{yield (@connection_prepared_statements[conn] ||= {})}
+      end
+
+      # Close given adapter connections, and delete any related prepared statements.
       def disconnect_connection(c)
+        @connection_prepared_statements_mutex.synchronize{@connection_prepared_statements.delete(c)}
         c.close
       end
       
@@ -340,12 +349,12 @@ module Sequel
         end
         sql = ps.prepared_sql
         synchronize(opts[:server]) do |conn|
-          if name and cps = conn.prepared_statements[name] and cps[0] == sql
+          if name and cps = cps_sync(conn){|cpsh| cpsh[name]} and cps[0] == sql
             cps = cps[1]
           else
             log_yield("CLOSE #{name}"){cps[1].close} if cps
             cps = log_yield("PREPARE#{" #{name}:" if name} #{sql}"){conn.prepareStatement(sql)}
-            conn.prepared_statements[name] = [sql, cps] if name
+            cps_sync(conn){|cpsh| cpsh[name] = [sql, cps]} if name
           end
           i = 0
           args.each{|arg| set_ps_arg(cps, arg, i+=1)}
@@ -476,14 +485,9 @@ module Sequel
         end
       end
       
-      # Add a prepared_statements accessor to the connection,
-      # and set it to an empty hash.  This is used to store
-      # adapter specific prepared statements.
+      # Return the connection.  Used to do configuration on the
+      # connection object before adding it to the connection pool.
       def setup_connection(conn)
-        class << conn
-          attr_accessor :prepared_statements
-        end
-        conn.prepared_statements = {}
         conn
       end
       

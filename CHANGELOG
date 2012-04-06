@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't assign instance variables to Java objects, for future JRuby 2.0 support (jeremyevans) (#466)
+
 * Use date and timestamp formats that are multilanguage and not DATEFORMAT dependent on Microsoft SQL Server (jeremyevans)
 
 * Add Database#log_exception, which logs when a query raises an exception, for easier overriding (jeremyevans) (#465)
