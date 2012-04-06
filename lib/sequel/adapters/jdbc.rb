@@ -317,7 +317,7 @@ module Sequel
       # Yield the native prepared statements hash for the given connection
       # to the block in a thread-safe manner.
       def cps_sync(conn, &block)
-        @connection_prepared_statements_mutex.synchronize{yield (@connection_prepared_statements[conn] ||= {})}
+        @connection_prepared_statements_mutex.synchronize{yield(@connection_prepared_statements[conn] ||= {})}
       end
 
       # Close given adapter connections, and delete any related prepared statements.
