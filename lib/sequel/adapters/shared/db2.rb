@@ -131,6 +131,18 @@ module Sequel
         super
       end
 
+      # Insert data from the current table into the new table after
+      # creating the table, since it is not possible to do it in one step.
+      def create_table_as(name, sql, options)
+        super
+        from(name).insert(sql.is_a?(Dataset) ? sql : dataset.with_sql(sql))
+      end
+
+      # DB2 requires parens around the SELECT, and DEFINITION ONLY at the end.
+      def create_table_as_sql(name, sql, options)
+        "#{create_table_prefix_sql(name, options)} AS (#{sql}) DEFINITION ONLY"
+      end
+
       # Here we use DGTT which has most backward compatibility, which uses
       # DECLARE instead of CREATE. CGTT can only be used after version 9.7.
       # http://www.ibm.com/developerworks/data/library/techarticle/dm-0912globaltemptable/
