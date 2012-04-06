@@ -217,6 +217,8 @@ module Sequel
           sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * power(2, #{literal b}))"}
         when :>>
           sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / power(2, #{literal b}))"}
+        when :%
+          sql << complex_expression_arg_pairs(args){|a, b| "MOD(#{literal(a)}, #{literal(b)})"}
         when :ILIKE, :'NOT ILIKE'
           sql << ILIKE_0
           literal_append(sql, args.at(0))
