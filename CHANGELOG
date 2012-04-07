@@ -1,5 +1,11 @@
 === HEAD
 
+* Handle blob prepared statement arguments on jdbc/db2 (jeremyevans)
+
+* Handle blob values in the swift adapter (jeremyevans)
+
+* Handle better nil prepared statement arguments on jdbc (jeremyevans) (#513)
+
 * Make SQL::Blob objects handle as, cast, and lit methods even if the core extensions are not loaded (jeremyevans)
 
 * Make #* with no arguments produce a ColumnAll for Identifier and QualifiedIdentifier (jeremyevans)

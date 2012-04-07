@@ -309,19 +309,19 @@ describe "Bound Argument Types" do
     @ds.literal(@ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>fract_time)[:t]).should == @ds.literal(fract_time)
   end
 
-  cspecify "should handle blob type", [:odbc], [:jdbc, :db2], :oracle do
+  cspecify "should handle blob type", [:odbc], :oracle do
     @ds.delete
     @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>@vs[:file])
     @ds.get(:file).should == @vs[:file]
   end
 
-  cspecify "should handle blob type with nil values", [:jdbc, :db2], :oracle, [:tinytds], [:jdbc, proc{|db| defined?(Sequel::JDBC::SQLServer::DatabaseMethods) && db.is_a?(Sequel::JDBC::SQLServer::DatabaseMethods)}] do
+  cspecify "should handle blob type with nil values", :oracle, [:tinytds], [:jdbc, proc{|db| defined?(Sequel::JDBC::SQLServer::DatabaseMethods) && db.is_a?(Sequel::JDBC::SQLServer::DatabaseMethods)}] do
     @ds.delete
     @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>nil)
     @ds.get(:file).should == nil
   end
 
-  cspecify "should handle blob type with embedded zeros", [:odbc], [:jdbc, :db2], :oracle do
+  cspecify "should handle blob type with embedded zeros", [:odbc], :oracle do
     zero_blob = Sequel::SQL::Blob.new("a\0"*100)
     @ds.delete
     @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>zero_blob)

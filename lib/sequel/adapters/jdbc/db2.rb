@@ -27,6 +27,15 @@ module Sequel
         end
 
         private
+
+        def set_ps_arg(cps, arg, i)
+          case arg
+          when Sequel::SQL::Blob
+            cps.setString(i, arg)
+          else
+            super
+          end
+        end
         
         def last_insert_id(conn, opts={})
           statement(conn) do |stmt|
