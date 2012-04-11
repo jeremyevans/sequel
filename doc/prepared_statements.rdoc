@@ -82,7 +82,6 @@ and update queries, the hash to insert/update is passed to +prepare+:
 If you are using the ruby-postgres or postgres-pr driver, PostgreSQL uses the
 default emulated support.  If you are using ruby-pg, there is native support,
 but it may require type specifiers on some old versions (generally not anymore).
-direct control over the SQL string, but since Sequel abstracts that, the types
 You can add a __* suffix to the placeholder symbol to specify a type, which
 casts to that type in the SQL (e.g.  :$name__text, which will be compiled to
 "$1::text" in the SQL).  Prepared statements are always server side.
