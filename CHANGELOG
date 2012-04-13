@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix possible thread safety issues in creating Database objects and anonymous model classes (jeremyevans)
+
 * Don't assign instance variables to Java objects, for future JRuby 2.0 support (jeremyevans) (#466)
 
 * Use date and timestamp formats that are multilanguage and not DATEFORMAT dependent on Microsoft SQL Server (jeremyevans)

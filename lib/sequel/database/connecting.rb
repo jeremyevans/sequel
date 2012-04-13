@@ -81,7 +81,7 @@ module Sequel
       ensure
         if block_given?
           db.disconnect if db
-          ::Sequel::DATABASES.delete(db)
+          Sequel.synchronize{::Sequel::DATABASES.delete(db)}
         end
       end
       block_given? ? result : db

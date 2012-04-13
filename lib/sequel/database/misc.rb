@@ -63,7 +63,7 @@ module Sequel
       self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
       @pool = ConnectionPool.get_pool(@opts, &block)
 
-      ::Sequel::DATABASES.push(self)
+      Sequel.synchronize{::Sequel::DATABASES.push(self)}
     end
 
     # If a transaction is not currently in process, yield to the block immediately.

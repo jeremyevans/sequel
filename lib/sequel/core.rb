@@ -34,6 +34,9 @@ module Sequel
   # Mutex used to protect file loading/requireing
   @require_mutex = Mutex.new
   
+  # Mutex used to protect global data structures
+  @data_mutex = Mutex.new
+  
   class << self
     # Sequel converts two digit years in <tt>Date</tt>s and <tt>DateTime</tt>s by default,
     # so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted
@@ -280,6 +283,12 @@ module Sequel
     rescue => e
       raise convert_exception_class(e, InvalidValue)
     end
+  end
+
+  # Protects access to any mutable global data structure in Sequel.
+  # Uses a non-reentrant mutex, so calling code should be careful.
+  def self.synchronize(&block)
+    @data_mutex.synchronize(&block)
   end
 
   # Uses a transaction on all given databases with the given options. This:

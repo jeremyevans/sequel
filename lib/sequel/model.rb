@@ -35,7 +35,7 @@ module Sequel
   #     dataset # => DB1[:comments]
   #   end
   def self.Model(source)
-    if Sequel::Model.cache_anonymous_models && (klass = Model::ANONYMOUS_MODEL_CLASSES[source])
+    if Sequel::Model.cache_anonymous_models && (klass = Sequel.synchronize{Model::ANONYMOUS_MODEL_CLASSES[source]})
       return klass
     end
     klass = if source.is_a?(Database)
@@ -45,7 +45,7 @@ module Sequel
     else
       Class.new(Model).set_dataset(source)
     end
-    Model::ANONYMOUS_MODEL_CLASSES[source] = klass if Sequel::Model.cache_anonymous_models
+    Sequel.synchronize{Model::ANONYMOUS_MODEL_CLASSES[source] = klass} if Sequel::Model.cache_anonymous_models
     klass
   end
 

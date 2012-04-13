@@ -220,7 +220,7 @@ module Sequel
       #   end # COMMIT
       def db
         return @db if @db
-        @db = self == Model ? DATABASES.first : superclass.db
+        @db = self == Model ? Sequel.synchronize{DATABASES.first} : superclass.db
         raise(Error, "No database associated with #{self}: have you called Sequel.connect or #{self}.db= ?") unless @db
         @db
       end
