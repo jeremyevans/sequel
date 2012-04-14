@@ -19,7 +19,7 @@ module Sequel
     #   # timestamp, and setting the update timestamp when creating
     #   Album.plugin :timestamps, :force=>true, :update_on_create=>true
     module Timestamps
-      # Configure the plugin by setting the avialable options.  Note that
+      # Configure the plugin by setting the available options.  Note that
       # if this method is run more than once, previous settings are ignored,
       # and it will just use the settings given or the default settings.  Options:
       # * :create - The field to hold the create timestamp (default: :created_at)
