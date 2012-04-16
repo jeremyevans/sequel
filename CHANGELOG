@@ -1,5 +1,7 @@
 === HEAD
 
+* Recognize identity type in the schema dumper (jeremyevans) (#468)
+
 * Fix possible thread safety issues in creating Database objects and anonymous model classes (jeremyevans)
 
 * Don't assign instance variables to Java objects, for future JRuby 2.0 support (jeremyevans) (#466)

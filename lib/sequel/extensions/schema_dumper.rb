@@ -175,7 +175,7 @@ END_MIG
         {:type=>BigDecimal, :size=>(s.empty? ? nil : s)}
       when /\A(?:bytea|(?:tiny|medium|long)?blob|(?:var)?binary)(?:\((\d+)\))?\z/o
         {:type=>File, :size=>($1.to_i if $1)}
-      when 'year'
+      when /\A(?:year|(?:int )?identity)\z/o
         {:type=>Integer}
       else
         {:type=>String}

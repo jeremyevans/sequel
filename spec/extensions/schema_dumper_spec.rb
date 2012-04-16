@@ -508,7 +508,7 @@ END_MIG
       ["double precision", "timestamp with time zone", "timestamp without time zone",
        "time with time zone", "time without time zone", "character varying(20)"] +
       %w"nvarchar ntext smalldatetime smallmoney binary varbinary nchar" +
-      ["timestamp(6) without time zone", "timestamp(6) with time zone", "int(12) unsigned", 'bigint unsigned', 'tinyint(3) unsigned']
+      ["timestamp(6) without time zone", "timestamp(6) with time zone", "int(12) unsigned", 'bigint unsigned', 'tinyint(3) unsigned', 'identity', 'int identity']
     @d.meta_def(:schema) do |t, *o|
       i = 0
       types.map{|x| [:"c#{i+=1}", {:db_type=>x, :allow_null=>true}]}
@@ -581,6 +581,8 @@ create_table(:x) do
   Integer :c64
   Bignum :c65
   Integer :c66
+  Integer :c67
+  Integer :c68
 end
 END_MIG
   end
