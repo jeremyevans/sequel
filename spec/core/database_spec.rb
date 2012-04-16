@@ -636,6 +636,45 @@ shared_examples_for "Database#transaction" do
     proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
   end
   
+  specify "should handle errors when sending BEGIN" do
+    ec = Class.new(StandardError)
+    @db.meta_def(:database_error_classes){[ec]}
+    @db.meta_def(:log_connection_execute){|c, sql| sql =~ /BEGIN/ ? raise(ec, 'bad') : super(c, sql)}
+    begin
+      @db.transaction{@db.execute 'DROP TABLE test;'}
+    rescue Sequel::DatabaseError => e
+    end
+    e.should_not be_nil
+    e.wrapped_exception.should be_a_kind_of(ec)
+    @db.sqls.should == ['ROLLBACK']
+  end
+  
+  specify "should handle errors when sending COMMIT" do
+    ec = Class.new(StandardError)
+    @db.meta_def(:database_error_classes){[ec]}
+    @db.meta_def(:log_connection_execute){|c, sql| sql =~ /COMMIT/ ? raise(ec, 'bad') : super(c, sql)}
+    begin
+      @db.transaction{@db.execute 'DROP TABLE test;'}
+    rescue Sequel::DatabaseError => e
+    end
+    e.should_not be_nil
+    e.wrapped_exception.should be_a_kind_of(ec)
+    @db.sqls.should == ['BEGIN', 'DROP TABLE test;']
+  end
+  
+  specify "should handle errors when sending ROLLBACK" do
+    ec = Class.new(StandardError)
+    @db.meta_def(:database_error_classes){[ec]}
+    @db.meta_def(:log_connection_execute){|c, sql| sql =~ /ROLLBACK/ ? raise(ec, 'bad') : super(c, sql)}
+    begin
+      @db.transaction{raise ArgumentError, 'asdf'}
+    rescue Sequel::DatabaseError => e
+    end
+    e.should_not be_nil
+    e.wrapped_exception.should be_a_kind_of(ec)
+    @db.sqls.should == ['BEGIN']
+  end
+  
   specify "should issue ROLLBACK if Sequel::Rollback is called in the transaction" do
     @db.transaction do
       @db.drop_table(:a)

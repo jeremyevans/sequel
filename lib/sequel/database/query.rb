@@ -286,7 +286,11 @@ module Sequel
           yield(conn)
         end
       rescue Exception => e
-        rollback_transaction(conn, opts)
+        begin
+          rollback_transaction(conn, opts)
+        rescue Exception => e3
+          raise_error(e3, :classes=>database_error_classes, :conn=>conn)
+        end
         transaction_error(e, :conn=>conn, :rollback=>rollback)
       ensure
         begin
