@@ -1,5 +1,7 @@
 === HEAD
 
+* The :index option when creating columns in the schema generator can now be a hash of options passed to index (jeremyevans)
+
 * Parsing the default column values in the oracle adapter no longer requires superuser privileges (Jason Hines)
 
 * Add Database#cache_schema to allow schema caching to be turned of, useful for development modes where models are reloaded (jeremyevans)

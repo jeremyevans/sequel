@@ -83,7 +83,8 @@ module Sequel
       #                reference table will use for its foreign key a value that does not
       #                exists(yet) on referenced table. Basically it adds
       #                DEFERRABLE INITIALLY DEFERRED on key creation.
-      # :index :: Create an index on this column.
+      # :index :: Create an index on this column.  If given a hash, use the hash as the
+      #           options for the index.
       # :key :: For foreign key columns, the column in the associated table
       #         that this column references.  Unnecessary if this column
       #         references the primary key of the associated table, except if you are
@@ -107,7 +108,9 @@ module Sequel
       #              columns.
       def column(name, type, opts = {})
         columns << {:name => name, :type => type}.merge(opts)
-        index(name) if opts[:index]
+        if index_opts = opts[:index]
+          index(name, index_opts.is_a?(Hash) ? index_opts : {})
+        end
       end
       
       # Adds a named constraint (or unnamed if name is nil) to the DDL,

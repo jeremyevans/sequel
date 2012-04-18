@@ -80,7 +80,8 @@ When using the type name as method, the third argument is an options hash, and w
 method, the fourth argument is the options hash.  The following options are supported:
 
 :default :: The default value for the column.
-:index :: Create an index on this column.
+:index :: Create an index on this column. If given a hash, use the hash as the
+          options for the index.
 :null :: Mark the column as allowing NULL values (if true),
          or not allowing NULL values (if false).  If unspecified, will default
          to whatever the database default is.
@@ -173,6 +174,13 @@ column, but create a foreign key constraint:
   create_table(:a) do
     Integer :id
     index :id
+  end
+
+  create_table(:a){Integer :id, :index=>{:unique=>true}}
+  # Same as:
+  create_table(:a) do
+    Integer :id
+    index :id, :unique=>true
   end
 
 Similar to the +primary_key+ and +foreign_key+ methods, calling +index+ with an array of symbols
