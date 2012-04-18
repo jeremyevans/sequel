@@ -35,6 +35,11 @@ module Sequel
     # Database#transaction, as on MSSQL if affects all future transactions
     # on the same connection.
     attr_accessor :transaction_isolation_level
+
+    # Whether the schema should be cached for this database.  True by default
+    # for performance, can be set to false to always issue a database query to
+    # get the schema.
+    attr_accessor :cache_schema
     
     # Runs the supplied SQL statement string on the database server.
     # Returns self so it can be safely chained:
@@ -195,7 +200,8 @@ module Sequel
       cols = schema_parse_table(table_name, opts)
       raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
       cols.each{|_,c| c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type])}
-      @schemas[quoted_name] = cols
+      @schemas[quoted_name] = cols if cache_schema
+      cols
     end
 
     # Returns true if a table with the given name exists.  This requires a query

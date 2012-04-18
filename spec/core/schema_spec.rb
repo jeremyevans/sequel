@@ -1155,6 +1155,28 @@ describe "Schema Parser" do
     proc{@db.schema(:x)}.should raise_error(Sequel::Error)
   end
 
+  specify "should cache data by default" do
+    @db.meta_def(:schema_parse_table) do |t, opts|
+      [[:a, {}]]
+    end
+    @db.schema(:x).should equal(@db.schema(:x))
+  end
+
+  specify "should not cache data if :reload=>true is given" do
+    @db.meta_def(:schema_parse_table) do |t, opts|
+      [[:a, {}]]
+    end
+    @db.schema(:x).should_not equal(@db.schema(:x, :reload=>true))
+  end
+
+  specify "should not cache schema metadata if cache_schema is false" do
+    @db.cache_schema = false
+    @db.meta_def(:schema_parse_table) do |t, opts|
+      [[:a, {}]]
+    end
+    @db.schema(:x).should_not equal(@db.schema(:x))
+  end
+
   specify "should provide options if given a table name" do
     c = nil
     @db.meta_def(:schema_parse_table) do |t, opts|

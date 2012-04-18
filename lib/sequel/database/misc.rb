@@ -59,6 +59,7 @@ module Sequel
       @quote_identifiers = nil
       @timezone = nil
       @dataset_class = dataset_class_default
+      @cache_schema = typecast_value_boolean(@opts.fetch(:cache_schema, true))
       @dataset_modules = []
       self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
       @pool = ConnectionPool.get_pool(@opts, &block)

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#cache_schema to allow schema caching to be turned of, useful for development modes where models are reloaded (jeremyevans)
+
 * Correctly handle errors that occur when rolling back transactions (jeremyevans)
 
 * Recognize identity type in the schema dumper (jeremyevans) (#468)
