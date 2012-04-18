@@ -243,7 +243,7 @@ module Sequel
 
         # Default values
         defaults = begin
-          metadata_dataset.from(:dba_tab_cols).
+          metadata_dataset.from(:user_tab_cols).
             where(:table_name=>im.call(table)).
             to_hash(:column_name, :data_default)
         rescue DatabaseError

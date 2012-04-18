@@ -1,5 +1,7 @@
 === HEAD
 
+* Parsing the default column values in the oracle adapter no longer requires superuser privileges (Jason Hines)
+
 * Add Database#cache_schema to allow schema caching to be turned of, useful for development modes where models are reloaded (jeremyevans)
 
 * Correctly handle errors that occur when rolling back transactions (jeremyevans)
