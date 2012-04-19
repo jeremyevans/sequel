@@ -694,6 +694,7 @@ ActiveRecord Method :: Sequel Method
 +set_primary_key+ :: +set_primary_key+
 +sum+ :: +sum+
 +table_name+ :: +table_name+
++unescoped+ :: +unfiltered+
 
 === Class Methods without an Equivalent
 
