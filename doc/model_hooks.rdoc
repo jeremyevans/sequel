@@ -69,6 +69,12 @@ Note that these hooks are only called when using <tt>Model#destroy</tt>, they ar
 
 <tt>Sequel::Model</tt> does support a few additional hooks. One is +after_intialize+, which is called after the model object has been initalized.  It can be used to set default attribute values for new objects, since by default new <tt>Sequel::Model</tt> objects have no attributes, and the attributes are not filled in until the model object is saved.  You should be careful when you are using +after_initialize+, since it is called for every created record.  So if you run a query that returns 1000 model objects, it will be called 1000 times.  If you only want to change the behavior for new records, you can override the +initialize_set+ private method, which is called with the hash passed to +initialize+.
 
+== Special Hook-Related Instance Variables
+
+For after_save hooks, a @was_new instance variable is present that indicates whether the record was a new record that was just inserted, or an existing record that was updated.  Sequel marks a record as existing as soon as it inserts the record, so in an after_save or after_create hook, the instance is no longer considered new.  You have to check @was_new to see if the record was inserted.  This exists so that you don't have to have separate after_create and after_update hooks that are mostly the same and only differ slightly depending on whether the record was a new record.
+
+For after_update hooks, a @columns_updated instance variable is present that is a hash of the values used to update the row (keys are column symbols, values are column values).  This should be used by any code that wants to check what columns and values were used during the update.  You can't just check the current values of the instance, since Sequel offers ways to manually specify which columns to use during the save.
+
 == Transaction-related Hooks
 
 There are four other model hooks that <tt>Sequel::Model</tt> supports, all related to transactions.  These are +after_commit+, +after_rollback+, +after_destroy_commit+, and +after_destroy_rollback+.  +after_commit+ is called after the transaction in which you saved the object commits, only if it commits.  +after_rollback+ is called after the transaction in which you saved the object rolls back, if it rolls back.  +after_destroy_commit+ is called after the transaction in which you destroyed the object commits, if it commits.  +after_destroy_rollback+ is called after the transaction in which you destroyed the object rolls back, if it rolls back.
