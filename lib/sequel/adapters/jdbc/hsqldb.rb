@@ -47,6 +47,11 @@ module Sequel
           end
         end
 
+        # HSQLDB requires parens around the SELECT, and the WITH DATA syntax.
+        def create_table_as_sql(name, sql, options)
+          "#{create_table_prefix_sql(name, options)} AS (#{sql}) WITH DATA"
+        end
+
         # Use IDENTITY() to get the last inserted id.
         def last_insert_id(conn, opts={})
           statement(conn) do |stmt|

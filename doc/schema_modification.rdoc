@@ -277,6 +277,13 @@ which expands to:
     index [:artist_id, :album_id]
   end
 
+== <tt>create_table :as=></tt>
+
+To create a table from the result of a SELECT query, instead of passing a block
+to +create_table+, provide a dataset to the :as option:
+
+  create_table(:older_items, :as=>DB[:items].where{updated_at < Date.today << 6})
+
 == +alter_table+
 
 +alter_table+ is used to alter existing tables, changing their columns, indexes,

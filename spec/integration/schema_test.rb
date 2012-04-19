@@ -239,7 +239,7 @@ describe "Database schema modifiers" do
     @ds = @db[:items]
   end
   after do
-    @db.drop_table?(:items)
+    @db.drop_table?(:items, :items2)
   end
 
   specify "should create tables correctly" do
@@ -248,6 +248,15 @@ describe "Database schema modifiers" do
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:number]
     @ds.insert([10])
     @ds.columns!.should == [:number]
+  end
+  
+  specify "should create tables from select statements correctly" do
+    @db.create_table!(:items){Integer :number}
+    @ds.insert([10])
+    @db.create_table(:items2, :as=>@db[:items])
+    @db.schema(:items2, :reload=>true).map{|x| x.first}.should == [:number]
+    @db[:items2].columns.should == [:number]
+    @db[:items2].all.should == [{:number=>10}]
   end
   
   specify "should handle create table in a rolled back transaction" do

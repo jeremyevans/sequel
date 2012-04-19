@@ -132,19 +132,27 @@ module Sequel
     #   end
     #
     # Options:
-    # :temp :: Create the table as a temporary table.
+    # :as :: Create the table using the value, which should be either a
+    #        dataset or a literal SQL string.  If this option is used,
+    #        a block should not be given to the method.
     # :ignore_index_errors :: Ignore any errors when creating indexes.
+    # :temp :: Create the table as a temporary table.
     #
-    # See <tt>Schema::Generator</tt> and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
+    # See <tt>Schema::Generator</tt> and the {"Schema Modification" guide}[link:files/doc/schema_modification_rdoc.html].
     def create_table(name, options={}, &block)
       remove_cached_schema(name)
       options = {:generator=>options} if options.is_a?(Schema::Generator)
-      generator = options[:generator] || Schema::Generator.new(self, &block)
-      create_table_from_generator(name, generator, options)
-      create_table_indexes_from_generator(name, generator, options)
-      nil
+      if sql = options[:as]
+        raise(Error, "can't provide both :as option and block to create_table") if block
+        create_table_as(name, sql, options)
+      else
+        generator = options[:generator] || Schema::Generator.new(self, &block)
+        create_table_from_generator(name, generator, options)
+        create_table_indexes_from_generator(name, generator, options)
+        nil
+      end
     end
-    
+
     # Forcibly create a table, attempting to drop it if it already exists, then creating it.
     # 
     #   DB.create_table!(:a){Integer :a} 
@@ -466,7 +474,25 @@ module Sequel
 
     # DDL statement for creating a table with the given name, columns, and options
     def create_table_sql(name, generator, options)
-      "CREATE #{temporary_table_sql if options[:temp]}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)} (#{column_list_sql(generator)})"
+      "#{create_table_prefix_sql(name, options)} (#{column_list_sql(generator)})"
+    end
+
+    # Run a command to create the table with the given name from the given
+    # SELECT sql statement.
+    def create_table_as(name, sql, options)
+      sql = sql.sql if sql.is_a?(Sequel::Dataset)
+      run(create_table_as_sql(name, sql, options))
+    end
+    
+    # DDL statement for creating a table from the result of a SELECT statement.
+    # +sql+ should be a string representing a SELECT query.
+    def create_table_as_sql(name, sql, options)
+      "#{create_table_prefix_sql(name, options)} AS #{sql}"
+    end
+
+    # DDL statement for creating a table with the given name, columns, and options
+    def create_table_prefix_sql(name, options)
+      "CREATE #{temporary_table_sql if options[:temp]}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"
     end
 
     # Default index name for the table and columns, may be too long

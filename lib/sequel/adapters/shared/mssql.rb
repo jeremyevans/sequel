@@ -157,10 +157,19 @@ module Sequel
       # MSSQL uses the name of the table to decide the difference between
       # a regular and temporary table, with temporary table names starting with
       # a #.
-      def create_table_sql(name, generator, options)
-        "CREATE TABLE #{quote_schema_table(options[:temp] ? "##{name}" : name)} (#{column_list_sql(generator)})"
+      def create_table_prefix_sql(name, options)
+        "CREATE TABLE #{quote_schema_table(options[:temp] ? "##{name}" : name)}"
       end
       
+      # MSSQL doesn't support CREATE TABLE AS, it only supports SELECT INTO.
+      # Emulating CREATE TABLE AS using SELECT INTO is only possible if a dataset
+      # is given as the argument, it can't work with a string, so raise an
+      # Error if a string is given.
+      def create_table_as(name, ds, options)
+        raise(Error, "must provide dataset instance as value of create_table :as option on MSSQL") unless ds.is_a?(Sequel::Dataset)
+        run(ds.into(name).sql)
+      end
+    
       # The name of the constraint for setting the default value on the table and column.
       def default_constraint_name(table, column)
         from(:sysobjects___c_obj).

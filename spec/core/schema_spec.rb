@@ -550,6 +550,20 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc(x, y) ON DELETE SET NULL ON UPDATE SET NULL)"]
   end
+
+  specify "should accept an :as option to create a table from the results of a dataset" do
+    @db.create_table(:cats, :as=>@db[:a])
+    @db.sqls.should == ['CREATE TABLE cats AS SELECT * FROM a']
+  end
+
+  specify "should accept an :as option to create a table from a SELECT string" do
+    @db.create_table(:cats, :as=>'SELECT * FROM a')
+    @db.sqls.should == ['CREATE TABLE cats AS SELECT * FROM a']
+  end
+
+  specify "should raise an Error if both a block and an :as argument are given" do
+    proc{@db.create_table(:cats, :as=>@db[:a]){}}.should raise_error(Sequel::Error)
+  end
 end
 
 describe "DB#create_table!" do

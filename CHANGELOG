@@ -1,5 +1,7 @@
 === HEAD
 
+* create_table now supports an :as option to create a table directly from the results of a query (jeremyevans)
+
 * The :index option when creating columns in the schema generator can now be a hash of options passed to index (jeremyevans)
 
 * Parsing the default column values in the oracle adapter no longer requires superuser privileges (Jason Hines)

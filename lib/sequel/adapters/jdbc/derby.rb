@@ -75,10 +75,30 @@ module Sequel
           sql << " NOT NULL" if column.fetch(:null, column[:allow_null]) == false
         end
     
-        # Temporary table creation on Derby use DECLARE instead of CREATE.
+        # Add NOT LOGGED for temporary tables to improve performance.
         def create_table_sql(name, generator, options)
+          s = super
+          s << ' NOT LOGGED' if options[:temp]
+          s
+        end
+
+        # Insert data from the current table into the new table after
+        # creating the table, since it is not possible to do it in one step.
+        def create_table_as(name, sql, options)
+          super
+          from(name).insert(sql.is_a?(Dataset) ? sql : dataset.with_sql(sql))
+        end
+
+        # Derby currently only requires WITH NO DATA, with a separate insert
+        # to import data.
+        def create_table_as_sql(name, sql, options)
+          "#{create_table_prefix_sql(name, options)} AS #{sql} WITH NO DATA"
+        end
+
+        # Temporary table creation on Derby uses DECLARE instead of CREATE.
+        def create_table_prefix_sql(name, options)
           if options[:temp]
-            "DECLARE GLOBAL TEMPORARY TABLE #{quote_identifier(name)} (#{column_list_sql(generator)}) NOT LOGGED"
+            "DECLARE GLOBAL TEMPORARY TABLE #{quote_identifier(name)}"
           else
             super
           end

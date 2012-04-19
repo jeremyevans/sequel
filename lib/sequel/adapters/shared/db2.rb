@@ -134,9 +134,9 @@ module Sequel
       # Here we use DGTT which has most backward compatibility, which uses
       # DECLARE instead of CREATE. CGTT can only be used after version 9.7.
       # http://www.ibm.com/developerworks/data/library/techarticle/dm-0912globaltemptable/
-      def create_table_sql(name, generator, options)
+      def create_table_prefix_sql(name, options)
         if options[:temp]
-          "DECLARE GLOBAL TEMPORARY TABLE #{quote_identifier(name)} (#{column_list_sql(generator)})"
+          "DECLARE GLOBAL TEMPORARY TABLE #{quote_identifier(name)}"
         else
           super
         end
