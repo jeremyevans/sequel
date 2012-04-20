@@ -1,5 +1,7 @@
 === HEAD
 
+* Add dirty plugin, which saves the initial value of the column when the value is changed (jeremyevans)
+
 * create_table now supports an :as option to create a table directly from the results of a query (jeremyevans)
 
 * The :index option when creating columns in the schema generator can now be a hash of options passed to index (jeremyevans)

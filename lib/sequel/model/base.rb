@@ -927,8 +927,7 @@ module Sequel
         v = typecast_value(column, value)
         vals = @values
         if new? || !vals.include?(column) || v != (c = vals[column]) || v.class != c.class
-          changed_columns << column unless changed_columns.include?(column)
-          vals[column] = v
+          change_column_value(column, v)
         end
       end
   
@@ -1700,6 +1699,13 @@ module Sequel
       # If transactions should be used, wrap the yield in a transaction block.
       def checked_transaction(opts={})
         use_transaction?(opts) ? db.transaction({:server=>this_server}.merge(opts)){yield} : yield
+      end
+
+      # Change the value of the column to given value, recording the change.
+      def change_column_value(column, value)
+        cc = changed_columns
+        cc << column unless cc.include?(column)
+        @values[column] = value
       end
 
       # Set the columns with the given hash.  By default, the same as +set+, but
