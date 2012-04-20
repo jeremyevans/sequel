@@ -79,6 +79,11 @@ module Sequel
     #
     #   Album.array_from_xml(Album.to_xml) # same as Album.all
     #
+    # If you have an existing array of model instances you want to convert to
+    # XML, you can call the class to_xml method with the :array option:
+    #
+    #   Album.to_xml(:array=>[Album[1], Album[2]])
+    #
     # Usage:
     #
     #   # Add XML output capability to all model subclass instances (called before loading subclasses)
@@ -316,8 +321,14 @@ module Sequel
           raise(Sequel::Error, "Dataset#to_xml") unless row_proc
           x = model.xml_builder(opts)
           name_proc = model.xml_serialize_name_proc(opts)
+          array = if opts[:array]
+            opts = opts.dup
+            opts.delete(:array)
+          else
+            all
+          end
           x.send(name_proc[opts.fetch(:array_root_name, model.send(:pluralize, model.send(:underscore, model.name))).to_s]) do |x1|
-            all.each do |obj|
+            array.each do |obj|
               obj.to_xml(opts.merge(:builder=>x1))
             end
           end

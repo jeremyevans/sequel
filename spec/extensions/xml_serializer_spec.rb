@@ -157,6 +157,19 @@ describe "Sequel::Plugins::XmlSerializer" do
     Album.array_from_xml(Album.dataset.to_xml(:only=>:name)).should == [Album.load(:name=>@album.name)]
   end
 
+  it "should have to_xml dataset method respect an :array option" do
+    a = Album.load(:id=>1, :name=>'RF', :artist_id=>3)
+    Album.array_from_xml(Album.to_xml(:array=>[a])).should == [a]
+
+    a.associations[:artist] = artist = Artist.load(:id=>3, :name=>'YJM')
+    Album.array_from_xml(Album.to_xml(:array=>[a], :include=>:artist)).first.artist.should == artist
+
+    artist.associations[:albums] = [a]
+    x = Artist.array_from_xml(Artist.to_xml(:array=>[artist], :include=>:albums))
+    x.should == [artist]
+    x.first.albums.should == [a]
+  end
+
   it "should raise an error if the dataset does not have a row_proc" do
     proc{Album.dataset.naked.to_xml}.should raise_error(Sequel::Error)
   end

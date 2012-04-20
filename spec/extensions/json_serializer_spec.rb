@@ -116,6 +116,19 @@ describe "Sequel::Plugins::JsonSerializer" do
     JSON.parse(ds.to_json).should == [@album.values.inject({}){|h, (k, v)| h[k.to_s] = v; h}]
   end
 
+  it "should have dataset to_json method respect :array option for the array to use" do
+    a = Album.load(:id=>1, :name=>'RF', :artist_id=>3)
+    JSON.parse(Album.to_json(:array=>[a])).should == [a]
+
+    a.associations[:artist] = artist = Artist.load(:id=>3, :name=>'YJM')
+    JSON.parse(Album.to_json(:array=>[a], :include=>:artist)).first.artist.should == artist
+
+    artist.associations[:albums] = [a]
+    x = JSON.parse(Artist.to_json(:array=>[artist], :include=>:albums))
+    x.should == [artist]
+    x.first.albums.should == [a]
+  end
+
   it "should propagate class default options to instance to_json output" do
     class ::Album2 < Sequel::Model
       attr_accessor :blah

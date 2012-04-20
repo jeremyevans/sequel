@@ -56,6 +56,11 @@ module Sequel
     #   Album.to_json
     #   Album.filter(:artist_id=>1).to_json(:include=>:tags)
     #
+    # If you have an existing array of model instances you want to convert to
+    # JSON, you can call the class to_json method with the :array option:
+    #
+    #   Album.to_json(:array=>[Album[1], Album[2]])
+    #
     # Usage:
     #
     #   # Add JSON output capability to all model subclass instances (called before loading subclasses)
@@ -203,7 +208,17 @@ module Sequel
           else
             opts = model.json_serializer_opts
           end
-          res = row_proc ? all.map{|obj| Literal.new(obj.to_json(opts))} : all
+          res = if row_proc 
+            array = if opts[:array]
+              opts = opts.dup
+              opts.delete(:array)
+            else
+              all
+            end
+            array.map{|obj| Literal.new(obj.to_json(opts))}
+           else
+            all
+          end
           opts[:root] ? {model.send(:pluralize, model.send(:underscore, model.to_s)) => res}.to_json(*a) : res.to_json(*a)
         end
       end
