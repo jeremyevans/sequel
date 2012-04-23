@@ -150,7 +150,7 @@ module Sequel
       if @migration_format.nil? || @migration_format == format
         @migration_format = format
       else
-        raise(RuntimeError, "Invalid migration - both change and up/down blocks were defined")
+        ::Kernel.raise(ArgumentError, "Invalid migration - both change and up/down blocks were defined")
       end 
     end
   end

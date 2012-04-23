@@ -666,11 +666,11 @@ describe "Sequel::MigrationDSL" do
   end
 
   specify "should raise error if migration contains change and up blocks" do
-    lambda{ Sequel::MigrationDSL.new(&invalid_migration_up)}.should raise_error
+    lambda{ Sequel::MigrationDSL.new(&invalid_migration_up)}.should raise_error(ArgumentError)
   end
 
   specify "should raise error if migration contains change and down blocks" do
-    lambda{ Sequel::MigrationDSL.new(&invalid_migration_down)}.should raise_error
+    lambda{ Sequel::MigrationDSL.new(&invalid_migration_down)}.should raise_error(ArgumentError)
   end
 
 end
