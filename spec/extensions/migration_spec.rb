@@ -634,3 +634,43 @@ describe "Sequel::TimestampMigrator" do
     @db.sqls.should == ["SELECT NULL FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')"]
   end
 end
+
+describe "Sequel::MigrationDSL" do
+
+  let(:valid_change_migration) { Proc.new {
+    change do; end
+  }} 
+  let(:valid_updown_migration) { Proc.new {
+    up do; end
+    down do; end
+  }} 
+  let(:invalid_migration_up) { Proc.new {
+    change do; end
+    up do;end
+  }} 
+  let(:invalid_migration_down) { Proc.new {
+    change do; end
+    down do;end
+  }} 
+
+  before :each do
+    @called = false
+  end
+
+  specify "should not thrown any exception with a valid change migration" do
+    lambda{ Sequel::MigrationDSL.new(&valid_change_migration)}.should_not raise_error
+  end
+
+  specify "should not thrown any exception with a valid up/down migration" do
+    lambda{ Sequel::MigrationDSL.new(&valid_updown_migration)}.should_not raise_error
+  end
+
+  specify "should raise error if migration contains change and up blocks" do
+    lambda{ Sequel::MigrationDSL.new(&invalid_migration_up)}.should raise_error
+  end
+
+  specify "should raise error if migration contains change and down blocks" do
+    lambda{ Sequel::MigrationDSL.new(&invalid_migration_down)}.should raise_error
+  end
+
+end
