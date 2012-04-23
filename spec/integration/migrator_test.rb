@@ -237,4 +237,9 @@ describe Sequel::Migrator do
     [:schema_info].each{|n| @db.table_exists?(n).should be_true}
     [:schema_migrations, :a, :b].each{|n| @db.table_exists?(n).should be_false}
   end
+
+  it 'should raise an exception if migration file contains migrations in two different styles' do
+    @dir = 'spec/files/invalid_migrations'
+    lambda{ @m.apply(@db, @dir, 1) }.should raise_error
+  end
 end
