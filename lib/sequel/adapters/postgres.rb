@@ -584,7 +584,7 @@ module Sequel
       end
 
       def truncate(opts = {})
-        if opts.fetch(:cascade, false)
+        if opts[:cascade]
           execute_ddl("#{truncate_sql} CASCADE")
         else
           super()
