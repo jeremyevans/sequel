@@ -64,11 +64,13 @@ If you have any comments or suggestions please post to the Google group.
 
 == The Sequel Console
 
-Sequel includes an IRB console for quick access to databases. You can use it like this:
+Sequel includes an IRB console for quick access to databases (usually referred to as <tt>bin/sequel</tt>). You can use it like this:
 
   sequel sqlite://test.db # test.db in current directory
 
 You get an IRB session with the database object stored in DB.
+
+In addition to providing an IRB shell (the default behavior), bin/sequel also has support for migrating databases (-m and -M), dumping schema migrations (-d and -D), and copying databases (-C).
 
 == An Introduction
 
