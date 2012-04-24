@@ -161,7 +161,7 @@ describe "A PostgreSQL dataset" do
     proc{POSTGRES_DB[:test].join(:test2, [:name]).update(:name=>'a')}.should raise_error(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
   end
 
-  specify "it should truncate with the cascade option" do
+  specify "should truncate with the cascade option" do
     @d << { :name => 'abc', :value => 1}
     @d.count.should == 1
     @d.truncate(:cascade => true)
