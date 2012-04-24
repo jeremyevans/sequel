@@ -583,6 +583,14 @@ module Sequel
         clone(:cursor=>{:rows_per_fetch=>1000}.merge(opts))
       end
 
+      def truncate(opts = {})
+        if opts.fetch(:cascade, false)
+          execute_ddl("#{truncate_sql} CASCADE")
+        else
+          super()
+        end
+      end
+
       if SEQUEL_POSTGRES_USES_PG
         
         PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze

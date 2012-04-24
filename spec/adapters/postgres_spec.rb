@@ -160,6 +160,13 @@ describe "A PostgreSQL dataset" do
   specify "should raise an error if attempting to update a joined dataset with a single FROM table" do
     proc{POSTGRES_DB[:test].join(:test2, [:name]).update(:name=>'a')}.should raise_error(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
   end
+
+  specify "it should truncate with the cascade option" do
+    @d << { :name => 'abc', :value => 1}
+    @d.count.should == 1
+    @d.truncate(:cascade => true)
+    @d.count.should == 0
+  end
 end
 
 describe "Dataset#distinct" do
