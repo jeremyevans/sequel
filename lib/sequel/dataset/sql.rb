@@ -152,8 +152,8 @@ module Sequel
       if opts[:sql]
         static_sql(opts[:sql])
       else
-        check_modification_allowed!
-        raise(InvalidOperation, "Can't truncate filtered datasets") if opts[:where]
+        check_truncation_allowed!
+        raise(InvalidOperation, "Can't truncate filtered datasets") if opts[:where] || opts[:having]
         _truncate_sql(source_list(opts[:from]))
       end
     end
@@ -788,6 +788,11 @@ module Sequel
     def check_modification_allowed!
       raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
       raise(InvalidOperation, "Joined datasets cannot be modified") if !supports_modifying_joins? && joined_dataset?
+    end
+
+    # Alias of check_modification_allowed!
+    def check_truncation_allowed!
+      check_modification_allowed!
     end
 
     # Prepare an SQL statement by calling all clause methods for the given statement type.

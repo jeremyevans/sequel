@@ -214,6 +214,11 @@ describe "A simple dataset" do
     @dataset.truncate_sql.should == 'TRUNCATE TABLE test'
   end
   
+  specify "should format a truncate statement with multiple tables if supported" do
+    @dataset.meta_def(:check_truncation_allowed!){}
+    @dataset.from(:test, :test2).truncate_sql.should == 'TRUNCATE TABLE test, test2'
+  end
+  
   specify "should format an insert statement with default values" do
     @dataset.insert_sql.should == 'INSERT INTO test DEFAULT VALUES'
   end
@@ -3216,6 +3221,7 @@ describe "Dataset default #fetch_rows, #insert, #update, #delete, #with_sql_dele
   
   specify "#truncate should raise an InvalidOperation exception if the dataset is filtered" do
     proc{@ds.filter(:a=>1).truncate}.should raise_error(Sequel::InvalidOperation)
+    proc{@ds.having(:a=>1).truncate}.should raise_error(Sequel::InvalidOperation)
   end
   
   specify "#execute should execute the SQL on the database" do
