@@ -855,6 +855,29 @@ module Sequel
         server_version >= 80400
       end
 
+      # Truncates the dataset.  Returns nil.
+      #
+      # Options:
+      # :cascade :: whether to use the CASCADE option, useful when truncating
+      #   tables with Foreign Keys.
+      # :only :: truncate using ONLY, so child tables are unaffected
+      # :restart :: use RESTART IDENTITY to restart any related sequences
+      #
+      # :only and :restart only work correctly on PostgreSQL 8.4+.
+      #
+      # Usage:
+      #   DB[:table].truncate # TRUNCATE TABLE "table"
+      #   # => nil
+      #   DB[:table].truncate(:cascade => true, :only=>true, :restart=>true) # TRUNCATE TABLE ONLY "table" RESTART IDENTITY CASCADE
+      #   # => nil
+      def truncate(opts = {})
+        if opts.empty?
+          super()
+        else
+          clone(:truncate_opts=>opts).truncate
+        end
+      end
+
       # Return a clone of the dataset with an addition named window that can be referenced in window functions.
       def window(name, opts)
         clone(:window=>(@opts[:window]||[]) + [[name, SQL::Window.new(opts)]])
@@ -880,6 +903,18 @@ module Sequel
       end
 
       private
+
+      # Format TRUNCATE statement with PostgreSQL specific options.
+      def _truncate_sql(table)
+        to = @opts[:truncate_opts] || {}
+        "TRUNCATE TABLE#{' ONLY' if to[:only]} #{table}#{' RESTART IDENTITY' if to[:restart]}#{' CASCADE' if to[:cascade]}"
+      end
+
+      # Allow truncation of multiple source tables.
+      def check_truncation_allowed!
+        raise(InvalidOperation, "Grouped datasets cannot be truncated") if opts[:group]
+        raise(InvalidOperation, "Joined datasets cannot be truncated") if opts[:join]
+      end
 
       # PostgreSQL allows deleting from joined datasets
       def delete_clause_methods

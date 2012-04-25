@@ -583,25 +583,6 @@ module Sequel
         clone(:cursor=>{:rows_per_fetch=>1000}.merge(opts))
       end
 
-      # Truncates the dataset.  Returns nil.
-      #
-      # Options:
-      # * :cascade - whether to use the CASCADE option, useful when truncating
-      #   tables with Foreign Keys.
-      #
-      # Usage:
-      #   DB[:table].truncate # TRUNCATE table
-      #   # => nil
-      #   DB[:table].truncate(:cascade => true) # TRUNCATE table CASCADE
-      #   # => nil
-      def truncate(opts = {})
-        if opts[:cascade]
-          execute_ddl("#{truncate_sql} CASCADE")
-        else
-          super()
-        end
-      end
-
       if SEQUEL_POSTGRES_USES_PG
         
         PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze

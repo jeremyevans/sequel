@@ -161,11 +161,23 @@ describe "A PostgreSQL dataset" do
     proc{POSTGRES_DB[:test].join(:test2, [:name]).update(:name=>'a')}.should raise_error(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
   end
 
-  specify "should truncate with the cascade option" do
+  specify "should truncate with options" do
     @d << { :name => 'abc', :value => 1}
     @d.count.should == 1
     @d.truncate(:cascade => true)
     @d.count.should == 0
+    if @d.db.server_version > 80400
+      @d << { :name => 'abc', :value => 1}
+      @d.truncate(:cascade => true, :only=>true, :restart=>true)
+      @d.count.should == 0
+    end
+  end
+
+  specify "should truncate multiple tables at once" do
+    tables = [:test, :test2, :test3, :test4]
+    tables.each{|t| @d.from(t).insert}
+    @d.from(:test, :test2, :test3, :test4).truncate
+    tables.each{|t| @d.from(t).count.should == 0}
   end
 end
 

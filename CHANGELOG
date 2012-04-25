@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow truncation of multiple tables at the same time on PostgreSQL (jeremyevans)
+
+* Allow truncate to take a :cascade, :only, and :restart options on PostgreSQL (hgimenez, jeremyevans)
+
 * Allow json and xml serializers to support :array option in class to_json method to serialize existing array of model instances (jeremyevans)
 
 * Add dirty plugin, which saves the initial value of the column when the value is changed (jeremyevans)
