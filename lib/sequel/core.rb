@@ -34,8 +34,8 @@ module Sequel
   # Mutex used to protect file loading/requireing
   @require_mutex = Mutex.new
   
-  # Mutex used to protect global data structures
-  @data_mutex = Mutex.new
+  # Whether Sequel is being run in single threaded mode
+  @single_threaded = false
   
   class << self
     # Sequel converts two digit years in <tt>Date</tt>s and <tt>DateTime</tt>s by default,
@@ -91,6 +91,7 @@ module Sequel
 
     # Make thread safe requiring reentrant to prevent deadlocks.
     def check_requiring_thread
+      return yield if @single_threaded
       t = Thread.current
       return(yield) if @require_thread == t
       @require_mutex.synchronize do
@@ -236,13 +237,15 @@ module Sequel
     Array(files).each{|f| super("#{File.dirname(__FILE__).untaint}/#{"#{subdir}/" if subdir}#{f}")}
   end
   
-  # Set whether to set the single threaded mode for all databases by default. By default,
+  # Set whether Sequel is being used in single threaded mode. By default,
   # Sequel uses a thread-safe connection pool, which isn't as fast as the
-  # single threaded connection pool.  If your program will only have one thread,
-  # and speed is a priority, you may want to set this to true:
+  # single threaded connection pool, and also has some additional thread
+  # safety checks.  If your program will only have one thread,
+  # and speed is a priority, you should set this to true:
   #
   #   Sequel.single_threaded = true
   def self.single_threaded=(value)
+    @single_threaded = value
     Database.single_threaded = value
   end
 
@@ -285,10 +288,22 @@ module Sequel
     end
   end
 
-  # Protects access to any mutable global data structure in Sequel.
-  # Uses a non-reentrant mutex, so calling code should be careful.
-  def self.synchronize(&block)
-    @data_mutex.synchronize(&block)
+  if defined?(RUBY_ENGINE) && RUBY_ENGINE != 'ruby'
+    # Mutex used to protect mutable data structures
+    @data_mutex = Mutex.new
+
+    # Unless in single threaded mode, protects access to any mutable
+    # global data structure in Sequel.
+    # Uses a non-reentrant mutex, so calling code should be careful.
+    def self.synchronize(&block)
+      @single_threaded ? yield : @data_mutex.synchronize(&block)
+    end
+  else
+    # Yield directly to the block.  You don't need to synchronize
+    # access on MRI because the GVL makes certain methods atomic.
+    def self.synchronize(&block)
+      yield
+    end
   end
 
   # Uses a transaction on all given databases with the given options. This:
