@@ -28,7 +28,7 @@ module Sequel
 
         # All descendent classes of this model.
         def descendents
-          subclasses.map{|x| [x] + x.descendents}.flatten
+          Sequel.synchronize{_descendents}
         end
 
         # Add the subclass to this model's current subclasses,
@@ -36,8 +36,16 @@ module Sequel
         # in the subclass.
         def inherited(subclass)
           super
-          subclasses << subclass
+          Sequel.synchronize{subclasses << subclass}
           subclass.instance_variable_set(:@subclasses, [])
+        end
+
+        private
+
+        # Recursive, non-thread safe version of descendents, since
+        # the mutex Sequel uses isn't reentrant.
+        def _descendents
+          subclasses.map{|x| [x] + x.send(:_descendents)}.flatten
         end
       end
     end
