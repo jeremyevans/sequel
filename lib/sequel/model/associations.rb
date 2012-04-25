@@ -54,7 +54,7 @@ module Sequel
       
         # The class associated to the current model class via this association
         def associated_class
-          self[:class] ||= constantize(self[:class_name])
+          cached_fetch(:class){constantize(self[:class_name])}
         end
         
         # Whether this association can have associated objects, given the current
@@ -81,9 +81,9 @@ module Sequel
     
         # The eager limit strategy to use for this dataset.
         def eager_limit_strategy
-          fetch(:_eager_limit_strategy) do
-            self[:_eager_limit_strategy] = if self[:limit]
-              case s = self.fetch(:eager_limit_strategy){self[:model].default_eager_limit_strategy || :ruby}
+          cached_fetch(:_eager_limit_strategy) do
+            if self[:limit]
+              case s = cached_fetch(:eager_limit_strategy){self[:model].default_eager_limit_strategy || :ruby}
               when true
                 ds = associated_class.dataset
                 if ds.supports_window_functions?
@@ -151,16 +151,19 @@ module Sequel
         # to populate reciprocal associations.  For example, when you do this_artist.add_album(album)
         # it sets album.artist to this_artist.
         def reciprocal
-          return self[:reciprocal] if include?(:reciprocal)
-          r_types = Array(reciprocal_type)
-          keys = self[:keys]
-          associated_class.all_association_reflections.each do |assoc_reflect|
-            if r_types.include?(assoc_reflect[:type]) && assoc_reflect[:keys] == keys && assoc_reflect.associated_class == self[:model]
-              self[:reciprocal_type] = assoc_reflect[:type]
-              return self[:reciprocal] = assoc_reflect[:name]
+          cached_fetch(:reciprocal) do
+            r_types = Array(reciprocal_type)
+            keys = self[:keys]
+            recip = nil
+            associated_class.all_association_reflections.each do |assoc_reflect|
+              if r_types.include?(assoc_reflect[:type]) && assoc_reflect[:keys] == keys && assoc_reflect.associated_class == self[:model]
+                cached_set(:reciprocal_type, assoc_reflect[:type])
+                recip = assoc_reflect[:name]
+                break
+              end
             end
+            recip
           end
-          self[:reciprocal] = nil
         end
     
         # Whether the reciprocal of this association returns an array of objects instead of a single object,
@@ -214,6 +217,39 @@ module Sequel
         
         private
 
+        if defined?(RUBY_ENGINE) && RUBY_ENGINE != 'ruby'
+          # On non-GVL rubies, assume the need to synchronize access.  Store the key
+          # in a special sub-hash that always uses this method to synchronize access.
+          def cached_fetch(key)
+            fetch(key) do
+              h = self[:cache]
+              Sequel.synchronize{return h[key] if h.has_key?(key)}
+              value = yield
+              Sequel.synchronize{h[key] = value}
+            end
+          end
+
+          # Cache the value at the given key, synchronizing access.
+          def cached_set(key, value)
+            h = self[:cache]
+            Sequel.synchronize{h[key] = value}
+          end
+        else
+          # On MRI, use a plain fetch, since the GVL will synchronize access.
+          def cached_fetch(key)
+            fetch(key) do 
+              h = self[:cache]
+              h.fetch(key){h[key] = yield}
+            end
+          end
+
+          # On MRI, just set the value at the key in the cache, since the GVL
+          # will synchronize access.
+          def cached_set(key, value)
+            self[:cache][key] = value
+          end
+        end
+
         # If +s+ is an array, map +s+ over the block.  Otherwise, just call the
         # block with +s+.
         def transform(s)
@@ -254,35 +290,35 @@ module Sequel
 
         # The key to use for the key hash when eager loading
         def eager_loader_key
-          self[:eager_loader_key] ||= self[:key]
+          cached_fetch(:eager_loader_key){self[:key]}
         end
     
         # The column(s) in the associated table that the key in the current table references (either a symbol or an array).
         def primary_key
-         self[:primary_key] ||= associated_class.primary_key
+         cached_fetch(:primary_key){associated_class.primary_key}
         end
        
         # The columns in the associated table that the key in the current table references (always an array).
         def primary_keys
-         self[:primary_keys] ||= Array(primary_key)
+         cached_fetch(:primary_keys){Array(primary_key)}
         end
         alias associated_object_keys primary_keys
 
         # The method symbol or array of method symbols to call on the associated object
         # to get the value to use for the foreign keys.
         def primary_key_method
-         self[:primary_key_method] ||= primary_key
+         cached_fetch(:primary_key_method){primary_key}
         end
        
         # The array of method symbols to call on the associated object
         # to get the value to use for the foreign keys.
         def primary_key_methods
-         self[:primary_key_methods] ||= Array(primary_key_method)
+         cached_fetch(:primary_key_methods){Array(primary_key_method)}
         end
        
         # #primary_key qualified by the associated table
         def qualified_primary_key
-          self[:qualified_primary_key] ||= self[:qualify] == false ? primary_key : qualify_assoc(primary_key)
+          cached_fetch(:qualified_primary_key){self[:qualify] == false ? primary_key : qualify_assoc(primary_key)}
         end
         
         # True only if the reciprocal is a one_to_many association.
@@ -299,7 +335,7 @@ module Sequel
         # True only if the reciprocal is a one_to_one association.
         def set_reciprocal_to_self?
           reciprocal
-          self[:reciprocal_type] == :one_to_one
+          reciprocal_type == :one_to_one
         end
     
         private
@@ -307,7 +343,7 @@ module Sequel
         # The reciprocal type of a many_to_one association is either
         # a one_to_many or a one_to_one association.
         def reciprocal_type
-          self[:reciprocal_type] ||= [:one_to_many, :one_to_one]
+          cached_fetch(:reciprocal_type){[:one_to_many, :one_to_one]}
         end
       end
     
@@ -333,12 +369,12 @@ module Sequel
         
         # The key to use for the key hash when eager loading
         def eager_loader_key
-          self[:eager_loader_key] ||= primary_key
+          cached_fetch(:eager_loader_key){primary_key}
         end
 
         # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
         def eager_loading_predicate_key
-          self[:eager_loading_predicate_key] ||= qualify_assoc(self[:key])
+          cached_fetch(:eager_loading_predicate_key){qualify_assoc(self[:key])}
         end
         alias qualified_key eager_loading_predicate_key
     
@@ -349,7 +385,7 @@ module Sequel
 
         # #primary_key qualified by the current table
         def qualified_primary_key
-          self[:qualified_primary_key] ||= qualify_cur(primary_key)
+          cached_fetch(:qualified_primary_key){qualify_cur(primary_key)}
         end
       
         # Whether the reciprocal of this association returns an array of objects instead of a single object,
@@ -387,8 +423,8 @@ module Sequel
         # one_to_one associations don't use an eager limit strategy by default, but
         # support both DISTINCT ON and window functions as strategies.
         def eager_limit_strategy
-          fetch(:_eager_limit_strategy) do
-            self[:_eager_limit_strategy] = case s = self[:eager_limit_strategy]
+          cached_fetch(:_eager_limit_strategy) do
+            case s = self[:eager_limit_strategy]
             when Symbol
               s
             when true
@@ -464,19 +500,19 @@ module Sequel
       
         # The key to use for the key hash when eager loading
         def eager_loader_key
-          self[:eager_loader_key] ||= self[:left_primary_key]
+          cached_fetch(:eager_loader_key){self[:left_primary_key]}
         end
     
         # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3)).
         # The left key qualified by the join table.
         def eager_loading_predicate_key
-          self[:eager_loading_predicate_key] ||= qualify(join_table_alias, self[:left_key])
+          cached_fetch(:eager_loading_predicate_key){qualify(join_table_alias, self[:left_key])}
         end
         alias qualified_left_key eager_loading_predicate_key
 
         # The right key qualified by the join table.
         def qualified_right_key
-          self[:qualified_right_key] ||= qualify(join_table_alias, self[:right_key])
+          cached_fetch(:qualified_right_key){qualify(join_table_alias, self[:right_key])}
         end
     
         # many_to_many associations need to select a key in an associated table to eagerly load
@@ -487,18 +523,15 @@ module Sequel
         # The source of the join table.  This is the join table itself, unless it
         # is aliased, in which case it is the unaliased part.
         def join_table_source
-          fetch(:join_table_source) do
-            split_join_table_alias
-            self[:join_table_source]
-          end
+          cached_fetch(:join_table_source){split_join_table_alias[0]}
         end
 
         # The join table itself, unless it is aliased, in which case this
         # is the alias.
         def join_table_alias
-          fetch(:join_table_alias) do
-            split_join_table_alias
-            self[:join_table_alias]
+          cached_fetch(:join_table_alias) do
+            s, a = split_join_table_alias
+            a || s
           end
         end
         alias associated_key_table join_table_alias
@@ -511,60 +544,60 @@ module Sequel
     
         # Returns the reciprocal association symbol, if one exists.
         def reciprocal
-          return self[:reciprocal] if include?(:reciprocal)
-          left_keys = self[:left_keys]
-          right_keys = self[:right_keys]
-          join_table = self[:join_table]
-          associated_class.all_association_reflections.each do |assoc_reflect|
-            if assoc_reflect[:type] == :many_to_many && assoc_reflect[:left_keys] == right_keys &&
-               assoc_reflect[:right_keys] == left_keys && assoc_reflect[:join_table] == join_table &&
-               assoc_reflect.associated_class == self[:model]
-              return self[:reciprocal] = assoc_reflect[:name]
+          cached_fetch(:reciprocal) do
+            left_keys = self[:left_keys]
+            right_keys = self[:right_keys]
+            join_table = self[:join_table]
+            recip = nil
+            associated_class.all_association_reflections.each do |assoc_reflect|
+              if assoc_reflect[:type] == :many_to_many && assoc_reflect[:left_keys] == right_keys &&
+                 assoc_reflect[:right_keys] == left_keys && assoc_reflect[:join_table] == join_table &&
+                 assoc_reflect.associated_class == self[:model]
+                recip = assoc_reflect[:name]
+                break
+              end
             end
+            recip
           end
-          self[:reciprocal] = nil
         end
 
         # #right_primary_key qualified by the associated table
         def qualified_right_primary_key
-          self[:qualified_right_primary_key] ||= qualify_assoc(right_primary_key)
+          cached_fetch(:qualified_right_primary_key){qualify_assoc(right_primary_key)}
         end
     
         # The primary key column(s) to use in the associated table (can be symbol or array).
         def right_primary_key
-          self[:right_primary_key] ||= associated_class.primary_key
+          cached_fetch(:right_primary_key){associated_class.primary_key}
         end
         
         # The primary key columns to use in the associated table (always array).
         def right_primary_keys
-          self[:right_primary_keys] ||= Array(right_primary_key)
+          cached_fetch(:right_primary_keys){Array(right_primary_key)}
         end
     
         # The method symbol or array of method symbols to call on the associated objects
         # to get the foreign key values for the join table. 
         def right_primary_key_method
-          self[:right_primary_key_method] ||= right_primary_key
+          cached_fetch(:right_primary_key_method){right_primary_key}
         end
 
         # The array of method symbols to call on the associated objects
         # to get the foreign key values for the join table. 
         def right_primary_key_methods
-          self[:right_primary_key_methods] ||= Array(right_primary_key_method)
+          cached_fetch(:right_primary_key_methods){Array(right_primary_key_method)}
         end
         
         # The columns to select when loading the association, associated_class.table_name.* by default.
         def select
-         return self[:select] if include?(:select)
-         self[:select] ||= Sequel::SQL::ColumnAll.new(associated_class.table_name)
+         cached_fetch(:select){Sequel::SQL::ColumnAll.new(associated_class.table_name)}
         end
 
         private
 
         # Split the join table into source and alias parts.
         def split_join_table_alias
-          s, a = associated_class.dataset.split_alias(self[:join_table])
-          self[:join_table_source] = s
-          self[:join_table_alias] = a || s
+          associated_class.dataset.split_alias(self[:join_table])
         end
       end
   
@@ -862,7 +895,7 @@ module Sequel
           # dup early so we don't modify opts
           orig_opts = opts.dup
           orig_opts = association_reflection(opts[:clone])[:orig_opts].merge(orig_opts) if opts[:clone]
-          opts = orig_opts.merge(:type => type, :name => name, :cache => true, :model => self)
+          opts = orig_opts.merge(:type => type, :name => name, :cache=>{}, :model => self)
           opts[:block] = block if block
           opts = assoc_class.new.merge!(opts)
           opts[:eager_block] = block unless opts.include?(:eager_block)
@@ -877,6 +910,9 @@ module Sequel
             opts[cb_type] = Array(opts[cb_type])
           end
           late_binding_class_option(opts, opts.returns_array? ? singularize(name) : name)
+          
+          # Remove :class entry if it exists and is nil, to work with cached_fetch
+          opts.delete(:class) unless opts[:class]
           
           send(:"def_#{type}", opts)
       
