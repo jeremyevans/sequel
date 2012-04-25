@@ -1,4 +1,4 @@
-require 'mysql2' unless defined? Mysql2
+require 'mysql2'
 Sequel.require %w'shared/mysql_prepared_statements', 'adapters'
 
 module Sequel
