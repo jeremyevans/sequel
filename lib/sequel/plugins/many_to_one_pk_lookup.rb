@@ -38,8 +38,8 @@ module Sequel
         # caching if the associated model is using caching.
         def _load_associated_object(opts, dynamic_opts)
           klass = opts.associated_class
-          cache_lookup = opts.fetch(:many_to_one_pk_lookup) do 
-            opts[:many_to_one_pk_lookup] = opts[:type] == :many_to_one &&
+          cache_lookup = opts.send(:cached_fetch, :many_to_one_pk_lookup) do 
+            opts[:type] == :many_to_one &&
               opts[:key] &&
               opts.primary_key == klass.primary_key
           end
