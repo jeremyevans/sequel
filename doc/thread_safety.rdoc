@@ -1,0 +1,17 @@
+= Thread Safety
+
+Most Sequel usage (and all common Sequel usage) is thread safe by default.  Specifically, multiple threads can operate on Database instances, Dataset instances, and Model classes concurrently without problems.  In general, Database instance and Model classes are not modified after application startup, and modifying Dataset instances returns modified copies of the dataset instead of mutating it.
+
+== Connection Pool
+
+In order to allow multiple threads to operate on the same database at the same time, Sequel uses a connection pool.  The connection pool is designed so that a thread uses a connection for the minimum amount of time, returning the connection to the pool as soon as it is done using the connection.  If a thread requests a connection and the pool is empty, the thread will block (actually busy-wait) until a connection is available or the the connection pool timeout has elapsed (in which case a PoolTimeout error will be raised).
+
+== Exceptions
+
+This is a small list of things that are specifically non thread-safe.  This is not an exhaustive list, there may be cases not mentioned here.
+
+1) Model instances: Model instances are not thread-safe unless they are frozen first.  Multiple threads should not operate on an unfrozen model instance concurrently.
+
+2) Model class modifications: Model class modifications, such as adding associations and loading plugins, are not designed to be thread safe.  You should not modify a class in one thread if any other thread can concurrently access it.  Model subclassing is designed to be thread-safe, so you create a model subclass in a thread and modify it safely.
+
+3) Dataset mutation methods: Dataset mutation methods are not thread safe, you should not call them on datasets that could be accessed by other threads.  It is safe to clone the dataset first inside a thread and call mutation methods on the cloned dataset.
