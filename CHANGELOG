@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix possible thread-safety issues in non-GVL ruby implementations in association reflection caching (jeremyevans)
+
 * Allow truncation of multiple tables at the same time on PostgreSQL (jeremyevans)
 
 * Allow truncate to take a :cascade, :only, and :restart options on PostgreSQL (hgimenez, jeremyevans)
@@ -20,7 +22,7 @@
 
 * Recognize identity type in the schema dumper (jeremyevans) (#468)
 
-* Fix possible thread safety issues in creating Database objects and anonymous model classes (jeremyevans)
+* Fix possible thread safety issues in non-GVL ruby implementations when creating Database objects and anonymous model classes (jeremyevans)
 
 * Don't assign instance variables to Java objects, for future JRuby 2.0 support (jeremyevans) (#466)
 

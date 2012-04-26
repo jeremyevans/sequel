@@ -47,40 +47,23 @@ module Sequel
       class ManyThroughManyAssociationReflection < Sequel::Model::Associations::ManyToManyAssociationReflection
         Sequel::Model::Associations::ASSOCIATION_TYPES[:many_through_many] = self
 
-        # The table containing the column to use for the associated key when eagerly loading
-        def associated_key_table
-          self[:associated_key_table] = self[:final_reverse_edge][:alias]
-        end
-        
         # The default associated key alias(es) to use when eager loading
         # associations via eager.
         def default_associated_key_alias
           self[:uses_left_composite_keys] ? (0...self[:through].first[:left].length).map{|i| :"x_foreign_key_#{i}_x"} : :x_foreign_key_x
         end
 
-        # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
-        def eager_loading_predicate_key
-          self[:eager_loading_predicate_key] ||= begin
-            calculate_edges
-            e = self[:edges].first
-            f = self[:final_reverse_edge]
-            qualify(f[:alias], e[:right])
-          end
-        end
-    
-        # The list of joins to use when eager graphing
-        def edges
-          self[:edges] || calculate_edges || self[:edges]
+        %w'associated_key_table eager_loading_predicate_key edges final_edge final_reverse_edge reverse_edges'.each do |meth|
+          class_eval(<<-END, __FILE__, __LINE__+1)
+            def #{meth}
+              cached_fetch(:#{meth}){calculate_edges[:#{meth}]}
+            end
+          END
         end
 
         # Many through many associations don't have a reciprocal
         def reciprocal
           nil
-        end
-
-        # The list of joins to use when lazy loading or eager loading
-        def reverse_edges
-          self[:reverse_edges] || calculate_edges || self[:reverse_edges]
         end
 
         private
@@ -119,11 +102,18 @@ module Sequel
           reverse_edges = es.reverse.map{|e| {:table=>e[:left_table], :left=>e[:left_key], :right=>e[:right_key]}}
           reverse_edges.pop
           calculate_reverse_edge_aliases(reverse_edges)
-          self[:final_edge] = edges.pop
-          self[:final_reverse_edge] = reverse_edges.pop
-          self[:edges] = edges
-          self[:reverse_edges] = reverse_edges
-          nil
+          final_reverse_edge = reverse_edges.pop
+          final_reverse_alias = final_reverse_edge[:alias]
+
+          h = {:final_edge=>edges.pop,
+               :final_reverse_edge=>final_reverse_edge,
+               :edges=>edges,
+               :reverse_edges=>reverse_edges,
+               :eager_loading_predicate_key=>qualify(final_reverse_alias, edges.first[:right]),
+               :associated_key_table=>final_reverse_edge[:alias],
+          }
+          h.each{|k, v| cached_set(k, v)}
+          h
         end
       end
 
@@ -185,7 +175,7 @@ module Sequel
           opts[:dataset] ||= lambda do
             ds = opts.associated_class
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
-            ft = opts[:final_reverse_edge]
+            ft = opts.final_reverse_edge
             ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])) + left_keys.zip(left_pks.map{|k| send(k)}), :table_alias=>ft[:alias])
           end
 
@@ -196,7 +186,7 @@ module Sequel
             rows.each{|object| object.associations[name] = []}
             ds = opts.associated_class 
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
-            ft = opts[:final_reverse_edge]
+            ft = opts.final_reverse_edge
             ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.eager_loading_predicate_key, h.keys]], :table_alias=>ft[:alias])
             ds = model.eager_loading_dataset(opts, ds, nil, eo[:associations], eo)
             case opts.eager_limit_strategy
@@ -240,7 +230,7 @@ module Sequel
               ds = ds.graph(t[:table], t.fetch(:only_conditions, (Array(t[:right]).zip(Array(t[:left])) + t[:conditions])), :select=>false, :table_alias=>ds.unused_table_alias(t[:table]), :join_type=>t[:join_type], :implicit_qualifier=>iq, &t[:block])
               iq = nil
             end
-            fe = opts[:final_edge]
+            fe = opts.final_edge
             ds.graph(opts.associated_class, use_only_conditions ? only_conditions : (Array(opts.right_primary_key).zip(Array(fe[:left])) + conditions), :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, &graph_block)
           end
 
@@ -269,7 +259,7 @@ module Sequel
           end
           meths = ref.right_primary_keys
           meths = ref.qualify(obj.model.table_name, meths) if obj.is_a?(Sequel::Dataset)
-          exp = association_filter_key_expression(ref.qualify(last_alias, Array(ref[:final_edge][:left])), meths, obj)
+          exp = association_filter_key_expression(ref.qualify(last_alias, Array(ref.final_edge[:left])), meths, obj)
           if exp == SQL::Constants::FALSE
             association_filter_handle_inversion(op, exp, Array(lpks))
           else

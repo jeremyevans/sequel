@@ -53,8 +53,7 @@ module Sequel
           when :many_to_many
             association_bound_variable_hash(opts.join_table_alias, opts[:left_keys], opts[:left_primary_keys])
           when :many_through_many
-            opts.reverse_edges
-            association_bound_variable_hash(opts[:final_reverse_edge][:alias], Array(opts[:left_key]), opts[:left_primary_keys])
+            association_bound_variable_hash(opts.final_reverse_edge[:alias], Array(opts[:left_key]), opts[:left_primary_keys])
           end
         end
 

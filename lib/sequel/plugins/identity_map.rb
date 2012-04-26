@@ -111,7 +111,7 @@ module Sequel
               eo[:rows].each{|object| object.associations[name] = []}
               ds = opts.associated_class 
               opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
-              ft = opts[:final_reverse_edge]
+              ft = opts.final_reverse_edge
               conds = uses_lcks ? [[left_keys.map{|k| SQL::QualifiedIdentifier.new(ft[:table], k)}, h.keys]] : [[left_key, h.keys]]
 
               # See above comment in many_to_many eager_loader
