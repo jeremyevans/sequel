@@ -61,7 +61,7 @@ module Sequel
         # that, given appropriate bound variables, the prepared statement will work correctly for any
         # instance.
         def association_prepared_statement(opts)
-          opts[:prepared_statement] ||= begin
+          opts.send(:cached_fetch, :prepared_statement) do
             ps = _associated_dataset(opts, {}).unbind.first.prepare(opts.returns_array? ? :select : :first, :"smpsap_#{NEXT.call}")
             ps.log_sql = true
             ps
