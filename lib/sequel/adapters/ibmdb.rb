@@ -227,7 +227,7 @@ module Sequel
       # Execute a prepared statement named by name on the database.
       def execute_prepared_statement(ps_name, opts)
         args = opts[:arguments]
-        ps = prepared_statements[ps_name]
+        ps = prepared_statement(ps_name)
         sql = ps.prepared_sql
         synchronize(opts[:server]) do |conn|
           unless conn.prepared_statements.fetch(ps_name, []).first == sql
@@ -444,7 +444,7 @@ module Sequel
         ps.extend(PreparedStatementMethods)
         if name
           ps.prepared_statement_name = name
-          db.prepared_statements[name] = ps
+          db.set_prepared_statement(name, ps)
         end
         ps
       end

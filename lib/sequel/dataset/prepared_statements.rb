@@ -247,7 +247,7 @@ module Sequel
     #   DB.call(:select_by_name, :name=>'Blah') # Same thing
     def prepare(type, name=nil, *values)
       ps = to_prepared_statement(type, values)
-      db.prepared_statements[name] = ps if name
+      db.set_prepared_statement(name, ps) if name
       ps
     end
     

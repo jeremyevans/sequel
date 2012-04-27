@@ -216,7 +216,7 @@ module Sequel
 
       # Execute a prepared statement on the database using the given name.
       def execute_prepared_statement(conn, type, name, opts, &block)
-        ps = prepared_statements[name]
+        ps = prepared_statement(name)
         sql = ps.prepared_sql
         args = opts[:arguments]
         ps_args = {}
@@ -382,7 +382,7 @@ module Sequel
         ps.extend(PreparedStatementMethods)
         if name
           ps.prepared_statement_name = name
-          db.prepared_statements[name] = ps
+          db.set_prepared_statement(name, ps)
         end
         ps
       end

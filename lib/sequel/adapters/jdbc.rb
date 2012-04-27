@@ -345,7 +345,7 @@ module Sequel
           ps = name
           name = ps.prepared_statement_name
         else
-          ps = prepared_statements[name]
+          ps = prepared_statement(name)
         end
         sql = ps.prepared_sql
         synchronize(opts[:server]) do |conn|
@@ -612,7 +612,7 @@ module Sequel
         ps.extend(PreparedStatementMethods)
         if name
           ps.prepared_statement_name = name
-          db.prepared_statements[name] = ps
+          db.set_prepared_statement(name, ps)
         end
         ps
       end

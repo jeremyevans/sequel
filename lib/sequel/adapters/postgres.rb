@@ -469,7 +469,7 @@ module Sequel
       # of rows changed.  If the :insert option is passed, return the value
       # of the primary key for the last inserted row.
       def execute_prepared_statement(name, opts={})
-        ps = prepared_statements[name]
+        ps = prepared_statement(name)
         sql = ps.prepared_sql
         ps_name = name.to_s
         synchronize(opts[:server]) do |conn|
@@ -691,7 +691,7 @@ module Sequel
           ps.extend(PreparedStatementMethods)
           if name
             ps.prepared_statement_name = name
-            db.prepared_statements[name] = ps
+            db.set_prepared_statement(name, ps)
           end
           ps
         end

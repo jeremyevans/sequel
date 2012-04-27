@@ -141,10 +141,20 @@ module Sequel
       schema_utility_dataset.literal(v)
     end
 
+    # Synchronize access to the prepared statements cache.
+    def prepared_statement(name)
+      Sequel.synchronize{prepared_statements[name]}
+    end
+
     # Default serial primary key options, used by the table creation
     # code.
     def serial_primary_key_options
       {:primary_key => true, :type => Integer, :auto_increment => true}
+    end
+
+    # Cache the prepared statement object at the given name.
+    def set_prepared_statement(name, ps)
+      Sequel.synchronize{prepared_statements[name] = ps}
     end
 
     # Whether the database supports CREATE TABLE IF NOT EXISTS syntax,

@@ -126,7 +126,7 @@ module Sequel
       end
 
       def execute_prepared_statement(conn, type, name, opts)
-        ps = prepared_statements[name]
+        ps = prepared_statement(name)
         sql = ps.prepared_sql
         if cursora = conn.prepared_statements[name]
           cursor, cursor_sql = cursora
@@ -370,19 +370,6 @@ module Sequel
         ps.call(bind_vars, &block)
       end
       
-      # Prepare the given type of query with the given name and store
-      # it in the database.  Note that a new native prepared statement is
-      # created on each call to this prepared statement.
-      def prepare(type, name=nil, *values)
-        ps = to_prepared_statement(type, values)
-        ps.extend(PreparedStatementMethods)
-        if name
-          ps.prepared_statement_name = name
-          db.prepared_statements[name] = ps
-        end
-        ps
-      end
-      
       def fetch_rows(sql)
         execute(sql) do |cursor|
           offset = @opts[:offset]
@@ -403,14 +390,15 @@ module Sequel
         self
       end
 
-      # Create a named prepared statement that is stored in the
-      # database (and connection) for reuse.
+      # Prepare the given type of query with the given name and store
+      # it in the database.  Note that a new native prepared statement is
+      # created on each call to this prepared statement.
       def prepare(type, name=nil, *values)
         ps = to_prepared_statement(type, values)
         ps.extend(PreparedStatementMethods)
         if name
           ps.prepared_statement_name = name
-          db.prepared_statements[name] = ps
+          db.set_prepared_statement(name, ps)
         end
         ps
       end
