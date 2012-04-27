@@ -309,36 +309,46 @@ module Sequel
       end
     end
 
+    # Synchronize access to the current transactions, returning the hash
+    # of options for the current transaction (if any)
+    def _trans(conn)
+      Sequel.synchronize{@transactions[conn]}
+    end
+
     # Add the current thread to the list of active transactions
     def add_transaction(conn, opts)
       if supports_savepoints?
-        unless @transactions[conn]
-          @transactions[conn] = {:savepoint_level=>0}
-          @transactions[conn][:prepare] = opts[:prepare] if opts[:prepare] && supports_prepared_transactions?
+        unless _trans(conn)
+          if (prep = opts[:prepare]) && supports_prepared_transactions?
+            Sequel.synchronize{@transactions[conn] = {:savepoint_level=>0, :prepare=>prep}}
+          else
+            Sequel.synchronize{@transactions[conn] = {:savepoint_level=>0}}
+          end
         end
+      elsif (prep = opts[:prepare]) && supports_prepared_transactions?
+        Sequel.synchronize{@transactions[conn] = {:prepare => prep}}
       else
-        @transactions[conn] = {}
-        @transactions[conn][:prepare] = opts[:prepare] if opts[:prepare] && supports_prepared_transactions?
+        Sequel.synchronize{@transactions[conn] = {}}
       end
     end    
 
     # Call all stored after_commit blocks for the given transaction
     def after_transaction_commit(conn)
-      if ary = @transactions[conn][:after_commit]
+      if ary = _trans(conn)[:after_commit]
         ary.each{|b| b.call}
       end
     end
 
     # Call all stored after_rollback blocks for the given transaction
     def after_transaction_rollback(conn)
-      if ary = @transactions[conn][:after_rollback]
+      if ary = _trans(conn)[:after_rollback]
         ary.each{|b| b.call}
       end
     end
 
     # Whether the current thread/connection is already inside a transaction
     def already_in_transaction?(conn, opts)
-      @transactions.has_key?(conn) && (!supports_savepoints? || !opts[:savepoint])
+      _trans(conn) && (!supports_savepoints? || !opts[:savepoint])
     end
     
     # SQL to start a new savepoint
@@ -355,7 +365,7 @@ module Sequel
     # Start a new database transaction or a new savepoint on the given connection.
     def begin_transaction(conn, opts={})
       if supports_savepoints?
-        th = @transactions[conn]
+        th = _trans(conn)
         if (depth = th[:savepoint_level]) > 0
           log_connection_execute(conn, begin_savepoint_sql(depth))
         else
@@ -462,7 +472,7 @@ module Sequel
     # Commit the active transaction on the connection
     def commit_transaction(conn, opts={})
       if supports_savepoints?
-        depth = @transactions[conn][:savepoint_level]
+        depth = _trans(conn)[:savepoint_level]
         log_connection_execute(conn, depth > 1 ? commit_savepoint_sql(depth-1) : commit_transaction_sql)
       else
         log_connection_execute(conn, commit_transaction_sql)
@@ -512,7 +522,7 @@ module Sequel
     
     # Remove the current thread from the list of active transactions
     def remove_transaction(conn, committed)
-      if !supports_savepoints? || ((@transactions[conn][:savepoint_level] -= 1) <= 0)
+      if !supports_savepoints? || ((_trans(conn)[:savepoint_level] -= 1) <= 0)
         begin
           if committed
             after_transaction_commit(conn)
@@ -520,7 +530,7 @@ module Sequel
             after_transaction_rollback(conn)
           end
         ensure
-          @transactions.delete(conn)
+          Sequel.synchronize{@transactions.delete(conn)}
         end
       end
     end
@@ -533,7 +543,7 @@ module Sequel
     # Rollback the active transaction on the connection
     def rollback_transaction(conn, opts={})
       if supports_savepoints?
-        depth = @transactions[conn][:savepoint_level]
+        depth = _trans(conn)[:savepoint_level]
         log_connection_execute(conn, depth > 1 ? rollback_savepoint_sql(depth-1) : rollback_transaction_sql)
       else
         log_connection_execute(conn, rollback_transaction_sql)

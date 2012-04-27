@@ -75,7 +75,7 @@ module Sequel
     def after_commit(opts={}, &block)
       raise Error, "must provide block to after_commit" unless block
       synchronize(opts[:server]) do |conn|
-        if h = @transactions[conn]
+        if h = _trans(conn)
           raise Error, "cannot call after_commit in a prepared transaction" if h[:prepare]
           (h[:after_commit] ||= []) << block
         else
@@ -92,7 +92,7 @@ module Sequel
     def after_rollback(opts={}, &block)
       raise Error, "must provide block to after_rollback" unless block
       synchronize(opts[:server]) do |conn|
-        if h = @transactions[conn]
+        if h = _trans(conn)
           raise Error, "cannot call after_rollback in a prepared transaction" if h[:prepare]
           (h[:after_rollback] ||= []) << block
         end
@@ -118,7 +118,7 @@ module Sequel
     # false otherwise.  Respects the :server option for selecting
     # a shard.
     def in_transaction?(opts={})
-      synchronize(opts[:server]){|conn| !!@transactions[conn]}
+      synchronize(opts[:server]){|conn| !!_trans(conn)}
     end
 
     # Returns a string representation of the database object including the
