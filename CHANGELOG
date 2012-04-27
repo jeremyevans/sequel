@@ -1,5 +1,7 @@
 === HEAD
 
+* Add DSL support for the modulus operator (%), similar to the bitwise operators (jeremyevans)
+
 * Fix possible thread-safety issues on non-GVL ruby implementations (jeremyevans)
 
 * Allow truncation of multiple tables at the same time on PostgreSQL (jeremyevans)

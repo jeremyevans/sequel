@@ -192,6 +192,8 @@ module Sequel
             super(sql, :LIKE, [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1))])
           when :"NOT ILIKE"
             super(sql, :"NOT LIKE", [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1))])
+          when :%
+            sql << complex_expression_arg_pairs(args){|a, b| "MOD(#{literal(a)}, #{literal(b)})"}
           when :&, :|, :^, :<<, :>>
             raise Error, "Derby doesn't support the #{op} operator"
           when :'B~'

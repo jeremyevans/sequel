@@ -1126,6 +1126,13 @@ describe "Sequel::Dataset DSL support" do
     @ds.get{a.sql_number ^ b ^ 1}.to_i.should == 7
   end
   
+  specify "should work with the modulus operator" do
+    @ds.insert(3, 5)
+    @ds.get{a.sql_number % 4}.to_i.should == 3
+    @ds.get{b.sql_number % 4}.to_i.should == 1
+    @ds.get{a.sql_number % 4 % 2}.to_i.should == 1
+  end
+  
   specify "should work with inequality operators" do
     @ds.insert(10, 11)
     @ds.insert(11, 11)

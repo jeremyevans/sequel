@@ -138,7 +138,7 @@ module Sequel
       MATHEMATICAL_OPERATORS = [:+, :-, :/, :*]
 
       # Bitwise mathematical operators used in +NumericMethods+
-      BITWISE_OPERATORS = [:&, :|, :^, :<<, :>>]
+      BITWISE_OPERATORS = [:&, :|, :^, :<<, :>>, :%]
 
       # Inequality operators used in +InequalityMethods+
       INEQUALITY_OPERATORS = [:<, :>, :<=, :>=]
