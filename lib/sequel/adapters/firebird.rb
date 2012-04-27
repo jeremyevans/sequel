@@ -31,7 +31,7 @@ module Sequel
       def execute(sql, opts={})
         begin
           synchronize(opts[:server]) do |conn|
-            if conn.transaction_started && !@transactions.has_key?(conn)
+            if conn.transaction_started && !_trans(conn)
               conn.rollback
               raise DatabaseDisconnectError, "transaction accidently left open, rolling back and disconnecting"
             end

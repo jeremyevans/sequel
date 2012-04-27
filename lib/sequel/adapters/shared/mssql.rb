@@ -146,7 +146,7 @@ module Sequel
       # Commit the active transaction on the connection, does not commit/release
       # savepoints.
       def commit_transaction(conn, opts={})
-        log_connection_execute(conn, commit_transaction_sql) unless @transactions[conn][:savepoint_level] > 1
+        log_connection_execute(conn, commit_transaction_sql) unless _trans(conn)[:savepoint_level] > 1
       end
 
       # SQL to COMMIT a transaction.
