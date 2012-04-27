@@ -246,7 +246,7 @@ module Sequel
       # Prepare the XA transaction for a two-phase commit if the
       # :prepare option is given.
       def commit_transaction(conn, opts={})
-        if (s = opts[:prepare]) && _trans[conn)[:savepoint_level] <= 1
+        if (s = opts[:prepare]) && _trans(conn)[:savepoint_level] <= 1
           log_connection_execute(conn, "XA END #{literal(s)}")
           log_connection_execute(conn, "XA PREPARE #{literal(s)}")
         else
