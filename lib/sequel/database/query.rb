@@ -194,13 +194,13 @@ module Sequel
       end
       opts[:schema] = sch if sch && !opts.include?(:schema)
 
-      @schemas.delete(quoted_name) if opts[:reload]
-      return @schemas[quoted_name] if @schemas[quoted_name]
+      Sequel.synchronize{@schemas.delete(quoted_name)} if opts[:reload]
+      return Sequel.synchronize{@schemas[quoted_name]} if @schemas[quoted_name]
 
       cols = schema_parse_table(table_name, opts)
       raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
       cols.each{|_,c| c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type])}
-      @schemas[quoted_name] = cols if cache_schema
+      Sequel.synchronize{@schemas[quoted_name] = cols} if cache_schema
       cols
     end
 
