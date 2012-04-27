@@ -135,8 +135,10 @@ module Sequel
     #
     #   DB.add_servers(:f=>{:host=>"hash_host_f"})
     def add_servers(servers)
-      @opts[:servers] = @opts[:servers] ? @opts[:servers].merge(servers) : servers
-      @pool.add_servers(servers.keys)
+      if h = @opts[:servers]
+        Sequel.synchronize{h.merge!(servers)}
+        @pool.add_servers(servers.keys)
+      end
     end
     
     # Connects to the database. This method should be overridden by descendants.
@@ -191,11 +193,8 @@ module Sequel
     #
     #   DB.remove_servers(:f1, :f2)
     def remove_servers(*servers)
-      if @opts[:servers] && !@opts[:servers].empty?
-        servs = @opts[:servers].dup
-        servers.flatten!
-        servers.each{|s| servs.delete(s)}
-        @opts[:servers] = servs
+      if h = @opts[:servers]
+        servers.flatten.each{|s| Sequel.synchronize{h.delete(s)}}
         @pool.remove_servers(servers)
       end
     end
