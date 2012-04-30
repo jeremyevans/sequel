@@ -353,7 +353,9 @@ module Sequel
       def schema_parse_table(table_name, opts)
         m = output_identifier_meth(opts[:dataset])
         im = input_identifier_meth(opts[:dataset])
-        metadata_dataset.with_sql("DESCRIBE ?", SQL::Identifier.new(im.call(table_name))).map do |row|
+        table = SQL::Identifier.new(im.call(table_name))
+        table = SQL::QualifiedIdentifier.new(im.call(opts[:schema]), table) if opts[:schema]
+        metadata_dataset.with_sql("DESCRIBE ?", table).map do |row|
           row[:auto_increment] = true if row.delete(:Extra).to_s =~ /auto_increment/io
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:default] = row.delete(:Default)

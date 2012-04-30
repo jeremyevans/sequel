@@ -1,5 +1,7 @@
 === HEAD
 
+* Correctly handle parsing schema for tables in other databases on MySQL (jeremyevans)
+
 * Add DSL support for the modulus operator (%), similar to the bitwise operators (jeremyevans)
 
 * Fix possible thread-safety issues on non-GVL ruby implementations (jeremyevans)
