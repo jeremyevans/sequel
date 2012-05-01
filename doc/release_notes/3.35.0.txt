@@ -1,0 +1,144 @@
+= New Features
+
+* A dirty plugin has been added, which saves the initial value of
+  the column when the column is changed, similar to
+  ActiveModel::Dirty:
+
+    artist.name                   # => 'Foo'
+    artist.name = 'Bar'
+    artist.initial_value(:name)   # 'Foo'
+    artist.column_change(:name)   # ['Foo', 'Bar']
+    artist.column_changes         # {:name => ['Foo', 'Bar']}
+    artist.column_changed?(:name) # true
+    artist.reset_column(:name)
+    artist.name                   # => 'Foo'
+    artist.column_changed?(:name) # false
+    artist.update(:name=>'Bar')
+    artist.column_changes         # => {}
+    artist.previous_changes       # => {:name=>['Foo', 'Bar']}
+
+* Database#create_table now respects an :as option to create a
+  database based on the results of a query.  The :as option value
+  should either be an SQL string or a dataset.
+
+    DB.create_table(:new_foos, :as=>DB[:foos].where(:new=>true))
+
+* The json_serializer and xml_serializer plugins can now serialize
+  arbitrary arrays of model objects by passing an :array option
+  to the to_json class method.  This works around an issue in
+  ruby's JSON library where Array#to_json does not pass arguments
+  given to it to the members of the array.
+
+    Artist.to_json(:array=>[Artist[1]], :include=>:albums)
+
+* You can now use the % (modulus) operator in the same way you
+  can use the bitwise operators in Sequel:
+
+    :column.sql_number % 1 # (column % 1)
+
+* On PostgreSQL, you can now provide :only, :cascade, and :restart
+  options to Dataset#truncate to use ONLY, CASCADE, and
+  RESTART IDENTITY.  Additionally, you can now truncate multiple
+  tables at the same time:
+
+    DB.from(:table1, :table2).truncate(:cascade=>true)
+
+* The :index option when creating columns in the schema generator
+  can now take a hash of index options:
+
+    DB.create_table(:foo){Integer :bar, :index=>{:unique=>true}}
+
+* A Database#cache_schema accessor has been added, it can be set
+  to false to have the Database never cache schema results.  This
+  can be useful in Rails development mode, so that you don't need to
+  restart a running server to have models pick up the new schema.
+
+* Database#log_exception has been added for easier instrumentation.
+  It is called with the exception and SQL query string for all
+  queries that raise an exception.
+
+* The Sequel.migration DSL now has a transaction method that forces
+  transaction use for the given migration.
+
+= Other Improvements
+
+* Many theoretical thread-safety issues have been fixed for ruby
+  implementations that don't use a global interpreter lock.
+  Previously, Sequel relied on MRI's global interpreter lock for
+  part of its thread safety, now it does manually locking in more
+  places to avoid thread-safety issues on JRuby (and other ruby
+  implementations without a global interpreter lock).
+
+  No Sequel user ever reported a production error related to the
+  previous thread-safety issues, and most of the issues fixed
+  were so difficult to hit that even tests specifically designed
+  to raise errors were unable to do so.
+
+* Sequel.single_threaded = true now disables the mutex
+  synchronization that enforces thread safety for additional
+  performance in single threaded mode.
+
+* Sequel's migrators now only attempt to use transactions by
+  default if the underlying database supports transactional DDL.
+  SQLite does support transactional DDL, but Sequel will not
+  use transactions for SQLite migrations as it causes issues
+  when emulating alter_table operations for tables with foreign
+  keys.
+
+* Errors that occur when rolling back database transactions are
+  now handled correctly.  Previously, the underlying exception was
+  raised, it wasn't correctly wrapped in a Sequel::DatabaseError,
+  and if it was due to a database disconnection, the connection
+  wasn't removed from the pool.
+
+* Sequel no longer sets ruby instance variables on java objects,
+  fixing warnings on JRuby 1.7 and attempting to be forward
+  compatible with JRuby 2.0.
+
+* Sequel now uses date and timestamp formats that are multilanguage
+  and not DATEFORMAT dependent on Microsoft SQL Server.
+
+* Sequel now correctly escapes blackslash-carriage return-line feed
+  on Microsoft SQL Server.
+
+* Parsing the column default values in the oracle adapter no longer
+  requires database superuser privileges.
+
+* Sequel now correctly handles parsing schema for tables in other
+  databases on MySQL.  Previously, it would always look in the
+  current database.
+
+* Sequel no longer doubles backslashes in strings by default.  It
+  now only does so on MySQL, since that is the only database that
+  appears to use backslashes for escaping.  This fixes issues with
+  backslashes being doubled on some of the less commonly used
+  adapters.
+
+* The pg_auto_parameterize extension now works correctly when
+  using cursors.
+
+* Dataset#truncate now raises an Error if you attempt to do so
+  on a dataset that uses HAVING.  Previously, it only checked for
+  WHERE.
+
+* The schema dumper now recognized the identity type.
+
+= Backwards Compatibility
+
+* Association reflections now store cached information in a
+  separate subhash due to the thread-safety changes.  Any code
+  accessing an association reflection should always call the
+  related method to get the cached data instead of checking
+  for a specific location in the hash.
+
+* Association reflection internals for many_through_many associations
+  changed significantly, any code that accesses the edge information
+  in the reflection will need to be changed to use the new methods
+  instead of accessing the old values directly.
+
+* The features deprecated in 3.34.0 have now been removed:
+  * Ruby <1.8.7 support
+  * PostgreSQL <8.2 support
+  * Dataset#disable_insert_returning on PostgreSQL
+  * Array#all_two_pairs? and #sql_expr_if_all_two_pairs
+  
