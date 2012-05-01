@@ -150,9 +150,8 @@ module Sequel
       module InstanceMethods
         # Clear the cached compositions when refreshing.
         def _refresh(ds)
-          v = super
+          super
           compositions.clear
-          v
         end
 
         # For each composition, set the columns in the model class based

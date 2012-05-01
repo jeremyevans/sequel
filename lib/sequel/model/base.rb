@@ -1106,7 +1106,8 @@ module Sequel
       #     a.update(...)
       #   end
       def lock!
-        new? ? self : _refresh(this.for_update)
+        _refresh(this.for_update) unless new?
+        self
       end
       
       # Remove elements of the model object that make marshalling fail. Returns self.
@@ -1185,6 +1186,7 @@ module Sequel
       def refresh
         raise Sequel::Error, "can't refresh frozen object" if frozen?
         _refresh(this)
+        self
       end
 
       # Alias of refresh, but not aliased directly to make overriding in a plugin easier.
@@ -1532,7 +1534,6 @@ module Sequel
       def _refresh(dataset)
         set_values(_refresh_get(dataset) || raise(Error, "Record not found"))
         changed_columns.clear
-        self
       end
 
       # Get the row of column data from the database.
