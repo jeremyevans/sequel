@@ -457,6 +457,20 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == []
   end
 
+  it "should have the setter not modify the reciprocal if set to same value as current" do
+    @c2.many_to_one :parent, :class => @c2
+    @c2.one_to_many :children, :class => @c2, :key=>:parent_id
+
+    c1 = @c2.load(:id => 1, :parent_id=>nil)
+    c2 = @c2.load(:id => 2, :parent_id=>1)
+    c3 = @c2.load(:id => 3, :parent_id=>1)
+    c1.associations[:children] = [c2, c3]
+    c2.associations[:parent] = c1
+    c2.parent = c1
+    c1.children.should == [c2, c3]
+    MODEL_DB.sqls.should == []
+  end
+
   it "should get all matching records and only return the first if :key option is set to nil" do
     @c2.one_to_many :children, :class => @c2, :key=>:parent_id
     @c2.many_to_one :first_grand_parent, :class => @c2, :key=>nil, :eager_graph=>:children, :dataset=>proc{model.filter(:children_id=>parent_id)}
@@ -957,6 +971,19 @@ describe Sequel::Model, "one_to_one" do
     e.child.should == nil
     d.parent = nil
     f.child.should == nil
+  end
+
+  it "should have the setter not modify the reciprocal if set to same value as current" do
+    @c2.one_to_one :parent, :class => @c2, :key=>:parent_id
+    @c2.many_to_one :child, :class => @c2, :key=>:parent_id
+
+    c1 = @c2.load(:id => 1, :parent_id=>nil)
+    c2 = @c2.load(:id => 2, :parent_id=>1)
+    c1.associations[:child] = c2
+    c2.associations[:parent] = c1
+    c2.parent = c1
+    c1.child.should == c2
+    MODEL_DB.sqls.should == []
   end
 
   it "should not add associations methods directly to class" do

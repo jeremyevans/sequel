@@ -1,3 +1,9 @@
+=== HEAD
+
+* Make *_to_one association setters be noops if you pass a value that is the same as the cached value (jeremyevans)
+
+* Make Model#refresh return self when using dirty plugin (jeremyevans)
+
 === 3.35.0 (2012-05-01)
 
 * Correctly handle parsing schema for tables in other databases on MySQL (jeremyevans)

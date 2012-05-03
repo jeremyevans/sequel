@@ -1644,32 +1644,36 @@ module Sequel
           end
         end
 
-        # Set the given object as the associated object for the given many_to_one association reflection
-        def set_associated_object(opts, o)
-          raise(Error, "associated object #{o.inspect} does not have a primary key") if o && !o.pk
+        # Set the given object as the associated object for the given *_to_one association reflection
+        def _set_associated_object(opts, o)
+          a = associations[opts[:name]]
+          return if a && a == o && !set_associated_object_if_same?
           run_association_callbacks(opts, :before_set, o)
-          if a = associations[opts[:name]]
-            remove_reciprocal_object(opts, a)
-          end
+          remove_reciprocal_object(opts, a) if a
           send(opts._setter_method, o)
           associations[opts[:name]] = o
           add_reciprocal_object(opts, o) if o
           run_association_callbacks(opts, :after_set, o)
           o
         end
+
+        # Whether run the associated object setter code if passed the same object as the one already
+        # cached in the association.  Usually not set (so nil), can be set on a per-object basis
+        # if necessary.
+        def set_associated_object_if_same?
+          @set_associated_object_if_same
+        end
         
+        # Set the given object as the associated object for the given many_to_one association reflection
+        def set_associated_object(opts, o)
+          raise(Error, "associated object #{o.inspect} does not have a primary key") if o && !o.pk
+          _set_associated_object(opts, o)
+        end
+
         # Set the given object as the associated object for the given one_to_one association reflection
         def set_one_to_one_associated_object(opts, o)
           raise(Error, "object #{inspect} does not have a primary key") unless pk
-          run_association_callbacks(opts, :before_set, o)
-          if a = associations[opts[:name]]
-            remove_reciprocal_object(opts, a)
-          end
-          send(opts._setter_method, o)
-          associations[opts[:name]] = o
-          add_reciprocal_object(opts, o) if o
-          run_association_callbacks(opts, :after_set, o)
-          o
+          _set_associated_object(opts, o)
         end
       end
 
