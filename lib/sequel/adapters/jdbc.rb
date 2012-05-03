@@ -205,7 +205,7 @@ module Sequel
           begin
             JavaSQL::DriverManager.setLoginTimeout(opts[:login_timeout]) if opts[:login_timeout]
             JavaSQL::DriverManager.getConnection(*args)
-          rescue => e
+          rescue JavaSQL::SQLException, NativeException, StandardError => e
             raise e unless driver
             # If the DriverManager can't get the connection - use the connect
             # method of the driver. (This happens under Tomcat for instance)
@@ -217,7 +217,7 @@ module Sequel
             opts[:jdbc_properties].each{|k,v| props.setProperty(k.to_s, v)} if opts[:jdbc_properties]
             begin
               driver.new.connect(args[0], props)
-            rescue => e2
+            rescue JavaSQL::SQLException, NativeException, StandardError => e2
               e.message << "\n#{e2.class.name}: #{e2.message}"
               raise e
             end
