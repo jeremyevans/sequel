@@ -148,6 +148,8 @@ describe "Sequel::Plugins::Dirty" do
     it_should_behave_like "dirty plugin"
 
     it "previous_changes should be the previous changes after saving" do
+      @o.previous_changes.should == {}
+      @o.previous_changes[:initial_changes].first.should be_nil
       @o.save
       @o.previous_changes.should == {:initial_changed=>['ic', 'ic2'], :missing_changed=>[nil, 'mc2']}
     end

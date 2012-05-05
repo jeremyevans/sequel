@@ -52,7 +52,9 @@ module Sequel
         # saved, in the same format as #column_changes.
         # Note that this is not necessarily the same as the columns
         # that were used in the update statement.
-        attr_reader :previous_changes
+        def previous_changes
+          @previous_changes ||= Hash.new{[]}
+        end
 
         # An array with the initial value and the current value
         # of the column, if the column has been changed.  If the
@@ -68,7 +70,7 @@ module Sequel
         #
         #   column_changes # => {:name => ['Initial', 'Current']}
         def column_changes
-          h = {}
+          h = Hash.new{[]}
           initial_values.each do |column, value|
             h[column] = [value, send(column)]
           end
@@ -98,7 +100,7 @@ module Sequel
         #
         #   initial_values # {:name => 'Initial'}
         def initial_values
-          @initial_values ||= {}
+          @initial_values ||= Hash.new{[]}
         end
 
         # Reset the column to its initial value.  If the column was not set
