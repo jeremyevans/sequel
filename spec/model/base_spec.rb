@@ -9,6 +9,12 @@ describe "Model attribute setters" do
     MODEL_DB.reset
   end
 
+  specify "refresh should return self" do
+    @o = @c[1]
+    @o.stub(:_refresh).and_return([])
+    @o.refresh.should == @o
+  end
+
   it "should mark the column value as changed" do
     @o.changed_columns.should == []
 
