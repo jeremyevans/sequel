@@ -512,7 +512,7 @@ module Sequel
     # has no records. Users should probably use +first+ instead of
     # this method.
     def single_record
-      clone(:limit=>1).each{|r| return r}
+      clone(:limit=>1).all{|r| return r}
       nil
     end
 
