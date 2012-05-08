@@ -76,6 +76,8 @@ module Sequel
     #   DB[:items].literal([1, 2, 3]) => "(1, 2, 3)"
     #   DB[:items].literal(DB[:items]) => "(SELECT * FROM items)"
     #   DB[:items].literal(:x + 1 > :y) => "((x + 1) > y)"
+    #   DB[:items].literal(Time.now) => "TIMESTAMP '2010-12-14 23:04:36.489914 +00:00'"
+    #   DB[:items].literal(Date.today) => "DATE '2010-12-14'"
     #
     # If an unsupported object is given, an +Error+ is raised.
     def literal_append(sql, v)
