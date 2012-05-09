@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :connection_handling=>:queue option to the threaded connection pools, may reduce chance of stale connections (jeremyevans) (#481)
+
 * Handle JRuby 1.7 exception handling changes when connecting in the jdbc adapter (jeremyevans) (#477)
 
 * Make *_to_one association setters be noops if you pass a value that is the same as the cached value (jeremyevans)

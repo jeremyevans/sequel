@@ -340,6 +340,31 @@ shared_examples_for "A threaded connection pool" do
     @pool.available_connections.size.should == 5
     @pool.allocated.should be_empty
   end
+
+  specify "should store connections in a stack by default" do
+    c2 = nil
+    c = @pool.hold{|cc| Thread.new{@pool.hold{|cc2| c2 = cc2}}.join; cc}
+    @pool.size.should == 2
+    @pool.hold{|cc| cc.should == c}
+    @pool.hold{|cc| cc.should == c}
+    @pool.hold do |cc|
+      cc.should == c
+      Thread.new{@pool.hold{|cc2| cc2.should == c2}}
+    end
+  end
+
+  specify "should store connections in a queue if :connection_handling=>:queue" do
+    @pool = Sequel::ConnectionPool.get_pool(@cp_opts.merge(:connection_handling=>:queue)){@invoked_count += 1}
+    c2 = nil
+    c = @pool.hold{|cc| Thread.new{@pool.hold{|cc2| c2 = cc2}}.join; cc}
+    @pool.size.should == 2
+    @pool.hold{|cc| cc.should == c2}
+    @pool.hold{|cc| cc.should == c}
+    @pool.hold do |cc|
+      cc.should == c2
+      Thread.new{@pool.hold{|cc2| cc2.should == c}}
+    end
+  end
 end
 
 describe "Threaded Unsharded Connection Pool" do

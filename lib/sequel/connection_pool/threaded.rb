@@ -13,6 +13,9 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   attr_reader :allocated
 
   # The following additional options are respected:
+  # * :connection_handling - Set how to handle available connections.  By default,
+  #   uses a a stack for performance.  Can be set to :queue to use a queue, which reduces
+  #   the chances of connections becoming stale.
   # * :max_connections - The maximum number of connections the connection pool
   #   will open (default 4)
   # * :pool_sleep_time - The amount of time to sleep before attempting to acquire
@@ -24,6 +27,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     @max_size = Integer(opts[:max_connections] || 4)
     raise(Sequel::Error, ':max_connections must be positive') if @max_size < 1
     @mutex = Mutex.new  
+    @queue = opts[:connection_handling] == :queue
     @available_connections = []
     @allocated = {}
     @timeout = Integer(opts[:pool_timeout] || 5)
@@ -153,7 +157,11 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # Releases the connection assigned to the supplied thread back to the pool.
   # The calling code should already have the mutex before calling this.
   def release(thread)
-    @available_connections << @allocated.delete(thread)
+    if @queue
+      @available_connections.unshift(@allocated.delete(thread))
+    else
+      @available_connections << @allocated.delete(thread)
+    end
   end
 
   # Yield to the block while inside the mutex. The calling code should NOT
