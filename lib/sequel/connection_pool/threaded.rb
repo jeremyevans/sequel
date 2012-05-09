@@ -19,6 +19,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   #   a connection again (default 0.001)
   # * :pool_timeout - The amount of seconds to wait to acquire a connection
   #   before raising a PoolTimeoutError (default 5)
+  # * :stack - Is the connection pool treated as a stack? (default true)
   def initialize(opts = {}, &block)
     super
     @max_size = Integer(opts[:max_connections] || 4)
@@ -26,6 +27,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     @mutex = Mutex.new  
     @available_connections = []
     @allocated = {}
+    @stack = opts[:stack] || true
     @timeout = Integer(opts[:pool_timeout] || 5)
     @sleep_time = Float(opts[:pool_sleep_time] || 0.001)
   end
@@ -153,7 +155,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # Releases the connection assigned to the supplied thread back to the pool.
   # The calling code should already have the mutex before calling this.
   def release(thread)
-    @available_connections << @allocated.delete(thread)
+    @stack ? @available_connections << @allocated.delete(thread) : @available_connections.unshift(@allocated.delete(thread))
   end
 
   # Yield to the block while inside the mutex. The calling code should NOT
