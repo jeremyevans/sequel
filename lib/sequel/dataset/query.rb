@@ -164,7 +164,7 @@ module Sequel
     #   DB[:items].filter('price < ?', 100)
     #   # SELECT * FROM items WHERE price < 100
     #
-    #   DB[:items].filter([[:id, (1,2,3)], [:id, 0..10]])
+    #   DB[:items].filter([[:id, [1,2,3]], [:id, 0..10]])
     #   # SELECT * FROM items WHERE ((id IN (1, 2, 3)) AND ((id >= 0) AND (id <= 10)))
     #
     #   DB[:items].filter('price < 100')
