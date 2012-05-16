@@ -98,14 +98,8 @@ module Sequel
       #               (:restrict, :cascade, :set_null, :set_default, :no_action).
       # :primary_key :: Make the column as a single primary key column.  This should only
       #                 be used if you have a single, nonautoincrementing primary key column.
-      # :size :: The size of the column, generally used with string
-      #          columns to specify the maximum number of characters the column will hold.
-      #          An array of two integers can be provided to set the size and the
-      #          precision, respectively, of decimal columns.
       # :unique :: Mark the column as unique, generally has the same effect as
       #            creating a unique index on the column.
-      # :unsigned :: Make the column type unsigned, only useful for integer
-      #              columns.
       def column(name, type, opts = {})
         columns << {:name => name, :type => type}.merge(opts)
         if index_opts = opts[:index]
