@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't set Sequel::Model.db automatically when creating an anonymous class with an associated database object (jeremyevans)
+
 * Add :connection_handling=>:queue option to the threaded connection pools, may reduce chance of stale connections (jeremyevans) (#481)
 
 * Handle JRuby 1.7 exception handling changes when connecting in the jdbc adapter (jeremyevans) (#477)

@@ -355,6 +355,54 @@ describe "Model.qualified_primary_key_hash" do
   end
 end
 
+describe "Model.db" do
+  before do
+    @db = Sequel.mock
+    @databases = Sequel::DATABASES.dup
+    @model_db = Sequel::Model.db
+    Sequel::Model.db = nil
+    Sequel::DATABASES.clear
+  end
+  after do
+    Sequel::Model.instance_variable_get(:@db).should == nil
+    Sequel::DATABASES.replace(@databases)
+    Sequel::Model.db = @model_db
+  end
+
+  specify "should be required when create named model classes" do
+    begin
+      proc{class ModelTest < Sequel::Model; end}.should raise_error(Sequel::Error)
+    ensure
+      Object.send(:remove_const, :ModelTest)
+    end
+  end
+
+  specify "should be required when creating anonymous model classes without a database" do
+    proc{Sequel::Model(:foo)}.should raise_error(Sequel::Error)
+  end
+
+  specify "should not be required when creating anonymous model classes with a database" do
+    Sequel::Model(@db).db.should == @db
+    Sequel::Model(@db[:foo]).db.should == @db
+  end
+
+  specify "should work correctly when subclassing anonymous model classes with a database" do
+    begin
+      Class.new(Sequel::Model(@db)).db.should == @db
+      Class.new(Sequel::Model(@db[:foo])).db.should == @db
+      class ModelTest < Sequel::Model(@db)
+        db.should == @db
+      end
+      class ModelTest2 < Sequel::Model(@db[:foo])
+        db.should == @db
+      end
+    ensure
+      Object.send(:remove_const, :ModelTest)
+      Object.send(:remove_const, :ModelTest2)
+    end
+  end
+end
+
 describe "Model.db=" do
   before do
     @db1 = Sequel.mock
