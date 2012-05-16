@@ -7,8 +7,7 @@ module Sequel
       include Sequel::MSSQL::DatabaseMethods
       set_adapter_scheme :tinytds
       
-      # Transfer the :host and :user options to the
-      # :dataserver and :username options.
+      # Transfer the :user option to the :username option.
       def connect(server)
         opts = server_opts(server)
         opts[:username] = opts[:user]
