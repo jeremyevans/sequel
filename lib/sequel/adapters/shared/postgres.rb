@@ -444,6 +444,25 @@ module Sequel
 
       private
 
+      # If the :synchronous option is given and non-nil, set synchronous_commit
+      # appropriately.  Valid values for the :synchronous option are true,
+      # :on, false, :off, :local, and :remote_write.
+      def begin_new_transaction(conn, opts)
+        super
+        if opts.has_key?(:synchronous)
+          case sync = opts[:synchronous]
+          when true
+            sync = :on
+          when false
+            sync = :off
+          when nil
+            return
+          end
+
+          log_connection_execute(conn, "SET LOCAL synchronous_commit = #{sync}")
+        end
+      end
+
       # If the :prepare option is given and we aren't in a savepoint,
       # prepare the transaction for a two-phase commit.
       def commit_transaction(conn, opts={})

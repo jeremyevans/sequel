@@ -148,6 +148,27 @@ describe "A PostgreSQL dataset" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}
   end
 
+  specify "should have #transaction support various types of synchronous options" do
+    @db = POSTGRES_DB
+    @db.transaction(:synchronous=>:on){}
+    @db.transaction(:synchronous=>true){}
+    @db.transaction(:synchronous=>:off){}
+    @db.transaction(:synchronous=>false){}
+    @db.sqls.grep(/synchronous/).should == ["SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = off", "SET LOCAL synchronous_commit = off"]
+
+    if @db.server_version >= 90100
+      @db.sqls.clear
+      @db.transaction(:synchronous=>:local){}
+      @db.sqls.grep(/synchronous/).should == ["SET LOCAL synchronous_commit = local"]
+
+      if @db.server_version >= 90200
+        @db.sqls.clear
+        @db.transaction(:synchronous=>:remote_write){}
+        @db.sqls.grep(/synchronous/).should == ["SET LOCAL synchronous_commit = remote_write"]
+      end
+    end
+  end
+
   specify "#lock should lock table if inside a transaction" do
     POSTGRES_DB.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}
   end

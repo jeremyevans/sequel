@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#transaction on PostgreSQL accept a :synchronous option to change synchronous_commit setting for that transaction (jeremyevans)
+
 * Support :sql_mode option when connecting to MySQL (jeremyevans)
 
 * Apply :timeout MySQL connection setting on do, jdbc, and swift adapters (jeremyevans)
