@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :sql_mode option when connecting to MySQL (jeremyevans)
+
 * Apply :timeout MySQL connection setting on do, jdbc, and swift adapters (jeremyevans)
 
 * Don't set Sequel::Model.db automatically when creating an anonymous class with an associated database object (jeremyevans)

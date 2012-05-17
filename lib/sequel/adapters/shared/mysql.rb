@@ -220,6 +220,12 @@ module Sequel
         # By default, MySQL 'where id is null' selects the last inserted id
         sqls <<  "SET SQL_AUTO_IS_NULL=0" unless opts[:auto_is_null]
 
+        # If the user has specified one or more sql modes, enable them
+        if sql_mode = opts[:sql_mode]
+          sql_mode = Array(sql_mode).join(',').upcase
+          sqls <<  "SET sql_mode = '#{sql_mode}'"
+        end
+
         sqls
       end
       

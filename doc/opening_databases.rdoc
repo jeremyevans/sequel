@@ -68,7 +68,7 @@ These options are shared by all adapters unless otherwise noted.
 
 :adapter :: The adapter to use
 :database :: The name of the database to which to connect
-:default_schema :: The database schema to use by default.
+:default_schema :: The database schema to use in schema_modification and introspection.
 :host :: The hostname of the database server to which to connect
 :logger :: An array of SQL loggers to log to
 :loggers :: An array of SQL loggers to log to
@@ -294,6 +294,8 @@ The following additional options are supported:
 :config_local_infile :: If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with the given value.
 :encoding :: Specify the encoding/character set to use for the connection.
 :socket :: Can be used to specify a Unix socket file to connect to instead of a TCP host and port.
+:sql_mode :: Set the sql_mode(s) for a given connection.  Can be single symbol or string,
+             or an array of symbols or strings (e.g. <tt>:sql_mode=>[:no_zero_date, :pipes_as_concat]</tt>).
 :timeout :: Sets the wait_timeout for the connection, defaults to 1 month.
 :read_timeout :: Set the timeout in seconds for reading back results to a query.
 :connect_timeout :: Set the timeout in seconds before a connection attempt is abandoned.
