@@ -50,7 +50,9 @@ module Sequel
     # an optional options hash.
     attr_reader :dataset_class
 
-    # The default schema to use, generally should be nil.
+    # The default schema to use, generally should be nil.  This sets
+    # the default schema used for some schema modification and
+    # introspection queries, but does not effect most dataset code.
     attr_accessor :default_schema
 
     # If the database has any dataset modules associated with it,

@@ -26,7 +26,7 @@ module Sequel
     # options hash.
     #
     # Accepts the following options:
-    # :default_schema :: The default schema to use, should generally be nil
+    # :default_schema :: The default schema to use, see #default_schema.
     # :disconnection_proc :: A proc used to disconnect the connection
     # :identifier_input_method :: A string method symbol to call on identifiers going into the database
     # :identifier_output_method :: A string method symbol to call on identifiers coming from the database
