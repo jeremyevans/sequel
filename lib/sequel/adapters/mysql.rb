@@ -118,19 +118,13 @@ module Sequel
           Mysql::CLIENT_MULTI_STATEMENTS +
           (opts[:compress] == false ? 0 : Mysql::CLIENT_COMPRESS)
         )
-        sqls = []
+        sqls = mysql_connection_setting_sqls
+
         # Set encoding a slightly different way after connecting,
         # in case the READ_DEFAULT_GROUP overrode the provided encoding.
         # Doesn't work across implicit reconnects, but Sequel doesn't turn on
         # that feature.
-        sqls << "SET NAMES #{literal(encoding.to_s)}" if encoding
-
-        # Increase timeout so mysql server doesn't disconnect us
-        # Value used by default is maximum allowed value on Windows.
-        sqls << "SET @@wait_timeout = #{opts[:timeout] || 2147483}"
-
-        # By default, MySQL 'where id is null' selects the last inserted id
-        sqls << "SET SQL_AUTO_IS_NULL=0" unless opts[:auto_is_null]
+        sqls.unshift("SET NAMES #{literal(encoding.to_s)}") if encoding
 
         sqls.each{|sql| log_yield(sql){conn.query(sql)}}
 

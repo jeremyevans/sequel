@@ -53,13 +53,11 @@ module Sequel
           db_type == 'tinyint(1)' ? :boolean : super
         end
       
-        # By default, MySQL 'where id is null' selects the last inserted id.
-        # Turn that off unless explicitly enabled.
+        # Run the default connection setting SQL statements.
+        # Apply the connectiong setting SQLs for every new connection.
         def setup_connection(conn)
+          mysql_connection_setting_sqls.each{|sql| statement(conn){|s| log_yield(sql){s.execute(sql)}}}
           super
-          sql = "SET SQL_AUTO_IS_NULL=0"
-          statement(conn){|s| log_yield(sql){s.execute(sql)}} unless opts[:auto_is_null]
-          conn
         end
       end
     end

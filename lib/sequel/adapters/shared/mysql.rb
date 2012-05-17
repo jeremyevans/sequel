@@ -208,6 +208,20 @@ module Sequel
           super(table, op)
         end
       end
+
+      # The SQL queries to execute on initial connection
+      def mysql_connection_setting_sqls
+        sqls = []
+        
+        # Increase timeout so mysql server doesn't disconnect us
+        # Value used by default is maximum allowed value on Windows.
+        sqls << "SET @@wait_timeout = #{opts[:timeout] || 2147483}"
+
+        # By default, MySQL 'where id is null' selects the last inserted id
+        sqls <<  "SET SQL_AUTO_IS_NULL=0" unless opts[:auto_is_null]
+
+        sqls
+      end
       
       # Use MySQL specific AUTO_INCREMENT text.
       def auto_increment_sql

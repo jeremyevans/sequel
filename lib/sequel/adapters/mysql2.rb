@@ -48,21 +48,15 @@ module Sequel
         opts[:flags] = ::Mysql2::Client::FOUND_ROWS if ::Mysql2::Client.const_defined?(:FOUND_ROWS)
         conn = ::Mysql2::Client.new(opts)
 
-        sqls = []
+        sqls = mysql_connection_setting_sqls
+
         # Set encoding a slightly different way after connecting,
         # in case the READ_DEFAULT_GROUP overrode the provided encoding.
         # Doesn't work across implicit reconnects, but Sequel doesn't turn on
         # that feature.
         if encoding = opts[:encoding] || opts[:charset]
-          sqls << "SET NAMES #{conn.escape(encoding.to_s)}"
+          sqls.unshift("SET NAMES #{conn.escape(encoding.to_s)}")
         end
-
-        # Increase timeout so mysql server doesn't disconnect us.
-        # Value used by default is maximum allowed value on Windows.
-        sqls << "SET @@wait_timeout = #{opts[:timeout] || 2147483}"
-
-        # By default, MySQL 'where id is null' selects the last inserted id
-        sqls << "SET SQL_AUTO_IS_NULL=0" unless opts[:auto_is_null]
 
         sqls.each{|sql| log_yield(sql){conn.query(sql)}}
 

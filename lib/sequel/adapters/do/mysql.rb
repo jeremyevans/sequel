@@ -18,8 +18,15 @@ module Sequel
           (m = /\/(.*)/.match(URI.parse(uri).path)) && m[1]
         end
 
+        # Recognize the tinyint(1) column as boolean.
         def schema_column_type(db_type)
           db_type == 'tinyint(1)' ? :boolean : super
+        end
+
+        # Apply the connectiong setting SQLs for every new connection.
+        def setup_connection(conn)
+          mysql_connection_setting_sqls.each{|sql| log_yield(sql){conn.create_command(sql).execute_non_query}}
+          super
         end
       end
       
