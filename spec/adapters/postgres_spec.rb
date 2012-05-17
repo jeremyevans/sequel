@@ -66,6 +66,7 @@ describe "A PostgreSQL dataset" do
   before do
     @d = POSTGRES_DB[:test]
     @d.delete # remove all records
+    POSTGRES_DB.sqls.clear
   end
 
   specify "should quote columns and tables using double quotes if quoting identifiers" do
@@ -168,6 +169,33 @@ describe "A PostgreSQL dataset" do
       end
     end
   end
+
+  specify "should support creating indexes concurrently" do
+    POSTGRES_DB.sqls.clear
+    POSTGRES_DB.add_index :test, [:name, :value], :concurrently=>true
+    POSTGRES_DB.sqls.should == ['CREATE INDEX CONCURRENTLY "test_name_value_index" ON "test" ("name", "value")'] if check_sqls
+  end
+
+  specify "should support dropping indexes only if they already exist" do
+    POSTGRES_DB.add_index :test, [:name, :value], :name=>'tnv1'
+    POSTGRES_DB.sqls.clear
+    POSTGRES_DB.drop_index :test, [:name, :value], :if_exists=>true, :name=>'tnv1'
+    POSTGRES_DB.sqls.should == ['DROP INDEX IF EXISTS "tnv1"']
+  end
+
+  specify "should support CASCADE when dropping indexes" do
+    POSTGRES_DB.add_index :test, [:name, :value], :name=>'tnv2'
+    POSTGRES_DB.sqls.clear
+    POSTGRES_DB.drop_index :test, [:name, :value], :cascade=>true, :name=>'tnv2'
+    POSTGRES_DB.sqls.should == ['DROP INDEX "tnv2" CASCADE']
+  end
+
+  specify "should support dropping indexes concurrently" do
+    POSTGRES_DB.add_index :test, [:name, :value], :name=>'tnv2'
+    POSTGRES_DB.sqls.clear
+    POSTGRES_DB.drop_index :test, [:name, :value], :concurrently=>true, :name=>'tnv2'
+    POSTGRES_DB.sqls.should == ['DROP INDEX CONCURRENTLY "tnv2"']
+  end if POSTGRES_DB.server_version >= 90200
 
   specify "#lock should lock table if inside a transaction" do
     POSTGRES_DB.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}

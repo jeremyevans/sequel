@@ -1,5 +1,9 @@
 === HEAD
 
+* Support :if_exists and :cascade options when dropping indexes on PostgreSQL (jeremyevans)
+
+* Support :concurrently option when adding and dropping indexes on PostgreSQL (jeremyevans)
+
 * Make Database#transaction on PostgreSQL accept a :synchronous option to change synchronous_commit setting for that transaction (jeremyevans)
 
 * Support :sql_mode option when connecting to MySQL (jeremyevans)
