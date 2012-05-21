@@ -294,10 +294,7 @@ module Sequel
       
       # Execute the given SQL with the given args on an available connection.
       def execute(sql, opts={}, &block)
-        check_database_errors do
-          return execute_prepared_statement(sql, opts, &block) if Symbol === sql
-          synchronize(opts[:server]){|conn| conn.execute(sql, opts[:arguments], &block)}
-        end
+        synchronize(opts[:server]){|conn| check_database_errors{_execute(conn, sql, opts, &block)}}
       end
 
       if SEQUEL_POSTGRES_USES_PG
@@ -436,6 +433,15 @@ module Sequel
         
       private
 
+      # Execute the given SQL string or prepared statement on the connection object.
+      def _execute(conn, sql, opts, &block)
+        if sql.is_a?(Symbol)
+          execute_prepared_statement(conn, sql, opts, &block)
+        else
+          conn.execute(sql, opts[:arguments], &block)
+        end
+      end
+
       # Convert exceptions raised from the block into DatabaseErrors.
       def check_database_errors
         begin
@@ -466,38 +472,34 @@ module Sequel
       # has prepared a statement with the same name and different SQL,
       # deallocate that statement first and then prepare this statement.
       # If a block is given, yield the result, otherwise, return the number
-      # of rows changed.  If the :insert option is passed, return the value
-      # of the primary key for the last inserted row.
-      def execute_prepared_statement(name, opts={})
+      # of rows changed.
+      def execute_prepared_statement(conn, name, opts={}, &block)
         ps = prepared_statement(name)
         sql = ps.prepared_sql
         ps_name = name.to_s
-        synchronize(opts[:server]) do |conn|
-          if args = opts[:arguments]
-            args = args.map{|arg| bound_variable_arg(arg, conn)}
-          end
 
-          unless conn.prepared_statements[ps_name] == sql
-            if conn.prepared_statements.include?(ps_name)
-              conn.execute("DEALLOCATE #{ps_name}") unless conn.prepared_statements[ps_name] == sql
-            end
-            conn.prepared_statements[ps_name] = sql
-            conn.check_disconnect_errors{log_yield("PREPARE #{ps_name} AS #{sql}"){conn.prepare(ps_name, sql)}}
-          end
+        if args = opts[:arguments]
+          args = args.map{|arg| bound_variable_arg(arg, conn)}
+        end
 
-          log_sql = "EXECUTE #{ps_name}"
-          if ps.log_sql
-            log_sql << " ("
-            log_sql << sql
-            log_sql << ")"
-          end
+        unless conn.prepared_statements[ps_name] == sql
+          conn.execute("DEALLOCATE #{ps_name}") if conn.prepared_statements.include?(ps_name)
+          conn.prepared_statements[ps_name] = sql
+          conn.check_disconnect_errors{log_yield("PREPARE #{ps_name} AS #{sql}"){conn.prepare(ps_name, sql)}}
+        end
 
-          q = conn.check_disconnect_errors{log_yield(log_sql, args){conn.exec_prepared(ps_name, args)}}
-          begin
-            block_given? ? yield(q) : q.cmd_tuples
-          ensure
-            q.clear
-          end
+        log_sql = "EXECUTE #{ps_name}"
+        if ps.log_sql
+          log_sql << " ("
+          log_sql << sql
+          log_sql << ")"
+        end
+
+        q = conn.check_disconnect_errors{log_yield(log_sql, args){conn.exec_prepared(ps_name, args)}}
+        begin
+          block_given? ? yield(q) : q.cmd_tuples
+        ensure
+          q.clear
         end
       end
 
