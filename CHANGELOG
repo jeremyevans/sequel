@@ -1,5 +1,7 @@
 === HEAD
 
+* Support partial indexes on Microsoft SQL Server 2008 (jeremyevans)
+
 * Make Database#call pass blocks (jeremyevans)
 
 * Support :each when preparing statements, useful for iterating over large datasets (jeremyevans)
