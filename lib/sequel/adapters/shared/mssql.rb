@@ -187,6 +187,16 @@ module Sequel
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
       end
       
+      # support for clustered index type
+      def index_definition_sql(table_name, index)
+        index_name = index[:name] || default_index_name(table_name, index[:columns])
+        if index[:type] == :full_text
+          "CREATE FULLTEXT INDEX ON #{quote_schema_table(table_name)} #{literal(index[:columns])} KEY INDEX #{literal(index[:key_index])}"
+        else
+          "CREATE #{'UNIQUE ' if index[:unique]}#{'CLUSTERED ' if index[:type] == :clustered}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}#{" INCLUDE #{literal(index[:include])}" if index[:include]}#{" WHERE #{filter_expr(index[:where])}" if index[:where]}"
+        end
+      end
+
       # Backbone of the tables and views support.
       def information_schema_tables(type, opts)
         m = output_identifier_meth
@@ -289,17 +299,6 @@ module Sequel
       # MSSQL uses varbinary(max) type for blobs
       def type_literal_generic_file(column)
         :'varbinary(max)'
-      end
-
-      # support for clustered index type
-      def index_definition_sql(table_name, index)
-        index_name = index[:name] || default_index_name(table_name, index[:columns])
-        raise Error, "Partial indexes are not supported for this database" if index[:where]
-        if index[:type] == :full_text
-          "CREATE FULLTEXT INDEX ON #{quote_schema_table(table_name)} #{literal(index[:columns])} KEY INDEX #{literal(index[:key_index])}"
-        else
-          "CREATE #{'UNIQUE ' if index[:unique]}#{'CLUSTERED ' if index[:type] == :clustered}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}#{" INCLUDE #{literal(index[:include])}" if index[:include]}"
-        end
       end
     end
   
