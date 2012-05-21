@@ -17,6 +17,7 @@ describe "Prepared Statements and Bound Arguments" do
   end
   
   specify "should support bound variables when selecting" do
+    @ds.filter(:numb=>:$n).call(:each, :n=>10){|h| h.should == {:id=>1, :numb=>10}}
     @ds.filter(:numb=>:$n).call(:select, :n=>10).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).call(:all, :n=>10).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).call(:first, :n=>10).should == {:id=>1, :numb=>10}
@@ -25,7 +26,9 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:numb=>:$n).call([:to_hash_groups, :id, :numb], :n=>10).should == {1=>[10]}
   end
     
-  specify "should support blocks for select, all, and map " do
+  specify "should support blocks for each, select, all, and map when using bound variables" do
+    a = []
+    @ds.filter(:numb=>:$n).call(:each, :n=>10){|r| r[:numb] *= 2; a << r}; a.should == [{:id=>1, :numb=>20}]
     @ds.filter(:numb=>:$n).call(:select, :n=>10){|r| r[:numb] *= 2}.should == [{:id=>1, :numb=>20}]
     @ds.filter(:numb=>:$n).call(:all, :n=>10){|r| r[:numb] *= 2}.should == [{:id=>1, :numb=>20}]
     @ds.filter(:numb=>:$n).call([:map], :n=>10){|r| r[:numb] * 2}.should == [20]
@@ -125,6 +128,8 @@ describe "Prepared Statements and Bound Arguments" do
   end
   
   specify "should support prepared statements when selecting" do
+    @ds.filter(:numb=>:$n).prepare(:each, :select_n)
+    @db.call(:select_n, :n=>10){|h| h.should == {:id=>1, :numb=>10}}
     @ds.filter(:numb=>:$n).prepare(:select, :select_n)
     @db.call(:select_n, :n=>10).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).prepare(:all, :select_n)
@@ -137,7 +142,20 @@ describe "Prepared Statements and Bound Arguments" do
     @db.call(:select_n, :n=>10).should == {1=>10}
   end
 
-  specify "should support prepared statements being call multiple times with different arguments" do
+  specify "should support blocks for each, select, all, and map when using prepared statements" do
+    a = []
+    @ds.filter(:numb=>:$n).prepare(:each, :select_n).call(:n=>10){|r| r[:numb] *= 2; a << r}; a.should == [{:id=>1, :numb=>20}]
+    a = []
+    @db.call(:select_n, :n=>10){|r| r[:numb] *= 2; a << r}; a.should == [{:id=>1, :numb=>20}]
+    @ds.filter(:numb=>:$n).prepare(:select, :select_n).call(:n=>10){|r| r[:numb] *= 2}.should == [{:id=>1, :numb=>20}]
+    @db.call(:select_n, :n=>10){|r| r[:numb] *= 2}.should == [{:id=>1, :numb=>20}]
+    @ds.filter(:numb=>:$n).prepare(:all, :select_n).call(:n=>10){|r| r[:numb] *= 2}.should == [{:id=>1, :numb=>20}]
+    @db.call(:select_n, :n=>10){|r| r[:numb] *= 2}.should == [{:id=>1, :numb=>20}]
+    @ds.filter(:numb=>:$n).prepare([:map], :select_n).call(:n=>10){|r| r[:numb] *= 2}.should == [20]
+    @db.call(:select_n, :n=>10){|r| r[:numb] *= 2}.should == [20]
+  end
+    
+  specify "should support prepared statements being called multiple times with different arguments" do
     @ds.filter(:numb=>:$n).prepare(:select, :select_n)
     @db.call(:select_n, :n=>10).should == [{:id=>1, :numb=>10}]
     @db.call(:select_n, :n=>0).should == []

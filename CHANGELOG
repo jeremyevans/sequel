@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Database#call pass blocks (jeremyevans)
+
+* Support :each when preparing statements, useful for iterating over large datasets (jeremyevans)
+
 * Support :if_exists and :cascade options when dropping indexes on PostgreSQL (jeremyevans)
 
 * Support :concurrently option when adding and dropping indexes on PostgreSQL (jeremyevans)

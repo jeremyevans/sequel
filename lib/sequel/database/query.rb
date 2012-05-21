@@ -55,8 +55,8 @@ module Sequel
     #
     #   DB[:items].filter(:id=>1).prepare(:first, :sa)
     #   DB.call(:sa) # SELECT * FROM items WHERE id = 1
-    def call(ps_name, hash={})
-      prepared_statement(ps_name).call(hash)
+    def call(ps_name, hash={}, &block)
+      prepared_statement(ps_name).call(hash, &block)
     end
     
     # Executes the given SQL on the database. This method should be overridden in descendants.

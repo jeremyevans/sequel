@@ -80,7 +80,7 @@ module Sequel
       # the type of the statement and the prepared_modify_values.
       def prepared_sql
         case @prepared_type
-        when :select, :all
+        when :select, :all, :each
           # Most common scenario, so listed first.
           select_sql
         when :first
@@ -131,6 +131,8 @@ module Sequel
         when :select, :all
           # Most common scenario, so listed first
           all(&block)
+        when :each
+          each(&block)
         when :insert_select
           with_sql(prepared_sql).first
         when :first
