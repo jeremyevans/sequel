@@ -249,6 +249,9 @@ module Sequel
     #               only respected if the database/adapter supports savepoints.  By
     #               default Sequel will reuse an existing transaction, so if you want to
     #               use a savepoint you must use this option.
+    # :synchronous :: (PostgreSQL only) if non-nil, set synchronous_commit
+    #                 appropriately.  Valid values true, :on, false, :off, :local (9.1+),
+    #                 and :remote_write (9.2+).
     def transaction(opts={}, &block)
       synchronize(opts[:server]) do |conn|
         return yield(conn) if already_in_transaction?(conn, opts)

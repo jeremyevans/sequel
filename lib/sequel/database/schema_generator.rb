@@ -145,6 +145,12 @@ module Sequel
       end
 
       # Add a full text index on the given columns to the DDL.
+      #
+      # PostgreSQL specific options:
+      # :language :: Set a language to use for the index (default: simple).
+      #
+      # Microsoft SQL Server specific options:
+      # :key_index :: The KEY INDEX to use for the full text index.
       def full_text_index(columns, opts = {})
         index(columns, opts.merge(:type => :full_text))
       end
@@ -155,11 +161,25 @@ module Sequel
       end
       
       # Add an index on the given column(s) with the given options to the DDL.
-      # The available options are:
+      # General options:
       #
+      # :name :: The name to use for the index. If not given, a default name
+      #          based on the table and columns is used.
       # :type :: The type of index to use (only supported by some databases)
       # :unique :: Make the index unique, so duplicate values are not allowed.
       # :where :: Create a partial index (only supported by some databases)
+      #
+      # PostgreSQL specific options:
+      #
+      # :concurrently :: Create the index concurrently, so it doesn't block
+      #                  operations on the table while the index is being
+      #                  built.
+      # :op_class :: Use a specific operator class in the index.
+      #
+      # Microsoft SQL Server specific options:
+      #
+      # :include :: Include additional column values in the index, without
+      #             actually indexing on those values.
       #
       #   index :name
       #   # CREATE INDEX table_name_index ON table (name)
@@ -339,7 +359,10 @@ module Sequel
         @operations << {:op => :drop_column, :name => name}.merge(opts)
       end
       
-      # Remove a constraint from the DDL for the table.
+      # Remove a constraint from the DDL for the table. MySQL/SQLite specific options:
+      #
+      # :type :: Set the type of constraint to drop, either :primary_key, :foreign_key,
+      #          or :unique.
       #
       #   drop_constraint(:unique_name) # DROP CONSTRAINT unique_name
       #   drop_constraint(:unique_name, :cascade=>true) # DROP CONSTRAINT unique_name CASCADE
@@ -347,7 +370,17 @@ module Sequel
         @operations << {:op => :drop_constraint, :name => name}.merge(opts)
       end
       
-      # Remove an index from the DDL for the table.
+      # Remove an index from the DDL for the table. General options:
+      #
+      # :name :: The name of the index to drop.  If not given, uses the same name
+      #          that would be used by add_index with the same columns.
+      #
+      # PostgreSQL specific options:
+      #
+      # :cascade :: Cascade the index drop to dependent objects.
+      # :concurrently :: Drop the index using CONCURRENTLY, which doesn't block
+      #                  operations on the table.  Supported in PostgreSQL 9.2+.
+      # :if_exists :: Only drop the index if it already exists.
       #
       #   drop_index(:artist_id) # DROP INDEX table_artist_id_index
       #   drop_index([:a, :b]) # DROP INDEX table_a_b_index

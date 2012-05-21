@@ -131,12 +131,17 @@ module Sequel
     #     index :title
     #   end
     #
-    # Options:
+    # General options:
     # :as :: Create the table using the value, which should be either a
     #        dataset or a literal SQL string.  If this option is used,
     #        a block should not be given to the method.
     # :ignore_index_errors :: Ignore any errors when creating indexes.
     # :temp :: Create the table as a temporary table.
+    #
+    # MySQL specific options:
+    # :charset :: The character set to use for the table.
+    # :collate :: The collation to use for the table.
+    # :engine :: The table engine to use for the table.
     #
     # See <tt>Schema::Generator</tt> and the {"Schema Modification" guide}[link:files/doc/schema_modification_rdoc.html].
     def create_table(name, options={}, &block)
