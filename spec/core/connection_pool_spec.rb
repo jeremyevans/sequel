@@ -187,7 +187,7 @@ describe "A connection pool with a max size of 1" do
     q.push nil
     q1.pop
 
-    t1.should_not be_alive
+    t1.join
     t2.should be_alive
     
     c2.should == 'hello'
