@@ -24,7 +24,11 @@ describe Sequel::Database do
     begin
       INTEGRATION_DB << "SELECT"
     rescue Sequel::DatabaseError=>e
-      e.wrapped_exception.should be_a_kind_of(Exception)
+      if defined?(Java::JavaLang::Exception)
+        (e.wrapped_exception.is_a?(Exception) || e.wrapped_exception.is_a?(Java::JavaLang::Exception)).should be_true
+      else
+        e.wrapped_exception.should be_a_kind_of(Exception)
+      end
     end
   end
 
