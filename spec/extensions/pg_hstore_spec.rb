@@ -180,7 +180,7 @@ describe "pg_hstore extension" do
     @db.schema(:items).map{|e| e[1][:type]}.should == [:integer, :hstore]
   end
 
-  it "should support typecasting of the various array types" do
+  it "should support typecasting for the hstore type" do
     @db.extend @c::DatabaseMethods
     h = {1=>2}.hstore
     @db.typecast_value(:hstore, h).should equal(h)
