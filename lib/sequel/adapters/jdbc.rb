@@ -217,6 +217,8 @@ module Sequel
             opts[:jdbc_properties].each{|k,v| props.setProperty(k.to_s, v)} if opts[:jdbc_properties]
             begin
               driver.new.connect(args[0], props)
+              raise(Sequel::DatabaseError, 'driver.new.connect returned nil: probably bad JDBC connection string') unless c
+              c
             rescue JavaSQL::SQLException, NativeException, StandardError => e2
               e.message << "\n#{e2.class.name}: #{e2.message}"
               raise e
