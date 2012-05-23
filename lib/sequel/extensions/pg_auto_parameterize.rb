@@ -98,15 +98,6 @@ module Sequel
           end
           super
         end
-        
-        # If the sql string has an embedded parameter array,
-        # extract the arguments from that.
-        def execute_insert(sql, opts={})
-          if sql.is_a?(StringWithArray) && (args = sql.args)
-            opts = opts.merge(:arguments=>args)
-          end
-          super
-        end
       end
 
       module DatasetMethods
