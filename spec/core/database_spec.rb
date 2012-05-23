@@ -2002,6 +2002,19 @@ describe "Database#supports_savepoints?" do
   end
 end
 
+describe "Database#supports_savepoints_in_prepared_transactions?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_savepoints_in_prepared_transactions?.should == false
+  end
+
+  specify "should be true if both savepoints and prepared transactions are supported" do
+    db = Sequel::Database.new
+    db.meta_def(:supports_savepoints?){true}
+    db.meta_def(:supports_prepared_transactions?){true}
+    db.supports_savepoints_in_prepared_transactions?.should == true
+  end
+end
+
 describe "Database#supports_prepared_transactions?" do
   specify "should be false by default" do
     Sequel::Database.new.supports_prepared_transactions?.should == false
