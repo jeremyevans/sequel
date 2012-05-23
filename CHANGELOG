@@ -1,5 +1,7 @@
 === HEAD
 
+* Support savepoints in prepared transactions on MySQL 5.5.23+ (jeremyevans)
+
 * Add pg_json extension, for working with PostgreSQL 9.2's new json type (jeremyevans)
 
 * In the optimistic locking plugin, make refresh and save after a failed save work correctly (jeremyevans)

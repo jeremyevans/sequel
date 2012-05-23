@@ -124,10 +124,10 @@ module Sequel
         server_version >= 50000
       end
 
-      # MySQL doesn't appear to support savepoints inside prepared transactions in >=5.5.12,
-      # see http://bugs.mysql.com/bug.php?id=64374
+      # MySQL doesn't support savepoints inside prepared transactions in from
+      # 5.5.12 to 5.5.23, see http://bugs.mysql.com/bug.php?id=64374
       def supports_savepoints_in_prepared_transactions?
-        super && server_version <= 50512
+        super && (server_version <= 50512 || server_version >= 50523)
       end
 
       # MySQL supports transaction isolation levels
