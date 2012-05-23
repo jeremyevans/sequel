@@ -30,6 +30,15 @@ describe Sequel::Model, "rcte_tree" do
     @o.descendants_dataset.sql.should == 'WITH t AS (SELECT * FROM nodes WHERE (parent_id = 2) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id)) SELECT * FROM t AS nodes'
   end
   
+  it "should use the correct SQL for lazy associations when recursive CTEs require column aliases" do
+    @c.dataset.meta_def(:recursive_cte_requires_column_aliases?){true}
+    @c.plugin :rcte_tree
+    @o.parent_dataset.sql.should == 'SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1'
+    @o.children_dataset.sql.should == 'SELECT * FROM nodes WHERE (nodes.parent_id = 2)'
+    @o.ancestors_dataset.sql.should == 'WITH t(id, name, parent_id, i, pi) AS (SELECT id, name, parent_id, i, pi FROM nodes WHERE (id = 1) UNION ALL SELECT nodes.id, nodes.name, nodes.parent_id, nodes.i, nodes.pi FROM nodes INNER JOIN t ON (t.parent_id = nodes.id)) SELECT * FROM t AS nodes'
+    @o.descendants_dataset.sql.should == 'WITH t(id, name, parent_id, i, pi) AS (SELECT id, name, parent_id, i, pi FROM nodes WHERE (parent_id = 2) UNION ALL SELECT nodes.id, nodes.name, nodes.parent_id, nodes.i, nodes.pi FROM nodes INNER JOIN t ON (t.id = nodes.parent_id)) SELECT * FROM t AS nodes'
+  end
+  
   it "should use the correct SQL for lazy associations when giving options" do
     @c.plugin :rcte_tree, :primary_key=>:i, :key=>:pi, :cte_name=>:cte, :order=>:name, :ancestors=>{:name=>:as}, :children=>{:name=>:cs}, :descendants=>{:name=>:ds}, :parent=>{:name=>:p}
     @o.p_dataset.sql.should == 'SELECT * FROM nodes WHERE (nodes.i = 4) ORDER BY name LIMIT 1'
