@@ -72,6 +72,10 @@ describe "Serialization plugin" do
     MODEL_DB.sqls.should == ["INSERT INTO items (abc) VALUES ('olleh')"]
   end
   
+  it "should raise an error if specificing serializer as an unregistered symbol" do
+    proc{@c.plugin :serialization, :foo, :abc}.should raise_error(Sequel::Error)
+  end
+  
   it "should translate values to and from yaml serialization format using accessor methods" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
