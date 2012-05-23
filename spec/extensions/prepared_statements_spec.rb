@@ -54,4 +54,34 @@ describe "prepared_statements plugin" do
     c[1].should == c.load(:id=>1, :name=>'foo', :i=>2)
     @db.sqls.should == ["SELECT * FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
   end 
+
+  describe " with placeholder type specifiers" do 
+    before do
+      @ds.meta_def(:requires_placeholder_type_specifiers?){true}
+    end
+
+    specify "should correctly handle without schema type" do
+      @c[1].should == @p
+      @db.sqls.should == ["SELECT * FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+    end
+
+    specify "should correctly handle with schema type" do
+      @c.db_schema[:id][:type] = :integer
+      ds = @c.send(:prepared_lookup)
+      def ds.literal_symbol_append(sql, v)
+        if @opts[:bind_vars] and match = /\A\$(.*)\z/.match(v.to_s)
+          s = match[1].split('__')[0].to_sym
+          if prepared_arg?(s)
+            literal_append(sql, prepared_arg(s))
+          else
+            sql << v.to_s
+          end
+        else
+          super
+        end
+      end
+      @c[1].should == @p
+      @db.sqls.should == ["SELECT * FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+    end 
+  end
 end
