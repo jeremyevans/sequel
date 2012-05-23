@@ -52,4 +52,12 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
     @ds.should_not_receive(:eager_load)
     ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
   end
+
+  it "should handle case where an association is valid on an instance, but not on all instances" do
+    c = Class.new(@c)
+    c.many_to_one :parent2, :class=>@c, :key=>:parent_id
+    @c.dataset.row_proc = proc{|r| (r[:parent_id] == 101 ? c : @c).call(r)}
+    @c.all{|x| x.parent2 if x.is_a?(c)}
+  end
+
 end

@@ -28,19 +28,18 @@ module Sequel
     module TacticalEagerLoading
       module InstanceMethods
         # The dataset that retrieved this object, set if the object was
-        # reteived via Dataset#all with an active identity map.
+        # reteived via Dataset#all.
         attr_accessor :retrieved_by
 
         # All model objects retrieved with this object, set if the object was
-        # reteived via Dataset#all with an active identity map.
+        # reteived via Dataset#all.
         attr_accessor :retrieved_with
 
         private
 
-        # If there is an active identity map and the association is not in the
-        # associations cache and the object was reteived via Dataset#all,
-        # eagerly load the association for all model objects retrieved with the
-        # current object.
+        # If there the association is not in the associations cache and the object
+        # was reteived via Dataset#all, eagerly load the association for all model
+        # objects retrieved with the current object.
         def load_associated_objects(opts, reload=false)
           name = opts[:name]
           if !associations.include?(name) && retrieved_by
@@ -51,6 +50,7 @@ module Sequel
               # is only defined in a subclass.  This particular instance can use the
               # association, but it can't be eagerly loaded as the parent class doesn't
               # have access to the association, and that's the class doing the eager loading.
+              nil
             end
           end
           super
@@ -60,7 +60,7 @@ module Sequel
       module DatasetMethods
         private
 
-        # If there is an active identity map, set the reteived_with attribute for the object
+        # Set the reteived_with and retrieved_by attributes for the object
         # with the current dataset and array of all objects.
         def post_load(objects)
           super
