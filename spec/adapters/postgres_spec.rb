@@ -1624,3 +1624,75 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(h2.avals.pg_array.length).should == 1
   end
 end if POSTGRES_DB.type_supported?(:hstore)
+
+describe 'PostgreSQL json type' do
+  before(:all) do
+    Sequel.extension :pg_json
+    @db = POSTGRES_DB
+    @db.extend Sequel::Postgres::JSONDatabaseMethods
+    @ds = @db[:items]
+    @a = [1, 2, {'a'=>'b'}, 3.0]
+    @h = {'a'=>'b', '1'=>[3, 4, 5]}
+    @native = POSTGRES_DB.adapter_scheme == :postgres
+  end
+  after do
+    @db.drop_table?(:items)
+  end
+
+  specify 'insert and retrieve json values' do
+    @db.create_table!(:items){json :j}
+    @ds.insert(@h.pg_json)
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      v = rs.first[:j]
+      v.should_not be_a_kind_of(Hash)
+      v.to_hash.should be_a_kind_of(Hash)
+      v.should == @h
+      v.to_hash.should == @h
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+
+    @ds.delete
+    @ds.insert(@a.pg_json)
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      v = rs.first[:j]
+      v.should_not be_a_kind_of(Array)
+      v.to_a.should be_a_kind_of(Array)
+      v.should == @a
+      v.to_a.should == @a
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+  end
+
+  specify 'use json in bound variables' do
+    @db.create_table!(:items){json :i}
+    @ds.call(:insert, {:i=>@h.pg_json}, {:i=>:$i})
+    @ds.get(:i).should == @h
+    @ds.filter(:i.cast(String)=>:$i).call(:first, :i=>@h.pg_json).should == {:i=>@h}
+    @ds.filter(:i.cast(String)=>:$i).call(:first, :i=>{}.pg_json).should == nil
+    @ds.filter(:i.cast(String)=>:$i).call(:delete, :i=>@h.pg_json).should == 1
+
+    @ds.call(:insert, {:i=>@a.pg_json}, {:i=>:$i})
+    @ds.get(:i).should == @a
+    @ds.filter(:i.cast(String)=>:$i).call(:first, :i=>@a.pg_json).should == {:i=>@a}
+    @ds.filter(:i.cast(String)=>:$i).call(:first, :i=>[].pg_json).should == nil
+  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+
+  specify 'with models' do
+    @db.create_table!(:items) do
+      primary_key :id
+      json :h
+    end
+    c = Class.new(Sequel::Model(@db[:items]))
+    c.plugin :typecast_on_load, :h unless @native
+    c.create(:h=>@h.pg_json).h.should == @h
+    c.create(:h=>@a.pg_json).h.should == @a
+  end
+end if POSTGRES_DB.server_version >= 90200

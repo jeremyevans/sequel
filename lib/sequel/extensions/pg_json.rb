@@ -1,0 +1,178 @@
+# The pg_json extension adds support for Sequel to handle
+# PostgreSQL's json type.  It is slightly more strict than the
+# PostgreSQL json type in that the object returned must be an
+# array or object (PostgreSQL's json type considers plain numbers
+# and strings as valid).  This is because Sequel relies completely
+# on the ruby JSON library for parsing, and ruby's JSON library
+# does not accept the values.
+#
+# This extension integrates with Sequel's native postgres adapter, so
+# that when json fields are retrieved, they are parsed and returned
+# as instances of Sequel::Postgres::JSONArray or
+# Sequel::Postgres::JSONHash.  JSONArray and JSONHash are
+# DelegateClasses of Array and Hash, so they mostly act the same, but
+# not completely (json_array.is_a?(Array) is false).  If you want
+# the actual array for a JSONArray, call JSONArray#to_a.  If you want
+# the actual hash for a JSONHash, call JSONHash#to_hash.
+# This is done so that Sequel does not treat JSONArray and JSONHash
+# like Array and Hash by default, which would cause issues.
+#
+# To turn an existing Array or Hash into a JSONArray or JSONHash:
+#
+#   array.pg_json
+#   hash.pg_json
+#
+# So if you want to insert an array or hash into an json database column:
+#
+#   DB[:table].insert(:column=>[1, 2, 3].pg_json)
+#   DB[:table].insert(:column=>{'a'=>1, 'b'=>2}.pg_json)
+#
+# If you would like to use PostgreSQL json columns in your model
+# objects, you probably want to modify the schema parsing/typecasting
+# so that it recognizes and correctly handles the json type, which
+# you can do by:
+#
+#   DB.extend Sequel::Postgres::JSONDatabaseMethods
+#
+# If you are not using the native postgres adapter, you probably
+# also want to use the typecast_on_load plugin in the model, and
+# set it to typecast the json column(s) on load.
+#
+# The extension is designed to be used with the json type natively
+# supported by PostgreSQL 9.2+.  There was also a PostgreSQL extension released
+# that allowed the json type to be used on PostgreSQL 9.1.  To make
+# this extension support that type in the native adapter, do the
+# following after loading this extension:
+#
+#   Sequel::Postgres::PG_NAMED_TYPES = {} unless defined?(Sequel::Postgres::PG_NAMED_TYPES)
+#   Sequel::Postgres::PG_NAMED_TYPES[:json] = Sequel::Postgres::PG_TYPES[114]
+#
+# This extension requires both the json and delegate libraries.
+
+require 'delegate'
+require 'json'
+
+module Sequel
+  module Postgres
+    CAST_JSON = '::json'.freeze
+
+    # Class representating PostgreSQL JSON column array values.
+    class JSONArray < DelegateClass(Array)
+      # Convert the array to a string using to_json, append a
+      # literalized version of the string to the sql, and explicitly
+      # cast the string to json.
+      def sql_literal_append(ds, sql)
+        ds.literal_append(sql, to_json)
+        sql << CAST_JSON
+      end
+    end
+
+    # Class representating PostgreSQL JSON column hash/object values.
+    class JSONHash < DelegateClass(Hash)
+      # Convert the array to a string using to_json, append a
+      # literalized version of the string to the sql, and explicitly
+      # cast the string to json.
+      def sql_literal_append(ds, sql)
+        ds.literal_append(sql, to_json)
+        sql << CAST_JSON
+      end
+
+      # Return the object being delegated to.
+      alias to_hash __getobj__
+    end
+
+    # Methods enabling Database object integration with the json type.
+    module JSONDatabaseMethods
+      # Parse the given string as json, returning either a JSONArray
+      # or JSONHash instance, and raising an error if the JSON
+      # parsing does not yield an array or hash.
+      def self.parse_json(s)
+        begin
+          value = JSON.parse(s)
+        rescue JSON::ParserError=>e
+          raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
+        end
+
+        case value
+        when Array
+          JSONArray.new(value)
+        when Hash 
+          JSONHash.new(value)
+        else
+          raise Sequel::InvalidValue, "unhandled json value: #{value.inspect} (from #{s.inspect})"
+        end
+      end
+
+      # Reset the conversion procs when extending the Database object, so
+      # it will pick up the json convertor.  This is only done for the native
+      # postgres adapter.
+      def self.extended(db)
+        db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)
+      end
+
+      # Handle JSONArray and JSONHash in bound variables
+      def bound_variable_arg(arg, conn)
+        case arg
+        when JSONArray, JSONHash
+          arg.to_json
+        else
+          super
+        end
+      end
+
+      # Make the column type detection recognize the json type.
+      def schema_column_type(db_type)
+        case db_type
+        when 'json'
+          :json
+        else
+          super
+        end
+      end
+
+      private
+
+      # Given a value to typecast to the json column
+      # * If given a JSONArray or JSONHash, just return the value
+      # * If given an Array, return a JSONArray
+      # * If given a Hash, return a JSONHash
+      # * If given a String, parse it as would be done during
+      #   database retrieval.
+      def typecast_value_json(value)
+        case value
+        when JSONArray, JSONHash
+          value
+        when Array
+          JSONArray.new(value)
+        when Hash 
+          JSONHash.new(value)
+        when String
+          JSONDatabaseMethods.parse_json(value)
+        else
+          raise Sequel::InvalidValue, "invalid value for json: #{value.inspect}"
+        end
+      end
+    end
+
+    PG_TYPES = {} unless defined?(PG_TYPES)
+    PG_TYPES[114] = JSONDatabaseMethods.method(:parse_json)
+  end
+end
+
+class Array
+  # Return a Sequel::Postgres::JSONArray proxy to the receiver.
+  # This is mostly useful as a short cut for creating JSONArray
+  # objects that didn't come from the database.
+  def pg_json
+    Sequel::Postgres::JSONArray.new(self)
+  end
+end
+
+class Hash
+  # Return a Sequel::Postgres::JSONHash proxy to the receiver.
+  # This is mostly useful as a short cut for creating JSONHash
+  # objects that didn't come from the database.
+  def pg_json
+    Sequel::Postgres::JSONHash.new(self)
+  end
+end

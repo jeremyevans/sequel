@@ -1,5 +1,7 @@
 === HEAD
 
+* Add pg_json extension, for working with PostgreSQL 9.2's new json type (jeremyevans)
+
 * In the optimistic locking plugin, make refresh and save after a failed save work correctly (jeremyevans)
 
 * Support partial indexes on Microsoft SQL Server 2008 (jeremyevans)
