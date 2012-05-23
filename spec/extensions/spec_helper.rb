@@ -8,6 +8,14 @@ unless Sequel.const_defined?('Model')
   require 'sequel/model'
 end
 
+begin
+  # Attempt to load ActiveSupport inflector first, so Sequel inflector
+  # can override it.
+  require 'active_support/inflector'
+  require 'active_support/string/inflections'
+rescue LoadError
+end
+
 Sequel.extension(*%w'string_date_time inflector pagination query pretty_table blank migration schema_dumper looser_typecasting sql_expr thread_local_timezones to_dot columns_introspection server_block arbitrary_servers pg_auto_parameterize pg_statement_cache pg_hstore pg_hstore_ops schema_caching null_dataset select_remove query_literals')
 {:hook_class_methods=>[], :schema=>[], :validation_class_methods=>[]}.each{|p, opts| Sequel::Model.plugin(p, *opts)}
 
