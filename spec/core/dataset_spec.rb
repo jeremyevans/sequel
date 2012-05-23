@@ -1199,6 +1199,17 @@ describe "Dataset#from" do
     @dataset.from(@dataset.from(:a)).select_sql.should == "SELECT * FROM (SELECT * FROM a) AS t1"
   end
   
+  specify "should treat string arguments as identifiers" do
+    @dataset.quote_identifiers = true
+    @dataset.from('a').select_sql.should == "SELECT * FROM \"a\""
+  end
+  
+  specify "should not treat literal strings or blobs as identifiers" do
+    @dataset.quote_identifiers = true
+    @dataset.from('a'.lit).select_sql.should == "SELECT * FROM a"
+    @dataset.from('a'.to_sequel_blob).select_sql.should == "SELECT * FROM 'a'"
+  end
+  
   specify "should remove all FROM tables if called with no arguments" do
     @dataset.from.sql.should == 'SELECT *'
   end
@@ -1262,6 +1273,10 @@ describe "Dataset#select" do
     @d.select.sql.should == 'SELECT * FROM test'
   end
   
+  specify "should handle array condition specifiers that are aliased" do
+    @d.select(Sequel.as([[:b, :c]], :n)).sql.should == 'SELECT (b = c) AS n FROM test'
+  end
+
   specify "should accept a hash for AS values" do
     @d.select(:name => 'n', :__ggh => 'age').sql.should =~ /SELECT ((name AS n, __ggh AS age)|(__ggh AS age, name AS n)) FROM test/
   end
@@ -3298,6 +3313,11 @@ describe "Dataset prepared statements and bound variables " do
       'INSERT INTO items (num) VALUES (1) RETURNING *']
   end
     
+  specify "#call should default to using :all if an invalid type is given" do
+    @ds.filter(:num=>:$n).call(:select_all, :n=>1)
+    @db.sqls.should == ['SELECT * FROM items WHERE (num = 1)']
+  end
+
   specify "#inspect should indicate it is a prepared statement with the prepared SQL" do
     @ds.filter(:num=>:$n).prepare(:select, :sn).inspect.should == \
       '<Sequel::Mock::Dataset/PreparedStatement "SELECT * FROM items WHERE (num = $n)">'
@@ -3368,7 +3388,7 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
     @ps.first.inspect.should == '<Sequel::Mock::Dataset/PreparedStatement "SELECT * FROM items WHERE (num = ?)">'
   end
   
-  specify "should submitted the SQL to the database with placeholders and bind variables" do
+  specify "should submit the SQL to the database with placeholders and bind variables" do
     @ps.each{|p| p.prepared_sql; p.call(:n=>1)}
     @db.sqls.should == ["SELECT * FROM items WHERE (num = ?) -- args: [1]",
       "SELECT * FROM items WHERE (num = ?) -- args: [1]",
@@ -3376,6 +3396,14 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
       "DELETE FROM items WHERE (num = ?) -- args: [1]",
       "INSERT INTO items (num) VALUES (?) -- args: [1]",
       "UPDATE items SET num = ? WHERE (num = ?) -- args: [1, 1]"]
+  end
+
+  specify "should handle unrecognized statement types as :all" do
+    ps = @ds.prepare(:select_all, :s)
+    ps.extend(Sequel::Dataset::UnnumberedArgumentMapper)
+    ps.prepared_sql
+    ps.call(:n=>1)
+    @db.sqls.should == ["SELECT * FROM items WHERE (num = ?) -- args: [1]"]
   end
 end
 
