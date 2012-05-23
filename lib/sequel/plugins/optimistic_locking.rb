@@ -65,6 +65,14 @@ module Sequel
           lc = model.lock_column
           instance_filter(lc=>send(lc))
         end
+
+        # Clear the instance filters when refreshing, so that attempting to
+        # refresh after a failed save removes the previous lock column filter
+        # (the new one will be added before updating).
+        def _refresh(ds)
+          clear_instance_filters
+          super
+        end
         
         # Only update the row if it has the same lock version, and increment the
         # lock version.

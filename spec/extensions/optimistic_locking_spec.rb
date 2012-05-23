@@ -37,7 +37,7 @@ describe "optimistic_locking plugin" do
         puts sql
       end
     end
-    @c.dataset._fetch = proc do |sql|
+    @c.instance_dataset._fetch = @c.dataset._fetch = proc do |sql|
       m = h[1].dup
       v = m.delete(:lock_version)
       m[lv.to_sym] = v
@@ -93,6 +93,20 @@ describe "optimistic_locking plugin" do
     p2 = c[1]
     p1.update(:name=>'Jim')
     proc{p2.update(:name=>'Bob')}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
+  end
+
+  specify "should work correctly if attempting to refresh and save again after a failed save" do
+    p1 = @c[1]
+    p2 = @c[1]
+    p1.update(:name=>'Jim')
+    begin
+      p2.update(:name=>'Bob')
+    rescue Sequel::Plugins::OptimisticLocking::Error
+      p2.refresh
+      @c.db.sqls
+      proc{p2.update(:name=>'Bob')}.should_not raise_error
+    end
+    @c.db.sqls.first.should =~ /UPDATE people SET (name = 'Bob', lock_version = 4|lock_version = 4, name = 'Bob') WHERE \(\(id = 1\) AND \(lock_version = 3\)\)/
   end
 
   specify "should increment the lock column when #modified! even if no columns are changed" do
