@@ -22,7 +22,7 @@ module Sequel
 
       # Delegate to the db's #_execute method.
       def execute(sql)
-        @db.send(:_execute, self, sql) 
+        @db.send(:_execute, self, sql, :log=>false) 
       end
     end
 
@@ -200,7 +200,7 @@ module Sequel
         sql += " -- args: #{opts[:arguments].inspect}" if opts[:arguments]
         sql += " -- #{@opts[:append]}" if @opts[:append]
         sql += " -- #{c.server.is_a?(Symbol) ? c.server : c.server.inspect}" if c.server != :default
-        log_info(sql)
+        log_info(sql) unless opts[:log] == false
         @sqls << sql 
 
         ds = opts[:dataset]
@@ -296,10 +296,6 @@ module Sequel
       end
 
       def disconnect_connection(c)
-      end
-
-      def log_connection_execute(c, sql)
-        c.execute(sql)
       end
 
       def quote_identifiers_default
