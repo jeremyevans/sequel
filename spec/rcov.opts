@@ -4,3 +4,5 @@ gems
 spec
 --exclude
 00*
+--threshold
+100
