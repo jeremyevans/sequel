@@ -28,12 +28,6 @@ module Sequel
         pragma_set(:auto_vacuum, value)
       end
 
-      # Boolean signifying the value of the case_sensitive_likePRAGMA, or nil
-      # if not using SQLite 3.2.3+.
-      def case_sensitive_like
-        pragma_get(:case_sensitive_like).to_i == 1 if sqlite_version >= 30203
-      end
-      
       # Set the case_sensitive_like PRAGMA using the given boolean value, if using
       # SQLite 3.2.3+.  If not using 3.2.3+, no error is raised. See pragma_set.
       # Consider using the :case_sensitive_like Database option instead.

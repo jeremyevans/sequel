@@ -10,11 +10,10 @@ describe "An SQLite database" do
   before do
     @db = SQLITE_DB
     @fk = @db.foreign_keys
-    @csl = @db.case_sensitive_like
   end
   after do
     @db.foreign_keys = @fk
-    @db.case_sensitive_like = @csl
+    @db.case_sensitive_like = true
     Sequel.datetime_class = Time
   end
 
