@@ -144,11 +144,6 @@ module Sequel
         _execute(:insert, sql, opts)
       end
       
-      # Run the given SQL with the given arguments and return the first value of the first row.
-      def single_value(sql, opts={})
-        _execute(:single_value, sql, opts)
-      end
-      
       # Handle Integer and Float arguments, since SQLite can store timestamps as integers and floats.
       def to_application_timestamp(s)
         case s
@@ -177,8 +172,6 @@ module Sequel
             case type
             when :select
               log_yield(sql, log_args){conn.query(sql, args, &block)}
-            when :single_value
-              log_yield(sql, log_args){conn.get_first_value(sql, args)}
             when :insert
               log_yield(sql, log_args){conn.execute(sql, args)}
               conn.last_insert_row_id

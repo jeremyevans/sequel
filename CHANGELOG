@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove Database#single_value in the sqlite adapter (jeremyevans)
+
 * Make Dataset#get work with nil and false arguments (jeremyevans)
 
 * Make json_serializer plugin respect :root=>:collection and :root=>:instance options (jeremyevans)

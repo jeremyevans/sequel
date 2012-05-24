@@ -252,7 +252,7 @@ module Sequel
         end
       end
 
-      # The array of column symbols in the table, except for ones given in opts[:except]
+      # A name to use for the backup table
       def backup_table_name(table, opts={})
         table = table.gsub('`', '')
         (opts[:times]||1000).times do |i|
@@ -283,16 +283,12 @@ module Sequel
         ps
       end
 
-      # The array of column schema hashes, except for the ones given in opts[:except]
-      def defined_columns_for(table, opts={})
+      # The array of column schema hashes for the current columns in the table
+      def defined_columns_for(table)
         cols = parse_pragma(table, {})
         cols.each do |c|
           c[:default] = LiteralString.new(c[:default]) if c[:default]
           c[:type] = c[:db_type]
-        end
-        if opts[:except]
-          nono= Array(opts[:except]).compact.map{|n| n.to_s}
-          cols.reject!{|c| nono.include? c[:name] }
         end
         cols
       end

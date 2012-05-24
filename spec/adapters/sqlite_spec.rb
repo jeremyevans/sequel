@@ -10,9 +10,11 @@ describe "An SQLite database" do
   before do
     @db = SQLITE_DB
     @fk = @db.foreign_keys
+    @csl = @db.case_sensitive_like
   end
   after do
     @db.foreign_keys = @fk
+    @db.case_sensitive_like = @csl
     Sequel.datetime_class = Time
   end
 
@@ -36,6 +38,16 @@ describe "An SQLite database" do
       
       proc {@db.auto_vacuum = :invalid}.should raise_error(Sequel::Error)
     end
+  end
+  
+  specify "should respect case sensitive like false" do
+    @db.case_sensitive_like = false
+    @db.get(Sequel.like('a', 'A')).to_s.should == '1'
+  end
+  
+  specify "should respect case sensitive like true" do
+    @db.case_sensitive_like = true
+    @db.get(Sequel.like('a', 'A')).to_s.should == '0'
   end
   
   specify "should provide the SQLite version as an integer" do
