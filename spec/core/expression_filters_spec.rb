@@ -695,6 +695,11 @@ describe "Sequel core extension replacements" do
     l(Sequel.expr([[:a, 1], [:b, 2]]) & nil, "((a = 1) AND (b = 2) AND NULL)")
   end
 
+  it "Sequel.expr should handle arrays that are not condition specifiers" do
+    l(Sequel.expr([1]), "(1)")
+    l(Sequel.expr([1, 2]), "(1, 2)")
+  end
+
   it "Sequel.expr should treat blocks/procs as virtual rows and wrap the output" do
     l(Sequel.expr{1} + 1, "(1 + 1)")
     l(Sequel.expr{o__a} + 1, "(o.a + 1)")
@@ -1009,5 +1014,31 @@ describe "Sequel::SQL::Wrapper" do
     @ds.literal(s.cast(Integer)).should == "CAST(foo AS integer)"
     @ds.literal(s.desc).should == "foo DESC"
     @ds.literal(s.sql_string + '1').should == "(foo || '1')"
+  end
+end
+
+describe "Sequel::SQL::Blob#to_sequel_blob" do
+  specify "should return self" do
+    c = Sequel::SQL::Blob.new('a')
+    c.to_sequel_blob.should equal(c)
+  end
+end
+
+describe Sequel::SQL::Subscript do
+  before do
+    @s = Sequel::SQL::Subscript.new(:a, [1])
+    @ds = Sequel::Dataset.new(nil)
+  end
+
+  specify "should have | return a new non-nested subscript" do
+    s = (@s | 2)
+    s.should_not equal(@s)
+    @ds.literal(s).should == 'a[1, 2]'
+  end
+
+  specify "should have [] return a new nested subscript" do
+    s = @s[2]
+    s.should_not equal(@s)
+    @ds.literal(s).should == 'a[1][2]'
   end
 end

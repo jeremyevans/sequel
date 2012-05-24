@@ -942,6 +942,15 @@ describe Sequel::Model, "#set_fields" do
     @o1.set_fields({:x => 1, :y => 3, :z=>3, :id=>4}, [:x, :y], :missing=>:raise)
     @o1.values.should == {:x => 1, :y => 3}
   end
+
+  it "should use default behavior for an unrecognized :missing option" do
+    @o1.set_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y], :missing=>:foo)
+    @o1.values.should == {:x => 1, :y => 2}
+    @o1.set_fields({:x => 9, :y => 8, :z=>6, :id=>7}, [:x, :y, :id], :missing=>:foo)
+    @o1.values.should == {:x => 9, :y => 8, :id=>7}
+    MODEL_DB.sqls.should == []
+  end
+
 end
 
 describe Sequel::Model, "#update_fields" do

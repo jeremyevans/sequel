@@ -571,6 +571,12 @@ describe Sequel::Model, ".[]" do
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE id = 9999"]
   end
 
+  it "should have #[] return nil if no rows match" do
+    @c.dataset._fetch = []
+    @c[1].should == nil
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE id = 1"]
+  end
+
   it "should work correctly for custom primary key" do
     @c.set_primary_key :name
     @c['sharon'].should == @c.load(:name => 'sharon', :id => 1)
