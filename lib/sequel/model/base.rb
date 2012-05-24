@@ -1808,7 +1808,7 @@ module Sequel
       # for database specific column types.
       def typecast_value(column, value)
         return value unless typecast_on_assignment && db_schema && (col_schema = db_schema[column])
-        value = nil if value == '' and typecast_empty_string_to_nil and col_schema[:type] and ![:string, :blob].include?(col_schema[:type])
+        value = nil if '' == value and typecast_empty_string_to_nil and col_schema[:type] and ![:string, :blob].include?(col_schema[:type])
         raise(InvalidValue, "nil/NULL is not allowed for the #{column} column") if raise_on_typecast_failure && value.nil? && (col_schema[:allow_null] == false)
         begin
           model.db.typecast_value(col_schema[:type], value)

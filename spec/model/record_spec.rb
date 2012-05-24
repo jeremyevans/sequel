@@ -1539,6 +1539,15 @@ describe Sequel::Model, "typecasting" do
     proc{@c.new.x = ''}.should raise_error
   end
 
+  specify "should handle typecasting where == raises an error on the object" do
+    m = @c.new
+    o = Object.new
+    def o.==(v) raise ArgumentError end
+    def o.to_i() 4 end
+    m.x = o
+    m.x.should == 4
+  end
+
   specify "should not typecast nil if NULLs are allowed" do
     @c.db_schema[:x][:allow_null] = true
     m = @c.new
