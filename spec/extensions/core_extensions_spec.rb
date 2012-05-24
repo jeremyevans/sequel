@@ -18,6 +18,89 @@ describe "Sequel core extensions" do
   end
 end
 
+describe "Array and Hash extensions" do
+  before do
+    db = Sequel::Database.new
+    @d = db[:items]
+    def @d.l(*args, &block)
+      literal(filter_expr(*args, &block))
+    end
+    def @d.lit(*args)
+      literal(*args)
+    end
+  end
+  
+  it "should support sql_expr on arrays with all two pairs" do
+    @d.l([[:x, 100],[:y, 'a']].sql_expr).should == '((x = 100) AND (y = \'a\'))'
+    @d.l([[:x, true], [:y, false]].sql_expr).should == '((x IS TRUE) AND (y IS FALSE))'
+    @d.l([[:x, nil], [:y, [1,2,3]]].sql_expr).should == '((x IS NULL) AND (y IN (1, 2, 3)))'
+  end
+  
+  it "should support sql_negate on arrays with all two pairs" do
+    @d.l([[:x, 100],[:y, 'a']].sql_negate).should == '((x != 100) AND (y != \'a\'))'
+    @d.l([[:x, true], [:y, false]].sql_negate).should == '((x IS NOT TRUE) AND (y IS NOT FALSE))'
+    @d.l([[:x, nil], [:y, [1,2,3]]].sql_negate).should == '((x IS NOT NULL) AND (y NOT IN (1, 2, 3)))'
+  end
+  
+  it "should support ~ on arrays with all two pairs" do
+    @d.l(~[[:x, 100],[:y, 'a']]).should == '((x != 100) OR (y != \'a\'))'
+    @d.l(~[[:x, true], [:y, false]]).should == '((x IS NOT TRUE) OR (y IS NOT FALSE))'
+    @d.l(~[[:x, nil], [:y, [1,2,3]]]).should == '((x IS NOT NULL) OR (y NOT IN (1, 2, 3)))'
+  end
+  
+  it "should support sql_or on arrays with all two pairs" do
+    @d.l([[:x, 100],[:y, 'a']].sql_or).should == '((x = 100) OR (y = \'a\'))'
+    @d.l([[:x, true], [:y, false]].sql_or).should == '((x IS TRUE) OR (y IS FALSE))'
+    @d.l([[:x, nil], [:y, [1,2,3]]].sql_or).should == '((x IS NULL) OR (y IN (1, 2, 3)))'
+  end
+  
+  it "should support Array#sql_string_join for concatenation of SQL strings" do
+    @d.lit([:x].sql_string_join).should == '(x)'
+    @d.lit([:x].sql_string_join(', ')).should == '(x)'
+    @d.lit([:x, :y].sql_string_join).should == '(x || y)'
+    @d.lit([:x, :y].sql_string_join(', ')).should == "(x || ', ' || y)"
+    @d.lit([:x.sql_function(1), :y.sql_subscript(1)].sql_string_join).should == '(x(1) || y[1])'
+    @d.lit([:x.sql_function(1), 'y.z'.lit].sql_string_join(', ')).should == "(x(1) || ', ' || y.z)"
+    @d.lit([:x, 1, :y].sql_string_join).should == "(x || '1' || y)"
+    @d.lit([:x, 1, :y].sql_string_join(', ')).should == "(x || ', ' || '1' || ', ' || y)"
+    @d.lit([:x, 1, :y].sql_string_join(:y__z)).should == "(x || y.z || '1' || y.z || y)"
+    @d.lit([:x, 1, :y].sql_string_join(1)).should == "(x || '1' || '1' || '1' || y)"
+    @d.lit([:x, :y].sql_string_join('y.x || x.y'.lit)).should == "(x || y.x || x.y || y)"
+    @d.lit([[:x, :y].sql_string_join, [:a, :b].sql_string_join].sql_string_join).should == "(x || y || a || b)"
+  end
+
+  it "should support sql_expr on hashes" do
+    @d.l({:x => 100, :y => 'a'}.sql_expr)[1...-1].split(' AND ').sort.should == ['(x = 100)', '(y = \'a\')']
+    @d.l({:x => true, :y => false}.sql_expr)[1...-1].split(' AND ').sort.should == ['(x IS TRUE)', '(y IS FALSE)']
+    @d.l({:x => nil, :y => [1,2,3]}.sql_expr)[1...-1].split(' AND ').sort.should == ['(x IS NULL)', '(y IN (1, 2, 3))']
+  end
+  
+  it "should support sql_negate on hashes" do
+    @d.l({:x => 100, :y => 'a'}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x != 100)', '(y != \'a\')']
+    @d.l({:x => true, :y => false}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x IS NOT TRUE)', '(y IS NOT FALSE)']
+    @d.l({:x => nil, :y => [1,2,3]}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x IS NOT NULL)', '(y NOT IN (1, 2, 3))']
+  end
+  
+  it "should support ~ on hashes" do
+    @d.l(~{:x => 100, :y => 'a'})[1...-1].split(' OR ').sort.should == ['(x != 100)', '(y != \'a\')']
+    @d.l(~{:x => true, :y => false})[1...-1].split(' OR ').sort.should == ['(x IS NOT TRUE)', '(y IS NOT FALSE)']
+    @d.l(~{:x => nil, :y => [1,2,3]})[1...-1].split(' OR ').sort.should == ['(x IS NOT NULL)', '(y NOT IN (1, 2, 3))']
+  end
+  
+  it "should support sql_or on hashes" do
+    @d.l({:x => 100, :y => 'a'}.sql_or)[1...-1].split(' OR ').sort.should == ['(x = 100)', '(y = \'a\')']
+    @d.l({:x => true, :y => false}.sql_or)[1...-1].split(' OR ').sort.should == ['(x IS TRUE)', '(y IS FALSE)']
+    @d.l({:x => nil, :y => [1,2,3]}.sql_or)[1...-1].split(' OR ').sort.should == ['(x IS NULL)', '(y IN (1, 2, 3))']
+  end
+  
+  it "should Hash#& and Hash#|" do
+    @d.l({:y => :z} & :x).should == '((y = z) AND x)'
+    @d.l({:x => :a} & {:y => :z}).should == '((x = a) AND (y = z))'
+    @d.l({:y => :z} | :x).should == '((y = z) OR x)'
+    @d.l({:x => :a} | {:y => :z}).should == '((x = a) OR (y = z))'
+  end
+end
+
 describe "Array#case and Hash#case" do
   before do
     @d = Sequel::Dataset.new(nil)

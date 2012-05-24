@@ -212,8 +212,6 @@ describe "Blockless Ruby Filters" do
     @d.l(:x.sql_boolean & :y).should == '(x AND y)'
     @d.l(:x & :y & :z).should == '(x AND y AND z)'
     @d.l(:x & {:y => :z}).should == '(x AND (y = z))'
-    @d.l({:y => :z} & :x).should == '((y = z) AND x)'
-    @d.l({:x => :a} & {:y => :z}).should == '((x = a) AND (y = z))'
     @d.l((:x + 200 < 0) & (:y - 200 < 0)).should == '(((x + 200) < 0) AND ((y - 200) < 0))'
     @d.l(:x & ~:y).should == '(x AND NOT y)'
     @d.l(~:x & :y).should == '(NOT x AND y)'
@@ -225,8 +223,6 @@ describe "Blockless Ruby Filters" do
     @d.l(:x.sql_boolean | :y).should == '(x OR y)'
     @d.l(:x | :y | :z).should == '(x OR y OR z)'
     @d.l(:x | {:y => :z}).should == '(x OR (y = z))'
-    @d.l({:y => :z} | :x).should == '((y = z) OR x)'
-    @d.l({:x => :a} | {:y => :z}).should == '((x = a) OR (y = z))'
     @d.l((:x.sql_number > 200) | (:y.sql_number < 200)).should == '((x > 200) OR (y < 200))'
   end
   
@@ -267,58 +263,10 @@ describe "Blockless Ruby Filters" do
     @d.l(:x => nil, :y => [1,2,3])[1...-1].split(' AND ').sort.should == ['(x IS NULL)', '(y IN (1, 2, 3))']
   end
   
-  it "should support sql_expr on hashes" do
-    @d.l({:x => 100, :y => 'a'}.sql_expr)[1...-1].split(' AND ').sort.should == ['(x = 100)', '(y = \'a\')']
-    @d.l({:x => true, :y => false}.sql_expr)[1...-1].split(' AND ').sort.should == ['(x IS TRUE)', '(y IS FALSE)']
-    @d.l({:x => nil, :y => [1,2,3]}.sql_expr)[1...-1].split(' AND ').sort.should == ['(x IS NULL)', '(y IN (1, 2, 3))']
-  end
-  
-  it "should support sql_negate on hashes" do
-    @d.l({:x => 100, :y => 'a'}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x != 100)', '(y != \'a\')']
-    @d.l({:x => true, :y => false}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x IS NOT TRUE)', '(y IS NOT FALSE)']
-    @d.l({:x => nil, :y => [1,2,3]}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x IS NOT NULL)', '(y NOT IN (1, 2, 3))']
-  end
-  
-  it "should support ~ on hashes" do
-    @d.l(~{:x => 100, :y => 'a'})[1...-1].split(' OR ').sort.should == ['(x != 100)', '(y != \'a\')']
-    @d.l(~{:x => true, :y => false})[1...-1].split(' OR ').sort.should == ['(x IS NOT TRUE)', '(y IS NOT FALSE)']
-    @d.l(~{:x => nil, :y => [1,2,3]})[1...-1].split(' OR ').sort.should == ['(x IS NOT NULL)', '(y NOT IN (1, 2, 3))']
-  end
-  
-  it "should support sql_or on hashes" do
-    @d.l({:x => 100, :y => 'a'}.sql_or)[1...-1].split(' OR ').sort.should == ['(x = 100)', '(y = \'a\')']
-    @d.l({:x => true, :y => false}.sql_or)[1...-1].split(' OR ').sort.should == ['(x IS TRUE)', '(y IS FALSE)']
-    @d.l({:x => nil, :y => [1,2,3]}.sql_or)[1...-1].split(' OR ').sort.should == ['(x IS NULL)', '(y IN (1, 2, 3))']
-  end
-  
   it "should support arrays with all two pairs the same as hashes" do
     @d.l([[:x, 100],[:y, 'a']]).should == '((x = 100) AND (y = \'a\'))'
     @d.l([[:x, true], [:y, false]]).should == '((x IS TRUE) AND (y IS FALSE))'
     @d.l([[:x, nil], [:y, [1,2,3]]]).should == '((x IS NULL) AND (y IN (1, 2, 3)))'
-  end
-  
-  it "should support sql_expr on arrays with all two pairs" do
-    @d.l([[:x, 100],[:y, 'a']].sql_expr).should == '((x = 100) AND (y = \'a\'))'
-    @d.l([[:x, true], [:y, false]].sql_expr).should == '((x IS TRUE) AND (y IS FALSE))'
-    @d.l([[:x, nil], [:y, [1,2,3]]].sql_expr).should == '((x IS NULL) AND (y IN (1, 2, 3)))'
-  end
-  
-  it "should support sql_negate on arrays with all two pairs" do
-    @d.l([[:x, 100],[:y, 'a']].sql_negate).should == '((x != 100) AND (y != \'a\'))'
-    @d.l([[:x, true], [:y, false]].sql_negate).should == '((x IS NOT TRUE) AND (y IS NOT FALSE))'
-    @d.l([[:x, nil], [:y, [1,2,3]]].sql_negate).should == '((x IS NOT NULL) AND (y NOT IN (1, 2, 3)))'
-  end
-  
-  it "should support ~ on arrays with all two pairs" do
-    @d.l(~[[:x, 100],[:y, 'a']]).should == '((x != 100) OR (y != \'a\'))'
-    @d.l(~[[:x, true], [:y, false]]).should == '((x IS NOT TRUE) OR (y IS NOT FALSE))'
-    @d.l(~[[:x, nil], [:y, [1,2,3]]]).should == '((x IS NOT NULL) OR (y NOT IN (1, 2, 3)))'
-  end
-  
-  it "should support sql_or on arrays with all two pairs" do
-    @d.l([[:x, 100],[:y, 'a']].sql_or).should == '((x = 100) OR (y = \'a\'))'
-    @d.l([[:x, true], [:y, false]].sql_or).should == '((x IS TRUE) OR (y IS FALSE))'
-    @d.l([[:x, nil], [:y, [1,2,3]]].sql_or).should == '((x IS NULL) OR (y IN (1, 2, 3)))'
   end
   
   it "should emulate columns for array values" do
@@ -332,21 +280,6 @@ describe "Blockless Ruby Filters" do
     @d.l([:x, :y, :z]=>[[1,2,5], [3,4,6]]).should == '(((x = 1) AND (y = 2) AND (z = 5)) OR ((x = 3) AND (y = 4) AND (z = 6)))'
   end
   
-  it "should support Array#sql_string_join for concatenation of SQL strings" do
-    @d.lit([:x].sql_string_join).should == '(x)'
-    @d.lit([:x].sql_string_join(', ')).should == '(x)'
-    @d.lit([:x, :y].sql_string_join).should == '(x || y)'
-    @d.lit([:x, :y].sql_string_join(', ')).should == "(x || ', ' || y)"
-    @d.lit([:x.sql_function(1), :y.sql_subscript(1)].sql_string_join).should == '(x(1) || y[1])'
-    @d.lit([:x.sql_function(1), 'y.z'.lit].sql_string_join(', ')).should == "(x(1) || ', ' || y.z)"
-    @d.lit([:x, 1, :y].sql_string_join).should == "(x || '1' || y)"
-    @d.lit([:x, 1, :y].sql_string_join(', ')).should == "(x || ', ' || '1' || ', ' || y)"
-    @d.lit([:x, 1, :y].sql_string_join(:y__z)).should == "(x || y.z || '1' || y.z || y)"
-    @d.lit([:x, 1, :y].sql_string_join(1)).should == "(x || '1' || '1' || '1' || y)"
-    @d.lit([:x, :y].sql_string_join('y.x || x.y'.lit)).should == "(x || y.x || x.y || y)"
-    @d.lit([[:x, :y].sql_string_join, [:a, :b].sql_string_join].sql_string_join).should == "(x || y || a || b)"
-  end
-
   it "should support StringExpression#+ for concatenation of SQL strings" do
     @d.lit(:x.sql_string + :y).should == '(x || y)'
     @d.lit([:x].sql_string_join + :y).should == '(x || y)'
