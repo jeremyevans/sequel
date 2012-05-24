@@ -2662,6 +2662,11 @@ describe "Dataset#get" do
   specify "should raise an error if both a regular argument and block argument are used" do
     proc{@d.get(:name){|o| o.x__b.as(:name)}}.should raise_error(Sequel::Error)
   end
+  
+  specify "should support false and nil values" do
+    @d.get(false).should == "SELECT 'f' FROM test LIMIT 1"
+    @d.get(nil).should == "SELECT NULL FROM test LIMIT 1"
+  end
 end
 
 describe "Dataset#set_row_proc" do

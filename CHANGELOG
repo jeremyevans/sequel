@@ -1,8 +1,8 @@
 === HEAD
 
-* Make json_serializer plugin respect :root=>:collection and :root=>:instance options (jeremyevans)
-
 * Make Dataset#get work with nil and false arguments (jeremyevans)
+
+* Make json_serializer plugin respect :root=>:collection and :root=>:instance options (jeremyevans)
 
 * Support savepoints in prepared transactions on MySQL 5.5.23+ (jeremyevans)
 

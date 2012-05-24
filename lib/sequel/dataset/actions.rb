@@ -204,12 +204,12 @@ module Sequel
     #
     #   ds.get{sum(id)} # SELECT sum(id) FROM table LIMIT 1
     #   # => 6
-    def get(column=nil, &block)
-      if column
-        raise(Error, ARG_BLOCK_ERROR_MSG) if block
-        select(column).single_value
-      else
+    def get(column=(no_arg=true; nil), &block)
+      if block
+        raise(Error, ARG_BLOCK_ERROR_MSG) unless no_arg
         select(&block).single_value
+      else
+        select(column).single_value
       end
     end
     
