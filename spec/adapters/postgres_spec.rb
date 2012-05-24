@@ -1250,7 +1250,7 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
       i = 0
       @db.listen('foo2', :timeout=>0.001, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.should == nil
       i.should == 4
-    end unless RUBY_VERSION =~ /1.8.7|1.9.2/ && RUBY_PLATFORM =~ /mingw/ # Ruby freezes on this spec on this platform/version
+    end unless RUBY_PLATFORM =~ /mingw/ # Ruby freezes on this spec on this platform/version
   end
 end
 
