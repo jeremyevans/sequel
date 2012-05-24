@@ -60,6 +60,15 @@ describe "A PostgreSQL database" do
       [:value, {:type=>:blob, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"bytea", :primary_key=>false}]
     ]
   end
+
+  specify "should parse foreign keys for tables in a schema" do
+    begin
+      @db.create_table!(:public__testfk){primary_key :id; foreign_key :i, :public__testfk}
+      @db.foreign_key_list(:public__testfk).should == [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>Sequel.qualify(:public, :testfk), :name=>:testfk_i_fkey}]
+    ensure
+      @db.drop_table(:public__testfk)
+    end
+  end
 end
 
 describe "A PostgreSQL dataset" do

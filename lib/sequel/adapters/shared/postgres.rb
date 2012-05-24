@@ -247,9 +247,9 @@ module Sequel
         # If a schema is given, we only search in that schema, and the returned :table
         # entry is schema qualified as well.
         if schema
-          ds.join!(:pg_namespace___nsp, :oid=>:cl__relnamespace).
-            where(:nsp___nspname=>im.call(schema))
-          ref_ds.join!(:pg_namespace___nsp2, :oid=>:cl2__relnamespace).
+          ds = ds.join(:pg_namespace___nsp, :oid=>:cl__relnamespace).
+            where(:nsp__nspname=>im.call(schema))
+          ref_ds = ref_ds.join(:pg_namespace___nsp2, :oid=>:cl2__relnamespace).
             select_more(:nsp2__nspname___schema)
         end
 
@@ -264,7 +264,7 @@ module Sequel
         end
         ref_ds.each do |row|
           r = h[row[:name]]
-          r[:table] ||= m.call(schema ? SQL::QualifiedIdentifier.new(row[:schema], row[:table]) : row[:table])
+          r[:table] ||= schema ? SQL::QualifiedIdentifier.new(m.call(row[:schema]), m.call(row[:table])) : m.call(row[:table])
           r[:key] ||= []
           r[:key] << m.call(row[:refcolumn])
         end

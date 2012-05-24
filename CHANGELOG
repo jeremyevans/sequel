@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix bugs when parsing foreign keys for tables with explicit schema on PostgreSQL (jeremyevans)
+
 * Remove Database#case_sensitive_like on SQLite (jeremyevans)
 
 * Remove Database#single_value in the native sqlite adapter (jeremyevans)
