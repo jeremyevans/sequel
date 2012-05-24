@@ -1,5 +1,7 @@
 === HEAD
 
+* Add pg_inet extension, for working with PostgreSQL inet and cidr types (jeremyevans)
+
 * Fix bug in model column setters when passing an object that raises an exception for ==('') (jeremyevans)
 
 * Add eager_each plugin, which makes each on an eagerly loaded dataset do eager loading (jeremyevans)

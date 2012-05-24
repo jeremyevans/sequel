@@ -1709,3 +1709,95 @@ describe 'PostgreSQL json type' do
     c.create(:h=>@a.pg_json).h.should == @a
   end
 end if POSTGRES_DB.server_version >= 90200
+
+describe 'PostgreSQL inet/cidr types' do
+  ipv6_broken = (IPAddr.new('::1'); false) rescue true
+
+  before(:all) do
+    Sequel.extension :pg_inet
+    @db = POSTGRES_DB
+    @db.extend Sequel::Postgres::InetDatabaseMethods
+    @ds = @db[:items]
+    @v4 = '127.0.0.1'
+    @v4nm = '127.0.0.0/8'
+    @v6 = '2001:4f8:3:ba:2e0:81ff:fe22:d1f1'
+    @v6nm = '2001:4f8:3:ba::/64'
+    @ipv4 = IPAddr.new(@v4)
+    @ipv4nm = IPAddr.new(@v4nm)
+    unless ipv6_broken
+      @ipv6 = IPAddr.new(@v6)
+      @ipv6nm = IPAddr.new(@v6nm)
+    end
+    @native = POSTGRES_DB.adapter_scheme == :postgres
+  end
+  after do
+    @db.drop_table?(:items)
+  end
+
+  specify 'insert and retrieve inet/cidr values' do
+    @db.create_table!(:items){inet :i; cidr :c}
+    @ds.insert(@ipv4, @ipv4nm)
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      rs.first[:i].should == @ipv4
+      rs.first[:c].should == @ipv4nm
+      rs.first[:i].should be_a_kind_of(IPAddr)
+      rs.first[:c].should be_a_kind_of(IPAddr)
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+
+    unless ipv6_broken
+      @ds.delete
+      @ds.insert(@ipv6, @ipv6nm)
+      @ds.count.should == 1
+      if @native
+        rs = @ds.all
+        v = rs.first[:j]
+        rs.first[:i].should == @ipv6
+        rs.first[:c].should == @ipv6nm
+        rs.first[:i].should be_a_kind_of(IPAddr)
+        rs.first[:c].should be_a_kind_of(IPAddr)
+        @ds.delete
+        @ds.insert(rs.first)
+        @ds.all.should == rs
+      end
+    end
+  end
+
+  specify 'use ipaddr in bound variables' do
+    @db.create_table!(:items){inet :i; cidr :c}
+
+    @ds.call(:insert, {:i=>@ipv4, :c=>@ipv4nm}, {:i=>:$i, :c=>:$c})
+    @ds.get(:i).should == @ipv4
+    @ds.get(:c).should == @ipv4nm
+    @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv4, :c=>@ipv4nm).should == {:i=>@ipv4, :c=>@ipv4nm}
+    @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv6, :c=>@ipv6nm).should == nil
+    @ds.filter(:i=>:$i, :c=>:$c).call(:delete, :i=>@ipv4, :c=>@ipv4nm).should == 1
+
+    unless ipv6_broken
+      @ds.call(:insert, {:i=>@ipv6, :c=>@ipv6nm}, {:i=>:$i, :c=>:$c})
+      @ds.get(:i).should == @ipv6
+      @ds.get(:c).should == @ipv6nm
+      @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv6, :c=>@ipv6nm).should == {:i=>@ipv6, :c=>@ipv6nm}
+      @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv4, :c=>@ipv4nm).should == nil
+      @ds.filter(:i=>:$i, :c=>:$c).call(:delete, :i=>@ipv6, :c=>@ipv6nm).should == 1
+    end
+  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+
+  specify 'with models' do
+    @db.create_table!(:items) do
+      primary_key :id
+      inet :i
+      cidr :c
+    end
+    c = Class.new(Sequel::Model(@db[:items]))
+    c.plugin :typecast_on_load, :i, :c unless @native
+    c.create(:i=>@v4, :c=>@v4nm).values.values_at(:i, :c).should == [@ipv4, @ipv4nm]
+    unless ipv6_broken
+      c.create(:i=>@ipv6, :c=>@ipv6nm).values.values_at(:i, :c).should == [@ipv6, @ipv6nm]
+    end
+  end
+end if POSTGRES_DB.server_version >= 90200
