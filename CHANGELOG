@@ -1,5 +1,7 @@
 === HEAD
 
+* Add eager_each plugin, which makes each on an eagerly loaded dataset do eager loading (jeremyevans)
+
 * Fix bugs when parsing foreign keys for tables with explicit schema on PostgreSQL (jeremyevans)
 
 * Remove Database#case_sensitive_like on SQLite (jeremyevans)
