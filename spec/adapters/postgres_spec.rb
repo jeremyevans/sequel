@@ -166,6 +166,10 @@ describe "A PostgreSQL dataset" do
     @db.transaction(:synchronous=>false){}
     @db.sqls.grep(/synchronous/).should == ["SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = off", "SET LOCAL synchronous_commit = off"]
 
+    @db.sqls.clear
+    @db.transaction(:synchronous=>nil){}
+    @db.sqls.should == ['BEGIN', 'COMMIT']
+
     if @db.server_version >= 90100
       @db.sqls.clear
       @db.transaction(:synchronous=>:local){}
