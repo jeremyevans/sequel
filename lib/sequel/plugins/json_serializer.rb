@@ -200,7 +200,21 @@ module Sequel
       module DatasetMethods
         # Return a JSON string representing an array of all objects in
         # this dataset.  Takes the same options as the the instance
-        # method, and passes them to every instance.
+        # method, and passes them to every instance.  Additionally,
+        # respects the following options:
+        #
+        # :array :: An array of instances.  If this is not provided,
+        #           calls #all on the receiver to get the array.
+        # :root :: If set to :collection, only wraps the collection
+        #          in a root object.  If set to :instance, only wraps
+        #          the instances in a root object.  If set to :both,
+        #          wraps both the collection and instances in a root
+        #          object.  Unfortunately, for backwards compatibility,
+        #          if this option is true and doesn't match one of those
+        #          symbols, it defaults to both.  That may change in a
+        #          future version, so for forwards compatibility, you
+        #          should pick a specific symbol for your desired
+        #          behavior.
         def to_json(*a)
           if opts = a.first.is_a?(Hash)
             opts = model.json_serializer_opts.merge(a.first)
@@ -208,6 +222,19 @@ module Sequel
           else
             opts = model.json_serializer_opts
           end
+
+          collection_root = case opts[:root]
+          when nil, false, :instance
+            false
+          when :collection
+            opts = opts.dup
+            opts.delete(:root)
+            opts[:naked] = true unless opts.has_key?(:naked)
+            true
+          else
+            true
+          end
+
           res = if row_proc 
             array = if opts[:array]
               opts = opts.dup
@@ -219,7 +246,12 @@ module Sequel
            else
             all
           end
-          opts[:root] ? {model.send(:pluralize, model.send(:underscore, model.to_s)) => res}.to_json(*a) : res.to_json(*a)
+
+          if collection_root
+            {model.send(:pluralize, model.send(:underscore, model.to_s)) => res}.to_json(*a)
+          else
+            res.to_json(*a)
+          end
         end
       end
     end

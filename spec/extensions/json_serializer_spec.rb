@@ -149,7 +149,22 @@ describe "Sequel::Plugins::JsonSerializer" do
     @album.to_json(:root=>true, :only => :name).to_s.should == '{"album":{"name":"RF"}}'
   end
   
-  it "should handle the :root option to qualify a dataset of records" do
+  it "should handle the :root=>:both option to qualify a dataset of records" do
+    Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
+    Album.dataset.to_json(:root=>true, :only => :id).to_s.should == '{"albums":[{"album":{"id":1}},{"album":{"id":1}}]}'
+  end
+
+  it "should handle the :root=>:collection option to qualify just the collection" do
+    Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
+    Album.dataset.to_json(:root=>:collection, :only => :id).to_s.should == '{"albums":[{"id":1},{"id":1}]}'
+  end
+
+  it "should handle the :root=>:instance option to qualify just the instances" do
+    Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
+    Album.dataset.to_json(:root=>:instance, :only => :id).to_s.should == '[{"album":{"id":1}},{"album":{"id":1}}]'
+  end
+
+  it "should handle the :root=>true option be the same as :root=>:both for backwards compatibility" do
     Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
     Album.dataset.to_json(:root=>true, :only => :id).to_s.should == '{"albums":[{"album":{"id":1}},{"album":{"id":1}}]}'
   end
