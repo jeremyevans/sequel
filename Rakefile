@@ -136,7 +136,7 @@ begin
   spec_with_cov.call("spec_integration", Dir["spec/integration/*_test.rb"], "Run integration tests")
   
   %w'postgres sqlite mysql informix oracle firebird mssql db2'.each do |adapter|
-    spec_with_cov.call("spec_#{adapter}", ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"], "Run #{adapter} specs")
+    spec_with_cov.call("spec_#{adapter}", ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"], "Run #{adapter} specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|connection_pool|database|dataset|model|extensions|plugins)"')}
   end
 
   desc "Run model specs without the associations code"
