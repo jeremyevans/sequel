@@ -642,11 +642,6 @@ module Sequel
           def execute_dui(sql, opts={}, &block)
             super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
           end
-          
-          # Same as execute, explicit due to intricacies of alias and super.
-          def execute_insert(sql, opts={}, &block)
-            super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
-          end
         end
         
         # Allow use of server side prepared statements for PostgreSQL using the
@@ -670,11 +665,6 @@ module Sequel
           
           # Same as execute, explicit due to intricacies of alias and super.
           def execute_dui(sql, opts={}, &block)
-            super(prepared_statement_name, opts, &block)
-          end
-          
-          # Same as execute, explicit due to intricacies of alias and super.
-          def execute_insert(sql, opts={}, &block)
             super(prepared_statement_name, opts, &block)
           end
         end
