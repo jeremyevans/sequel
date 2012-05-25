@@ -361,6 +361,10 @@ module Sequel
       migrator_class(directory).new(db, directory, opts).run
     end
 
+    def self.is_current?(db, directory, opts={})
+      migrator_class(directory).new(db, directory, opts).is_current?
+    end
+
     # Choose the Migrator subclass to use.  Uses the TimestampMigrator
     # if the version number appears to be a unix time integer for a year
     # after 2005, otherwise uses the IntegerMigrator.
@@ -500,6 +504,10 @@ module Sequel
       target
     end
 
+    def is_current?
+      current_migration_version == target
+    end
+    
     private
 
     # Gets the current migration version stored in the database. If no version
@@ -616,6 +624,10 @@ module Sequel
       nil
     end
 
+    def is_current?
+      migration_tuples.empty?
+    end
+    
     private
 
     # Convert the schema_info table to the new schema_migrations table format,
