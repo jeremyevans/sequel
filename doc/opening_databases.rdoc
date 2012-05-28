@@ -265,6 +265,7 @@ Example connection strings:
   jdbc:oracle:thin:user/password@localhost:1521:database
   jdbc:db2://localhost:3700/database:user=user;password=password;
   jdbc:firebirdsql:localhost/3050:/path/to/database.fdb
+  jdbc:jdbcprogress:T:hostname:port:database
 
 You can also use JNDI connection strings:
 

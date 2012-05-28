@@ -116,6 +116,12 @@ module Sequel
         db.extend(Sequel::JDBC::Firebird::DatabaseMethods)
         db.extend_datasets Sequel::Firebird::DatasetMethods
         org.firebirdsql.jdbc.FBDriver
+      end,
+      :jdbcprogress=>proc do |db|
+        Sequel.ts_require 'adapters/jdbc/progress'
+        db.extend(Sequel::JDBC::Progress::DatabaseMethods)
+        db.extend_datasets Sequel::Progress::DatasetMethods
+        com.progress.sql.jdbc.JdbcProgressDriver
       end
     }
     
