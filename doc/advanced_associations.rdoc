@@ -96,25 +96,168 @@ necessary for polymorphic associations).  Inside the <tt>:eager_loader</tt>
 proc, you should get the related objects and populate the
 associations cache for all objects in the array of records.  The hash
 of dependent associations is available for you to cascade the eager
-loading down multiple levels, but it is up to you to use it.  The
-key_hash is a performance enhancement that is used by the default
+loading down multiple levels, but it is up to you to use it.
+
+The key_hash is a performance enhancement that is used by the default
 association loaders and is also available to you.  It is a hash with keys being
 foreign/primary key symbols in the current table, and the values
 being hashes where the key is foreign/primary key values and values
 being arrays of current model objects having the foreign/primary key
 value associated with the key.  This is hard to visualize, so I'll
-give an example:
-    
-  album1 = Album.load(:id=>1, :artist_id=>2)
-  album2 = Album.load(:id=>3, :artist_id=>2)
+give an example.  Let's say you have the following associations
+
   Album.many_to_one :artist
   Album.one_to_many :tracks
-  Album.eager(:band, :tracks).all
-  # The key_hash provided to the :eager_loader proc would be:
-  {:id=>{1=>[album1], 3=>[album2]}, :artist_id=>{2=>[album1, album2]}}
+    
+and the following two albums in the database:
 
-Using these options, you can build associations that Sequel doesn't natively support,
-and still be able to use the same eager loading features that you are used to.
+  album1 = Album.create(:artist_id=>3) # id: 1
+  album2 = Album.create(:artist_id=>3) # id: 2
+
+If you try to eager load this dataset:
+
+  Album.eager(:artist, :tracks).all
+
+Then the key_hash provided to the :eager_loader proc would be:
+
+  {:id=>{1=>[album1], 2=>[album2]}, :artist_id=>{3=>[album1, album2]}}
+
+Let's break down the reason for the makeup of this key_hash.  The hash has keys for
+each of foreign/primary keys used in the association.  In this case, the artist
+association needs the artist_id foreign key (since it is a many_to_one), and the
+tracks association needs the id primary key (since it is a one_to_many).
+
+If you only eagerly loaded the artist association:
+
+  Album.eager(:artist).all
+
+Then the key_hash would only contain artist_id information:
+
+  {:artist_id=>{3=>[album1, album2]}}
+ 
+Likewise, if you only eagerly loaded the tracks association:
+
+  Album.eager(:tracks).all
+
+Then the key_hash would only contain id information:
+
+  {:id=>{1=>[album1], 2=>[album2]}}
+
+Now, the eager loader for the artist association is only going to care about the
+value of the artist_id key in the hash, so it's going to do the equivalent of:
+
+  artist_id_map = key_hash[:artist_id] # {3=>[album1, album2]}
+
+The artist_id_map contains a mapping of artist_id values to arrays of
+album objects.  Since it only has a single entry with a key of 3, when eagerly
+loading the artists, you only need to look for artists that have an id of 3.
+
+  artists = Artist.where(:id=>artist_id_map.keys).all
+
+When the artists are retrieved, you can iterate over them, find entries
+with matching keys, and manually associate them to the albums:
+
+  artists.each do |artist|
+    # Find related albums using the artist_id_map
+    if albums = artist_id_map[artist.id]
+      # Iterate over the albums
+      albums.each do |album|
+        # Manually set the artist association for each album
+        album.associations[:artist] = artist
+      end
+    end
+  end
+
+Similarly, the eager loader for the tracks association is only going to care about the
+value of the id key in the hash:
+
+  id_map = key_hash[:id] # {1=>[album1], 2=>[album2]}
+
+Now the id_map contains a mapping of id values to arrays of album objects (in this
+case each array only has a single object, because id is the primary key).  So when
+looking for tracks to eagerly load, you only need to look for ones that have an
+album_id of 1 or 2:
+
+  tracks = Track.where(:album_id=>id_map.keys).all
+
+When the tracks are retrieved, you can iterate over them, find entries with matching
+keys, and manually associate them to the albums:
+
+  tracks.each do |track|
+    if albums = id_map[track.album_id]
+      albums.each do |album|
+        album.associations[:tracks] << track
+      end
+    end
+  end
+
+=== Two basic example eager loaders
+
+Putting the code in the above examples together, you almost have enough for a basic
+working eager loader.  The main important thing that is missing is you need to set
+initial values for the eagerly loaded associations.  For the artist association, you
+need to initial the values to nil:
+
+  # rows here is the :rows entry in the hash passed to the eager loader
+  rows.each{|album| album.associations[:artist] = nil}
+  
+For the tracks association, you set the initial value to an empty array:
+
+  rows.each{|album| album.associations[:track] = []}
+
+These are done so that if an album currently being loaded doesn't have an associated
+artist or any associated tracks, the lack of them will be cached, so calling the
+artist or tracks method on the album will not do another database lookup.
+
+So putting everything together, the artist eager loader looks like:
+
+  :eager_loader=>(proc do |eo_opts|
+    eo_opts[:rows].each{|album| album.associations[:artist] = nil}
+    artist_id_map = eo_opts[:key_hash][:artist_id]
+    Artist.where(:id=>artist_id_map.keys).all do |artist|
+      if albums = artist_id_map[artist.id]
+        albums.each do |album|
+          album.associations[:artist] = artist
+        end
+      end
+    end
+  end)
+
+and the tracks eager loader looks like:
+
+  :eager_loader=>(proc do |eo_opts|
+    eo_opts[:rows].each{|album| album.associations[:tracks] = []}
+    id_map = eo_opts[:key_hash][:id]
+    Track.where(:id=>id_map.keys).all do |tracks|
+      if albums = id_map[track.album_id]
+        albums.each do |album|
+          album.associations[:tracks] << track
+        end
+      end
+    end
+  end)
+
+Now, these are both overly simplistic eager loaders that don't respect cascaded
+associations or any of the association options.  But hopefully they both
+provide simple examples that you can more easily build and learn from, as 
+the custom eager loaders described later in this page are more complex.
+
+Basically, the eager loading steps can be broken down into:
+
+1. Set default association values (nil/[]) for each of the current objects
+2. Build a custom key map mapping foreign/primary key values to arrays of
+   current objects (using the key_hash)
+3. Return just related associated objects by filtering the associated class
+   to include only matching values
+4. Iterating over the returned associated objects, indexing into the custom key
+   map using the foreign/primary key value in the associated object to get
+   current values associated to that specific object.
+5. For each of those current values, updating the cached association value to
+   include that specific object.
+
+Using the :eager_loader proc, you should be able to eagerly load all associations
+that can be eagerly loaded, even if Sequel doesn't natively support such eager
+loading.
 
 == ActiveRecord associations
 
