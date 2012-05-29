@@ -164,8 +164,8 @@ module Sequel
         # Find an associated object with the matching pk.  If a matching option
         # is not found and the :strict option is not false, raise an Error.
         def nested_attributes_find(reflection, pk)
-          pk = pk.to_s
-          unless obj = Array(send(reflection[:name])).find{|x| x.pk.to_s == pk}
+          pk = pk.map {|k| k.to_s }
+          unless obj = Array(send(reflection[:name])).find{|x| [*x.pk].map{|k| k.to_s} == pk}
             raise(Error, "no matching associated object with given primary key (association: #{reflection[:name]}, pk: #{pk})") unless reflection[:nested_attributes][:strict] == false
           end
           obj
@@ -223,8 +223,10 @@ module Sequel
           return if (b = reflection[:nested_attributes][:reject_if]) && b.call(attributes)
           modified!
           klass = reflection.associated_class
-          if pk = attributes.delete(klass.primary_key) || attributes.delete(klass.primary_key.to_s)
-            attributes = attributes.dup
+          sym_keys = [*klass.primary_key]
+          str_keys = sym_keys.map { |k| k.to_s }
+          if ((pk = attributes.values_at(*sym_keys)).all? || (pk = attributes.values_at(*str_keys)).all?)
+            attributes = attributes.dup.delete_if { |k| str_keys.include? k.to_s }
             if reflection[:nested_attributes][:destroy] && klass.db.send(:typecast_value_boolean, attributes.delete(:_delete) || attributes.delete('_delete'))
               nested_attributes_remove(reflection, pk, :destroy=>true)
             elsif reflection[:nested_attributes][:remove] && klass.db.send(:typecast_value_boolean, attributes.delete(:_remove) || attributes.delete('_remove'))

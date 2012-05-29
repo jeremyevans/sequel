@@ -22,17 +22,24 @@ describe "NestedAttributes plugin" do
     @Artist = Class.new(@c).set_dataset(:artists)
     @Album = Class.new(@c).set_dataset(:albums)
     @Tag = Class.new(@c).set_dataset(:tags)
+    @Concert = Class.new(@c).set_dataset(:concerts)
     @Artist.plugin :skip_create_refresh
     @Album.plugin :skip_create_refresh
     @Tag.plugin :skip_create_refresh
+    @Concert.plugin :skip_create_refresh
     @Artist.columns :id, :name
     @Album.columns :id, :name, :artist_id
     @Tag.columns :id, :name
+    @Concert.columns :tour, :date, :artist_id, :playlist
+    @Concert.set_primary_key([:tour, :date])
+    @Concert.unrestrict_primary_key
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
+    @Artist.one_to_many :concerts, :class=>@Concert, :key=>:artist_id
     @Artist.one_to_one :first_album, :class=>@Album, :key=>:artist_id
     @Album.many_to_one :artist, :class=>@Artist
     @Album.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:at
     @Artist.nested_attributes :albums, :first_album, :destroy=>true, :remove=>true
+    @Artist.nested_attributes :concerts, :destroy=>true, :remove=>true
     @Album.nested_attributes :artist, :tags, :destroy=>true, :remove=>true
     @db.sqls
   end
@@ -80,6 +87,25 @@ describe "NestedAttributes plugin" do
     a.albums.first.tags.should == [@Tag.new(:name=>'T')]
   end
   
+  it "should support creating new objects with composite primary keys" do
+    insert = nil
+    @Concert.class_eval do
+     define_method :_insert do
+        insert = values
+      end
+      def before_create # Have to define the CPK somehow.
+        self.tour = 'To'
+        self.date = '2004-04-05'
+        super
+      end
+    end
+    a = @Artist.new({:name=>'Ar', :concerts_attributes=>[{:playlist=>'Pl'}]})
+    @db.sqls.should == []
+    a.save
+    check_sql_array(["INSERT INTO artists (name) VALUES ('Ar')"])
+    insert.should == {:tour=>'To', :date=>'2004-04-05', :artist_id=>1, :playlist=>'Pl'}
+  end
+
   it "should support updating many_to_one objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -140,6 +166,16 @@ describe "NestedAttributes plugin" do
     @db.sqls.should == ["UPDATE albums SET name = 'Al' WHERE (id = 10)", "UPDATE tags SET name = 'T2' WHERE (id = 20)"]
   end
   
+  it "should support updating objects with composite primary keys" do
+    ar = @Artist.load(:id=>10, :name=>'Ar')
+    co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
+    ar.associations[:concerts] = [co]
+    ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl2'}])
+    @db.sqls.should == []
+    ar.save
+    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 10)", "UPDATE concerts SET playlist = 'Pl2' WHERE ((tour = 'To') AND (date = '2004-04-05'))"]
+  end
+
   it "should support removing many_to_one objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -183,6 +219,19 @@ describe "NestedAttributes plugin" do
     @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)"]
   end
   
+  it "should support removing objects with composite primary keys" do
+    ar = @Artist.load(:id=>10, :name=>'Ar')
+    co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
+    ar.associations[:concerts] = [co]
+    ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :_remove=>'t'}])
+    @db.sqls.should == []
+    @Concert.dataset._fetch = {:id=>1}
+    ar.save
+    check_sql_array("SELECT 1 AS one FROM concerts WHERE ((concerts.artist_id = 10) AND (tour = 'To') AND (date = '2004-04-05')) LIMIT 1",
+      ["UPDATE concerts SET artist_id = NULL, playlist = 'Pl' WHERE ((tour = 'To') AND (date = '2004-04-05'))", "UPDATE concerts SET playlist = 'Pl', artist_id = NULL WHERE ((tour = 'To') AND (date = '2004-04-05'))"],
+      "UPDATE artists SET name = 'Ar' WHERE (id = 10)")
+  end
+
   it "should support destroying many_to_one objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -224,6 +273,16 @@ describe "NestedAttributes plugin" do
     @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)", "DELETE FROM tags WHERE (id = 20)"]
   end
   
+  it "should support destroying objects with composite primary keys" do
+    ar = @Artist.load(:id=>10, :name=>'Ar')
+    co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
+    ar.associations[:concerts] = [co]
+    ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :_delete=>'t'}])
+    @db.sqls.should == []
+    ar.save
+    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 10)", "DELETE FROM concerts WHERE ((tour = 'To') AND (date = '2004-04-05'))"]
+  end
+
   it "should support both string and symbol keys in nested attribute hashes" do
     a = @Album.load(:id=>10, :name=>'Al')
     t = @Tag.load(:id=>20, :name=>'T')
@@ -283,6 +342,25 @@ describe "NestedAttributes plugin" do
     @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)"]
   end
   
+  it "should raise an Error if a composite primary key is given in a nested attribute hash, but no matching associated object exists" do
+    ar = @Artist.load(:id=>10, :name=>'Ar')
+    co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
+    ar.associations[:concerts] = [co]
+    proc{ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-04', :_delete=>'t'}])}.should raise_error(Sequel::Error)
+    proc{ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :_delete=>'t'}])}.should_not raise_error(Sequel::Error)
+  end
+
+  it "should not raise an Error if an unmatched composite primary key is given, if the :strict=>false option is used" do
+    @Artist.nested_attributes :concerts, :strict=>false
+    ar = @Artist.load(:id=>10, :name=>'Ar')
+    co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
+    ar.associations[:concerts] = [co]
+    ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-06', :_delete=>'t'}])
+    @db.sqls.should == []
+    ar.save
+    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 10)"]
+  end
+
   it "should not save if nested attribute is not valid and should include nested attribute validation errors in the main object's validation errors" do
     @Artist.class_eval do
       def validate
