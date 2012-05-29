@@ -90,7 +90,7 @@ describe "NestedAttributes plugin" do
   it "should support creating new objects with composite primary keys" do
     insert = nil
     @Concert.class_eval do
-     define_method :_insert do
+      define_method :_insert do
         insert = values
       end
       def before_create # Have to define the CPK somehow.
@@ -100,6 +100,37 @@ describe "NestedAttributes plugin" do
       end
     end
     a = @Artist.new({:name=>'Ar', :concerts_attributes=>[{:playlist=>'Pl'}]})
+    @db.sqls.should == []
+    a.save
+    @db.sqls.should == ["INSERT INTO artists (name) VALUES ('Ar')"]
+    insert.should == {:tour=>'To', :date=>'2004-04-05', :artist_id=>1, :playlist=>'Pl'}
+  end
+
+  it "should support creating new objects with specific primary keys if :unmatched_pk => :create is set" do
+    @Artist.nested_attributes :albums, :unmatched_pk=>:create
+    insert = nil
+    @Album.class_eval do
+      unrestrict_primary_key
+      define_method :_insert do
+        insert = values
+      end
+    end
+    a = @Artist.new({:name=>'Ar', :albums_attributes=>[{:id=>7, :name=>'Al'}]})
+    @db.sqls.should == []
+    a.save
+    @db.sqls.should == ["INSERT INTO artists (name) VALUES ('Ar')"]
+    insert.should == {:artist_id=>1, :name=>'Al', :id=>7}
+  end
+
+  it "should support creating new objects with specific composite primary keys if :unmatched_pk => :create is set" do
+    insert = nil
+    @Artist.nested_attributes :concerts, :unmatched_pk=>:create
+    @Concert.class_eval do
+      define_method :_insert do
+        insert = values
+      end
+    end
+    a = @Artist.new({:name=>'Ar', :concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl'}]})
     @db.sqls.should == []
     a.save
     @db.sqls.should == ["INSERT INTO artists (name) VALUES ('Ar')"]
@@ -342,6 +373,17 @@ describe "NestedAttributes plugin" do
     @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)"]
   end
   
+  it "should not raise an Error if an unmatched primary key is given, if the :unmatched_pk=>:ignore option is used" do
+    @Artist.nested_attributes :albums, :unmatched_pk=>:ignore
+    al = @Album.load(:id=>10, :name=>'Al')
+    ar = @Artist.load(:id=>20, :name=>'Ar')
+    ar.associations[:albums] = [al]
+    ar.set(:albums_attributes=>[{:id=>30, :_delete=>'t'}])
+    @db.sqls.should == []
+    ar.save
+    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)"]
+  end
+
   it "should raise an Error if a composite primary key is given in a nested attribute hash, but no matching associated object exists" do
     ar = @Artist.load(:id=>10, :name=>'Ar')
     co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
@@ -459,7 +501,7 @@ describe "NestedAttributes plugin" do
     a = @Album.new(:name=>'Al')
     a.associations[:tags] = [@Tag.load(:id=>6, :name=>'A'), @Tag.load(:id=>7, :name=>'A2')] 
     a.tags_attributes = [{:id=>6, :name=>'T'}, {:id=>7, :name=>'T2', :_remove=>true}, {:name=>'T3'}, {:id=>8, :name=>'T4'}, {:id=>9, :name=>'T5', :_remove=>true}]
-    objs.should == [[@Tag.load(:id=>6, :name=>'T'), :update], [@Tag.load(:id=>7, :name=>'A2'), :remove], [@Tag.new(:name=>'T3'), :create], [nil, :update], [nil, :remove]]
+    objs.should == [[@Tag.load(:id=>6, :name=>'T'), :update], [@Tag.load(:id=>7, :name=>'A2'), :remove], [@Tag.new(:name=>'T3'), :create]]
   end
 
   it "should raise an error if updating modifies the associated objects keys" do
