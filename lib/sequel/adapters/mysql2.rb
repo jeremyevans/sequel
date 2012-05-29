@@ -107,8 +107,15 @@ module Sequel
         [::Mysql2::Error]
       end
 
+      # If a connection object is available, try pinging it.  Otherwise, if the
+      # error is a Mysql2::Error, check the SQL state and exception message for
+      # disconnects.
       def disconnect_error?(e, opts)
-        super || (e.is_a?(::Mysql2::Error) && MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message))
+        super ||
+          ((conn = opts[:conn]) && !conn.ping) ||
+          (e.is_a?(::Mysql2::Error) &&
+            (e.sql_state =~ /\A08/ ||
+             MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)))
       end
 
       # The database name when using the native adapter is always stored in

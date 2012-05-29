@@ -1,5 +1,7 @@
 === HEAD
 
+* Attempt to detect more disconnect errors in the mysql2 adapter (jeremyevans)
+
 * Add is_current? and check_current to the migrators, for checking/raising if there are unapplied migrations (pvh, jeremyevans) (#487)
 
 * Add a jdbc subadapter for the Progress database (Michael Gliwinski, jeremyevans)
