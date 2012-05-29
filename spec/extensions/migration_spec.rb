@@ -272,11 +272,10 @@ describe "Sequel::IntegerMigrator" do
     @db.dataset.columns.should == [:sic]
   end
   
-  specify "should apply migrations correctly in the up direction if no target is given" do
+  specify "should be able to tell whether there are outstanding migrations" do
+    Sequel::Migrator.is_current?(@db, @dirname).should be_false
     Sequel::Migrator.apply(@db, @dirname)
-    @db.creates.should == [1111, 2222, 3333]
-    @db.version.should == 3
-    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [1, 2, 3]
+    Sequel::Migrator.is_current?(@db, @dirname).should be_true
   end 
 
   specify "should apply migrations correctly in the up direction with target" do
@@ -446,6 +445,14 @@ describe "Sequel::TimestampMigrator" do
     [:sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_false}
     @db.table_exists?(:sm1111).should be_true
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb'
+  end
+
+  specify "should not be current when there are migrations to apply" do
+    @dir = 'spec/files/timestamped_migrations'
+    @m.apply(@db, @dir)
+    @m.is_current?.should be_true
+    @dir = 'spec/files/interleaved_timestamped_migrations'
+    @m.is_current?.should be_false
   end
 
   specify "should apply all missing files when migrating up" do
