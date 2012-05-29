@@ -226,7 +226,7 @@ module Sequel
           sym_keys = [*klass.primary_key]
           str_keys = sym_keys.map { |k| k.to_s }
           if ((pk = attributes.values_at(*sym_keys)).all? || (pk = attributes.values_at(*str_keys)).all?)
-            attributes = attributes.dup.delete_if { |k| str_keys.include? k.to_s }
+            attributes = attributes.dup.delete_if { |k,v| str_keys.include? k.to_s }
             if reflection[:nested_attributes][:destroy] && klass.db.send(:typecast_value_boolean, attributes.delete(:_delete) || attributes.delete('_delete'))
               nested_attributes_remove(reflection, pk, :destroy=>true)
             elsif reflection[:nested_attributes][:remove] && klass.db.send(:typecast_value_boolean, attributes.delete(:_remove) || attributes.delete('_remove'))

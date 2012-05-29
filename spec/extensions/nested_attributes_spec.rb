@@ -102,7 +102,7 @@ describe "NestedAttributes plugin" do
     a = @Artist.new({:name=>'Ar', :concerts_attributes=>[{:playlist=>'Pl'}]})
     @db.sqls.should == []
     a.save
-    check_sql_array(["INSERT INTO artists (name) VALUES ('Ar')"])
+    @db.sqls.should == ["INSERT INTO artists (name) VALUES ('Ar')"]
     insert.should == {:tour=>'To', :date=>'2004-04-05', :artist_id=>1, :playlist=>'Pl'}
   end
 
@@ -173,7 +173,7 @@ describe "NestedAttributes plugin" do
     ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl2'}])
     @db.sqls.should == []
     ar.save
-    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 10)", "UPDATE concerts SET playlist = 'Pl2' WHERE ((tour = 'To') AND (date = '2004-04-05'))"]
+    check_sql_array("UPDATE artists SET name = 'Ar' WHERE (id = 10)", ["UPDATE concerts SET playlist = 'Pl2' WHERE ((tour = 'To') AND (date = '2004-04-05'))", "UPDATE concerts SET playlist = 'Pl2' WHERE ((date = '2004-04-05') AND (tour = 'To'))"])
   end
 
   it "should support removing many_to_one objects" do
@@ -227,8 +227,8 @@ describe "NestedAttributes plugin" do
     @db.sqls.should == []
     @Concert.dataset._fetch = {:id=>1}
     ar.save
-    check_sql_array("SELECT 1 AS one FROM concerts WHERE ((concerts.artist_id = 10) AND (tour = 'To') AND (date = '2004-04-05')) LIMIT 1",
-      ["UPDATE concerts SET artist_id = NULL, playlist = 'Pl' WHERE ((tour = 'To') AND (date = '2004-04-05'))", "UPDATE concerts SET playlist = 'Pl', artist_id = NULL WHERE ((tour = 'To') AND (date = '2004-04-05'))"],
+    check_sql_array(["SELECT 1 AS one FROM concerts WHERE ((concerts.artist_id = 10) AND (tour = 'To') AND (date = '2004-04-05')) LIMIT 1", "SELECT 1 AS one FROM concerts WHERE ((concerts.artist_id = 10) AND (date = '2004-04-05') AND (tour = 'To')) LIMIT 1"],
+      ["UPDATE concerts SET artist_id = NULL, playlist = 'Pl' WHERE ((tour = 'To') AND (date = '2004-04-05'))", "UPDATE concerts SET playlist = 'Pl', artist_id = NULL WHERE ((tour = 'To') AND (date = '2004-04-05'))", "UPDATE concerts SET artist_id = NULL, playlist = 'Pl' WHERE ((date = '2004-04-05') AND (tour = 'To'))", "UPDATE concerts SET playlist = 'Pl', artist_id = NULL WHERE ((date = '2004-04-05') AND (tour = 'To'))"],
       "UPDATE artists SET name = 'Ar' WHERE (id = 10)")
   end
 
@@ -280,7 +280,7 @@ describe "NestedAttributes plugin" do
     ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :_delete=>'t'}])
     @db.sqls.should == []
     ar.save
-    @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 10)", "DELETE FROM concerts WHERE ((tour = 'To') AND (date = '2004-04-05'))"]
+    check_sql_array("UPDATE artists SET name = 'Ar' WHERE (id = 10)", ["DELETE FROM concerts WHERE ((tour = 'To') AND (date = '2004-04-05'))", "DELETE FROM concerts WHERE ((date = '2004-04-05') AND (tour = 'To'))"])
   end
 
   it "should support both string and symbol keys in nested attribute hashes" do
