@@ -1,5 +1,7 @@
 === HEAD
 
+* Add is_current? and check_current to the migrators, for checking/raising if there are unapplied migrations (pvh, jeremyevans) (#487)
+
 * Add a jdbc subadapter for the Progress database (Michael Gliwinski, jeremyevans)
 
 * Add pg_inet extension, for working with PostgreSQL inet and cidr types (jeremyevans)

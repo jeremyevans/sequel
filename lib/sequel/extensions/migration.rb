@@ -340,9 +340,26 @@ module Sequel
     class Error < Sequel::Error
     end
 
+    # Exception class raised when Migrator.check_current signals that it is
+    # not current.
+    class NotCurrentError < Error
+    end
+
     # Wrapper for +run+, maintaining backwards API compatibility
     def self.apply(db, directory, target = nil, current = nil)
       run(db, directory, :target => target, :current => current)
+    end
+
+    # Raise a NotCurrentError unless the migrator is current, takes the same
+    # arguments as #run.
+    def self.check_current(*args)
+      raise(NotCurrentError, 'migrator is not current') unless is_current?(*args)
+    end
+
+    # Return whether the migrator is current (i.e. it does not need to make
+    # any changes).  Takes the same arguments as #run.
+    def self.is_current?(db, directory, opts={})
+      migrator_class(directory).new(db, directory, opts).is_current?
     end
 
     # Migrates the supplied database using the migration files in the the specified directory. Options:
@@ -359,10 +376,6 @@ module Sequel
     #   Sequel::Migrator.run(DB, "app2/migrations", :column => :app2_version, :table=>:schema_info2)
     def self.run(db, directory, opts={})
       migrator_class(directory).new(db, directory, opts).run
-    end
-
-    def self.is_current?(db, directory, opts={})
-      migrator_class(directory).new(db, directory, opts).is_current?
     end
 
     # Choose the Migrator subclass to use.  Uses the TimestampMigrator
@@ -488,6 +501,11 @@ module Sequel
       @migrations = get_migrations
     end
 
+    # The integer migrator is current if the current version is the same as the target version.
+    def is_current?
+      current_migration_version == target
+    end
+    
     # Apply all migrations on the database
     def run
       migrations.zip(version_numbers).each do |m, v|
@@ -504,10 +522,6 @@ module Sequel
       target
     end
 
-    def is_current?
-      current_migration_version == target
-    end
-    
     private
 
     # Gets the current migration version stored in the database. If no version
@@ -609,6 +623,12 @@ module Sequel
       @migration_tuples = get_migration_tuples
     end
 
+    # The timestamp migrator is current if there are no migrations to apply
+    # in either direction.
+    def is_current?
+      migration_tuples.empty?
+    end
+    
     # Apply all migration tuples on the database
     def run
       migration_tuples.each do |m, f, direction|
@@ -624,10 +644,6 @@ module Sequel
       nil
     end
 
-    def is_current?
-      migration_tuples.empty?
-    end
-    
     private
 
     # Convert the schema_info table to the new schema_migrations table format,

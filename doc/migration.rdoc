@@ -534,6 +534,24 @@ with an empty database, and attempt to recreate the schema using:
 
   sequel -m db/migrations postgres://host/database
 
+== Checking for Current Migrations
+
+In your application code, you may want to check that you are up to date in
+regards to migrations (i.e. you don't have any unapplied migrations).  Sequel
+offers two separate methods to do that.  The first is Sequel::Migrator.check_current.
+This method raises an exception if there are outstanding migrations that need to
+be run.  The second is Sequel::Migrator.is_current?, which returns true if there
+are no outstanding migrations, and false if there are outstanding migrations.
+
+If you want to ensure that your application code is up to date, you may want to
+add the following code after connecting to your database:
+
+  Sequel.extension :migration
+  Sequel::Migrator.check_current(DB, '/path/to/migrations')
+
+This will cause your application to raise an error when you start it if you have
+any outstanding migrations.
+
 == Old-style migration classes
 
 Before the <tt>Sequel.migration</tt> DSL was introduced, Sequel used classes

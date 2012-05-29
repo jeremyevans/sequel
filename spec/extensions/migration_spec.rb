@@ -272,11 +272,24 @@ describe "Sequel::IntegerMigrator" do
     @db.dataset.columns.should == [:sic]
   end
   
+  specify "should apply migrations correctly in the up direction if no target is given" do
+    Sequel::Migrator.apply(@db, @dirname)
+    @db.creates.should == [1111, 2222, 3333]
+    @db.version.should == 3
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [1, 2, 3]
+  end
+  
   specify "should be able to tell whether there are outstanding migrations" do
     Sequel::Migrator.is_current?(@db, @dirname).should be_false
     Sequel::Migrator.apply(@db, @dirname)
     Sequel::Migrator.is_current?(@db, @dirname).should be_true
   end 
+
+  specify "should have #check_current raise an exception if the migrator is not current" do
+    proc{Sequel::Migrator.check_current(@db, @dirname)}.should raise_error(Sequel::Migrator::NotCurrentError)
+    Sequel::Migrator.apply(@db, @dirname)
+    proc{Sequel::Migrator.check_current(@db, @dirname)}.should_not raise_error
+  end
 
   specify "should apply migrations correctly in the up direction with target" do
     Sequel::Migrator.apply(@db, @dirname, 2)
@@ -450,9 +463,17 @@ describe "Sequel::TimestampMigrator" do
   specify "should not be current when there are migrations to apply" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
-    @m.is_current?.should be_true
+    @m.is_current?(@db, @dir).should be_true
     @dir = 'spec/files/interleaved_timestamped_migrations'
-    @m.is_current?.should be_false
+    @m.is_current?(@db, @dir).should be_false
+  end
+
+  specify "should raise an exception if the migrator is not current" do
+    @dir = 'spec/files/timestamped_migrations'
+    @m.apply(@db, @dir)
+    proc{@m.check_current(@db, @dir)}.should_not raise_error
+    @dir = 'spec/files/interleaved_timestamped_migrations'
+    proc{@m.check_current(@db, @dir)}.should raise_error(Sequel::Migrator::NotCurrentError)
   end
 
   specify "should apply all missing files when migrating up" do
