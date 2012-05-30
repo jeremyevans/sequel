@@ -139,8 +139,13 @@ module Sequel
       module InstanceMethods
         # Parse the provided JSON, which should return a hash,
         # and call +set+ with that hash.
-        def from_json(json)
-          set(JSON.parse(json))
+        def from_json(json, opts={})
+          h = JSON.parse(json)
+          if fields = opts[:fields]
+            set_fields(h, fields, opts)
+          else
+            set(h)
+          end
         end
 
         # Return a string in JSON format.  Accepts the following

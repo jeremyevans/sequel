@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Model#from_json in the json_serializer plugin to use set_fields if a :fields option is given (jeremyevans)
+
 * Support :using option to set_column_type on PostgreSQL, to force a specific conversion from the old value to the new value (jeremyevans)
 
 * Drop indexes in the reverse order that they were added in the schema dumper (jeremyevans)

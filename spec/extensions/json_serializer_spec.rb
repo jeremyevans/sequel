@@ -96,6 +96,22 @@ describe "Sequel::Plugins::JsonSerializer" do
     @artist.id.should == 2
   end
 
+  it "should support #from_json to support specific :fields" do
+    @album.from_json('{"name": "AS", "artist_id": 3}', :fields=>['name'])
+    @album.name.should == 'AS'
+    @album.artist_id.should == 2
+  end
+
+  it "should support #from_json to support :missing=>:skip option" do
+    @album.from_json('{"artist_id": 3}', :fields=>['name'], :missing=>:skip)
+    @album.name.should == 'RF'
+    @album.artist_id.should == 2
+  end
+
+  it "should support #from_json to support :missing=>:raise option" do
+    proc{@album.from_json('{"artist_id": 3}', :fields=>['name'], :missing=>:raise)}.should raise_error(Sequel::Error)
+  end
+
   it "should raise an exception for json keys that aren't associations, columns, or setter methods" do
     Album.send(:undef_method, :blah=)
     proc{JSON.parse(@album.to_json(:include=>:blah))}.should raise_error(Sequel::Error)
