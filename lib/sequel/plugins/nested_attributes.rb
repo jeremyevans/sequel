@@ -89,6 +89,9 @@ module Sequel
         #   that will be processed, to prevent denial of service attacks.
         # * :remove - Allow disassociation of nested records (can remove the associated
         #   object from the parent object, but not destroy the associated object).
+        # * :transform - A proc to modify attribute hashes before they are
+        #   passed to associated object. Takes two arguments, the attribute
+        #   hash and the parent object. The return value is ignored.
         # * :unmatched_pk - Specify the action to be taken if a primary key is
         #   provided in a record, but it doesn't match an existing associated
         #   object. Set to :create to create a new object with that primary
@@ -207,6 +210,7 @@ module Sequel
         end
 
         # Modify the associated object based on the contents of the attributes hash:
+        # * If a :transform block was given to nested_attributes, use it to modify the attribute hash.
         # * If a block was given to nested_attributes, call it with the attributes and return immediately if the block returns true.
         # * If a primary key exists in the attributes hash and it matches an associated object:
         # ** If _delete is a key in the hash and the :destroy option is used, destroy the matching associated object.
@@ -215,6 +219,9 @@ module Sequel
         # * If a primary key exists in the attributes hash but it does not match an associated object, either raise an error, create a new object or ignore the hash, depending on the :unmatched_pk option.
         # * If no primary key exists in the attributes hash, create a new object.
         def nested_attributes_setter(reflection, attributes)
+          if a = reflection[:nested_attributes][:transform]
+            a.call(attributes, self)
+          end
           return if (b = reflection[:nested_attributes][:reject_if]) && b.call(attributes)
           modified!
           klass = reflection.associated_class
