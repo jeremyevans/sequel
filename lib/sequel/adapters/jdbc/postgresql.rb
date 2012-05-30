@@ -43,7 +43,7 @@ module Sequel
       class Dataset < JDBC::Dataset
         include Sequel::Postgres::DatasetMethods
         APOS = Dataset::APOS
-
+        
         class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
           # Convert Java::OrgPostgresqlJdbc4::Jdbc4Array to ruby arrays
           def pg_array(v)
@@ -73,6 +73,15 @@ module Sequel
         PG_ARRAY_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:pg_array)
         PG_OBJECT_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:pg_object)
       
+        # Add the shared PostgreSQL prepared statement methods
+        def prepare(*args)
+          ps = super
+          ps.extend(::Sequel::Postgres::DatasetMethods::PreparedStatementMethods)
+          ps
+        end
+
+        private
+        
         # Handle PostgreSQL array and object types. Object types are just
         # turned into strings, similarly to how the native adapter treats
         # the types.
@@ -85,13 +94,6 @@ module Sequel
           else
             super
           end
-        end
-        
-        # Add the shared PostgreSQL prepared statement methods
-        def prepare(*args)
-          ps = super
-          ps.extend(::Sequel::Postgres::DatasetMethods::PreparedStatementMethods)
-          ps
         end
         
         # Literalize strings similar to the native postgres adapter
