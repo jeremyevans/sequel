@@ -378,9 +378,9 @@ END_MIG
   it "should honor the :index_names => :namespace option to include names of indexes with prepended table name" do
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
-       :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
+       :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>false}}
     end
-    @d.dump_table_schema(:t1, :index_names=>:namespace).should == "create_table(:t1, :ignore_index_errors=>true) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1], :name=>:t1_i1\n  index [:c2, :c1], :unique=>true\nend"
+    @d.dump_table_schema(:t1, :index_names=>:namespace).should == "create_table(:t1, :ignore_index_errors=>true) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1], :name=>:t1_i1\n  index [:c2, :c1]\nend"
     @d.dump_schema_migration(:index_names=>:namespace).should == <<-END_MIG
 Sequel.migration do
   up do
@@ -389,7 +389,7 @@ Sequel.migration do
       String :c2, :size=>20
       
       index [:c1], :name=>:t1_i1
-      index [:c2, :c1], :unique=>true
+      index [:c2, :c1]
     end
     
     create_table(:t2, :ignore_index_errors=>true) do
@@ -399,7 +399,7 @@ Sequel.migration do
       primary_key [:c1, :c2]
       
       index [:c1], :name=>:t2_i1
-      index [:c2, :c1], :name=>:t2_t1_c2_c1_index, :unique=>true
+      index [:c2, :c1], :name=>:t2_t1_c2_c1_index
     end
   end
   
@@ -499,24 +499,24 @@ END_MIG
     @d.meta_def(:tables){|o| [:t1, :t2]}
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
-       :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
+       :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>false}}
     end
     @d.dump_indexes_migration(:index_names=>:namespace).should == <<-END_MIG
 Sequel.migration do
   up do
     add_index :t1, [:c1], :ignore_errors=>true, :name=>:t1_i1
-    add_index :t1, [:c2, :c1], :ignore_errors=>true, :unique=>true
+    add_index :t1, [:c2, :c1], :ignore_errors=>true
     
     add_index :t2, [:c1], :ignore_errors=>true, :name=>:t2_i1
-    add_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t2_t1_c2_c1_index, :unique=>true
+    add_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t2_t1_c2_c1_index
   end
   
   down do
     drop_index :t2, [:c1], :ignore_errors=>true, :name=>:t2_i1
-    drop_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t2_t1_c2_c1_index, :unique=>true
+    drop_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t2_t1_c2_c1_index
     
     drop_index :t1, [:c1], :ignore_errors=>true, :name=>:t1_i1
-    drop_index :t1, [:c2, :c1], :ignore_errors=>true, :unique=>true
+    drop_index :t1, [:c2, :c1], :ignore_errors=>true
   end
 end
 END_MIG
