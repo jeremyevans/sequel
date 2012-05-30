@@ -28,6 +28,8 @@ END_MIG
     # the :indexes=>false option to dump_schema_migration. Options:
     # * :same_db - Create a dump for the same database type, so
     #   don't ignore errors if the index statements fail.
+    # * :index_names - If set to false, don't record names of indexes. If
+    #   set to :namespace, prepend the table name to the index name.
     def dump_indexes_migration(options={})
       ts = tables(options)
       <<END_MIG
@@ -53,6 +55,8 @@ END_MIG
     # * :foreign_keys - If set to false, don't dump foreign_keys
     # * :indexes - If set to false, don't dump indexes (they can be added
     #   later via dump_index_migration).
+    # * :index_names - If set to false, don't record names of indexes. If
+    #   set to :namespace, prepend the table name to the index name.
     def dump_schema_migration(options={})
       options = options.dup
       if options[:indexes] == false && !options.has_key?(:foreign_keys)
@@ -261,7 +265,7 @@ END_MIG
       Schema::Generator.new(self) do
         s.each{|name, info| send(*m.call(name, info, options))}
         primary_key(pks) if !@primary_key && pks.length > 0
-        indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts))} if indexes
+        indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts, options))} if indexes
         composite_fks.each{|fk| send(:foreign_key, fk[:columns], fk)} if composite_fks
       end
     end
@@ -276,15 +280,21 @@ END_MIG
       end
       im = method(:index_to_generator_opts)
       gen = Schema::Generator.new(self) do
-        indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts))}
+        indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts, options))}
       end
       gen.dump_indexes(meth=>table, :ignore_errors=>!options[:same_db])
     end
 
     # Convert the parsed index information into options to the Generators index method. 
-    def index_to_generator_opts(table, name, index_opts)
+    def index_to_generator_opts(table, name, index_opts, options={})
       h = {}
-      h[:name] = name unless default_index_name(table, index_opts[:columns]) == name.to_s
+      if options[:index_names] != false && default_index_name(table, index_opts[:columns]) != name.to_s
+        if options[:index_names] == :namespace
+          h[:name] = "#{table}_#{name}".to_sym
+        else
+          h[:name] = name
+        end
+      end
       h[:unique] = true if index_opts[:unique]
       h
     end
