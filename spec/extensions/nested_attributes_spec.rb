@@ -490,8 +490,8 @@ describe "NestedAttributes plugin" do
       ["INSERT INTO at (album_id, tag_id) VALUES (1, 4)", "INSERT INTO at (tag_id, album_id) VALUES (4, 1)"])
   end
   
-  it "should accept a :transform block that modifies the attributes hash using the parent object" do
-    @Album.nested_attributes :tags, :transform=>proc{|hash, parent| hash[:name] << parent.name }
+  it "should accept a :transform block that returns a changed attributes hash" do
+    @Album.nested_attributes :tags, :transform=>proc{|parent, hash| hash[:name] << parent.name; hash }
     a = @Album.new(:name => 'Al')
     a.set(:tags_attributes=>[{:name=>'T'}, {:name=>'T2'}])
     @db.sqls.should == []
