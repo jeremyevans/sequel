@@ -640,7 +640,7 @@ module Sequel
       # Handle type conversions for common Java types.
       class TYPE_TRANSLATOR
         LF = "\n".freeze
-        def time(v) Sequel.string_to_time(v.to_string) + v.getTime.divmod(1000).last/1000.0 end
+        def time(v) Sequel.string_to_time("#{v.to_string}.#{sprintf('%03i', v.getTime.divmod(1000).last)}") end
         def date(v) Date.civil(v.getYear + 1900, v.getMonth + 1, v.getDate) end
         def decimal(v) BigDecimal.new(v.to_string) end
         def byte_array(v) Sequel::SQL::Blob.new(String.from_java_bytes(v)) end

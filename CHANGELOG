@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix typecasting of time columns on jdbc/postgres, before could be off by a millisecond (jeremyevans)
+
 * Add document explaining Sequel's object model (jeremyevans)
 
 * Attempt to detect more disconnect errors in the mysql2 adapter (jeremyevans)
