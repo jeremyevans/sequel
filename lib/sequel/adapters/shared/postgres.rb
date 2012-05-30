@@ -444,6 +444,22 @@ module Sequel
 
       private
 
+      # Handle :using option for set_column_type op.
+      def alter_table_sql(table, op)
+        case op[:op]
+        when :set_column_type
+          s = super
+          if using = op[:using]
+            using = Sequel::LiteralString.new(using) if using.is_a?(String)
+            s << ' USING '
+            s << literal(using)
+          end
+          s
+        else
+          super
+        end
+      end
+
       # If the :synchronous option is given and non-nil, set synchronous_commit
       # appropriately.  Valid values for the :synchronous option are true,
       # :on, false, :off, :local, and :remote_write.

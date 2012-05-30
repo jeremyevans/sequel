@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :using option to set_column_type on PostgreSQL, to force a specific conversion from the old value to the new value (jeremyevans)
+
 * Drop indexes in the reverse order that they were added in the schema dumper (jeremyevans)
 
 * Add :index_names option to schema dumper method, can be set to false or :namespace (stu314, jeremyevans)

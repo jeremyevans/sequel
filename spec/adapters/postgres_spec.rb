@@ -158,6 +158,30 @@ describe "A PostgreSQL dataset" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}
   end
 
+  specify "should support :using when altering a column's type" do
+    begin
+      @db = POSTGRES_DB
+      @db.create_table!(:atest){Integer :t}
+      @db[:atest].insert(1262304000)
+      @db.alter_table(:atest){set_column_type :t, Time, :using=>'epoch'.cast(Time) + '1 second'.cast(:interval) * :t}
+      @db[:atest].get(:t.extract(:year)).should == 2010
+    ensure
+      @db.drop_table?(:atest)
+    end
+  end
+
+  specify "should support :using with a string when altering a column's type" do
+    begin
+      @db = POSTGRES_DB
+      @db.create_table!(:atest){Integer :t}
+      @db[:atest].insert(1262304000)
+      @db.alter_table(:atest){set_column_type :t, Time, :using=>"'epoch'::timestamp + '1 second'::interval * t"}
+      @db[:atest].get(:t.extract(:year)).should == 2010
+    ensure
+      @db.drop_table?(:atest)
+    end
+  end
+
   specify "should have #transaction support various types of synchronous options" do
     @db = POSTGRES_DB
     @db.transaction(:synchronous=>:on){}

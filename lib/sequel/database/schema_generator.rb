@@ -406,6 +406,10 @@ module Sequel
       # Modify a column's type in the DDL for the table.
       #
       #   set_column_type(:artist_name, 'char(10)') # ALTER COLUMN artist_name TYPE char(10)
+      #
+      # PostgreSQL specific options:
+      #
+      # :using :: Add a USING clause that specifies how to convert existing values to new values.
       def set_column_type(name, type, opts={})
         @operations << {:op => :set_column_type, :name => name, :type => type}.merge(opts)
       end
