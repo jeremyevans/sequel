@@ -1,5 +1,7 @@
 === HEAD
 
+* Drop indexes in the reverse order that they were added in the schema dumper (jeremyevans)
+
 * Add :index_names option to schema dumper method, can be set to false or :namespace (stu314, jeremyevans)
 
 * Add Database#global_index_namespace? for checking if index namespace is global or per table (jeremyevans)

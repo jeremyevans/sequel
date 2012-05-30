@@ -455,6 +455,7 @@ END_MIG
             "index #{cols.inspect}#{opts_inspect(c)}"
           end
         end
+        is = is.reverse if options[:drop_index]
         is.join("\n")
       end
 

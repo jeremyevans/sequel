@@ -50,9 +50,9 @@ add_index :t, [:b, :c], :unique=>true
 END_CODE
 
     g.dump_indexes(:drop_index=>:t).should == (<<END_CODE).strip
-drop_index :t, [:a]
-drop_index :t, [:c, :e], :name=>:blah
 drop_index :t, [:b, :c], :unique=>true
+drop_index :t, [:c, :e], :name=>:blah
+drop_index :t, [:a]
 END_CODE
   end
 
@@ -503,8 +503,8 @@ Sequel.migration do
   end
   
   down do
-    drop_index :t1, [:c1], :ignore_errors=>true, :name=>:i1
     drop_index :t1, [:c2, :c1], :ignore_errors=>true, :unique=>true
+    drop_index :t1, [:c1], :ignore_errors=>true, :name=>:i1
   end
 end
 END_MIG
@@ -524,8 +524,8 @@ Sequel.migration do
   end
   
   down do
-    drop_index :t1, [:c1], :ignore_errors=>true
     drop_index :t1, [:c2, :c1], :ignore_errors=>true, :unique=>true
+    drop_index :t1, [:c1], :ignore_errors=>true
   end
 end
 END_MIG
@@ -548,11 +548,11 @@ Sequel.migration do
   end
   
   down do
-    drop_index :t2, [:c1], :ignore_errors=>true, :name=>:i1
     drop_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t1_c2_c1_index
+    drop_index :t2, [:c1], :ignore_errors=>true, :name=>:i1
     
-    drop_index :t1, [:c1], :ignore_errors=>true, :name=>:i1
     drop_index :t1, [:c2, :c1], :ignore_errors=>true
+    drop_index :t1, [:c1], :ignore_errors=>true, :name=>:i1
   end
 end
 END_MIG
@@ -576,11 +576,11 @@ Sequel.migration do
   end
   
   down do
-    drop_index :t2, [:c1], :ignore_errors=>true, :name=>:t2_i1
     drop_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t2_t1_c2_c1_index
+    drop_index :t2, [:c1], :ignore_errors=>true, :name=>:t2_i1
     
-    drop_index :t1, [:c1], :ignore_errors=>true, :name=>:t1_i1
     drop_index :t1, [:c2, :c1], :ignore_errors=>true
+    drop_index :t1, [:c1], :ignore_errors=>true, :name=>:t1_i1
   end
 end
 END_MIG
