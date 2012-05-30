@@ -29,7 +29,8 @@ END_MIG
     # * :same_db - Create a dump for the same database type, so
     #   don't ignore errors if the index statements fail.
     # * :index_names - If set to false, don't record names of indexes. If
-    #   set to :namespace, prepend the table name to the index name.
+    #   set to :namespace, prepend the table name to the index name if the
+    #   database does not use a global index namespace.
     def dump_indexes_migration(options={})
       ts = tables(options)
       <<END_MIG
@@ -289,7 +290,7 @@ END_MIG
     def index_to_generator_opts(table, name, index_opts, options={})
       h = {}
       if options[:index_names] != false && default_index_name(table, index_opts[:columns]) != name.to_s
-        if options[:index_names] == :namespace
+        if options[:index_names] == :namespace && !global_index_namespace?
           h[:name] = "#{table}_#{name}".to_sym
         else
           h[:name] = name
