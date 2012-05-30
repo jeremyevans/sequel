@@ -462,7 +462,7 @@ module Sequel
           log_connection_execute(conn, "SET LOCAL synchronous_commit = #{sync}")
         end
       end
-
+      
       # If the :prepare option is given and we aren't in a savepoint,
       # prepare the transaction for a two-phase commit.
       def commit_transaction(conn, opts={})
@@ -666,6 +666,20 @@ module Sequel
         end
       end
 
+      # Set the transaction isolation level on the given connection
+      def set_transaction_isolation(conn, opts)
+        level = opts.fetch(:isolation, transaction_isolation_level)
+        set_read_mode = opts.has_key?(:read_only)
+        set_deferrable_mode = opts.has_key?(:deferrable)
+        if level || set_read_mode || set_deferrable_mode
+          sql = "SET TRANSACTION"
+          sql << " ISOLATION LEVEL #{Sequel::Database::TRANSACTION_ISOLATION_LEVELS[level]}" if level
+          sql << " READ #{opts[:read_only] ? 'ONLY' : 'WRITE'}" if set_read_mode
+          sql << " #{'NOT ' unless opts[:deferrable]}DEFERRABLE" if set_deferrable_mode
+          log_connection_execute(conn, sql)
+        end
+      end
+     
       # Turns an array of argument specifiers into an SQL fragment used for function arguments.  See create_function_sql.
       def sql_function_args(args)
         "(#{Array(args).map{|a| Array(a).reverse.join(' ')}.join(', ')})"

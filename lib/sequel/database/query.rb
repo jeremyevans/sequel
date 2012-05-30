@@ -232,7 +232,7 @@ module Sequel
     # either all statements are successful or none of the statements are
     # successful.  Note that MySQL MyISAM tabels do not support transactions.
     #
-    # The following options are respected:
+    # The following general options are respected:
     #
     # :isolation :: The transaction isolation level to use for this transaction,
     #               should be :uncommitted, :committed, :repeatable, or :serializable,
@@ -249,7 +249,12 @@ module Sequel
     #               only respected if the database/adapter supports savepoints.  By
     #               default Sequel will reuse an existing transaction, so if you want to
     #               use a savepoint you must use this option.
-    # :synchronous :: (PostgreSQL only) if non-nil, set synchronous_commit
+    #
+    # PostgreSQL specific options:
+    #
+    # :deferrable :: (9.1+) If present, set to DEFERRABLE if true or NOT DEFERRABLE if false.
+    # :read_only :: If present, set to READ ONLY if true or READ WRITE if false.
+    # :synchronous :: if non-nil, set synchronous_commit
     #                 appropriately.  Valid values true, :on, false, :off, :local (9.1+),
     #                 and :remote_write (9.2+).
     def transaction(opts={}, &block)

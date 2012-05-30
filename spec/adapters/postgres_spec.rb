@@ -183,6 +183,26 @@ describe "A PostgreSQL dataset" do
     end
   end
 
+  specify "should have #transaction support read only transactions" do
+    @db = POSTGRES_DB
+    @db.transaction(:read_only=>true){}
+    @db.transaction(:read_only=>false){}
+    @db.transaction(:isolation=>:serializable, :read_only=>true){}
+    @db.transaction(:isolation=>:serializable, :read_only=>false){}
+    @db.sqls.grep(/READ/).should == ["SET TRANSACTION READ ONLY", "SET TRANSACTION READ WRITE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE"]
+  end
+
+  specify "should have #transaction support deferrable transactions" do
+    @db = POSTGRES_DB
+    @db.transaction(:deferrable=>true){}
+    @db.transaction(:deferrable=>false){}
+    @db.transaction(:deferrable=>true, :read_only=>true){}
+    @db.transaction(:deferrable=>false, :read_only=>false){}
+    @db.transaction(:isolation=>:serializable, :deferrable=>true, :read_only=>true){}
+    @db.transaction(:isolation=>:serializable, :deferrable=>false, :read_only=>false){}
+    @db.sqls.grep(/DEF/).should == ["SET TRANSACTION DEFERRABLE", "SET TRANSACTION NOT DEFERRABLE", "SET TRANSACTION READ ONLY DEFERRABLE", "SET TRANSACTION READ WRITE NOT DEFERRABLE",  "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE NOT DEFERRABLE"]
+  end if POSTGRES_DB.server_version >= 90100
+
   specify "should support creating indexes concurrently" do
     POSTGRES_DB.sqls.clear
     POSTGRES_DB.add_index :test, [:name, :value], :concurrently=>true

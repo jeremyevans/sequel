@@ -1,5 +1,7 @@
 === HEAD
 
+* Add document explaining Sequel's object model (jeremyevans)
+
 * Attempt to detect more disconnect errors in the mysql2 adapter (jeremyevans)
 
 * Add is_current? and check_current to the migrators, for checking/raising if there are unapplied migrations (pvh, jeremyevans) (#487)
@@ -38,7 +40,7 @@
 
 * Support :concurrently option when adding and dropping indexes on PostgreSQL (jeremyevans)
 
-* Make Database#transaction on PostgreSQL accept a :synchronous option to change synchronous_commit setting for that transaction (jeremyevans)
+* Make Database#transaction on PostgreSQL recognize :synchronous, :read_only, and :deferrable options (jeremyevans)
 
 * Support :sql_mode option when connecting to MySQL (jeremyevans)
 
