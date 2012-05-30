@@ -114,6 +114,12 @@ module Sequel
       Sequel.convert_output_timestamp(v, timezone)
     end
 
+    # Whether the database uses a global namespace for the index.  If
+    # false, the indexes are going to be namespaced per table.
+    def global_index_namespace?
+      true
+    end
+
     # Return true if already in a transaction given the options,
     # false otherwise.  Respects the :server option for selecting
     # a shard.

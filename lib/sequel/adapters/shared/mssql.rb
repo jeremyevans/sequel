@@ -28,6 +28,11 @@ module Sequel
         :mssql
       end
       
+      # Microsoft SQL Server namespaces indexes per table.
+      def global_index_namespace?
+        false
+      end
+
       # Use the system tables to get index information
       def indexes(table, opts={})
         m = output_identifier_meth

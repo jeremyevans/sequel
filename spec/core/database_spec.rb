@@ -1996,6 +1996,12 @@ describe "Database#supports_transactional_ddl?" do
   end
 end
 
+describe "Database#global_index_namespace?" do
+  specify "should be true by default" do
+    Sequel::Database.new.global_index_namespace?.should == true
+  end
+end
+
 describe "Database#supports_savepoints?" do
   specify "should be false by default" do
     Sequel::Database.new.supports_savepoints?.should == false

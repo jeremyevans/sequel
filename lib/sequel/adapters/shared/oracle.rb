@@ -29,6 +29,11 @@ module Sequel
         :oracle
       end
 
+      # Oracle namespaces indexes per table.
+      def global_index_namespace?
+        false
+      end
+
       def tables(opts={})
         m = output_identifier_meth
         metadata_dataset.from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'TABLE').map{|r| m.call(r[:tname])}

@@ -76,6 +76,11 @@ module Sequel
         h.values
       end
 
+      # MySQL namespaces indexes per table.
+      def global_index_namespace?
+        false
+      end
+
       # Use SHOW INDEX FROM to get the index information for the
       # table.
       #
