@@ -87,6 +87,9 @@ module Sequel
         #   modified through the association_attributes= method to the specific fields given.
         # * :limit - For *_to_many associations, a limit on the number of records
         #   that will be processed, to prevent denial of service attacks.
+        # * :reject_if - A proc that is given each attribute hash before it is
+        #   passed to its associated object. If the proc returns a truthy
+        #   value, the attribute hash is ignored.
         # * :remove - Allow disassociation of nested records (can remove the associated
         #   object from the parent object, but not destroy the associated object).
         # * :transform - A proc to modify attribute hashes before they are
