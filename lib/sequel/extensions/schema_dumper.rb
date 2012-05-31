@@ -149,8 +149,14 @@ END_MIG
     # database type is not recognized, return it as a String type.
     def column_schema_to_ruby_type(schema)
       case t = schema[:db_type].downcase
-      when /\A(?:medium|small)?int(?:eger)?(?:\((?:\d+)\))?(?: unsigned)?\z/o
-        {:type=>Integer}
+      when /\A(medium|small)?int(?:eger)?(?:\((\d+)\))?( unsigned)?\z/o
+        if !$1 && $2 && $2.to_i >= 10 && $3
+          # Unsigned integer type with 10 digits can potentially contain values which
+          # don't fit signed integer type, so use bigint type in target database.
+          {:type=>Bignum}
+        else
+          {:type=>Integer}
+        end
       when /\Atinyint(?:\((\d+)\))?(?: unsigned)?\z/o
         {:type =>schema[:type] == :boolean ? TrueClass : Integer}
       when /\Abigint(?:\((?:\d+)\))?(?: unsigned)?\z/o
