@@ -1,5 +1,7 @@
 === HEAD
 
+* Use Bignum generic type when dumping unsigned integer types that could potentially overflow 32-bit signed integer values (stu314)
+
 * Support :transform option in the nested_attributes plugin, for automatically preprocessing input hashes (chanks)
 
 * Support :unmatched_pk option in the nested_attributes plugin, can be set to :create for associated objects with natural keys (chanks)
