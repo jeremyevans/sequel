@@ -685,13 +685,13 @@ module Sequel
       # Set the transaction isolation level on the given connection
       def set_transaction_isolation(conn, opts)
         level = opts.fetch(:isolation, transaction_isolation_level)
-        set_read_mode = opts.has_key?(:read_only)
-        set_deferrable_mode = opts.has_key?(:deferrable)
-        if level || set_read_mode || set_deferrable_mode
+        read_only = opts[:read_only]
+        deferrable = opts[:deferrable]
+        if level || !read_only.nil? || !deferrable.nil?
           sql = "SET TRANSACTION"
           sql << " ISOLATION LEVEL #{Sequel::Database::TRANSACTION_ISOLATION_LEVELS[level]}" if level
-          sql << " READ #{opts[:read_only] ? 'ONLY' : 'WRITE'}" if set_read_mode
-          sql << " #{'NOT ' unless opts[:deferrable]}DEFERRABLE" if set_deferrable_mode
+          sql << " READ #{read_only ? 'ONLY' : 'WRITE'}" unless read_only.nil?
+          sql << " #{'NOT ' unless deferrable}DEFERRABLE" unless deferrable.nil?
           log_connection_execute(conn, sql)
         end
       end
