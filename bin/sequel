@@ -162,10 +162,12 @@ begin
     start_time = Time.now
     TO_DB = connect_proc[db2]
     same_db = DB.database_type==TO_DB.database_type
+    index_opts = {:same_db=>same_db}
+    index_opts[:index_names] = :namespace if !DB.global_index_namespace? && TO_DB.global_index_namespace?
 
     puts "Databases connections successful"
     schema_migration = eval(DB.dump_schema_migration(:indexes=>false, :same_db=>same_db))
-    index_migration = eval(DB.dump_indexes_migration(:same_db=>same_db))
+    index_migration = eval(DB.dump_indexes_migration(index_opts))
     fk_migration = eval(DB.dump_foreign_key_migration(:same_db=>same_db))
     puts "Migrations dumped successfully"
 
