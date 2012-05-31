@@ -1,5 +1,11 @@
 === HEAD
 
+* Support :transform option in the nested_attributes plugin, for automatically preprocessing input hashes (chanks)
+
+* Support :unmatched_pk option in the nested_attributes plugin, can be set to :create for associated objects with natural keys (chanks)
+
+* Support composite primary keys in the nested_attributes plugin (chanks)
+
 * Allow Model#from_json in the json_serializer plugin to use set_fields if a :fields option is given (jeremyevans)
 
 * Support :using option to set_column_type on PostgreSQL, to force a specific conversion from the old value to the new value (jeremyevans)

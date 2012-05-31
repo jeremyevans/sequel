@@ -92,6 +92,8 @@ module Sequel
         #   value, the attribute hash is ignored.
         # * :remove - Allow disassociation of nested records (can remove the associated
         #   object from the parent object, but not destroy the associated object).
+        # * :strict - Kept for backward compatibility. Setting it to false is
+        #   equivalent to setting :unmatched_pk to :ignore.
         # * :transform - A proc to transform attribute hashes before they are
         #   passed to associated object. Takes two arguments, the parent object and
         #   the attribute hash. Uses the return value as the new attribute hash.
@@ -100,11 +102,8 @@ module Sequel
         #   object. Set to :create to create a new object with that primary
         #   key, :ignore to ignore the record, or :raise to raise an error.
         #   The default is :raise.
-        # * :strict - Kept for backward compatibility. Setting it to false is
-        #   equivalent to setting :unmatched_pk to :ignore.
         #
-        # If a block is provided, it is passed each nested attribute hash.  If
-        # the hash should be ignored, the block should return anything except false or nil.
+        # If a block is provided, it is used to set the :reject_if option.
         def nested_attributes(*associations, &block)
           include(self.nested_attributes_module ||= Module.new) unless nested_attributes_module
           opts = associations.last.is_a?(Hash) ? associations.pop : {}
@@ -144,7 +143,9 @@ module Sequel
         def nested_attributes_check_key_modifications(reflection, obj)
           keys = reflection.associated_object_keys.map{|x| obj.send(x)}
           yield
-          raise(Error, "Modifying association dependent key(s) when updating associated objects is not allowed") unless keys == reflection.associated_object_keys.map{|x| obj.send(x)}
+          unless keys == reflection.associated_object_keys.map{|x| obj.send(x)}
+            raise(Error, "Modifying association dependent key(s) when updating associated objects is not allowed")
+          end
         end
         
         # Create a new associated object with the given attributes, validate
@@ -219,7 +220,8 @@ module Sequel
         # ** If _delete is a key in the hash and the :destroy option is used, destroy the matching associated object.
         # ** If _remove is a key in the hash and the :remove option is used, disassociated the matching associated object.
         # ** Otherwise, update the matching associated object with the contents of the hash.
-        # * If a primary key exists in the attributes hash but it does not match an associated object, either raise an error, create a new object or ignore the hash, depending on the :unmatched_pk option.
+        # * If a primary key exists in the attributes hash but it does not match an associated object,
+        #   either raise an error, create a new object or ignore the hash, depending on the :unmatched_pk option.
         # * If no primary key exists in the attributes hash, create a new object.
         def nested_attributes_setter(reflection, attributes)
           if a = reflection[:nested_attributes][:transform]
