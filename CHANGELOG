@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.36.0 (2012-06-01)
 
 * Use Bignum generic type when dumping unsigned integer types that could potentially overflow 32-bit signed integer values (stu314)
 
