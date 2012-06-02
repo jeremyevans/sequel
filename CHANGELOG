@@ -1,3 +1,7 @@
+=== 3.36.1 (2012-06-01)
+
+* Fix jdbc adapter when DriverManager#getConnection fails (aportnov) (#488)
+
 === 3.36.0 (2012-06-01)
 
 * Use Bignum generic type when dumping unsigned integer types that could potentially overflow 32-bit signed integer values (stu314)
