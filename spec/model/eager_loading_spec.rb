@@ -349,7 +349,9 @@ describe Sequel::Model, "#eager" do
   it "should cache the negative lookup when eagerly loading a *_to_many associations" do
     a = EagerBand.eager(:albums).filter('id > 100').all
     a.should == [EagerBand.load(:id => 101), EagerBand.load(:id =>102)]
-    MODEL_DB.sqls.should == ['SELECT * FROM bands WHERE (id > 100)', 'SELECT * FROM albums WHERE (albums.band_id IN (101, 102))', "SELECT * FROM tracks WHERE (tracks.album_id IN (101))"]
+    sqls = MODEL_DB.sqls
+    ['SELECT * FROM albums WHERE (albums.band_id IN (101, 102))', 'SELECT * FROM albums WHERE (albums.band_id IN (102, 101))'].should include(sqls.delete_at(1))
+    sqls.should == ['SELECT * FROM bands WHERE (id > 100)', "SELECT * FROM tracks WHERE (tracks.album_id IN (101))"]
     a.map{|b| b.associations[:albums]}.should == [[EagerAlbum.load({:band_id=>101, :id=>101})], []]
     MODEL_DB.sqls.should == []
   end
