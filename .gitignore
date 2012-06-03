@@ -7,3 +7,4 @@
 /www/public/static/*_presentation
 *.rbc
 *.swp
+*.lock
