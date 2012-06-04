@@ -41,7 +41,11 @@ module Sequel
     # requires an order.
     def select_sql
       return super unless o = @opts[:offset]
-      raise(Error, "#{db.database_type} requires an order be provided if using an offset") unless order = @opts[:order]
+      unless (order = @opts[:order]) && columns.size > 0
+        raise(Error, "#{db.database_type} requires an order be provided if using an offset")
+      end
+      order ||= self.columns.include?(:id) ? :id : self.columns
+
       dsa1 = dataset_alias(1)
       rn = row_number_column
       sql = @opts[:append_sql] || ''
