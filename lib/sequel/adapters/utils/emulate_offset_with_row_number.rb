@@ -65,7 +65,7 @@ module Sequel
     # The default order to use for datasets with offsets, if no order is defined.
     # By default, orders by all of the columns in the dataset.
     def default_offset_order
-      columns
+      clone(:append_sql=>'').columns
     end
 
     # This emulation adds an extra row number column that should be
