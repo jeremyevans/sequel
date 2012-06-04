@@ -41,10 +41,11 @@ module Sequel
     # requires an order.
     def select_sql
       return super unless o = @opts[:offset]
-      unless (order = @opts[:order]) && columns.size > 0
+
+      order = @opts[:order] || default_offset_order
+      if order.nil? || order.empty?
         raise(Error, "#{db.database_type} requires an order be provided if using an offset")
       end
-      order ||= self.columns.include?(:id) ? :id : self.columns
 
       dsa1 = dataset_alias(1)
       rn = row_number_column
@@ -60,6 +61,12 @@ module Sequel
     end
 
     private
+
+    # The default order to use for datasets with offsets, if no order is defined.
+    # By default, orders by all of the columns in the dataset.
+    def default_offset_order
+      columns
+    end
 
     # This emulation adds an extra row number column that should be
     # eliminated.

@@ -1,6 +1,8 @@
 === HEAD
 
-* Work around bug in JRuby 1.6 ruby 1.9 mode bug in Time -> SQLTime conversion (jeremyevans)
+* When emulating offset with ROW_NUMBER, default to ordering by all columns if no specific order is given (stnoonan, jeremyevans) (#490)
+
+* Work around JRuby 1.6 ruby 1.9 mode bug in Time -> SQLTime conversion (jeremyevans)
 
 === 3.36.1 (2012-06-01)
 
