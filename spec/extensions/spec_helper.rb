@@ -1,4 +1,20 @@
 require 'rubygems'
+
+if defined?(RSpec)
+  begin
+    require 'rspec/expectations/syntax'
+    if defined?(RSpec::Expectations::Syntax) && RSpec::Expectations::Syntax.respond_to?(:enable_should)
+       RSpec::Expectations::Syntax.enable_should 
+    end
+  rescue LoadError
+    begin
+      require 'rspec/expectations/extensions/kernel'
+    rescue LoadError
+      nil
+    end
+  end
+end
+
 unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
   require 'sequel/core'
