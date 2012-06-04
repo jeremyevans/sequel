@@ -362,7 +362,8 @@ module Sequel
         if value.is_a?(SQLTime)
           value
         else
-          SQLTime.create(value.hour, value.min, value.sec, value.respond_to?(:nsec) ? value.nsec/1000.0 : value.usec)
+          # specifically check for nsec == 0 value to work around JRuby 1.6 ruby 1.9 mode bug
+          SQLTime.create(value.hour, value.min, value.sec, (value.respond_to?(:nsec) && value.nsec != 0) ? value.nsec/1000.0 : value.usec)
         end
       when String
         Sequel.string_to_time(value)
