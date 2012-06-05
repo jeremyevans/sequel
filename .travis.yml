@@ -10,3 +10,5 @@ rvm:
   - ruby-head
   - jruby-head
   - ree
+script: bundle exec rake spec spec_plugin
+gemfile: .travis.gemfile
