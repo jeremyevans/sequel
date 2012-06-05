@@ -4,12 +4,12 @@ describe Sequel::Model, "BooleanReaders plugin" do
   before do
     @db = Sequel::Database.new({})
     def @db.schema(*args)
-      [[:id, {}], [:y, {:type=>:integer, :db_type=>'tinyint(1)'}], [:b, {:type=>:boolean, :db_type=>'boolean'}]]
+      [[:id, {}], [:z, {:type=>:integer, :db_type=>'tinyint(1)'}], [:b, {:type=>:boolean, :db_type=>'boolean'}]]
     end
 
     @c = Class.new(Sequel::Model(@db[:items]))
     @p = proc do
-      @columns = [:id, :b, :y]
+      @columns = [:id, :b, :z]
       def columns; @columns; end
     end
     @c.instance_eval(&@p)
@@ -29,7 +29,7 @@ describe Sequel::Model, "BooleanReaders plugin" do
 
   specify "should not create attribute? readers for non-boolean attributes" do
     @c.plugin(:boolean_readers)
-    proc{@c.new.y?}.should raise_error(NoMethodError)
+    proc{@c.new.z?}.should raise_error(NoMethodError)
     proc{@c.new.id?}.should raise_error(NoMethodError)
   end
 
@@ -37,17 +37,17 @@ describe Sequel::Model, "BooleanReaders plugin" do
     @c.plugin(:boolean_readers){|c| db_schema[c][:db_type] == 'tinyint(1)'}
     proc{@c.new.b?}.should raise_error(NoMethodError)
     o = @c.new
-    o.y.should == nil
-    o.y?.should == nil
-    o.y = '1'
-    o.y.should == 1
-    o.y?.should == true
-    o.y = '0'
-    o.y.should == 0
-    o.y?.should == false
-    o.y = ''
-    o.y.should == nil
-    o.y?.should == nil
+    o.z.should == nil
+    o.z?.should == nil
+    o.z = '1'
+    o.z.should == 1
+    o.z?.should == true
+    o.z = '0'
+    o.z.should == 0
+    o.z?.should == false
+    o.z = ''
+    o.z.should == nil
+    o.z?.should == nil
   end
 
   specify "should create boolean readers when set_dataset is defined" do
@@ -70,17 +70,17 @@ describe Sequel::Model, "BooleanReaders plugin" do
     c.plugin(:boolean_readers){|x| db_schema[x][:db_type] == 'tinyint(1)'}
     c.set_dataset(@db[:a])
     o = c.new
-    o.y.should == nil
-    o.y?.should == nil
-    o.y = '1'
-    o.y.should == 1
-    o.y?.should == true
-    o.y = '0'
-    o.y.should == 0
-    o.y?.should == false
-    o.y = ''
-    o.y.should == nil
-    o.y?.should == nil
+    o.z.should == nil
+    o.z?.should == nil
+    o.z = '1'
+    o.z.should == 1
+    o.z?.should == true
+    o.z = '0'
+    o.z.should == 0
+    o.z?.should == false
+    o.z = ''
+    o.z.should == nil
+    o.z?.should == nil
     proc{o.b?}.should raise_error(NoMethodError)
   end
 
