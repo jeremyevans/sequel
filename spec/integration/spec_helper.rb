@@ -42,7 +42,7 @@ def Sequel.guarded?(*checked)
           return c if c.first == INTEGRATION_DB.adapter_scheme
         when 2
           if c.first.is_a?(Proc)
-            return c if c.first.call(INTEGRATION_DB) && c.last == INTEGRATION_DB.database_type
+            return c if c.last == INTEGRATION_DB.database_type && c.first.call(INTEGRATION_DB)
           elsif c.last.is_a?(Proc)
             return c if c.first == INTEGRATION_DB.adapter_scheme && c.last.call(INTEGRATION_DB)
           else
@@ -69,7 +69,7 @@ end
   
   def self.cspecify(message, *checked, &block)
     if pending = Sequel.guarded?(*checked)
-      specify(message){pending("Not yet working on #{Array(pending).join(', ')}", &block)}
+      specify(message){pending("Not yet working on #{Array(pending).map{|x| x.is_a?(Proc) ? :proc : x}.join(', ')}", &block)}
     else
       specify(message, &block)
     end
