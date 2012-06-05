@@ -100,7 +100,7 @@ describe "Class Table Inheritance Plugin" do
     Employee.filter(:id=>@i2).all.first.manager.id.should == @i4
   end
 
-  cspecify "should insert rows into all tables", [:amalgalite], [:jdbc, :sqlite] do
+  cspecify "should insert rows into all tables", [proc{|db| db.sqlite_version < 30709}, :sqlite] do
     e = Executive.create(:name=>'Ex2', :num_managers=>8, :num_staff=>9)
     i = e.id
     @db[:employees][:id=>i].should == {:id=>i, :name=>'Ex2', :kind=>'Executive'}
@@ -139,7 +139,7 @@ describe "Class Table Inheritance Plugin" do
     Executive.limit(1).eager(:staff_members).first.staff_members.should == [Staff[@i2]]
   end
   
-  cspecify "should handle eagerly graphing one_to_many relationships", [:amalgalite], [:jdbc, :sqlite] do
+  cspecify "should handle eagerly graphing one_to_many relationships", [proc{|db| db.sqlite_version < 30709}, :sqlite] do
     es = Executive.limit(1).eager_graph(:staff_members).all
     es.should == [Executive[@i4]]
     es.map{|x| x.staff_members}.should == [[Staff[@i2]]]
