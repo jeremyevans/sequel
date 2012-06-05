@@ -15,3 +15,7 @@ gemfile: .travis.gemfile
 before_script:
   - mysql -e 'create database sequel_test;'
   - psql -c 'create database sequel_test;' -U postgres
+matrix:
+  allow_failures:
+    - rvm: jruby-19mode
+    - rvm: rbx-19mode
