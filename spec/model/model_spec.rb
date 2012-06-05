@@ -502,24 +502,24 @@ describe Sequel::Model, "attribute accessors" do
   before do
     db = Sequel.mock
     def db.schema(*)
-      [[:x, {:type=>:integer}], [:y, {:type=>:integer}]]
+      [[:x, {:type=>:integer}], [:z, {:type=>:integer}]]
     end
-    @dataset = db[:items].columns(:x, :y)
+    @dataset = db[:items].columns(:x, :z)
     @c = Class.new(Sequel::Model)
     MODEL_DB.reset
   end
 
   it "should be created on set_dataset" do
-    %w'x y x= y='.each do |x|
-      @c.instance_methods.collect{|y| y.to_s}.should_not include(x)
+    %w'x z x= z='.each do |x|
+      @c.instance_methods.collect{|z| z.to_s}.should_not include(x)
     end
     @c.set_dataset(@dataset)
-    %w'x y x= y='.each do |x|
-      @c.instance_methods.collect{|y| y.to_s}.should include(x)
+    %w'x z x= z='.each do |x|
+      @c.instance_methods.collect{|z| z.to_s}.should include(x)
     end
     o = @c.new
-    %w'x y x= y='.each do |x|
-      o.methods.collect{|y| y.to_s}.should include(x)
+    %w'x z x= z='.each do |x|
+      o.methods.collect{|z| z.to_s}.should include(x)
     end
 
     o.x.should be_nil
@@ -538,7 +538,7 @@ describe Sequel::Model, "attribute accessors" do
   end
 
   it "should have a working typecasting setter even if the column is not selected" do
-    @c.set_dataset(@dataset.select(:y).columns(:y))
+    @c.set_dataset(@dataset.select(:z).columns(:z))
     o = @c.new
 
     o.x = '34'
@@ -546,7 +546,7 @@ describe Sequel::Model, "attribute accessors" do
   end
 
   it "should typecast if the new value is the same as the existing but has a different class" do
-    @c.set_dataset(@dataset.select(:y).columns(:y))
+    @c.set_dataset(@dataset.select(:z).columns(:z))
     o = @c.new
 
     o.x = 34

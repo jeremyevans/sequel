@@ -1796,7 +1796,7 @@ describe Sequel::Model, "many_to_many" do
       attr_accessor :yyy
       def self.name; 'Attribute'; end
       def self.to_s; 'Attribute'; end
-      columns :id, :y
+      columns :id, :y, :z
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
@@ -2058,9 +2058,9 @@ describe Sequel::Model, "many_to_many" do
   end
   
   it "should have the add_ method respect composite keys" do
-    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :z]
     n = @c2.load(:id => 1234, :x=>5)
-    a = @c1.load(:id => 2345, :y=>8)
+    a = @c1.load(:id => 2345, :z=>8)
     a.should == n.add_attribute(a)
     sqls = MODEL_DB.sqls
     m = /INSERT INTO attributes_nodes \((\w+), (\w+), (\w+), (\w+)\) VALUES \((\d+), (\d+), (\d+), (\d+)\)/.match(sqls.pop)
@@ -2080,14 +2080,14 @@ describe Sequel::Model, "many_to_many" do
   end
   
   it "should have the add_ method respect composite keys" do
-    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
-    @c1.set_primary_key [:id, :y]
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :z]
+    @c1.set_primary_key [:id, :z]
     n = @c2.load(:id => 1234, :x=>5)
-    a = @c1.load(:id => 2345, :y=>8)
-    @c1.dataset._fetch = {:id => 2345, :y=>8}
+    a = @c1.load(:id => 2345, :z=>8)
+    @c1.dataset._fetch = {:id => 2345, :z=>8}
     n.add_attribute([2345, 8]).should == a
     sqls = MODEL_DB.sqls
-    sqls.shift.should =~ /SELECT \* FROM attributes WHERE \(\((id|y) = (8|2345)\) AND \((id|y) = (8|2345)\)\) LIMIT 1/
+    sqls.shift.should =~ /SELECT \* FROM attributes WHERE \(\((id|z) = (8|2345)\) AND \((id|z) = (8|2345)\)\) LIMIT 1/
     sqls.pop.should =~ /INSERT INTO attributes_nodes \([lr][12], [lr][12], [lr][12], [lr][12]\) VALUES \((1234|5|2345|8), (1234|5|2345|8), (1234|5|2345|8), (1234|5|2345|8)\)/
     sqls.should == []
   end
@@ -2102,9 +2102,9 @@ describe Sequel::Model, "many_to_many" do
   end
   
   it "should have the remove_ method respect composite keys" do
-    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :z]
     n = @c2.load(:id => 1234, :x=>5)
-    a = @c1.load(:id => 2345, :y=>8)
+    a = @c1.load(:id => 2345, :z=>8)
     a.should == n.remove_attribute(a)
     MODEL_DB.sqls.should == ["DELETE FROM attributes_nodes WHERE ((l1 = 1234) AND (l2 = 5) AND (r1 = 2345) AND (r2 = 8))"]
   end
