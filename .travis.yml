@@ -14,4 +14,4 @@ script: bundle exec rake spec_travis
 gemfile: .travis.gemfile
 before_script:
   - mysql -e 'create database sequel_test;'
-  - psql -c 'create database myapp_test;' -U postgres
+  - psql -c 'create database sequel_test;' -U postgres
