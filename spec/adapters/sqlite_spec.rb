@@ -1,7 +1,13 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 unless defined?(SQLITE_DB)
-  SQLITE_URL = 'sqlite:/' unless defined? SQLITE_URL
+  unless defined? SQLITE_URL
+    if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
+      SQLITE_URL = 'jdbc:sqlite::memory:'
+    else
+      SQLITE_URL = 'sqlite:/'
+    end
+  end
   SQLITE_DB = Sequel.connect(ENV['SEQUEL_SQLITE_SPEC_DB']||SQLITE_URL)
 end
 INTEGRATION_DB = SQLITE_DB unless defined?(INTEGRATION_DB)
