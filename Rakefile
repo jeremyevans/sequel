@@ -138,6 +138,19 @@ begin
   %w'postgres sqlite mysql informix oracle firebird mssql db2'.each do |adapter|
     spec_with_cov.call("spec_#{adapter}", ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"], "Run #{adapter} specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|connection_pool|database|dataset|model|extensions|plugins)"')}
   end
+  
+  task :spec_travis=>[:spec, :spec_plugin, :spec_sqlite] do
+    if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
+      ENV['SEQUEL_PG_SPEC_DB'] = "jdbc:postgresql://localhost/sequel_test?user=postgres"
+      ENV['SEQUEL_MY_SPEC_DB'] = "jdbc:mysql://localhost/sequel_test?user=root"
+    else
+      ENV['SEQUEL_PG_SPEC_DB'] = "postgres://localhost/sequel_test?user=postgres"
+      ENV['SEQUEL_MY_SPEC_DB'] = "mysql2://localhost/sequel_test?user=root"
+    end
+
+    Rake::Task['spec_postgres'].invoke
+    Rake::Task['spec_mysql'].invoke
+  end
 
   desc "Run model specs without the associations code"
   task :spec_model_no_assoc do

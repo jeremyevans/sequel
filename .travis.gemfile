@@ -4,7 +4,19 @@ source 'http://rubygems.org'
 
 gem 'rake'
 gem 'rspec', '<2.10.0'
+
+# Plugin/Extension Dependencies
 gem 'tzinfo'
 gem 'activemodel'
 gem 'nokogiri'
 gem 'json'
+
+# MRI/Rubinius Adapter Dependencies
+gem "sqlite3", :platform => :ruby
+gem "mysql2", :platform => :ruby
+gem "pg", :platform => :ruby
+
+# JRuby Adapter Dependencies
+gem 'jdbc-sqlite3', :platform => :jruby
+gem 'jdbc-mysql', :platform => :jruby
+gem 'jdbc-postgres', :platform => :jruby
