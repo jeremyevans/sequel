@@ -3,7 +3,7 @@
 source 'http://rubygems.org'
 
 gem 'rake'
-gem 'rspec'
+gem 'rspec', '<2.10.0'
 gem 'tzinfo'
 gem 'activemodel'
 gem 'nokogiri'
