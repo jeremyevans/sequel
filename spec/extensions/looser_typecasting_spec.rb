@@ -4,11 +4,11 @@ describe "LooserTypecasting Extension" do
   before do
     @db = Sequel::Database.new({})
     def @db.schema(*args)
-      [[:id, {}], [:y, {:type=>:float}], [:b, {:type=>:integer}]]
+      [[:id, {}], [:z, {:type=>:float}], [:b, {:type=>:integer}]]
     end 
     @c = Class.new(Sequel::Model(@db[:items]))
     @c.instance_eval do
-      @columns = [:id, :b, :y] 
+      @columns = [:id, :b, :z] 
       def columns; @columns; end 
     end
   end
@@ -26,14 +26,14 @@ describe "LooserTypecasting Extension" do
   end
 
   specify "Should use to_f instead of Float() for typecasting floats" do
-    proc{@c.new(:y=>'a')}.should raise_error(Sequel::InvalidValue)
+    proc{@c.new(:z=>'a')}.should raise_error(Sequel::InvalidValue)
     @db.extend(Sequel::LooserTypecasting)
-    @c.new(:y=>'a').y.should == 0.0
+    @c.new(:z=>'a').z.should == 0.0
 
     o = Object.new
     def o.to_f
       1.0
     end
-    @c.new(:y=>o).y.should == 1.0
+    @c.new(:z=>o).z.should == 1.0
   end
 end
