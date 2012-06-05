@@ -2,10 +2,10 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe Sequel::Database do
   specify "should provide disconnect functionality" do
-    INTEGRATION_DB.test_connection
-    INTEGRATION_DB.pool.size.should == 1
     INTEGRATION_DB.disconnect
     INTEGRATION_DB.pool.size.should == 0
+    INTEGRATION_DB.test_connection
+    INTEGRATION_DB.pool.size.should == 1
   end
 
   specify "should provide disconnect functionality after preparing a statement" do
