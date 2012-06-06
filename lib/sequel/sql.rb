@@ -67,7 +67,7 @@ module Sequel
       # such methods are the values of the object's attributes.
       def self.attr_reader(*args)
         super
-        comparison_attrs.concat args
+        comparison_attrs.concat(args)
       end
 
       # All attributes used for equality and hash methods.
@@ -166,12 +166,12 @@ module Sequel
       # Custom expressions that may have different syntax on different databases
       CUSTOM_EXPRESSIONS = [:extract]
 
-      # An array of args for this object
-      attr_reader :args
-
       # The operator symbol for this object
       attr_reader :op
       
+      # An array of args for this object
+      attr_reader :args
+
       # Set the operator symbol and arguments for this object to the ones given.
       # Convert all args that are hashes or arrays of two element arrays to +BooleanExpressions+,
       # other than the second arg for an IN/NOT IN operator.
@@ -1075,12 +1075,12 @@ module Sequel
 
     # Represents an SQL function call.
     class Function < GenericExpression
-      # The array of arguments to pass to the function (may be blank)
-      attr_reader :args
-
       # The SQL function to call
       attr_reader :f
       
+      # The array of arguments to pass to the function (may be blank)
+      attr_reader :args
+
       # Set the functions and args to the given arguments
       def initialize(f, *args)
         @f, @args = f, args
@@ -1173,15 +1173,15 @@ module Sequel
     # required for the prepared statement support and for database-specific
     # literalization.
     class PlaceholderLiteralString < GenericExpression
+      # The literal string containing placeholders.  This can also be an array
+      # of strings, where each arg in args goes between the string elements. 
+      attr_reader :str
+
       # The arguments that will be subsituted into the placeholders.
       # Either an array of unnamed placeholders (which will be substituted in
       # order for ? characters), or a hash of named placeholders (which will be
       # substituted for :key phrases).
       attr_reader :args
-
-      # The literal string containing placeholders.  This can also be an array
-      # of strings, where each arg in args goes between the string elements. 
-      attr_reader :str
 
       # Whether to surround the expression with parantheses
       attr_reader :parens
@@ -1257,11 +1257,11 @@ module Sequel
     class QualifiedIdentifier < GenericExpression
       include QualifyingMethods
 
-      # The column/table referenced
-      attr_reader :column
-
       # The table/schema qualifying the reference
       attr_reader :table
+
+      # The column/table referenced
+      attr_reader :column
 
       # Set the table and column to the given arguments
       def initialize(table, column)
