@@ -1,5 +1,7 @@
 === HEAD
 
+* Add eval_inspect extension, which makes Sequel::SQL::Expression#inspect attempt to return a string suitable for eval (jeremyevans)
+
 * When emulating offset with ROW_NUMBER, default to ordering by all columns if no specific order is given (stnoonan, jeremyevans) (#490)
 
 * Work around JRuby 1.6 ruby 1.9 mode bug in Time -> SQLTime conversion (jeremyevans)
