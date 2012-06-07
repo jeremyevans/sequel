@@ -127,9 +127,9 @@ module Sequel
     {
       [16] => tt.method(:boolean),
       [17] => tt.method(:bytea),
-      [20, 21, 22, 23, 26] => tt.method(:integer),
+      [20, 21, 23, 26] => tt.method(:integer),
       [700, 701] => tt.method(:float),
-      [790, 1700] => ::BigDecimal.method(:new),
+      [1700] => ::BigDecimal.method(:new),
       [1083, 1266] => ::Sequel.method(:string_to_time),
     }.each do |k,v|
       k.each{|n| PG_TYPES[n] = v}
