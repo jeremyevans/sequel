@@ -162,6 +162,7 @@ describe "pg_array extension" do
     @db.bound_variable_arg([1,2], nil).should == '{1,2}'
     @db.bound_variable_arg([[1,2]], nil).should == '{{1,2}}'
     @db.bound_variable_arg([1.0,2.0], nil).should == '{1.0,2.0}'
+    @db.bound_variable_arg([Sequel.lit('a'), Sequel.blob("a\0'\"")], nil).should == '{a,"a\\\\000\\\\047\\""}'
     @db.bound_variable_arg(["\\ \"", 'NULL', nil], nil).should == '{"\\\\ \\"","NULL",NULL}'
   end
 

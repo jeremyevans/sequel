@@ -169,8 +169,11 @@ module Sequel
       end
 
       module DatabaseMethods
+        APOS = "'".freeze
+        DOUBLE_APOS = "''".freeze
         ESCAPE_RE = /("|\\)/.freeze
         ESCAPE_REPLACEMENT = '\\\\\1'.freeze
+        BLOB_RANGE = 1...-1
 
         # Reset the conversion procs when extending the Database object, so
         # it will pick up the array convertors.  This is only done for the native
@@ -215,6 +218,10 @@ module Sequel
           case a
           when Array
             "{#{a.map{|i| bound_variable_array(i)}.join(COMMA)}}"
+          when Sequel::SQL::Blob
+            "\"#{literal(a)[BLOB_RANGE].gsub(DOUBLE_APOS, APOS).gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)}\""
+          when Sequel::LiteralString
+            a
           when String
             "\"#{a.gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)}\""
           else

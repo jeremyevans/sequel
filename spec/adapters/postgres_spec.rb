@@ -1524,6 +1524,15 @@ describe 'PostgreSQL array handling' do
     @ds.get(:i).should == a
     @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
     @ds.filter(:i=>:$i).call(:first, :i=>[false, true].pg_array('boolean')).should == nil
+
+    @db.create_table!(:items) do
+      column :i, 'bytea[]'
+    end
+    a = [Sequel.blob("a\0'\"")]
+    @ds.call(:insert, {:i=>:$i}, :i=>a.pg_array('bytea'))
+    @ds.get(:i).should == a
+    @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
+    @ds.filter(:i=>:$i).call(:first, :i=>[Sequel.blob("b\0")].pg_array('bytea')).should == nil
   end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models' do
