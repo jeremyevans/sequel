@@ -1,7 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 begin
-  Sequel.extension :pg_json
+  Sequel.extension :pg_array, :pg_json
 rescue LoadError => e
   skip_warn "can't load pg_json extension (#{e.class}: #{e})"
 else
@@ -74,6 +74,12 @@ describe "pg_json extension" do
     @db.bound_variable_arg(1, nil).should == 1
     @db.bound_variable_arg([1].pg_json, nil).should == '[1]'
     @db.bound_variable_arg({'a'=>'b'}.pg_json, nil).should == '{"a":"b"}'
+  end
+
+  it "should support using json[] types in bound variables" do
+    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
+    @db.extend @m
+    @db.bound_variable_arg([[{"a"=>1}].pg_json, {"b"=>[1, 2]}.pg_json].pg_array, nil).should == '{"[{\\"a\\":1}]","{\\"b\\":[1,2]}"}'
   end
 
   it "should parse json type from the schema correctly" do

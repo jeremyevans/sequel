@@ -1745,7 +1745,7 @@ end if POSTGRES_DB.type_supported?(:hstore)
 
 describe 'PostgreSQL json type' do
   before(:all) do
-    Sequel.extension :pg_json
+    Sequel.extension :pg_array, :pg_json
     @db = POSTGRES_DB
     @db.extend Sequel::Postgres::JSONDatabaseMethods
     @ds = @db[:items]
@@ -1789,6 +1789,24 @@ describe 'PostgreSQL json type' do
     end
   end
 
+  specify 'insert and retrieve json[] values' do
+    @db.create_table!(:items){column :j, 'json[]'}
+    j = [{'a'=>1}.pg_json, ['b', 2].pg_json].pg_array
+    @ds.insert(j)
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      v = rs.first[:j]
+      v.should_not be_a_kind_of(Array)
+      v.to_a.should be_a_kind_of(Array)
+      v.should == j
+      v.to_a.should == j
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+  end
+
   specify 'use json in bound variables' do
     @db.create_table!(:items){json :i}
     @ds.call(:insert, {:i=>@h.pg_json}, {:i=>:$i})
@@ -1801,6 +1819,13 @@ describe 'PostgreSQL json type' do
     @ds.get(:i).should == @a
     @ds.filter(:i.cast(String)=>:$i).call(:first, :i=>@a.pg_json).should == {:i=>@a}
     @ds.filter(:i.cast(String)=>:$i).call(:first, :i=>[].pg_json).should == nil
+
+    @db.create_table!(:items){column :i, 'json[]'}
+    j = [{'a'=>1}.pg_json, ['b', 2].pg_json].pg_array(:text)
+    @ds.call(:insert, {:i=>j}, {:i=>:$i})
+    @ds.get(:i).should == j
+    @ds.filter(:i.cast('text[]')=>:$i).call(:first, :i=>j).should == {:i=>j}
+    @ds.filter(:i.cast('text[]')=>:$i).call(:first, :i=>[].pg_array).should == nil
   end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models' do

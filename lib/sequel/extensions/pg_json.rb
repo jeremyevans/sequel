@@ -38,19 +38,16 @@
 # also want to use the typecast_on_load plugin in the model, and
 # set it to typecast the json column(s) on load.
 #
-# The extension is designed to be used with the json type natively
-# supported by PostgreSQL 9.2+.  There was also a PostgreSQL extension released
-# that allowed the json type to be used on PostgreSQL 9.1.  To make
-# this extension support that type in the native adapter, do the
-# following after loading this extension:
-#
-#   Sequel::Postgres::PG_NAMED_TYPES = {} unless defined?(Sequel::Postgres::PG_NAMED_TYPES)
-#   Sequel::Postgres::PG_NAMED_TYPES[:json] = Sequel::Postgres::PG_TYPES[114]
+# This extension integrates with the pg_array extension.  If you plan
+# to use the json[] type, load the pg_array extension first, and extend
+# the Database instance with Sequel::Postgres::PGArray::DatabaseMethods
+# before extending it with Sequel::Postgres::JSONDatabaseMethods.
 #
 # This extension requires both the json and delegate libraries.
 
 require 'delegate'
 require 'json'
+Sequel.require 'adapters/utils/pg_types'
 
 module Sequel
   module Postgres
@@ -132,6 +129,16 @@ module Sequel
 
       private
 
+      # Handle json[] types in bound variables.
+      def bound_variable_array(a)
+        case a
+        when JSONHash, JSONArray
+          "\"#{a.to_json.gsub('"', '\\"')}\""
+        else
+          super
+        end
+      end
+
       # Given a value to typecast to the json column
       # * If given a JSONArray or JSONHash, just return the value
       # * If given an Array, return a JSONArray
@@ -154,8 +161,10 @@ module Sequel
       end
     end
 
-    PG_TYPES = {} unless defined?(PG_TYPES)
     PG_TYPES[114] = JSONDatabaseMethods.method(:parse_json)
+    if defined?(PGArray) && PGArray.respond_to?(:register)
+      PGArray.register('json', :oid=>199, :scalar_oid=>114)
+    end
   end
 end
 

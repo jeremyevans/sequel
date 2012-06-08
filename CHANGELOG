@@ -1,6 +1,10 @@
 === HEAD
 
+* Make the pg_json extension handle json[] type when used with the pg_array extension (jeremyevans)
+
 * Fix schema parsing of h2 clob types (jeremyevans)
+
+* Make the pg_array extension handle array types for scalar types handled by the native postgres adapter (jeremyevans)
 
 * Generalize handling of array types in the pg_array extension, allowing easy support of custom array types (jeremyevans)
 
