@@ -1,14 +1,9 @@
 # The pg_array extension adds support for Sequel to handle
-# PostgreSQL's string and numeric array types.  It supports both
-# single and multi-dimensional arrays.  For integer and
-# float arrays, it uses a JSON-based parser which is usually written in C
-# and should be fairly fast.  For string and decimal arrays, it uses
-# a hand coded parser written in ruby that is unoptimized and probably
-# slow.
+# PostgreSQL's array types.
 #
 # This extension integrates with Sequel's native postgres adapter, so
 # that when array fields are retrieved, they are parsed and returned
-# as instances of Sequel::Postgres::PGArray subclasses.  PGArray is
+# as instances of Sequel::Postgres::PGArray.  PGArray is
 # a DelegateClass of Array, so it mostly acts like an array, but not
 # completely (is_a?(Array) is false).  If you want the actual array,
 # you can call PGArray#to_a.  This is done so that Sequel does not
@@ -24,9 +19,9 @@
 #
 # You can also provide a type, though it many cases it isn't necessary:
 #
-#   array.pg_array(:varchar) # or :int4, :"double precision", etc.
+#   array.pg_array(:varchar) # or :integer, :"double precision", etc.
 #
-# So if you want to insert an array into an int4[] database column:
+# So if you want to insert an array into an integer[] database column:
 #
 #   DB[:table].insert(:column=>[1, 2, 3].pg_array)
 #
@@ -39,6 +34,25 @@
 # If you are not using the native postgres adapter, you probably
 # also want to use the typecast_on_load plugin in the model, and
 # set it to typecast the array column(s) on load.
+#
+# This extension by default includes handlers for array types for
+# all scalar types that the native postgres adapter handles. It
+# also makes it easy to add support for other array types.  In
+# general, you just need to make sure that the scalar type is
+# handled and has the appropriate converter installed in
+# Sequel::Postgres::PG_TYPES under the appropriate type OID.
+# Then you can call Sequel::Postgres::PGArray.register with
+# the appropriate arguments to automatically set up a handler
+# for the array type.
+#
+# For example, if you add support for a scalar custom type named
+# foo which uses OID 1234, and you want to add support for the
+# foo[] type, which uses type OID 4321, you need to do:
+#
+#   Sequel::Postgres::PGArray.register('foo', :oid=>4321, :scalar_oid=>1234)
+#
+# Sequel::Postgres::PGArray.register has many additional options
+# and should be able to handle most PostgreSQL array types.
 #
 # If you want an easy way to call PostgreSQL array functions and
 # operators, look into the pg_array_ops extension.
@@ -73,12 +87,11 @@
 
 require 'delegate'
 require 'json'
+Sequel.require 'adapters/utils/pg_types'
 
 module Sequel
   module Postgres
-    # Base class for the PostgreSQL array types.  Subclasses generally
-    # just deal with parsing, so instances manually created from arrays
-    # can use this class correctly.
+    # Represents a PostgreSQL array column value.
     class PGArray < DelegateClass(Array)
       ARRAY = "ARRAY".freeze
       DOUBLE_COLON = '::'.freeze
@@ -93,6 +106,68 @@ module Sequel
       NULL = 'NULL'.freeze
       QUOTE = '"'.freeze
 
+      # Hash of database array type name strings to symbols (e.g. 'double precision' => :float),
+      # used by the schema parsing.
+      ARRAY_TYPES = {}
+
+      # Registers an array type that the extension should handle.  Makes a Database instance that
+      # has been extended with DatabaseMethods recognize the array type given and set up the
+      # appropriate typecasting.  Also sets up automatic typecasting for the native postgres
+      # adapter, so that on retrieval, the values are automatically converted to PGArray instances.
+      # The db_type argument should be the exact database type used (as returned by the PostgreSQL
+      # format_type database function).  Accepts the following options:
+      #
+      # :array_type :: The type to automatically cast the array to when literalizing the array.
+      #                Usually the same as db_type.
+      # :converter :: A callable object (e.g. Proc), that is called with each element of the array
+      #               (usually a string), and should return the appropriate typecasted object.
+      # :oid :: The PostgreSQL OID for the array type.  This is used by the Sequel postgres adapter
+      #         to set up automatic type conversion on retrieval from the database.
+      # :parser :: Can be set to :json to use the faster JSON-based parser.  Note that the JSON-based
+      #            parser can only correctly handle integers values correctly.  It doesn't handle
+      #            full precision for numeric types, and doesn't handle NaN/Infinity values for
+      #            floating point types.
+      # :scalar_oid :: Should be the PostgreSQL OID for the scalar version of this array type. If given,
+      #                automatically sets the :converter option by looking for scalar conversion
+      #                proc.
+      # :type_symbol :: The based of the schema type symbol for this type.  For example, if you provide
+      #                 :integer, Sequel will recognize this type as :integer_array during schema parsing.
+      # :typecast_method :: If given, specifies the :type_symbol option, but additionally causes no
+      #                     typecasting method to be created in the database.  This should only be used
+      #                     to alias existing array types.  For example, if there is an array type that can be
+      #                     treated just like an integer array, you can do :typecast_method=>:integer.
+      #
+      # If a block is given, it is treated as the :converter option.
+      def self.register(db_type, opts={}, &block)
+        db_type = db_type.to_s
+        typecast_method = opts[:typecast_method]
+        type = (typecast_method || opts[:type_symbol] || db_type).to_sym
+
+        if converter = opts[:converter]
+          raise Error, "can't provide both a block and :converter option to register" if block
+        else
+          converter = block
+        end
+
+        if soid = opts[:scalar_oid]
+          raise Error, "can't provide both a converter and :scalar_oid option to register" if converter 
+          raise Error, "no conversion proc for :scalar_oid=>#{soid.inspect} in PG_TYPES" unless converter = PG_TYPES[soid]
+        end
+
+        array_type = (opts[:array_type] || db_type).to_s.dup.freeze
+        creator = (opts[:parser] == :json ? JSONCreator : Creator).new(array_type, converter)
+
+        ARRAY_TYPES[db_type] = :"#{type}_array"
+
+        DatabaseMethods.define_array_typecast_method(type, creator) unless typecast_method
+
+        if oid = opts[:oid]
+          Sequel::Postgres::PG_TYPES[oid] = creator
+        end
+
+        nil
+      end
+
       module DatabaseMethods
         ESCAPE_RE = /("|\\)/.freeze
         ESCAPE_REPLACEMENT = '\\\\\1'.freeze
@@ -102,6 +177,14 @@ module Sequel
         # postgres adapter.
         def self.extended(db)
           db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)
+        end
+
+        # Define a private array typecasting method for the given type that uses
+        # the creator argument to do the type conversion.
+        def self.define_array_typecast_method(type, creator)
+          meth = :"typecast_value_#{type}_array"
+          define_method(meth){|v| typecast_value_pg_array(v, creator)}
+          private meth
         end
 
         # Handle arrays in bound variables
@@ -116,17 +199,10 @@ module Sequel
           end
         end
 
-        # Make the column type detection deal with string and numeric array types.
+        # Make the column type detection handle registered array types.
         def schema_column_type(db_type)
-          case db_type
-          when /\A(character( varying)?|text).*\[\]\z/io
-            :string_array
-          when /\A(integer|bigint|smallint)\[\]\z/io
-            :integer_array
-          when /\A(real|double precision)\[\]\z/io
-            :float_array
-          when /\Anumeric.*\[\]\z/io
-            :decimal_array
+          if (db_type =~ /\A([^(]+)(?:\([^(]+\))?\[\]\z/io) && (type = ARRAY_TYPES[$1])
+            type
           else
             super
           end
@@ -146,38 +222,52 @@ module Sequel
           end
         end
 
-        # Given a value to typecast and the type of PGArray subclass:
-        # * If given a PGArray, just return the value (even if different subclass)
-        # * If given an Array, create a new instance of the subclass
-        # * If given a String, call the parser for the subclass with it.
-        def typecast_value_pg_array(value, klass)
-          case value
-          when PGArray
-            value
-          when Array
-            klass.new(value)
-          when String
-            klass.parse(value)
-          else
-            raise Sequel::InvalidValue, "invalid value for #{klass}: #{value.inspect}"
-          end
+        # Manually override the typecasting for timestamp array types so that
+        # they use the database's timezone instead of the global Sequel
+        # timezone.
+        def get_conversion_procs(conn)
+          procs = super
+
+          convertor = method(:to_application_timestamp)
+          procs[1115] = Creator.new("timestamp without time zone", convertor)
+          procs[1185] = Creator.new("timestamp with time zone", convertor)
+
+          procs
         end
 
-        # Create typecast methods for the supported array types that
-        # delegate to typecast_value_pg_array with the related class.
-        %w'string integer float decimal'.each do |t|
-          class_eval("def typecast_value_#{t}_array(v) typecast_value_pg_array(v, PG#{t.capitalize}Array) end", __FILE__, __LINE__)
+        # Given a value to typecast and the type of PGArray subclass:
+        # * If given a PGArray with a matching array_type, use it directly.
+        # * If given a PGArray with a different array_type, return a PGArray
+        #   with the creator's type.
+        # * If given an Array, create a new PGArray instance for it.  This does not
+        #   typecast all members of the array in ruby for performance reasons, but
+        #   it will cast the array the appropriate database type when the array is
+        #   literalized.
+        # * If given a String, call the parser for the subclass with it.
+        def typecast_value_pg_array(value, creator)
+          case value
+          when PGArray
+            if value.array_type != creator.type
+              PGArray.new(value.to_a, creator.type)
+            else
+              value
+            end
+          when Array
+            PGArray.new(value, creator.type)
+          when String
+            creator.call(value)
+          else
+            raise Sequel::InvalidValue, "invalid value for array type: #{value.inspect}"
+          end
         end
       end
 
-      # PostgreSQL array parser that handles both text and numeric
-      # input.  Because PostgreSQL arrays can contain objects that
-      # can be literalized in any number of ways, it is not possible
-      # to make a fully generic parser.
+      # PostgreSQL array parser that handles all types of input.
       #
       # This parser is very simple and unoptimized, but should still
       # be O(n) where n is the length of the input string.
       class Parser
+        # Current position in the input string.
         attr_reader :pos
 
         # Set the source for the input, and any converter callable
@@ -271,17 +361,63 @@ module Sequel
         end
       end
 
-      # Parse the string using the generalized parser, setting the type
-      # if given.
-      def self.parse(string, type=nil)
-        new(Parser.new(string, method(:convert_item)).parse, type)
+      # Callable object that takes the input string and parses it using Parser.
+      class Creator
+        # The converter callable that is called on each member of the array
+        # to convert it to the correct type.
+        attr_reader :converter
+
+        # The database type to set on the PGArray instances returned.
+        attr_reader :type
+
+        # Set the type and optional converter callable that will be used.
+        def initialize(type, converter=nil)
+          @type = type
+          @converter = converter
+        end
+
+        # Parse the string using Parser with the appropriate
+        # converter, and return a PGArray with the appropriate database
+        # type.
+        def call(string)
+          PGArray.new(Parser.new(string, @converter).parse, @type)
+        end
       end
 
-      # Return the item as-is by default, making conversion a no-op.
-      def self.convert_item(s)
-        s
+      # Callable object that takes the input string and parses it using.
+      # a JSON parser.  This should be faster than the standard Creator,
+      # but only handles integer types correctly.
+      class JSONCreator < Creator
+        # Character conversion map mapping input strings to JSON replacements
+        SUBST = {'{'.freeze=>'['.freeze, '}'.freeze=>']'.freeze, 'NULL'.freeze=>'null'.freeze}
+
+        # Regular expression matching input strings to convert
+        SUBST_RE = %r[\{|\}|NULL].freeze
+
+        # Parse the input string by using a gsub to convert non-JSON characters to
+        # JSON, running it through a regular JSON parser. If a converter is used, a
+        # recursive map of the output is done to make sure that the entires in the
+        # correct type.
+        def call(string)
+          array = JSON.parse(string.gsub(SUBST_RE){|m| SUBST[m]})
+          array = recursive_map(array, @converter) if @converter
+          PGArray.new(array, @type)
+        end
+
+        private
+
+        # Convert each item in the array to the correct type, handling multi-dimensional
+        # arrays.
+        def recursive_map(array, converter)
+          array.map do |i|
+            if i.is_a?(Array)
+              recursive_map(i, converter)
+            elsif i
+              converter.call(i)
+            end
+          end
+        end
       end
-      private_class_method :convert_item
 
       # The type of this array.  May be nil if no type was given. If a type
       # is provided, the array is automatically casted to this type when
@@ -292,11 +428,8 @@ module Sequel
       # Set the array to delegate to, and a database type.
       def initialize(array, type=nil)
         super(array)
-        self.array_type = type
+        @array_type = type
       end
-
-      # The delegated object is always an array.
-      alias to_a __getobj__
 
       # Append the array SQL to the given sql string. 
       # If the receiver has a type, add a cast to the
@@ -329,122 +462,28 @@ module Sequel
         end
         sql << CLOSE_BRACKET
       end
-    end
 
-    # PGArray subclass handling integer and float types, using a fast JSON
-    # parser.  Does not handle numeric/decimal types, since JSON does deal
-    # with arbitrary precision (see PGDecimalArray for that).
-    class PGNumericArray < PGArray
-      # Character conversion map mapping input strings to JSON replacements
-      SUBST = {'{'.freeze=>'['.freeze, '}'.freeze=>']'.freeze, 'NULL'.freeze=>'null'.freeze}
+      # Register all array types that this extension handles by default.
 
-      # Regular expression matching input strings to convert
-      SUBST_RE = %r[\{|\}|NULL].freeze
+      register('text', :oid=>1009, :type_symbol=>:string)
+      register('integer', :oid=>1007, :parser=>:json)
+      register('bigint', :oid=>1016, :parser=>:json)
+      register('numeric', :oid=>1231, :scalar_oid=>1700, :type_symbol=>:decimal)
+      register('double precision', :oid=>1022, :scalar_oid=>701, :type_symbol=>:float)
 
-      # Parse the input string by using a gsub to convert non-JSON characters to
-      # JSON, running it through a regular JSON parser, and the doing a recursive
-      # map over the output to make sure the entries are in the correct type (mostly,
-      # to make sure real/double precision database types are returned as float and
-      # not integer).
-      def self.parse(string, type=nil)
-        new(recursive_map(JSON.parse(string.gsub(SUBST_RE){|m| SUBST[m]})), type)
-      end
+      register('boolean', :oid=>1000, :scalar_oid=>16)
+      register('bytea', :oid=>1001, :scalar_oid=>17, :type_symbol=>:blob)
+      register('date', :oid=>1182, :scalar_oid=>1082)
+      register('time without time zone', :oid=>1183, :scalar_oid=>1083, :type_symbol=>:time)
+      register('timestamp without time zone', :oid=>1115, :type_symbol=>:datetime, :converter=>Sequel.method(:database_to_application_timestamp))
+      register('time with time zone', :oid=>1270, :scalar_oid=>1083, :type_symbol=>:time_timezone)
+      register('timestamp with time zone', :oid=>1185, :type_symbol=>:datetime_timezone, :converter=>Sequel.method(:database_to_application_timestamp))
 
-      # Convert each item in the array to the correct type, handling multi-dimensional
-      # arrays.
-      def self.recursive_map(array)
-        array.map do |i|
-          if i.is_a?(Array)
-            recursive_map(i)
-          elsif i
-            convert_item(i)
-          end
-        end
-      end
-      private_class_method :recursive_map
-    end
-
-    # PGArray subclass for decimal/numeric types.  Uses the general
-    # parser as the JSON parser cannot handle arbitrary precision numbers.
-    class PGDecimalArray < PGArray
-      # Convert the item to a BigDecimal.
-      def self.convert_item(s)
-        BigDecimal.new(s.to_s)
-      end
-      private_class_method :convert_item
-
-      ARRAY_TYPE = 'decimal'.freeze
-
-      # Use the decimal type by default.
-      def array_type
-        super || ARRAY_TYPE
-      end
-    end
-
-    # PGArray subclass for handling real/double precision arrays.
-    class PGFloatArray < PGNumericArray
-      # Convert the item to a float.
-      def self.convert_item(s)
-        s.to_f
-      end
-      private_class_method :convert_item
-
-      ARRAY_TYPE = 'double precision'.freeze
-
-      # Use the double precision type by default.
-      def array_type
-        super || ARRAY_TYPE
-      end
-    end
-
-    # PGArray subclass for handling int2/int4/int8 arrays.
-    class PGIntegerArray < PGNumericArray
-      ARRAY_TYPE = 'int4'.freeze
-
-      # Use the int4 type by default.
-      def array_type
-        super || ARRAY_TYPE
-      end
-    end
-
-    # PGArray subclass for handling char/varchar/text arrays.
-    class PGStringArray < PGArray
-      CHAR = 'char'.freeze
-      VARCHAR = 'varchar'.freeze
-      TEXT = 'text'.freeze
-
-      # By default, use a text array.  If char is given without
-      # a size, use varchar instead, as otherwise Postgres assumes
-      # length of 1, which is likely to cause data loss.
-      def array_type
-        case (c = super)
-        when nil 
-          TEXT
-        when CHAR, :char
-          VARCHAR
-        else
-          c
-        end
-      end
-    end
-
-    PG_TYPES = {} unless defined?(PG_TYPES)
-
-    # Automatically convert the built-in numeric and text array
-    # types. to PGArray instances on retrieval if the native
-    # postgres adapter is used.
-    [ [1005, PGIntegerArray, 'int2'.freeze],
-      [1007, PGIntegerArray, 'int4'.freeze],
-      [1016, PGIntegerArray, 'int8'.freeze],
-      [1021, PGFloatArray, 'real'.freeze],
-      [1022, PGFloatArray, 'double precision'.freeze],
-      [1231, PGDecimalArray, 'numeric'.freeze],
-      [1009, PGStringArray, 'text'.freeze],
-      [1014, PGStringArray, 'char'.freeze],
-      [1015, PGStringArray, 'varchar'.freeze]
-    ].each do |ftype, klass, type|
-      meth = klass.method(:parse)
-      PG_TYPES[ftype] = lambda{|s| meth.call(s, type)}
+      register('smallint', :oid=>1005, :parser=>:json, :typecast_method=>:integer)
+      register('oid', :oid=>1028, :parser=>:json, :typecast_method=>:integer)
+      register('real', :oid=>1021, :scalar_oid=>701, :typecast_method=>:float)
+      register('character', :oid=>1014, :array_type=>:text, :typecast_method=>:string)
+      register('character varying', :oid=>1015, :typecast_method=>:string)
     end
   end
 end

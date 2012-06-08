@@ -1,5 +1,7 @@
 === HEAD
 
+* Generalize handling of array types in the pg_array extension, allowing easy support of custom array types (jeremyevans)
+
 * Remove type conversion of int2vector and money types on PostgreSQL, since previous conversions were wrong (jeremyevans)
 
 * Add eval_inspect extension, which makes Sequel::SQL::Expression#inspect attempt to return a string suitable for eval (jeremyevans)

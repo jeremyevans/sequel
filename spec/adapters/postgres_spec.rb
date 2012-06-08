@@ -1354,6 +1354,7 @@ describe 'PostgreSQL array handling' do
     @db.extend Sequel::Postgres::PGArray::DatabaseMethods
     @ds = @db[:items]
     @native = POSTGRES_DB.adapter_scheme == :postgres
+    @tp = lambda{@db.schema(:items).map{|a| a.last[:type]}}
   end
   after do
     @db.drop_table?(:items)
@@ -1367,6 +1368,7 @@ describe 'PostgreSQL array handling' do
       column :r, 'real[]'
       column :dp, 'double precision[]'
     end
+    @tp.call.should == [:integer_array, :integer_array, :bigint_array, :float_array, :float_array]
     @ds.insert([1].pg_array(:int2), [nil, 2].pg_array(:int4), [3, nil].pg_array(:int8), [4, nil, 4.5].pg_array(:real), [5, nil, 5.5].pg_array("double precision"))
     @ds.count.should == 1
     if @native
@@ -1394,6 +1396,7 @@ describe 'PostgreSQL array handling' do
     @db.create_table!(:items) do
       column :n, 'numeric[]'
     end
+    @tp.call.should == [:decimal_array]
     @ds.insert([BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')].pg_array(:numeric))
     @ds.count.should == 1
     if @native
@@ -1423,6 +1426,7 @@ describe 'PostgreSQL array handling' do
       column :vc, 'varchar[]'
       column :t, 'text[]'
     end
+    @tp.call.should == [:string_array, :string_array, :string_array]
     @ds.insert(['a', nil, 'NULL', 'b"\'c'].pg_array('char(4)'), ['a', nil, 'NULL', 'b"\'c'].pg_array(:varchar), ['a', nil, 'NULL', 'b"\'c'].pg_array(:text))
     @ds.count.should == 1
     if @native
@@ -1438,6 +1442,36 @@ describe 'PostgreSQL array handling' do
       @ds.insert([[['a'], [nil]], [['NULL'], ['b"\'c']]].pg_array('char(4)'), [[['a'], ['']], [['NULL'], ['b"\'c']]].pg_array(:varchar), [[['a'], [nil]], [['NULL'], ['b"\'c']]].pg_array(:text))
       rs = @ds.all
       rs.should == [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
+      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
+      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+  end
+
+  specify 'insert and retrieve arrays of other types' do
+    @db.create_table!(:items) do
+      column :b, 'bool[]'
+      column :ba, 'bytea[]'
+      column :d, 'date[]'
+      column :t, 'time[]'
+      column :tz, 'timetz[]'
+      column :ts, 'timestamp[]'
+      column :tstz, 'timestamptz[]'
+      column :o, 'oid[]'
+    end
+    @tp.call.should == [:boolean_array, :blob_array, :date_array, :time_array, :time_timezone_array, :datetime_array, :datetime_timezone_array, :integer_array]
+
+    d = Date.today
+    t = Sequel::SQLTime.create(10, 20, 30)
+    ts = Time.local(2011, 1, 2, 3, 4, 5)
+
+    @ds.insert([true, false].pg_array(:bool), [Sequel.blob("a\0"), nil].pg_array(:bytea), [d, nil].pg_array(:date), [t, nil].pg_array(:time), [t, nil].pg_array(:timetz), [ts, nil].pg_array(:timestamp), [ts, nil].pg_array(:timestamptz), [1, 2, 3].pg_array(:oid))
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      rs.should == [{:b=>[true, false], :ba=>[Sequel.blob("a\0"), nil], :d=>[d, nil], :t=>[t, nil], :tz=>[t, nil], :ts=>[ts, nil], :tstz=>[ts, nil], :o=>[1, 2, 3]}]
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1463,6 +1497,33 @@ describe 'PostgreSQL array handling' do
     @ds.get(:i).should == a
     @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
     @ds.filter(:i=>:$i).call(:first, :i=>['', nil, nil, 'a']).should == nil
+
+    @db.create_table!(:items) do
+      column :i, 'date[]'
+    end
+    a = [Date.today]
+    @ds.call(:insert, {:i=>:$i}, :i=>a.pg_array('date'))
+    @ds.get(:i).should == a
+    @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
+    @ds.filter(:i=>:$i).call(:first, :i=>[Date.today-1].pg_array('date')).should == nil
+
+    @db.create_table!(:items) do
+      column :i, 'timestamp[]'
+    end
+    a = [Time.local(2011, 1, 2, 3, 4, 5)]
+    @ds.call(:insert, {:i=>:$i}, :i=>a.pg_array('timestamp'))
+    @ds.get(:i).should == a
+    @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
+    @ds.filter(:i=>:$i).call(:first, :i=>[a.first-1].pg_array('timestamp')).should == nil
+
+    @db.create_table!(:items) do
+      column :i, 'boolean[]'
+    end
+    a = [true, false]
+    @ds.call(:insert, {:i=>:$i}, :i=>a.pg_array('boolean'))
+    @ds.get(:i).should == a
+    @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
+    @ds.filter(:i=>:$i).call(:first, :i=>[false, true].pg_array('boolean')).should == nil
   end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models' do
