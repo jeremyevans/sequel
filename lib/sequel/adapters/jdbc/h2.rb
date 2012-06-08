@@ -112,7 +112,7 @@ module Sequel
 
         # Treat clob as string instead of blob
         def schema_column_type(db_type)
-          db_type == 'clob' ? :string : super
+          db_type.downcase == 'clob' ? :string : super
         end
 
         # Use BIGINT IDENTITY for identity columns that use bigint, fixes

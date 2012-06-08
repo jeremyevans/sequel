@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix schema parsing of h2 clob types (jeremyevans)
+
 * Generalize handling of array types in the pg_array extension, allowing easy support of custom array types (jeremyevans)
 
 * Remove type conversion of int2vector and money types on PostgreSQL, since previous conversions were wrong (jeremyevans)
