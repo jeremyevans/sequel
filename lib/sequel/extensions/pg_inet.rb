@@ -14,11 +14,19 @@
 # also want to use the typecast_on_load plugin in the model, and
 # set it to typecast the inet/cidr column(s) on load.
 #
+# This extension integrates with the pg_array extension.  If you plan
+# to use the inet[] or cidr[] types, load the pg_array extension first, and extend
+# the Database instance with Sequel::Postgres::PGArray::DatabaseMethods
+# before extending it with Sequel::Postgres::InetDatabaseMethods.
+#
 # This extension does not add special support for the macaddr
 # type.  Ruby doesn't have a stdlib class that represents mac
-# addresses, so these will still be returned as strings.
+# addresses, so these will still be returned as strings.  The exception
+# to this is that the pg_array extension integration will recognize
+# macaddr[] types return them as arrays of strings.
 
 require 'ipaddr'
+Sequel.require 'adapters/utils/pg_types'
 
 module Sequel
   module Postgres
@@ -56,6 +64,16 @@ module Sequel
 
       private
 
+      # Handle inet[]/cidr[] types in bound variables.
+      def bound_variable_array(a)
+        case a
+        when IPAddr
+          "\"#{a.to_s}/#{a.instance_variable_get(:@mask_addr).to_s(2).count('1')}\""
+        else
+          super
+        end
+      end
+
       # Typecast the given value to an IPAddr object.
       def typecast_value_ipaddr(value)
         case value
@@ -83,7 +101,11 @@ module Sequel
       end
     end
 
-    PG_TYPES = {} unless defined?(PG_TYPES)
     PG_TYPES[869] = PG_TYPES[650] = IPAddr.method(:new)
+    if defined?(PGArray) && PGArray.respond_to?(:register)
+      PGArray.register('inet', :oid=>1041, :scalar_oid=>869)
+      PGArray.register('cidr', :oid=>651, :scalar_oid=>650)
+      PGArray.register('macaddr', :oid=>1040)
+    end
   end
 end

@@ -1756,6 +1756,7 @@ describe 'PostgreSQL json type' do
   before(:all) do
     Sequel.extension :pg_array, :pg_json
     @db = POSTGRES_DB
+    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
     @db.extend Sequel::Postgres::JSONDatabaseMethods
     @ds = @db[:items]
     @a = [1, 2, {'a'=>'b'}, 3.0]
@@ -1853,8 +1854,9 @@ describe 'PostgreSQL inet/cidr types' do
   ipv6_broken = (IPAddr.new('::1'); false) rescue true
 
   before(:all) do
-    Sequel.extension :pg_inet
+    Sequel.extension :pg_array, :pg_inet
     @db = POSTGRES_DB
+    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
     @db.extend Sequel::Postgres::InetDatabaseMethods
     @ds = @db[:items]
     @v4 = '127.0.0.1'
@@ -1906,6 +1908,24 @@ describe 'PostgreSQL inet/cidr types' do
     end
   end
 
+  specify 'insert and retrieve inet/cidr/macaddr array values' do
+    @db.create_table!(:items){column :i, 'inet[]'; column :c, 'cidr[]'; column :m, 'macaddr[]'}
+    @ds.insert([@ipv4].pg_array('inet'), [@ipv4nm].pg_array('cidr'), ['12:34:56:78:90:ab'].pg_array('macaddr'))
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      rs.first.values.all?{|c| c.is_a?(Sequel::Postgres::PGArray)}.should be_true
+      rs.first[:i].first.should == @ipv4
+      rs.first[:c].first.should == @ipv4nm
+      rs.first[:m].first.should == '12:34:56:78:90:ab'
+      rs.first[:i].first.should be_a_kind_of(IPAddr)
+      rs.first[:c].first.should be_a_kind_of(IPAddr)
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+  end
+
   specify 'use ipaddr in bound variables' do
     @db.create_table!(:items){inet :i; cidr :c}
 
@@ -1924,6 +1944,12 @@ describe 'PostgreSQL inet/cidr types' do
       @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv4, :c=>@ipv4nm).should == nil
       @ds.filter(:i=>:$i, :c=>:$c).call(:delete, :i=>@ipv6, :c=>@ipv6nm).should == 1
     end
+
+    @db.create_table!(:items){column :i, 'inet[]'; column :c, 'cidr[]'; column :m, 'macaddr[]'}
+    @ds.call(:insert, {:i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']}, {:i=>:$i, :c=>:$c, :m=>:$m})
+    @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).should == {:i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']}
+    @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[], :c=>[], :m=>[]).should == nil
+    @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:delete, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).should == 1
   end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models' do

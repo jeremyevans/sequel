@@ -1,5 +1,7 @@
 === HEAD
 
+* Make the pg_inet extension handle inet[]/cidr[]/macaddr[] types when used with the pg_array extension (jeremyevans)
+
 * Make the pg_json extension handle json[] type when used with the pg_array extension (jeremyevans)
 
 * Fix schema parsing of h2 clob types (jeremyevans)

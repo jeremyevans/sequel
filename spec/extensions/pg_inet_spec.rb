@@ -1,5 +1,12 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
+begin
+  Sequel.extension :pg_array
+  array_spec = true
+rescue LoadError
+end
+Sequel.extension :pg_inet
+
 describe "pg_inet extension" do
   ipv6_broken = (IPAddr.new('::1'); false) rescue true
   before do
@@ -28,6 +35,14 @@ describe "pg_inet extension" do
     @db.bound_variable_arg(1, nil).should == 1
     @db.bound_variable_arg(IPAddr.new('127.0.0.1'), nil).should == '127.0.0.1/32'
   end
+
+  it "should support using IPAddr instances in array types in bound variables" do
+    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
+    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
+    @db.extend(Sequel::Postgres::InetDatabaseMethods)
+    @db.bound_variable_arg([IPAddr.new('127.0.0.1')].pg_array, nil).should == '{"127.0.0.1/32"}'
+  end if array_spec
 
   it "should parse inet/cidr type from the schema correctly" do
     @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'inet'}, {:name=>'c', :db_type=>'cidr'}]
