@@ -1354,6 +1354,7 @@ describe 'PostgreSQL array handling' do
     @db.extend Sequel::Postgres::PGArray::DatabaseMethods
     @ds = @db[:items]
     @native = POSTGRES_DB.adapter_scheme == :postgres
+    @jdbc = POSTGRES_DB.adapter_scheme == :jdbc
     @tp = lambda{@db.schema(:items).map{|a| a.last[:type]}}
   end
   after do
@@ -1371,19 +1372,26 @@ describe 'PostgreSQL array handling' do
     @tp.call.should == [:integer_array, :integer_array, :bigint_array, :float_array, :float_array]
     @ds.insert([1].pg_array(:int2), [nil, 2].pg_array(:int4), [3, nil].pg_array(:int8), [4, nil, 4.5].pg_array(:real), [5, nil, 5.5].pg_array("double precision"))
     @ds.count.should == 1
-    if @native
-      rs = @ds.all
+    rs = @ds.all
+    if @jdbc || @native
       rs.should == [{:i2=>[1], :i4=>[nil, 2], :i8=>[3, nil], :r=>[4.0, nil, 4.5], :dp=>[5.0, nil, 5.5]}]
+    end
+    if @native
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
       @ds.all.should == rs
+    end
 
-      @ds.delete
-      @ds.insert([[1], [2]].pg_array(:int2), [[nil, 2], [3, 4]].pg_array(:int4), [[3, nil], [nil, nil]].pg_array(:int8), [[4, nil], [nil, 4.5]].pg_array(:real), [[5, nil], [nil, 5.5]].pg_array("double precision"))
-      rs = @ds.all
+    @ds.delete
+    @ds.insert([[1], [2]].pg_array(:int2), [[nil, 2], [3, 4]].pg_array(:int4), [[3, nil], [nil, nil]].pg_array(:int8), [[4, nil], [nil, 4.5]].pg_array(:real), [[5, nil], [nil, 5.5]].pg_array("double precision"))
+
+    rs = @ds.all
+    if @jdbc || @native
       rs.should == [{:i2=>[[1], [2]], :i4=>[[nil, 2], [3, 4]], :i8=>[[3, nil], [nil, nil]], :r=>[[4, nil], [nil, 4.5]], :dp=>[[5, nil], [nil, 5.5]]}]
+    end
+    if @native
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1399,19 +1407,25 @@ describe 'PostgreSQL array handling' do
     @tp.call.should == [:decimal_array]
     @ds.insert([BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')].pg_array(:numeric))
     @ds.count.should == 1
-    if @native
-      rs = @ds.all
+    rs = @ds.all
+    if @jdbc || @native
       rs.should == [{:n=>[BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')]}]
+    end
+    if @native
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
       @ds.all.should == rs
+    end
 
-      @ds.delete
-      @ds.insert([[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]].pg_array(:numeric))
-      rs = @ds.all
+    @ds.delete
+    @ds.insert([[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]].pg_array(:numeric))
+    rs = @ds.all
+    if @jdbc || @native
       rs.should == [{:n=>[[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]]}]
+    end
+    if @native
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1429,19 +1443,25 @@ describe 'PostgreSQL array handling' do
     @tp.call.should == [:string_array, :string_array, :string_array]
     @ds.insert(['a', nil, 'NULL', 'b"\'c'].pg_array('char(4)'), ['a', nil, 'NULL', 'b"\'c'].pg_array(:varchar), ['a', nil, 'NULL', 'b"\'c'].pg_array(:text))
     @ds.count.should == 1
-    if @native
-      rs = @ds.all
+    rs = @ds.all
+    if @jdbc || @native
       rs.should == [{:c=>['a   ', nil, 'NULL', 'b"\'c'], :vc=>['a', nil, 'NULL', 'b"\'c'], :t=>['a', nil, 'NULL', 'b"\'c']}]
+    end
+    if @native
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
       @ds.all.should == rs
+    end
 
-      @ds.delete
-      @ds.insert([[['a'], [nil]], [['NULL'], ['b"\'c']]].pg_array('char(4)'), [[['a'], ['']], [['NULL'], ['b"\'c']]].pg_array(:varchar), [[['a'], [nil]], [['NULL'], ['b"\'c']]].pg_array(:text))
-      rs = @ds.all
+    @ds.delete
+    @ds.insert([[['a'], [nil]], [['NULL'], ['b"\'c']]].pg_array('char(4)'), [[['a'], ['']], [['NULL'], ['b"\'c']]].pg_array(:varchar), [[['a'], [nil]], [['NULL'], ['b"\'c']]].pg_array(:text))
+    rs = @ds.all
+    if @jdbc || @native
       rs.should == [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
+    end
+    if @native
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1453,25 +1473,42 @@ describe 'PostgreSQL array handling' do
   specify 'insert and retrieve arrays of other types' do
     @db.create_table!(:items) do
       column :b, 'bool[]'
-      column :ba, 'bytea[]'
       column :d, 'date[]'
       column :t, 'time[]'
-      column :tz, 'timetz[]'
       column :ts, 'timestamp[]'
       column :tstz, 'timestamptz[]'
-      column :o, 'oid[]'
     end
-    @tp.call.should == [:boolean_array, :blob_array, :date_array, :time_array, :time_timezone_array, :datetime_array, :datetime_timezone_array, :integer_array]
+    @tp.call.should == [:boolean_array, :date_array, :time_array, :datetime_array, :datetime_timezone_array]
 
     d = Date.today
     t = Sequel::SQLTime.create(10, 20, 30)
     ts = Time.local(2011, 1, 2, 3, 4, 5)
 
-    @ds.insert([true, false].pg_array(:bool), [Sequel.blob("a\0"), nil].pg_array(:bytea), [d, nil].pg_array(:date), [t, nil].pg_array(:time), [t, nil].pg_array(:timetz), [ts, nil].pg_array(:timestamp), [ts, nil].pg_array(:timestamptz), [1, 2, 3].pg_array(:oid))
+    @ds.insert([true, false].pg_array(:bool), [d, nil].pg_array(:date), [t, nil].pg_array(:time), [ts, nil].pg_array(:timestamp), [ts, nil].pg_array(:timestamptz))
+    @ds.count.should == 1
+    rs = @ds.all
+    if @jdbc || @native
+      rs.should == [{:b=>[true, false], :d=>[d, nil], :t=>[t, nil], :ts=>[ts, nil], :tstz=>[ts, nil]}]
+    end
+    if @native
+      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
+      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+
+    @db.create_table!(:items) do
+      column :ba, 'bytea[]'
+      column :tz, 'timetz[]'
+      column :o, 'oid[]'
+    end
+    @tp.call.should == [:blob_array, :time_timezone_array, :integer_array]
+    @ds.insert( [Sequel.blob("a\0"), nil].pg_array(:bytea), [t, nil].pg_array(:timetz), [1, 2, 3].pg_array(:oid))
     @ds.count.should == 1
     if @native
       rs = @ds.all
-      rs.should == [{:b=>[true, false], :ba=>[Sequel.blob("a\0"), nil], :d=>[d, nil], :t=>[t, nil], :tz=>[t, nil], :ts=>[ts, nil], :tstz=>[ts, nil], :o=>[1, 2, 3]}]
+      rs.should == [{:ba=>[Sequel.blob("a\0"), nil], :tz=>[t, nil], :o=>[1, 2, 3]}]
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete

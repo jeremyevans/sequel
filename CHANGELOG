@@ -1,5 +1,7 @@
 === HEAD
 
+* Make jdbc/postgres adapter convert array type elements (e.g. date[] arrays are returned as arrays of Date instances) (jeremyevans)
+
 * Make the pg_inet extension handle inet[]/cidr[]/macaddr[] types when used with the pg_array extension (jeremyevans)
 
 * Make the pg_json extension handle json[] type when used with the pg_array extension (jeremyevans)

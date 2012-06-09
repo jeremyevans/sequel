@@ -45,24 +45,43 @@ module Sequel
         APOS = Dataset::APOS
         
         class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
-          # Convert Java::OrgPostgresqlJdbc4::Jdbc4Array to ruby arrays
-          def pg_array(v)
-            _pg_array(v.array)
-          end
-
           # Convert Java::OrgPostgresqlUtil::PGobject to ruby strings
           def pg_object(v)
             v.to_string
+          end
+        end
+
+        # Handle conversions of PostgreSQL array instances
+        class PGArrayConverter
+          # Set the method that will return the correct conversion
+          # proc for elements of this array.
+          def initialize(meth)
+            @conversion_proc_method = meth
+            @conversion_proc = nil
+          end
+          
+          # Convert Java::OrgPostgresqlJdbc4::Jdbc4Array to ruby arrays
+          def call(v)
+            _pg_array(v.array)
           end
 
           private
 
           # Handle multi-dimensional Java arrays by recursively mapping them
-          # to ruby arrays.
+          # to ruby arrays of ruby values.
           def _pg_array(v)
             v.to_ary.map do |i|
               if i.respond_to?(:to_ary)
                 _pg_array(i)
+              elsif i
+                if @conversion_proc.nil?
+                  @conversion_proc = @conversion_proc_method.call(i)
+                end
+                if @conversion_proc
+                  @conversion_proc.call(i)
+                else
+                  i
+                end
               else
                 i
               end
@@ -70,7 +89,6 @@ module Sequel
           end
         end
 
-        PG_ARRAY_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:pg_array)
         PG_OBJECT_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:pg_object)
       
         # Add the shared PostgreSQL prepared statement methods
@@ -88,7 +106,7 @@ module Sequel
         def convert_type_proc(v)
           case v
           when Java::OrgPostgresqlJdbc4::Jdbc4Array
-            PG_ARRAY_METHOD
+            PGArrayConverter.new(method(:convert_type_proc))
           when Java::OrgPostgresqlUtil::PGobject
             PG_OBJECT_METHOD
           else
