@@ -5,7 +5,7 @@ describe "pg_auto_parameterize extension" do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     @db.synchronize{|c| def c.escape_bytea(v) v*2 end}
     @db.extend_datasets{def use_cursor(*) clone end}
-    @db.extend Sequel::Postgres::AutoParameterize::DatabaseMethods
+    @db.extension :pg_auto_parameterize
   end
 
   it "should automatically parameterize queries strings, blobs, numerics, dates, and times" do

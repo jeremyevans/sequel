@@ -8,8 +8,9 @@ else
 describe "pg_array extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
-    @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
+    @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end; def get_conversion_procs(conn) {} end})
     @db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
+    @db.extension(:pg_array)
     @m = Sequel::Postgres
     @convertor = @m::PG_TYPES
   end
@@ -157,7 +158,6 @@ describe "pg_array extension" do
   end
 
   it "should support using arrays as bound variables" do
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
     @db.bound_variable_arg(1, nil).should == 1
     @db.bound_variable_arg([1,2].pg_array, nil).should == '{1,2}'
     @db.bound_variable_arg([1,2], nil).should == '{1,2}'
@@ -168,13 +168,11 @@ describe "pg_array extension" do
   end
 
   it "should parse array types from the schema correctly" do
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
     @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'integer[]'}, {:name=>'f', :db_type=>'real[]'}, {:name=>'d', :db_type=>'numeric[]'}, {:name=>'t', :db_type=>'text[]'}]
     @db.schema(:items).map{|e| e[1][:type]}.should == [:integer, :integer_array, :float_array, :decimal_array, :string_array]
   end
 
   it "should support typecasting of the various array types" do
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
     {
       :integer=>{:class=>Integer, :convert=>['1', '1', 1, '1']},
       :float=>{:db_type=>'double precision',  :class=>Float, :convert=>['1.1', '1.1', 1.1, '1.1']},
@@ -220,8 +218,6 @@ describe "pg_array extension" do
   end
 
   it "should support registering custom array types" do
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
-
     Sequel::Postgres::PGArray.register('foo')
     @db.typecast_value(:foo_array, []).should be_a_kind_of(Sequel::Postgres::PGArray)
     @db.fetch = [{:name=>'id', :db_type=>'foo[]'}]
@@ -229,8 +225,6 @@ describe "pg_array extension" do
   end
 
   it "should support registering custom types with :type_symbol option" do
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
-
     Sequel::Postgres::PGArray.register('foo', :type_symbol=>:bar)
     @db.typecast_value(:bar_array, []).should be_a_kind_of(Sequel::Postgres::PGArray)
     @db.fetch = [{:name=>'id', :db_type=>'foo[]'}]
@@ -238,22 +232,16 @@ describe "pg_array extension" do
   end
 
   it "should support using a block as a custom conversion proc given as block" do
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
-
     Sequel::Postgres::PGArray.register('foo'){|s| (s*2).to_i}
     @db.typecast_value(:foo_array, '{1}').should == [11]
   end
 
   it "should support using a block as a custom conversion proc given as :converter option" do
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
-
     Sequel::Postgres::PGArray.register('foo', :converter=>proc{|s| (s*2).to_i})
     @db.typecast_value(:foo_array, '{1}').should == [11]
   end
 
   it "should support using an existing scaler conversion proc via the :scalar_oid option" do
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
-
     Sequel::Postgres::PGArray.register('foo', :scalar_oid=>16)
     @db.typecast_value(:foo_array, '{"t"}').should == [true]
   end
@@ -291,15 +279,12 @@ describe "pg_array extension" do
   end
 
   it "should use and not override existing database typecast method if :typecast_method option is given" do
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
     Sequel::Postgres::PGArray.register('foo', :typecast_method=>:float)
     @db.fetch = [{:name=>'id', :db_type=>'foo[]'}]
     @db.schema(:items).map{|e| e[1][:type]}.should == [:float_array]
   end
 
   it "should set appropriate timestamp conversion procs when getting conversion procs" do
-    @db.extend(Module.new{def get_conversion_procs(conn) {} end})
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
     procs = @db.send(:get_conversion_procs, nil)
     procs[1185].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
     procs[1115].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]

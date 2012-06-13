@@ -15,7 +15,7 @@ describe "LooserTypecasting Extension" do
 
   specify "Should use to_i instead of Integer() for typecasting integers" do
     proc{@c.new(:b=>'a')}.should raise_error(Sequel::InvalidValue)
-    @db.extend(Sequel::LooserTypecasting)
+    @db.extension(:looser_typecasting)
     @c.new(:b=>'a').b.should == 0
 
     o = Object.new
@@ -27,7 +27,7 @@ describe "LooserTypecasting Extension" do
 
   specify "Should use to_f instead of Float() for typecasting floats" do
     proc{@c.new(:z=>'a')}.should raise_error(Sequel::InvalidValue)
-    @db.extend(Sequel::LooserTypecasting)
+    @db.extension(:looser_typecasting)
     @c.new(:z=>'a').z.should == 0.0
 
     o = Object.new

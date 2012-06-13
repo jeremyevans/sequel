@@ -67,9 +67,7 @@
 # recognizes and correctly handles the hstore columns, which you can
 # do by:
 #
-#   Sequel.extension :pg_hstore
-#
-#   DB.extend Sequel::Postgres::HStore::DatabaseMethods
+#   DB.extension :pg_hstore
 #
 # If you are not using the native postgres adapter, you probably
 # also want to use the typecast_on_load plugin in the model, and
@@ -283,6 +281,8 @@ module Sequel
     # Associate the named types by default.
     PG_NAMED_TYPES[:hstore] = HStore.method(:parse)
   end
+
+  Database.register_extension(:pg_hstore, Postgres::HStore::DatabaseMethods)
 end
 
 class Hash

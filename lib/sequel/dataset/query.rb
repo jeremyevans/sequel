@@ -5,6 +5,11 @@ module Sequel
     # These methods all return modified copies of the receiver.
     # ---------------------
 
+    # Hash of extension name symbols to callable objects to load the extension
+    # into the Dataset object (usually by extending it with a module defined
+    # in the extension).
+    EXTENSIONS = {}
+
     # The dataset options that require the removal of cached columns
     # if changed.
     COLUMN_CHANGE_OPTS = [:select, :sql, :from, :join].freeze
@@ -36,6 +41,27 @@ module Sequel
       set_defaults set_graph_aliases set_overrides unfiltered ungraphed ungrouped union
       unlimited unordered where with with_recursive with_sql
     METHS
+
+    # Register an extension callback for Dataset objects.  ext should be the
+    # extension name symbol, and mod should either be a Module that the
+    # dataset is extended with, or a callable object called with the database
+    # object.  If mod is not provided, a block can be provided and is treated
+    # as the mod object.
+    #
+    # If mod is a module, this also registers a Database extension that will
+    # extend all of the database's datasets.
+    def self.register_extension(ext, mod=nil, &block)
+      if mod
+        raise(Error, "cannot provide both mod and block to Dataset.register_extension") if block
+        if mod.is_a?(Module)
+          block = proc{|ds| ds.extend(mod)}
+          Sequel::Database.register_extension(ext){|db| db.extend_datasets(mod)}
+        else
+          block = mod
+        end
+      end
+      Sequel.synchronize{EXTENSIONS[ext] = block}
+    end
 
     # Adds an further filter to an existing filter using AND. If no filter 
     # exists an error is raised. This method is identical to #filter except
@@ -128,6 +154,28 @@ module Sequel
     #   # GROUP BY name HAVING (count(name) >= 2)
     def exclude_where(*cond, &block)
       _filter_or_exclude(true, :where, *cond, &block)
+    end
+
+    # Return a clone of the dataset loaded with the extensions, see #extension!.
+    def extension(*exts)
+      clone.extension!(*exts)
+    end
+
+    # Load an extension into the receiver.  In addition to requiring the extension file, this
+    # also modifies the dataset to work with the extension (usually extending it with a
+    # module defined in the extension file).  If no related extension file exists or the
+    # extension does not have specific support for Database objects, an Error will be raised.
+    # Returns self.
+    def extension!(*exts)
+      Sequel.extension(*exts)
+      exts.each do |ext|
+        if pr = Sequel.synchronize{EXTENSIONS[ext]}
+          pr.call(self)
+        else
+          raise(Error, "Extension #{ext} does not have specific support handling individual datasets")
+        end
+      end
+      self
     end
 
     # Returns a copy of the dataset with the given conditions imposed upon it.  

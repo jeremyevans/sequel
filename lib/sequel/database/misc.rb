@@ -4,6 +4,28 @@ module Sequel
     # :section: 7 - Miscellaneous methods
     # These methods don't fit neatly into another category.
     # ---------------------
+    
+    # Hash of extension name symbols to callable objects to load the extension
+    # into the Database object (usually by extending it with a module defined
+    # in the extension).
+    EXTENSIONS = {}
+
+    # Register an extension callback for Database objects.  ext should be the
+    # extension name symbol, and mod should either be a Module that the
+    # database is extended with, or a callable object called with the database
+    # object.  If mod is not provided, a block can be provided and is treated
+    # as the mod object.
+    def self.register_extension(ext, mod=nil, &block)
+      if mod
+        raise(Error, "cannot provide both mod and block to Database.register_extension") if block
+        if mod.is_a?(Module)
+          block = proc{|db| db.extend(mod)}
+        else
+          block = mod
+        end
+      end
+      Sequel.synchronize{EXTENSIONS[ext] = block}
+    end
 
     # Converts a uri to an options hash. These options are then passed
     # to a newly created database object. 
@@ -105,6 +127,23 @@ module Sequel
     #   DB.cast_type_literal(:foo) # foo
     def cast_type_literal(type)
       type_literal(:type=>type)
+    end
+
+    # Load an extension into the receiver.  In addition to requiring the extension file, this
+    # also modifies the database to work with the extension (usually extending it with a
+    # module defined in the extension file).  If no related extension file exists or the
+    # extension does not have specific support for Database objects, an Error will be raised.
+    # Returns self.
+    def extension(*exts)
+      Sequel.extension(*exts)
+      exts.each do |ext|
+        if pr = Sequel.synchronize{EXTENSIONS[ext]}
+          pr.call(self)
+        else
+          raise(Error, "Extension #{ext} does not have specific support handling individual databases")
+        end
+      end
+      self
     end
 
     # Convert the given timestamp from the application's timezone,

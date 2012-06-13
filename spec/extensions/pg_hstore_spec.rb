@@ -6,6 +6,7 @@ describe "pg_hstore extension" do
     @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
     @m = Sequel::Postgres
     @c = @m::HStore
+    @db.extension :pg_hstore
   end
 
   it "should parse hstore strings correctly" do
@@ -164,7 +165,6 @@ describe "pg_hstore extension" do
   end
 
   it "should support using hstores as bound variables" do
-    @db.extend @c::DatabaseMethods
     @db.bound_variable_arg(1, nil).should == 1
     @db.bound_variable_arg({'1'=>'2'}, nil).should == '"1"=>"2"'
     @db.bound_variable_arg({'1'=>'2'}.hstore, nil).should == '"1"=>"2"'
@@ -175,13 +175,11 @@ describe "pg_hstore extension" do
   end
 
   it "should parse hstore type from the schema correctly" do
-    @db.extend @c::DatabaseMethods
     @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'hstore'}]
     @db.schema(:items).map{|e| e[1][:type]}.should == [:integer, :hstore]
   end
 
   it "should support typecasting for the hstore type" do
-    @db.extend @c::DatabaseMethods
     h = {1=>2}.hstore
     @db.typecast_value(:hstore, h).should equal(h)
     @db.typecast_value(:hstore, '').should be_a_kind_of(@c)

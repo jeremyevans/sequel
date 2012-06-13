@@ -2,8 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "query_literals extension" do
   before do
-    @ds = Sequel::Dataset.new(nil).from(:t)
-    @ds.extend(Sequel::QueryLiterals)
+    @ds = Sequel::Dataset.new(nil).from(:t).extension(:query_literals)
   end
 
   it "should not use special support if given a block" do

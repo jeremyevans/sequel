@@ -21,17 +21,15 @@
 # desirable in this area, but for backwards compatibility, the
 # defaults won't be changed until the next major release.
 #
-# Loading this extension does nothing by default except make the
-# Sequel::QueryLiterals module available.  You can extend specific
-# datasets with this module:
+# You can load this extension into specific datasets:
 #
 #   ds = DB[:table]
-#   ds.extend(Sequel::QueryLiterals)
+#   ds.extension(:query_literals)
 #
-# Order you can extend all of a database's datasets with it, which
+# Or you can load it into all of a database's datasets, which
 # is probably the desired behavior if you are using this extension:
 #
-#   DB.extend_datasets(Sequel::QueryLiterals)
+#   DB.extension(:query_literals)
 
 module Sequel
   # The QueryLiterals module can be used to make select, group, and
@@ -76,4 +74,6 @@ module Sequel
       end
     end
   end
+
+  Dataset.register_extension(:query_literals, QueryLiterals)
 end

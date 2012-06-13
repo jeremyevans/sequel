@@ -3,8 +3,7 @@
 # executed repeatedly.  When combined with the pg_auto_parameterize
 # extension, it can take Sequel code such as:
 #
-#   DB.extend Sequel::Postgres::AutoParameterize::DatabaseMethods
-#   DB.extend Sequel::Postgres::StatementCache::DatabaseMethods
+#   DB.extension :pg_auto_parameterize, :pg_statement_cache
 #   DB[:table].filter(:a=>1)
 #   DB[:table].filter(:a=>2)
 #   DB[:table].filter(:a=>3)
@@ -313,4 +312,6 @@ module Sequel
       end
     end
   end
+
+  Database.register_extension(:pg_statement_cache, Postgres::StatementCache::DatabaseMethods)
 end

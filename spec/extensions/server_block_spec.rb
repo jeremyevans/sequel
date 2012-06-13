@@ -44,7 +44,7 @@ end
 describe "Database#with_server single threaded" do
   before do
     @db = Sequel.mock(:single_threaded=>true, :servers=>{:a=>{}, :b=>{}})
-    @db.extend Sequel::ServerBlock
+    @db.extension :server_block
   end
 
   it_should_behave_like "Database#with_server"
@@ -53,7 +53,7 @@ end
 describe "Database#with_server multi threaded" do
   before do
     @db = Sequel.mock(:servers=>{:a=>{}, :b=>{}, :c=>{}, :d=>{}})
-    @db.extend Sequel::ServerBlock
+    @db.extension :server_block
   end
 
   it_should_behave_like "Database#with_server"

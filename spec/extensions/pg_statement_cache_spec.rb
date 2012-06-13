@@ -23,8 +23,7 @@ describe "pg_statement_cache and pg_auto_parameterize extensions" do
             end
           end)
         end)
-      @db.extend Sequel::Postgres::AutoParameterize::DatabaseMethods
-      @db.extend Sequel::Postgres::StatementCache::DatabaseMethods
+      @db.extension :pg_auto_parameterize, :pg_statement_cache
       @db.extend(Module.new do
         attr_accessor :exec_raise
         def _execute(c, sql, opts={})

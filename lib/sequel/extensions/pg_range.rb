@@ -36,16 +36,17 @@
 # recognizes and correctly handles the range type columns, which you can
 # do by:
 #
-#   DB.extend Sequel::Postgres::PGRange::DatabaseMethods
+#   DB.extension :pg_range
 #
 # If you are not using the native postgres adapter, you probably
 # also want to use the typecast_on_load plugin in the model, and
 # set it to typecast the range type column(s) on load.
 #
 # This extension integrates with the pg_array extension.  If you plan
-# to use arrays of range types, load the pg_array extension first, and extend
-# the Database instance with Sequel::Postgres::PGArray::DatabaseMethods
-# before extending it with Sequel::Postgres::PGRange::DatabaseMethods.
+# to use arrays of range types, load the pg_array extension before the
+# pg_range extension:
+#
+#   DB.extension :pg_array, :pg_range
 
 Sequel.require 'adapters/utils/pg_types'
 
@@ -473,6 +474,8 @@ module Sequel
       PGArray.register('int8range', :oid=>3927, :scalar_oid=>3926, :scalar_typecast=>:int8range)
     end
   end
+
+  Database.register_extension(:pg_range, Postgres::PGRange::DatabaseMethods)
 end
 
 class Range 

@@ -9,7 +9,7 @@
 #   DB[:test].where(:a=>1)
 #   # SQL: SELECT * FROM test WHERE a = 1
 #
-#   DB.extend Sequel::Postgres::AutoParameterize::DatabaseMethods
+#   DB.extension :pg_auto_parameterize
 #   DB[:test].where(:a=>1)
 #   # SQL: SELECT * FROM test WHERE a = $1 (args: [1])
 #
@@ -166,4 +166,6 @@ module Sequel
       end
     end
   end
+
+  Database.register_extension(:pg_auto_parameterize, Postgres::AutoParameterize::DatabaseMethods)
 end

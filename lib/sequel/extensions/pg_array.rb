@@ -29,7 +29,7 @@
 # probably want to modify the schema parsing/typecasting so that it
 # recognizes and correctly handles the arrays, which you can do by:
 #
-#   DB.extend Sequel::Postgres::PGArray::DatabaseMethods
+#   DB.extension :pg_array
 #
 # If you are not using the native postgres adapter, you probably
 # also want to use the typecast_on_load plugin in the model, and
@@ -489,6 +489,8 @@ module Sequel
       register('character varying', :oid=>1015, :typecast_method=>:string)
     end
   end
+
+  Database.register_extension(:pg_array, Postgres::PGArray::DatabaseMethods)
 end
 
 class Array

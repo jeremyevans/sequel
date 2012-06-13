@@ -2124,3 +2124,61 @@ describe "Database#column_schema_to_ruby_default" do
     p["((-12.1))", :decimal].should == BigDecimal.new('-12.1')
   end
 end
+
+describe "Database extensions" do
+  before(:all) do
+    class << Sequel
+      alias _extension extension
+      def extension(*)
+      end
+    end
+  end
+  after(:all) do
+    class << Sequel
+      alias extension _extension
+    end
+  end
+  before do
+    @db = Sequel.mock
+  end
+
+  specify "should be able to register an extension with a module Database#extension extend the module" do
+    Sequel::Database.register_extension(:foo, Module.new{def a; 1; end})
+    @db.extension(:foo).a.should == 1
+  end
+
+  specify "should be able to register an extension with a block and Database#extension call the block" do
+    @db.quote_identifiers = false
+    Sequel::Database.register_extension(:foo){|db| db.quote_identifiers = true}
+    @db.extension(:foo).quote_identifiers?.should be_true
+  end
+
+  specify "should be able to register an extension with a callable and Database#extension call the callable" do
+    @db.quote_identifiers = false
+    Sequel::Database.register_extension(:foo, proc{|db| db.quote_identifiers = true})
+    @db.extension(:foo).quote_identifiers?.should be_true
+  end
+
+  specify "should be able to load multiple extensions in the same call" do
+    @db.quote_identifiers = false
+    @db.identifier_input_method = :downcase
+    Sequel::Database.register_extension(:foo, proc{|db| db.quote_identifiers = true})
+    Sequel::Database.register_extension(:bar, proc{|db| db.identifier_input_method = nil})
+    @db.extension(:foo, :bar)
+    @db.quote_identifiers?.should be_true
+    @db.identifier_input_method.should be_nil
+  end
+
+  specify "should return the receiver" do
+    Sequel::Database.register_extension(:foo, Module.new{def a; 1; end})
+    @db.extension(:foo).should equal(@db)
+  end
+
+  specify "should raise an Error if registering with both a module and a block" do
+    proc{Sequel::Database.register_extension(:foo, Module.new){}}.should raise_error(Sequel::Error)
+  end
+
+  specify "should raise an Error if attempting to load an incompatible extension" do
+    proc{@db.extension(:foo2)}.should raise_error(Sequel::Error)
+  end
+end

@@ -4306,3 +4306,87 @@ describe "Dataset feature defaults" do
     Sequel::Database.new.dataset.send(:offset_returns_row_number_column?).should be_false
   end
 end
+
+describe "Dataset extensions" do
+  before(:all) do
+    class << Sequel
+      alias _extension extension
+      def extension(*)
+      end
+    end
+  end
+  after(:all) do
+    class << Sequel
+      alias extension _extension
+    end
+  end
+  before do
+    @ds = Sequel::Dataset.new(nil)
+  end
+
+  specify "should be able to register an extension with a module Database#extension extend the module" do
+    Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
+    @ds.extension(:foo).a.should == 1
+  end
+
+  specify "should be able to register an extension with a block and Database#extension call the block" do
+    @ds.quote_identifiers = false
+    Sequel::Dataset.register_extension(:foo){|db| db.quote_identifiers = true}
+    @ds.extension(:foo).quote_identifiers?.should be_true
+  end
+
+  specify "should be able to register an extension with a callable and Database#extension call the callable" do
+    @ds.quote_identifiers = false
+    Sequel::Dataset.register_extension(:foo, proc{|db| db.quote_identifiers = true})
+    @ds.extension(:foo).quote_identifiers?.should be_true
+  end
+
+  specify "should be able to load multiple extensions in the same call" do
+    @ds.quote_identifiers = false
+    @ds.identifier_input_method = :downcase
+    Sequel::Dataset.register_extension(:foo, proc{|ds| ds.quote_identifiers = true})
+    Sequel::Dataset.register_extension(:bar, proc{|ds| ds.identifier_input_method = nil})
+    ds = @ds.extension(:foo, :bar)
+    ds.quote_identifiers?.should be_true
+    ds.identifier_input_method.should be_nil
+  end
+
+  specify "should have #extension not modify the receiver" do
+    Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
+    @ds.extension(:foo)
+    proc{@ds.a}.should raise_error(NoMethodError)
+  end
+
+  specify "should have #extension not return a cloned dataset" do
+    @ds.extend(Module.new{def b; 2; end})
+    Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
+    v = @ds.extension(:foo)
+    v.should_not equal(@ds)
+    v.should be_a_kind_of(Sequel::Dataset)
+    v.b.should == 2
+  end
+
+  specify "should have #extension! modify the receiver" do
+    Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
+    @ds.extension!(:foo)
+    @ds.a.should == 1
+  end
+
+  specify "should have #extension! return the receiver" do
+    Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
+    @ds.extension!(:foo).should equal(@ds)
+  end
+
+  specify "should register a Database extension for modifying all datasets when registering with a module" do
+    Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
+    Sequel.mock.extension(:foo).dataset.a.should == 1
+  end
+
+  specify "should raise an Error if registering with both a module and a block" do
+    proc{Sequel::Dataset.register_extension(:foo, Module.new){}}.should raise_error(Sequel::Error)
+  end
+
+  specify "should raise an Error if attempting to load an incompatible extension" do
+    proc{@ds.extension(:foo2)}.should raise_error(Sequel::Error)
+  end
+end

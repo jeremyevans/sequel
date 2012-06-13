@@ -1,10 +1,8 @@
 # The LooserTypecasting extension changes the float and integer typecasting to
 # use the looser .to_f and .to_i instead of the more strict Kernel.Float and
-# Kernel.Integer.  To use it, you should extend the database with the
-# Sequel::LooserTypecasting module after loading the extension:
+# Kernel.Integer.  To load the extension into the database:
 #
-#   Sequel.extension :looser_typecasting
-#   DB.extend(Sequel::LooserTypecasting)
+#   DB.extension :looser_typecasting
 
 module Sequel
   module LooserTypecasting
@@ -18,4 +16,7 @@ module Sequel
       value.to_i
     end
   end
+
+  Database.register_extension(:looser_typecasting, LooserTypecasting)
 end
+

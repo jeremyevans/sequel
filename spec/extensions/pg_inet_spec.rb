@@ -12,7 +12,8 @@ describe "pg_inet extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
-    @db.extend(Sequel::Postgres::InetDatabaseMethods)
+    @db.extension(:pg_array) if array_spec
+    @db.extension(:pg_inet)
   end
 
   it "should literalize IPAddr v4 instances to strings correctly" do
@@ -37,10 +38,6 @@ describe "pg_inet extension" do
   end
 
   it "should support using IPAddr instances in array types in bound variables" do
-    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
-    @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
-    @db.extend(Sequel::Postgres::InetDatabaseMethods)
     @db.bound_variable_arg([IPAddr.new('127.0.0.1')].pg_array, nil).should == '{"127.0.0.1/32"}'
   end if array_spec
 

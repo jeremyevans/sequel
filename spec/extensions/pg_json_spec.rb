@@ -26,6 +26,7 @@ describe "pg_json extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
+    @db.extension(:pg_array, :pg_json)
   end
 
   it "should parse json strings correctly" do
@@ -70,26 +71,21 @@ describe "pg_json extension" do
   end
 
   it "should support using JSONHash and JSONArray as bound variables" do
-    @db.extend @m
     @db.bound_variable_arg(1, nil).should == 1
     @db.bound_variable_arg([1].pg_json, nil).should == '[1]'
     @db.bound_variable_arg({'a'=>'b'}.pg_json, nil).should == '{"a":"b"}'
   end
 
   it "should support using json[] types in bound variables" do
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
-    @db.extend @m
     @db.bound_variable_arg([[{"a"=>1}].pg_json, {"b"=>[1, 2]}.pg_json].pg_array, nil).should == '{"[{\\"a\\":1}]","{\\"b\\":[1,2]}"}'
   end
 
   it "should parse json type from the schema correctly" do
-    @db.extend @m
     @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'json'}]
     @db.schema(:items).map{|e| e[1][:type]}.should == [:integer, :json]
   end
 
   it "should support typecasting for the json type" do
-    @db.extend @m
     h = {1=>2}.pg_json
     a = [1].pg_json
     @db.typecast_value(:json, h).should equal(h)

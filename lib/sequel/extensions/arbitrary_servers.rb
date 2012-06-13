@@ -1,10 +1,8 @@
 # The arbitrary_servers extension allows you to connect to arbitrary
 # servers/shards that were not defined when you created the database.
-# To use it, you first extend the Database's connection pool with the
-# Sequel::ArbitraryServers module:
+# To use it, you first load the extension into the Database object:
 #
-#   Sequel.extension :arbitrary_servers
-#   DB.pool.extend Sequel::ArbitraryServers
+#   DB.extension :arbitrary_servers
 #
 # Then you can pass arbitrary connection options for the server/shard
 # to use as a hash:
@@ -105,4 +103,7 @@ module Sequel
       end
     end
   end
+
+  Database.register_extension(:arbitrary_servers){|db| db.pool.extend(ArbitraryServers)}
 end
+

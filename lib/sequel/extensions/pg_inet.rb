@@ -8,16 +8,17 @@
 # After loading the extension, you should extend your dataset
 # with a module so that it correctly handles the inet/cidr type:
 #
-#   DB.extend Sequel::Postgres::InetDatabaseMethods
+#   DB.extension :pg_inet
 #
 # If you are not using the native postgres adapter, you probably
 # also want to use the typecast_on_load plugin in the model, and
 # set it to typecast the inet/cidr column(s) on load.
 #
 # This extension integrates with the pg_array extension.  If you plan
-# to use the inet[] or cidr[] types, load the pg_array extension first, and extend
-# the Database instance with Sequel::Postgres::PGArray::DatabaseMethods
-# before extending it with Sequel::Postgres::InetDatabaseMethods.
+# to use the inet[] or cidr[] types, load the pg_array extension before
+# the pg_inet extension:
+#
+#   DB.extension :pg_array, :pg_inet
 #
 # This extension does not add special support for the macaddr
 # type.  Ruby doesn't have a stdlib class that represents mac
@@ -108,4 +109,6 @@ module Sequel
       PGArray.register('macaddr', :oid=>1040)
     end
   end
+
+  Database.register_extension(:pg_inet, Postgres::InetDatabaseMethods)
 end

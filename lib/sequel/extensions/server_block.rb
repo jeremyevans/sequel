@@ -4,8 +4,7 @@
 #
 # First, you need to enable it on the database object:
 #
-#   Sequel.extension :server_block
-#   DB.extend Sequel::ServerBlock
+#   DB.extension :server_block
 # 
 # Then you can call with_server:
 #
@@ -136,4 +135,6 @@ module Sequel
       end
     end
   end
+
+  Database.register_extension(:server_block, ServerBlock)
 end

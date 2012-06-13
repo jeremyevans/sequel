@@ -32,16 +32,17 @@
 # so that it recognizes and correctly handles the json type, which
 # you can do by:
 #
-#   DB.extend Sequel::Postgres::JSONDatabaseMethods
+#   DB.extension :pg_json
 #
 # If you are not using the native postgres adapter, you probably
 # also want to use the typecast_on_load plugin in the model, and
 # set it to typecast the json column(s) on load.
 #
 # This extension integrates with the pg_array extension.  If you plan
-# to use the json[] type, load the pg_array extension first, and extend
-# the Database instance with Sequel::Postgres::PGArray::DatabaseMethods
-# before extending it with Sequel::Postgres::JSONDatabaseMethods.
+# to use the json[] type, load the pg_array extension before the
+# pg_json extension:
+#
+#   DB.extension :pg_array, :pg_json
 #
 # This extension requires both the json and delegate libraries.
 
@@ -166,6 +167,8 @@ module Sequel
       PGArray.register('json', :oid=>199, :scalar_oid=>114)
     end
   end
+
+  Database.register_extension(:pg_json, Postgres::JSONDatabaseMethods)
 end
 
 class Array

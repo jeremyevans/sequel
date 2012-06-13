@@ -12,9 +12,9 @@ describe "pg_range extension" do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     @R = Sequel::Postgres::PGRange
     @db.extend(Module.new{def get_conversion_procs(conn) {} end; def bound_variable_arg(arg, conn) arg end})
-    @db.extend(Sequel::Postgres::PGArray::DatabaseMethods) if array_spec
-    @db.extend(@R::DatabaseMethods)
     @db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
+    @db.extension(:pg_array) if array_spec
+    @db.extension(:pg_range)
   end
 
   it "should literalize Range instances to strings correctly" do

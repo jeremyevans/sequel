@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "arbtirary servers" do
   before do
     @db = Sequel.mock(:servers=>{})
-    @db.pool.extend Sequel::ArbitraryServers
+    @db.extension :arbitrary_servers
   end
 
   specify "should allow arbitrary server options using a hash" do
