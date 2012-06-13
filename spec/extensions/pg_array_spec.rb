@@ -9,6 +9,7 @@ describe "pg_array extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
+    @db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
     @m = Sequel::Postgres
     @convertor = @m::PG_TYPES
   end
@@ -174,22 +175,47 @@ describe "pg_array extension" do
 
   it "should support typecasting of the various array types" do
     @db.extend Sequel::Postgres::PGArray::DatabaseMethods
-    a = [1, 2]
-    o = a.pg_array
-    {:integer=>:integer, :float=>'double precision', :decimal=>'numeric', :string=>:text}.each do |x, y|
-      v = @db.typecast_value(:"#{x}_array", o)
-      v.should == o
-      v.array_type.should_not be_nil
-      @db.typecast_value(:"#{x}_array", v).should equal(v)
-      @db.typecast_value(:"#{x}_array", a).should == a
-      @db.literal(@db.typecast_value(:"#{x}_array", a)).should == "ARRAY[1,2]::#{y}[]"
-      @db.typecast_value(:"#{x}_array", '{}').should == []
-      @db.literal(@db.typecast_value(:"#{x}_array", '{}')).should == "ARRAY[]::#{y}[]"
+    {
+      :integer=>{:class=>Integer, :convert=>['1', '1', 1, '1']},
+      :float=>{:db_type=>'double precision',  :class=>Float, :convert=>['1.1', '1.1', 1.1, '1.1']},
+      :decimal=>{:db_type=>'numeric', :class=>BigDecimal, :convert=>['1.00000000000000000000000001', '1.00000000000000000000000001', BigDecimal.new('1.00000000000000000000000001'), '1.00000000000000000000000001']},
+      :string=>{:db_type=>'text', :class=>String, :convert=>['1', 1, '1', "'1'"]},
+      :bigint=>{:class=>Integer, :convert=>['1', '1', 1, '1']},
+      :boolean=>{:class=>TrueClass, :convert=>['t', 't', true, 'true']},
+      :blob=>{:db_type=>'bytea', :class=>Sequel::SQL::Blob, :convert=>['1', '1', '1', "'1'"]},
+      :date=>{:class=>Date, :convert=>['2011-10-12', '2011-10-12', Date.new(2011, 10, 12), "'2011-10-12'"]},
+      :time=>{:db_type=>'time without time zone', :class=>Sequel::SQLTime, :convert=>['01:02:03', '01:02:03', Sequel::SQLTime.create(1, 2, 3), "'01:02:03'"]},
+      :datetime=>{:db_type=>'timestamp without time zone', :class=>Time, :convert=>['2011-10-12 01:02:03', '2011-10-12 01:02:03', Time.local(2011, 10, 12, 1, 2, 3), "'2011-10-12 01:02:03'"]},
+      :time_timezone=>{:db_type=>'time with time zone', :class=>Sequel::SQLTime, :convert=>['01:02:03', '01:02:03', Sequel::SQLTime.create(1, 2, 3), "'01:02:03'"]},
+      :datetime_timezone=>{:db_type=>'timestamp with time zone', :class=>Time, :convert=>['2011-10-12 01:02:03', '2011-10-12 01:02:03', Time.local(2011, 10, 12, 1, 2, 3), "'2011-10-12 01:02:03'"]},
+    }.each do |type, h|
+      meth = :"#{type}_array"
+      db_type = h[:db_type]||type
+      klass = h[:class]
+      text_in, array_in, value, output = h[:convert]
+
+      ["{#{text_in}}", [array_in]].each do |input|
+        v = @db.typecast_value(meth, input)
+        v.should == [value]
+        v.first.should be_a_kind_of(klass)
+        v.array_type.should_not be_nil
+        @db.typecast_value(meth, [value].pg_array).should == v
+        @db.typecast_value(meth, v).should equal(v)
+      end
+
+      ["{{#{text_in}}}", [[array_in]]].each do |input|
+        v = @db.typecast_value(meth, input)
+        v.should == [[value]]
+        v.first.first.should be_a_kind_of(klass)
+        v.array_type.should_not be_nil
+        @db.typecast_value(meth, [[value]].pg_array).should == v
+        @db.typecast_value(meth, v).should equal(v)
+      end
+
+      @db.literal(@db.typecast_value(meth, [array_in])).should == "ARRAY[#{output}]::#{db_type}[]"
+      @db.typecast_value(meth, '{}').should == []
+      @db.literal(@db.typecast_value(meth, '{}')).should == "ARRAY[]::#{db_type}[]"
     end
-    @db.typecast_value(:integer_array, '{1}').should == [1]
-    @db.typecast_value(:float_array, '{1}').should == [1.0]
-    @db.typecast_value(:decimal_array, '{1}').should == [BigDecimal.new('1')]
-    @db.typecast_value(:string_array, '{1}').should == ['1']
     proc{@db.typecast_value(:integer_array, {})}.should raise_error(Sequel::InvalidValue)
   end
 

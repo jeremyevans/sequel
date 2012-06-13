@@ -130,8 +130,14 @@ module Sequel
       # :scalar_oid :: Should be the PostgreSQL OID for the scalar version of this array type. If given,
       #                automatically sets the :converter option by looking for scalar conversion
       #                proc.
-      # :type_symbol :: The based of the schema type symbol for this type.  For example, if you provide
+      # :scalar_typecast :: Should be a symbol indicating the typecast method that should be called on
+      #                     each element of the array, when a plain array is passed into a database
+      #                     typecast method.  For example, for an array of integers, this could be set to
+      #                     :integer, so that the typecast_value_integer method is called on all of the
+      #                     array elements.  Defaults to :type_symbol option.
+      # :type_symbol :: The base of the schema type symbol for this type.  For example, if you provide
       #                 :integer, Sequel will recognize this type as :integer_array during schema parsing.
+      #                 Defaults to the db_type argument.
       # :typecast_method :: If given, specifies the :type_symbol option, but additionally causes no
       #                     typecasting method to be created in the database.  This should only be used
       #                     to alias existing array types.  For example, if there is an array type that can be
@@ -159,7 +165,7 @@ module Sequel
 
         ARRAY_TYPES[db_type] = :"#{type}_array"
 
-        DatabaseMethods.define_array_typecast_method(type, creator) unless typecast_method
+        DatabaseMethods.define_array_typecast_method(type, creator, opts.fetch(:scalar_typecast, type)) unless typecast_method
 
         if oid = opts[:oid]
           Sequel::Postgres::PG_TYPES[oid] = creator
@@ -184,9 +190,10 @@ module Sequel
 
         # Define a private array typecasting method for the given type that uses
         # the creator argument to do the type conversion.
-        def self.define_array_typecast_method(type, creator)
+        def self.define_array_typecast_method(type, creator, scalar_typecast)
           meth = :"typecast_value_#{type}_array"
-          define_method(meth){|v| typecast_value_pg_array(v, creator)}
+          scalar_typecast_method = :"typecast_value_#{scalar_typecast}"
+          define_method(meth){|v| typecast_value_pg_array(v, creator, scalar_typecast_method)}
           private meth
         end
 
@@ -235,9 +242,9 @@ module Sequel
         def get_conversion_procs(conn)
           procs = super
 
-          convertor = method(:to_application_timestamp)
-          procs[1115] = Creator.new("timestamp without time zone", convertor)
-          procs[1185] = Creator.new("timestamp with time zone", convertor)
+          converter = method(:to_application_timestamp)
+          procs[1115] = Creator.new("timestamp without time zone", converter)
+          procs[1185] = Creator.new("timestamp with time zone", converter)
 
           procs
         end
@@ -251,7 +258,7 @@ module Sequel
         #   it will cast the array the appropriate database type when the array is
         #   literalized.
         # * If given a String, call the parser for the subclass with it.
-        def typecast_value_pg_array(value, creator)
+        def typecast_value_pg_array(value, creator, scalar_typecast_method=nil)
           case value
           when PGArray
             if value.array_type != creator.type
@@ -260,6 +267,9 @@ module Sequel
               value
             end
           when Array
+            if scalar_typecast_method && respond_to?(scalar_typecast_method, true)
+              value = Sequel.recursive_map(value, method(scalar_typecast_method))
+            end
             PGArray.new(value, creator.type)
           when String
             creator.call(value)
@@ -460,7 +470,7 @@ module Sequel
 
       register('text', :oid=>1009, :type_symbol=>:string)
       register('integer', :oid=>1007, :parser=>:json)
-      register('bigint', :oid=>1016, :parser=>:json)
+      register('bigint', :oid=>1016, :parser=>:json, :scalar_typecast=>:integer)
       register('numeric', :oid=>1231, :scalar_oid=>1700, :type_symbol=>:decimal)
       register('double precision', :oid=>1022, :scalar_oid=>701, :type_symbol=>:float)
 
@@ -468,9 +478,9 @@ module Sequel
       register('bytea', :oid=>1001, :scalar_oid=>17, :type_symbol=>:blob)
       register('date', :oid=>1182, :scalar_oid=>1082)
       register('time without time zone', :oid=>1183, :scalar_oid=>1083, :type_symbol=>:time)
-      register('timestamp without time zone', :oid=>1115, :type_symbol=>:datetime, :converter=>Sequel.method(:database_to_application_timestamp))
-      register('time with time zone', :oid=>1270, :scalar_oid=>1083, :type_symbol=>:time_timezone)
-      register('timestamp with time zone', :oid=>1185, :type_symbol=>:datetime_timezone, :converter=>Sequel.method(:database_to_application_timestamp))
+      register('timestamp without time zone', :oid=>1115, :scalar_oid=>1114, :type_symbol=>:datetime)
+      register('time with time zone', :oid=>1270, :scalar_oid=>1083, :type_symbol=>:time_timezone, :scalar_typecast=>:time)
+      register('timestamp with time zone', :oid=>1185, :scalar_oid=>1184, :type_symbol=>:datetime_timezone, :scalar_typecast=>:datetime)
 
       register('smallint', :oid=>1005, :parser=>:json, :typecast_method=>:integer)
       register('oid', :oid=>1028, :parser=>:json, :typecast_method=>:integer)
