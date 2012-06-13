@@ -43,6 +43,7 @@ module Sequel
       [700, 701] => tt.method(:float),
       [1700] => ::BigDecimal.method(:new),
       [1083, 1266] => ::Sequel.method(:string_to_time),
+      [1184, 1114] => ::Sequel.method(:database_to_application_timestamp),
     }.each do |k,v|
       k.each{|n| PG_TYPES[n] = v}
     end
