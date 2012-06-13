@@ -407,22 +407,8 @@ module Sequel
         # correct type.
         def call(string)
           array = JSON.parse(string.gsub(SUBST_RE){|m| SUBST[m]})
-          array = recursive_map(array, @converter) if @converter
+          array = Sequel.recursive_map(array, @converter) if @converter
           PGArray.new(array, @type)
-        end
-
-        private
-
-        # Convert each item in the array to the correct type, handling multi-dimensional
-        # arrays.
-        def recursive_map(array, converter)
-          array.map do |i|
-            if i.is_a?(Array)
-              recursive_map(i, converter)
-            elsif i
-              converter.call(i)
-            end
-          end
         end
       end
 

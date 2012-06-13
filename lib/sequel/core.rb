@@ -228,6 +228,19 @@ module Sequel
   def self.quote_identifiers=(value)
     Database.quote_identifiers = value
   end
+
+  # Convert each item in the array to the correct type, handling multi-dimensional
+  # arrays.  For each element in the array or subarrays, call the converter,
+  # unless the value is nil.
+  def self.recursive_map(array, converter)
+    array.map do |i|
+      if i.is_a?(Array)
+        recursive_map(i, converter)
+      elsif i
+        converter.call(i)
+      end
+    end
+  end
   
   # Require all given +files+ which should be in the same or a subdirectory of
   # this file.  If a +subdir+ is given, assume all +files+ are in that subdir.

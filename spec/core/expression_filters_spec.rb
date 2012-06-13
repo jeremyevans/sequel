@@ -1042,3 +1042,15 @@ describe Sequel::SQL::Subscript do
     @ds.literal(s).should == 'a[1][2]'
   end
 end
+
+describe "Sequel.recursive_map" do
+  specify "should recursively convert an array using a callable" do
+    Sequel.recursive_map(['1'], proc{|s| s.to_i}).should == [1]
+    Sequel.recursive_map([['1']], proc{|s| s.to_i}).should == [[1]]
+  end
+
+  specify "should not call callable if value is nil" do
+    Sequel.recursive_map([nil], proc{|s| s.to_i}).should == [nil]
+    Sequel.recursive_map([[nil]], proc{|s| s.to_i}).should == [[nil]]
+  end
+end
