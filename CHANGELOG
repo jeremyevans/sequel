@@ -1,5 +1,7 @@
 === HEAD
 
+* Utitilize an existing dataset limit when updating on Microsoft SQL Server (jeremyevans)
+
 * Add pg_range extension, for dealing with PostgreSQL 9.2+ range types (jeremyevans)
 
 * Make pg_array extension convert array members when typecasting Array to PGArray (jeremyevans)

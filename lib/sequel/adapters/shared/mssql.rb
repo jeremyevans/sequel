@@ -316,7 +316,7 @@ module Sequel
       DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'with delete from output from2 where')
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'with insert into columns output values')
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with select distinct limit columns into from lock join where group having order compounds')
-      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with update table set output from where')
+      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with update limit table set output from where')
       NOLOCK = ' WITH (NOLOCK)'.freeze
       UPDLOCK = ' WITH (UPDLOCK)'.freeze
       WILDCARD = LiteralString.new('*').freeze
@@ -690,6 +690,7 @@ module Sequel
           end
         end
       end
+      alias update_limit_sql select_limit_sql
 
       # Support different types of locking styles
       def select_lock_sql(sql)
