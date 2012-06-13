@@ -1,5 +1,7 @@
 === HEAD
 
+* Add pg_range extension, for dealing with PostgreSQL 9.2+ range types (jeremyevans)
+
 * Make pg_array extension convert array members when typecasting Array to PGArray (jeremyevans)
 
 * Make jdbc/postgres adapter convert array type elements (e.g. date[] arrays are returned as arrays of Date instances) (jeremyevans)

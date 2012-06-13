@@ -2002,4 +2002,113 @@ describe 'PostgreSQL inet/cidr types' do
       c.create(:i=>@ipv6, :c=>@ipv6nm).values.values_at(:i, :c).should == [@ipv6, @ipv6nm]
     end
   end
+end
+
+describe 'PostgreSQL range types' do
+  before(:all) do
+    Sequel.extension :pg_array, :pg_range
+    @db = POSTGRES_DB
+    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
+    @db.extend Sequel::Postgres::PGRange::DatabaseMethods
+    @ds = @db[:items]
+    @map = {:i4=>'int4range', :i8=>'int8range', :n=>'numrange', :d=>'daterange', :t=>'tsrange', :tz=>'tstzrange'}
+    @r = {:i4=>1...2, :i8=>2...3, :n=>BigDecimal.new('1.0')..BigDecimal.new('2.0'), :d=>Date.today...(Date.today+1), :t=>Time.local(2011, 1)..Time.local(2011, 2), :tz=>Time.local(2011, 1)..Time.local(2011, 2)}
+    @ra = {}
+    @pgr = {}
+    @pgra = {}
+    @r.each{|k, v| @ra[k] = [v].pg_array(@map[k])}
+    @r.each{|k, v| @pgr[k] = v.pg_range}
+    @r.each{|k, v| @pgra[k] = [v.pg_range].pg_array(@map[k])}
+    @native = POSTGRES_DB.adapter_scheme == :postgres
+  end
+  after do
+    @db.drop_table?(:items)
+  end
+
+  specify 'insert and retrieve range type values' do
+    @db.create_table!(:items){int4range :i4; int8range :i8; numrange :n; daterange :d; tsrange :t; tstzrange :tz}
+    [@r, @pgr].each do |input|
+      h = {}
+      input.each{|k, v| h[k] = Sequel.cast(v, @map[k])}
+      @ds.insert(h)
+      @ds.count.should == 1
+      if @native
+        rs = @ds.all
+        rs.first.each do |k, v|
+          v.should_not be_a_kind_of(Range)
+          v.to_range.should be_a_kind_of(Range)
+          v.should == @r[k]
+          v.to_range.should == @r[k]
+        end
+        @ds.delete
+        @ds.insert(rs.first)
+        @ds.all.should == rs
+      end
+      @ds.delete
+    end
+  end
+
+  specify 'insert and retrieve arrays of range type values' do
+    @db.create_table!(:items){column :i4, 'int4range[]'; column :i8, 'int8range[]'; column :n, 'numrange[]'; column :d, 'daterange[]'; column :t, 'tsrange[]'; column :tz, 'tstzrange[]'}
+    [@ra, @pgra].each do |input|
+      @ds.insert(input)
+      @ds.count.should == 1
+      if @native
+        rs = @ds.all
+        rs.first.each do |k, v|
+          v.should_not be_a_kind_of(Array)
+          v.to_a.should be_a_kind_of(Array)
+          v.first.should_not be_a_kind_of(Range)
+          v.first.to_range.should be_a_kind_of(Range)
+          v.should == @ra[k].to_a
+          v.first.should == @r[k]
+        end
+        @ds.delete
+        @ds.insert(rs.first)
+        @ds.all.should == rs
+      end
+      @ds.delete
+    end
+  end
+
+  specify 'use range types in bound variables' do
+    @db.create_table!(:items){int4range :i4; int8range :i8; numrange :n; daterange :d; tsrange :t; tstzrange :tz}
+    h = {}
+    @r.keys.each{|k| h[k] = :"$#{k}"}
+    r2 = {}
+    @r.each{|k, v| r2[k] = Range.new(v.begin, v.end+2)}
+    @ds.call(:insert, @r, h)
+    @ds.first.should == @r
+    @ds.filter(h).call(:first, @r).should == @r
+    @ds.filter(h).call(:first, @pgr).should == @r
+    @ds.filter(h).call(:first, r2).should == nil
+    @ds.filter(h).call(:delete, @r).should == 1
+
+    @db.create_table!(:items){column :i4, 'int4range[]'; column :i8, 'int8range[]'; column :n, 'numrange[]'; column :d, 'daterange[]'; column :t, 'tsrange[]'; column :tz, 'tstzrange[]'}
+    @r.each{|k, v| r2[k] = [Range.new(v.begin, v.end+2)]}
+    @ds.call(:insert, @ra, h)
+    @ds.filter(h).call(:first, @ra).each{|k, v| v.should == @ra[k].to_a}
+    @ds.filter(h).call(:first, @pgra).each{|k, v| v.should == @ra[k].to_a}
+    @ds.filter(h).call(:first, r2).should == nil
+    @ds.filter(h).call(:delete, @ra).should == 1
+  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+
+  specify 'with models' do
+    @db.create_table!(:items){primary_key :id; int4range :i4; int8range :i8; numrange :n; daterange :d; tsrange :t; tstzrange :tz}
+    c = Class.new(Sequel::Model(@db[:items]))
+    c.plugin :typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
+    v = c.create(@r).values
+    v.delete(:id)
+    v.should == @r
+
+    unless @db.adapter_scheme == :jdbc
+      @db.create_table!(:items){primary_key :id; column :i4, 'int4range[]'; column :i8, 'int8range[]'; column :n, 'numrange[]'; column :d, 'daterange[]'; column :t, 'tsrange[]'; column :tz, 'tstzrange[]'}
+      c = Class.new(Sequel::Model(@db[:items]))
+      c.plugin :typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
+      v = c.create(@ra).values
+      v.delete(:id)
+      v.each{|k,v| v.should == @ra[k].to_a}
+    end
+  end
 end if POSTGRES_DB.server_version >= 90200
+
