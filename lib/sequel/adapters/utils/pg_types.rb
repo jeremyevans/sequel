@@ -11,7 +11,6 @@ module Sequel
     
     TYPE_TRANSLATOR = tt = Class.new do
       def boolean(s) s == TRUE_STR end
-      def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
       def integer(s) s.to_i end
       def float(s) 
         case s
@@ -26,6 +25,18 @@ module Sequel
         end
       end
       def date(s) ::Date.new(*s.split(DASH_STR).map{|x| x.to_i}) end
+      def bytea(str)
+        str = if str =~ /\A\\x/
+          # PostgreSQL 9.0+ bytea hex format
+          str[2..-1].gsub(/(..)/){|s| s.to_i(16).chr}
+        else
+          # Historical PostgreSQL bytea escape format
+          str.gsub(/\\(\\|'|[0-3][0-7][0-7])/) {|s|
+            if s.size == 2 then s[1,1] else s[1,3].oct.chr end
+          }
+        end
+        ::Sequel::SQL::Blob.new(str)
+      end
     end.new
 
     # Hash with type name strings/symbols and callable values for converting PostgreSQL types.

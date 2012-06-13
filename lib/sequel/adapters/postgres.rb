@@ -88,7 +88,11 @@ module Sequel
   Dataset::NON_SQL_OPTIONS << :cursor
   module Postgres
     CONVERTED_EXCEPTIONS << PGError
-    
+
+    PG_TYPES[17] = Class.new do
+      def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
+    end.new.method(:bytea)
+
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
     class Adapter < ::PGconn
