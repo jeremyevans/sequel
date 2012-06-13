@@ -1,5 +1,7 @@
 === HEAD
 
+* Add split_array_nil extension, for compiling :col=>[1, nil] to col IN (1) OR col IS NULL (jeremyevans)
+
 * Add Database#extension and Dataset#extension for loading extension modules into objects automatically (jeremyevans)
 
 * Respect an existing dataset limit when updating on Microsoft SQL Server (jeremyevans)
