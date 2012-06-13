@@ -67,6 +67,8 @@
 # recognizes and correctly handles the hstore columns, which you can
 # do by:
 #
+#   Sequel.extension :pg_hstore
+#
 #   DB.extend Sequel::Postgres::HStore::DatabaseMethods
 #
 # If you are not using the native postgres adapter, you probably
