@@ -19,7 +19,7 @@
 #
 #   ds = DB[:table].exclude(:column=>[1, nil])
 #   # Default:
-#   #   SELECT * FROM table WHERE (column IN (1, NULL))
+#   #   SELECT * FROM table WHERE (column NOT IN (1, NULL))
 #   # with split_array_nils extension:
 #   #   SELECT * FROM table WHERE ((column NOT IN (1)) AND (column IS NOT NULL)))
 #
