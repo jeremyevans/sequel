@@ -1,6 +1,11 @@
 # The pg_hstore_ops extension adds support to Sequel's DSL to make
-# it easier to call PostgreSQL hstore functions and operators. The
-# most common usage is taking an object that represents an SQL
+# it easier to call PostgreSQL hstore functions and operators.
+#
+# To load the extension:
+#
+#   Sequel.extension :pg_hstore_ops
+#
+# The most common usage is taking an object that represents an SQL
 # expression (such as a :symbol), and calling #hstore on it:
 #
 #   h = :hstore_column.hstore

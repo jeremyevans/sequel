@@ -1,9 +1,15 @@
 # The thread_local_timezones extension allows you to set a per-thread timezone that
 # will override the default global timezone while the thread is executing.  The
 # main use case is for web applications that execute each request in its own thread,
-# and want to set the timezones based on the request.  The most common example
-# is having the database always store time in UTC, but have the application deal
-# with the timezone of the current user.  That can be done with:
+# and want to set the timezones based on the request.
+#
+# To load the extension:
+#
+#   Sequel.extension :thread_local_timezones
+#
+# The most common example is having the database always store time in
+# UTC, but have the application deal with the timezone of the current
+# user.  That can be done with:
 #
 #   Sequel.database_timezone = :utc
 #   # In each thread:
