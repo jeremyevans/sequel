@@ -15,6 +15,10 @@
 # for HStore using the standard Sequel literalization callbacks, so
 # they work with on all adapters.
 #
+# To load the extension:
+#
+#   Sequel.extension :pg_hstore
+#
 # To turn an existing Hash into an HStore:
 #
 #   hash.hstore
@@ -66,8 +70,6 @@
 # probably want to modify the schema parsing/typecasting so that it
 # recognizes and correctly handles the hstore columns, which you can
 # do by:
-#
-#   Sequel.extension :pg_hstore
 #
 #   DB.extend Sequel::Postgres::HStore::DatabaseMethods
 #
