@@ -3,7 +3,11 @@
 #
 # This extension integrates with Sequel's native postgres adapter, so
 # that when inet/cidr fields are retrieved, they are returned as
-# IPAddr instances
+# IPAddr instances.
+#
+# To load the extension:
+#
+#   Sequel.extension :pg_inet
 #
 # After loading the extension, you should extend your dataset
 # with a module so that it correctly handles the inet/cidr type:
