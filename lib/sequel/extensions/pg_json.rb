@@ -17,6 +17,10 @@
 # This is done so that Sequel does not treat JSONArray and JSONHash
 # like Array and Hash by default, which would cause issues.
 #
+# To load the extension:
+#
+#   Sequel.extension :pg_json
+#
 # To turn an existing Array or Hash into a JSONArray or JSONHash:
 #
 #   array.pg_json
