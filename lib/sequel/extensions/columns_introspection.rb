@@ -5,6 +5,10 @@
 # This method is not fool-proof, it's possible that some databases
 # will use column names that Sequel does not expect.
 #
+# To load the extension:
+#
+#   Sequel.extension :columns_introspection
+#
 # To enable this for a single dataset, extend the dataset with
 # Sequel::ColumnIntrospection.  To enable this for all datasets, run:
 #
