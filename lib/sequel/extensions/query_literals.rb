@@ -22,8 +22,13 @@
 # defaults won't be changed until the next major release.
 #
 # Loading this extension does nothing by default except make the
-# Sequel::QueryLiterals module available.  You can extend specific
-# datasets with this module:
+# Sequel::QueryLiterals module available. 
+#
+# To load the extension:
+#
+#   Sequel.extension :query_literals
+#
+# Then you can extend specific datasets with this module:
 #
 #   ds = DB[:table]
 #   ds.extend(Sequel::QueryLiterals)
