@@ -33,7 +33,7 @@
 #   ds = DB[:table]
 #   ds.extend(Sequel::QueryLiterals)
 #
-# Order you can extend all of a database's datasets with it, which
+# Or you can extend all of a database's datasets with it, which
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extend_datasets(Sequel::QueryLiterals)
