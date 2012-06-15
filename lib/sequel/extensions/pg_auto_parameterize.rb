@@ -3,7 +3,13 @@
 # been to literalize all arguments unless specifically using
 # parameters (via :$arg placeholders and the prepare/call methods).
 # This extension makes Sequel take all string, numeric, date, and
-# time types and automatically turn them into parameters. Example:
+# time types and automatically turn them into parameters.
+#
+# To load the extension:
+#
+#   Sequel.extension :pg_auto_parameterize
+#
+# Example:
 #
 #   # Default
 #   DB[:test].where(:a=>1)
