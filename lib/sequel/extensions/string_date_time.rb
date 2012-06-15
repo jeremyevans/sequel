@@ -1,6 +1,11 @@
 # The string_date_time extension provides String instance methods
 # for converting the strings to a date (e.g. String#to_date), allowing
 # for backwards compatibility with legacy Sequel code.
+#
+# To load the extension:
+#
+#   Sequel.extension :string_date_time
+#
 
 class String
   # Converts a string into a Date object.
