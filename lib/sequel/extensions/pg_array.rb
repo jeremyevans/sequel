@@ -13,6 +13,10 @@
 # for PGArray using the standard Sequel literalization callbacks, so
 # they work with on all adapters.
 #
+# To load the extension:
+#
+#   Sequel.extension :pg_array
+#
 # To turn an existing Array into a PGArray:
 #
 #   array.pg_array
