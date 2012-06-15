@@ -1,6 +1,11 @@
 # The pg_array_ops extension adds support to Sequel's DSL to make
-# it easier to call PostgreSQL array functions and operators. The
-# most common usage is taking an object that represents an SQL
+# it easier to call PostgreSQL array functions and operators.
+#
+# To load the extension:
+#
+#   Sequel.extension :pg_array_ops
+#
+# The most common usage is taking an object that represents an SQL
 # identifier (such as a :symbol), and calling #pg_array on it:
 #
 #   ia = :int_array_column.pg_array
