@@ -35,6 +35,11 @@
 #
 # This extension only works when the pg driver is used as the backend
 # for the postgres adapter.
+#
+# To load the extension:
+#
+#   Sequel.extension :pg_statement_cache
+#
 
 module Sequel
   module Postgres
