@@ -555,4 +555,22 @@ describe "NestedAttributes plugin" do
     proc{al.set(:tags_attributes=>[{:id=>30, :name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
     proc{al.set(:tags_attributes=>[{:name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
   end
+
+  it "should accept a proc for the :fields option that accepts the associated object and returns an array of fields" do
+    @Tag.columns :id, :name, :number
+    @Album.nested_attributes :tags, :destroy=>true, :remove=>true, :fields=>proc{|object| object.is_a?(@Tag) ? [:name] : []}
+
+    al = @Album.load(:id=>10, :name=>'Al')
+    t = @Tag.load(:id=>30, :name=>'T', :number=>10)
+    al.associations[:tags] = [t]
+    al.set(:tags_attributes=>[{:id=>30, :name=>'T2'}, {:name=>'T3'}])
+    @db.sqls.should == []
+    al.save
+    check_sql_array("UPDATE albums SET name = 'Al' WHERE (id = 10)",
+      "UPDATE tags SET name = 'T2' WHERE (id = 30)",
+      "INSERT INTO tags (name) VALUES ('T3')",
+      ["INSERT INTO at (album_id, tag_id) VALUES (10, 1)", "INSERT INTO at (tag_id, album_id) VALUES (1, 10)"])
+    proc{al.set(:tags_attributes=>[{:id=>30, :name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
+    proc{al.set(:tags_attributes=>[{:name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
+  end
 end

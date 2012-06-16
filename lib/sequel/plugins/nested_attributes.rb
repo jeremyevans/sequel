@@ -83,8 +83,11 @@ module Sequel
         
         # Allow nested attributes to be set for the given associations.  Options:
         # * :destroy - Allow destruction of nested records.
-        # * :fields - If provided, should be an Array.  Restricts the fields allowed to be
-        #   modified through the association_attributes= method to the specific fields given.
+        # * :fields - If provided, should be an Array or proc. If it is an array,
+        #   restricts the fields allowed to be modified through the
+        #   association_attributes= method to the specific fields given. If it is
+        #   a proc, it will be given the associated object and should return an
+        #   array of the allowable fields.
         # * :limit - For *_to_many associations, a limit on the number of records
         #   that will be processed, to prevent denial of service attacks.
         # * :reject_if - A proc that is given each attribute hash before it is
@@ -207,6 +210,7 @@ module Sequel
         # specific :fields if configured.
         def nested_attributes_set_attributes(reflection, obj, attributes)
           if fields = reflection[:nested_attributes][:fields]
+            fields = fields.call(obj) if fields.respond_to?(:call)
             obj.set_only(attributes, fields)
           else
             obj.set(attributes)
