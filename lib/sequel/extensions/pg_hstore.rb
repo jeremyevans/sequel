@@ -84,6 +84,7 @@ class String
   HSTORE_EITHER_STRING = /(#{HSTORE_QUOTED_STRING}|#{HSTORE_UNQUOTED_STRING})/
   HSTORE_PAIR_RE = /#{HSTORE_EITHER_STRING}\s*=>\s*#{HSTORE_EITHER_STRING}/
 
+
   # Parse the output format that PostgreSQL uses for hstore
   # columns.
   #
@@ -176,6 +177,7 @@ module Sequel
       ESCAPE_REPLACE = '\\\\\1'.freeze
       HSTORE_CAST = '::hstore'.freeze
 
+
       # Parse the given string into an HStore, assuming the str is in PostgreSQL
       # hstore output format.
       def self.parse(str)
@@ -217,11 +219,13 @@ module Sequel
       # Return the underlying hash used by this HStore instance.
       alias to_hash __getobj__
 
+
       # Append a literalize version of the hstore to the sql.
       def sql_literal_append(ds, sql)
         ds.literal_append(sql, unquoted_literal)
         sql << HSTORE_CAST
       end
+
 
       # Return a string containing the unquoted, unstring-escaped
       # literal version of the hstore.  Separated out for use by
@@ -247,6 +251,7 @@ module Sequel
         str
       end
 
+
       private
 
       # Return a new hash based on the input hash with string
@@ -257,6 +262,7 @@ module Sequel
         hash
       end
 
+
       # Return value v as a string unless it is already nil.
       def convert_value(v)
         return nil if v.nil?          
@@ -266,6 +272,7 @@ module Sequel
           v.to_s
         end
       end
+
 
       # Escape key/value strings when literalizing to
       # correctly handle backslash and quote characters.
