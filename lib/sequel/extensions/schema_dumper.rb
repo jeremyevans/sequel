@@ -3,6 +3,11 @@
 # database (which can be the same type or a different type than
 # the current database).  The main interface is through
 # Sequel::Database#dump_schema_migration.
+#
+# To load the extension:
+#
+#   Sequel.extension :schema_dumper
+#
 
 module Sequel
   class Database
