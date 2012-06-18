@@ -297,4 +297,6 @@ class Hash
   def hstore
     Sequel::Postgres::HStore.new(self)
   end
+
+  alias :to_hstore :hstore
 end
