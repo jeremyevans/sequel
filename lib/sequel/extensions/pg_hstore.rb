@@ -75,57 +75,49 @@
 #
 # This extension requires the delegate and strscan libraries.
 
+
+# Parser for PostgreSQL hstore output format.
+class String
+  
+  HSTORE_QUOTED_STRING = /"[^"\\]*(?:\\.[^"\\]*)*"/
+  HSTORE_UNQUOTED_STRING = /[^\s=,][^\s=,\\]*(?:\\.[^\s=,\\]*|=[^,>])*/
+  HSTORE_EITHER_STRING = /(#{HSTORE_QUOTED_STRING}|#{HSTORE_UNQUOTED_STRING})/
+  HSTORE_PAIR_RE = /#{HSTORE_EITHER_STRING}\s*=>\s*#{HSTORE_EITHER_STRING}/
+
+  # Parse the output format that PostgreSQL uses for hstore
+  # columns.
+  #
+  # Return the resulting hash of objects.  This can be called
+  # multiple times, it will cache the parsed hash on the first
+  # call and use it for subsequent calls.
+  def from_hstore
+    return @result if @result
+    token_pairs = (scan(HSTORE_PAIR_RE)).map { |k,v| [k,v =~ /^NULL$/i ? nil : v] }
+    token_pairs = token_pairs.map { |k,v|
+      [k,v].map { |t| 
+        case t
+        when nil
+          t
+        when /^"{(.*)"$/ # A quoted hash
+          $1.gsub(/\\(.)/, '\1').from_hstore
+        when /^"(.*)"$/ # A quoted value
+          $1.gsub(/\\(.)/, '\1')
+        else
+          t.gsub(/\\(.)/, '\1')
+        end
+      }
+    }
+    @result = Hash[ token_pairs ]
+  end
+end
+
+
 require 'delegate'
-require 'strscan'
 
 module Sequel
   module Postgres
     class HStore < DelegateClass(Hash)
-      # Parser for PostgreSQL hstore output format.
-      class Parser < StringScanner
-        QUOTE_RE = /"/.freeze
-        KV_SEP_RE = /"\s*=>\s*/.freeze
-        NULL_RE = /NULL/.freeze
-        SEP_RE = /,\s*/.freeze
-        QUOTED_RE = /(\\"|[^"])*/.freeze
-        REPLACE_RE = /\\(.)/.freeze
-        REPLACE_WITH = '\1'.freeze
 
-        # Parse the output format that PostgreSQL uses for hstore
-        # columns.  Note that this does not attempt to parse all
-        # input formats that PostgreSQL will accept.  For instance,
-        # it expects all keys and non-NULL values to be quoted.
-        #
-        # Return the resulting hash of objects.  This can be called
-        # multiple times, it will cache the parsed hash on the first
-        # call and use it for subsequent calls.
-        def parse
-          return @result if @result
-          hash = {}
-          while !eos?
-            skip(QUOTE_RE)
-            k = parse_quoted
-            skip(KV_SEP_RE)
-            if skip(QUOTE_RE)
-              v = parse_quoted
-              skip(QUOTE_RE)
-            else
-              scan(NULL_RE)
-              v = nil
-            end
-            skip(SEP_RE)
-            hash[k] = v
-          end
-          @result = hash
-        end
-          
-        private
-
-        # Parse and unescape a quoted key/value.
-        def parse_quoted
-          scan(QUOTED_RE).gsub(REPLACE_RE, REPLACE_WITH)
-        end
-      end
 
       module DatabaseMethods
         # Reset the conversion procs if using the native postgres adapter.
@@ -187,7 +179,7 @@ module Sequel
       # Parse the given string into an HStore, assuming the str is in PostgreSQL
       # hstore output format.
       def self.parse(str)
-        new(Parser.new(str).parse)
+        new(str.from_hstore)
       end
 
       # Override methods that accept key argument to convert to string.
@@ -267,7 +259,12 @@ module Sequel
 
       # Return value v as a string unless it is already nil.
       def convert_value(v)
-        v.to_s unless v.nil?
+        return nil if v.nil?          
+        if v.respond_to? :keys
+          convert_hash(v)
+        else 
+          v.to_s
+        end
       end
 
       # Escape key/value strings when literalizing to

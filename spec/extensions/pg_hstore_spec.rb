@@ -1,5 +1,11 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
+shared_examples "parse then to_hash" do
+  subject{ @c.parse(input).to_hash }
+  it { should be_a_kind_of Hash }
+  it { should == expected }
+end
+
 describe "pg_hstore extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
@@ -9,19 +15,100 @@ describe "pg_hstore extension" do
     @db.extension :pg_hstore
   end
 
-  it "should parse hstore strings correctly" do
-    @c.parse('').to_hash.should == {}
-    @c.parse('"a"=>"b"').to_hash.should == {'a'=>'b'}
-    @c.parse('"a"=>"b", "c"=>NULL').to_hash.should == {'a'=>'b', 'c'=>nil}
-    @c.parse('"a"=>"b", "c"=>"NULL"').to_hash.should == {'a'=>'b', 'c'=>'NULL'}
-    @c.parse('"a"=>"b", "c"=>"\\\\ \\"\'=>"').to_hash.should == {'a'=>'b', 'c'=>'\ "\'=>'}
+  describe "When parsing via `HStore.parse`" do
+    context "Given an empty string" do
+      subject{ @c.parse('').to_hash }
+      it { should be_a_kind_of Hash }
+      it { should be_empty }
+    end
+  
+    context "Given a simple key/value pair" do
+      context "With no spaces in the hash expression" do
+        it_behaves_like "parse then to_hash" do
+          let(:input) { '"a"=>"b"' }
+          let(:expected) { {'a'=>'b'} }
+        end
+      end
+      context "With spaces in the hash expression" do
+        it_behaves_like "parse then to_hash" do
+          let(:input) { '"a" => "b"' }
+          let(:expected) { {'a'=>'b'} }
+        end
+        context "But the key and value are not wrapped in quotes" do
+          it_behaves_like "parse then to_hash" do
+            let(:input) { 'k => v' }
+            let(:expected) { {'k'=>'v'} }
+          end
+          it_behaves_like "parse then to_hash" do
+            let(:input) { 'foo => bar, baz => whatever' }
+            let(:expected) { {'foo'=>'bar', 'baz' => 'whatever'} }
+          end
+        end
+        context "And non word characters in the key" do
+          it_behaves_like "parse then to_hash" do
+            let(:input) { '"1-a" => "anything at all"' }
+            let(:expected) { {"1-a"=>"anything at all"} }
+          end
+          context "And also escaped characters in the value" do
+            it_behaves_like "parse then to_hash" do
+              let(:input) { %q(c=>"}", "\"a\""=>"b \"a b") }
+              let(:expected) { {"c"=>"}", "\"a\""=>"b \"a b"} }
+            end          
+          end
+        end
+      end
+    end
+    context "Given a hash" do
+      context "With multiple keys and values" do
+        context "Of ordinary strings" do
+          context "With no spaces in the hash expression" do
+            it_behaves_like "parse then to_hash" do
+              let(:input) { '"a"=>"b","c"=>"d"' }
+              let(:expected) { {'a'=>'b', 'c'=>'d'} }
+            end
+          end
+          context "With spaces in the hash expression" do
+            it_behaves_like "parse then to_hash" do
+              let(:input) { '"a"=>"b", "c"=>"d"' }
+              let(:expected) { {'a'=>'b', 'c'=>'d'} }
+            end
+            it_behaves_like "parse then to_hash" do
+              let(:input) { '"a" => "b", "c"=>"d"' }
+              let(:expected) { {'a'=>'b', 'c'=>'d'} }
+            end
+            it_behaves_like "parse then to_hash" do
+              let(:input) { '"a"=>"b","c" => "d"' }
+              let(:expected) { {'a'=>'b', 'c'=>'d'} }
+            end
+          end
+        end
+        context "Containing a SQL null value" do
+          it_behaves_like "parse then to_hash" do
+            let(:input) { '"a"=>"b", "c"=>NULL' }
+            let(:expected) { {'a'=>'b', 'c'=>nil} }
+          end
+        end
+        context "Containing a value of a string with NULL in it" do
+          it_behaves_like "parse then to_hash" do
+            let(:input) { '"a"=>"b", "c"=>"NULL"' }
+            let(:expected) { {'a'=>'b', 'c'=>'NULL'} }
+          end
+        end
+        context "Containing a value of a string with escapes in it" do
+          it_behaves_like "parse then to_hash" do
+            let(:input) { '"a"=>"b", "c"=>"\\\\ \\"\'=>"' }
+            let(:expected) { {'a'=>'b', 'c'=>'\ "\'=>'} }
+          end
+        end
+      end
+    end
   end
 
   it "should cache parse results" do
-    r = @c::Parser.new('')
-    o = r.parse
+    s = ''
+    o = s.from_hstore
     o.should == {}
-    r.parse.should equal(o)
+    s.from_hstore.should equal(o)
   end
 
   it "should literalize HStores to strings correctly" do
