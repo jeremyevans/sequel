@@ -231,13 +231,12 @@ module Sequel
       # literal version of the hstore.  Separated out for use by
       # the bound argument code.
       def unquoted_literal
-        str = ''
         comma = false
         commas = COMMA
         quote = QUOTE
         kv_sep = KV_SEP
         null = NULL
-        each do |k, v|
+        each_with_object("") do |(k, v),str|
           str << commas if comma
           str << quote << escape_value(k) << quote
           str << kv_sep
@@ -248,7 +247,6 @@ module Sequel
           end
           comma = true
         end
-        str
       end
 
 
