@@ -1,8 +1,16 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
+require 'hashie' # for testing against hash-like structures too.
+
 shared_examples "parse then to_hash" do
   subject{ @c.parse(input).to_hash }
   it { should be_a_kind_of Hash }
+  it { should == expected }
+end
+
+shared_examples "it literalises HStores to strings" do
+  subject{ @db.literal(input.hstore) }
+  it { should be_a_kind_of String }
   it { should == expected }
 end
 
@@ -100,6 +108,12 @@ describe "pg_hstore extension" do
             let(:expected) { {'a'=>'b', 'c'=>'\ "\'=>'} }
           end
         end
+        context "Containing nested hashes" do
+          it_behaves_like "parse then to_hash" do
+            let(:input) { %q!"name"=>"{\"first\"=>\"David\", \"last\"=>\"Smith\"}"! }
+            let(:expected) { {"name" => {"first" => "David", "last" => "Smith"}} }
+          end
+        end
       end
     end
   end
@@ -111,21 +125,85 @@ describe "pg_hstore extension" do
     s.from_hstore.should equal(o)
   end
 
-  it "should literalize HStores to strings correctly" do
-    @db.literal({}.hstore).should == '\'\'::hstore'
-    @db.literal({"a"=>"b"}.hstore).should == '\'"a"=>"b"\'::hstore'
-    @db.literal({"c"=>nil}.hstore).should == '\'"c"=>NULL\'::hstore'
-    @db.literal({"c"=>'NULL'}.hstore).should == '\'"c"=>"NULL"\'::hstore'
-    @db.literal({'c'=>'\ "\'=>'}.hstore).should == '\'"c"=>"\\\\ \\"\'\'=>"\'::hstore'
-    ['\'"a"=>"b","c"=>"d"\'::hstore', '\'"c"=>"d","a"=>"b"\'::hstore'].should include(@db.literal({"a"=>"b","c"=>"d"}.hstore))
+  context "Given a hash" do
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { Hash.new }
+      let(:expected) { '\'\'::hstore' }
+    end
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { {"a"=>"b"} }
+      let(:expected) { '\'"a"=>"b"\'::hstore' }
+    end
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { {"c"=>nil} }
+      let(:expected) { '\'"c"=>NULL\'::hstore' }
+    end
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { {"c"=>'NULL'} }
+      let(:expected) { '\'"c"=>"NULL"\'::hstore' }
+    end
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { {'c'=>'\ "\'=>'} }
+      let(:expected) { '\'"c"=>"\\\\ \\"\'\'=>"\'::hstore' }
+    end
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { {:name => {:first => "David", :last => "Smith"}} }
+      let(:expected) { %q!'"name"=>"{\\"first\\"=>\\"David\\", \\"last\\"=>\\"Smith\\"}"'::hstore! }
+    end
+    context "With a hash-like structure nested within it" do
+      it_behaves_like "it literalises HStores to strings" do
+        let(:input) { {:name => Hashie::Mash.new({:first => "David", :last => "Smith"})} }
+        let(:expected) { %q!'"name"=>"{\\"first\\"=>\\"David\\", \\"last\\"=>\\"Smith\\"}"'::hstore! }
+      end
+    end
+  end    
+  context "Given a hash like structure (Hashie::Mash)" do   
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { Hashie::Mash.new }
+      let(:expected) { '\'\'::hstore' }
+    end
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { Hashie::Mash.new({"a"=>"b"}) }
+      let(:expected) { '\'"a"=>"b"\'::hstore' }
+    end
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { Hashie::Mash.new({"c"=>nil}) }
+      let(:expected) { '\'"c"=>NULL\'::hstore' }
+    end
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { Hashie::Mash.new({"c"=>'NULL'}) }
+      let(:expected) { '\'"c"=>"NULL"\'::hstore' }
+    end
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { Hashie::Mash.new({'c'=>'\ "\'=>'}) }
+      let(:expected) { '\'"c"=>"\\\\ \\"\'\'=>"\'::hstore' }
+    end
+    it_behaves_like "it literalises HStores to strings" do
+      let(:input) { Hashie::Mash.new({:name => {:first => "David", :last => "Smith"}}) }
+      let(:expected) { %q!'"name"=>"{\\"first\\"=>\\"David\\", \\"last\\"=>\\"Smith\\"}"'::hstore! }
+    end
+  end
+  
+  context "Given an array of hashes" do
+    subject {
+      ['\'"a"=>"b","c"=>"d"\'::hstore', '\'"c"=>"d","a"=>"b"\'::hstore']
+    }
+    it{ should include(@db.literal({"a"=>"b","c"=>"d"}.hstore)) }
   end
 
-  it "should have Hash#hstore method for creating HStore instances" do
-    {}.hstore.should be_a_kind_of(@c)
+  context "Hashes" do
+    subject { Hash.new }
+    it { should respond_to :hstore }
+    
+    describe "#hstore" do
+      subject { {}.hstore }
+      it { should be_a_kind_of(@c) }
+    end
   end
-
-  it "should HStore#to_hash method for getting underlying hash" do
-    {}.hstore.to_hash.should be_a_kind_of(Hash)
+  
+  describe "HStore#to_hash" do
+    subject{ {}.hstore.to_hash }
+    it { should be_a_kind_of(Hash) }
   end
 
   it "should convert keys and values to strings on creation" do
