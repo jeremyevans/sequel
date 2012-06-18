@@ -1050,7 +1050,7 @@ Column in associated table that :right_key points to, as a symbol.
 Defaults to primary key of the associated table.
 
   Tag.set_primary_key :tid
-  Album.many_to_many :tags # :left_primary_key=>:tid
+  Album.many_to_many :tags # :right_primary_key=>:tid
 
 Can use an array of symbols for a composite key association.
 
