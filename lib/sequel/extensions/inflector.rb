@@ -2,6 +2,11 @@
 # words from singular to plural, class names to table names, modularized class
 # names to ones without, and class names to foreign keys.  It exists for 
 # backwards compatibility to legacy Sequel code.
+#
+# To load the extension:
+#
+#   Sequel.extension :inflector
+#
 
 class String
   # This module acts as a singleton returned/yielded by String.inflections,

@@ -2,6 +2,10 @@
 # returns a cloned dataset that will never issue a query to the
 # database.  It implements the null object pattern for datasets.
 #
+# To load the extension:
+#
+#   Sequel.extension :null_dataset
+#
 # The most common usage is probably in a method that must return
 # a dataset, where the method knows the dataset shouldn't return
 # anything.  With standard Sequel, you'd probably just add a

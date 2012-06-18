@@ -8,6 +8,10 @@
 # typecast_timezone=.  If a string is passed, it is converted to a
 # TZInfo::Timezone using TZInfo::Timezone.get.
 #
+# To load the extension:
+#
+#   Sequel.extension :named_timezones
+#
 # Let's say you have the database server in New York and the
 # application server in Los Angeles.  For historical reasons, data
 # is stored in local New York time, but the application server only

@@ -7,6 +7,11 @@
 # as String, Integer, Float, and Symbol, but it's not true for classes such
 # as Time, Date, and BigDecimal.  Sequel attempts to handle situations where
 # instances of these classes are a component of a Sequel expression.
+#
+# To load the extension:
+#
+#   Sequel.extension :eval_inspect
+#
 
 module Sequel
   module EvalInspect

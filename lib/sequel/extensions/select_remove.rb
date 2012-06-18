@@ -1,6 +1,11 @@
 # The select_remove extension adds Sequel::Dataset#select_remove for removing existing selected
 # columns from a dataset.  It's not part of Sequel core as it is rarely needed and has
 # some corner cases where it can't work correctly.
+#
+# To load the extension:
+#
+#   Sequel.extension :select_remove
+#
 
 module Sequel
   class Dataset

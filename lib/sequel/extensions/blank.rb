@@ -1,4 +1,9 @@
 # The blank extension adds the blank? method to all objects (e.g. Object#blank?).
+#
+# To load the extension:
+#
+#   Sequel.extension :blank
+#
 
 class FalseClass
   # false is always blank

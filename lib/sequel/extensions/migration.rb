@@ -1,8 +1,12 @@
 # Adds the Sequel::Migration and Sequel::Migrator classes, which allow
 # the user to easily group schema changes and migrate the database
 # to a newer version or revert to a previous version.
-
 #
+# To load the extension:
+#
+#   Sequel.extension :migration
+#
+
 module Sequel
   # Sequel's older migration class, available for backward compatibility.
   # Uses subclasses with up and down instance methods for each migration:

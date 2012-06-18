@@ -2,6 +2,11 @@
 # returns a string that can be processed by graphviz's +dot+ program in
 # order to get a visualization of the dataset.  Basically, it shows a version
 # of the dataset's abstract syntax tree.
+#
+# To load the extension:
+#
+#   Sequel.extension :to_dot
+#
 
 module Sequel
   class ToDot
