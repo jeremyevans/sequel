@@ -7,6 +7,11 @@
 #   true.sql_expr | :a  # TRUE OR a
 #   ~nil.sql_expr       # NOT NULL
 #   "a".sql_expr + "b"  # 'a' || 'b'
+#
+# To load the extension:
+#
+#   Sequel.extension :sql_expr
+#
 
 class Object
   # Return the object wrapper in an appropriate Sequel expression object.
