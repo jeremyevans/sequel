@@ -7,7 +7,6 @@
 # To load the extension:
 #
 #   Sequel.extension :schema_dumper
-#
 
 module Sequel
   class Database

@@ -15,6 +15,7 @@
 #
 # To attempt to introspect columns for all datasets on all databases:
 #
+#   Sequel.extension :columns_introspection
 #   Sequel::Dataset.introspect_all_columns
 
 module Sequel

@@ -2,6 +2,12 @@
 # They make using Sequel's DSL easier by adding methods to Array,
 # Hash, String, and Symbol to add methods that return Sequel
 # expression objects.
+#
+# This extension is currently loaded by default, but that will no
+# longer be true in a future version.  In a future version, you will
+# need to load it manually via:
+#
+#   Sequel.extension :core_extensions
 
 # This extension loads the core extensions.
 def Sequel.core_extensions?

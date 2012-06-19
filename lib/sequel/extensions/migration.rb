@@ -5,7 +5,6 @@
 # To load the extension:
 #
 #   Sequel.extension :migration
-#
 
 module Sequel
   # Sequel's older migration class, available for backward compatibility.

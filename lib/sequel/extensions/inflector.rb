@@ -6,7 +6,6 @@
 # To load the extension:
 #
 #   Sequel.extension :inflector
-#
 
 class String
   # This module acts as a singleton returned/yielded by String.inflections,

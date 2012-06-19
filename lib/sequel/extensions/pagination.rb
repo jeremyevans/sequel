@@ -5,7 +5,6 @@
 # To load the extension:
 #
 #   Sequel.extension :pagination
-#
 
 module Sequel
   class Dataset

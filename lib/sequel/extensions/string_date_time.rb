@@ -5,7 +5,6 @@
 # To load the extension:
 #
 #   Sequel.extension :string_date_time
-#
 
 class String
   # Converts a string into a Date object.

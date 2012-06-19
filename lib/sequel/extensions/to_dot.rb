@@ -6,7 +6,6 @@
 # To load the extension:
 #
 #   Sequel.extension :to_dot
-#
 
 module Sequel
   class ToDot

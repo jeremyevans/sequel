@@ -5,7 +5,6 @@
 # To load the extension:
 #
 #   Sequel.extension :select_remove
-#
 
 module Sequel
   class Dataset

@@ -11,7 +11,6 @@
 # To load the extension:
 #
 #   Sequel.extension :eval_inspect
-#
 
 module Sequel
   module EvalInspect

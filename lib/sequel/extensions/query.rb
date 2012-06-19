@@ -1,6 +1,10 @@
 # The query extension adds Sequel::Dataset#query which allows
 # a different way to construct queries instead of the usual
 # method chaining.
+#
+# To load the extension, do:
+#
+#   Sequel.extension :query
 
 module Sequel
   class Database

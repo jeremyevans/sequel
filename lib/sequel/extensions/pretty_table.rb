@@ -1,11 +1,17 @@
 # The pretty_table extension adds Sequel::Dataset#print and the
 # Sequel::PrettyTable class for creating nice-looking plain-text
-# tables.
+# tables.  Example:
+#
+#   +--+-------+
+#   |id|name   |
+#   |--+-------|
+#   |1 |fasdfas|
+#   |2 |test   |
+#   +--+-------+
 #
 # To load the extension:
 #
 #   Sequel.extension :pretty_table
-#
 
 module Sequel
   extension :_pretty_table

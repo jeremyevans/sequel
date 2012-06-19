@@ -86,7 +86,7 @@ module Sequel
         # * :fields - If provided, should be an Array or proc. If it is an array,
         #   restricts the fields allowed to be modified through the
         #   association_attributes= method to the specific fields given. If it is
-        #   a proc, it will be given the associated object and should return an
+        #   a proc, it will be called with the associated object and should return an
         #   array of the allowable fields.
         # * :limit - For *_to_many associations, a limit on the number of records
         #   that will be processed, to prevent denial of service attacks.

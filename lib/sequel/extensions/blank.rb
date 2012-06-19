@@ -3,7 +3,6 @@
 # To load the extension:
 #
 #   Sequel.extension :blank
-#
 
 class FalseClass
   # false is always blank
