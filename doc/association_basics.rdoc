@@ -1135,8 +1135,6 @@ Called after removing an object from the association:
 
 Called before the _<i>association</i>= method is called to modify the objects:
 
-Called before removing an object from the association:
-
   class Album
     # Don't associate the album with an artist if the year the album was
     # released is less than the year the artist/band started.
