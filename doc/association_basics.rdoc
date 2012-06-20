@@ -473,7 +473,7 @@ associations (ones without conditions).
 == Name Collisions
 
 Because associations create instance methods, it's possible to override
-existing instance methods if you name an extension the same as an
+existing instance methods if you name an association the same as an
 existing method.  For example, <tt>values</tt> and <tt>associations</tt>
 would be bad association names.
 
