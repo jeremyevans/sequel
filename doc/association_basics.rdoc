@@ -1221,13 +1221,9 @@ For many details and examples of custom eager loaders, please see the
 ==== :eager_loader_key
 
 A symbol for the key column to use to populate the key hash for the eager
-loader.  It can be necessary to specify this for custom eager loaders
-where the default key that would be used does not exist, as in that case, Sequel
-would think that the key values are all NULL, and would not attempt to
-eagerly load any associated objects for that association.  If you have a
-custom eager loader and aren't sure of a good value to use here, and you
-aren't using the key_hash (first argument to the eager_loader proc), then
-you can probably use the primary key column of the model.
+loader.  Generally does not need to be set manually, defaults to the key
+method used.  Can be set to nil to not populate the key hash (better for
+performance if a custom eager loader does not use the key_hash).
 
 ==== :eager_block
 
@@ -1466,10 +1462,6 @@ aliases defined with <tt>Model.def_column_alias</tt>:
     many_to_one :things, :key=>:object_id, :key_method=>:obj_id
   end
 
-Note that for eager loading purposes, you generally need to set the
-<tt>:eager_loader_key</tt> option as well, specifying the underlying
-column(s) to use.
-
 ==== :key_column [+many_to_one+]
 
 Like the :key option, but :key references the method name, while
@@ -1573,6 +1565,19 @@ eager_graph.
 This is usually used if the association dataset depends on specific values in
 model instance that would not be valid when eager loading for multiple
 instances.
+
+==== :predicate_key
+
+The SQL expression to use when lazy loading associations or eager loading
+associations via eager.  For lazy loading associations, this is the left
+hand side of the = expression, and for eager loading via eager, this is
+the left hand side of the IN expression.  This option is only needed
+when the association depends on an expression that is not a simple
+column reference.
+
+This option is not used when eager_graphing, because the default is
+a qualified versions of the foreign or primary key, and the graphing
+code needs unqualified versions as it does its own qualification.
 
 ==== :cartesian_product_number 
 

@@ -13,6 +13,10 @@ describe Sequel::Model, "#eager" do
       many_to_one :band_name, :class=>'EagerBand', :key=>:band_id, :select=>[:id, :name]
       one_to_many :track_names, :class=>'EagerTrack', :key=>:album_id, :select=>[:id, :name]
       many_to_many :genre_names, :class=>'EagerGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :select=>[:id]
+
+      def band_id3
+        band_id*3
+      end
     end
 
     class ::EagerBand < Sequel::Model(:bands)
@@ -29,6 +33,10 @@ describe Sequel::Model, "#eager" do
       end
       one_to_many :albums_by_name, :class=>'EagerAlbum', :key=>:band_id, :order=>:name, :allow_eager=>false
       one_to_many :top_10_albums, :class=>'EagerAlbum', :key=>:band_id, :limit=>10
+
+      def id3
+        id/3
+      end
     end
     
     class ::EagerTrack < Sequel::Model(:tracks)
@@ -90,6 +98,26 @@ describe Sequel::Model, "#eager" do
     [:EagerAlbum, :EagerBand, :EagerTrack, :EagerGenre, :EagerBandMember].each{|x| Object.send(:remove_const, x)}
   end
   
+  it "should populate :key_hash and :id_map option correctly for custom eager loaders" do
+    khs = {}
+    pr = proc{|a, m| proc{|h| khs[a] = h[:key_hash][m]; h[:id_map].should == h[:key_hash][m]}}
+    EagerAlbum.many_to_one :sband, :clone=>:band, :eager_loader=>pr.call(:sband, :band_id)
+    EagerAlbum.one_to_many :stracks, :clone=>:tracks, :eager_loader=>pr.call(:stracks, :id)
+    EagerAlbum.many_to_many :sgenres, :clone=>:genres, :eager_loader=>pr.call(:sgenres, :id)
+    EagerAlbum.eager(:sband, :stracks, :sgenres).all
+    khs.should == {:sband=>{2=>[EagerAlbum.load(:band_id=>2, :id=>1)]}, :stracks=>{1=>[EagerAlbum.load(:band_id=>2, :id=>1)]}, :sgenres=>{1=>[EagerAlbum.load(:band_id=>2, :id=>1)]}}
+  end
+
+  it "should populate :key_hash using the method symbol" do
+    khs = {}
+    pr = proc{|a, m| proc{|h| khs[a] = h[:key_hash][m]}}
+    EagerAlbum.many_to_one :sband, :clone=>:band, :eager_loader=>pr.call(:sband, :band_id), :key=>:band_id, :key_column=>:b_id
+    EagerAlbum.one_to_many :stracks, :clone=>:tracks, :eager_loader=>pr.call(:stracks, :id), :primary_key=>:id, :primary_key_column=>:i
+    EagerAlbum.many_to_many :sgenres, :clone=>:genres, :eager_loader=>pr.call(:sgenres, :id), :left_primary_key=>:id, :left_primary_key_column=>:i
+    EagerAlbum.eager(:sband, :stracks, :sgenres).all
+    khs.should == {:sband=>{2=>[EagerAlbum.load(:band_id=>2, :id=>1)]}, :stracks=>{1=>[EagerAlbum.load(:band_id=>2, :id=>1)]}, :sgenres=>{1=>[EagerAlbum.load(:band_id=>2, :id=>1)]}}
+  end
+
   it "should raise an error if called without a symbol or hash" do
     proc{EagerAlbum.eager(Object.new)}.should raise_error(Sequel::Error)
   end
@@ -186,6 +214,65 @@ describe Sequel::Model, "#eager" do
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
     a.first.genres.should == [EagerGenre.load(:id=>4)]
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should support using a custom :key option when eager loading many_to_one associations" do
+    EagerAlbum.many_to_one :sband, :clone=>:band, :key=>:band_id3
+    EagerBand.dataset._fetch = {:id=>6}
+    a = EagerAlbum.eager(:sband).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM bands WHERE (bands.id IN (6))']
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.first.sband.should == EagerBand.load(:id=>6)
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should support using a custom :primary_key option when eager loading one_to_many associations" do
+    EagerBand.one_to_many :salbums, :clone=>:albums, :primary_key=>:id3, :eager=>nil
+    EagerBand.dataset._fetch = {:id=>6}
+    a = EagerBand.eager(:salbums).all
+    MODEL_DB.sqls.should == ['SELECT * FROM bands', 'SELECT * FROM albums WHERE (albums.band_id IN (2))']
+    a.should == [EagerBand.load(:id => 6)]
+    a.first.salbums.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    MODEL_DB.sqls.should == []
+  end
+
+  it "should support using a custom :left_primary_key option when eager loading many_to_many associations" do
+    EagerAlbum.many_to_many :sgenres, :clone=>:genres, :left_primary_key=>:band_id3
+    EagerGenre.dataset._fetch = {:id=>4, :x_foreign_key_x=>6}
+    a = EagerAlbum.eager(:sgenres).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (6)))"]
+    a.first.sgenres.should == [EagerGenre.load(:id=>4)]
+    MODEL_DB.sqls.should == []
+  end
+
+  it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup, for many_to_one associations" do
+    EagerAlbum.many_to_one :sband, :clone=>:band, :eager_loading_predicate_key=>Sequel./(:bands__id, 3), :primary_key_method=>:id3
+    EagerBand.dataset._fetch = {:id=>6}
+    a = EagerAlbum.eager(:sband).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM bands WHERE ((bands.id / 3) IN (2))']
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.first.sband.should == EagerBand.load(:id=>6)
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup, for one_to_many associations" do
+    EagerBand.one_to_many :salbums, :clone=>:albums, :eager_loading_predicate_key=>Sequel.*(:albums__band_id, 3), :key_method=>:band_id3, :eager=>nil
+    EagerBand.dataset._fetch = {:id=>6}
+    a = EagerBand.eager(:salbums).all
+    MODEL_DB.sqls.should == ['SELECT * FROM bands', 'SELECT * FROM albums WHERE ((albums.band_id * 3) IN (6))']
+    a.should == [EagerBand.load(:id => 6)]
+    a.first.salbums.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup, for many_to_many associations" do
+    EagerAlbum.many_to_many :sgenres, :clone=>:genres, :eager_loading_predicate_key=>Sequel.*(:ag__album_id, 1)
+    a = EagerAlbum.eager(:sgenres).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, (ag.album_id * 1) AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND ((ag.album_id * 1) IN (1)))"]
+    a.first.sgenres.should == [EagerGenre.load(:id=>4)]
     MODEL_DB.sqls.should == []
   end
   
@@ -547,7 +634,7 @@ describe Sequel::Model, "#eager" do
   end
 
   it "should use the :eager_loader association option when eager loading" do
-    EagerAlbum.many_to_one :special_band, :eager_loader=>(proc do |key_hash, records, assocs| 
+    EagerAlbum.many_to_one :special_band, :key=>:band_id, :eager_loader=>(proc do |key_hash, records, assocs| 
       item = EagerBand.filter(:album_id=>records.collect{|r| [r.pk, r.pk*2]}.flatten).order(:name).first
       records.each{|r| r.associations[:special_band] = item}
     end)

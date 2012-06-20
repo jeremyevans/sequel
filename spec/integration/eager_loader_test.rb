@@ -12,7 +12,7 @@ describe "Eagerly loading a tree structure" do
       one_to_many :children, :key=>:parent_id
     
       # Only useful when eager loading
-      many_to_one :ancestors, :eager_loader=>(proc do |eo|
+      many_to_one :ancestors, :eager_loader_key=>nil, :eager_loader=>(proc do |eo|
         # Handle cases where the root node has the same parent_id as primary_key
         # and also when it is NULL
         non_root_nodes = eo[:rows].reject do |n| 
@@ -36,7 +36,7 @@ describe "Eagerly loading a tree structure" do
           end
         end
       end)
-      many_to_one :descendants, :eager_loader=>(proc do |eo|
+      many_to_one :descendants, :eager_loader_key=>nil, :eager_loader=>(proc do |eo|
         id_map = {}
         eo[:rows].each do |n|
           # Initialize an empty array of child associations for each parent node

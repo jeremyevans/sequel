@@ -1693,14 +1693,61 @@ describe 'PostgreSQL hstore handling' do
     @ds.filter(:i=>:$i).call(:first, :i=>{}).should == nil
   end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
-  specify 'with models' do
+  specify 'with models and associations' do
     @db.create_table!(:items) do
       primary_key :id
       column :h, :hstore
     end
-    c = Class.new(Sequel::Model(@db[:items]))
+    c = Class.new(Sequel::Model(@db[:items])) do
+      def self.name
+        'Item'
+      end
+      unrestrict_primary_key
+      def item_id
+        h['item_id'].to_i if h
+      end
+    end
+    Sequel.extension :pg_hstore_ops
     c.plugin :typecast_on_load, :h unless @native
-    c.create(:h=>@h.hstore).h.should == @h
+
+    h = {'item_id'=>"2", 'left_item_id'=>"1"}
+    o2 = c.create(:id=>2)
+    o = c.create(:id=>1, :h=>h)
+    o.h.should == h
+
+    c.many_to_one :item, :class=>c, :graph_only_conditions=>{Sequel.cast(:items__h.hstore['item_id'], Integer)=>:item__id}
+    c.one_to_many :items, :class=>c, :eager_loading_predicate_key=>Sequel.cast(:h.hstore['item_id'], Integer), :graph_only_conditions=>{:items__id=>Sequel.cast(:items_0__h.hstore['item_id'], Integer)}
+    c.many_to_many :related_items, :class=>c, :join_table=>:items___i, :eager_loading_predicate_key=>Sequel.cast(:i__h.hstore['left_item_id'], Integer), :right_key=>Sequel.cast(:i__h.hstore['item_id'], Integer), :graph_join_table_only_conditions=>{:items__id=>Sequel.cast(:i__h.hstore['left_item_id'], Integer)}, :graph_only_conditions=>{Sequel.cast(:i__h.hstore['item_id'], Integer)=>:related_items__id}
+
+    c.many_to_one :other_item, :class=>c, :graph_only_conditions=>{Sequel.cast(:other_item__h.hstore['item_id'], Integer)=>:items__id}, :key=>:id, :primary_key_method=>:item_id, :eager_loading_predicate_key=>Sequel.cast(:items__h.hstore['item_id'], Integer)
+    c.one_to_many :other_items, :class=>c, :graph_only_conditions=>{:other_items__id=>Sequel.cast(:items__h.hstore['item_id'], Integer)}, :primary_key=>:item_id, :key=>:id
+    c.many_to_many :other_related_items, :class=>c, :join_table=>:items___i, :eager_loading_predicate_key=>Sequel.cast(:i__h.hstore['left_item_id'], Integer), :right_key=>Sequel.cast(:i__h.hstore['left_item_id'], Integer), :right_primary_key_method=>:item_id, :graph_join_table_only_conditions=>{:items__id=>Sequel.cast(:i__h.hstore['left_item_id'], Integer)}, :graph_only_conditions=>{Sequel.cast(:i__h.hstore['item_id'], Integer)=>Sequel.cast(:other_related_items__h.hstore['item_id'], Integer)}
+
+    # Lazily Loading
+    o.item.should == o2
+    o2.items.should == [o]
+    o.related_items.should == [o2]
+    o2.other_item.should == o
+    o.other_items.should == [o2]
+    o.other_related_items.should == [o]
+
+    # Eager Loading via eager
+    os = c.eager(:item, :related_items, :other_items, :other_related_items).where(:id=>1).all.first
+    os.item.should == o2
+    os.related_items.should == [o2]
+    os.other_items.should == [o2]
+    os.other_related_items.should == [o]
+    os = c.eager(:items, :other_item).where(:id=>2).all.first
+    os.items.should == [o]
+    os.other_item.should == o
+
+    # Eager Loading via eager_graph
+    c.eager_graph(:item).where(:items__id=>1).all.first.item.should == o2
+    c.eager_graph(:items).where(:items__id=>2).all.first.items.should == [o]
+    c.eager_graph(:related_items).where(:items__id=>1).all.first.related_items.should == [o2]
+    c.eager_graph(:other_item).where(:items__id=>2).all.first.other_item.should == o
+    c.eager_graph(:other_items).where(:items__id=>1).all.first.other_items.should == [o2]
+    c.eager_graph(:other_related_items).where(:items__id=>1).all.first.other_related_items.should == [o]
   end
 
   specify 'operations/functions with pg_hstore_ops' do

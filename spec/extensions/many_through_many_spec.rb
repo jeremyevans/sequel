@@ -21,6 +21,41 @@ describe Sequel::Model, "many_through_many" do
     Object.send(:remove_const, :Tag)
   end
 
+  it "should populate :key_hash and :id_map option correctly for custom eager loaders" do
+    khs = []
+    pr = proc{|h| khs << [h[:key_hash], h[:id_map]]}
+    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_loader=>pr
+    @c1.eager(:tags).all
+    khs.should == [[{:id=>{1=>[Artist.load(:x=>1, :id=>1)]}}, {1=>[Artist.load(:x=>1, :id=>1)]}]]
+
+    khs.clear
+    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :left_primary_key=>:id, :left_primary_key_column=>:i, :eager_loader=>pr
+    @c1.eager(:tags).all
+    khs.should == [[{:id=>{1=>[Artist.load(:x=>1, :id=>1)]}}, {1=>[Artist.load(:x=>1, :id=>1)]}]]
+  end
+
+  it "should support using a custom :left_primary_key option when eager loading many_to_many associations" do
+    @c1.send(:define_method, :id3){id*3}
+    @c1.dataset._fetch = {:id=>1}
+    @c2.dataset._fetch = {:id=>4, :x_foreign_key_x=>3}
+    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :left_primary_key=>:id3
+    a = @c1.eager(:tags).all
+    a.should == [@c1.load(:id => 1)]
+    MODEL_DB.sqls.should == ['SELECT * FROM artists', "SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (3)))"]
+    a.first.tags.should == [@c2.load(:id=>4)]
+    MODEL_DB.sqls.should == []
+  end
+
+  it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup" do
+    @c1.dataset._fetch = {:id=>1}
+    @c2.dataset._fetch = {:id=>4, :x_foreign_key_x=>1}
+    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_loading_predicate_key=>Sequel./(:albums_artists__artist_id, 3)
+    a = @c1.eager(:tags).all
+    a.should == [@c1.load(:id => 1)]
+    MODEL_DB.sqls.should == ['SELECT * FROM artists', "SELECT tags.*, (albums_artists.artist_id / 3) AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND ((albums_artists.artist_id / 3) IN (1)))"]
+    a.first.tags.should == [@c2.load(:id=>4)]
+  end
+  
   it "should default to associating to other models in the same scope" do
     begin
       class ::AssociationModuleTest
@@ -598,6 +633,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   it "should respect the :limit option on a many_through_many association with composite primary keys on the main table using a :window_function strategy" do
     Tag.dataset.meta_def(:supports_window_functions?){true}
     @c1.set_primary_key([:id1, :id2])
+    @c1.columns :id1, :id2
     @c1.many_through_many :first_two_tags, [[:albums_artists, [:artist_id1, :artist_id2], :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :eager_limit_strategy=>true, :order=>:name
     @c1.dataset._fetch = [{:id1=>1, :id2=>2}]
     Tag.dataset._fetch = [{:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>5}, {:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>6}]

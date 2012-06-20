@@ -53,7 +53,7 @@ module Sequel
           self[:uses_left_composite_keys] ? (0...self[:through].first[:left].length).map{|i| :"x_foreign_key_#{i}_x"} : :x_foreign_key_x
         end
 
-        %w'associated_key_table eager_loading_predicate_key edges final_edge final_reverse_edge reverse_edges'.each do |meth|
+        %w'associated_key_table predicate_key edges final_edge final_reverse_edge reverse_edges'.each do |meth|
           class_eval(<<-END, __FILE__, __LINE__+1)
             def #{meth}
               cached_fetch(:#{meth}){calculate_edges[:#{meth}]}
@@ -109,7 +109,7 @@ module Sequel
                :final_reverse_edge=>final_reverse_edge,
                :edges=>edges,
                :reverse_edges=>reverse_edges,
-               :eager_loading_predicate_key=>qualify(final_reverse_alias, edges.first[:right]),
+               :predicate_key=>qualify(final_reverse_alias, edges.first[:right]),
                :associated_key_table=>final_reverse_edge[:alias],
           }
           h.each{|k, v| cached_set(k, v)}
@@ -171,23 +171,24 @@ module Sequel
           uses_lcks = opts[:uses_left_composite_keys] = left_key.is_a?(Array)
           left_keys = Array(left_key)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
+          opts[:eager_loader_key] = left_pk unless opts.has_key?(:eager_loader_key)
           left_pks = opts[:left_primary_keys] = Array(left_pk)
           opts[:dataset] ||= lambda do
             ds = opts.associated_class
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
             ft = opts.final_reverse_edge
-            ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])) + left_keys.zip(left_pks.map{|k| send(k)}), :table_alias=>ft[:alias])
+            ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])) + opts.predicate_keys.zip(left_pks.map{|k| send(k)}), :table_alias=>ft[:alias])
           end
 
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
           opts[:eager_loader] ||= lambda do |eo|
-            h = eo[:key_hash][left_pk]
+            h = eo[:id_map]
             rows = eo[:rows]
             rows.each{|object| object.associations[name] = []}
             ds = opts.associated_class 
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
             ft = opts.final_reverse_edge
-            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.eager_loading_predicate_key, h.keys]], :table_alias=>ft[:alias])
+            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.predicate_key, h.keys]], :table_alias=>ft[:alias])
             ds = model.eager_loading_dataset(opts, ds, nil, eo[:associations], eo)
             case opts.eager_limit_strategy
             when :window_function
