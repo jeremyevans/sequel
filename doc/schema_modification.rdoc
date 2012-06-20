@@ -98,6 +98,10 @@ You've seen this one used already.  It's used to create an autoincrementing inte
 
   create_table(:a0){primary_key :id}
 
+If you want an autoincrementing 64-bit integer:
+
+  create_table(:a0){primary_key :id, :type=>Bignum}
+
 If you want to create a primary key column that doesn't use an autoincrementing integer, you should
 not use this method.  Instead, you should use the :primary_key option to the +column+ method or type
 method:

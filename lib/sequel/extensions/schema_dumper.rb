@@ -117,16 +117,15 @@ END_MIG
       end
     end
 
-    # Convert the given name and parsed database schema into an array with a method
-    # name and arguments to it to pass to a Schema::Generator to recreate the column.
-    def column_schema_to_generator_opts(name, schema, options)
+    # Recreate the column in the passed Schema::Generator from the given name and parsed database schema.
+    def recreate_column(name, schema, gen, options)
       if options[:single_pk] && schema_autoincrementing_primary_key?(schema)
         type_hash = options[:same_db] ? {:type=>schema[:db_type]} : column_schema_to_ruby_type(schema)
         [:table, :key, :on_delete, :on_update, :deferrable].each{|f| type_hash[f] = schema[f] if schema[f]}
         if type_hash == {:type=>Integer} || type_hash == {:type=>"integer"}
-          [:primary_key, name]
+          gen.primary_key(name)
         else
-          [:primary_key, name, type_hash]
+          gen.primary_key(name, type_hash)
         end
       else
         col_opts = options[:same_db] ? {:type=>schema[:db_type]} : column_schema_to_ruby_type(schema)
@@ -142,9 +141,13 @@ END_MIG
         if table = schema[:table]
           [:key, :on_delete, :on_update, :deferrable].each{|f| col_opts[f] = schema[f] if schema[f]}
           col_opts[:type] = type unless type == Integer || type == 'integer'
-          [:foreign_key, name, table, col_opts]
+          gen.foreign_key(name, table, col_opts)
         else
-          [:column, name, type, col_opts]
+          gen.column(name, type, col_opts)
+          if (type == Integer || type == Bignum) && schema[:db_type] =~ / unsigned\z/io
+            Sequel.extension :eval_inspect
+            gen.check(Sequel::SQL::Identifier.new(name) >= 0)
+          end
         end
       end
     end
@@ -234,7 +237,7 @@ END_MIG
       s = schema(table).dup
       pks = s.find_all{|x| x.last[:primary_key] == true}.map{|x| x.first}
       options = options.merge(:single_pk=>true) if pks.length == 1
-      m = method(:column_schema_to_generator_opts)
+      m = method(:recreate_column)
       im = method(:index_to_generator_opts)
 
       if options[:indexes] != false
@@ -275,7 +278,7 @@ END_MIG
       end
 
       Schema::Generator.new(self) do
-        s.each{|name, info| send(*m.call(name, info, options))}
+        s.each{|name, info| m.call(name, info, self, options)}
         primary_key(pks) if !@primary_key && pks.length > 0
         indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts, options))} if indexes
         composite_fks.each{|fk| send(:foreign_key, fk[:columns], fk)} if composite_fks
