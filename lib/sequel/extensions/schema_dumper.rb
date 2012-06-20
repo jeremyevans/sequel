@@ -8,9 +8,6 @@
 #
 #   Sequel.extension :schema_dumper
 
-# eval_inspect is required for recreating constraints.
-Sequel.extension :eval_inspect
-
 module Sequel
   class Database
     # Dump foreign key constraints for all tables as a migration. This complements
@@ -147,6 +144,7 @@ END_MIG
         else
           gen.column(name, type, col_opts)
           if (type == Integer || type == Bignum) && schema[:db_type] =~ / unsigned\z/io
+            Sequel.extension :eval_inspect
             gen.check(Sequel::SQL::Identifier.new(name) >= 0)
           end
         end
