@@ -906,7 +906,11 @@ module Sequel
 
           # dup early so we don't modify opts
           orig_opts = opts.dup
-          orig_opts = association_reflection(opts[:clone])[:orig_opts].merge(orig_opts) if opts[:clone]
+          if opts[:clone]
+            cloned_assoc = association_reflection(opts[:clone])
+            raise(Error, "cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})") unless cloned_assoc[:type] == type
+            orig_opts = cloned_assoc[:orig_opts].merge(orig_opts)
+          end
           opts = orig_opts.merge(:type => type, :name => name, :cache=>{}, :model => self)
           opts[:block] = block if block
           opts = assoc_class.new.merge!(opts)

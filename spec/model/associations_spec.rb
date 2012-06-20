@@ -125,6 +125,11 @@ describe Sequel::Model, "associate" do
     end
   end
 
+  it "should raise an error if attempting to clone an association of differing type" do
+    c = Class.new(Sequel::Model(:c))
+    c.many_to_one :c
+    proc{c.one_to_many :cs, :clone=>:c}.should raise_error(Sequel::Error)
+  end
 end
 
 describe Sequel::Model, "many_to_one" do
