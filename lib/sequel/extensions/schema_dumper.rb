@@ -30,11 +30,11 @@ END_MIG
 
     # Dump indexes for all tables as a migration.  This complements
     # the :indexes=>false option to dump_schema_migration. Options:
-    # * :same_db - Create a dump for the same database type, so
-    #   don't ignore errors if the index statements fail.
-    # * :index_names - If set to false, don't record names of indexes. If
-    #   set to :namespace, prepend the table name to the index name if the
-    #   database does not use a global index namespace.
+    # :same_db :: Create a dump for the same database type, so
+    #             don't ignore errors if the index statements fail.
+    # :index_names :: If set to false, don't record names of indexes. If
+    #                 set to :namespace, prepend the table name to the index name if the
+    #                 database does not use a global index namespace.
     def dump_indexes_migration(options={})
       ts = tables(options)
       <<END_MIG
@@ -52,16 +52,17 @@ END_MIG
 
     # Return a string that contains a Sequel::Migration subclass that when
     # run would recreate the database structure. Options:
-    # * :same_db - Don't attempt to translate database types to ruby types.
-    #   If this isn't set to true, all database types will be translated to
-    #   ruby types, but there is no guarantee that the migration generated
-    #   will yield the same type.  Without this set, types that aren't
-    #   recognized will be translated to a string-like type.
-    # * :foreign_keys - If set to false, don't dump foreign_keys
-    # * :indexes - If set to false, don't dump indexes (they can be added
-    #   later via dump_index_migration).
-    # * :index_names - If set to false, don't record names of indexes. If
-    #   set to :namespace, prepend the table name to the index name.
+    # :same_db :: Don't attempt to translate database types to ruby types.
+    #             If this isn't set to true, all database types will be translated to
+    #             ruby types, but there is no guarantee that the migration generated
+    #             will yield the same type.  Without this set, types that aren't
+    #             recognized will be translated to a string-like type.
+    # :foreign_keys :: If set to false, don't dump foreign_keys (they can be
+    #             added later via #dump_foreign_key_migration)
+    # :indexes :: If set to false, don't dump indexes (they can be added
+    #             later via #dump_index_migration).
+    # :index_names :: If set to false, don't record names of indexes. If
+    #                 set to :namespace, prepend the table name to the index name.
     def dump_schema_migration(options={})
       options = options.dup
       if options[:indexes] == false && !options.has_key?(:foreign_keys)
