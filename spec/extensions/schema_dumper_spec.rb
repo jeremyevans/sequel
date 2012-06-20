@@ -774,4 +774,16 @@ create_table(:x) do
 end
 END_MIG
   end
+
+  it "should not use primary_key with non autoincrementable types" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'char(8)', :primary_key=>true}]]}
+    @d.dump_table_schema(:t3).should == "create_table(:t3) do\n  String :c1, :size=>8, :fixed=>true, :primary_key=>true\nend"
+  end
+
+  it "should not use foreign_key with non autoincrementable types" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'char(8)', :primary_key=>true}]]}
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'char(8)', :primary_key=>true}]]}
+    @d.meta_def(:foreign_key_list){|t, *a| [{:columns=>[:c1], :table=>:t3, :key=>[:c1]}] if t == :t4}
+    @d.dump_table_schema(:t4).should == "create_table(:t4) do\n  String :c1, :size=>8, :fixed=>true, :primary_key=>true\n  foreign_key[c1], :t3\nend"
+  end
 end
