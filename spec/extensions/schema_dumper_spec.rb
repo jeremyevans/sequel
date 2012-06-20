@@ -771,6 +771,13 @@ create_table(:x) do
   Integer :c70
   Integer :c71
   Integer :c72
+  
+  check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c64), 0)
+  check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c65), 0)
+  check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c66), 0)
+  check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c67), 0)
+  check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c68), 0)
+  check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c69), 0)
 end
 END_MIG
   end
