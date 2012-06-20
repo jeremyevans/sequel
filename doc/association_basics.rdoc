@@ -1459,7 +1459,7 @@ aliases defined with <tt>Model.def_column_alias</tt>:
     def_column_alias(:obj_id, :object_id)
   end
   class Obj < Sequel::Model
-    many_to_one :things, :key=>:object_id, :key_method=>:obj_id
+    one_to_many :things, :key=>:object_id, :key_method=>:obj_id
   end
 
 ==== :key_column [+many_to_one+]
