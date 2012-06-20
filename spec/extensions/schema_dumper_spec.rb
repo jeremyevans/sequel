@@ -183,7 +183,7 @@ describe "Sequel::Database dump methods" do
   it "should support dumping the whole database as a migration" do
     @d.dump_schema_migration.should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     create_table(:t1) do
       primary_key :c1
       String :c2, :size=>20
@@ -195,10 +195,6 @@ Sequel.migration do
       
       primary_key [:c1, :c2]
     end
-  end
-  
-  down do
-    drop_table(:t2, :t1)
   end
 end
 END_MIG
@@ -208,7 +204,7 @@ END_MIG
     @d.meta_def(:tables){|o| [:t2, :t1]}
     @d.dump_schema_migration.should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     create_table(:t1) do
       primary_key :c1
       String :c2, :size=>20
@@ -220,10 +216,6 @@ Sequel.migration do
       
       primary_key [:c1, :c2]
     end
-  end
-  
-  down do
-    drop_table(:t2, :t1)
   end
 end
 END_MIG
@@ -239,7 +231,7 @@ END_MIG
     end
     @d.dump_schema_migration.should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     create_table(:t2) do
       primary_key :c1
     end
@@ -247,10 +239,6 @@ Sequel.migration do
     create_table(:t1) do
       foreign_key :c2, :t2, :key=>[:c1]
     end
-  end
-  
-  down do
-    drop_table(:t1, :t2)
   end
 end
 END_MIG
@@ -266,7 +254,7 @@ END_MIG
     end
     @d.dump_schema_migration.should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     create_table(:t1) do
       Integer :c2
     end
@@ -278,10 +266,6 @@ Sequel.migration do
     alter_table(:t1) do
       add_foreign_key [:c2], :t2, :key=>[:c1]
     end
-  end
-  
-  down do
-    drop_table(:t2, :t1)
   end
 end
 END_MIG
@@ -298,7 +282,7 @@ END_MIG
     end
     @d.dump_schema_migration.should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     create_table(:t2) do
       primary_key :c1
     end
@@ -306,10 +290,6 @@ Sequel.migration do
     create_table(:t1) do
       foreign_key :c2, :t2, :key=>[:c1]
     end
-  end
-  
-  down do
-    drop_table(:t1, :t2)
   end
 end
 END_MIG
@@ -319,7 +299,7 @@ END_MIG
     @d.dump_table_schema(:t1, :same_db=>true).should == "create_table(:t1) do\n  primary_key :c1\n  column :c2, \"varchar(20)\"\nend"
     @d.dump_schema_migration(:same_db=>true).should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     create_table(:t1) do
       primary_key :c1
       column :c2, "varchar(20)"
@@ -331,10 +311,6 @@ Sequel.migration do
       
       primary_key [:c1, :c2]
     end
-  end
-  
-  down do
-    drop_table(:t2, :t1)
   end
 end
 END_MIG
@@ -348,7 +324,7 @@ END_MIG
     @d.dump_table_schema(:t1, :index_names=>false).should == "create_table(:t1, :ignore_index_errors=>true) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1]\n  index [:c2, :c1], :unique=>true\nend"
     @d.dump_schema_migration(:index_names=>false).should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     create_table(:t1, :ignore_index_errors=>true) do
       primary_key :c1
       String :c2, :size=>20
@@ -367,10 +343,6 @@ Sequel.migration do
       index [:c2, :c1], :unique=>true
     end
   end
-  
-  down do
-    drop_table(:t2, :t1)
-  end
 end
 END_MIG
   end
@@ -383,7 +355,7 @@ END_MIG
     @d.dump_table_schema(:t1, :index_names=>:namespace).should == "create_table(:t1, :ignore_index_errors=>true) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1], :name=>:i1\n  index [:c2, :c1]\nend"
     @d.dump_schema_migration(:index_names=>:namespace).should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     create_table(:t1, :ignore_index_errors=>true) do
       primary_key :c1
       String :c2, :size=>20
@@ -402,10 +374,6 @@ Sequel.migration do
       index [:c2, :c1], :name=>:t1_c2_c1_index
     end
   end
-  
-  down do
-    drop_table(:t2, :t1)
-  end
 end
 END_MIG
   end
@@ -419,7 +387,7 @@ END_MIG
     @d.dump_table_schema(:t1, :index_names=>:namespace).should == "create_table(:t1, :ignore_index_errors=>true) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1], :name=>:t1_i1\n  index [:c2, :c1]\nend"
     @d.dump_schema_migration(:index_names=>:namespace).should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     create_table(:t1, :ignore_index_errors=>true) do
       primary_key :c1
       String :c2, :size=>20
@@ -438,10 +406,6 @@ Sequel.migration do
       index [:c2, :c1], :name=>:t2_t1_c2_c1_index
     end
   end
-  
-  down do
-    drop_table(:t2, :t1)
-  end
 end
 END_MIG
   end
@@ -454,7 +418,7 @@ END_MIG
     @d.dump_table_schema(:t1, :indexes=>false).should == "create_table(:t1) do\n  primary_key :c1\n  String :c2, :size=>20\nend"
     @d.dump_schema_migration(:indexes=>false).should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     create_table(:t1) do
       primary_key :c1
       String :c2, :size=>20
@@ -466,10 +430,6 @@ Sequel.migration do
       
       primary_key [:c1, :c2]
     end
-  end
-  
-  down do
-    drop_table(:t2, :t1)
   end
 end
 END_MIG
@@ -497,14 +457,9 @@ END_MIG
     end
     @d.dump_indexes_migration.should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     add_index :t1, [:c1], :ignore_errors=>true, :name=>:i1
     add_index :t1, [:c2, :c1], :ignore_errors=>true, :unique=>true
-  end
-  
-  down do
-    drop_index :t1, [:c2, :c1], :ignore_errors=>true, :unique=>true
-    drop_index :t1, [:c1], :ignore_errors=>true, :name=>:i1
   end
 end
 END_MIG
@@ -518,14 +473,9 @@ END_MIG
     end
     @d.dump_indexes_migration(:index_names=>false).should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     add_index :t1, [:c1], :ignore_errors=>true
     add_index :t1, [:c2, :c1], :ignore_errors=>true, :unique=>true
-  end
-  
-  down do
-    drop_index :t1, [:c2, :c1], :ignore_errors=>true, :unique=>true
-    drop_index :t1, [:c1], :ignore_errors=>true
   end
 end
 END_MIG
@@ -539,20 +489,12 @@ END_MIG
     end
     @d.dump_indexes_migration(:index_names=>:namespace).should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     add_index :t1, [:c1], :ignore_errors=>true, :name=>:i1
     add_index :t1, [:c2, :c1], :ignore_errors=>true
     
     add_index :t2, [:c1], :ignore_errors=>true, :name=>:i1
     add_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t1_c2_c1_index
-  end
-  
-  down do
-    drop_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t1_c2_c1_index
-    drop_index :t2, [:c1], :ignore_errors=>true, :name=>:i1
-    
-    drop_index :t1, [:c2, :c1], :ignore_errors=>true
-    drop_index :t1, [:c1], :ignore_errors=>true, :name=>:i1
   end
 end
 END_MIG
@@ -567,20 +509,12 @@ END_MIG
     end
     @d.dump_indexes_migration(:index_names=>:namespace).should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     add_index :t1, [:c1], :ignore_errors=>true, :name=>:t1_i1
     add_index :t1, [:c2, :c1], :ignore_errors=>true
     
     add_index :t2, [:c1], :ignore_errors=>true, :name=>:t2_i1
     add_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t2_t1_c2_c1_index
-  end
-  
-  down do
-    drop_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t2_t1_c2_c1_index
-    drop_index :t2, [:c1], :ignore_errors=>true, :name=>:t2_i1
-    
-    drop_index :t1, [:c2, :c1], :ignore_errors=>true
-    drop_index :t1, [:c1], :ignore_errors=>true, :name=>:t1_i1
   end
 end
 END_MIG
@@ -590,11 +524,7 @@ END_MIG
     @d.meta_def(:tables){|o| [:t1]}
     @d.dump_indexes_migration.should == <<-END_MIG
 Sequel.migration do
-  up do
-    
-  end
-  
-  down do
+  change do
     
   end
 end
@@ -605,7 +535,7 @@ END_MIG
     @d.meta_def(:tables){|o| [:t1]}
     @d.dump_foreign_key_migration.should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     
   end
 end
@@ -629,7 +559,7 @@ END_MIG
     end
     @d.dump_foreign_key_migration.should == <<-END_MIG
 Sequel.migration do
-  up do
+  change do
     alter_table(:t1) do
       add_foreign_key [:c2], :t2, :key=>[:c1]
     end

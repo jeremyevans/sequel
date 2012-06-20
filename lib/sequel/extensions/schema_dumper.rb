@@ -21,7 +21,7 @@ module Sequel
       ts = tables(options)
       <<END_MIG
 Sequel.migration do
-  up do
+  change do
 #{ts.sort_by{|t| t.to_s}.map{|t| dump_table_foreign_keys(t)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
   end
 end
@@ -39,12 +39,8 @@ END_MIG
       ts = tables(options)
       <<END_MIG
 Sequel.migration do
-  up do
+  change do
 #{ts.sort_by{|t| t.to_s}.map{|t| dump_table_indexes(t, :add_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
-  end
-  
-  down do
-#{ts.sort_by{|t| t.to_s}.reverse.map{|t| dump_table_indexes(t, :drop_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
   end
 end
 END_MIG
@@ -83,12 +79,8 @@ END_MIG
 
       <<END_MIG
 Sequel.migration do
-  up do
+  change do
 #{ts.map{|t| dump_table_schema(t, options)}.join("\n\n").gsub(/^/o, '    ')}#{"\n    \n" if skipped_fks}#{skipped_fks}
-  end
-  
-  down do
-    drop_table(#{ts.reverse.inspect[1...-1]})
   end
 end
 END_MIG

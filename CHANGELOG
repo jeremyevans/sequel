@@ -1,5 +1,9 @@
 === HEAD
 
+* Use change migrations instead of up/down migrations in the schema_dumper (jeremyevans)
+
+* Dump unsigned integer columns with a check >= 0 constraint in the schema_dumper (stu314)
+
 * Switch the :key_hash entry to the association :eager_loader option to use the method symbol(s) instead of the column symbol(s) (jeremyevans)
 
 * Add :id_map entry to the hash passed to the association :eager_loader option, for easier custom eager loading (jeremyevans)
