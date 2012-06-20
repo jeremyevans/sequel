@@ -193,6 +193,11 @@ describe Sequel::Model::Associations::AssociationReflection do
     @c.meta_def(:name){"C"}
   end
 
+  it "#eager_loading_predicate_key should be an alias of predicate_key for backwards compatibility" do
+    @c.one_to_many :cs, :class=>@c
+    @c.dataset.literal(@c.association_reflection(:cs).eager_loading_predicate_key).should == 'foo.c_id'
+  end
+
   it "one_to_many #qualified_primary_key should be a qualified version of the primary key" do
     @c.one_to_many :cs, :class=>@c
     @c.dataset.literal(@c.association_reflection(:cs).qualified_primary_key).should == 'foo.id'

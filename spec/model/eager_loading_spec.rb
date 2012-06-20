@@ -275,6 +275,21 @@ describe Sequel::Model, "#eager" do
     a.first.sgenres.should == [EagerGenre.load(:id=>4)]
     MODEL_DB.sqls.should == []
   end
+
+  it "should raise an error for an unhandled :eager_loader_key option" do
+    EagerAlbum.many_to_many :sgenres, :clone=>:genres, :eager_loader_key=>1
+    ds = EagerAlbum.eager(:sgenres)
+    proc{ds.all}.should raise_error(Sequel::Error)
+  end
+  
+  it "should not add entry to key_hash for :eager_loader_key=>nil option" do
+    eo = nil
+    EagerAlbum.many_to_many :sgenres, :clone=>:genres, :eager_loader_key=>nil, :eager_loader=>proc{|o| eo = o}
+    ds = EagerAlbum.eager(:sgenres)
+    ds.all
+    eo[:key_hash].should == {}
+    eo[:id_map].should == nil
+  end
   
   it "should correctly handle a :select=>[] option to many_to_many" do
     EagerAlbum.many_to_many :sgenres, :clone=>:genres, :select=>[]
