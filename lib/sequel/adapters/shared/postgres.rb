@@ -642,7 +642,7 @@ module Sequel
       # PostgreSQL's autoincrementing primary keys are of type integer or bigint
       # using a nextval function call as a default.
       def schema_autoincrementing_primary_key?(schema)
-        super and schema[:db_type] =~ /\A(?:integer|bigint)\z/io and schema[:default]=~/\Anextval/io
+        super && schema[:default] =~ /\Anextval/io
       end
 
       # The dataset used for parsing table schemas, using the pg_* system catalogs.

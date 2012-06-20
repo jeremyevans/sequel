@@ -369,11 +369,6 @@ module Sequel
         end
       end
 
-      # MySQL treats integer primary keys as autoincrementing.
-      def schema_autoincrementing_primary_key?(schema)
-        super and schema[:db_type] =~ /int/io
-      end
-
       # Use the MySQL specific DESCRIBE syntax to get a table description.
       def schema_parse_table(table_name, opts)
         m = output_identifier_meth(opts[:dataset])

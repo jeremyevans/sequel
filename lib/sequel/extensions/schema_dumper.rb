@@ -141,6 +141,7 @@ END_MIG
         col_opts[:null] = false if schema[:allow_null] == false
         if table = schema[:table]
           [:key, :on_delete, :on_update, :deferrable].each{|f| col_opts[f] = schema[f] if schema[f]}
+          col_opts[:type] = type unless type == Integer || type == 'integer'
           [:foreign_key, name, table, col_opts]
         else
           [:column, name, type, col_opts]

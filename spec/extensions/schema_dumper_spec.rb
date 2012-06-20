@@ -157,9 +157,9 @@ describe "Sequel::Database dump methods" do
     s.should_not =~ /:deferrable/
   end
 
-  it "should dump primary key columns with explicit :type equal to the database type when :same_db option is passed" do
+  it "should dump primary key columns with explicit type equal to the database type when :same_db option is passed" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'somedbspecifictype', :primary_key=>true, :allow_null=>false}]]}
-    @d.dump_table_schema(:t7, :same_db => true).should == "create_table(:t7) do\n  primary_key :c1, :type=>\"somedbspecifictype\"\nend"
+    @d.dump_table_schema(:t7, :same_db => true).should == "create_table(:t7) do\n  column :c1, \"somedbspecifictype\", :null=>false\n  \n  primary_key [:c1]\nend"
   end
 
   it "should use a composite primary_key calls if there is a composite primary key" do
@@ -773,5 +773,27 @@ create_table(:x) do
   Integer :c72
 end
 END_MIG
+  end
+
+  it "should use separate primary_key call with non autoincrementable types" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'varchar(8)', :primary_key=>true}]]}
+    @d.dump_table_schema(:t3).should == "create_table(:t3) do\n  String :c1, :size=>8\n  \n  primary_key [:c1]\nend"
+    @d.dump_table_schema(:t3, :same_db=>true).should == "create_table(:t3) do\n  column :c1, \"varchar(8)\"\n  \n  primary_key [:c1]\nend"
+  end
+
+  it "should use explicit type for non integer foreign_key types" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'date', :primary_key=>true}]]}
+    @d.meta_def(:foreign_key_list){|t, *a| [{:columns=>[:c1], :table=>:t3, :key=>[:c1]}] if t == :t4}
+    ["create_table(:t4) do\n  foreign_key :c1, :t3, :type=>Date, :key=>[:c1]\n  \n  primary_key [:c1]\nend",
+     "create_table(:t4) do\n  foreign_key :c1, :t3, :key=>[:c1], :type=>Date\n  \n  primary_key [:c1]\nend"].should include(@d.dump_table_schema(:t4))
+    ["create_table(:t4) do\n  foreign_key :c1, :t3, :type=>\"date\", :key=>[:c1]\n  \n  primary_key [:c1]\nend",
+     "create_table(:t4) do\n  foreign_key :c1, :t3, :key=>[:c1], :type=>\"date\"\n  \n  primary_key [:c1]\nend"].should include(@d.dump_table_schema(:t4, :same_db=>true))
+  end
+
+  it "should correctly handing autoincrementing primary keys that are also foreign keys" do
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true}]]}
+    @d.meta_def(:foreign_key_list){|t, *a| [{:columns=>[:c1], :table=>:t3, :key=>[:c1]}] if t == :t4}
+    ["create_table(:t4) do\n  primary_key :c1, :table=>:t3, :key=>[:c1]\nend",
+     "create_table(:t4) do\n  primary_key :c1, :key=>[:c1], :table=>:t3\nend"].should include(@d.dump_table_schema(:t4))
   end
 end

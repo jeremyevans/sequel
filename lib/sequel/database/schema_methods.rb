@@ -621,7 +621,7 @@ module Sequel
 
     # Return true if the given column schema represents an autoincrementing primary key.
     def schema_autoincrementing_primary_key?(schema)
-      !!schema[:primary_key]
+      !!(schema[:primary_key] && schema[:db_type] =~ /int/io)
     end
 
     # The dataset to use for proxying certain schema methods.

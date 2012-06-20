@@ -383,7 +383,7 @@ module Sequel
       
       # SQLite treats integer primary keys as autoincrementing (alias of rowid).
       def schema_autoincrementing_primary_key?(schema)
-        super and schema[:db_type].downcase == 'integer'
+        super && schema[:db_type].downcase == 'integer'
       end
 
       # SQLite supports schema parsing using the table_info PRAGMA, so
