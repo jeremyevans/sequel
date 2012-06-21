@@ -66,7 +66,7 @@ module Sequel
         # test code or simple examples.
         def set_schema(name = nil, &block)
           set_dataset(db[name]) if name
-          @schema = Sequel::Schema::Generator.new(db, &block)
+          @schema = db.create_table_generator(&block)
           set_primary_key(@schema.primary_key_name) if @schema.primary_key_name
         end
         

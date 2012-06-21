@@ -68,10 +68,16 @@ module Sequel
     #
     # See <tt>Schema::AlterTableGenerator</tt> and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
     def alter_table(name, generator=nil, &block)
-      generator ||= Schema::AlterTableGenerator.new(self, &block)
+      generator ||= alter_table_generator(&block)
       remove_cached_schema(name)
       apply_alter_table(name, generator.operations)
       nil
+    end
+
+    # Return a new Schema::AlterTableGenerator instance with the receiver as
+    # the database and the given block.
+    def alter_table_generator(&block)
+      alter_table_generator_class.new(self, &block)
     end
 
     # Create a join table using a hash of foreign keys to referenced
@@ -146,12 +152,12 @@ module Sequel
     # See <tt>Schema::Generator</tt> and the {"Schema Modification" guide}[link:files/doc/schema_modification_rdoc.html].
     def create_table(name, options={}, &block)
       remove_cached_schema(name)
-      options = {:generator=>options} if options.is_a?(Schema::Generator)
+      options = {:generator=>options} if options.is_a?(Schema::CreateTableGenerator)
       if sql = options[:as]
         raise(Error, "can't provide both :as option and block to create_table") if block
         create_table_as(name, sql, options)
       else
-        generator = options[:generator] || Schema::Generator.new(self, &block)
+        generator = options[:generator] || create_table_generator(&block)
         create_table_from_generator(name, generator, options)
         create_table_indexes_from_generator(name, generator, options)
         nil
@@ -180,6 +186,12 @@ module Sequel
       elsif !table_exists?(name)
         create_table(name, options, &block)
       end
+    end
+
+    # Return a new Schema::CreateTableGenerator instance with the receiver as
+    # the database and the given block.
+    def create_table_generator(&block)
+      create_table_generator_class.new(self, &block)
     end
     
     # Creates a view, replacing it if it already exists:
@@ -324,6 +336,11 @@ module Sequel
       alter_table_sql_list(name, ops).flatten.each{|sql| execute_ddl(sql)}
     end
     
+    # The class used for alter_table generators.
+    def alter_table_generator_class
+      Schema::AlterTableGenerator
+    end
+    
     # The SQL to execute to modify the DDL for the given table name.  op
     # should be one of the operations returned by the AlterTableGenerator.
     def alter_table_sql(table, op)
@@ -465,6 +482,11 @@ module Sequel
       execute_ddl(create_table_sql(name, generator, options))
     end
 
+    # The class used for create_table generators.
+    def create_table_generator_class
+      Schema::CreateTableGenerator
+    end
+    
     # Execute the create index statements using the generator.
     def create_table_indexes_from_generator(name, generator, options)
       e = options[:ignore_index_errors] || options[:if_not_exists]

@@ -1,20 +1,20 @@
 module Sequel
   # The Schema module holds the schema generators.
   module Schema
-    # Schema::Generator is an internal class that the user is not expected
+    # Schema::CreateTableGenerator is an internal class that the user is not expected
     # to instantiate directly.  Instances are created by Database#create_table.
     # It is used to specify table creation parameters.  It takes a Database
     # object and a block of column/index/constraint specifications, and
     # gives the Database a table description, which the database uses to
     # create a table.
     #
-    # Schema::Generator has some methods but also includes method_missing,
+    # Schema::CreateTableGenerator has some methods but also includes method_missing,
     # allowing users to specify column type as a method instead of using
     # the column method, which makes for a nicer DSL.
     #
     # For more information on Sequel's support for schema modification, see
     # the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
-    class Generator
+    class CreateTableGenerator
       # Classes specifying generic types that Sequel will convert to database-specific types.
       GENERIC_TYPES=[String, Integer, Fixnum, Bignum, Float, Numeric, BigDecimal,
       Date, DateTime, Time, File, TrueClass, FalseClass]
@@ -255,6 +255,9 @@ module Sequel
       
       add_type_method(*GENERIC_TYPES)
     end
+
+    # Alias of CreateTableGenerator for backwards compatibility.
+    Generator = CreateTableGenerator
   
     # Schema::AlterTableGenerator is an internal class that the user is not expected
     # to instantiate directly.  Instances are created by Database#alter_table.
@@ -278,7 +281,7 @@ module Sequel
       end
       
       # Add a column with the given name, type, and opts to the DDL for the table.
-      # See Generator#column for the available options.
+      # See CreateTableGenerator#column for the available options.
       #
       #   add_column(:name, String) # ADD COLUMN name varchar(255)
       def add_column(name, type, opts = {})
@@ -286,7 +289,7 @@ module Sequel
       end
       
       # Add a constraint with the given name and args to the DDL for the table.
-      # See Generator#constraint.
+      # See CreateTableGenerator#constraint.
       #
       #   add_constraint(:valid_name, :name.like('A%'))
       #   # ADD CONSTRAINT valid_name CHECK (name LIKE 'A%')
@@ -303,7 +306,7 @@ module Sequel
       end
 
       # Add a foreign key with the given name and referencing the given table
-      # to the DDL for the table.  See Generator#column for the available options.
+      # to the DDL for the table.  See CreateTableGenerator#column for the available options.
       #
       # You can also pass an array of column names for creating composite foreign
       # keys. In this case, it will assume the columns exist and will only add
@@ -320,20 +323,20 @@ module Sequel
       end
       
       # Add a full text index on the given columns to the DDL for the table.
-      # See Generator#index for available options.
+      # See CreateTableGenerator#index for available options.
       def add_full_text_index(columns, opts = {})
         add_index(columns, {:type=>:full_text}.merge(opts))
       end
       
       # Add an index on the given columns to the DDL for the table.  See
-      # Generator#index for available options.
+      # CreateTableGenerator#index for available options.
       #
       #   add_index(:artist_id) # CREATE INDEX table_artist_id_index ON table (artist_id)
       def add_index(columns, opts = {})
         @operations << {:op => :add_index, :columns => Array(columns)}.merge(opts)
       end
       
-      # Add a primary key to the DDL for the table.  See Generator#column
+      # Add a primary key to the DDL for the table.  See CreateTableGenerator#column
       # for the available options.  Like +add_foreign_key+, if you specify
       # the column name as an array, it just creates a constraint:
       #
@@ -346,7 +349,7 @@ module Sequel
       end
       
       # Add a spatial index on the given columns to the DDL for the table.
-      # See Generator#index for available options.
+      # See CreateTableGenerator#index for available options.
       def add_spatial_index(columns, opts = {})
         add_index(columns, {:type=>:spatial}.merge(opts))
       end

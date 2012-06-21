@@ -198,7 +198,7 @@ END_MIG
     # string that would add the foreign keys if run in a migration.
     def dump_add_fk_constraints(table, fks)
       sfks = "alter_table(#{table.inspect}) do\n"
-      sfks << Schema::Generator.new(self) do
+      sfks << create_table_generator do
         fks.sort_by{|fk| fk[:columns].map{|c| c.to_s}}.each do |fk|
           foreign_key fk[:columns], fk
         end
@@ -270,7 +270,7 @@ END_MIG
         end
       end
 
-      Schema::Generator.new(self) do
+      create_table_generator do
         s.each{|name, info| m.call(name, info, self, options)}
         primary_key(pks) if !@primary_key && pks.length > 0
         indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts, options))} if indexes
@@ -287,7 +287,7 @@ END_MIG
         return ''
       end
       im = method(:index_to_generator_opts)
-      gen = Schema::Generator.new(self) do
+      gen = create_table_generator do
         indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts, options))}
       end
       gen.dump_indexes(meth=>table, :ignore_errors=>!options[:same_db])
