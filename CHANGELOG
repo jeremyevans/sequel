@@ -1,5 +1,7 @@
 === HEAD
 
+* The json library is now required when running the plugin/extension specs (jeremyevans)
+
 * Use change migrations instead of up/down migrations in the schema_dumper (jeremyevans)
 
 * Dump unsigned integer columns with a check >= 0 constraint in the schema_dumper (stu314)

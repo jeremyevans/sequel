@@ -1,10 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-begin
-  Sequel.extension :pg_array, :pg_json
-rescue LoadError => e
-  skip_warn "can't load pg_json extension (#{e.class}: #{e})"
-else
 describe "pg_json extension" do
   before(:all) do
     m = Sequel::Postgres
@@ -99,5 +94,4 @@ describe "pg_json extension" do
     proc{@db.typecast_value(:json, '')}.should raise_error(Sequel::InvalidValue)
     proc{@db.typecast_value(:json, 1)}.should raise_error(Sequel::InvalidValue)
   end
-end
 end

@@ -1,10 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-begin
-  require 'json'
-rescue LoadError => e
-  skip_warn "json_serializer plugin: can't load json (#{e.class}: #{e})"
-else
 describe "Sequel::Plugins::JsonSerializer" do
   before do
     class ::Artist < Sequel::Model
@@ -204,5 +199,4 @@ describe "Sequel::Plugins::JsonSerializer" do
     Object.send(:remove_const, :Artist2)
     Object.send(:remove_const, :Artist3)
   end
-end
 end

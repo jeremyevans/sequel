@@ -1,10 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-begin
-  Sequel.extension :pg_array
-rescue LoadError => e
-  skip_warn "can't load pg_array extension (#{e.class}: #{e})"
-else
 describe "pg_array extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
@@ -289,5 +284,4 @@ describe "pg_array extension" do
     procs[1185].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
     procs[1115].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
   end
-end
 end

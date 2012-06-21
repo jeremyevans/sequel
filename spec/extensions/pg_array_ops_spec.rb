@@ -1,16 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Postgres::ArrayOp" do
-  # Attempt to load pg_array first to test PGArray -> ArrayOp code
-  pg_array_loaded = begin
-    Sequel.extension :pg_array
-    true
-  rescue LoadError
-    false
-  end
-
-  Sequel.extension :pg_array_ops
-
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     @a = :a.pg_array
@@ -101,5 +91,5 @@ describe "Sequel::Postgres::ArrayOp" do
 
   it "should allow transforming PGArray instances into ArrayOp instances" do
     @db.literal([1,2].pg_array.op.push(3)).should == "(ARRAY[1,2] || 3)"
-  end if pg_array_loaded
+  end
 end

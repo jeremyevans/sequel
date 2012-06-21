@@ -1,19 +1,12 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-begin
-  Sequel.extension :pg_array
-  array_spec = true
-rescue LoadError
-end
-Sequel.extension :pg_range
-
 describe "pg_range extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     @R = Sequel::Postgres::PGRange
     @db.extend(Module.new{def get_conversion_procs(conn) {} end; def bound_variable_arg(arg, conn) arg end})
     @db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
-    @db.extension(:pg_array) if array_spec
+    @db.extension(:pg_array)
     @db.extension(:pg_range)
   end
 
@@ -57,11 +50,11 @@ describe "pg_range extension" do
 
   it "should support using arrays of Range instances as bound variables" do
     @db.bound_variable_arg([1..2,2...3], nil).should == '{"[1,2]","[2,3)"}'
-  end if array_spec
+  end
 
   it "should support using PGRange instances as bound variables" do
     @db.bound_variable_arg([@R.new(1, 2),@R.new(2, 3)], nil).should == '{"[1,2]","[2,3]"}'
-  end if array_spec
+  end
 
   it "should parse range types from the schema correctly" do
     @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4range'}, {:name=>'i8', :db_type=>'int8range'}, {:name=>'n', :db_type=>'numrange'}, {:name=>'d', :db_type=>'daterange'}, {:name=>'ts', :db_type=>'tsrange'}, {:name=>'tz', :db_type=>'tstzrange'}]
@@ -71,7 +64,7 @@ describe "pg_range extension" do
   it "should parse arrays of range types from the schema correctly" do
     @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4range[]'}, {:name=>'i8', :db_type=>'int8range[]'}, {:name=>'n', :db_type=>'numrange[]'}, {:name=>'d', :db_type=>'daterange[]'}, {:name=>'ts', :db_type=>'tsrange[]'}, {:name=>'tz', :db_type=>'tstzrange[]'}]
     @db.schema(:items).map{|e| e[1][:type]}.should == [:integer, :int4range_array, :int8range_array, :numrange_array, :daterange_array, :tsrange_array, :tstzrange_array]
-  end if array_spec
+  end
 
   describe "database typecasting" do
     before do
@@ -92,7 +85,7 @@ describe "pg_range extension" do
         @db.typecast_value(:"#{i}range_array", [@R.new(1, 2, :db_type=>"#{i}range")]).should be_a_kind_of(Sequel::Postgres::PGArray)
         @db.typecast_value(:"#{i}range_array", [@R.new(1, 2, :db_type=>"#{i}range")]).should == [@R.new(1, 2, :db_type=>"#{i}range")]
       end
-    end if array_spec
+    end
 
     it "should return PGRange value as is if they have the same subtype" do
       @db.typecast_value(:int4range, @o).should equal(@o)
@@ -220,7 +213,7 @@ describe "pg_range extension" do
     procs = @db.send(:get_conversion_procs, nil)
     procs[3909].call('{"[2011-10-20 11:12:13,2011-10-20 11:12:14]"}').should == [Time.local(2011, 10, 20, 11, 12, 13)..Time.local(2011, 10, 20, 11, 12, 14)]
     procs[3911].call('{"[2011-10-20 11:12:13,2011-10-20 11:12:14]"}').should == [Time.local(2011, 10, 20, 11, 12, 13)..Time.local(2011, 10, 20, 11, 12, 14)]
-  end if array_spec
+  end
 
   describe "a PGRange instance" do
     before do
