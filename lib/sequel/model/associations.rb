@@ -1820,8 +1820,7 @@ module Sequel
         # need to filter based on columns in associated tables, look at +eager_graph+
         # or join the tables you need to filter on manually. 
         #
-        # Each association's order, if defined, is respected. Eager also works
-        # on a limited dataset, but does not use any :limit options for associations.
+        # Each association's order, if defined, is respected.
         # If the association uses a block or has an :eager_block argument, it is used.
         def eager(*associations)
           opt = @opts[:eager]
