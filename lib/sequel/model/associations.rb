@@ -907,7 +907,7 @@ module Sequel
           orig_opts = opts.dup
           if opts[:clone]
             cloned_assoc = association_reflection(opts[:clone])
-            raise(Error, "cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})") unless cloned_assoc[:type] == type
+            raise(Error, "cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})") unless cloned_assoc[:type] == type || [cloned_assoc[:type], type].all?{|t| [:one_to_many, :one_to_one].include?(t)}
             orig_opts = cloned_assoc[:orig_opts].merge(orig_opts)
           end
           opts = orig_opts.merge(:type => type, :name => name, :cache=>{}, :model => self)
