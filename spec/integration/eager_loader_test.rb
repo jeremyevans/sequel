@@ -185,7 +185,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
           end
         end), \
         :eager_loader=>(proc do |eo|
-          id_map = eo[:key_hash][Firm.primary_key]
+          id_map = eo[:id_map]
           eo[:rows].each{|firm| firm.associations[:invoices] = []}
           Invoice.eager_graph(:client).filter(:client__firm_id=>id_map.keys).all do |inv|
             id_map[inv.client.firm_id].each do |firm|
@@ -526,7 +526,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
       many_to_one :client, :key=>:client_name, \
         :dataset=>proc{Client.filter(:name=>client_name)}, \
         :eager_loader=>(proc do |eo|
-          id_map = eo[:key_hash][:client_name]
+          id_map = eo[:id_map]
           eo[:rows].each{|inv| inv.associations[:client] = nil}
           Client.filter(:name=>id_map.keys).all do |client|
             id_map[client.name].each{|inv| inv.associations[:client] = client}
@@ -629,11 +629,11 @@ describe "statistics associations" do
        :dataset=>proc{Ticket.filter(:project_id=>id).select{sum(hours).as(hours)}},
        :eager_loader=>(proc do |eo|
         eo[:rows].each{|p| p.associations[:ticket_hours] = nil}
-        Ticket.filter(:project_id=>eo[:key_hash][:id].keys).
+        Ticket.filter(:project_id=>eo[:id_map].keys).
          group(:project_id).
          select{[project_id.as(project_id), sum(hours).as(hours)]}.
          all do |t|
-          p = eo[:key_hash][:id][t.values.delete(:project_id)].first
+          p = eo[:id_map][t.values.delete(:project_id)].first
           p.associations[:ticket_hours] = t
          end
        end)  

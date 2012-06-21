@@ -75,19 +75,15 @@ option.  Though it can often be verbose (compared to other things in Sequel),
 it allows you complete control over how to eagerly load associations for a
 group of objects.
 
-:eager_loader should be a proc that takes 1 or 3 arguments.  If the proc
-takes one argument, it will be given a hash with the following keys:
+:eager_loader should be a proc that takes a single hash argument, which will
+have at least the following keys:
 
-:key_hash :: A key_hash, described below
+:id_map :: A mapping of key values to arrays of current model instances,
+           usage described below
 :rows :: An array of model objects
 :associations :: A hash of dependent associations to eagerly load
 :self :: The dataset that is doing the eager loading
-
-If the proc takes three arguments, it gets passed the :key_hash, :rows,
-and :associations values.  The only way to get the :self value is to
-accept one argument.  The 3 argument procs are allowed for backwards
-compatibility, and it is recommended to use the 1 argument proc format
-for new code.
+:eager_block :: A dynamic callback for this eager load.
 
 Since you are given all of the records, you can do things like filter on
 associations that are specified by multiple keys, or do multiple
@@ -98,13 +94,12 @@ associations cache for all objects in the array of records.  The hash
 of dependent associations is available for you to cascade the eager
 loading down multiple levels, but it is up to you to use it.
 
-The key_hash is a performance enhancement that is used by the default
-association loaders and is also available to you.  It is a hash with keys being
-foreign/primary key symbols in the current table, and the values
-being hashes where the key is foreign/primary key values and values
-being arrays of current model objects having the foreign/primary key
-value associated with the key.  This is hard to visualize, so I'll
-give an example.  Let's say you have the following associations
+The id_map is a performance enhancement that is used by the default
+association loaders and is also available to you.  It is a hash with keys
+foreign/primary key values, and values being arrays of current model
+objects having the foreign/primary key value associated with the key. 
+This may be hard to visualize, so I'll give an example.  Let's say you
+have the following associations
 
   Album.many_to_one :artist
   Album.one_to_many :tracks
@@ -113,53 +108,30 @@ and the following two albums in the database:
 
   album1 = Album.create(:artist_id=>3) # id: 1
   album2 = Album.create(:artist_id=>3) # id: 2
+  album3 = Album.create(:artist_id=>2) # id: 3
 
 If you try to eager load this dataset:
 
   Album.eager(:artist, :tracks).all
 
-Then the key_hash provided to the :eager_loader proc would be:
+Then the id_map provided to the artist :eager_loader proc would be:
 
-  {:id=>{1=>[album1], 2=>[album2]}, :artist_id=>{3=>[album1, album2]}}
+  {3=>[album1, album2], 2=>[album3]}
 
-Let's break down the reason for the makeup of this key_hash.  The hash has keys for
-each of foreign/primary keys used in the association.  In this case, the artist
-association needs the artist_id foreign key (since it is a many_to_one), and the
-tracks association needs the id primary key (since it is a one_to_many).
+The artist id_map contains a mapping of artist_id values to arrays of
+album objects.  Since both album1 and album2 have the same artist_id,
+the are both in the array related to that key.  album3 has a different
+artist_id, so it is in a different array. Eager loading of artists is
+done by looking for any artist having one of the keys in the hash:
 
-If you only eagerly loaded the artist association:
-
-  Album.eager(:artist).all
-
-Then the key_hash would only contain artist_id information:
-
-  {:artist_id=>{3=>[album1, album2]}}
- 
-Likewise, if you only eagerly loaded the tracks association:
-
-  Album.eager(:tracks).all
-
-Then the key_hash would only contain id information:
-
-  {:id=>{1=>[album1], 2=>[album2]}}
-
-Now, the eager loader for the artist association is only going to care about the
-value of the artist_id key in the hash, so it's going to do the equivalent of:
-
-  artist_id_map = key_hash[:artist_id] # {3=>[album1, album2]}
-
-The artist_id_map contains a mapping of artist_id values to arrays of
-album objects.  Since it only has a single entry with a key of 3, when eagerly
-loading the artists, you only need to look for artists that have an id of 3.
-
-  artists = Artist.where(:id=>artist_id_map.keys).all
+  artists = Artist.where(:id=>id_map.keys).all
 
 When the artists are retrieved, you can iterate over them, find entries
 with matching keys, and manually associate them to the albums:
 
   artists.each do |artist|
     # Find related albums using the artist_id_map
-    if albums = artist_id_map[artist.id]
+    if albums = id_map[artist.id]
       # Iterate over the albums
       albums.each do |album|
         # Manually set the artist association for each album
@@ -168,15 +140,14 @@ with matching keys, and manually associate them to the albums:
     end
   end
 
-Similarly, the eager loader for the tracks association is only going to care about the
-value of the id key in the hash:
+The id_map provided to the tracks :eager_loader proc would be:
 
-  id_map = key_hash[:id] # {1=>[album1], 2=>[album2]}
+  {1=>[album1], 2=>[album2], 3=>[album3]}
 
 Now the id_map contains a mapping of id values to arrays of album objects (in this
 case each array only has a single object, because id is the primary key).  So when
 looking for tracks to eagerly load, you only need to look for ones that have an
-album_id of 1 or 2:
+album_id with one of the keys in the hash:
 
   tracks = Track.where(:album_id=>id_map.keys).all
 
@@ -213,9 +184,9 @@ So putting everything together, the artist eager loader looks like:
 
   :eager_loader=>(proc do |eo_opts|
     eo_opts[:rows].each{|album| album.associations[:artist] = nil}
-    artist_id_map = eo_opts[:key_hash][:artist_id]
-    Artist.where(:id=>artist_id_map.keys).all do |artist|
-      if albums = artist_id_map[artist.id]
+    id_map = eo_opts[:id_map]
+    Artist.where(:id=>id_map.keys).all do |artist|
+      if albums = id_map[artist.id]
         albums.each do |album|
           album.associations[:artist] = artist
         end
@@ -227,7 +198,7 @@ and the tracks eager loader looks like:
 
   :eager_loader=>(proc do |eo_opts|
     eo_opts[:rows].each{|album| album.associations[:tracks] = []}
-    id_map = eo_opts[:key_hash][:id]
+    id_map = eo_opts[:id_map]
     Track.where(:id=>id_map.keys).all do |tracks|
       if albums = id_map[track.album_id]
         albums.each do |album|
@@ -245,14 +216,12 @@ the custom eager loaders described later in this page are more complex.
 Basically, the eager loading steps can be broken down into:
 
 1. Set default association values (nil/[]) for each of the current objects
-2. Build a custom key map mapping foreign/primary key values to arrays of
-   current objects (using the key_hash)
-3. Return just related associated objects by filtering the associated class
-   to include only matching values
-4. Iterating over the returned associated objects, indexing into the custom key
-   map using the foreign/primary key value in the associated object to get
+2. Return just related associated objects by filtering the associated class
+   to include only rows with keys present in the id_map.
+3. Iterating over the returned associated objects, indexing into the id_map
+   using the foreign/primary key value in the associated object to get
    current values associated to that specific object.
-5. For each of those current values, updating the cached association value to
+4. For each of those current values, updating the cached association value to
    include that specific object.
 
 Using the :eager_loader proc, you should be able to eagerly load all associations
@@ -631,7 +600,7 @@ name, with no duplicates?
     one_to_many :songs, :order=>:songs__name, \
       :dataset=>proc{Song.select(:songs.*).join(Lyric, :id=>:lyric_id, id=>[:composer_id, :arranger_id, :vocalist_id, :lyricist_id])}, \
       :eager_loader=>(proc do |eo|
-        h = eo[:key_hash][:id]
+        h = eo[:id_map]
         ids = h.keys
         eo[:rows].each{|r| r.associations[:songs] = []}
         Song.select(:songs.*, :lyrics__composer_id, :lyrics__arranger_id, :lyrics__vocalist_id, :lyrics__lyricist_id)\
@@ -662,11 +631,11 @@ associated tickets.
      :dataset=>proc{Ticket.filter(:project_id=>id).select{sum(hours).as(hours)}},
      :eager_loader=>(proc do |eo|
       eo[:rows].each{|p| p.associations[:ticket_hours] = nil}
-      Ticket.filter(:project_id=>eo[:key_hash][:id].keys).
+      Ticket.filter(:project_id=>eo[:id_map].keys).
        group(:project_id).
        select{[project_id, sum(hours).as(hours)]}.
        all do |t|
-        p = eo[:key_hash][:id][t.values.delete(:project_id)].first
+        p = eo[:id_map][t.values.delete(:project_id)].first
         p.associations[:ticket_hours] = t
        end
      end)

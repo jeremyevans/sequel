@@ -58,7 +58,7 @@ module Sequel
             left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
             opts[:eager_loader] = lambda do |eo|
               return el.call(eo) unless model.identity_map
-              h = eo[:key_hash][left_pk]
+              h = eo[:id_map]
               eo[:rows].each{|object| object.associations[name] = []}
               r = uses_rcks ? rcks.zip(opts.right_primary_keys) : [[right, opts.right_primary_key]]
               l = uses_lcks ? [[lcks.map{|k| SQL::QualifiedIdentifier.new(join_table, k)}, h.keys]] : [[left, h.keys]]
@@ -107,7 +107,7 @@ module Sequel
             left_key_alias = opts[:left_key_alias]
             opts[:eager_loader] = lambda do |eo|
               return el.call(eo) unless model.identity_map
-              h = eo[:key_hash][left_pk]
+              h = eo[:id_map]
               eo[:rows].each{|object| object.associations[name] = []}
               ds = opts.associated_class 
               opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}

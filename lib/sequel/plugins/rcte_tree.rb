@@ -160,7 +160,7 @@ module Sequel
         end
         a[:after_load] ||= aal
         a[:eager_loader] ||= proc do |eo|
-          id_map = eo[:key_hash][key]
+          id_map = eo[:id_map]
           parent_map = {}
           children_map = {}
           eo[:rows].each do |obj|
@@ -259,7 +259,7 @@ module Sequel
         end
         d[:after_load] = dal
         d[:eager_loader] ||= proc do |eo|
-          id_map = eo[:key_hash][prkey]
+          id_map = eo[:id_map]
           associations = eo[:associations]
           parent_map = {}
           children_map = {}

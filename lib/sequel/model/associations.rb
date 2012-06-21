@@ -770,14 +770,13 @@ module Sequel
         #                          choice for the database, or specify a specific symbol to manually select a strategy.
         #                          one_to_one associations support :distinct_on, :window_function, and :correlated_subquery.
         #                          *_many associations support :ruby, :window_function, and :correlated_subquery.
-        # :eager_loader :: A proc to use to implement eager loading, overriding the default.  Takes one or three arguments.
-        #                  If three arguments, the first should be a key hash (used solely to enhance performance), the
-        #                  second an array of records, and the third a hash of dependent associations. If one argument, is
-        #                  passed a hash with keys :key_hash, :rows, and :associations, corresponding to the three
-        #                  arguments, and an additional keys :self, which is the dataset doing the eager loading,
+        # :eager_loader :: A proc to use to implement eager loading, overriding the default.  Takes a single hash argument,
+        #                  with at least the keys: :rows, which is an array of current model instances, :associations,
+        #                  which is a hash of dependent associations, :self, which is the dataset doing the eager loading,
         #                  :eager_block, which is a dynamic callback that should be called with the dataset, and :id_map,
-        #                  which is the appropriate value in the key_hash. In the proc, the associated records should be
-        #                  queried from the database and the associations cache for each record should be populated.
+        #                  which is a mapping of key values to arrays of current model instances. In the proc, the
+        #                  associated records should be queried from the database and the associations cache for each
+        #                  record should be populated.
         # :eager_loader_key :: A symbol for the key column to use to populate the key_hash
         #                      for the eager loader.  Can be set to nil to not populate the key_hash.
         # :extend :: A module or array of modules to extend the dataset with.
