@@ -66,16 +66,20 @@ module Sequel
     module AutoParameterize
       # String that holds an array of parameters
       class StringWithArray < ::String
+        PLACEHOLDER = '$'.freeze
+        CAST = '::'.freeze
+
         # The array of parameters used by this query.
         attr_reader :args
 
         # Add a new parameter to this query, which adds
         # the parameter to the array of parameters, and an
         # SQL placeholder to the query itself.
-        def add_arg(s, type)
+        def add_arg(s, type=nil)
           @args ||= []
           @args << s
-          self << "$#{@args.length}::#{type}"
+          self << PLACEHOLDER << @args.length.to_s
+          self << CAST << type.to_s if type
         end
 
         # Show args when the string is inspected
@@ -120,7 +124,7 @@ module Sequel
               when Sequel::SQL::Blob
                 sql.add_arg(v, :bytea)
               else
-                sql.add_arg(v, :text)
+                sql.add_arg(v)
               end
             when Bignum
               sql.add_arg(v, :int8)

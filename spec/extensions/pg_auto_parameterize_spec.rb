@@ -20,7 +20,7 @@ describe "pg_auto_parameterize extension" do
     pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::int8)', 18446744073709551616)
     pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::double precision)', 1.1)
     pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::numeric)', BigDecimal.new('1.01'))
-    pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::text)', "a")
+    pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1)', "a")
     pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::bytea)', "a\0b".to_sequel_blob)
     pr.call(@db[:table], 'SELECT * FROM table WHERE (a = 1)', '1'.lit, :nil)
     pr.call(@db[:table], 'SELECT * FROM table WHERE (a = $1::time)', Sequel::SQLTime.create(1, 2, 3, 500000))
@@ -38,7 +38,7 @@ describe "pg_auto_parameterize extension" do
     @db.sqls.should == ['SELECT * FROM table WHERE (a = $1::int4) -- args: [1]']
 
     @db[:table].filter(:a=>1).update(:b=>'a').should == 1
-    @db.sqls.should == ['UPDATE table SET b = $1::text WHERE (a = $2::int4) -- args: ["a", 1]']
+    @db.sqls.should == ['UPDATE table SET b = $1 WHERE (a = $2::int4) -- args: ["a", 1]']
 
     @db[:table].filter(:a=>1).delete.should == 1
     @db.sqls.should == ['DELETE FROM table WHERE (a = $1::int4) -- args: [1]']

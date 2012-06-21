@@ -1,5 +1,7 @@
 === HEAD
 
+* Do not automatically cast String to text in pg_auto_parameterize extension (jeremyevans)
+
 * Support alter_table validate_constraint on PostgreSQL for validating constraints previously declared with NOT VALID (jeremyevans)
 
 * Support :not_valid option when adding foreign key constraints on PostgreSQL (jeremyevans)

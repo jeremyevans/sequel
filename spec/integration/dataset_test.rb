@@ -301,11 +301,11 @@ describe Sequel::Database do
      "\\'dingo",
      "\\\\''dingo",
     ].each do |str|
-      INTEGRATION_DB.get(str.as(:a)).should == str
+      INTEGRATION_DB.get(str.cast(String)).should == str
       str = "1#{str}1"
-      INTEGRATION_DB.get(str.as(:a)).should == str
+      INTEGRATION_DB.get(str.cast(String)).should == str
       str = "#{str}#{str}"
-      INTEGRATION_DB.get(str.as(:a)).should == str
+      INTEGRATION_DB.get(str.cast(String)).should == str
     end
   end
 
