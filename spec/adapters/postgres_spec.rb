@@ -158,6 +158,25 @@ describe "A PostgreSQL dataset" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}
   end
 
+  specify "should support exclusion constraints when creating or altering tables" do
+    begin
+      @db = POSTGRES_DB
+      @db.create_table!(:atest){Integer :t; exclude [[:t.desc(:nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}}
+      @db[:atest].insert(1)
+      @db[:atest].insert(2)
+      proc{@db[:atest].insert(2)}.should raise_error(Sequel::DatabaseError)
+
+      @db.create_table!(:atest){Integer :t}
+      @db.alter_table(:atest){add_exclusion_constraint [[:t, '=']], :using=>:btree, :name=>'atest_ex'}
+      @db[:atest].insert(1)
+      @db[:atest].insert(2)
+      proc{@db[:atest].insert(2)}.should raise_error(Sequel::DatabaseError)
+      @db.alter_table(:atest){drop_constraint 'atest_ex'}
+    ensure
+      @db.drop_table?(:atest)
+    end
+  end if POSTGRES_DB.server_version >= 90000
+
   specify "should support :using when altering a column's type" do
     begin
       @db = POSTGRES_DB

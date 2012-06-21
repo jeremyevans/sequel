@@ -1,5 +1,7 @@
 === HEAD
 
+* Support exclusion constraints on PostgreSQL (jeremyevans)
+
 * Allow for overriding the create/alter table generators used per Database object (jeremyevans)
 
 * Make casting to Date/(Time/DateTime) use date/datetime functions on SQLite (jeremyevans)

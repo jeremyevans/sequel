@@ -50,6 +50,37 @@ module Sequel
       attr_accessor :force_standard_strings
     end
 
+    class CreateTableGenerator < Sequel::Schema::Generator
+      # Add an exclusion constraint when creating the table. elements should be
+      # an array of 2 element arrays, with the first element being the column or
+      # expression the exclusion constraint is applied to, and the second element
+      # being the operator to use for the column/expression to check for exclusion.
+      #
+      # Example:
+      #
+      #   exclusion_constraint([[:col1, '&&'], [:col2, '=']])
+      #   # EXCLUDE USING gist (col1 WITH &&, col2 WITH =)
+      #
+      # Options supported:
+      #
+      # :name :: Name the constraint with the given name (useful if you may
+      #          need to drop the constraint later)
+      # :using :: Override the index_method for the exclusion constraint (defaults to gist).
+      # :where :: Create a partial exclusion constraint, which only affects
+      #           a subset of table rows, value should be a filter expression.
+      def exclude(elements, opts={})
+        constraints << {:type => :exclude, :elements => elements}.merge(opts)
+      end
+    end
+
+    class AlterTableGenerator < Sequel::Schema::AlterTableGenerator
+      # Adds an exclusion constraint to an existing table, see
+      # CreateTableGenerator#exclude.
+      def add_exclusion_constraint(elements, opts={})
+        @operations << {:op => :add_constraint, :type => :exclude, :elements => elements}.merge(opts)
+      end
+    end
+
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
       EXCLUDE_SCHEMAS = /pg_*|information_schema/i
@@ -444,6 +475,11 @@ module Sequel
 
       private
 
+      # Use a PostgreSQL-specific alter table generator
+      def alter_table_generator_class
+        Postgres::AlterTableGenerator
+      end
+    
       # Handle :using option for set_column_type op.
       def alter_table_sql(table, op)
         case op[:op]
@@ -499,6 +535,17 @@ module Sequel
         sqls
       end
 
+      # Handle exclusion constraints.
+      def constraint_definition_sql(constraint)
+        case constraint[:type]
+        when :exclude
+          elements = constraint[:elements].map{|c, op| "#{literal(c)} WITH #{op}"}.join(', ')
+          "#{"CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name]}EXCLUDE USING #{constraint[:using]||'gist'} (#{elements})#{" WHERE #{filter_expr(constraint[:where])}" if constraint[:where]}"
+        else
+          super
+        end
+      end
+
       # SQL statement to create database function.
       def create_function_sql(name, definition, opts={})
         args = opts[:args]
@@ -530,6 +577,11 @@ module Sequel
         "CREATE SCHEMA #{quote_identifier(name)}"
       end
 
+      # Use a PostgreSQL-specific create table generator
+      def create_table_generator_class
+        Postgres::CreateTableGenerator
+      end
+    
       # SQL for creating a database trigger.
       def create_trigger_sql(table, name, function, opts={})
         events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
