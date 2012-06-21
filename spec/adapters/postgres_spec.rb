@@ -177,6 +177,24 @@ describe "A PostgreSQL dataset" do
     end
   end if POSTGRES_DB.server_version >= 90000
 
+  specify "should support adding foreign key constarints that are not yet valid, and validating them later" do
+    begin
+      @db = POSTGRES_DB
+      @db.create_table!(:atest){primary_key :id; Integer :fk}
+      @db[:atest].insert(1, 5)
+      @db.alter_table(:atest){add_foreign_key [:fk], :atest, :not_valid=>true, :name=>:atest_fk}
+      @db[:atest].insert(2, 1)
+      proc{@db[:atest].insert(3, 4)}.should raise_error(Sequel::DatabaseError)
+
+      proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.should raise_error(Sequel::DatabaseError)
+      @db[:atest].where(:id=>1).update(:fk=>2)
+      @db.alter_table(:atest){validate_constraint :atest_fk}
+      proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.should_not raise_error
+    ensure
+      @db.drop_table?(:atest)
+    end
+  end if POSTGRES_DB.server_version >= 90200
+
   specify "should support :using when altering a column's type" do
     begin
       @db = POSTGRES_DB

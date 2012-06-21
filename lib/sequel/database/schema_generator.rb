@@ -317,6 +317,16 @@ module Sequel
       #
       #   add_foreign_key(:artist_id, :table) # ADD COLUMN artist_id integer REFERENCES table
       #   add_foreign_key([:name], :table) # ADD FOREIGN KEY (name) REFERENCES table
+      #
+      # PostgreSQL specific options:
+      #
+      # :not_valid :: Set to true to add the constraint with the NOT VALID syntax.
+      #               This makes it so that future inserts must respect referential
+      #               integrity, but allows the constraint to be added even if existing
+      #               column values reference rows that do not exist.  After all the
+      #               existing data has been cleaned up, validate_constraint can be used
+      #               to mark the constraint as valid.  Note that this option only makes
+      #               sense when using an array of columns.
       def add_foreign_key(name, table, opts = {})
         return add_composite_foreign_key(name, table, opts) if name.is_a?(Array)
         add_column(name, Integer, {:table=>table}.merge(opts))

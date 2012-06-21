@@ -79,6 +79,12 @@ module Sequel
       def add_exclusion_constraint(elements, opts={})
         @operations << {:op => :add_constraint, :type => :exclude, :elements => elements}.merge(opts)
       end
+
+      # Validate the constraint with the given name, which should have
+      # been added previously with NOT VALID.
+      def validate_constraint(name)
+        @operations << {:op => :validate_constraint, :name => name}
+      end
     end
 
     # Methods shared by Database instances that connect to PostgreSQL.
@@ -480,7 +486,7 @@ module Sequel
         Postgres::AlterTableGenerator
       end
     
-      # Handle :using option for set_column_type op.
+      # Handle :using option for set_column_type op, and the :validate_constraint op.
       def alter_table_sql(table, op)
         case op[:op]
         when :set_column_type
@@ -491,6 +497,8 @@ module Sequel
             s << literal(using)
           end
           s
+        when :validate_constraint
+          "ALTER TABLE #{quote_schema_table(table)} VALIDATE CONSTRAINT #{quote_identifier(op[:name])}"
         else
           super
         end
@@ -541,6 +549,12 @@ module Sequel
         when :exclude
           elements = constraint[:elements].map{|c, op| "#{literal(c)} WITH #{op}"}.join(', ')
           "#{"CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name]}EXCLUDE USING #{constraint[:using]||'gist'} (#{elements})#{" WHERE #{filter_expr(constraint[:where])}" if constraint[:where]}"
+        when :foreign_key
+          sql = super
+          if constraint[:not_valid]
+            sql << " NOT VALID"
+          end
+          sql
         else
           super
         end
