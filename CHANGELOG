@@ -1,5 +1,7 @@
 === HEAD
 
+* Add pg_range_ops extension for DSL support for PostgreSQL range operators and functions (jeremyevans)
+
 * The json library is now required when running the plugin/extension specs (jeremyevans)
 
 * Use change migrations instead of up/down migrations in the schema_dumper (jeremyevans)

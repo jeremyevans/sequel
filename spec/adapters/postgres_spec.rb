@@ -2157,5 +2157,70 @@ describe 'PostgreSQL range types' do
       v.each{|k,v| v.should == @ra[k].to_a}
     end
   end
+
+  specify 'operations/functions with pg_range_ops' do
+    Sequel.extension :pg_range_ops
+
+    @db.get((1..5).pg_range(:int4range).op.contains(2..4)).should be_true
+    @db.get((1..5).pg_range(:int4range).op.contains(3..6)).should be_false
+    @db.get((1..5).pg_range(:int4range).op.contains(0..6)).should be_false
+
+    @db.get((1..5).pg_range(:int4range).op.contained_by(0..6)).should be_true
+    @db.get((1..5).pg_range(:int4range).op.contained_by(3..6)).should be_false
+    @db.get((1..5).pg_range(:int4range).op.contained_by(2..4)).should be_false
+
+    @db.get((1..5).pg_range(:int4range).op.overlaps(5..6)).should be_true
+    @db.get((1...5).pg_range(:int4range).op.overlaps(5..6)).should be_false
+    
+    @db.get((1..5).pg_range(:int4range).op.left_of(6..10)).should be_true
+    @db.get((1..5).pg_range(:int4range).op.left_of(5..10)).should be_false
+    @db.get((1..5).pg_range(:int4range).op.left_of(-1..0)).should be_false
+    @db.get((1..5).pg_range(:int4range).op.left_of(-1..3)).should be_false
+
+    @db.get((1..5).pg_range(:int4range).op.right_of(6..10)).should be_false
+    @db.get((1..5).pg_range(:int4range).op.right_of(5..10)).should be_false
+    @db.get((1..5).pg_range(:int4range).op.right_of(-1..0)).should be_true
+    @db.get((1..5).pg_range(:int4range).op.right_of(-1..3)).should be_false
+
+    @db.get((1..5).pg_range(:int4range).op.starts_before(6..10)).should be_true
+    @db.get((1..5).pg_range(:int4range).op.starts_before(5..10)).should be_true
+    @db.get((1..5).pg_range(:int4range).op.starts_before(-1..0)).should be_false
+    @db.get((1..5).pg_range(:int4range).op.starts_before(-1..3)).should be_false
+
+    @db.get((1..5).pg_range(:int4range).op.ends_after(6..10)).should be_false
+    @db.get((1..5).pg_range(:int4range).op.ends_after(5..10)).should be_false
+    @db.get((1..5).pg_range(:int4range).op.ends_after(-1..0)).should be_true
+    @db.get((1..5).pg_range(:int4range).op.ends_after(-1..3)).should be_true
+
+    @db.get((1..5).pg_range(:int4range).op.adjacent_to(6..10)).should be_true
+    @db.get((1...5).pg_range(:int4range).op.adjacent_to(6..10)).should be_false
+
+    @db.get(((1..5).pg_range(:int4range).op + (6..10)).adjacent_to(6..10)).should be_false
+    @db.get(((1..5).pg_range(:int4range).op + (6..10)).adjacent_to(11..20)).should be_true
+
+    @db.get(((1..5).pg_range(:int4range).op * (2..6)).adjacent_to(6..10)).should be_true
+    @db.get(((1..4).pg_range(:int4range).op * (2..6)).adjacent_to(6..10)).should be_false
+
+    @db.get(((1..5).pg_range(:int4range).op - (2..6)).adjacent_to(2..10)).should be_true
+    @db.get(((0..4).pg_range(:int4range).op - (3..6)).adjacent_to(4..10)).should be_false
+
+    @db.get((0..4).pg_range(:int4range).op.lower).should == 0
+    @db.get((0..4).pg_range(:int4range).op.upper).should == 5
+
+    @db.get((0..4).pg_range(:int4range).op.isempty).should be_false
+    @db.get(Sequel::Postgres::PGRange.empty(:int4range).op.isempty).should be_true
+
+    @db.get((1..5).pg_range(:numrange).op.lower_inc).should be_true
+    @db.get(Sequel::Postgres::PGRange.new(1, 5, :exclude_begin=>true, :db_type=>:numrange).op.lower_inc).should be_false
+
+    @db.get((1..5).pg_range(:numrange).op.upper_inc).should be_true
+    @db.get((1...5).pg_range(:numrange).op.upper_inc).should be_false
+
+    @db.get(Sequel::Postgres::PGRange.new(1, 5, :db_type=>:int4range).op.lower_inf).should be_false
+    @db.get(Sequel::Postgres::PGRange.new(nil, 5, :db_type=>:int4range).op.lower_inf).should be_true
+
+    @db.get(Sequel::Postgres::PGRange.new(1, 5, :db_type=>:int4range).op.upper_inf).should be_false
+    @db.get(Sequel::Postgres::PGRange.new(1, nil, :db_type=>:int4range).op.upper_inf).should be_true
+  end
 end if POSTGRES_DB.server_version >= 90200
 
