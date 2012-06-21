@@ -55,6 +55,15 @@ describe "An SQLite database" do
     @db.get(Sequel.like('a', 'A')).to_s.should == '0'
   end
   
+  specify "should support casting to Date by using the date function" do
+    @db.get('2012-10-20 11:12:13'.cast(Date)).should == '2012-10-20'
+  end
+  
+  specify "should support casting to Time or DateTime by using the datetime function" do
+    @db.get('2012-10-20'.cast(Time)).should == '2012-10-20 00:00:00'
+    @db.get('2012-10-20'.cast(DateTime)).should == '2012-10-20 00:00:00'
+  end
+  
   specify "should provide the SQLite version as an integer" do
     @db.sqlite_version.should be_a_kind_of(Integer)
   end

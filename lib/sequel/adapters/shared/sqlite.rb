@@ -428,6 +428,22 @@ module Sequel
       DOUBLE_BACKTICK = '``'.freeze
       BLOB_START = "X'".freeze
       HSTAR = "H*".freeze
+      DATE_OPEN = "date(".freeze
+      DATETIME_OPEN = "datetime(".freeze
+
+      def cast_sql_append(sql, expr, type)
+        if type == Time or type == DateTime
+          sql << DATETIME_OPEN
+          literal_append(sql, expr)
+          sql << PAREN_CLOSE
+        elsif type == Date
+          sql << DATE_OPEN
+          literal_append(sql, expr)
+          sql << PAREN_CLOSE
+        else
+          super
+        end
+      end
 
       # SQLite does not support pattern matching via regular expressions.
       # SQLite is case insensitive (depending on pragma), so use LIKE for

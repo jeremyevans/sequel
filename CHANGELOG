@@ -1,5 +1,7 @@
 === HEAD
 
+* Make casting to Date/(Time/DateTime) use date/datetime functions on SQLite (jeremyevans)
+
 * Add pg_range_ops extension for DSL support for PostgreSQL range operators and functions (jeremyevans)
 
 * The json library is now required when running the plugin/extension specs (jeremyevans)
