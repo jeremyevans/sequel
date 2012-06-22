@@ -1755,19 +1755,17 @@ describe 'PostgreSQL hstore handling' do
     o = c.create(:id=>1, :h=>h)
     o.h.should == h
 
-    c.many_to_one :item, :class=>c, :key_column=>Sequel.cast(:items__h.hstore['item_id'], Integer)
-    c.one_to_many :items, :class=>c, :key=>Sequel.cast(:h.hstore['item_id'], Integer), :key_method=>:item_id, :graph_only_conditions=>{:items__id=>Sequel.cast(:items_0__h.hstore['item_id'], Integer)}
-    c.many_to_many :related_items, :class=>c, :join_table=>:items___i, :left_key=>Sequel.cast(:i__h.hstore['left_item_id'], Integer), :right_key=>Sequel.cast(:i__h.hstore['item_id'], Integer), :graph_join_table_only_conditions=>{:items__id=>Sequel.cast(:i__h.hstore['left_item_id'], Integer)}, :graph_only_conditions=>{Sequel.cast(:i__h.hstore['item_id'], Integer)=>:related_items__id}
+    c.many_to_one :item, :class=>c, :key_column=>Sequel.cast(:h.hstore['item_id'], Integer)
+    c.one_to_many :items, :class=>c, :key=>Sequel.cast(:h.hstore['item_id'], Integer), :key_method=>:item_id
+    c.many_to_many :related_items, :class=>c, :join_table=>:items___i, :left_key=>Sequel.cast(:h.hstore['left_item_id'], Integer), :right_key=>Sequel.cast(:h.hstore['item_id'], Integer)
 
-    c.many_to_one :other_item, :class=>c, :graph_only_conditions=>{Sequel.cast(:other_item__h.hstore['item_id'], Integer)=>:items__id}, :key=>:id, :primary_key_method=>:item_id, :primary_key=>Sequel.cast(:items__h.hstore['item_id'], Integer)
-    c.one_to_many :other_items, :class=>c, :graph_only_conditions=>{:other_items__id=>Sequel.cast(:items__h.hstore['item_id'], Integer)}, :primary_key=>:item_id, :key=>:id, :primary_key_column=>Sequel.cast(:items__h.hstore['item_id'], Integer)
+    c.many_to_one :other_item, :class=>c, :key=>:id, :primary_key_method=>:item_id, :primary_key=>Sequel.cast(:h.hstore['item_id'], Integer)
+    c.one_to_many :other_items, :class=>c, :primary_key=>:item_id, :key=>:id, :primary_key_column=>Sequel.cast(:h.hstore['item_id'], Integer)
     c.many_to_many :other_related_items, :class=>c, :join_table=>:items___i, :left_key=>:id, :right_key=>:id,
-      :left_primary_key_column=>Sequel.cast(:items__h.hstore['left_item_id'], Integer),
+      :left_primary_key_column=>Sequel.cast(:h.hstore['left_item_id'], Integer),
       :left_primary_key=>:left_item_id,
-      :right_primary_key=>Sequel.cast(:items__h.hstore['left_item_id'], Integer),
-      :right_primary_key_method=>:left_item_id,
-      :graph_join_table_only_conditions=>{:i__id=>Sequel.cast(:items__h.hstore['left_item_id'], Integer)},
-      :graph_only_conditions=>{:i__id=>Sequel.cast(:other_related_items__h.hstore['left_item_id'], Integer)}
+      :right_primary_key=>Sequel.cast(:h.hstore['left_item_id'], Integer),
+      :right_primary_key_method=>:left_item_id
 
     # Lazily Loading
     o.item.should == o2

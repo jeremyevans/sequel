@@ -1,5 +1,11 @@
 === HEAD
 
+* Use :qualify=>:deep option when joining tables in model association datasets (jeremyevans)
+
+* Support :qualify=>:deep option to Dataset#join_table to qualify subexpressions in the expression tree (jeremyevans)
+
+* Support :qualify=>false option to Dataset#join_table to not automatically qualify keys/values (jeremyevans)
+
 * Make filter by associations support use column references and method references correctly (jeremyevans)
 
 * Call super in list plugin before_create (jeremyevans) (#504)

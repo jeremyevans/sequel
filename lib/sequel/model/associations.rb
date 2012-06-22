@@ -1134,7 +1134,7 @@ module Sequel
           graph_jt_conds = opts[:graph_join_table_conditions] = opts.fetch(:graph_join_table_conditions, []).to_a
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
-          opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, rcks.zip(opts.right_primary_keys) + opts.predicate_keys.zip(lcpks.map{|k| send(k)}))}
+          opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, rcks.zip(opts.right_primary_keys) + opts.predicate_keys.zip(lcpks.map{|k| send(k)}), :qualify=>:deep)}
 
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:id_map]
@@ -1142,7 +1142,7 @@ module Sequel
             rows.each{|object| object.associations[name] = []}
             r = rcks.zip(opts.right_primary_keys)
             l = [[opts.predicate_key, h.keys]]
-            ds = model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), nil, eo[:associations], eo)
+            ds = model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l, :qualify=>:deep), nil, eo[:associations], eo)
             case opts.eager_limit_strategy
             when :window_function
               delete_rn = true
@@ -1151,7 +1151,7 @@ module Sequel
             when :correlated_subquery
               ds = apply_correlated_subquery_eager_limit_strategy(ds, opts) do |xds|
                 dsa = ds.send(:dataset_alias, 2)
-                xds.inner_join(join_table, r + lcks.map{|k| [k, SQL::QualifiedIdentifier.new(opts.join_table_alias, k)]}, :table_alias=>dsa)
+                xds.inner_join(join_table, r + lcks.map{|k| [k, SQL::QualifiedIdentifier.new(opts.join_table_alias, k)]}, :table_alias=>dsa, :qualify=>:deep)
               end
             end
             ds.all do |assoc_record|
@@ -1182,8 +1182,8 @@ module Sequel
           jt_graph_block = opts[:graph_join_table_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
-            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, &graph_block)
+            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
+            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>join_type, &graph_block)
           end
       
           def_association_dataset_methods(opts)
@@ -1255,7 +1255,7 @@ module Sequel
           graph_cks = opts[:graph_keys]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(graph_cks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(graph_cks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
           end
       
           def_association_dataset_methods(opts)
@@ -1342,7 +1342,7 @@ module Sequel
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : cks.zip(pkcs) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds = ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : cks.zip(pkcs) + conditions, eo.merge(:select=>select, :join_type=>join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
             # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
             ds.opts[:eager_graph][:reciprocals][eo[:table_alias]] = opts.reciprocal
             ds

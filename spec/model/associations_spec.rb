@@ -3119,9 +3119,9 @@ describe "Sequel::Model Associations with non-column expression keys" do
     @Foo.first.bar.should == @bar
     @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT * FROM bars WHERE (bars.object_ids[0] = 2) LIMIT 1"]
     @Foo.first.mtmbars.should == [@bar]
-    @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT bars.* FROM bars INNER JOIN bars_foos ON ((bar_ids[0] = object_ids[0]) AND (bars_foos.foo_ids[0] = 2))"]
+    @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT bars.* FROM bars INNER JOIN bars_foos ON ((bars_foos.bar_ids[0] = bars.object_ids[0]) AND (bars_foos.foo_ids[0] = 2))"]
     @Bar.first.mtmfoos.should == [@foo]
-    @db.sqls.should == ["SELECT * FROM bars LIMIT 1", "SELECT foos.* FROM foos INNER JOIN bars_foos ON ((foo_ids[0] = object_ids[0]) AND (bars_foos.bar_ids[0] = 2))"]
+    @db.sqls.should == ["SELECT * FROM bars LIMIT 1", "SELECT foos.* FROM foos INNER JOIN bars_foos ON ((bars_foos.foo_ids[0] = foos.object_ids[0]) AND (bars_foos.bar_ids[0] = 2))"]
   end
 
   it "should have working eager loading methods" do
@@ -3133,28 +3133,28 @@ describe "Sequel::Model Associations with non-column expression keys" do
     @db.sqls.should == ["SELECT * FROM foos", "SELECT * FROM bars WHERE (bars.object_ids[0] IN (2))"]
     @db.fetch = [[{:id=>1, :object_ids=>[2]}], [{:id=>1, :object_ids=>[2], :x_foreign_key_x=>2}]]
     @Foo.eager(:mtmbars).all.map{|o| [o, o.mtmbars]}.should == [[@foo, [@bar]]]
-    @db.sqls.should == ["SELECT * FROM foos", "SELECT bars.*, bars_foos.foo_ids[0] AS x_foreign_key_x FROM bars INNER JOIN bars_foos ON ((bar_ids[0] = object_ids[0]) AND (bars_foos.foo_ids[0] IN (2)))"]
+    @db.sqls.should == ["SELECT * FROM foos", "SELECT bars.*, bars_foos.foo_ids[0] AS x_foreign_key_x FROM bars INNER JOIN bars_foos ON ((bars_foos.bar_ids[0] = bars.object_ids[0]) AND (bars_foos.foo_ids[0] IN (2)))"]
     @db.fetch = [[{:id=>1, :object_ids=>[2]}], [{:id=>1, :object_ids=>[2], :x_foreign_key_x=>2}]]
     @Bar.eager(:mtmfoos).all.map{|o| [o, o.mtmfoos]}.should == [[@bar, [@foo]]]
-    @db.sqls.should == ["SELECT * FROM bars", "SELECT foos.*, bars_foos.bar_ids[0] AS x_foreign_key_x FROM foos INNER JOIN bars_foos ON ((foo_ids[0] = object_ids[0]) AND (bars_foos.bar_ids[0] IN (2)))"]
+    @db.sqls.should == ["SELECT * FROM bars", "SELECT foos.*, bars_foos.bar_ids[0] AS x_foreign_key_x FROM foos INNER JOIN bars_foos ON ((bars_foos.foo_ids[0] = foos.object_ids[0]) AND (bars_foos.bar_ids[0] IN (2)))"]
   end
 
   it "should have working eager graphing methods" do
     @db.fetch = {:id=>1, :object_ids=>[2], :foo_id=>1, :foo_object_ids=>[2]}
     @Bar.eager_graph(:foo).all.map{|o| [o, o.foo]}.should == [[@bar, @foo]]
-    @db.sqls.should == ["SELECT bars.id, bars.object_ids, foo.id AS foo_id, foo.object_ids AS foo_object_ids FROM bars LEFT OUTER JOIN foos AS foo ON (object_ids[0] = object_ids[0])"]
+    @db.sqls.should == ["SELECT bars.id, bars.object_ids, foo.id AS foo_id, foo.object_ids AS foo_object_ids FROM bars LEFT OUTER JOIN foos AS foo ON (foo.object_ids[0] = bars.object_ids[0])"]
     @db.fetch = {:id=>1, :object_ids=>[2], :bars_id=>1, :bars_object_ids=>[2]}
     @Foo.eager_graph(:bars).all.map{|o| [o, o.bars]}.should == [[@foo, [@bar]]]
-    @db.sqls.should == ["SELECT foos.id, foos.object_ids, bars.id AS bars_id, bars.object_ids AS bars_object_ids FROM foos LEFT OUTER JOIN bars ON (object_ids[0] = object_ids[0])"]
+    @db.sqls.should == ["SELECT foos.id, foos.object_ids, bars.id AS bars_id, bars.object_ids AS bars_object_ids FROM foos LEFT OUTER JOIN bars ON (bars.object_ids[0] = foos.object_ids[0])"]
     @db.fetch = {:id=>1, :object_ids=>[2], :bar_id=>1, :bar_object_ids=>[2]}
     @Foo.eager_graph(:bar).all.map{|o| [o, o.bar]}.should == [[@foo, @bar]]
-    @db.sqls.should == ["SELECT foos.id, foos.object_ids, bar.id AS bar_id, bar.object_ids AS bar_object_ids FROM foos LEFT OUTER JOIN bars AS bar ON (object_ids[0] = object_ids[0])"]
+    @db.sqls.should == ["SELECT foos.id, foos.object_ids, bar.id AS bar_id, bar.object_ids AS bar_object_ids FROM foos LEFT OUTER JOIN bars AS bar ON (bar.object_ids[0] = foos.object_ids[0])"]
     @db.fetch = {:id=>1, :object_ids=>[2], :mtmfoos_id=>1, :mtmfoos_object_ids=>[2]}
     @Bar.eager_graph(:mtmfoos).all.map{|o| [o, o.mtmfoos]}.should == [[@bar, [@foo]]]
-    @db.sqls.should == ["SELECT bars.id, bars.object_ids, mtmfoos.id AS mtmfoos_id, mtmfoos.object_ids AS mtmfoos_object_ids FROM bars LEFT OUTER JOIN bars_foos ON (bar_ids[0] = object_ids[0]) LEFT OUTER JOIN foos AS mtmfoos ON (object_ids[0] = foo_ids[0])"]
+    @db.sqls.should == ["SELECT bars.id, bars.object_ids, mtmfoos.id AS mtmfoos_id, mtmfoos.object_ids AS mtmfoos_object_ids FROM bars LEFT OUTER JOIN bars_foos ON (bars_foos.bar_ids[0] = bars.object_ids[0]) LEFT OUTER JOIN foos AS mtmfoos ON (mtmfoos.object_ids[0] = bars_foos.foo_ids[0])"]
     @db.fetch = {:id=>1, :object_ids=>[2], :mtmbars_id=>1, :mtmbars_object_ids=>[2]}
     @Foo.eager_graph(:mtmbars).all.map{|o| [o, o.mtmbars]}.should == [[@foo, [@bar]]]
-    @db.sqls.should == ["SELECT foos.id, foos.object_ids, mtmbars.id AS mtmbars_id, mtmbars.object_ids AS mtmbars_object_ids FROM foos LEFT OUTER JOIN bars_foos ON (foo_ids[0] = object_ids[0]) LEFT OUTER JOIN bars AS mtmbars ON (object_ids[0] = bar_ids[0])"]
+    @db.sqls.should == ["SELECT foos.id, foos.object_ids, mtmbars.id AS mtmbars_id, mtmbars.object_ids AS mtmbars_object_ids FROM foos LEFT OUTER JOIN bars_foos ON (bars_foos.foo_ids[0] = foos.object_ids[0]) LEFT OUTER JOIN bars AS mtmbars ON (mtmbars.object_ids[0] = bars_foos.bar_ids[0])"]
   end
 
   it "should have working filter by associations with model instances" do
@@ -3168,6 +3168,19 @@ describe "Sequel::Model Associations with non-column expression keys" do
     @db.sqls.should == ["SELECT * FROM foos WHERE (foos.object_ids[0] IN (SELECT bars_foos.foo_ids[0] FROM bars_foos WHERE ((bars_foos.bar_ids[0] = 2) AND (bars_foos.foo_ids[0] IS NOT NULL)))) LIMIT 1"]
     @Bar.first(:mtmfoos=>@foo).should == @bar
     @db.sqls.should == ["SELECT * FROM bars WHERE (bars.object_ids[0] IN (SELECT bars_foos.bar_ids[0] FROM bars_foos WHERE ((bars_foos.foo_ids[0] = 2) AND (bars_foos.bar_ids[0] IS NOT NULL)))) LIMIT 1"]
+  end
+
+  it "should have working filter by associations with model datasets" do
+    @Bar.first(:foo=>@Foo.where(:id=>@foo.id)).should == @bar
+    @db.sqls.should == ["SELECT * FROM bars WHERE (bars.object_ids[0] IN (SELECT foos.object_ids[0] FROM foos WHERE ((id = 1) AND (foos.object_ids[0] IS NOT NULL)))) LIMIT 1"]
+    @Foo.first(:bars=>@Bar.where(:id=>@bar.id)).should == @foo
+    @db.sqls.should == ["SELECT * FROM foos WHERE (foos.object_ids[0] IN (SELECT bars.object_ids[0] FROM bars WHERE ((id = 1) AND (bars.object_ids[0] IS NOT NULL)))) LIMIT 1"]
+    @Foo.first(:bar=>@Bar.where(:id=>@bar.id)).should == @foo
+    @db.sqls.should == ["SELECT * FROM foos WHERE (foos.object_ids[0] IN (SELECT bars.object_ids[0] FROM bars WHERE ((id = 1) AND (bars.object_ids[0] IS NOT NULL)))) LIMIT 1"]
+    @Foo.first(:mtmbars=>@Bar.where(:id=>@bar.id)).should == @foo
+    @db.sqls.should == ["SELECT * FROM foos WHERE (foos.object_ids[0] IN (SELECT bars_foos.foo_ids[0] FROM bars_foos WHERE ((bars_foos.bar_ids[0] IN (SELECT bars.object_ids[0] FROM bars WHERE ((id = 1) AND (bars.object_ids[0] IS NOT NULL)))) AND (bars_foos.foo_ids[0] IS NOT NULL)))) LIMIT 1"]
+    @Bar.first(:mtmfoos=>@Foo.where(:id=>@foo.id)).should == @bar
+    @db.sqls.should == ["SELECT * FROM bars WHERE (bars.object_ids[0] IN (SELECT bars_foos.bar_ids[0] FROM bars_foos WHERE ((bars_foos.foo_ids[0] IN (SELECT foos.object_ids[0] FROM foos WHERE ((id = 1) AND (foos.object_ids[0] IS NOT NULL)))) AND (bars_foos.bar_ids[0] IS NOT NULL)))) LIMIT 1"]
   end
 end
 

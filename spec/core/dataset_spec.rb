@@ -2152,6 +2152,14 @@ describe "Dataset#join_table" do
     @d.from('stats').join('players', {:id => :player_id}, :implicit_qualifier=>:p).sql.should == 'SELECT * FROM "stats" INNER JOIN "players" ON ("players"."id" = "p"."player_id")'
   end
   
+  specify "should not qualify if :qualify=>false option is given" do
+    @d.from('stats').join(:players, {:id => :player_id}, :qualify=>false).sql.should == 'SELECT * FROM "stats" INNER JOIN "players" ON ("id" = "player_id")'
+  end
+  
+  specify "should do deep qualification if :qualify=>:deep option is given" do
+    @d.from('stats').join(:players, {Sequel.function(:f, :id) => Sequel.subscript(:player_id, 0)}, :qualify=>:deep).sql.should == 'SELECT * FROM "stats" INNER JOIN "players" ON (f("players"."id") = "stats"."player_id"[0])'
+  end
+  
   specify "should allow for arbitrary conditions in the JOIN clause" do
     @d.join_table(:left_outer, :categories, :status => 0).sql.should == 'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."status" = 0)'
     @d.join_table(:left_outer, :categories, :categorizable_type => "Post").sql.should == 'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."categorizable_type" = \'Post\')'

@@ -480,6 +480,9 @@ module Sequel
     #     to the same table more than once.  No alias is used by default.
     #   * :implicit_qualifier - The name to use for qualifying implicit conditions.  By default,
     #     the last joined or primary table is used.
+    #   * :qualify - Can be set to false to not do any implicit qualification.  Can be set
+    #     to :deep to use the Qualifier AST Transformer, which will attempt to qualify
+    #     subexpressions of the expression tree.
     # * block - The block argument should only be given if a JOIN with an ON clause is used,
     #   in which case it yields the table alias/name for the table currently being joined,
     #   the table alias/name for the last joined (or first table), and an array of previous
@@ -518,6 +521,7 @@ module Sequel
       when Hash
         table_alias = options[:table_alias]
         last_alias = options[:implicit_qualifier]
+        qualify_type = options[:qualify]
       when Symbol, String, SQL::Identifier
         table_alias = options
         last_alias = nil 
@@ -547,8 +551,16 @@ module Sequel
         last_alias ||= @opts[:last_joined_table] || first_source_alias
         if Sequel.condition_specifier?(expr)
           expr = expr.collect do |k, v|
-            k = qualified_column_name(k, table_name) if k.is_a?(Symbol)
-            v = qualified_column_name(v, last_alias) if v.is_a?(Symbol)
+            case qualify_type
+            when false
+              nil # Do no qualification
+            when :deep
+              k = Sequel::Qualifier.new(self, table_name).transform(k)
+              v = Sequel::Qualifier.new(self, last_alias).transform(v)
+            else
+              k = qualified_column_name(k, table_name) if k.is_a?(Symbol)
+              v = qualified_column_name(v, last_alias) if v.is_a?(Symbol)
+            end
             [k,v]
           end
           expr = SQL::BooleanExpression.from_value_pairs(expr)

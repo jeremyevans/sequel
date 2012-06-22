@@ -63,6 +63,7 @@ module Sequel
     #                     determines the alias to use.
     # :implicit_qualifier :: The qualifier of implicit conditions, see #join_table.
     # :join_type :: The type of join to use (passed to +join_table+).  Defaults to :left_outer.
+    # :qualify:: The type of qualification to do, see #join_table.
     # :select :: An array of columns to select.  When not used, selects
     #            all columns in the given dataset.  When set to false, selects no
     #            columns and is like simply joining the tables, though graph keeps
@@ -106,7 +107,7 @@ module Sequel
       ds = (!@opts[:graph] && (@opts[:from].length > 1 || @opts[:join])) ? from_self(:alias=>options[:from_self_alias] || first_source) : self
       
       # Join the table early in order to avoid cloning the dataset twice
-      ds = ds.join_table(options[:join_type] || :left_outer, table, join_conditions, :table_alias=>table_alias, :implicit_qualifier=>options[:implicit_qualifier], &block)
+      ds = ds.join_table(options[:join_type] || :left_outer, table, join_conditions, :table_alias=>table_alias, :implicit_qualifier=>options[:implicit_qualifier], :qualify=>options[:qualify], &block)
       opts = ds.opts
 
       # Whether to include the table in the result set
