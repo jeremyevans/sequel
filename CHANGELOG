@@ -1,5 +1,7 @@
 === HEAD
 
+* Make filter by associations support use column references and method references correctly (jeremyevans)
+
 * Call super in list plugin before_create (jeremyevans) (#504)
 
 * Do not automatically cast String to text in pg_auto_parameterize extension (jeremyevans)
@@ -25,8 +27,6 @@
 * Switch the :key_hash entry to the association :eager_loader option to use the method symbol(s) instead of the column symbol(s) (jeremyevans)
 
 * Add :id_map entry to the hash passed to the association :eager_loader option, for easier custom eager loading (jeremyevans)
-
-* Add :predicate_key association option, for easier creation of associations depending on expressions beyond simple column references (jeremyevans)
 
 * Fix dumping of non-integer foreign key columns in the schema_dumper (jeremyevans) (#502)
 

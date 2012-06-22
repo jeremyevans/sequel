@@ -111,7 +111,7 @@ module Sequel
           false
         end
 
-        # Alias of predicate_key
+        # Alias of predicate_key, only for backwards compatibility.
         def eager_loading_predicate_key
           predicate_key
         end
@@ -144,9 +144,17 @@ module Sequel
         end
 
         # Qualify +col+ with the given table name.  If +col+ is an array of columns,
-        # return an array of qualified columns.
+        # return an array of qualified columns.  Only qualifies Symbols and SQL::Identifier
+        # values, other values are not modified.
         def qualify(table, col)
-          transform(col){|k| SQL::QualifiedIdentifier.new(table, k)}
+          transform(col) do |k|
+            case k
+            when Symbol, SQL::Identifier
+              SQL::QualifiedIdentifier.new(table, k)
+            else
+              k
+            end
+          end
         end
 
         # Qualify col with the associated model's table name.
@@ -806,12 +814,6 @@ module Sequel
         #           singular column symbol or an array of column symbols.
         # :order_eager_graph :: Whether to add the association's order to the graphed dataset's order when graphing
         #                       via +eager_graph+.  Defaults to true, so set to false to disable.
-        # :predicate_key :: The SQL expression used when loading the associations.  For regular loading, the
-        #                   left hand side of the = expression, for eager loading, the left hand side of the IN
-        #                   expression.  Usually not necessary to set manually except in advanced cases (e.g. where
-        #                   the association depends on a expression instead of just a column reference).  Not used
-        #                   during eager_graphing, you'll probably need to set :graph_only_conditions for similar
-        #                   behavior.
         # :read_only :: Do not add a setter method (for many_to_one or one_to_one associations),
         #               or add_/remove_/remove_all_ methods (for one_to_many and many_to_many associations).
         # :reciprocal :: the symbol name of the reciprocal association,
@@ -1210,13 +1212,11 @@ module Sequel
           name = opts[:name]
           model = self
           opts[:key] = opts.default_key unless opts.has_key?(:key)
-          key_column = key = opts[:key]
+          key = opts[:key]
           opts[:eager_loader_key] = key unless opts.has_key?(:eager_loader_key)
           cks = opts[:graph_keys] = opts[:keys] = Array(key)
-          if opts[:key_column]
-            key_column = opts[:key_column]
-            opts[:graph_keys] = Array(key_column)
-          end
+          opts[:key_column] ||= key
+          opts[:graph_keys] = opts[:key_columns] = Array(opts[:key_column])
           opts[:qualified_key] = opts.qualify_cur(key)
           if opts[:primary_key]
             cpks = Array(opts[:primary_key])
@@ -1274,6 +1274,7 @@ module Sequel
           key = (opts[:key] ||= opts.default_key)
           km = opts[:key_method] ||= opts[:key]
           cks = opts[:keys] = Array(key)
+          opts[:key_methods] = Array(opts[:key_method])
           primary_key = (opts[:primary_key] ||= self.primary_key)
           opts[:eager_loader_key] = primary_key unless opts.has_key?(:eager_loader_key)
           cpks = opts[:primary_keys] = Array(primary_key)
@@ -2071,12 +2072,17 @@ module Sequel
 
         # Return a subquery expression for filering by a many_to_many association
         def many_to_many_association_filter_expression(op, ref, obj)
-          lpks, lks, rks = ref.values_at(:left_primary_keys, :left_keys, :right_keys)
+          lpks, lks, rks = ref.values_at(:left_primary_key_columns, :left_keys, :right_keys)
           jt = ref.join_table_alias
           lpks = lpks.first if lpks.length == 1
           lpks = ref.qualify(model.table_name, lpks)
-          meths = ref.right_primary_keys
-          meths = ref.qualify(obj.model.table_name, meths) if obj.is_a?(Sequel::Dataset)
+
+          meths = if obj.is_a?(Sequel::Dataset)
+            ref.qualify(obj.model.table_name, ref.right_primary_keys)
+          else
+            ref.right_primary_key_methods
+          end
+
           exp = association_filter_key_expression(ref.qualify(jt, rks), meths, obj)
           if exp == SQL::Constants::FALSE
             association_filter_handle_inversion(op, exp, Array(lpks))
@@ -2087,17 +2093,23 @@ module Sequel
 
         # Return a simple equality expression for filering by a many_to_one association
         def many_to_one_association_filter_expression(op, ref, obj)
-          keys = ref.qualify(model.table_name, ref[:keys])
-          meths = ref.primary_keys
-          meths = ref.qualify(obj.model.table_name, meths) if obj.is_a?(Sequel::Dataset)
+          keys = ref.qualify(model.table_name, ref[:key_columns])
+          meths = if obj.is_a?(Sequel::Dataset)
+            ref.qualify(obj.model.table_name, ref.primary_keys)
+          else
+            ref.primary_key_methods
+          end
           association_filter_handle_inversion(op, association_filter_key_expression(keys, meths, obj), keys)
         end
 
         # Return a simple equality expression for filering by a one_to_* association
         def one_to_many_association_filter_expression(op, ref, obj)
-          keys = ref.qualify(model.table_name, ref[:primary_keys])
-          meths = ref[:keys]
-          meths = ref.qualify(obj.model.table_name, meths) if obj.is_a?(Sequel::Dataset)
+          keys = ref.qualify(model.table_name, ref[:primary_key_columns])
+          meths = if obj.is_a?(Sequel::Dataset)
+            ref.qualify(obj.model.table_name, ref[:keys])
+          else
+            ref[:key_methods]
+          end
           association_filter_handle_inversion(op, association_filter_key_expression(keys, meths, obj), keys)
         end
         alias one_to_one_association_filter_expression one_to_many_association_filter_expression

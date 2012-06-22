@@ -1566,19 +1566,6 @@ This is usually used if the association dataset depends on specific values in
 model instance that would not be valid when eager loading for multiple
 instances.
 
-==== :predicate_key
-
-The SQL expression to use when lazy loading associations or eager loading
-associations via eager.  For lazy loading associations, this is the left
-hand side of the = expression, and for eager loading via eager, this is
-the left hand side of the IN expression.  This option is only needed
-when the association depends on an expression that is not a simple
-column reference.
-
-This option is not used when eager_graphing, because the default is
-a qualified versions of the foreign or primary key, and the graphing
-code needs unqualified versions as it does its own qualification.
-
 ==== :cartesian_product_number 
 
 The number of joins completed by this association that could cause more
