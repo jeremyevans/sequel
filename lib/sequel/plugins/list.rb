@@ -98,6 +98,7 @@ module Sequel
           unless send(position_field)
             send("#{position_field}=", list_dataset.max(position_field).to_i+1)
           end
+          super
         end
 
         # Find the last position in the list containing this instance.
