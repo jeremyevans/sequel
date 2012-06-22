@@ -3090,6 +3090,87 @@ describe "Sequel::Model Associations with clashing column names" do
   end
 end 
 
+describe "Sequel::Model Associations with non-column expression keys" do
+  before do
+    @db = Sequel.mock(:fetch=>{:id=>1, :object_ids=>[2]})
+    @Foo = Class.new(Sequel::Model(@db[:foos]))
+    @Bar = Class.new(Sequel::Model(@db[:bars]))
+    @Foo.columns :id, :object_ids
+    @Bar.columns :id, :object_ids
+    m = Module.new{def obj_id; object_ids[0]; end}
+    @Foo.include m
+    @Bar.include m
+
+    @Foo.one_to_many :bars, :primary_key=>:obj_id, :primary_key_column=>Sequel.subscript(:object_ids, 0), :key=>Sequel.subscript(:object_ids, 0), :key_method=>:obj_id,  :class=>@Bar
+    @Foo.one_to_one :bar, :primary_key=>:obj_id, :primary_key_column=>Sequel.subscript(:object_ids, 0), :key=>Sequel.subscript(:object_ids, 0), :key_method=>:obj_id, :class=>@Bar
+    @Bar.many_to_one :foo, :key=>:obj_id, :key_column=>Sequel.subscript(:object_ids, 0), :primary_key=>Sequel.subscript(:object_ids, 0), :primary_key_method=>:obj_id, :class=>@Foo
+    @Foo.many_to_many :mtmbars, :join_table=>:bars_foos, :left_primary_key=>:obj_id, :left_primary_key_column=>Sequel.subscript(:object_ids, 0), :right_primary_key=>Sequel.subscript(:object_ids, 0), :right_primary_key_method=>:obj_id, :left_key=>Sequel.subscript(:foo_ids, 0), :right_key=>Sequel.subscript(:bar_ids, 0), :class=>@Bar
+    @Bar.many_to_many :mtmfoos, :join_table=>:bars_foos, :left_primary_key=>:obj_id, :left_primary_key_column=>Sequel.subscript(:object_ids, 0), :right_primary_key=>Sequel.subscript(:object_ids, 0), :right_primary_key_method=>:obj_id, :left_key=>Sequel.subscript(:bar_ids, 0), :right_key=>Sequel.subscript(:foo_ids, 0), :class=>@Foo
+    @foo = @Foo.load(:id=>1, :object_ids=>[2])
+    @bar = @Bar.load(:id=>1, :object_ids=>[2])
+    @db.sqls
+  end
+
+  it "should have working regular association methods" do
+    @Bar.first.foo.should == @foo
+    @db.sqls.should == ["SELECT * FROM bars LIMIT 1", "SELECT * FROM foos WHERE (foos.object_ids[0] = 2) LIMIT 1"]
+    @Foo.first.bars.should == [@bar]
+    @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT * FROM bars WHERE (bars.object_ids[0] = 2)"]
+    @Foo.first.bar.should == @bar
+    @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT * FROM bars WHERE (bars.object_ids[0] = 2) LIMIT 1"]
+    @Foo.first.mtmbars.should == [@bar]
+    @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT bars.* FROM bars INNER JOIN bars_foos ON ((bar_ids[0] = object_ids[0]) AND (bars_foos.foo_ids[0] = 2))"]
+    @Bar.first.mtmfoos.should == [@foo]
+    @db.sqls.should == ["SELECT * FROM bars LIMIT 1", "SELECT foos.* FROM foos INNER JOIN bars_foos ON ((foo_ids[0] = object_ids[0]) AND (bars_foos.bar_ids[0] = 2))"]
+  end
+
+  it "should have working eager loading methods" do
+    @Bar.eager(:foo).all.map{|o| [o, o.foo]}.should == [[@bar, @foo]]
+    @db.sqls.should == ["SELECT * FROM bars", "SELECT * FROM foos WHERE (foos.object_ids[0] IN (2))"]
+    @Foo.eager(:bars).all.map{|o| [o, o.bars]}.should == [[@foo, [@bar]]]
+    @db.sqls.should == ["SELECT * FROM foos", "SELECT * FROM bars WHERE (bars.object_ids[0] IN (2))"]
+    @Foo.eager(:bar).all.map{|o| [o, o.bar]}.should == [[@foo, @bar]]
+    @db.sqls.should == ["SELECT * FROM foos", "SELECT * FROM bars WHERE (bars.object_ids[0] IN (2))"]
+    @db.fetch = [[{:id=>1, :object_ids=>[2]}], [{:id=>1, :object_ids=>[2], :x_foreign_key_x=>2}]]
+    @Foo.eager(:mtmbars).all.map{|o| [o, o.mtmbars]}.should == [[@foo, [@bar]]]
+    @db.sqls.should == ["SELECT * FROM foos", "SELECT bars.*, bars_foos.foo_ids[0] AS x_foreign_key_x FROM bars INNER JOIN bars_foos ON ((bar_ids[0] = object_ids[0]) AND (bars_foos.foo_ids[0] IN (2)))"]
+    @db.fetch = [[{:id=>1, :object_ids=>[2]}], [{:id=>1, :object_ids=>[2], :x_foreign_key_x=>2}]]
+    @Bar.eager(:mtmfoos).all.map{|o| [o, o.mtmfoos]}.should == [[@bar, [@foo]]]
+    @db.sqls.should == ["SELECT * FROM bars", "SELECT foos.*, bars_foos.bar_ids[0] AS x_foreign_key_x FROM foos INNER JOIN bars_foos ON ((foo_ids[0] = object_ids[0]) AND (bars_foos.bar_ids[0] IN (2)))"]
+  end
+
+  it "should have working eager graphing methods" do
+    @db.fetch = {:id=>1, :object_ids=>[2], :foo_id=>1, :foo_object_ids=>[2]}
+    @Bar.eager_graph(:foo).all.map{|o| [o, o.foo]}.should == [[@bar, @foo]]
+    @db.sqls.should == ["SELECT bars.id, bars.object_ids, foo.id AS foo_id, foo.object_ids AS foo_object_ids FROM bars LEFT OUTER JOIN foos AS foo ON (object_ids[0] = object_ids[0])"]
+    @db.fetch = {:id=>1, :object_ids=>[2], :bars_id=>1, :bars_object_ids=>[2]}
+    @Foo.eager_graph(:bars).all.map{|o| [o, o.bars]}.should == [[@foo, [@bar]]]
+    @db.sqls.should == ["SELECT foos.id, foos.object_ids, bars.id AS bars_id, bars.object_ids AS bars_object_ids FROM foos LEFT OUTER JOIN bars ON (object_ids[0] = object_ids[0])"]
+    @db.fetch = {:id=>1, :object_ids=>[2], :bar_id=>1, :bar_object_ids=>[2]}
+    @Foo.eager_graph(:bar).all.map{|o| [o, o.bar]}.should == [[@foo, @bar]]
+    @db.sqls.should == ["SELECT foos.id, foos.object_ids, bar.id AS bar_id, bar.object_ids AS bar_object_ids FROM foos LEFT OUTER JOIN bars AS bar ON (object_ids[0] = object_ids[0])"]
+    @db.fetch = {:id=>1, :object_ids=>[2], :mtmfoos_id=>1, :mtmfoos_object_ids=>[2]}
+    @Bar.eager_graph(:mtmfoos).all.map{|o| [o, o.mtmfoos]}.should == [[@bar, [@foo]]]
+    @db.sqls.should == ["SELECT bars.id, bars.object_ids, mtmfoos.id AS mtmfoos_id, mtmfoos.object_ids AS mtmfoos_object_ids FROM bars LEFT OUTER JOIN bars_foos ON (bar_ids[0] = object_ids[0]) LEFT OUTER JOIN foos AS mtmfoos ON (object_ids[0] = foo_ids[0])"]
+    @db.fetch = {:id=>1, :object_ids=>[2], :mtmbars_id=>1, :mtmbars_object_ids=>[2]}
+    @Foo.eager_graph(:mtmbars).all.map{|o| [o, o.mtmbars]}.should == [[@foo, [@bar]]]
+    @db.sqls.should == ["SELECT foos.id, foos.object_ids, mtmbars.id AS mtmbars_id, mtmbars.object_ids AS mtmbars_object_ids FROM foos LEFT OUTER JOIN bars_foos ON (foo_ids[0] = object_ids[0]) LEFT OUTER JOIN bars AS mtmbars ON (object_ids[0] = bar_ids[0])"]
+  end
+
+  it "should have working filter by associations with model instances" do
+    @Bar.first(:foo=>@foo).should == @bar
+    @db.sqls.should == ["SELECT * FROM bars WHERE (bars.object_ids[0] = 2) LIMIT 1"]
+    @Foo.first(:bars=>@bar).should == @foo
+    @db.sqls.should == ["SELECT * FROM foos WHERE (foos.object_ids[0] = 2) LIMIT 1"]
+    @Foo.first(:bar=>@bar).should == @foo
+    @db.sqls.should == ["SELECT * FROM foos WHERE (foos.object_ids[0] = 2) LIMIT 1"]
+    @Foo.first(:mtmbars=>@bar).should == @foo
+    @db.sqls.should == ["SELECT * FROM foos WHERE (foos.object_ids[0] IN (SELECT bars_foos.foo_ids[0] FROM bars_foos WHERE ((bars_foos.bar_ids[0] = 2) AND (bars_foos.foo_ids[0] IS NOT NULL)))) LIMIT 1"]
+    @Bar.first(:mtmfoos=>@foo).should == @bar
+    @db.sqls.should == ["SELECT * FROM bars WHERE (bars.object_ids[0] IN (SELECT bars_foos.bar_ids[0] FROM bars_foos WHERE ((bars_foos.foo_ids[0] = 2) AND (bars_foos.bar_ids[0] IS NOT NULL)))) LIMIT 1"]
+  end
+end
+
 describe "Model#pk_or_nil" do
   before do
     @m = Class.new(Sequel::Model)

@@ -152,7 +152,7 @@ module Sequel
             when Symbol, SQL::Identifier
               SQL::QualifiedIdentifier.new(table, k)
             else
-              k
+              Sequel::Qualifier.new(self[:model].dataset, table).transform(k)
             end
           end
         end
