@@ -970,3 +970,48 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     @c1.eager_graph(:tags, :albums).sql.should == 'SELECT artists.id, tags.id AS tags_id, albums_0.id AS albums_0_id FROM artists LEFT OUTER JOIN albums_artists ON ((albums_artists.artist_id = artists.id) AND (albums_artists.a = artists.b)) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON ((albums_artists_0.artist_id = artists.id) AND (albums_artists_0.c = artists.d)) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id)'
   end
 end
+
+describe "many_through_many associations with non-column expression keys" do
+  before do
+    @db = Sequel.mock(:fetch=>{:id=>1, :object_ids=>[2]})
+    @Foo = Class.new(Sequel::Model(@db[:foos]))
+    @Foo.columns :id, :object_ids
+    @Foo.plugin :many_through_many
+    m = Module.new{def obj_id; object_ids[0]; end}
+    @Foo.include m
+
+    @Foo.many_through_many :foos, [
+      [:f, Sequel.subscript(:l, 0), Sequel.subscript(:r, 0)],
+      [:f, Sequel.subscript(:l, 1), Sequel.subscript(:r, 1)]
+    ], :class=>@Foo, :left_primary_key=>:obj_id, :left_primary_key_column=>Sequel.subscript(:object_ids, 0), :right_primary_key=>Sequel.subscript(:object_ids, 0), :right_primary_key_method=>:obj_id
+    @foo = @Foo.load(:id=>1, :object_ids=>[2])
+    @db.sqls
+  end
+
+  it "should have working regular association methods" do
+    @Foo.first.foos.should == [@foo]
+    @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT foos.* FROM foos INNER JOIN f ON (f.r[1] = foos.object_ids[0]) INNER JOIN f AS f_0 ON ((f_0.r[0] = f.l[1]) AND (f_0.l[0] = 2))"]
+  end
+
+  it "should have working eager loading methods" do
+    @db.fetch = [[{:id=>1, :object_ids=>[2]}], [{:id=>1, :object_ids=>[2], :x_foreign_key_x=>2}]]
+    @Foo.eager(:foos).all.map{|o| [o, o.foos]}.should == [[@foo, [@foo]]]
+    @db.sqls.should == ["SELECT * FROM foos", "SELECT foos.*, f_0.l[0] AS x_foreign_key_x FROM foos INNER JOIN f ON (f.r[1] = foos.object_ids[0]) INNER JOIN f AS f_0 ON ((f_0.r[0] = f.l[1]) AND (f_0.l[0] IN (2)))"]
+  end
+
+  it "should have working eager graphing methods" do
+    @db.fetch = {:id=>1, :object_ids=>[2], :foos_0_id=>1, :foos_0_object_ids=>[2]}
+    @Foo.eager_graph(:foos).all.map{|o| [o, o.foos]}.should == [[@foo, [@foo]]]
+    @db.sqls.should == ["SELECT foos.id, foos.object_ids, foos_0.id AS foos_0_id, foos_0.object_ids AS foos_0_object_ids FROM foos LEFT OUTER JOIN f ON (f.l[0] = foos.object_ids[0]) LEFT OUTER JOIN f AS f_0 ON (f_0.l[1] = f.r[0]) LEFT OUTER JOIN foos AS foos_0 ON (foos_0.object_ids[0] = f_0.r[1])"]
+  end
+
+  it "should have working filter by associations with model instances" do
+    @Foo.first(:foos=>@foo).should == @foo
+    @db.sqls.should == ["SELECT * FROM foos WHERE (foos.object_ids[0] IN (SELECT f.l[0] FROM f INNER JOIN f AS f_0 ON (f_0.l[1] = f.r[0]) WHERE ((f_0.r[1] = 2) AND (f.l[0] IS NOT NULL)))) LIMIT 1"]
+  end
+
+  it "should have working filter by associations with model datasets" do
+    @Foo.first(:foos=>@Foo.where(:id=>@foo.id)).should == @foo
+    @db.sqls.should == ["SELECT * FROM foos WHERE (foos.object_ids[0] IN (SELECT f.l[0] FROM f INNER JOIN f AS f_0 ON (f_0.l[1] = f.r[0]) WHERE ((f_0.r[1] IN (SELECT foos.object_ids[0] FROM foos WHERE ((id = 1) AND (foos.object_ids[0] IS NOT NULL)))) AND (f.l[0] IS NOT NULL)))) LIMIT 1"]
+  end
+end

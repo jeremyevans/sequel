@@ -1748,6 +1748,7 @@ describe 'PostgreSQL hstore handling' do
       end
     end
     Sequel.extension :pg_hstore_ops
+    c.plugin :many_through_many
     c.plugin :typecast_on_load, :h unless @native
 
     h = {'item_id'=>"2", 'left_item_id'=>"1"}
@@ -1767,6 +1768,16 @@ describe 'PostgreSQL hstore handling' do
       :right_primary_key=>Sequel.cast(:h.hstore['left_item_id'], Integer),
       :right_primary_key_method=>:left_item_id
 
+    c.many_through_many :mtm_items, [
+        [:items, Sequel.cast(:h.hstore['item_id'], Integer), Sequel.cast(:h.hstore['left_item_id'], Integer)],
+        [:items, Sequel.cast(:h.hstore['left_item_id'], Integer), Sequel.cast(:h.hstore['left_item_id'], Integer)]
+      ],
+      :class=>c,
+      :left_primary_key_column=>Sequel.cast(:h.hstore['item_id'], Integer),
+      :left_primary_key=>:item_id,
+      :right_primary_key=>Sequel.cast(:h.hstore['left_item_id'], Integer),
+      :right_primary_key_method=>:left_item_id
+
     # Lazily Loading
     o.item.should == o2
     o2.items.should == [o]
@@ -1774,13 +1785,15 @@ describe 'PostgreSQL hstore handling' do
     o2.other_item.should == o
     o.other_items.should == [o2]
     o.other_related_items.should == [o]
+    o.mtm_items.should == [o]
 
     # Eager Loading via eager
-    os = c.eager(:item, :related_items, :other_items, :other_related_items).where(:id=>1).all.first
+    os = c.eager(:item, :related_items, :other_items, :other_related_items, :mtm_items).where(:id=>1).all.first
     os.item.should == o2
     os.related_items.should == [o2]
     os.other_items.should == [o2]
     os.other_related_items.should == [o]
+    os.mtm_items.should == [o]
     os = c.eager(:items, :other_item).where(:id=>2).all.first
     os.items.should == [o]
     os.other_item.should == o
@@ -1792,6 +1805,7 @@ describe 'PostgreSQL hstore handling' do
     c.eager_graph(:other_item).where(:items__id=>2).all.first.other_item.should == o
     c.eager_graph(:other_items).where(:items__id=>1).all.first.other_items.should == [o2]
     c.eager_graph(:other_related_items).where(:items__id=>1).all.first.other_related_items.should == [o]
+    c.eager_graph(:mtm_items).where(:items__id=>1).all.first.mtm_items.should == [o]
 
     # Filter By Associations - Model Instances
     c.filter(:item=>o2).all.should == [o]
@@ -1800,6 +1814,7 @@ describe 'PostgreSQL hstore handling' do
     c.filter(:other_item=>o).all.should == [o2]
     c.filter(:other_items=>o2).all.should == [o]
     c.filter(:other_related_items=>o).all.should == [o]
+    c.filter(:mtm_items=>o).all.should == [o]
    
     # Filter By Associations - Model Datasets
     c.filter(:item=>c.filter(:id=>o2.id)).all.should == [o]
@@ -1807,7 +1822,7 @@ describe 'PostgreSQL hstore handling' do
     c.filter(:related_items=>c.filter(:id=>o2.id)).all.should == [o]
     c.filter(:other_item=>c.filter(:id=>o.id)).all.should == [o2]
     c.filter(:other_items=>c.filter(:id=>o2.id)).all.should == [o]
-    c.filter(:other_related_items=>c.filter(:id=>o.id)).all.should == [o]
+    c.filter(:mtm_items=>c.filter(:id=>o.id)).all.should == [o]
   end
 
   specify 'operations/functions with pg_hstore_ops' do

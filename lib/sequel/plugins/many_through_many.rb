@@ -87,7 +87,7 @@ module Sequel
 
         # Transform the :through option into a list of edges and reverse edges to use to join tables when loading the association.
         def calculate_edges
-          es = [{:left_table=>self[:model].table_name, :left_key=>self[:left_primary_key]}]
+          es = [{:left_table=>self[:model].table_name, :left_key=>self[:left_primary_key_column]}]
           self[:through].each do |t|
             es.last.merge!(:right_key=>t[:left], :right_table=>t[:table], :join_type=>t[:join_type]||self[:graph_join_type], :conditions=>(t[:conditions]||[]).to_a, :block=>t[:block])
             es.last[:only_conditions] = t[:only_conditions] if t.include?(:only_conditions)
@@ -123,24 +123,17 @@ module Sequel
         # * through - The tables and keys to join between the current table and the associated table.
         #   Must be an array, with elements that are either 3 element arrays, or hashes with keys :table, :left, and :right.
         #   The required entries in the array/hash are:
-        #   * :table (first array element) - The name of the table to join.
-        #   * :left (middle array element) - The key joining the table to the previous table. Can use an
-        #     array of symbols for a composite key association.
-        #   * :right (last array element) - The key joining the table to the next table. Can use an
-        #     array of symbols for a composite key association.
+        #   :table (first array element) :: The name of the table to join.
+        #   :left (middle array element) :: The key joining the table to the previous table. Can use an
+        #                                   array of symbols for a composite key association.
+        #   :right (last array element) :: The key joining the table to the next table. Can use an
+        #                                  array of symbols for a composite key association.
         #   If a hash is provided, the following keys are respected when using eager_graph:
-        #   * :block - A proc to use as the block argument to join.
-        #   * :conditions - Extra conditions to add to the JOIN ON clause.  Must be a hash or array of two pairs.
-        #   * :join_type - The join type to use for the join, defaults to :left_outer.
-        #   * :only_conditions - Conditions to use for the join instead of the ones specified by the keys.
-        # * opts - The options for the associaion.  Takes the same options as associate, and supports these additional options:
-        #   * :left_primary_key - column in current table that the first :left option in
-        #     through points to, as a symbol. Defaults to primary key of current table. Can use an
-        #     array of symbols for a composite key association.
-        #   * :right_primary_key - column in associated table that the final :right option in 
-        #     through points to, as a symbol. Defaults to primary key of the associated table.  Can use an
-        #     array of symbols for a composite key association.
-        #   * :uniq - Adds a after_load callback that makes the array of objects unique.
+        #   :block :: A proc to use as the block argument to join.
+        #   :conditions :: Extra conditions to add to the JOIN ON clause.  Must be a hash or array of two pairs.
+        #   :join_type :: The join type to use for the join, defaults to :left_outer.
+        #   :only_conditions :: Conditions to use for the join instead of the ones specified by the keys.
+        # * opts - The options for the associaion.  Takes the same options as many_to_many.
         def many_through_many(name, through, opts={}, &block)
           associate(:many_through_many, name, opts.merge(through.is_a?(Hash) ? through : {:through=>through}), &block)
         end
@@ -173,11 +166,13 @@ module Sequel
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
           opts[:eager_loader_key] = left_pk unless opts.has_key?(:eager_loader_key)
           left_pks = opts[:left_primary_keys] = Array(left_pk)
+          lpkc = opts[:left_primary_key_column] ||= left_pk
+          lpkcs = opts[:left_primary_key_columns] ||= Array(lpkc)
           opts[:dataset] ||= lambda do
             ds = opts.associated_class
-            opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
+            opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
             ft = opts.final_reverse_edge
-            ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])) + opts.predicate_keys.zip(left_pks.map{|k| send(k)}), :table_alias=>ft[:alias])
+            ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])) + opts.predicate_keys.zip(left_pks.map{|k| send(k)}), :table_alias=>ft[:alias], :qualify=>:deep)
           end
 
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
@@ -186,9 +181,9 @@ module Sequel
             rows = eo[:rows]
             rows.each{|object| object.associations[name] = []}
             ds = opts.associated_class 
-            opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
+            opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
             ft = opts.final_reverse_edge
-            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.predicate_key, h.keys]], :table_alias=>ft[:alias])
+            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.predicate_key, h.keys]], :table_alias=>ft[:alias], :qualify=>:deep)
             ds = model.eager_loading_dataset(opts, ds, nil, eo[:associations], eo)
             case opts.eager_limit_strategy
             when :window_function
@@ -199,7 +194,7 @@ module Sequel
               ds = apply_correlated_subquery_eager_limit_strategy(ds, opts) do |xds|
                 dsa = ds.send(:dataset_alias, 2)
                 opts.reverse_edges.each{|t| xds = xds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
-                xds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + left_keys.map{|k| [k, SQL::QualifiedIdentifier.new(ft[:table], k)]}, :table_alias=>dsa)
+                xds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + left_keys.map{|k| [k, SQL::QualifiedIdentifier.new(ft[:table], k)]}, :table_alias=>dsa, :qualify=>:deep)
               end
             end
             ds.all do |assoc_record|
@@ -228,11 +223,11 @@ module Sequel
             ds = eo[:self]
             iq = eo[:implicit_qualifier]
             opts.edges.each do |t|
-              ds = ds.graph(t[:table], t.fetch(:only_conditions, (Array(t[:right]).zip(Array(t[:left])) + t[:conditions])), :select=>false, :table_alias=>ds.unused_table_alias(t[:table]), :join_type=>t[:join_type], :implicit_qualifier=>iq, &t[:block])
+              ds = ds.graph(t[:table], t.fetch(:only_conditions, (Array(t[:right]).zip(Array(t[:left])) + t[:conditions])), :select=>false, :table_alias=>ds.unused_table_alias(t[:table]), :join_type=>t[:join_type], :qualify=>:deep, :implicit_qualifier=>iq, &t[:block])
               iq = nil
             end
             fe = opts.final_edge
-            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : (Array(opts.right_primary_key).zip(Array(fe[:left])) + conditions), :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, &graph_block)
+            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : (Array(opts.right_primary_key).zip(Array(fe[:left])) + conditions), :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>join_type, &graph_block)
           end
 
           def_association_dataset_methods(opts)
@@ -244,22 +239,27 @@ module Sequel
 
         # Use a subquery to filter rows to those related to the given associated object
         def many_through_many_association_filter_expression(op, ref, obj)
-          lpks = ref[:left_primary_keys]
+          lpks = ref[:left_primary_key_columns]
           lpks = lpks.first if lpks.length == 1
           lpks = ref.qualify(model.table_name, lpks)
           edges = ref.edges
           first, rest = edges.first, edges[1..-1]
           last = edges.last
           ds = model.db[first[:table]].select(*Array(ref.qualify(first[:table], first[:right])))
-          rest.each{|e| ds = ds.join(e[:table], e.fetch(:only_conditions, (Array(e[:right]).zip(Array(e[:left])) + e[:conditions])), :table_alias=>ds.unused_table_alias(e[:table]), &e[:block])}
+          rest.each{|e| ds = ds.join(e[:table], e.fetch(:only_conditions, (Array(e[:right]).zip(Array(e[:left])) + e[:conditions])), :table_alias=>ds.unused_table_alias(e[:table]), :qualify=>:deep, &e[:block])}
           last_alias = if rest.empty?
             first[:table]
           else
             last_join = ds.opts[:join].last
             last_join.table_alias || last_join.table
           end
-          meths = ref.right_primary_keys
-          meths = ref.qualify(obj.model.table_name, meths) if obj.is_a?(Sequel::Dataset)
+
+          meths = if obj.is_a?(Sequel::Dataset)
+            ref.qualify(obj.model.table_name, ref.right_primary_keys)
+          else
+            ref.right_primary_key_methods
+          end
+
           exp = association_filter_key_expression(ref.qualify(last_alias, Array(ref.final_edge[:left])), meths, obj)
           if exp == SQL::Constants::FALSE
             association_filter_handle_inversion(op, exp, Array(lpks))

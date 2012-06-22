@@ -1,5 +1,7 @@
 === HEAD
 
+* Differentiate between column references and method references in many_through_many associations (jeremyevans)
+
 * Use :qualify=>:deep option when joining tables in model association datasets (jeremyevans)
 
 * Support :qualify=>:deep option to Dataset#join_table to qualify subexpressions in the expression tree (jeremyevans)
