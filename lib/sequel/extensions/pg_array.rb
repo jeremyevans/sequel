@@ -376,7 +376,7 @@ module Sequel
           raise Sequel::Error, "array dimensions not balanced" unless @dimension == 0
           @entries
         end
-      end
+      end unless Sequel::Postgres.respond_to?(:parse_pg_array)
 
       # Callable object that takes the input string and parses it using Parser.
       class Creator
@@ -393,11 +393,18 @@ module Sequel
           @converter = converter
         end
 
-        # Parse the string using Parser with the appropriate
-        # converter, and return a PGArray with the appropriate database
-        # type.
-        def call(string)
-          PGArray.new(Parser.new(string, @converter).parse, @type)
+        if Sequel::Postgres.respond_to?(:parse_pg_array)
+          # Use sequel_pg's C-based parser if it has already been defined.
+          def call(string)
+            PGArray.new(Sequel::Postgres.parse_pg_array(string, @converter), @type)
+          end
+        else
+          # Parse the string using Parser with the appropriate
+          # converter, and return a PGArray with the appropriate database
+          # type.
+          def call(string)
+            PGArray.new(Parser.new(string, @converter).parse, @type)
+          end
         end
       end
 
