@@ -11,7 +11,7 @@ describe "NestedAttributes plugin" do
 
   def check_sql_array(*shoulds)
     sqls = @db.sqls
-    shoulds.length.should == sqls.length
+    sqls.length.should == shoulds.length
     shoulds.zip(sqls){|s, i| check_sqls(s, i)}
   end
 
@@ -59,9 +59,8 @@ describe "NestedAttributes plugin" do
     @db.sqls.should == []
     a.save
     check_sql_array(["INSERT INTO artists (name, id) VALUES ('Ar', 1)", "INSERT INTO artists (id, name) VALUES (1, 'Ar')"],
-      "INSERT INTO albums (name) VALUES ('Al')",
-      "UPDATE albums SET artist_id = NULL WHERE ((artist_id = 1) AND (id != 2))",
-      ["UPDATE albums SET artist_id = 1, name = 'Al' WHERE (id = 2)", "UPDATE albums SET name = 'Al', artist_id = 1 WHERE (id = 2)"])
+      "UPDATE albums SET artist_id = NULL WHERE (artist_id = 1)",
+      ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
   end
   
   it "should support creating new one_to_many objects" do

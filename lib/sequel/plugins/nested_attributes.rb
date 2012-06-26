@@ -171,7 +171,11 @@ module Sequel
 
             # Don't need to validate the object twice if :validate association option is not false
             # and don't want to validate it at all if it is false.
-            send(reflection[:type] == :many_to_one ? :before_save_hook : :after_save_hook){send(reflection.setter_method, obj.save(:validate=>false))}
+            if reflection[:type] == :many_to_one 
+              before_save_hook{send(reflection.setter_method, obj.save(:validate=>false))}
+            else
+              after_save_hook{send(reflection.setter_method, obj)}
+            end
           end
           obj
         end
