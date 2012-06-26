@@ -1360,7 +1360,7 @@ module Sequel
               association_module_private_def(opts._setter_method, opts) do |o|
                 up_ds = _apply_association_options(opts, opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)})))
                 if o
-                  up_ds = up_ds.exclude(o.pk_hash)
+                  up_ds = up_ds.exclude(o.pk_hash) unless o.new?
                   cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
                 end
                 checked_transaction do

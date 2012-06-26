@@ -684,7 +684,7 @@ describe Sequel::Model, "one_to_one" do
     sqls = MODEL_DB.sqls
     ['INSERT INTO attributes (node_id, id) VALUES (1234, 3)',
       'INSERT INTO attributes (id, node_id) VALUES (3, 1234)'].should(include(sqls.slice! 1))
-    sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))', "SELECT * FROM attributes WHERE (id = 3) LIMIT 1"]
+    sqls.should == ['UPDATE attributes SET node_id = NULL WHERE (node_id = 1234)', "SELECT * FROM attributes WHERE (id = 3) LIMIT 1"]
 
     @c2.new(:id => 1234).attribute.should == attrib
     attrib = @c1.load(:id=>3)
@@ -723,7 +723,7 @@ describe Sequel::Model, "one_to_one" do
     sqls = MODEL_DB.sqls
     ['INSERT INTO attributes (node_id, id) VALUES (5, 3)',
       'INSERT INTO attributes (id, node_id) VALUES (3, 5)'].should(include(sqls.slice! 1))
-    sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))', "SELECT * FROM attributes WHERE (id = 3) LIMIT 1"]
+    sqls.should == ['UPDATE attributes SET node_id = NULL WHERE (node_id = 5)', "SELECT * FROM attributes WHERE (id = 3) LIMIT 1"]
 
     @c2.new(:id => 321, :xxx=>5).attribute.should == attrib
     attrib = @c1.load(:id=>3)
@@ -857,38 +857,6 @@ describe Sequel::Model, "one_to_one" do
     MODEL_DB.sqls.should == []
   end
 
-  it "should define a setter method" do
-    @c2.one_to_one :parent, :class => @c2
-
-    d = @c2.new(:id => 1)
-    f = @c2.new(:id => 3, :node_id=> 4321)
-    @c2.dataset._fetch = @c2.instance_dataset._fetch = {:id => 3, :node_id=>1}
-    d.parent = f
-    f.values.should == {:id => 3, :node_id=>1}
-    d.parent.should == f
-    sqls = MODEL_DB.sqls
-    ["INSERT INTO nodes (node_id, id) VALUES (1, 3)",
-     "INSERT INTO nodes (id, node_id) VALUES (3, 1)"].should include(sqls.slice! 1)
-    sqls.should == ["UPDATE nodes SET node_id = NULL WHERE ((node_id = 1) AND (id != 3))", "SELECT * FROM nodes WHERE (id = 3) LIMIT 1"]
-    
-    d.parent = nil
-    d.parent.should == nil
-    MODEL_DB.sqls.should == ["UPDATE nodes SET node_id = NULL WHERE (node_id = 1)"]
-  end
-  
-  it "should have the setter method respect the :primary_key option" do
-    @c2.one_to_one :parent, :class => @c2, :primary_key=>:blah
-    d = @c2.new(:id => 1, :blah => 3)
-    e = @c2.new(:id => 4321, :node_id=>444)
-    @c2.dataset._fetch = @c2.instance_dataset._fetch = {:id => 4321, :node_id => 3}
-    d.parent = e
-    e.values.should == {:id => 4321, :node_id => 3}
-    sqls = MODEL_DB.sqls
-    ["INSERT INTO nodes (node_id, id) VALUES (3, 4321)",
-     "INSERT INTO nodes (id, node_id) VALUES (4321, 3)"].should include(sqls.slice! 1)
-    sqls.should == ["UPDATE nodes SET node_id = NULL WHERE ((node_id = 3) AND (id != 4321))", "SELECT * FROM nodes WHERE (id = 4321) LIMIT 1"]
-  end
-  
   it "should have the setter method respect the :key option" do
     @c2.one_to_one :parent, :class => @c2, :key=>:blah
     d = @c2.new(:id => 3)
@@ -899,7 +867,7 @@ describe Sequel::Model, "one_to_one" do
     sqls = MODEL_DB.sqls
     ["INSERT INTO nodes (blah, id) VALUES (3, 4321)",
      "INSERT INTO nodes (id, blah) VALUES (4321, 3)"].should include(sqls.slice! 1)
-    sqls.should == ["UPDATE nodes SET blah = NULL WHERE ((blah = 3) AND (id != 4321))", "SELECT * FROM nodes WHERE (id = 4321) LIMIT 1"]
+    sqls.should == ["UPDATE nodes SET blah = NULL WHERE (blah = 3)", "SELECT * FROM nodes WHERE (id = 4321) LIMIT 1"]
   end
   
   it "should persist changes to associated object when the setter is called" do
