@@ -21,7 +21,7 @@ begin
   # Attempt to load ActiveSupport inflector first, so Sequel inflector
   # can override it.
   require 'active_support/inflector'
-  require 'active_support/string/inflections'
+  require 'active_support/core_ext/string/inflections'
 rescue LoadError
   nil
 end
