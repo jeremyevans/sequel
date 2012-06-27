@@ -64,7 +64,7 @@ module Sequel
       # Creates callable objects that convert strings into ActiveSupport::Duration instances.
       class Parser
         # Regexp that parses the full range of PostgreSQL interval type output.
-        PARSER = /\A([+-]?\d+ years?\s?)?([+-]?\d+ mons?\s?)?([+-]?\d+ days?\s?)?(?:([+-])?(\d\d):(\d\d):(\d\d(\.\d+)?))?\z/o
+        PARSER = /\A([+-]?\d+ years?\s?)?([+-]?\d+ mons?\s?)?([+-]?\d+ days?\s?)?(?:(?:([+-])?(\d\d):(\d\d):(\d\d(\.\d+)?))|([+-]?\d+ hours?\s?)?([+-]?\d+ mins?\s?)?([+-]?\d+(\.\d+)? secs?\s?)?)?\z/o
 
         # Parse the interval input string into an ActiveSupport::Duration instance.
         def call(string)
@@ -92,6 +92,19 @@ module Sequel
             seconds = matches[5].to_i * 3600 + matches[6].to_i * 60
             seconds += matches[8] ? matches[7].to_f : matches[7].to_i
             seconds *= -1 if matches[4] == '-'
+            value += seconds
+            parts << [:seconds, seconds]
+          elsif matches[9] || matches[10] || matches[11]
+            seconds = 0
+            if v = matches[9]
+              seconds += v.to_i * 3600
+            end
+            if v = matches[10]
+              seconds += v.to_i * 60
+            end
+            if v = matches[11]
+              seconds += matches[12] ? v.to_f : v.to_i
+            end
             value += seconds
             parts << [:seconds, seconds]
           end

@@ -54,6 +54,12 @@ describe "pg_interval extension" do
     @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07").is_a?(ActiveSupport::Duration).should be_true
     @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07").should == d
     @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07").parts.sort_by{|k,v| k.to_s}.should == d.parts.sort_by{|k,v| k.to_s}
+    @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07.0").parts.sort_by{|k,v| k.to_s}.should == d.parts.sort_by{|k,v| k.to_s}
+
+    @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7 secs").is_a?(ActiveSupport::Duration).should be_true
+    @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7 secs").should == d
+    @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7 secs").parts.sort_by{|k,v| k.to_s}.should == d.parts.sort_by{|k,v| k.to_s}
+    @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7.0 secs").parts.sort_by{|k,v| k.to_s}.should == d.parts.sort_by{|k,v| k.to_s}
 
     d2 = ActiveSupport::Duration.new(1, [[:seconds, 1]])
     @db.typecast_value(:interval, 1).is_a?(ActiveSupport::Duration).should be_true
