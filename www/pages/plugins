@@ -102,6 +102,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html">pg_hstore</a>: Adds support for the PostgreSQL hstore type.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_ops_rb.html">pg_hstore_ops</a>: Adds DSL support for calling PostgreSQL hstore operators and functions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_inet_rb.html">pg_inet</a>: Adds support for the PostgreSQL inet and cidr types.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_interval_rb.html">pg_interval</a>: Adds support for the PostgreSQL interval type.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_json_rb.html">pg_json</a>: Adds support for the PostgreSQL json type.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_rb.html">pg_range</a>: Adds support for PostgreSQL range types.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_ops_rb.html">pg_range_ops</a>: Adds DSL support for calling PostgreSQL range operators and functions.</li>

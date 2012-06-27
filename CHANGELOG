@@ -1,5 +1,7 @@
 === HEAD
 
+* Add pg_interval extension, for returning interval types as ActiveSupport::Duration instances (jeremyevans)
+
 * Save a new one_to_one associated object once instead of twice in the nested_attributes plugin (jeremyevans)
 
 * Don't add unnecessary filter condition when passing a new object to a one_to_one setter method (jeremyevans)

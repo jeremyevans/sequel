@@ -1386,9 +1386,8 @@ end
 
 describe 'PostgreSQL array handling' do
   before(:all) do
-    Sequel.extension :pg_array
     @db = POSTGRES_DB
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
+    @db.extension :pg_array
     @ds = @db[:items]
     @native = POSTGRES_DB.adapter_scheme == :postgres
     @jdbc = POSTGRES_DB.adapter_scheme == :jdbc
@@ -1685,9 +1684,8 @@ end
 
 describe 'PostgreSQL hstore handling' do
   before(:all) do
-    Sequel.extension :pg_hstore
     @db = POSTGRES_DB
-    @db.extend Sequel::Postgres::HStore::DatabaseMethods
+    @db.extension :pg_hstore
     @ds = @db[:items]
     @h = {'a'=>'b', 'c'=>nil, 'd'=>'NULL', 'e'=>'\\\\" \\\' ,=>'}
     @native = POSTGRES_DB.adapter_scheme == :postgres
@@ -1826,9 +1824,7 @@ describe 'PostgreSQL hstore handling' do
   end
 
   specify 'operations/functions with pg_hstore_ops' do
-    Sequel.extension :pg_hstore_ops
-    Sequel.extension :pg_array
-    Sequel.extension :pg_array_ops
+    Sequel.extension :pg_hstore_ops, :pg_array, :pg_array_ops
     @db.create_table!(:items){hstore :h1; hstore :h2; hstore :h3; String :t}
     @ds.insert({'a'=>'b', 'c'=>nil}.hstore, {'a'=>'b'}.hstore, {'d'=>'e'}.hstore)
     h1 = :h1.hstore
@@ -1913,10 +1909,8 @@ end if POSTGRES_DB.type_supported?(:hstore)
 
 describe 'PostgreSQL json type' do
   before(:all) do
-    Sequel.extension :pg_array, :pg_json
     @db = POSTGRES_DB
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
-    @db.extend Sequel::Postgres::JSONDatabaseMethods
+    @db.extension :pg_array, :pg_json
     @ds = @db[:items]
     @a = [1, 2, {'a'=>'b'}, 3.0]
     @h = {'a'=>'b', '1'=>[3, 4, 5]}
@@ -2013,10 +2007,8 @@ describe 'PostgreSQL inet/cidr types' do
   ipv6_broken = (IPAddr.new('::1'); false) rescue true
 
   before(:all) do
-    Sequel.extension :pg_array, :pg_inet
     @db = POSTGRES_DB
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
-    @db.extend Sequel::Postgres::InetDatabaseMethods
+    @db.extension :pg_array, :pg_inet
     @ds = @db[:items]
     @v4 = '127.0.0.1'
     @v4nm = '127.0.0.0/8'
@@ -2128,10 +2120,8 @@ end
 
 describe 'PostgreSQL range types' do
   before(:all) do
-    Sequel.extension :pg_array, :pg_range
     @db = POSTGRES_DB
-    @db.extend Sequel::Postgres::PGArray::DatabaseMethods
-    @db.extend Sequel::Postgres::PGRange::DatabaseMethods
+    @db.extension :pg_array, :pg_range
     @ds = @db[:items]
     @map = {:i4=>'int4range', :i8=>'int8range', :n=>'numrange', :d=>'daterange', :t=>'tsrange', :tz=>'tstzrange'}
     @r = {:i4=>1...2, :i8=>2...3, :n=>BigDecimal.new('1.0')..BigDecimal.new('2.0'), :d=>Date.today...(Date.today+1), :t=>Time.local(2011, 1)..Time.local(2011, 2), :tz=>Time.local(2011, 1)..Time.local(2011, 2)}
@@ -2298,4 +2288,103 @@ describe 'PostgreSQL range types' do
     @db.get(Sequel::Postgres::PGRange.new(1, nil, :db_type=>:int4range).op.upper_inf).should be_true
   end
 end if POSTGRES_DB.server_version >= 90200
+
+describe 'PostgreSQL interval types' do
+  before(:all) do
+    @db = POSTGRES_DB
+    @db.extension :pg_array, :pg_interval
+    @ds = @db[:items]
+    @native = POSTGRES_DB.adapter_scheme == :postgres
+  end
+  after(:all) do
+    Sequel::Postgres::PG_TYPES.delete(1186)
+  end
+  after do
+    @db.drop_table?(:items)
+  end
+
+  specify 'insert and retrieve interval values' do
+    @db.create_table!(:items){interval :i}
+    [
+      ['0', '00:00:00',  0, [[:seconds, 0]]],
+      ['1 microsecond', '00:00:00.000001',  0.000001, [[:seconds, 0.000001]]],
+      ['1 millisecond', '00:00:00.001',  0.001, [[:seconds, 0.001]]],
+      ['1 second', '00:00:01', 1, [[:seconds, 1]]],
+      ['1 minute', '00:01:00', 60, [[:seconds, 60]]],
+      ['1 hour', '01:00:00', 3600, [[:seconds, 3600]]],
+      ['1 day', '1 day', 86400, [[:days, 1]]],
+      ['1 week', '7 days', 86400*7, [[:days, 7]]],
+      ['1 month', '1 mon', 86400*30, [[:months, 1]]],
+      ['1 year', '1 year', 31557600, [[:years, 1]]],
+      ['1 decade', '10 years', 31557600*10, [[:years, 10]]],
+      ['1 century', '100 years', 31557600*100, [[:years, 100]]],
+      ['1 millennium', '1000 years', 31557600*1000, [[:years, 1000]]],
+      ['1 year 2 months 3 weeks 4 days 5 hours 6 minutes 7 seconds', '1 year 2 mons 25 days 05:06:07', 31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]]],
+      ['-1 year +2 months -3 weeks +4 days -5 hours +6 minutes -7 seconds', '-10 mons -17 days -04:54:07', -10*86400*30 - 3*86400*7 + 4*86400 - 5*3600 + 6*60 - 7, [[:months, -10], [:days, -17], [:seconds, -17647]]],
+      ['+2 years -1 months +3 weeks -4 days +5 hours -6 minutes +7 seconds', '1 year 11 mons 17 days 04:54:07', 31557600 + 11*86400*30 + 3*86400*7 - 4*86400 + 5*3600 - 6*60 + 7, [[:years, 1], [:months, 11], [:days, 17], [:seconds, 17647]]],
+    ].each do |instr, outstr, value, parts|
+      @ds.insert(instr)
+      @ds.count.should == 1
+      if @native
+        @ds.get(Sequel.cast(:i, String)).should == outstr
+        rs = @ds.all
+        rs.first[:i].is_a?(ActiveSupport::Duration).should be_true
+        rs.first[:i].should == ActiveSupport::Duration.new(value, parts)
+        rs.first[:i].parts.sort_by{|k,v| k.to_s}.should == parts.sort_by{|k,v| k.to_s}
+        @ds.delete
+        @ds.insert(rs.first)
+        @ds.all.should == rs
+      end
+      @ds.delete
+    end
+  end
+
+  specify 'insert and retrieve interval array values' do
+    @db.create_table!(:items){column :i, 'interval[]'}
+    @ds.insert(['1 year 2 months 3 weeks 4 days 5 hours 6 minutes 7 seconds'].pg_array('interval'))
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      rs.first[:i].is_a?(Sequel::Postgres::PGArray).should be_true
+      rs.first[:i].first.is_a?(ActiveSupport::Duration).should be_true
+      rs.first[:i].first.should == ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
+      rs.first[:i].first.parts.sort_by{|k,v| k.to_s}.should == [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,v| k.to_s}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+  end
+
+  specify 'use intervals in bound variables' do
+    @db.create_table!(:items){interval :i}
+    @ds.insert('1 year 2 months 3 weeks 4 days 5 hours 6 minutes 7 seconds')
+    d = @ds.get(:i)
+    @ds.delete
+
+    @ds.call(:insert, {:i=>d}, {:i=>:$i})
+    @ds.get(:i).should == d
+    @ds.filter(:i=>:$i).call(:first, :i=>d).should == {:i=>d}
+    @ds.filter(:i=>:$i).call(:first, :i=>'0').should == nil
+    @ds.filter(:i=>:$i).call(:delete, :i=>d).should == 1
+
+    @db.create_table!(:items){column :i, 'interval[]'}
+    @ds.call(:insert, {:i=>[d]}, {:i=>:$i})
+    @ds.filter(:i=>:$i).call(:first, :i=>[d]).should == {:i=>[d]}
+    @ds.filter(:i=>:$i).call(:first, :i=>[]).should == nil
+    @ds.filter(:i=>:$i).call(:delete, :i=>[d]).should == 1
+  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+
+  specify 'with models' do
+    @db.create_table!(:items) do
+      primary_key :id
+      interval :i
+    end
+    c = Class.new(Sequel::Model(@db[:items]))
+    c.plugin :typecast_on_load, :i, :c unless @native
+    v = c.create(:i=>'1 year 2 mons 25 days 05:06:07').i
+    v.is_a?(ActiveSupport::Duration).should be_true
+    v.should == ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
+    v.parts.sort_by{|k,v| k.to_s}.should == [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,v| k.to_s}
+  end
+end if ((require 'active_support/duration'; true) rescue false)
 
