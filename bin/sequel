@@ -4,18 +4,17 @@ require 'rubygems'
 require 'optparse'
 require 'sequel'
 
-db_opts = {:test=>true}
 copy_databases = nil
 dump_migration = nil
 dump_schema = nil
-echo = nil
 env = nil
-logfile = nil
 migrate_dir = nil
 migrate_ver = nil
 backtrace = nil
+test = true
 load_dirs = []
 exclusive_options = []
+loggers = []
 
 opts = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
@@ -54,7 +53,8 @@ opts = OptionParser.new do |opts|
   end
   
   opts.on("-E", "--echo", "echo SQL statements") do
-    echo = true
+    require 'logger'
+    loggers << Logger.new($stdout)
   end
   
   opts.on("-I", "--include dir", "specify $LOAD_PATH directory") do |v|
@@ -62,7 +62,8 @@ opts = OptionParser.new do |opts|
   end
 
   opts.on("-l", "--log logfile", "log SQL statements to log file") do |v|
-    logfile = v
+    require 'logger'
+    loggers << Logger.new(v)
   end
   
   opts.on("-L", "--load-dir DIR", "loads all *.rb under specifed directory") do |v|
@@ -79,7 +80,7 @@ opts = OptionParser.new do |opts|
   end
 
   opts.on("-N", "--no-test-connection", "do not test the connection") do
-    db_opts[:test] = false
+    test = false
   end
 
   opts.on("-r", "--require lib", "require the library, before executing your script") do |v|
@@ -112,26 +113,21 @@ end
 error_proc["Error: Must specify -m if using -M"] if migrate_ver && !migrate_dir
 error_proc["Error: Cannot specify #{exclusive_options.map{|v| "-#{v}"}.join(' and ')} together"] if exclusive_options.length > 1
 
-if logfile || echo
-  require 'logger'
-  db_opts[:loggers] = []
-  db_opts[:loggers] << Logger.new(logfile) if logfile
-  db_opts[:loggers] << Logger.new($stdout) if echo
-end
-
 connect_proc = lambda do |database|
   db = if database.nil? || database.empty?
-    Sequel.connect('mock:///', db_opts)
+    Sequel.connect('mock:///')
   elsif File.exist?(database)
     require 'yaml'
     env ||= "development"
     db_config = YAML.load_file(database)
     db_config = db_config[env] || db_config[env.to_sym] || db_config
     db_config.keys.each{|k| db_config[k.to_sym] = db_config.delete(k)}
-    Sequel.connect(db_config.merge!(db_opts))
+    Sequel.connect(db_config)
   else
-    Sequel.connect(database, db_opts)
+    Sequel.connect(database)
   end
+  db.loggers = loggers
+  db.test_connection if test
   db
 end
 
