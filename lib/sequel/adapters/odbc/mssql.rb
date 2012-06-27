@@ -16,8 +16,8 @@ module Sequel
               log_yield(sql){conn.do(sql)}
               begin
                 s = log_yield(LAST_INSERT_ID_SQL){conn.run(LAST_INSERT_ID_SQL)}
-                if (rows = s.fetch_all) and (row = rows.first)
-                  Integer(row.first)
+                if (rows = s.fetch_all) and (row = rows.first) and (v = row.first)
+                  Integer(v)
                 end
               ensure
                 s.drop if s

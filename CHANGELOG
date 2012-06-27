@@ -1,5 +1,7 @@
 === HEAD
 
+* Correctly handle cases where SCOPE_IDENTITY is nil in the odbc/mssql adapter (stnoonan, jeremyevans)
+
 * Add pg_interval extension, for returning interval types as ActiveSupport::Duration instances (jeremyevans)
 
 * Save a new one_to_one associated object once instead of twice in the nested_attributes plugin (jeremyevans)
