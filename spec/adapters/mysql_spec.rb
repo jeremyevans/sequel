@@ -1224,3 +1224,28 @@ if MYSQL_DB.adapter_scheme == :mysql
     end
   end
 end
+
+if MYSQL_DB.adapter_scheme == :mysql2
+  describe "Mysql2 streaming" do
+    before(:all) do
+      MYSQL_DB.create_table!(:a){Integer :a}
+      MYSQL_DB.transaction do
+        1000.times do |i|
+          MYSQL_DB[:a].insert(i)
+        end
+      end
+      @ds = MYSQL_DB[:a].stream.order(:a)
+    end
+    after(:all) do
+      MYSQL_DB.drop_table?(:a)
+    end
+
+    specify "should correctly stream results" do
+      @ds.map(:a).should == (0...1000).to_a
+    end
+
+    specify "should correctly handle early returning when streaming results" do
+      3.times{@ds.each{|r| break r[:a]}.should == 0}
+    end
+  end if false
+end
