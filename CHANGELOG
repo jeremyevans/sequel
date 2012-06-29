@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow specifying eager_graph alias base on a per-call basis using an AliasedExpression (jeremyevans)
+
 * Allow bin/sequel to respect multiple -l options for logging to multiple files (jeremyevans)
 
 * Correctly handle cases where SCOPE_IDENTITY is nil in the odbc/mssql adapter (stnoonan, jeremyevans)

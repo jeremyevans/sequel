@@ -862,6 +862,37 @@ describe Sequel::Model, "#eager_graph" do
     proc{ds2.eager_graph(:tracks)}.should_not raise_error
   end
 
+  it "should allow manually selecting the alias base per call via an AliasedExpression" do
+    ds = GraphAlbum.eager_graph(Sequel.as(:band, :b))
+    ds.sql.should == 'SELECT albums.id, albums.band_id, b.id AS b_id, b.vocalist_id FROM albums LEFT OUTER JOIN bands AS b ON (b.id = albums.band_id)'
+    ds._fetch = {:id=>1, :band_id=>2, :b_id=>2, :vocalist_id=>3}
+    a = ds.all
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.band.should == GraphBand.load(:id => 2, :vocalist_id=>3)
+  end
+  
+  it "should handle multiple associations using the same alias base" do
+    ds = GraphAlbum.eager_graph(Sequel.as(:genres, :b), Sequel.as(:tracks, :b), Sequel.as(:band, :b))
+    ds.sql.should == 'SELECT albums.id, albums.band_id, b.id AS b_id, b_0.id AS b_0_id, b_0.album_id, b_1.id AS b_1_id, b_1.vocalist_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS b ON (b.id = ag.genre_id) LEFT OUTER JOIN tracks AS b_0 ON (b_0.album_id = albums.id) LEFT OUTER JOIN bands AS b_1 ON (b_1.id = albums.band_id)'
+    ds._fetch = {:id=>1, :band_id=>2, :b_id=>4, :b_0_id=>3, :album_id=>1, :b_1_id=>2, :vocalist_id=>6}
+    a = ds.all
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a = a.first
+    a.band.should == GraphBand.load(:id => 2, :vocalist_id=>6)
+    a.tracks.should == [GraphTrack.load({:id => 3, :album_id=>1})]
+    a.genres.should == [GraphGenre.load(:id => 4)]
+
+    ds = GraphTrack.eager_graph(Sequel.as(:album, :b)=>{Sequel.as(:band, :b)=>Sequel.as(:members, :b)})
+    ds.sql.should == 'SELECT tracks.id, tracks.album_id, b.id AS b_id, b.band_id, b_0.id AS b_0_id, b_0.vocalist_id, b_1.id AS b_1_id FROM tracks LEFT OUTER JOIN albums AS b ON (b.id = tracks.album_id) LEFT OUTER JOIN bands AS b_0 ON (b_0.id = b.band_id) LEFT OUTER JOIN bm ON (bm.band_id = b_0.id) LEFT OUTER JOIN members AS b_1 ON (b_1.id = bm.member_id)'
+    ds._fetch = {:id=>3, :album_id=>1, :b_id=>1, :band_id=>2, :b_1_id=>5, :b_0_id=>2, :vocalist_id=>6}
+    a = ds.all
+    a.should == [GraphTrack.load(:id => 3, :album_id => 1)]
+    a = a.first
+    a.album.should == GraphAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.should == GraphBand.load(:id => 2, :vocalist_id=>6)
+    a.album.band.members.should == [GraphBandMember.load(:id => 5)]
+  end
+  
   it "should eagerly load a single many_to_one association" do
     ds = GraphAlbum.eager_graph(:band)
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'

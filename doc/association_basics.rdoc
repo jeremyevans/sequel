@@ -1334,6 +1334,11 @@ This is mostly useful if you have associations with the same name in many models
 to be able to easily tell which table alias corresponds to which association when eagerly
 graphing multiple associations with the same name.
 
+You can override this option on a per-graph basis by specifying the association as an
+SQL::AliasedExpression instead of a symbol:
+
+  Album.eager_graph(Sequel.as(:artist, :a))
+
 ==== :eager_grapher
 
 Sets up a custom grapher to use when eager loading the objects via eager_graph.

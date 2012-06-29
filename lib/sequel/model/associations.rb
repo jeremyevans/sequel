@@ -1895,11 +1895,18 @@ module Sequel
         # model :: Current Model
         # ta :: table_alias used for the parent association
         # requirements :: an array, used as a stack for requirements
-        # r :: association reflection for the current association
+        # r :: association reflection for the current association, or an SQL::AliasedExpression
+        #      with the reflection as the expression and the alias base as the aliaz.
         # *associations :: any associations dependent on this one
         def eager_graph_association(ds, model, ta, requirements, r, *associations)
+          if r.is_a?(SQL::AliasedExpression)
+            alias_base = r.aliaz
+            r = r.expression
+          else
+            alias_base = r[:graph_alias_base]
+          end
           assoc_name = r[:name]
-          assoc_table_alias = ds.unused_table_alias(r[:graph_alias_base])
+          assoc_table_alias = ds.unused_table_alias(alias_base)
           loader = r[:eager_grapher]
           if !associations.empty?
             if associations.first.respond_to?(:call)
@@ -1937,11 +1944,11 @@ module Sequel
           return ds if associations.empty?
           associations.flatten.each do |association|
             ds = case association
-            when Symbol
-              ds.eager_graph_association(ds, model, ta, requirements, check_association(model, association))
+            when Symbol, SQL::AliasedExpression
+              ds.eager_graph_association(ds, model, ta, requirements, eager_graph_check_association(model, association))
             when Hash
               association.each do |assoc, assoc_assocs|
-                ds = ds.eager_graph_association(ds, model, ta, requirements, check_association(model, assoc), assoc_assocs)
+                ds = ds.eager_graph_association(ds, model, ta, requirements, eager_graph_check_association(model, assoc), assoc_assocs)
               end
               ds
             else raise(Sequel::Error, 'Associations must be in the form of a symbol or hash')
@@ -1949,7 +1956,7 @@ module Sequel
           end
           ds
         end
-      
+
         # Replace the array of plain hashes with an array of model objects will all eager_graphed
         # associations set in the associations cache for each object.
         def eager_graph_build_associations(hashes)
@@ -2006,6 +2013,16 @@ module Sequel
           raise(Sequel::UndefinedAssociation, "Invalid association #{association} for #{model.name}") unless reflection = model.association_reflection(association)
           raise(Sequel::Error, "Eager loading is not allowed for #{model.name} association #{association}") if reflection[:allow_eager] == false
           reflection
+        end
+      
+        # Allow associations that are eagerly graphed to be specified as an SQL::AliasedExpression, for
+        # per-call determining of the alias base.
+        def eager_graph_check_association(model, association)
+          if association.is_a?(SQL::AliasedExpression)
+            SQL::AliasedExpression.new(check_association(model, association.expression), association.aliaz)
+          else
+            check_association(model, association)
+          end
         end
       
         # Eagerly load all specified associations 
