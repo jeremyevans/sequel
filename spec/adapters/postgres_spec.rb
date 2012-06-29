@@ -1820,6 +1820,7 @@ describe 'PostgreSQL hstore handling' do
     c.filter(:related_items=>c.filter(:id=>o2.id)).all.should == [o]
     c.filter(:other_item=>c.filter(:id=>o.id)).all.should == [o2]
     c.filter(:other_items=>c.filter(:id=>o2.id)).all.should == [o]
+    c.filter(:other_related_items=>c.filter(:id=>o.id)).all.should == [o]
     c.filter(:mtm_items=>c.filter(:id=>o.id)).all.should == [o]
   end
 
