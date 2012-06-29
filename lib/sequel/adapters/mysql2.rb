@@ -47,6 +47,7 @@ module Sequel
         opts[:username] ||= opts[:user]
         opts[:flags] = ::Mysql2::Client::FOUND_ROWS if ::Mysql2::Client.const_defined?(:FOUND_ROWS)
         conn = ::Mysql2::Client.new(opts)
+        conn.query_options.merge!(:symbolize_keys=>true, :cache_rows=>false)
 
         sqls = mysql_connection_setting_sqls
 
@@ -86,7 +87,7 @@ module Sequel
       # yield the connection if a block is given.
       def _execute(conn, sql, opts)
         begin
-          r = log_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql){conn.query(sql, :symbolize_keys => true, :database_timezone => timezone, :application_timezone => Sequel.application_timezone)}
+          r = log_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql){conn.query(sql, :database_timezone => timezone, :application_timezone => Sequel.application_timezone, :cast_booleans => convert_tinyint_to_bool)}
           if opts[:type] == :select
             yield r if r
           elsif block_given?
@@ -149,7 +150,7 @@ module Sequel
             cols = r.fields
             @columns = cols2 = cols.map{|c| output_identifier(c.to_s)}
             cs = cols.zip(cols2)
-            r.each(:cast_booleans => db.convert_tinyint_to_bool) do |row|
+            r.each do |row|
               h = {}
               cs.each do |a, b|
                 h[b] = row[a]
@@ -158,7 +159,7 @@ module Sequel
             end
           else
             @columns = r.fields
-            r.each(:cast_booleans => db.convert_tinyint_to_bool){|h| yield h}
+            r.each{|h| yield h}
           end
         end
         self
