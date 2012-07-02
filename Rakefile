@@ -29,7 +29,7 @@ end
 
 desc "Upload sequel gem to gemcutter"
 task :release=>[:package] do
-  sh %{gem push ./#{NAME}-#{VERS.call}.gem} 
+  sh %{gem push ./#{NAME}-#{VERS.call}.gem}
 end
 
 ### RDoc
@@ -134,11 +134,11 @@ begin
   spec.call("_spec_model_no_assoc", Dir["spec/model/*_spec.rb"].delete_if{|f| f =~ /association|eager_loading/}, '')
   spec_with_cov.call("spec_plugin", Dir["spec/extensions/*_spec.rb"], "Run extension/plugin specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|adapters|connection_pool|database|dataset|model)"')}
   spec_with_cov.call("spec_integration", Dir["spec/integration/*_test.rb"], "Run integration tests")
-  
+
   %w'postgres sqlite mysql informix oracle firebird mssql db2'.each do |adapter|
     spec_with_cov.call("spec_#{adapter}", ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"], "Run #{adapter} specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|connection_pool|database|dataset|model|extensions|plugins)"')}
   end
-  
+
   task :spec_travis=>[:spec, :spec_plugin, :spec_sqlite] do
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
       ENV['SEQUEL_PG_SPEC_DB'] = "jdbc:postgresql://localhost/sequel_test?user=postgres"
@@ -173,7 +173,7 @@ end
 desc "Report code statistics (KLOCs, etc) from the application"
 task :stats do
   STATS_DIRECTORIES = [%w(Code lib/), %w(Spec spec)].map{|name, dir| [ name, "./#{dir}" ] }.select { |name, dir| File.directory?(dir)}
-  require "extra/stats"
+  require "./extra/stats"
   verbose = true
   CodeStatistics.new(*STATS_DIRECTORIES).to_s
 end
