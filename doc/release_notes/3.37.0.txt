@@ -1,0 +1,338 @@
+= New Features
+
+* Database#extension and Dataset#extension have been added and
+  make it much easier to use extensions that just define modules,
+  where you previously had to manually extend a Database or
+  Dataset object with the module to get the extension's behavior.
+  These methods operate similarly to model plugins, where you just
+  specify the extension symbol, except that you can specify multiple
+  extensions at once:
+
+    DB.extension(:pg_array, :pg_hstore)
+
+  For databases, these modify the Database itself (and
+  potentially all of its datasets).  Dataset#extension operates
+  like other dataset methods, returning a modified clone of
+  the dataset with the extension added:
+
+    dataset = dataset.extension(:columns_introspection)
+
+  Dataset#extension! has also been added for modifying the
+  receiver instead of returning a clone.
+
+  Not all extensions are usable by Database#extension or
+  Dataset#extension, the extension has to have specific support
+  for it.  The following extensions support both
+  Database#extension and Dataset#extension:
+
+  * columns_introspection
+  * query_literals
+  * split_array_nil
+
+  The following extensions support just Database#extension:
+
+  * arbitrary_servers
+  * looser_typecasting
+  * pg_array
+  * pg_auto_parameterize
+  * pg_hstore
+  * pg_inet
+  * pg_interval
+  * pg_json
+  * pg_range
+  * pg_statement_cache
+  * server_block
+
+  Any user that was loading these extensions with Sequel.extension
+  and then manually extending objects with the extension's module
+  is encouraged to switch to Database#extension and/or
+  Dataset#extension.
+
+* Dataset join methods now respect a :qualify=>:deep option
+  to do deep qualification of expressions, allowing qualification
+  of subexpressions in the expression tree.  This can allow you
+  to do things like:
+
+     DB[:a].join(:b, {:c.cast(Integer)=>:d.cast(Integer)},
+                 :qualify=>:deep)
+     # SELECT * FROM a INNER JOIN b
+     # ON (CAST(b.c AS INTEGER) = CAST(a.d AS INTEGER))
+
+  For backwards compatibility, by default Sequel will only do
+  automatic qualification if the arguments are simple symbols.
+  This may change in a future version, if automatic qualification
+  of only symbols is desired, switch to using :qualify=>:symbol.
+  
+  You can also choose to do no automatic qualification using the
+  :qualify=>false option.
+
+* All of Sequel's model associations now work with key expressions
+  that are not simple column references, without creating a fully
+  custom association.  So you can create associations where the
+  primary/foreign key values are stored in PostgreSQL array or
+  hstore columns, for example.
+
+* The pg_array extension has now been made more generic, so that it
+  is easy to support array types for any scalar type that is
+  currently supported.  All scalar types that Sequel's postgres
+  adapter supports now have corresponding array types supported in
+  the pg_array extension.  So if you load the pg_array extension and
+  return a date array column, the returned values will be arrays of
+  ruby Date objects.
+
+  Other pg_* extensions that add support for PostgreSQL-specific
+  scalar types now support array versions of those types if the
+  pg_array extension is loaded first.
+
+* A pg_range extension has been added, making it easy to deal
+  with PostgreSQL 9.2+'s range types.  As ruby's Range class does
+  not support all PostgreSQL range type values (such as empty ranges,
+  unbounded ranges, or ranges with an exlusive beginning), range
+  types are returned as instances of Sequel::Postgres::PGRange, which
+  has an API similar to Range.  You can turn a PGRange into a Range
+  using PGRange#to_range, assuming that the range type value does not
+  use features that are incompatible with ruby's Range class.
+
+  The pg_range extension supports all range types supported by
+  default in PostgreSQL 9.2, and makes it easy to support custom
+  range types.
+
+* A pg_range_ops extension has been added, which adds DSL support for
+  PostgreSQL range operators and functions, similar to the
+  pg_array_ops and pg_hstore_ops extensions.
+
+* A pg_interval extension has been added, which makes Sequel return
+  PostgreSQL interval types as instances of ActiveSupport::Duration.
+  This is useful if you want to take the interval value and use it in
+  calculations in ruby (assuming you load the appropriate parts of
+  ActiveSupport).
+
+* A split_array_nil extension has been added, which changes how Sequel
+  compiles IN/NOT IN expressions with arrays with nil values.
+
+    where(:col=>[1, nil])
+    # Default:
+    #   WHERE (col IN (1, NULL))
+    # with split_array_nil extension:
+    #   WHERE ((col IN (1)) OR (col IS NULL))
+
+    exclude(:col=>[1, nil])
+    # Default:
+    #   WHERE (col NOT IN (1, NULL))
+    # with split_array_nil extension:
+    #   WHERE ((col NOT IN (1)) AND (col IS NOT NULL))
+
+* The nested_attributes plugin now allows the :fields option to
+  be a proc, which is called with the associated object and should
+  return an array of allowable fields.
+
+* You can now specify the graph alias base when using eager_graph on
+  a per-call basis.  Previously, it could only be set on a per
+  association basis.  This is helpful if you have multiple
+  associations to the same class, and are cascading the eager graph to
+  dependent associations of that class for both of the associations.
+  Previously, there was no way to manually give descriptive names to
+  the tables in the cascaded associations, but you can now do so
+  by passing the association as an Sequel::SQL::AliasedExpression
+  instance instead of a plain Symbol.  Here's a usage example:
+
+    ds = Game.eager_graph(:winner=>:players.as(:winning_players),
+                          :loser=>:players.as(:losing_players)).
+          where(:winning_players__name=>'A',
+                :losing_players__name=>'B')
+
+* many_through_many associations now differentiate between column
+  references and method references, by supporting the
+  :left_primary_key_column and :right_primary_key_method options that
+  many_to_many associations support.
+
+* Custom :eager_loader procs that accept a single hash argument now
+  have an additional entry passed in the hash, :id_map, which is
+  easier to use than the :key_hash entry (which is still present for
+  backwards compatibility).  Anyone with custom :eager_loader procs is
+  encouraged to switch from using :key_hash to :id_map.
+
+* You can now override the create_table/alter_table schema generators
+  per database/adapter.  This allows for database specific generator
+  subclasses, which have methods for unique features for that
+  database.
+
+* You can now setup exclusion constraints on PostgreSQL using the
+  create_table and alter_table schema generators:
+
+    DB.create_table(:t) do
+      ...
+      exclusion_constraint([[:col1, '&&'], [:col2, '=']])
+      # EXCLUDE USING gist (col1 WITH &&, col2 WITH =)
+    end
+
+  One common use for exclusion constraints is to make sure that no two
+  rows have overlapping values/ranges/circles.
+
+* When adding foreign key constraints to an existing table on
+  PostgreSQL, you can use the :not_valid option to mark the constraint
+  as not yet valid.  This will make it so that future changes to the
+  table need to respect the foreign key constraint, but existing rows
+  do not.  After cleaning up the existing data, you can then use the
+  alter_table validate_constraint method to mark the constraint as
+  valid.
+
+* An eval_inspect extension has been added that attempts to do
+  do the following for Sequel::SQL::Expression instances:
+
+    eval(obj.inspect) == obj # => true
+
+  There are a lot of cases that this extension does not handle, but
+  it does a decent job in most cases.  This is currently only used
+  internally in a specific case in the schema_dumper extension.
+
+= Other Improvements
+
+* The filter by associations support now respects the method
+  reference vs column reference distinction that other parts of the
+  association code have respected since 3.32.0.
+
+* In the nested_attributes plugin, new one_to_one associated
+  values are saved once instead of twice.  Previously it attempted to
+  save them before they were associated to the current model object,
+  which can violate some validations/constraints.
+
+* When saving an associated object in the one_to_one association
+  setter method, Sequel no longer adds an unnecessary filter
+  condition when nullifying the foreign key for existing rows
+  in the associated table.
+
+* The list plugin's before_create method now calls super, which
+  fixes usage when other plugins that define before_create are loaded
+  before it.
+
+* In the pg_array extension, when typecasting an Array to PGArray,
+  a recursive map is done on the input array to convert each value
+  in the input array to the expected type, using the typecasting
+  method that would be used for the scalar value.  For example, for
+  model objects, where ids is an integer array column:
+
+   model.set(:ids=>['1', '2']).ids.to_a # => [1, 2]
+
+* The pg_array extension now correctly handles bytea arrays used
+  in bound variables.
+
+* The pg_array extension no longer uses the JSON-based parser for
+  floating point types, since it doesn't handle NaN and Infinity
+  values correctly.
+
+* When typecasting in the pg_array extension, PGArray values are
+  only returned verbatim if they have a matching database type.
+  Otherwise, the underlying array is rewrapped in a new PGArray
+  value with the correct database type.
+
+* H2 clob types are now recognized as strings instead of blobs.
+  Previously the code attempted to do this, but it didn't do so
+  correctly.
+
+* The jdbc/postgres adapter now converts scalar values of
+  the array to the appropriate type.  Previously, if you retrieved
+  a date array, you got back a ruby array of JavaSQL::SQL::Date
+  instances.  Now, you get back a ruby array of ruby Date instances.
+
+* The schema_dumper extension now dumps migrations as change
+  migrations, instead of separate up/down migrations, resulting in
+  simpler code.
+
+* When dumping non-integer foreign keys in the schema dumper, an
+  explicit type is now used.  Previously, the column would have been
+  dumped as an integer column.
+
+* When dumping unsigned integer columns in the schema dumper, add a
+  column > 0 constraint in the dumped migration.
+
+* On Microsoft SQL Server, when updating a dataset with a limit,
+  the limit is now respected.
+
+* When emulating offset using the ROW_NUMBER window function,
+  do not require that the dataset be ordered.  If an order is
+  not provided, default to ordering on all of the columns in
+  the dataset.  If you want to override the default order used
+  in such a case, you need to override the default_offset_order
+  method for the dataset.
+
+* On SQLite, casting to Date/Time/DateTime now calls an SQLite
+  date/datetime function instead of using a cast, as SQLite treats
+  such a cast as a cast to integer.
+
+* When using JRuby 1.6 in ruby 1.9 mode and typecasting a time
+  column, workaround a bug where Time#nsec is 0 even though
+  Time#usec is not.
+
+* The odbc/mssql adapter now correctly handles the case where
+  SCOPE_IDENTITY returns NULL after an insert.
+
+* bin/sequel now accepts multiple -l options for logging to multiple
+  output files.
+
+* In addition to Sequel's rigorous pre-push testing, Sequel now
+  also uses TravisCI for continuous integration testing across
+  a wider range of ruby implementations.
+
+= Backwards Compatibility
+
+* The keys in the :key_hash entry passed to the :eager_loader proc
+  are now method references instead of column references.  For most
+  associations, they are the same thing, but for associations using
+  the :key_column/:primary_key_column/:left_primary_key_column
+  options, the values could be different.  If you were using one
+  of those options and had a custom eager_loader, you should switch
+  from indexing into the :key_hash option to just using the :id_map
+  option.
+
+* The :key_hash entry passed to the :eager_loader proc is now no
+  longer guaranteed to contain key maps for associations other than
+  the one currently being eagerly loaded.  Previously, it contained 
+  key maps for all associations that were being eagerly loaded.  If
+  you have a custom :eager_loader proc that accessed a key map for
+  a separate association that was being loaded concurrently, you'll
+  now have to build the key map manually if it doesn't exist.
+
+* If you previously explicitly specified an :eager_loader_key option
+  when defining an association, you may need to change it so that it
+  is a method reference instead of a column reference, or possibly
+  just omit the option.
+
+* If you have a custom :eager_loader proc for an association where
+  the default :eager_loader_key option references a method that
+  the model does not respond to (or raises an exception), you may
+  need to specify the :eager_loader_key=>nil option.
+
+* In the pg_auto_parameterize extension, String values are no longer
+  automatically casted to text.  This is because the default type of
+  a string literal in PostgreSQL is unknown, not text.  This makes it
+  much less likely to require manual casts, but has the potential to
+  break existing code relying on the automatic cast to text.  As a
+  work around, any query that can no longer be automatically
+  parameterized after this query just needs to add manual casting
+  to text.
+
+* Sequel now raises an exception if you attempt to clone associations
+  with different types, except if one type is one_to_many and the
+  other is one_to_one.  Cloning from other types was usually a bug,
+  and raising an exception early will make it much easier to track
+  such bugs down.
+
+* When running the plugin/extension and PostgreSQL adapter specs,
+  a json library is now required.
+
+* The json/postgres adapter array typecasting internals have been
+  modified, if you were relying on the internals, you may need to
+  update your code.
+
+* The pg_array extension internals changed significantly.  PGArray
+  no longer has any subclasses by default, as parsing is now done
+  in separate objects.  Anyone relying on the pg_array internals
+  will need to update their code.
+
+* The postgres adapter no longer sets up type conversion of int2vector
+  and money types, since in both cases the conversion was incorrect in
+  most cases.  These types will now be returned as strings.  If you are
+  relying on the conversion, you'll need to add your own custom type
+  procs.
+
