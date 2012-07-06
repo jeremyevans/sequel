@@ -115,7 +115,7 @@ describe "An Oracle dataset" do
       {:name => 'def'}
     ]
            
-    @d.order(:value.desc).limit(1).to_a.should == [
+    @d.order(Sequel.desc(:value)).limit(1).to_a.should == [
       {:date_created=>nil, :name => 'def', :value => 789}                                        
     ]
 
@@ -124,7 +124,7 @@ describe "An Oracle dataset" do
       {:date_created=>nil, :name => 'abc', :value => 456} 
     ]
     
-    @d.order(:value.desc).filter(:name => 'abc').to_a.should == [
+    @d.order(Sequel.desc(:value)).filter(:name => 'abc').to_a.should == [
       {:date_created=>nil, :name => 'abc', :value => 456},
       {:date_created=>nil, :name => 'abc', :value => 123} 
     ]
@@ -133,7 +133,7 @@ describe "An Oracle dataset" do
       {:date_created=>nil, :name => 'abc', :value => 123}                                        
     ]
         
-    @d.filter(:name => 'abc').order(:value.desc).limit(1).to_a.should == [
+    @d.filter(:name => 'abc').order(Sequel.desc(:value)).limit(1).to_a.should == [
       {:date_created=>nil, :name => 'abc', :value => 456}                                        
     ]
     
@@ -157,25 +157,25 @@ describe "An Oracle dataset" do
     
     @d.max(:value).to_i.should == 789
     
-    @d.select(:name, :AVG.sql_function(:value).as(:avg)).filter(:name => 'abc').group(:name).to_a.should == [
+    @d.select(:name, Sequel.function(:AVG, :value).as(:avg)).filter(:name => 'abc').group(:name).to_a.should == [
       {:name => 'abc', :avg => (456+123)/2.0}
     ]
 
-    @d.select(:AVG.sql_function(:value).as(:avg)).group(:name).order(:name).limit(1).to_a.should == [
+    @d.select(Sequel.function(:AVG, :value).as(:avg)).group(:name).order(:name).limit(1).to_a.should == [
       {:avg => (456+123)/2.0}
     ]
         
-    @d.select(:name, :AVG.sql_function(:value).as(:avg)).group(:name).order(:name).to_a.should == [
+    @d.select(:name, Sequel.function(:AVG, :value).as(:avg)).group(:name).order(:name).to_a.should == [
       {:name => 'abc', :avg => (456+123)/2.0},
       {:name => 'def', :avg => 789*1.0}
     ]
     
-    @d.select(:name, :AVG.sql_function(:value).as(:avg)).group(:name).order(:name).to_a.should == [
+    @d.select(:name, Sequel.function(:AVG, :value).as(:avg)).group(:name).order(:name).to_a.should == [
       {:name => 'abc', :avg => (456+123)/2.0},
       {:name => 'def', :avg => 789*1.0}
     ]
 
-    @d.select(:name, :AVG.sql_function(:value).as(:avg)).group(:name).having(:name => ['abc', 'def']).order(:name).to_a.should == [
+    @d.select(:name, Sequel.function(:AVG, :value).as(:avg)).group(:name).having(:name => ['abc', 'def']).order(:name).to_a.should == [
       {:name => 'abc', :avg => (456+123)/2.0},
       {:name => 'def', :avg => 789*1.0}
     ]
@@ -203,7 +203,7 @@ describe "An Oracle dataset" do
   specify "should translate values correctly" do
     @d << {:name => 'abc', :value => 456}
     @d << {:name => 'def', :value => 789}
-    @d.filter('value > 500').update(:date_created => "to_timestamp('2009-09-09', 'YYYY-MM-DD')".lit)
+    @d.filter('value > 500').update(:date_created => Sequel.lit("to_timestamp('2009-09-09', 'YYYY-MM-DD')"))
     
     @d[:name => 'def'][:date_created].strftime('%F').should == '2009-09-09'
   end
@@ -266,7 +266,7 @@ describe "Joined Oracle dataset" do
       {:id => 4, :title => 'ddd', :cat_name => nil} 
     ]
     
-    @d1.left_outer_join(:categories, :id => :category_id).select(:books__id, :title, :cat_name).order(:books__id.desc).limit(2, 0).to_a.should == [      
+    @d1.left_outer_join(:categories, :id => :category_id).select(:books__id, :title, :cat_name).reverse_order(:books__id).limit(2, 0).to_a.should == [      
       {:id => 4, :title => 'ddd', :cat_name => nil}, 
       {:id => 3, :title => 'ccc', :cat_name => 'rails'}
     ]      
@@ -283,7 +283,7 @@ describe "Oracle aliasing" do
   end
 
   specify "should allow columns to be renamed" do
-    @d1.select(:title.as(:name)).order_by(:id).to_a.should == [
+    @d1.select(Sequel.as(:title, :name)).order_by(:id).to_a.should == [
       { :name => 'aaa' },
       { :name => 'bbb' },
       { :name => 'bbb' },
