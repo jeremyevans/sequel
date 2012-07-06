@@ -768,7 +768,7 @@ module Sequel
       when Symbol
         _, c, a = split_symbol(s)
         (a || c).to_sym
-      when SQL::Identifier
+      when SQL::Identifier, SQL::Wrapper
         hash_key_symbol(s.value)
       when SQL::QualifiedIdentifier
         hash_key_symbol(s.column)
@@ -821,9 +821,8 @@ module Sequel
         c.expression
       when SQL::OrderedExpression
         expr = c.expression
-        if expr.is_a?(Symbol)
-          expr = unaliased_identifier(expr)
-          SQL::OrderedExpression.new(unaliased_identifier(c.expression), c.descending, :nulls=>c.nulls)
+        if expr.is_a?(Symbol) || (expr.is_a?(SQL::Wrapper) && expr.value.is_a?(Symbol) && (expr = expr.value))
+          SQL::OrderedExpression.new(unaliased_identifier(expr), c.descending, :nulls=>c.nulls)
         else
           c
         end
