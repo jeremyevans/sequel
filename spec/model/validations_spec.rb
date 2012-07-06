@@ -65,7 +65,7 @@ describe Sequel::Model::Errors do
     @errors.full_messages.should == []
     
     @errors[:blow] << 'blieuh'
-    @errors[:blow] << 'blich'.lit
+    @errors[:blow] << Sequel.lit('blich')
     @errors[:blay] << 'bliu'
     msgs = @errors.full_messages
     msgs.size.should == 3

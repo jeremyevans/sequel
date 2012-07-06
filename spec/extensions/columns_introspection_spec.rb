@@ -58,19 +58,19 @@ describe "columns_introspection extension" do
   end
 
   specify "should handle SQL::Identifiers " do
-    @ds.select(:x.identifier).columns.should == [:x]
+    @ds.select(Sequel.identifier(:x)).columns.should == [:x]
     @db.sqls.length.should == 0
   end
 
   specify "should handle SQL::QualifiedIdentifiers" do
-    @ds.select(:x.qualify(:t)).columns.should == [:x]
-    @ds.select(:x.identifier.qualify(:t)).columns.should == [:x]
+    @ds.select(Sequel.qualify(:t, :x)).columns.should == [:x]
+    @ds.select(Sequel.identifier(:x).qualify(:t)).columns.should == [:x]
     @db.sqls.length.should == 0
   end
 
   specify "should handle SQL::AliasedExpressions" do
-    @ds.select(:x.as(:a)).columns.should == [:a]
-    @ds.select(:x.as(:a.identifier)).columns.should == [:a]
+    @ds.select(Sequel.as(:x, :a)).columns.should == [:a]
+    @ds.select(Sequel.as(:x, Sequel.identifier(:a))).columns.should == [:a]
     @db.sqls.length.should == 0
   end
 

@@ -115,7 +115,7 @@ describe "MSSQL Dataset#output" do
   specify "should format OUTPUT clauses without INTO for DELETE statements" do
     @ds.output(nil, [:deleted__name, :deleted__value]).delete_sql.should =~
       /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\]/
-    @ds.output(nil, [:deleted.*]).delete_sql.should =~
+    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:deleted)]).delete_sql.should =~
       /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].*/
   end
   
@@ -129,7 +129,7 @@ describe "MSSQL Dataset#output" do
   specify "should format OUTPUT clauses without INTO for INSERT statements" do
     @ds.output(nil, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).should =~
       /INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] VALUES \((N'name'|1), (N'name'|1)\)/
-    @ds.output(nil, [:inserted.*]).insert_sql(:name => "name", :value => 1).should =~
+    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:inserted)]).insert_sql(:name => "name", :value => 1).should =~
       /INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].* VALUES \((N'name'|1), (N'name'|1)\)/
   end
 
@@ -143,7 +143,7 @@ describe "MSSQL Dataset#output" do
   specify "should format OUTPUT clauses without INTO for UPDATE statements" do
     @ds.output(nil, [:inserted__name, :deleted__value]).update_sql(:value => 2).should =~
       /UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\]/
-    @ds.output(nil, [:inserted.*]).update_sql(:value => 2).should =~
+    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:inserted)]).update_sql(:value => 2).should =~
       /UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[INSERTED\].*/
   end
 
@@ -329,7 +329,7 @@ describe "Common Table Expressions" do
 
   specify "using #with_recursive should be able to update" do
     ds = @ds.with_recursive(:t, @ds.filter(:parent_id=>1).or(:id => 1), @ds.join(:t, :i=>:parent_id).select(:i1__id, :i1__parent_id), :args=>[:i, :pi])
-    ds.filter(~{:id => @db[:t].select(:i)}).update(:parent_id => 1)
+    ds.exclude(:id => @db[:t].select(:i)).update(:parent_id => 1)
     @ds[:id => 1].should == {:id => 1, :parent_id => nil}
     @ds[:id => 2].should == {:id => 2, :parent_id => 1}
     @ds[:id => 5].should == {:id => 5, :parent_id => 3}

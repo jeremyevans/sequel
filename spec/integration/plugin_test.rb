@@ -199,7 +199,7 @@ describe "Many Through Many Plugin" do
   end
   
   def self_join(c)
-    c.join(c.table_name.as(:b), Array(c.primary_key).zip(Array(c.primary_key))).select_all(c.table_name)
+    c.join(Sequel.as(c.table_name, :b), Array(c.primary_key).zip(Array(c.primary_key))).select_all(c.table_name)
   end
 
   specify "should handle super simple case with 1 join table" do

@@ -9,10 +9,10 @@ describe "Supported types" do
   specify "should support casting correctly" do
     ds = create_items_table_with_column(:number, Integer)
     ds.insert(:number => 1)
-    ds.select(:number.cast_string.as(:n)).map(:n).should == %w'1'
+    ds.select(Sequel.cast(:number, String).as(:n)).map(:n).should == %w'1'
     ds = create_items_table_with_column(:name, String)
     ds.insert(:name=> '1')
-    ds.select(:name.cast_numeric.as(:n)).map(:n).should == [1]
+    ds.select(Sequel.cast(:name, Integer).as(:n)).map(:n).should == [1]
   end
 
   specify "should support NULL correctly" do
@@ -95,8 +95,8 @@ describe "Supported types" do
   
   cspecify "should support generic file type", [:do], [:odbc, :mssql], [:mysql2], [:swift], [:tinytds] do
     ds = create_items_table_with_column(:name, File)
-    ds.insert(:name => ("a\0"*300).to_sequel_blob)
-    ds.all.should == [{:name=>("a\0"*300).to_sequel_blob}]
+    ds.insert(:name =>Sequel.blob("a\0"*300))
+    ds.all.should == [{:name=>Sequel.blob("a\0"*300)}]
     ds.first[:name].should be_a_kind_of(::Sequel::SQL::Blob)
   end
   

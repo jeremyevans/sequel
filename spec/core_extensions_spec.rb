@@ -1,24 +1,16 @@
-require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
+require File.join(File.dirname(File.expand_path(__FILE__)), 'extensions', 'spec_helper')
+
+Regexp.send(:include, Sequel::SQL::StringMethods)
+String.send(:include, Sequel::SQL::StringMethods)
+Sequel.extension :core_extensions
 
 describe "Sequel core extensions" do
-  specify "should not be used inside Sequel, to insure Sequel works without them" do
-    usage = []
-    match_re = /(\.(sql_value_list|sql_array|sql_expr|sql_negate|sql_or|sql_string_join|lit|to_sequel_blob|case)\W)|:\w+\.(qualify|identifier|as|cast|asc|desc|sql_subscript|\*|sql_function)\W/
-    comment_re = /^\s*#|# core_sql/
-    Dir['lib/sequel/**/*.rb'].each do |f|
-      lines = File.read(f).split("\n").grep(match_re).delete_if{|l| l =~ comment_re}
-      usage << [f, lines] unless lines.empty?
-    end
-    puts usage unless usage.empty?
-    usage.should be_empty
-  end
-
   specify "should have Sequel.core_extensions? be true if enabled" do
     Sequel.core_extensions?.should be_true
   end
 end
 
-describe "Array and Hash extensions" do
+describe "Core extensions" do
   before do
     db = Sequel::Database.new
     @d = db[:items]
@@ -30,6 +22,150 @@ describe "Array and Hash extensions" do
     end
   end
   
+  if RUBY_VERSION < '1.9.0'
+    it "should not allow inequality operations on true, false, or nil" do
+      @d.lit(:x > 1).should == "(x > 1)"
+      @d.lit(:x < true).should == "(x < 't')"
+      @d.lit(:x >= false).should == "(x >= 'f')"
+      @d.lit(:x <= nil).should == "(x <= NULL)"
+    end
+
+    it "should not allow inequality operations on boolean complex expressions" do
+      @d.lit(:x > (:y > 5)).should == "(x > (y > 5))"
+      @d.lit(:x < (:y < 5)).should == "(x < (y < 5))"
+      @d.lit(:x >= (:y >= 5)).should == "(x >= (y >= 5))"
+      @d.lit(:x <= (:y <= 5)).should == "(x <= (y <= 5))"
+      @d.lit(:x > {:y => nil}).should == "(x > (y IS NULL))"
+      @d.lit(:x < ~{:y => nil}).should == "(x < (y IS NOT NULL))"
+      @d.lit(:x >= {:y => 5}).should == "(x >= (y = 5))"
+      @d.lit(:x <= ~{:y => 5}).should == "(x <= (y != 5))"
+      @d.lit(:x >= {:y => [1,2,3]}).should == "(x >= (y IN (1, 2, 3)))"
+      @d.lit(:x <= ~{:y => [1,2,3]}).should == "(x <= (y NOT IN (1, 2, 3)))"
+    end
+    
+    it "should support >, <, >=, and <= via Symbol#>,<,>=,<=" do
+      @d.l(:x > 100).should == '(x > 100)'
+      @d.l(:x < 100.01).should == '(x < 100.01)'
+      @d.l(:x >= 100000000000000000000000000000000000).should == '(x >= 100000000000000000000000000000000000)'
+      @d.l(:x <= 100).should == '(x <= 100)'
+    end
+    
+    it "should support negation of >, <, >=, and <= via Symbol#~" do
+      @d.l(~(:x > 100)).should == '(x <= 100)'
+      @d.l(~(:x < 100.01)).should == '(x >= 100.01)'
+      @d.l(~(:x >= 100000000000000000000000000000000000)).should == '(x < 100000000000000000000000000000000000)'
+      @d.l(~(:x <= 100)).should == '(x > 100)'
+    end
+    
+    it "should support double negation via ~" do
+      @d.l(~~(:x > 100)).should == '(x > 100)'
+    end
+  end
+  it "should support NOT via Symbol#~" do
+    @d.l(~:x).should == 'NOT x'
+    @d.l(~:x__y).should == 'NOT x.y'
+  end
+  
+  it "should support + - * / via Symbol#+,-,*,/" do
+    @d.l(:x + 1 > 100).should == '((x + 1) > 100)'
+    @d.l((:x * :y) < 100.01).should == '((x * y) < 100.01)'
+    @d.l((:x - :y/2) >= 100000000000000000000000000000000000).should == '((x - (y / 2)) >= 100000000000000000000000000000000000)'
+    @d.l((((:x - :y)/(:x + :y))*:z) <= 100).should == '((((x - y) / (x + y)) * z) <= 100)'
+    @d.l(~((((:x - :y)/(:x + :y))*:z) <= 100)).should == '((((x - y) / (x + y)) * z) > 100)'
+  end
+  
+  it "should support LIKE via Symbol#like" do
+    @d.l(:x.like('a')).should == '(x LIKE \'a\')'
+    @d.l(:x.like(/a/)).should == '(x ~ \'a\')'
+    @d.l(:x.like('a', 'b')).should == '((x LIKE \'a\') OR (x LIKE \'b\'))'
+    @d.l(:x.like(/a/, /b/i)).should == '((x ~ \'a\') OR (x ~* \'b\'))'
+    @d.l(:x.like('a', /b/)).should == '((x LIKE \'a\') OR (x ~ \'b\'))'
+
+    @d.l('a'.like(:x)).should == "('a' LIKE x)"
+    @d.l('a'.like(:x, 'b')).should == "(('a' LIKE x) OR ('a' LIKE 'b'))"
+    @d.l('a'.like(:x, /b/)).should == "(('a' LIKE x) OR ('a' ~ 'b'))"
+    @d.l('a'.like(:x, /b/i)).should == "(('a' LIKE x) OR ('a' ~* 'b'))"
+
+    @d.l(/a/.like(:x)).should == "('a' ~ x)"
+    @d.l(/a/.like(:x, 'b')).should == "(('a' ~ x) OR ('a' ~ 'b'))"
+    @d.l(/a/.like(:x, /b/)).should == "(('a' ~ x) OR ('a' ~ 'b'))"
+    @d.l(/a/.like(:x, /b/i)).should == "(('a' ~ x) OR ('a' ~* 'b'))"
+
+    @d.l(/a/i.like(:x)).should == "('a' ~* x)"
+    @d.l(/a/i.like(:x, 'b')).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/i.like(:x, /b/)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/i.like(:x, /b/i)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+  end
+
+  it "should support NOT LIKE via Symbol#like and Symbol#~" do
+    @d.l(~:x.like('a')).should == '(x NOT LIKE \'a\')'
+    @d.l(~:x.like(/a/)).should == '(x !~ \'a\')'
+    @d.l(~:x.like('a', 'b')).should == '((x NOT LIKE \'a\') AND (x NOT LIKE \'b\'))'
+    @d.l(~:x.like(/a/, /b/i)).should == '((x !~ \'a\') AND (x !~* \'b\'))'
+    @d.l(~:x.like('a', /b/)).should == '((x NOT LIKE \'a\') AND (x !~ \'b\'))'
+
+    @d.l(~'a'.like(:x)).should == "('a' NOT LIKE x)"
+    @d.l(~'a'.like(:x, 'b')).should == "(('a' NOT LIKE x) AND ('a' NOT LIKE 'b'))"
+    @d.l(~'a'.like(:x, /b/)).should == "(('a' NOT LIKE x) AND ('a' !~ 'b'))"
+    @d.l(~'a'.like(:x, /b/i)).should == "(('a' NOT LIKE x) AND ('a' !~* 'b'))"
+
+    @d.l(~/a/.like(:x)).should == "('a' !~ x)"
+    @d.l(~/a/.like(:x, 'b')).should == "(('a' !~ x) AND ('a' !~ 'b'))"
+    @d.l(~/a/.like(:x, /b/)).should == "(('a' !~ x) AND ('a' !~ 'b'))"
+    @d.l(~/a/.like(:x, /b/i)).should == "(('a' !~ x) AND ('a' !~* 'b'))"
+
+    @d.l(~/a/i.like(:x)).should == "('a' !~* x)"
+    @d.l(~/a/i.like(:x, 'b')).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/i.like(:x, /b/)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/i.like(:x, /b/i)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+  end
+
+  it "should support ILIKE via Symbol#ilike" do
+    @d.l(:x.ilike('a')).should == '(x ILIKE \'a\')'
+    @d.l(:x.ilike(/a/)).should == '(x ~* \'a\')'
+    @d.l(:x.ilike('a', 'b')).should == '((x ILIKE \'a\') OR (x ILIKE \'b\'))'
+    @d.l(:x.ilike(/a/, /b/i)).should == '((x ~* \'a\') OR (x ~* \'b\'))'
+    @d.l(:x.ilike('a', /b/)).should == '((x ILIKE \'a\') OR (x ~* \'b\'))'
+
+    @d.l('a'.ilike(:x)).should == "('a' ILIKE x)"
+    @d.l('a'.ilike(:x, 'b')).should == "(('a' ILIKE x) OR ('a' ILIKE 'b'))"
+    @d.l('a'.ilike(:x, /b/)).should == "(('a' ILIKE x) OR ('a' ~* 'b'))"
+    @d.l('a'.ilike(:x, /b/i)).should == "(('a' ILIKE x) OR ('a' ~* 'b'))"
+
+    @d.l(/a/.ilike(:x)).should == "('a' ~* x)"
+    @d.l(/a/.ilike(:x, 'b')).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/.ilike(:x, /b/)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/.ilike(:x, /b/i)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+
+    @d.l(/a/i.ilike(:x)).should == "('a' ~* x)"
+    @d.l(/a/i.ilike(:x, 'b')).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/i.ilike(:x, /b/)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/i.ilike(:x, /b/i)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+  end
+
+  it "should support NOT ILIKE via Symbol#ilike and Symbol#~" do
+    @d.l(~:x.ilike('a')).should == '(x NOT ILIKE \'a\')'
+    @d.l(~:x.ilike(/a/)).should == '(x !~* \'a\')'
+    @d.l(~:x.ilike('a', 'b')).should == '((x NOT ILIKE \'a\') AND (x NOT ILIKE \'b\'))'
+    @d.l(~:x.ilike(/a/, /b/i)).should == '((x !~* \'a\') AND (x !~* \'b\'))'
+    @d.l(~:x.ilike('a', /b/)).should == '((x NOT ILIKE \'a\') AND (x !~* \'b\'))'
+
+    @d.l(~'a'.ilike(:x)).should == "('a' NOT ILIKE x)"
+    @d.l(~'a'.ilike(:x, 'b')).should == "(('a' NOT ILIKE x) AND ('a' NOT ILIKE 'b'))"
+    @d.l(~'a'.ilike(:x, /b/)).should == "(('a' NOT ILIKE x) AND ('a' !~* 'b'))"
+    @d.l(~'a'.ilike(:x, /b/i)).should == "(('a' NOT ILIKE x) AND ('a' !~* 'b'))"
+
+    @d.l(~/a/.ilike(:x)).should == "('a' !~* x)"
+    @d.l(~/a/.ilike(:x, 'b')).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/.ilike(:x, /b/)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/.ilike(:x, /b/i)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+
+    @d.l(~/a/i.ilike(:x)).should == "('a' !~* x)"
+    @d.l(~/a/i.ilike(:x, 'b')).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/i.ilike(:x, /b/)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/i.ilike(:x, /b/i)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+  end
+
   it "should support sql_expr on arrays with all two pairs" do
     @d.l([[:x, 100],[:y, 'a']].sql_expr).should == '((x = 100) AND (y = \'a\'))'
     @d.l([[:x, true], [:y, false]].sql_expr).should == '((x IS TRUE) AND (y IS FALSE))'

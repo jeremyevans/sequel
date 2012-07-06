@@ -118,12 +118,12 @@ describe "Sequel::Postgres::HStoreOp" do
   end
 
   it "should be able to turn expressions into hstore ops using hstore" do
-    @ds.literal(:a.qualify(:b).hstore['a']).should == "(b.a -> 'a')"
-    @ds.literal(:a.sql_function(:b).hstore['a']).should == "(a(b) -> 'a')"
+    @ds.literal(Sequel.qualify(:b, :a).hstore['a']).should == "(b.a -> 'a')"
+    @ds.literal(Sequel.function(:a, :b).hstore['a']).should == "(a(b) -> 'a')"
   end
 
   it "should be able to turn literal strings into hstore ops using hstore" do
-    @ds.literal('a'.lit.hstore['a']).should == "(a -> 'a')"
+    @ds.literal(Sequel.lit('a').hstore['a']).should == "(a -> 'a')"
   end
 
   it "should be able to turn symbols into hstore ops using hstore" do

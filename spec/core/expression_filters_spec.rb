@@ -1,8 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
-Regexp.send(:include, Sequel::SQL::StringMethods)
-String.send(:include, Sequel::SQL::StringMethods)
-
 describe "Blockless Ruby Filters" do
   before do
     db = Sequel::Database.new
@@ -19,27 +16,22 @@ describe "Blockless Ruby Filters" do
     @d.l(:x).should == 'x'
   end
   
-  it "should support NOT via Symbol#~" do
-    @d.l(~:x).should == 'NOT x'
-  end
-  
   it "should support qualified columns" do
     @d.l(:x__y).should == 'x.y'
-    @d.l(~:x__y).should == 'NOT x.y'
   end
 
   it "should support NOT with SQL functions" do
-    @d.l(~:is_blah.sql_function).should == 'NOT is_blah()'
-    @d.l(~:is_blah.sql_function(:x)).should == 'NOT is_blah(x)'
-    @d.l(~:is_blah.sql_function(:x__y)).should == 'NOT is_blah(x.y)'
-    @d.l(~:is_blah.sql_function(:x, :x__y)).should == 'NOT is_blah(x, x.y)'
+    @d.l(~Sequel.function(:is_blah)).should == 'NOT is_blah()'
+    @d.l(~Sequel.function(:is_blah, :x)).should == 'NOT is_blah(x)'
+    @d.l(~Sequel.function(:is_blah, :x__y)).should == 'NOT is_blah(x.y)'
+    @d.l(~Sequel.function(:is_blah, :x, :x__y)).should == 'NOT is_blah(x, x.y)'
   end
 
   it "should handle multiple ~" do
-    @d.l(~~:x).should == 'x'
-    @d.l(~~~:x).should == 'NOT x'
-    @d.l(~~(:x & :y)).should == '(x AND y)'
-    @d.l(~~(:x | :y)).should == '(x OR y)'
+    @d.l(~Sequel.~(:x)).should == 'x'
+    @d.l(~~Sequel.~(:x)).should == 'NOT x'
+    @d.l(~~Sequel.&(:x, :y)).should == '(x AND y)'
+    @d.l(~~Sequel.|(:x, :y)).should == '(x OR y)'
   end
 
   it "should support = via Hash" do
@@ -54,207 +46,107 @@ describe "Blockless Ruby Filters" do
   it "should use = 't' and != 't' OR IS NULL if IS TRUE is not supported" do
     @d.meta_def(:supports_is_true?){false}
     @d.l(:x => true).should == "(x = 't')"
-    @d.l(~{:x => true}).should == "((x != 't') OR (x IS NULL))"
+    @d.l(~Sequel.expr(:x => true)).should == "((x != 't') OR (x IS NULL))"
     @d.l(:x => false).should == "(x = 'f')"
-    @d.l(~{:x => false}).should == "((x != 'f') OR (x IS NULL))"
+    @d.l(~Sequel.expr(:x => false)).should == "((x != 'f') OR (x IS NULL))"
   end
   
-  it "should support != via Hash#~" do
-    @d.l(~{:x => 100}).should == '(x != 100)'
-    @d.l(~{:x => 'a'}).should == '(x != \'a\')'
-    @d.l(~{:x => true}).should == '(x IS NOT TRUE)'
-    @d.l(~{:x => false}).should == '(x IS NOT FALSE)'
-    @d.l(~{:x => nil}).should == '(x IS NOT NULL)'
+  it "should support != via inverted Hash" do
+    @d.l(~Sequel.expr(:x => 100)).should == '(x != 100)'
+    @d.l(~Sequel.expr(:x => 'a')).should == '(x != \'a\')'
+    @d.l(~Sequel.expr(:x => true)).should == '(x IS NOT TRUE)'
+    @d.l(~Sequel.expr(:x => false)).should == '(x IS NOT FALSE)'
+    @d.l(~Sequel.expr(:x => nil)).should == '(x IS NOT NULL)'
   end
   
   it "should support ~ via Hash and Regexp (if supported by database)" do
     @d.l(:x => /blah/).should == '(x ~ \'blah\')'
   end
   
-  it "should support !~ via Hash#~ and Regexp" do
-    @d.l(~{:x => /blah/}).should == '(x !~ \'blah\')'
+  it "should support !~ via inverted Hash and Regexp" do
+    @d.l(~Sequel.expr(:x => /blah/)).should == '(x !~ \'blah\')'
   end
   
-  it "should support LIKE via Symbol#like" do
-    @d.l(:x.like('a')).should == '(x LIKE \'a\')'
-    @d.l(:x.like(/a/)).should == '(x ~ \'a\')'
-    @d.l(:x.like('a', 'b')).should == '((x LIKE \'a\') OR (x LIKE \'b\'))'
-    @d.l(:x.like(/a/, /b/i)).should == '((x ~ \'a\') OR (x ~* \'b\'))'
-    @d.l(:x.like('a', /b/)).should == '((x LIKE \'a\') OR (x ~ \'b\'))'
-
-    @d.l('a'.like(:x)).should == "('a' LIKE x)"
-    @d.l('a'.like(:x, 'b')).should == "(('a' LIKE x) OR ('a' LIKE 'b'))"
-    @d.l('a'.like(:x, /b/)).should == "(('a' LIKE x) OR ('a' ~ 'b'))"
-    @d.l('a'.like(:x, /b/i)).should == "(('a' LIKE x) OR ('a' ~* 'b'))"
-
-    @d.l(/a/.like(:x)).should == "('a' ~ x)"
-    @d.l(/a/.like(:x, 'b')).should == "(('a' ~ x) OR ('a' ~ 'b'))"
-    @d.l(/a/.like(:x, /b/)).should == "(('a' ~ x) OR ('a' ~ 'b'))"
-    @d.l(/a/.like(:x, /b/i)).should == "(('a' ~ x) OR ('a' ~* 'b'))"
-
-    @d.l(/a/i.like(:x)).should == "('a' ~* x)"
-    @d.l(/a/i.like(:x, 'b')).should == "(('a' ~* x) OR ('a' ~* 'b'))"
-    @d.l(/a/i.like(:x, /b/)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
-    @d.l(/a/i.like(:x, /b/i)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
-  end
-
-  it "should support NOT LIKE via Symbol#like and Symbol#~" do
-    @d.l(~:x.like('a')).should == '(x NOT LIKE \'a\')'
-    @d.l(~:x.like(/a/)).should == '(x !~ \'a\')'
-    @d.l(~:x.like('a', 'b')).should == '((x NOT LIKE \'a\') AND (x NOT LIKE \'b\'))'
-    @d.l(~:x.like(/a/, /b/i)).should == '((x !~ \'a\') AND (x !~* \'b\'))'
-    @d.l(~:x.like('a', /b/)).should == '((x NOT LIKE \'a\') AND (x !~ \'b\'))'
-
-    @d.l(~'a'.like(:x)).should == "('a' NOT LIKE x)"
-    @d.l(~'a'.like(:x, 'b')).should == "(('a' NOT LIKE x) AND ('a' NOT LIKE 'b'))"
-    @d.l(~'a'.like(:x, /b/)).should == "(('a' NOT LIKE x) AND ('a' !~ 'b'))"
-    @d.l(~'a'.like(:x, /b/i)).should == "(('a' NOT LIKE x) AND ('a' !~* 'b'))"
-
-    @d.l(~/a/.like(:x)).should == "('a' !~ x)"
-    @d.l(~/a/.like(:x, 'b')).should == "(('a' !~ x) AND ('a' !~ 'b'))"
-    @d.l(~/a/.like(:x, /b/)).should == "(('a' !~ x) AND ('a' !~ 'b'))"
-    @d.l(~/a/.like(:x, /b/i)).should == "(('a' !~ x) AND ('a' !~* 'b'))"
-
-    @d.l(~/a/i.like(:x)).should == "('a' !~* x)"
-    @d.l(~/a/i.like(:x, 'b')).should == "(('a' !~* x) AND ('a' !~* 'b'))"
-    @d.l(~/a/i.like(:x, /b/)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
-    @d.l(~/a/i.like(:x, /b/i)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
-  end
-
-  it "should support ILIKE via Symbol#ilike" do
-    @d.l(:x.ilike('a')).should == '(x ILIKE \'a\')'
-    @d.l(:x.ilike(/a/)).should == '(x ~* \'a\')'
-    @d.l(:x.ilike('a', 'b')).should == '((x ILIKE \'a\') OR (x ILIKE \'b\'))'
-    @d.l(:x.ilike(/a/, /b/i)).should == '((x ~* \'a\') OR (x ~* \'b\'))'
-    @d.l(:x.ilike('a', /b/)).should == '((x ILIKE \'a\') OR (x ~* \'b\'))'
-
-    @d.l('a'.ilike(:x)).should == "('a' ILIKE x)"
-    @d.l('a'.ilike(:x, 'b')).should == "(('a' ILIKE x) OR ('a' ILIKE 'b'))"
-    @d.l('a'.ilike(:x, /b/)).should == "(('a' ILIKE x) OR ('a' ~* 'b'))"
-    @d.l('a'.ilike(:x, /b/i)).should == "(('a' ILIKE x) OR ('a' ~* 'b'))"
-
-    @d.l(/a/.ilike(:x)).should == "('a' ~* x)"
-    @d.l(/a/.ilike(:x, 'b')).should == "(('a' ~* x) OR ('a' ~* 'b'))"
-    @d.l(/a/.ilike(:x, /b/)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
-    @d.l(/a/.ilike(:x, /b/i)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
-
-    @d.l(/a/i.ilike(:x)).should == "('a' ~* x)"
-    @d.l(/a/i.ilike(:x, 'b')).should == "(('a' ~* x) OR ('a' ~* 'b'))"
-    @d.l(/a/i.ilike(:x, /b/)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
-    @d.l(/a/i.ilike(:x, /b/i)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
-  end
-
-  it "should support NOT ILIKE via Symbol#ilike and Symbol#~" do
-    @d.l(~:x.ilike('a')).should == '(x NOT ILIKE \'a\')'
-    @d.l(~:x.ilike(/a/)).should == '(x !~* \'a\')'
-    @d.l(~:x.ilike('a', 'b')).should == '((x NOT ILIKE \'a\') AND (x NOT ILIKE \'b\'))'
-    @d.l(~:x.ilike(/a/, /b/i)).should == '((x !~* \'a\') AND (x !~* \'b\'))'
-    @d.l(~:x.ilike('a', /b/)).should == '((x NOT ILIKE \'a\') AND (x !~* \'b\'))'
-
-    @d.l(~'a'.ilike(:x)).should == "('a' NOT ILIKE x)"
-    @d.l(~'a'.ilike(:x, 'b')).should == "(('a' NOT ILIKE x) AND ('a' NOT ILIKE 'b'))"
-    @d.l(~'a'.ilike(:x, /b/)).should == "(('a' NOT ILIKE x) AND ('a' !~* 'b'))"
-    @d.l(~'a'.ilike(:x, /b/i)).should == "(('a' NOT ILIKE x) AND ('a' !~* 'b'))"
-
-    @d.l(~/a/.ilike(:x)).should == "('a' !~* x)"
-    @d.l(~/a/.ilike(:x, 'b')).should == "(('a' !~* x) AND ('a' !~* 'b'))"
-    @d.l(~/a/.ilike(:x, /b/)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
-    @d.l(~/a/.ilike(:x, /b/i)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
-
-    @d.l(~/a/i.ilike(:x)).should == "('a' !~* x)"
-    @d.l(~/a/i.ilike(:x, 'b')).should == "(('a' !~* x) AND ('a' !~* 'b'))"
-    @d.l(~/a/i.ilike(:x, /b/)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
-    @d.l(~/a/i.ilike(:x, /b/i)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
-  end
-
-  it "should support negating ranges via Hash#~ and Range" do
-    @d.l(~{:x => 1..5}).should == '((x < 1) OR (x > 5))'
-    @d.l(~{:x => 1...5}).should == '((x < 1) OR (x >= 5))'
+  it "should support negating ranges" do
+    @d.l(~Sequel.expr(:x => 1..5)).should == '((x < 1) OR (x > 5))'
+    @d.l(~Sequel.expr(:x => 1...5)).should == '((x < 1) OR (x >= 5))'
   end
   
-  it "should support negating NOT IN via Hash#~ and Dataset or Array" do
-    @d.l(~{:x => @d.select(:i)}).should == '(x NOT IN (SELECT i FROM items))'
-    @d.l(~{:x => [1,2,3]}).should == '(x NOT IN (1, 2, 3))'
+  it "should support negating IN with Dataset or Array" do
+    @d.l(~Sequel.expr(:x => @d.select(:i))).should == '(x NOT IN (SELECT i FROM items))'
+    @d.l(~Sequel.expr(:x => [1,2,3])).should == '(x NOT IN (1, 2, 3))'
   end
 
-  it "should support + - * / via Symbol#+,-,*,/" do
-    @d.l(:x + 1 > 100).should == '((x + 1) > 100)'
-    @d.l((:x * :y) < 100.01).should == '((x * y) < 100.01)'
-    @d.l((:x - :y/2) >= 100000000000000000000000000000000000).should == '((x - (y / 2)) >= 100000000000000000000000000000000000)'
-    @d.l((((:x - :y)/(:x + :y))*:z) <= 100).should == '((((x - y) / (x + y)) * z) <= 100)'
-    @d.l(~((((:x - :y)/(:x + :y))*:z) <= 100)).should == '((((x - y) / (x + y)) * z) > 100)'
-  end
-  
   it "should not add ~ method to string expressions" do
-    proc{~:x.sql_string}.should raise_error(NoMethodError) 
+    proc{~Sequel.expr(:x).sql_string}.should raise_error(NoMethodError) 
   end
 
   it "should allow mathematical or string operations on true, false, or nil" do
-    @d.lit(:x + 1).should == '(x + 1)'
-    @d.lit(:x - true).should == "(x - 't')"
-    @d.lit(:x / false).should == "(x / 'f')"
-    @d.lit(:x * nil).should == '(x * NULL)'
-    @d.lit([:x, nil].sql_string_join).should == '(x || NULL)'
+    @d.lit(Sequel.expr(:x) + 1).should == '(x + 1)'
+    @d.lit(Sequel.expr(:x) - true).should == "(x - 't')"
+    @d.lit(Sequel.expr(:x) / false).should == "(x / 'f')"
+    @d.lit(Sequel.expr(:x) * nil).should == '(x * NULL)'
+    @d.lit(Sequel.join([:x, nil])).should == '(x || NULL)'
   end
 
   it "should allow mathematical or string operations on boolean complex expressions" do
-    @d.lit(:x + (:y + 1)).should == '(x + y + 1)'
-    @d.lit(:x - ~:y).should == '(x - NOT y)'
-    @d.lit(:x / (:y & :z)).should == '(x / (y AND z))'
-    @d.lit(:x * (:y | :z)).should == '(x * (y OR z))'
-    @d.lit(:x + :y.like('a')).should == "(x + (y LIKE 'a'))"
-    @d.lit(:x - ~:y.like('a')).should == "(x - (y NOT LIKE 'a'))"
-    @d.lit([:x, ~:y.like('a')].sql_string_join).should == "(x || (y NOT LIKE 'a'))"
+    @d.lit(Sequel.expr(:x) + (Sequel.expr(:y) + 1)).should == '(x + y + 1)'
+    @d.lit(Sequel.expr(:x) - ~Sequel.expr(:y)).should == '(x - NOT y)'
+    @d.lit(Sequel.expr(:x) / (Sequel.expr(:y) & :z)).should == '(x / (y AND z))'
+    @d.lit(Sequel.expr(:x) * (Sequel.expr(:y) | :z)).should == '(x * (y OR z))'
+    @d.lit(Sequel.expr(:x) + Sequel.expr(:y).like('a')).should == "(x + (y LIKE 'a'))"
+    @d.lit(Sequel.expr(:x) - ~Sequel.expr(:y).like('a')).should == "(x - (y NOT LIKE 'a'))"
+    @d.lit(Sequel.join([:x, ~Sequel.expr(:y).like('a')])).should == "(x || (y NOT LIKE 'a'))"
   end
 
   it "should support AND conditions via &" do
-    @d.l(:x & :y).should == '(x AND y)'
-    @d.l(:x.sql_boolean & :y).should == '(x AND y)'
-    @d.l(:x & :y & :z).should == '(x AND y AND z)'
-    @d.l(:x & {:y => :z}).should == '(x AND (y = z))'
-    @d.l((:x + 200 < 0) & (:y - 200 < 0)).should == '(((x + 200) < 0) AND ((y - 200) < 0))'
-    @d.l(:x & ~:y).should == '(x AND NOT y)'
-    @d.l(~:x & :y).should == '(NOT x AND y)'
-    @d.l(~:x & ~:y).should == '(NOT x AND NOT y)'
+    @d.l(Sequel.expr(:x) & :y).should == '(x AND y)'
+    @d.l(Sequel.expr(:x).sql_boolean & :y).should == '(x AND y)'
+    @d.l(Sequel.expr(:x) & :y & :z).should == '(x AND y AND z)'
+    @d.l(Sequel.expr(:x) & {:y => :z}).should == '(x AND (y = z))'
+    @d.l((Sequel.expr(:x) + 200 < 0) & (Sequel.expr(:y) - 200 < 0)).should == '(((x + 200) < 0) AND ((y - 200) < 0))'
+    @d.l(Sequel.expr(:x) & ~Sequel.expr(:y)).should == '(x AND NOT y)'
+    @d.l(~Sequel.expr(:x) & :y).should == '(NOT x AND y)'
+    @d.l(~Sequel.expr(:x) & ~Sequel.expr(:y)).should == '(NOT x AND NOT y)'
   end
   
   it "should support OR conditions via |" do
-    @d.l(:x | :y).should == '(x OR y)'
-    @d.l(:x.sql_boolean | :y).should == '(x OR y)'
-    @d.l(:x | :y | :z).should == '(x OR y OR z)'
-    @d.l(:x | {:y => :z}).should == '(x OR (y = z))'
-    @d.l((:x.sql_number > 200) | (:y.sql_number < 200)).should == '((x > 200) OR (y < 200))'
+    @d.l(Sequel.expr(:x) | :y).should == '(x OR y)'
+    @d.l(Sequel.expr(:x).sql_boolean | :y).should == '(x OR y)'
+    @d.l(Sequel.expr(:x) | :y | :z).should == '(x OR y OR z)'
+    @d.l(Sequel.expr(:x) | {:y => :z}).should == '(x OR (y = z))'
+    @d.l((Sequel.expr(:x).sql_number > 200) | (Sequel.expr(:y).sql_number < 200)).should == '((x > 200) OR (y < 200))'
   end
   
   it "should support & | combinations" do
-    @d.l((:x | :y) & :z).should == '((x OR y) AND z)'
-    @d.l(:x | (:y & :z)).should == '(x OR (y AND z))'
-    @d.l((:x & :w) | (:y & :z)).should == '((x AND w) OR (y AND z))'
+    @d.l((Sequel.expr(:x) | :y) & :z).should == '((x OR y) AND z)'
+    @d.l(Sequel.expr(:x) | (Sequel.expr(:y) & :z)).should == '(x OR (y AND z))'
+    @d.l((Sequel.expr(:x) & :w) | (Sequel.expr(:y) & :z)).should == '((x AND w) OR (y AND z))'
   end
   
   it "should support & | with ~" do
-    @d.l(~((:x | :y) & :z)).should == '((NOT x AND NOT y) OR NOT z)'
-    @d.l(~(:x | (:y & :z))).should == '(NOT x AND (NOT y OR NOT z))'
-    @d.l(~((:x & :w) | (:y & :z))).should == '((NOT x OR NOT w) AND (NOT y OR NOT z))'
-    @d.l(~((:x.sql_number > 200) | (:y & :z))).should == '((x <= 200) AND (NOT y OR NOT z))'
+    @d.l(~((Sequel.expr(:x) | :y) & :z)).should == '((NOT x AND NOT y) OR NOT z)'
+    @d.l(~(Sequel.expr(:x) | (Sequel.expr(:y) & :z))).should == '(NOT x AND (NOT y OR NOT z))'
+    @d.l(~((Sequel.expr(:x) & :w) | (Sequel.expr(:y) & :z))).should == '((NOT x OR NOT w) AND (NOT y OR NOT z))'
+    @d.l(~((Sequel.expr(:x).sql_number > 200) | (Sequel.expr(:y) & :z))).should == '((x <= 200) AND (NOT y OR NOT z))'
   end
   
   it "should support LiteralString" do
-    @d.l('x'.lit).should == '(x)'
-    @d.l(~'x'.lit).should == 'NOT x'
-    @d.l(~~'x'.lit).should == 'x'
-    @d.l(~(('x'.lit | :y) & :z)).should == '((NOT x AND NOT y) OR NOT z)'
-    @d.l(~(:x | 'y'.lit)).should == '(NOT x AND NOT y)'
-    @d.l(~('x'.lit & 'y'.lit)).should == '(NOT x OR NOT y)'
-    @d.l({'y'.lit => 'z'.lit} & 'x'.lit).should == '((y = z) AND x)'
-    @d.l(('x'.lit > 200) & ('y'.lit < 200)).should == '((x > 200) AND (y < 200))'
-    @d.l(~('x'.lit + 1 > 100)).should == '((x + 1) <= 100)'
-    @d.l('x'.lit.like(/a/)).should == '(x ~ \'a\')'
-    @d.l('x'.lit + 1 > 100).should == '((x + 1) > 100)'
-    @d.l(('x'.lit * :y) < 100.01).should == '((x * y) < 100.01)'
-    @d.l(('x'.lit - :y/2) >= 100000000000000000000000000000000000).should == '((x - (y / 2)) >= 100000000000000000000000000000000000)'
-    @d.l(('z'.lit * (('x'.lit / :y)/(:x + :y))) <= 100).should == '((z * (x / y / (x + y))) <= 100)'
-    @d.l(~(((('x'.lit - :y)/(:x + :y))*:z) <= 100)).should == '((((x - y) / (x + y)) * z) > 100)'
+    @d.l(Sequel.lit('x')).should == '(x)'
+    @d.l(~Sequel.lit('x')).should == 'NOT x'
+    @d.l(~~Sequel.lit('x')).should == 'x'
+    @d.l(~((Sequel.lit('x') | :y) & :z)).should == '((NOT x AND NOT y) OR NOT z)'
+    @d.l(~(Sequel.expr(:x) | Sequel.lit('y'))).should == '(NOT x AND NOT y)'
+    @d.l(~(Sequel.lit('x') & Sequel.lit('y'))).should == '(NOT x OR NOT y)'
+    @d.l(Sequel.expr(Sequel.lit('y') => Sequel.lit('z')) & Sequel.lit('x')).should == '((y = z) AND x)'
+    @d.l((Sequel.lit('x') > 200) & (Sequel.lit('y') < 200)).should == '((x > 200) AND (y < 200))'
+    @d.l(~(Sequel.lit('x') + 1 > 100)).should == '((x + 1) <= 100)'
+    @d.l(Sequel.lit('x').like(/a/)).should == '(x ~ \'a\')'
+    @d.l(Sequel.lit('x') + 1 > 100).should == '((x + 1) > 100)'
+    @d.l((Sequel.lit('x') * :y) < 100.01).should == '((x * y) < 100.01)'
+    @d.l((Sequel.lit('x') - Sequel.expr(:y)/2) >= 100000000000000000000000000000000000).should == '((x - (y / 2)) >= 100000000000000000000000000000000000)'
+    @d.l((Sequel.lit('z') * ((Sequel.lit('x') / :y)/(Sequel.expr(:x) + :y))) <= 100).should == '((z * (x / y / (x + y))) <= 100)'
+    @d.l(~((((Sequel.lit('x') - :y)/(Sequel.expr(:x) + :y))*:z) <= 100)).should == '((((x - y) / (x + y)) * z) > 100)'
   end
 
   it "should support hashes by ANDing the conditions" do
@@ -270,64 +162,64 @@ describe "Blockless Ruby Filters" do
   end
   
   it "should emulate columns for array values" do
-    @d.l([:x, :y]=>[[1,2], [3,4]].sql_array).should == '((x, y) IN ((1, 2), (3, 4)))'
+    @d.l([:x, :y]=>Sequel.value_list([[1,2], [3,4]])).should == '((x, y) IN ((1, 2), (3, 4)))'
     @d.l([:x, :y, :z]=>[[1,2,5], [3,4,6]]).should == '((x, y, z) IN ((1, 2, 5), (3, 4, 6)))'
   end
   
   it "should emulate multiple column in if not supported" do
     @d.meta_def(:supports_multiple_column_in?){false}
-    @d.l([:x, :y]=>[[1,2], [3,4]].sql_array).should == '(((x = 1) AND (y = 2)) OR ((x = 3) AND (y = 4)))'
+    @d.l([:x, :y]=>Sequel.value_list([[1,2], [3,4]])).should == '(((x = 1) AND (y = 2)) OR ((x = 3) AND (y = 4)))'
     @d.l([:x, :y, :z]=>[[1,2,5], [3,4,6]]).should == '(((x = 1) AND (y = 2) AND (z = 5)) OR ((x = 3) AND (y = 4) AND (z = 6)))'
   end
   
   it "should support StringExpression#+ for concatenation of SQL strings" do
-    @d.lit(:x.sql_string + :y).should == '(x || y)'
-    @d.lit([:x].sql_string_join + :y).should == '(x || y)'
-    @d.lit([:x, :z].sql_string_join(' ') + :y).should == "(x || ' ' || z || y)"
+    @d.lit(Sequel.expr(:x).sql_string + :y).should == '(x || y)'
+    @d.lit(Sequel.join([:x]) + :y).should == '(x || y)'
+    @d.lit(Sequel.join([:x, :z], ' ') + :y).should == "(x || ' ' || z || y)"
   end
 
   it "should be supported inside blocks" do
-    @d.l{[[:x, nil], [:y, [1,2,3]]].sql_or}.should == '((x IS NULL) OR (y IN (1, 2, 3)))'
-    @d.l{~[[:x, nil], [:y, [1,2,3]]]}.should == '((x IS NOT NULL) OR (y NOT IN (1, 2, 3)))'
-    @d.l{~(((('x'.lit - :y)/(:x + :y))*:z) <= 100)}.should == '((((x - y) / (x + y)) * z) > 100)'
-    @d.l{{:x => :a} & {:y => :z}}.should == '((x = a) AND (y = z))'
+    @d.l{Sequel.or([[:x, nil], [:y, [1,2,3]]])}.should == '((x IS NULL) OR (y IN (1, 2, 3)))'
+    @d.l{Sequel.~([[:x, nil], [:y, [1,2,3]]])}.should == '((x IS NOT NULL) OR (y NOT IN (1, 2, 3)))'
+    @d.l{~((((Sequel.lit('x') - :y)/(Sequel.expr(:x) + :y))*:z) <= 100)}.should == '((((x - y) / (x + y)) * z) > 100)'
+    @d.l{Sequel.&({:x => :a}, {:y => :z})}.should == '((x = a) AND (y = z))'
   end
 
   it "should support &, |, ^, ~, <<, and >> for NumericExpressions" do
-    @d.l(:x.sql_number & 1 > 100).should == '((x & 1) > 100)'
-    @d.l(:x.sql_number | 1 > 100).should == '((x | 1) > 100)'
-    @d.l(:x.sql_number ^ 1 > 100).should == '((x ^ 1) > 100)'
-    @d.l(~:x.sql_number > 100).should == '(~x > 100)'
-    @d.l(:x.sql_number << 1 > 100).should == '((x << 1) > 100)'
-    @d.l(:x.sql_number >> 1 > 100).should == '((x >> 1) > 100)'
-    @d.l((:x + 1) & 1 > 100).should == '(((x + 1) & 1) > 100)'
-    @d.l((:x + 1) | 1 > 100).should == '(((x + 1) | 1) > 100)'
-    @d.l((:x + 1) ^ 1 > 100).should == '(((x + 1) ^ 1) > 100)'
-    @d.l(~(:x + 1) > 100).should == '(~(x + 1) > 100)'
-    @d.l((:x + 1) << 1 > 100).should == '(((x + 1) << 1) > 100)'
-    @d.l((:x + 1) >> 1 > 100).should == '(((x + 1) >> 1) > 100)'
-    @d.l((:x + 1) & (:x + 2) > 100).should == '(((x + 1) & (x + 2)) > 100)'
+    @d.l(Sequel.expr(:x).sql_number & 1 > 100).should == '((x & 1) > 100)'
+    @d.l(Sequel.expr(:x).sql_number | 1 > 100).should == '((x | 1) > 100)'
+    @d.l(Sequel.expr(:x).sql_number ^ 1 > 100).should == '((x ^ 1) > 100)'
+    @d.l(~Sequel.expr(:x).sql_number > 100).should == '(~x > 100)'
+    @d.l(Sequel.expr(:x).sql_number << 1 > 100).should == '((x << 1) > 100)'
+    @d.l(Sequel.expr(:x).sql_number >> 1 > 100).should == '((x >> 1) > 100)'
+    @d.l((Sequel.expr(:x) + 1) & 1 > 100).should == '(((x + 1) & 1) > 100)'
+    @d.l((Sequel.expr(:x) + 1) | 1 > 100).should == '(((x + 1) | 1) > 100)'
+    @d.l((Sequel.expr(:x) + 1) ^ 1 > 100).should == '(((x + 1) ^ 1) > 100)'
+    @d.l(~(Sequel.expr(:x) + 1) > 100).should == '(~(x + 1) > 100)'
+    @d.l((Sequel.expr(:x) + 1) << 1 > 100).should == '(((x + 1) << 1) > 100)'
+    @d.l((Sequel.expr(:x) + 1) >> 1 > 100).should == '(((x + 1) >> 1) > 100)'
+    @d.l((Sequel.expr(:x) + 1) & (Sequel.expr(:x) + 2) > 100).should == '(((x + 1) & (x + 2)) > 100)'
   end
 
   it "should allow using a Bitwise method on a ComplexExpression that isn't a NumericExpression" do
-    @d.lit((:x + 1) & (:x + '2')).should == "((x + 1) & (x || '2'))"
+    @d.lit((Sequel.expr(:x) + 1) & (Sequel.expr(:x) + '2')).should == "((x + 1) & (x || '2'))"
   end
 
   it "should allow using a Boolean method on a ComplexExpression that isn't a BooleanExpression" do
-    @d.l(:x & (:x + '2')).should == "(x AND (x || '2'))"
+    @d.l(Sequel.expr(:x) & (Sequel.expr(:x) + '2')).should == "(x AND (x || '2'))"
   end
 
   it "should raise an error if attempting to invert a ComplexExpression that isn't a BooleanExpression" do
-    proc{Sequel::SQL::BooleanExpression.invert(:x + 2)}.should raise_error(Sequel::Error)
+    proc{Sequel::SQL::BooleanExpression.invert(Sequel.expr(:x) + 2)}.should raise_error(Sequel::Error)
   end
 
   it "should return self on .lit" do
-    y = :x + 1
+    y = Sequel.expr(:x) + 1
     y.lit.should == y
   end
 
   it "should return have .sql_literal operate like .to_s" do
-    y = :x + 1
+    y = Sequel.expr(:x) + 1
     y.sql_literal(@d).should == '(x + 1)'
     y.sql_literal(@d).should == y.to_s(@d)
     y.sql_literal(@d).should == @d.literal(y)
@@ -343,12 +235,12 @@ describe "Blockless Ruby Filters" do
   end
   
   it "should support negation of SQL::Constants" do
-    @d.l(~{:x => Sequel::NULL}).should == '(x IS NOT NULL)'
-    @d.l(~{:x => Sequel::NOTNULL}).should == '(x IS NULL)'
-    @d.l(~{:x => Sequel::TRUE}).should == '(x IS NOT TRUE)'
-    @d.l(~{:x => Sequel::FALSE}).should == '(x IS NOT FALSE)'
-    @d.l(~{:x => Sequel::SQLTRUE}).should == '(x IS NOT TRUE)'
-    @d.l(~{:x => Sequel::SQLFALSE}).should == '(x IS NOT FALSE)'
+    @d.l(Sequel.~(:x => Sequel::NULL)).should == '(x IS NOT NULL)'
+    @d.l(Sequel.~(:x => Sequel::NOTNULL)).should == '(x IS NULL)'
+    @d.l(Sequel.~(:x => Sequel::TRUE)).should == '(x IS NOT TRUE)'
+    @d.l(Sequel.~(:x => Sequel::FALSE)).should == '(x IS NOT FALSE)'
+    @d.l(Sequel.~(:x => Sequel::SQLTRUE)).should == '(x IS NOT TRUE)'
+    @d.l(Sequel.~(:x => Sequel::SQLFALSE)).should == '(x IS NOT FALSE)'
   end
   
   it "should support direct negation of SQL::Constants" do
@@ -369,85 +261,85 @@ describe "Blockless Ruby Filters" do
   end
 
   it "should use a string concatentation for + if given a string" do
-    @d.lit(:x + '1').should == "(x || '1')"
-    @d.lit(:x + '1' + '1').should == "(x || '1' || '1')"
+    @d.lit(Sequel.expr(:x) + '1').should == "(x || '1')"
+    @d.lit(Sequel.expr(:x) + '1' + '1').should == "(x || '1' || '1')"
   end
 
   it "should use an addition for + if given a literal string" do
-    @d.lit(:x + '1'.lit).should == "(x + 1)"
-    @d.lit(:x + '1'.lit + '1'.lit).should == "(x + 1 + 1)"
+    @d.lit(Sequel.expr(:x) + Sequel.lit('1')).should == "(x + 1)"
+    @d.lit(Sequel.expr(:x) + Sequel.lit('1') + Sequel.lit('1')).should == "(x + 1 + 1)"
   end
 
   it "should use a bitwise operator for & and | if given an integer" do
-    @d.lit(:x & 1).should == "(x & 1)"
-    @d.lit(:x | 1).should == "(x | 1)"
-    @d.lit(:x & 1 & 1).should == "(x & 1 & 1)"
-    @d.lit(:x | 1 | 1).should == "(x | 1 | 1)"
+    @d.lit(Sequel.expr(:x) & 1).should == "(x & 1)"
+    @d.lit(Sequel.expr(:x) | 1).should == "(x | 1)"
+    @d.lit(Sequel.expr(:x) & 1 & 1).should == "(x & 1 & 1)"
+    @d.lit(Sequel.expr(:x) | 1 | 1).should == "(x | 1 | 1)"
   end
   
   it "should allow adding a string to an integer expression" do
-    @d.lit(:x + 1 + 'a').should == "(x + 1 + 'a')"
+    @d.lit(Sequel.expr(:x) + 1 + 'a').should == "(x + 1 + 'a')"
   end
 
   it "should allow adding an integer to an string expression" do
-    @d.lit(:x + 'a' + 1).should == "(x || 'a' || 1)"
+    @d.lit(Sequel.expr(:x) + 'a' + 1).should == "(x || 'a' || 1)"
   end
 
   it "should allow adding a boolean to an integer expression" do
-    @d.lit(:x + 1 + true).should == "(x + 1 + 't')"
+    @d.lit(Sequel.expr(:x) + 1 + true).should == "(x + 1 + 't')"
   end
 
   it "should allow adding a boolean to an string expression" do
-    @d.lit(:x + 'a' + true).should == "(x || 'a' || 't')"
+    @d.lit(Sequel.expr(:x) + 'a' + true).should == "(x || 'a' || 't')"
   end
 
   it "should allow using a boolean operation with an integer on an boolean expression" do
-    @d.lit(:x & :a & 1).should == "(x AND a AND 1)"
+    @d.lit(Sequel.expr(:x) & :a & 1).should == "(x AND a AND 1)"
   end
 
   it "should allow using a boolean operation with a string on an boolean expression" do
-    @d.lit(:x & :a & 'a').should == "(x AND a AND 'a')"
+    @d.lit(Sequel.expr(:x) & :a & 'a').should == "(x AND a AND 'a')"
   end
 
   it "should allowing AND of boolean expression and literal string" do
-   @d.lit(:x & :a & 'a'.lit).should == "(x AND a AND a)"
+   @d.lit(Sequel.expr(:x) & :a & Sequel.lit('a')).should == "(x AND a AND a)"
   end
 
   it "should allowing + of integer expression and literal string" do
-   @d.lit(:x + :a + 'a'.lit).should == "(x + a + a)"
+   @d.lit(Sequel.expr(:x) + :a + Sequel.lit('a')).should == "(x + a + a)"
   end
 
   it "should allowing + of string expression and literal string" do
-   @d.lit(:x + 'a' + 'a'.lit).should == "(x || 'a' || a)"
+   @d.lit(Sequel.expr(:x) + 'a' + Sequel.lit('a')).should == "(x || 'a' || a)"
   end
 
   it "should allow sql_{string,boolean,number} methods on numeric expressions" do
-   @d.lit((:x + 1).sql_string + 'a').should == "((x + 1) || 'a')"
-   @d.lit((:x + 1).sql_boolean & 1).should == "((x + 1) AND 1)"
-   @d.lit((:x + 1).sql_number + 'a').should == "(x + 1 + 'a')"
+   @d.lit((Sequel.expr(:x) + 1).sql_string + 'a').should == "((x + 1) || 'a')"
+   @d.lit((Sequel.expr(:x) + 1).sql_boolean & 1).should == "((x + 1) AND 1)"
+   @d.lit((Sequel.expr(:x) + 1).sql_number + 'a').should == "(x + 1 + 'a')"
   end
 
   it "should allow sql_{string,boolean,number} methods on string expressions" do
-   @d.lit((:x + 'a').sql_string + 'a').should == "(x || 'a' || 'a')"
-   @d.lit((:x + 'a').sql_boolean & 1).should == "((x || 'a') AND 1)"
-   @d.lit((:x + 'a').sql_number + 'a').should == "((x || 'a') + 'a')"
+   @d.lit((Sequel.expr(:x) + 'a').sql_string + 'a').should == "(x || 'a' || 'a')"
+   @d.lit((Sequel.expr(:x) + 'a').sql_boolean & 1).should == "((x || 'a') AND 1)"
+   @d.lit((Sequel.expr(:x) + 'a').sql_number + 'a').should == "((x || 'a') + 'a')"
   end
 
   it "should allow sql_{string,boolean,number} methods on boolean expressions" do
-   @d.lit((:x & :y).sql_string + 'a').should == "((x AND y) || 'a')"
-   @d.lit((:x & :y).sql_boolean & 1).should == "(x AND y AND 1)"
-   @d.lit((:x & :y).sql_number + 'a').should == "((x AND y) + 'a')"
+   @d.lit((Sequel.expr(:x) & :y).sql_string + 'a').should == "((x AND y) || 'a')"
+   @d.lit((Sequel.expr(:x) & :y).sql_boolean & 1).should == "(x AND y AND 1)"
+   @d.lit((Sequel.expr(:x) & :y).sql_number + 'a').should == "((x AND y) + 'a')"
   end
 
   it "should raise an error if trying to literalize an invalid complex expression" do
-    ce = :x + 1
+    ce = Sequel.+(:x, 1)
     ce.instance_variable_set(:@op, :BANG)
     proc{@d.lit(ce)}.should raise_error(Sequel::Error)
   end
 
   it "should support equality comparison of two expressions" do
-    e1 = ~:comment.like('%:hidden:%')
-    e2 = ~:comment.like('%:hidden:%')
+    e1 = ~Sequel.like(:comment, '%:hidden:%')
+    e2 = ~Sequel.like(:comment, '%:hidden:%')
     e1.should == e2
   end
 
@@ -460,7 +352,7 @@ describe "Blockless Ruby Filters" do
     @d.lit(d / 1).should == '((SELECT a FROM items) / 1)'
 
     @d.lit(d => 1).should == '((SELECT a FROM items) = 1)'
-    @d.lit(~{d => 1}).should == '((SELECT a FROM items) != 1)'
+    @d.lit(Sequel.~(d => 1)).should == '((SELECT a FROM items) != 1)'
     @d.lit(d > 1).should == '((SELECT a FROM items) > 1)'
     @d.lit(d < 1).should == '((SELECT a FROM items) < 1)'
     @d.lit(d >= 1).should == '((SELECT a FROM items) >= 1)'
@@ -488,46 +380,6 @@ describe "Blockless Ruby Filters" do
 
     @d.lit(d.like(:b)).should == '((SELECT a FROM items) LIKE b)'
     @d.lit(d.ilike(:b)).should == '((SELECT a FROM items) ILIKE b)'
-  end
-  
-  if RUBY_VERSION < '1.9.0'
-    it "should not allow inequality operations on true, false, or nil" do
-      @d.lit(:x > 1).should == "(x > 1)"
-      @d.lit(:x < true).should == "(x < 't')"
-      @d.lit(:x >= false).should == "(x >= 'f')"
-      @d.lit(:x <= nil).should == "(x <= NULL)"
-    end
-
-    it "should not allow inequality operations on boolean complex expressions" do
-      @d.lit(:x > (:y > 5)).should == "(x > (y > 5))"
-      @d.lit(:x < (:y < 5)).should == "(x < (y < 5))"
-      @d.lit(:x >= (:y >= 5)).should == "(x >= (y >= 5))"
-      @d.lit(:x <= (:y <= 5)).should == "(x <= (y <= 5))"
-      @d.lit(:x > {:y => nil}).should == "(x > (y IS NULL))"
-      @d.lit(:x < ~{:y => nil}).should == "(x < (y IS NOT NULL))"
-      @d.lit(:x >= {:y => 5}).should == "(x >= (y = 5))"
-      @d.lit(:x <= ~{:y => 5}).should == "(x <= (y != 5))"
-      @d.lit(:x >= {:y => [1,2,3]}).should == "(x >= (y IN (1, 2, 3)))"
-      @d.lit(:x <= ~{:y => [1,2,3]}).should == "(x <= (y NOT IN (1, 2, 3)))"
-    end
-    
-    it "should support >, <, >=, and <= via Symbol#>,<,>=,<=" do
-      @d.l(:x > 100).should == '(x > 100)'
-      @d.l(:x < 100.01).should == '(x < 100.01)'
-      @d.l(:x >= 100000000000000000000000000000000000).should == '(x >= 100000000000000000000000000000000000)'
-      @d.l(:x <= 100).should == '(x <= 100)'
-    end
-    
-    it "should support negation of >, <, >=, and <= via Symbol#~" do
-      @d.l(~(:x > 100)).should == '(x <= 100)'
-      @d.l(~(:x < 100.01)).should == '(x >= 100.01)'
-      @d.l(~(:x >= 100000000000000000000000000000000000)).should == '(x < 100000000000000000000000000000000000)'
-      @d.l(~(:x <= 100)).should == '(x > 100)'
-    end
-    
-    it "should support double negation via ~" do
-      @d.l(~~(:x > 100)).should == '(x > 100)'
-    end
   end
 end
 
@@ -926,14 +778,14 @@ end
 
 describe "Sequel::SQL::Function#==" do
   specify "should be true for functions with the same name and arguments, false otherwise" do
-    a = :date.sql_function(:t)
-    b = :date.sql_function(:t)
+    a = Sequel.function(:date, :t)
+    b = Sequel.function(:date, :t)
     a.should == b
     (a == b).should == true
-    c = :date.sql_function(:c)
+    c = Sequel.function(:date, :c)
     a.should_not == c
     (a == c).should == false
-    d = :time.sql_function(:c)
+    d = Sequel.function(:time, :c)
     a.should_not == d
     c.should_not == d
     (a == d).should == false
@@ -963,20 +815,20 @@ end
 
 describe "Expression" do
   specify "should consider objects == only if they have the same attributes" do
-    :column.qualify(:table).cast(:type).*(:numeric_column).asc.should == :column.qualify(:table).cast(:type).*(:numeric_column).asc
-    :other_column.qualify(:table).cast(:type).*(:numeric_column).asc.should_not == :column.qualify(:table).cast(:type).*(:numeric_column).asc
+    Sequel.qualify(:table, :column).cast(:type).*(:numeric_column).asc.should == Sequel.qualify(:table, :column).cast(:type).*(:numeric_column).asc
+    Sequel.qualify(:table, :other_column).cast(:type).*(:numeric_column).asc.should_not == Sequel.qualify(:table, :column).cast(:type).*(:numeric_column).asc
 
-    :column.qualify(:table).cast(:type).*(:numeric_column).asc.should eql(:column.qualify(:table).cast(:type).*(:numeric_column).asc)
-    :other_column.qualify(:table).cast(:type).*(:numeric_column).asc.should_not eql(:column.qualify(:table).cast(:type).*(:numeric_column).asc)
+    Sequel.qualify(:table, :column).cast(:type).*(:numeric_column).asc.should eql(Sequel.qualify(:table, :column).cast(:type).*(:numeric_column).asc)
+    Sequel.qualify(:table, :other_column).cast(:type).*(:numeric_column).asc.should_not eql(Sequel.qualify(:table, :column).cast(:type).*(:numeric_column).asc)
   end
 
   specify "should use the same hash value for objects that have the same attributes" do
-    :column.qualify(:table).cast(:type).*(:numeric_column).asc.hash.should == :column.qualify(:table).cast(:type).*(:numeric_column).asc.hash
-    :other_column.qualify(:table).cast(:type).*(:numeric_column).asc.hash.should_not == :column.qualify(:table).cast(:type).*(:numeric_column).asc.hash
+    Sequel.qualify(:table, :column).cast(:type).*(:numeric_column).asc.hash.should == Sequel.qualify(:table, :column).cast(:type).*(:numeric_column).asc.hash
+    Sequel.qualify(:table, :other_column).cast(:type).*(:numeric_column).asc.hash.should_not == Sequel.qualify(:table, :column).cast(:type).*(:numeric_column).asc.hash
 
     h = {}
-    a = :column.qualify(:table).cast(:type).*(:numeric_column).asc
-    b = :column.qualify(:table).cast(:type).*(:numeric_column).asc
+    a = Sequel.qualify(:table, :column).cast(:type).*(:numeric_column).asc
+    b = Sequel.qualify(:table, :column).cast(:type).*(:numeric_column).asc
     h[a] = 1
     h[b] = 2
     h[a].should == 2

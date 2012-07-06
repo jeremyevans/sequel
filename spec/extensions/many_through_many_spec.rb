@@ -244,7 +244,7 @@ describe Sequel::Model, "many_through_many" do
   end
   
   it "should support an array for the select option" do
-    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>[:tags.*, :albums__name]
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>[Sequel::SQL::ColumnAll.new(:tags), :albums__name]
     n = @c1.load(:id => 1234)
     n.tags_dataset.sql.should == 'SELECT tags.*, albums.name FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
     n.tags.should == [@c2.load(:id=>1)]
@@ -914,12 +914,12 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   end
 
   it "should respect the association's :graph_block option" do 
-    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id}, [:albums_tags, :album_id, :tag_id]], :graph_block=>proc{|ja,lja,js| {:active.qualify(ja)=>true}}
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id}, [:albums_tags, :album_id, :tag_id]], :graph_block=>proc{|ja,lja,js| {Sequel.qualify(ja, :active)=>true}}
     @c1.eager_graph(:tags).sql.should == 'SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON ((tags.id = albums_tags.tag_id) AND (tags.active IS TRUE))'
   end
 
   it "should respect the association's :block option on through" do 
-    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id, :block=>proc{|ja,lja,js| {:active.qualify(ja)=>true}}}, [:albums_tags, :album_id, :tag_id]]
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id, :block=>proc{|ja,lja,js| {Sequel.qualify(ja, :active)=>true}}}, [:albums_tags, :album_id, :tag_id]]
     @c1.eager_graph(:tags).sql.should == 'SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON ((albums.id = albums_artists.album_id) AND (albums.active IS TRUE)) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)'
   end
 
@@ -943,7 +943,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   end
 
   it "should only qualify unqualified symbols, identifiers, or ordered versions in association's :order" do
-    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id}, [:albums_tags, :album_id, :tag_id]], :order=>[:blah__id.identifier, :blah__id.identifier.desc, :blah__id.desc, :blah__id, :album_id, :album_id.desc, 1, 'RANDOM()'.lit, :a.qualify(:b)]
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id}, [:albums_tags, :album_id, :tag_id]], :order=>[Sequel.identifier(:blah__id), Sequel.identifier(:blah__id).desc, Sequel.desc(:blah__id), :blah__id, :album_id, Sequel.desc(:album_id), 1, Sequel.lit('RANDOM()'), Sequel.qualify(:b, :a)]
     @c1.order(:artists__blah2, :artists__blah3).eager_graph(:tags).sql.should == 'SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3, tags.blah__id, tags.blah__id DESC, blah.id DESC, blah.id, tags.album_id, tags.album_id DESC, 1, RANDOM(), b.a'
   end
 

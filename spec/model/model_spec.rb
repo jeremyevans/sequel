@@ -20,35 +20,35 @@ describe "Sequel::Model()" do
   end
 
   it "should return a model subclass with a dataset with the default database and given table name if given a LiteralString" do
-    c = Sequel::Model('blah'.lit)
+    c = Sequel::Model(Sequel.lit('blah'))
     c.superclass.should == Sequel::Model
     c.db.should == @db
-    c.table_name.should == 'blah'.lit
+    c.table_name.should == Sequel.lit('blah')
   end
 
   it "should return a model subclass with a dataset with the default database and given table name if given an SQL::Identifier" do
-    c = Sequel::Model(:blah.identifier)
+    c = Sequel::Model(Sequel.identifier(:blah))
     c.superclass.should == Sequel::Model
     c.db.should == @db
-    c.table_name.should == :blah.identifier
+    c.table_name.should == Sequel.identifier(:blah)
   end
 
   it "should return a model subclass with a dataset with the default database and given table name if given an SQL::QualifiedIdentifier" do
-    c = Sequel::Model(:blah.qualify(:boo))
+    c = Sequel::Model(Sequel.qualify(:boo, :blah))
     c.superclass.should == Sequel::Model
     c.db.should == @db
-    c.table_name.should == :blah.qualify(:boo)
+    c.table_name.should == Sequel.qualify(:boo, :blah)
   end
 
   it "should return a model subclass with a dataset with the default database and given table name if given an SQL::AliasedExpression" do
-    c = Sequel::Model(:blah.as(:boo))
+    c = Sequel::Model(Sequel.as(:blah, :boo))
     c.superclass.should == Sequel::Model
     c.db.should == @db
     c.table_name.should == :boo
   end
 
   it "should return a model subclass with the given dataset if given a dataset using an SQL::Identifier" do
-    ds = @db[:blah.identifier]
+    ds = @db[Sequel.identifier(:blah)]
     c = Sequel::Model(ds)
     c.superclass.should == Sequel::Model
     c.dataset.should == ds
@@ -84,29 +84,29 @@ describe "Sequel::Model()" do
 
     it "should work without raising an exception with an SQL::Identifier " do
       proc do
-        class ::Album < Sequel::Model(:table.identifier); end
-        class ::Album < Sequel::Model(:table.identifier); end
+        class ::Album < Sequel::Model(Sequel.identifier(:table)); end
+        class ::Album < Sequel::Model(Sequel.identifier(:table)); end
       end.should_not raise_error
     end
 
     it "should work without raising an exception with an SQL::QualifiedIdentifier " do
       proc do
-        class ::Album < Sequel::Model(:table.qualify(:schema)); end
-        class ::Album < Sequel::Model(:table.qualify(:schema)); end
+        class ::Album < Sequel::Model(Sequel.qualify(:schema, :table)); end
+        class ::Album < Sequel::Model(Sequel.qualify(:schema, :table)); end
       end.should_not raise_error
     end
 
     it "should work without raising an exception with an SQL::AliasedExpression" do
       proc do
-        class ::Album < Sequel::Model(:table.as(:alias)); end
-        class ::Album < Sequel::Model(:table.as(:alias)); end
+        class ::Album < Sequel::Model(Sequel.as(:table, :alias)); end
+        class ::Album < Sequel::Model(Sequel.as(:table, :alias)); end
       end.should_not raise_error
     end
 
     it "should work without raising an exception with an LiteralString" do
       proc do
-        class ::Album < Sequel::Model('table'.lit); end
-        class ::Album < Sequel::Model('table'.lit); end
+        class ::Album < Sequel::Model(Sequel.lit('table')); end
+        class ::Album < Sequel::Model(Sequel.lit('table')); end
       end.should_not raise_error
     end
 
@@ -126,16 +126,16 @@ describe "Sequel::Model()" do
 
     it "should work without raising an exception with a dataset with an SQL::Identifier" do
       proc do
-        class ::Album < Sequel::Model(@db[:table.identifier]); end
-        class ::Album < Sequel::Model(@db[:table.identifier]); end
+        class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
+        class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
       end.should_not raise_error
     end
 
     it "should raise an exception if anonymous model caching is disabled" do
       Sequel::Model.cache_anonymous_models = false
       proc do
-        class ::Album < Sequel::Model(@db[:table.identifier]); end
-        class ::Album < Sequel::Model(@db[:table.identifier]); end
+        class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
+        class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
       end.should raise_error
     end
   end
@@ -195,25 +195,25 @@ describe Sequel::Model, "dataset & schema" do
 
   it "set_dataset should take a LiteralString" do
     @model.db = MODEL_DB
-    @model.set_dataset('foo'.lit)
-    @model.table_name.should == 'foo'.lit
+    @model.set_dataset(Sequel.lit('foo'))
+    @model.table_name.should == Sequel.lit('foo')
   end
 
   it "set_dataset should take an SQL::Identifier" do
     @model.db = MODEL_DB
-    @model.set_dataset(:foo.identifier)
-    @model.table_name.should == :foo.identifier
+    @model.set_dataset(Sequel.identifier(:foo))
+    @model.table_name.should == Sequel.identifier(:foo)
   end
 
   it "set_dataset should take an SQL::QualifiedIdentifier" do
     @model.db = MODEL_DB
-    @model.set_dataset(:foo.qualify(:bar))
-    @model.table_name.should == :foo.qualify(:bar)
+    @model.set_dataset(Sequel.qualify(:bar, :foo))
+    @model.table_name.should == Sequel.qualify(:bar, :foo)
   end
 
   it "set_dataset should take an SQL::AliasedExpression" do
     @model.db = MODEL_DB
-    @model.set_dataset(:foo.as(:bar))
+    @model.set_dataset(Sequel.as(:foo, :bar))
     @model.table_name.should == :bar
   end
 
@@ -361,12 +361,12 @@ describe Sequel::Model, ".subset" do
   specify "should create a filter on the underlying dataset" do
     proc {@c.new_only}.should raise_error(NoMethodError)
     
-    @c.subset(:new_only) {:age.sql_number < 'new'}
+    @c.subset(:new_only){age < 'new'}
     
     @c.new_only.sql.should == "SELECT * FROM items WHERE (age < 'new')"
     @c.dataset.new_only.sql.should == "SELECT * FROM items WHERE (age < 'new')"
     
-    @c.subset(:pricey) {:price.sql_number > 100}
+    @c.subset(:pricey){price > 100}
     
     @c.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
     @c.dataset.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
@@ -393,15 +393,15 @@ describe Sequel::Model, ".find" do
     @c.find(:name => 'sharon').should be_a_kind_of(@c)
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"]
 
-    @c.find(:name.like('abc%')).should be_a_kind_of(@c)
+    @c.find(Sequel.expr(:name).like('abc%')).should be_a_kind_of(@c)
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (name LIKE 'abc%') LIMIT 1"]
   end
   
   specify "should accept filter blocks" do
-    @c.find{:id.sql_number > 1}.should be_a_kind_of(@c)
+    @c.find{id > 1}.should be_a_kind_of(@c)
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id > 1) LIMIT 1"]
 
-    @c.find {(:x.sql_number > 1) & (:y.sql_number < 2)}.should be_a_kind_of(@c)
+    @c.find{(x > 1) & (y < 2)}.should be_a_kind_of(@c)
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE ((x > 1) AND (y < 2)) LIMIT 1"]
   end
 end

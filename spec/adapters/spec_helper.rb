@@ -2,7 +2,7 @@ require 'rubygems'
 require 'logger'
 unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require 'sequel'
+  require 'sequel/no_core_ext'
 end
 begin
   require File.join(File.dirname(File.dirname(File.expand_path(__FILE__))), 'spec_config.rb')

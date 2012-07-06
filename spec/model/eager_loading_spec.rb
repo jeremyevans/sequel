@@ -179,7 +179,7 @@ describe Sequel::Model, "#eager" do
   end
   
   it "should handle qualified order clauses when eagerly loading a single one_to_one association using the :correlated_subquery strategy" do
-    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>:correlated_subquery, :order=>[:tracks__name, :tracks__name.desc, :name.qualify(:tracks), :name.qualify(:t), 1]
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>:correlated_subquery, :order=>[:tracks__name, Sequel.desc(:tracks__name), Sequel.qualify(:tracks, :name), Sequel.qualify(:t, :name), 1]
     a = EagerAlbum.eager(:track).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE ((tracks.album_id IN (1)) AND (tracks.id IN (SELECT t1.id FROM tracks AS t1 WHERE (t1.album_id = tracks.album_id) ORDER BY t1.name, t1.name DESC, t1.name, t.name, 1 LIMIT 1))) ORDER BY tracks.name, tracks.name DESC, tracks.name, t.name, 1']
@@ -1303,21 +1303,21 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should respect the association's :graph_block option" do 
-    GraphAlbum.many_to_one :active_band, :class=>'GraphBand', :key=>:band_id, :graph_block=>proc{|ja,lja,js| {:active.qualify(ja)=>true}}
+    GraphAlbum.many_to_one :active_band, :class=>'GraphBand', :key=>:band_id, :graph_block=>proc{|ja,lja,js| {Sequel.qualify(ja, :active)=>true}}
     GraphAlbum.eager_graph(:active_band).sql.should == "SELECT albums.id, albums.band_id, active_band.id AS active_band_id, active_band.vocalist_id FROM albums LEFT OUTER JOIN bands AS active_band ON ((active_band.id = albums.band_id) AND (active_band.active IS TRUE))"
 
-    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :graph_block=>proc{|ja,lja,js| {:id.qualify(ja)=>(0..100)}}
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :graph_block=>proc{|ja,lja,js| {Sequel.qualify(ja, :id)=>(0..100)}}
     GraphAlbum.eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums LEFT OUTER JOIN tracks AS right_tracks ON ((right_tracks.album_id = albums.id) AND (right_tracks.id >= 0) AND (right_tracks.id <= 100))'
 
-    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_block=>proc{|ja,lja,js| {true=>:active.qualify(lja)}}
+    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_block=>proc{|ja,lja,js| {true=>Sequel.qualify(lja, :active)}}
     GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS active_genres ON ((active_genres.id = ag.genre_id) AND ('t' = ag.active))"
   end
 
-  it "should respect the association's :graph_join_block option" do 
-    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_join_table_block=>proc{|ja,lja,js| {:active.qualify(ja)=>true}}
+  it "should respect the association's :graph_join_table_block option" do 
+    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_join_table_block=>proc{|ja,lja,js| {Sequel.qualify(ja, :active)=>true}}
     GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON ((ag.album_id = albums.id) AND (ag.active IS TRUE)) LEFT OUTER JOIN genres AS active_genres ON (active_genres.id = ag.genre_id)"
 
-    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_block=>proc{|ja,lja,js| {true=>:active.qualify(lja)}}, :graph_join_table_block=>proc{|ja,lja,js| {true=>:active.qualify(lja)}}
+    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_block=>proc{|ja,lja,js| {true=>Sequel.qualify(lja, :active)}}, :graph_join_table_block=>proc{|ja,lja,js| {true=>Sequel.qualify(lja, :active)}}
     GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON ((ag.album_id = albums.id) AND ('t' = albums.active)) LEFT OUTER JOIN genres AS active_genres ON ((active_genres.id = ag.genre_id) AND ('t' = ag.active))"
   end
 
@@ -1351,7 +1351,7 @@ describe Sequel::Model, "#eager_graph" do
     GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_join_table_only_conditions=>{:active=>true}
     GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON (ag.active IS TRUE) LEFT OUTER JOIN genres AS active_genres ON (active_genres.id = ag.genre_id)"
 
-    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_only_conditions=>(:price + 2 > 100), :graph_join_table_only_conditions=>"active"
+    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_only_conditions=>(Sequel.expr(:price) + 2 > 100), :graph_join_table_only_conditions=>"active"
     GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON (active) LEFT OUTER JOIN genres AS active_genres ON ((price + 2) > 100)"
   end
 
@@ -1365,7 +1365,7 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should only qualify unqualified symbols, identifiers, or ordered versions in association's :order" do
-    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :order=>[:blah__id.identifier, :blah__id.identifier.desc, :blah__id.desc, :blah__id, :album_id, :album_id.desc, 1, 'RANDOM()'.lit, :a.qualify(:b)]
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :order=>[Sequel.identifier(:blah__id), Sequel.identifier(:blah__id).desc, Sequel.desc(:blah__id), :blah__id, :album_id, Sequel.desc(:album_id), 1, Sequel.lit('RANDOM()'), Sequel.qualify(:b, :a)]
     GraphAlbum.eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums LEFT OUTER JOIN tracks AS right_tracks ON (right_tracks.album_id = albums.id) ORDER BY right_tracks.blah__id, right_tracks.blah__id DESC, blah.id DESC, blah.id, right_tracks.album_id, right_tracks.album_id DESC, 1, RANDOM(), b.a'
   end
 
@@ -1415,16 +1415,16 @@ describe Sequel::Model, "#eager_graph" do
   
   it "should handle eager loading with schemas and aliases of different types" do
     GraphAlbum.eager_graph(:band).join(:s__genres, [:b_id]).eager_graph(:genres).sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id, genres_0.id AS genres_0_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) INNER JOIN s.genres USING (b_id) LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genres_0 ON (genres_0.id = ag.genre_id)'
-    GraphAlbum.eager_graph(:band).join(:genres.qualify(:s), [:b_id]).eager_graph(:genres).sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id, genres_0.id AS genres_0_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) INNER JOIN s.genres USING (b_id) LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genres_0 ON (genres_0.id = ag.genre_id)'
-    GraphAlbum.eager_graph(:band).join(:s__b.as('genres'), [:b_id]).eager_graph(:genres).sql.should ==  'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id, genres_0.id AS genres_0_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) INNER JOIN s.b AS genres USING (b_id) LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genres_0 ON (genres_0.id = ag.genre_id)'
-    GraphAlbum.eager_graph(:band).join(:s__b, [:b_id], :genres.identifier).eager_graph(:genres).sql.should ==  'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id, genres_0.id AS genres_0_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) INNER JOIN s.b AS genres USING (b_id) LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genres_0 ON (genres_0.id = ag.genre_id)'
-    GraphAlbum.eager_graph(:band).join(:genres.identifier, [:b_id]).eager_graph(:genres).sql.should ==  'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id, genres_0.id AS genres_0_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) INNER JOIN genres USING (b_id) LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genres_0 ON (genres_0.id = ag.genre_id)'
+    GraphAlbum.eager_graph(:band).join(Sequel.qualify(:s, :genres), [:b_id]).eager_graph(:genres).sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id, genres_0.id AS genres_0_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) INNER JOIN s.genres USING (b_id) LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genres_0 ON (genres_0.id = ag.genre_id)'
+    GraphAlbum.eager_graph(:band).join(Sequel.expr(:s__b).as('genres'), [:b_id]).eager_graph(:genres).sql.should ==  'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id, genres_0.id AS genres_0_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) INNER JOIN s.b AS genres USING (b_id) LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genres_0 ON (genres_0.id = ag.genre_id)'
+    GraphAlbum.eager_graph(:band).join(:s__b, [:b_id], Sequel.identifier(:genres)).eager_graph(:genres).sql.should ==  'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id, genres_0.id AS genres_0_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) INNER JOIN s.b AS genres USING (b_id) LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genres_0 ON (genres_0.id = ag.genre_id)'
+    GraphAlbum.eager_graph(:band).join(Sequel.identifier(:genres), [:b_id]).eager_graph(:genres).sql.should ==  'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id, genres_0.id AS genres_0_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) INNER JOIN genres USING (b_id) LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genres_0 ON (genres_0.id = ag.genre_id)'
     GraphAlbum.eager_graph(:band).join('genres', [:b_id]).eager_graph(:genres).sql.should ==  'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id, genres_0.id AS genres_0_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) INNER JOIN genres USING (b_id) LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genres_0 ON (genres_0.id = ag.genre_id)'
   end
   
   it "should raise errors if invalid aliases or table styles are used" do
-    proc{GraphAlbum.from_self(:alias=>:bands.qualify(:s)).eager_graph(:band)}.should raise_error(Sequel::Error)
-    proc{GraphAlbum.from('?'.lit(:bands)).eager_graph(:band)}.should raise_error(Sequel::Error)
+    proc{GraphAlbum.from_self(:alias=>Sequel.qualify(:s, :bands)).eager_graph(:band)}.should raise_error(Sequel::Error)
+    proc{GraphAlbum.from(Sequel.lit('?', :bands)).eager_graph(:band)}.should raise_error(Sequel::Error)
   end
 
   it "should eagerly load schema qualified tables correctly with joins" do

@@ -100,19 +100,19 @@ END
   end
 
   it "should handle SQL::OrderedExpressions" do
-    dot(@ds.order(:a.desc(:nulls=>:last))).should == ["1 -> 2 [label=\"order\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"OrderedExpression: DESC NULLS LAST\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":a\"];"]
+    dot(@ds.order(Sequel.desc(:a, :nulls=>:last))).should == ["1 -> 2 [label=\"order\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"OrderedExpression: DESC NULLS LAST\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":a\"];"]
   end
 
   it "should handle SQL::AliasedExpressions" do
-    dot(@ds.from(:a.as(:b))).should == ["1 -> 2 [label=\"from\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"AliasedExpression\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"alias\"];", "5 [label=\":b\"];"]
+    dot(@ds.from(Sequel.as(:a, :b))).should == ["1 -> 2 [label=\"from\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"AliasedExpression\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"alias\"];", "5 [label=\":b\"];"]
   end
 
   it "should handle SQL::CaseExpressions" do
-    dot(@ds.select({:a=>:b}.case(:c, :d))).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"CaseExpression\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":d\"];", "3 -> 5 [label=\"conditions\"];", "5 [label=\"Array\"];", "5 -> 6 [label=\"0\"];", "6 [label=\"Array\"];", "6 -> 7 [label=\"0\"];", "7 [label=\":a\"];", "6 -> 8 [label=\"1\"];", "8 [label=\":b\"];", "3 -> 9 [label=\"default\"];", "9 [label=\":c\"];"]
+    dot(@ds.select(Sequel.case({:a=>:b}, :c, :d))).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"CaseExpression\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":d\"];", "3 -> 5 [label=\"conditions\"];", "5 [label=\"Array\"];", "5 -> 6 [label=\"0\"];", "6 [label=\"Array\"];", "6 -> 7 [label=\"0\"];", "7 [label=\":a\"];", "6 -> 8 [label=\"1\"];", "8 [label=\":b\"];", "3 -> 9 [label=\"default\"];", "9 [label=\":c\"];"]
   end
 
   it "should handle SQL::Cast" do
-    dot(@ds.select(:a.cast(Integer))).should ==  ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Cast\"];", "3 -> 4 [label=\"expr\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"type\"];", "5 [label=\"Integer\"];"]
+    dot(@ds.select(Sequel.cast(:a, Integer))).should ==  ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Cast\"];", "3 -> 4 [label=\"expr\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"type\"];", "5 [label=\"Integer\"];"]
   end
 
   it "should handle SQL::Function" do
@@ -120,7 +120,7 @@ END
   end
 
   it "should handle SQL::Subscript" do
-    dot(@ds.select(:a.sql_subscript(1))).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Subscript\"];", "3 -> 4 [label=\"f\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"sub\"];", "5 [label=\"Array\"];", "5 -> 6 [label=\"0\"];", "6 [label=\"1\"];"]
+    dot(@ds.select(Sequel.subscript(:a, 1))).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Subscript\"];", "3 -> 4 [label=\"f\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"sub\"];", "5 [label=\"Array\"];", "5 -> 6 [label=\"0\"];", "6 [label=\"1\"];"]
   end
 
   it "should handle SQL::WindowFunction" do

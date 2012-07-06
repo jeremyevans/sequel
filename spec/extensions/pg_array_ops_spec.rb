@@ -77,12 +77,12 @@ describe "Sequel::Postgres::ArrayOp" do
   end
 
   it "should be able to turn expressions into array ops using pg_array" do
-    @db.literal(:a.qualify(:b).pg_array.push(3)).should == "(b.a || 3)"
-    @db.literal(:a.sql_function(:b).pg_array.push(3)).should == "(a(b) || 3)"
+    @db.literal(Sequel.qualify(:b, :a).pg_array.push(3)).should == "(b.a || 3)"
+    @db.literal(Sequel.function(:a, :b).pg_array.push(3)).should == "(a(b) || 3)"
   end
 
   it "should be able to turn literal strings into array ops using pg_array" do
-    @db.literal('a'.lit.pg_array.unnest).should == "unnest(a)"
+    @db.literal(Sequel.lit('a').pg_array.unnest).should == "unnest(a)"
   end
 
   it "should be able to turn symbols into array ops using pg_array" do

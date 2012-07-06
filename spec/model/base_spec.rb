@@ -335,12 +335,12 @@ describe "Model.qualified_primary_key_hash" do
   end
   
   specify "should handle a single primary key" do
-    @c.qualified_primary_key_hash(1).should == {:id.qualify(:items)=>1}
+    @c.qualified_primary_key_hash(1).should == {Sequel.qualify(:items, :id)=>1}
   end
 
   specify "should handle a composite primary key" do
     @c.set_primary_key([:id1, :id2])
-    @c.qualified_primary_key_hash([1, 2]).should == {:id1.qualify(:items)=>1, :id2.qualify(:items)=>2}
+    @c.qualified_primary_key_hash([1, 2]).should == {Sequel.qualify(:items, :id1)=>1, Sequel.qualify(:items, :id2)=>2}
   end
 
   specify "should raise an error for no primary key" do
@@ -349,9 +349,9 @@ describe "Model.qualified_primary_key_hash" do
   end
 
   specify "should allow specifying a different qualifier" do
-    @c.qualified_primary_key_hash(1, :apple).should == {:id.qualify(:apple)=>1}
+    @c.qualified_primary_key_hash(1, :apple).should == {Sequel.qualify(:apple, :id)=>1}
     @c.set_primary_key([:id1, :id2])
-    @c.qualified_primary_key_hash([1, 2], :bear).should == {:id1.qualify(:bear)=>1, :id2.qualify(:bear)=>2}
+    @c.qualified_primary_key_hash([1, 2], :bear).should == {Sequel.qualify(:bear, :id1)=>1, Sequel.qualify(:bear, :id2)=>2}
   end
 end
 
@@ -608,7 +608,7 @@ describe Sequel::Model, ".[] optimization" do
     @c.simple_pk.should == '"id"'
     @c.set_primary_key :b
     @c.simple_pk.should == '"b"'
-    @c.set_primary_key :b__a.identifier
+    @c.set_primary_key Sequel.identifier(:b__a)
     @c.simple_pk.should == '"b__a"'
   end
 

@@ -56,12 +56,12 @@ describe "An SQLite database" do
   end
   
   specify "should support casting to Date by using the date function" do
-    @db.get('2012-10-20 11:12:13'.cast(Date)).should == '2012-10-20'
+    @db.get(Sequel.cast('2012-10-20 11:12:13', Date)).should == '2012-10-20'
   end
   
   specify "should support casting to Time or DateTime by using the datetime function" do
-    @db.get('2012-10-20'.cast(Time)).should == '2012-10-20 00:00:00'
-    @db.get('2012-10-20'.cast(DateTime)).should == '2012-10-20 00:00:00'
+    @db.get(Sequel.cast('2012-10-20', Time)).should == '2012-10-20 00:00:00'
+    @db.get(Sequel.cast('2012-10-20', DateTime)).should == '2012-10-20 00:00:00'
   end
   
   specify "should provide the SQLite version as an integer" do
@@ -95,11 +95,11 @@ describe "An SQLite database" do
   specify "should support a use_timestamp_timezones setting" do
     @db.create_table!(:time){Time :time}
     @db[:time].insert(Time.now)
-    @db[:time].get(:time.cast_string).should =~ /[-+]\d\d\d\d\z/
+    @db[:time].get(Sequel.cast(:time, String)).should =~ /[-+]\d\d\d\d\z/
     @db.use_timestamp_timezones = false
     @db[:time].delete
     @db[:time].insert(Time.now)
-    @db[:time].get(:time.cast_string).should_not =~ /[-+]\d\d\d\d\z/
+    @db[:time].get(Sequel.cast(:time, String)).should_not =~ /[-+]\d\d\d\d\z/
     @db.use_timestamp_timezones = true
   end
   
@@ -183,10 +183,10 @@ describe "SQLite type conversion" do
     @db.create_table(:items){TrueClass :a}
     @db[:items].insert(false)
     @db[:items].select_map(:a).should == [false]
-    @db[:items].select_map(:a+:a).should == [0]
+    @db[:items].select_map(Sequel.expr(:a)+:a).should == [0]
     @db[:items].update(:a=>true)
     @db[:items].select_map(:a).should == [true]
-    @db[:items].select_map(:a+:a).should == [2]
+    @db[:items].select_map(Sequel.expr(:a)+:a).should == [2]
   end
   
   specify "should handle integers/floats/strings/decimals in numeric/decimal columns" do
@@ -258,10 +258,10 @@ describe "An SQLite dataset" do
   end
   
   specify "should raise errors if given a regexp pattern match" do
-    proc{@d.literal(:x.like(/a/))}.should raise_error(Sequel::Error)
-    proc{@d.literal(~:x.like(/a/))}.should raise_error(Sequel::Error)
-    proc{@d.literal(:x.like(/a/i))}.should raise_error(Sequel::Error)
-    proc{@d.literal(~:x.like(/a/i))}.should raise_error(Sequel::Error)
+    proc{@d.literal(Sequel.expr(:x).like(/a/))}.should raise_error(Sequel::Error)
+    proc{@d.literal(~Sequel.expr(:x).like(/a/))}.should raise_error(Sequel::Error)
+    proc{@d.literal(Sequel.expr(:x).like(/a/i))}.should raise_error(Sequel::Error)
+    proc{@d.literal(~Sequel.expr(:x).like(/a/i))}.should raise_error(Sequel::Error)
   end
 end
 
@@ -289,7 +289,7 @@ describe "An SQLite dataset AS clause" do
   end
 
   specify "should use a string literal for :column.as(:alias)" do
-    SQLITE_DB.literal(:c.as(:a)).should == "`c` AS 'a'"
+    SQLITE_DB.literal(Sequel.as(:c, :a)).should == "`c` AS 'a'"
   end
 
   specify "should use a string literal in the SELECT clause" do
@@ -321,10 +321,10 @@ describe "SQLite::Dataset#delete" do
   
   specify "should return the number of records affected when filtered" do
     @d.count.should == 3
-    @d.filter(:value.sql_number < 3).delete.should == 1
+    @d.filter{value < 3}.delete.should == 1
     @d.count.should == 2
 
-    @d.filter(:value.sql_number < 3).delete.should == 0
+    @d.filter{value < 3}.delete.should == 0
     @d.count.should == 2
   end
   

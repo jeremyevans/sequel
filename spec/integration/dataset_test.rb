@@ -60,8 +60,8 @@ describe "Simple Dataset operations" do
   end
 
   specify "should correctly deal with qualified columns and subselects" do
-    @ds.from_self(:alias=>:a).select(:a__id, :number.qualify(:a)).all.should == [{:id=>1, :number=>10}]
-    @ds.join(@ds.as(:a), :id=>:id).select(:a__id, :number.qualify(:a)).all.should == [{:id=>1, :number=>10}]
+    @ds.from_self(:alias=>:a).select(:a__id, Sequel.qualify(:a, :number)).all.should == [{:id=>1, :number=>10}]
+    @ds.join(@ds.as(:a), :id=>:id).select(:a__id, Sequel.qualify(:a, :number)).all.should == [{:id=>1, :number=>10}]
   end
 
   specify "should graph correctly" do
@@ -87,7 +87,7 @@ describe "Simple Dataset operations" do
   end
   
   specify "should update correctly" do
-    @ds.update(:number=>:number+1).should == 1
+    @ds.update(:number=>Sequel.expr(:number)+1).should == 1
     @ds.all.should == [{:id=>1, :number=>11}]
   end
   
@@ -301,16 +301,16 @@ describe Sequel::Database do
      "\\'dingo",
      "\\\\''dingo",
     ].each do |str|
-      INTEGRATION_DB.get(str.cast(String)).should == str
+      INTEGRATION_DB.get(Sequel.cast(str, String)).should == str
       str = "1#{str}1"
-      INTEGRATION_DB.get(str.cast(String)).should == str
+      INTEGRATION_DB.get(Sequel.cast(str, String)).should == str
       str = "#{str}#{str}"
-      INTEGRATION_DB.get(str.cast(String)).should == str
+      INTEGRATION_DB.get(Sequel.cast(str, String)).should == str
     end
   end
 
   cspecify "should properly escape binary data", [:odbc], [:jdbc, :hsqldb], [:swift], :oracle do
-    INTEGRATION_DB.get("\1\2\3".to_sequel_blob.cast(File).as(:a)).should == "\1\2\3"
+    INTEGRATION_DB.get(Sequel.cast(Sequel.blob("\1\2\3"), File).as(:a)).should == "\1\2\3"
   end
 
   specify "should have a working table_exists?" do
@@ -443,20 +443,20 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
     @ds1.insert(:number=>38)
     @ds2.insert(:number=>39)
 
-    @ds1.order(:number.desc).union(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'8 9 10 20 30 38 39'
-    @ds1.union(@ds2.order(:number.desc)).order(:number).map{|x| x[:number].to_s}.should == %w'8 9 10 20 30 38 39'
+    @ds1.reverse_order(:number).union(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'8 9 10 20 30 38 39'
+    @ds1.union(@ds2.reverse_order(:number)).order(:number).map{|x| x[:number].to_s}.should == %w'8 9 10 20 30 38 39'
 
-    @ds1.order(:number.desc).limit(1).union(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'9 10 30 38 39'
-    @ds2.order(:number.desc).limit(1).union(@ds1).order(:number).map{|x| x[:number].to_s}.should == %w'8 10 20 38 39'
+    @ds1.reverse_order(:number).limit(1).union(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'9 10 30 38 39'
+    @ds2.reverse_order(:number).limit(1).union(@ds1).order(:number).map{|x| x[:number].to_s}.should == %w'8 10 20 38 39'
 
     @ds1.union(@ds2.order(:number).limit(1)).order(:number).map{|x| x[:number].to_s}.should == %w'8 9 10 20 38'
     @ds2.union(@ds1.order(:number).limit(1)).order(:number).map{|x| x[:number].to_s}.should == %w'8 9 10 30 39'
 
     @ds1.union(@ds2).limit(2).order(:number).map{|x| x[:number].to_s}.should == %w'8 9'
-    @ds2.union(@ds1).order(:number.desc).limit(2).map{|x| x[:number].to_s}.should == %w'39 38'
+    @ds2.union(@ds1).reverse_order(:number).limit(2).map{|x| x[:number].to_s}.should == %w'39 38'
 
-    @ds1.order(:number.desc).limit(2).union(@ds2.order(:number.desc).limit(2)).order(:number).limit(3).map{|x| x[:number].to_s}.should == %w'20 30 38'
-    @ds2.order(:number).limit(2).union(@ds1.order(:number).limit(2)).order(:number.desc).limit(3).map{|x| x[:number].to_s}.should == %w'10 9 8'
+    @ds1.reverse_order(:number).limit(2).union(@ds2.reverse_order(:number).limit(2)).order(:number).limit(3).map{|x| x[:number].to_s}.should == %w'20 30 38'
+    @ds2.order(:number).limit(2).union(@ds1.order(:number).limit(2)).reverse_order(:number).limit(3).map{|x| x[:number].to_s}.should == %w'10 9 8'
   end
 
   specify "should give the correct results for compound UNION, EXCEPT, and INTERSECT" do
@@ -562,7 +562,7 @@ if INTEGRATION_DB.dataset.supports_cte?(:update) # Assume INSERT and DELETE supp
     specify "should give correct results for WITH" do
       @ds2.insert(@db[:t])
       @ds.select_order_map(:id).should == [1, 1, 2, 2]
-      @ds2.filter(:id=>@db[:t].select{max(id)}).update(:id=>:id+1)
+      @ds2.filter(:id=>@db[:t].select{max(id)}).update(:id=>Sequel.+(:id, 1))
       @ds.select_order_map(:id).should == [1, 1, 3, 3]
       @ds2.filter(:id=>@db[:t].select{max(id)}).delete
       @ds.select_order_map(:id).should == [1, 1]
@@ -609,16 +609,16 @@ if INTEGRATION_DB.dataset.supports_returning?(:update) # Assume DELETE support a
     
     specify "should give correct results" do
       h = []
-      @ds.returning(:foo).update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      @ds.returning(:foo).update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}
       h.should == [{:foo=>4}]
       h.clear
-      @ds.returning(:id).update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      @ds.returning(:id).update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}
       h.should == [{:id=>3}]
       h.clear
-      @ds.returning.update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      @ds.returning.update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}
       h.should == [{:id=>4, :foo=>16}]
       h.clear
-      @ds.returning(:id___foo, :foo___id).update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
+      @ds.returning(:id___foo, :foo___id).update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}
       h.should == [{:id=>32, :foo=>5}]
       h.clear
 
@@ -812,13 +812,13 @@ describe "Sequel::Dataset convenience methods" do
   end
   
   it "#group_rollup should include hierarchy of groupings" do
-    @ds.group_by(:a).group_rollup.select_map([:a, :sum.sql_function(:b).cast(Integer).as(:b), :sum.sql_function(:c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 10, 16], [2, 7, 11], [nil, 17, 27]]
-    @ds.group_by(:a, :b).group_rollup.select_map([:a, :b, :sum.sql_function(:c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 3, 11], [1, 4, 5], [1, nil, 16], [2, 3, 5], [2, 4, 6], [2, nil, 11], [nil, nil, 27]]
+    @ds.group_by(:a).group_rollup.select_map([:a, Sequel.function(:sum, :b).cast(Integer).as(:b), Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 10, 16], [2, 7, 11], [nil, 17, 27]]
+    @ds.group_by(:a, :b).group_rollup.select_map([:a, :b, Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 3, 11], [1, 4, 5], [1, nil, 16], [2, 3, 5], [2, 4, 6], [2, nil, 11], [nil, nil, 27]]
   end if INTEGRATION_DB.dataset.supports_group_rollup?
 
   it "#group_cube should include all combinations of groupings" do
-    @ds.group_by(:a).group_cube.select_map([:a, :sum.sql_function(:b).cast(Integer).as(:b), :sum.sql_function(:c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 10, 16], [2, 7, 11], [nil, 17, 27]]
-    @ds.group_by(:a, :b).group_cube.select_map([:a, :b, :sum.sql_function(:c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 3, 11], [1, 4, 5], [1, nil, 16], [2, 3, 5], [2, 4, 6], [2, nil, 11], [nil, 3, 16], [nil, 4, 11], [nil, nil, 27]]
+    @ds.group_by(:a).group_cube.select_map([:a, Sequel.function(:sum, :b).cast(Integer).as(:b), Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 10, 16], [2, 7, 11], [nil, 17, 27]]
+    @ds.group_by(:a, :b).group_cube.select_map([:a, :b, Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 3, 11], [1, 4, 5], [1, nil, 16], [2, 3, 5], [2, 4, 6], [2, nil, 11], [nil, 3, 16], [nil, 4, 11], [nil, nil, 27]]
   end if INTEGRATION_DB.dataset.supports_group_cube?
 end
 
@@ -1026,34 +1026,34 @@ describe "Sequel::Dataset convenience methods" do
     @ds.select_map(:b___e).should == [2, 6]
     @ds.select_map([:a___e, :b___f]).should == [[1, 2], [5, 6]]
     @ds.select_map([:a__a___e, :a__b___f]).should == [[1, 2], [5, 6]]
-    @ds.select_map([:a__a.as(:e), :a__b.as(:f)]).should == [[1, 2], [5, 6]]
-    @ds.select_map([:a.qualify(:a).as(:e), :b.qualify(:a).as(:f)]).should == [[1, 2], [5, 6]]
-    @ds.select_map([:a.identifier.qualify(:a).as(:e), :b.qualify(:a).as(:f)]).should == [[1, 2], [5, 6]]
+    @ds.select_map([Sequel.expr(:a__a).as(:e), Sequel.expr(:a__b).as(:f)]).should == [[1, 2], [5, 6]]
+    @ds.select_map([Sequel.qualify(:a, :a).as(:e), Sequel.qualify(:a, :b).as(:f)]).should == [[1, 2], [5, 6]]
+    @ds.select_map([Sequel.identifier(:a).qualify(:a).as(:e), Sequel.qualify(:a, :b).as(:f)]).should == [[1, 2], [5, 6]]
   end
   
   specify "should have working #select_order_map" do
     @ds.select_order_map(:a).should == [1, 5]
-    @ds.select_order_map(:a__b.desc).should == [6, 2]
-    @ds.select_order_map(:a__b___e.desc).should == [6, 2]
-    @ds.select_order_map(:b.qualify(:a).as(:e)).should == [2, 6]
+    @ds.select_order_map(Sequel.desc(:a__b)).should == [6, 2]
+    @ds.select_order_map(Sequel.desc(:a__b___e)).should == [6, 2]
+    @ds.select_order_map(Sequel.qualify(:a, :b).as(:e)).should == [2, 6]
     @ds.select_order_map([:a]).should == [[1], [5]]
-    @ds.select_order_map([:a.desc, :b]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([Sequel.desc(:a), :b]).should == [[5, 6], [1, 2]]
 
     @ds.select_order_map(:a___e).should == [1, 5]
     @ds.select_order_map(:b___e).should == [2, 6]
-    @ds.select_order_map([:a___e.desc, :b___f]).should == [[5, 6], [1, 2]]
-    @ds.select_order_map([:a__a___e.desc, :a__b___f]).should == [[5, 6], [1, 2]]
-    @ds.select_order_map([:a__a.desc, :a__b.as(:f)]).should == [[5, 6], [1, 2]]
-    @ds.select_order_map([:a.qualify(:a).desc, :b.qualify(:a).as(:f)]).should == [[5, 6], [1, 2]]
-    @ds.select_order_map([:a.identifier.qualify(:a).desc, :b.qualify(:a).as(:f)]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([Sequel.desc(:a___e), :b___f]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([Sequel.desc(:a__a___e), :a__b___f]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([Sequel.desc(:a__a), Sequel.expr(:a__b).as(:f)]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([Sequel.qualify(:a, :a).desc, Sequel.qualify(:a, :b).as(:f)]).should == [[5, 6], [1, 2]]
+    @ds.select_order_map([Sequel.identifier(:a).qualify(:a).desc, Sequel.qualify(:a, :b).as(:f)]).should == [[5, 6], [1, 2]]
   end
 
   specify "should have working #select_hash" do
     @ds.select_hash(:a, :b).should == {1=>2, 5=>6}
     @ds.select_hash(:a__a___e, :b).should == {1=>2, 5=>6}
-    @ds.select_hash(:a__a.as(:e), :b).should == {1=>2, 5=>6}
-    @ds.select_hash(:a.qualify(:a).as(:e), :b).should == {1=>2, 5=>6}
-    @ds.select_hash(:a.identifier.qualify(:a).as(:e), :b).should == {1=>2, 5=>6}
+    @ds.select_hash(Sequel.expr(:a__a).as(:e), :b).should == {1=>2, 5=>6}
+    @ds.select_hash(Sequel.qualify(:a, :a).as(:e), :b).should == {1=>2, 5=>6}
+    @ds.select_hash(Sequel.identifier(:a).qualify(:a).as(:e), :b).should == {1=>2, 5=>6}
     @ds.select_hash([:a, :c], :b).should == {[1, 3]=>2, [5, 7]=>6}
     @ds.select_hash(:a, [:b, :c]).should == {1=>[2, 3], 5=>[6, 7]}
     @ds.select_hash([:a, :c], [:b, :d]).should == {[1, 3]=>[2, 4], [5, 7]=>[6, 8]}
@@ -1064,9 +1064,9 @@ describe "Sequel::Dataset convenience methods" do
     ds.insert(1, 2, 3, 9)
     ds.select_hash_groups(:a, :d).should == {1=>[4, 9], 5=>[8]}
     ds.select_hash_groups(:a__a___e, :d).should == {1=>[4, 9], 5=>[8]}
-    ds.select_hash_groups(:a__a.as(:e), :d).should == {1=>[4, 9], 5=>[8]}
-    ds.select_hash_groups(:a.qualify(:a).as(:e), :d).should == {1=>[4, 9], 5=>[8]}
-    ds.select_hash_groups(:a.identifier.qualify(:a).as(:e), :d).should == {1=>[4, 9], 5=>[8]}
+    ds.select_hash_groups(Sequel.expr(:a__a).as(:e), :d).should == {1=>[4, 9], 5=>[8]}
+    ds.select_hash_groups(Sequel.qualify(:a, :a).as(:e), :d).should == {1=>[4, 9], 5=>[8]}
+    ds.select_hash_groups(Sequel.identifier(:a).qualify(:a).as(:e), :d).should == {1=>[4, 9], 5=>[8]}
     ds.select_hash_groups([:a, :c], :d).should == {[1, 3]=>[4, 9], [5, 7]=>[8]}
     ds.select_hash_groups(:a, [:b, :d]).should == {1=>[[2, 4], [2, 9]], 5=>[[6, 8]]}
     ds.select_hash_groups([:a, :c], [:b, :d]).should == {[1, 3]=>[[2, 4], [2, 9]], [5, 7]=>[[6, 8]]}
@@ -1146,35 +1146,35 @@ describe "Sequel::Dataset DSL support" do
   
   specify "should work with casting and string concatentation" do
     @ds.insert(20, 20)
-    @ds.get{a.cast_string + b.cast_string}.should == '2020'
+    @ds.get{Sequel.cast(a, String).sql_string + Sequel.cast(b, String)}.should == '2020'
   end
   
   it "should work with ordering" do
     @ds.insert(10, 20)
     @ds.insert(20, 10)
     @ds.order(:a, :b).all.should == [{:a=>10, :b=>20}, {:a=>20, :b=>10}]
-    @ds.order(:a.asc, :b.asc).all.should == [{:a=>10, :b=>20}, {:a=>20, :b=>10}]
-    @ds.order(:a.desc, :b.desc).all.should == [{:a=>20, :b=>10}, {:a=>10, :b=>20}]
+    @ds.order(Sequel.asc(:a), Sequel.asc(:b)).all.should == [{:a=>10, :b=>20}, {:a=>20, :b=>10}]
+    @ds.order(Sequel.desc(:a), Sequel.desc(:b)).all.should == [{:a=>20, :b=>10}, {:a=>10, :b=>20}]
   end
   
   it "should work with qualifying" do
     @ds.insert(10, 20)
     @ds.get(:a__b).should == 20
     @ds.get{a__b}.should == 20
-    @ds.get(:b.qualify(:a)).should == 20
+    @ds.get(Sequel.qualify(:a, :b)).should == 20
   end
   
   it "should work with aliasing" do
     @ds.insert(10, 20)
     @ds.get(:a__b___c).should == 20
     @ds.get{a__b.as(c)}.should == 20
-    @ds.get(:b.qualify(:a).as(:c)).should == 20
-    @ds.get(:b.as(:c)).should == 20
+    @ds.get(Sequel.qualify(:a, :b).as(:c)).should == 20
+    @ds.get(Sequel.as(:b, :c)).should == 20
   end
   
   it "should work with selecting all columns of a table" do
     @ds.insert(20, 10)
-    @ds.select(:a.*).all.should == [{:a=>20, :b=>10}]
+    @ds.select_all(:a).all.should == [{:a=>20, :b=>10}]
   end
   
   it "should work with ranges as hash values" do
@@ -1215,24 +1215,24 @@ describe "Sequel::Dataset DSL support" do
   
   it "should work with CASE statements" do
     @ds.insert(20, 10)
-    @ds.filter({{:a=>20}=>20}.case(0) > 0).all.should == [{:a=>20, :b=>10}]
-    @ds.filter({{:a=>15}=>20}.case(0) > 0).all.should == []
-    @ds.filter({20=>20}.case(0, :a) > 0).all.should == [{:a=>20, :b=>10}]
-    @ds.filter({15=>20}.case(0, :a) > 0).all.should == []
+    @ds.filter(Sequel.case({{:a=>20}=>20}, 0) > 0).all.should == [{:a=>20, :b=>10}]
+    @ds.filter(Sequel.case({{:a=>15}=>20}, 0) > 0).all.should == []
+    @ds.filter(Sequel.case({20=>20}, 0, :a) > 0).all.should == [{:a=>20, :b=>10}]
+    @ds.filter(Sequel.case({15=>20}, 0, :a) > 0).all.should == []
   end
   
   specify "should work with multiple value arrays" do
     @ds.insert(20, 10)
     @ds.quote_identifiers = false
-    @ds.filter([:a, :b]=>[[20, 10]].sql_array).all.should == [{:a=>20, :b=>10}]
-    @ds.filter([:a, :b]=>[[10, 20]].sql_array).all.should == []
-    @ds.filter([:a, :b]=>[[20, 10], [1, 2]].sql_array).all.should == [{:a=>20, :b=>10}]
-    @ds.filter([:a, :b]=>[[10, 10], [20, 20]].sql_array).all.should == []
+    @ds.filter([:a, :b]=>[[20, 10]]).all.should == [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>[[10, 20]]).all.should == []
+    @ds.filter([:a, :b]=>[[20, 10], [1, 2]]).all.should == [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>[[10, 10], [20, 20]]).all.should == []
     
-    @ds.exclude([:a, :b]=>[[20, 10]].sql_array).all.should == []
-    @ds.exclude([:a, :b]=>[[10, 20]].sql_array).all.should == [{:a=>20, :b=>10}]
-    @ds.exclude([:a, :b]=>[[20, 10], [1, 2]].sql_array).all.should == []
-    @ds.exclude([:a, :b]=>[[10, 10], [20, 20]].sql_array).all.should == [{:a=>20, :b=>10}]
+    @ds.exclude([:a, :b]=>[[20, 10]]).all.should == []
+    @ds.exclude([:a, :b]=>[[10, 20]]).all.should == [{:a=>20, :b=>10}]
+    @ds.exclude([:a, :b]=>[[20, 10], [1, 2]]).all.should == []
+    @ds.exclude([:a, :b]=>[[10, 10], [20, 20]]).all.should == [{:a=>20, :b=>10}]
   end
 
   it "should work with IN/NOT in with datasets" do
@@ -1270,12 +1270,12 @@ describe "Sequel::Dataset DSL support" do
     @ds.exclude([:a, :b]=>[]).all.should == []
 
     unless Sequel.guarded?(:mssql, :oracle, :db2)
-      # MSSQL doesn't like boolean results in the select list
+      # Some databases don't like boolean results in the select list
       pr = proc{|r| r.is_a?(Integer) ? (r != 0) : r}
-      pr[@ds.get({:a=>[]}.sql_expr)].should == nil
-      pr[@ds.get(~({:a=>[]}).sql_expr)].should == nil
-      pr[@ds.get({[:a, :b]=>[]}.sql_expr)].should == nil
-      pr[@ds.get(~({[:a, :b]=>[]}).sql_expr)].should == nil
+      pr[@ds.get(Sequel.expr(:a=>[]))].should == nil
+      pr[@ds.get(~Sequel.expr(:a=>[]))].should == nil
+      pr[@ds.get(Sequel.expr([:a, :b]=>[]))].should == nil
+      pr[@ds.get(~Sequel.expr([:a, :b]=>[]))].should == nil
     end
   end
   
@@ -1289,12 +1289,12 @@ describe "Sequel::Dataset DSL support" do
       @ds.exclude([:a, :b]=>[]).all.should == [{:a=>nil, :b=>nil}]
 
       unless Sequel.guarded?(:mssql, :oracle, :db2)
-        # MSSQL doesn't like boolean results in the select list
+        # Some databases don't like boolean results in the select list
         pr = proc{|r| r.is_a?(Integer) ? (r != 0) : r}
-        pr[@ds.get({:a=>[]}.sql_expr)].should == false
-        pr[@ds.get(~({:a=>[]}).sql_expr)].should == true
-        pr[@ds.get({[:a, :b]=>[]}.sql_expr)].should == false
-        pr[@ds.get(~({[:a, :b]=>[]}).sql_expr)].should == true
+        pr[@ds.get(Sequel.expr(:a=>[]))].should == false
+        pr[@ds.get(~Sequel.expr(:a=>[]))].should == true
+        pr[@ds.get(Sequel.expr([:a, :b]=>[]))].should == false
+        pr[@ds.get(~Sequel.expr([:a, :b]=>[]))].should == true
       end
     ensure
       Sequel.empty_array_handle_nulls = true
@@ -1305,9 +1305,9 @@ describe "Sequel::Dataset DSL support" do
     @ds.insert(20, 10)
     @ds.filter(:a=>20, :b=>10).all.should == [{:a=>20, :b=>10}]
     @ds.filter([[:a, 20], [:b, 10]]).all.should == [{:a=>20, :b=>10}]
-    @ds.filter({:a=>20} & {:b=>10}).all.should == [{:a=>20, :b=>10}]
-    @ds.filter({:a=>20} | {:b=>5}).all.should == [{:a=>20, :b=>10}]
-    @ds.filter(~{:a=>10}).all.should == [{:a=>20, :b=>10}]
+    @ds.filter({:a=>20}, {:b=>10}).all.should == [{:a=>20, :b=>10}]
+    @ds.filter(Sequel.|({:a=>20}, {:b=>5})).all.should == [{:a=>20, :b=>10}]
+    @ds.filter(Sequel.~(:a=>10)).all.should == [{:a=>20, :b=>10}]
   end
 end
 
@@ -1385,38 +1385,38 @@ describe "Dataset string methods" do
   
   it "#like should return matching rows" do
     @ds.insert('foo', 'bar')
-    @ds.filter(:a.like('foo')).all.should == [{:a=>'foo', :b=>'bar'}]
-    @ds.filter(:a.like('bar')).all.should == []
-    @ds.filter(:a.like('foo', 'bar')).all.should == [{:a=>'foo', :b=>'bar'}]
-    @ds.exclude(:a.like('foo')).all.should == []
-    @ds.exclude(:a.like('bar')).all.should == [{:a=>'foo', :b=>'bar'}]
-    @ds.exclude(:a.like('foo', 'bar')).all.should == []
+    @ds.filter(Sequel.expr(:a).like('foo')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.filter(Sequel.expr(:a).like('bar')).all.should == []
+    @ds.filter(Sequel.expr(:a).like('foo', 'bar')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(Sequel.expr(:a).like('foo')).all.should == []
+    @ds.exclude(Sequel.expr(:a).like('bar')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(Sequel.expr(:a).like('foo', 'bar')).all.should == []
   end
   
   it "#like should be case sensitive" do
     @ds.insert('foo', 'bar')
-    @ds.filter(:a.like('Foo')).all.should == []
-    @ds.filter(:b.like('baR')).all.should == []
-    @ds.filter(:a.like('FOO', 'BAR')).all.should == []
-    @ds.exclude(:a.like('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
-    @ds.exclude(:a.like('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
-    @ds.exclude(:a.like('FOO', 'BAR')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.filter(Sequel.expr(:a).like('Foo')).all.should == []
+    @ds.filter(Sequel.expr(:b).like('baR')).all.should == []
+    @ds.filter(Sequel.expr(:a).like('FOO', 'BAR')).all.should == []
+    @ds.exclude(Sequel.expr(:a).like('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(Sequel.expr(:a).like('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(Sequel.expr(:a).like('FOO', 'BAR')).all.should == [{:a=>'foo', :b=>'bar'}]
   end
   
   it "#ilike should return matching rows, in a case insensitive manner" do
     @ds.insert('foo', 'bar')
-    @ds.filter(:a.ilike('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
-    @ds.filter(:a.ilike('baR')).all.should == []
-    @ds.filter(:a.ilike('FOO', 'BAR')).all.should == [{:a=>'foo', :b=>'bar'}]
-    @ds.exclude(:a.ilike('Foo')).all.should == []
-    @ds.exclude(:a.ilike('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
-    @ds.exclude(:a.ilike('FOO', 'BAR')).all.should == []
+    @ds.filter(Sequel.expr(:a).ilike('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.filter(Sequel.expr(:a).ilike('baR')).all.should == []
+    @ds.filter(Sequel.expr(:a).ilike('FOO', 'BAR')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(Sequel.expr(:a).ilike('Foo')).all.should == []
+    @ds.exclude(Sequel.expr(:a).ilike('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(Sequel.expr(:a).ilike('FOO', 'BAR')).all.should == []
   end
   
-  it "should work with strings created with sql_string_join" do
+  it "should work with strings created with Sequel.join" do
     @ds.insert('foo', 'bar')
-    @ds.get([:a, "bar"].sql_string_join).should == 'foobar'
-    @ds.get(["foo", :b].sql_string_join(' ')).should == 'foo bar'
+    @ds.get(Sequel.join([:a, "bar"])).should == 'foobar'
+    @ds.get(Sequel.join(["foo", :b], ' ')).should == 'foo bar'
   end
 end
 
@@ -1491,7 +1491,7 @@ if INTEGRATION_DB.dataset.supports_modifying_joins?
       @db.create_table!(:a){Integer :a; Integer :d}
       @db.create_table!(:b){Integer :b; Integer :e}
       @db.create_table!(:c){Integer :c; Integer :f}
-      @ds = @db.from(:a, :b).join(:c, :c=>:e.identifier).where(:d=>:b, :f=>6)
+      @ds = @db.from(:a, :b).join(:c, :c=>Sequel.identifier(:e)).where(:d=>:b, :f=>6)
       @db[:a].insert(1, 2)
       @db[:a].insert(3, 4)
       @db[:b].insert(2, 5)

@@ -18,7 +18,7 @@ describe "query_literals extension" do
   end
 
   it "should have #select work the standard way if initial string is a literal string already" do
-    @ds.select('a, b, ?'.lit, 1).sql.should == 'SELECT a, b, ?, 1 FROM t'
+    @ds.select(Sequel.lit('a, b, ?'), 1).sql.should == 'SELECT a, b, ?, 1 FROM t'
   end
 
   it "should have #select work regularly if not given a string as the first argument" do
@@ -39,7 +39,7 @@ describe "query_literals extension" do
     end
 
     it "should have #select_more work the standard way if initial string is a literal string already" do
-      @ds.select_more('a, b, ?'.lit, 1).sql.should == 'SELECT d, a, b, ?, 1 FROM t'
+      @ds.select_more(Sequel.lit('a, b, ?'), 1).sql.should == 'SELECT d, a, b, ?, 1 FROM t'
     end
 
     it "should have #select_more work regularly if not given a string as the first argument" do
@@ -56,7 +56,7 @@ describe "query_literals extension" do
   end
 
   it "should have #select_append work the standard way if initial string is a literal string already" do
-    @ds.select_append('a, b, ?'.lit, 1).sql.should == 'SELECT *, a, b, ?, 1 FROM t'
+    @ds.select_append(Sequel.lit('a, b, ?'), 1).sql.should == 'SELECT *, a, b, ?, 1 FROM t'
   end
 
   it "should have #select_append work regularly if not given a string as the first argument" do
@@ -72,7 +72,7 @@ describe "query_literals extension" do
   end
 
   it "should have #select_group work the standard way if initial string is a literal string already" do
-    @ds.select_group('a, b, ?'.lit, 1).sql.should == 'SELECT a, b, ?, 1 FROM t GROUP BY a, b, ?, 1'
+    @ds.select_group(Sequel.lit('a, b, ?'), 1).sql.should == 'SELECT a, b, ?, 1 FROM t GROUP BY a, b, ?, 1'
   end
 
   it "should have #select_group work regularly if not given a string as the first argument" do
@@ -87,11 +87,11 @@ describe "query_literals extension" do
     @ds.group('a, b, ?', 1).sql.should == 'SELECT * FROM t GROUP BY a, b, 1'
   end
 
-  it "should have #select_group work the standard way if initial string is a literal string already" do
-    @ds.group('a, b, ?'.lit, 1).sql.should == 'SELECT * FROM t GROUP BY a, b, ?, 1'
+  it "should have #group work the standard way if initial string is a literal string already" do
+    @ds.group(Sequel.lit('a, b, ?'), 1).sql.should == 'SELECT * FROM t GROUP BY a, b, ?, 1'
   end
 
-  it "should have #select_group work regularly if not given a string as the first argument" do
+  it "should have #group work regularly if not given a string as the first argument" do
     @ds.group(:a, 1).sql.should == 'SELECT * FROM t GROUP BY a, 1'
   end
 
@@ -104,7 +104,7 @@ describe "query_literals extension" do
   end
 
   it "should have #group_and_count work the standard way if initial string is a literal string already" do
-    @ds.group_and_count('a, b, ?'.lit, 1).sql.should == 'SELECT a, b, ?, 1, count(*) AS count FROM t GROUP BY a, b, ?, 1'
+    @ds.group_and_count(Sequel.lit('a, b, ?'), 1).sql.should == 'SELECT a, b, ?, 1, count(*) AS count FROM t GROUP BY a, b, ?, 1'
   end
 
   it "should have #group_and_count work regularly if not given a string as the first argument" do
@@ -120,7 +120,7 @@ describe "query_literals extension" do
   end
 
   it "should have #order work the standard way if initial string is a literal string already" do
-    @ds.order('a, b, ?'.lit, 1).sql.should == 'SELECT * FROM t ORDER BY a, b, ?, 1'
+    @ds.order(Sequel.lit('a, b, ?'), 1).sql.should == 'SELECT * FROM t ORDER BY a, b, ?, 1'
   end
 
   it "should have #order work regularly if not given a string as the first argument" do
@@ -141,7 +141,7 @@ describe "query_literals extension" do
     end
 
     it "should have #order_more work the standard way if initial string is a literal string already" do
-      @ds.order_more('a, b, ?'.lit, 1).sql.should == 'SELECT * FROM t ORDER BY d, a, b, ?, 1'
+      @ds.order_more(Sequel.lit('a, b, ?'), 1).sql.should == 'SELECT * FROM t ORDER BY d, a, b, ?, 1'
     end
 
     it "should have #order_more work regularly if not given a string as the first argument" do
@@ -157,7 +157,7 @@ describe "query_literals extension" do
     end
 
     it "should have #order_append work the standard way if initial string is a literal string already" do
-      @ds.order_prepend('a, b, ?'.lit, 1).sql.should == 'SELECT * FROM t ORDER BY a, b, ?, 1, d'
+      @ds.order_prepend(Sequel.lit('a, b, ?'), 1).sql.should == 'SELECT * FROM t ORDER BY a, b, ?, 1, d'
     end
 
     it "should have #order_append work regularly if not given a string as the first argument" do

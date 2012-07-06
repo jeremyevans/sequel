@@ -13,14 +13,14 @@ describe "DB#create_table" do
   specify "should accept the table name in multiple formats" do
     @db.create_table(:cats__cats) {}
     @db.create_table("cats__cats1") {}
-    @db.create_table(:cats__cats2.identifier) {}
-    @db.create_table(:cats.qualify(:cats3)) {}
+    @db.create_table(Sequel.identifier(:cats__cats2)) {}
+    @db.create_table(Sequel.qualify(:cats3, :cats)) {}
     @db.sqls.should == ['CREATE TABLE cats.cats ()', 'CREATE TABLE cats__cats1 ()', 'CREATE TABLE cats__cats2 ()', 'CREATE TABLE cats3.cats ()']
   end
 
   specify "should raise an error if the table name argument is not valid" do
     proc{@db.create_table(1) {}}.should raise_error(Sequel::Error)
-    proc{@db.create_table(:cats.as(:c)) {}}.should raise_error(Sequel::Error)
+    proc{@db.create_table(Sequel.as(:cats, :c)) {}}.should raise_error(Sequel::Error)
   end
 
   specify "should remove cached schema entry" do
@@ -391,7 +391,7 @@ describe "DB#create_table" do
   specify "should accept functional indexes" do
     @db.create_table(:cats) do
       integer :id
-      index :lower.sql_function(:name)
+      index Sequel.function(:lower, :name)
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_lower_name__index ON cats (lower(name))"]
   end
@@ -399,7 +399,7 @@ describe "DB#create_table" do
   specify "should accept indexes with identifiers" do
     @db.create_table(:cats) do
       integer :id
-      index :lower__name.identifier
+      index Sequel.identifier(:lower__name)
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_lower__name_index ON cats (lower__name)"]
   end
@@ -431,7 +431,7 @@ describe "DB#create_table" do
   specify "should accept unnamed constraint definitions with blocks" do
     @db.create_table(:cats) do
       integer :score
-      check {(:x.sql_number > 0) & (:y.sql_number < 1)}
+      check{(x.sql_number > 0) & (y.sql_number < 1)}
     end
     @db.sqls.should == ["CREATE TABLE cats (score integer, CHECK ((x > 0) AND (y < 1)))"]
   end
@@ -460,7 +460,7 @@ describe "DB#create_table" do
 
   specify "should accept named constraint definitions with block" do
     @db.create_table(:cats) do
-      constraint(:blah_blah) {(:x.sql_number > 0) & (:y.sql_number < 1)}
+      constraint(:blah_blah){(x.sql_number > 0) & (y.sql_number < 1)}
     end
     @db.sqls.should == ["CREATE TABLE cats (CONSTRAINT blah_blah CHECK ((x > 0) AND (y < 1)))"]
   end
@@ -787,7 +787,7 @@ describe "DB#alter_table" do
 
   specify "should support add_constraint with block" do
     @db.alter_table(:cats) do
-      add_constraint(:blah_blah) {(:x.sql_number > 0) & (:y.sql_number < 1)}
+      add_constraint(:blah_blah){(x.sql_number > 0) & (y.sql_number < 1)}
     end
     @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT blah_blah CHECK ((x > 0) AND (y < 1))"]
   end
@@ -1122,7 +1122,7 @@ describe "Database#create_view" do
   specify "should construct proper SQL with raw SQL" do
     @db.create_view :test, "SELECT * FROM xyz"
     @db.sqls.should == ['CREATE VIEW test AS SELECT * FROM xyz']
-    @db.create_view :test.identifier, "SELECT * FROM xyz"
+    @db.create_view Sequel.identifier(:test), "SELECT * FROM xyz"
     @db.sqls.should == ['CREATE VIEW test AS SELECT * FROM xyz']
   end
   
@@ -1136,7 +1136,7 @@ describe "Database#create_view" do
   specify "should construct proper SQL with dataset" do
     @db.create_or_replace_view :test, @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT a, b FROM items ORDER BY c']
-    @db.create_or_replace_view :test.identifier, @db[:items].select(:a, :b).order(:c)
+    @db.create_or_replace_view Sequel.identifier(:test), @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT a, b FROM items ORDER BY c']
   end
 end
@@ -1148,9 +1148,9 @@ describe "Database#drop_view" do
   
   specify "should construct proper SQL" do
     @db.drop_view :test
-    @db.drop_view :test.identifier
+    @db.drop_view Sequel.identifier(:test)
     @db.drop_view :sch__test
-    @db.drop_view :test.qualify(:sch)
+    @db.drop_view Sequel.qualify(:sch, :test)
     @db.sqls.should == ['DROP VIEW test', 'DROP VIEW test', 'DROP VIEW sch.test', 'DROP VIEW sch.test']
   end
 
@@ -1243,11 +1243,11 @@ describe "Schema Parser" do
     s1 = @db.schema(:x)
     s1.should == [['x', {:db_type=>'x', :ruby_default=>nil}]]
     @db.schema(:x).object_id.should == s1.object_id
-    @db.schema(:x.identifier).object_id.should == s1.object_id
+    @db.schema(Sequel.identifier(:x)).object_id.should == s1.object_id
     s2 = @db.schema(:x__y)
     s2.should == [['y', {:db_type=>'y', :ruby_default=>nil}]]
     @db.schema(:x__y).object_id.should == s2.object_id
-    @db.schema(:y.qualify(:x)).object_id.should == s2.object_id
+    @db.schema(Sequel.qualify(:x, :y)).object_id.should == s2.object_id
   end
 
   specify "should correctly parse all supported data types" do

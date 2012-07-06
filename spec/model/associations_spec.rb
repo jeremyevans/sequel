@@ -259,7 +259,7 @@ describe Sequel::Model, "many_to_one" do
 
   it "should support :order, :limit (only for offset), and :dataset options, as well as a block" do
     @c2.many_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{model.filter(:parent_id=>pk)}, :limit=>[10,20], :order=>:name do |ds|
-      ds.filter(:x.sql_number > 1)
+      ds.filter{x > 1}
     end
     @c2.load(:id => 100).child_20
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((parent_id = 100) AND (x > 1)) ORDER BY name LIMIT 1 OFFSET 20"]
@@ -833,7 +833,7 @@ describe Sequel::Model, "one_to_one" do
 
   it "should support :order, :limit (only for offset), and :dataset options, as well as a block" do
     @c2.one_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{model.filter(:parent_id=>pk)}, :limit=>[10,20], :order=>:name do |ds|
-      ds.filter(:x.sql_number > 1)
+      ds.filter{x > 1}
     end
     @c2.load(:id => 100).child_20
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((parent_id = 100) AND (x > 1)) ORDER BY name LIMIT 1 OFFSET 20"]
@@ -1365,7 +1365,7 @@ describe Sequel::Model, "one_to_many" do
   it "should support a conditions option" do
     @c2.one_to_many :attributes, :class => @c1, :conditions => {:a=>32}
     @c2.new(:id => 1234).attributes_dataset.sql.should == "SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (a = 32))"
-    @c2.one_to_many :attributes, :class => @c1, :conditions => ~:a
+    @c2.one_to_many :attributes, :class => @c1, :conditions => Sequel.~(:a)
     @c2.new(:id => 1234).attributes_dataset.sql.should == "SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND NOT a)"
   end
   
@@ -1886,7 +1886,7 @@ describe Sequel::Model, "many_to_many" do
   end
   
   it "should support an array for the select option" do
-    @c2.many_to_many :attributes, :class => @c1, :select => [:attributes.*, :attribute_nodes__blah2]
+    @c2.many_to_many :attributes, :class => @c1, :select => [Sequel::SQL::ColumnAll.new(:attributes), :attribute_nodes__blah2]
 
     @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end

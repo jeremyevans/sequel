@@ -74,68 +74,35 @@ end
 describe "A PostgreSQL dataset" do
   before do
     @d = POSTGRES_DB[:test]
-    @d.delete # remove all records
+    @d.delete
     POSTGRES_DB.sqls.clear
   end
 
   specify "should quote columns and tables using double quotes if quoting identifiers" do
-    @d.select(:name).sql.should == \
-      'SELECT "name" FROM "test"'
-
-    @d.select('COUNT(*)'.lit).sql.should == \
-      'SELECT COUNT(*) FROM "test"'
-
-    @d.select(:max.sql_function(:value)).sql.should == \
-      'SELECT max("value") FROM "test"'
-
-    @d.select(:NOW.sql_function).sql.should == \
-    'SELECT NOW() FROM "test"'
-
-    @d.select(:max.sql_function(:items__value)).sql.should == \
-      'SELECT max("items"."value") FROM "test"'
-
-    @d.order(:name.desc).sql.should == \
-      'SELECT * FROM "test" ORDER BY "name" DESC'
-
-    @d.select('test.name AS item_name'.lit).sql.should == \
-      'SELECT test.name AS item_name FROM "test"'
-
-    @d.select('"name"'.lit).sql.should == \
-      'SELECT "name" FROM "test"'
-
-    @d.select('max(test."name") AS "max_name"'.lit).sql.should == \
-      'SELECT max(test."name") AS "max_name" FROM "test"'
-
-    @d.insert_sql(:x => :y).should =~ \
-      /\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/
+    @d.select(:name).sql.should == 'SELECT "name" FROM "test"'
+    @d.select(Sequel.lit('COUNT(*)')).sql.should == 'SELECT COUNT(*) FROM "test"'
+    @d.select(Sequel.function(:max, :value)).sql.should == 'SELECT max("value") FROM "test"'
+    @d.select(Sequel.function(:NOW)).sql.should == 'SELECT NOW() FROM "test"'
+    @d.select(Sequel.function(:max, :items__value)).sql.should == 'SELECT max("items"."value") FROM "test"'
+    @d.order(Sequel.desc(:name)).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC'
+    @d.select(Sequel.lit('test.name AS item_name')).sql.should == 'SELECT test.name AS item_name FROM "test"'
+    @d.select(Sequel.lit('"name"')).sql.should == 'SELECT "name" FROM "test"'
+    @d.select(Sequel.lit('max(test."name") AS "max_name"')).sql.should == 'SELECT max(test."name") AS "max_name" FROM "test"'
+    @d.insert_sql(:x => :y).should =~ /\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/
 
     if check_sqls
-      @d.select(:test.sql_function(:abc, 'hello')).sql.should == \
-        "SELECT test(\"abc\", 'hello') FROM \"test\""
-
-      @d.select(:test.sql_function(:abc__def, 'hello')).sql.should == \
-        "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
-
-      @d.select(:test.sql_function(:abc__def, 'hello').as(:x2)).sql.should == \
-        "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
-
-      @d.insert_sql(:value => 333).should =~ \
-        /\AINSERT INTO "test" \("value"\) VALUES \(333\)( RETURNING NULL)?\z/
+      @d.select(Sequel.function(:test, :abc, 'hello')).sql.should == "SELECT test(\"abc\", 'hello') FROM \"test\""
+      @d.select(Sequel.function(:test, :abc__def, 'hello')).sql.should == "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
+      @d.select(Sequel.function(:test, :abc__def, 'hello').as(:x2)).sql.should == "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
+      @d.insert_sql(:value => 333).should =~ /\AINSERT INTO "test" \("value"\) VALUES \(333\)( RETURNING NULL)?\z/
     end
   end
 
   specify "should quote fields correctly when reversing the order if quoting identifiers" do
-    @d.reverse_order(:name).sql.should == \
-      'SELECT * FROM "test" ORDER BY "name" DESC'
-
-    @d.reverse_order(:name.desc).sql.should == \
-      'SELECT * FROM "test" ORDER BY "name" ASC'
-
-    @d.reverse_order(:name, :test.desc).sql.should == \
-      'SELECT * FROM "test" ORDER BY "name" DESC, "test" ASC'
-
-    @d.reverse_order(:name.desc, :test).sql.should == \
-      'SELECT * FROM "test" ORDER BY "name" ASC, "test" DESC'
+    @d.reverse_order(:name).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC'
+    @d.reverse_order(Sequel.desc(:name)).sql.should == 'SELECT * FROM "test" ORDER BY "name" ASC'
+    @d.reverse_order(:name, Sequel.desc(:test)).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC, "test" ASC'
+    @d.reverse_order(Sequel.desc(:name), :test).sql.should == 'SELECT * FROM "test" ORDER BY "name" ASC, "test" DESC'
   end
 
   specify "should support regexps" do
@@ -149,9 +116,9 @@ describe "A PostgreSQL dataset" do
     @d << {:name => 'abc'}
     @d << {:name => 'bcd'}
     @d << {:name => 'bcd', :value => 2}
-    @d.order(:value.asc(:nulls=>:first), :name).select_map(:name).should == %w[abc bcd bcd]
-    @d.order(:value.asc(:nulls=>:last), :name).select_map(:name).should == %w[bcd abc bcd]
-    @d.order(:value.asc(:nulls=>:first), :name).reverse.select_map(:name).should == %w[bcd bcd abc]
+    @d.order(Sequel.asc(:value, :nulls=>:first), :name).select_map(:name).should == %w[abc bcd bcd]
+    @d.order(Sequel.asc(:value, :nulls=>:last), :name).select_map(:name).should == %w[bcd abc bcd]
+    @d.order(Sequel.asc(:value, :nulls=>:first), :name).reverse.select_map(:name).should == %w[bcd bcd abc]
   end
 
   specify "#lock should lock tables and yield if a block is given" do
@@ -161,7 +128,7 @@ describe "A PostgreSQL dataset" do
   specify "should support exclusion constraints when creating or altering tables" do
     begin
       @db = POSTGRES_DB
-      @db.create_table!(:atest){Integer :t; exclude [[:t.desc(:nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}}
+      @db.create_table!(:atest){Integer :t; exclude [[Sequel.desc(:t, :nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}}
       @db[:atest].insert(1)
       @db[:atest].insert(2)
       proc{@db[:atest].insert(2)}.should raise_error(Sequel::DatabaseError)
@@ -200,8 +167,8 @@ describe "A PostgreSQL dataset" do
       @db = POSTGRES_DB
       @db.create_table!(:atest){Integer :t}
       @db[:atest].insert(1262304000)
-      @db.alter_table(:atest){set_column_type :t, Time, :using=>'epoch'.cast(Time) + '1 second'.cast(:interval) * :t}
-      @db[:atest].get(:t.extract(:year)).should == 2010
+      @db.alter_table(:atest){set_column_type :t, Time, :using=>Sequel.cast('epoch', Time) + Sequel.cast('1 second', :interval) * :t}
+      @db[:atest].get(Sequel.extract(:year, :t)).should == 2010
     ensure
       @db.drop_table?(:atest)
     end
@@ -213,7 +180,7 @@ describe "A PostgreSQL dataset" do
       @db.create_table!(:atest){Integer :t}
       @db[:atest].insert(1262304000)
       @db.alter_table(:atest){set_column_type :t, Time, :using=>"'epoch'::timestamp + '1 second'::interval * t"}
-      @db[:atest].get(:t.extract(:year)).should == 2010
+      @db[:atest].get(Sequel.extract(:year, :t)).should == 2010
     ensure
       @db.drop_table?(:atest)
     end
@@ -341,9 +308,9 @@ describe "Dataset#distinct" do
     @ds.insert(20, 10)
     @ds.insert(30, 10)
     @ds.order(:b, :a).distinct.map(:a).should == [20, 30]
-    @ds.order(:b, :a.desc).distinct.map(:a).should == [30, 20]
+    @ds.order(:b, Sequel.desc(:a)).distinct.map(:a).should == [30, 20]
     @ds.order(:b, :a).distinct(:b).map(:a).should == [20]
-    @ds.order(:b, :a.desc).distinct(:b).map(:a).should == [30]
+    @ds.order(:b, Sequel.desc(:a)).distinct(:b).map(:a).should == [30]
   end
 end
 
@@ -435,7 +402,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
 
   if POSTGRES_DB.adapter_scheme == :postgres
     specify "should handle infinite timestamps if convert_infinite_timestamps is set" do
-      @d << {:time=>'infinity'.cast(:timestamp)}
+      @d << {:time=>Sequel.cast('infinity', :timestamp)}
       @db.convert_infinite_timestamps = :nil
       @db[:test3].get(:time).should == nil
       @db.convert_infinite_timestamps = :string
@@ -443,7 +410,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
       @db.convert_infinite_timestamps = :float
       @db[:test3].get(:time).should == 1.0/0.0
 
-      @d.update(:time=>'-infinity'.cast(:timestamp))
+      @d.update(:time=>Sequel.cast('-infinity', :timestamp))
       @db.convert_infinite_timestamps = :nil
       @db[:test3].get(:time).should == nil
       @db.convert_infinite_timestamps = :string
@@ -730,12 +697,12 @@ describe "Postgres::Database schema qualified tables" do
     POSTGRES_DB[:schema_test__schema_test].first.should == nil
     POSTGRES_DB[:schema_test__schema_test].insert(:i=>1).should == 1
     POSTGRES_DB[:schema_test__schema_test].first.should == {:i=>1}
-    POSTGRES_DB.from('schema_test.schema_test'.lit).first.should == {:i=>1}
+    POSTGRES_DB.from(Sequel.lit('schema_test.schema_test')).first.should == {:i=>1}
     POSTGRES_DB.drop_table(:schema_test__schema_test)
-    POSTGRES_DB.create_table(:schema_test.qualify(:schema_test)){integer :i}
+    POSTGRES_DB.create_table(Sequel.qualify(:schema_test, :schema_test)){integer :i}
     POSTGRES_DB[:schema_test__schema_test].first.should == nil
-    POSTGRES_DB.from('schema_test.schema_test'.lit).first.should == nil
-    POSTGRES_DB.drop_table(:schema_test.qualify(:schema_test))
+    POSTGRES_DB.from(Sequel.lit('schema_test.schema_test')).first.should == nil
+    POSTGRES_DB.drop_table(Sequel.qualify(:schema_test, :schema_test))
   end
 
   specify "#tables should not include tables in a default non-public schema" do
@@ -802,13 +769,13 @@ describe "Postgres::Database schema qualified tables" do
 
   specify "should be able to get custom sequences for tables in a given schema" do
     POSTGRES_DB << "CREATE SEQUENCE schema_test.kseq"
-    POSTGRES_DB.create_table(:schema_test__schema_test){integer :j; primary_key :k, :type=>:integer, :default=>"nextval('schema_test.kseq'::regclass)".lit}
+    POSTGRES_DB.create_table(:schema_test__schema_test){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.kseq'::regclass)")}
     POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test".kseq'
   end
 
   specify "should be able to get custom sequences for tables that have spaces in the name in a given schema" do
     POSTGRES_DB << "CREATE SEQUENCE schema_test.\"ks eq\""
-    POSTGRES_DB.create_table(:"schema_test__schema test"){integer :j; primary_key :k, :type=>:integer, :default=>"nextval('schema_test.\"ks eq\"'::regclass)".lit}
+    POSTGRES_DB.create_table(:"schema_test__schema test"){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.\"ks eq\"'::regclass)")}
     POSTGRES_DB.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."ks eq"'
   end
 
@@ -889,14 +856,14 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
   end
 
   specify "should have eager graphs work with previous joins" do
-    bands = @Band.order(:bands__name).select(:s__bands.*).join(:s__members, :band_id=>:id).from_self(:alias=>:bands0).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(:bands__name).select_all(:s__bands).join(:s__members, :band_id=>:id).from_self(:alias=>:bands0).eager_graph(:albums=>:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.albums.map{|y| y.tracks}}.should == [[[@t1, @t2], [@t3, @t4]], [[], []]]
   end
 
   specify "should have eager graphs work with joins with the same tables" do
-    bands = @Band.order(:bands__name).select(:s__bands.*).join(:s__members, :band_id=>:id).eager_graph({:albums=>:tracks}, :members).all
+    bands = @Band.order(:bands__name).select_all(:s__bands).join(:s__members, :band_id=>:id).eager_graph({:albums=>:tracks}, :members).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.albums.map{|y| y.tracks}}.should == [[[@t1, @t2], [@t3, @t4]], [[], []]]
@@ -934,62 +901,62 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
     bands.should == [@b1, @b2]
     bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
 
-    bands = @Band.order(:tracks__name).from(:s__bands.as(:tracks)).eager_graph(:tracks).all
+    bands = @Band.order(:tracks__name).from(Sequel.expr(:s__bands).as(:tracks)).eager_graph(:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
 
-    bands = @Band.order(:tracks__name).from(:s__bands.as(:tracks.identifier)).eager_graph(:tracks).all
+    bands = @Band.order(:tracks__name).from(Sequel.expr(:s__bands).as(Sequel.identifier(:tracks))).eager_graph(:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
 
-    bands = @Band.order(:tracks__name).from(:s__bands.as('tracks')).eager_graph(:tracks).all
+    bands = @Band.order(:tracks__name).from(Sequel.expr(:s__bands).as('tracks')).eager_graph(:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
   end
 
   specify "should have eager graphs work with join tables with aliases" do
-    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums___tracks, :band_id=>:id.qualify(:s__bands)).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums___tracks, :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums.as(:tracks), :band_id=>:id.qualify(:s__bands)).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(:bands__name).eager_graph(:members).join(Sequel.as(:s__albums, :tracks), :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums.as('tracks'), :band_id=>:id.qualify(:s__bands)).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(:bands__name).eager_graph(:members).join(Sequel.as(:s__albums, 'tracks'), :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums.as(:tracks.identifier), :band_id=>:id.qualify(:s__bands)).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(:bands__name).eager_graph(:members).join(Sequel.as(:s__albums, Sequel.identifier(:tracks)), :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>:id.qualify(:s__bands)}, :table_alias=>:tracks).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>Sequel.qualify(:s__bands, :id)}, :table_alias=>:tracks).eager_graph(:albums=>:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>:id.qualify(:s__bands)}, :table_alias=>'tracks').eager_graph(:albums=>:tracks).all
+    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>Sequel.qualify(:s__bands, :id)}, :table_alias=>'tracks').eager_graph(:albums=>:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>:id.qualify(:s__bands)}, :table_alias=>:tracks.identifier).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>Sequel.qualify(:s__bands, :id)}, :table_alias=>Sequel.identifier(:tracks)).eager_graph(:albums=>:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
   end
 
   specify "should have eager graphs work with different types of qualified from tables" do
-    bands = @Band.order(:bands__name).from(:bands.qualify(:s)).eager_graph(:tracks).all
+    bands = @Band.order(:bands__name).from(Sequel.qualify(:s, :bands)).eager_graph(:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
 
-    bands = @Band.order(:bands__name).from(:bands.identifier.qualify(:s)).eager_graph(:tracks).all
+    bands = @Band.order(:bands__name).from(Sequel.identifier(:bands).qualify(:s)).eager_graph(:tracks).all
     bands.should == [@b1, @b2]
     bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
 
@@ -1195,7 +1162,7 @@ if POSTGRES_DB.adapter_scheme == :postgres
 
     specify "should look up conversion procs by name" do
       @db.create_table!(:foo){interval :bar}
-      @db[:foo].insert('21 days'.cast(:interval))
+      @db[:foo].insert(Sequel.cast('21 days', :interval))
       @db[:foo].get(:bar).should == 'syad 12'
     end
   end
@@ -1642,11 +1609,11 @@ describe 'PostgreSQL array handling' do
     @ds.get(:i3.pg_array <= :i).should be_false
     @ds.get(:i.pg_array <= :i).should be_true
 
-    @ds.get({5=>:i.pg_array.any}.sql_expr).should be_false
-    @ds.get({1=>:i.pg_array.any}.sql_expr).should be_true
+    @ds.get(Sequel.expr(5=>:i.pg_array.any)).should be_false
+    @ds.get(Sequel.expr(1=>:i.pg_array.any)).should be_true
 
-    @ds.get({1=>:i3.pg_array.all}.sql_expr).should be_false
-    @ds.get({4=>:i3.pg_array.all}.sql_expr).should be_true
+    @ds.get(Sequel.expr(1=>:i3.pg_array.all)).should be_false
+    @ds.get(Sequel.expr(4=>:i3.pg_array.all)).should be_true
 
     @ds.get(:i2.pg_array[1]).should == 2
     @ds.get(:i2.pg_array[2]).should == 1
@@ -1885,7 +1852,7 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(h2.akeys.pg_array.length).should == 1
 
     @ds.from({'t'=>'s'}.hstore.op.populate(Sequel::SQL::Cast.new(nil, :items))).select_map(:t).should == ['s']
-    @ds.from(:items___i).select({'t'=>'s'}.hstore.op.record_set(:i).as(:r)).from_self(:alias=>:s).select('(r).*'.lit).from_self.select_map(:t).should == ['s']
+    @ds.from(:items___i).select({'t'=>'s'}.hstore.op.record_set(:i).as(:r)).from_self(:alias=>:s).select(Sequel.lit('(r).*')).from_self.select_map(:t).should == ['s']
 
     @ds.from({'t'=>'s', 'a'=>'b'}.hstore.op.skeys.as(:s)).select_order_map(:s).should == %w'a t'
 
@@ -1975,21 +1942,21 @@ describe 'PostgreSQL json type' do
     @db.create_table!(:items){json :i}
     @ds.call(:insert, {:i=>@h.pg_json}, {:i=>:$i})
     @ds.get(:i).should == @h
-    @ds.filter(:i.cast(String)=>:$i).call(:first, :i=>@h.pg_json).should == {:i=>@h}
-    @ds.filter(:i.cast(String)=>:$i).call(:first, :i=>{}.pg_json).should == nil
-    @ds.filter(:i.cast(String)=>:$i).call(:delete, :i=>@h.pg_json).should == 1
+    @ds.filter(Sequel.cast(:i, String)=>:$i).call(:first, :i=>@h.pg_json).should == {:i=>@h}
+    @ds.filter(Sequel.cast(:i, String)=>:$i).call(:first, :i=>{}.pg_json).should == nil
+    @ds.filter(Sequel.cast(:i, String)=>:$i).call(:delete, :i=>@h.pg_json).should == 1
 
     @ds.call(:insert, {:i=>@a.pg_json}, {:i=>:$i})
     @ds.get(:i).should == @a
-    @ds.filter(:i.cast(String)=>:$i).call(:first, :i=>@a.pg_json).should == {:i=>@a}
-    @ds.filter(:i.cast(String)=>:$i).call(:first, :i=>[].pg_json).should == nil
+    @ds.filter(Sequel.cast(:i, String)=>:$i).call(:first, :i=>@a.pg_json).should == {:i=>@a}
+    @ds.filter(Sequel.cast(:i, String)=>:$i).call(:first, :i=>[].pg_json).should == nil
 
     @db.create_table!(:items){column :i, 'json[]'}
     j = [{'a'=>1}.pg_json, ['b', 2].pg_json].pg_array(:text)
     @ds.call(:insert, {:i=>j}, {:i=>:$i})
     @ds.get(:i).should == j
-    @ds.filter(:i.cast('text[]')=>:$i).call(:first, :i=>j).should == {:i=>j}
-    @ds.filter(:i.cast('text[]')=>:$i).call(:first, :i=>[].pg_array).should == nil
+    @ds.filter(Sequel.cast(:i, 'text[]')=>:$i).call(:first, :i=>j).should == {:i=>j}
+    @ds.filter(Sequel.cast(:i, 'text[]')=>:$i).call(:first, :i=>[].pg_array).should == nil
   end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models' do

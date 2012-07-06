@@ -24,15 +24,15 @@ describe "Dataset#select_remove" do
   end
 
   specify "should handle expressions where Sequel can't determine the alias by itself" do
-    d = @d.select(:a, :b.sql_function, :c.as(:b))
+    d = @d.select(:a, Sequel.function(:b), Sequel.as(:c, :b))
     d.columns :a, :"b()", :b
     d.select_remove(:"b()").sql.should == 'SELECT a, c AS b FROM test'
   end
 
   specify "should remove expressions if given exact expressions" do
-    d = @d.select(:a, :b.sql_function, :c.as(:b))
+    d = @d.select(:a, Sequel.function(:b), Sequel.as(:c, :b))
     d.columns :a, :"b()", :b
-    d.select_remove(:b.sql_function).sql.should == 'SELECT a, c AS b FROM test'
-    d.select_remove(:c.as(:b)).sql.should == 'SELECT a, b() FROM test'
+    d.select_remove(Sequel.function(:b)).sql.should == 'SELECT a, c AS b FROM test'
+    d.select_remove(Sequel.as(:c, :b)).sql.should == 'SELECT a, b() FROM test'
   end
 end

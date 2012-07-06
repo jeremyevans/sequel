@@ -51,17 +51,17 @@ describe Sequel::Dataset, " graphing" do
     ds._fetch = {:id=>1, :x=>-1, :lines_id=>2, :lines_x=>3, :y=>4, :graph_id=>5}
     ds.all.should == [{:points=>{:id=>1, :x=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
 
-    ds = @ds1.select(:id.identifier, :x.qualify(:points)).graph(@ds2, :x=>:id)
+    ds = @ds1.select(Sequel.identifier(:id), Sequel.qualify(:points, :x)).graph(@ds2, :x=>:id)
     ds.sql.should == 'SELECT points.id, points.x, lines.id AS lines_id, lines.x AS lines_x, lines.y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     ds._fetch = {:id=>1, :x=>-1, :lines_id=>2, :lines_x=>3, :y=>4, :graph_id=>5}
     ds.all.should == [{:points=>{:id=>1, :x=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
 
-    ds = @ds1.select(:id.identifier.qualify(:points), :x.identifier.as(:y)).graph(@ds2, :x=>:id)
+    ds = @ds1.select(Sequel.identifier(:id).qualify(:points), Sequel.identifier(:x).as(:y)).graph(@ds2, :x=>:id)
     ds.sql.should == 'SELECT points.id, points.x AS y, lines.id AS lines_id, lines.x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     ds._fetch = {:id=>1, :y=>-1, :lines_id=>2, :x=>3, :lines_y=>4, :graph_id=>5}
     ds.all.should == [{:points=>{:id=>1, :y=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
 
-    ds = @ds1.select(:id, :x.identifier.qualify(:points.identifier).as(:y.identifier)).graph(@ds2, :x=>:id)
+    ds = @ds1.select(:id, Sequel.identifier(:x).qualify(Sequel.identifier(:points)).as(Sequel.identifier(:y))).graph(@ds2, :x=>:id)
     ds.sql.should == 'SELECT points.id, points.x AS y, lines.id AS lines_id, lines.x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     ds._fetch = {:id=>1, :y=>-1, :lines_id=>2, :x=>3, :lines_y=>4, :graph_id=>5}
     ds.all.should == [{:points=>{:id=>1, :y=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
@@ -140,7 +140,7 @@ describe Sequel::Dataset, " graphing" do
   end
 
   it "#graph should accept a block instead of conditions and pass it to join_table" do
-    ds = @ds1.graph(@ds2){|ja, lja, js| [[:x.qualify(ja), :id.qualify(lja)], [:y.qualify(ja), :id.qualify(lja)]]}
+    ds = @ds1.graph(@ds2){|ja, lja, js| [[Sequel.qualify(ja, :x), Sequel.qualify(lja, :id)], [Sequel.qualify(ja, :y), Sequel.qualify(lja, :id)]]}
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON ((lines.x = points.id) AND (lines.y = points.id))'
   end
 
@@ -197,7 +197,7 @@ describe Sequel::Dataset, " graphing" do
   end
 
   it "#set_graph_aliases should allow a third entry to specify an expression to use other than the default" do
-    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x, 1], :y=>[:lines, :y, :random.sql_function])
+    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x, 1], :y=>[:lines, :y, Sequel.function(:random)])
     ['SELECT 1 AS x, random() AS y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
     'SELECT random() AS y, 1 AS x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     ].should(include(ds.sql))
@@ -280,7 +280,7 @@ describe Sequel::Dataset, " graphing" do
 
   it "#graph_each should correctly map values when #set_graph_aliases is used with a third argument for each entry" do
     @db.fetch = [nil, {:x=>2,:y=>3}]
-    @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :z1, 2], :y=>[:lines, :z2, :random.sql_function]).all.should == [{:points=>{:z1=>2}, :lines=>{:z2=>3}}]
+    @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :z1, 2], :y=>[:lines, :z2, Sequel.function(:random)]).all.should == [{:points=>{:z1=>2}, :lines=>{:z2=>3}}]
   end
 
   it "#graph_each should correctly map values when #set_graph_aliases is used with a single argument for each entry" do

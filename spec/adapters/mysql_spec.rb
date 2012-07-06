@@ -164,72 +164,36 @@ describe "A MySQL dataset" do
 
   specify "should quote columns and tables using back-ticks if quoting identifiers" do
     @d.quote_identifiers = true
-    @d.select(:name).sql.should == \
-      'SELECT `name` FROM `items`'
-
-    @d.select('COUNT(*)'.lit).sql.should == \
-      'SELECT COUNT(*) FROM `items`'
-
-    @d.select(:max.sql_function(:value)).sql.should == \
-      'SELECT max(`value`) FROM `items`'
-
-    @d.select(:NOW.sql_function).sql.should == \
-    'SELECT NOW() FROM `items`'
-
-    @d.select(:max.sql_function(:items__value)).sql.should == \
-      'SELECT max(`items`.`value`) FROM `items`'
-
-    @d.order(:name.desc).sql.should == \
-      'SELECT * FROM `items` ORDER BY `name` DESC'
-
-    @d.select('items.name AS item_name'.lit).sql.should == \
-      'SELECT items.name AS item_name FROM `items`'
-
-    @d.select('`name`'.lit).sql.should == \
-      'SELECT `name` FROM `items`'
-
-    @d.select('max(items.`name`) AS `max_name`'.lit).sql.should == \
-      'SELECT max(items.`name`) AS `max_name` FROM `items`'
-
-    @d.select(:test.sql_function(:abc, 'hello')).sql.should == \
-      "SELECT test(`abc`, 'hello') FROM `items`"
-
-    @d.select(:test.sql_function(:abc__def, 'hello')).sql.should == \
-      "SELECT test(`abc`.`def`, 'hello') FROM `items`"
-
-    @d.select(:test.sql_function(:abc__def, 'hello').as(:x2)).sql.should == \
-      "SELECT test(`abc`.`def`, 'hello') AS `x2` FROM `items`"
-
-    @d.insert_sql(:value => 333).should == \
-      'INSERT INTO `items` (`value`) VALUES (333)'
-
-    @d.insert_sql(:x => :y).should == \
-      'INSERT INTO `items` (`x`) VALUES (`y`)'
+    @d.select(:name).sql.should == 'SELECT `name` FROM `items`'
+    @d.select(Sequel.lit('COUNT(*)')).sql.should == 'SELECT COUNT(*) FROM `items`'
+    @d.select(Sequel.function(:max, :value)).sql.should == 'SELECT max(`value`) FROM `items`'
+    @d.select(Sequel.function(:NOW)).sql.should == 'SELECT NOW() FROM `items`'
+    @d.select(Sequel.function(:max, :items__value)).sql.should == 'SELECT max(`items`.`value`) FROM `items`'
+    @d.order(Sequel.expr(:name).desc).sql.should == 'SELECT * FROM `items` ORDER BY `name` DESC'
+    @d.select(Sequel.lit('items.name AS item_name')).sql.should == 'SELECT items.name AS item_name FROM `items`'
+    @d.select(Sequel.lit('`name`')).sql.should == 'SELECT `name` FROM `items`'
+    @d.select(Sequel.lit('max(items.`name`) AS `max_name`')).sql.should == 'SELECT max(items.`name`) AS `max_name` FROM `items`'
+    @d.select(Sequel.function(:test, :abc, 'hello')).sql.should == "SELECT test(`abc`, 'hello') FROM `items`"
+    @d.select(Sequel.function(:test, :abc__def, 'hello')).sql.should == "SELECT test(`abc`.`def`, 'hello') FROM `items`"
+    @d.select(Sequel.function(:test, :abc__def, 'hello').as(:x2)).sql.should == "SELECT test(`abc`.`def`, 'hello') AS `x2` FROM `items`"
+    @d.insert_sql(:value => 333).should == 'INSERT INTO `items` (`value`) VALUES (333)'
+    @d.insert_sql(:x => :y).should == 'INSERT INTO `items` (`x`) VALUES (`y`)'
   end
 
   specify "should quote fields correctly when reversing the order" do
     @d.quote_identifiers = true
-    @d.reverse_order(:name).sql.should == \
-      'SELECT * FROM `items` ORDER BY `name` DESC'
-
-    @d.reverse_order(:name.desc).sql.should == \
-      'SELECT * FROM `items` ORDER BY `name` ASC'
-
-    @d.reverse_order(:name, :test.desc).sql.should == \
-      'SELECT * FROM `items` ORDER BY `name` DESC, `test` ASC'
-
-    @d.reverse_order(:name.desc, :test).sql.should == \
-      'SELECT * FROM `items` ORDER BY `name` ASC, `test` DESC'
+    @d.reverse_order(:name).sql.should == 'SELECT * FROM `items` ORDER BY `name` DESC'
+    @d.reverse_order(Sequel.desc(:name)).sql.should == 'SELECT * FROM `items` ORDER BY `name` ASC'
+    @d.reverse_order(:name, Sequel.desc(:test)).sql.should == 'SELECT * FROM `items` ORDER BY `name` DESC, `test` ASC'
+    @d.reverse_order(Sequel.desc(:name), :test).sql.should == 'SELECT * FROM `items` ORDER BY `name` ASC, `test` DESC'
   end
 
   specify "should support ORDER clause in UPDATE statements" do
-    @d.order(:name).update_sql(:value => 1).should == \
-      'UPDATE `items` SET `value` = 1 ORDER BY `name`'
+    @d.order(:name).update_sql(:value => 1).should == 'UPDATE `items` SET `value` = 1 ORDER BY `name`'
   end
 
   specify "should support LIMIT clause in UPDATE statements" do
-    @d.limit(10).update_sql(:value => 1).should == \
-      'UPDATE `items` SET `value` = 1 LIMIT 10'
+    @d.limit(10).update_sql(:value => 1).should == 'UPDATE `items` SET `value` = 1 LIMIT 10'
   end
 
   specify "should support regexps" do
@@ -272,9 +236,9 @@ describe "MySQL datasets" do
     @d.quote_identifiers = true
     market = 'ICE'
     ack_stamp = Time.now - 15 * 60 # 15 minutes ago
-    @d.select(:market, :minute.sql_function(:from_unixtime.sql_function(:ack)).as(:minute)).
-      where{|o|(:ack.sql_number > ack_stamp) & {:market => market}}.
-      group_by(:minute.sql_function(:from_unixtime.sql_function(:ack))).sql.should == \
+    @d.select(:market, Sequel.function(:minute, Sequel.function(:from_unixtime, :ack)).as(:minute)).
+      where{(ack > ack_stamp) & {:market => market}}.
+      group_by(Sequel.function(:minute, Sequel.function(:from_unixtime, :ack))).sql.should == \
       "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM `orders` WHERE ((`ack` > #{@d.literal(ack_stamp)}) AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"
   end
 end
@@ -296,7 +260,7 @@ describe "Dataset#distinct" do
     @ds.insert(20, 10)
     @ds.insert(30, 10)
     @ds.order(:b, :a).distinct.map(:a).should == [20, 30]
-    @ds.order(:b, :a.desc).distinct.map(:a).should == [30, 20]
+    @ds.order(:b, Sequel.desc(:a)).distinct.map(:a).should == [30, 20]
     # MySQL doesn't respect orders when using the nonstandard GROUP BY
     [[20], [30]].should include(@ds.order(:b, :a).distinct(:b).map(:a))
   end
@@ -1036,25 +1000,25 @@ describe "MySQL::Dataset#complex_expression_sql" do
   end
 
   specify "should handle pattern matches correctly" do
-    @d.literal(:x.like('a')).should == "(`x` LIKE BINARY 'a')"
-    @d.literal(~:x.like('a')).should == "(`x` NOT LIKE BINARY 'a')"
-    @d.literal(:x.ilike('a')).should == "(`x` LIKE 'a')"
-    @d.literal(~:x.ilike('a')).should == "(`x` NOT LIKE 'a')"
-    @d.literal(:x.like(/a/)).should == "(`x` REGEXP BINARY 'a')"
-    @d.literal(~:x.like(/a/)).should == "(`x` NOT REGEXP BINARY 'a')"
-    @d.literal(:x.like(/a/i)).should == "(`x` REGEXP 'a')"
-    @d.literal(~:x.like(/a/i)).should == "(`x` NOT REGEXP 'a')"
+    @d.literal(Sequel.expr(:x).like('a')).should == "(`x` LIKE BINARY 'a')"
+    @d.literal(~Sequel.expr(:x).like('a')).should == "(`x` NOT LIKE BINARY 'a')"
+    @d.literal(Sequel.expr(:x).ilike('a')).should == "(`x` LIKE 'a')"
+    @d.literal(~Sequel.expr(:x).ilike('a')).should == "(`x` NOT LIKE 'a')"
+    @d.literal(Sequel.expr(:x).like(/a/)).should == "(`x` REGEXP BINARY 'a')"
+    @d.literal(~Sequel.expr(:x).like(/a/)).should == "(`x` NOT REGEXP BINARY 'a')"
+    @d.literal(Sequel.expr(:x).like(/a/i)).should == "(`x` REGEXP 'a')"
+    @d.literal(~Sequel.expr(:x).like(/a/i)).should == "(`x` NOT REGEXP 'a')"
   end
 
   specify "should handle string concatenation with CONCAT if more than one record" do
-    @d.literal([:x, :y].sql_string_join).should == "CONCAT(`x`, `y`)"
-    @d.literal([:x, :y].sql_string_join(' ')).should == "CONCAT(`x`, ' ', `y`)"
-    @d.literal([:x.sql_function(:y), 1, 'z'.lit].sql_string_join(:y.sql_subscript(1))).should == "CONCAT(x(`y`), `y`[1], '1', `y`[1], z)"
+    @d.literal(Sequel.join([:x, :y])).should == "CONCAT(`x`, `y`)"
+    @d.literal(Sequel.join([:x, :y], ' ')).should == "CONCAT(`x`, ' ', `y`)"
+    @d.literal(Sequel.join([Sequel.function(:x, :y), 1, Sequel.lit('z')], Sequel.subscript(:y, 1))).should == "CONCAT(x(`y`), `y`[1], '1', `y`[1], z)"
   end
 
   specify "should handle string concatenation as simple string if just one record" do
-    @d.literal([:x].sql_string_join).should == "`x`"
-    @d.literal([:x].sql_string_join(' ')).should == "`x`"
+    @d.literal(Sequel.join([:x])).should == "`x`"
+    @d.literal(Sequel.join([:x], ' ')).should == "`x`"
   end
 end
 
@@ -1076,7 +1040,7 @@ describe "MySQL::Dataset#calc_found_rows" do
     MYSQL_DB.sqls.clear
 
     MYSQL_DB[:items].calc_found_rows.filter(:a => 1).limit(1).all.should == [{:a => 1}]
-    MYSQL_DB.dataset.select(:FOUND_ROWS.sql_function.as(:rows)).all.should == [{:rows => 2 }]
+    MYSQL_DB.dataset.select(Sequel.function(:FOUND_ROWS).as(:rows)).all.should == [{:rows => 2 }]
 
     MYSQL_DB.sqls.should == [
       'SELECT SQL_CALC_FOUND_ROWS * FROM `items` WHERE (`a` = 1) LIMIT 1',

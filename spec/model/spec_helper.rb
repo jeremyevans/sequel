@@ -1,11 +1,7 @@
 require 'rubygems'
-unless Object.const_defined?('Sequel')
+unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model') 
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require 'sequel/core'
-end
-unless Sequel.const_defined?('Model')
-  $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require 'sequel/model'
+  require 'sequel/no_core_ext'
 end
 
 if ENV['SEQUEL_COLUMNS_INTROSPECTION']

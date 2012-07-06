@@ -369,7 +369,7 @@ describe "Database#dataset" do
   end
   
   specify "should provide a filtered #from dataset if a block is given" do
-    d = @db.from(:mau) {:x.sql_number > 100}
+    d = @db.from(:mau){x.sql_number > 100}
     d.should be_a_kind_of(Sequel::Dataset)
     d.sql.should == 'SELECT * FROM mau WHERE (x > 100)'
   end
@@ -1360,7 +1360,7 @@ describe "Database#fetch" do
     ds.select_sql.should == 'select * from xyz'
     ds.sql.should == 'select * from xyz'
     
-    ds.filter!(:price.sql_number < 100)
+    ds.filter!{price.sql_number < 100}
     ds.select_sql.should == 'select * from xyz'
     ds.sql.should == 'select * from xyz'
   end
@@ -1409,7 +1409,7 @@ describe "Database#get" do
     @db.get(1).should == 1
     @db.sqls.should == ['SELECT 1 LIMIT 1']
     
-    @db.get(:version.sql_function)
+    @db.get(Sequel.function(:version))
     @db.sqls.should == ['SELECT version() LIMIT 1']
   end
 
@@ -1914,7 +1914,7 @@ describe "Database#typecast_value" do
   end
 
   specify "should typecast string values to String" do
-    [1.0, '1.0', '1.0'.to_sequel_blob].each do |i|
+    [1.0, '1.0', Sequel.blob('1.0')].each do |i|
       v = @db.typecast_value(:string, i)
       v.should be_an_instance_of(String)
       v.should == "1.0"
@@ -2079,7 +2079,7 @@ describe "Database#column_schema_to_ruby_default" do
     p["'t'", :boolean].should == true
     p["'f'", :boolean].should == false
     p["'a'", :string].should == 'a'
-    p["'a'", :blob].should == 'a'.to_sequel_blob
+    p["'a'", :blob].should == Sequel.blob('a')
     p["'a'", :blob].should be_a_kind_of(Sequel::SQL::Blob)
     p["''", :string].should == ''
     p["'\\a''b'", :string].should == "\\a'b"
@@ -2099,7 +2099,7 @@ describe "Database#column_schema_to_ruby_default" do
     p["(-1)", :integer].should == -1
     p["(-1.0)", :float].should == -1.0
     p['(-1.0)', :decimal].should == BigDecimal.new('-1.0')
-    p["'a'::bytea", :blob].should == 'a'.to_sequel_blob
+    p["'a'::bytea", :blob].should == Sequel.blob('a')
     p["'a'::bytea", :blob].should be_a_kind_of(Sequel::SQL::Blob)
     p["'2009-10-29'::date", :date].should == Date.new(2009,10,29)
     p["'2009-10-29 10:20:30.241343'::timestamp without time zone", :datetime].should == DateTime.parse('2009-10-29 10:20:30.241343')

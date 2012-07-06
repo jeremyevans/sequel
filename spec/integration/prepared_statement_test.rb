@@ -123,7 +123,7 @@ describe "Prepared Statements and Bound Arguments" do
   end
 
   specify "should support bound variables with update" do
-    @ds.filter(:numb=>:$n).call(:update, {:n=>10, :nn=>20}, :numb=>:numb+:$nn).should == 1
+    @ds.filter(:numb=>:$n).call(:update, {:n=>10, :nn=>20}, :numb=>Sequel.+(:numb, :$nn)).should == 1
     @ds.all.should == [{:id=>1, :numb=>30}]
   end
   
@@ -235,7 +235,7 @@ describe "Prepared Statements and Bound Arguments" do
   end
 
   specify "should support prepared statements with update" do
-    @ds.filter(:numb=>:$n).prepare(:update, :update_n, :numb=>:numb+:$nn)
+    @ds.filter(:numb=>:$n).prepare(:update, :update_n, :numb=>Sequel.+(:numb, :$nn))
     @db.call(:update_n, :n=>10, :nn=>20).should == 1
     @ds.all.should == [{:id=>1, :numb=>30}]
   end
@@ -393,8 +393,8 @@ describe "Dataset#unbind" do
       Integer :d
     end
     @ds.insert(:a=>2, :b=>0, :c=>3, :d=>5)
-    @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and({~{:d=>4}=>1}.case(0) => 1)].should == {:a=>2, :b=>0, :c=>3, :d=>5}
-    @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and({~{:d=>5}=>1}.case(0) => 1)].should == nil
+    @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and(Sequel.case({~Sequel.expr(:d=>4)=>1}, 0) => 1)].should == {:a=>2, :b=>0, :c=>3, :d=>5}
+    @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and(Sequel.case({~Sequel.expr(:d=>5)=>1}, 0) => 1)].should == nil
   end
 
   specify "should handle case where the same variable has the same value in multiple places " do

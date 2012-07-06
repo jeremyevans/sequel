@@ -244,22 +244,22 @@ shared_examples_for "filtering/excluding by associations" do
     album.update(:artist => artist)
 
     @Artist.filter(:albums=>@Album).all.sort_by{|x| x.pk}.should == [@artist, artist]
-    @Artist.filter(:albums=>@Album.filter(Array(Album.primary_key).map{|k| k.qualify(Album.table_name)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [artist]
+    @Artist.filter(:albums=>@Album.filter(Array(Album.primary_key).map{|k| Sequel.qualify(Album.table_name, k)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [artist]
     @Artist.filter(:albums=>@Album.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
     @Artist.filter(:first_album=>@Album).all.sort_by{|x| x.pk}.should == [@artist, artist]
-    @Artist.filter(:first_album=>@Album.filter(Array(Album.primary_key).map{|k| k.qualify(Album.table_name)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [artist]
+    @Artist.filter(:first_album=>@Album.filter(Array(Album.primary_key).map{|k| Sequel.qualify(Album.table_name, k)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [artist]
     @Artist.filter(:first_album=>@Album.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
     @Album.filter(:artist=>@Artist).all.sort_by{|x| x.pk}.should == [@album, album]
-    @Album.filter(:artist=>@Artist.filter(Array(Artist.primary_key).map{|k| k.qualify(Artist.table_name)}.zip(Array(artist.pk)))).all.sort_by{|x| x.pk}.should == [album]
+    @Album.filter(:artist=>@Artist.filter(Array(Artist.primary_key).map{|k| Sequel.qualify(Artist.table_name, k)}.zip(Array(artist.pk)))).all.sort_by{|x| x.pk}.should == [album]
     @Album.filter(:artist=>@Artist.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
     @Album.filter(:tags=>@Tag).all.sort_by{|x| x.pk}.should == [@album, album]
-    @Album.filter(:tags=>@Tag.filter(Array(Tag.primary_key).map{|k| k.qualify(Tag.table_name)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [album]
+    @Album.filter(:tags=>@Tag.filter(Array(Tag.primary_key).map{|k| Sequel.qualify(Tag.table_name, k)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [album]
     @Album.filter(:tags=>@Tag.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
     @Album.filter(:alias_tags=>@Tag).all.sort_by{|x| x.pk}.should == [@album, album]
-    @Album.filter(:alias_tags=>@Tag.filter(Array(Tag.primary_key).map{|k| k.qualify(Tag.table_name)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [album]
+    @Album.filter(:alias_tags=>@Tag.filter(Array(Tag.primary_key).map{|k| Sequel.qualify(Tag.table_name, k)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [album]
     @Album.filter(:alias_tags=>@Tag.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
     @Tag.filter(:albums=>@Album).all.sort_by{|x| x.pk}.should == [@tag, tag]
-    @Tag.filter(:albums=>@Album.filter(Array(Album.primary_key).map{|k| k.qualify(Album.table_name)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [tag]
+    @Tag.filter(:albums=>@Album.filter(Array(Album.primary_key).map{|k| Sequel.qualify(Album.table_name, k)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [tag]
     @Tag.filter(:albums=>@Album.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
   end
 
@@ -271,19 +271,19 @@ shared_examples_for "filtering/excluding by associations" do
     album.update(:artist => artist)
 
     @Artist.exclude(:albums=>@Album).all.sort_by{|x| x.pk}.should == []
-    @Artist.exclude(:albums=>@Album.filter(Array(Album.primary_key).map{|k| k.qualify(Album.table_name)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@artist]
+    @Artist.exclude(:albums=>@Album.filter(Array(Album.primary_key).map{|k| Sequel.qualify(Album.table_name, k)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@artist]
     @Artist.exclude(:albums=>@Album.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@artist, artist]
     @Album.exclude(:artist=>@Artist).all.sort_by{|x| x.pk}.should == []
-    @Album.exclude(:artist=>@Artist.filter(Array(Artist.primary_key).map{|k| k.qualify(Artist.table_name)}.zip(Array(artist.pk)))).all.sort_by{|x| x.pk}.should == [@album]
+    @Album.exclude(:artist=>@Artist.filter(Array(Artist.primary_key).map{|k| Sequel.qualify(Artist.table_name, k)}.zip(Array(artist.pk)))).all.sort_by{|x| x.pk}.should == [@album]
     @Album.exclude(:artist=>@Artist.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
     @Album.exclude(:tags=>@Tag).all.sort_by{|x| x.pk}.should == []
-    @Album.exclude(:tags=>@Tag.filter(Array(Tag.primary_key).map{|k| k.qualify(Tag.table_name)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [@album]
+    @Album.exclude(:tags=>@Tag.filter(Array(Tag.primary_key).map{|k| Sequel.qualify(Tag.table_name, k)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [@album]
     @Album.exclude(:tags=>@Tag.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
     @Album.exclude(:alias_tags=>@Tag).all.sort_by{|x| x.pk}.should == []
-    @Album.exclude(:alias_tags=>@Tag.filter(Array(Tag.primary_key).map{|k| k.qualify(Tag.table_name)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [@album]
+    @Album.exclude(:alias_tags=>@Tag.filter(Array(Tag.primary_key).map{|k| Sequel.qualify(Tag.table_name, k)}.zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [@album]
     @Album.exclude(:alias_tags=>@Tag.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
     @Tag.exclude(:albums=>@Album).all.sort_by{|x| x.pk}.should == []
-    @Tag.exclude(:albums=>@Album.filter(Array(Album.primary_key).map{|k| k.qualify(Album.table_name)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@tag]
+    @Tag.exclude(:albums=>@Album.filter(Array(Album.primary_key).map{|k| Sequel.qualify(Album.table_name, k)}.zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@tag]
     @Tag.exclude(:albums=>@Album.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@tag, tag]
   end
 end
@@ -456,7 +456,7 @@ shared_examples_for "regular and composite key associations" do
 
   describe "when filtering/excluding by associations when joining" do
     def self_join(c)
-      c.join(c.table_name.as(:b), Array(c.primary_key).zip(Array(c.primary_key))).select_all(c.table_name)
+      c.join(Sequel.as(c.table_name, :b), Array(c.primary_key).zip(Array(c.primary_key))).select_all(c.table_name)
     end
 
     before do
@@ -561,15 +561,15 @@ describe "Sequel::Model Simple Associations" do
       plugin :dataset_associations
       one_to_many :albums, :order=>:name
       one_to_one :first_album, :class=>:Album, :order=>:name
-      one_to_one :last_album, :class=>:Album, :order=>:name.desc
+      one_to_one :last_album, :class=>:Album, :order=>Sequel.desc(:name)
       one_to_many :first_two_albums, :class=>:Album, :order=>:name, :limit=>2
       one_to_many :second_two_albums, :class=>:Album, :order=>:name, :limit=>[2, 1]
-      one_to_many :last_two_albums, :class=>:Album, :order=>:name.desc, :limit=>2
+      one_to_many :last_two_albums, :class=>:Album, :order=>Sequel.desc(:name), :limit=>2
       plugin :many_through_many
       many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]]
       many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2
       many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1]
-      many_through_many :last_two_tags, :clone=>:tags, :order=>:tags__name.desc, :limit=>2
+      many_through_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:tags__name), :limit=>2
     end
     class ::Album < Sequel::Model(@db)
       plugin :dataset_associations
@@ -578,7 +578,7 @@ describe "Sequel::Model Simple Associations" do
       many_to_many :alias_tags, :clone=>:tags, :join_table=>:albums_tags___at
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
       many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
-      many_to_many :last_two_tags, :clone=>:tags, :order=>:name.desc, :limit=>2
+      many_to_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:name), :limit=>2
     end
     class ::Tag < Sequel::Model(@db)
       plugin :dataset_associations
@@ -770,15 +770,15 @@ describe "Sequel::Model Composite Key Associations" do
       unrestrict_primary_key
       one_to_many :albums, :key=>[:artist_id1, :artist_id2], :order=>:name
       one_to_one :first_album, :clone=>:albums, :order=>:name
-      one_to_one :last_album, :clone=>:albums, :order=>:name.desc
+      one_to_one :last_album, :clone=>:albums, :order=>Sequel.desc(:name)
       one_to_many :first_two_albums, :clone=>:albums, :order=>:name, :limit=>2
       one_to_many :second_two_albums, :clone=>:albums, :order=>:name, :limit=>[2, 1]
-      one_to_many :last_two_albums, :clone=>:albums, :order=>:name.desc, :limit=>2
+      one_to_many :last_two_albums, :clone=>:albums, :order=>Sequel.desc(:name), :limit=>2
       plugin :many_through_many
       many_through_many :tags, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]]
       many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2
       many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1]
-      many_through_many :last_two_tags, :clone=>:tags, :order=>:tags__name.desc, :limit=>2
+      many_through_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:tags__name), :limit=>2
     end
     class ::Album < Sequel::Model(@db)
       plugin :dataset_associations
@@ -789,7 +789,7 @@ describe "Sequel::Model Composite Key Associations" do
       many_to_many :alias_tags, :clone=>:tags, :join_table=>:albums_tags___at
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
       many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
-      many_to_many :last_two_tags, :clone=>:tags, :order=>:name.desc, :limit=>2
+      many_to_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:name), :limit=>2
     end
     class ::Tag < Sequel::Model(@db)
       plugin :dataset_associations
