@@ -6,7 +6,7 @@ module Sequel
     # name symbols and values are hashes representing the columns related to
     # that table.  All of these methods return modified copies of the receiver.
     # ---------------------
-    
+
     # Adds the given graph aliases to the list of graph aliases to use,
     # unlike +set_graph_aliases+, which replaces the list (the equivalent
     # of +select_more+ when graphing).  See +set_graph_aliases+.
@@ -97,15 +97,15 @@ module Sequel
       # Raise Sequel::Error with explanation that the table alias has been used
       raise_alias_error = lambda do
         raise(Error, "this #{options[:table_alias] ? 'alias' : 'table'} has already been been used, please specify " \
-          "#{options[:table_alias] ? 'a different alias' : 'an alias via the :table_alias option'}") 
+          "#{options[:table_alias] ? 'a different alias' : 'an alias via the :table_alias option'}")
       end
 
       # Only allow table aliases that haven't been used
       raise_alias_error.call if @opts[:graph] && @opts[:graph][:table_aliases] && @opts[:graph][:table_aliases].include?(table_alias)
-      
+
       # Use a from_self if this is already a joined table
       ds = (!@opts[:graph] && (@opts[:from].length > 1 || @opts[:join])) ? from_self(:alias=>options[:from_self_alias] || first_source) : self
-      
+
       # Join the table early in order to avoid cloning the dataset twice
       ds = ds.join_table(options[:join_type] || :left_outer, table, join_conditions, :table_alias=>table_alias, :implicit_qualifier=>options[:implicit_qualifier], :qualify=>options[:qualify], &block)
       opts = ds.opts
@@ -181,7 +181,7 @@ module Sequel
         cols = options[:select] || dataset.columns
         # If the column hasn't been used yet, don't alias it.
         # If it has been used, try table_column.
-        # If that has been used, try table_column_N 
+        # If that has been used, try table_column_N
         # using the next value of N that we know hasn't been
         # used
         cols.each do |column|
@@ -189,7 +189,7 @@ module Sequel
             column_alias = :"#{table_alias}_#{column}"
             if column_aliases[column_alias]
               column_alias_num = ca_num[column_alias]
-              column_alias = :"#{column_alias}_#{column_alias_num}" 
+              column_alias = :"#{column_alias}_#{column_alias_num}"
               ca_num[column_alias] += 1
             end
             [column_alias, SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(table_alias, column), column_alias)]
@@ -248,7 +248,7 @@ module Sequel
     # a select method, and the second is a new hash of preprocessed graph aliases.
     def graph_alias_columns(graph_aliases)
       gas = {}
-      identifiers = graph_aliases.collect do |col_alias, tc| 
+      identifiers = graph_aliases.collect do |col_alias, tc|
         table, column, value = Array(tc)
         column ||= col_alias
         gas[col_alias] = [table, column]

@@ -87,12 +87,12 @@ describe "Sequel::Plugins::Dirty" do
       @o.reset_column(:missing_changed)
       @o.values.has_key?(:missing_changed).should == false
     end
-    
+
     it "refresh should clear the cached initial values" do
       @o.refresh
       @o.column_changes.should == {}
     end
-    
+
     it "will_change_column should be used to signal in-place modification to column" do
       @o.will_change_column(:initial)
       @o.initial << 'b'

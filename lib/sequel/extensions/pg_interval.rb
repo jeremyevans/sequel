@@ -146,7 +146,7 @@ module Sequel
       end
 
       # Typecast value correctly to an ActiveSupport::Duration instance.
-      # If already an ActiveSupport::Duration, return it. 
+      # If already an ActiveSupport::Duration, return it.
       # If a numeric argument is given, assume it represents a number
       # of seconds, and create a new ActiveSupport::Duration instance
       # representing that number of seconds.

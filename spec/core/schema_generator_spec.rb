@@ -18,20 +18,20 @@ describe Sequel::Schema::Generator do
     end
     @columns, @indexes, @constraints = @generator.columns, @generator.indexes, @generator.constraints
   end
-  
+
   it "should primary key column first" do
     @columns.first[:name].should == :id
     @columns.first[:primary_key].should == true
     @columns[3][:name].should == :parent_id
     @columns[3][:primary_key].should == nil
   end
-  
+
   it "counts definitions correctly" do
     @columns.size.should == 6
     @indexes.size.should == 2
     @constraints.size.should == 4
   end
-  
+
   it "retrieves primary key name" do
     @generator.primary_key_name.should == :id
   end
@@ -42,7 +42,7 @@ describe Sequel::Schema::Generator do
     @columns[2][:name].should == :body
     @columns[2][:type].should == :text
   end
-  
+
   it "creates foreign key column" do
     @columns[3][:name].should == :parent_id
     @columns[3][:type].should == Integer
@@ -55,20 +55,20 @@ describe Sequel::Schema::Generator do
     @columns[5][:type].should == Integer
     @columns[5][:deferrable].should == true
   end
-  
+
   it "uses table for foreign key columns, if specified" do
     @columns[3][:table].should == nil
     @columns[4][:table].should == :nodes
     @constraints[3][:table].should == :nodes_props
   end
-  
+
   it "finds columns" do
     [:title, :body, :parent_id, :id].each do |col|
       @generator.has_column?(col).should be_true
     end
     @generator.has_column?(:foo).should_not be_true
   end
-  
+
   it "creates constraints" do
     @constraints[0][:name].should == nil
     @constraints[0][:type].should == :check
@@ -87,7 +87,7 @@ describe Sequel::Schema::Generator do
     @constraints[3][:columns].should == [ :node_id, :prop_id ]
     @constraints[3][:table].should == :nodes_props
   end
-  
+
   it "creates indexes" do
     @indexes[0][:columns].should include(:title)
     @indexes[1][:columns].should include(:title)
@@ -119,7 +119,7 @@ describe Sequel::Schema::AlterTableGenerator do
       add_foreign_key [:node_id, :prop_id], :nodes_props
     end
   end
-  
+
   specify "should generate operation records" do
     @generator.operations.should == [
       {:op => :add_column, :name => :aaa, :type => :text},

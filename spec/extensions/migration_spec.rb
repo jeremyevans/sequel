@@ -7,15 +7,15 @@ describe "Migration.descendants" do
 
   specify "should include Migration subclasses" do
     @class = Class.new(Sequel::Migration)
-    
+
     Sequel::Migration.descendants.should == [@class]
   end
-  
+
   specify "should include Migration subclasses in order of creation" do
     @c1 = Class.new(Sequel::Migration)
     @c2 = Class.new(Sequel::Migration)
     @c3 = Class.new(Sequel::Migration)
-    
+
     Sequel::Migration.descendants.should == [@c1, @c2, @c3]
   end
 
@@ -23,7 +23,7 @@ describe "Migration.descendants" do
     i1 = Sequel.migration{}
     i2 = Sequel.migration{}
     i3 = Sequel.migration{}
-    
+
     Sequel::Migration.descendants.should == [i1, i2, i3]
   end
 end
@@ -36,11 +36,11 @@ describe "Migration.apply" do
     end
     @db = @c.new
   end
-  
+
   specify "should raise for an invalid direction" do
     proc {Sequel::Migration.apply(@db, :hahaha)}.should raise_error(ArgumentError)
   end
-  
+
   specify "should apply the up and down directions correctly" do
     m = Class.new(Sequel::Migration) do
       define_method(:up) {one(3333)}
@@ -65,11 +65,11 @@ describe "SimpleMigration#apply" do
     end
     @db = @c.new
   end
-  
+
   specify "should raise for an invalid direction" do
     proc {Sequel.migration{}.apply(@db, :hahaha)}.should raise_error(ArgumentError)
   end
-  
+
   specify "should apply the up and down directions correctly" do
     m = Sequel.migration do
       up{one(3333)}
@@ -132,7 +132,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
     end
   end
-  
+
   specify "should apply up with normal actions in normal order" do
     p = @p
     Sequel.migration{change(&p)}.apply(@db, :up)
@@ -177,19 +177,19 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       [:drop_column, :a, :b],
       [:drop_table, :a]]
   end
-  
+
   specify "should raise in the down direction if migration uses unsupported method" do
     m = Sequel.migration{change{run 'SQL'}}
     proc{m.apply(@db, :up)}.should_not raise_error(Sequel::Error)
     proc{m.apply(@db, :down)}.should raise_error(Sequel::Error)
   end
-  
+
   specify "should raise in the down direction if migration uses add_primary_key with an array" do
     m = Sequel.migration{change{alter_table(:a){add_primary_key [:b]}}}
     proc{m.apply(@db, :up)}.should_not raise_error(Sequel::Error)
     proc{m.apply(@db, :down)}.should raise_error(Sequel::Error)
   end
-  
+
   specify "should raise in the down direction if migration uses add_foreign_key with an array" do
     m = Sequel.migration{change{alter_table(:a){add_foreign_key [:b]}}}
     proc{m.apply(@db, :up)}.should_not raise_error(Sequel::Error)
@@ -208,7 +208,7 @@ describe "Sequel::IntegerMigrator" do
         @columns_created = []
         @versions = Hash.new{|h,k| h[k.to_sym]}
       end
-  
+
       def version; versions.values.first || 0; end
       def creates; @tables_created.map{|x| y = x.to_s; y !~ /\Asm(\d+)/; $1.to_i if $1}.compact; end
       def drop_table(*a); super; @drops.concat(a.map{|x| y = x.to_s; y !~ /\Asm(\d+)/; $1.to_i if $1}.compact); end
@@ -218,7 +218,7 @@ describe "Sequel::IntegerMigrator" do
         @columns_created << / \(?(\w+) integer.*\)?\z/.match(@sqls.last)[1].to_sym
         @tables_created << name.to_sym
       end
-      
+
       def dataset(opts={})
         ds = super
         ds.extend(Module.new do
@@ -236,14 +236,14 @@ describe "Sequel::IntegerMigrator" do
       end
     end
     @db = dbc.new
-    
+
     @dirname = "spec/files/integer_migrations"
   end
-  
+
   after do
     Object.send(:remove_const, "CreateSessions") if Object.const_defined?("CreateSessions")
   end
-  
+
   specify "should raise and error if there is a missing integer migration version" do
     proc{Sequel::Migrator.apply(@db, "spec/files/missing_integer_migrations")}.should raise_error(Sequel::Migrator::Error)
   end
@@ -271,19 +271,19 @@ describe "Sequel::IntegerMigrator" do
     @db.table_exists?(:si).should be_true
     @db.dataset.columns.should == [:sic]
   end
-  
+
   specify "should apply migrations correctly in the up direction if no target is given" do
     Sequel::Migrator.apply(@db, @dirname)
     @db.creates.should == [1111, 2222, 3333]
     @db.version.should == 3
     @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [1, 2, 3]
   end
-  
+
   specify "should be able to tell whether there are outstanding migrations" do
     Sequel::Migrator.is_current?(@db, @dirname).should be_false
     Sequel::Migrator.apply(@db, @dirname)
     Sequel::Migrator.is_current?(@db, @dirname).should be_true
-  end 
+  end
 
   specify "should have #check_current raise an exception if the migrator is not current" do
     proc{Sequel::Migrator.check_current(@db, @dirname)}.should raise_error(Sequel::Migrator::NotCurrentError)
@@ -297,7 +297,7 @@ describe "Sequel::IntegerMigrator" do
     @db.version.should == 2
     @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [1, 2]
   end
-  
+
   specify "should apply migrations correctly in the up direction with target and existing" do
     Sequel::Migrator.apply(@db, @dirname, 2, 1)
     @db.creates.should == [2222]
@@ -314,14 +314,14 @@ describe "Sequel::IntegerMigrator" do
     @db.version.should == 0
     @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [2, 1, 0]
   end
-  
+
   specify "should apply migrations correctly in the down direction with target and existing" do
     Sequel::Migrator.apply(@db, @dirname, 1, 2)
     @db.drops.should == [2222]
     @db.version.should == 1
     @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [1]
   end
-  
+
   specify "should return the target version" do
     Sequel::Migrator.apply(@db, @dirname, 3, 2).should == 3
     Sequel::Migrator.apply(@db, @dirname, 0).should == 0
@@ -437,7 +437,7 @@ describe "Sequel::TimestampMigrator" do
     Object.send(:remove_const, "CreateArtists") if Object.const_defined?("CreateArtists")
     Object.send(:remove_const, "CreateAlbums") if Object.const_defined?("CreateAlbums")
   end
-  
+
   specify "should handle migrating up or down all the way" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
@@ -596,13 +596,13 @@ describe "Sequel::TimestampMigrator" do
     [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
   end
-  
+
   specify "should raise error missing column name in existing schema_migrations table" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
     proc{@m.run(@db, @dir, :column=>:fn)}.should raise_error(Sequel::Migrator::Error)
   end
-  
+
   specify "should handle migration filenames in a case insensitive manner" do
     @dir = 'spec/files/uppercase_timestamped_migrations'
     @m.apply(@db, @dir)

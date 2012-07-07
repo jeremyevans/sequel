@@ -5,7 +5,7 @@
 # First, you need to enable it on the database object:
 #
 #   DB.extension :server_block
-# 
+#
 # Then you can call with_server:
 #
 #   DB.with_server(:shard1) do
@@ -24,7 +24,7 @@
 #     DB[:a].all # Uses shard1
 #   end
 #   DB[:a].all # Uses default
-# 
+#
 # Note this this extension assumes the following shard names should use the
 # server/shard passed to with_server: :default, nil, :read_only.  All other
 # shard names will cause the standard behavior to be used.

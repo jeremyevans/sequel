@@ -7,7 +7,7 @@ module Sequel
     # allow the full support of Sequel::Model objects in Rails 3.
     # This plugin requires active_model in order to use
     # ActiveModel::Naming.
-    # 
+    #
     # Usage:
     #
     #   # Make all subclasses active_model compliant (called before loading subclasses)
@@ -18,7 +18,7 @@ module Sequel
     module ActiveModel
       module ClassMethods
         include ::ActiveModel::Naming
-        
+
         # Class level cache for to_partial_path.
         def _to_partial_path
           @_to_partial_path ||= "#{underscore(pluralize(to_s))}/#{underscore(demodulize(to_s))}".freeze
@@ -28,19 +28,19 @@ module Sequel
       module InstanceMethods
         # The default string to join composite primary keys with in to_param.
         DEFAULT_TO_PARAM_JOINER = '-'.freeze
-      
+
         # Record that an object was destroyed, for later use by
         # destroyed?
         def after_destroy
           super
           @destroyed = true
         end
-        
+
         # False if the object is new? or has been destroyed, true otherwise.
         def persisted?
           !new? && @destroyed != true
         end
-        
+
         # An array of primary key values, or nil if the object is not persisted.
         def to_key
           if primary_key.is_a?(Symbol)
@@ -55,7 +55,7 @@ module Sequel
         def to_model
           self
         end
-        
+
         # An string representing the object's primary key.  For composite
         # primary keys, joins them with to_param_joiner.
         def to_param
@@ -68,9 +68,9 @@ module Sequel
         def to_partial_path
           model._to_partial_path
         end
-        
+
         private
-        
+
         # The string to use to join composite primary key param strings.
         def to_param_joiner
           DEFAULT_TO_PARAM_JOINER

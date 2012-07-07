@@ -6,7 +6,7 @@ module Sequel
     class Database < Sequel::Database
       include Sequel::MSSQL::DatabaseMethods
       set_adapter_scheme :tinytds
-      
+
       # Transfer the :user option to the :username option.
       def connect(server)
         opts = server_opts(server)
@@ -14,7 +14,7 @@ module Sequel
         set_mssql_unicode_strings
         TinyTds::Client.new(opts)
       end
-      
+
       # Execute the given +sql+ on the server.  If the :return option
       # is present, its value should be a method symbol that is called
       # on the TinyTds::Result object returned from executing the
@@ -86,7 +86,7 @@ module Sequel
       # the column is a primary key column.
       def column_list_sql(g)
         pks = []
-        g.constraints.each{|c| pks = c[:columns] if c[:type] == :primary_key} 
+        g.constraints.each{|c| pks = c[:columns] if c[:type] == :primary_key}
         g.columns.each{|c| c[:null] = true if !pks.include?(c[:name]) && !c[:primary_key] && !c.has_key?(:null) && !c.has_key?(:allow_null)}
         super
       end
@@ -141,18 +141,18 @@ module Sequel
         end
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include Sequel::MSSQL::DatasetMethods
 
       Database::DatasetClass = self
-      
+
       # SQLite already supports named bind arguments, so use directly.
       module ArgumentMapper
         include Sequel::Dataset::ArgumentMapper
-        
+
         protected
-        
+
         # Return a hash with the same values as the given hash,
         # but with the keys converted to strings.
         def map_to_prepared_args(hash)
@@ -160,9 +160,9 @@ module Sequel
           hash.each{|k,v| args[k.to_s.gsub('.', '__')] = v}
           args
         end
-        
+
         private
-        
+
         # SQLite uses a : before the name of the argument for named
         # arguments.
         def prepared_arg(k)
@@ -174,31 +174,31 @@ module Sequel
           true
         end
       end
-      
+
       # SQLite prepared statement uses a new prepared statement each time
       # it is called, but it does use the bind arguments.
       module PreparedStatementMethods
         include ArgumentMapper
-        
+
         private
-        
+
         # Run execute_select on the database with the given SQL and the stored
         # bind arguments.
         def execute(sql, opts={}, &block)
           super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
-        
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts={}, &block)
           super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
-        
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_insert(sql, opts={}, &block)
           super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
       end
-      
+
       # Yield hashes with symbol keys, attempting to optimize for
       # various cases.
       def fetch_rows(sql)
@@ -240,7 +240,7 @@ module Sequel
         end
         self
       end
-      
+
       # Create a named prepared statement that is stored in the
       # database (and connection) for reuse.
       def prepare(type, name=nil, *values)
@@ -252,9 +252,9 @@ module Sequel
         end
         ps
       end
-      
+
       private
-      
+
       # Properly escape the given string +v+.
       def literal_string_append(sql, v)
         sql << (mssql_unicode_strings ? UNICODE_STRING_START : APOS)

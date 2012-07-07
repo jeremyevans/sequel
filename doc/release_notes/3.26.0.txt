@@ -17,10 +17,10 @@
   as decimal, and you can still use the 0x prefix to treat them as
   hexidecimal.  If anyone was relying on the old octal behavior, let
   me know and I'll add an extension that restores the octal behavior.
-  
+
 * The identity_map plugin now works with the standard eager loading
   of many_to_many and many_through_many associations.
-  
+
 * Database#create_table! now only attempts to drop the table if it
   already exists.  Previously, it attempted to drop the table
   unconditionally ignoring any errors, which resulted in misleading
@@ -30,15 +30,15 @@
 * The default connection pool now correctly handles the case where a
   disconnect error is raised and an exception is raised while
   running the disconnection proc.
-  
+
 * Disconnection errors are now detected when issuing transaction
   statements such as BEGIN/ROLLBACK/COMMIT.  Previously, these
   statements did not handle disconnect errors on most adapters.
-  
+
 * More disconnection errors are now detected.  Specifically, the ado
   adapter and do postgres subadapter now handle disconnect errors,
   and the postgres adapter handles more types of disconnect errors.
-  
+
 * Database#table_exists? now always issues a query to select from the
   table, it no longer attempts to parse the schema to determine the
   information on PostgreSQL and Oracle.
@@ -73,7 +73,7 @@
   Dataset#eager a many_to_many association that includes an
   :eager_graph option.  Previously, incorrect SQL would have been
   generated and an error raised by the database.
-  
+
 * Datasets are no longer guaranteed to have @row_proc,
   @indentifier_input_method, and @identifier_output_method defined
   as instance variables.  You should be be using methods to access

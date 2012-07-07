@@ -63,13 +63,13 @@ module Sequel
         # A hash with composition name keys and composition reflection
         # hash values.
         attr_reader :compositions
-        
+
         # A module included in the class holding the composition
         # getter and setter methods.
         attr_reader :composition_module
-        
+
         # Define a composition for this model, with name being the name of the composition.
-        # You must provide either a :mapping option or both the :composer and :decomposer options. 
+        # You must provide either a :mapping option or both the :composer and :decomposer options.
         #
         # Options:
         # * :class - if using the :mapping option, the class to use, as a Class, String or Symbol.
@@ -95,7 +95,7 @@ module Sequel
           compositions[name] = opts
           if mapping = opts[:mapping]
             keys = mapping.map{|k| k.is_a?(Array) ? k.first : k}
-            if !opts[:composer]              
+            if !opts[:composer]
               late_binding_class_option(opts, name)
               klass = opts[:class]
               class_proc = proc{klass || constantize(opts[:class_name])}
@@ -123,20 +123,20 @@ module Sequel
           raise(Error, "Must provide :composer and :decomposer options, or :mapping option") unless opts[:composer] && opts[:decomposer]
           define_composition_accessor(name, opts)
         end
-        
+
         # Copy the necessary class instance variables to the subclass.
         def inherited(subclass)
           super
           c = compositions.dup
           subclass.instance_eval{@compositions = c}
         end
-        
+
         # Define getter and setter methods for the composition object.
         def define_composition_accessor(name, opts={})
           include(@composition_module ||= Module.new) unless composition_module
           composer = opts[:composer]
           composition_module.class_eval do
-            define_method(name) do 
+            define_method(name) do
               compositions.include?(name) ? compositions[name] : (compositions[name] = instance_eval(&composer))
             end
             define_method("#{name}=") do |v|
@@ -160,7 +160,7 @@ module Sequel
           @compositions.keys.each{|n| instance_eval(&model.compositions[n][:decomposer])} if @compositions
           super
         end
-        
+
         # Cache of composition objects for this class.
         def compositions
           @compositions ||= {}

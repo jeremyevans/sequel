@@ -1,5 +1,5 @@
 # This _pretty_table extension is only for internal use.
-# It adds the Sequel::PrettyTable class without modifying 
+# It adds the Sequel::PrettyTable class without modifying
 # Sequel::Dataset.
 #
 # To load the extension:
@@ -9,7 +9,7 @@
 module Sequel
   module PrettyTable
     # Prints nice-looking plain-text tables via puts
-    # 
+    #
     #   +--+-------+
     #   |id|name   |
     #   |--+-------|
@@ -34,7 +34,7 @@ module Sequel
 
     ### Private Module Methods ###
 
-    # Hash of the maximum size of the value for each column 
+    # Hash of the maximum size of the value for each column
     def self.column_sizes(records, columns) # :nodoc:
       sizes = Hash.new {0}
       columns.each do |c|
@@ -49,12 +49,12 @@ module Sequel
       end
       sizes
     end
-    
+
     # String for each data line
     def self.data_line(columns, sizes, record) # :nodoc:
       '|' << columns.map {|c| format_cell(sizes[c], record[c])}.join('|') << '|'
     end
-    
+
     # Format the value so it takes up exactly size characters
     def self.format_cell(size, v) # :nodoc:
       case v
@@ -66,7 +66,7 @@ module Sequel
         "%-#{size}s" % v.to_s
       end
     end
-    
+
     # String for header line
     def self.header_line(columns, sizes) # :nodoc:
       '|' << columns.map {|c| "%-#{sizes[c]}s" % c.to_s}.join('|') << '|'

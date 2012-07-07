@@ -4,20 +4,20 @@ module Sequel
     # :section: 6 - Miscellaneous methods
     # These methods don't fit cleanly into another section.
     # ---------------------
-    
+
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
     ARRAY_ACCESS_ERROR_MSG = 'You cannot call Dataset#[] with an integer or with no arguments.'.freeze
     ARG_BLOCK_ERROR_MSG = 'Must use either an argument or a block, not both'.freeze
     IMPORT_ERROR_MSG = 'Using Sequel::Dataset#import an empty column array is not allowed'.freeze
-    
+
     # The database related to this dataset.  This is the Database instance that
     # will execute all of this dataset's queries.
     attr_accessor :db
 
     # The hash of options for this dataset, keys are symbols.
     attr_accessor :opts
-    
-    # Constructs a new Dataset instance with an associated database and 
+
+    # Constructs a new Dataset instance with an associated database and
     # options. Datasets are usually constructed by invoking the Database#[] method:
     #
     #   DB[:posts]
@@ -40,7 +40,7 @@ module Sequel
     def eql?(o)
       self == o
     end
-    
+
     # Yield a dataset for each server in the connection pool that is tied to that server.
     # Intended for use in sharded environments where all servers need to be modified
     # with the same data:
@@ -49,7 +49,7 @@ module Sequel
     def each_server
       db.servers.each{|s| yield server(s)}
     end
-   
+
     # Alias of +first_source_alias+
     def first_source
       first_source_alias
@@ -78,7 +78,7 @@ module Sequel
         s
       end
     end
-    
+
     # The first source (primary table) for this dataset.  If the dataset doesn't
     # have a table, raises an error.  If the table is aliased, returns the original
     # table, not the alias
@@ -109,7 +109,7 @@ module Sequel
     def hash
       [db, opts.sort_by{|k, v| k.to_s}, sql].hash
     end
-    
+
     # The String instance method to call on identifiers before sending them to
     # the database.
     def identifier_input_method
@@ -121,7 +121,7 @@ module Sequel
         @identifier_input_method = nil
       end
     end
-    
+
     # The String instance method to call on identifiers before sending them to
     # the database.
     def identifier_output_method
@@ -133,15 +133,15 @@ module Sequel
         @identifier_output_method = nil
       end
     end
-    
-    # Returns a string representation of the dataset including the class name 
+
+    # Returns a string representation of the dataset including the class name
     # and the corresponding SQL select statement.
     def inspect
       c = self.class
       c = c.superclass while c.name.nil? || c.name == ''
       "#<#{c.name}: #{sql.inspect}>"
     end
-    
+
     # The alias to use for the row_number column, used when emulating OFFSET
     # support and for eager limit strategies
     def row_number_column
@@ -196,7 +196,7 @@ module Sequel
         loop do
           ta = :"#{table_alias}_#{i}"
           return ta unless used_aliases.include?(ta)
-          i += 1 
+          i += 1
         end
       else
         table_alias

@@ -229,7 +229,7 @@ Around hooks should only be used if you cannot accomplish the same results with 
       # parse database error, set error on self, and reraise a Sequel::ValidationFailed
     end
   end
- 
+
 Likewise, let's say that upon retrieval, you associate an object with a file descriptor, and you want to ensure that the file descriptor is closed after the object is saved to the database.  Let's assume you are always saving the object and you are not using validations.  You could not use an +after_save+ hook safely, since if the database raises an error, the +after_save+ method will not be called.  In this case, an +around_save+ hook is also the correct choice:
 
   class Album < Sequel::Model

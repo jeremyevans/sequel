@@ -14,15 +14,15 @@ describe "Blockless Ruby Filters" do
       literal(*args)
     end
   end
-  
+
   it "should support boolean columns directly" do
     @d.l(:x).should == 'x'
   end
-  
+
   it "should support NOT via Symbol#~" do
     @d.l(~:x).should == 'NOT x'
   end
-  
+
   it "should support qualified columns" do
     @d.l(:x__y).should == 'x.y'
     @d.l(~:x__y).should == 'NOT x.y'
@@ -58,7 +58,7 @@ describe "Blockless Ruby Filters" do
     @d.l(:x => false).should == "(x = 'f')"
     @d.l(~{:x => false}).should == "((x != 'f') OR (x IS NULL))"
   end
-  
+
   it "should support != via Hash#~" do
     @d.l(~{:x => 100}).should == '(x != 100)'
     @d.l(~{:x => 'a'}).should == '(x != \'a\')'
@@ -66,15 +66,15 @@ describe "Blockless Ruby Filters" do
     @d.l(~{:x => false}).should == '(x IS NOT FALSE)'
     @d.l(~{:x => nil}).should == '(x IS NOT NULL)'
   end
-  
+
   it "should support ~ via Hash and Regexp (if supported by database)" do
     @d.l(:x => /blah/).should == '(x ~ \'blah\')'
   end
-  
+
   it "should support !~ via Hash#~ and Regexp" do
     @d.l(~{:x => /blah/}).should == '(x !~ \'blah\')'
   end
-  
+
   it "should support LIKE via Symbol#like" do
     @d.l(:x.like('a')).should == '(x LIKE \'a\')'
     @d.l(:x.like(/a/)).should == '(x ~ \'a\')'
@@ -171,7 +171,7 @@ describe "Blockless Ruby Filters" do
     @d.l(~{:x => 1..5}).should == '((x < 1) OR (x > 5))'
     @d.l(~{:x => 1...5}).should == '((x < 1) OR (x >= 5))'
   end
-  
+
   it "should support negating NOT IN via Hash#~ and Dataset or Array" do
     @d.l(~{:x => @d.select(:i)}).should == '(x NOT IN (SELECT i FROM items))'
     @d.l(~{:x => [1,2,3]}).should == '(x NOT IN (1, 2, 3))'
@@ -184,9 +184,9 @@ describe "Blockless Ruby Filters" do
     @d.l((((:x - :y)/(:x + :y))*:z) <= 100).should == '((((x - y) / (x + y)) * z) <= 100)'
     @d.l(~((((:x - :y)/(:x + :y))*:z) <= 100)).should == '((((x - y) / (x + y)) * z) > 100)'
   end
-  
+
   it "should not add ~ method to string expressions" do
-    proc{~:x.sql_string}.should raise_error(NoMethodError) 
+    proc{~:x.sql_string}.should raise_error(NoMethodError)
   end
 
   it "should allow mathematical or string operations on true, false, or nil" do
@@ -217,7 +217,7 @@ describe "Blockless Ruby Filters" do
     @d.l(~:x & :y).should == '(NOT x AND y)'
     @d.l(~:x & ~:y).should == '(NOT x AND NOT y)'
   end
-  
+
   it "should support OR conditions via |" do
     @d.l(:x | :y).should == '(x OR y)'
     @d.l(:x.sql_boolean | :y).should == '(x OR y)'
@@ -225,20 +225,20 @@ describe "Blockless Ruby Filters" do
     @d.l(:x | {:y => :z}).should == '(x OR (y = z))'
     @d.l((:x.sql_number > 200) | (:y.sql_number < 200)).should == '((x > 200) OR (y < 200))'
   end
-  
+
   it "should support & | combinations" do
     @d.l((:x | :y) & :z).should == '((x OR y) AND z)'
     @d.l(:x | (:y & :z)).should == '(x OR (y AND z))'
     @d.l((:x & :w) | (:y & :z)).should == '((x AND w) OR (y AND z))'
   end
-  
+
   it "should support & | with ~" do
     @d.l(~((:x | :y) & :z)).should == '((NOT x AND NOT y) OR NOT z)'
     @d.l(~(:x | (:y & :z))).should == '(NOT x AND (NOT y OR NOT z))'
     @d.l(~((:x & :w) | (:y & :z))).should == '((NOT x OR NOT w) AND (NOT y OR NOT z))'
     @d.l(~((:x.sql_number > 200) | (:y & :z))).should == '((x <= 200) AND (NOT y OR NOT z))'
   end
-  
+
   it "should support LiteralString" do
     @d.l('x'.lit).should == '(x)'
     @d.l(~'x'.lit).should == 'NOT x'
@@ -262,24 +262,24 @@ describe "Blockless Ruby Filters" do
     @d.l(:x => true, :y => false)[1...-1].split(' AND ').sort.should == ['(x IS TRUE)', '(y IS FALSE)']
     @d.l(:x => nil, :y => [1,2,3])[1...-1].split(' AND ').sort.should == ['(x IS NULL)', '(y IN (1, 2, 3))']
   end
-  
+
   it "should support arrays with all two pairs the same as hashes" do
     @d.l([[:x, 100],[:y, 'a']]).should == '((x = 100) AND (y = \'a\'))'
     @d.l([[:x, true], [:y, false]]).should == '((x IS TRUE) AND (y IS FALSE))'
     @d.l([[:x, nil], [:y, [1,2,3]]]).should == '((x IS NULL) AND (y IN (1, 2, 3)))'
   end
-  
+
   it "should emulate columns for array values" do
     @d.l([:x, :y]=>[[1,2], [3,4]].sql_array).should == '((x, y) IN ((1, 2), (3, 4)))'
     @d.l([:x, :y, :z]=>[[1,2,5], [3,4,6]]).should == '((x, y, z) IN ((1, 2, 5), (3, 4, 6)))'
   end
-  
+
   it "should emulate multiple column in if not supported" do
     @d.meta_def(:supports_multiple_column_in?){false}
     @d.l([:x, :y]=>[[1,2], [3,4]].sql_array).should == '(((x = 1) AND (y = 2)) OR ((x = 3) AND (y = 4)))'
     @d.l([:x, :y, :z]=>[[1,2,5], [3,4,6]]).should == '(((x = 1) AND (y = 2) AND (z = 5)) OR ((x = 3) AND (y = 4) AND (z = 6)))'
   end
-  
+
   it "should support StringExpression#+ for concatenation of SQL strings" do
     @d.lit(:x.sql_string + :y).should == '(x || y)'
     @d.lit([:x].sql_string_join + :y).should == '(x || y)'
@@ -341,7 +341,7 @@ describe "Blockless Ruby Filters" do
     @d.l({:x => Sequel::SQLTRUE}).should == '(x IS TRUE)'
     @d.l({:x => Sequel::SQLFALSE}).should == '(x IS FALSE)'
   end
-  
+
   it "should support negation of SQL::Constants" do
     @d.l(~{:x => Sequel::NULL}).should == '(x IS NOT NULL)'
     @d.l(~{:x => Sequel::NOTNULL}).should == '(x IS NULL)'
@@ -350,7 +350,7 @@ describe "Blockless Ruby Filters" do
     @d.l(~{:x => Sequel::SQLTRUE}).should == '(x IS NOT TRUE)'
     @d.l(~{:x => Sequel::SQLFALSE}).should == '(x IS NOT FALSE)'
   end
-  
+
   it "should support direct negation of SQL::Constants" do
     @d.l({:x => ~Sequel::NULL}).should == '(x IS NOT NULL)'
     @d.l({:x => ~Sequel::NOTNULL}).should == '(x IS NULL)'
@@ -359,7 +359,7 @@ describe "Blockless Ruby Filters" do
     @d.l({:x => ~Sequel::SQLTRUE}).should == '(x IS FALSE)'
     @d.l({:x => ~Sequel::SQLFALSE}).should == '(x IS TRUE)'
   end
-  
+
   it "should raise an error if trying to invert an invalid SQL::Constant" do
     proc{~Sequel::CURRENT_DATE}.should raise_error(Sequel::Error)
   end
@@ -384,7 +384,7 @@ describe "Blockless Ruby Filters" do
     @d.lit(:x & 1 & 1).should == "(x & 1 & 1)"
     @d.lit(:x | 1 | 1).should == "(x | 1 | 1)"
   end
-  
+
   it "should allow adding a string to an integer expression" do
     @d.lit(:x + 1 + 'a').should == "(x + 1 + 'a')"
   end
@@ -489,7 +489,7 @@ describe "Blockless Ruby Filters" do
     @d.lit(d.like(:b)).should == '((SELECT a FROM items) LIKE b)'
     @d.lit(d.ilike(:b)).should == '((SELECT a FROM items) ILIKE b)'
   end
-  
+
   if RUBY_VERSION < '1.9.0'
     it "should not allow inequality operations on true, false, or nil" do
       @d.lit(:x > 1).should == "(x > 1)"
@@ -510,21 +510,21 @@ describe "Blockless Ruby Filters" do
       @d.lit(:x >= {:y => [1,2,3]}).should == "(x >= (y IN (1, 2, 3)))"
       @d.lit(:x <= ~{:y => [1,2,3]}).should == "(x <= (y NOT IN (1, 2, 3)))"
     end
-    
+
     it "should support >, <, >=, and <= via Symbol#>,<,>=,<=" do
       @d.l(:x > 100).should == '(x > 100)'
       @d.l(:x < 100.01).should == '(x < 100.01)'
       @d.l(:x >= 100000000000000000000000000000000000).should == '(x >= 100000000000000000000000000000000000)'
       @d.l(:x <= 100).should == '(x <= 100)'
     end
-    
+
     it "should support negation of >, <, >=, and <= via Symbol#~" do
       @d.l(~(:x > 100)).should == '(x <= 100)'
       @d.l(~(:x < 100.01)).should == '(x >= 100.01)'
       @d.l(~(:x >= 100000000000000000000000000000000000)).should == '(x < 100000000000000000000000000000000000)'
       @d.l(~(:x <= 100)).should == '(x > 100)'
     end
-    
+
     it "should support double negation via ~" do
       @d.l(~~(:x > 100)).should == '(x > 100)'
     end
@@ -623,13 +623,13 @@ describe Sequel::SQL::VirtualRow do
     proc{@d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}}.should raise_error(Sequel::Error)
     proc{Sequel::Dataset.new(nil).filter{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.sql}.should raise_error(Sequel::Error)
   end
-  
+
   it "should deal with classes without requiring :: prefix" do
     @d.l{date < Date.today}.should == "(\"date\" < '#{Date.today}')"
     @d.l{date < Sequel::CURRENT_DATE}.should == "(\"date\" < CURRENT_DATE)"
     @d.l{num < Math::PI.to_i}.should == "(\"num\" < 3)"
   end
-  
+
   it "should deal with methods added to Object after requiring Sequel" do
     class Object
       def adsoiwemlsdaf; 42; end
@@ -637,7 +637,7 @@ describe Sequel::SQL::VirtualRow do
     Sequel::BasicObject.remove_methods!
     @d.l{a > adsoiwemlsdaf}.should == '("a" > "adsoiwemlsdaf")'
   end
-  
+
   it "should deal with private methods added to Kernel after requiring Sequel" do
     module Kernel
       private

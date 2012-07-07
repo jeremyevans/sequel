@@ -88,7 +88,7 @@ module Sequel
     # The replacement should always be a string that may include references to the matched data from the rule.
     #
     # Example:
-    #   singular(/([^aeiouy]|qu)ies$/i, '\1y') 
+    #   singular(/([^aeiouy]|qu)ies$/i, '\1y')
     def self.singular(rule, replacement)
       @singulars.insert(0, [rule, replacement])
     end
@@ -114,7 +114,7 @@ module Sequel
       s = s.gsub(CAMELIZE_MODULE_REGEXP){|x| "::#{x[-1..-1].upcase unless x == SLASH}"}.gsub(CAMELIZE_CONVERT_REGEXP){|x| x[-1..-1].upcase}
       s
     end
-  
+
     # Tries to find a declared constant with the name specified
     # in the string. It raises a NameError when the name is not in CamelCase
     # or is not initialized.
@@ -124,14 +124,14 @@ module Sequel
       raise(NameError, "#{s.inspect} is not a valid constant name!") unless m = VALID_CONSTANT_NAME_REGEXP.match(s)
       Object.module_eval("::#{m[1]}", __FILE__, __LINE__)
     end
-  
+
     # Removes the module part from the expression in the string
     def demodulize(s)
       s = s.to_s
       return s.demodulize if s.respond_to?(:demodulize)
       s.gsub(DEMODULIZE_CONVERT_REGEXP, EMPTY_STRING)
     end
-  
+
     # Returns the plural form of the word in the string.
     def pluralize(s)
       s = s.to_s
@@ -140,7 +140,7 @@ module Sequel
       Inflections.plurals.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(s.downcase)
       result
     end
-  
+
     # The reverse of pluralize, returns the singular form of a word in a string.
     def singularize(s)
       s = s.to_s
@@ -149,7 +149,7 @@ module Sequel
       Inflections.singulars.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(s.downcase)
       result
     end
-  
+
     # The reverse of camelize. Makes an underscored form from the expression in the string.
     # Also changes '::' to '/' to convert namespaces to paths.
     def underscore(s)

@@ -42,7 +42,7 @@ describe "Sequel::Plugins::XmlSerializer" do
       plugin :xml_serializer
       columns :id, :name
       @db_schema = {:id=>{:type=>:integer}, :name=>{:type=>:string}}
-      end 
+      end
     end
     artist = XmlSerializerTest::Artist.load(:id=>2, :name=>'YJM')
     XmlSerializerTest::Artist.from_xml(artist.to_xml).should == artist

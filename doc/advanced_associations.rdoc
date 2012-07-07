@@ -30,37 +30,37 @@ JOINing to the join table in a many_to_many association).
                      current model.
 :graph_block :: A block passed to +join_table+, allowing you to specify
                 conditions other than equality, or to use OR, or set up any arbitrary
-                condition.  The block is passed the associated table alias, current table 
+                condition.  The block is passed the associated table alias, current table
                 alias, and an array of previous joins clause objects.
 :graph_only_conditions :: Use these conditions instead of the standard
                           association conditions. This is necessary when you don't want to have an
                           equal condition between the foreign key and primary key of the tables.
                           You can also use this to have a JOIN USING (array of symbols), or a NATURAL
                           or CROSS JOIN (nil, with the appropriate <tt>:graph_join_type</tt>).
-  
+
 These can be used like this:
 
   # Makes Artist.eager_graph(:required_albums).all not return artists that
   # don't have any albums
   Artist.one_to_many :required_albums, :class=>:Album, :graph_join_type=>:inner
-  
+
   # Makes sure all returned albums have the active flag set
   Artist.one_to_many :active_albums, :class=>:Album, \
     :graph_conditions=>{:active=>true}
-    
+
   # Only returns albums that have sold more than 500,000 copies
   Artist.one_to_many :gold_albums, :class=>:Album, \
     :graph_block=>proc{|j,lj,js| :copies_sold.qualify(j) > 500000}
-    
+
   # Handles the case where the tables are associated by a case insensitive name string
   Artist.one_to_many :albums, :key=>:artist_name, \
     :graph_only_conditions=>nil, \
     :graph_block=>proc{|j,lj,js| {:lower.sql_function(artist_name.qualify(j))=>:lower.sql_function(name.qualify(lj))}}
-    
+
   # Handles the case where both key columns have the name artist_name, and you want to use
   # a JOIN USING
   Artist.one_to_many :albums, :key=>:artist_name, :graph_only_conditions=>[:artist_name]
-  
+
 Remember, using +eager_graph+ is generally only necessary when you need to
 filter/order based on columns in an associated table, it is recommended to
 use +eager+ for eager loading if possible.
@@ -97,13 +97,13 @@ loading down multiple levels, but it is up to you to use it.
 The id_map is a performance enhancement that is used by the default
 association loaders and is also available to you.  It is a hash with keys
 foreign/primary key values, and values being arrays of current model
-objects having the foreign/primary key value associated with the key. 
+objects having the foreign/primary key value associated with the key.
 This may be hard to visualize, so I'll give an example.  Let's say you
 have the following associations
 
   Album.many_to_one :artist
   Album.one_to_many :tracks
-    
+
 and the following two albums in the database:
 
   album1 = Album.create(:artist_id=>3) # id: 1
@@ -171,7 +171,7 @@ need to initial the values to nil:
 
   # rows here is the :rows entry in the hash passed to the eager loader
   rows.each{|album| album.associations[:artist] = nil}
-  
+
 For the tracks association, you set the initial value to an empty array:
 
   rows.each{|album| album.associations[:track] = []}
@@ -210,7 +210,7 @@ and the tracks eager loader looks like:
 
 Now, these are both overly simplistic eager loaders that don't respect cascaded
 associations or any of the association options.  But hopefully they both
-provide simple examples that you can more easily build and learn from, as 
+provide simple examples that you can more easily build and learn from, as
 the custom eager loaders described later in this page are more complex.
 
 Basically, the eager loading steps can be broken down into:
@@ -261,7 +261,7 @@ otherwise modified:
     one_to_many :authorships
   end
   Author.first.authorships_dataset.filter{|o| o.number < 10}.first
- 
+
 You can extend a dataset with a module using the <tt>:extend</tt> association option.  You can reference
 the model object that created the association dataset via the dataset's
 +model_object+ method, and the related association reflection via the dataset's
@@ -334,13 +334,13 @@ ActiveRecord:
   end
 
   Firm.find(:first).invoices
-  
+
 Sequel::Model:
 
   class Firm < Sequel::Model
     one_to_many :clients
     many_to_many :invoices, :join_table=>:clients, :right_key=>:id, :right_primary_key=>:client_id
-  end 
+  end
 
   class Client < Sequel::Model
     many_to_one :firm
@@ -414,7 +414,7 @@ Sequel::Model:
       :eager_loader=>(proc do |eo|
         id_map = {}
         eo[:rows].each do |asset|
-          asset.associations[:attachable] = nil 
+          asset.associations[:attachable] = nil
           ((id_map[asset.attachable_type] ||= {})[asset.attachable_id] ||= []) << asset
         end
         id_map.each do |klass_name, id_map|
@@ -426,32 +426,32 @@ Sequel::Model:
           end
         end
       end)
-  
+
     private
 
     def _attachable=(attachable)
       self[:attachable_id] = (attachable.pk if attachable)
       self[:attachable_type] = (attachable.class.name if attachable)
-    end 
-  end 
+    end
+  end
 
   class Post < Sequel::Model
     one_to_many :assets, :key=>:attachable_id do |ds|
       ds.filter(:attachable_type=>'Post')
-    end 
-  
+    end
+
     private
 
     def _add_asset(asset)
       asset.attachable_id = pk
       asset.attachable_type = 'Post'
       asset.save
-    end 
+    end
     def _remove_asset(asset)
-      asset.attachable_id = nil 
-      asset.attachable_type = nil 
+      asset.attachable_id = nil
+      asset.attachable_type = nil
       asset.save
-    end 
+    end
     def _remove_all_assets
       Asset.filter(:attachable_id=>pk, :attachable_type=>'Post')\
         .update(:attachable_id=>nil, :attachable_type=>nil)
@@ -495,7 +495,7 @@ associations:
   # Both of these models have an album_id, number, and disc_number fields.
   # All FavoriteTracks have an associated track, but not all tracks have an
   # associated favorite track
-  
+
   class Track < Sequel::Model
     many_to_one :favorite_track, :key=>[:disc_number, :number, :album_id], :primary_key=>[:disc_number, :number, :album_id]
   end
@@ -512,11 +512,11 @@ simple:
     many_to_one :parent, :class=>self
     one_to_many :children, :key=>:parent_id, :class=>self
   end
-  
+
 You can easily get a node's parent with node.parent, and a node's children with
 node.children.  You can even eager load the relationship up to a certain depth:
 
-  # Eager load three generations of generations of children for a given node 
+  # Eager load three generations of generations of children for a given node
   Node.filter(:id=>1).eager(:children=>{:children=>:children}).all.first
   # Load parents and grandparents for a group of nodes
   Node.filter{|o| o.id < 10}.eager(:parent=>:parent).all
@@ -529,15 +529,15 @@ without knowing the depth of the tree?
      :eager_loader=>(proc do |eo|
       # Handle cases where the root node has the same parent_id as primary_key
       # and also when it is NULL
-      non_root_nodes = eo[:rows].reject do |n| 
+      non_root_nodes = eo[:rows].reject do |n|
         if [nil, n.pk].include?(n.parent_id)
           # Make sure root nodes have their parent association set to nil
-          n.associations[:parent] = nil 
+          n.associations[:parent] = nil
           true
         else
           false
-        end 
-      end 
+        end
+      end
       unless non_root_nodes.empty?
         id_map = {}
         # Create an map of parent_ids to nodes that have that parent id
@@ -547,17 +547,17 @@ without knowing the depth of the tree?
         Node.filter(Node.primary_key=>id_map.keys).eager(:ancestors).all do |node|
           # Populate the parent association for each node
           id_map[node.pk].each{|n| n.associations[:parent] = node}
-        end 
-      end 
+        end
+      end
     end)
     many_to_one :descendants, :eager_loader=>(proc do |eo|
       id_map = {}
-      eo[:rows].each do |n| 
+      eo[:rows].each do |n|
         # Initialize an empty array of child associations for each parent node
         n.associations[:children] = []
         # Populate identity map of nodes
-        id_map[n.pk] = n 
-      end 
+        id_map[n.pk] = n
+      end
       # Doesn't cause an infinite loop, because the :eager_loader is not called
       # if no records are returned.  Exclude id = parent_id to avoid infinite loop
       # if the root note is one of the returned records and it has parent_id = id
@@ -565,11 +565,11 @@ without knowing the depth of the tree?
       Node.filter(:parent_id=>id_map.keys).exclude(:id=>:parent_id).eager(:descendants).all do |node|
         # Get the parent from the identity map
         parent = id_map[node.parent_id]
-        # Set the child's parent association to the parent 
+        # Set the child's parent association to the parent
         node.associations[:parent] = parent
         # Add the child association to the array of children in the parent
         parent.associations[:children] << node
-      end 
+      end
     end)
   end
 

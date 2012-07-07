@@ -1,11 +1,11 @@
 module Sequel
   tsk_require 'sequel/plugins/instance_filters'
-  
+
   module Plugins
     # This plugin implements a simple database-independent locking mechanism
     # to ensure that concurrent updates do not override changes. This is
     # best implemented by a code example:
-    # 
+    #
     #   class Person < Sequel::Model
     #     plugin :optimistic_locking
     #   end
@@ -22,7 +22,7 @@ module Sequel
     module OptimisticLocking
       # Exception class raised when trying to update or destroy a stale object.
       Error = InstanceFilters::Error
-      
+
       # Load the instance_filters plugin into the model.
       def self.apply(model, opts={})
         model.plugin :instance_filters
@@ -33,33 +33,33 @@ module Sequel
       def self.configure(model, opts={})
         model.lock_column = opts[:lock_column] || :lock_version
       end
-      
+
       module ClassMethods
         # The column holding the version of the lock
         attr_accessor :lock_column
-        
+
         # Copy the lock_column value into the subclass
         def inherited(subclass)
           super
           subclass.lock_column = lock_column
         end
       end
-    
+
       module InstanceMethods
         # Add the lock column instance filter to the object before destroying it.
         def before_destroy
           lock_column_instance_filter
           super
         end
-        
+
         # Add the lock column instance filter to the object before updating it.
         def before_update
           lock_column_instance_filter
           super
         end
-        
+
         private
-        
+
         # Add the lock column instance filter to the object.
         def lock_column_instance_filter
           lc = model.lock_column
@@ -73,7 +73,7 @@ module Sequel
           clear_instance_filters
           super
         end
-        
+
         # Only update the row if it has the same lock version, and increment the
         # lock version.
         def _update_columns(columns)

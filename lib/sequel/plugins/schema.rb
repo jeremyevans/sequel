@@ -8,7 +8,7 @@ module Sequel
     # This plugin is mostly suited to test code.  If there is any
     # chance that your application's schema could change, you should
     # be using the migration extension instead.
-    # 
+    #
     # Usage:
     #
     #   # Add the schema methods to all model subclasses (called before loading subclasses)
@@ -25,7 +25,7 @@ module Sequel
           @db_schema = get_db_schema(true)
           columns
         end
-        
+
         # Drops the table if it exists and then runs create_table.  Should probably
         # not be used except in testing.
         def create_table!(*args, &block)
@@ -37,24 +37,24 @@ module Sequel
         def create_table?(*args, &block)
           create_table(*args, &block) unless table_exists?
         end
-        
+
         # Drops table.  If the table doesn't exist, this will probably raise an error.
         def drop_table
           db.drop_table(table_name)
         end
-    
+
         # Drops table if it already exists, do nothing if it doesn't exist.
         def drop_table?
           db.drop_table?(table_name)
         end
-    
+
         # Returns table schema created with set_schema for direct descendant of Model.
         # Does not retreive schema information from the database, see db_schema if you
         # want that.
         def schema
           @schema || (superclass.schema unless superclass == Model)
         end
-    
+
         # Defines a table schema (see Schema::Generator for more information).
         #
         # This is only needed if you want to use the create_table/create_table! methods.
@@ -69,7 +69,7 @@ module Sequel
           @schema = db.create_table_generator(&block)
           set_primary_key(@schema.primary_key_name) if @schema.primary_key_name
         end
-        
+
         # Returns true if table exists, false otherwise.
         def table_exists?
           db.table_exists?(table_name)

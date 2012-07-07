@@ -28,7 +28,7 @@ describe "prepared_statements_safe plugin" do
     @db.sqls.first.should =~ /INSERT INTO people \((i|name), (i|name)\) VALUES \((NULL|'foo'), (NULL|'foo')\)/
     @c.create(:name=>'foo', :i=>2)
     @db.sqls.first.should =~ /INSERT INTO people \((i|name), (i|name)\) VALUES \((2|'foo'), (2|'foo')\)/
-  end 
+  end
 
   specify "should use database default values" do
     @c.instance_variable_set(:@db_schema, {:i=>{:ruby_default=>2}, :name=>{:ruby_default=>'foo'}, :id=>{:primary_key=>true}})

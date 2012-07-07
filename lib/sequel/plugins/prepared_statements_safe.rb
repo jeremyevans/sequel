@@ -6,7 +6,7 @@ module Sequel
     # just the changed ones.
     #
     # This plugin depends on the +prepared_statements+ plugin.
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclasses more safe when using prepared statements (called before loading subclasses)
@@ -32,7 +32,7 @@ module Sequel
         # in the INSERT statement), as the number of prepared statements
         # that can be created is 2^N (where N is the number of free columns).
         attr_reader :prepared_statements_column_defaults
-        
+
         def inherited(subclass)
           super
           subclass.instance_variable_set(:@prepared_statements_column_defaults, @prepared_statements_column_defaults) if @prepared_statements_column_defaults && !subclass.prepared_statements_column_defaults

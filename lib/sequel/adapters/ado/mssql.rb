@@ -10,13 +10,13 @@ module Sequel
         # Query to use to get the number of rows affected by an update or
         # delete query.
         ROWS_AFFECTED = "SELECT @@ROWCOUNT AS AffectedRows"
-        
+
         # Just execute so it doesn't attempt to return the number of rows modified.
         def execute_ddl(sql, opts={})
           execute(sql, opts)
         end
         alias execute_insert execute_ddl
-        
+
         # Issue a separate query to get the rows modified.  ADO appears to
         # use pass by reference with an integer variable, which is obviously
         # not supported directly in ruby, and I'm not aware of a workaround.
@@ -35,7 +35,7 @@ module Sequel
 
         private
 
-        # The ADO adapter's default provider doesn't support transactions, since it 
+        # The ADO adapter's default provider doesn't support transactions, since it
         # creates a new native connection for each query.  So Sequel only attempts
         # to use transactions if an explicit :provider is given.
         def begin_transaction(conn, opts={})
@@ -50,7 +50,7 @@ module Sequel
           super if @opts[:provider]
         end
       end
-      
+
       class Dataset < ADO::Dataset
         include Sequel::MSSQL::DatasetMethods
 
@@ -62,7 +62,7 @@ module Sequel
           return super if @opts[:sql]
           with_sql("SET NOCOUNT ON; #{insert_sql(*values)}; SELECT CAST(SCOPE_IDENTITY() AS INTEGER)").single_value
         end
-        
+
         # If you use a better :provider option for the database, you can get an
         # accurate number of rows matched.
         def provides_accurate_rows_matched?

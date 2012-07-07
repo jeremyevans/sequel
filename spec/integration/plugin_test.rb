@@ -31,16 +31,16 @@ describe "Class Table Inheritance Plugin" do
     [:staff, :executives, :managers, :employees].each{|t| @db[t].delete}
     class ::Employee < Sequel::Model(@db)
       plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
-    end 
+    end
     class ::Manager < Employee
       one_to_many :staff_members, :class=>:Staff
-    end 
+    end
     class ::Executive < Manager
-    end 
+    end
     class ::Staff < Employee
       many_to_one :manager, :qualify=>false
-    end 
-    
+    end
+
     @i1 =@db[:employees].insert(:name=>'E', :kind=>'Employee')
     @i2 = @db[:employees].insert(:name=>'S', :kind=>'Staff')
     @i3 = @db[:employees].insert(:name=>'M', :kind=>'Manager')
@@ -65,27 +65,27 @@ describe "Class Table Inheritance Plugin" do
       Executive.load(:id=>@i4, :name=>'Ex', :kind=>'Executive')
     ]
   end
-  
+
   specify "should lazily load columns in subclass tables" do
     a = Employee.order(:id).all
     a[1][:manager_id].should == nil
     a[1].manager_id.should == @i4
   end
-  
+
   specify "should include schema for columns for tables for ancestor classes" do
     Employee.db_schema.keys.sort_by{|x| x.to_s}.should == [:id, :kind, :name]
     Staff.db_schema.keys.sort_by{|x| x.to_s}.should == [:id, :kind, :manager_id, :name]
     Manager.db_schema.keys.sort_by{|x| x.to_s}.should == [:id, :kind, :name, :num_staff]
     Executive.db_schema.keys.sort_by{|x| x.to_s}.should == [:id, :kind, :name, :num_managers, :num_staff]
   end
-  
+
   specify "should include columns for tables for ancestor classes" do
     Employee.columns.should == [:id, :name, :kind]
     Staff.columns.should == [:id, :name, :kind, :manager_id]
     Manager.columns.should == [:id, :name, :kind, :num_staff]
     Executive.columns.should == [:id, :name, :kind, :num_staff, :num_managers]
   end
-  
+
   specify "should delete rows from all tables" do
     e = Executive.first
     i = e.id
@@ -95,7 +95,7 @@ describe "Class Table Inheritance Plugin" do
     @db[:managers][:id=>i].should == nil
     @db[:employees][:id=>i].should == nil
   end
-  
+
   specify "should handle associations only defined in subclasses" do
     Employee.filter(:id=>@i2).all.first.manager.id.should == @i4
   end
@@ -107,38 +107,38 @@ describe "Class Table Inheritance Plugin" do
     @db[:managers][:id=>i].should == {:id=>i, :num_staff=>9}
     @db[:executives][:id=>i].should == {:id=>i, :num_managers=>8}
   end
-  
+
   specify "should update rows in all tables" do
     Executive.first.update(:name=>'Ex2', :num_managers=>8, :num_staff=>9)
     @db[:employees][:id=>@i4].should == {:id=>@i4, :name=>'Ex2', :kind=>'Executive'}
     @db[:managers][:id=>@i4].should == {:id=>@i4, :num_staff=>9}
     @db[:executives][:id=>@i4].should == {:id=>@i4, :num_managers=>8}
   end
-  
+
   specify "should handle many_to_one relationships" do
     m = Staff.first.manager
     m.should == Manager[@i4]
     m.should be_a_kind_of(Executive)
   end
-  
+
   specify "should handle eagerly loading many_to_one relationships" do
     Staff.limit(1).eager(:manager).all.map{|x| x.manager}.should == [Manager[@i4]]
   end
-  
+
   specify "should handle eagerly graphing many_to_one relationships" do
     ss = Staff.eager_graph(:manager).all
     ss.should == [Staff[@i2]]
     ss.map{|x| x.manager}.should == [Manager[@i4]]
   end
-  
+
   specify "should handle one_to_many relationships" do
     Executive.first.staff_members.should == [Staff[@i2]]
   end
-  
+
   specify "should handle eagerly loading one_to_many relationships" do
     Executive.limit(1).eager(:staff_members).first.staff_members.should == [Staff[@i2]]
   end
-  
+
   cspecify "should handle eagerly graphing one_to_many relationships", [proc{|db| db.sqlite_version < 30709}, :sqlite] do
     es = Executive.limit(1).eager_graph(:staff_members).all
     es.should == [Executive[@i4]]
@@ -169,11 +169,11 @@ describe "Many Through Many Plugin" do
     [:albums_artists, :albums, :artists].each{|t| @db[t].delete}
     class ::Album < Sequel::Model(@db)
       many_to_many :artists
-    end 
+    end
     class ::Artist < Sequel::Model(@db)
       plugin :many_through_many
-    end 
-    
+    end
+
     @artist1 = Artist.create(:name=>'1')
     @artist2 = Artist.create(:name=>'2')
     @artist3 = Artist.create(:name=>'3')
@@ -197,7 +197,7 @@ describe "Many Through Many Plugin" do
   after(:all) do
     @db.drop_table? :albums_artists, :albums, :artists
   end
-  
+
   def self_join(c)
     c.join(c.table_name.as(:b), Array(c.primary_key).zip(Array(c.primary_key))).select_all(c.table_name)
   end
@@ -208,7 +208,7 @@ describe "Many Through Many Plugin" do
     Artist[@artist2.id].albums.map{|x| x.name}.sort.should == %w'A C'
     Artist[@artist3.id].albums.map{|x| x.name}.sort.should == %w'B C'
     Artist[@artist4.id].albums.map{|x| x.name}.sort.should == %w'B D'
-    
+
     Artist.plugin :prepared_statements_associations
     Artist[@artist1.id].albums.map{|x| x.name}.sort.should == %w'A D'
     Artist[@artist2.id].albums.map{|x| x.name}.sort.should == %w'A C'
@@ -219,7 +219,7 @@ describe "Many Through Many Plugin" do
     Artist.filter(:id=>2).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A C'
     Artist.filter(:id=>3).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B C'
     Artist.filter(:id=>4).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
-    
+
     Artist.filter(:artists__id=>1).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A D'
     Artist.filter(:artists__id=>2).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A C'
     Artist.filter(:artists__id=>3).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B C'
@@ -271,18 +271,18 @@ describe "Many Through Many Plugin" do
     Artist[@artist2.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'
     Artist[@artist3.id].related_artists.map{|x| x.name}.sort.should == %w'2 3 4'
     Artist[@artist4.id].related_artists.map{|x| x.name}.sort.should == %w'1 3 4'
-    
+
     Artist.plugin :prepared_statements_associations
     Artist[@artist1.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 4'
     Artist[@artist2.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'
     Artist[@artist3.id].related_artists.map{|x| x.name}.sort.should == %w'2 3 4'
     Artist[@artist4.id].related_artists.map{|x| x.name}.sort.should == %w'1 3 4'
-    
+
     Artist.filter(:id=>@artist1.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 4'
     Artist.filter(:id=>@artist2.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 3'
     Artist.filter(:id=>@artist3.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'2 3 4'
     Artist.filter(:id=>@artist4.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 3 4'
-    
+
     Artist.filter(:artists__id=>@artist1.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 4'
     Artist.filter(:artists__id=>@artist2.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 3'
     Artist.filter(:artists__id=>@artist3.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'2 3 4'
@@ -332,23 +332,23 @@ describe "Many Through Many Plugin" do
     @album3.add_artist(@artist1)
     @album4.add_artist(@artist3)
     @album4.add_artist(@artist4)
-    
+
     Artist[@artist1.id].related_albums.map{|x| x.name}.sort.should == %w'A B C'
     Artist[@artist2.id].related_albums.map{|x| x.name}.sort.should == %w'A B C D'
     Artist[@artist3.id].related_albums.map{|x| x.name}.sort.should == %w'A B D'
     Artist[@artist4.id].related_albums.map{|x| x.name}.sort.should == %w'B D'
-    
+
     Artist.plugin :prepared_statements_associations
     Artist[@artist1.id].related_albums.map{|x| x.name}.sort.should == %w'A B C'
     Artist[@artist2.id].related_albums.map{|x| x.name}.sort.should == %w'A B C D'
     Artist[@artist3.id].related_albums.map{|x| x.name}.sort.should == %w'A B D'
     Artist[@artist4.id].related_albums.map{|x| x.name}.sort.should == %w'B D'
-    
+
     Artist.filter(:id=>@artist1.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C'
     Artist.filter(:id=>@artist2.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C D'
     Artist.filter(:id=>@artist3.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B D'
     Artist.filter(:id=>@artist4.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
-    
+
     Artist.filter(:artists__id=>@artist1.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C'
     Artist.filter(:artists__id=>@artist2.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C D'
     Artist.filter(:artists__id=>@artist3.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B D'
@@ -395,7 +395,7 @@ describe "Many Through Many Plugin" do
   end
 end
 
-describe "Lazy Attributes plugin" do 
+describe "Lazy Attributes plugin" do
   before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:items) do
@@ -413,21 +413,21 @@ describe "Lazy Attributes plugin" do
     @db.drop_table?(:items)
     Object.send(:remove_const, :Item)
   end
-  
+
   specify "should not include lazy attribute columns by default" do
     Item.first.should == Item.load(:id=>1, :name=>'J')
   end
-  
+
   specify "should load lazy attribute on access" do
     Item.first.num.should == 1
   end
-  
+
   specify "should typecast lazy attribute in setter" do
     i = Item.new
     i.num = '1'
     i.num.should == 1
   end
-  
+
   specify "should load lazy attribute for all items returned when accessing any item if using identity map " do
     Item.create(:name=>'K', :num=>2)
     Item.with_identity_map do
@@ -465,8 +465,8 @@ describe "Tactical Eager Loading Plugin" do
     class ::Artist < Sequel::Model(@db)
       plugin :tactical_eager_loading
       one_to_many :albums, :order=>:name
-    end 
-    
+    end
+
     @artist1 = Artist.create(:name=>'1')
     @artist2 = Artist.create(:name=>'2')
     @artist3 = Artist.create(:name=>'3')
@@ -488,7 +488,7 @@ describe "Tactical Eager Loading Plugin" do
     a.map{|x| x.associations}.should == [{}, {}, {}, {}]
     a.first.albums.should == [@album1, @album2]
     a.map{|x| x.associations}.should == [{:albums=>[@album1, @album2]}, {:albums=>[@album3]}, {:albums=>[@album4]}, {:albums=>[]}]
-    
+
     a = Album.order(:name).all
     a.map{|x| x.associations}.should == [{}, {}, {}, {}]
     a.first.artist.should == @artist1
@@ -496,7 +496,7 @@ describe "Tactical Eager Loading Plugin" do
   end
 end
 
-describe "Identity Map plugin" do 
+describe "Identity Map plugin" do
   before do
     @db = INTEGRATION_DB
     @db.create_table!(:items) do
@@ -517,9 +517,9 @@ describe "Identity Map plugin" do
   specify "should return the same instance if retrieved more than once" do
     Item.with_identity_map{Item.first.object_id.should == Item.first.object_id}
   end
-  
+
   specify "should merge attributes that don't exist in the model" do
-    Item.with_identity_map do 
+    Item.with_identity_map do
       i = Item.select(:id, :name).first
       i.values.should == {:id=>1, :name=>'J'}
       Item.first
@@ -552,8 +552,8 @@ describe "Touch plugin" do
       plugin :touch, :associations=>:artist
     end
     class ::Artist < Sequel::Model(@db)
-    end 
-    
+    end
+
     @artist = Artist.create(:name=>'1')
     @album = Album.create(:name=>'A', :artist=>@artist)
   end
@@ -569,7 +569,7 @@ describe "Touch plugin" do
     @album.touch
     @album.updated_at.to_i.should be_within(2).of(Time.now.to_i)
   end
-  
+
   cspecify "should update the timestamp column for associated records when the record is updated or destroyed", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
     @artist.updated_at.should == nil
     @album.update(:name=>'B')
@@ -589,7 +589,7 @@ describe "Touch plugin" do
   end
 end
 
-describe "Serialization plugin" do 
+describe "Serialization plugin" do
   before do
     @db = INTEGRATION_DB
     @db.create_table!(:items) do
@@ -616,7 +616,7 @@ describe "Serialization plugin" do
   end
 end
 
-describe "OptimisticLocking plugin" do 
+describe "OptimisticLocking plugin" do
   before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:people) do
@@ -658,7 +658,7 @@ describe "OptimisticLocking plugin" do
   end
 end
 
-describe "Composition plugin" do 
+describe "Composition plugin" do
   before do
     @db = INTEGRATION_DB
     @db.create_table!(:events) do
@@ -724,7 +724,7 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       class ::Node < Sequel::Model(@db)
         plugin :rcte_tree, :order=>:name
       end
-      
+
       @nodes = []
       @nodes << @a = Node.create(:name=>'a')
       @nodes << @b = Node.create(:name=>'b')
@@ -747,7 +747,7 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       @db.drop_table? :nodes
       Object.send(:remove_const, :Node)
     end
-    
+
     specify "should load all standard (not-CTE) methods correctly" do
       @a.children.should == [@aa, @ab]
       @b.children.should == [@ba, @bb]
@@ -762,7 +762,7 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       @aaaa.children.should == [@aaaaa]
       @aaab.children.should == []
       @aaaaa.children.should == []
-      
+
       @a.parent.should == nil
       @b.parent.should == nil
       @aa.parent.should == @a
@@ -777,7 +777,7 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       @aaab.parent.should == @aaa
       @aaaaa.parent.should == @aaaa
     end
-    
+
     specify "should load all ancestors and descendants lazily for a given instance" do
       @a.descendants.should == [@aa, @aaa, @aaaa, @aaaaa, @aaab, @aab, @ab, @aba, @abb]
       @b.descendants.should == [@ba, @bb]
@@ -792,7 +792,7 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       @aaaa.descendants.should == [@aaaaa]
       @aaab.descendants.should == []
       @aaaaa.descendants.should == []
-      
+
       @a.ancestors.should == []
       @b.ancestors.should == []
       @aa.ancestors.should == [@a]
@@ -807,7 +807,7 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       @aaab.ancestors.should == [@a, @aa, @aaa]
       @aaaaa.ancestors.should == [@a, @aa, @aaa, @aaaa]
     end
-    
+
     specify "should eagerly load all ancestors and descendants for a dataset" do
       nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:ancestors, :descendants).all
       nodes.should == [@a, @aaa, @b]
@@ -830,21 +830,21 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       nodes[2].descendants.should == [{:parent_id=>2, :id=>5}, {:parent_id=>2, :id=>6}].map{|x| c.load(x)}
       nodes[1].ancestors.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>1, :id=>3}].map{|x| c.load(x)}
     end
-    
+
     specify "should eagerly load descendants to a given level" do
       nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>1).all
       nodes.should == [@a, @aaa, @b]
       nodes[0].descendants.should == [@aa, @ab]
       nodes[1].descendants.should == [@aaaa, @aaab]
       nodes[2].descendants.should == [@ba, @bb]
-      
+
       nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>2).all
       nodes.should == [@a, @aaa, @b]
       nodes[0].descendants.should == [@aa, @aaa, @aab, @ab, @aba, @abb]
       nodes[1].descendants.should == [@aaaa, @aaaaa, @aaab]
       nodes[2].descendants.should == [@ba, @bb]
     end
-    
+
     specify "should populate all :children associations when eagerly loading descendants for a dataset" do
       nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants).all
       nodes[0].associations[:children].should == [@aa, @ab]
@@ -858,7 +858,7 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.should == [[[[@aaaaa], []], []], [[], []]]
       nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children].map{|c4| c4.associations[:children]}}}}.should == [[[[[]], []], []], [[], []]]
     end
-    
+
     specify "should not populate :children associations for final level when loading descendants to a given level" do
       nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>1).all
       nodes[0].associations[:children].should == [@aa, @ab]
@@ -867,31 +867,31 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       nodes[1].associations[:children].map{|c1| c1.associations[:children]}.should == [nil, nil]
       nodes[2].associations[:children].should == [@ba, @bb]
       nodes[2].associations[:children].map{|c1| c1.associations[:children]}.should == [nil, nil]
-      
+
       nodes[0].associations[:children].map{|c1| c1.children}.should == [[@aaa, @aab], [@aba, @abb]]
       nodes[1].associations[:children].map{|c1| c1.children}.should == [[@aaaaa], []]
       nodes[2].associations[:children].map{|c1| c1.children}.should == [[], []]
-      
+
       nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>2).all
       nodes[0].associations[:children].should == [@aa, @ab]
       nodes[0].associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaa, @aab], [@aba, @abb]]
       nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[@aaaa, @aaab], nil], [nil, nil]]
       nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| (cc2 = c2.associations[:children]) ? cc2.map{|c3| c3.associations[:children]} : nil}}.should == [[[[@aaaaa], []], nil], [nil, nil]]
       nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| (cc2 = c2.associations[:children]) ? cc2.map{|c3| (cc3 = c3.associations[:children]) ? cc3.map{|c4| c4.associations[:children]} : nil} : nil}}.should == [[[[nil], []], nil], [nil, nil]]
-      
+
       nodes[1].associations[:children].should == [@aaaa, @aaab]
       nodes[1].associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaaaa], []]
       nodes[1].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[nil], []]
-      
+
       nodes[2].associations[:children].should == [@ba, @bb]
       nodes[2].associations[:children].map{|c1| c1.associations[:children]}.should == [[], []]
-      
+
       nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children}}.should == [[[@aaaa, @aaab], []], [[], []]]
       nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children.map{|c3| c3.children}}}.should == [[[[@aaaaa], []], []], [[], []]]
       nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children.map{|c3| c3.children.map{|c4| c4.children}}}}.should == [[[[[]], []], []], [[], []]]
       nodes[1].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children}}.should == [[[]], []]
     end
-    
+
     specify "should populate all :children associations when lazily loading descendants" do
       @a.descendants
       @a.associations[:children].should == [@aa, @ab]
@@ -899,16 +899,16 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[@aaaa, @aaab], []], [[], []]]
       @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.should == [[[[@aaaaa], []], []], [[], []]]
       @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children].map{|c4| c4.associations[:children]}}}}.should == [[[[[]], []], []], [[], []]]
-      
+
       @b.descendants
       @b.associations[:children].should == [@ba, @bb]
       @b.associations[:children].map{|c1| c1.associations[:children]}.should == [[], []]
-      
+
       @aaa.descendants
       @aaa.associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaaaa], []]
       @aaa.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[]], []]
     end
-    
+
     specify "should populate all :parent associations when eagerly loading ancestors for a dataset" do
       nodes = Node.filter(:id=>[@a.id, @ba.id, @aaa.id, @aaaaa.id]).order(:name).eager(:ancestors).all
       nodes[0].associations.fetch(:parent, 1).should == nil
@@ -923,17 +923,17 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       nodes[3].associations[:parent].should == @b
       nodes[3].associations[:parent].associations.fetch(:parent, 1).should == nil
     end
-    
+
     specify "should populate all :parent associations when lazily loading ancestors" do
       @a.reload
       @a.ancestors
       @a.associations[:parent].should == nil
-      
+
       @ba.reload
       @ba.ancestors
       @ba.associations[:parent].should == @b
       @ba.associations[:parent].associations.fetch(:parent, 1).should == nil
-      
+
       @ba.reload
       @aaaaa.ancestors
       @aaaaa.associations[:parent].should == @aaaa
@@ -945,7 +945,7 @@ if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
   end
 end
 
-describe "Instance Filters plugin" do 
+describe "Instance Filters plugin" do
   before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:items) do
@@ -968,17 +968,17 @@ describe "Instance Filters plugin" do
     @db.drop_table?(:items)
     Object.send(:remove_const, :Item)
   end
-  
+
   specify "should not raise an error if saving only updates one row" do
     @i.save
     @i.refresh.name.should == 'K'
   end
-  
+
   specify "should raise error if saving doesn't update a row" do
     @i.this.update(:number=>2)
     proc{@i.save}.should raise_error(Sequel::Error)
   end
-  
+
   specify "should apply all instance filters" do
     @i.instance_filter{cost <= 2}
     @i.this.update(:number=>2)
@@ -989,26 +989,26 @@ describe "Instance Filters plugin" do
     @i.save
     @i.refresh.name.should == 'K'
   end
-  
+
   specify "should clear instance filters after successful save" do
     @i.save
     @i.this.update(:number=>2)
     @i.update(:name=>'L')
     @i.refresh.name.should == 'L'
   end
-  
+
   specify "should not raise an error if deleting only deletes one row" do
     @i.destroy
     proc{@i.refresh}.should raise_error(Sequel::Error, 'Record not found')
   end
-  
+
   specify "should raise error if destroying doesn't delete a row" do
     @i.this.update(:number=>2)
     proc{@i.destroy}.should raise_error(Sequel::Error)
   end
 end
 
-describe "UpdatePrimaryKey plugin" do 
+describe "UpdatePrimaryKey plugin" do
   before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:t) do
@@ -1066,7 +1066,7 @@ describe "UpdatePrimaryKey plugin" do
   end
 end
 
-describe "AssociationPks plugin" do 
+describe "AssociationPks plugin" do
   before(:all) do
     @db = INTEGRATION_DB
     @db.drop_table?(:albums_tags, :tags, :albums, :artists)
@@ -1090,13 +1090,13 @@ describe "AssociationPks plugin" do
     class ::Artist < Sequel::Model
       plugin :association_pks
       one_to_many :albums, :order=>:id
-    end 
+    end
     class ::Album < Sequel::Model
       plugin :association_pks
       many_to_many :tags, :order=>:id
-    end 
+    end
     class ::Tag < Sequel::Model
-    end 
+    end
   end
   before do
     [:albums_tags, :tags, :albums, :artists].each{|t| @db[t].delete}
@@ -1328,12 +1328,12 @@ describe "Sequel::Plugins::Tree" do
         Integer :id, :primary_key=>true
         String :name
         Integer :parent_id
-        Integer :position 
+        Integer :position
       end
 
-      @nodes = [{:id => 1, :name => 'one', :parent_id => nil, :position => 1}, 
-        {:id => 2, :name => 'two', :parent_id => nil, :position => 2}, 
-        {:id => 3, :name => 'three', :parent_id => nil, :position => 3}, 
+      @nodes = [{:id => 1, :name => 'one', :parent_id => nil, :position => 1},
+        {:id => 2, :name => 'two', :parent_id => nil, :position => 2},
+        {:id => 3, :name => 'three', :parent_id => nil, :position => 3},
         {:id => 4, :name => "two.one", :parent_id => 2, :position => 1},
         {:id => 5, :name => "two.two", :parent_id => 2, :position => 2},
         {:id => 6, :name => "two.two.one", :parent_id => 5, :position => 1},
@@ -1362,31 +1362,31 @@ describe "Sequel::Plugins::Tree" do
       Node.roots_dataset.count.should == 5
     end
 
-    it "should find all descendants of a node" do 
+    it "should find all descendants of a node" do
       two = Node.find(:id => 2)
       two.name.should == "two"
       two.descendants.map{|m| m[:id]}.should == [4, 5, 12, 6]
     end
 
-    it "should find all ancestors of a node" do 
+    it "should find all ancestors of a node" do
       twotwoone = Node.find(:id => 6)
       twotwoone.name.should == "two.two.one"
       twotwoone.ancestors.map{|m| m[:id]}.should == [5, 2]
     end
-    
-    it "should find all siblings of a node, excepting self" do 
+
+    it "should find all siblings of a node, excepting self" do
       twoone = Node.find(:id => 4)
       twoone.name.should == "two.one"
       twoone.siblings.map{|m| m[:id]}.should == [5, 12]
     end
 
-    it "should find all siblings of a node, including self" do 
+    it "should find all siblings of a node, including self" do
       twoone = Node.find(:id => 4)
       twoone.name.should == "two.one"
       twoone.self_and_siblings.map{|m| m[:id]}.should == [4, 5, 12]
     end
 
-    it "should find siblings for root nodes" do 
+    it "should find siblings for root nodes" do
       three = Node.find(:id => 3)
       three.name.should == "three"
       three.self_and_siblings.map{|m| m[:id]}.should == [1, 2, 3, 9, 10]
@@ -1396,11 +1396,11 @@ describe "Sequel::Plugins::Tree" do
       twotwoone = Node.find(:id => 6)
       twotwoone.name.should == "two.two.one"
       twotwoone.root[:id].should == 2
-    
+
       three = Node.find(:id => 3)
       three.name.should == "three"
       three.root[:id].should == 3
-    
+
       fiveone = Node.find(:id => 11)
       fiveone.name.should == "five.one"
       fiveone.root[:id].should == 9
@@ -1410,14 +1410,14 @@ describe "Sequel::Plugins::Tree" do
       Node.roots_dataset.count.should == 5
       Node.roots.inject([]){|ids, p| ids << p.position}.should == [1, 2, 3, 5, 4]
     end
-  
+
     it "should have children" do
       one = Node.find(:id => 1)
       one.name.should == "one"
       one.children.size.should == 2
     end
-  
-    it "children should be natural database order" do 
+
+    it "children should be natural database order" do
       one = Node.find(:id => 1)
       one.name.should == "one"
       one.children.map{|m| m[:position]}.should == [2, 1]
@@ -1438,7 +1438,7 @@ describe "Sequel::Plugins::Tree" do
         OrderedNode.roots.inject([]){|ids, p| ids << p.position}.should == [1, 2, 3, 4, 5]
       end
 
-      it "children should be in specified order" do 
+      it "children should be in specified order" do
         one = OrderedNode.find(:id => 1)
         one.name.should == "one"
         one.children.map{|m| m[:position]}.should == [1, 2]
@@ -1455,10 +1455,10 @@ describe "Sequel::Plugins::Tree" do
         Integer :neque
       end
 
-      @lorems = [{:id => 1, :name => 'Lorem', :ipsum_id => nil, :neque => 4}, 
-        {:id => 2, :name => 'Ipsum', :ipsum_id => nil, :neque => 3}, 
+      @lorems = [{:id => 1, :name => 'Lorem', :ipsum_id => nil, :neque => 4},
+        {:id => 2, :name => 'Ipsum', :ipsum_id => nil, :neque => 3},
         {:id => 4, :name => "Neque", :ipsum_id => 2, :neque => 2},
-        {:id => 5, :name => "Porro", :ipsum_id => 2, :neque => 1}]  
+        {:id => 5, :name => "Porro", :ipsum_id => 2, :neque => 1}]
       @lorems.each{|lorem| @db[:lorems].insert(lorem)}
 
       class ::Lorem < Sequel::Model
@@ -1475,7 +1475,7 @@ describe "Sequel::Plugins::Tree" do
       Lorem.roots.inject([]){|ids, p| ids << p.neque}.should == [3, 4]
     end
 
-    it "children should be specified order" do 
+    it "children should be specified order" do
       one = Lorem.find(:id => 2)
       one.children.map{|m| m[:neque]}.should == [1, 2]
     end
@@ -1502,14 +1502,14 @@ describe "Sequel::Plugins::PreparedStatements" do
     @db.drop_table?(:ps_test)
   end
 
-  it "should work with looking up using Model.[]" do 
+  it "should work with looking up using Model.[]" do
     @c[@foo.id].should == @foo
     @c[@bar.id].should == @bar
     @c[0].should == nil
     @c[nil].should == nil
   end
 
-  it "should work with looking up using Dataset#with_pk" do 
+  it "should work with looking up using Dataset#with_pk" do
     @c.dataset.with_pk(@foo.id).should == @foo
     @c.dataset.with_pk(@bar.id).should == @bar
     @c.dataset.with_pk(0).should == nil
@@ -1525,14 +1525,14 @@ describe "Sequel::Plugins::PreparedStatements" do
     @c.dataset.filter(:name=>'bar').with_pk(nil).should == nil
   end
 
-  it "should work with Model#destroy" do 
+  it "should work with Model#destroy" do
     @foo.destroy
     @bar.destroy
     @c[@foo.id].should == nil
     @c[@bar.id].should == nil
   end
 
-  it "should work with Model#update" do 
+  it "should work with Model#update" do
     @foo.update(:name=>'foo2', :i=>30)
     @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo2', :i=>30)
     @foo.update(:name=>'foo3')
@@ -1543,7 +1543,7 @@ describe "Sequel::Plugins::PreparedStatements" do
     @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo3', :i=>nil)
   end
 
-  it "should work with Model#create" do 
+  it "should work with Model#create" do
     o = @c.create(:name=>'foo2', :i=>30)
     @c[o.id].should == @c.load(:id=>o.id, :name=>'foo2', :i=>30)
     o = @c.create(:name=>'foo2')
@@ -1578,14 +1578,14 @@ describe "Caching plugins" do
   end
 
   shared_examples_for "a caching plugin" do
-    it "should work with looking up using Model.[]" do 
+    it "should work with looking up using Model.[]" do
       @Artist[1].should equal(@Artist[1])
       @Artist[:id=>1].should == @Artist[1]
       @Artist[0].should == nil
       @Artist[nil].should == nil
     end
 
-    it "should work with lookup up many_to_one associated objects" do 
+    it "should work with lookup up many_to_one associated objects" do
       a = @Artist[1]
       @Album.first.artist.should equal(a)
     end

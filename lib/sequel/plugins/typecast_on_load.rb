@@ -7,7 +7,7 @@ module Sequel
     #
     # This plugin modifies Model#set_values to call the setter methods (which typecast
     # by default) for all columns given.  You can either specify the columns to
-    # typecast on load in the plugin call itself, or afterwards using 
+    # typecast on load in the plugin call itself, or afterwards using
     # add_typecast_on_load_columns:
     #
     #   Album.plugin :typecast_on_load, :release_date, :record_date

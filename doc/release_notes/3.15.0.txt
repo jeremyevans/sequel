@@ -4,14 +4,14 @@
   performance increase over the standard mysql adapter. In order to
   use it, you need to install mysql2, and change your connection
   strings to use mysql2:// instead of mysql://.
-  
+
 * Support for sequel_pg was added to the native postgres adapter,
   when pg is being used as the backend.  sequel_pg also offers a
   large (2-6x) performance increase over the default row fetching
   code that the Sequel postgres adapter uses.  In order to use it,
   you just need to install sequel_pg, and the postgres adapter will
   pick it up automatically.
-  
+
 * Mass assignment has been made about 10x faster by caching the
   allowed setter methods in the model.
 
@@ -19,10 +19,10 @@
 
 * The following construct is now safe to use in environments that
   reload code without unloading existing constants:
-  
+
     class MyModel < Sequel::Model(DB[:table])
     end
-    
+
   Previously, this would raise a superclass mismatch TypeError.
 
 * Sequel now handles the case where both an implicit and an explicit
@@ -36,10 +36,10 @@
 
 * The active_model plugin now supports the final release of
   ActiveModel 3.0.0.
-  
+
 * Typecasting now works correctly for attributes loaded lazily
   when using the lazy_attributes plugin.
-  
+
 * The class_table_inheritance plugin now works with non-integer
   primary keys on SQLite.
 
@@ -74,5 +74,5 @@
   incorrect exception class being raised if you manually undefine
   instance setter methods in the model class.  If you do this, you
   need to clear the setter methods cache manually:
-  
+
     MyModel.clear_setter_methods_cache

@@ -51,7 +51,7 @@ New Features
 
   The :indexes=>false option causes indexes not be included in the
   migration.  The dump_indexes_migration can be used to create a
-  separate migration with the indexes.  This can be useful if you 
+  separate migration with the indexes.  This can be useful if you
   plan on loading a lot of data right after creating the tables,
   since it is faster to add indexes after the data has been added.
 
@@ -99,7 +99,7 @@ New Features
 * SQL::QualifiedIdentifiers can now be qualified, allowing you to do:
 
    :column.qualify(:table).qualify(:schema)
- 
+
 * Using the :db_type=>'mssql' option with the DBI adapter will now
   load the MSSQL support.
 
@@ -130,7 +130,7 @@ Other Improvements
 * The PostgreSQL shared adapter now handles sequences that need to be
   quoted correctly (previously these were quoted twice).
 
-* String quoting on Oracle no longer doubles backslashes. 
+* String quoting on Oracle no longer doubles backslashes.
 
 * Database#count now works correctly when used on MSSQL when using
   an adapter that doesn't handle unnamed columns.
@@ -183,7 +183,7 @@ Backwards Compatibility
 
     # 2.12.0
     dataset.exclude{{:a=>1, :b=>1}} # a != 1 OR b != 1
-  
+
   If you want the previous behavior,
   change the code to the following:
 
@@ -208,8 +208,8 @@ Backwards Compatibility
 
 * The Firebird adapter no longer translates the text database
   specific type.  Use the following instead:
-    
-    String :column, :text=>true 
+
+    String :column, :text=>true
 
 * The MySQL shared adapter used to use the timestamp type for Time,
   now it uses datetime.  This is because the timestamp type cannot

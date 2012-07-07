@@ -63,9 +63,9 @@
 #
 # PGArray::Parser code was translated from Javascript code in the
 # node-postgres project and has the following additional license:
-# 
+#
 # Copyright (c) 2010 Brian Carlson (brian.m.carlson@gmail.com)
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -73,10 +73,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject
 # to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 # KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 # WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -156,7 +156,7 @@ module Sequel
         end
 
         if soid = opts[:scalar_oid]
-          raise Error, "can't provide both a converter and :scalar_oid option to register" if converter 
+          raise Error, "can't provide both a converter and :scalar_oid option to register" if converter
           raise Error, "no conversion proc for :scalar_oid=>#{soid.inspect} in PG_TYPES" unless converter = PG_TYPES[soid]
         end
 
@@ -294,7 +294,7 @@ module Sequel
         def initialize(source, converter=nil)
           @source = source
           @source_length = source.length
-          @converter = converter 
+          @converter = converter
           @pos = -1
           @entries = []
           @recorded = ""
@@ -317,7 +317,7 @@ module Sequel
         def record(c)
           @recorded << c
         end
-        
+
         # Take the buffer of recorded characters and add it to the array
         # of entries, and use a new buffer for recorded characters.
         def new_entry(include_empty=false)
@@ -441,7 +441,7 @@ module Sequel
         @array_type = type
       end
 
-      # Append the array SQL to the given sql string. 
+      # Append the array SQL to the given sql string.
       # If the receiver has a type, add a cast to the
       # database array type.
       def sql_literal_append(ds, sql)

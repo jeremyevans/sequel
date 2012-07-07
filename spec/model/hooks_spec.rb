@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Model#after_initialize" do
   specify "should be called after initialization for both new object and objects retrieved from the database" do
-    
+
     a = Class.new(Sequel::Model) do
       self::Foo = []
       columns :x, :y
@@ -10,7 +10,7 @@ describe "Model#after_initialize" do
         model::Foo << @values.clone
       end
     end
-    
+
     a.new(:x => 1, :y => 2)
     a.call(:x => 1, :y => 3)
     a::Foo.should == [{:x => 1, :y => 2}, {:x => 1, :y => 3}]
@@ -23,14 +23,14 @@ describe "Model#before_create && Model#after_create" do
       columns :x
       set_primary_key :x
       unrestrict_primary_key
-      
+
       def after_create
         MODEL_DB << "BLAH after"
       end
     end
     MODEL_DB.reset
   end
-  
+
   specify "should be called around new record creation" do
     @c.send(:define_method, :before_create){MODEL_DB << "BLAH before"}
     @c.create(:x => 2)
@@ -62,7 +62,7 @@ describe "Model#before_update && Model#after_update" do
     end
     MODEL_DB.reset
   end
-  
+
   specify "should be called around record update" do
     @c.send(:define_method, :before_update){MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233, :x=>123)
@@ -103,14 +103,14 @@ describe "Model#before_save && Model#after_save" do
     end
     MODEL_DB.reset
   end
-  
+
   specify "should be called around record update" do
     @c.send(:define_method, :before_save){MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233, :x=>123)
     m.save
     MODEL_DB.sqls.should == ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
   end
-  
+
   specify "should be called around record creation" do
     @c.send(:define_method, :before_save){MODEL_DB << "BLAH before"}
     @c.set_primary_key :x
@@ -151,7 +151,7 @@ describe "Model#before_destroy && Model#after_destroy" do
     end
     MODEL_DB.reset
   end
-  
+
   specify "should be called around record destruction" do
     @c.send(:define_method, :before_destroy){MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
@@ -193,7 +193,7 @@ describe "Model#before_validation && Model#after_validation" do
       end
     end
   end
-  
+
   specify "should be called around validation" do
     @c.send(:define_method, :before_validation){MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
@@ -231,14 +231,14 @@ describe "Model#before_validation && Model#after_validation" do
     proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
   end
-  
+
   specify "#save should cancel the save and return nil if before_validation returns false and raise_on_save_failure is false" do
     @c.send(:define_method, :before_validation){false}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).save.should == nil
     MODEL_DB.sqls.should == []
   end
-  
+
   specify "#valid? should return false if before_validation returns false" do
     @c.send(:define_method, :before_validation){false}
     @c.load(:id => 2233).valid?.should == false
@@ -252,7 +252,7 @@ describe "Model around filters" do
     end
     MODEL_DB.reset
   end
-  
+
   specify "around_create should be called around new record creation" do
     @c.class_eval do
       def around_create
@@ -276,7 +276,7 @@ describe "Model around filters" do
     @c.load(:id=>1, :x => 2).destroy
     MODEL_DB.sqls.should == ['ad_before', 'DELETE FROM items WHERE id = 1', 'ad_after']
   end
-  
+
   specify "around_update should be called around updating existing records" do
     @c.class_eval do
       def around_update
@@ -348,23 +348,23 @@ describe "Model around filters" do
     @c.send(:define_method, :around_create){}
     proc{@c.create(:x => 2)}.should raise_error(Sequel::HookFailed)
   end
-  
+
   specify "around_update that doesn't call super should raise a HookFailed" do
     @c.send(:define_method, :around_update){}
     proc{@c.load(:x => 2).save}.should raise_error(Sequel::HookFailed)
   end
-  
+
   specify "around_save that doesn't call super should raise a HookFailed" do
     @c.send(:define_method, :around_save){}
     proc{@c.create(:x => 2)}.should raise_error(Sequel::HookFailed)
     proc{@c.load(:x => 2).save}.should raise_error(Sequel::HookFailed)
   end
-  
+
   specify "around_destroy that doesn't call super should raise a HookFailed" do
     @c.send(:define_method, :around_destroy){}
     proc{@c.load(:x => 2).destroy}.should raise_error(Sequel::HookFailed)
   end
-  
+
   specify "around_validation that doesn't call super should raise a HookFailed" do
     @c.send(:define_method, :around_validation){}
     proc{@c.new.save}.should raise_error(Sequel::HookFailed)

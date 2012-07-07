@@ -2,7 +2,7 @@
 # IN/NOT IN with arrays of values to do specific nil checking.  For example,
 #
 #   ds = DB[:table].where(:column=>[1, nil])
-# 
+#
 # By default, that produces the following SQL:
 #
 #   SELECT * FROM table WHERE (column IN (1, NULL))

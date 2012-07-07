@@ -28,15 +28,15 @@ describe "class_table_inheritance plugin" do
         dataset.columns
       end
       plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
-    end 
+    end
     class ::Manager < Employee
       one_to_many :staff_members, :class=>:Staff
-    end 
+    end
     class ::Executive < Manager
-    end 
+    end
     class ::Staff < Employee
       many_to_one :manager
-    end 
+    end
     @ds = Employee.dataset
     @db.sqls
   end
@@ -53,45 +53,45 @@ describe "class_table_inheritance plugin" do
     Executive.simple_table.should == nil
     Staff.simple_table.should == nil
   end
-  
+
   specify "should use a joined dataset in subclasses" do
     Employee.dataset.sql.should == 'SELECT * FROM employees'
     Manager.dataset.sql.should == 'SELECT * FROM employees INNER JOIN managers USING (id)'
     Executive.dataset.sql.should == 'SELECT * FROM employees INNER JOIN managers USING (id) INNER JOIN executives USING (id)'
     Staff.dataset.sql.should == 'SELECT * FROM employees INNER JOIN staff USING (id)'
   end
-  
+
   it "should return rows with the correct class based on the polymorphic_key value" do
     @ds._fetch = [{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Staff'}]
     Employee.all.collect{|x| x.class}.should == [Employee, Manager, Executive, Staff]
-  end 
-  
+  end
+
   it "should return rows with the correct class based on the polymorphic_key value for subclasses" do
     Manager.dataset._fetch = [{:kind=>'Manager'}, {:kind=>'Executive'}]
     Manager.all.collect{|x| x.class}.should == [Manager, Executive]
   end
-  
+
   it "should return rows with the current class if cti_key is nil" do
     Employee.plugin(:class_table_inheritance)
     @ds._fetch = [{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Staff'}]
     Employee.all.collect{|x| x.class}.should == [Employee, Employee, Employee, Employee]
   end
-  
+
   it "should return rows with the current class if cti_key is nil in subclasses" do
     Employee.plugin(:class_table_inheritance)
     Object.send(:remove_const, :Executive)
     Object.send(:remove_const, :Manager)
-    class ::Manager < Employee; end 
-    class ::Executive < Manager; end 
+    class ::Manager < Employee; end
+    class ::Executive < Manager; end
     Manager.dataset._fetch = [{:kind=>'Manager'}, {:kind=>'Executive'}]
     Manager.all.collect{|x| x.class}.should == [Manager, Manager]
   end
-  
+
   it "should fallback to the main class if the given class does not exist" do
     @ds._fetch = [{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Blah'}, {:kind=>'Staff'}]
     Employee.all.collect{|x| x.class}.should == [Employee, Manager, Employee, Staff]
   end
-  
+
   it "should fallback to the main class if the given class does not exist in subclasses" do
     Manager.dataset._fetch = [{:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Blah'}]
     Manager.all.collect{|x| x.class}.should == [Manager, Executive, Manager]
@@ -101,7 +101,7 @@ describe "class_table_inheritance plugin" do
     Employee.create
     @db.sqls.should == ["INSERT INTO employees (kind) VALUES ('Employee')"]
   end
-  
+
   it "should add a before_create hook that sets the model class name for the key in subclasses" do
     Executive.create
     @db.sqls.should == ["INSERT INTO employees (kind) VALUES ('Executive')",
@@ -113,7 +113,7 @@ describe "class_table_inheritance plugin" do
     Employee.create(:kind=>'Manager')
     @db.sqls.should == ["INSERT INTO employees (kind) VALUES ('Employee')"]
   end
-    
+
   it "should ignore existing cti_key value in subclasses" do
     Manager.create(:kind=>'Executive')
     @db.sqls.should == ["INSERT INTO employees (kind) VALUES ('Manager')",
@@ -170,7 +170,7 @@ describe "class_table_inheritance plugin" do
     sqls[1].should =~ /INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \([12], [12]\)/
     sqls[2].should =~ /INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\)/
     end
-    
+
   it "should insert the correct rows into all tables with a given primary key" do
     e = Executive.new(:num_managers=>3, :num_staff=>2, :name=>'E')
     e.id = 2
@@ -192,7 +192,7 @@ describe "class_table_inheritance plugin" do
     Staff.load(:manager_id=>3).manager.should == Executive.load(:id=>3, :name=>'E', :kind=>'Executive', :num_managers=>3)
     @db.sqls.should == ['SELECT * FROM employees INNER JOIN managers USING (id) WHERE (managers.id = 3) LIMIT 1']
   end
-  
+
   it "should handle one_to_many relationships correctly" do
     Staff.dataset._fetch = {:id=>1, :name=>'S', :kind=>'Staff', :manager_id=>3}
     Executive.load(:id=>3).staff_members.should == [Staff.load(:id=>1, :name=>'S', :kind=>'Staff', :manager_id=>3)]

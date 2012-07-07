@@ -4,7 +4,7 @@ module Sequel
   module DBI
     class Database < Sequel::Database
       set_adapter_scheme :dbi
-      
+
       DBI_ADAPTERS = {
         :ado => "ADO",
         :db2 => "DB2",
@@ -19,7 +19,7 @@ module Sequel
         :sqlite => "SQLite",
         :sqlrelay => "SQLRelay"
       }
-      
+
       def initialize(opts)
         super
         case @opts[:db_type]
@@ -52,7 +52,7 @@ module Sequel
       end
 
       private_class_method :uri_to_options
-      
+
       def connect(server)
         opts = server_opts(server)
         dbname = opts[:database]
@@ -62,7 +62,7 @@ module Sequel
         end
         ::DBI.connect(dbname, opts[:user], opts[:password])
       end
-      
+
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
           r = log_yield(sql){conn.execute(sql)}
@@ -70,7 +70,7 @@ module Sequel
           r
         end
       end
-      
+
       def do(sql, opts={})
         synchronize(opts[:server]){|conn| log_yield(sql){conn.do(sql)}}
       end
@@ -82,7 +82,7 @@ module Sequel
         c.disconnect
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self
 

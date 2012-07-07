@@ -5,11 +5,11 @@ describe "LooserTypecasting Extension" do
     @db = Sequel::Database.new({})
     def @db.schema(*args)
       [[:id, {}], [:z, {:type=>:float}], [:b, {:type=>:integer}]]
-    end 
+    end
     @c = Class.new(Sequel::Model(@db[:items]))
     @c.instance_eval do
-      @columns = [:id, :b, :z] 
-      def columns; @columns; end 
+      @columns = [:id, :b, :z]
+      def columns; @columns; end
     end
   end
 

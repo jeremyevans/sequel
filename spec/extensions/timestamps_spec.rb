@@ -17,11 +17,11 @@ describe "Sequel::Plugins::Timestamps" do
       db.reset
     end
     @c.dataset.autoid = nil
-  end 
+  end
   after do
     Sequel.datetime_class = Time
   end
-  
+
   it "should set the create timestamp field on creation" do
     o = @c.create
     @c.db.sqls.should == ["INSERT INTO t (created_at) VALUES ('2009-08-01')"]
@@ -81,7 +81,7 @@ describe "Sequel::Plugins::Timestamps" do
     end
     c.create(:x=>2)
     c.load(:id=>1, :x=>2).save
-    c.db.sqls.should == ["INSERT INTO t (x) VALUES (2)", "UPDATE t SET x = 2 WHERE (id = 1)"] 
+    c.db.sqls.should == ["INSERT INTO t (x) VALUES (2)", "UPDATE t SET x = 2 WHERE (id = 1)"]
   end
 
   it "should not overwrite an existing create timestamp" do
@@ -139,7 +139,7 @@ describe "Sequel::Plugins::Timestamps" do
     c2.db.reset
     o = c2.create
     o.c.should == '2009-08-01'
-    o.u.should === o.c 
+    o.u.should === o.c
     c2.db.sqls.first.should =~ /INSERT INTO t \([cu], [cu]\) VALUES \('2009-08-01', '2009-08-01'\)/
     c2.db.reset
     o = c2.load(:id=>1).save

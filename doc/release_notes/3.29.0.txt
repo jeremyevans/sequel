@@ -415,7 +415,7 @@
     # Case sensitive
     DB[:foos].where(:name.like('bar%'))
     # Case insensitive
-    DB[:foos].where(:name.ilike('bar%'))    
+    DB[:foos].where(:name.ilike('bar%'))
 
   Sequel now sets the case_sensitive_like PRAGMA to true by default
   on SQLite.  To set it to false instead, pass the

@@ -5,7 +5,7 @@ module Sequel
       # Instance methods for H2 Database objects accessed via JDBC.
       module DatabaseMethods
         PRIMARY_KEY_INDEX_RE = /\Aprimary_key/i.freeze
-      
+
         # Commit an existing prepared transaction with the given transaction
         # identifier string.
         def commit_prepared_transaction(transaction_id)
@@ -32,19 +32,19 @@ module Sequel
         def supports_create_table_if_not_exists?
           true
         end
-      
+
         # H2 supports prepared transactions
         def supports_prepared_transactions?
           true
         end
-        
+
         # H2 supports savepoints
         def supports_savepoints?
           true
         end
-        
+
         private
-        
+
         # If the :prepare option is given and we aren't in a savepoint,
         # prepare the transaction for a two-phase commit.
         def commit_transaction(conn, opts={})
@@ -89,13 +89,13 @@ module Sequel
             super(table, op)
           end
         end
-        
+
         # Default to a single connection for a memory database.
         def connection_pool_default_options
           o = super
           uri == 'jdbc:h2:mem:' ? o.merge(:max_connections=>1) : o
         end
-      
+
         # Use IDENTITY() to get the last inserted id.
         def last_insert_id(conn, opts={})
           statement(conn) do |stmt|
@@ -105,7 +105,7 @@ module Sequel
             rs.getInt(1)
           end
         end
-        
+
         def primary_key_index_re
           PRIMARY_KEY_INDEX_RE
         end
@@ -121,7 +121,7 @@ module Sequel
           column[:identity] ? 'BIGINT IDENTITY' : super
         end
       end
-      
+
       # Dataset class for H2 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
@@ -132,7 +132,7 @@ module Sequel
         BITCOMP_CLOSE = ") - 1)".freeze
         ILIKE_PLACEHOLDER = ["CAST(".freeze, " AS VARCHAR_IGNORECASE)".freeze].freeze
         TIME_FORMAT = "'%H:%M:%S'".freeze
-        
+
         # Emulate the case insensitive LIKE operator and the bitwise operators.
         def complex_expression_sql_append(sql, op, args)
           case op
@@ -152,7 +152,7 @@ module Sequel
             super
           end
         end
-        
+
         # H2 requires SQL standard datetimes
         def requires_sql_standard_datetimes?
           true
@@ -162,16 +162,16 @@ module Sequel
         def supports_is_true?
           false
         end
-        
+
         # H2 doesn't support JOIN USING
         def supports_join_using?
           false
         end
-        
+
         # H2 doesn't support multiple columns in IN/NOT IN
         def supports_multiple_column_in?
           false
-        end 
+        end
 
         private
 
@@ -182,7 +182,7 @@ module Sequel
         end
 
         H2_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:h2_clob)
-      
+
         # Handle H2 specific clobs as strings.
         def convert_type_proc(v)
           if v.is_a?(Java::OrgH2Jdbc::JdbcClob)
@@ -191,12 +191,12 @@ module Sequel
             super
           end
         end
-        
+
         # H2 expects hexadecimal strings for blob values
         def literal_blob_append(sql, v)
           sql << APOS << v.unpack(HSTAR).first << APOS
         end
-        
+
         # H2 handles fractional seconds in timestamps, but not in times
         def literal_sqltime(v)
           v.strftime(TIME_FORMAT)

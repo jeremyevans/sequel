@@ -6,7 +6,7 @@ New Features
   if you have a sharded database but have lookup tables that should
   be identical on all shards.  It works by yielding copies of the
   current dataset that are tied to each server/shard:
-  
+
     DB[:table].filter(:id=>1).each_server do |ds|
       ds.update(:name=>'foo')
     end
@@ -15,17 +15,17 @@ New Features
   modification methods on all shards.  It works by yielding a
   new Sequel::Database object for each shard, that will connect to
   only that shard:
-  
+
     DB.each_server do |db|
       db.create_table(:t){Integer :num}
     end
-    
+
 * You can now add and remove servers/shards from the connection
   pool while Sequel is running:
-  
+
     DB.add_servers(:shard1=>{:host=>'s1'}, :shard2=>{:host=>'s2'})
     DB.remove_servers(:shard1, :shard2)
-    
+
 * When you attempt to disconnect from a server that has connections
   currently in use, Sequel will now schedule those connections to
   be disconnected when they are returned to the pool.  Previously,
@@ -34,12 +34,12 @@ New Features
   disconnection from the server.  Even with this new feature, you can
   only guarantee eventual disconnection, since disconnection of
   connections in use happens asynchronously.
-  
+
 * Database#disconnect now accepts a :servers option specifying the
   server(s) from which to disconnect.  This should be a symbol or
   array of symbols representing servers/shards.  Only those specified
   will be disconnected:
-  
+
     DB.disconnect(:servers=>[:shard1, :shard2])
 
 * A validates_type validation was added to the validation_helpers
@@ -47,7 +47,7 @@ New Features
   the correct type.  I can be helpful if you are also using the
   serialization plugin to store serialized ruby objects, by making
   sure that the objects are of the correct type (e.g. Hash):
-  
+
     def validate
       validates_type(Hash, :options)
     end
@@ -64,7 +64,7 @@ New Features
 * When using the generic File type to create blob columns on
   MySQL, you can specify the specific database type by using the
   :size option (with :tiny, :medium, and :long values recognized):
-  
+
     DB.create_table(:docs){File :body, :size=>:long} # longblob
 
 * The mysql adapter will now default to using mysqlplus, falling
@@ -73,7 +73,7 @@ New Features
 
 * The JDBC adapter is now able to detect certain types of disconnect
   errors.
-  
+
 * ConnectionPool.servers and Database.servers were added, which
   return an array of symbols specifying the servers/shards in use.
 
@@ -90,7 +90,7 @@ Other Improvements
 * PGErrors are now correctly converted to DatabaseErrors in the
   postgres adapter when preparing statements or executing prepared
   statements.
-  
+
 * DatabaseDisconnectErrors are now raised correctly in the postgres
   adapter if the connection status is not OK after a query raises an
   error.
@@ -106,15 +106,15 @@ Other Improvements
 
 * Backslashes are no longer doubled inside string literals when
   connecting to Microsoft SQL Server.
-  
+
 * The ORDER clause now correctly comes after the HAVING clause on
   Microsoft SQL Server.
-  
+
 * Sequel now checks that there is an active transaction before
   rolling back transactions on Microsoft SQL Server, since
   there are cases where Microsoft SQL Server will roll back
   transactions implicitly.
-  
+
 * Blobs are now handled correctly when connecting to H2.
 
 * 64-bit integers are now handled correctly in JDBC prepared
@@ -123,7 +123,7 @@ Other Improvements
 * In the boolean_readers plugin, correctly handle columns not in
   the db_schema, and don't raise an error if the model's columns
   can't be determined.
-  
+
 * In the identity_map plugin, remove instances from the cache if they
   are deleted or destroyed.
 

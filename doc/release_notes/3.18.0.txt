@@ -28,7 +28,7 @@
     end
 
   The following methods are supported in a change block:
- 
+
   * create_table
   * add_column
   * add_index

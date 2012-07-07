@@ -5,7 +5,7 @@ describe "String#to_time" do
     "2007-07-11".to_time.should == Time.parse("2007-07-11")
     "06:30".to_time.should == Time.parse("06:30")
   end
-  
+
   specify "should raise InvalidValue for an invalid time" do
     proc {'0000-00-00'.to_time}.should raise_error(Sequel::InvalidValue)
   end
@@ -19,7 +19,7 @@ describe "String#to_date" do
   specify "should convert the string into a Date object" do
     "2007-07-11".to_date.should == Date.parse("2007-07-11")
   end
-  
+
   specify "should convert 2 digit years by default" do
     "July 11, 07".to_date.should == Date.parse("2007-07-11")
   end
@@ -42,7 +42,7 @@ describe "String#to_datetime" do
   specify "should convert the string into a DateTime object" do
     "2007-07-11 10:11:12a".to_datetime.should == DateTime.parse("2007-07-11 10:11:12a")
   end
-  
+
   specify "should convert 2 digit years by default" do
     "July 11, 07 10:11:12a".to_datetime.should == DateTime.parse("2007-07-11 10:11:12a")
   end
@@ -67,13 +67,13 @@ describe "String#to_sequel_time" do
     "2007-07-11 10:11:12a".to_sequel_time.class.should == Time
     "2007-07-11 10:11:12a".to_sequel_time.should == Time.parse("2007-07-11 10:11:12a")
   end
-  
+
   specify "should convert the string into a DateTime object if that is set" do
     Sequel.datetime_class = DateTime
     "2007-07-11 10:11:12a".to_sequel_time.class.should == DateTime
     "2007-07-11 10:11:12a".to_sequel_time.should == DateTime.parse("2007-07-11 10:11:12a")
   end
-  
+
   specify "should convert 2 digit years by default if using DateTime class" do
     Sequel.datetime_class = DateTime
     "July 11, 07 10:11:12a".to_sequel_time.should == DateTime.parse("2007-07-11 10:11:12a")

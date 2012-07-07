@@ -16,13 +16,13 @@ module Sequel
           c
         end
       end
-      
+
       # Dataset class for SQLite datasets accessed via Swift.
       class Dataset < Swift::Dataset
         include Sequel::SQLite::DatasetMethods
-        
+
         private
-        
+
         # Use Swift's escape method for quoting.
         def literal_string_append(sql, s)
           sql << db.synchronize{|c| c.escape(s)}

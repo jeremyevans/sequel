@@ -1,20 +1,20 @@
-module Sequel 
+module Sequel
   class Dataset
     # ---------------------
     # :section: 8 - Methods related to prepared statements or bound variables
     # On some adapters, these use native prepared statements and bound variables, on others
     # support is emulated.  For details, see the {"Prepared Statements/Bound Variables" guide}[link:files/doc/prepared_statements_rdoc.html].
     # ---------------------
-    
+
     PREPARED_ARG_PLACEHOLDER = LiteralString.new('?').freeze
-    
+
     # Default implementation of the argument mapper to allow
     # native database support for bind variables and prepared
     # statements (as opposed to the emulated ones used by default).
     module ArgumentMapper
       # The name of the prepared statement, if any.
       attr_accessor :prepared_statement_name
-      
+
       # The bind arguments to use for running this prepared statement
       attr_accessor :bind_arguments
 
@@ -25,7 +25,7 @@ module Sequel
         ds.bind_arguments = ds.map_to_prepared_args(ds.opts[:bind_vars])
         ds.run(&block)
       end
-        
+
       # Override the given *_sql method based on the type, and
       # cache the result of the sql.
       def prepared_sql
@@ -45,25 +45,25 @@ module Sequel
     # from using the dataset without bind variables.
     module PreparedStatementMethods
       PLACEHOLDER_RE = /\A\$(.*)\z/
-      
+
       # Whether to log the full SQL query.  By default, just the prepared statement
       # name is generally logged on adapters that support native prepared statements.
       attr_accessor :log_sql
-      
+
       # The type of prepared statement, should be one of :select, :first,
       # :insert, :update, or :delete
       attr_accessor :prepared_type
-      
+
       # The array/hash of bound variable placeholder names.
       attr_accessor :prepared_args
-      
+
       # The dataset that created this prepared statement.
       attr_accessor :orig_dataset
-      
+
       # The argument to supply to insert and update, which may use
       # placeholders specified by prepared_args
       attr_accessor :prepared_modify_values
-      
+
       # Sets the prepared_args to the given hash and runs the
       # prepared statement.
       def call(bind_vars={}, &block)
@@ -75,7 +75,7 @@ module Sequel
       def columns
         orig_dataset.columns
       end
-      
+
       # Returns the SQL for the prepared statement, depending on
       # the type of the statement and the prepared_modify_values.
       def prepared_sql
@@ -97,7 +97,7 @@ module Sequel
           select_sql
         end
       end
-      
+
       # Changes the values of symbols if they start with $ and
       # prepared_args is present.  If so, they are considered placeholders,
       # and they are substituted using prepared_arg.
@@ -113,16 +113,16 @@ module Sequel
           super
         end
       end
-      
+
       # Programmer friendly string showing this is a prepared statement,
       # with the prepared SQL it represents (which in general won't have
       # substituted variables).
       def inspect
         "<#{self.class.name}/PreparedStatement #{prepared_sql.inspect}>"
       end
-      
+
       protected
-      
+
       # Run the method based on the type of prepared statement, with
       # :select running #all to get all of the rows, and the other
       # types running the method with the same name as the type.
@@ -146,15 +146,15 @@ module Sequel
         when Array
           case @prepared_type.at(0)
           when :map, :to_hash, :to_hash_groups
-            send(*@prepared_type, &block) 
+            send(*@prepared_type, &block)
           end
         else
           all(&block)
         end
       end
-      
+
       private
-      
+
       # Returns the value of the prepared_args hash for the given key.
       def prepared_arg(k)
         @opts[:bind_vars][k]
@@ -175,38 +175,38 @@ module Sequel
         ps.prepared_sql
       end
     end
-    
+
     # Default implementation for an argument mapper that uses
     # unnumbered SQL placeholder arguments.  Keeps track of which
     # arguments have been used, and allows arguments to
     # be used more than once.
     module UnnumberedArgumentMapper
       include ArgumentMapper
-      
+
       protected
-      
+
       # Returns a single output array mapping the values of the input hash.
       # Keys in the input hash that are used more than once in the query
       # have multiple entries in the output array.
       def map_to_prepared_args(bind_vars)
         prepared_args.map{|v| bind_vars[v]}
       end
-      
+
       private
-      
+
       # Associates the argument with name k with the next position in
       # the output array.
       def prepared_arg(k)
         prepared_args << k
         prepared_arg_placeholder
       end
-      
+
       # Always assume there is a prepared arg in the argument mapper.
       def prepared_arg?(k)
         true
       end
     end
-    
+
     # Set the bind variables to use for the call.  If bind variables have
     # already been set for this dataset, they are updated with the contents
     # of bind_vars.
@@ -217,7 +217,7 @@ module Sequel
     def bind(bind_vars={})
       clone(:bind_vars=>@opts[:bind_vars] ? @opts[:bind_vars].merge(bind_vars) : bind_vars)
     end
-    
+
     # For the given type (:select, :first, :insert, :insert_select, :update, or :delete),
     # run the sql with the bind variables specified in the hash.  +values+ is a hash passed to
     # insert or update (if one of those types is used), which may contain placeholders.
@@ -228,7 +228,7 @@ module Sequel
     def call(type, bind_variables={}, *values, &block)
       prepare(type, nil, *values).call(bind_variables, &block)
     end
-    
+
     # Prepare an SQL statement for later execution.  Takes a type similar to #call,
     # and the +name+ symbol of the prepared statement.  While +name+ defaults to +nil+,
     # it should always be provided as a symbol for the name of the prepared statement,
@@ -252,9 +252,9 @@ module Sequel
       db.set_prepared_statement(name, ps) if name
       ps
     end
-    
+
     protected
-    
+
     # Return a cloned copy of the current dataset extended with
     # PreparedStatementMethods, setting the type and modify values.
     def to_prepared_statement(type, values=nil)
@@ -267,7 +267,7 @@ module Sequel
     end
 
     private
-    
+
     # The argument placeholder.  Most databases used unnumbered
     # arguments with question marks, so that is the default.
     def prepared_arg_placeholder

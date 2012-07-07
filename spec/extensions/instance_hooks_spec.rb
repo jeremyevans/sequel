@@ -5,7 +5,7 @@ describe "InstanceHooks plugin" do
     @r << x
     x
   end
-  
+
   before do
     @c = Class.new(Sequel::Model(:items))
     @c.plugin :instance_hooks
@@ -14,7 +14,7 @@ describe "InstanceHooks plugin" do
     @x = @c.load({:id=>1})
     @r = []
   end
-  
+
   it "should support before_create_hook and after_create_hook" do
     @o.after_create_hook{r 1}
     @o.before_create_hook{r 2}
@@ -65,7 +65,7 @@ describe "InstanceHooks plugin" do
     @o.save.should_not == nil
     @r.should == [4, 2, 1, 3]
     @r.clear
-    
+
     @x.after_save_hook{r 1}
     @x.before_save_hook{r 2}
     @x.after_save_hook{r 3}
@@ -83,7 +83,7 @@ describe "InstanceHooks plugin" do
     @x.save.should == nil
     @r.should == [4, false]
     @r.clear
-    
+
     @x.after_save_hook{r 1}
     @x.before_save_hook{r false}
     @x.before_save_hook{r 4}
@@ -201,28 +201,28 @@ describe "InstanceHooks plugin with transactions" do
     @r = []
     @db.sqls
   end
-  
+
   it "should support after_commit_hook" do
     @o.after_commit_hook{@db.execute('ac1')}
     @o.after_commit_hook{@db.execute('ac2')}
     @o.save.should_not be_nil
     @db.sqls.should == ['BEGIN', 'as', 'COMMIT', 'ac1', 'ac2']
   end
-  
+
   it "should support after_rollback_hook" do
     @or.after_rollback_hook{@db.execute('ar1')}
     @or.after_rollback_hook{@db.execute('ar2')}
     @or.save.should be_nil
     @db.sqls.should == ['BEGIN', 'as', 'ROLLBACK', 'ar1', 'ar2']
   end
-  
+
   it "should support after_commit_hook" do
     @o.after_destroy_commit_hook{@db.execute('adc1')}
     @o.after_destroy_commit_hook{@db.execute('adc2')}
     @o.destroy.should_not be_nil
     @db.sqls.should == ['BEGIN', "DELETE FROM items WHERE (id = 1)", 'ad', 'COMMIT', 'adc1', 'adc2']
   end
-  
+
   it "should support after_rollback_hook" do
     @or.after_destroy_rollback_hook{@db.execute('adr1')}
     @or.after_destroy_rollback_hook{@db.execute('adr2')}

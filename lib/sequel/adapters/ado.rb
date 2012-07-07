@@ -56,7 +56,7 @@ module Sequel
         handle.Open(s)
         handle
       end
-      
+
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
           begin
@@ -71,8 +71,8 @@ module Sequel
       alias do execute
 
       private
-      
-      # The ADO adapter's default provider doesn't support transactions, since it 
+
+      # The ADO adapter's default provider doesn't support transactions, since it
       # creates a new native connection for each query.  So Sequel only attempts
       # to use transactions if an explicit :provider is given.
       def begin_transaction(conn, opts={})
@@ -99,7 +99,7 @@ module Sequel
         super if @opts[:provider]
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self
 
@@ -120,7 +120,7 @@ module Sequel
           end unless s.eof
         end
       end
-      
+
       # ADO returns nil for all for delete and update statements.
       def provides_accurate_rows_matched?
         false

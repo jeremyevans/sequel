@@ -2,7 +2,7 @@ Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   Postgres::CONVERTED_EXCEPTIONS << ::DataObjects::Error
-  
+
   module DataObjects
     # Adapter, Database, and Dataset support for accessing a PostgreSQL
     # database via DataObjects.
@@ -11,7 +11,7 @@ module Sequel
       # DataObjects.
       module DatabaseMethods
         include Sequel::Postgres::DatabaseMethods
-        
+
         # Add the primary_keys and primary_key_sequences instance variables,
         # so we can get the correct return values for inserted rows.
         def self.extended(db)
@@ -20,9 +20,9 @@ module Sequel
             @primary_key_sequences = {}
           end
         end
-        
+
         private
-        
+
         # Extend the adapter with the DataObjects PostgreSQL AdapterMethods
         def setup_connection(conn)
           conn = super(conn)

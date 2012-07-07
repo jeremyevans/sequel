@@ -11,7 +11,7 @@ module Sequel
     SQL_ROLLBACK = 'ROLLBACK'.freeze
     SQL_ROLLBACK_TO_SAVEPOINT = 'ROLLBACK TO SAVEPOINT autopoint_%d'.freeze
     SQL_SAVEPOINT = 'SAVEPOINT autopoint_%d'.freeze
-    
+
     TRANSACTION_BEGIN = 'Transaction.begin'.freeze
     TRANSACTION_COMMIT = 'Transaction.commit'.freeze
     TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
@@ -20,7 +20,7 @@ module Sequel
       :committed=>'READ COMMITTED'.freeze,
       :repeatable=>'REPEATABLE READ'.freeze,
       :serializable=>'SERIALIZABLE'.freeze}
-    
+
     POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/
     MSSQL_DEFAULT_RE = /\A(?:\(N?('.*')\)|\(\((-?\d+(?:\.\d+)?)\)\))\z/
     MYSQL_TIMESTAMP_RE = /\ACURRENT_(?:DATE|TIMESTAMP)?\z/
@@ -28,7 +28,7 @@ module Sequel
 
     # The prepared statement object hash for this database, keyed by name symbol
     attr_reader :prepared_statements
-    
+
     # The default transaction isolation level for this database,
     # used for all future transactions.  For MSSQL, this should be set
     # to something if you ever plan to use the :isolation option to
@@ -40,7 +40,7 @@ module Sequel
     # for performance, can be set to false to always issue a database query to
     # get the schema.
     attr_accessor :cache_schema
-    
+
     # Runs the supplied SQL statement string on the database server.
     # Returns self so it can be safely chained:
     #
@@ -49,7 +49,7 @@ module Sequel
       run(sql)
       self
     end
-    
+
     # Call the prepared statement with the given name with the given hash
     # of arguments.
     #
@@ -58,13 +58,13 @@ module Sequel
     def call(ps_name, hash={}, &block)
       prepared_statement(ps_name).call(hash, &block)
     end
-    
+
     # Executes the given SQL on the database. This method should be overridden in descendants.
     # This method should not be called directly by user code.
     def execute(sql, opts={})
       raise NotImplemented, "#execute should be overridden by adapters"
     end
-    
+
     # Method that should be used when submitting any DDL (Data Definition
     # Language) SQL, such as +create_table+.  By default, calls +execute_dui+.
     # This method should not be called directly by user code.
@@ -103,7 +103,7 @@ module Sequel
     def foreign_key_list(table, opts={})
       raise NotImplemented, "#foreign_key_list should be overridden by adapters"
     end
-    
+
     # Returns a single value from the database, e.g.:
     #
     #   DB.get(1) # SELECT 1
@@ -112,7 +112,7 @@ module Sequel
     def get(*args, &block)
       dataset.get(*args, &block)
     end
-    
+
     # Return a hash containing index information for the table. Hash keys are index name symbols.
     # Values are subhashes with two keys, :columns and :unique.  The value of :columns
     # is an array of symbols of column names.  The value of :unique is true or false
@@ -125,7 +125,7 @@ module Sequel
     def indexes(table, opts={})
       raise NotImplemented, "#indexes should be overridden by adapters"
     end
-    
+
     # Runs the supplied SQL statement string on the database server. Returns nil.
     # Options:
     # :server :: The server to run the SQL on.
@@ -135,7 +135,7 @@ module Sequel
       execute_ddl(sql, opts)
       nil
     end
-    
+
     # Returns the schema for the given table as an array with all members being arrays of length 2,
     # the first member being the column name, and the second member being a hash of column information.
     # The table argument can also be a dataset, as long as it only has one table.
@@ -227,7 +227,7 @@ module Sequel
     def tables(opts={})
       raise NotImplemented, "#tables should be overridden by adapters"
     end
-    
+
     # Starts a database transaction.  When a database transaction is used,
     # either all statements are successful or none of the statements are
     # successful.  Note that MySQL MyISAM tabels do not support transactions.
@@ -263,22 +263,22 @@ module Sequel
         _transaction(conn, opts, &block)
       end
     end
-    
+
     # Return all views in the database as an array of symbols.
     #
     #   DB.views # => [:gold_albums, :artists_with_many_albums]
     def views(opts={})
       raise NotImplemented, "#views should be overridden by adapters"
     end
-    
+
     private
-    
+
     # Should raise an error if the table doesn't not exist,
     # and not raise an error if the table does exist.
     def _table_exists?(ds)
       ds.get(Sequel::NULL)
     end
-    
+
     # Internal generic transaction method.  Any exception raised by the given
     # block will cause the transaction to be rolled back.  If the exception is
     # not a Sequel::Rollback, the error will be reraised. If no exception occurs
@@ -338,7 +338,7 @@ module Sequel
       else
         Sequel.synchronize{@transactions[conn] = {}}
       end
-    end    
+    end
 
     # Call all stored after_commit blocks for the given transaction
     def after_transaction_commit(conn)
@@ -358,7 +358,7 @@ module Sequel
     def already_in_transaction?(conn, opts)
       _trans(conn) && (!supports_savepoints? || !opts[:savepoint])
     end
-    
+
     # SQL to start a new savepoint
     def begin_savepoint_sql(depth)
       SQL_SAVEPOINT % depth
@@ -384,7 +384,7 @@ module Sequel
         begin_new_transaction(conn, opts)
       end
     end
-    
+
     # SQL to BEGIN a transaction.
     def begin_transaction_sql
       SQL_BEGIN
@@ -412,7 +412,7 @@ module Sequel
       res = begin
         case type
         when :boolean
-          case default 
+          case default
           when /[f0]/i
             false
           when /[t1]/i
@@ -439,7 +439,7 @@ module Sequel
         nil
       end
     end
-   
+
     if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or RUBY_ENGINE == 'rbx') and RUBY_VERSION < '1.9'
       # Whether to commit the current transaction. On ruby 1.8 and rubinius,
       # Thread.current.status is checked because Thread#kill skips rescue
@@ -471,7 +471,7 @@ module Sequel
         end
       end
     end
-    
+
     # SQL to commit a savepoint
     def commit_savepoint_sql(depth)
       SQL_RELEASE_SAVEPOINT % depth
@@ -491,7 +491,7 @@ module Sequel
     def commit_transaction_sql
       SQL_COMMIT
     end
-    
+
     # Method called on the connection object to execute SQL on the database,
     # used by the transaction code.
     def connection_execute_method
@@ -504,7 +504,7 @@ module Sequel
     def input_identifier_meth(ds=nil)
       (ds || dataset).method(:input_identifier)
     end
-    
+
     # Return a dataset that uses the default identifier input and output methods
     # for this database.  Used when parsing metadata so that column symbols are
     # returned as expected.
@@ -527,7 +527,7 @@ module Sequel
     def remove_cached_schema(table)
       @schemas.delete(quote_schema_table(table)) if @schemas
     end
-    
+
     # Remove the current thread from the list of active transactions
     def remove_transaction(conn, committed)
       if !supports_savepoints? || ((_trans(conn)[:savepoint_level] -= 1) <= 0)
@@ -562,7 +562,7 @@ module Sequel
     def rollback_transaction_sql
       SQL_ROLLBACK
     end
-    
+
     # Match the database's column type to a ruby type via a
     # regular expression, and return the ruby type as a symbol
     # such as :integer or :string.

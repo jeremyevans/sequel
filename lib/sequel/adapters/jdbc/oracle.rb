@@ -18,7 +18,7 @@ module Sequel
             @primary_key_sequences = {}
           end
         end
-        
+
         private
 
         def last_insert_id(conn, opts)
@@ -67,7 +67,7 @@ module Sequel
           false
         end
       end
-      
+
       # Dataset class for Oracle datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Oracle::DatasetMethods
@@ -96,7 +96,7 @@ module Sequel
         def convert_type_oracle_timestamp(v)
           db.to_application_timestamp(v.to_string)
         end
-      
+
         def convert_type_proc(v)
           case v
           when JAVA_BIG_DECIMAL

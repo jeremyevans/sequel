@@ -36,7 +36,7 @@ module Sequel
           log_yield(TRANSACTION_BEGIN){conn.setAutoCommit(false)}
         end
       end
-      
+
       # Use JDBC connection's commit method to commit transactions
       def commit_transaction(conn, opts={})
         if supports_savepoints?
@@ -50,7 +50,7 @@ module Sequel
           log_yield(TRANSACTION_COMMIT){conn.commit}
         end
       end
-      
+
       # Use JDBC connection's setAutoCommit to true to enable non-transactional behavior
       def remove_transaction(conn, committed)
         if supports_savepoints?
@@ -63,7 +63,7 @@ module Sequel
       ensure
         super
       end
-      
+
       # Use JDBC connection's rollback method to rollback transactions
       def rollback_transaction(conn, opts={})
         if supports_savepoints?

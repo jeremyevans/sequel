@@ -9,8 +9,8 @@ module Sequel
   #             from the returned class, where the name of the
   #             subclass sets the table name (which is combined
   #             with the +Database+ in +source+ to create the
-  #             dataset to use) 
-  # Dataset :: Sets the dataset for this model to +source+. 
+  #             dataset to use)
+  # Dataset :: Sets the dataset for this model to +source+.
   # other :: Sets the table name for this model to +source+. The
   #          class will use the default database for model
   #          classes in order to create the dataset.
@@ -73,7 +73,7 @@ module Sequel
     # Class methods added to model that call the method of the same name on the dataset
     DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS +
       [:eager, :eager_graph, :each_page, :each_server, :print]) - [:and, :or, :[], :[]=, :columns, :columns!]
-    
+
     # Class instance variables to set to nil when a subclass is created, for -w compliance
     EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@db]
 
@@ -106,9 +106,9 @@ module Sequel
     # Class instance variables that are inherited in subclasses.  If the value is <tt>:dup</tt>, dup is called
     # on the superclass's instance variable when creating the instance variable in the subclass.
     # If the value is +nil+, the superclass's instance variable is used directly in the subclass.
-    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@dataset_methods=>:dup, 
+    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@dataset_methods=>:dup,
       :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil,
-      :@raise_on_save_failure=>nil, :@require_modification=>nil, 
+      :@raise_on_save_failure=>nil, :@require_modification=>nil,
       :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
       :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,

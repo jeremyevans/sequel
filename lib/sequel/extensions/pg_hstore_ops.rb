@@ -20,7 +20,7 @@
 #   h.has_key?('a')                      # ?
 #   h.contain_all(:array_column)         # ?&
 #   h.contain_any(:array_column)         # ?|
-#   h.contains(:other_hstore_column)     # @> 
+#   h.contains(:other_hstore_column)     # @>
 #   h.contained_by(:other_hstore_column) # <@
 #
 #   h.defined        # defined(hstore_column)
@@ -163,7 +163,7 @@ module Sequel
       def populate(record)
         SQL::Function.new(:populate_record, record, self)
       end
-      
+
       # Update the values in a record using entries in the receiver:
       #
       #   hstore_op.record_set(:a) # (a #= hstore)

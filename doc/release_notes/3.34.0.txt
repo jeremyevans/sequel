@@ -76,7 +76,7 @@
   code such as:
 
     DB[:table].where(:column=>1)
-  
+
   and do:
 
     SELECT * FROM table WHERE column = $1; -- [1]
@@ -137,12 +137,12 @@
 
     # Removal by column alias
     ds.select(:a, :b___c, :c___b).select_remove(:c)
-    # SELECT a, c AS b FROM table 
-    
+    # SELECT a, c AS b FROM table
+
     # Removal by expression
     ds.select(:a, :b___c, :c___b).select_remove(:c___b)
-    # SELECT a, b AS c FROM table 
-    
+    # SELECT a, b AS c FROM table
+
   This method makes it easier to select all columns except for the
   columns given.  This is common in cases where a table has a few
   large columns that are expensive to retrieve.  This method does
@@ -200,7 +200,7 @@
 * Most of Sequel's core extensions now have equivalent methods defined
   on the Sequel module:
 
-    :column.as(:alias)        -> Sequel.as(:column, :alias)   
+    :column.as(:alias)        -> Sequel.as(:column, :alias)
     :column.asc               -> Sequel.asc(:column)
     :column.desc              -> Sequel.desc(:column)
     :column.cast(Integer)     -> Sequel.cast(:column, Integer)
@@ -344,7 +344,7 @@
   support it.  Database#supports_drop_table_if_exists? has been added
   for checking whether the database supports that syntax.
 
-* Database#create_join_table has been added that allows easy 
+* Database#create_join_table has been added that allows easy
   creation of many_to_many join tables:
 
     DB.create_join_table(:album_id=>:albums, :artist_id=>:artists)
@@ -437,7 +437,7 @@
 * SQL::Subscript#[] has been added for accessing members of a
   multi-dimensional array:
 
-    Sequel.subscript(:column, 1)[2][3]  # column[1][2][3] 
+    Sequel.subscript(:column, 1)[2][3]  # column[1][2][3]
 
 * SQL::Wrapper has been added for wrapping arbitrary objects in a
   Sequel expression object.
@@ -574,7 +574,7 @@
   adapter on ruby 1.9.
 
 * Connecting to PostgreSQL via the swift adapter has been fixed when
-  using newer versions of swift. 
+  using newer versions of swift.
 
 * The mock adapter now handles calling the Database#execute methods
   directly (instead of via a dataset).

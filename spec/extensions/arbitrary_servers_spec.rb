@@ -81,7 +81,7 @@ describe "arbtirary servers" do
   specify "should respect multithreaded access with server block plugin" do
     @db.extend Sequel::ServerBlock
     q, q1 = Queue.new, Queue.new
-    
+
     t = nil
     @db[:t].all
     @db.with_server(:host=>'a') do

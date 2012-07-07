@@ -15,9 +15,9 @@
       set_graph_aliases(:c=>[:a, :c], :d=>[:b, :d])
     # >= 3.17.0:
     DB[:a].graph(:b, :a_id=>:id).set_graph_aliases(:c=>:a, :d=>:b)
-    
+
   Both of these now yield the SQL:
-  
+
     SELECT a.c, b.d FROM a LEFT OUTER JOIN b ON (b.a_id = a.id)
 
 * You should now be able to connect to MySQL over SSL in the native
@@ -40,16 +40,16 @@
 * The xml_serializer plugin can now round-trip nil values correctly.
   Previously, nil values would be converted into empty strings.  This
   is accomplished by including a nil attribute in the xml tag.
-  
+
 * Database#each_server now works correctly when using the jdbc and do
   adapters and a connection string without a separate :adapter option.
-  
+
 * You can now clone many_through_many associations.
 
 * The default wait_timeout used by the mysql and mysql2 adapters was
   decreased slightly so that it works correctly with MySQL database
   servers that run on Windows.
-  
+
 * Many improvements were made to the AS400 jdbc subadapter.
 
 * Many improvements were made to the swift adapter and subadapters.

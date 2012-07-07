@@ -26,25 +26,25 @@ describe "Supported types" do
     ds.insert(:number => 2)
     ds.all.should == [{:number=>2}]
   end
-  
+
   specify "should support generic fixnum type" do
     ds = create_items_table_with_column(:number, Fixnum)
     ds.insert(:number => 2)
     ds.all.should == [{:number=>2}]
   end
-  
+
   cspecify "should support generic bignum type", [:swift, :sqlite] do
     ds = create_items_table_with_column(:number, Bignum)
     ds.insert(:number => 2**34)
     ds.all.should == [{:number=>2**34}]
   end
-  
+
   cspecify "should support generic float type", [:swift, :sqlite] do
     ds = create_items_table_with_column(:number, Float)
     ds.insert(:number => 2.1)
     ds.all.should == [{:number=>2.1}]
   end
-  
+
   cspecify "should support generic numeric type", [:odbc, :mssql], [:swift, :sqlite] do
     ds = create_items_table_with_column(:number, Numeric, :size=>[15, 10])
     ds.insert(:number => BigDecimal.new('2.123456789'))
@@ -59,7 +59,7 @@ describe "Supported types" do
     ds.insert(:name => 'Test User')
     ds.all.should == [{:name=>'Test User'}]
   end
-  
+
   cspecify "should support generic date type", [:do, :sqlite], [:jdbc, :sqlite], :mssql, :oracle do
     ds = create_items_table_with_column(:dat, Date)
     d = Date.today
@@ -67,7 +67,7 @@ describe "Supported types" do
     ds.first[:dat].should be_a_kind_of(Date)
     ds.first[:dat].to_s.should == d.to_s
   end
-  
+
   cspecify "should support generic time type", [:do], [:swift], [:odbc], [:jdbc, :mssql], [:jdbc, :sqlite], [:mysql2], [:tinytds], :oracle do
     ds = create_items_table_with_column(:tim, Time, :only_time=>true)
     t = Sequel::SQLTime.now
@@ -81,7 +81,7 @@ describe "Supported types" do
     ds.literal(v2).should == ds.literal(t)
     v2.should be_a_kind_of(Sequel::SQLTime)
   end
-  
+
   cspecify "should support generic datetime type", [:do, :sqlite], [:jdbc, :sqlite] do
     ds = create_items_table_with_column(:tim, DateTime)
     t = DateTime.now
@@ -92,14 +92,14 @@ describe "Supported types" do
     ds.insert(:tim => t)
     ds.first[:tim].strftime('%Y%m%d%H%M%S').should == t.strftime('%Y%m%d%H%M%S')
   end
-  
+
   cspecify "should support generic file type", [:do], [:odbc, :mssql], [:mysql2], [:swift], [:tinytds] do
     ds = create_items_table_with_column(:name, File)
     ds.insert(:name => ("a\0"*300).to_sequel_blob)
     ds.all.should == [{:name=>("a\0"*300).to_sequel_blob}]
     ds.first[:name].should be_a_kind_of(::Sequel::SQL::Blob)
   end
-  
+
   cspecify "should support generic boolean type", [:do, :sqlite], [:jdbc, :sqlite], [:jdbc, :db2], [:odbc, :mssql], :oracle do
     ds = create_items_table_with_column(:number, TrueClass)
     ds.insert(:number => true)

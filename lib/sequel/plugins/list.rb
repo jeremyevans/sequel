@@ -4,40 +4,40 @@ module Sequel
     # based on a position field in the database.  It can either consider all
     # rows in the table as being from the same list, or you can specify scopes
     # so that multiple lists can be kept in the same table.
-    # 
+    #
     # Basic Example:
     #
     #   class Item < Sequel::Model(:items)
     #     plugin :list # will use :position field for position
     #     plugin :list, :field=>:pos # will use :pos field for position
     #   end
-    #   
+    #
     #   item = Item[1]
-    # 
+    #
     #   # Get the next or previous item in the list
-    # 
+    #
     #   item.next
     #   item.prev
-    # 
+    #
     #   # Modify the item's position, which may require modifying other items in
     #   # the same list
-    # 
+    #
     #   item.move_to(3)
     #   item.move_to_top
     #   item.move_to_bottom
     #   item.move_up
     #   item.move_down
-    # 
+    #
     # You can provide a <tt>:scope</tt> option to scope the list.  This option
     # can be a symbol or array of symbols specifying column name(s), or a proc
     # that accepts a model instance and returns a dataset representing the list
     # the object is in.
-    # 
+    #
     # For example, if each item has a +user_id+ field, and you want every user
     # to have their own list:
     #
     #   Item.plugin :list, :scope=>:user_id
-    # 
+    #
     # Note that using this plugin modifies the order of the model's dataset to
     # sort by the position and scope fields.  Also note that this plugin is subject to
     # race conditions, and is not safe when concurrent modifications are made
@@ -56,7 +56,7 @@ module Sequel
       def self.configure(model, opts = {})
         model.position_field = opts[:field] || :position
         model.dataset = model.dataset.order_prepend(model.position_field)
-        
+
         model.scope_proc = case scope = opts[:scope]
         when Symbol
           model.dataset = model.dataset.order_prepend(scope)
@@ -73,7 +73,7 @@ module Sequel
         # The column name holding the position in the list, as a symbol.
         attr_accessor :position_field
 
-        # A proc that scopes the dataset, so that there can be multiple positions 
+        # A proc that scopes the dataset, so that there can be multiple positions
         # in the list, but the positions are unique with the scoped dataset. This
         # proc should accept an instance and return a dataset representing the list.
         attr_accessor :scope_proc
@@ -141,7 +141,7 @@ module Sequel
 
         # Move this instance to the bottom (last position) of the list.
         def move_to_bottom
-          lp = last_position 
+          lp = last_position
           move_to(lp, lp)
         end
 
@@ -153,7 +153,7 @@ module Sequel
         # Move this instance the given number of places up in the list, or 1 place
         # if no argument is specified.
         def move_up(n = 1)
-          move_to(position_value - n) 
+          move_to(position_value - n)
         end
 
         # The model instance the given number of places below this model instance

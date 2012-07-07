@@ -46,7 +46,7 @@ module Sequel
             super
           elsif type == :many_to_many
             opts = super
-            el = opts[:eager_loader] 
+            el = opts[:eager_loader]
             model = self
             left_pk = opts[:left_primary_key]
             uses_lcks = opts[:uses_left_composite_keys]
@@ -68,7 +68,7 @@ module Sequel
               # When loading the associated objects, lookup the left key alias value and associate the
               # associated objects to the main objects if the left key alias value matches the left primary key
               # value of the main object.
-              # 
+              #
               # The deleting of the left key alias from the hash before calling the previous row proc
               # is necessary when an identity map is used, otherwise if the same associated object is returned more than
               # once for the association, it won't know which of current objects to associate it to.
@@ -98,7 +98,7 @@ module Sequel
             opts
           elsif type == :many_through_many
             opts = super
-            el = opts[:eager_loader] 
+            el = opts[:eager_loader]
             model = self
             left_pk = opts[:left_primary_key]
             left_key = opts[:left_key]
@@ -109,7 +109,7 @@ module Sequel
               return el.call(eo) unless model.identity_map
               h = eo[:id_map]
               eo[:rows].each{|object| object.associations[name] = []}
-              ds = opts.associated_class 
+              ds = opts.associated_class
               opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
               ft = opts.final_reverse_edge
               conds = uses_lcks ? [[left_keys.map{|k| SQL::QualifiedIdentifier.new(ft[:table], k)}, h.keys]] : [[left_key, h.keys]]
@@ -143,7 +143,7 @@ module Sequel
             super
           end
         end
-          
+
         # Returns the current thread-local identity map.  Should be a hash if
         # there is an active identity map, and nil otherwise.
         def identity_map
@@ -230,7 +230,7 @@ module Sequel
         # map for the associated object and return it if present.
         def _load_associated_object(opts, dynamic_opts)
           klass = opts.associated_class
-          cache_lookup = opts.fetch(:idm_cache_lookup) do 
+          cache_lookup = opts.fetch(:idm_cache_lookup) do
             opts[:idm_cache_lookup] = klass.respond_to?(:identity_map) &&
               opts[:type] == :many_to_one &&
               opts[:key] &&

@@ -291,7 +291,7 @@ module Sequel
         end
 
         h = {}
-        fklod_map = FOREIGN_KEY_LIST_ON_DELETE_MAP 
+        fklod_map = FOREIGN_KEY_LIST_ON_DELETE_MAP
         ds.each do |row|
           if r = h[row[:name]]
             r[:columns] << m.call(row[:column])
@@ -485,7 +485,7 @@ module Sequel
       def alter_table_generator_class
         Postgres::AlterTableGenerator
       end
-    
+
       # Handle :using option for set_column_type op, and the :validate_constraint op.
       def alter_table_sql(table, op)
         case op[:op]
@@ -522,7 +522,7 @@ module Sequel
           log_connection_execute(conn, "SET LOCAL synchronous_commit = #{sync}")
         end
       end
-      
+
       # If the :prepare option is given and we aren't in a savepoint,
       # prepare the transaction for a two-phase commit.
       def commit_transaction(conn, opts={})
@@ -595,7 +595,7 @@ module Sequel
       def create_table_generator_class
         Postgres::CreateTableGenerator
       end
-    
+
       # SQL for creating a database trigger.
       def create_trigger_sql(table, name, function, opts={})
         events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
@@ -612,7 +612,7 @@ module Sequel
       def drop_function_sql(name, opts={})
         "DROP FUNCTION#{' IF EXISTS' if opts[:if_exists]} #{name}#{sql_function_args(opts[:args])}#{' CASCADE' if opts[:cascade]}"
       end
-      
+
       # Support :if_exists, :cascade, and :concurrently options.
       def drop_index_sql(table, op)
         "DROP INDEX#{' CONCURRENTLY' if op[:concurrently]}#{' IF EXISTS' if op[:if_exists]} #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))}#{' CASCADE' if op[:cascade]}"
@@ -761,7 +761,7 @@ module Sequel
           log_connection_execute(conn, sql)
         end
       end
-     
+
       # Turns an array of argument specifiers into an SQL fragment used for function arguments.  See create_function_sql.
       def sql_function_args(args)
         "(#{Array(args).map{|a| Array(a).reverse.join(' ')}.join(', ')})"
@@ -1093,7 +1093,7 @@ module Sequel
       def literal_false
         BOOL_FALSE
       end
-      
+
       # PostgreSQL quotes NaN and Infinity.
       def literal_float(value)
         if value.finite?
@@ -1105,7 +1105,7 @@ module Sequel
         else
           "'-Infinity'"
         end
-      end 
+      end
 
       # Assume that SQL standard quoting is on, per Sequel's defaults
       def literal_string_append(sql, v)

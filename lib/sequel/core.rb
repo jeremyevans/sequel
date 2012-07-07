@@ -7,15 +7,15 @@
 #
 #   DB = Sequel.sqlite # Memory database
 #   DB = Sequel.sqlite('blog.db')
-#   DB = Sequel.postgres('database_name', :user=>'user', 
-#          :password=>'password', :host=>'host', :port=>5432, 
+#   DB = Sequel.postgres('database_name', :user=>'user',
+#          :password=>'password', :host=>'host', :port=>5432,
 #          :max_connections=>10)
 #
 # If a block is given to these methods, it is passed the opened Database
 # object, which is closed (disconnected) when the block exits, just
 # like a block passed to connect.  For example:
 #
-#   Sequel.sqlite('blog.db'){|db| puts db[:users].count} 
+#   Sequel.sqlite('blog.db'){|db| puts db[:users].count}
 #
 # Sequel currently adds methods to the Array, Hash, String and Symbol classes by
 # default.  You can either require 'sequel/no_core_ext' or set the
@@ -30,13 +30,13 @@ module Sequel
   @empty_array_handle_nulls = true
   @virtual_row_instance_eval = true
   @require_thread = nil
-  
+
   # Mutex used to protect file loading/requireing
   @require_mutex = Mutex.new
-  
+
   # Whether Sequel is being run in single threaded mode
   @single_threaded = false
-  
+
   class << self
     # Sequel converts two digit years in <tt>Date</tt>s and <tt>DateTime</tt>s by default,
     # so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted
@@ -76,14 +76,14 @@ module Sequel
     #   # SELECT * FROM a WHERE 1 = 0
     #   DB[:a].exclude(:b=>[])
     #   # SELECT * FROM a WHERE 1 = 1
-    # 
+    #
     # This may not handle NULLs correctly, but can be much faster on
     # some databases.
     attr_accessor :empty_array_handle_nulls
 
     # For backwards compatibility, has no effect.
     attr_accessor :virtual_row_instance_eval
-    
+
     # Alias to the standard version of require
     alias k_require require
 
@@ -96,7 +96,7 @@ module Sequel
       return(yield) if @require_thread == t
       @require_mutex.synchronize do
         begin
-          @require_thread = t 
+          @require_thread = t
           yield
         ensure
           @require_thread = nil
@@ -139,8 +139,8 @@ module Sequel
   # If a block is given, it is passed the opened +Database+ object, which is
   # closed when the block exits.  For example:
   #
-  #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
-  # 
+  #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}
+  #
   # For details, see the {"Connecting to a Database" guide}[link:files/doc/opening_databases_rdoc.html].
   # To set up a master/slave or sharded database connection, see the {"Master/Slave Databases and Sharding" guide}[link:files/doc/sharding_rdoc.html].
   def self.connect(*args, &block)
@@ -164,7 +164,7 @@ module Sequel
     end
   end
 
-  
+
   # Convert the +exception+ to the given class.  The given class should be
   # <tt>Sequel::Error</tt> or a subclass.  Returns an instance of +klass+ with
   # the message and backtrace of +exception+.
@@ -189,13 +189,13 @@ module Sequel
   def self.extension(*extensions)
     extensions.each{|e| tsk_require "sequel/extensions/#{e}"}
   end
-  
+
   # Set the method to call on identifiers going into the database.  This affects
   # the literalization of identifiers by calling this method on them before they are input.
   # Sequel upcases identifiers in all SQL strings for most databases, so to turn that off:
   #
   #   Sequel.identifier_input_method = nil
-  # 
+  #
   # to downcase instead:
   #
   #   Sequel.identifier_input_method = :downcase
@@ -204,14 +204,14 @@ module Sequel
   def self.identifier_input_method=(value)
     Database.identifier_input_method = value
   end
-  
+
   # Set the method to call on identifiers coming out of the database.  This affects
   # the literalization of identifiers by calling this method on them when they are
   # retrieved from the database.  Sequel downcases identifiers retrieved for most
   # databases, so to turn that off:
   #
   #   Sequel.identifier_output_method = nil
-  # 
+  #
   # to upcase instead:
   #
   #   Sequel.identifier_output_method = :upcase
@@ -220,7 +220,7 @@ module Sequel
   def self.identifier_output_method=(value)
     Database.identifier_output_method = value
   end
-  
+
   # Set whether to quote identifiers for all databases by default. By default,
   # Sequel quotes identifiers in all SQL strings, so to turn that off:
   #
@@ -241,7 +241,7 @@ module Sequel
       end
     end
   end
-  
+
   # Require all given +files+ which should be in the same or a subdirectory of
   # this file.  If a +subdir+ is given, assume all +files+ are in that subdir.
   # This is used to ensure that the files loaded are from the same version of
@@ -249,7 +249,7 @@ module Sequel
   def self.require(files, subdir=nil)
     Array(files).each{|f| super("#{File.dirname(__FILE__).untaint}/#{"#{subdir}/" if subdir}#{f}")}
   end
-  
+
   # Set whether Sequel is being used in single threaded mode. By default,
   # Sequel uses a thread-safe connection pool, which isn't as fast as the
   # single threaded connection pool, and also has some additional thread
@@ -363,7 +363,7 @@ module Sequel
   def self.ts_require(*args)
     check_requiring_thread{require(*args)}
   end
-  
+
   # Same as Kernel.require, but wrapped in a mutex in order to be thread safe.
   def self.tsk_require(*args)
     check_requiring_thread{k_require(*args)}
@@ -383,9 +383,9 @@ module Sequel
       vr.instance_eval(&block)
     else
       block.call(vr)
-    end  
+    end
   end
-  
+
   ### Private Class Methods ###
 
   # Helper method that the database adapter class methods that are added to Sequel via
@@ -411,7 +411,7 @@ module Sequel
   end
 
   private_class_method :adapter_method, :def_adapter_method
-  
+
   require(%w"metaprogramming sql connection_pool exceptions dataset database timezones ast_transformer version")
   extension(:core_extensions) if Sequel.core_extensions?
 

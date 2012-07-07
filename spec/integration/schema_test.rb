@@ -24,7 +24,7 @@ describe "Database schema parser" do
     begin
       INTEGRATION_DB.schema(:items, :reload=>true).should be_a_kind_of(Array)
       INTEGRATION_DB.schema(:items, :reload=>true).first.first.should == :number
-    ensure 
+    ensure
       INTEGRATION_DB.drop_table(:items)
     end
   end
@@ -43,7 +43,7 @@ describe "Database schema parser" do
     begin
       INTEGRATION_DB.schema(ds, :reload=>true).should be_a_kind_of(Array)
       INTEGRATION_DB.schema(ds, :reload=>true).first.first.should == :number
-    ensure 
+    ensure
       INTEGRATION_DB.identifier_output_method = :reverse
       INTEGRATION_DB.identifier_input_method = :reverse
       INTEGRATION_DB.drop_table(:items)
@@ -168,7 +168,7 @@ describe "Database index parsing" do
     INTEGRATION_DB.drop_index(:items, [:n, :a])
     INTEGRATION_DB.indexes(:items).should == {}
   end
-  
+
   specify "should not include a primary key index" do
     INTEGRATION_DB.create_table!(:items){primary_key :n}
     INTEGRATION_DB.indexes(:items).should == {}
@@ -249,7 +249,7 @@ describe "Database schema modifiers" do
     @ds.insert([10])
     @ds.columns!.should == [:number]
   end
-  
+
   specify "should create tables from select statements correctly" do
     @db.create_table!(:items){Integer :number}
     @ds.insert([10])
@@ -258,13 +258,13 @@ describe "Database schema modifiers" do
     @db[:items2].columns.should == [:number]
     @db[:items2].all.should == [{:number=>10}]
   end
-  
+
   specify "should handle create table in a rolled back transaction" do
     @db.drop_table?(:items)
     @db.transaction(:rollback=>:always){@db.create_table(:items){Integer :number}}
     @db.table_exists?(:items).should be_false
   end if INTEGRATION_DB.supports_transactional_ddl?
-  
+
   describe "join tables" do
     after do
       @db.drop_join_table(:cat_id=>:cats, :dog_id=>:dogs) if @db.table_exists?(:cats_dogs)
@@ -283,7 +283,7 @@ describe "Database schema modifiers" do
   specify "should create temporary tables without raising an exception" do
     @db.create_table!(:items, :temp=>true){Integer :number}
   end
-  
+
   specify "should have create_table? only create the table if it doesn't already exist" do
     @db.create_table!(:items){String :a}
     @db.create_table?(:items){String :b}
@@ -312,7 +312,7 @@ describe "Database schema modifiers" do
     @ds.insert([10])
     @ds.columns!.should == [:number]
   end
-  
+
   specify "should allow creating indexes with tables" do
     @db.create_table!(:items){Integer :number; index :number}
     @db.table_exists?(:items).should == true
@@ -329,7 +329,7 @@ describe "Database schema modifiers" do
   end
 
   specify "should handle foreign keys correctly when creating tables" do
-    @db.create_table!(:items) do 
+    @db.create_table!(:items) do
       primary_key :id
       foreign_key :item_id, :items
       unique [:item_id, :id]

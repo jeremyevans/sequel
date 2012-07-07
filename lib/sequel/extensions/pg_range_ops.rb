@@ -14,7 +14,7 @@
 # for easier querying:
 #
 #   r.contains(:other)      # range @> other
-#   r.contained_by(:other)  # range <@ other 
+#   r.contained_by(:other)  # range <@ other
 #   r.overlaps(:other)      # range && other
 #   r.left_of(:other)       # range << other
 #   r.right_of(:other)      # range >> other
@@ -29,7 +29,7 @@
 #   r.upper_inc        # upper_inc(range)
 #   r.lower_inf        # lower_inf(range)
 #   r.upper_inf        # upper_inf(range)
-#   
+#
 # See the PostgreSQL range function and operator documentation for more
 # details on what these functions and operators do.
 #

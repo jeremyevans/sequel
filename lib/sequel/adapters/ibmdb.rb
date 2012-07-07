@@ -29,7 +29,7 @@ module Sequel
 
     # Wraps an underlying connection to DB2 using IBM_DB.
     class Connection
-      # A hash with prepared statement name symbol keys, where each value is 
+      # A hash with prepared statement name symbol keys, where each value is
       # a two element array with an sql string and cached Statement value.
       attr_accessor :prepared_statements
 
@@ -179,11 +179,11 @@ module Sequel
         reorg(name)
         res
       end
-    
+
       # Create a new connection object for the given server.
       def connect(server)
         opts = server_opts(server)
-        
+
         # use uncataloged connection so that host and port can be supported
         connection_string = ( \
             'Driver={IBM DB2 ODBC DRIVER};' \
@@ -247,7 +247,7 @@ module Sequel
             ensure
               stmt.free
             end
-          else  
+          else
             stmt.affected
           end
         end
@@ -255,7 +255,7 @@ module Sequel
 
       # Convert smallint type to boolean if convert_smallint_to_bool is true
       def schema_column_type(db_type)
-        if Sequel::IBMDB.convert_smallint_to_bool && db_type =~ /smallint/i 
+        if Sequel::IBMDB.convert_smallint_to_bool && db_type =~ /smallint/i
           :boolean
         else
           super
@@ -276,7 +276,7 @@ module Sequel
           # table probably needs reorg
           reorg(name)
           v = true
-          retry 
+          retry
         end
         false
       end
@@ -292,7 +292,7 @@ module Sequel
           ensure
             stmt.free
           end
-        else  
+        else
           stmt.affected
         end
       end
@@ -308,7 +308,7 @@ module Sequel
       def commit_transaction(conn, opts={})
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
-    
+
       # Close the given connection.
       def disconnect_connection(conn)
         conn.close
@@ -350,7 +350,7 @@ module Sequel
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include Sequel::DB2::DatasetMethods
 
@@ -367,17 +367,17 @@ module Sequel
           ps.prepared_sql
         end
       end
-      
+
       # Methods for DB2 prepared statements using the native driver.
       module PreparedStatementMethods
         include Sequel::Dataset::UnnumberedArgumentMapper
-        
+
         private
         # Execute the prepared statement with arguments instead of the given SQL.
         def execute(sql, opts={}, &block)
           super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
         end
-        
+
         # Execute the prepared statment with arguments instead of the given SQL.
         def execute_dui(sql, opts={}, &block)
           super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
@@ -389,7 +389,7 @@ module Sequel
         end
 
       end
-      
+
       # Emulate support of bind arguments in called statements.
       def call(type, bind_arguments={}, *values, &block)
         ps = to_prepared_statement(type, values)

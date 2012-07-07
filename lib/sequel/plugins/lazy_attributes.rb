@@ -23,14 +23,14 @@ module Sequel
       # Lazy attributes requires the identity map and tactical eager loading plugins
       def self.apply(model, *attrs)
         model.plugin :identity_map
-        model.plugin :tactical_eager_loading  
+        model.plugin :tactical_eager_loading
       end
-      
+
       # Set the attributes given as lazy attributes
       def self.configure(model, *attrs)
         model.lazy_attributes(*attrs) unless attrs.empty?
       end
-      
+
       module ClassMethods
         # Module to store the lazy attribute getter methods, so they can
         # be overridden and call super to get the lazy attribute behavior
@@ -43,7 +43,7 @@ module Sequel
           set_dataset(dataset.select(*(columns - attrs)))
           attrs.each{|a| define_lazy_attribute_getter(a)}
         end
-        
+
         private
 
         # Add a lazy attribute getter method to the lazy_attributes_module

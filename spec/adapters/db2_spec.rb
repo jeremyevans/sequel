@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # coding: utf-8
 #Author: Roy L Zuo (roylzuo at gmail dot com)
-#Description: 
+#Description:
 
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
@@ -26,7 +26,7 @@ describe Sequel::Database do
   after do
     @db.drop_table(:test)
   end
-  
+
   specify "should provide disconnect functionality after preparing a connection" do
     @ds.prepare(:first, :a).call
     @db.disconnect
@@ -84,7 +84,7 @@ describe "Sequel::IBMDB.convert_smallint_to_bool" do
     Sequel::IBMDB.convert_smallint_to_bool = true
     @db.drop_table(:booltest)
   end
-  
+
   specify "should consider smallint datatypes as boolean if set, but not larger smallints" do
     @db.schema(:booltest, :reload=>true).first.last[:type].should == :boolean
     @db.schema(:booltest, :reload=>true).first.last[:db_type].should match /smallint/i
@@ -92,7 +92,7 @@ describe "Sequel::IBMDB.convert_smallint_to_bool" do
     @db.schema(:booltest, :reload=>true).first.last[:type].should == :integer
     @db.schema(:booltest, :reload=>true).first.last[:db_type].should match /smallint/i
   end
-  
+
   specify "should return smallints as bools and integers as integers when set" do
     Sequel::IBMDB.convert_smallint_to_bool = true
     @ds.delete
@@ -114,7 +114,7 @@ describe "Sequel::IBMDB.convert_smallint_to_bool" do
     @ds.delete
     @ds << {:b=>false, :i=>0}
     @ds.all.should == [{:b=>0, :i=>0}]
-    
+
     @ds.delete
     @ds << {:b=>1, :i=>10}
     @ds.all.should == [{:b=>1, :i=>10}]

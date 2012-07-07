@@ -90,20 +90,20 @@ describe "Sequel::Plugins::AssociationPks" do
   end
 
   specify "should run a regular query if :conditions option is used when defining the association" do
-    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>1} 
+    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>1}
     @Artist.load(:id=>1).albums
     @db.sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 1) AND (a = 1))"]
   end
 
   specify "should run a regular query if :dataset option is used when defining the association" do
     album = @Album
-    @Artist.one_to_many :albums, :class=>@Album, :dataset=>proc{album.filter(:artist_id=>id)} 
+    @Artist.one_to_many :albums, :class=>@Album, :dataset=>proc{album.filter(:artist_id=>id)}
     @Artist.load(:id=>1).albums
     @db.sqls.should == ["SELECT * FROM albums WHERE (artist_id = 1)"]
   end
 
   specify "should run a regular query if :cloning an association that doesn't used prepared statements" do
-    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>1} 
+    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>1}
     @Artist.one_to_many :oalbums, :clone=>:albums
     @Artist.load(:id=>1).oalbums
     @db.sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 1) AND (a = 1))"]

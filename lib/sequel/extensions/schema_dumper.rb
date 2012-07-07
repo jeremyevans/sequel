@@ -96,7 +96,7 @@ END_MIG
     end
 
     private
-        
+
     # If a database default exists and can't be converted, return the string with the inspect
     # method modified so that .lit is always appended after it, only if the
     # :same_db option is used.
@@ -244,7 +244,7 @@ END_MIG
       if options[:foreign_keys] != false
         begin
           fk_list = foreign_key_list(table)
-          
+
           if (sfk = options[:skipped_foreign_keys]) && (sfkt = sfk[table])
             fk_list.delete_if{|fk| sfkt.has_key?(fk[:columns])}
           end
@@ -293,7 +293,7 @@ END_MIG
       gen.dump_indexes(meth=>table, :ignore_errors=>!options[:same_db])
     end
 
-    # Convert the parsed index information into options to the Generators index method. 
+    # Convert the parsed index information into options to the Generators index method.
     def index_to_generator_opts(table, name, index_opts, options={})
       h = {}
       if options[:index_names] != false && default_index_name(table, index_opts[:columns]) != name.to_s
@@ -341,7 +341,7 @@ END_MIG
     def sort_dumped_tables_topologically(table_fks, sorted_tables)
       skipped_foreign_keys = {}
 
-      until table_fks.empty? 
+      until table_fks.empty?
         this_loop = []
 
         table_fks.each do |table, fks|
@@ -370,7 +370,7 @@ END_MIG
 
       [sorted_tables, skipped_foreign_keys]
     end
-    
+
     # Don't use the "...".lit fallback on MySQL, since the defaults it uses aren't
     # valid literal SQL values.
     def use_column_schema_to_ruby_default_fallback?

@@ -7,7 +7,7 @@ module Sequel
         :progress
       end
     end
-  
+
     module DatasetMethods
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select limit distinct columns from join where group order having compounds')
 

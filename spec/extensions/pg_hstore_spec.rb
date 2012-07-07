@@ -72,7 +72,7 @@ describe "pg_hstore extension" do
     k = nil
     {'foo2'=>'bar'}.hstore.fetch(:foo){|key| k = key }.should == 'foo'
     k.should == 'foo'
-    
+
     {'foo'=>'bar'}.hstore.has_key?(:foo).should be_true
     {'foo'=>'bar'}.hstore.has_key?(:bar).should be_false
     {'foo'=>'bar'}.hstore.key?(:foo).should be_true

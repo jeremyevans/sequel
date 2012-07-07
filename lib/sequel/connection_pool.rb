@@ -25,13 +25,13 @@
 class Sequel::ConnectionPool
   # The default server to use
   DEFAULT_SERVER = :default
-  
+
   # A map of [single threaded, sharded] values to symbols or ConnectionPool subclasses.
-  CONNECTION_POOL_MAP = {[true, false] => :single, 
+  CONNECTION_POOL_MAP = {[true, false] => :single,
     [true, true] => :sharded_single,
     [false, false] => :threaded,
     [false, true] => :sharded_threaded}
-  
+
   # Class methods used to return an appropriate pool subclass, separated
   # into a module for easier overridding by extensions.
   module ClassMethods
@@ -48,9 +48,9 @@ class Sequel::ConnectionPool
         connection_pool_class(opts).new(opts, &block) || raise(Sequel::Error, "No connection pool class found")
       end
     end
-    
+
     private
-    
+
     # Return a connection pool class based on the given options.
     def connection_pool_class(opts)
       CONNECTION_POOL_MAP[opts[:pool_class]] || opts[:pool_class] || CONNECTION_POOL_MAP[[!!opts[:single_threaded], !!opts[:servers]]]
@@ -65,7 +65,7 @@ class Sequel::ConnectionPool
   # The disconnect_proc used for the pool.  This is called with each connection
   # that is disconnected, usually to clean up related resources.
   attr_accessor :disconnection_proc
-  
+
   # Instantiates a connection pool with the given options.  The block is called
   # with a single symbol (specifying the server/shard to use) every time a new
   # connection is needed.  The following options are respected for all connection
@@ -80,19 +80,19 @@ class Sequel::ConnectionPool
     @disconnection_proc = opts[:disconnection_proc]
     @after_connect = opts[:after_connect]
   end
-  
+
   # Alias for +size+, not aliased directly for ease of subclass implementation
   def created_count(*args)
     size(*args)
   end
-  
+
   # An array of symbols for all shards/servers, which is a single <tt>:default</tt> by default.
   def servers
     [DEFAULT_SERVER]
   end
-  
+
   private
-  
+
   # Return a new connection by calling the connection proc with the given server name,
   # and checking for connection errors.
   def make_new(server)

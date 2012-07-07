@@ -27,53 +27,53 @@ describe "An SQLite database" do
     specify "should support getting pragma values" do
       @db.pragma_get(:auto_vacuum).to_s.should == '0'
     end
-    
+
     specify "should support setting pragma values" do
       @db.pragma_set(:auto_vacuum, '1')
       @db.pragma_get(:auto_vacuum).to_s.should == '1'
       @db.pragma_set(:auto_vacuum, '2')
       @db.pragma_get(:auto_vacuum).to_s.should == '2'
     end
-    
+
     specify "should support getting and setting the auto_vacuum pragma" do
       @db.auto_vacuum = :full
       @db.auto_vacuum.should == :full
       @db.auto_vacuum = :incremental
       @db.auto_vacuum.should == :incremental
-      
+
       proc {@db.auto_vacuum = :invalid}.should raise_error(Sequel::Error)
     end
   end
-  
+
   specify "should respect case sensitive like false" do
     @db.case_sensitive_like = false
     @db.get(Sequel.like('a', 'A')).to_s.should == '1'
   end
-  
+
   specify "should respect case sensitive like true" do
     @db.case_sensitive_like = true
     @db.get(Sequel.like('a', 'A')).to_s.should == '0'
   end
-  
+
   specify "should support casting to Date by using the date function" do
     @db.get('2012-10-20 11:12:13'.cast(Date)).should == '2012-10-20'
   end
-  
+
   specify "should support casting to Time or DateTime by using the datetime function" do
     @db.get('2012-10-20'.cast(Time)).should == '2012-10-20 00:00:00'
     @db.get('2012-10-20'.cast(DateTime)).should == '2012-10-20 00:00:00'
   end
-  
+
   specify "should provide the SQLite version as an integer" do
     @db.sqlite_version.should be_a_kind_of(Integer)
   end
-  
+
   specify "should support setting and getting the foreign_keys pragma" do
     (@db.sqlite_version >= 30619 ? [true, false] : [nil]).should include(@db.foreign_keys)
     @db.foreign_keys = true
     @db.foreign_keys = false
   end
-  
+
   if SQLITE_DB.sqlite_version >= 30619
     specify "should enforce foreign key integrity if foreign_keys pragma is set" do
       @db.foreign_keys = true
@@ -84,14 +84,14 @@ describe "An SQLite database" do
       proc{@db[:fk].insert(4, 5)}.should raise_error(Sequel::Error)
     end
   end
-  
+
   specify "should not enforce foreign key integrity if foreign_keys pragma is unset" do
     @db.foreign_keys = false
     @db.create_table!(:fk){primary_key :id; foreign_key :parent_id, :fk}
     @db[:fk].insert(1, 2)
     @db[:fk].all.should == [{:id=>1, :parent_id=>2}]
   end
-  
+
   specify "should support a use_timestamp_timezones setting" do
     @db.create_table!(:time){Time :time}
     @db[:time].insert(Time.now)
@@ -102,7 +102,7 @@ describe "An SQLite database" do
     @db[:time].get(:time.cast_string).should_not =~ /[-+]\d\d\d\d\z/
     @db.use_timestamp_timezones = true
   end
-  
+
   specify "should provide a list of existing tables" do
     @db.drop_table?(:testing)
     @db.tables.should be_a_kind_of(Array)
@@ -120,10 +120,10 @@ describe "An SQLite database" do
     @db.synchronous.should == :normal
     @db.synchronous = :full
     @db.synchronous.should == :full
-    
+
     proc {@db.synchronous = :invalid}.should raise_error(Sequel::Error)
   end
-  
+
   specify "should support getting and setting the temp_store pragma" do
     @db.temp_store = :default
     @db.temp_store.should == :default
@@ -131,10 +131,10 @@ describe "An SQLite database" do
     @db.temp_store.should == :file
     @db.temp_store = :memory
     @db.temp_store.should == :memory
-    
+
     proc {@db.temp_store = :invalid}.should raise_error(Sequel::Error)
   end
-  
+
   cspecify "should support timestamps and datetimes and respect datetime_class", :do, :jdbc, :amalgalite, :swift do
     @db.create_table!(:time){timestamp :t; datetime :d}
     t1 = Time.at(1)
@@ -146,7 +146,7 @@ describe "An SQLite database" do
     @db[:time].map(:t).should == [t2]
     @db[:time].map(:d).should == [t2]
   end
-  
+
   specify "should support sequential primary keys" do
     @db.create_table!(:with_pk) {primary_key :id; text :name}
     @db[:with_pk] << {:name => 'abc'}
@@ -158,7 +158,7 @@ describe "An SQLite database" do
       {:id => 3, :name => 'ghi'}
     ]
   end
-  
+
   specify "should correctly parse the schema" do
     @db.create_table!(:time2) {timestamp :t}
     @db.schema(:time2, :reload=>true).should == [[:t, {:type=>:datetime, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"timestamp", :primary_key=>false}]]
@@ -178,7 +178,7 @@ describe "SQLite type conversion" do
     Sequel.datetime_class = Time
     @db.drop_table?(:items)
   end
-  
+
   specify "should handle integers in boolean columns" do
     @db.create_table(:items){TrueClass :a}
     @db[:items].insert(false)
@@ -188,7 +188,7 @@ describe "SQLite type conversion" do
     @db[:items].select_map(:a).should == [true]
     @db[:items].select_map(:a+:a).should == [2]
   end
-  
+
   specify "should handle integers/floats/strings/decimals in numeric/decimal columns" do
     @db.create_table(:items){Numeric :a}
     @db[:items].insert(100)
@@ -256,7 +256,7 @@ describe "An SQLite dataset" do
   before do
     @d = SQLITE_DB[:items]
   end
-  
+
   specify "should raise errors if given a regexp pattern match" do
     proc{@d.literal(:x.like(/a/))}.should raise_error(Sequel::Error)
     proc{@d.literal(~:x.like(/a/))}.should raise_error(Sequel::Error)
@@ -318,7 +318,7 @@ describe "SQLite::Dataset#delete" do
     @d << {:name => 'def', :value => 4.56}
     @d << {:name => 'ghi', :value => 7.89}
   end
-  
+
   specify "should return the number of records affected when filtered" do
     @d.count.should == 3
     @d.filter(:value.sql_number < 3).delete.should == 1
@@ -327,7 +327,7 @@ describe "SQLite::Dataset#delete" do
     @d.filter(:value.sql_number < 3).delete.should == 0
     @d.count.should == 2
   end
-  
+
   specify "should return the number of records affected when unfiltered" do
     @d.count.should == 3
     @d.delete.should == 3
@@ -350,12 +350,12 @@ describe "SQLite::Dataset#update" do
     @d << {:name => 'def', :value => 4.56}
     @d << {:name => 'ghi', :value => 7.89}
   end
-  
+
   specify "should return the number of records affected" do
     @d.filter(:name => 'abc').update(:value => 2).should == 1
-    
+
     @d.update(:value => 10).should == 3
-    
+
     @d.filter(:name => 'xxx').update(:value => 23).should == 0
   end
 end
@@ -380,18 +380,18 @@ describe "SQLite dataset" do
   after do
     SQLITE_DB.drop_table?(:test, :items)
   end
-  
+
   specify "should be able to insert from a subquery" do
     SQLITE_DB[:test] << @d
     SQLITE_DB[:test].count.should == 3
     SQLITE_DB[:test].select(:name, :value).order(:value).to_a.should == \
       @d.select(:name, :value).order(:value).to_a
   end
-    
+
   specify "should support #explain" do
     SQLITE_DB[:test].explain.should be_a_kind_of(String)
   end
-  
+
   specify "should have #explain work when identifier_output_method is modified" do
     ds = SQLITE_DB[:test]
     ds.identifier_output_method = :upcase
@@ -410,19 +410,19 @@ describe "A SQLite database" do
 
   specify "should support add_column operations" do
     @db.add_column :test2, :xyz, :text
-    
+
     @db[:test2].columns.should == [:name, :value, :xyz]
     @db[:test2] << {:name => 'mmm', :value => 111, :xyz=>'000'}
     @db[:test2].first.should == {:name => 'mmm', :value => 111, :xyz=>'000'}
   end
-  
+
   specify "should support drop_column operations" do
     @db.drop_column :test2, :value
     @db[:test2].columns.should == [:name]
     @db[:test2] << {:name => 'mmm'}
     @db[:test2].first.should == {:name => 'mmm'}
   end
-  
+
   specify "should support drop_column operations in a transaction" do
     @db.transaction{@db.drop_column :test2, :value}
     @db[:test2].columns.should == [:name]
@@ -498,7 +498,7 @@ describe "A SQLite database" do
     @db[:test2].first[:zyx].should == 'qqqq'
     @db[:test2].count.should eql(1)
   end
-  
+
   specify "should preserve defaults when dropping or renaming columns" do
     @db.create_table! :test3 do
       String :s, :default=>'a'
@@ -517,7 +517,7 @@ describe "A SQLite database" do
     @db[:test3].first[:t].should == 'a'
     @db[:test3].delete
   end
-  
+
   specify "should handle quoted tables when dropping or renaming columns" do
     @db.quote_identifiers = true
     table_name = "T T"
@@ -534,7 +534,7 @@ describe "A SQLite database" do
     @db.rename_column table_name, :"s s", :"t t"
     @db.from(table_name).all.should == [{:"t t"=>1}]
   end
-  
+
   specify "should choose a temporary table name that isn't already used when dropping or renaming columns" do
     sqls = []
     @db.loggers << (l=Class.new{%w'info error'.each{|m| define_method(m){|sql| sqls << sql}}}.new)
@@ -575,12 +575,12 @@ describe "A SQLite database" do
     @db[:test3_backup2].columns.should == [:l]
     @db.loggers.delete(l)
   end
-  
+
   specify "should support add_index" do
     @db.add_index :test2, :value, :unique => true
     @db.add_index :test2, [:name, :value]
   end
-  
+
   specify "should support drop_index" do
     @db.add_index :test2, :value, :unique => true
     @db.drop_index :test2, :value
@@ -594,4 +594,4 @@ describe "A SQLite database" do
     @db.drop_column :a, :b
     @db.indexes(:a).should == {:a_a_index=>{:unique=>false, :columns=>[:a]}}
   end
-end  
+end

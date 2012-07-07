@@ -110,7 +110,7 @@ module Sequel
       def lit
         self
       end
-      
+
       # Alias of +to_s+
       def sql_literal(ds)
         to_s(ds)
@@ -168,7 +168,7 @@ module Sequel
 
       # The operator symbol for this object
       attr_reader :op
-      
+
       # An array of args for this object
       attr_reader :args
 
@@ -202,15 +202,15 @@ module Sequel
         @op = op
         @args = args
       end
-      
+
       to_s_method :complex_expression_sql, '@op, @args'
     end
 
     # The base class for expressions that can be used in multiple places in
-    # an SQL query.  
+    # an SQL query.
     class GenericExpression < Expression
     end
-    
+
     ### Modules ###
 
     # Includes an +as+ method that creates an SQL alias.
@@ -257,7 +257,7 @@ module Sequel
     # One exception to this is when a NumericExpression or Integer is the argument
     # to & or |, in which case a bitwise method will be used:
     #
-    #   :a & 1 # "a" & 1 
+    #   :a & 1 # "a" & 1
     #   :a | (:b + 1) # "a" | ("b" + 1)
     module BooleanMethods
       ComplexExpression::BOOLEAN_OPERATOR_METHODS.each do |m, o|
@@ -266,13 +266,13 @@ module Sequel
             case o
             when NumericExpression, Integer
               NumericExpression.new(#{m.inspect}, self, o)
-            else  
+            else
               BooleanExpression.new(#{o.inspect}, self, o)
             end
           end
         END
       end
-      
+
       # Create a new BooleanExpression with NOT, representing the inversion of whatever self represents.
       #
       #   ~:a # NOT :a
@@ -334,7 +334,7 @@ module Sequel
 
       # Cast the reciever to the given SQL type (or the database's default Integer type if none given),
       # and return the result as a +NumericExpression+, so you can use the bitwise operators
-      # on the result. 
+      # on the result.
       #
       #   Sequel.cast_numeric(:a) # CAST(a AS integer)
       #   Sequel.cast_numeric(:a, Float) # CAST(a AS double precision)
@@ -502,7 +502,7 @@ module Sequel
             LiteralString.new(s)
           end
         else
-          SQL::PlaceholderLiteralString.new(s, args) 
+          SQL::PlaceholderLiteralString.new(s, args)
         end
       end
 
@@ -554,7 +554,7 @@ module Sequel
       end
 
       # Return a <tt>SQL::ValueList</tt> created from the given array.  Used if the array contains
-      # all two element arrays and you want it treated as an SQL value list (IN predicate) 
+      # all two element arrays and you want it treated as an SQL value list (IN predicate)
       # instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using
       # this array as a value in a filter, but may be necessary if you are using it as a
       # value with placeholder SQL:
@@ -569,7 +569,7 @@ module Sequel
     end
 
     # Holds methods that are used to cast objects to different SQL types.
-    module CastMethods 
+    module CastMethods
       # Cast the reciever to the given SQL type.  You can specify a ruby class as a type,
       # and it is handled similarly to using a database independent type in the schema methods.
       #
@@ -581,7 +581,7 @@ module Sequel
 
       # Cast the reciever to the given SQL type (or the database's default Integer type if none given),
       # and return the result as a +NumericExpression+, so you can use the bitwise operators
-      # on the result. 
+      # on the result.
       #
       #   :a.cast_numeric # CAST(a AS integer)
       #   :a.cast_numeric(Float) # CAST(a AS double precision)
@@ -599,7 +599,7 @@ module Sequel
         cast(sql_type || String).sql_string
       end
     end
-    
+
     # Adds methods that allow you to treat an object as an instance of a specific
     # +ComplexExpression+ subclass.  This is useful if another library
     # overrides the methods defined by Sequel.
@@ -630,7 +630,7 @@ module Sequel
       end
 
       # Return a NumericExpression representation of +self+.
-      # 
+      #
       #   ~:a # NOT "a"
       #   ~:a.sql_number # ~"a"
       def sql_number
@@ -657,8 +657,8 @@ module Sequel
       end
     end
 
-    # This module includes the inequality methods (>, <, >=, <=) that are defined on objects that can be 
-    # used in a numeric or string context in SQL (+Symbol+ (except on ruby 1.9), +LiteralString+, 
+    # This module includes the inequality methods (>, <, >=, <=) that are defined on objects that can be
+    # used in a numeric or string context in SQL (+Symbol+ (except on ruby 1.9), +LiteralString+,
     # <tt>SQL::GenericExpression</tt>).
     #
     #   'a'.lit > :b # a > "b"
@@ -731,7 +731,7 @@ module Sequel
           end
         END
       end
-      
+
       # Invert the given expression.  Returns a <tt>Sequel::SQL::BooleanExpression</tt>
       # created from this argument, not matching all of the conditions.
       #
@@ -759,7 +759,7 @@ module Sequel
       def asc(opts={})
         OrderedExpression.new(self, false, opts)
       end
-      
+
       # Mark the receiving SQL column as sorting in a descending fashion.
       # Options:
       #
@@ -784,7 +784,7 @@ module Sequel
       end
     end
 
-    # This module includes the +like+ and +ilike+ methods used for pattern matching that are defined on objects that can be 
+    # This module includes the +like+ and +ilike+ methods used for pattern matching that are defined on objects that can be
     # used in a string context in SQL (+Symbol+, +LiteralString+, <tt>SQL::GenericExpression</tt>).
     module StringMethods
       # Create a +BooleanExpression+ case insensitive pattern match of the receiver
@@ -849,7 +849,7 @@ module Sequel
     end
 
     # +Blob+ is used to represent binary data in the Ruby environment that is
-    # stored as a blob type in the database. Sequel represents binary data as a Blob object because 
+    # stored as a blob type in the database. Sequel represents binary data as a Blob object because
     # most database engines require binary data to be escaped differently than regular strings.
     class Blob < ::String
       # Returns +self+, used so that Blobs don't get wrapped in multiple
@@ -863,7 +863,7 @@ module Sequel
     # in a boolean value in SQL.
     class BooleanExpression < ComplexExpression
       include BooleanMethods
-      
+
       # Take pairs of values (e.g. a hash or array of two element arrays)
       # and converts it to a +BooleanExpression+.  The operator and args
       # used depends on the case of the right (2nd) argument:
@@ -871,8 +871,8 @@ module Sequel
       # * 0..10 - left >= 0 AND left <= 10
       # * [1,2] - left IN (1,2)
       # * nil - left IS NULL
-      # * true - left IS TRUE 
-      # * false - left IS FALSE 
+      # * true - left IS TRUE
+      # * false - left IS FALSE
       # * /as/ - left ~ 'as'
       # * :blah - left = blah
       # * 'blah' - left = 'blah'
@@ -906,7 +906,7 @@ module Sequel
         end
         pairs.length == 1 ? pairs.at(0) : new(op, *pairs)
       end
-      
+
       # Invert the expression, if possible.  If the expression cannot
       # be inverted, raise an error.  An inverted expression should match everything that the
       # uninverted expression did not match, and vice-versa, except for possible issues with
@@ -954,7 +954,7 @@ module Sequel
       # condition matches.
       attr_reader :conditions
 
-      # The default value if no conditions match. 
+      # The default value if no conditions match.
       attr_reader :default
 
       # The expression to test the conditions against
@@ -984,7 +984,7 @@ module Sequel
 
       # The type to which to cast the expression
       attr_reader :type
-      
+
       # Set the attributes to the given arguments
       def initialize(expr, type)
         @expr = expr
@@ -1006,7 +1006,7 @@ module Sequel
 
       to_s_method :column_all_sql
     end
-    
+
     class ComplexExpression
       include AliasMethods
       include CastMethods
@@ -1038,7 +1038,7 @@ module Sequel
       def initialize(constant)
         @constant = constant
       end
-      
+
       to_s_method :constant_sql, '@constant'
     end
 
@@ -1046,13 +1046,13 @@ module Sequel
     class BooleanConstant < Constant
       to_s_method :boolean_constant_sql, '@constant'
     end
-    
+
     # Represents inverse boolean constants (currently only +NOTNULL+). A
     # special class to allow for special behavior.
     class NegativeBooleanConstant < BooleanConstant
       to_s_method :negative_boolean_constant_sql, '@constant'
     end
-    
+
     # Holds default generic constants that can be referenced.  These
     # are included in the Sequel top level module and are also available
     # in this module which can be required at the top level to get
@@ -1077,7 +1077,7 @@ module Sequel
     class Function < GenericExpression
       # The SQL function to call
       attr_reader :f
-      
+
       # The array of arguments to pass to the function (may be blank)
       attr_reader :args
 
@@ -1088,7 +1088,7 @@ module Sequel
 
       to_s_method :function_sql
     end
-    
+
     class GenericExpression
       include AliasMethods
       include BooleanMethods
@@ -1114,10 +1114,10 @@ module Sequel
       def initialize(value)
         @value = value
       end
-      
+
       to_s_method :quote_identifier, '@value'
     end
-    
+
     # Represents an SQL JOIN clause, used for joining tables.
     class JoinClause < Expression
       # The type of join to do
@@ -1154,7 +1154,7 @@ module Sequel
 
     # Represents an SQL JOIN clause with USING conditions.
     class JoinUsingClause < JoinClause
-      # The columns that appear in both tables that should be equal 
+      # The columns that appear in both tables that should be equal
       # for the conditions to match.
       attr_reader :using
 
@@ -1174,7 +1174,7 @@ module Sequel
     # literalization.
     class PlaceholderLiteralString < GenericExpression
       # The literal string containing placeholders.  This can also be an array
-      # of strings, where each arg in args goes between the string elements. 
+      # of strings, where each arg in args goes between the string elements.
       attr_reader :str
 
       # The arguments that will be subsituted into the placeholders.
@@ -1199,7 +1199,7 @@ module Sequel
     # Subclass of +ComplexExpression+ where the expression results
     # in a numeric value in SQL.
     class NumericExpression < ComplexExpression
-      include BitwiseMethods 
+      include BitwiseMethods
       include NumericMethods
       include InequalityMethods
 
@@ -1267,10 +1267,10 @@ module Sequel
       def initialize(table, column)
         @table, @column = table, column
       end
-      
+
       to_s_method :qualified_identifier_sql, "@table, @column"
     end
-    
+
     # Subclass of +ComplexExpression+ where the expression results
     # in a text/string/varchar value in SQL.
     class StringExpression < ComplexExpression
@@ -1280,7 +1280,7 @@ module Sequel
 
       # Map of [regexp, case_insenstive] to +ComplexExpression+ operator symbol
       LIKE_MAP = {[true, true]=>:'~*', [true, false]=>:~, [false, true]=>:ILIKE, [false, false]=>:LIKE}
-      
+
       # Creates a SQL pattern match exprssion. left (l) is the SQL string we
       # are matching against, and ces are the patterns we are matching.
       # The match succeeds if any of the patterns match (SQL OR).
@@ -1293,8 +1293,8 @@ module Sequel
       # ruby regular expression verbatim as the SQL regular expression string.
       #
       # If any other object is used as a regular expression, the SQL LIKE operator will
-      # be used, and should be supported by most databases.  
-      # 
+      # be used, and should be supported by most databases.
+      #
       # The pattern match will be case insensitive if the last argument is a hash
       # with a key of :case_insensitive that is not false or nil. Also,
       # if a case insensitive regular expression is used (//i), that particular
@@ -1302,7 +1302,7 @@ module Sequel
       #
       #   StringExpression.like(:a, 'a%') # "a" LIKE 'a%'
       #   StringExpression.like(:a, 'a%', :case_insensitive=>true) # "a" ILIKE 'a%'
-      #   StringExpression.like(:a, 'a%', /^a/i) # "a" LIKE 'a%' OR "a" ~* '^a' 
+      #   StringExpression.like(:a, 'a%', /^a/i) # "a" LIKE 'a%' OR "a" ~* '^a'
       def self.like(l, *ces)
         l, lre, lci = like_element(l)
         lci = (ces.last.is_a?(Hash) ? ces.pop : {})[:case_insensitive] ? true : lci
@@ -1312,7 +1312,7 @@ module Sequel
         end
         ces.length == 1 ? ces.at(0) : BooleanExpression.new(:OR, *ces)
       end
-      
+
       # Returns a three element array, made up of:
       # * The object to use
       # * Whether it is a regular expression
@@ -1362,7 +1362,7 @@ module Sequel
       def [](sub)
         Subscript.new(self, Array(sub))
       end
-      
+
       to_s_method :subscript_sql
     end
 
@@ -1385,7 +1385,7 @@ module Sequel
     # If the block doesn't take an argument, the block is instance_evaled in the context of
     # a new instance of this class.
     #
-    # +VirtualRow+ uses +method_missing+ to return either an +Identifier+, +QualifiedIdentifier+, +Function+, or +WindowFunction+, 
+    # +VirtualRow+ uses +method_missing+ to return either an +Identifier+, +QualifiedIdentifier+, +Function+, or +WindowFunction+,
     # depending on how it is called.
     #
     # If a block is _not_ given, creates one of the following objects:
@@ -1560,7 +1560,7 @@ module Sequel
     end
   end
 
-  # +LiteralString+ is used to represent literal SQL expressions. A 
+  # +LiteralString+ is used to represent literal SQL expressions. A
   # +LiteralString+ is copied verbatim into an SQL statement. Instances of
   # +LiteralString+ can be created by calling <tt>String#lit</tt>.
   class LiteralString
@@ -1576,17 +1576,17 @@ module Sequel
     unless Sequel.core_extensions?
       include Sequel::SQL::AliasMethods
       include Sequel::SQL::CastMethods
-      
+
       def lit(*args)
         args.empty? ? self : SQL::PlaceholderLiteralString.new(self, args)
       end
-      
+
       def to_sequel_blob
         SQL::Blob.new(self)
       end
     end
   end
-  
+
   include SQL::Constants
   extend SQL::Builders
   extend SQL::OperatorBuilders

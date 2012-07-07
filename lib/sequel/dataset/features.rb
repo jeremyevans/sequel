@@ -5,7 +5,7 @@ module Sequel
     # These methods all return booleans, with most describing whether or not the
     # dataset supports a feature.
     # ---------------------
-    
+
     # Whether this dataset quotes identifiers.
     def quote_identifiers?
       if defined?(@quote_identifiers)
@@ -16,14 +16,14 @@ module Sequel
         @quote_identifiers = false
       end
     end
-    
+
     # Whether this dataset will provide accurate number of rows matched for
     # delete and update statements.  Accurate in this case is the number of
     # rows matched by the dataset's filter.
     def provides_accurate_rows_matched?
       true
     end
-    
+
     # Whether you must use a column alias list for recursive CTEs (false by
     # default).
     def recursive_cte_requires_column_aliases?
@@ -91,17 +91,17 @@ module Sequel
     def supports_is_true?
       true
     end
-    
+
     # Whether the dataset supports the JOIN table USING (column1, ...) syntax.
     def supports_join_using?
       true
     end
-    
+
     # Whether modifying joined datasets is supported.
     def supports_modifying_joins?
       false
     end
-    
+
     # Whether the IN/NOT IN operators support multiple columns when an
     # array of values is given.
     def supports_multiple_column_in?
@@ -113,7 +113,7 @@ module Sequel
     def supports_ordered_distinct_on?
       supports_distinct_on?
     end
-    
+
     # Whether the RETURNING clause is supported for the given type of query.
     # +type+ can be :insert, :update, or :delete.
     def supports_returning?(type)
@@ -129,17 +129,17 @@ module Sequel
     def supports_timestamp_timezones?
       false
     end
-    
+
     # Whether the dataset supports fractional seconds in literal timestamps
     def supports_timestamp_usecs?
       true
     end
-    
+
     # Whether the dataset supports window functions.
     def supports_window_functions?
       false
     end
-    
+
     # Whether the dataset supports WHERE TRUE (or WHERE 1 for databases that
     # that use 1 for true).
     def supports_where_true?
@@ -165,7 +165,7 @@ module Sequel
     def uses_returning?(type)
       opts[:returning] && !@opts[:sql] && supports_returning?(type)
     end
-    
+
     # Whether the dataset uses WITH ROLLUP/CUBE instead of ROLLUP()/CUBE().
     def uses_with_rollup?
       false

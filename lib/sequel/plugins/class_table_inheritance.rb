@@ -6,7 +6,7 @@ module Sequel
     # table.  For example, with this hierarchy:
     #
     #       Employee
-    #      /        \ 
+    #      /        \
     #   Staff     Manager
     #                |
     #            Executive
@@ -28,13 +28,13 @@ module Sequel
     # * managers.id - foreign key referencing employees(id)
     # * executives.id - foreign key referencing managers(id)
     #
-    # When using the class_table_inheritance plugin, subclasses use joined 
+    # When using the class_table_inheritance plugin, subclasses use joined
     # datasets:
     #
     #   Employee.dataset.sql  # SELECT * FROM employees
     #   Manager.dataset.sql   # SELECT * FROM employees
     #                         # INNER JOIN managers USING (id)
-    #   Executive.dataset.sql # SELECT * FROM employees 
+    #   Executive.dataset.sql # SELECT * FROM employees
     #                         # INNER JOIN managers USING (id)
     #                         # INNER JOIN executives USING (id)
     #
@@ -54,7 +54,7 @@ module Sequel
     #   a = Employee.all # [<#Staff>, <#Manager>, <#Executive>]
     #   a.first.values # {:id=>1, name=>'S', :kind=>'Staff'}
     #   a.first.manager_id # Loads the manager_id attribute from the database
-    # 
+    #
     # Usage:
     #
     #   # Set up class table inheritance in the parent class
@@ -62,7 +62,7 @@ module Sequel
     #   Employee.plugin :class_table_inheritance
     #
     #   # Set the +kind+ column to hold the class name, and
-    #   # set the subclass table to map to for each subclass 
+    #   # set the subclass table to map to for each subclass
     #   Employee.plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
     module ClassTableInheritance
       # The class_table_inheritance plugin requires the lazy_attributes plugin
@@ -71,7 +71,7 @@ module Sequel
       def self.apply(model, opts={})
         model.plugin :lazy_attributes
       end
-      
+
       # Initialize the per-model data structures and set the dataset's row_proc
       # to check for the :key option column for the type of class when loading objects.
       # Options:
@@ -85,7 +85,7 @@ module Sequel
         model.instance_eval do
           m = method(:constantize)
           @cti_base_model = self
-          @cti_key = key = opts[:key] 
+          @cti_key = key = opts[:key]
           @cti_tables = [table_name]
           @cti_columns = {table_name=>columns}
           @cti_table_map = opts[:table_map] || {}
@@ -102,26 +102,26 @@ module Sequel
         # This is the only model in the hierarchy that load the
         # class_table_inheritance plugin.
         attr_reader :cti_base_model
-        
+
         # Hash with table name symbol keys and arrays of column symbol values,
         # giving the columns to update in each backing database table.
         attr_reader :cti_columns
-        
+
         # The column containing the class name as a string.  Used to
         # return instances of subclasses when calling the superclass's
         # load method.
         attr_reader :cti_key
-        
+
         # An array of table symbols that back this model.  The first is
         # cti_base_model table symbol, and the last is the current model
         # table symbol.
         attr_reader :cti_tables
-        
+
         # A hash with class name symbol keys and table name symbol values.
         # Specified with the :table_map option to the plugin, and used if
         # the implicit naming is incorrect.
         attr_reader :cti_table_map
-        
+
         # Add the appropriate data structures to the subclass.  Does not
         # allow anonymous subclasses to be created, since they would not
         # be mappable to a table.
@@ -137,7 +137,7 @@ module Sequel
             raise(Error, "cannot create anonymous subclass for model class using class_table_inheritance") if !(n = name) || n.empty?
             table = ctm[n.to_sym] || implicit_table_name
             columns = db.from(table).columns
-            @cti_key = ck 
+            @cti_key = ck
             @cti_tables = ct + [table]
             @cti_columns = cc.merge(table=>columns)
             @cti_table_map = ctm
@@ -162,14 +162,14 @@ module Sequel
             end
           end
         end
-        
+
         # The primary key in the parent/base/root model, which should have a
         # foreign key with the same name referencing it in each model subclass.
         def primary_key
           return super if self == cti_base_model
           cti_base_model.primary_key
         end
-        
+
         # The table name for the current model class's main table (not used
         # by any superclasses).
         def table_name
@@ -183,7 +183,7 @@ module Sequel
           send("#{model.cti_key}=", model.name.to_s) if model.cti_key
           super
         end
-        
+
         # Delete the row from all backing tables, starting from the
         # most recent table and going through all superclasses.
         def delete
@@ -193,14 +193,14 @@ module Sequel
           end
           self
         end
-        
+
         private
-        
+
         # Insert rows into all backing tables, using the columns
-        # in each table.  
+        # in each table.
         def _insert
           return super if model == model.cti_base_model
-          iid = @values[primary_key] 
+          iid = @values[primary_key]
           m = model
           m.cti_tables.each do |table|
             h = {}
@@ -211,7 +211,7 @@ module Sequel
           end
           @values[primary_key] = iid
         end
-        
+
         # Update rows in all backing tables, using the columns in each table.
         def _update(columns)
           pkh = pk_hash

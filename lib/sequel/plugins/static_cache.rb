@@ -2,7 +2,7 @@ module Sequel
   module Plugins
     # The static_cache plugin is designed for models that are not modified at all
     # in production use cases, or at least where modifications to them would usually
-    # coincide with an application restart.  When loaded into a model class, it 
+    # coincide with an application restart.  When loaded into a model class, it
     # retrieves all rows in the database and staticly caches a ruby array and hash
     # keyed on primary key containing all of the model instances.  All of these instances
     # are frozen so they won't be modified unexpectedly.

@@ -6,7 +6,7 @@ module Sequel
     # They don't return modified datasets, so if used in a method chain
     # they should be the last method called.
     # ---------------------
-    
+
     # Action methods defined by Sequel that execute code on the database.
     ACTION_METHODS = (<<-METHS).split.map{|x| x.to_sym}
       << [] []= all avg count columns columns! delete each
@@ -17,13 +17,13 @@ module Sequel
 
     # Inserts the given argument into the database.  Returns self so it
     # can be used safely when chaining:
-    # 
+    #
     #   DB[:items] << {:id=>0, :name=>'Zero'} << DB[:old_items].select(:id, name)
     def <<(arg)
       insert(arg)
       self
     end
-    
+
     # Returns the first record matching the conditions. Examples:
     #
     #   DB[:table][:id=>1] # SELECT * FROM table WHERE (id = 1) LIMIT 1
@@ -57,7 +57,7 @@ module Sequel
       a.each(&block) if block
       a
     end
-    
+
     # Returns the average value for the given column.
     #
     #   DB[:table].avg(:number) # SELECT avg(number) FROM table LIMIT 1
@@ -65,7 +65,7 @@ module Sequel
     def avg(column)
       aggregate_dataset.get{avg(column)}
     end
-  
+
     # Returns the columns in the result set in order as an array of symbols.
     # If the columns are currently cached, returns the cached value. Otherwise,
     # a SELECT query is performed to retrieve a single row in order to get the columns.
@@ -82,7 +82,7 @@ module Sequel
       @columns = ds.instance_variable_get(:@columns)
       @columns || []
     end
-        
+
     # Ignore any cached column information and perform a query to retrieve
     # a row in order to get the columns.
     #
@@ -92,7 +92,7 @@ module Sequel
       @columns = nil
       columns
     end
-    
+
     # Returns the number of records in the dataset.
     #
     #   DB[:table].count # SELECT COUNT(*) AS count FROM table LIMIT 1
@@ -100,8 +100,8 @@ module Sequel
     def count
       aggregate_dataset.get{COUNT(:*){}.as(count)}.to_i
     end
-    
-    # Deletes the records in the dataset.  The returned value should be 
+
+    # Deletes the records in the dataset.  The returned value should be
     # number of records deleted, but that is adapter dependent.
     #
     #   DB[:table].delete # DELETE * FROM table
@@ -134,7 +134,7 @@ module Sequel
       end
       self
     end
-    
+
     # Returns true if no records exist in the dataset, false otherwise
     #
     #   DB[:table].empty? # SELECT 1 AS one FROM table LIMIT 1
@@ -150,14 +150,14 @@ module Sequel
     def fetch_rows(sql)
       raise NotImplemented, NOTIMPL_MSG
     end
-    
-    # If a integer argument is given, it is interpreted as a limit, and then returns all 
+
+    # If a integer argument is given, it is interpreted as a limit, and then returns all
     # matching records up to that limit.  If no argument is passed,
     # it returns the first matching record.  If any other type of
     # argument(s) is passed, it is given to filter and the
     # first matching record is returned. If a block is given, it is used
     # to filter the dataset before returning anything.  Examples:
-    # 
+    #
     #   DB[:table].first # SELECT * FROM table LIMIT 1
     #   # => {:id=>7}
     #
@@ -212,22 +212,22 @@ module Sequel
         select(column).single_value
       end
     end
-    
+
     # Inserts multiple records into the associated table. This method can be
     # used to efficiently insert a large number of records into a table in a
     # single query if the database supports it. Inserts
     # are automatically wrapped in a transaction.
-    # 
+    #
     # This method is called with a columns array and an array of value arrays:
     #
     #   DB[:table].import([:x, :y], [[1, 2], [3, 4]])
-    #   # INSERT INTO table (x, y) VALUES (1, 2) 
-    #   # INSERT INTO table (x, y) VALUES (3, 4) 
+    #   # INSERT INTO table (x, y) VALUES (1, 2)
+    #   # INSERT INTO table (x, y) VALUES (3, 4)
     #
     # This method also accepts a dataset instead of an array of value arrays:
     #
     #   DB[:table].import([:x, :y], DB[:table2].select(:a, :b))
-    #   # INSERT INTO table (x, y) SELECT a, b FROM table2 
+    #   # INSERT INTO table (x, y) SELECT a, b FROM table2
     #
     # Options:
     # :commit_every :: Open a new transaction for every given number of records.
@@ -242,7 +242,7 @@ module Sequel
       return if values.empty?
       raise(Error, IMPORT_ERROR_MSG) if columns.empty?
       ds = opts[:server] ? server(opts[:server]) : self
-      
+
       if slice_size = opts[:commit_every] || opts[:slice]
         offset = 0
         rows = []
@@ -299,7 +299,7 @@ module Sequel
         execute_insert(sql)
       end
     end
-    
+
     # Inserts multiple values. If a block is given it is invoked for each
     # item in the given array before inserting it.  See +multi_insert+ as
     # a possibly faster version that may be able to insert multiple
@@ -322,8 +322,8 @@ module Sequel
         array.map{|i| insert(i)}
       end
     end
-    
-    # Returns the interval between minimum and maximum values for the given 
+
+    # Returns the interval between minimum and maximum values for the given
     # column.
     #
     #   DB[:table].interval(:id) # SELECT (max(id) - min(id)) FROM table LIMIT 1
@@ -346,9 +346,9 @@ module Sequel
       raise(Error, 'No order specified') unless @opts[:order]
       reverse.first(*args, &block)
     end
-    
+
     # Maps column values for each record in the dataset (if a column name is
-    # given), or performs the stock mapping functionality of +Enumerable+ otherwise. 
+    # given), or performs the stock mapping functionality of +Enumerable+ otherwise.
     # Raises an +Error+ if both an argument and block are given.
     #
     #   DB[:table].map(:id) # SELECT * FROM table
@@ -393,7 +393,7 @@ module Sequel
 
     # This is a front end for import that allows you to submit an array of
     # hashes instead of arrays of columns and values:
-    # 
+    #
     #   DB[:table].multi_insert([{:x => 1}, {:x => 2}])
     #   # INSERT INTO table (x) VALUES (1)
     #   # INSERT INTO table (x) VALUES (2)
@@ -419,7 +419,7 @@ module Sequel
         (r[:v1]..r[:v2])
       end
     end
-    
+
     # Returns a hash with key_column values as keys and value_column values as
     # values.  Similar to to_hash, but only selects the columns given.
     #
@@ -438,7 +438,7 @@ module Sequel
     def select_hash(key_column, value_column)
       _select_hash(:to_hash, key_column, value_column)
     end
-    
+
     # Returns a hash with key_column values as keys and an array of value_column values.
     # Similar to to_hash_groups, but only selects the columns given.
     #
@@ -481,7 +481,7 @@ module Sequel
     def select_map(column=nil, &block)
       _select_map(column, false, &block)
     end
-    
+
     # The same as select_map, but in addition orders the array by the column.
     #
     #   DB[:table].select_order_map(:id) # SELECT id FROM table ORDER BY id
@@ -507,7 +507,7 @@ module Sequel
     def set(*args)
       update(*args)
     end
-    
+
     # Returns the first record in the dataset, or nil if the dataset
     # has no records. Users should probably use +first+ instead of
     # this method.
@@ -524,7 +524,7 @@ module Sequel
         r.values.first
       end
     end
-    
+
     # Returns the sum for the given column.
     #
     #   DB[:table].sum(:id) # SELECT sum(id) FROM table LIMIT 1
@@ -533,9 +533,9 @@ module Sequel
       aggregate_dataset.get{sum(column)}
     end
 
-    # Returns a string in CSV format containing the dataset records. By 
+    # Returns a string in CSV format containing the dataset records. By
     # default the CSV representation includes the column titles in the
-    # first line. You can turn that off by passing false as the 
+    # first line. You can turn that off by passing false as the
     # include_column_titles argument.
     #
     # This does not use a CSV library or handle quoting of values in
@@ -554,7 +554,7 @@ module Sequel
       n.each{|r| csv << "#{cols.collect{|c| r[c]}.join(COMMA_SEPARATOR)}\r\n"}
       csv
     end
-    
+
     # Returns a hash with one column used as key and another used as value.
     # If rows have duplicate values for the key column, the latter row(s)
     # will overwrite the value of the previous row(s). If the value_column
@@ -690,19 +690,19 @@ module Sequel
         @db.transaction(trans_opts){stmts.each{|st| execute_dui(st)}}
       end
     end
-  
+
     # Return an array of arrays of values given by the symbols in ret_cols.
     def _select_map_multiple(ret_cols)
       map{|r| r.values_at(*ret_cols)}
     end
-  
+
     # Returns an array of the first value in each row.
     def _select_map_single
       map{|r| r.values.first}
     end
-  
+
     private
-    
+
     # Internals of +select_hash+ and +select_hash_groups+
     def _select_hash(meth, key_column, value_column)
       if key_column.is_a?(Array)
@@ -717,7 +717,7 @@ module Sequel
         select(key_column, value_column).send(meth, hash_key_symbol(key_column), hash_key_symbol(value_column))
       end
     end
-    
+
     # Internals of +select_map+ and +select_order_map+
     def _select_map(column, order, &block)
       ds = naked.ungraphed
@@ -743,23 +743,23 @@ module Sequel
     def execute(sql, opts={}, &block)
       @db.execute(sql, {:server=>@opts[:server] || :read_only}.merge(opts), &block)
     end
-    
+
     # Execute the given SQL on the database using execute_ddl.
     def execute_ddl(sql, opts={}, &block)
       @db.execute_ddl(sql, default_server_opts(opts), &block)
       nil
     end
-    
+
     # Execute the given SQL on the database using execute_dui.
     def execute_dui(sql, opts={}, &block)
       @db.execute_dui(sql, default_server_opts(opts), &block)
     end
-    
+
     # Execute the given SQL on the database using execute_insert.
     def execute_insert(sql, opts={}, &block)
       @db.execute_insert(sql, default_server_opts(opts), &block)
     end
-    
+
     # Return a plain symbol given a potentially qualified or aliased symbol,
     # specifying the symbol that is likely to be used as the hash key
     # for the column when records are returned.
@@ -777,17 +777,17 @@ module Sequel
       when String
         s.to_sym
       else
-        raise(Error, "#{s.inspect} is not supported, should be a Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression") 
+        raise(Error, "#{s.inspect} is not supported, should be a Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression")
       end
     end
-    
+
     # Modify the identifier returned from the database based on the
     # identifier_output_method.
     def output_identifier(v)
       v = 'untitled' if v == ''
       (i = identifier_output_method) ? v.to_s.send(i).to_sym : v.to_sym
     end
-    
+
     # This is run inside .all, after all of the records have been loaded
     # via .each, but before any block passed to all is called.  It is called with
     # a single argument, an array of all returned records.  Does nothing by
@@ -808,7 +808,7 @@ module Sequel
         rows
       end
     end
-    
+
     # Return the unaliased part of the identifier.  Handles both
     # implicit aliases in symbols, as well as SQL::AliasedExpression
     # objects.  Other objects are returned as is.

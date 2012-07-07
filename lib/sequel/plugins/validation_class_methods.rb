@@ -9,7 +9,7 @@ module Sequel
     # as it is less complex and more flexible.  However, this plugin provides reflection
     # support, since it is class-level, while the instance-level validation_helpers
     # plugin does not.
-    # 
+    #
     # Usage:
     #
     #   # Add the validation class methods to all model subclasses (called before loading subclasses)
@@ -38,7 +38,7 @@ module Sequel
         # options.
         attr_reader :validation_reflections
 
-        # The Generator class is used to generate validation definitions using 
+        # The Generator class is used to generate validation definitions using
         # the validates {} idiom.
         class Generator
           # Initializes a new generator.
@@ -46,13 +46,13 @@ module Sequel
             @receiver = receiver
             instance_eval(&block)
           end
-      
+
           # Delegates method calls to the receiver by calling receiver.validates_xxx.
           def method_missing(m, *args, &block)
             @receiver.send(:"validates_#{m}", *args, &block)
           end
         end
-    
+
         # Returns true if validations are defined.
         def has_validations?
           !validations.empty?
@@ -70,18 +70,18 @@ module Sequel
           end
           super
         end
-    
+
         # Instructs the model to skip validations defined in superclasses
         def skip_superclass_validations
           @skip_superclass_validations = true
         end
-        
+
         # Instructs the model to skip validations defined in superclasses
         def skip_superclass_validations?
           defined?(@skip_superclass_validations) && @skip_superclass_validations
         end
 
-        # Defines validations by converting a longhand block into a series of 
+        # Defines validations by converting a longhand block into a series of
         # shorthand definitions. For example:
         #
         #   class MyClass < Sequel::Model
@@ -99,7 +99,7 @@ module Sequel
         def validates(&block)
           Generator.new(self, &block)
         end
-    
+
         # Validates the given instance.
         def validate(o)
           superclass.validate(o) if superclass.respond_to?(:validate) && !skip_superclass_validations?
@@ -113,7 +113,7 @@ module Sequel
             procs.each {|tag, p| p.call(o, att, v)}
           end
         end
-        
+
         # Validates acceptance of an attribute.  Just checks that the value
         # is equal to the :accept option. This method is unique in that
         # :allow_nil is assumed to be true instead of false.
@@ -134,7 +134,7 @@ module Sequel
             o.errors.add(a, opts[:message]) unless v == opts[:accept]
           end
         end
-    
+
         # Validates confirmation of an attribute. Checks that the object has
         # a _confirmation value matching the current value.  For example:
         #
@@ -156,9 +156,9 @@ module Sequel
             o.errors.add(a, opts[:message]) unless v == o.send(:"#{a}_confirmation")
           end
         end
-    
+
         # Adds a validation for each of the given attributes using the supplied
-        # block. The block must accept three arguments: instance, attribute and 
+        # block. The block must accept three arguments: instance, attribute and
         # value, e.g.:
         #
         #   validates_each :name, :password do |object, attribute, value|
@@ -166,7 +166,7 @@ module Sequel
         #   end
         #
         # Possible Options:
-        # * :allow_blank - Whether to skip the validation if the value is blank. 
+        # * :allow_blank - Whether to skip the validation if the value is blank.
         # * :allow_missing - Whether to skip the validation if the attribute isn't a key in the
         #   values hash.  This is different from allow_nil, because Sequel only sends the attributes
         #   in the values when doing an insert or update.  If the attribute is not present, Sequel
@@ -194,7 +194,7 @@ module Sequel
             block
           end
           tag = opts[:tag]
-          atts.each do |a| 
+          atts.each do |a|
             a_vals = @validation_mutex.synchronize{validations[a] ||= []}
             if tag && (old = a_vals.find{|x| x[0] == tag})
               old[1] = blk
@@ -203,7 +203,7 @@ module Sequel
             end
           end
         end
-    
+
         # Validates the format of an attribute, checking the string representation of the
         # value against the regular expression provided by the :with option.
         #
@@ -215,18 +215,18 @@ module Sequel
             :message => 'is invalid',
             :tag => :format,
           }.merge!(extract_options!(atts))
-          
+
           unless opts[:with].is_a?(Regexp)
             raise ArgumentError, "A regular expression must be supplied as the :with option of the options hash"
           end
-          
+
           reflect_validation(:format, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
             o.errors.add(a, opts[:message]) unless v.to_s =~ opts[:with]
           end
         end
-    
+
         # Validates the length of an attribute.
         #
         # Possible Options:
@@ -247,7 +247,7 @@ module Sequel
             :too_short    => 'is too short',
             :wrong_length => 'is the wrong length'
           }.merge!(extract_options!(atts))
-          
+
           opts[:tag] ||= ([:length] + [:maximum, :minimum, :is, :within].reject{|x| !opts.include?(x)}).join('-').to_sym
           reflect_validation(:length, opts, atts)
           atts << opts
@@ -266,7 +266,7 @@ module Sequel
             end
           end
         end
-    
+
         # Validates whether an attribute is not a string.  This is generally useful
         # in conjunction with raise_on_typecast_failure = false, where you are
         # passing in string values for non-string attributes (such as numbers and dates).
@@ -295,7 +295,7 @@ module Sequel
             end
           end
         end
-    
+
         # Validates whether an attribute is a number.
         #
         # Possible Options:
@@ -320,7 +320,7 @@ module Sequel
             end
           end
         end
-    
+
         # Validates the presence of an attribute.  Requires the value not be blank,
         # with false considered present instead of absent.
         #
@@ -337,7 +337,7 @@ module Sequel
             o.errors.add(a, opts[:message]) if v.blank? && v != false
           end
         end
-        
+
         # Validates that an attribute is within a specified range or set of values.
         #
         # Possible Options:
@@ -356,7 +356,7 @@ module Sequel
             o.errors.add(a, opts[:message]) unless n.send(n.respond_to?(:cover?) ? :cover? : :include?, v)
           end
         end
-    
+
         # Validates only if the fields in the model (specified by atts) are
         # unique in the database.  Pass an array of fields instead of multiple
         # fields to specify that the combination of fields must be unique,
@@ -378,7 +378,7 @@ module Sequel
             :message => 'is already taken',
             :tag => :uniqueness,
           }.merge!(extract_options!(atts))
-    
+
           reflect_validation(:uniqueness, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
@@ -406,9 +406,9 @@ module Sequel
             o.errors.add(error_field, opts[:message]) unless allow
           end
         end
-    
+
         private
-    
+
         # Removes and returns the last member of the array if it is a hash. Otherwise,
         # an empty hash is returned This method is useful when writing methods that
         # take an options hash as the last parameter.
@@ -433,7 +433,7 @@ module Sequel
           end
         end
       end
-    
+
       module InstanceMethods
         # Validates the object.
         def validate

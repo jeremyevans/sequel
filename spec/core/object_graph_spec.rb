@@ -96,11 +96,11 @@ describe Sequel::Dataset, " graphing" do
     oc = Class.new
     o = oc.new
     ds = @ds2
-    oc.send(:define_method, :dataset){ds} 
+    oc.send(:define_method, :dataset){ds}
     ds = @ds1.graph(o, :x=>:id)
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     ds = :lines
-    oc.send(:define_method, :dataset){ds} 
+    oc.send(:define_method, :dataset){ds}
     ds = @ds1.graph(o, :x=>:id)
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
   end

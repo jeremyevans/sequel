@@ -64,7 +64,7 @@ module Sequel
         e.each do |k, val|
           v(val, k)
         end
-      when SQL::ComplexExpression 
+      when SQL::ComplexExpression
         dot "ComplexExpression: #{e.op}"
         e.args.each_with_index do |val, j|
           v(val, j)
@@ -97,7 +97,7 @@ module Sequel
         e.args.each_with_index do |val, j|
           v(val, j)
         end
-      when SQL::Subscript 
+      when SQL::Subscript
         dot "Subscript"
         v(e.f, :f)
         v(e.sub, :sub)
@@ -124,15 +124,15 @@ module Sequel
         v(e.table, :table)
         v(e.table_alias, :alias) if e.table_alias
         if e.is_a?(SQL::JoinOnClause)
-          v(e.on, :on) 
+          v(e.on, :on)
         elsif e.is_a?(SQL::JoinUsingClause)
-          v(e.using, :using) 
+          v(e.using, :using)
         end
       when Dataset
         dot "Dataset"
         TO_DOT_OPTIONS.each do |k|
           if val = e.opts[k]
-            v(val, k.to_s) 
+            v(val, k.to_s)
           end
         end
       else

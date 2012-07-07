@@ -33,7 +33,7 @@ module Sequel
         db.set_integer_booleans
       end
     }
-      
+
     # DataObjects uses it's own internal connection pooling in addition to the
     # pooling that Sequel uses.  You should make sure that you don't set
     # the connection pool size to more than 8 for a
@@ -43,7 +43,7 @@ module Sequel
       DISCONNECT_ERROR_RE = /terminating connection due to administrator command/
 
       set_adapter_scheme :do
-      
+
       # Call the DATABASE_SETUP proc directly after initialization,
       # so the object always uses sub adapter specific code.  Also,
       # raise an error immediately if the connection doesn't have a
@@ -55,12 +55,12 @@ module Sequel
           prok.call(self)
         end
       end
-      
+
       # Setup a DataObjects::Connection to the database.
       def connect(server)
         setup_connection(::DataObjects::Connection.new(uri(server_opts(server))))
       end
-      
+
       # Execute the given SQL.  If a block is given, the DataObjects::Reader
       # created is yielded to it. A block should not be provided unless a
       # a SELECT statement is being used (or something else that returns rows).
@@ -87,25 +87,25 @@ module Sequel
           end
         end
       end
-      
+
       # Execute the SQL on the this database, returning the number of affected
       # rows.
       def execute_dui(sql, opts={})
         execute(sql, opts)
       end
-      
+
       # Execute the SQL on this database, returning the primary key of the
       # table being inserted to.
       def execute_insert(sql, opts={})
         execute(sql, opts.merge(:type=>:insert))
       end
-      
+
       # Return the subadapter type for this database, i.e. sqlite3 for
       # do:sqlite3::memory:.
       def subadapter
         uri.split(":").first
       end
-      
+
       # Return the DataObjects URI for the Sequel URI, removing the do:
       # prefix.
       def uri(opts={})
@@ -114,13 +114,13 @@ module Sequel
       end
 
       private
-      
+
       # Method to call on a statement object to execute SQL that does
       # not return any rows.
       def connection_execute_method
         :execute_non_query
       end
-      
+
       # dataobjects uses the DataObjects::Error class as the main error class.
       def database_error_classes
         [::DataObjects::Error]
@@ -135,19 +135,19 @@ module Sequel
       def disconnect_error?(e, opts)
         super || (e.is_a?(::DataObjects::Error) && (e.is_a?(::DataObjects::ConnectionError) || e.message =~ DISCONNECT_ERROR_RE))
       end
-      
+
       # Execute SQL on the connection by creating a command first
       def log_connection_execute(conn, sql)
         log_yield(sql){conn.create_command(sql).execute_non_query}
       end
-      
+
       # Allow extending the given connection when it is first created.
       # By default, just returns the connection.
       def setup_connection(conn)
         conn
       end
     end
-    
+
     # Dataset class for Sequel::DataObjects::Database objects.
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self

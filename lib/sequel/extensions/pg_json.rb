@@ -94,7 +94,7 @@ module Sequel
         case value
         when Array
           JSONArray.new(value)
-        when Hash 
+        when Hash
           JSONHash.new(value)
         else
           raise Sequel::InvalidValue, "unhandled json value: #{value.inspect} (from #{s.inspect})"
@@ -152,7 +152,7 @@ module Sequel
           value
         when Array
           JSONArray.new(value)
-        when Hash 
+        when Hash
           JSONHash.new(value)
         when String
           JSONDatabaseMethods.parse_json(value)

@@ -43,7 +43,7 @@ describe "NestedAttributes plugin" do
     @Album.nested_attributes :artist, :tags, :destroy=>true, :remove=>true
     @db.sqls
   end
-  
+
   it "should support creating new many_to_one objects" do
     a = @Album.new({:name=>'Al', :artist_attributes=>{:name=>'Ar'}})
     @db.sqls.should == []
@@ -51,7 +51,7 @@ describe "NestedAttributes plugin" do
     check_sql_array("INSERT INTO artists (name) VALUES ('Ar')",
       ["INSERT INTO albums (name, artist_id) VALUES ('Al', 1)", "INSERT INTO albums (artist_id, name) VALUES (1, 'Al')"])
   end
-  
+
   it "should support creating new one_to_one objects" do
     a = @Artist.new(:name=>'Ar')
     a.id = 1
@@ -62,7 +62,7 @@ describe "NestedAttributes plugin" do
       "UPDATE albums SET artist_id = NULL WHERE (artist_id = 1)",
       ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
   end
-  
+
   it "should support creating new one_to_many objects" do
     a = @Artist.new({:name=>'Ar', :albums_attributes=>[{:name=>'Al'}]})
     @db.sqls.should == []
@@ -70,7 +70,7 @@ describe "NestedAttributes plugin" do
     check_sql_array("INSERT INTO artists (name) VALUES ('Ar')",
       ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
   end
-  
+
   it "should support creating new many_to_many objects" do
     a = @Album.new({:name=>'Al', :tags_attributes=>[{:name=>'T'}]})
     @db.sqls.should == []
@@ -79,13 +79,13 @@ describe "NestedAttributes plugin" do
       "INSERT INTO tags (name) VALUES ('T')",
       ["INSERT INTO at (album_id, tag_id) VALUES (1, 2)", "INSERT INTO at (tag_id, album_id) VALUES (2, 1)"])
   end
-  
+
   it "should add new objects to the cached association array as soon as the *_attributes= method is called" do
     a = @Artist.new({:name=>'Ar', :albums_attributes=>[{:name=>'Al', :tags_attributes=>[{:name=>'T'}]}]})
     a.albums.should == [@Album.new(:name=>'Al')]
     a.albums.first.tags.should == [@Tag.new(:name=>'T')]
   end
-  
+
   it "should support creating new objects with composite primary keys" do
     insert = nil
     @Concert.class_eval do
@@ -145,7 +145,7 @@ describe "NestedAttributes plugin" do
     al.save
     @db.sqls.should == ["UPDATE albums SET name = 'Al' WHERE (id = 10)", "UPDATE artists SET name = 'Ar2' WHERE (id = 20)"]
   end
-  
+
   it "should support updating one_to_one objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -155,7 +155,7 @@ describe "NestedAttributes plugin" do
     ar.save
     @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "UPDATE albums SET name = 'Al2' WHERE (id = 10)"]
   end
-  
+
   it "should support updating one_to_many objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -165,7 +165,7 @@ describe "NestedAttributes plugin" do
     ar.save
     @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "UPDATE albums SET name = 'Al2' WHERE (id = 10)"]
   end
-  
+
   it "should support updating one_to_many objects with _delete/_remove flags set to false" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -175,7 +175,7 @@ describe "NestedAttributes plugin" do
     ar.save
     @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "UPDATE albums SET name = 'Al2' WHERE (id = 10)"]
   end
-  
+
   it "should support updating many_to_many objects" do
     a = @Album.load(:id=>10, :name=>'Al')
     t = @Tag.load(:id=>20, :name=>'T')
@@ -185,7 +185,7 @@ describe "NestedAttributes plugin" do
     a.save
     @db.sqls.should == ["UPDATE albums SET name = 'Al' WHERE (id = 10)", "UPDATE tags SET name = 'T2' WHERE (id = 20)"]
   end
-  
+
   it "should support updating many_to_many objects with _delete/_remove flags set to false" do
     a = @Album.load(:id=>10, :name=>'Al')
     t = @Tag.load(:id=>20, :name=>'T')
@@ -195,7 +195,7 @@ describe "NestedAttributes plugin" do
     a.save
     @db.sqls.should == ["UPDATE albums SET name = 'Al' WHERE (id = 10)", "UPDATE tags SET name = 'T2' WHERE (id = 20)"]
   end
-  
+
   it "should support updating objects with composite primary keys" do
     ar = @Artist.load(:id=>10, :name=>'Ar')
     co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
@@ -215,7 +215,7 @@ describe "NestedAttributes plugin" do
     al.save
     check_sql_array(["UPDATE albums SET artist_id = NULL, name = 'Al' WHERE (id = 10)", "UPDATE albums SET name = 'Al', artist_id = NULL WHERE (id = 10)"])
   end
-  
+
   it "should support removing one_to_one objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -225,7 +225,7 @@ describe "NestedAttributes plugin" do
     ar.save
     @db.sqls.should == ["UPDATE albums SET artist_id = NULL WHERE (artist_id = 20)", "UPDATE artists SET name = 'Ar' WHERE (id = 20)"]
   end
-  
+
   it "should support removing one_to_many objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -238,7 +238,7 @@ describe "NestedAttributes plugin" do
       ["UPDATE albums SET artist_id = NULL, name = 'Al' WHERE (id = 10)", "UPDATE albums SET name = 'Al', artist_id = NULL WHERE (id = 10)"],
       "UPDATE artists SET name = 'Ar' WHERE (id = 20)")
   end
-  
+
   it "should support removing many_to_many objects" do
     a = @Album.load(:id=>10, :name=>'Al')
     t = @Tag.load(:id=>20, :name=>'T')
@@ -248,7 +248,7 @@ describe "NestedAttributes plugin" do
     a.save
     @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)"]
   end
-  
+
   it "should support removing objects with composite primary keys" do
     ar = @Artist.load(:id=>10, :name=>'Ar')
     co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
@@ -272,7 +272,7 @@ describe "NestedAttributes plugin" do
     check_sql_array(["UPDATE albums SET artist_id = NULL, name = 'Al' WHERE (id = 10)", "UPDATE albums SET name = 'Al', artist_id = NULL WHERE (id = 10)"],
       "DELETE FROM artists WHERE (id = 20)")
   end
-  
+
   it "should support destroying one_to_one objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -282,7 +282,7 @@ describe "NestedAttributes plugin" do
     ar.save
     @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "DELETE FROM albums WHERE (id = 10)"]
   end
-  
+
   it "should support destroying one_to_many objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -292,7 +292,7 @@ describe "NestedAttributes plugin" do
     ar.save
     @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "DELETE FROM albums WHERE (id = 10)"]
   end
-  
+
   it "should support destroying many_to_many objects" do
     a = @Album.load(:id=>10, :name=>'Al')
     t = @Tag.load(:id=>20, :name=>'T')
@@ -302,7 +302,7 @@ describe "NestedAttributes plugin" do
     a.save
     @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)", "DELETE FROM tags WHERE (id = 20)"]
   end
-  
+
   it "should support destroying objects with composite primary keys" do
     ar = @Artist.load(:id=>10, :name=>'Ar')
     co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
@@ -322,7 +322,7 @@ describe "NestedAttributes plugin" do
     a.save
     @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)", "DELETE FROM tags WHERE (id = 20)"]
   end
-  
+
   it "should support using a hash instead of an array for to_many nested attributes" do
     a = @Album.load(:id=>10, :name=>'Al')
     t = @Tag.load(:id=>20, :name=>'T')
@@ -332,7 +332,7 @@ describe "NestedAttributes plugin" do
     a.save
     @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)", "DELETE FROM tags WHERE (id = 20)"]
   end
-  
+
   it "should only allow destroying associated objects if :destroy option is used in the nested_attributes call" do
     a = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -342,7 +342,7 @@ describe "NestedAttributes plugin" do
     @Album.nested_attributes :artist, :destroy=>true
     proc{a.set(:artist_attributes=>{:id=>'20', :_delete=>'1'})}.should_not raise_error(Sequel::Error)
   end
-  
+
   it "should only allow removing associated objects if :remove option is used in the nested_attributes call" do
     a = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -352,7 +352,7 @@ describe "NestedAttributes plugin" do
     @Album.nested_attributes :artist, :remove=>true
     proc{a.set(:artist_attributes=>{:id=>'20', :_remove=>'1'})}.should_not raise_error(Sequel::Error)
   end
-  
+
   it "should raise an Error if a primary key is given in a nested attribute hash, but no matching associated object exists" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -360,7 +360,7 @@ describe "NestedAttributes plugin" do
     proc{ar.set(:albums_attributes=>[{:id=>30, :_delete=>'t'}])}.should raise_error(Sequel::Error)
     proc{ar.set(:albums_attributes=>[{:id=>10, :_delete=>'t'}])}.should_not raise_error(Sequel::Error)
   end
-  
+
   it "should not raise an Error if an unmatched primary key is given, if the :strict=>false option is used" do
     @Artist.nested_attributes :albums, :strict=>false
     al = @Album.load(:id=>10, :name=>'Al')
@@ -371,7 +371,7 @@ describe "NestedAttributes plugin" do
     ar.save
     @db.sqls.should == ["UPDATE artists SET name = 'Ar' WHERE (id = 20)"]
   end
-  
+
   it "should not raise an Error if an unmatched primary key is given, if the :unmatched_pk=>:ignore option is used" do
     @Artist.nested_attributes :albums, :unmatched_pk=>:ignore
     al = @Album.load(:id=>10, :name=>'Al')
@@ -417,7 +417,7 @@ describe "NestedAttributes plugin" do
     # Should preserve attributes
     a.artist.name.should == 'Ar'
   end
-  
+
   it "should not attempt to validate nested attributes if the :validate=>false association option is used" do
     @Album.many_to_one :artist, :class=>@Artist, :validate=>false
     @Album.nested_attributes :artist, :tags, :destroy=>true, :remove=>true
@@ -433,7 +433,7 @@ describe "NestedAttributes plugin" do
     check_sql_array("INSERT INTO artists (name) VALUES ('Ar')",
       ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
   end
-  
+
   it "should not attempt to validate nested attributes if the :validate=>false option is passed to save" do
     @Artist.class_eval do
       def validate
@@ -447,13 +447,13 @@ describe "NestedAttributes plugin" do
     check_sql_array("INSERT INTO artists (name) VALUES ('Ar')",
       ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
   end
-  
+
   it "should not accept nested attributes unless explicitly specified" do
     @Artist.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:at
     proc{@Artist.create({:name=>'Ar', :tags_attributes=>[{:name=>'T'}]})}.should raise_error(Sequel::Error)
     @db.sqls.should == []
   end
-  
+
   it "should save when save_changes or update is called if nested attribute associated objects changed but there are no changes to the main object" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -462,7 +462,7 @@ describe "NestedAttributes plugin" do
     al.update(:artist_attributes=>{:id=>'20', :name=>'Ar2'})
     @db.sqls.should == ["UPDATE artists SET name = 'Ar2' WHERE (id = 20)"]
   end
-  
+
   it "should have a :limit option limiting the amount of entries" do
     @Album.nested_attributes :tags, :limit=>2
     arr = [{:name=>'T'}]
@@ -476,7 +476,7 @@ describe "NestedAttributes plugin" do
       "INSERT INTO tags (name) VALUES ('T')",
       ["INSERT INTO at (album_id, tag_id) VALUES (1, 4)", "INSERT INTO at (tag_id, album_id) VALUES (4, 1)"])
   end
-  
+
   it "should accept a block that each hash gets passed to determine if it should be processed" do
     @Album.nested_attributes(:tags){|h| h[:name].empty?}
     a = @Album.new({:name=>'Al', :tags_attributes=>[{:name=>'T'}, {:name=>''}, {:name=>'T2'}]})
@@ -488,7 +488,7 @@ describe "NestedAttributes plugin" do
       "INSERT INTO tags (name) VALUES ('T2')",
       ["INSERT INTO at (album_id, tag_id) VALUES (1, 4)", "INSERT INTO at (tag_id, album_id) VALUES (4, 1)"])
   end
-  
+
   it "should accept a :transform block that returns a changed attributes hash" do
     @Album.nested_attributes :tags, :transform=>proc{|parent, hash| hash[:name] << parent.name; hash }
     a = @Album.new(:name => 'Al')
@@ -511,7 +511,7 @@ describe "NestedAttributes plugin" do
       define_method(:nested_attributes_update){|*a| objs << [super(*a), :update]}
     end
     a = @Album.new(:name=>'Al')
-    a.associations[:tags] = [@Tag.load(:id=>6, :name=>'A'), @Tag.load(:id=>7, :name=>'A2')] 
+    a.associations[:tags] = [@Tag.load(:id=>6, :name=>'A'), @Tag.load(:id=>7, :name=>'A2')]
     a.tags_attributes = [{:id=>6, :name=>'T'}, {:id=>7, :name=>'T2', :_remove=>true}, {:name=>'T3'}, {:id=>8, :name=>'T4'}, {:id=>9, :name=>'T5', :_remove=>true}]
     objs.should == [[@Tag.load(:id=>6, :name=>'T'), :update], [@Tag.load(:id=>7, :name=>'A2'), :remove], [@Tag.new(:name=>'T3'), :create]]
   end

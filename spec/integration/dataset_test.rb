@@ -20,8 +20,8 @@ describe "Simple Dataset operations" do
     @ds.order(:number).all.should == [
       {:id => 1, :number=>10},
       {:id => 2, :number=>20},
-      {:id => 3, :number=>30} ]   
-  end 
+      {:id => 3, :number=>30} ]
+  end
 
   specify "should support sequential primary keys with a Bignum" do
     @db.create_table!(:items) do
@@ -30,8 +30,8 @@ describe "Simple Dataset operations" do
     end
     @ds << {:number=>20}
     @ds << {:number=>30}
-    @ds.order(:number).all.should == [{:id => 1, :number=>20}, {:id => 2, :number=>30}]   
-  end 
+    @ds.order(:number).all.should == [{:id => 1, :number=>20}, {:id => 2, :number=>30}]
+  end
 
   cspecify "should insert with a primary key specified", :db2, :mssql do
     @ds.insert(:id=>100, :number=>20)
@@ -85,12 +85,12 @@ describe "Simple Dataset operations" do
     @ds.filter(1=>1).delete.should == 1
     @ds.count.should == 0
   end
-  
+
   specify "should update correctly" do
     @ds.update(:number=>:number+1).should == 1
     @ds.all.should == [{:id=>1, :number=>11}]
   end
-  
+
   cspecify "should have update return the number of matched rows", [:do, :mysql], [:ado] do
     @ds.update(:number=>:number).should == 1
     @ds.filter(:id=>1).update(:number=>:number).should == 1
@@ -105,18 +105,18 @@ describe "Simple Dataset operations" do
   specify "should fetch a single row correctly" do
     @ds.first.should == {:id=>1, :number=>10}
   end
-  
+
   specify "should have distinct work with limit" do
     @ds.limit(1).distinct.all.should == [{:id=>1, :number=>10}]
   end
-  
+
   specify "should fetch correctly with a limit" do
     @ds.order(:id).limit(2).all.should == [{:id=>1, :number=>10}]
     @ds.insert(:number=>20)
     @ds.order(:id).limit(1).all.should == [{:id=>1, :number=>10}]
     @ds.order(:id).limit(2).all.should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
   end
-  
+
   specify "should fetch correctly with a limit and offset" do
     @ds.order(:id).limit(2, 0).all.should == [{:id=>1, :number=>10}]
     @ds.order(:id).limit(2, 1).all.should == []
@@ -125,7 +125,7 @@ describe "Simple Dataset operations" do
     @ds.order(:id).limit(2, 0).all.should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
     @ds.order(:id).limit(2, 1).all.should == [{:id=>2, :number=>20}]
   end
-  
+
   specify "should provide correct columns when using a limit and offset" do
     ds = @ds.order(:id).limit(1, 1)
     ds.all
@@ -149,7 +149,7 @@ describe "Simple Dataset operations" do
     @ds.cross_join(:items2___i).cross_join(@db[:items2].select(:id2___id3, :number2___number3)).order(:id).limit(2, 1).all.should == []
     @db.drop_table(:items2)
   end
-  
+
   specify "should fetch correctly with a limit and offset without an order" do
     @ds.limit(2, 1).all.should == []
   end
@@ -160,7 +160,7 @@ describe "Simple Dataset operations" do
     @ds.where(:id=>@ds.select(:id).order(:id).limit(1)).all.should == [{:id=>1, :number=>10}]
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2)).order(:id).all.should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
   end
-  
+
   specify "should fetch correctly with a limit and offset in an IN subselect" do
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 0)).all.should == [{:id=>1, :number=>10}]
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 1)).all.should == []
@@ -169,7 +169,7 @@ describe "Simple Dataset operations" do
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 0)).order(:id).all.should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 1)).all.should == [{:id=>2, :number=>20}]
   end
-  
+
   specify "should alias columns correctly" do
     @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
   end
@@ -185,7 +185,7 @@ end
 describe "Simple dataset operations with nasty table names" do
   before do
     @db = INTEGRATION_DB
-    @table = :"i`t' [e]\"m\\s" 
+    @table = :"i`t' [e]\"m\\s"
     @qi = @db.quote_identifiers?
     @db.quote_identifiers = true
   end
@@ -201,12 +201,12 @@ describe "Simple dataset operations with nasty table names" do
     @ds = @db[@table]
     @ds.insert(:number=>10).should == 1
     @ds.all.should == [{:id=>1, :number=>10}]
-    @ds.update(:number=>20).should == 1 
+    @ds.update(:number=>20).should == 1
     @ds.all.should == [{:id=>1, :number=>20}]
     @ds.delete.should == 1
     @ds.count.should == 0
     proc{@db.drop_table?(@table)}.should_not raise_error
-  end 
+  end
 end
 
 describe Sequel::Dataset do
@@ -273,7 +273,7 @@ describe Sequel::Dataset do
     @d.count.should == 1
     @d.first[:name].should == 'def'
   end
-  
+
   specify "should be able to truncate the table" do
     @d << {:name => 'abc', :value => 123}
     @d << {:name => 'abc', :value => 456}
@@ -295,7 +295,7 @@ describe Sequel::Database do
      "\\\\\n",
      "\\\r\n",
      "\\\\\r\n",
-     "\\\\\n\n", 
+     "\\\\\n\n",
      "\\\\\r\n\r\n",
      "\\dingo",
      "\\'dingo",
@@ -329,33 +329,33 @@ end
 describe Sequel::Dataset do
   before do
     INTEGRATION_DB.create_table! :items do
-      primary_key :id 
+      primary_key :id
       Integer :value
-    end 
+    end
     @d = INTEGRATION_DB[:items]
     @d << {:value => 123}
     @d << {:value => 456}
     @d << {:value => 789}
-  end 
+  end
   after do
     INTEGRATION_DB.drop_table?(:items)
-  end 
-  
+  end
+
   specify "should correctly return avg" do
     @d.avg(:value).to_i.should == 456
-  end 
-  
+  end
+
   specify "should correctly return sum" do
     @d.sum(:value).to_i.should == 1368
-  end 
-  
+  end
+
   specify "should correctly return max" do
-    @d.max(:value).to_i.should == 789 
-  end 
-  
+    @d.max(:value).to_i.should == 789
+  end
+
   specify "should correctly return min" do
-    @d.min(:value).to_i.should == 123 
-  end 
+    @d.min(:value).to_i.should == 123
+  end
 end
 
 describe "Simple Dataset operations" do
@@ -403,7 +403,7 @@ describe "Simple Dataset operations in transactions" do
       @ds.order(:id).all.should == [{:id=>100, :number=>20}]
     end
   end
-  
+
   specify "should have insert return primary key value inside a transaction" do
     INTEGRATION_DB.transaction do
       @ds.insert(:number=>20).should == 1
@@ -411,7 +411,7 @@ describe "Simple Dataset operations in transactions" do
       @ds.order(:id).all.should == [{:id=>1, :number=>20}]
     end
   end
-  
+
   specify "should support for_update" do
     INTEGRATION_DB.transaction{@ds.for_update.all.should == []}
   end
@@ -428,7 +428,7 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
     @ds2.insert(:number=>10)
     @ds2.insert(:number=>30)
   end
-  
+
   specify "should give the correct results for simple UNION, EXCEPT, and INTERSECT" do
     @ds1.union(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'10 20 30'
     if @ds1.supports_intersect_except?
@@ -436,7 +436,7 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
       @ds1.intersect(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'10'
     end
   end
-  
+
   cspecify "should give the correct results for UNION, EXCEPT, and INTERSECT when used with ordering and limits", :mssql do
     @ds1.insert(:number=>8)
     @ds2.insert(:number=>9)
@@ -472,14 +472,14 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
       @ds1.union(@ds2.except(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'10 20 30'
       @ds1.union(@ds2).intersect(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'10 '
       @ds1.union(@ds2.intersect(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'10 20'
-      
+
       @ds1.except(@ds2).union(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'10 20 40'
       @ds1.except(@ds2.union(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'20'
       @ds1.except(@ds2).except(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'20'
       @ds1.except(@ds2.except(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'10 20'
       @ds1.except(@ds2).intersect(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w''
       @ds1.except(@ds2.intersect(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'20'
-      
+
       @ds1.intersect(@ds2).union(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'10 40'
       @ds1.intersect(@ds2.union(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'10'
       @ds1.intersect(@ds2).except(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w''
@@ -506,11 +506,11 @@ if INTEGRATION_DB.dataset.supports_cte?
     after(:all) do
       @db.drop_table?(:i1)
     end
-    
+
     specify "should give correct results for WITH" do
       @db[:t].with(:t, @ds.filter(:parent_id=>nil).select(:id)).order(:id).map(:id).should == [1, 2]
     end
-    
+
     cspecify "should give correct results for recursive WITH", :db2 do
       ds = @db[:t].select(:i___id, :pi___parent_id).with_recursive(:t, @ds.filter(:parent_id=>nil), @ds.join(:t, :i=>:parent_id).select(:i1__id, :i1__parent_id), :args=>[:i, :pi])
       ds.all.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>nil, :id=>2}, {:parent_id=>1, :id=>3}, {:parent_id=>1, :id=>4}, {:parent_id=>3, :id=>5}, {:parent_id=>5, :id=>6}]
@@ -558,7 +558,7 @@ if INTEGRATION_DB.dataset.supports_cte?(:update) # Assume INSERT and DELETE supp
     after do
       @db.drop_table?(:i1)
     end
-    
+
     specify "should give correct results for WITH" do
       @ds2.insert(@db[:t])
       @ds.select_order_map(:id).should == [1, 1, 2, 2]
@@ -580,7 +580,7 @@ if INTEGRATION_DB.dataset.supports_returning?(:insert)
     after do
       @db.drop_table?(:i1)
     end
-    
+
     specify "should give correct results" do
       h = {}
       @ds.returning(:foo).insert(1, 2){|r| h = r}
@@ -606,7 +606,7 @@ if INTEGRATION_DB.dataset.supports_returning?(:update) # Assume DELETE support a
     after do
       @db.drop_table?(:i1)
     end
-    
+
     specify "should give correct results" do
       h = []
       @ds.returning(:foo).update(:id=>:id+1, :foo=>:foo*2){|r| h << r}
@@ -647,34 +647,34 @@ if INTEGRATION_DB.dataset.supports_window_functions?
     after(:all) do
       @db.drop_table?(:i1)
     end
-    
+
     specify "should give correct results for aggregate window functions" do
       @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id){}.as(:sum)}.all.should ==
         [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
       @ds.select(:id){sum(:over, :args=>amount){}.as(:sum)}.all.should ==
         [{:sum=>111111, :id=>1}, {:sum=>111111, :id=>2}, {:sum=>111111, :id=>3}, {:sum=>111111, :id=>4}, {:sum=>111111, :id=>5}, {:sum=>111111, :id=>6}]
     end
-      
+
     specify "should give correct results for ranking window functions with orders" do
       @ds.select(:id){rank(:over, :partition=>group_id, :order=>id){}.as(:rank)}.all.should ==
         [{:rank=>1, :id=>1}, {:rank=>2, :id=>2}, {:rank=>3, :id=>3}, {:rank=>1, :id=>4}, {:rank=>2, :id=>5}, {:rank=>3, :id=>6}]
       @ds.select(:id){rank(:over, :order=>id){}.as(:rank)}.all.should ==
         [{:rank=>1, :id=>1}, {:rank=>2, :id=>2}, {:rank=>3, :id=>3}, {:rank=>4, :id=>4}, {:rank=>5, :id=>5}, {:rank=>6, :id=>6}]
     end
-      
+
     cspecify "should give correct results for aggregate window functions with orders", :mssql do
       @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :order=>id){}.as(:sum)}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
       @ds.select(:id){sum(:over, :args=>amount, :order=>id){}.as(:sum)}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
     end
-    
+
     cspecify "should give correct results for aggregate window functions with frames", :mssql do
       @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :order=>id, :frame=>:all){}.as(:sum)}.all.should ==
         [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
       @ds.select(:id){sum(:over, :args=>amount, :order=>id, :frame=>:all){}.as(:sum)}.all.should ==
         [{:sum=>111111, :id=>1}, {:sum=>111111, :id=>2}, {:sum=>111111, :id=>3}, {:sum=>111111, :id=>4}, {:sum=>111111, :id=>5}, {:sum=>111111, :id=>6}]
-        
+
       @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :order=>id, :frame=>:rows){}.as(:sum)}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
       @ds.select(:id){sum(:over, :args=>amount, :order=>id, :frame=>:rows){}.as(:sum)}.all.should ==
@@ -702,7 +702,7 @@ describe Sequel::SQL::Constants do
   after do
     @db.drop_table?(:constants)
   end
-  
+
   cspecify "should have working CURRENT_DATE", [:odbc, :mssql], [:jdbc, :sqlite], :oracle do
     @db.create_table!(:constants){Date :d}
     @ds.insert(:d=>Sequel::CURRENT_DATE)
@@ -760,7 +760,7 @@ describe "Sequel::Dataset#import and #multi_insert" do
     @ids.all.should == [{:i=>10}, {:i=>20}]
     @db.drop_table(:exp2)
   end
-  
+
   it "should have import work with the :slice_size option" do
     @ids.import([:i], [[10], [20], [30]], :slice_size=>1)
     @ids.all.should == [{:i=>10}, {:i=>20}, {:i=>30}]
@@ -810,7 +810,7 @@ describe "Sequel::Dataset convenience methods" do
   after(:all) do
     @db.drop_table?(:a)
   end
-  
+
   it "#group_rollup should include hierarchy of groupings" do
     @ds.group_by(:a).group_rollup.select_map([:a, :sum.sql_function(:b).cast(Integer).as(:b), :sum.sql_function(:c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 10, 16], [2, 7, 11], [nil, 17, 27]]
     @ds.group_by(:a, :b).group_rollup.select_map([:a, :b, :sum.sql_function(:c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 3, 11], [1, 4, 5], [1, nil, 16], [2, 3, 5], [2, 4, 6], [2, nil, 11], [nil, nil, 27]]
@@ -834,26 +834,26 @@ describe "Sequel::Dataset convenience methods" do
   after(:all) do
     @db.drop_table?(:a)
   end
-  
+
   it "#[]= should update matching rows" do
     @ds.insert(20, 10)
     @ds[:a=>20] = {:b=>30}
     @ds.all.should == [{:a=>20, :b=>30}]
   end
-  
+
   it "#empty? should return whether the dataset returns no rows" do
     @ds.empty?.should == true
     @ds.insert(20, 10)
     @ds.empty?.should == false
   end
-  
+
   it "#empty? should work correctly for datasets with limits" do
     ds = @ds.limit(1)
     ds.empty?.should == true
     ds.insert(20, 10)
     ds.empty?.should == false
   end
-  
+
   it "#empty? should work correctly for datasets with limits and offsets" do
     ds = @ds.limit(1, 1)
     ds.empty?.should == true
@@ -862,7 +862,7 @@ describe "Sequel::Dataset convenience methods" do
     ds.insert(20, 10)
     ds.empty?.should == false
   end
-  
+
   it "#group_and_count should return a grouping by count" do
     @ds.group_and_count(:a).order(:count).all.should == []
     @ds.insert(20, 10)
@@ -872,7 +872,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.insert(30, 30)
     @ds.group_and_count(:a).order(:count).all.each{|h| h[:count] = h[:count].to_i}.should == [{:a=>30, :count=>1}, {:a=>20, :count=>2}]
   end
-  
+
   it "#group_and_count should support column aliases" do
     @ds.group_and_count(:a___c).order(:count).all.should == []
     @ds.insert(20, 10)
@@ -882,7 +882,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.insert(30, 30)
     @ds.group_and_count(:a___c).order(:count).all.each{|h| h[:count] = h[:count].to_i}.should == [{:c=>30, :count=>1}, {:c=>20, :count=>2}]
   end
-  
+
   specify "#range should return the range between the maximum and minimum values" do
     @ds = @ds.unordered
     @ds.insert(20, 10)
@@ -890,7 +890,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.range(:a).should == (20..30)
     @ds.range(:b).should == (10..10)
   end
-  
+
   it "#interval should return the different between the maximum and minimum values" do
     @ds = @ds.unordered
     @ds.insert(20, 10)
@@ -899,7 +899,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.interval(:b).to_i.should == 0
   end
 end
-  
+
 describe "Sequel::Dataset main SQL methods" do
   before(:all) do
     @db = INTEGRATION_DB
@@ -912,21 +912,21 @@ describe "Sequel::Dataset main SQL methods" do
   after(:all) do
     @db.drop_table?(:a)
   end
-  
+
   it "#exists should return a usable exists clause" do
     @ds.filter(@db[:a___c].filter(:c__a=>:a__b).exists).all.should == []
     @ds.insert(20, 30)
     @ds.insert(10, 20)
     @ds.filter(@db[:a___c].filter(:c__a=>:a__b).exists).all.should == [{:a=>10, :b=>20}]
   end
-  
+
   it "#filter and #exclude should work with placeholder strings" do
     @ds.insert(20, 30)
     @ds.filter("a > ?", 15).all.should == [{:a=>20, :b=>30}]
     @ds.exclude("b < ?", 15).all.should == [{:a=>20, :b=>30}]
     @ds.filter("b < ?", 15).invert.all.should == [{:a=>20, :b=>30}]
   end
-  
+
   it "#and and #or should work correctly" do
     @ds.insert(20, 30)
     @ds.filter(:a=>20).and(:b=>30).all.should == [{:a=>20, :b=>30}]
@@ -951,7 +951,7 @@ describe "Sequel::Dataset main SQL methods" do
     @ds.insert(20, 30)
     @ds.select_group(:b___c).all.should == [{:c=>30}]
   end
-  
+
   it "#having should work correctly" do
     @ds.unordered!
     @ds.select{[b, max(a).as(c)]}.group(:b).having{max(a) > 30}.all.should == []
@@ -960,7 +960,7 @@ describe "Sequel::Dataset main SQL methods" do
     @ds.insert(40, 20)
     @ds.select{[b, max(a).as(c)]}.group(:b).having{max(a) > 30}.all.each{|h| h[:c] = h[:c].to_i}.should == [{:b=>20, :c=>40}]
   end
-  
+
   cspecify "#having should work without a previous group", :sqlite do
     @ds.unordered!
     @ds.select{max(a).as(c)}.having{max(a) > 30}.all.should == []
@@ -985,13 +985,13 @@ describe "Sequel::Dataset convenience methods" do
   after(:all) do
     @db.drop_table?(:a)
   end
-  
+
   specify "should have working #map" do
     @ds.map(:a).should == [1, 5]
     @ds.map(:b).should == [2, 6]
     @ds.map([:a, :b]).should == [[1, 2], [5, 6]]
   end
-  
+
   specify "should have working #to_hash" do
     @ds.to_hash(:a).should == {1=>{:a=>1, :b=>2, :c=>3, :d=>4}, 5=>{:a=>5, :b=>6, :c=>7, :d=>8}}
     @ds.to_hash(:b).should == {2=>{:a=>1, :b=>2, :c=>3, :d=>4}, 6=>{:a=>5, :b=>6, :c=>7, :d=>8}}
@@ -1030,7 +1030,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.select_map([:a.qualify(:a).as(:e), :b.qualify(:a).as(:f)]).should == [[1, 2], [5, 6]]
     @ds.select_map([:a.identifier.qualify(:a).as(:e), :b.qualify(:a).as(:f)]).should == [[1, 2], [5, 6]]
   end
-  
+
   specify "should have working #select_order_map" do
     @ds.select_order_map(:a).should == [1, 5]
     @ds.select_order_map(:a__b.desc).should == [6, 2]
@@ -1085,7 +1085,7 @@ describe "Sequel::Dataset DSL support" do
   after(:all) do
     @db.drop_table?(:a)
   end
-  
+
   it "should work with standard mathematical operators" do
     @ds.insert(20, 10)
     @ds.get{a + b}.to_i.should == 30
@@ -1093,7 +1093,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.get{a * b}.to_i.should == 200
     @ds.get{a / b}.to_i.should == 2
   end
-  
+
   cspecify "should work with bitwise shift operators", :derby do
     @ds.insert(3, 2)
     @ds.get{a.sql_number << b}.to_i.should == 12
@@ -1113,26 +1113,26 @@ describe "Sequel::Dataset DSL support" do
     @ds.get{a.sql_number | b | 8}.to_i.should == 15
     @ds.get{a.sql_number & b & 8}.to_i.should == 0
   end
-  
+
   specify "should work with the bitwise compliment operator" do
     @ds.insert(-3, 3)
     @ds.get{~a.sql_number}.to_i.should == 2
     @ds.get{~b.sql_number}.to_i.should == -4
   end
-  
+
   cspecify "should work with the bitwise xor operator", :derby do
     @ds.insert(3, 5)
     @ds.get{a.sql_number ^ b}.to_i.should == 6
     @ds.get{a.sql_number ^ b ^ 1}.to_i.should == 7
   end
-  
+
   specify "should work with the modulus operator" do
     @ds.insert(3, 5)
     @ds.get{a.sql_number % 4}.to_i.should == 3
     @ds.get{b.sql_number % 4}.to_i.should == 1
     @ds.get{a.sql_number % 4 % 2}.to_i.should == 1
   end
-  
+
   specify "should work with inequality operators" do
     @ds.insert(10, 11)
     @ds.insert(11, 11)
@@ -1143,12 +1143,12 @@ describe "Sequel::Dataset DSL support" do
     @ds.filter{a < b}.select_order_map(:a).should == [10]
     @ds.filter{a <= b}.select_order_map(:a).should == [10, 11, 20]
   end
-  
+
   specify "should work with casting and string concatentation" do
     @ds.insert(20, 20)
     @ds.get{a.cast_string + b.cast_string}.should == '2020'
   end
-  
+
   it "should work with ordering" do
     @ds.insert(10, 20)
     @ds.insert(20, 10)
@@ -1156,14 +1156,14 @@ describe "Sequel::Dataset DSL support" do
     @ds.order(:a.asc, :b.asc).all.should == [{:a=>10, :b=>20}, {:a=>20, :b=>10}]
     @ds.order(:a.desc, :b.desc).all.should == [{:a=>20, :b=>10}, {:a=>10, :b=>20}]
   end
-  
+
   it "should work with qualifying" do
     @ds.insert(10, 20)
     @ds.get(:a__b).should == 20
     @ds.get{a__b}.should == 20
     @ds.get(:b.qualify(:a)).should == 20
   end
-  
+
   it "should work with aliasing" do
     @ds.insert(10, 20)
     @ds.get(:a__b___c).should == 20
@@ -1171,12 +1171,12 @@ describe "Sequel::Dataset DSL support" do
     @ds.get(:b.qualify(:a).as(:c)).should == 20
     @ds.get(:b.as(:c)).should == 20
   end
-  
+
   it "should work with selecting all columns of a table" do
     @ds.insert(20, 10)
     @ds.select(:a.*).all.should == [{:a=>20, :b=>10}]
   end
-  
+
   it "should work with ranges as hash values" do
     @ds.insert(20, 10)
     @ds.filter(:a=>(10..30)).all.should == [{:a=>20, :b=>10}]
@@ -1186,7 +1186,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.exclude(:a=>(25..30)).all.should == [{:a=>20, :b=>10}]
     @ds.exclude(:a=>(10..15)).all.should == [{:a=>20, :b=>10}]
   end
-  
+
   it "should work with nil as hash value" do
     @ds.insert(20, nil)
     @ds.filter(:a=>nil).all.should == []
@@ -1194,7 +1194,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.exclude(:b=>nil).all.should == []
     @ds.exclude(:a=>nil).all.should == [{:a=>20, :b=>nil}]
   end
-  
+
   it "should work with arrays as hash values" do
     @ds.insert(20, 10)
     @ds.filter(:a=>[10]).all.should == []
@@ -1202,7 +1202,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.exclude(:a=>[10]).all.should == [{:a=>20, :b=>10}]
     @ds.exclude(:a=>[20, 10]).all.should == []
   end
-  
+
   it "should work with ranges as hash values" do
     @ds.insert(20, 10)
     @ds.filter(:a=>(10..30)).all.should == [{:a=>20, :b=>10}]
@@ -1212,7 +1212,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.exclude(:a=>(25..30)).all.should == [{:a=>20, :b=>10}]
     @ds.exclude(:a=>(10..15)).all.should == [{:a=>20, :b=>10}]
   end
-  
+
   it "should work with CASE statements" do
     @ds.insert(20, 10)
     @ds.filter({{:a=>20}=>20}.case(0) > 0).all.should == [{:a=>20, :b=>10}]
@@ -1220,7 +1220,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.filter({20=>20}.case(0, :a) > 0).all.should == [{:a=>20, :b=>10}]
     @ds.filter({15=>20}.case(0, :a) > 0).all.should == []
   end
-  
+
   specify "should work with multiple value arrays" do
     @ds.insert(20, 10)
     @ds.quote_identifiers = false
@@ -1228,7 +1228,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.filter([:a, :b]=>[[10, 20]].sql_array).all.should == []
     @ds.filter([:a, :b]=>[[20, 10], [1, 2]].sql_array).all.should == [{:a=>20, :b=>10}]
     @ds.filter([:a, :b]=>[[10, 10], [20, 20]].sql_array).all.should == []
-    
+
     @ds.exclude([:a, :b]=>[[20, 10]].sql_array).all.should == []
     @ds.exclude([:a, :b]=>[[10, 20]].sql_array).all.should == [{:a=>20, :b=>10}]
     @ds.exclude([:a, :b]=>[[20, 10], [1, 2]].sql_array).all.should == []
@@ -1261,7 +1261,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.filter([:a, :b]=>[]).all.should == []
     @ds.exclude([:a, :b]=>[]).all.should == [{:a=>20, :b=>10}]
   end
-  
+
   specify "should work empty arrays with nulls" do
     @ds.insert(nil, nil)
     @ds.filter(:a=>[]).all.should == []
@@ -1278,7 +1278,7 @@ describe "Sequel::Dataset DSL support" do
       pr[@ds.get(~({[:a, :b]=>[]}).sql_expr)].should == nil
     end
   end
-  
+
   specify "should work empty arrays with nulls and Sequel.empty_array_null_handling = true" do
     begin
       Sequel.empty_array_handle_nulls = false
@@ -1320,7 +1320,7 @@ describe "SQL Extract Function" do
   after do
     @db.drop_table?(:a)
   end
-  
+
   specify "should return the part of the datetime asked for" do
     t = Time.now
     def @ds.supports_timestamp_timezones?() false end
@@ -1353,7 +1353,7 @@ describe "Dataset string methods" do
   after(:all) do
     @db.drop_table?(:a)
   end
-  
+
   it "#grep should return matching rows" do
     @ds.insert('foo', 'bar')
     @ds.grep(:a, 'foo').all.should == [{:a=>'foo', :b=>'bar'}]
@@ -1363,7 +1363,7 @@ describe "Dataset string methods" do
     @ds.grep([:a, :b], %w'foo bar').all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.grep([:a, :b], %w'boo far').all.should == []
   end
-  
+
   it "#grep should work with :all_patterns and :all_columns options" do
     @ds.insert('foo bar', ' ')
     @ds.insert('foo d', 'bar')
@@ -1382,7 +1382,7 @@ describe "Dataset string methods" do
     @ds.grep([:a, :b], %w'%baz% %foo%', :all_columns=>true, :all_patterns=>true).all.should == []
     @ds.grep([:a, :b], %w'%boo% %foo%', :all_columns=>true, :all_patterns=>true).all.should == [{:a=>'foo boo', :b=>'boo foo'}]
   end
-  
+
   it "#like should return matching rows" do
     @ds.insert('foo', 'bar')
     @ds.filter(:a.like('foo')).all.should == [{:a=>'foo', :b=>'bar'}]
@@ -1392,7 +1392,7 @@ describe "Dataset string methods" do
     @ds.exclude(:a.like('bar')).all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.exclude(:a.like('foo', 'bar')).all.should == []
   end
-  
+
   it "#like should be case sensitive" do
     @ds.insert('foo', 'bar')
     @ds.filter(:a.like('Foo')).all.should == []
@@ -1402,7 +1402,7 @@ describe "Dataset string methods" do
     @ds.exclude(:a.like('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.exclude(:a.like('FOO', 'BAR')).all.should == [{:a=>'foo', :b=>'bar'}]
   end
-  
+
   it "#ilike should return matching rows, in a case insensitive manner" do
     @ds.insert('foo', 'bar')
     @ds.filter(:a.ilike('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
@@ -1412,7 +1412,7 @@ describe "Dataset string methods" do
     @ds.exclude(:a.ilike('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.exclude(:a.ilike('FOO', 'BAR')).all.should == []
   end
-  
+
   it "should work with strings created with sql_string_join" do
     @ds.insert('foo', 'bar')
     @ds.get([:a, "bar"].sql_string_join).should == 'foobar'
@@ -1437,14 +1437,14 @@ describe "Dataset identifier methods" do
   after(:all) do
     @db.drop_table?(:a)
   end
-  
+
   cspecify "#identifier_output_method should change how identifiers are output", [:swift] do
     @ds.identifier_output_method = :upcase
     @ds.first.should == {:AB=>1}
     @ds.identifier_output_method = :uprev
     @ds.first.should == {:BA=>1}
   end
-  
+
   it "should work with a nil identifier_output_method" do
     @ds.identifier_output_method = nil
     [{:ab=>1}, {:AB=>1}].should include(@ds.first)
@@ -1468,14 +1468,14 @@ describe "Dataset defaults and overrides" do
   after(:all) do
     @db.drop_table?(:a)
   end
-  
+
   it "#set_defaults should set defaults that can be overridden" do
     @ds = @ds.set_defaults(:a=>10)
     @ds.insert
     @ds.insert(:a=>20)
     @ds.all.should == [{:a=>10}, {:a=>20}]
   end
-  
+
   it "#set_overrides should set defaults that cannot be overridden" do
     @ds = @ds.set_overrides(:a=>10)
     @ds.insert
@@ -1502,7 +1502,7 @@ if INTEGRATION_DB.dataset.supports_modifying_joins?
     after do
       @db.drop_table?(:a, :b, :c)
     end
-    
+
     it "#update should allow updating joined datasets" do
       @ds.update(:a=>10)
       @ds.all.should == [{:c=>5, :b=>2, :a=>10, :d=>2, :e=>5, :f=>6}]
@@ -1510,7 +1510,7 @@ if INTEGRATION_DB.dataset.supports_modifying_joins?
       @db[:b].order(:b).all.should == [{:b=>2, :e=>5}, {:b=>4, :e=>7}]
       @db[:c].order(:c).all.should == [{:c=>5, :f=>6}, {:c=>7, :f=>8}]
     end
-    
+
     it "#delete should allow deleting from joined datasets" do
       @ds.delete
       @ds.all.should == []

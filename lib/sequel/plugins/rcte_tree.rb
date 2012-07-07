@@ -11,7 +11,7 @@ module Sequel
     # etc.) in a single query.
     #
     # = Background
-    # 
+    #
     # There are two types of common models for storing tree structured data
     # in an SQL database, the adjacency list model and the nested set model.
     # Before recursive common table expressions (or similar capabilities such
@@ -44,18 +44,18 @@ module Sequel
     # the Overview).
     #
     #   Model.plugin :rcte_tree
-    #   
+    #
     #   # Lazy loading
     #   model = Model.first
     #   model.parent
     #   model.children
     #   model.ancestors # Populates :parent association for all ancestors
     #   model.descendants # Populates :children association for all descendants
-    #   
+    #
     #   # Eager loading - also populates the :parent and children associations
     #   # for all ancestors and descendants
     #   Model.filter(:id=>[1, 2]).eager(:ancestors, :descendants).all
-    #   
+    #
     #   # Eager loading children and grand children
     #   Model.filter(:id=>[1, 2]).eager(:descendants=>2).all
     #   # Eager loading children, grand children, and great grand children
@@ -99,13 +99,13 @@ module Sequel
         opts[:class] = model
         opts[:methods_module] = Module.new
         model.send(:include, opts[:methods_module])
-        
+
         key = opts[:key] ||= :parent_id
         prkey = opts[:primary_key] ||= model.primary_key
-        
+
         parent = opts.merge(opts.fetch(:parent, {})).fetch(:name, :parent)
         childrena = opts.merge(opts.fetch(:children, {})).fetch(:name, :children)
-        
+
         ka = opts[:key_alias] ||= :x_root_x
         t = opts[:cte_name] ||= :t
         opts[:reciprocal] = nil
@@ -118,7 +118,7 @@ module Sequel
         else
           [SQL::ColumnAll.new(model.table_name)]
         end
-        
+
         a = opts.merge(opts.fetch(:ancestors, {}))
         ancestors = a.fetch(:name, :ancestors)
         a[:read_only] = true unless a.has_key?(:read_only)
@@ -200,7 +200,7 @@ module Sequel
               parent_map[opk] = obj
               (children_map[obj[key]] ||= []) << obj
             end
-            
+
             kv = obj.values.delete(ka)
             kv = kv.to_i if conv_bd && kv.is_a?(BigDecimal)
             if roots = id_map[kv]
@@ -218,7 +218,7 @@ module Sequel
           end
         end
         model.one_to_many ancestors, a
-        
+
         d = opts.merge(opts.fetch(:descendants, {}))
         descendants = d.fetch(:name, :descendants)
         d[:read_only] = true unless d.has_key?(:read_only)
@@ -296,7 +296,7 @@ module Sequel
             if level
               no_cache = no_cache_level == obj.values.delete(la)
             end
-            
+
             opk = obj[prkey]
             if in_pm = parent_map.has_key?(opk)
               if idm_obj = parent_map[opk]
@@ -307,13 +307,13 @@ module Sequel
               obj.associations[childrena] = [] unless no_cache
               parent_map[opk] = obj
             end
-            
+
             kv = obj.values.delete(ka)
             kv = kv.to_i if conv_bd && kv.is_a?(BigDecimal)
             if root = id_map[kv].first
               root.associations[descendants] << obj
             end
-            
+
             (children_map[obj[key]] ||= []) << obj
           end
           children_map.each do |parent_id, objs|

@@ -56,11 +56,11 @@ Any options you pass to +first+ will be used as a filter:
   artist = Artist.first(:name => 'YJM')
   # SELECT * FROM artists WHERE (name = 'YJM') LIMIT 1
   => #<Artist @values={:name=>"YJM", :id=>1}>
-  
+
   artist = Artist.first(:name.like('Y%'))
   # SELECT * FROM artists WHERE (name LIKE 'Y%') LIMIT 1
   => #<Artist @values={:name=>"YJM", :id=>1}>
-  
+
 <tt>Sequel::Dataset#[]</tt> is basically an alias for +first+, except it
 requires an argument:
 
@@ -229,7 +229,7 @@ Likewise, +select_hash_groups+ also exists:
   # SELECT name, id FROM artists
   => {"YJM"=>[1, 10, ...], "AS"=>[2, 20, ...]}
 
-== Modifying datasets 
+== Modifying datasets
 
 Note that the retrieval methods discussed above just return
 the row(s) included in the existing dataset.  In most cases,
@@ -267,7 +267,7 @@ not modify the receiver:
   # SELECT * FROM artists
   ds2
   # SELECT * FROM artists WHERE name LIKE 'A%'
- 
+
 In Sequel, most dataset methods that you will be using will
 not modify the dataset itself, so you can freely use the dataset in multiple
 places without worrying that its usage in one place will affect its usage
@@ -278,7 +278,7 @@ we want to order by name:
 
   ds3 = ds.order(:name).select(:id, :name)
   # SELECT id, name FROM artists WHERE name LIKE 'A%' ORDER BY name
-  
+
 Note how you don't need to assign the returned value of order to a variable,
 and then call select on that.  Because order just returns a dataset, you can
 call select directly on the returned dataset.  This is what is meant by a
@@ -464,7 +464,7 @@ filters:
 
   Artist.exclude(:id=>5)
   # SELECT * FROM artists WHERE id != 5
-  
+
   Artist.filter(:id=>5).exclude{name > 'A'}
   # SELECT * FROM artists WHERE id = 5 OR name <= 'A'
 
@@ -477,7 +477,7 @@ Or to use the NOT LIKE operator:
 
   Artist.exclude(:name.like('%J%'))
   # SELECT * FROM artists WHERE name NOT LIKE '%J%'
- 
+
 === Removing
 
 To remove all existing filters, use +unfiltered+:
@@ -503,7 +503,7 @@ append to an existing order:
 
   Artist.order(:id).order(:name)
   # SELECT * FROM artists ORDER BY name
-  
+
 If you want to add a column to the end of the existing order:
 
   Artist.order(:id).order_append(:name)
@@ -628,7 +628,7 @@ You can remove an existing grouping using +ungrouped+:
 
   Album.group(:artist_id).ungrouped
   # SELECT * FROM albums
- 
+
 A common use of grouping is to count based on the number of grouped rows,
 and Sequel provides a +group_and_count+ method to make this easier:
 
@@ -709,7 +709,7 @@ Or a dataset, in which case a subselect is used:
 
 === Join Conditions
 
-The second argument to the specialized join methods is the conditions 
+The second argument to the specialized join methods is the conditions
 to use when joining, which is similar to a filter expression, with
 a few minor exceptions.
 
@@ -939,7 +939,7 @@ for each of these aggregate functions.
   Album.count
   # SELECT COUNT(*) AS count FROM albums LIMIT 1
   => 2
-  
+
 The other methods take a column argument and call the aggregate function with
 the argument:
 

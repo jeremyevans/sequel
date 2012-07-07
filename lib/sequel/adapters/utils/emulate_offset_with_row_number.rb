@@ -32,7 +32,7 @@ module Sequel
     end
 
     # Emulate OFFSET support with the ROW_NUMBER window function
-    # 
+    #
     # The implementation is ugly, cloning the current dataset and modifying
     # the clone to add a ROW_NUMBER window function (and some other things),
     # then using the modified clone in a subselect which is selected from.

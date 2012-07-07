@@ -12,7 +12,7 @@ module Sequel
       SQL_ROLLBACK = "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION".freeze
       SQL_ROLLBACK_TO_SAVEPOINT = 'IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION autopoint_%d'.freeze
       SQL_SAVEPOINT = 'SAVE TRANSACTION autopoint_%d'.freeze
-      
+
       # Whether to use N'' to quote strings, which allows unicode characters inside the
       # strings.  True by default for compatibility, can be set to false for a possible
       # performance increase.  This sets the default for all datasets created from this
@@ -27,7 +27,7 @@ module Sequel
       def database_type
         :mssql
       end
-      
+
       # Microsoft SQL Server namespaces indexes per table.
       def global_index_namespace?
         false
@@ -66,12 +66,12 @@ module Sequel
         end
         @server_version
       end
-        
+
       # MSSQL supports savepoints, though it doesn't support committing/releasing them savepoint
       def supports_savepoints?
         true
       end
-      
+
       # MSSQL supports transaction isolation levels
       def supports_transaction_isolation_levels?
         true
@@ -95,12 +95,12 @@ module Sequel
       end
 
       private
-      
+
       # MSSQL uses the IDENTITY(1,1) column for autoincrementing columns.
       def auto_increment_sql
         AUTO_INCREMENT
       end
-      
+
       # MSSQL specific syntax for altering tables.
       def alter_table_sql(table, op)
         case op[:op]
@@ -137,7 +137,7 @@ module Sequel
           super(table, op)
         end
       end
-      
+
       # SQL to start a new savepoint
       def begin_savepoint_sql(depth)
         SQL_SAVEPOINT % depth
@@ -147,7 +147,7 @@ module Sequel
       def begin_transaction_sql
         SQL_BEGIN
       end
-      
+
       # Commit the active transaction on the connection, does not commit/release
       # savepoints.
       def commit_transaction(conn, opts={})
@@ -158,14 +158,14 @@ module Sequel
       def commit_transaction_sql
         SQL_COMMIT
       end
-        
+
       # MSSQL uses the name of the table to decide the difference between
       # a regular and temporary table, with temporary table names starting with
       # a #.
       def create_table_prefix_sql(name, options)
         "CREATE TABLE #{quote_schema_table(options[:temp] ? "##{name}" : name)}"
       end
-      
+
       # MSSQL doesn't support CREATE TABLE AS, it only supports SELECT INTO.
       # Emulating CREATE TABLE AS using SELECT INTO is only possible if a dataset
       # is given as the argument, it can't work with a string, so raise an
@@ -174,7 +174,7 @@ module Sequel
         raise(Error, "must provide dataset instance as value of create_table :as option on MSSQL") unless ds.is_a?(Sequel::Dataset)
         run(ds.into(name).sql)
       end
-    
+
       # The name of the constraint for setting the default value on the table and column.
       def default_constraint_name(table, column)
         from(:sysobjects___c_obj).
@@ -191,7 +191,7 @@ module Sequel
       def drop_index_sql(table, op)
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
       end
-      
+
       # support for clustered index type
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
@@ -217,22 +217,22 @@ module Sequel
         ds.quote_identifiers = true
         ds
       end
-      
+
       # Use sp_rename to rename the table
       def rename_table_sql(name, new_name)
         "sp_rename #{literal(quote_schema_table(name))}, #{quote_identifier(schema_and_table(new_name).pop)}"
       end
-      
+
       # SQL to rollback to a savepoint
       def rollback_savepoint_sql(depth)
         SQL_ROLLBACK_TO_SAVEPOINT % depth
       end
-      
+
       # SQL to ROLLBACK a transaction.
       def rollback_transaction_sql
         SQL_ROLLBACK
       end
-      
+
       # The closest MSSQL equivalent of a boolean datatype is the bit type.
       def schema_column_type(db_type)
         case db_type
@@ -283,7 +283,7 @@ module Sequel
       def set_mssql_unicode_strings
         @mssql_unicode_strings = typecast_value_boolean(@opts.fetch(:mssql_unicode_strings, true))
       end
-      
+
       # MSSQL has both datetime and timestamp classes, most people are going
       # to want datetime
       def type_literal_generic_datetime(column)
@@ -295,18 +295,18 @@ module Sequel
       def type_literal_generic_time(column)
         column[:only_time] ? :time : :datetime
       end
-      
+
       # MSSQL doesn't have a true boolean class, so it uses bit
       def type_literal_generic_trueclass(column)
         :bit
       end
-      
+
       # MSSQL uses varbinary(max) type for blobs
       def type_literal_generic_file(column)
         :'varbinary(max)'
       end
     end
-  
+
     module DatasetMethods
       include EmulateOffsetWithRowNumber
 
@@ -391,7 +391,7 @@ module Sequel
           super
         end
       end
-      
+
       # MSSQL doesn't support the SQL standard CURRENT_DATE or CURRENT_TIME
       def constant_sql_append(sql, constant)
         if c = CONSTANT_MAP[constant]
@@ -400,7 +400,7 @@ module Sequel
           super
         end
       end
-      
+
       # Disable the use of INSERT OUTPUT
       def disable_insert_output
         clone(:disable_insert_output=>true)
@@ -482,7 +482,7 @@ module Sequel
       def quoted_identifier_append(sql, name)
         sql << BRACKET_OPEN << name.to_s << BRACKET_CLOSE
       end
-      
+
       # The version of the database server.
       def server_version
         db.server_version(@opts[:server])
@@ -507,12 +507,12 @@ module Sequel
       def supports_intersect_except?
         is_2005_or_later?
       end
-      
+
       # MSSQL does not support IS TRUE
       def supports_is_true?
         false
       end
-      
+
       # MSSQL doesn't support JOIN USING
       def supports_join_using?
         false
@@ -527,7 +527,7 @@ module Sequel
       def supports_multiple_column_in?
         false
       end
-      
+
       # MSSQL 2005+ supports the output clause.
       def supports_output_clause?
         is_2005_or_later?
@@ -542,9 +542,9 @@ module Sequel
       def supports_where_true?
         false
       end
-      
+
       protected
-      
+
       # If returned primary keys are requested, use OUTPUT unless already set on the
       # dataset.  If OUTPUT is already set, use existing returning values.  If OUTPUT
       # is only set to return a single columns, return an array of just that column.
@@ -606,7 +606,7 @@ module Sequel
         end
       end
       alias update_from_sql delete_from2_sql
-      
+
       # Return the first primary key for the current table.  If this table has
       # multiple primary keys, this will only return one of them.  Used by #_import.
       def first_primary_key
@@ -640,7 +640,7 @@ module Sequel
       def literal_blob_append(sql, v)
         sql << HEX_START << v.unpack(HSTAR).first
       end
-      
+
       # Use YYYYmmdd format, since that's the only want that is
       # multilanguage and not DATEFORMAT dependent.
       def literal_date(v)
@@ -658,12 +658,12 @@ module Sequel
         sql << (mssql_unicode_strings ? UNICODE_STRING_START : APOS)
         sql << v.gsub(APOS_RE, DOUBLE_APOS).gsub(BACKSLASH_CRLF_RE, BACKSLASH_CRLF_REPLACE) << APOS
       end
-      
+
       # Use 1 for true on MSSQL
       def literal_true
         BOOL_TRUE
       end
-      
+
       # MSSQL adds the limit before the columns
       def select_clause_methods
         SELECT_CLAUSE_METHODS

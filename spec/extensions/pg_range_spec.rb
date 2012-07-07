@@ -73,7 +73,7 @@ describe "pg_range extension" do
       @eo = @R.new(nil, nil, :empty=>true, :db_type=>'int4range')
       @eo2 = @R.new(nil, nil, :empty=>true, :db_type=>'int8range')
     end
-    
+
     it "should handle multiple range types" do
       %w'int4 int8 num date ts tstz'.each do |i|
         @db.typecast_value(:"#{i}range", @R.new(1, 2, :db_type=>"#{i}range")).should == @R.new(1, 2, :db_type=>"#{i}range")

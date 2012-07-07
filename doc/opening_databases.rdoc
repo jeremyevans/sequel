@@ -51,7 +51,7 @@ though some adapters have the same name as the database type.  So if you
 want to connect to SQLite, for example, you can do so using the sqlite, do, dbi, jdbc, odbc, and swift adapters.
 If you want to connect to SQLite on JRuby using the jdbc adapter, you should not use <tt>Sequel.sqlite</tt>
 for example, as that uses the C-based sqlite3 gem. Instead, the <tt>Sequel.jdbc</tt> would be appropriate (though
-as mentioned below, using <tt>Sequel.connect</tt> is recommended instead of <tt>Sequel.jdbc</tt>). 
+as mentioned below, using <tt>Sequel.connect</tt> is recommended instead of <tt>Sequel.jdbc</tt>).
 
 == Passing a block to either method
 
@@ -60,7 +60,7 @@ provide a block to the method, Sequel will create a Database object and pass it 
 to the block.  When the block returns, Sequel will disconnect the database connection.
 For example:
 
-  Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
+  Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}
 
 == General connection options
 
@@ -94,7 +94,7 @@ library with the same name.
 
 === ado
 
-Requires: win32ole 
+Requires: win32ole
 
 The ADO adapter provides connectivity to ADO databases in Windows. It relies
 on WIN32OLE library, so it isn't usable on other operating systems (except
@@ -132,7 +132,7 @@ Example connections:
   # Excel 2000 (for table names, use a dollar after the sheet name, e.g. Sheet1$)
   Sequel.ado(:conn_string=>'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\\path\\filename.xls;Extended Properties=Excel 8.0;')
 
-=== amalgalite 
+=== amalgalite
 
 Amalgalite is an ruby extension that provides self contained access to SQLite,
 so you don't need to install SQLite separately.  As amalgalite is a file backed
@@ -148,14 +148,14 @@ Without a database argument, assumes a memory database, so you can do:
 Handles paths in the connection string similar to the SQLite adapter, so see
 the sqlite section below for details.
 
-=== db2 
+=== db2
 
 Requires: db2/db2cli
 
 This is the older DB2 adapter.  It's recommended you try the ibmdb adapter
 instead for new DB2 work, as it is better supported.
 
-=== dbi 
+=== dbi
 
 Allows access to a multitude of databases via ruby-dbi.  Additional options:
 
@@ -181,7 +181,7 @@ in front of the protocol.  Examples:
 While the DBI adapter does work, it is recommended that you use another adapter
 if your database supports it.
 
-=== do 
+=== do
 
 Requires: data_objects
 
@@ -200,7 +200,7 @@ Connection string examples:
   do:postgres://user:password@host/database
   do:mysql://user:password@host/database
 
-=== firebird 
+=== firebird
 
 Requires: fb (using code at http://github.com/wishdev/fb)
 
@@ -213,11 +213,11 @@ requires 'ibm_db'
 This connects to DB2 using IBM_DB.  This is the recommended adapter if you are
 using a C-based ruby to connect to DB2.
 
-=== informix 
+=== informix
 
 Does not support the :host or :port options.  Depending on the configuration of your server
 it may be necessary to either set
-   
+
    DB.quote_identifier = false
 
 or set
@@ -225,8 +225,8 @@ or set
    export DELIMIDENT=y
 
 in the scripts environment.
- 
-=== jdbc 
+
+=== jdbc
 
 Requires: java
 
@@ -279,7 +279,7 @@ The following additional options are supported:
                   directly to JDBC), you have to pass it as a separate option.
 :login_timeout :: Set the login timeout on the JDBC connection (in seconds).
 
-=== mysql 
+=== mysql
 
 Requires: mysqlplus (or mysql if mysqlplus is not available)
 
@@ -307,9 +307,9 @@ This is a newer MySQL adapter that does typecasting in C, so it is often faster 
 mysql adapter.  Supports the same additional options as the mysql adapter, except for :compress, and uses
 :timeout instead of :read_timeout and :connect_timeout.
 
-=== odbc 
+=== odbc
 
-The ODBC adapter allows you to connect to any database with the appropriate ODBC drivers installed.  
+The ODBC adapter allows you to connect to any database with the appropriate ODBC drivers installed.
 The :database option given ODBC database should be the DSN (Descriptive Service Name) from the ODBC configuration.
 
   Sequel.odbc('mydb', :user => "user", :password => "password")
@@ -319,11 +319,11 @@ The :host and :port options are not respected. The following additional options 
 :db_type :: Can be specified as 'mssql' or 'progress' to use SQL syntax specific to those databases.
 :driver :: The name of the ODBC driver to utilize.
 
-=== openbase 
+=== openbase
 
 The :port option is ignored.
 
-=== oracle 
+=== oracle
 
 Requires: oci8
 
@@ -365,7 +365,7 @@ Examples:
 
   # In Memory databases:
   Sequel.sqlite
-  Sequel.connect('sqlite:/') 
+  Sequel.connect('sqlite:/')
   Sequel.sqlite(':memory:')
 
   # Relative Path
@@ -375,7 +375,7 @@ Examples:
 
   # Absolute Path
   Sequel.sqlite('/var/sqlite/blog.db')
-  Sequel.connect('sqlite:///var/sqlite/blog.db') 
+  Sequel.connect('sqlite:///var/sqlite/blog.db')
 
 The following additional options are supported:
 

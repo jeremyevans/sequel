@@ -2,20 +2,20 @@ New Features
 ------------
 
 * The ConnectionPool classes were refactored from 2 separate
-  classes to a 5 class hierarchy, with one main class and 4 
+  classes to a 5 class hierarchy, with one main class and 4
   subclasses, one for each combination of sharding and threading.
-  
+
   The primary reason for this refactoring is to make it so that
   the user doesn't have to pay a performance penalty for sharding
   if they aren't using it.  A connection pool that supports sharding
   is automatically used if the :servers option is used when setting
   up the database connection.
-  
+
   In addition, the default connection pool no longer contains
   the code to schedule future disconnections of currently allocated
   connections.  The sharded connection pool must be used if that
   feature is desired.
-  
+
   The unsharded connection pools are about 25-30% faster than the
   sharded versions.
 
@@ -47,13 +47,13 @@ New Features
 
     DB[:test].unused_table_alias(:blah) # => :blah
     DB[:test].unused_table_alias(:test) # => :test_0
-    
+
   The use case is when you need to join a table to a dataset, where
   the table may already be used inside the dataset, and you want
   to generate a unique alias:
-  
+
     ds.join(:table.as(ds.unused_table_alias(:table)), ...)
-    
+
 * The Sequel::ValidationFailed exception now has an errors accessor
   which returns the Sequel::Model::Errors instance with the
   validation errors.  This can be helpful in situations where a
@@ -65,7 +65,7 @@ New Features
 
 * Support SELECT ... INTO in the MSSQL adapter, using Dataset#into,
   which takes a table argument.
-  
+
 * You can now provide your own connection pool class via the
   :pool_class option when instantiating the database.
 
@@ -73,21 +73,21 @@ Other Improvements
 ------------------
 
 * IN/NOT IN constructs with an empty array are now handled properly.
-  
+
     DB[:table].filter(:id=>[]) # IN
     DB[:table].exclude(:id=>[]) # NOT IN
-    
+
   Before, the IN construct would mostly work, other than some minor
   differences in NULL semantics.  However, the NOT IN construct
   would not work.  Sequel now handles the NOT IN case using an
   expression that evaluates to true.
-  
+
 * If using an IN/NOT IN construct with multiple columns and a dataset
   argument, where multiple column IN/NOT IN support is emulated, a
   separate query is done to get the records, which is then handled
   like an array of values.  This means that the following type of
   query now works on all tested databases:
-  
+
     DB[:table1].filter([:id1, :id2]=>DB[:table2].select(:id1, :id2))
 
 * Schemas and aliases are now handled correctly when eager graphing.
@@ -106,7 +106,7 @@ Other Improvements
   PostgreSQL will use a varchar(255) column instead of a text column
   when restoring a schema dump of a varchar(255) column from another
   database.
-  
+
 * You can now load adapters from outside the Sequel lib directory,
   now they just need to be in a sequel/adapters directory somewhere
   in the LOAD_PATH.
@@ -120,7 +120,7 @@ Other Improvements
 
 * Performance of prepared statements was improved in the native
   SQLite adapter.
-  
+
 * The schema_dumper extension now passes the options hash from
   dump_*_migration to Database#tables.
 
@@ -133,44 +133,44 @@ Other Improvements
   always return an instance of the main model class.  This fixes
   issues if constantize(nil) returns Object instead of raising
   an exception.
-  
+
 * No longer use Date#to_s for literalization, always use ISO8601
   format for dates.
-  
+
 * A couple lambdas which were instance_evaled were changed to procs
   for ruby 1.9.2 compatibility.
-  
+
 * MSSQL emulated offset support was simplified to only use one
   subquery, and made to work correctly on ruby 1.9.
-  
+
 * Emulate multiple column IN/NOT IN on H2, since it doesn't handle
   all cases correctly.
-  
+
 * ODBC timestamps are now handled correctly if the database_timezone
   is nil.
-  
+
 * ArgumentErrors raised when running queries in the ODBC adapter are
   now raised as DatabaseErrors.
-  
+
 * Attempting to use DISTINCT ON on SQLite now raises an error before
   sending the query to the database.
-  
+
 * The options hash passed to the database connection method is no
   longer modified.  However, there may be additional options
   present in Database#opts that weren't specified by the options
   hash passed to the database connection method.
-  
+
 * Make Dataset#add_graph_aliases handle the case where the dataset
   has not yet been graphed.
 
 * You can now provide an SQL::Identifier as a 4th argument to
   Dataset#join_table, and unsupported arguments are caught and an
   exception is raised.
-  
+
 * The gem specification has been moved out of the Rakefile, so
   that the gem can now be built without rake, and works well with
   gem build and bundler.
-  
+
 * The Rakefile no longer assumes the current directory is in the
   $LOAD_PATH, so it should work correctly on ruby 1.9.2.
 
@@ -178,7 +178,7 @@ Other Improvements
 
 * Empty query parameter keys in connection strings are now ignored
   instead of raising an exception.
-  
+
 * The specs were changed so that you can run them in parallel.
   Previously there was a race condition in the migration extension
   specs.
@@ -203,7 +203,7 @@ Backwards Compatibility
   instead of being used verbatim.  If you have a column that includes
   a double underscore, you now need to wrap it in an SQL::Identifier
   or use a String instead.
-  
+
 * The connection pools no longer convert non-StandardError based
   exceptions to RuntimeErrors.  Previously, all of the common adapters
   turned this feature off, so there is no change for most users.
@@ -220,10 +220,10 @@ Backwards Compatibility
 
 * The private Dataset#eager_graph_qualify_order method was removed,
   used Dataset#qualified_expression instead.
-  
+
 * The private Sequel::Model class methods plugin_gem_location and
   plugin_gem_location_old have been removed.
-  
+
 * Gems built with the rake tasks now show up in the root directory
   instead of the pkg subdirectory, and no tarball package is created.
 

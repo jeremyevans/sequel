@@ -9,7 +9,7 @@
   variety of timestamp formats (though the ActiveRecord default
   of YYYYMMDDHHMMSS is recommended and should be used in
   portable code).
-  
+
   Sequel still defaults to the old migrator, but you can use the
   new one without making changes to your old migrations.  Just
   make sure your new migration starts with a version greater than
@@ -155,7 +155,7 @@
 
     Employee.plugin :single_table_inheritance, :type_id,
      :model_map=>{1=>:Staff, 2=>:Manager}
-   
+
   Here the :model_map keys are type_id column values, and the
   :model_map values are symbols or strings specifying class names.
 

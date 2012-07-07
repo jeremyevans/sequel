@@ -5,8 +5,8 @@ module Sequel
     # If this exception wraps an underlying exception, the underlying
     # exception is held here.
     attr_accessor :wrapped_exception
-  end  
-    
+  end
+
   # Raised when the adapter requested doesn't exist or can't be loaded.
   class AdapterNotFound < Error ; end
 
@@ -14,13 +14,13 @@ module Sequel
   # problem originating from the database server.  Usually raised
   # because incorrect SQL syntax is used.
   class DatabaseError < Error; end
-  
+
   # Error raised when the Sequel is unable to connect to the database with the
   # connection parameters it was given.
   class DatabaseConnectionError < DatabaseError; end
 
   # Error that should be raised by adapters when they determine that the connection
-  # to the database has been lost.  Instructs the connection pool code to 
+  # to the database has been lost.  Instructs the connection pool code to
   # remove that connection from the pool so that other connections can be acquired
   # automatically.
   class DatabaseDisconnectError < DatabaseError; end
@@ -54,5 +54,5 @@ module Sequel
     InvalidValue = Sequel::InvalidValue
     PoolTimeoutError = Sequel::PoolTimeout
     Rollback = Sequel::Rollback
-  end  
+  end
 end

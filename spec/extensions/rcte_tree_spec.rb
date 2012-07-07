@@ -16,7 +16,7 @@ describe Sequel::Model, "rcte_tree" do
     @c.plugin :rcte_tree
     @c.associations.sort_by{|x| x.to_s}.should == [:ancestors, :children, :descendants, :parent]
   end
-  
+
   it "should define the correct associations when giving options" do
     @c.plugin :rcte_tree, :ancestors=>{:name=>:as}, :children=>{:name=>:cs}, :descendants=>{:name=>:ds}, :parent=>{:name=>:p}
     @c.associations.sort_by{|x| x.to_s}.should == [:as, :cs, :ds, :p]
@@ -29,7 +29,7 @@ describe Sequel::Model, "rcte_tree" do
     @o.ancestors_dataset.sql.should == 'WITH t AS (SELECT * FROM nodes WHERE (id = 1) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.parent_id = nodes.id)) SELECT * FROM t AS nodes'
     @o.descendants_dataset.sql.should == 'WITH t AS (SELECT * FROM nodes WHERE (parent_id = 2) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id)) SELECT * FROM t AS nodes'
   end
-  
+
   it "should use the correct SQL for lazy associations when recursive CTEs require column aliases" do
     @c.dataset.meta_def(:recursive_cte_requires_column_aliases?){true}
     @c.plugin :rcte_tree
@@ -38,7 +38,7 @@ describe Sequel::Model, "rcte_tree" do
     @o.ancestors_dataset.sql.should == 'WITH t(id, name, parent_id, i, pi) AS (SELECT id, name, parent_id, i, pi FROM nodes WHERE (id = 1) UNION ALL SELECT nodes.id, nodes.name, nodes.parent_id, nodes.i, nodes.pi FROM nodes INNER JOIN t ON (t.parent_id = nodes.id)) SELECT * FROM t AS nodes'
     @o.descendants_dataset.sql.should == 'WITH t(id, name, parent_id, i, pi) AS (SELECT id, name, parent_id, i, pi FROM nodes WHERE (parent_id = 2) UNION ALL SELECT nodes.id, nodes.name, nodes.parent_id, nodes.i, nodes.pi FROM nodes INNER JOIN t ON (t.id = nodes.parent_id)) SELECT * FROM t AS nodes'
   end
-  
+
   it "should use the correct SQL for lazy associations when giving options" do
     @c.plugin :rcte_tree, :primary_key=>:i, :key=>:pi, :cte_name=>:cte, :order=>:name, :ancestors=>{:name=>:as}, :children=>{:name=>:cs}, :descendants=>{:name=>:ds}, :parent=>{:name=>:p}
     @o.p_dataset.sql.should == 'SELECT * FROM nodes WHERE (nodes.i = 4) ORDER BY name LIMIT 1'
@@ -54,7 +54,7 @@ describe Sequel::Model, "rcte_tree" do
     @o.ancestors_dataset.sql.should == 'WITH t AS (SELECT * FROM nodes WHERE ((id = 1) AND (i = 1)) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.parent_id = nodes.id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)'
     @o.descendants_dataset.sql.should == 'WITH t AS (SELECT * FROM nodes WHERE ((parent_id = 2) AND (i = 1)) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)'
   end
-  
+
   it "should add all parent associations when lazily loading ancestors" do
     @c.plugin :rcte_tree
     @ds._fetch = [[{:id=>1, :name=>'A', :parent_id=>3}, {:id=>4, :name=>'B', :parent_id=>nil}, {:id=>3, :name=>'?', :parent_id=>4}]]
@@ -64,7 +64,7 @@ describe Sequel::Model, "rcte_tree" do
     @o.associations[:parent].associations[:parent].associations[:parent].should == @c.load(:id=>4, :name=>'B', :parent_id=>nil)
     @o.associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).should == nil
   end
-  
+
   it "should add all parent associations when lazily loading ancestors and giving options" do
     @c.plugin :rcte_tree, :primary_key=>:i, :key=>:pi, :ancestors=>{:name=>:as}, :parent=>{:name=>:p}
     @ds._fetch = [[{:i=>4, :name=>'A', :pi=>5}, {:i=>6, :name=>'B', :pi=>nil}, {:i=>5, :name=>'?', :pi=>6}]]
@@ -74,7 +74,7 @@ describe Sequel::Model, "rcte_tree" do
     @o.associations[:p].associations[:p].associations[:p].should == @c.load(:i=>6, :name=>'B', :pi=>nil)
     @o.associations[:p].associations[:p].associations[:p].associations.fetch(:p, 1).should == nil
   end
-  
+
   it "should add all children associations when lazily loading descendants" do
     @c.plugin :rcte_tree
     @ds._fetch = [[{:id=>3, :name=>'??', :parent_id=>1}, {:id=>1, :name=>'A', :parent_id=>2}, {:id=>4, :name=>'B', :parent_id=>2}, {:id=>5, :name=>'?', :parent_id=>3}]]
@@ -84,7 +84,7 @@ describe Sequel::Model, "rcte_tree" do
     @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[@c.load(:id=>5, :name=>'?', :parent_id=>3)]], []]
     @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.should == [[[[]]], []]
   end
-  
+
   it "should add all children associations when lazily loading descendants and giving options" do
     @c.plugin :rcte_tree, :primary_key=>:i, :key=>:pi, :children=>{:name=>:cs}, :descendants=>{:name=>:ds}
     @ds._fetch = [[{:i=>7, :name=>'??', :pi=>5}, {:i=>5, :name=>'A', :pi=>3}, {:i=>6, :name=>'B', :pi=>3}, {:i=>8, :name=>'?', :pi=>7}]]
@@ -94,7 +94,7 @@ describe Sequel::Model, "rcte_tree" do
     @o.associations[:cs].map{|c1| c1.associations[:cs].map{|c2| c2.associations[:cs]}}.should == [[[@c.load(:i=>8, :name=>'?', :pi=>7)]], []]
     @o.associations[:cs].map{|c1| c1.associations[:cs].map{|c2| c2.associations[:cs].map{|c3| c3.associations[:cs]}}}.should == [[[[]]], []]
   end
-  
+
   it "should eagerly load ancestors" do
     @c.plugin :rcte_tree
     @ds._fetch = [[{:id=>2, :parent_id=>1, :name=>'AA'}, {:id=>6, :parent_id=>2, :name=>'C'}, {:id=>7, :parent_id=>1, :name=>'D'}, {:id=>9, :parent_id=>nil, :name=>'E'}],
@@ -116,7 +116,7 @@ describe Sequel::Model, "rcte_tree" do
     os.map{|o| o.parent.parent.parent.parent if o.parent and o.parent.parent and o.parent.parent.parent}.should == [nil, nil, nil, nil]
     MODEL_DB.sqls.should == []
   end
-  
+
   it "should eagerly load ancestors when giving options" do
     @c.plugin :rcte_tree, :primary_key=>:i, :key=>:pi, :key_alias=>:kal, :cte_name=>:cte, :ancestors=>{:name=>:as}, :parent=>{:name=>:p}
     @ds._fetch = [[{:i=>2, :pi=>1, :name=>'AA'}, {:i=>6, :pi=>2, :name=>'C'}, {:i=>7, :pi=>1, :name=>'D'}, {:i=>9, :pi=>nil, :name=>'E'}],
@@ -169,7 +169,7 @@ describe Sequel::Model, "rcte_tree" do
     os.map{|o1| o1.children.map{|o2| o2.children.map{|o3| o3.children}}}.should == [[[[]], []], [[]], [[[]]]]
     MODEL_DB.sqls.should == []
   end
-  
+
   it "should eagerly load descendants when giving options" do
     @c.plugin :rcte_tree, :primary_key=>:i, :key=>:pi, :key_alias=>:kal, :cte_name=>:cte, :children=>{:name=>:cs}, :descendants=>{:name=>:ds}
     @ds._fetch = [[{:i=>2, :pi=>1, :name=>'AA'}, {:i=>6, :pi=>2, :name=>'C'}, {:i=>7, :pi=>1, :name=>'D'}],
@@ -189,7 +189,7 @@ describe Sequel::Model, "rcte_tree" do
     os.map{|o1| o1.cs.map{|o2| o2.cs.map{|o3| o3.cs}}}.should == [[[[]], []], [[]], [[[]]]]
     MODEL_DB.sqls.should == []
   end
-  
+
   it "should eagerly load descendants to a given level" do
     @c.plugin :rcte_tree
     @ds._fetch = [[{:id=>2, :parent_id=>1, :name=>'AA'}, {:id=>6, :parent_id=>2, :name=>'C'}, {:id=>7, :parent_id=>1, :name=>'D'}],
@@ -209,7 +209,7 @@ describe Sequel::Model, "rcte_tree" do
     os.map{|o1| o1.associations[:children].map{|o2| o2.associations[:children].map{|o3| o3.associations[:children]}}}.should == [[[[]], []], [[]], [[nil]]]
     MODEL_DB.sqls.should == []
   end
-  
+
   it "should eagerly load descendants to a given level when giving options" do
     @c.plugin :rcte_tree, :primary_key=>:i, :key=>:pi, :key_alias=>:kal, :level_alias=>:lal, :cte_name=>:cte, :children=>{:name=>:cs}, :descendants=>{:name=>:ds}
     @ds._fetch = [[{:i=>2, :pi=>1, :name=>'AA'}, {:i=>6, :pi=>2, :name=>'C'}, {:i=>7, :pi=>1, :name=>'D'}],

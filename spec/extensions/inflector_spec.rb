@@ -14,30 +14,30 @@ describe String do
     proc{"BKSDDF".constantize}.should raise_error
     proc{"++A++".constantize}.should raise_error
   end
-  
+
   it "#dasherize should transform underscores to dashes" do
     "egg_and_hams".dasherize.should == "egg-and-hams"
     "post".dasherize.should == "post"
   end
-  
+
   it "#demodulize should remove any preceding modules" do
     "String::Inflections::Blah".demodulize.should == "Blah"
     "String::Inflections".demodulize.should == "Inflections"
     "String".demodulize.should == "String"
   end
-  
+
   it "#humanize should remove _i, transform underscore to spaces, and capitalize" do
     "egg_and_hams".humanize.should == "Egg and hams"
     "post".humanize.should == "Post"
     "post_id".humanize.should == "Post"
   end
-  
+
   it "#titleize and #titlecase should underscore, humanize, and capitalize all words" do
     "egg-and: hams".titleize.should == "Egg And: Hams"
     "post".titleize.should == "Post"
     "post".titlecase.should == "Post"
   end
-  
+
   it "#underscore should add underscores between CamelCased words, change :: to / and - to _, and downcase" do
     "EggAndHams".underscore.should == "egg_and_hams"
     "EGGAndHams".underscore.should == "egg_and_hams"
@@ -52,25 +52,25 @@ describe String do
     "the blue mailman".pluralize.should == "the blue mailmen"
     "CamelOctopus".pluralize.should == "CamelOctopuses"
   end
-  
+
   it "#singularize should transform words from plural to singular" do
     "posts".singularize.should == "post"
     "octopuses".singularize.should == "octopus"
     "the blue mailmen".singularize.should == "the blue mailman"
     "CamelOctopuses".singularize.should == "CamelOctopus"
   end
-  
+
   it "#tableize should transform class names to table names" do
     "RawScaledScorer".tableize.should == "raw_scaled_scorers"
     "egg_and_ham".tableize.should == "egg_and_hams"
     "fancyCategory".tableize.should == "fancy_categories"
   end
-  
+
   it "#classify should tranform table names to class names" do
     "egg_and_hams".classify.should == "EggAndHam"
     "post".classify.should == "Post"
   end
-  
+
   it "#foreign_key should create a foreign key name from a class name" do
     "Message".foreign_key.should == "message_id"
     "Message".foreign_key(false).should == "messageid"

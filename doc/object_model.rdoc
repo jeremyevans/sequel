@@ -3,7 +3,7 @@
 Sequel's dataset layer is mostly structured as an DSL, so it often obscures
 what actual objects are being used.  For example, you don't usually create
 Sequel objects by calling #new on the object's class (other than Sequel::Model
-subclasses).  However, just as almost everything in ruby is an object, all 
+subclasses).  However, just as almost everything in ruby is an object, all
 the methods you call in Sequel deal with objects behind the scenes.
 
 There are five main types of Sequel-specific objects that you deal with in
@@ -293,7 +293,7 @@ The following shortcuts exist for creating Sequel::SQL::AliasedExpression object
 
   Sequel.as(:column, :alias)
   :column.as(:alias)
-  
+
 === Sequel::SQL::ComplexExpression
 
 Sequel::SQL::ComplexExpression objects mostly represent SQL operations with arguments.
@@ -327,7 +327,7 @@ against:
   Sequel::SQL::CaseExpression.new({2=>1}, 0, :a) # CASE "a" WHEN 2 THEN 1 ELSE 0 END
 
 Or they can treat each condition separately:
- 
+
   Sequel::SQL::CaseExpression.new({{:a=>2}=>1}, 0) # CASE WHEN ("a" = 2) THEN 1 ELSE 0 END
 
 In addition to providing a hash, you can also provide an array of two-element arrays:
@@ -481,7 +481,7 @@ The following shortcuts exist for creating Sequel::SQL::Subscript objects:
 
   :a.sql_subscript(1)
   :a.sql_subscript(1, 2)
-  
+
 === Sequel::SQL::VirtualRow
 
 Sequel::SQL::VirtualRow is a BasicObject subclass that is the backbone behind the
@@ -538,4 +538,4 @@ You can use the Sequel.expr method to wrap any object:
 However, note that that does not necessarily return a Sequel::SQL::Wrapper
 object, it may return a different class of object, such as a
 Sequel::SQL::ComplexExpression subclass object.
-  
+

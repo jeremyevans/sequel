@@ -280,7 +280,7 @@ Sequel's general inversion operator is ~, which works on symbols and most Sequel
   ~:column # NOT "column"
 
 Note that ~ will actually apply the inversion operation to the underlying object, which is why
-  
+
   ~{:column=>1}
 
 produces <tt>(column != 1)</tt> instead of <tt>NOT (column = 1)</tt>.
@@ -352,7 +352,7 @@ As you can see, these literalize with ANDs by default.  You can use the +sql_or+
 You've already seen the +sql_negate+ method, which will use ANDs if multiple entries are used:
 
   {:column1=>1, :column2=>2}.sql_negate # (("column1" != 1) AND ("column2" != 2))
- 
+
 To negate while using ORs, the ~ operator can be used:
 
   ~{:column1=>1, :column2=>2} # (("column1" != 1) OR ("column2" != 2))
@@ -412,7 +412,7 @@ Just like for the mathematical operators, you can use the +sql_expr+ extension t
 
   Sequel.extension :sql_expr
   'Name - '.sql_expr + :name # ('Name - ' || "name")
-  
+
 Sequel also adds an <tt>Array#sql_string_join</tt> method, which concatenates all of the elements in the array:
 
   ['Name', :name].sql_string_join # ('Name' || "name")
@@ -423,8 +423,8 @@ Just like ruby's <tt>String#join</tt>, you can provide an argument for a string 
 
 For the LIKE operator, Sequel defines the +like+ and +ilike+ methods on symbol and most Sequel-specific expression objects:
 
-  :name.like('A%') # ("name" LIKE 'A%') 
-  :name.qualify.ilike('A%') # ("name" ILIKE 'A%') 
+  :name.like('A%') # ("name" LIKE 'A%')
+  :name.qualify.ilike('A%') # ("name" ILIKE 'A%')
 
 Note the above syntax, while Sequel's default, is specific to PostgreSQL.  However, most other adapters override the behavior.  For example, on MySQL, Sequel uses LIKE BINARY for +like+, and LIKE for +ilike+.  If the database supports both case sensitive and case insensitive LIKE, then +like+ will use a case sensitive LIKE, and +ilike+ will use a case insensitive LIKE.  Some databases only support case insensitive behavior, in which case +like+ and +ilike+ will act identically.
 

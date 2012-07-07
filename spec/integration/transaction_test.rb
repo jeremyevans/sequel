@@ -61,8 +61,8 @@ describe "Database transactions" do
     @db.transaction do
       @db.transaction do
         @d << {:name => 'abc', :value => 1}
-      end 
-    end 
+      end
+    end
     @d.count.should == 1
 
     @d.delete
@@ -70,7 +70,7 @@ describe "Database transactions" do
       @d << {:name => 'abc', :value => 1}
       @db.transaction do
         raise Sequel::Rollback
-      end 
+      end
     end}.should_not raise_error
     @d.count.should == 0
 
@@ -78,11 +78,11 @@ describe "Database transactions" do
       @d << {:name => 'abc', :value => 1}
       @db.transaction do
         raise Interrupt, 'asdf'
-      end 
+      end
     end}.should raise_error(Interrupt)
     @d.count.should == 0
-  end 
-  
+  end
+
   if INTEGRATION_DB.supports_savepoints?
     cspecify "should support nested transactions through savepoints using the savepoint option", [:jdbc, :sqlite] do
       @db.transaction do

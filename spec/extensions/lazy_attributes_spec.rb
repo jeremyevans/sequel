@@ -40,7 +40,7 @@ describe "Sequel::Plugins::LazyAttributes" do
   after do
     Object.send(:remove_const, :LazyAttributesModel)
   end
-  
+
   it "should allowing adding additional lazy attributes via plugin :lazy_attributes" do
     @c.set_dataset(@ds.select(:id, :blah))
     @c.dataset.sql.should == 'SELECT id, blah FROM la'
@@ -48,7 +48,7 @@ describe "Sequel::Plugins::LazyAttributes" do
     @c.dataset.opts[:select].should == [:id]
     @c.dataset.sql.should == 'SELECT id FROM la'
   end
-  
+
   it "should allowing adding additional lazy attributes via lazy_attributes" do
     @c.set_dataset(@ds.select(:id, :blah))
     @c.dataset.sql.should == 'SELECT id, blah FROM la'

@@ -67,7 +67,7 @@ module Sequel
       def auto_increment_sql()
         AUTO_INCREMENT
       end
-      
+
       def create_sequence_sql(name, opts={})
         "CREATE SEQUENCE #{quote_identifier(name)}"
       end
@@ -121,7 +121,7 @@ module Sequel
         end_sql
         sql
       end
-      
+
       def drop_sequence_sql(name)
         "DROP SEQUENCE #{quote_identifier(name)}"
       end
@@ -154,7 +154,7 @@ module Sequel
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'insert into columns values returning')
       FIRST = " FIRST ".freeze
       SKIP = " SKIP ".freeze
-      
+
       # Insert given values into the database.
       def insert(*values)
         if @opts[:sql] || @opts[:returning]
@@ -205,7 +205,7 @@ module Sequel
       def select_clause_methods
         SELECT_CLAUSE_METHODS
       end
-      
+
       def select_limit_sql(sql)
         if l = @opts[:limit]
           sql << FIRST

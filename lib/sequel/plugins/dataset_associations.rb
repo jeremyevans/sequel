@@ -15,7 +15,7 @@ module Sequel
     #   # WHERE (albums.artist_id IN (
     #   #   SELECT id FROM artists
     #   #   WHERE ((id >= 1) AND (id <= 100))))
-    # 
+    #
     # This works for all of the association types that ship with Sequel,
     # including the many_through_many type.  Most association options that
     # are supported when eager loading are supported when using a
@@ -39,7 +39,7 @@ module Sequel
     #   #       WHERE ((id >= 1) AND (id <= 100)))
     #   #     AND
     #   #     (name < 'M')))))
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclasses create association methods for datasets

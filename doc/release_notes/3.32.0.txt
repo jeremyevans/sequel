@@ -127,7 +127,7 @@
 * Sequel's default handling of NOT IN operators with an empty array
   of values has changed, which can change which rows are returned for
   such queries.
- 
+
   Previously, Sequel was inconsistent in that it tried to handle NULL
   values correctly in the IN case, but not in the NOT IN case.  Now,
   it defaults to handling NULL values correctly in both cases:

@@ -2,7 +2,7 @@
 
 Most Model methods that take a hash of attribute keys and values, including <tt>Model.new</tt>, <tt>Model.create</tt>, <tt>Model#set</tt> and <tt>Model#update</tt> are subject to Sequel's mass assignment rules.
 When you pass a hash to these methods, each key has an <tt>=</tt> appended to it (the setter method), and if the setter method exists and access to it is not restricted, Sequel will call the setter method with the hash value.
-By default, there are two types of setter methods that are restricted.  
+By default, there are two types of setter methods that are restricted.
 The first is methods like <tt>typecast_on_assignment=</tt> and <tt>==</tt>, which don't affect columns.
 These methods cannot be enabled for mass assignment.
 The second is primary key setters.

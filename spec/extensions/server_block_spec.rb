@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-shared_examples_for "Database#with_server" do  
+shared_examples_for "Database#with_server" do
   specify "should set the default server to use in the block" do
     @db.with_server(:a){@db[:t].all}
     @db.sqls.should == ["SELECT * FROM t -- a"]
@@ -60,7 +60,7 @@ describe "Database#with_server multi threaded" do
 
   specify "should respect multithreaded access" do
     q, q1 = Queue.new, Queue.new
-    
+
     t = nil
     @db[:t].all
     @db.with_server(:a) do

@@ -33,7 +33,7 @@ describe "eval_inspect extension" do
       Sequel::SQL::Window.new(:order=>:a, :partition=>:b),
       Sequel::SQL::WindowFunction.new(Sequel::SQL::Function.new(:a, :b, :c), Sequel::SQL::Window.new(:order=>:a, :partition=>:b)),
       Sequel::SQL::Wrapper.new(:a),
-      
+
       # Objects with components where eval(inspect) != self
       Sequel::SQL::AliasedExpression.new(Sequel::SQL::Blob.new('s'), :a),
       Sequel::SQL::AliasedExpression.new(Sequel::LiteralString.new('s'), :a),

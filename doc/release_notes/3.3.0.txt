@@ -4,22 +4,22 @@ New Features
 * An association_proxies plugin has been added.  This is not a
   full-blown proxy implementation, but it allows you to write code
   such as:
-  
+
     artist.albums.filter{num_tracks > 10}
-    
+
   Without the plugin, you have to call filter specifically on the
   association's dataset:
-  
+
     artist.albums_dataset.filter{num_tracks > 10}
 
   The plugin works by proxying array methods to the array of
   associated objects, and all other methods to the association's
   dataset.  This results in the following behavior:
-  
+
     # Will load the associated objects (unless they are already
     # cached), and return the length of the array
     artist.albums.length
-    
+
     # Will issue an SQL query with COUNT (even if the association
     # is already cached), and return the result
     artist.albums.count
@@ -38,7 +38,7 @@ New Features
                               :artist_id=>artist.id))
       end
     end
-    
+
     album = Album[1]
     artist1 = Artist[2]
     artist2 = Artist[3]
@@ -73,12 +73,12 @@ Other Improvements
   ADO, and JDBC adapters, close to the level of support for
   PostreSQL, MySQL, SQLite, and H2.  Improvements are too numerous
   to list, but here are some highlights:
-  
+
   * Dataset#insert now returns the primary key (identity field), so
     it can be used easier with models.
-    
+
   * Transactions can now use savepoints (except on ADO).
-  
+
   * Offsets are supported when using SQL Server 2005 or 2008, using
     a ROW_NUMBER window function.  However, you must specify an
     order for your dataset (which you probably are already doing if
@@ -87,7 +87,7 @@ Other Improvements
   * Schema parsing has been implemented, though it doesn't support
     primary key parsing (except on JDBC, since the JDBC support is
     used there).
-  
+
   * The SQL syntax Sequel uses is now much more compatible, and
     most schema modification methods and database types now work
     correctly.
@@ -122,7 +122,7 @@ Other Improvements
 
 * Model class initialization now raises an exception if there is a
   problem connecting to the database.
-  
+
 * Connection pool performance has been increased slightly.
 
 * The literal_time method in the ODBC adapter has been fixed.
@@ -137,7 +137,7 @@ Backwards Compatibility
   the only adapter that converted tinyint columns to booleans when
   the rows are returned, so you can only use the setting with the
   native MySQL adapter.
-  
+
   Additionally, the setting's behavior has changed.  When parsing
   the schema, now only tinyint(1) columns are now considered as
   boolean, instead of all tinyint columns. This allows you to use
@@ -147,14 +147,14 @@ Backwards Compatibility
   due to limitations in the native MySQL driver, all tinyint
   column values are converted to booleans upon retrieval, not just
   tinyint(1) column values.
-  
+
   Unfortunately, the previous Sequel behavior was to use the
   default tinyint size (tinyint(4)) when creating boolean columns
   (using the TrueClass or FalseClass generic types).  If you were
   using the generic type support to create the columns, you should
   modify your database to change the column type from tinyint(4) to
   tinyint(1).
-  
+
   If you use MySQL with tinyint columns, these changes have the
   potential to break applications.  Care should be taken when
   upgrading if these changes apply to you.
@@ -163,8 +163,8 @@ Backwards Compatibility
   same scope.  It's highly unlikely anyone was relying on the
   previous behavior, but if you have a model inside a module that
   you are associating to a model outside of a module, you now need
-  to specify the associated class using the :class option. 
-  
+  to specify the associated class using the :class option.
+
 * Model#save no longer includes the primary key fields in the SET
   clause of the UPDATE query, only in the WHERE clause.  I'm not
   sure if this affects backwards compatibility of production code,

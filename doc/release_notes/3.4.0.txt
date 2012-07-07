@@ -4,7 +4,7 @@ New Plugins
 * A nested_attributes plugin was added allowing you to modify
   associated objects directly through a model object, similar to
   ActiveRecord's Nested Attributes.
-  
+
     Artist.plugin :nested_attributes
     Artist.one_to_many :albums
     Artist.nested_attributes :albums
@@ -14,10 +14,10 @@ New Plugins
 
     a.save # Saves artist and both albums
     a.albums.map{|x| x.name} # ['RF', 'MO']
-  
+
   It takes most of the same options as ActiveRecord, as well as a
   a few additional options:
-  
+
   * :destroy - Allow destruction of nested records.
   * :limit - For *_to_many associations, a limit on the number of
     records that will be processed, to prevent denial of service
@@ -28,7 +28,7 @@ New Plugins
   * :strict - Set to false to not raise an error message if a primary
     key is provided in a record, but it doesn't match an existing
     associated object.
-    
+
   If a block is provided, it is passed each nested attribute hash.
   If the hash should be ignored, the block should return anything
   except false or nil.
@@ -39,18 +39,18 @@ New Plugins
   plugins that handle timestamps, but the implementations are
   suboptimal.  The new built-in plugin supports the following
   options (with the default in parentheses):
-  
+
   * :create - The field to hold the create timestamp (:created_at)
   * :force - Whether to overwrite an existing create timestamp
     (false)
   * :update - The field to hold the update timestamp (:updated_at)
   * :update_on_create - Whether to set the update timestamp to the
     create timestamp when creating (false)
-      
+
 * An instance_hooks plugin was added for adding hooks to specific
   w
   model instances:
-  
+
     obj = Model.new
     obj.after_save_hook{do_something}
     obj.save # calls do_something after the obj has been saved
@@ -64,21 +64,21 @@ New Plugins
 
   Instance level hooks are cleared when the object is saved
   successfully.
-  
+
 * A boolean_readers plugin was added for creating attribute? methods
   for boolean columns.  This can provide a nicer API:
-  
+
     obj = Model[1]
     obj.active  # Sequel default column reader
     obj.active? # Using the boolean_readers plugin
-    
+
   You can provide a block when loading the plugin to change the
   criteria used to determine if the column is boolean:
-  
+
     Sequel::Model.plugin(:boolean_readers) do |c|
       db_schema[c][:db_type] =~ /\Atinyint/
     end
-    
+
   This may be useful if you are using MySQL and have some tinyint
   columns that represent booleans and others that represent integers.
   You can turn the convert_tinyint_to_bool setting off and use the
@@ -90,7 +90,7 @@ Other New Features
 
 * Sequel now has support for converting Time/DateTime to local or UTC
   time upon storage, retrieval, or typecasting.
-  
+
   There are three different timezone settings:
 
   * Sequel.database_timezone - The timezone that timestamps use in
@@ -152,7 +152,7 @@ Other New Features
 
 * Dataset#truncate was added for truncating tables.  Truncate allows
   for fast removal of all rows in a table.
-  
+
 * Sequel now supports typecasting a hash to date, time, and datetime
   types.  This allows easy usage of Sequel with forms that split
   the entry of these database types into separate from fields.
@@ -171,7 +171,7 @@ Other New Features
     obj.date = params['date']
     # or
     obj.set(params)
-  
+
 * validates_unique now takes a block that can be used to scope the
   uniqueness constraint. This allows you to easily set up uniqueness
   validations that are only necessary in a given scope.  For example,
@@ -180,9 +180,9 @@ Other New Features
   block to validates_unique:
 
     validates_unique(:name){|ds| ds.filter(:active)}
-    
+
 * The serialization plugin now supports json.
-    
+
 * Sequel now supports generic concepts of
   CURRENT_{DATE,TIME,TIMESTAMP}.  Most databases support these SQL
   concepts, but not all, and some implementations act differently.
@@ -194,7 +194,7 @@ Other New Features
   It's separated out into a separate module so that you can just
   include that module in the top level scope, allowing you to
   reference the constants directly (e.g. CURRENT_TIMESTAMP).
-  
+
     DB[:events].filter{date < ::Sequel::CURRENT_DATE}
     # or:
     include Sequel::SQL::Constants
@@ -203,26 +203,26 @@ Other New Features
 * Database#run was added for executing arbitrary SQL on a database.
   It's an alias for Database#<<, but it allows for a nicer API inside
   migrations, since you can now do:
-  
+
     run 'SQL'
-    
+
   instead of:
-  
+
     self << 'SQL'
-    
+
   You can also provide a :server option to run the SQL on the
   given server/shard:
-  
+
     run 'SQL', :server=>:shard1
 
 * Sequel::Model() can now take a database argument in addition to
   a symbol or dataset argument.  If a database is given, it'll create
   an anonymous subclass attached to the given database.  Other changes
   were made to allow the following code to work:
-  
+
     class Item < Sequel::Model(DB2)
     end
-    
+
   That will work correctly assuming a table named items in DB2.
 
 * Dataset#ungrouped was added for removing a grouping from an
@@ -246,7 +246,7 @@ Other Improvements
   to work together on the same column.  Make sure the
   lazy_attributes accessor is setup before the serialization
   accessor if you want to have a lazy serialized column.
-  
+
 * Calling the add_* method for many_to_many association now saves the
   record if the record is new.  This makes it operate more similarly
   to one_to_many associations.  Previously, it raised an Error.
@@ -263,7 +263,7 @@ Other Improvements
 * Using multiple emulated ALTER TABLE statements (such as
   drop_column) in a single alter_table block now works correctly
   on SQLite.
-  
+
 * Database#indexes now works on JDBC for tables in a non-default
   schema.  It also now properly detects unique indexes on MSSQL.
 
@@ -274,17 +274,17 @@ Other Improvements
 
 * Datasets without tables now work correctly on Oracle, so things
   like DB.get(...) now work.
-  
+
 * A descriptive error message is given if you attempt to use
   Sequel with the mysql.rb driver (which Sequel doesn't support).
-  
+
 * The postgres adapter now works correctly with a modified
   postgres-pr that raises PGErrors instead of RuntimeErrors
   (e.g. http://github.com/jeremyevans/postgres-pr).
-  
+
 * You now get a Sequel::InvalidOperation instead of a NoMethodError
   if you attempt to update a dataset without a table.
-  
+
 * The inflection support has been modified to reduce code
   duplication.
 
@@ -294,7 +294,7 @@ Backwards Compatibility
 * Sequel now includes fractional seconds in timestamps for all
   adapters except MySQL.  It's possible that this may break
   timestamp columns for databases that are not regularly tested.
-  
+
 * Sequel now includes timezone values in timestamps on Microsoft
   SQL Server, Oracle, PostgreSQL and SQLite.  The modification for
   SQLite is probably the biggest cause for concern, since SQLite
@@ -302,7 +302,7 @@ Backwards Compatibility
   timestamps and is accessed by something other than Sequel, you
   should make sure that it works with the timestamp format that
   Sequel now uses.
-  
+
 * The default timestamp format used by Sequel now uses a space
   instead of 'T' between the date and time parts, which could
   possibly affect some databases that are not regularly tested.
@@ -311,7 +311,7 @@ Backwards Compatibility
   selects from multiple tables will now raise an Error.  Previously,
   it would ignore any GROUP or JOIN settings and generate bad SQL if
   there were multiple FROM tables.
-  
+
 * Database#<< now always returns nil.  Before, the return value was
   adapter dependent.
 
@@ -319,7 +319,7 @@ Backwards Compatibility
   Sequel.datetime_class.  Before, ODBC::Time used Time and
   ODBC::DateTime used DateTime regardless of the
   Sequel.datetime_class setting.
-  
+
 * The default inflections were modified, fixing some obvious errors
   and possibly changing some existing inflections.  Further changes
   to the default inflections are unlikely.

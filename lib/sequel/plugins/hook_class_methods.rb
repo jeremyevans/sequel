@@ -23,7 +23,7 @@ module Sequel
     # Note that returning false in any before hook block will skip further
     # before hooks and abort the action.  So if a before_save hook block returns
     # false, future before_save hook blocks are not called, and the save is aborted.
-    # 
+    #
     # Usage:
     #
     #   # Allow use of hook class methods in all model subclasses (called before loading subclasses)
@@ -56,9 +56,9 @@ module Sequel
         # immediately without running the rest of the hooks of that type.
         #
         # It is recommended that you always provide a symbol to this method,
-        # for descriptive purposes.  It's only necessary to do so when you 
+        # for descriptive purposes.  It's only necessary to do so when you
         # are using a system that reloads code.
-        # 
+        #
         # Example of usage:
         #
         #  class MyModel
@@ -77,12 +77,12 @@ module Sequel
             class_eval("def #{hook}; model.hook_blocks(:#{hook}){|b| return false if instance_eval(&b) == false}; end", __FILE__, __LINE__)
           end
         end
-    
+
         # Returns true if there are any hook blocks for the given hook.
         def has_hooks?(hook)
           !@hooks[hook].empty?
         end
-    
+
         # Yield every block related to the given hook.
         def hook_blocks(hook)
           @hooks[hook].each{|k,v| yield v}
@@ -90,13 +90,13 @@ module Sequel
 
         # Make a copy of the current class's hooks for the subclass.
         def inherited(subclass)
-          hooks = subclass.instance_variable_set(:@hooks, {}) 
+          hooks = subclass.instance_variable_set(:@hooks, {})
           instance_variable_get(:@hooks).each{|k,v| hooks[k] = v.dup}
           super
         end
-    
+
         private
-    
+
         # Add a hook block to the list of hook methods.
         # If a non-nil tag is given and it already is in the list of hooks,
         # replace it with the new block.

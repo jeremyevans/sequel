@@ -7,10 +7,10 @@ module Sequel
   # The tiny version of Sequel.  Usually 0, only bumped for bugfix
   # releases that fix regressions from previous versions.
   TINY  = 1
-  
+
   # The version of Sequel you are using, as a string (e.g. "2.11.0")
   VERSION = [MAJOR, MINOR, TINY].join('.')
-  
+
   # The version of Sequel you are using, as a string (e.g. "2.11.0")
   def self.version
     VERSION

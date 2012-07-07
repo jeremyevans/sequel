@@ -39,15 +39,15 @@ module Sequel
         metadata_dataset.from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'TABLE').map{|r| m.call(r[:tname])}
       end
 
-      def views(opts={}) 
+      def views(opts={})
         m = output_identifier_meth
         metadata_dataset.from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'VIEW').map{|r| m.call(r[:tname])}
-      end 
- 
-      def view_exists?(name) 
+      end
+
+      def view_exists?(name)
         m = input_identifier_meth
-        metadata_dataset.from(:tab).filter(:tname =>m.call(name), :tabtype => 'VIEW').count > 0 
-      end 
+        metadata_dataset.from(:tab).filter(:tname =>m.call(name), :tabtype => 'VIEW').count > 0
+      end
 
       private
 
@@ -143,7 +143,7 @@ module Sequel
         @primary_key_sequences.delete(table)
         super
       end
-      
+
       def sequence_for_table(table)
         return nil unless autosequence
         @primary_key_sequences.fetch(table) do |key|
@@ -312,17 +312,17 @@ module Sequel
       def supports_is_true?
         false
       end
-      
+
       # Oracle does not support SELECT *, column
       def supports_select_all_and_column?
         false
       end
-      
+
       # Oracle supports timezones in literal timestamps.
       def supports_timestamp_timezones?
         true
       end
-      
+
       # Oracle does not support WHERE 'Y' for WHERE TRUE.
       def supports_where_true?
         false

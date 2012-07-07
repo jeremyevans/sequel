@@ -52,7 +52,7 @@ describe "A connection pool handling connections" do
   specify "#hold should add the connection to the #allocated array" do
     @cpool.hold do
       @cpool.allocated.size.should == 1
-  
+
       @cpool.allocated.should == {Thread.current=>:got_connection}
     end
   end
@@ -110,7 +110,7 @@ describe "A connection pool handling connections" do
   end
 end
 
-describe "A connection pool handling connection errors" do 
+describe "A connection pool handling connection errors" do
   specify "#hold should raise a Sequel::DatabaseConnectionError if an exception is raised by the connection_proc" do
     cpool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS){raise Interrupt}
     proc{cpool.hold{:block_return}}.should raise_error(Sequel::DatabaseConnectionError)
@@ -133,7 +133,7 @@ describe "ConnectionPool#hold" do
     end
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS){@c.new}
   end
-  
+
   specify "should pass the result of the connection maker proc to the supplied block" do
     res = nil
     @pool.hold {|c| res = c}
@@ -143,13 +143,13 @@ describe "ConnectionPool#hold" do
     res.should be_a_kind_of(@c)
     res.value.should == 1 # the connection maker is invoked only once
   end
-  
+
   specify "should be re-entrant by the same thread" do
     cc = nil
     @pool.hold {|c| @pool.hold {|c| @pool.hold {|c| cc = c}}}
     cc.should be_a_kind_of(@c)
   end
-  
+
   specify "should catch exceptions and reraise them" do
     proc {@pool.hold {|c| c.foobar}}.should raise_error(NoMethodError)
   end
@@ -160,26 +160,26 @@ describe "A connection pool with a max size of 1" do
     @invoked_count = 0
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>1)) {@invoked_count += 1; 'herro'}
   end
-  
+
   specify "should let only one thread access the connection at any time" do
     cc,c1, c2 = nil
     q, q1 = Queue.new, Queue.new
-    
+
     t1 = Thread.new {@pool.hold {|c| cc = c; c1 = c.dup; q1.push nil; q.pop}}
     q1.pop
     cc.should == 'herro'
     c1.should == 'herro'
-    
+
     t2 = Thread.new {@pool.hold {|c| c2 = c.dup; q1.push nil; q.pop;}}
-    
+
     # connection held by t1
     t1.should be_alive
     t2.should be_alive
-    
+
     cc.should == 'herro'
     c1.should == 'herro'
     c2.should be_nil
-    
+
     @pool.available_connections.should be_empty
     @pool.allocated.should == {t1=>cc}
 
@@ -189,22 +189,22 @@ describe "A connection pool with a max size of 1" do
 
     t1.join
     t2.should be_alive
-    
+
     c2.should == 'hello'
 
     @pool.available_connections.should be_empty
     @pool.allocated.should == {t2=>cc}
-    
+
     #connection released
     q.push nil
     t2.join
-    
+
     @invoked_count.should == 1
     @pool.size.should == 1
     @pool.available_connections.should == [cc]
     @pool.allocated.should be_empty
   end
-  
+
   specify "should let the same thread reenter #hold" do
     c1, c2, c3 = nil
     @pool.hold do |c|
@@ -219,7 +219,7 @@ describe "A connection pool with a max size of 1" do
     c1.should == 'herro'
     c2.should == 'herro'
     c3.should == 'herro'
-    
+
     @invoked_count.should == 1
     @pool.size.should == 1
     @pool.available_connections.size.should == 1
@@ -227,7 +227,7 @@ describe "A connection pool with a max size of 1" do
   end
 end
 
-shared_examples_for "A threaded connection pool" do  
+shared_examples_for "A threaded connection pool" do
   specify "should not have all_connections yield connections allocated to other threads" do
     pool = Sequel::ConnectionPool.get_pool(@cp_opts.merge(:max_connections=>2, :pool_timeout=>0)) {@invoked_count += 1}
     q, q1 = Queue.new, Queue.new
@@ -277,7 +277,7 @@ shared_examples_for "A threaded connection pool" do
     q.push nil
     t.join
   end
-  
+
   it "should not add a disconnected connection back to the pool if the disconnection_proc raises an error" do
     pool = Sequel::ConnectionPool.get_pool(@cp_opts.merge(:max_connections=>1, :pool_timeout=>0, :disconnection_proc=>proc{|c| raise Sequel::Error})) {@invoked_count += 1}
     proc{pool.hold{raise Sequel::DatabaseDisconnectError}}.should raise_error(Sequel::Error)
@@ -288,7 +288,7 @@ shared_examples_for "A threaded connection pool" do
     cc = {}
     threads = []
     q, q1, q2 = Queue.new, Queue.new, Queue.new
-    
+
     5.times{|i| threads << Thread.new{@pool.hold{|c| q.pop; cc[i] = c; q1.push nil; q2.pop}}; q.push nil; q1.pop}
     threads.each {|t| t.should be_alive}
     cc.size.should == 5
@@ -303,23 +303,23 @@ shared_examples_for "A threaded connection pool" do
     @pool.available_connections.should == []
     5.times{q2.push nil}
     threads.each{|t| t.join}
-    
+
     @pool.available_connections.size.should == 5
     @pool.allocated.should be_empty
   end
-  
+
   specify "should block threads until a connection becomes available" do
     cc = {}
     threads = []
     q, q1 = Queue.new, Queue.new
-    
+
     5.times{|i| threads << Thread.new{@pool.hold{|c| cc[i] = c; q1.push nil; q.pop}}}
     5.times{q1.pop}
     threads.each {|t| t.should be_alive}
     @pool.available_connections.should be_empty
 
     3.times {|i| threads << Thread.new {@pool.hold {|c| cc[i + 5] = c; q1.push nil}}}
-    
+
     threads[5].should be_alive
     threads[6].should be_alive
     threads[7].should be_alive
@@ -327,14 +327,14 @@ shared_examples_for "A threaded connection pool" do
     cc[5].should be_nil
     cc[6].should be_nil
     cc[7].should be_nil
-    
+
     5.times{q.push nil}
     5.times{|i| threads[i].join}
     3.times{q1.pop}
     3.times{|i| threads[i+5].join}
-    
+
     threads.each {|t| t.should_not be_alive}
-    
+
     @pool.size.should == 5
     @invoked_count.should == 5
     @pool.available_connections.size.should == 5
@@ -373,7 +373,7 @@ describe "Threaded Unsharded Connection Pool" do
     @cp_opts = CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5)
     @pool = Sequel::ConnectionPool.get_pool(@cp_opts) {@invoked_count += 1}
   end
-  
+
   it_should_behave_like "A threaded connection pool"
 end
 
@@ -398,7 +398,7 @@ describe "ConnectionPool#disconnect" do
     5.times{q.push nil}
     threads.each {|t| t.join}
   end
-  
+
   specify "should invoke the given block for each available connection" do
     @pool.size.should == 5
     @pool.available_connections.size.should == 5
@@ -407,7 +407,7 @@ describe "ConnectionPool#disconnect" do
     @pool.disconnect {|c| conns << c}
     conns.size.should == 5
   end
-  
+
   specify "should remove all available connections" do
     @pool.size.should == 5
     @pool.disconnect
@@ -433,7 +433,7 @@ describe "A connection pool with multiple servers" do
     @invoked_counts = Hash.new(0)
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:servers=>{:read_only=>{}})){|server| "#{server}#{@invoked_counts[server] += 1}"}
   end
-  
+
   specify "#all_connections should return connections for all servers" do
     @pool.hold{}
     @pool.all_connections{|c1| c1.should == "default1"}
@@ -443,7 +443,7 @@ describe "A connection pool with multiple servers" do
     end
     a.sort_by{|c| c.to_s}.should == ["default1", "read_only1"]
   end
-  
+
   specify "#servers should return symbols for all servers" do
     @pool.servers.sort_by{|s| s.to_s}.should == [:default, :read_only]
   end
@@ -458,7 +458,7 @@ describe "A connection pool with multiple servers" do
     @pool.size.should == 1
     @invoked_counts.should == {:default=>1}
   end
-  
+
   specify "should use the :default server an invalid server is used" do
     @pool.hold do |c1|
       c1.should == "default1"
@@ -497,7 +497,7 @@ describe "A connection pool with multiple servers" do
     @pool.size(:read_only).should == 1
     @invoked_counts.should == {:read_only=>1}
   end
-  
+
   specify "#hold should only yield connections for the server requested" do
     @pool.hold(:read_only) do |c|
       c.should == "read_only1"
@@ -513,7 +513,7 @@ describe "A connection pool with multiple servers" do
     end
     @invoked_counts.should == {:read_only=>1, :default=>1}
   end
-  
+
   specify "#disconnect should disconnect from all servers" do
     @pool.hold(:read_only){}
     @pool.hold{}
@@ -527,10 +527,10 @@ describe "A connection pool with multiple servers" do
     @pool.hold(:read_only){|c| c.should == 'read_only2'}
     @pool.hold{|c| c.should == 'default2'}
   end
-  
+
   specify "#add_servers should add new servers to the pool" do
     pool = Sequel::ConnectionPool.get_pool(:servers=>{:server1=>{}}){|s| s}
-    
+
     pool.hold{}
     pool.hold(:server2){}
     pool.hold(:server3){}
@@ -546,7 +546,7 @@ describe "A connection pool with multiple servers" do
 
       pool.add_servers([:server2, :server3])
       pool.hold(:server2){}
-      pool.hold(:server3) do 
+      pool.hold(:server3) do
         pool.allocated.length.should == 0
         pool.allocated(:server1).length.should == 1
         pool.allocated(:server2).length.should == 0
@@ -561,18 +561,18 @@ describe "A connection pool with multiple servers" do
 
   specify "#add_servers should ignore existing keys" do
     pool = Sequel::ConnectionPool.get_pool(:servers=>{:server1=>{}}){|s| s}
-    
+
     pool.allocated.length.should == 0
     pool.allocated(:server1).length.should == 0
     pool.available_connections.length.should == 0
     pool.available_connections(:server1).length.should == 0
-    pool.hold do |c1| 
+    pool.hold do |c1|
       c1.should == :default
       pool.allocated.length.should == 1
       pool.allocated(:server1).length.should == 0
       pool.available_connections.length.should == 0
       pool.available_connections(:server1).length.should == 0
-      pool.hold(:server1) do |c2| 
+      pool.hold(:server1) do |c2|
         c2.should == :server1
         pool.allocated.length.should == 1
         pool.allocated(:server1).length.should == 1
@@ -604,7 +604,7 @@ describe "A connection pool with multiple servers" do
     pool.available_connections.length.should == 1
     pool.available_connections(:server1).length.should == 1
   end
-  
+
   specify "#remove_servers should disconnect available connections immediately" do
     pool = Sequel::ConnectionPool.get_pool(:max_connections=>5, :servers=>{:server1=>{}}){|s| s}
     threads = []
@@ -613,12 +613,12 @@ describe "A connection pool with multiple servers" do
     5.times{q1.pop}
     5.times{q.push nil}
     threads.each {|t| t.join}
-    
+
     pool.size(:server1).should == 5
     pool.remove_servers([:server1])
     pool.size(:server1).should == 0
   end
-  
+
   specify "#remove_servers should disconnect connections in use as soon as they are returned to the pool" do
     dc = []
     pool = Sequel::ConnectionPool.get_pool(:servers=>{:server1=>{}}, :disconnection_proc=>proc{|c| dc << c}){|s| s}
@@ -634,7 +634,7 @@ describe "A connection pool with multiple servers" do
     pool.size(:server1).should == 0
     dc.should == [c1]
   end
-  
+
   specify "#remove_servers should remove server related data structures immediately" do
     pool = Sequel::ConnectionPool.get_pool(:servers=>{:server1=>{}}){|s| s}
     pool.available_connections(:server1).should == []
@@ -643,13 +643,13 @@ describe "A connection pool with multiple servers" do
     pool.available_connections(:server1).should == nil
     pool.allocated(:server1).should == nil
   end
-  
+
   specify "#remove_servers should not allow the removal of the default server" do
     pool = Sequel::ConnectionPool.get_pool(:servers=>{:server1=>{}}){|s| s}
     proc{pool.remove_servers([:server1])}.should_not raise_error
     proc{pool.remove_servers([:default])}.should raise_error(Sequel::Error)
   end
-  
+
   specify "#remove_servers should ignore servers that have already been removed" do
     dc = []
     pool = Sequel::ConnectionPool.get_pool(:servers=>{:server1=>{}}, :disconnection_proc=>proc{|c| dc << c}){|s| s}
@@ -674,13 +674,13 @@ describe "SingleConnectionPool" do
   before do
     @pool = Sequel::ConnectionPool.get_pool(ST_CONNECTION_POOL_DEFAULTS){1234}
   end
-  
+
   specify "should provide a #hold method" do
     conn = nil
     @pool.hold{|c| conn = c}
     conn.should == 1234
   end
-  
+
   specify "should provide a #disconnect method" do
     conn = nil
     x = nil
@@ -697,7 +697,7 @@ describe "A single threaded pool with multiple servers" do
     @max_size=2
     @pool = Sequel::ConnectionPool.get_pool(ST_CONNECTION_POOL_DEFAULTS.merge(:disconnection_proc=>proc{|c| @max_size=3}, :servers=>{:read_only=>{}})){|server| server}
   end
-  
+
   specify "#all_connections should return connections for all servers" do
     @pool.hold{}
     @pool.all_connections{|c1| c1.should == :default}
@@ -707,17 +707,17 @@ describe "A single threaded pool with multiple servers" do
     end
     a.sort_by{|c| c.to_s}.should == [:default, :read_only]
   end
-  
+
   specify "#servers should return symbols for all servers" do
     @pool.servers.sort_by{|s| s.to_s}.should == [:default, :read_only]
   end
-  
+
   specify "#add_servers should add new servers to the pool" do
     @pool.hold(:blah){|c| c.should == :default}
     @pool.add_servers([:blah])
     @pool.hold(:blah){|c| c.should == :blah}
   end
-  
+
   specify "#add_servers should ignore keys already existing" do
     @pool.hold{|c| c.should == :default}
     @pool.hold(:read_only){|c| c.should == :read_only}
@@ -725,17 +725,17 @@ describe "A single threaded pool with multiple servers" do
     @pool.conn.should == :default
     @pool.conn(:read_only).should == :read_only
   end
-  
+
   specify "#remove_servers should remove servers from the pool" do
     @pool.hold(:read_only){|c| c.should == :read_only}
     @pool.remove_servers([:read_only])
     @pool.hold(:read_only){|c| c.should == :default}
   end
-  
+
   specify "#remove_servers should not allow the removal of the default server" do
     proc{@pool.remove_servers([:default])}.should raise_error(Sequel::Error)
   end
-  
+
   specify "#remove_servers should disconnect connection immediately" do
     @pool.hold(:read_only){|c| c.should == :read_only}
     @pool.conn(:read_only).should == :read_only
@@ -744,16 +744,16 @@ describe "A single threaded pool with multiple servers" do
     @pool.hold{}
     @pool.conn(:read_only).should == :default
   end
-  
+
   specify "#remove_servers should ignore keys that do not exist" do
     proc{@pool.remove_servers([:blah])}.should_not raise_error
   end
-  
+
   specify "should use the :default server by default" do
     @pool.hold{|c| c.should == :default}
     @pool.conn.should == :default
   end
-  
+
   specify "should use the :default server an invalid server is used" do
     @pool.hold do |c1|
       c1.should == :default
@@ -770,7 +770,7 @@ describe "A single threaded pool with multiple servers" do
     @pool.hold(:read_only){|c| c.should == :read_only}
     @pool.conn(:read_only).should == :read_only
   end
-  
+
   specify "#hold should only yield connections for the server requested" do
     @pool.hold(:read_only) do |c|
       c.should == :read_only
@@ -785,7 +785,7 @@ describe "A single threaded pool with multiple servers" do
     @pool.conn.should == :default
     @pool.conn(:read_only).should == :read_only
   end
-  
+
   specify "#disconnect should disconnect from all servers" do
     @pool.hold(:read_only){}
     @pool.hold{}
@@ -845,39 +845,39 @@ shared_examples_for "All connection pools classes" do
     proc{c.disconnect}.should_not raise_error
     proc{c.disconnect}.should_not raise_error
   end
-  
+
   specify "should yield a connection created by the initialize block to hold" do
     x = nil
     @class.new({}){123}.hold{|c| x = c}
     x.should == 123
   end
-  
+
   specify "should have the initialize block accept a shard/server argument" do
     x = nil
     @class.new({}){|c| [c, c]}.hold{|c| x = c}
     x.should == [:default, :default]
   end
-  
+
   specify "should have respect an :after_connect proc that is called with each newly created connection" do
     x = nil
     @class.new(:after_connect=>proc{|c| x = [c, c]}){|c| 123}.hold{}
     x.should == [123, 123]
   end
-  
+
   specify "should raise a DatabaseConnectionError if the connection raises an exception" do
     proc{@class.new({}){|c| raise Exception}.hold{}}.should raise_error(Sequel::DatabaseConnectionError)
   end
-  
+
   specify "should raise a DatabaseConnectionError if the initialize block returns nil" do
     proc{@class.new({}){}.hold{}}.should raise_error(Sequel::DatabaseConnectionError)
   end
-  
+
   specify "should call the disconnection_proc option if the hold block raises a DatabaseDisconnectError" do
     x = nil
     proc{@class.new(:disconnection_proc=>proc{|c| x = c}){123}.hold{raise Sequel::DatabaseDisconnectError}}.should raise_error(Sequel::DatabaseDisconnectError)
     x.should == 123
   end
-  
+
   specify "should have a disconnect method that calls the :disconnection_proc option with the connection" do
     x = nil
     c = @class.new(:disconnection_proc=>proc{|c| x = c}){123}
@@ -886,7 +886,7 @@ shared_examples_for "All connection pools classes" do
     c.disconnect
     x.should == 123
   end
-  
+
   specify "should have a disconnect method that calls the given block with the connection" do
     x = nil
     y = nil
@@ -896,7 +896,7 @@ shared_examples_for "All connection pools classes" do
     x.should == nil
     y.should == 123
   end
-  
+
   specify "should have a reentrent hold method" do
     o = Object.new
     c = @class.new({}){o}
@@ -910,11 +910,11 @@ shared_examples_for "All connection pools classes" do
       end
     end
   end
-  
+
   specify "should have a servers method that returns an array of shard/server symbols" do
     @class.new({}){123}.servers.should == [:default]
   end
-  
+
   specify "should have a servers method that returns an array of shard/server symbols" do
     c = @class.new({}){123}
     c.size.should == 0

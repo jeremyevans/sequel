@@ -36,7 +36,7 @@ describe "columns_introspection extension" do
     @ds.columns.should == [:x]
     @db.sqls.length.should == 0
   end
-  
+
   specify "should handle plain symbols without a database query" do
     @ds.select(:x).columns.should == [:x]
     @db.sqls.length.should == 0

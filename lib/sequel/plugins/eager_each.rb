@@ -12,7 +12,7 @@ module Sequel
     # #each, this is a bit of issue, but this plugin resolves the issue by cloning the dataset
     # and setting a new flag in the cloned dataset, so that each can check with the flag to
     # determine whether it should call all.
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances eagerly load for each (called before loading subclasses)
@@ -20,7 +20,7 @@ module Sequel
     #
     #   # Make the Album class eagerly load for each
     #   Album.plugin :eager_each
-    module EagerEach 
+    module EagerEach
       # Methods added to eagerly loaded datasets when the eager_each plugin is in use.
       module EagerDatasetMethods
         # Call #all instead of #each unless #each is being called by #all.
@@ -48,7 +48,7 @@ module Sequel
         def eager(*)
           super.extend(EagerDatasetMethods)
         end
-        
+
         # Make sure calling each on this dataset will eagerly load the dataset.
         def eager_graph(*)
           super.extend(EagerDatasetMethods)

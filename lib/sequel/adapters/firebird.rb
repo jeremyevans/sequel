@@ -52,7 +52,7 @@ module Sequel
             conn.transaction
           rescue Fb::Error => e
             conn.rollback
-            raise_error(e, :disconnect=>true) 
+            raise_error(e, :disconnect=>true)
           end
         end
       end
@@ -60,7 +60,7 @@ module Sequel
       def commit_transaction(conn, opts={})
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
-      
+
       def database_error_classes
         [Fb::Error]
       end

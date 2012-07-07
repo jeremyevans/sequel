@@ -58,7 +58,7 @@
   SQL query inside a migration that is specifically not supported
   inside a transaction, such as CREATE INDEX CONCURRENTLY on
   PostgreSQL.
-  
+
   The first way to disable transactions is on a per-migration basis
   by calling the no_transaction method inside the Sequel.migration
   block:

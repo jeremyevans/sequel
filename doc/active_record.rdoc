@@ -92,7 +92,7 @@ Sequel supports both single table inheritance and class table inheritance using 
 
   class Manager < Employee
   end
-  
+
   class Executive < Manager
   end
 
@@ -250,7 +250,7 @@ Let's say you want to override accessor methods.  In Sequel, instead of using +r
     end
   end
 
-You can override almost all model class or instance methods this way, just remember to call +super+.  
+You can override almost all model class or instance methods this way, just remember to call +super+.
 
 == +method_missing+ Missing
 
@@ -298,7 +298,7 @@ Updating <tt>*_to_many</tt> associations is very different, however.  ActiveReco
   artist.remove_album(album) # disassociate album from artist
   artist.remove_all_albums # disassociate all albums from artist
 
-Sequel doesn't have a <tt>has_many :through</tt> association, instead you can use a +many_to_many+ association in most cases.  Sequel ships with a +many_through_many+ plugin that allows you to set up a many to many relationship through an arbitrary number of join tables. 
+Sequel doesn't have a <tt>has_many :through</tt> association, instead you can use a +many_to_many+ association in most cases.  Sequel ships with a +many_through_many+ plugin that allows you to set up a many to many relationship through an arbitrary number of join tables.
 
 Sequel doesn't come with support for polymorphic associations.  Using polymorphic associations is generally bad from a database design perspective, as it violates referential integrity.  If you have an old database and must have polymorphic associations, there is an external +sequel_polymorphic+ plugin that can handle them, just by using the standard association options provided by Sequel.
 
@@ -319,7 +319,7 @@ If you want to create an association extension, you can use the <tt>:extend</tt>
 
 Association datasets are just like any other Sequel dataset, in that you can filter them and manipulate them further:
 
-  gold_albums = artist.albums_dataset.filter{copies_sold > 500000}.order(:name).all  
+  gold_albums = artist.albums_dataset.filter{copies_sold > 500000}.order(:name).all
 
 Sequel caches associated objects similarly to ActiveRecord, and you can skip the cache by passing +true+ to the association method, just like ActiveRecord.
 
@@ -334,7 +334,7 @@ With either way of eager loading, you must call +all+ to retrieve all records at
 
   Artist.eager(:albums=>[:tags, :tracks]).each{|a| ...} # No cookie
   Artist.eager(:albums=>[:tags, :tracks]).all{|a| ...} # Cookie
-  
+
 Like ActiveRecord, Sequel supports cascading of eager loading for both methods of eager loading.
 
 Unlike ActiveRecord, Sequel allows you to eager load custom associations using the <tt>:eager_loader</tt> and <tt>:eager_grapher</tt> association options.  See the {Advanced Associations guide}[link:files/doc/advanced_associations_rdoc.html] for more details.
@@ -345,7 +345,7 @@ Table aliasing when eager loading via +eager_graph+ is different in Sequel than 
     many_to_one :parent, :class=>self
     one_to_many :children, :class=>self, :key=>:parent_id
   end
-    
+
   Node.eager_graph(:parent=>:parent, :children=>{:children=>:children}).all
 
   # SELECT nodes.id, nodes.parent_id, -- main table
@@ -361,7 +361,7 @@ Table aliasing when eager loading via +eager_graph+ is different in Sequel than 
   #  LEFT OUTER JOIN nodes AS children_0 ON (children_0.parent_id = children.id) -- grandchildren
   #  LEFT OUTER JOIN nodes AS children_1 ON (children_1.parent_id = children_0.id) -- great grandchildren
 
-=== Options 
+=== Options
 
 Sequel supports many more association options than ActiveRecord, but here's a mapping of ActiveRecord association options to Sequel association options.  Note that when you specify columns in Sequel, you use symbols, not strings.  Where ActiveRecord would use an SQL string fragment with embedded commas for multiple columns, Sequel would use an array of column symbols.
 
@@ -428,13 +428,13 @@ Unlike ActiveRecord, Sequel's behavior depends on how you configure it.  In Sequ
 
 +raise_on_save_failure+ :: Whether to raise an error instead of returning nil on a failure to save/create/save_changes/etc due to a validation failure or a before_* hook returning false. By default, an error is raised, when this is set to false, nil is returned instead.
 +raise_on_typecast_failure+ :: Whether to raise an error when unable to typecast data for a column (default: true). This should be set to false if you want to use validations to display nice error messages to the user (e.g. most web applications). You can use the +validates_not_string+ validation in connection with this option to check for typecast failures for columns that aren't blobs or strings.
-+require_modification+ :: Whether to raise an error if an UPDATE or DELETE query related to a model instance does not modify exactly 1 row. If set to false, Sequel  will not check the number of rows modified (default: true if the database supports it). 
++require_modification+ :: Whether to raise an error if an UPDATE or DELETE query related to a model instance does not modify exactly 1 row. If set to false, Sequel  will not check the number of rows modified (default: true if the database supports it).
 +strict_param_setting+ :: Whether new/set/update and their variants should raise an error if an invalid key is used. A key is invalid if no setter method exists for that key or the access to the setter method is restricted (e.g. due to it being a primary key field). If set to false, silently skip any key where the setter method doesn't exist or access to it is restricted.
-+typecast_empty_string_to_nil+ :: Whether to typecast the empty string ('') to nil for columns that are not string or blob. In most cases the empty string would be the way to specify a NULL SQL value in string form (nil.to_s == ''), and an empty string would not usually be typecast correctly for other types, so the default is true. 
++typecast_empty_string_to_nil+ :: Whether to typecast the empty string ('') to nil for columns that are not string or blob. In most cases the empty string would be the way to specify a NULL SQL value in string form (nil.to_s == ''), and an empty string would not usually be typecast correctly for other types, so the default is true.
 +typecast_on_assignment+ :: Whether to typecast attribute values on assignment (default: true). If set to false, no typecasting is done, so it will be left up to the database to typecast the value correctly.
 +use_transactions+ :: Whether to use a transaction by default when saving/deleting records (default: true). If you are sending database queries in before or after hooks, you shouldn't change the default setting without a good reason.
 
-== ActiveRecord Method to Sequel Method Mapping 
+== ActiveRecord Method to Sequel Method Mapping
 
 This part of the guide will list Sequel equivalents for ActiveRecord methods, hopefully allowing you to convert your existing ActiveRecord code to Sequel code more easily.
 
@@ -558,7 +558,7 @@ If you are using <tt>find(:last, ...)</tt>, you need to specify an order in Sequ
 If you are using <tt>find(:all, ...)</tt>, you use a method chain instead of passing the options, and end it with +all+:
 
   Album.filter(:artist_id=>1).order(:name).all
-  
+
 Here's a mapping of ActiveRecord +find+ options to <tt>Sequel::Dataset</tt> methods:
 
 :conditions :: filter, where

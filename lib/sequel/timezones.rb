@@ -2,7 +2,7 @@ module Sequel
   @application_timezone = nil
   @database_timezone = nil
   @typecast_timezone = nil
-  
+
   # Sequel doesn't pay much attention to timezones by default, but you can set it
   # handle timezones if you want.  There are three separate timezone settings, application_timezone,
   # database_timezone, and typecast_timezone.  All three timezones have getter and setter methods.
@@ -18,21 +18,21 @@ module Sequel
     # The timezone you want the application to use.  This is the timezone
     # that incoming times from the database and typecasting are converted to.
     attr_reader :application_timezone
-    
+
     # The timezone for storage in the database.  This is the
     # timezone to which Sequel will convert timestamps before literalizing them
     # for storage in the database.  It is also the timezone that Sequel will assume
     # database timestamp values are already in (if they don't include an offset).
     attr_reader :database_timezone
-    
+
     # The timezone that incoming data that Sequel needs to typecast
     # is assumed to be already in (if they don't include an offset).
     attr_reader :typecast_timezone
-  
+
     %w'application database typecast'.each do |t|
       class_eval("def #{t}_timezone=(tz); @#{t}_timezone = convert_timezone_setter_arg(tz) end", __FILE__, __LINE__)
     end
-  
+
     # Convert the given +Time+/+DateTime+ object into the database timezone, used when
     # literalizing objects in an SQL string.
     def application_to_database_timestamp(v)
@@ -58,7 +58,7 @@ module Sequel
         v
       end
     end
-    
+
     # Converts the given object from the given input timezone to the
     # +application_timezone+ using +convert_input_timestamp+ and
     # +convert_output_timestamp+.
@@ -80,21 +80,21 @@ module Sequel
         raise convert_exception_class(e, InvalidValue)
       end
     end
-    
+
     # Convert the given object into an object of <tt>Sequel.datetime_class</tt> in the
     # +application_timezone+.  Used when coverting datetime/timestamp columns
     # returned by the database.
     def database_to_application_timestamp(v)
       convert_timestamp(v, Sequel.database_timezone)
     end
-  
-    # Sets the database, application, and typecasting timezones to the given timezone. 
+
+    # Sets the database, application, and typecasting timezones to the given timezone.
     def default_timezone=(tz)
       self.database_timezone = tz
       self.application_timezone = tz
       self.typecast_timezone = tz
     end
-  
+
     # Convert the given object into an object of <tt>Sequel.datetime_class</tt> in the
     # +application_timezone+.  Used when typecasting values when assigning them
     # to model datetime attributes.
@@ -117,14 +117,14 @@ module Sequel
         convert_input_datetime_other(v, input_timezone)
       end
     end
-    
+
     # Convert the given +DateTime+ to the given input_timezone that is not supported
     # by default (i.e. one other than +nil+, <tt>:local</tt>, or <tt>:utc</tt>).  Raises an +InvalidValue+ by default.
     # Can be overridden in extensions.
     def convert_input_datetime_other(v, input_timezone)
       raise InvalidValue, "Invalid input_timezone: #{input_timezone.inspect}"
     end
-    
+
     # Converts the object from a +String+, +Array+, +Date+, +DateTime+, or +Time+ into an
     # instance of <tt>Sequel.datetime_class</tt>.  If given an array or a string that doesn't
     # contain an offset, assume that the array/string is already in the given +input_timezone+.
@@ -186,7 +186,7 @@ module Sequel
     def convert_output_datetime_other(v, output_timezone)
       raise InvalidValue, "Invalid output_timezone: #{output_timezone.inspect}"
     end
-    
+
     # Convert the timezone setter argument.  Returns argument given by default,
     # exists for easier overriding in extensions.
     def convert_timezone_setter_arg(tz)

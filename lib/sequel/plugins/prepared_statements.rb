@@ -10,9 +10,9 @@ module Sequel
     # +prepared_statements_safe+ plugin in addition to this plugin to reduce the number
     # of prepared statements that can be created, unless you tightly control how your
     # model instances are saved.
-    # 
+    #
     # This plugin probably does not work correctly with the instance filters plugin.
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclasses use prepared statements  (called before loading subclasses)
@@ -23,7 +23,7 @@ module Sequel
     module PreparedStatements
       # Synchronize access to the integer sequence so that no two calls get the same integer.
       MUTEX = Mutex.new
-      
+
       i = 0
       # This plugin names prepared statements uniquely using an integer sequence, this
       # lambda returns the next integer to use.

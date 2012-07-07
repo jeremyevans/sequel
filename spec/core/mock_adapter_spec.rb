@@ -99,7 +99,7 @@ describe "Sequel Mock Adapter" do
     rescue => e
     end
     e.should be_a_kind_of(Sequel::DatabaseError)
-    e.wrapped_exception.should be_a_kind_of(ArgumentError) 
+    e.wrapped_exception.should be_a_kind_of(ArgumentError)
   end
 
   specify "should be able to set separate kinds of results for fetch using an array" do
@@ -166,7 +166,7 @@ describe "Sequel Mock Adapter" do
     rescue => e
     end
     e.should be_a_kind_of(Sequel::DatabaseError)
-    e.wrapped_exception.should be_a_kind_of(ArgumentError) 
+    e.wrapped_exception.should be_a_kind_of(ArgumentError)
   end
 
   specify "should be able to set separate kinds of results for numrows using an array" do
@@ -234,7 +234,7 @@ describe "Sequel Mock Adapter" do
     rescue => e
     end
     e.should be_a_kind_of(Sequel::DatabaseError)
-    e.wrapped_exception.should be_a_kind_of(ArgumentError) 
+    e.wrapped_exception.should be_a_kind_of(ArgumentError)
   end
 
   specify "should be able to set separate kinds of results for autoid using an array" do

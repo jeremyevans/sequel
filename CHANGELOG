@@ -727,7 +727,7 @@
 * Allow Model.set_dataset to accept Sequel::LiteralString arguments as table names (jeremyevans)
 
 * Association :after_load hooks in lazy loading are now called after the associated objects have been cached (jeremyevans)
- 
+
 * Emulate handling of extract on MSSQL, using datepart (jeremyevans)
 
 * Emulate handling of extract on SQLite, but you need to set Database#use_timestamp_timezones = false (jeremyevans)
@@ -799,7 +799,7 @@
 * Work with tiny_tds-0.4.5 in the tinytds adapter, older versions are no longer supported (jeremyevans)
 
 * Make association_pks plugin typecast provided values to integer if the primary key column type is integer (jeremyevans)
- 
+
 * Model.set_dataset now accepts Identifier, QualifiedIdentifier, and AliasedExpression arguments (jeremyevans)
 
 * Fix handling of nil values in bound variables and prepared statement and stored procedure arguments in the jdbc adapter (jeremyevans, wei)
@@ -1513,7 +1513,7 @@
 * Make add_ association method not add the associated object to the cached array if it's already there (jeremyevans)
 
 * Add Model#modified! for explicitly marking an object as modified, so save_changes/update will run callbacks even if no columns have been modified (jeremyevans)
- 
+
 * Add support for a :fields option in the nested attributes plugin, and only allow updating of the fields specified (jeremyevans)
 
 * Don't allow modifying keys related to the association when updating existing objects in the nested_attributes plugin (jeremyevans)
@@ -1657,7 +1657,7 @@
 * Make Dataset#insert_select return nil on PostgreSQL if disable_insert_returning is used (jeremyevans)
 
 * Speed up execution of prepared statements with bound variables on MySQL (ibc@aliax.net)
- 
+
 * Add association_dependencies plugin, for deleting, destroying, or nullifying associated objects when destroying a model object (jeremyevans)
 
 * Add :validate association option, set to false to not validate when implicitly saving associated objects (jeremyevans)
@@ -1805,7 +1805,7 @@
 * Add Model#autoincrementing_primary_key, for when the autoincrementing key isn't the same as the primary key (jeremyevans)
 
 * Add Dataset#ungraphed, to remove the splitting of results into subhashes or associated records (jeremyevans)
- 
+
 * Support :opclass option for PostgreSQL indexes (tmi, jeremyevans)
 
 * Make parsing of server's version more reliable for PostgreSQL (jeremyevans)
@@ -2687,7 +2687,7 @@
 * The :reciprocal option to associations should now be the symbol name of the reciprocal association, not an instance variable symbol (jeremyevans)
 
 * Add Model#associations, which is a hash holding a cache of associated objects, with each association being a separate key (jeremyevans)
-  
+
 * Make all associations support a :graph_select option, specifying a column or array of columns to select when using eager_graph (jeremyevans)
 
 * Bring back Model#set and Model#update, now the same as Model#set_with_params and Model#update_with_params (jeremyevans)
@@ -2797,7 +2797,7 @@
 * Make all associations support the :select option, not just many_to_many (jeremyevans)
 
 * Allow the use of blocks when eager loading, and add the :eager_block and :allow_eager association options for configuration (jeremyevans)
-  
+
 * Add the :graph_join_type, :graph_conditions, and :graph_join_table_conditions association options, used when eager graphing (jeremyevans)
 
 * Add AssociationReflection class (subclass of Hash), to make calling a couple of private Model methods unnecessary (jeremyevans)
@@ -2963,7 +2963,7 @@
 * No longer depend on the assistance gem, merge the Inflector and Validations code (jeremyevans)
 
 * Add Model#set_with_params, which is Model#update_with_params without the save (jeremyevans)
-  
+
 * Fix Model#destroy so that it returns self, not the result of after_destroy (jeremyevans)
 
 * Define Model column accessors in set_dataset, so they should always be avaiable, deprecate Model#method_missing (jeremyevans)
@@ -3052,7 +3052,7 @@
 
 * Use "\n" instead of $/ (since $/ can be redefined in ways we do not want) (jeremyevans)
 
-=== 1.4.0 (2008-04-08) 
+=== 1.4.0 (2008-04-08)
 
 * Don't mark a column as changed unless the new value is different from the current value (tamas.denes, jeremyevans) (#203).
 
@@ -3284,7 +3284,7 @@
 
 * Changed MySQL adapter to support specifying socket option.
 
-* Added support for limiting and paginating datasets with fixed SQL, gotten with DB#fetch (thanks Ruy Diaz). 
+* Added support for limiting and paginating datasets with fixed SQL, gotten with DB#fetch (thanks Ruy Diaz).
 
 * Added new Dataset#from_self method that returns a dataset selecting from the original dataset.
 
@@ -3396,7 +3396,7 @@
 
 * Fixed Dataset#count to work properly with datasets with fixed SQL (when using #fetch).
 
-* Added Model.create_with_params method that filters the given parameters accordring to the model's columns (thanks Aman Gupta). 
+* Added Model.create_with_params method that filters the given parameters accordring to the model's columns (thanks Aman Gupta).
 
 === 0.4.2.1 (2007-12-09)
 
@@ -4219,7 +4219,7 @@
 
 * Fixed Dataset#reverse_order to provide chainability. This method can be called without arguments to invert the current order or with arguments to provide a descending order.
 
-* Fixed literal representation of literals in SQLite adapter (thanks Christian Neukirchen!) 
+* Fixed literal representation of literals in SQLite adapter (thanks Christian Neukirchen!)
 
 * Refactored insert code in Postgres adapter (in preparation for fetching the last insert id for pre-8.1 versions).
 
@@ -4271,7 +4271,7 @@
 
 * Refactored Dataset#where_equal_condition into Dataset#where_condition, allowing arrays and ranges, e.g. posts.filter(:stamp => (3.days.ago)..(1.day.ago)), or posts.filter(:category => ['ruby', 'postgres', 'linux']).
 
-* Added Model#[]= method for changing column values and Model#save 
+* Added Model#[]= method for changing column values and Model#save
 method for saving them.
 
 * Added Dataset#destroy for deleting each record individually as support for models. Renamed Model#delete to Model#destroy (and Model#destroy_all) ala ActiveRecord.

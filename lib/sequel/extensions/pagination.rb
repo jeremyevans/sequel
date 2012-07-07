@@ -18,7 +18,7 @@ module Sequel
       paginated.extend(Pagination)
       paginated.set_pagination_info(page_no, page_size, record_count || count)
     end
-      
+
     # Yields a paginated dataset for each page and returns the receiver. Does
     # a count to find the total number of records for this dataset.
     def each_page(page_size)
@@ -49,7 +49,7 @@ module Sequel
       # Returns the record range for the current page
       def current_page_record_range
         return (0..0) if @current_page > @page_count
-        
+
         a = 1 + (@current_page - 1) * @page_size
         b = a + @page_size - 1
         b = @pagination_record_count if b > @pagination_record_count
@@ -59,7 +59,7 @@ module Sequel
       # Returns the number of records in the current page
       def current_page_record_count
         return 0 if @current_page > @page_count
-        
+
         a = 1 + (@current_page - 1) * @page_size
         b = a + @page_size - 1
         b = @pagination_record_count if b > @pagination_record_count
@@ -80,12 +80,12 @@ module Sequel
       def next_page
         current_page < page_count ? (current_page + 1) : nil
       end
-      
+
       # Returns the page range
       def page_range
         1..page_count
       end
-      
+
       # Returns the previous page number or nil if the current page is the first
       def prev_page
         current_page > 1 ? (current_page - 1) : nil

@@ -40,14 +40,14 @@ module Sequel
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
       include Sequel::MySQL::PreparedStatements::DatabaseMethods
-      
+
       # Mysql::Error messages that indicate the current connection should be disconnected
       MYSQL_DATABASE_DISCONNECT_ERRORS = /\A(Commands out of sync; you can't run this command now|Can't connect to local MySQL server through socket|MySQL server has gone away|Lost connection to MySQL server during query)/
-       
+
       # Regular expression used for getting accurate number of rows
       # matched by an update statement.
       AFFECTED_ROWS_RE = /Rows matched:\s+(\d+)\s+Changed:\s+\d+\s+Warnings:\s+\d+/.freeze
-      
+
       set_adapter_scheme :mysql
 
       # Hash of conversion procs for the current database
@@ -61,7 +61,7 @@ module Sequel
       # like 0000-00-00 and times like 838:00:00 as nil values.  If set to :string,
       # it returns the strings as is.
       attr_reader :convert_invalid_date_time
-      
+
       def initialize(opts={})
         super
         @conversion_procs = MYSQL_TYPES.dup
@@ -131,13 +131,13 @@ module Sequel
         add_prepared_statements_cache(conn)
         conn
       end
-      
+
       # Modify the type translators for the date, time, and timestamp types
       # depending on the value given.
       def convert_invalid_date_time=(v)
         m0 = ::Sequel.method(:string_to_time)
         @conversion_procs[11] = (v != false) ?  lambda{|v| convert_date_time(v, &m0)} : m0
-        m1 = ::Sequel.method(:string_to_date) 
+        m1 = ::Sequel.method(:string_to_date)
         m = (v != false) ? lambda{|v| convert_date_time(v, &m1)} : m1
         [10, 14].each{|i| @conversion_procs[i] = m}
         m2 = method(:to_application_timestamp)
@@ -169,7 +169,7 @@ module Sequel
       end
 
       private
-      
+
       # Execute the given SQL on the given connection.  If the :type
       # option is :select, yield the result of the query, otherwise
       # yield the connection if a block is given.
@@ -216,7 +216,7 @@ module Sequel
           end
         end
       end
-      
+
       # Try to get an accurate number of rows matched using the query
       # info.  Fall back to affected_rows if there was no match, but
       # that may be inaccurate.
@@ -233,7 +233,7 @@ module Sequel
       def connection_execute_method
         :query
       end
-      
+
       # If convert_invalid_date_time is nil, :nil, or :string and
       # the conversion raises an InvalidValue exception, return v
       # if :string and nil otherwise.
@@ -246,12 +246,12 @@ module Sequel
             nil
           when :string
             v
-          else 
+          else
             raise
           end
         end
       end
-    
+
       # The MySQL adapter main error class is Mysql::Error
       def database_error_classes
         [Mysql::Error]
@@ -262,26 +262,26 @@ module Sequel
       def disconnect_error?(e, opts)
         super || (e.is_a?(::Mysql::Error) && MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message))
       end
-      
+
       # The database name when using the native adapter is always stored in
       # the :database option.
       def database_name
         @opts[:database]
       end
-      
+
       # Closes given database connection.
       def disconnect_connection(c)
         c.close
       rescue Mysql::Error
         nil
       end
-      
+
       # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true
       def schema_column_type(db_type)
         convert_tinyint_to_bool && db_type == 'tinyint(1)' ? :boolean : super
       end
     end
-    
+
     # Dataset class for MySQL datasets accessed via the native driver.
     class Dataset < Sequel::Dataset
       include Sequel::MySQL::DatasetMethods
@@ -296,7 +296,7 @@ module Sequel
         execute(sql) do |r|
           i = -1
           cps = db.conversion_procs
-          cols = r.fetch_fields.map do |f| 
+          cols = r.fetch_fields.map do |f|
             # Pretend tinyint is another integer type if its length is not 1, to
             # avoid casting to boolean if Sequel::MySQL.convert_tinyint_to_bool
             # is set.
@@ -314,13 +314,13 @@ module Sequel
         end
         self
       end
-      
+
       # Don't allow graphing a dataset that splits multiple statements
       def graph(*)
         raise(Error, "Can't graph a dataset that splits multiple result sets") if opts[:split_multiple_result_sets]
         super
       end
-      
+
       # Makes each yield arrays of rows, with each array containing the rows
       # for a given result set.  Does not work with graphing.  So you can submit
       # SQL with multiple statements and easily determine which statement
@@ -336,21 +336,21 @@ module Sequel
         ds.row_proc = proc{|x| x.map{|h| row_proc.call(h)}} if row_proc
         ds
       end
-      
+
       private
-      
+
       # Set the :type option to :select if it hasn't been set.
       def execute(sql, opts={}, &block)
         super(sql, {:type=>:select}.merge(opts), &block)
       end
-      
+
       # Handle correct quoting of strings using ::MySQL.quote.
       def literal_string_append(sql, v)
         sql << "'"
         sql << ::Mysql.quote(v)
         sql << "'"
       end
-      
+
       # Yield each row of the given result set r with columns cols
       # as a hash with symbol keys
       def yield_rows(r, cols)

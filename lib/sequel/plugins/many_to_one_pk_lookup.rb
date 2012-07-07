@@ -20,7 +20,7 @@ module Sequel
     #
     # You can disable primary key lookups on a per association basis with this
     # plugin using the :many_to_one_pk_lookup=>false association option.
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances use primary key lookups for many_to_one
@@ -38,7 +38,7 @@ module Sequel
         # caching if the associated model is using caching.
         def _load_associated_object(opts, dynamic_opts)
           klass = opts.associated_class
-          cache_lookup = opts.send(:cached_fetch, :many_to_one_pk_lookup) do 
+          cache_lookup = opts.send(:cached_fetch, :many_to_one_pk_lookup) do
             opts[:type] == :many_to_one &&
               opts[:key] &&
               opts.primary_key == klass.primary_key

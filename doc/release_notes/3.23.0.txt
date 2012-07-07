@@ -13,15 +13,15 @@
 
     min = params[:min].to_i
     Artist.eager(:albums=>proc{|ds| ds.where{id > min}})
-    
+
   This also works when eager loading via eager_graph:
-  
+
     Artist.eager_graph(:albums=>proc{|ds| ds.where{id > min}})
-  
+
   For eager_graph, the dataset is the dataset to graph into the
   current dataset, and filtering it will result in an SQL query
   that joins to a subquery.
-  
+
   You can also use dynamic customization while cascading to also
   eagerly load dependent associations, by making the hash value
   a single entry hash with a proc key and the value being the
@@ -40,17 +40,17 @@
   reciprocals.  For example:
 
     albums.each{|album| album.artist}
-    
+
   Would issue one query per album to get the artist, because the
   reciprocal association was not set.  Now you can provide a
   block to the association method:
-  
+
     albums = artist.albums{|ds| ds.filter{id > min}}
-    
+
   This block is called with the dataset used to retrieve the
   associated objects, and should return a modified version of that
   dataset.
-  
+
   Note that ruby 1.8.6 doesn't allow blocks to take block arguments,
   so you have to pass the block as a separate proc argument to the
   association method if you are still using 1.8.6.
@@ -61,36 +61,36 @@
   on models.  Now, model datasets have the ability to filter by
   associations.  For example, to get all albums for a given artist,
   you could do:
-  
+
     artist = Artist[1]
     Album.filter(:artist=>artist)
-    
+
   Since the above can also be accomplished with:
-  
+
     artist.albums
-    
+
   this may not seem like a big improvement, but it allows you to
   filter on multiple associations simultaneously:
-  
+
     Album.filter(:artist=>artist, :publisher=>publisher)
-    
+
   For simple many_to_one associations, the above is just a simpler
   way to do:
-  
+
     Album.filter(:artist_id=>artist.id, :publisher_id=>publisher.id)
-    
+
   Sequel supports this for all association types, including
   many_to_many and many_through_many, where a subquery is used, and
   it also works when composite key associations are used:
-  
+
     Album.filter(:artist=>artist, :tags=>tag)
-    
+
   This will give you the albums for that artist that are also tagged
   with that tag.  To provide multiple values for the same
   association, mostly useful for many_to_many associations, you can
   either use separate filter calls or specify the conditions as an
   array:
-  
+
     Album.filter(:tags=>tag1).filter(:tags=>tag2)
     Album.filter([[:tags, tag1], [:tags, tag2]])
 
@@ -101,20 +101,20 @@
   loading the extension, you can enable the support for specific
   datasets by extending them with Sequel::ColumnIntrospection.  To
   enable introspection for all datasets, use:
-  
+
     Sequel::Dataset.introspect_all_columns
 
 * A serialization_modification_detection plugin has been added.
   Previously, Sequel could not detect modifications made to
   serialized objects.  It could detect modification if you assigned
   a new value:
-  
+
     model.hash_column = model.hash_column.merge(:foo=>:bar)
-    
+
   but not if you just modified the object directly:
-  
+
     model.hash_columns[:foo] = :bar
-    
+
   With this plugin, such modifications can be detected, at a
   potentially significant performance cost.
 
@@ -142,13 +142,13 @@
 * The xml_serializer plugin now handles namespaced models by
   using __ instead of / as the namespace separator.  Previously, /
   was used and caused problems as it is not valid XML.
-  
+
 * The :eager_grapher association option can now accept a proc that
   takes a single hash of options instead of a fixed 3 arguments.
   This is the recommended way going forward of writing custom
   :eager_graphers, and all of the internal ones have been converted.
   The previous way of using 3 arguments is still supported.
-  
+
 * A bug in the identity_map plugin for many_to_one associations
   without full association reflection information has been fixed.
 
@@ -163,7 +163,7 @@
   but inferior than the filter by association support.  The following
   code can be used as a temporary workaround until you can modify
   your program to use the new filter by associations support:
-  
+
     Sequel::Model::Associations::DatasetMethods.
       send(:remove_method, :complex_expression_sql)
 

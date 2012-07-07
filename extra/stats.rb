@@ -11,7 +11,7 @@ class CodeStatistics
     print_header
     @statistics.each{ |k, v| print_line(k, v) }
     print_splitter
-  
+
     if @total
       print_line('Total', @total)
       print_splitter
@@ -35,7 +35,7 @@ class CodeStatistics
       stats[:codelines] += 1 unless line =~ /^\s*$/ || line =~ /^\s*#/
     end
   end
-  
+
   def get_directory_statistics(dir, stats)
     Dir.foreach(dir) do |fn|
       next if fn =~ /^\./

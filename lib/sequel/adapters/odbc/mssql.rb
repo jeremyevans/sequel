@@ -8,7 +8,7 @@ module Sequel
       module DatabaseMethods
         include Sequel::MSSQL::DatabaseMethods
         LAST_INSERT_ID_SQL='SELECT SCOPE_IDENTITY()'.freeze
-        
+
         # Return the last inserted identity value.
         def execute_insert(sql, opts={})
           synchronize(opts[:server]) do |conn|

@@ -15,7 +15,7 @@ describe "serialization_modification_detection plugin" do
     @o4 = @c.load(:id=>1, :h=>nil)
     MODEL_DB.reset
   end
-  
+
   it "should not detect columns that haven't been changed" do
     @o1.changed_columns.should == []
     @o1.h.should == {}
@@ -29,7 +29,7 @@ describe "serialization_modification_detection plugin" do
     @o2.h.clear
     @o2.changed_columns.should == []
   end
-  
+
   it "should detect columns that have been changed" do
     @o1.changed_columns.should == []
     @o1.h.should == {}
@@ -51,7 +51,7 @@ describe "serialization_modification_detection plugin" do
     @o4.h = {}
     @o4.changed_columns.should == [:h]
   end
-  
+
   it "should report correct changed_columns after saving" do
     @o1.h[1] = 2
     @o1.save

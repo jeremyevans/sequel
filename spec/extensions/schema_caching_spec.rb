@@ -4,7 +4,7 @@ describe "schema_caching extension" do
   before do
     @db = Sequel.mock
     @schemas = {'"table"'=>[[:column, {:db_type=>"integer", :default=>"nextval('table_id_seq'::regclass)", :allow_null=>false, :primary_key=>true, :type=>:integer, :ruby_default=>nil}]]}
-    @filename = "spec/files/test_schema_#$$.dump" 
+    @filename = "spec/files/test_schema_#$$.dump"
     @db.instance_variable_set(:@schemas, @schemas)
   end
   after do

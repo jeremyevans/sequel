@@ -32,7 +32,7 @@
 #
 #   {'foo'=>'bar'}.hstore[:foo] # 'bar'
 #   {'foo'=>'bar'}.hstore.to_hash[:foo] # 'bar'
-# 
+#
 # HStore instances mostly just delegate to the underlying hash
 # instance, so Hash methods that modify the receiver or returned
 # modified copies of the receiver may not do string conversion.
@@ -118,7 +118,7 @@ module Sequel
           end
           @result = hash
         end
-          
+
         private
 
         # Parse and unescape a quoted key/value.

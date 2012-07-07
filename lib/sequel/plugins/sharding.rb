@@ -9,7 +9,7 @@ module Sequel
     #    object.
     # 3) It adds a slightly nicer API for creating model instances on
     #    specific shards.
-    # 
+    #
     # Usage:
     #
     #   # Add the sharding support to all model subclasses (called before loading subclasses)

@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe Sequel::Model, "dataset & schema" do
   before do
     @model = Class.new(Sequel::Model(:items))
-  end 
+  end
 
   specify "sets schema with implicit table name" do
     @model.set_schema do
@@ -109,7 +109,7 @@ describe Sequel::Model, "create_table!" do
     MODEL_DB.reset
     @model = Class.new(Sequel::Model(:items))
   end
-  
+
   it "should drop table if it exists and then create the table" do
     @model.create_table!
     MODEL_DB.sqls.should == ["SELECT NULL FROM items LIMIT 1", 'DROP TABLE items', 'CREATE TABLE items ()']
@@ -121,7 +121,7 @@ describe Sequel::Model, "create_table?" do
     MODEL_DB.reset
     @model = Class.new(Sequel::Model(:items))
   end
-  
+
   it "should not create the table if it already exists" do
     @model.should_receive(:table_exists?).and_return(true)
     @model.create_table?

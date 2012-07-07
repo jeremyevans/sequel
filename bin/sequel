@@ -34,15 +34,15 @@ opts = OptionParser.new do |opts|
     exit
   end
 
-  opts.on("-C", "--copy-databases", "copy one database to another") do 
+  opts.on("-C", "--copy-databases", "copy one database to another") do
     copy_databases = true
   end
-  
-  opts.on("-d", "--dump-migration", "print database migration to STDOUT") do 
+
+  opts.on("-d", "--dump-migration", "print database migration to STDOUT") do
     dump_migration = true
     exclusive_options << :d
   end
-  
+
   opts.on("-D", "--dump-migration-same-db", "print database migration to STDOUT without type translation") do
     dump_migration = :same_db
     exclusive_options << :D
@@ -51,12 +51,12 @@ opts = OptionParser.new do |opts|
   opts.on("-e", "--env ENV", "use environment config for database") do |v|
     env = v
   end
-  
+
   opts.on("-E", "--echo", "echo SQL statements") do
     require 'logger'
     loggers << Logger.new($stdout)
   end
-  
+
   opts.on("-I", "--include dir", "specify $LOAD_PATH directory") do |v|
     $: << v
   end
@@ -65,16 +65,16 @@ opts = OptionParser.new do |opts|
     require 'logger'
     loggers << Logger.new(v)
   end
-  
+
   opts.on("-L", "--load-dir DIR", "loads all *.rb under specifed directory") do |v|
     load_dirs << v
   end
-  
+
   opts.on("-m", "--migrate-directory DIR", "run the migrations in directory") do |v|
     migrate_dir = v
     exclusive_options << :m
   end
-  
+
   opts.on("-M", "--migrate-version VER", "migrate the database to version given") do |v|
     migrate_ver = Integer(v)
   end
@@ -95,7 +95,7 @@ opts = OptionParser.new do |opts|
   opts.on("-t", "--trace", "Output the full backtrace if an exception is raised") do
     backtrace = true
   end
-  
+
   opts.on_tail("-v", "--version", "Show version") do
     puts "sequel #{Sequel.version}"
     exit
@@ -180,7 +180,7 @@ begin
           j = 0
           DB.from(table).each do |record|
             if Time.now - time > 5
-              puts "Status: #{j} records copied" 
+              puts "Status: #{j} records copied"
               time = Time.now
             end
             to_ds.insert(record)
@@ -212,7 +212,7 @@ rescue => e
   error_proc["Error: #{e.class}: #{e.message}#{e.backtrace.first}"]
 end
 
-if !ARGV.empty? 
+if !ARGV.empty?
   ARGV.each{|v| load(v)}
 elsif !$stdin.isatty
   eval($stdin.read)

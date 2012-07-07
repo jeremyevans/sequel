@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-describe "Sequel::Model basic support" do 
+describe "Sequel::Model basic support" do
   before do
     @db = INTEGRATION_DB
     @db.create_table!(:items, :engine=>:InnoDB) do
@@ -21,7 +21,7 @@ describe "Sequel::Model basic support" do
     Item.create(:name=>'J')
     Item.find(:name=>'J').should == Item.load(:id=>1, :name=>'J')
   end
-  
+
   specify ".find_or_create should return first matching item, or create it if it doesn't exist" do
     Item.all.should == []
     Item.find_or_create(:name=>'J').should == Item.load(:id=>1, :name=>'J')
@@ -145,14 +145,14 @@ describe "Sequel::Model basic support" do
     i.save(:num)
     Item.all.should == [Item.load(:id=>1, :name=>'K', :num=>2)]
   end
-  
+
   specify "#save should check that the only a single row is modified, unless require_modification is false" do
     i = Item.create(:name=>'a')
     i.require_modification = true
     i.delete
     proc{i.save}.should raise_error(Sequel::NoExistingObject)
     proc{i.delete}.should raise_error(Sequel::NoExistingObject)
-    
+
     i.require_modification = false
     i.save
     i.delete
@@ -162,12 +162,12 @@ describe "Sequel::Model basic support" do
     i = Item.create(:name=>'J')
     Item.to_hash.should == {1=>Item.load(:id=>1, :name=>'J')}
   end
-  
+
   specify ".to_hash should return a hash keyed on argument if one argument provided" do
     i = Item.create(:name=>'J')
     Item.to_hash(:name).should == {'J'=>Item.load(:id=>1, :name=>'J')}
   end
-  
+
   specify "should be marshallable before and after saving if marshallable! is called" do
     i = Item.new(:name=>'J')
     s = nil
@@ -189,7 +189,7 @@ describe "Sequel::Model basic support" do
     proc{i2 = Marshal.load(s)}.should_not raise_error
     i2.should == i
   end
-  
+
   specify "#lock! should lock records" do
     Item.db.transaction do
       i = Item.create(:name=>'J')
@@ -199,7 +199,7 @@ describe "Sequel::Model basic support" do
   end
 end
 
-describe "Sequel::Model with no existing table" do 
+describe "Sequel::Model with no existing table" do
   specify "should not raise an error when setting the dataset" do
     db = INTEGRATION_DB
     db.drop_table?(:items)

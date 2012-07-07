@@ -22,7 +22,7 @@ describe Sequel::Model, "tree plugin" do
   it "should define the correct associations" do
     @c.associations.sort_by{|x| x.to_s}.should == [:children, :parent]
   end
-  
+
   it "should define the correct associations when giving options" do
     klass(:children=>{:name=>:cs}, :parent=>{:name=>:p}).associations.sort_by{|x| x.to_s}.should == [:cs, :p]
   end
@@ -31,7 +31,7 @@ describe Sequel::Model, "tree plugin" do
     @o.parent_dataset.sql.should == 'SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1'
     @o.children_dataset.sql.should == 'SELECT * FROM nodes WHERE (nodes.parent_id = 2)'
   end
-  
+
   it "should use the correct SQL for lazy associations when giving options" do
     o = klass(:primary_key=>:i, :key=>:pi, :order=>:name, :children=>{:name=>:cs}, :parent=>{:name=>:p}).load(:id=>2, :parent_id=>1, :name=>'AA', :i=>3, :pi=>4)
     o.p_dataset.sql.should == 'SELECT * FROM nodes WHERE (nodes.i = 4) ORDER BY name LIMIT 1'
@@ -74,7 +74,7 @@ describe Sequel::Model, "tree plugin" do
 
   it "should have descendants return the descendants of the current node" do
     @ds._fetch = [[{:id=>3, :parent_id=>2, :name=>'r'}, {:id=>4, :parent_id=>2, :name=>'r2'}], [{:id=>5, :parent_id=>4, :name=>'r3'}], []]
-    @o.descendants.should == [@c.load(:id=>3, :parent_id=>2, :name=>'r'), @c.load(:id=>4, :parent_id=>2, :name=>'r2'), @c.load(:id=>5, :parent_id=>4, :name=>'r3')] 
+    @o.descendants.should == [@c.load(:id=>3, :parent_id=>2, :name=>'r'), @c.load(:id=>4, :parent_id=>2, :name=>'r2'), @c.load(:id=>5, :parent_id=>4, :name=>'r3')]
     @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.parent_id = 2)",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 3)",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 5)",
@@ -99,14 +99,14 @@ describe Sequel::Model, "tree plugin" do
 
   it "should have self_and_siblings return the children of the current node's parent" do
     @ds._fetch = [[{:id=>1, :parent_id=>3, :name=>'r'}], [{:id=>7, :parent_id=>1, :name=>'r2'}, @o.values.dup]]
-    @o.self_and_siblings.should == [@c.load(:id=>7, :parent_id=>1, :name=>'r2'), @o] 
+    @o.self_and_siblings.should == [@c.load(:id=>7, :parent_id=>1, :name=>'r2'), @o]
     @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 1)"]
   end
 
   it "should have siblings return the children of the current node's parent, except for the current node" do
     @ds._fetch = [[{:id=>1, :parent_id=>3, :name=>'r'}], [{:id=>7, :parent_id=>1, :name=>'r2'}, @o.values.dup]]
-    @o.siblings.should == [@c.load(:id=>7, :parent_id=>1, :name=>'r2')] 
+    @o.siblings.should == [@c.load(:id=>7, :parent_id=>1, :name=>'r2')]
     @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 1)"]
   end

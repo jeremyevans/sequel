@@ -13,7 +13,7 @@ describe Sequel::Model, "TypecastOnLoad plugin" do
         super
       end
     end
-  end 
+  end
 
   specify "should call setter method with value when loading the object, for all given columns" do
     @c.plugin :typecast_on_load, :b
@@ -60,7 +60,7 @@ describe Sequel::Model, "TypecastOnLoad plugin" do
     @c.add_typecast_on_load_columns :y
     @c.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>1, :y=>false}
     c2.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>1, :y=>"0"}
-    
+
     c1.add_typecast_on_load_columns :y
     c1.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>"1", :y=>false}
   end

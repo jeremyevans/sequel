@@ -36,20 +36,20 @@ module Sequel
             $1.to_i
           end
         end
-        
+
         # Derby supports transaction DDL statements.
         def supports_transactional_ddl?
           true
         end
 
         private
-        
+
         # Derby optimizes away Sequel's default check of SELECT NULL FROM table,
         # so use a SELECT * FROM table there.
         def _table_exists?(ds)
           ds.first
         end
-    
+
         # Derby-specific syntax for renaming columns and changing a columns type/nullity.
         def alter_table_sql(table, op)
           case op[:op]
@@ -74,7 +74,7 @@ module Sequel
         def column_definition_null_sql(sql, column)
           sql << " NOT NULL" if column.fetch(:null, column[:allow_null]) == false
         end
-    
+
         # Add NOT LOGGED for temporary tables to improve performance.
         def create_table_sql(name, generator, options)
           s = super
@@ -139,7 +139,7 @@ module Sequel
           end
         end
       end
-      
+
       # Dataset class for Derby datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         PAREN_CLOSE = Dataset::PAREN_CLOSE

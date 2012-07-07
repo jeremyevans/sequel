@@ -28,7 +28,7 @@
 #    Since it will use the following SQL (which isn't valid):
 #
 #      SELECT a, b FROM table ORDER BY $1, $2
-#     
+#
 #    To work around this, you can either specify the columns
 #    manually or use a literal string:
 #

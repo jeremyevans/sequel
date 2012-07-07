@@ -40,7 +40,7 @@ module Sequel
 
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
       rc, NullHandle = DB2CLI.SQLAllocHandle(DB2CLI::SQL_HANDLE_ENV, DB2CLI::SQL_NULL_HANDLE)
-      
+
       # Hash of connection procs for converting
       attr_reader :conversion_procs
 
@@ -56,7 +56,7 @@ module Sequel
         checked_error("Could not connect to database"){DB2CLI.SQLConnect(dbc, opts[:database], opts[:user], opts[:password])}
         dbc
       end
-      
+
       def execute(sql, opts={}, &block)
         synchronize(opts[:server]){|conn| log_connection_execute(conn, sql, &block)}
       end
@@ -70,7 +70,7 @@ module Sequel
             name, buflen, datatype, size, digits, nullable = checked_error("Could not describe column"){DB2CLI.SQLDescribeCol(sth, 1, 256)}
             if DB2CLI.SQLFetch(sth) != DB2CLI::SQL_NO_DATA_FOUND
               v, _ = checked_error("Could not get data"){DB2CLI.SQLGetData(sth, 1, datatype, size)}
-              if v.is_a?(String) 
+              if v.is_a?(String)
                 return v.to_i
               else
                 return nil
@@ -79,7 +79,7 @@ module Sequel
           end
         end
       end
-      
+
       ERROR_MAP = {}
       %w'SQL_INVALID_HANDLE SQL_STILL_EXECUTING SQL_ERROR'.each do |s|
         ERROR_MAP[DB2CLI.const_get(s)] = s
@@ -128,13 +128,13 @@ module Sequel
       def commit_transaction(conn, opts={})
         log_yield(TRANSACTION_COMMIT){DB2CLI.SQLEndTran(DB2CLI::SQL_HANDLE_DBC, conn, DB2CLI::SQL_COMMIT)}
       end
-    
+
       def log_connection_execute(conn, sql)
         sth = checked_error("Could not allocate statement"){DB2CLI.SQLAllocHandle(DB2CLI::SQL_HANDLE_STMT, conn)}
 
         begin
           checked_error("Could not execute statement: #{sql}"){log_yield(sql){DB2CLI.SQLExecDirect(sth, sql)}}
-          
+
           if block_given?
             yield(sth)
           else
@@ -147,7 +147,7 @@ module Sequel
 
       # Convert smallint type to boolean if convert_smallint_to_bool is true
       def schema_column_type(db_type)
-        if DB2.convert_smallint_to_bool && db_type =~ /smallint/i 
+        if DB2.convert_smallint_to_bool && db_type =~ /smallint/i
           :boolean
         else
           super
@@ -159,13 +159,13 @@ module Sequel
         checked_error("Could not free Database handle"){DB2CLI.SQLFreeHandle(DB2CLI::SQL_HANDLE_DBC, conn)}
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include DatasetMethods
 
       Database::DatasetClass = self
       MAX_COL_SIZE = 256
-      
+
       # Whether to convert smallint to boolean arguments for this dataset.
       # Defaults to the DB2 module setting.
       def convert_smallint_to_bool
@@ -204,7 +204,7 @@ module Sequel
         end
         self
       end
-      
+
       private
 
       def get_column_info(sth)
@@ -213,7 +213,7 @@ module Sequel
         convert = convert_smallint_to_bool
         cps = db.conversion_procs
 
-        (1..column_count).map do |i| 
+        (1..column_count).map do |i|
           name, buflen, datatype, size, digits, nullable = db.checked_error("Could not describe column"){DB2CLI.SQLDescribeCol(sth, i, MAX_COL_SIZE)}
           pr = if datatype == DB2CLI::SQL_SMALLINT && convert && size <= 5 && digits <= 1
             cps[:boolean]
@@ -221,7 +221,7 @@ module Sequel
             cps[datatype]
           end
           [i, output_identifier(name), datatype, size, pr]
-        end 
+        end
       end
     end
   end

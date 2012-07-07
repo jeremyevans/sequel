@@ -2,9 +2,9 @@ module Sequel
   # Hash of adapters that have been used. The key is the adapter scheme
   # symbol, and the value is the Database subclass.
   ADAPTER_MAP = {}
-    
+
   # Array of all databases to which Sequel has connected.  If you are
-  # developing an application that can connect to an arbitrary number of 
+  # developing an application that can connect to an arbitrary number of
   # databases, delete the database objects from this or they will not get
   # garbage collected.
   DATABASES = []

@@ -5,7 +5,7 @@
   callable objects.  You can also register custom deserializers
   via Sequel::Plugins::Serialization.register_format, so that
   they can be referenced by name.  Example:
-  
+
     Sequel::Plugins::Serialization.register_format(:reverse,
       lambda{|v| v.reverse},
       lambda{|v| v.reverse})
@@ -19,13 +19,13 @@
   inserted row.  Usage of this option on MySQL requires that a
   separate query be issued per row (instead of the single
   query for all rows that MySQL would usually use).
-  
+
 * PostgreSQL can now use Dataset#returning in conjunction with
   import/multi_insert to set a custom column to return.
-  
+
 * Microsoft SQL Server can now use Dataset#output in conjection with
   import/multi_insert to set a custom column to return.
-  
+
 * Dataset#import and #multi_insert now respect a :server option to
   set the server/shard on which to execute the queries.
   Additionally, options given to this method are also passed to
@@ -45,7 +45,7 @@
   foreign key column, using the :key_column option.  Use of this
   feature is not recommended, as it is much better to either rename
   the column or rename the association.  Here's an example of usage:
-  
+
     # Example schema:
     #  albums           artists
     #   :id        /-->  :id
@@ -66,7 +66,7 @@
   Server.  Before using it, you must have previously setup a default
   full text search catalog, and you need to provide a :key_index
   option with an index name symbol.
-  
+
 * Dataset#group_rollup and #group_cube methods have been added for
   GROUP BY ROLLUP and GROUP BY CUBE support.  These features are in
   a recent SQL standard, and they are supported to various degrees on
@@ -74,7 +74,7 @@
 
 * Dataset#full_text_search on Microsoft SQL Server now supports
   multiple search terms.
-  
+
 * The jdbc adapter now supports a :login_timeout option, giving the
   timeout in seconds.
 
@@ -85,7 +85,7 @@
 
 * Dataset#full_text_search can now be used with prepared statement
   placeholders on PostgreSQL, MySQL, and Microsoft SQL Server.
-  
+
 * If tables from two separate schema are detected when parsing the
   schema for a table on PostgreSQL, an error is now raised.
   Previously, no error was raised, which led to weird errors later,
@@ -98,14 +98,14 @@
 * The shared postgres adapter now correctly handles the return value
   for Dataset#insert if you provide a separate column array and value
   array on PostgreSQL < 8.2.
-  
+
 * Handle case in the PostgreSQL adapter where the server version
   cannot be determined via a query.
-  
+
 * H2 clob types are now treated as string instead of as blob.
   Treating clob as blob breaks on H2, as it doesn't automatically
   hex-unescape the input for clobs as it does for blobs.
-  
+
 * Dataset#empty? now works correctly when the dataset has an offset
   and offset support is being emulated.
 
@@ -118,7 +118,7 @@
   LiteralString, which could potentially break some code.  If you
   would like a String returned, you can pass the returned object to
   Dataset#literal:
-  
+
     dataset.literal(dataset.exists)
 
 * Dataset#from no longer handles :a__b__c___d as "a.b.c AS d".  This
@@ -128,13 +128,13 @@
   people in very rare cases, as most databases don't use three level
   qualified tables.  One exception is Microsoft SQL Server, which can
   use three level qualified tables for cross-database access.
-  
+
 * Previously, Dataset#insert_multiple returned an array of hashes, now
   it returns an array of primary key values.
 
 * Dataset#EXRACT_CLOSE in the shared sqlite adapter has been renamed to
   Dataset#EXTRACT_CLOSE.
-  
+
 * Dataset::StoredProcedureMethods::SQL_QUERY_TYPE and
   Dataset::ArgumentMapper::SQL_QUERY_TYPE constants have been removed,
   as have related sql_query_type private methods.

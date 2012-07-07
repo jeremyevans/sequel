@@ -98,7 +98,7 @@ describe "Sequel::Plugins::ManyToOnePkLookup" do
       end
       cache = @cache_class.new
       @cache = cache
-      
+
       @cc.plugin :caching, @cache
       @cc.dataset._fetch = {:id=>1}
       @cm1 = @cc[1]

@@ -84,7 +84,7 @@ module Sequel
         # :min_size :: The minimum size (low water mark) for the cache.  On
         #              cleanup, the size of the cache is reduced to this
         #              number.  Note that there could be fewer than this
-        #              number of entries in the cache.  Defaults to :max_size/2. 
+        #              number of entries in the cache.  Defaults to :max_size/2.
         # :prepare_after :: The number of executions to wait for before preparing
         #              the query server-side.  If set to 1, prepares all executed
         #              queries server-side.  If set to 5, does not attempt to
@@ -94,11 +94,11 @@ module Sequel
         #            Comparable (usually a numeric) such that the lowest values
         #            returned are the first to be removed when it comes time to
         #            clean the pool.  The default is basically:
-        #             
+        #
         #              lambda{|t, stmt| (stmt.last_seen - t)/stmt.num_executes}
         #
         #            so that it doesn't remove statements that have been executed
-        #            many times just because many less-frequently executed statements 
+        #            many times just because many less-frequently executed statements
         #            have been executed recently.
         #
         # The block passed is called with the Statement object's name, only for
@@ -117,7 +117,7 @@ module Sequel
           # about to be added brings us to the min_size.
           @size_diff = @max_size - @min_size + 1
         end
-        
+
         # Completely clear the statement cache, deallocating on
         # the server side all statements that have been prepared.
         def clear
@@ -267,7 +267,7 @@ module Sequel
           end
         end
       end
-      
+
       module DatabaseMethods
         # Setup the after_connect proc for the connection pool to make
         # sure the connection object is extended with the appropriate

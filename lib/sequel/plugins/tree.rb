@@ -1,9 +1,9 @@
 module Sequel
   module Plugins
-    # The Tree plugin adds additional associations and methods that allow you to 
-    # treat a Model as a tree.  
+    # The Tree plugin adds additional associations and methods that allow you to
+    # treat a Model as a tree.
     #
-    # A column for holding the parent key is required and is :parent_id by default.  
+    # A column for holding the parent key is required and is :parent_id by default.
     # This may be overridden by passing column name via :key
     #
     # Optionally, a column to control order of nodes returned can be specified
@@ -11,13 +11,13 @@ module Sequel
     #
     # If you pass true for the :single_root option, the class will ensure there is
     # only ever one root in the tree.
-    # 
+    #
     # Examples:
     #
     #   class Node < Sequel::Model
     #     plugin :tree
     #   end
-    #  
+    #
     #   class Node < Sequel::Model
     #     plugin :tree, :key=>:parentid, :order=>:position
     #   end
@@ -35,22 +35,22 @@ module Sequel
           @parent_column = (opts[:key] ||= :parent_id)
           @tree_order = opts[:order]
         end
-        
+
         par = opts.merge(opts.fetch(:parent, {}))
         parent = par.fetch(:name, :parent)
         model.many_to_one parent, par
-        
+
         chi = opts.merge(opts.fetch(:children, {}))
         children = chi.fetch(:name, :children)
         model.one_to_many children, chi
 
         model.plugin SingleRoot if opts[:single_root]
       end
-      
+
       module ClassMethods
         # The column symbol or array of column symbols on which to order the tree.
         attr_accessor :tree_order
-        
+
         # The symbol for the column containing the value pointing to the
         # parent of the leaf.
         attr_accessor :parent_column
@@ -59,7 +59,7 @@ module Sequel
         def inherited(subclass)
           super
           subclass.parent_column = parent_column
-          subclass.tree_order = tree_order 
+          subclass.tree_order = tree_order
         end
 
         # Returns list of all root nodes (those with no parent nodes).
@@ -68,7 +68,7 @@ module Sequel
         def roots
           roots_dataset.all
         end
-        
+
         # Returns the dataset for retrieval of all root nodes
         #
         #   TreeClass.roots_dataset => Sequel#Dataset
@@ -78,7 +78,7 @@ module Sequel
           ds
         end
       end
-      
+
       module InstanceMethods
         # Returns list of ancestors, starting from parent until root.
         #
@@ -95,7 +95,7 @@ module Sequel
         def descendants
           nodes = children.dup
           nodes.each{|child| nodes.concat(child.descendants)}
-          nodes 
+          nodes
         end
 
         # Returns the root node of the tree that this node descends from

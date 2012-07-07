@@ -8,9 +8,9 @@ module Sequel
       # Database instance methods for Informix databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::Informix::DatabaseMethods
-        
+
         private
-        
+
         # TODO: implement
         def last_insert_id(conn, opts={})
           nil

@@ -4,7 +4,7 @@ module Sequel
     # :section: 7 - Miscellaneous methods
     # These methods don't fit neatly into another category.
     # ---------------------
-    
+
     # Hash of extension name symbols to callable objects to load the extension
     # into the Database object (usually by extending it with a module defined
     # in the extension).
@@ -28,7 +28,7 @@ module Sequel
     end
 
     # Converts a uri to an options hash. These options are then passed
-    # to a newly created database object. 
+    # to a newly created database object.
     def self.uri_to_options(uri)
       { :user => uri.user,
         :password => uri.password,
@@ -37,13 +37,13 @@ module Sequel
         :database => (m = /\/(.*)/.match(uri.path)) && (m[1]) }
     end
     private_class_method :uri_to_options
-    
+
     # The options hash for this database
     attr_reader :opts
-    
+
     # Set the timezone to use for this database, overridding <tt>Sequel.database_timezone</tt>.
     attr_writer :timezone
-    
+
     # Constructs a new instance of a database connection with the specified
     # options hash.
     #
@@ -55,7 +55,7 @@ module Sequel
     # :logger :: A specific logger to use
     # :loggers :: An array of loggers to use
     # :quote_identifiers :: Whether to quote identifiers
-    # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol 
+    # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol
     # :single_threaded :: Whether to use a single-threaded connection pool
     # :sql_log_level :: Method to use to log SQL to a logger, :info by default.
     #
@@ -70,7 +70,7 @@ module Sequel
       block ||= proc{|server| connect(server)}
       @opts[:servers] = {} if @opts[:servers].is_a?(String)
       @opts[:adapter_class] = self.class
-      
+
       @opts[:single_threaded] = @single_threaded = typecast_value_boolean(@opts.fetch(:single_threaded, @@single_threaded))
       @schemas = {}
       @default_schema = @opts.fetch(:default_schema, default_schema_default)
@@ -105,7 +105,7 @@ module Sequel
         end
       end
     end
-    
+
     # If a transaction is not currently in progress, ignore the block.
     # Otherwise, add the block to the list of the blocks to call after the currently
     # in progress transaction rolls back (and only if it rolls back).
@@ -120,7 +120,7 @@ module Sequel
         end
       end
     end
-    
+
     # Cast the given type to a literal type
     #
     #   DB.cast_type_literal(Float) # double precision
@@ -267,20 +267,20 @@ module Sequel
         raise Sequel.convert_exception_class(e, InvalidValue)
       end
     end
-    
+
     # Returns the URI use to connect to the database.  If a URI
     # was not used when connecting, returns nil.
     def uri
       opts[:uri]
     end
-    
+
     # Explicit alias of uri for easier subclassing.
     def url
       uri
     end
-    
+
     private
-    
+
     # Returns true when the object is considered blank.
     # The only objects that are blank are nil, false,
     # strings with all whitespace, and ones that respond
@@ -298,7 +298,7 @@ module Sequel
         obj.respond_to?(:empty?) ? obj.empty? : false
       end
     end
-    
+
     # Which transaction errors to translate, blank by default.
     def database_error_classes
       []
@@ -308,7 +308,7 @@ module Sequel
     def disconnect_error?(exception, opts)
       opts[:disconnect]
     end
-    
+
     # Convert the given exception to a DatabaseError, keeping message
     # and traceback.
     def raise_error(exception, opts={})
@@ -318,7 +318,7 @@ module Sequel
         raise exception
       end
     end
-    
+
     # Typecast the value to an SQL::Blob
     def typecast_value_blob(value)
       value.is_a?(Sequel::SQL::Blob) ? value : Sequel::SQL::Blob.new(value)
@@ -382,7 +382,7 @@ module Sequel
       end
     else
       # Replacement string when replacing leading zeroes.
-      LEADING_ZERO_REP = "\\1".freeze 
+      LEADING_ZERO_REP = "\\1".freeze
       # Typecast the value to an Integer
       def typecast_value_integer(value)
         Integer(value.is_a?(String) ? value.sub(LEADING_ZERO_RE, LEADING_ZERO_REP) : value)

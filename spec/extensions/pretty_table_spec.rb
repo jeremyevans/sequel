@@ -35,7 +35,7 @@ describe "PrettyTable" do
     @data1 = [
       {:x => 3, :y => 4}
     ]
-    
+
     @data2 = [
       {:a => 23, :b => 45},
       {:a => 45, :b => 2377}
@@ -55,20 +55,20 @@ describe "PrettyTable" do
   after do
     $stdout = @orig_stdout
   end
-  
+
   specify "should infer the columns if not given" do
     Sequel::PrettyTable.print(@data1)
     @output.rewind
     @output.read.should =~ \
       /\n(\|x\|y\|)|(\|y\|x\|)\n/
   end
-  
+
   specify "should have #string return the string without printing" do
     Sequel::PrettyTable.string(@data1).should =~ /\n(\|x\|y\|)|(\|y\|x\|)\n/
     @output.rewind
     @output.read.should == ''
   end
-  
+
   specify "should calculate the maximum width of each column correctly" do
     Sequel::PrettyTable.print(@data2, [:a, :b])
     @output.rewind
@@ -82,7 +82,7 @@ describe "PrettyTable" do
     @output.read.should == \
       "+---+--+-+\n|aaa|bb|c|\n+---+--+-+\n|  1|  | |\n|   | 2| |\n|   |  |3|\n+---+--+-+\n"
   end
-  
+
   specify "should print only the specified columns" do
     Sequel::PrettyTable.print(@data2, [:a])
     @output.rewind

@@ -41,7 +41,7 @@ module Sequel
     #       <name>YJM</name>
     #     </artist>
     #   </album>
-    # 
+    #
     # You can use a hash value with <tt>:include</tt> to pass options
     # to associations:
     #
@@ -191,7 +191,7 @@ module Sequel
           from_xml_node(Nokogiri::XML(xml).children.first, opts)
         end
 
-        # Update the contents of this instance based on the given 
+        # Update the contents of this instance based on the given
         # XML node, which should be a Nokogiri::XML::Node instance.
         def from_xml_node(parent, opts={})
           cols = model.columns.map{|x| x.to_s}

@@ -19,7 +19,7 @@ module Sequel
     def [](*args)
       (String === args.first) ? fetch(*args) : from(*args)
     end
-    
+
     # Returns a blank dataset for this database.
     #
     #   DB.dataset # SELECT *
@@ -46,7 +46,7 @@ module Sequel
       ds.each(&block) if block
       ds
     end
-    
+
     # Returns a new dataset with the +from+ method invoked. If a block is given,
     # it is used as a filter on the dataset.
     #
@@ -56,7 +56,7 @@ module Sequel
       ds = dataset.from(*args)
       block ? ds.filter(&block) : ds
     end
-    
+
     # Returns a new dataset with the select method invoked.
     #
     #   DB.select(1) # SELECT 1

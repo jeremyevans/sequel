@@ -1,4 +1,4 @@
-= Database Transactions 
+= Database Transactions
 
 Sequel uses autocommit mode by default for all of its database adapters, so in general in Sequel if you want to use database transactions, you need to be explicit about it.  There are a few cases where transactions are used implicitly by default:
 
@@ -17,7 +17,7 @@ In Sequel, the <tt>Database#transaction</tt> method should be called if you want
   DB.transaction do # BEGIN
     DB[:foo].insert(1) # INSERT
   end # COMMIT
-   
+
 If the block raises a Sequel::Rollback exception, the transaction is rolled back, but no exception is raised outside the block:
 
   DB.transaction do # BEGIN
@@ -64,7 +64,7 @@ You can add hooks to an in progress transaction that are called after the transa
     x # nil
   end
   x # 1
-  
+
   x = nil
   DB.transaction do
     DB.after_commit{x = 1}
@@ -118,7 +118,7 @@ To use prepared transactions in Sequel, you provide a string as the value of the
   DB.transaction(:prepare => 'foo') do # BEGIN
     DB[:foo].insert(1) # INSERT
   end # PREPARE TRANSACTION 'foo'
-   
+
 Later, you can commit the prepared transaction:
 
   DB.commit_prepared_transaction('foo')

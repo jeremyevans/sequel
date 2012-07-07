@@ -7,13 +7,13 @@ module Sequel
     #   # column b default 2
     #   album = Album.new.values # {:b => 2}
     #   album = Album.new(:a=>1, :b=>3).values # {:a => 1, :b => 3}
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances set defaults (called before loading subclasses)
     #   Sequel::Model.plugin :defaults_setter
     #
-    #   # Make the Album class set defaults 
+    #   # Make the Album class set defaults
     #   Album.plugin :defaults_setter
     module DefaultsSetter
       # Set the default values based on the model schema
@@ -27,7 +27,7 @@ module Sequel
         # to get the value, otherwise the value will be used directly.  You can manually modify
         # this hash to set specific default values, by default the ones will be parsed from the database.
         attr_reader :default_values
-        
+
         # Set the default values when loading the dataset.
         def set_dataset(*)
           x = super

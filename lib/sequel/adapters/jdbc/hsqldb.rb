@@ -30,9 +30,9 @@ module Sequel
             end
           end
         end
-        
+
         private
-        
+
         # HSQLDB specific SQL for renaming columns, and changing column types and/or nullity.
         def alter_table_sql(table, op)
           case op[:op]
@@ -61,7 +61,7 @@ module Sequel
             rs.getInt(1)
           end
         end
-        
+
         # Primary key indexes appear to start with sys_idx_sys_pk_ on HSQLDB
         def primary_key_index_re
           PRIMARY_KEY_INDEX_RE
@@ -84,7 +84,7 @@ module Sequel
           end
         end
       end
-      
+
       # Dataset class for HSQLDB datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
@@ -173,7 +173,7 @@ module Sequel
             sql << DEFAULT_FROM
           end
         end
-        
+
         # Use WITH RECURSIVE instead of WITH if any of the CTEs is recursive
         def select_with_sql_base
           opts[:with].any?{|w| w[:recursive]} ? SQL_WITH_RECURSIVE : super

@@ -8,7 +8,7 @@ module Sequel
     module JavaLang
       include_package 'java.lang'
     end
-    
+
     # Make it accesing the java.sql hierarchy more ruby friendly.
     module JavaSQL
       include_package 'java.sql'
@@ -22,11 +22,11 @@ module Sequel
     # Used to identify a jndi connection and to extract the jndi
     # resource name.
     JNDI_URI_REGEXP = /\Ajdbc:jndi:(.+)/
-    
+
     # The types to check for 0 scale to transform :decimal types
     # to :integer.
     DECIMAL_TYPE_RE = /number|numeric|decimal/io
-    
+
     # Contains procs keyed on sub adapter type that extend the
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {:postgresql=>proc do |db|
@@ -124,7 +124,7 @@ module Sequel
         com.progress.sql.jdbc.JdbcProgressDriver
       end
     }
-    
+
     # Allowing loading the necessary JDBC support via a gem, which
     # works for PostgreSQL, MySQL, and SQLite.
     def self.load_gem(name)
@@ -139,13 +139,13 @@ module Sequel
     # much based on the sub adapter.
     class Database < Sequel::Database
       set_adapter_scheme :jdbc
-      
+
       # The type of database we are connecting to
       attr_reader :database_type
-      
+
       # The Java database driver we are using
       attr_reader :driver
-      
+
       # Whether to convert some Java types to ruby types when retrieving rows.
       # True by default, can be set to false to roughly double performance when
       # fetching rows.
@@ -161,14 +161,14 @@ module Sequel
         @connection_prepared_statements_mutex = Mutex.new
         @convert_types = typecast_value_boolean(@opts.fetch(:convert_types, true))
         raise(Error, "No connection string specified") unless uri
-        
+
         resolved_uri = jndi? ? get_uri_from_jndi : uri
 
         if match = /\Ajdbc:([^:]+)/.match(resolved_uri) and prok = DATABASE_SETUP[match[1].to_sym]
           @driver = prok.call(self)
-        end        
+        end
       end
-      
+
       # Execute the given stored procedure with the give name. If a block is
       # given, the stored procedure should return rows.
       def call_sproc(name, opts = {})
@@ -199,7 +199,7 @@ module Sequel
           end
         end
       end
-         
+
       # Connect to the database using JavaSQL::DriverManager.getConnection.
       def connect(server)
         opts = server_opts(server)
@@ -233,7 +233,7 @@ module Sequel
         end
         setup_connection(conn)
       end
-      
+
       # Execute the given SQL.  If a block is given, if should be a SELECT
       # statement or something else that returns rows.
       def execute(sql, opts={}, &block)
@@ -264,19 +264,19 @@ module Sequel
         end
       end
       alias execute_dui execute
-      
+
       # Execute the given DDL SQL, which should not return any
       # values or rows.
       def execute_ddl(sql, opts={})
         execute(sql, {:type=>:ddl}.merge(opts))
       end
-      
+
       # Execute the given INSERT SQL, returning the last inserted
       # row id.
       def execute_insert(sql, opts={})
         execute(sql, {:type=>:insert}.merge(opts))
       end
-      
+
       # Use the JDBC metadata to get the index information for the table.
       def indexes(table, opts={})
         m = output_identifier_meth
@@ -288,23 +288,23 @@ module Sequel
         indexes = {}
         metadata(:getIndexInfo, nil, schema, table, false, true) do |r|
           next unless name = r[:column_name]
-          next if respond_to?(:primary_key_index_re, true) and r[:index_name] =~ primary_key_index_re 
+          next if respond_to?(:primary_key_index_re, true) and r[:index_name] =~ primary_key_index_re
           i = indexes[m.call(r[:index_name])] ||= {:columns=>[], :unique=>[false, 0].include?(r[:non_unique])}
           i[:columns] << m.call(name)
         end
         indexes
-      end 
+      end
 
       # Whether or not JNDI is being used for this connection.
       def jndi?
         !!(uri =~ JNDI_URI_REGEXP)
       end
-      
+
       # All tables in this database
       def tables(opts={})
         get_tables('TABLE', opts)
       end
-      
+
       # The uri for this connection.  You can specify the uri
       # using the :uri, :url, or :database options.  You don't
       # need to worry about this if you use Sequel.connect
@@ -321,7 +321,7 @@ module Sequel
       end
 
       private
-         
+
       # Yield the native prepared statements hash for the given connection
       # to the block in a thread-safe manner.
       def cps_sync(conn, &block)
@@ -333,7 +333,7 @@ module Sequel
         @connection_prepared_statements_mutex.synchronize{@connection_prepared_statements.delete(c)}
         c.close
       end
-      
+
       # Raise a disconnect error if the SQL state of the cause of the exception indicates so.
       def disconnect_error?(exception, opts)
         cause = exception.respond_to?(:cause) ? exception.cause : exception
@@ -399,7 +399,7 @@ module Sequel
         jndi_name = JNDI_URI_REGEXP.match(uri)[1]
         JavaxNaming::InitialContext.new.lookup(jndi_name).connection
       end
-            
+
       # Gets the JDBC connection uri from the JNDI resource.
       def get_uri_from_jndi
         conn = get_connection_from_jndi
@@ -407,7 +407,7 @@ module Sequel
       ensure
         conn.close if conn
       end
-      
+
       # Backbone of the tables and views support.
       def get_tables(type, opts)
         ts = []
@@ -433,8 +433,8 @@ module Sequel
         ts = java.sql.Timestamp.new(time.to_i * 1000)
         ts.setNanos(RUBY_VERSION >= '1.9.0' ? time.nsec : time.usec * 1000)
         ts
-      end 
-      
+      end
+
       # Log the given SQL and then execute it on the connection, used by
       # the transaction code.
       def log_connection_execute(conn, sql)
@@ -447,7 +447,7 @@ module Sequel
       def last_insert_id(conn, opts)
         nil
       end
-      
+
       # Yield the metadata for this database
       def metadata(*args, &block)
         synchronize do |c|
@@ -492,13 +492,13 @@ module Sequel
           cps.setObject(i, arg)
         end
       end
-      
+
       # Return the connection.  Used to do configuration on the
       # connection object before adding it to the connection pool.
       def setup_connection(conn)
         conn
       end
-      
+
       # Parse the table schema for the given table.
       def schema_parse_table(table, opts={})
         m = output_identifier_meth(opts[:dataset])
@@ -523,7 +523,7 @@ module Sequel
         end
         ts
       end
-      
+
       # Whether schema_parse_table should skip the given row when
       # parsing the schema.
       def schema_parse_table_skip?(h, schema)
@@ -547,61 +547,61 @@ module Sequel
         false
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include StoredProcedures
 
       Database::DatasetClass = self
-      
+
       # Use JDBC PreparedStatements instead of emulated ones.  Statements
       # created using #prepare are cached at the connection level to allow
       # reuse.  This also supports bind variables by using unnamed
       # prepared statements created using #call.
       module PreparedStatementMethods
         include Sequel::Dataset::UnnumberedArgumentMapper
-        
+
         private
-        
+
         # Execute the prepared SQL using the stored type and
         # arguments derived from the hash passed to call.
         def execute(sql, opts={}, &block)
           super(self, {:arguments=>bind_arguments}.merge(opts), &block)
         end
-        
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts={}, &block)
           super(self, {:arguments=>bind_arguments}.merge(opts), &block)
         end
-        
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_insert(sql, opts={}, &block)
           super(self, {:arguments=>bind_arguments, :type=>:insert}.merge(opts), &block)
         end
       end
-      
+
       # Use JDBC CallableStatements to execute stored procedures.  Only supported
       # if the underlying database has stored procedure support.
       module StoredProcedureMethods
         include Sequel::Dataset::StoredProcedureMethods
-        
+
         private
-        
+
         # Execute the database stored procedure with the stored arguments.
         def execute(sql, opts={}, &block)
           super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
         end
-        
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts={}, &block)
           super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
         end
-        
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_insert(sql, opts={}, &block)
           super(@sproc_name, {:args=>@sproc_args, :sproc=>true, :type=>:insert}.merge(opts), &block)
         end
       end
-      
+
       # Whether to convert some Java types to ruby types when retrieving rows.
       # Uses the database's setting by default, can be set to false to roughly
       # double performance when fetching rows.
@@ -612,7 +612,7 @@ module Sequel
         execute(sql){|result| process_result_set(result, &block)}
         self
       end
-      
+
       # Create a named prepared statement that is stored in the
       # database (and connection) for reuse.
       def prepare(type, name=nil, *values)
@@ -624,7 +624,7 @@ module Sequel
         end
         ps
       end
-      
+
       private
 
       # Cache Java class constants to speed up lookups
@@ -699,12 +699,12 @@ module Sequel
           false
         end
       end
-      
+
       # Extend the dataset with the JDBC stored procedure methods.
       def prepare_extend_sproc(ds)
         ds.extend(StoredProcedureMethods)
       end
-      
+
       # Split out from fetch rows to allow processing of JDBC result sets
       # that don't come from issuing an SQL string.
       def process_result_set(result, &block)
@@ -742,7 +742,7 @@ module Sequel
       # * if a conversion proc is not false/nil, call it with the object
       #   and return the result.
       # * if a conversion proc has already been looked up and doesn't
-      #   exist (false value), return object.  
+      #   exist (false value), return object.
       # * if a conversion proc hasn't been looked up yet (nil value),
       #   call convert_type_proc to get the conversion method.  Cache
       #   the result of as the column's conversion proc to speed up

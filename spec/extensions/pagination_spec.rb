@@ -4,45 +4,45 @@ describe "A paginated dataset" do
   before do
     @d = Sequel::Dataset.new(nil)
     @d.meta_def(:count) {153}
-    
+
     @paginated = @d.paginate(1, 20)
   end
-  
+
   specify "should raise an error if the dataset already has a limit" do
     proc{@d.limit(10).paginate(1,10)}.should raise_error(Sequel::Error)
     proc{@paginated.paginate(2,20)}.should raise_error(Sequel::Error)
   end
-  
+
   specify "should set the limit and offset options correctly" do
     @paginated.opts[:limit].should == 20
     @paginated.opts[:offset].should == 0
   end
-  
+
   specify "should set the page count correctly" do
     @paginated.page_count.should == 8
     @d.paginate(1, 50).page_count.should == 4
   end
-  
+
   specify "should set the current page number correctly" do
     @paginated.current_page.should == 1
     @d.paginate(3, 50).current_page.should == 3
   end
-  
+
   specify "should return the next page number or nil if we're on the last" do
     @paginated.next_page.should == 2
     @d.paginate(4, 50).next_page.should be_nil
   end
-  
+
   specify "should return the previous page number or nil if we're on the first" do
     @paginated.prev_page.should be_nil
     @d.paginate(4, 50).prev_page.should == 3
   end
-  
+
   specify "should return the page range" do
     @paginated.page_range.should == (1..8)
     @d.paginate(4, 50).page_range.should == (1..4)
   end
-  
+
   specify "should return the record range for the current page" do
     @paginated.current_page_record_range.should == (1..20)
     @d.paginate(4, 50).current_page_record_range.should == (151..153)
@@ -81,11 +81,11 @@ describe "Dataset#each_page" do
     @d = Sequel::Dataset.new(nil).from(:items)
     @d.meta_def(:count) {153}
   end
-  
+
   specify "should raise an error if the dataset already has a limit" do
     proc{@d.limit(10).each_page(10){}}.should raise_error(Sequel::Error)
   end
-  
+
   specify "should iterate over each page in the resultset as a paginated dataset" do
     a = []
     @d.each_page(50) {|p| a << p}

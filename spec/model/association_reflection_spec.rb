@@ -81,7 +81,7 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
     ParParentTwo.association_reflection(:par_parents).reciprocal.should == :par_parent_twos
     ParParentThree.association_reflection(:par_parents).reciprocal.should == :par_parent_threes
   end
-  
+
   it "should handle composite keys" do
     ParParent.many_to_one :par_parent_two, :key=>[:a, :b], :primary_key=>[:c, :b]
     ParParent.many_to_one :par_parent_three, :key=>[:d, :e], :primary_key=>[:c, :b]
@@ -338,7 +338,7 @@ describe Sequel::Model, " association reflection methods" do
     end
     MODEL_DB.reset
   end
-  
+
   it "#all_association_reflections should include all association reflection hashes" do
     @c1.all_association_reflections.should == []
 

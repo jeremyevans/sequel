@@ -21,12 +21,12 @@ module Sequel
       def identifier_input_method_default
         nil
       end
-      
+
       def identifier_output_method_default
         nil
       end
     end
-  
+
     module DatasetMethods
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select limit distinct columns from join where group order having compounds')
       DATE_FORMAT = '#%Y-%m-%d#'.freeze

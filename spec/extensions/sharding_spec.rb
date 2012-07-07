@@ -25,15 +25,15 @@ describe "sharding plugin" do
     @Album.many_to_one :artist, :class=>@Artist
     @Album.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:albums_tags
     @db.sqls
-  end 
+  end
 
   specify "should allow you to instantiate a new object for a specified shard" do
     @Album.new_using_server(:s1, :name=>'RF').save
     @db.sqls.should == ["INSERT INTO albums (name) VALUES ('RF') -- s1", "SELECT * FROM albums WHERE (id = 1) LIMIT 1 -- s1"]
-    
+
     @Album.new_using_server(:s2){|o| o.name = 'MO'}.save
     @db.sqls.should == ["INSERT INTO albums (name) VALUES ('MO') -- s2", "SELECT * FROM albums WHERE (id = 1) LIMIT 1 -- s2"]
-  end 
+  end
 
   specify "should allow you to create and save a new object for a specified shard" do
     @Album.create_using_server(:s1, :name=>'RF')
@@ -41,22 +41,22 @@ describe "sharding plugin" do
 
     @Album.create_using_server(:s2){|o| o.name = 'MO'}
     @db.sqls.should == ["INSERT INTO albums (name) VALUES ('MO') -- s2", "SELECT * FROM albums WHERE (id = 1) LIMIT 1 -- s2"]
-  end 
+  end
 
   specify "should have objects retrieved from a specific shard update that shard" do
     @Album.server(:s1).first.update(:name=>'MO')
     @db.sqls.should == ["SELECT * FROM albums LIMIT 1 -- s1", "UPDATE albums SET name = 'MO' WHERE (id = 1) -- s1"]
-  end 
+  end
 
   specify "should have objects retrieved from a specific shard delete from that shard" do
     @Album.server(:s1).first.delete
     @db.sqls.should == ["SELECT * FROM albums LIMIT 1 -- s1", "DELETE FROM albums WHERE (id = 1) -- s1"]
-  end 
+  end
 
   specify "should have objects retrieved from a specific shard reload from that shard" do
     @Album.server(:s1).first.reload
     @db.sqls.should == ["SELECT * FROM albums LIMIT 1 -- s1", "SELECT * FROM albums WHERE (id = 1) LIMIT 1 -- s1"]
-  end 
+  end
 
   specify "should use current dataset's shard when eager loading if eagerly loaded dataset doesn't have its own shard" do
     albums = @Album.server(:s1).eager(:artist).all
@@ -64,7 +64,7 @@ describe "sharding plugin" do
     albums.length.should == 1
     albums.first.artist.save
     @db.sqls.should == ["UPDATE artists SET name = 'YJM' WHERE (id = 2) -- s1"]
-  end 
+  end
 
   specify "should not use current dataset's shard when eager loading if eagerly loaded dataset has its own shard" do
     @Artist.instance_dataset.opts[:server] = @Artist.dataset.opts[:server] = :s2
@@ -73,7 +73,7 @@ describe "sharding plugin" do
     albums.length.should == 1
     albums.first.artist.save
     @db.sqls.should == ["UPDATE artists SET name = 'YJM' WHERE (id = 2) -- s2"]
-  end 
+  end
 
   specify "should use current dataset's shard when eager graphing if eagerly graphed dataset doesn't have its own shard" do
     ds = @Album.server(:s1).eager_graph(:artist)
@@ -83,7 +83,7 @@ describe "sharding plugin" do
     albums.length.should == 1
     albums.first.artist.save
     @db.sqls.should == ["UPDATE artists SET name = 'YJM' WHERE (id = 2) -- s1"]
-  end 
+  end
 
   specify "should not use current dataset's shard when eager graphing if eagerly graphed dataset has its own shard" do
     @Artist.instance_dataset.opts[:server] = @Artist.dataset.opts[:server] = :s2
@@ -94,7 +94,7 @@ describe "sharding plugin" do
     albums.length.should == 1
     albums.first.artist.save
     @db.sqls.should == ["UPDATE artists SET name = 'YJM' WHERE (id = 2) -- s2"]
-  end 
+  end
 
   specify "should use eagerly graphed dataset shard for eagerly graphed objects even if current dataset does not have a shard" do
     @Artist.instance_dataset.opts[:server] = @Artist.dataset.opts[:server] = :s2
@@ -105,7 +105,7 @@ describe "sharding plugin" do
     albums.length.should == 1
     albums.first.artist.save
     @db.sqls.should == ["UPDATE artists SET name = 'YJM' WHERE (id = 2) -- s2"]
-  end 
+  end
 
   specify "should have objects retrieved from a specific shard use associated objects from that shard, with modifications to the associated objects using that shard" do
     album = @Album.server(:s1).first
@@ -116,7 +116,7 @@ describe "sharding plugin" do
     @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.album_id = 1)) -- s1", "UPDATE tags SET name = 'SR' WHERE (id = 3) -- s1"]
     @Artist.server(:s2).first.albums.map{|a| a.update(:name=>'MO')}
     @db.sqls.should == ["SELECT * FROM artists LIMIT 1 -- s2", "SELECT * FROM albums WHERE (albums.artist_id = 2) -- s2", "UPDATE albums SET name = 'MO' WHERE (id = 1) -- s2"]
-  end 
+  end
 
   specify "should have objects retrieved from a specific shard add associated objects to that shard" do
     album = @Album.server(:s1).first
@@ -127,12 +127,12 @@ describe "sharding plugin" do
     sqls = @db.sqls
     ["INSERT INTO albums (artist_id, name) VALUES (2, 'MO') -- s2", "INSERT INTO albums (name, artist_id) VALUES ('MO', 2) -- s2"].should include(sqls.shift)
     sqls.should == ["SELECT * FROM albums WHERE (id = 1) LIMIT 1 -- s2"]
-    
+
     album.add_tag(:name=>'SR')
     sqls = @db.sqls
     ["INSERT INTO albums_tags (album_id, tag_id) VALUES (1, 3) -- s1", "INSERT INTO albums_tags (tag_id, album_id) VALUES (3, 1) -- s1"].should include(sqls.pop)
     sqls.should == ["INSERT INTO tags (name) VALUES ('SR') -- s1", "SELECT * FROM tags WHERE (id = 1) LIMIT 1 -- s1", ]
-  end 
+  end
 
   specify "should have objects retrieved from a specific shard remove associated objects from that shard" do
     album = @Album.server(:s1).first
@@ -143,10 +143,10 @@ describe "sharding plugin" do
     sqls = @db.sqls
     ["UPDATE albums SET artist_id = NULL, name = 'RF' WHERE (id = 1) -- s2", "UPDATE albums SET name = 'RF', artist_id = NULL WHERE (id = 1) -- s2"].should include(sqls.pop)
     sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 2) AND (albums.id = 1)) LIMIT 1 -- s2"]
-    
+
     album.remove_tag(3)
     @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.album_id = 1)) WHERE (tags.id = 3) LIMIT 1 -- s1", "DELETE FROM albums_tags WHERE ((album_id = 1) AND (tag_id = 3)) -- s1"]
-  end 
+  end
 
   specify "should have objects retrieved from a specific shard remove all associated objects from that shard" do
     album = @Album.server(:s1).first
@@ -155,10 +155,10 @@ describe "sharding plugin" do
 
     artist.remove_all_albums
     @db.sqls.should == ["UPDATE albums SET artist_id = NULL WHERE (artist_id = 2) -- s2"]
-    
+
     album.remove_all_tags
     @db.sqls.should == ["DELETE FROM albums_tags WHERE (album_id = 1) -- s1"]
-  end 
+  end
 
   specify "should not override a server already set on an associated object" do
     album = @Album.server(:s1).first
@@ -173,12 +173,12 @@ describe "sharding plugin" do
     sqls = @db.sqls
     ["UPDATE albums SET artist_id = NULL, name = 'T' WHERE (id = 5) -- s4", "UPDATE albums SET name = 'T', artist_id = NULL WHERE (id = 5) -- s4"].should include(sqls.pop)
     sqls.should == ["SELECT 1 AS one FROM albums WHERE ((albums.artist_id = 2) AND (id = 5)) LIMIT 1 -- s2"]
-  end 
+  end
 
   specify "should be able to set a shard to use for any object using set_server" do
     @Album.server(:s1).first.set_server(:s2).reload
     @db.sqls.should == ["SELECT * FROM albums LIMIT 1 -- s1", "SELECT * FROM albums WHERE (id = 1) LIMIT 1 -- s2"]
-  end 
+  end
 
   specify "should use transactions on the correct shard" do
     @Album.use_transactions = true
@@ -186,7 +186,7 @@ describe "sharding plugin" do
     sqls = @db.sqls
     ["UPDATE albums SET artist_id = 2, name = 'RF' WHERE (id = 1) -- s2", "UPDATE albums SET name = 'RF', artist_id = 2 WHERE (id = 1) -- s2"].should include(sqls.slice!(2))
     sqls.should == ["SELECT * FROM albums LIMIT 1 -- s2", "BEGIN -- s2", "COMMIT -- s2"]
-  end 
+  end
 
   specify "should use override current shard when saving with given :server option" do
     @Album.use_transactions = true
@@ -194,5 +194,5 @@ describe "sharding plugin" do
     sqls = @db.sqls
     ["UPDATE albums SET artist_id = 2, name = 'RF' WHERE (id = 1) -- s1", "UPDATE albums SET name = 'RF', artist_id = 2 WHERE (id = 1) -- s1"].should include(sqls.slice!(2))
     sqls.should == ["SELECT * FROM albums LIMIT 1 -- s2", "BEGIN -- s1", "COMMIT -- s1"]
-  end 
+  end
 end

@@ -29,7 +29,7 @@ describe "AssociationDependencies plugin" do
     @Album.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
     MODEL_DB.sqls.should == ['DELETE FROM albums WHERE id = 1', 'DELETE FROM artists WHERE (artists.id = 2)']
   end
-  
+
   specify "should allow destroying associated one_to_one associated object" do
     @Artist.add_association_dependencies :first_album=>:destroy
     @Artist.load(:id=>2, :name=>'Ar').destroy
@@ -53,7 +53,7 @@ describe "AssociationDependencies plugin" do
     @Artist.load(:id=>2, :name=>'Ar').destroy
     MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (albums.artist_id = 2)', 'DELETE FROM artists WHERE id = 2']
   end
-  
+
   specify "should allow nullifying associated one_to_one objects" do
     @Artist.add_association_dependencies :first_album=>:nullify
     @Artist.load(:id=>2, :name=>'Ar').destroy

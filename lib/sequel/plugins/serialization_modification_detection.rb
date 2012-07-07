@@ -28,7 +28,7 @@ module Sequel
       def self.apply(model)
         model.plugin :serialization
       end
-      
+
       module InstanceMethods
         # Clear the cache of original deserialized values after saving so that it doesn't
         # show the column is modified after saving.
@@ -40,7 +40,7 @@ module Sequel
         # Detect which serialized columns have changed.
         def changed_columns
           cc = super
-          deserialized_values.each{|c, v| cc << c if !cc.include?(c) && original_deserialized_value(c) != v} 
+          deserialized_values.each{|c, v| cc << c if !cc.include?(c) && original_deserialized_value(c) != v}
           cc
         end
 

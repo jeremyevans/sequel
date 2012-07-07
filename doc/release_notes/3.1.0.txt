@@ -3,7 +3,7 @@ New Plugins
 
 3 new plugins were added that implement features supported by
 DataMapper: identity_map, tactical_eager_loading, and
-lazy_attributes.  These plugins don't add any real new features, 
+lazy_attributes.  These plugins don't add any real new features,
 since you can do most of what they allow before simply by being
 a little more explicit in your Sequel code. However, some people
 prefer a less explicit approach that uses a bit more magic, and
@@ -160,28 +160,28 @@ New Features
   to the given table or the first source. This can be used to join
   a dataset that has unqualified columns to a new table which has
   columns with the same name.
-  
+
   For example, take this dataset:
-  
+
     ds = DB[:albums].select(:name).order(:name).filter(:id=>1)
     # SELECT name FROM albums WHERE (id = 1) ORDER BY name
 
   Let's say you want to join it to the artists table:
-  
+
     ds2 = ds.join(:artists, :id=>:artist_id)
-    # SELECT name FROM albums 
+    # SELECT name FROM albums
     #  INNER JOIN artists ON (artists.id = albums.artist_id)
     #  WHERE (id = 1) ORDER BY name
-    
+
   That's going to give you an error, as the artists table already has
   columns named id and name.  This new feature allows you to do the
   following:
-  
+
     ds2 = ds.qualify_to_first_source.join(:artists, :id=>:artist_id)
     # SELECT albums.name FROM albums
     #  INNER JOIN artists ON (artists.id = albums.artist_id)
     #  WHERE (albums.id = 1) ORDER BY albums.name
-    
+
   By doing this, all unqualified columns are qualified, so you get
   a usable query.  This is expected to be most useful for users that
   have a default order or filter on their models and want to join
@@ -322,7 +322,7 @@ Other Improvements
 
 * The PostgreSQL Database#indexes method no longer returns partial
   indexes or functional indexes.
-  
+
 * The MySQL Database#indexes method no longer returns indexes on
   partial columns (prefix indexes).
 

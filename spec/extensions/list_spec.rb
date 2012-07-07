@@ -81,10 +81,10 @@ describe "List plugin" do
     @c.create.values.should == {:id=>1, :position=>1}
     @c.create.values.should == {:id=>2, :position=>2}
     @db.sqls.should == ["SELECT max(position) FROM items LIMIT 1",
-      "INSERT INTO items (position) VALUES (1)", 
+      "INSERT INTO items (position) VALUES (1)",
       "SELECT * FROM items WHERE (id = 1) ORDER BY position LIMIT 1",
       "SELECT max(position) FROM items LIMIT 1",
-      "INSERT INTO items (position) VALUES (2)", 
+      "INSERT INTO items (position) VALUES (2)",
       "SELECT * FROM items WHERE (id = 2) ORDER BY position LIMIT 1"]
   end
 

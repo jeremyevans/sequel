@@ -14,7 +14,7 @@ describe "pg_json extension" do
       alias old_parse parse
       def parse(s)
         return 1 if s == '1'
-        old_parse(s) 
+        old_parse(s)
       end
     end
   end

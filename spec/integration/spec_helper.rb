@@ -22,7 +22,7 @@ unless defined?(RSpec)
     class BeWithin
       include Spec::Matchers
       def initialize(delta); @delta = delta; end
-      def of(expected); be_close(expected, @delta); end 
+      def of(expected); be_close(expected, @delta); end
     end
     def be_within(delta)
       BeWithin.new(delta)
@@ -50,7 +50,7 @@ def Sequel.guarded?(*checked)
           end
         when 3
           return c if c[0] == INTEGRATION_DB.adapter_scheme && c[1] == INTEGRATION_DB.database_type && c[2].call(INTEGRATION_DB)
-        end          
+        end
       end
     end
   end
@@ -66,7 +66,7 @@ end
      INTEGRATION_DB.loggers.pop
     end
   end
-  
+
   def self.cspecify(message, *checked, &block)
     if pending = Sequel.guarded?(*checked)
       specify(message){pending("Not yet working on #{Array(pending).map{|x| x.is_a?(Proc) ? :proc : x}.join(', ')}", &block)}

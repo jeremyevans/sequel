@@ -13,7 +13,7 @@ module Sequel
       MYSQL_DATABASE_DISCONNECT_ERRORS = /\A(Commands out of sync; you can't run this command now|Can't connect to local MySQL server through socket|MySQL server has gone away|This connection is still waiting for a result, try again once you have the result|closed MySQL connection)/
 
       set_adapter_scheme :mysql2
-      
+
       # Whether to convert tinyint columns to bool for this database
       attr_accessor :convert_tinyint_to_bool
 

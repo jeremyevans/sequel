@@ -7,7 +7,7 @@ shared_examples_for "eager limit strategies" do
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
     al, ar, t = @pr.call
-    
+
     a = Artist.eager(:first_album, :last_album).order(:name).all
     a.should == [@artist, ar]
     a.first.first_album.should == @album
@@ -34,7 +34,7 @@ shared_examples_for "eager limit strategies" do
     middle_album = @middle_album.call
     diff_album = @diff_album.call
     al, ar, t = @pr.call
-    
+
     ars = Artist.eager(:first_two_albums, :second_two_albums, :last_two_albums).order(:name).all
     ars.should == [@artist, ar]
     ars.first.first_two_albums.should == [@album, middle_album]
@@ -43,13 +43,13 @@ shared_examples_for "eager limit strategies" do
     ars.last.first_two_albums.should == []
     ars.last.second_two_albums.should == []
     ars.last.last_two_albums.should == []
-    
+
     # Check that no extra columns got added by the eager loading
     ars.first.first_two_albums.map{|x| x.values}.should == [@album, middle_album].map{|x| x.values}
     ars.first.second_two_albums.map{|x| x.values}.should == [middle_album, diff_album].map{|x| x.values}
     ars.first.last_two_albums.map{|x| x.values}.should == [diff_album, middle_album].map{|x| x.values}
   end
-  
+
   specify "should correctly handle limits and offsets when eager loading many_to_many associations" do
     if @els == {:eager_limit_strategy=>:correlated_subquery} && Sequel.guarded?(:derby)
       pending("Derby errors with correlated subqueries on many_to_many associations")
@@ -59,7 +59,7 @@ shared_examples_for "eager limit strategies" do
     Album.many_to_many :last_two_tags, {:clone=>:last_two_tags}.merge(@els) if @els
     tu, tv = @other_tags.call
     al, ar, t = @pr.call
-    
+
     als = Album.eager(:first_two_tags, :second_two_tags, :last_two_tags).order(:name).all
     als.should == [@album, al]
     als.first.first_two_tags.should == [@tag, tu]
@@ -68,13 +68,13 @@ shared_examples_for "eager limit strategies" do
     als.last.first_two_tags.should == []
     als.last.second_two_tags.should == []
     als.last.last_two_tags.should == []
-    
+
     # Check that no extra columns got added by the eager loading
     als.first.first_two_tags.map{|x| x.values}.should == [@tag, tu].map{|x| x.values}
     als.first.second_two_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
     als.first.last_two_tags.map{|x| x.values}.should == [tv, tu].map{|x| x.values}
   end
-  
+
   specify "should correctly handle limits and offsets when eager loading many_through_many associations" do
     if @els == {:eager_limit_strategy=>:correlated_subquery} && Sequel.guarded?(:derby)
       pending("Derby errors with correlated subqueries on many_through_many associations")
@@ -85,7 +85,7 @@ shared_examples_for "eager limit strategies" do
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
     al, ar, t = @pr.call
-    
+
     ars = Artist.eager(:first_two_tags, :second_two_tags, :last_two_tags).order(:name).all
     ars.should == [@artist, ar]
     ars.first.first_two_tags.should == [@tag, tu]
@@ -94,7 +94,7 @@ shared_examples_for "eager limit strategies" do
     ars.last.first_two_tags.should == []
     ars.last.second_two_tags.should == []
     ars.last.last_two_tags.should == []
-    
+
     # Check that no extra columns got added by the eager loading
     ars.first.first_two_tags.map{|x| x.values}.should == [@tag, tu].map{|x| x.values}
     ars.first.second_two_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
@@ -106,7 +106,7 @@ shared_examples_for "filtering/excluding by associations" do
   specify "should work correctly when filtering by associations" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
-    
+
     @Artist.filter(:albums=>@album).all.should == [@artist]
     @Artist.filter(:first_album=>@album).all.should == [@artist]
     @Album.filter(:artist=>@artist).all.should == [@album]
@@ -130,12 +130,12 @@ shared_examples_for "filtering/excluding by associations" do
     @Tag.exclude(:albums=>@album).all.should == [tag]
     @Album.exclude(:artist=>@artist, :tags=>@tag).all.should == [album]
   end
-  
+
   specify "should work correctly when filtering by multiple associations" do
     album, artist, tag = @pr.call
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
-    
+
     @Artist.filter(:albums=>[@album, album]).all.should == [@artist]
     @Artist.filter(:first_album=>[@album, album]).all.should == [@artist]
     @Album.filter(:artist=>[@artist, artist]).all.should == [@album]
@@ -208,7 +208,7 @@ shared_examples_for "filtering/excluding by associations" do
     @Tag.exclude(:albums=>[@album, album]).all.should == []
     @Album.exclude(:artist=>[@artist, artist], :tags=>[@tag, tag]).all.should == []
   end
-  
+
   specify "should work correctly when excluding by associations in regards to NULL values" do
     @Artist.exclude(:albums=>@album).all.should == [@artist]
     @Artist.exclude(:first_album=>@album).all.should == [@artist]
@@ -288,7 +288,7 @@ shared_examples_for "filtering/excluding by associations" do
   end
 end
 
-shared_examples_for "regular and composite key associations" do  
+shared_examples_for "regular and composite key associations" do
   specify "should return no objects if none are associated" do
     @album.artist.should == nil
     @artist.first_album.should == nil
@@ -301,11 +301,11 @@ shared_examples_for "regular and composite key associations" do
   specify "should have add and set methods work any associated objects" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
-    
+
     @album.reload
     @artist.reload
     @tag.reload
-    
+
     @album.artist.should == @artist
     @artist.first_album.should == @album
     @artist.albums.should == [@album]
@@ -313,15 +313,15 @@ shared_examples_for "regular and composite key associations" do
     @album.alias_tags.should == [@tag]
     @tag.albums.should == [@album]
   end
-  
+
   specify "should work correctly with prepared_statements_association plugin" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
-    
+
     @album.reload
     @artist.reload
     @tag.reload
-    
+
     [Tag, Album, Artist].each{|x| x.plugin :prepared_statements_associations}
     @album.artist.should == @artist
     @artist.first_album.should == @album
@@ -381,17 +381,17 @@ shared_examples_for "regular and composite key associations" do
   specify "should have remove methods work" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
-    
+
     @album.update(:artist => nil)
     @album.remove_tag(@tag)
 
     @album.add_alias_tag(@tag)
     @album.remove_alias_tag(@tag)
-    
+
     @album.reload
     @artist.reload
     @tag.reload
-    
+
     @album.artist.should == nil
     @artist.albums.should == []
     @album.tags.should == []
@@ -403,18 +403,18 @@ shared_examples_for "regular and composite key associations" do
     @album.reload
     @album.alias_tags.should == []
   end
-  
+
   specify "should have remove_all methods work" do
     @artist.add_album(@album)
     @album.add_tag(@tag)
-    
+
     @artist.remove_all_albums
     @album.remove_all_tags
-    
+
     @album.reload
     @artist.reload
     @tag.reload
-    
+
     @album.artist.should == nil
     @artist.albums.should == []
     @album.tags.should == []
@@ -426,24 +426,24 @@ shared_examples_for "regular and composite key associations" do
     @album.reload
     @album.alias_tags.should == []
   end
-  
+
   specify "should eager load via eager correctly" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
-    
+
     a = Artist.eager(:albums=>[:tags, :alias_tags]).eager(:first_album).all
     a.should == [@artist]
     a.first.albums.should == [@album]
     a.first.first_album.should == @album
     a.first.albums.first.tags.should == [@tag]
     a.first.albums.first.alias_tags.should == [@tag]
-    
+
     a = Tag.eager(:albums=>:artist).all
     a.should == [@tag]
     a.first.albums.should == [@album]
     a.first.albums.first.artist.should == @artist
   end
-  
+
   describe "when filtering/excluding by associations" do
     before do
       @Artist = Artist.dataset
@@ -489,20 +489,20 @@ shared_examples_for "regular and composite key associations" do
   specify "should eager load via eager_graph correctly" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
-    
+
     a = Artist.eager_graph(:albums=>[:tags, :alias_tags]).eager_graph(:first_album).all
     a.should == [@artist]
     a.first.albums.should == [@album]
     a.first.first_album.should == @album
     a.first.albums.first.tags.should == [@tag]
     a.first.albums.first.alias_tags.should == [@tag]
-    
+
     a = Tag.eager_graph(:albums=>:artist).all
     a.should == [@tag]
     a.first.albums.should == [@album]
     a.first.albums.first.artist.should == @artist
   end
-  
+
   specify "should work with a many_through_many association" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
@@ -510,22 +510,22 @@ shared_examples_for "regular and composite key associations" do
     @album.reload
     @artist.reload
     @tag.reload
-    
+
     @album.tags.should == [@tag]
-    
+
     a = Artist.eager(:tags).all
     a.should == [@artist]
     a.first.tags.should == [@tag]
-    
+
     a = Artist.eager_graph(:tags).all
     a.should == [@artist]
     a.first.tags.should == [@tag]
-    
+
     a = Album.eager(:artist=>:tags).all
     a.should == [@album]
     a.first.artist.should == @artist
     a.first.artist.tags.should == [@tag]
-    
+
     a = Album.eager_graph(:artist=>:tags).all
     a.should == [@album]
     a.first.artist.should == @artist
@@ -600,7 +600,7 @@ describe "Sequel::Model Simple Associations" do
   after(:all) do
     @db.drop_table?(:albums_tags, :tags, :albums, :artists)
   end
-  
+
   it_should_behave_like "regular and composite key associations"
 
   describe "with :eager_limit_strategy=>:correlated_subquery" do
@@ -628,7 +628,7 @@ describe "Sequel::Model Simple Associations" do
   specify "should handle aliased tables when eager_graphing" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
-    
+
     Artist.set_dataset(:artists___ar)
     Album.set_dataset(:albums___a)
     Tag.set_dataset(:tags___t)
@@ -641,27 +641,27 @@ describe "Sequel::Model Simple Associations" do
     a.should == [@artist]
     a.first.balbums.should == [@album]
     a.first.balbums.first.btags.should == [@tag]
-    
+
     a = Tag.eager_graph(:balbums=>:bartist).all
     a.should == [@tag]
     a.first.balbums.should == [@album]
     a.first.balbums.first.bartist.should == @artist
   end
-  
+
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums
     Album.delete
     @album = @artist.add_album(:name=>'Al2')
     Album.first[:name].should == 'Al2'
     @artist.albums_dataset.first[:name].should == 'Al2'
-    
+
     @album.remove_all_tags
     Tag.delete
     @album.add_tag(:name=>'T2')
     Tag.first[:name].should == 'T2'
     @album.tags_dataset.first[:name].should == 'T2'
   end
-  
+
   specify "should have add method accept primary key and add related records" do
     @artist.remove_all_albums
     @artist.add_album(@album.id)
@@ -671,17 +671,17 @@ describe "Sequel::Model Simple Associations" do
     @album.add_tag(@tag.id)
     @album.tags_dataset.first[:id].should == @tag.id
   end
-  
+
   specify "should have remove method accept primary key and remove related album" do
     @artist.add_album(@album)
     @artist.reload.remove_album(@album.id)
     @artist.reload.albums.should == []
-    
+
     @album.add_tag(@tag)
     @album.reload.remove_tag(@tag.id)
     @tag.reload.albums.should == []
   end
-  
+
   specify "should handle dynamic callbacks for regular loading" do
     @artist.add_album(@album)
 
@@ -698,7 +698,7 @@ describe "Sequel::Model Simple Associations" do
     @album.artist{|ds| ds.exclude(:id=>@artist.id)}.should == nil
     @album.artist{|ds| ds.filter(:id=>@artist.id)}.should == @artist
   end
-  
+
   specify "should handle dynamic callbacks for eager loading via eager and eager_graph" do
     @artist.add_album(@album)
     @album.add_tag(@tag)
@@ -721,7 +721,7 @@ describe "Sequel::Model Simple Associations" do
     artist.albums.should == [album2]
     artist.albums.first.tags.should == [tag2]
   end
-  
+
   specify "should have remove method raise an error for one_to_many records if the object isn't already associated" do
     proc{@artist.remove_album(@album.id)}.should raise_error(Sequel::Error)
     proc{@artist.remove_album(@album)}.should raise_error(Sequel::Error)
@@ -829,34 +829,34 @@ describe "Sequel::Model Composite Key Associations" do
     @artist.add_album(:id1=>1, :id2=>2, :name=>'Al2')
     Album.first[:name].should == 'Al2'
     @artist.albums_dataset.first[:name].should == 'Al2'
-    
+
     @album.remove_all_tags
     Tag.delete
     @album.add_tag(:id1=>1, :id2=>2, :name=>'T2')
     Tag.first[:name].should == 'T2'
     @album.tags_dataset.first[:name].should == 'T2'
   end
-  
+
   specify "should have add method accept primary key and add related records" do
     @artist.remove_all_albums
     @artist.add_album([@album.id1, @album.id2])
     @artist.albums_dataset.first.pk.should == [@album.id1, @album.id2]
-    
+
     @album.remove_all_tags
     @album.add_tag([@tag.id1, @tag.id2])
     @album.tags_dataset.first.pk.should == [@tag.id1, @tag.id2]
   end
-  
+
   specify "should have remove method accept primary key and remove related album" do
     @artist.add_album(@album)
     @artist.reload.remove_album([@album.id1, @album.id2])
     @artist.reload.albums.should == []
-    
+
     @album.add_tag(@tag)
     @album.reload.remove_tag([@tag.id1, @tag.id2])
     @tag.reload.albums.should == []
   end
-  
+
   specify "should have remove method raise an error for one_to_many records if the object isn't already associated" do
     proc{@artist.remove_album([@album.id1, @album.id2])}.should raise_error(Sequel::Error)
     proc{@artist.remove_album(@album)}.should raise_error(Sequel::Error)
@@ -959,4 +959,4 @@ describe "Sequel::Model Associations with clashing column names" do
     @bar.remove_mtmfoo(f)
     @bar.mtmfoos.should == []
   end
-end 
+end

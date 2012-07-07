@@ -75,12 +75,12 @@ module Sequel
       def self.apply(model)
         model.plugin(:instance_hooks)
       end
-      
+
       module ClassMethods
         # Module to store the nested_attributes setter methods, so they can
         # call be overridden and call super to get the default behavior
         attr_accessor :nested_attributes_module
-        
+
         # Allow nested attributes to be set for the given associations.  Options:
         # * :destroy - Allow destruction of nested records.
         # * :fields - If provided, should be an Array or proc. If it is an array,
@@ -118,9 +118,9 @@ module Sequel
             def_nested_attribute_method(r)
           end
         end
-        
+
         private
-        
+
         # Add a nested attribute setter method to a module included in the
         # class.
         def def_nested_attribute_method(reflection)
@@ -137,10 +137,10 @@ module Sequel
           end
         end
       end
-      
+
       module InstanceMethods
         private
-        
+
         # Check that the keys related to the association are not modified inside the block.  Does
         # not use an ensure block, so callers should be careful.
         def nested_attributes_check_key_modifications(reflection, obj)
@@ -150,7 +150,7 @@ module Sequel
             raise(Error, "Modifying association dependent key(s) when updating associated objects is not allowed")
           end
         end
-        
+
         # Create a new associated object with the given attributes, validate
         # it when the parent is validated, and save it when the object is saved.
         # Returns the object created.
@@ -171,7 +171,7 @@ module Sequel
 
             # Don't need to validate the object twice if :validate association option is not false
             # and don't want to validate it at all if it is false.
-            if reflection[:type] == :many_to_one 
+            if reflection[:type] == :many_to_one
               before_save_hook{send(reflection.setter_method, obj.save(:validate=>false))}
             else
               after_save_hook{send(reflection.setter_method, obj)}
@@ -179,7 +179,7 @@ module Sequel
           end
           obj
         end
-        
+
         # Take an array or hash of attribute hashes and set each one individually.
         # If a hash is provided it, sort it by key and then use the values.
         # If there is a limit on the nested attributes for this association,
@@ -191,7 +191,7 @@ module Sequel
           end
           attributes_list.each{|a| nested_attributes_setter(reflection, a)}
         end
-        
+
         # Remove the given associated object from the current object. If the
         # :destroy option is given, destroy the object after disassociating it
         # (unless destroying the object would automatically disassociate it).
@@ -209,7 +209,7 @@ module Sequel
           after_save_hook{obj.destroy} if opts[:destroy]
           obj
         end
-        
+
         # Set the fields in the obj based on the association, only allowing
         # specific :fields if configured.
         def nested_attributes_set_attributes(reflection, obj, attributes)
@@ -261,7 +261,7 @@ module Sequel
             nested_attributes_create(reflection, attributes)
           end
         end
-        
+
         # Update the given object with the attributes, validating it when the
         # parent object is validated and saving it when the parent is saved.
         # Returns the object updated.

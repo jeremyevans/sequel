@@ -4,22 +4,22 @@ New Features
 * Sequel now has support for deleting and updating joined datasets
   on MySQL and PostgreSQL.  Previously, Sequel only supported this to
   a limited extent on Microsoft SQL Server, and support there has been
-  improved as well.  
-  
+  improved as well.
+
   This allows you to do:
-  
+
     DB.create_table!(:a){Integer :a; Integer :d}
     DB.create_table!(:b){Integer :b; Integer :e}
     DB.create_table!(:c){Integer :c; Integer :f}
-    
+
     # Insert some rows
-    
+
     ds = DB.from(:a, :b).
       join(:c, :c=>:e.identifier).
       where(:d=>:b)
     ds.where(:f=>6).update(:a => 10)
     ds.where(:f=>5).delete
-      
+
   Which will set the a column to 10 for all rows in table a, where
   an associated row in table c (through table b) has a value of 6 for
   column f.  It will delete rows from table a where an associated row
@@ -32,7 +32,7 @@ New Features
 * Dataset #select_map, #select_order_map, and #select_hash
   convenience methods were added for quickly creating arrays and
   hashes from a dataset.
-  
+
   select_map and select_order_map both return arrays of values for the
   column specified.  The column can be specified either via an argument
   or a block, similar to Dataset#get.  Both accept any valid objects as
@@ -53,14 +53,14 @@ New Features
 
 * The NULL, NOTNULL, TRUE, SQLTRUE, FALSE, and SQLFALSE constants
   were added to Sequel::SQL::Constants.  This allows you to do:
-  
+
     include Sequel::SQL::Constants
     DB[:table].where(:a=>'1', :b=>NOTNULL)
-    
+
   Previously, the shortest way to do this was:
 
     DB[:table].where(:a=>'1').exclude(:b=>nil)
-    
+
   It may make the code more descriptive:
 
     DB[:table].where(:b=>NULL)
@@ -89,17 +89,17 @@ New Features
   is recommended.  It's not done by default, but you can still
   reference the constants under the main Sequel module by default
   (e.g. Sequel::NULL).
-  
+
 * The validates_unique method in the validation_helpers plugin now
   supports an :only_if_modified option, which should speed up the
   common case where the unique attribute is not modified for an
   existing record.  It's not on by default, since it's possible the
   database could be changed between retrieving the model object and
   updating it.
-  
+
 * The Dataset #union, #intersect, and #except methods now accept an
   :alias option which is used as the alias for the returned dataset.
-  
+
     DB[:table].union(DB[:old_table], :alias=>:table)
 
 * Model#destroy now supports a :transaction option, similar to
@@ -111,11 +111,11 @@ New Features
 
   This makes Oracle work correctly when using models, with
   something like the following:
-  
+
     class Album < Sequel::Model
       set_dataset dataset.sequence(:seq_albums_id)
     end
-    
+
   You currently need to call Dataset#sequence in every model
   class where the underlying table uses a sequence to generate
   primary key values.
@@ -131,7 +131,7 @@ Other Improvements
   A previous change to the method raised an exception if a Symbol was
   not provided.  It also handles AliasedExpressions natively, so the
   following works correctly:
-  
+
     DB[:table].group_and_count(:column.as(:alias))
 
 * Sequel no longer uses native autoreconnection in the mysql adapter.
@@ -155,7 +155,7 @@ Other Improvements
   given as an option to primary key.  This makes it operate more
   similarly to other adapters that support autoincrementing 64-bit
   integer primary keys.
-  
+
 * The native mysql adapter will now attempt to load options in the
   [client] section of the my.cnf file.
 
@@ -167,7 +167,7 @@ Backwards Compatibility
 
 * Dataset::GET_ERROR_MSG and Dataset::MAP_ERROR_MSG constants were
   removed.  Both were replaced with Dataset::ARG_BLOCK_ERROR_MSG.
-  
+
 * The behavior of the Model#save_failure private instance method was
   modified.  It now always raises an exception, and validation
   failures no longer call it.

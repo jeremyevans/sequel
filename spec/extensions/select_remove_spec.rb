@@ -5,7 +5,7 @@ describe "Dataset#select_remove" do
     @d = Sequel.mock.from(:test)
     @d.columns :a, :b, :c
   end
-  
+
   specify "should remove columns from the selected columns" do
     @d.sql.should == 'SELECT * FROM test'
     @d.select_remove(:a).sql.should == 'SELECT b, c FROM test'

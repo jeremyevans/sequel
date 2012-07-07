@@ -116,7 +116,7 @@ array of column symbols:
     Integer :group_id
     Integer :position
     primary_key [:group_id, :position]
-  end 
+  end
 
 If provided with an array, +primary_key+ does not create a column, it just sets up the primary key constraint.
 
@@ -239,7 +239,7 @@ both take the same options as +index+.
     String :name
     constraint(:name_min_length){char_length(name) > 2}
   end
-  
+
 Instead of using a block, you can use arguments that will be handled similarly
 to <tt>Dataset#filter</tt>:
 
@@ -248,7 +248,7 @@ to <tt>Dataset#filter</tt>:
     String :name
     constraint(:name_length_range, :char_length.sql_function(:name)=>3..50)
   end
-  
+
 ==== +check+
 
 +check+ operates just like +constraint+, except that it doesn't take a name
@@ -259,7 +259,7 @@ and it creates an unnamed constraint
     String :name
     check{char_length(name) > 2}
   end
-  
+
 == +create_join_table+
 
 +create_join_table+ is a shortcut that you can use to create simple many-to-many join tables:

@@ -154,12 +154,12 @@ describe "Sequel::Plugins::JsonSerializer" do
     JSON.parse(@album2.to_json(:only => :name)).should == @album2.values.reject{|k,v| k.to_s != 'name'}.inject({}){|h, (k, v)| h[k.to_s] = v; h}
     JSON.parse(@album2.to_json(:except => :artist_id)).should == @album2.values.reject{|k,v| k.to_s == 'artist_id'}.inject({}){|h, (k, v)| h[k.to_s] = v; h}
   end
-  
+
   it "should handle the :root option to qualify single records" do
     @album.to_json(:root=>true, :except => [:name, :artist_id]).to_s.should == '{"album":{"id":1}}'
     @album.to_json(:root=>true, :only => :name).to_s.should == '{"album":{"name":"RF"}}'
   end
-  
+
   it "should handle the :root=>:both option to qualify a dataset of records" do
     Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
     Album.dataset.to_json(:root=>true, :only => :id).to_s.should == '{"albums":[{"album":{"id":1}},{"album":{"id":1}}]}'

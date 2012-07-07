@@ -21,18 +21,18 @@ module Sequel
     def self.identifier_input_method
       @@identifier_input_method
     end
-    
+
     # Set the method to call on identifiers going into the database
     # See Sequel.identifier_input_method=.
     def self.identifier_input_method=(v)
       @@identifier_input_method = v || ""
     end
-    
+
     # The method to call on identifiers coming from the database
     def self.identifier_output_method
       @@identifier_output_method
     end
-    
+
     # Set the method to call on identifiers coming from the database
     # See Sequel.identifier_output_method=.
     def self.identifier_output_method=(v)
@@ -79,7 +79,7 @@ module Sequel
     #
     #   # Introspec columns for all of DB's datasets
     #   DB.extend_datasets(Sequel::ColumnsIntrospection)
-    #   
+    #
     #   # Trace all SELECT queries by printing the SQL and the full backtrace
     #   DB.extend_datasets do
     #     def fetch_rows(sql)
@@ -113,7 +113,7 @@ module Sequel
         @identifier_input_method
       end
     end
-    
+
     # Set the method to call on identifiers going into the database:
     #
     #   DB[:items] # SELECT * FROM items
@@ -123,7 +123,7 @@ module Sequel
       reset_schema_utility_dataset
       @identifier_input_method = v || ""
     end
-    
+
     # The method to call on identifiers coming from the database
     def identifier_output_method
       case @identifier_output_method
@@ -136,7 +136,7 @@ module Sequel
         @identifier_output_method
       end
     end
-    
+
     # Set the method to call on identifiers coming from the database:
     #
     #   DB[:items].first # {:id=>1, :name=>'foo'}
@@ -156,20 +156,20 @@ module Sequel
       reset_schema_utility_dataset
       @quote_identifiers = v
     end
-    
+
     # Returns true if the database quotes identifiers.
     def quote_identifiers?
       return @quote_identifiers unless @quote_identifiers.nil?
       @quote_identifiers = @opts.fetch(:quote_identifiers, (@@quote_identifiers.nil? ? quote_identifiers_default : @@quote_identifiers))
     end
-    
+
     private
-    
+
     # The default dataset class to use for the database
     def dataset_class_default
       self.class.const_get(:DatasetClass)
     end
-    
+
     # The default value for default_schema.
     def default_schema_default
       nil
@@ -182,7 +182,7 @@ module Sequel
     def identifier_input_method_default
       :upcase
     end
-    
+
     # The method to apply to identifiers coming the database by default.
     # Should be overridden in subclasses for databases that fold unquoted
     # identifiers to lower case instead of uppercase, such as
@@ -190,7 +190,7 @@ module Sequel
     def identifier_output_method_default
       :downcase
     end
-    
+
     # Whether to quote identifiers by default for this database, true
     # by default.
     def quote_identifiers_default

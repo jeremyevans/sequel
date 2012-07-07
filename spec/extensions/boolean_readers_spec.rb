@@ -13,7 +13,7 @@ describe Sequel::Model, "BooleanReaders plugin" do
       def columns; @columns; end
     end
     @c.instance_eval(&@p)
-  end 
+  end
 
   specify "should create attribute? readers for all boolean attributes" do
     @c.plugin(:boolean_readers)

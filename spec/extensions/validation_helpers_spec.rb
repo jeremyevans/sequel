@@ -55,7 +55,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = '1_1'
     @m.should be_valid
   end
-  
+
   specify "should allow a proc for the :message option" do
     @c.set_validations{validates_format(/.+_.+/, :value, :message=>proc{|f| "doesn't match #{f.inspect}"})}
     @m.value = 'abc_'
@@ -72,7 +72,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value2 = 1
     @m.should be_valid
   end
-  
+
   specify "should support modifying default options for all models" do
     @c.set_validations{validates_presence(:value)}
     @m.should_not be_valid
@@ -83,7 +83,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.errors.should == {:value=>["was not entered"]}
     @m.value = 1
     @m.should be_valid
-    
+
     @m.values.clear
     Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS[:presence][:allow_missing] = true
     @m.should be_valid
@@ -91,7 +91,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should_not be_valid
     @m.errors.should == {:value=>["was not entered"]}
 
-    
+
     c = Class.new(Sequel::Model)
     c.class_eval do
       plugin :validation_helpers
@@ -105,7 +105,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     m.errors.should == {:value=>["was not entered"]}
     Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS[:presence] = o
   end
-  
+
   specify "should support modifying default validation options for a particular model" do
     @c.set_validations{validates_presence(:value)}
     @m.should_not be_valid
@@ -120,10 +120,10 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.errors.should == {:value=>["was not entered"]}
     @m.value = 1
     @m.should be_valid
-    
+
     @m.values.clear
     @m.should be_valid
-    
+
     c = Class.new(Sequel::Model)
     c.class_eval do
       plugin :validation_helpers
@@ -147,7 +147,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = '1234'
     @m.should_not be_valid
   end
-  
+
   specify "should support validate_format" do
     @c.set_validations{validates_format(/.+_.+/, :value)}
     @m.value = 'abc_'
@@ -155,7 +155,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = 'abc_def'
     @m.should be_valid
   end
-  
+
   specify "should support validates_includes with an array" do
     @c.set_validations{validates_includes([1,2], :value)}
     @m.should_not be_valid
@@ -164,11 +164,11 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = 1.5
     @m.should_not be_valid
     @m.value = 2
-    @m.should be_valid    
+    @m.should be_valid
     @m.value = 3
-    @m.should_not be_valid 
+    @m.should_not be_valid
   end
-  
+
   specify "should support validates_includes with a range" do
     @c.set_validations{validates_includes(1..4, :value)}
     @m.should_not be_valid
@@ -179,9 +179,9 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = 0
     @m.should_not be_valid
     @m.value = 5
-    @m.should_not be_valid    
+    @m.should_not be_valid
   end
-  
+
   specify "should supports validates_integer" do
     @c.set_validations{validates_integer(:value)}
     @m.value = 'blah'
@@ -191,7 +191,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = '123.1231'
     @m.should_not be_valid
   end
-  
+
   specify "should support validates_length_range" do
     @c.set_validations{validates_length_range(2..5, :value)}
     @m.should_not be_valid
@@ -272,7 +272,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should be_valid
     @m.value = '.0123'
   end
-  
+
   specify "should support validates_type" do
     @c.set_validations{validates_type(Integer, :value)}
     @m.value = 123
@@ -280,14 +280,14 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = '123'
     @m.should_not be_valid
     @m.errors.full_messages.should == ['value is not a Integer']
-    
+
     @c.set_validations{validates_type(:String, :value)}
     @m.value = '123'
     @m.should be_valid
     @m.value = 123
     @m.should_not be_valid
     @m.errors.full_messages.should == ['value is not a String']
-    
+
     @c.set_validations{validates_type('Integer', :value)}
     @m.value = 123
     @m.should be_valid
@@ -312,7 +312,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = Time.now
     @m.should be_valid
   end
-  
+
   it "should support validates_unique with a single attribute" do
     @c.columns(:id, :username, :password)
     @c.set_dataset MODEL_DB[:items]
@@ -325,7 +325,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
         {:v => 1}
       end
     end
-    
+
     @user = @c.new(:username => "0records", :password => "anothertest")
     @user.should be_valid
     @user = @c.load(:id=>3, :username => "0records", :password => "anothertest")
@@ -350,7 +350,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @user.should be_valid
     MODEL_DB.sqls.last.should == "SELECT COUNT(*) AS count FROM items WHERE (username = '0records') LIMIT 1"
   end
-  
+
   it "should support validates_unique with multiple attributes" do
     @c.columns(:id, :username, :password)
     @c.set_dataset MODEL_DB[:items]
@@ -363,7 +363,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
         {:v => 1}
       end
     end
-    
+
     @user = @c.new(:username => "0records", :password => "anothertest")
     @user.should be_valid
     @user = @c.load(:id=>3, :username => "0records", :password => "anothertest")
@@ -394,7 +394,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.set_dataset MODEL_DB[:items]
     @c.set_validations{validates_unique(:username){|ds| ds.filter(:active)}}
     @c.dataset._fetch = {:v=>0}
-    
+
     MODEL_DB.reset
     @c.new(:username => "0records", :password => "anothertest").should be_valid
     @c.load(:id=>3, :username => "0records", :password => "anothertest").should be_valid
@@ -407,7 +407,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.set_dataset MODEL_DB[:items]
     @c.set_validations{validates_unique([:username, :password], :only_if_modified=>true)}
     @c.dataset._fetch = {:v=>0}
-    
+
     MODEL_DB.reset
     @c.new(:username => "0records", :password => "anothertest").should be_valid
     MODEL_DB.sqls.should == ["SELECT COUNT(*) AS count FROM items WHERE ((username = '0records') AND (password = 'anothertest')) LIMIT 1"]
@@ -430,4 +430,4 @@ describe "Sequel::Plugins::ValidationHelpers" do
     m.should be_valid
     MODEL_DB.sqls.should == ["SELECT COUNT(*) AS count FROM items WHERE ((username = '2') AND (password = '1') AND (id != 3)) LIMIT 1"]
   end
-end 
+end

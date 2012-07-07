@@ -8,7 +8,7 @@ describe Sequel::Model, ".plugin" do
           def get_stamp(*args); @values[:stamp] end
           def abc; 123; end
         end
-        
+
         module ClassMethods
           def def; 234; end
         end
@@ -24,17 +24,17 @@ describe Sequel::Model, ".plugin" do
   after do
     Sequel::Plugins.send(:remove_const, :Timestamped)
   end
-  
+
   it "should raise LoadError if the plugin is not found" do
     proc{@c.plugin :something_or_other}.should raise_error(LoadError)
   end
-  
+
   it "should store the plugin in .plugins" do
     @c.plugins.should_not include(@t)
     @c.plugin @t
     @c.plugins.should include(@t)
   end
-  
+
   it "should be inherited in subclasses" do
     @c.plugins.should_not include(@t)
     c1 = Class.new(@c)
@@ -44,7 +44,7 @@ describe Sequel::Model, ".plugin" do
     c1.plugins.should_not include(@t)
     c2.plugins.should include(@t)
   end
-  
+
   it "should accept a symbol and load the module from the Sequel::Plugins namespace" do
     @c.plugin :timestamped
     @c.plugins.should include(@t)
@@ -85,18 +85,18 @@ describe Sequel::Model, ".plugin" do
     end
     b = lambda{42}
     @c.plugin(m, 123, 1=>2, &b)
-    
+
     m.args.should == [123, {1=>2}]
     m.block.should == b
     m.block_call.should == 42
     @c.new.blah.should == 43
-    
+
     m.args2.should == [123, {1=>2}]
     m.block2.should == b
     m.block2_call.should == 42
     @c.new.blag.should == 44
   end
-  
+
   it "should call configure even if the plugin has already been loaded" do
     m = Module.new do
       @args = []
@@ -105,16 +105,16 @@ describe Sequel::Model, ".plugin" do
         @args << [block, *args]
       end
     end
-    
+
     b = lambda{42}
     @c.plugin(m, 123, 1=>2, &b)
     m.args.should == [[b, 123, {1=>2}]]
-    
+
     b2 = lambda{44}
     @c.plugin(m, 234, 2=>3, &b2)
     m.args.should == [[b, 123, {1=>2}], [b2, 234, {2=>3}]]
   end
-  
+
   it "should call things in the following order: apply, InstanceMethods, ClassMethods, DatasetMethods, configure" do
     m = Module.new do
       @args = []
@@ -141,7 +141,7 @@ describe Sequel::Model, ".plugin" do
         end
       end
     end
-    
+
     b = lambda{44}
     @c.plugin(m, 123, 1=>2, &b)
     m.args.should == [:apply, :im, :cm, :dm, :configure]
@@ -179,7 +179,7 @@ describe Sequel::Model, ".plugin" do
     c.dataset.ghi.should == 345
     c.ghi.should == 345
   end
-  
+
   it "should save the DatasetMethods module and apply it later if the class has a dataset" do
     @c.plugin @t
     @c.dataset = MODEL_DB[:i]
@@ -200,7 +200,7 @@ describe Sequel::Model, ".plugin" do
     @c.a.should == 1
     @c.b.should == 2
   end
-  
+
   it "should not define class methods for private instance methods in DatasetMethod" do
     m = Module.new do
       self::DatasetMethods = Module.new do

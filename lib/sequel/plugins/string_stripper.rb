@@ -5,7 +5,7 @@ module Sequel
     #
     #   album = Album.new(:name=>' A ')
     #   album.name # => 'A'
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances strip strings (called before loading subclasses)

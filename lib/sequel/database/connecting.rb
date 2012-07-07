@@ -26,7 +26,7 @@ module Sequel
         rescue LoadError => e
           raise Sequel.convert_exception_class(e, AdapterNotFound)
         end
-        
+
         # make sure we actually loaded the adapter
         unless klass = ADAPTER_MAP[scheme]
           raise AdapterNotFound, "Could not load #{scheme} adapter: adapter class not registered in ADAPTER_MAP"
@@ -34,12 +34,12 @@ module Sequel
       end
       klass
     end
-        
+
     # Returns the scheme symbol for the Database class.
     def self.adapter_scheme
       @scheme
     end
-    
+
     # Connects to a database.  See Sequel.connect.
     def self.connect(conn_string, opts = {})
       case conn_string
@@ -86,7 +86,7 @@ module Sequel
       end
       block_given? ? result : db
     end
-    
+
     # Sets the default single_threaded mode for new databases.
     # See Sequel.single_threaded=.
     def self.single_threaded=(value)
@@ -110,7 +110,7 @@ module Sequel
       ADAPTER_MAP[scheme.to_sym] = self
     end
     private_class_method :set_adapter_scheme
-    
+
     # The connection pool for this Database instance.  All Database instances have
     # their own connection pools.
     attr_reader :pool
@@ -140,12 +140,12 @@ module Sequel
         @pool.add_servers(servers.keys)
       end
     end
-    
+
     # Connects to the database. This method should be overridden by descendants.
     def connect(server)
       raise NotImplemented, "#connect should be overridden by adapters"
     end
-    
+
     # The database type for this database object, the same as the adapter scheme
     # by default.  Should be overridden in adapters (especially shared adapters)
     # to be the correct type, so that even if two separate Database objects are
@@ -158,7 +158,7 @@ module Sequel
     def database_type
       adapter_scheme
     end
-    
+
     # Disconnects all available connections from the connection pool.  Any
     # connections currently in use will not be disconnected. Options:
     # :servers :: Should be a symbol specifing the server to disconnect from,
@@ -198,7 +198,7 @@ module Sequel
         @pool.remove_servers(servers)
       end
     end
-    
+
     # An array of servers/shards for this Database object.
     #
     #   DB.servers # Unsharded: => [:default]
@@ -211,7 +211,7 @@ module Sequel
     def single_threaded?
       @single_threaded
     end
-    
+
     if !defined?(RUBY_ENGINE) || RUBY_ENGINE == 'ruby'
       # Acquires a database connection, yielding it to the passed block. This is
       # useful if you want to make sure the same connection is used for all
@@ -233,7 +233,7 @@ module Sequel
         @pool.hold(server || :default, &block)
       end
     end
-    
+
     # Attempts to acquire a database connection.  Returns true if successful.
     # Will probably raise an Error if unsuccessful.  If a server argument
     # is given, attempts to acquire a database connection to the given
@@ -244,12 +244,12 @@ module Sequel
     end
 
     private
-    
+
     # The default options for the connection pool.
     def connection_pool_default_options
       {}
     end
-    
+
     # Return the options for the given server by merging the generic
     # options for all server with the specific options for the given
     # server specified in the :servers option.

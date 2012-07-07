@@ -5,11 +5,11 @@ describe Sequel::Model, "#sti_key" do
     class ::StiTest < Sequel::Model
       columns :id, :kind, :blah
       plugin :single_table_inheritance, :kind
-    end 
+    end
     class ::StiTestSub1 < StiTest
-    end 
+    end
     class ::StiTestSub2 < StiTest
-    end 
+    end
     @ds = StiTest.dataset
     MODEL_DB.reset
   end
@@ -23,35 +23,35 @@ describe Sequel::Model, "#sti_key" do
     StiTest.simple_table.should == "sti_tests"
     StiTestSub1.simple_table.should == nil
   end
-  
+
   it "should allow changing the inheritance column via a plugin :single_table_inheritance call" do
     StiTest.plugin :single_table_inheritance, :blah
     Object.send(:remove_const, :StiTestSub1)
     Object.send(:remove_const, :StiTestSub2)
-    class ::StiTestSub1 < StiTest; end 
-    class ::StiTestSub2 < StiTest; end 
+    class ::StiTestSub1 < StiTest; end
+    class ::StiTestSub2 < StiTest; end
     @ds._fetch = [{:blah=>'StiTest'}, {:blah=>'StiTestSub1'}, {:blah=>'StiTestSub2'}]
     StiTest.all.collect{|x| x.class}.should == [StiTest, StiTestSub1, StiTestSub2]
     StiTest.dataset.sql.should == "SELECT * FROM sti_tests"
     StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.blah IN ('StiTestSub1'))"
     StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.blah IN ('StiTestSub2'))"
-  end 
-  
+  end
+
   it "should return rows with the correct class based on the polymorphic_key value" do
     @ds._fetch = [{:kind=>'StiTest'}, {:kind=>'StiTestSub1'}, {:kind=>'StiTestSub2'}]
     StiTest.all.collect{|x| x.class}.should == [StiTest, StiTestSub1, StiTestSub2]
-  end 
+  end
 
   it "should return rows with the correct class based on the polymorphic_key value when retreiving by primary key" do
     @ds._fetch = [{:kind=>'StiTestSub1'}]
     StiTest[1].class.should == StiTestSub1
-  end 
+  end
 
   it "should return rows with the correct class for subclasses based on the polymorphic_key value" do
-    class ::StiTestSub1Sub < StiTestSub1; end 
+    class ::StiTestSub1Sub < StiTestSub1; end
     StiTestSub1.dataset._fetch = [{:kind=>'StiTestSub1'}, {:kind=>'StiTestSub1Sub'}]
     StiTestSub1.all.collect{|x| x.class}.should == [StiTestSub1, StiTestSub1Sub]
-  end 
+  end
 
   it "should fallback to the main class if the given class does not exist" do
     @ds._fetch = {:kind=>'StiTestSub3'}

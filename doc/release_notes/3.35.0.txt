@@ -141,4 +141,4 @@
   * PostgreSQL <8.2 support
   * Dataset#disable_insert_returning on PostgreSQL
   * Array#all_two_pairs? and #sql_expr_if_all_two_pairs
-  
+

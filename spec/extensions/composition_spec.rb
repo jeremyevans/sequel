@@ -8,7 +8,7 @@ describe "Composition plugin" do
     @o = @c.load(:id=>1, :year=>1, :month=>2, :day=>3)
     MODEL_DB.reset
   end
-  
+
   it ".composition should add compositions" do
     @o.should_not respond_to(:date)
     @c.composition :date, :mapping=>[:year, :month, :day]

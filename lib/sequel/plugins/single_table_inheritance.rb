@@ -10,16 +10,16 @@ module Sequel
     # argument to the plugin) holds the class name as a string.  However,
     # you can override this by using the <tt>:model_map</tt> option and/or
     # the <tt>:key_map</tt> option.
-    #   
+    #
     # You should only load this plugin in the parent class, not in the subclasses.
-    #   
+    #
     # You shouldn't call set_dataset in the model after applying this
     # plugin, otherwise subclasses might use the wrong dataset. You should
     # make sure this plugin is loaded before the subclasses. Note that since you
     # need to load the plugin before the subclasses are created, you can't use
     # direct class references in the plugin class.  You should specify subclasses
     # in the plugin call using class name strings or symbols, see usage below.
-    #   
+    #
     # Usage:
     #
     #   # Use the default of storing the class name in the sti_key
@@ -36,7 +36,7 @@ module Sequel
     #     :model_map=>{'line staff'=>:Staff, 'supervisor'=>:Manager}
     #
     #   # Using custom procs, with :model_map taking column values
-    #   # and yielding either a class, string, symbol, or nil, 
+    #   # and yielding either a class, string, symbol, or nil,
     #   # and :key_map taking a class object and returning the column
     #   # value to use
     #   Employee.plugin :single_table_inheritance, :type,
@@ -52,7 +52,7 @@ module Sequel
       def self.configure(model, key, opts={})
         model.instance_eval do
           @sti_key_array = nil
-          @sti_key = key 
+          @sti_key = key
           @sti_dataset = dataset
           @sti_model_map = opts[:model_map] || lambda{|v| v if v && v != ''}
           @sti_key_map = if km = opts[:key_map]
@@ -105,7 +105,7 @@ module Sequel
           sd = sti_dataset
           skm = sti_key_map
           smm = sti_model_map
-          key = skm[subclass] 
+          key = skm[subclass]
           sti_subclass_added(key)
           ska = [key]
           rp = dataset.row_proc
@@ -127,7 +127,7 @@ module Sequel
           sti_class(sti_model_map[r[sti_key]]).call(r)
         end
 
-        # Make sure that all subclasses of the parent class correctly include 
+        # Make sure that all subclasses of the parent class correctly include
         # keys for all of their descendant classes.
         def sti_subclass_added(key)
           if sti_key_array

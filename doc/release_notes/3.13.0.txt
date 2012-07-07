@@ -8,7 +8,7 @@
   to include, as well pass options to nested associations using a
   hash.  In addition to serializing to JSON, it also adds support
   for parsing JSON to model objects via JSON.parse or #from_json.
-  
+
 * An xml_serializer plugin was added that allows you to serialize
   model instances or datasets to XML.  It requries the nokogiri
   library.  It has a similar API to the json_serializer plugin, using
@@ -38,18 +38,18 @@
   PostgreSQL, MySQL, and H2.  You can specify that you want to
   use prepared transactions using the :prepare option which
   should be some transaction id string:
-  
+
     DB.transaction(:prepare=>'some string') do ... end
-    
+
   Assuming that no exceptions are raised in the transaction block,
   Sequel will prepare the transaction.  You can then commit the
   transaction later:
-  
+
     DB.commit_prepared_transaction('some string')
-    
+
   If you need to rollback the prepared transaction, you can do
   so as well:
-  
+
     DB.rollback_prepared_transaction('some string')
 
 * Sequel now supports customizable transaction isolation levels on
@@ -57,21 +57,21 @@
   transaction isolation level to use for any transaction using the
   :isolation option with an :uncommitted, :committed, :repeatable,
   or :serializable value:
-  
+
     DB.transaction(:isolation=>:serializable) do ... end
-    
+
   You can also set the default isolation level for transactions via
   the transaction_isolation_level Database attribute:
-  
+
     DB.transaction_isolation_level = :committed
-    
+
   If you are connecting to Microsoft SQL Server, it is recommended
   that you set a default transaction isolation level if you plan
   on using this feature.
 
 * You can specify a NULLS FIRST/LAST ordering by using the
   :nulls=>:first/:last option to asc and desc:
-  
+
     Album.filter(:release_date.desc(:nulls=>:first),
                  :name.asc(:nulls=>:last))
     # ORDER BY release_date DESC NULLS FIRST,
@@ -84,8 +84,8 @@
 
 * Sequel::Model.find_or_create now accepts a block that is a yielded
   a new model object to be created if an existing model object is
-  not found.  
-  
+  not found.
+
     Node.find_or_create(:name=>'A'){|i| i.parent_id = 4}
 
 * The :frame option for windows and window functions can now be a
@@ -107,9 +107,9 @@
 
 * Sequel now handles arrays of two element arrays automatically when
   using them as the value of a filter hash:
-  
+
     DB[a].filter([:a, :b]=>[[1, 2], [3, 4]])
-    
+
   Previously, you had to call .sql_array on the array in order to
   tell Sequel that it was a value list and not a conditions
   specifier.
@@ -123,13 +123,13 @@
 
 * tinyint(1) columns are now handled as booleans when connecting to
   MySQL via JDBC.
-  
+
 * On PostgreSQL, if no :schema option is provided for
   Database#tables, #table_exists?, or #schema, and no default_schema
   is used,  assume all schemas except the default non-public ones.
   Previously, it assumed the public schema for tables and
   table_exists?, but did not assume any schema for #schema.
-  
+
   This fixes issues if you use table names that overlap with table
   names in the information_schema, such as domains.  It's still
   recommended that you specify a default_schema if you are using a
@@ -140,7 +140,7 @@
 * Sequel::SQL::PlaceholderLiteralString is now a GenericExpression
   subclass, allowing you to treat it like most other Sequel
   expression objects:
-  
+
     '(a || ?)'.lit(:b).like('Test%')
     # ((a || b) LIKE 'Test%')
 
@@ -169,40 +169,40 @@
   PostgreSQL's bitwise xor operator (#) instead of PostgreSQL's
   exponentiation operator (^).  If you want exponentiation, use
   the power function.
-  
+
 * Using the ruby bitwise complement operator (~) on MySQL now returns
   a signed integer instead of an unsigned integer, for better
   compatibility with other databases.
-  
+
 * Using nil as a case expression value (the 2nd argument to Hash#case
   and Array#case) will now use NULL as the case expression value,
   instead of omitting the case expression value:
-  
+
     # 3.12.0
     {1=>2}.case(0, nil)
     # CASE WHEN 1 THEN 2 ELSE 0 END
-    
+
     # 3.13.0
     {1=>2}.case(0, nil)
     # CASE NULL WHEN 1 THEN 2 ELSE 0 END
-    
+
   In general, you would never use nil explicitly, but the new
   behavior makes more sense if you have a variable that might be nil:
-  
+
     parent_id = Node[1].parent_id
     {1=>2}.case(0, parent_id)
 
   If parent_id IS NULL/nil, then previously Sequel would have
   generated unexpected SQL.  If you don't want a case expression
   value to be used, do not pass a second argument to #case.
-  
+
 * Some internal transaction methods now take an optional options
   hash, so if you have a custom adapter, you will need to make
   changes.
-  
+
 * Some internal association methods now take an optional options
   hash.
-  
+
 * Some Rakefile task names were modified in the name of consistency:
 
     spec_coverage -> spec_cov

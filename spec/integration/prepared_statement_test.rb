@@ -15,7 +15,7 @@ describe "Prepared Statements and Bound Arguments" do
   after do
     @db.drop_table?(:items)
   end
-  
+
   specify "should support bound variables when selecting" do
     @ds.filter(:numb=>:$n).call(:each, :n=>10){|h| h.should == {:id=>1, :numb=>10}}
     @ds.filter(:numb=>:$n).call(:select, :n=>10).should == [{:id=>1, :numb=>10}]
@@ -25,7 +25,7 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:numb=>:$n).call([:to_hash, :id, :numb], :n=>10).should == {1=>10}
     @ds.filter(:numb=>:$n).call([:to_hash_groups, :id, :numb], :n=>10).should == {1=>[10]}
   end
-    
+
   specify "should support blocks for each, select, all, and map when using bound variables" do
     a = []
     @ds.filter(:numb=>:$n).call(:each, :n=>10){|r| r[:numb] *= 2; a << r}; a.should == [{:id=>1, :numb=>20}]
@@ -33,22 +33,22 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:numb=>:$n).call(:all, :n=>10){|r| r[:numb] *= 2}.should == [{:id=>1, :numb=>20}]
     @ds.filter(:numb=>:$n).call([:map], :n=>10){|r| r[:numb] * 2}.should == [20]
   end
-    
+
   specify "should support binding variables before the call with #bind" do
     @ds.filter(:numb=>:$n).bind(:n=>10).call(:select).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>10).call(:all).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>10).call(:first).should == {:id=>1, :numb=>10}
-    
+
     @ds.bind(:n=>10).filter(:numb=>:$n).call(:select).should == [{:id=>1, :numb=>10}]
     @ds.bind(:n=>10).filter(:numb=>:$n).call(:all).should == [{:id=>1, :numb=>10}]
     @ds.bind(:n=>10).filter(:numb=>:$n).call(:first).should == {:id=>1, :numb=>10}
   end
-  
+
   specify "should allow overriding variables specified with #bind" do
     @ds.filter(:numb=>:$n).bind(:n=>1).call(:select, :n=>10).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>1).call(:all, :n=>10).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>1).call(:first, :n=>10).should == {:id=>1, :numb=>10}
-    
+
     @ds.filter(:numb=>:$n).bind(:n=>1).bind(:n=>10).call(:select).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>1).bind(:n=>10).call(:all).should == [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>1).bind(:n=>10).call(:first).should == {:id=>1, :numb=>10}
@@ -88,7 +88,7 @@ describe "Prepared Statements and Bound Arguments" do
   specify "should support subselects of subselects with call" do
     @ds.filter(:id=>:$i).filter(:numb=>@ds.select(:numb).filter(:numb=>@ds.select(:numb).filter(:numb=>:$n))).filter(:id=>:$j).call(:select, :n=>10, :i=>1, :j=>1).should == [{:id=>1, :numb=>10}]
   end
-  
+
   cspecify "should support using a bound variable for a limit and offset", [:jdbc, :db2] do
     @ds.insert(:numb=>20)
     ds = @ds.limit(:$n, :$n2).order(:id)
@@ -126,7 +126,7 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:numb=>:$n).call(:update, {:n=>10, :nn=>20}, :numb=>:numb+:$nn).should == 1
     @ds.all.should == [{:id=>1, :numb=>30}]
   end
-  
+
   specify "should support prepared statements when selecting" do
     @ds.filter(:numb=>:$n).prepare(:each, :select_n)
     @db.call(:select_n, :n=>10){|h| h.should == {:id=>1, :numb=>10}}
@@ -154,7 +154,7 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:numb=>:$n).prepare([:map], :select_n).call(:n=>10){|r| r[:numb] *= 2}.should == [20]
     @db.call(:select_n, :n=>10){|r| r[:numb] *= 2}.should == [20]
   end
-    
+
   specify "should support prepared statements being called multiple times with different arguments" do
     @ds.filter(:numb=>:$n).prepare(:select, :select_n)
     @db.call(:select_n, :n=>10).should == [{:id=>1, :numb=>10}]
@@ -196,7 +196,7 @@ describe "Prepared Statements and Bound Arguments" do
   specify "should support subselects of subselects with prepare" do
     @ds.filter(:id=>:$i).filter(:numb=>@ds.select(:numb).filter(:numb=>@ds.select(:numb).filter(:numb=>:$n))).filter(:id=>:$j).prepare(:select, :seq_select).call(:n=>10, :i=>1, :j=>1).should == [{:id=>1, :numb=>10}]
   end
-  
+
   cspecify "should support using a prepared_statement for a limit and offset", :db2 do
     @ds.insert(:numb=>20)
     ps = @ds.limit(:$n, :$n2).order(:id).prepare(:select, :seq_select)
@@ -239,13 +239,13 @@ describe "Prepared Statements and Bound Arguments" do
     @db.call(:update_n, :n=>10, :nn=>20).should == 1
     @ds.all.should == [{:id=>1, :numb=>30}]
   end
-  
+
   specify "model datasets should return model instances when using select, all, and first with bound variables" do
     @c.filter(:numb=>:$n).call(:select, :n=>10).should == [@c.load(:id=>1, :numb=>10)]
     @c.filter(:numb=>:$n).call(:all, :n=>10).should == [@c.load(:id=>1, :numb=>10)]
     @c.filter(:numb=>:$n).call(:first, :n=>10).should == @c.load(:id=>1, :numb=>10)
   end
-  
+
   specify "model datasets should return model instances when using select, all, and first with prepared statements" do
     @c.filter(:numb=>:$n).prepare(:select, :select_n1)
     @db.call(:select_n1, :n=>10).should == [@c.load(:id=>1, :numb=>10)]
@@ -283,7 +283,7 @@ describe "Bound Argument Types" do
     @db.drop_table?(:items)
   end
 
-  cspecify "should handle date type", [:do, :sqlite], :mssql, [:jdbc, :sqlite], :oracle do 
+  cspecify "should handle date type", [:do, :sqlite], :mssql, [:jdbc, :sqlite], :oracle do
     @ds.filter(:d=>:$x).prepare(:first, :ps_date).call(:x=>@vs[:d])[:d].should == @vs[:d]
   end
 
@@ -346,7 +346,7 @@ describe "Dataset#unbind" do
   after do
     INTEGRATION_DB.drop_table?(:items)
   end
-  
+
   specify "should unbind values assigned to equality and inequality statements" do
     @ct[Integer, 10]
     @u[@ds.filter(:c=>10)].should == {:c=>10}
@@ -402,4 +402,4 @@ describe "Dataset#unbind" do
     @u[@ds.filter{c > 1}.or{c < 1}.invert].should == {:c=>1}
     @u[@ds.filter{c > 1}.or{c < 1}].should == nil
   end
-end    
+end

@@ -76,7 +76,7 @@ it shows that the master database is named :default.  So for 4 masters and
     @current_master_host ||= -1
     "master_server#{(@current_master_host+=1)%4}"
   end
-  
+
 == Sharding
 
 There is specific support in Sequel for handling master/slave database
@@ -92,7 +92,7 @@ of 16 shards).  First, you need to configure the database:
     servers[hex.to_sym] = {:host=>"hash_host_#{hex}"}
   end
   DB=Sequel.connect('postgres://hash_host/hashes', :servers=>servers)
-  
+
 This configures 17 servers, the 16 shard servers (/hash_host_[0-9a-f]/), and 1
 default server which will be used if no shard is specified ("hash_host").  If
 you want the default server to be one of the shard servers (e.g. hash_host_a),
@@ -110,7 +110,7 @@ schemas, so you should always have a default server that works.
 To set the shard for a given query, you use the Dataset#server method:
 
   DB[:hashes].server(:a).filter(:hash=>/31337/)
-  
+
 That will return all matching rows on the hash_host_a shard that have a hash
 column that contains 31337.
 
@@ -125,7 +125,7 @@ the shard to use.  This is fairly easy using a Sequel::Model:
       row[:plaintext] if row
     end
   end
-  
+
   Rainbow.plaintext_for_hash("e580726d31f6e1ad216ffd87279e536d1f74e606")
 
 The connection pool can be further controlled to change how it handles attempts
@@ -150,8 +150,8 @@ to make the :read_only entry the same as the :default shard:
   (('0'..'9').to_a + ('a'..'f').to_a).each do |hex|
     servers[hex.to_sym] = {:host=>"hash_host_#{hex}"}
   end
-  DB=Sequel.connect('postgres://hash_host/hashes', :servers=>servers, 
-    :servers_hash=>Hash.new{raise Exception.new("Invalid Server")}) 
+  DB=Sequel.connect('postgres://hash_host/hashes', :servers=>servers,
+    :servers_hash=>Hash.new{raise Exception.new("Invalid Server")})
 
 === Sharding Plugin
 
@@ -242,6 +242,6 @@ to switch to the sharded threaded connection pool before using this
 extension.  If you are passing the :single_threaded option to
 the Database, just remove that option.  If you are setting:
 
-  Sequel.single_threaded = true 
+  Sequel.single_threaded = true
 
 just remove or comment out that code.

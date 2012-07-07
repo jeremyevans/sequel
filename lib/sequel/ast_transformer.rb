@@ -77,8 +77,8 @@ module Sequel
   # Handles qualifying existing datasets, so that unqualified columns
   # in the dataset are qualified with a given table name.
   class Qualifier < ASTTransformer
-    # Store the dataset to use as the basis for qualification, 
-    # and the table used to qualify unqualified columns. 
+    # Store the dataset to use as the basis for qualification,
+    # and the table used to qualify unqualified columns.
     def initialize(ds, table)
       @ds = ds
       @table = table
@@ -179,7 +179,7 @@ module Sequel
         if UNBIND_KEY_CLASSES.any?{|c| l.is_a?(c)} && UNBIND_VALUE_CLASSES.any?{|c| r.is_a?(c)} && !r.is_a?(LiteralString)
           key = bind_key(l)
           if (old = binds[key]) && old != r
-            raise UnbindDuplicate, "two different values for #{key.inspect}: #{[r, old].inspect}" 
+            raise UnbindDuplicate, "two different values for #{key.inspect}: #{[r, old].inspect}"
           end
           binds[key] = r
           SQL::ComplexExpression.new(o.op, l, :"$#{key}")

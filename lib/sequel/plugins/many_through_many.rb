@@ -31,7 +31,7 @@ module Sequel
     #    :right_primary_key=>:album_id
     #
     # Often you don't want the current object to appear in the array of associated objects.  This is easiest to handle via an :after_load hook:
-    # 
+    #
     #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]],
     #     :after_load=>proc{|artist, associated_artists| associated_artists.delete(artist)}
     #
@@ -39,7 +39,7 @@ module Sequel
     # that won't work when eagerly loading, which is why the :after_load proc is recommended instead.
     #
     # It's also common to not want duplicate records, in which case the :distinct option can be used:
-    # 
+    #
     #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]],
     #    :distinct=>true
     module ManyThroughMany
@@ -94,7 +94,7 @@ module Sequel
             es << {:left_table=>t[:table], :left_key=>t[:right]}
           end
           es.last.merge!(:right_key=>right_primary_key, :right_table=>associated_class.table_name)
-          edges = es.map do |e| 
+          edges = es.map do |e|
             h = {:table=>e[:right_table], :left=>e[:left_key], :right=>e[:right_key], :conditions=>e[:conditions], :join_type=>e[:join_type], :block=>e[:block]}
             h[:only_conditions] = e[:only_conditions] if e.include?(:only_conditions)
             h
@@ -180,7 +180,7 @@ module Sequel
             h = eo[:id_map]
             rows = eo[:rows]
             rows.each{|object| object.associations[name] = []}
-            ds = opts.associated_class 
+            ds = opts.associated_class
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
             ft = opts.final_reverse_edge
             ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.predicate_key, h.keys]], :table_alias=>ft[:alias], :qualify=>:deep)

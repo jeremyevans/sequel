@@ -73,7 +73,7 @@ module Sequel
         def _load_associated_objects(opts, dynamic_opts={})
           if !opts.can_have_associated_objects?(self) || dynamic_opts[:callback] || (ps = opts[:prepared_statement]) == false
             super
-          else 
+          else
             if bv = association_bound_variables(opts)
               (ps || association_prepared_statement(opts)).call(bv)
             else

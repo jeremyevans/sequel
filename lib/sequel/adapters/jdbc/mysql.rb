@@ -9,9 +9,9 @@ module Sequel
       module DatabaseMethods
         include Sequel::MySQL::DatabaseMethods
         LAST_INSERT_ID = 'SELECT LAST_INSERT_ID()'.freeze
-        
+
         private
-        
+
         # The database name for the given database.  Need to parse it out
         # of the connection string, since the JDBC does no parsing on the
         # given connection string by default.
@@ -19,7 +19,7 @@ module Sequel
           u = URI.parse(uri.sub(/\Ajdbc:/, ''))
           (m = /\/(.*)/.match(u.path)) && m[1]
         end
-        
+
         # Get the last inserted id using LAST_INSERT_ID().
         def last_insert_id(conn, opts={})
           if stmt = opts[:stmt]
@@ -47,12 +47,12 @@ module Sequel
         def requires_return_generated_keys?
           true
         end
-      
+
         # Convert tinyint(1) type to boolean
         def schema_column_type(db_type)
           db_type == 'tinyint(1)' ? :boolean : super
         end
-      
+
         # Run the default connection setting SQL statements.
         # Apply the connectiong setting SQLs for every new connection.
         def setup_connection(conn)

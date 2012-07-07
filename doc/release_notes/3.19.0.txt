@@ -3,13 +3,13 @@
 * The add_* association methods now accept a primary key, and
   associates the receiver to the associated model object with that
   primary key:
-  
+
     artist.add_album(42)
     # equivalent to: artist.add_album(Album[42])
 
 * The validation_class_methods plugin now has the ability to
   reflect on validations:
-  
+
     Album.plugin :validation_class_methods
     Album.validates_acceptance_of(:a)
     Album.validation_reflections
@@ -30,7 +30,7 @@
 
 * Date and DateTime objects are now handled correctly when using
   prepared statements/bound variables in the jdbc adapter.
-  
+
 * Date, DateTime, Time, true, false, and SQL::Blob objects are now
   handled correctly when using prepared statements/bound variables
   in the sqlite adapter.
@@ -38,7 +38,7 @@
 * Sequel now uses varbinary(max) instead of image for the generic
   File (blob) type on Microsoft SQL Server.  This makes it possible
   to use an SQL::Blob object as a prepared statement argument.
-  
+
 * Sequel now handles blobs better in the Amalgalite adapter.
 
 * When disconnecting a connection using the sqlite adapter, all

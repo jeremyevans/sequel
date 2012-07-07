@@ -13,7 +13,7 @@ following Sequel code works on ruby 1.8, but not ruby 1.9:
 
   dataset.filter(:a > :b[:c])
   # WHERE a > b(c)
-  
+
 This code does not work on ruby 1.9 for two reasons.  First, Symbol#>
 (like other inequality methods) is already defined in ruby 1.9, so Sequel
 does not override it to return an SQL inequality expression.  Second, Symbol#[]
@@ -38,7 +38,7 @@ available.  For example, you are no longer able to do:
 
   dataset.filter(:a & (:b | ~:c))
   # WHERE a AND (b OR NOT c)
-  
+
 Because Symbol#&, Symbol#| and Symbol#~ are not defined when the core
 extensions are turned off.  However, virtual rows allow almost the same
 syntax even without the core extensions:
@@ -56,11 +56,11 @@ evaluated in the context of an instance of Sequel::SQL::VirtualRow.
   # Regular proc
   ds.filter{|o| o.column > 1}
   # WHERE column > 1
-  
+
   # Instance-evaled proc
   ds.filter{column > 1}
   # WHERE column > 1
-  
+
 If you aren't familiar with the difference between regular blocks and instance
 evaled blocks, you should probably consult a general ruby reference, but briefly,
 with regular procs, methods called without an explicit receiver inside the
@@ -73,15 +73,15 @@ inside the proc.  If that doesn't make sense, maybe this example will help:
     42
   end
   b = 32
-  
+
   # Regular proc
   ds.filter{|o| o.c > a - b}
   # WHERE c > 10
-  
+
   # Instance-evaled proc
   ds.filter{c > a - b}
   # WHERE c > (a - 32)
-  
+
 There are two related differences here.  First is the usage of "o.c" vs "c",
 and second is the difference between the the use of "a".  In the regular proc,
 you couldn't call c without an explicit receiver in the proc, unless the self of the
@@ -123,7 +123,7 @@ name:
   ds.filter{|o| o.column > 1}
   ds.filter{column > 1}
   # WHERE column > 1
-  
+
 == SQL::QualifiedIdentifiers - Qualified columns
 
 SQL::QualifiedIdentifiers can be thought of as column references in SQL that
@@ -147,10 +147,10 @@ function call if you call a method with arguments and without a block:
   ds.filter{|o| o.function(1) > 1}
   ds.filter{function(1) > 1}
   # WHERE function(1) > 1
-  
+
 To call a SQL function with multiple arguments, just use those arguments in
 your function call:
-  
+
   ds.filter{|o| o.function(1, o.a) > 1}
   ds.filter{function(1, a) > 1}
   # WHERE function(1, a) > 1
@@ -162,11 +162,11 @@ SQL::Identifier:
   ds.select{|o| o.version{}}
   ds.select{version{}}
   # SELECT version()
-  
+
 To use the SQL wildcard (*) as the sole argument in a function call (most often
 used with the count function), you should provide :* as the sole argument to
 the method, and provide an empty block to the method:
-  
+
   ds.select{|o| o.count(:*){}}
   ds.select{count(:*){}}
   # SELECT count(*)
@@ -178,14 +178,14 @@ the method:
   ds.select{|o| o.count(:distinct, o.col1){}}
   ds.select{count(:distinct, col1){}}
   # SELECT count(DISTINCT col1)
-  
+
 To use multiple columns with the DISTINCT keyword, use multiple arguments in
 the method call:
 
   ds.select{|o| o.count(:distinct, o.col1, o.col2){}}
   ds.select{count(:distinct, col1, col2){}}
   # SELECT count(DISTINCT col1, col2)
-  
+
 == SQL::WindowFunctions - SQL window function calls
 
 SQL::WindowFunctions can be thought of as calls to SQL window functions.  Not
@@ -196,11 +196,11 @@ call, with an optional hash as the second argument: Here are some examples of us
   ds.select{|o| o.rank(:over){}}
   ds.select{rank(:over){}}
   # SELECT rank() OVER ()
-  
+
   ds.select{|o| o.count(:over, :*=>true){}}
   ds.select{count(:over, :*=>true){}}
   # SELECT count(*) OVER ()
-  
+
   ds.select{|o| o.sum(:over, :args=>o.col1, :partition=>o.col2, :order=>o.col3){}}
   ds.select{sum(:over, :args=>col1, :partition=>col2, :order=>col3){}}
   # SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)
@@ -263,13 +263,13 @@ array:
   ds.select{|o| [o.column1, o.sum(o.column2).as(o.sum)]}
   ds.select{[column1, sum(column2).as(sum)]}
   # SELECT column1, sum(column2) AS sum
-  
+
 Note that if you forget the array brackets, you'll end up with a syntax error:
 
   # Invalid ruby syntax
   ds.select{|o| o.column1, o.sum(o.column2).as(o.sum)}
   ds.select{column1, sum(column2).as(sum)}
-  
+
 == Alternative Description of the VirtualRow method call rules
 
 * If a block is given:
