@@ -46,6 +46,10 @@ describe "A PostgreSQL database" do
     @db = POSTGRES_DB
   end
 
+  specify "should know how to connect if 'postgresql' specified in connection string" do
+    Sequel.connect('postgresql://postgres:postgres@localhost:5432/reality_spec')
+  end
+
   specify "should provide the server version" do
     @db.server_version.should > 70000
   end

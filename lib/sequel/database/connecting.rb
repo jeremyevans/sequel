@@ -18,7 +18,9 @@ module Sequel
       return scheme if scheme.is_a?(Class)
 
       scheme = scheme.to_s.gsub('-', '_').to_sym
-      
+
+      scheme = :postgres if scheme == :postgresql
+
       unless klass = ADAPTER_MAP[scheme]
         # attempt to load the adapter file
         begin
