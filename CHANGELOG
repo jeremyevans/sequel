@@ -1,3 +1,7 @@
+=== HEAD
+
+* Treat clob columns as string instead of blob on Derby (jeremyevans) (#509)
+
 === 3.37.0 (2012-07-02)
 
 * Allow specifying eager_graph alias base on a per-call basis using an AliasedExpression (jeremyevans)
