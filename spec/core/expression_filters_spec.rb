@@ -797,6 +797,18 @@ describe "Sequel core extension replacements" do
     l(Sequel.expr(:a).*, 'a.*')
     l(Sequel.expr(:a__b).*, 'a.b.*')
   end
+
+  it "SQL::Blob should be aliasable and castable by default" do
+    b = Sequel.blob('a')
+    l(b.as(:a), "'a' AS a")
+    l(b.cast(Integer), "CAST('a' AS integer)")
+  end
+
+  it "SQL::Blob should be convertable to a literal string by default" do
+    b = Sequel.blob('a ?')
+    l(b.lit, "a ?")
+    l(b.lit(1), "a 1")
+  end
 end
 
 describe "Sequel::SQL::Function#==" do

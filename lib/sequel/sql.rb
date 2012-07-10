@@ -878,8 +878,16 @@ module Sequel
     # stored as a blob type in the database. Sequel represents binary data as a Blob object because 
     # most database engines require binary data to be escaped differently than regular strings.
     class Blob < ::String
-      # Returns +self+, used so that Blobs don't get wrapped in multiple
-      # levels.
+      include SQL::AliasMethods
+      include SQL::CastMethods
+
+      # Return a LiteralString with the same content if no args are given, otherwise
+      # return a SQL::PlaceholderLiteralString with the current string and the given args.
+      def lit(*args)
+        args.empty? ? LiteralString.new(self) : SQL::PlaceholderLiteralString.new(self, args)
+      end
+      
+      # Returns +self+, since it is already a blob.
       def to_sequel_blob
         self
       end
@@ -1596,13 +1604,16 @@ module Sequel
     include SQL::NumericMethods
     include SQL::StringMethods
     include SQL::InequalityMethods
-    include Sequel::SQL::AliasMethods
-    include Sequel::SQL::CastMethods
+    include SQL::AliasMethods
+    include SQL::CastMethods
       
+    # Return self if no args are given, otherwise return a SQL::PlaceholderLiteralString
+    # with the current string and the given args.
     def lit(*args)
       args.empty? ? self : SQL::PlaceholderLiteralString.new(self, args)
     end
       
+    # Convert a literal string to a SQL::Blob.
     def to_sequel_blob
       SQL::Blob.new(self)
     end
