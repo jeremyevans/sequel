@@ -1,5 +1,7 @@
 === HEAD
 
+* Make #* with no arguments produce a ColumnAll for Identifier and QualifiedIdentifier (jeremyevans)
+
 * Sequel.expr(:symbol) now returns Identifier, QualifiedIdentifier, or AliasedExpression instead of Wrapper (jeremyevans)
 
 * Treat clob columns as string instead of blob on Derby (jeremyevans) (#509)

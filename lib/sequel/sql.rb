@@ -613,7 +613,7 @@ module Sequel
         cast(sql_type || String).sql_string
       end
     end
-    
+
     # Adds methods that allow you to treat an object as an instance of a specific
     # +ComplexExpression+ subclass.  This is useful if another library
     # overrides the methods defined by Sequel.
@@ -786,8 +786,20 @@ module Sequel
     end
 
     # Includes a +qualify+ method that created <tt>QualifiedIdentifier</tt>s, used for qualifying column
-    # names with a table or table names with a schema.
+    # names with a table or table names with a schema, and the * method for returning all columns in
+    # the identifier if no arguments are given.
     module QualifyingMethods
+      # If no arguments are given, return an SQL::ColumnAll:
+      #
+      #   Sequel.expr(:a__b).*  # a.b.*
+      def *(ce=(arg=false;nil))
+        if arg == false
+          Sequel::SQL::ColumnAll.new(self)
+        else
+          super(ce)
+        end
+      end
+
       # Qualify the receiver with the given +qualifier+ (table for column/schema for table).
       #
       #   :column.qualify(:table) # "table"."column"

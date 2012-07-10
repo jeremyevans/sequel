@@ -792,6 +792,11 @@ describe "Sequel core extension replacements" do
   it "Sequel.extract should use a date/time extraction" do
     l(Sequel.extract(:year, :a), 'extract(year FROM a)')
   end
+
+  it "#* with no arguments should use a ColumnAll for Identifier and QualifiedIdentifier" do
+    l(Sequel.expr(:a).*, 'a.*')
+    l(Sequel.expr(:a__b).*, 'a.b.*')
+  end
 end
 
 describe "Sequel::SQL::Function#==" do

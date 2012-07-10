@@ -199,29 +199,17 @@ end
 
 # Sequel extends +Symbol+ to add methods to implement the SQL DSL.
 class Symbol
-  include Sequel::SQL::QualifyingMethods
   include Sequel::SQL::IdentifierMethods
   include Sequel::SQL::AliasMethods
   include Sequel::SQL::CastMethods
   include Sequel::SQL::OrderMethods
   include Sequel::SQL::BooleanMethods
   include Sequel::SQL::NumericMethods
+  include Sequel::SQL::QualifyingMethods
   include Sequel::SQL::StringMethods
   include Sequel::SQL::SubscriptMethods
   include Sequel::SQL::ComplexExpressionMethods
   include Sequel::SQL::InequalityMethods if RUBY_VERSION < '1.9.0'
-
-  # If no argument is given, returns a <tt>Sequel::SQL::ColumnAll</tt> object specifying all
-  # columns for this table.
-  # If an argument is given, returns a <tt>Sequel::SQL::NumericExpression</tt> using the *
-  # (multiplication) operator with this and the given argument.
-  # 
-  #   :table.* # SQL: table.*
-  #   :column * 2 # SQL: column * 2
-  def *(ce=(arg=false;nil))
-    return super(ce) unless arg == false
-    Sequel::SQL::ColumnAll.new(self);
-  end
 
   # Returns a <tt>Sequel::SQL::Function</tt> with this as the function name,
   # and the given arguments. This is aliased as <tt>Symbol#[]</tt> if the RUBY_VERSION
