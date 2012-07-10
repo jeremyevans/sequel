@@ -1596,20 +1596,15 @@ module Sequel
     include SQL::NumericMethods
     include SQL::StringMethods
     include SQL::InequalityMethods
-
-    # If the core extensions are enabled, these will already be included
-    # in String, so we don't need to include/define them here.
-    unless Sequel.core_extensions?
-      include Sequel::SQL::AliasMethods
-      include Sequel::SQL::CastMethods
+    include Sequel::SQL::AliasMethods
+    include Sequel::SQL::CastMethods
       
-      def lit(*args)
-        args.empty? ? self : SQL::PlaceholderLiteralString.new(self, args)
-      end
+    def lit(*args)
+      args.empty? ? self : SQL::PlaceholderLiteralString.new(self, args)
+    end
       
-      def to_sequel_blob
-        SQL::Blob.new(self)
-      end
+    def to_sequel_blob
+      SQL::Blob.new(self)
     end
   end
   
