@@ -4036,8 +4036,8 @@ describe "Sequel::Dataset#select_order_map" do
   specify "should handle an array of columns" do
     @ds.select_order_map([:c, :c]).should == [[1, 1], [2, 2]]
     @ds.db.sqls.should == ['SELECT c, c FROM t ORDER BY c, c']
-    @ds.select_order_map([Sequel.expr(:d).as(:c), Sequel.qualify(:b, :c), Sequel.identifier(:c), Sequel.identifier(:c).qualify(:b), Sequel.identifier(:c).qualify(:b).desc, :a__c, Sequel.expr(:a__d___c).desc]).should == [[1, 1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2, 2]]
-    @ds.db.sqls.should == ['SELECT d AS c, b.c, c, b.c, b.c, a.c, a.d AS c FROM t ORDER BY d, b.c, c, b.c, b.c DESC, a.c, a.d DESC']
+    @ds.select_order_map([Sequel.expr(:d).as(:c), Sequel.qualify(:b, :c), Sequel.identifier(:c), Sequel.identifier(:c).qualify(:b), Sequel.identifier(:c).qualify(:b).desc, :a__c, Sequel.desc(:a__d___c), Sequel.desc(Sequel.expr(:a__d___c))]).should == [[1, 1, 1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2, 2, 2]]
+    @ds.db.sqls.should == ['SELECT d AS c, b.c, c, b.c, b.c, a.c, a.d AS c, a.d AS c FROM t ORDER BY d, b.c, c, b.c, b.c DESC, a.c, a.d DESC, a.d DESC']
   end
 
   specify "should handle an array with a single element" do

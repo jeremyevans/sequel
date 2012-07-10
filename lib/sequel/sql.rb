@@ -389,6 +389,20 @@ module Sequel
         end
 
         case arg
+        when Symbol
+          t, c, a = Sequel.split_symbol(arg)
+
+          arg = if t
+            SQL::QualifiedIdentifier.new(t, c)
+          else
+            SQL::Identifier.new(c)
+          end
+
+          if a
+            arg = SQL::AliasedExpression.new(arg, a)
+          end
+
+          arg
         when SQL::Expression, LiteralString, SQL::Blob
           arg
         when Hash

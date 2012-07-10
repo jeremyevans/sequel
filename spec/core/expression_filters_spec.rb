@@ -531,6 +531,24 @@ describe "Sequel core extension replacements" do
     @db.literal(arg).should == should
   end
 
+  it "Sequel.expr should return items wrapped in Sequel objects" do
+    Sequel.expr(1).should be_a_kind_of(Sequel::SQL::NumericExpression)
+    Sequel.expr('a').should be_a_kind_of(Sequel::SQL::StringExpression)
+    Sequel.expr(true).should be_a_kind_of(Sequel::SQL::BooleanExpression)
+    Sequel.expr(nil).should be_a_kind_of(Sequel::SQL::Wrapper)
+    Sequel.expr({1=>2}).should be_a_kind_of(Sequel::SQL::BooleanExpression)
+    Sequel.expr([[1, 2]]).should be_a_kind_of(Sequel::SQL::BooleanExpression)
+    Sequel.expr([1]).should be_a_kind_of(Sequel::SQL::Wrapper)
+    Sequel.expr{|o| o.should be_a_kind_of(Sequel::SQL::VirtualRow)}
+    Sequel.expr{self.should be_a_kind_of(Sequel::SQL::VirtualRow)}
+    Sequel.expr(:a).should be_a_kind_of(Sequel::SQL::Identifier)
+    Sequel.expr(:a__b).should be_a_kind_of(Sequel::SQL::QualifiedIdentifier)
+    Sequel.expr(:a___c).should be_a_kind_of(Sequel::SQL::AliasedExpression)
+    Sequel.expr(:a___c).expression.should be_a_kind_of(Sequel::SQL::Identifier)
+    Sequel.expr(:a__b___c).should be_a_kind_of(Sequel::SQL::AliasedExpression)
+    Sequel.expr(:a__b___c).expression.should be_a_kind_of(Sequel::SQL::QualifiedIdentifier)
+  end
+
   it "Sequel.expr should return an appropriate wrapped object" do
     l(Sequel.expr(1) + 1, "(1 + 1)")
     l(Sequel.expr('a') + 'b', "('a' || 'b')")

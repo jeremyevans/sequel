@@ -262,6 +262,28 @@ module Sequel
     Database.single_threaded = value
   end
 
+  COLUMN_REF_RE1 = /\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/.freeze
+  COLUMN_REF_RE2 = /\A((?:(?!___).)+)___(.+)\z/.freeze
+  COLUMN_REF_RE3 = /\A((?:(?!__).)+)__(.+)\z/.freeze
+
+  # Splits the symbol into three parts.  Each part will
+  # either be a string or nil.
+  #
+  # For columns, these parts are the table, column, and alias.
+  # For tables, these parts are the schema, table, and alias.
+  def self.split_symbol(sym)
+    case s = sym.to_s
+    when COLUMN_REF_RE1
+      [$1, $2, $3]
+    when COLUMN_REF_RE2
+      [nil, $1, $2]
+    when COLUMN_REF_RE3
+      [$1, $2, nil]
+    else
+      [nil, s, nil]
+    end
+  end
+
   # Converts the given +string+ into a +Date+ object.
   #
   #   Sequel.string_to_date('2010-09-10') # Date.civil(2010, 09, 10)

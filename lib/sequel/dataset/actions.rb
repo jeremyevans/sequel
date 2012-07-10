@@ -820,8 +820,8 @@ module Sequel
       when SQL::AliasedExpression
         c.expression
       when SQL::OrderedExpression
-        expr = c.expression
-        if expr.is_a?(Symbol) || (expr.is_a?(SQL::Wrapper) && expr.value.is_a?(Symbol) && (expr = expr.value))
+        case expr = c.expression
+        when Symbol, SQL::AliasedExpression
           SQL::OrderedExpression.new(unaliased_identifier(expr), c.descending, :nulls=>c.nulls)
         else
           c
