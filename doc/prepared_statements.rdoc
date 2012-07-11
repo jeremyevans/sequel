@@ -10,7 +10,7 @@ the following adapters:
 * mysql (prepared statements only)
 * mysql2 (prepared statements only)
 * oracle (requires type specifiers for nil/NULL values)
-* postgres (when using the pg driver, may require type specifiers)
+* postgres (when using the pg driver)
 * sqlite
 * tinytds
 
@@ -29,7 +29,7 @@ significantly for placeholders (e.g. :name, $1, ?).  Sequel abstracts all of
 that and allows you to specify placeholders by using the :$name format for
 placeholders, e.g.:
 
-  ds = DB[:items].filter(:name=>:$n)
+  ds = DB[:items].where(:name=>:$n)
 
 == Bound Variables
 

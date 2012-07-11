@@ -57,7 +57,7 @@ Any options you pass to +first+ will be used as a filter:
   # SELECT * FROM artists WHERE (name = 'YJM') LIMIT 1
   => #<Artist @values={:name=>"YJM", :id=>1}>
   
-  artist = Artist.first(:name.like('Y%'))
+  artist = Artist.first(Sequel.like(:name, 'Y%'))
   # SELECT * FROM artists WHERE (name LIKE 'Y%') LIMIT 1
   => #<Artist @values={:name=>"YJM", :id=>1}>
   
@@ -69,12 +69,12 @@ requires an argument:
   => {:name=>"YJM", :id=>1}
 
 Note that while Model.[] allows you to pass a primary key directly,
-Dataset#[] does not.
+Dataset#[] does not (unless it is a model dataset).
 
 ==== Using +last+
 
 If you want the last record in the dataset,
-<tt>Sequel::Dataset#last</tt> is an obvious method to use.  Note first
+<tt>Sequel::Dataset#last</tt> is an obvious method to use.  Note
 that last requires that the dataset be ordered.  Without an order, any
 object can be considered the first as well as the last.
 
@@ -161,6 +161,13 @@ It's also common to want to order such a map, so Sequel provides a
   artist_names = Artist.select_order_map(:name)
   # SELECT name FROM artists ORDER BY name
   => ["AS", "YJM"]
+
+In all of these cases, you can provide an array of column symbols and
+an array of arrays of values will be returned:
+
+  artist_names = Artist.select_map([:id, :name])
+  # SELECT id, name FROM artists
+  => [[1, "YJM"], [2, "AS"]]
 
 ==== As a Hash
 
@@ -256,7 +263,7 @@ table +artists+:
 Let's say we are only interested in the artists whose names
 start with "A":
 
-  ds2 = ds1.where(:name.like('A%'))
+  ds2 = ds1.where(Sequel.like(:name, 'A%'))
   # SELECT * FROM artists WHERE name LIKE 'A%'
 
 Here we see that +where+ returns a dataset that adds a +WHERE+
@@ -306,47 +313,47 @@ of condition is used depends on the values in the hash.
 Unless Sequel has special support for the value's class, it uses a simple
 equality statement:
 
-  Artist.filter(:id=>1)
+  Artist.where(:id=>1)
   # SELECT * FROM artists WHERE id = 1
 
-  Artist.filter(:name=>'YJM')
+  Artist.where(:name=>'YJM')
   # SELECT * FROM artists WHERE name = 'YJM'
 
 For arrays, Sequel uses the IN operator.
 
-  Artist.filter(:id=>[1, 2])
+  Artist.where(:id=>[1, 2])
   # SELECT * FROM artists WHERE id IN (1, 2)
 
 For datasets, Sequel uses the IN operator with a subselect:
 
-  Artist.filter(:id=>Album.select(:artist_id))
+  Artist.where(:id=>Album.select(:artist_id))
   # SELECT * FROM artists WHERE id IN (
   #   SELECT artist_id FROM albums)
 
 For boolean values such as nil, true, and false, Sequel uses the IS operator:
 
-  Artist.filter(:id=>nil)
+  Artist.where(:id=>nil)
   # SELECT * FROM artists WHERE id IS NULL
 
 For ranges, Sequel uses a pair of inequality statements:
 
-  Artist.filter(:id=>1..5)
+  Artist.where(:id=>1..5)
   # SELECT * FROM artists WHERE id >= 1 AND id <= 5
 
 Finally, for regexps, Sequel uses an SQL regular expression.  Note that this
 is probably only supported on PostgreSQL and MySQL.
 
-  Artist.filter(:name=>/JM$/)
+  Artist.where(:name=>/JM$/)
   # SELECT * FROM artists WHERE name ~ 'JM$'
 
 If there are multiple arguments in the hash, the filters are ANDed together:
 
-  Artist.filter(:id=>1, :name=>/JM$/)
+  Artist.where(:id=>1, :name=>/JM$/)
   # SELECT * FROM artists WHERE id = 1 AND name ~ 'JM$'
 
-This works the same as if you used two separate filter calls:
+This works the same as if you used two separate +where+ calls:
 
-  Artist.filter(:id=>1).filter(:name=>/JM$/)
+  Artist.where(:id=>1).where(:name=>/JM$/)
   # SELECT * FROM artists WHERE id = 1 AND name ~ 'JM$'
 
 === Array of Two Element Arrays
@@ -355,14 +362,14 @@ If you use an array of two element arrays, it is treated as a hash.  The only
 advantage to using an array of two element arrays is that it allows you to
 duplicate keys, so you can do:
 
-  Artist.filter([[:name, /JM$/], [:name, /^YJ/]])
+  Artist.where([[:name, /JM$/], [:name, /^YJ/]])
   # SELECT * FROM artists WHERE name ~ 'JM$' AND name ~ '^YJ'
 
 === Virtual Row Blocks
 
-If a block is passed to filter, it is treated as a virtual row block:
+If a block is passed to a filter, it is treated as a virtual row block:
 
-  Artist.filter{id > 5}
+  Artist.where{id > 5}
   # SELECT * FROM artists WHERE id > 5
 
 You can learn more about virtual row blocks in the {"Virtual Rows" guide}[link:files/doc/virtual_rows_rdoc.html].
@@ -370,7 +377,7 @@ You can learn more about virtual row blocks in the {"Virtual Rows" guide}[link:f
 You can provide both regular arguments and a block, in which case the results
 will be ANDed together:
 
-  Artist.filter(:name=>'A'...'M'){id > 5}
+  Artist.where(:name=>'A'...'M'){id > 5}
   # SELECT * FROM artists WHERE name >= 'A' AND name < 'M' AND id > 5
 
 === Symbols
@@ -387,28 +394,30 @@ Sequel has a DSL that allows easily creating SQL expressions.  These SQL
 expressions are instances of subclasses of Sequel::SQL::Expression. You've
 already seen an example earlier:
 
-  Artist.filter(:name.like('Y%'))
+  Artist.where(Sequel.like(:name, 'Y%'))
   # SELECT * FROM artists WHERE name LIKE 'Y%'
 
-In this case Symbol#like returns a Sequel::SQL::BooleanExpression object,
+In this case Sequel.like returns a Sequel::SQL::BooleanExpression object,
 which is used directly in the filter.
 
 You can use the DSL to create arbitrarily complex expressions.  SQL::Expression
-objects support the & operator for +AND+, the | operator for +OR+, and the ~ operator
-for inversion:
+objects can be created via singleton methods on the Sequel module.  The most common
+method is Sequel.expr, which takes any object and wraps it in a SQL::Expression
+object.  In most cases, the SQL::Expression returned supports the & operator for
++AND+, the | operator for +OR+, and the ~ operator for inversion:
 
-  Artist.filter(:name.like('Y%') & ({:b=>1} | ~{:c=>3}))
+  Artist.where(Sequel.like(:name, 'Y%') & (Sequel.expr(:b=>1) | Sequel.~(:c=>3)))
   # SELECT * FROM artists WHERE name LIKE 'Y%' AND (b = 1 OR c != 3)
 
 You can combine these expression operators with the virtual row support:
 
-  Artist.filter{(a > 1) & ~((b(c) < 1) | d)}
+  Artist.where{(a > 1) & ~((b(c) < 1) | d)}
   # SELECT * FROM artists WHERE a > 1 AND b(c) >= 1 AND NOT d
 
 Note the use of parentheses when using the & and | operators, as they have lower
 precedence than other operators.  The following will not work:
 
-  Artist.filter{a > 1 & ~(b(c) < 1 | d)}
+  Artist.where{a > 1 & ~(b(c) < 1 | d)}
   # Raises a TypeError, as it calls Integer#| with a Sequel::SQL::Identifier
 
 === Strings with Placeholders
@@ -416,24 +425,24 @@ precedence than other operators.  The following will not work:
 Assuming you want to get your hands dirty and write some SQL, Sequel allows you
 to use strings using placeholders for the values:
 
-  Artist.filter("name LIKE ?", 'Y%')
+  Artist.where("name LIKE ?", 'Y%')
   # SELECT * FROM artists WHERE name LIKE 'Y%'
 
 This is the most common type of placeholder, where each question mark is substituted
 with the next argument:
 
-  Artist.filter("name LIKE ? AND id = ?", 'Y%', 5)
+  Artist.where("name LIKE ? AND id = ?", 'Y%', 5)
   # SELECT * FROM artists WHERE name LIKE 'Y%' AND id = 5
 
 You can also use named placeholders with a hash, where the named placeholders use
 colons before the placeholder names:
 
-  Artist.filter("name LIKE :name AND id = :id", :name=>'Y%', :id=>5)
+  Artist.where("name LIKE :name AND id = :id", :name=>'Y%', :id=>5)
   # SELECT * FROM artists WHERE name LIKE 'Y%' AND id = 5
 
 You don't have to provide any placeholders if you don't want to:
 
-  Artist.filter("id = 2")
+  Artist.where("id = 2")
   # SELECT * FROM artists WHERE id = 2
 
 However, if you are using any untrusted input, you should definitely be using placeholders.
@@ -441,9 +450,9 @@ In general, unless you are hardcoding values in the strings, you should use plac
 You should never pass a string that has been built using interpolation, unless you are
 sure of what you are doing.
 
-  Artist.filter("id = #{params[:id]}") # Don't do this!
-  Artist.filter("id = ?", params[:id]) # Do this instead
-  Artist.filter(:id=>params[:id]) # Even better
+  Artist.where("id = #{params[:id]}") # Don't do this!
+  Artist.where("id = ?", params[:id]) # Do this instead
+  Artist.where(:id=>params[:id]) # Even better
 
 === Inverting
 
@@ -451,12 +460,12 @@ You may be wondering how to specify a not equals condition in Sequel, or the NOT
 operator.  Sequel has generic support for inverting conditions, so to write a not
 equals condition, you write an equals condition, and invert it:
 
-  Artist.filter(:id=>5).invert
+  Artist.where(:id=>5).invert
   # SELECT * FROM artists WHERE id != 5
 
 Note that +invert+ inverts the entire filter:
 
-  Artist.filter(:id=>5).filter{name > 'A'}.invert
+  Artist.where(:id=>5).where{name > 'A'}.invert
   # SELECT * FROM artists WHERE id != 5 OR name <= 'A'
 
 In general, +invert+ is used rarely, since +exclude+ allows you to invert only specific
@@ -465,7 +474,7 @@ filters:
   Artist.exclude(:id=>5)
   # SELECT * FROM artists WHERE id != 5
   
-  Artist.filter(:id=>5).exclude{name > 'A'}
+  Artist.where(:id=>5).exclude{name > 'A'}
   # SELECT * FROM artists WHERE id = 5 OR name <= 'A'
 
 So to do a NOT IN with an array:
@@ -475,14 +484,14 @@ So to do a NOT IN with an array:
 
 Or to use the NOT LIKE operator:
 
-  Artist.exclude(:name.like('%J%'))
+  Artist.exclude(Sequel.like(:name, '%J%'))
   # SELECT * FROM artists WHERE name NOT LIKE '%J%'
  
 === Removing
 
 To remove all existing filters, use +unfiltered+:
 
-  Artist.filter(:id=>1).unfiltered
+  Artist.where(:id=>1).unfiltered
   # SELECT * FROM artists
 
 == Ordering
@@ -498,7 +507,7 @@ You can specify multiple arguments to order by more than one column:
   Album.order(:artist_id, :id)
   # SELECT * FROM album ORDER BY artist_id, id
 
-Note that unlike +filter+, +order+ replaces an existing order, it does not
+Note that unlike +where+, +order+ replaces an existing order, it does not
 append to an existing order:
 
   Artist.order(:id).order(:name)
@@ -523,15 +532,15 @@ order, using +reverse+:
   # SELECT FROM artists ORDER BY id DESC
 
 As you might expect, +reverse+ is not used all that much.  In general,
-<tt>Symbol#desc</tt> is used more commonly to specify a descending order
+<tt>Sequel.desc</tt> is used more commonly to specify a descending order
 for columns:
 
-  Artist.order(:id.desc)
+  Artist.order(Sequel.desc(:id))
   # SELECT FROM artists ORDER BY id DESC
 
 This allows you to easily use both ascending and descending orders:
 
-  Artist.order(:name, :id.desc)
+  Artist.order(:name, Sequel.desc(:id))
   # SELECT FROM artists ORDER BY name, id DESC
 
 === Removing
@@ -582,6 +591,12 @@ columns, use +select_all+:
 
   Artist.select(:id).select_all
   # SELECT * FROM artists
+
+To select all columns from a given table, provide an argument to
++select_all+:
+
+  Artist.select_all(:artists)
+  # SELECT artists.* FROM artists
 
 === Distinct
 
@@ -637,6 +652,17 @@ and Sequel provides a +group_and_count+ method to make this easier:
 
 This will return the number of albums for each artist_id.
 
+If you want to select and group on the same columns, you can use +select_group+:
+
+  Album.select_group(:artist_id)
+  # SELECT artist_id FROM albums GROUP BY artist_id
+
+Usually you would add a +select_append+ call after that, to add some sort of
+aggregation:
+
+  Album.select_group(:artist_id).select_append{sum(num_tracks).as(tracks)}
+  # SELECT artist_id, sum(num_tracks) AS tracks FROM albums GROUP BY artist_id
+
 == Having
 
 The SQL HAVING clause is similar to the WHERE clause, except that
@@ -656,12 +682,9 @@ will add to the HAVING clause instead of the WHERE clause:
   # SELECT artist_id, COUNT(*) AS count FROM albums
   # GROUP BY artist_id HAVING count >= 10 AND count < 15
 
-Unlike +filter+, +where+ always affects the WHERE clause:
-
-  Album.group_and_count(:artist_id).
-   having{count >= 10}.where(:name.like('A%'))
-  # SELECT artist_id, COUNT(*) AS count FROM albums
-  # WHERE name LIKE 'A%' GROUP BY artist_id HAVING count >= 10
+This can be confusing, so it is recommended that you always use
+either +having+ or +where+ instead of +filter+, indicating which
+clause that would want affected.
 
 Both the WHERE clause and the HAVING clause are removed by +unfiltered+:
 
@@ -702,7 +725,7 @@ can also provide a model class:
 
 Or a dataset, in which case a subselect is used:
 
-  Album.join(Artist.filter{name < 'A'}, :id=>:artist_id)
+  Album.join(Artist.where{name < 'A'}, :id=>:artist_id)
   # SELECT * FROM albums
   # INNER JOIN (SELECT * FROM artists WHERE (name < 'A')) AS t1
   #  ON (t1.id = albums.artist_id)
@@ -770,6 +793,19 @@ as a hash, but allows for duplicate keys:
 And just like in the hash case, unqualified symbol elements in the
 array are implicitly qualified.
 
+By default, Sequel only qualifies unqualified symbols in the conditions.  However,
+You can provide an options hash with a <tt>:qualify=>:deep</tt> option to do a deep
+qualification, which can qualify subexpressions.  For example, let's say you are doing
+a JOIN using case insensitive string comparison:
+
+  Album.join(:artists, {Sequel.function(:lower, :name) =>
+                        Sequel.function(:lower, :artist_name)},
+             :qualify => :deep)
+  # SELECT * FROM albums INNER JOIN artists
+  #  ON (lower(artists.name) = lower(albums.artist_name))
+
+Note how the arguments to lower were qualified correctly in both cases.
+
 ==== USING Joins
 
 The most common type of join conditions is a JOIN ON, as displayed
@@ -812,7 +848,7 @@ and artists tables, but only want albums where the artist's name
 comes before the album's name.
 
   Album.join(:artists, :id=>:artist_id) do |j, lj, js|
-    :name.qualify(j) < :name.qualify(lj)
+    Sequel.qualify(j, :name) < Sequel.qualify(lj, :name)
   end
   # SELECT * FROM albums INNER JOIN artists
   # ON artists.id = albums.artist_id
@@ -912,6 +948,25 @@ With either of these methods, you can use placeholders:
   DB[:albums].with_sql("SELECT * FROM artists WHERE id = :id", :id=>5)
   # SELECT * FROM artists WHERE id = 5
 
+Note that if you specify the dataset using custom SQL, you can still call the dataset
+modification methods, but in many cases they will appear to have no affect:
+
+  DB["SELECT * FROM artists"].select(:name).order(:id)
+  # SELECT * FROM artists
+
+If you must drop down to using custom SQL, it's recommended that you only do so for
+specific parts of a query.  For example, if the reason you are using custom SQL is
+to use a custom operator in the database in the SELECT clause:
+
+  DB["SELECT name, (foo !@# ?) AS baz FROM artists", 'bar']
+
+it's better to use Sequel's DSL, and use a literal string for the custom operator:
+
+  DB[:artists].select(:name, Sequel.lit("(foo !@# ?)", 'bar').as(:baz))
+
+That way Sequel's method chaining still works, and it increases Sequel's ability to
+introspect the code.
+
 == Checking for Records
 
 If you just want to know whether the current dataset would return any rows, use <tt>empty?</tt>:
@@ -920,11 +975,11 @@ If you just want to know whether the current dataset would return any rows, use 
   # SELECT 1 FROM albums LIMIT 1
   => false
 
-  Album.filter(:id=>0).empty?
+  Album.where(:id=>0).empty?
   # SELECT 1 FROM albums WHERE id = 0 LIMIT 1
   => true
 
-  Album.filter(:name.like('R%')).empty?
+  Album.where(Sequel.like(:name, 'R%')).empty?
   # SELECT 1 FROM albums WHERE name LIKE 'R%' LIMIT 1
   => false
 

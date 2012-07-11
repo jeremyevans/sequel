@@ -109,7 +109,7 @@ schemas, so you should always have a default server that works.
 
 To set the shard for a given query, you use the Dataset#server method:
 
-  DB[:hashes].server(:a).filter(:hash=>/31337/)
+  DB[:hashes].server(:a).where(:hash=>/31337/)
   
 That will return all matching rows on the hash_host_a shard that have a hash
 column that contains 31337.
@@ -119,10 +119,11 @@ work, you might want to add a method to the dataset that automatically sets
 the shard to use.  This is fairly easy using a Sequel::Model:
 
   class Rainbow < Sequel::Model(:hashes)
-    def_dataset_method(:plaintext_for_hash) do |hash|
-      raise(ArgumentError, 'Invalid SHA-1 Hash') unless /\A[0-9a-f]{40}\z/.match(hash)
-      row = self.server(hash[0...1].to_sym).first(:hash=>hash)
-      row[:plaintext] if row
+    dataset_module do
+      def plaintext_for_hash(hash)
+        raise(ArgumentError, 'Invalid SHA-1 Hash') unless /\A[0-9a-f]{40}\z/.match(hash)
+        server(hash[0...1].to_sym).where(:hash=>hash).get(:plaintext)
+      end
     end
   end
   
@@ -179,8 +180,7 @@ same shard, it can get a bit redundent to specify the same shard for all of them
 The server_block extension adds a Database#with_server method that scopes all database
 access inside the block to the given shard by default:
 
-  Sequel.extension :server_block
-  DB.extend Sequel::ServerBlock
+  DB.extension :server_block
   DB.with_server(:a) do
     # this SELECT query uses the "a" shard
     if r = Rainbow.first(:hash=>/31337/)
@@ -208,8 +208,7 @@ shards on the fly, but it is a bit cumbersome to work with truly arbitrary serve
 The arbitrary_servers extension allows you to pass a server/shard options hash as the
 server to use, and those options will be merged directly into the database's default options:
 
-  Sequel.extension :arbitrary_servers
-  DB.pool.extend Sequel::ArbitraryServers
+  DB.extension :arbitrary_servers
   DB[:rainbows].server(:host=>'hash_host_a').all
   # or
   DB[:rainbows].server(:host=>'hash_host_b', :database=>'backup').all

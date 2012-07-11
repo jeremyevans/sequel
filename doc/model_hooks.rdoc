@@ -45,7 +45,7 @@ Sequel calls hooks in the following order when saving an existing object:
   * +before_save+
   * +around_update+
     * +before_update+
-    * INSERT QUERY
+    * UPDATE QUERY
     * +after_update+
   * +after_save+
 
@@ -89,10 +89,10 @@ Sequel does not provide a simple way to turn off the running of save/create/upda
 
 However, you should note that there are plenty of ways to modify the database without saving a model object.  One example is by using plain datasets, or one of the model's dataset methods:
 
-  Album.filter(:name=>'RF').update(:copies_sold=>:copies_sold + 1)
+  Album.where(:name=>'RF').update(:copies_sold=>:copies_sold + 1)
   # UPDATE albums SET copies_sold = copies_sold + 1 WHERE name = 'RF'
 
-In this case, the +update+ method is called on the dataset returned by <tt>Album.filter</tt>.  Even if there is only a single object with the name RF, this will not call any hooks.  If you want model hooks to be called, you need to make sure to operate on a model object:
+In this case, the +update+ method is called on the dataset returned by <tt>Album.where</tt>.  Even if there is only a single object with the name RF, this will not call any hooks.  If you want model hooks to be called, you need to make sure to operate on a model object:
 
   album = Album.first(:name=>'RF')
   album.update(:copies_sold=>album.copies_sold + 1)

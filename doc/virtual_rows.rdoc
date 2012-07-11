@@ -1,6 +1,6 @@
 = Virtual Row Blocks
 
-Dataset methods filter, order, and select all take blocks that are referred to as
+Dataset methods where, order, and select all take blocks that are referred to as
 virtual row blocks.  Many other dataset methods pass the blocks
 they are given into one of those three methods, so there are actually
 many Sequel::Dataset methods that take virtual row blocks.
@@ -11,7 +11,7 @@ Virtual Rows were created to work around the issue that some parts of
 Sequel's standard DSL could not be used on ruby 1.9.  For example, the
 following Sequel code works on ruby 1.8, but not ruby 1.9:
 
-  dataset.filter(:a > :b[:c])
+  dataset.where(:a > :b[:c])
   # WHERE a > b(c)
   
 This code does not work on ruby 1.9 for two reasons.  First, Symbol#>
@@ -20,30 +20,15 @@ does not override it to return an SQL inequality expression.  Second, Symbol#[]
 is already defined on ruby 1.9, so Sequel does not override it to return an
 SQL function expression.
 
-Prior to the introduction of virtual rows, the way to handle this was
-to use the methods that work on both ruby 1.8 and ruby 1.9:
+It's possible to use Sequel's DSL to represent such expressions, but it is a
+little verbose:
 
-  dataset.filter(:a.identifier > :b.sql_function(:c))
+  dataset.where(Sequel.expr(:a) > Sequel.function(:b, :c))
   # WHERE a > b(c)
 
-However, that code is a little verbose.  The virtual row DSL makes such code
-more concise:
+The virtual row DSL makes such code more concise:
 
-  dataset.filter{a > b(c)}
-
-Another use of virtual rows is when you turn off Sequel's core extensions off
-using the SEQUEL_NO_CORE_EXTENSIONS constant or environment variable.  With
-the core extensions turned off, much of the standard Sequel DSL is not
-available.  For example, you are no longer able to do:
-
-  dataset.filter(:a & (:b | ~:c))
-  # WHERE a AND (b OR NOT c)
-  
-Because Symbol#&, Symbol#| and Symbol#~ are not defined when the core
-extensions are turned off.  However, virtual rows allow almost the same
-syntax even without the core extensions:
-
-  dataset.filter{a & (b | ~c)}
+  dataset.where{a > b(c)}
 
 == Regular Procs vs Instance Evaled Procs
 
@@ -54,11 +39,11 @@ evaluated in the context of an instance of Sequel::SQL::VirtualRow.
 
   ds = DB[:items]
   # Regular proc
-  ds.filter{|o| o.column > 1}
+  ds.where{|o| o.column > 1}
   # WHERE column > 1
   
   # Instance-evaled proc
-  ds.filter{column > 1}
+  ds.where{column > 1}
   # WHERE column > 1
   
 If you aren't familiar with the difference between regular blocks and instance
@@ -75,21 +60,21 @@ inside the proc.  If that doesn't make sense, maybe this example will help:
   b = 32
   
   # Regular proc
-  ds.filter{|o| o.c > a - b}
+  ds.where{|o| o.c > a - b}
   # WHERE c > 10
   
   # Instance-evaled proc
-  ds.filter{c > a - b}
+  ds.where{c > a - b}
   # WHERE c > (a - 32)
   
-There are two related differences here.  First is the usage of "o.c" vs "c",
-and second is the difference between the the use of "a".  In the regular proc,
-you couldn't call c without an explicit receiver in the proc, unless the self of the
-surrounding scope responded to it.  For a, note how ruby calls the method on
+There are two related differences here.  First is the usage of <tt>o.c</tt> vs +c+,
+and second is the difference between the the use of +a+.  In the regular proc,
+you couldn't call +c+ without an explicit receiver in the proc, unless the self of the
+surrounding scope responded to it.  For +a+, note how ruby calls the method on
 the receiver of the surrounding scope in the regular proc, which returns an integer,
-and does the substitution before Sequel gets access to it.  In the instance evaled
-proc, calling a without a receiver calls the a method on the VirtualRow instance.
-For b, note that it operates the same in both cases, as it is a local variable.
+and does the subtraction before Sequel gets access to it.  In the instance evaled
+proc, calling +a+ without a receiver calls the a method on the VirtualRow instance.
+For +b+, note that it operates the same in both cases, as it is a local variable.
 
 Basically, the choice for whether to use a regular proc or an instance evaled proc is
 completely up to you.  The same things can be accomplished with both.
@@ -105,7 +90,7 @@ variable, you can call it with () to differentiate the method call from the
 local variable access.  This is mostly useful in instance_evaled procs:
 
   b = 32
-  ds.filter{b() > b}
+  ds.where{b() > b}
   # WHERE b > 32
 
 == VirtualRow Methods
@@ -120,8 +105,8 @@ not qualified by any table. You get an SQL::Identifier if the method is called
 without a block or arguments, and doesn't have a double underscore in the method
 name:
 
-  ds.filter{|o| o.column > 1}
-  ds.filter{column > 1}
+  ds.where{|o| o.column > 1}
+  ds.where{column > 1}
   # WHERE column > 1
   
 == SQL::QualifiedIdentifiers - Qualified columns
@@ -131,8 +116,8 @@ are qualified to a specific table.  You get an SQL::QualifiedIdentifier if
 the method is called without a block or arguments, and has a double underscore
 in the method name:
 
-  ds.filter{|o| o.table__column > 1}
-  ds.filter{table__column > 1}
+  ds.where{|o| o.table__column > 1}
+  ds.where{table__column > 1}
   # WHERE table.column > 1
 
 Using the double underscore for SQL::QualifiedIdentifiers was done to make
@@ -144,15 +129,15 @@ into a qualified column.
 SQL::Functions can be thought of as function calls in SQL.  You get a simple
 function call if you call a method with arguments and without a block:
 
-  ds.filter{|o| o.function(1) > 1}
-  ds.filter{function(1) > 1}
+  ds.where{|o| o.function(1) > 1}
+  ds.where{function(1) > 1}
   # WHERE function(1) > 1
   
 To call a SQL function with multiple arguments, just use those arguments in
 your function call:
   
-  ds.filter{|o| o.function(1, o.a) > 1}
-  ds.filter{function(1, a) > 1}
+  ds.where{|o| o.function(1, o.a) > 1}
+  ds.where{function(1, a) > 1}
   # WHERE function(1, a) > 1
 
 If the SQL function does not accept any arguments, you need to provide an empty
@@ -191,7 +176,8 @@ the method call:
 SQL::WindowFunctions can be thought of as calls to SQL window functions.  Not
 all databases support them, but they are very helpful for certain types of
 queries.  To use them, you need to make :over the first argument of the method
-call, with an optional hash as the second argument: Here are some examples of use:
+call, with an optional hash as the second argument, and provide an empty block
+to the method. Here are some examples of use:
 
   ds.select{|o| o.rank(:over){}}
   ds.select{rank(:over){}}

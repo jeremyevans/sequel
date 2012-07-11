@@ -215,7 +215,7 @@ as literal SQL code, instead of as an SQL string that needs to be escaped:
 The following shortcuts exist for creating Sequel::LiteralString objects:
 
   Sequel.lit("co'de")
-  "co'de".lit
+  "co'de".lit # core_extensions extension
 
 === Sequel::SQL::Blob
 
@@ -228,7 +228,7 @@ than SQL strings do:
 The following shortcuts exist for creating Sequel::SQL::Blob objects:
 
   Sequel.blob("blob")
-  "blob".to_sequel_blob
+  "blob".to_sequel_blob  # core_extensions extension
 
 === Sequel::SQLTime
 
@@ -256,7 +256,7 @@ where they are required.
 The following shortcuts exist for creating Sequel::SQL::ValueList objects:
 
   Sequel.value_list([[1, 2], [3, 4]])
-  [[1, 2], [3, 4]].sql_value_list
+  [[1, 2], [3, 4]].sql_value_list # core_extensions extension
 
 === Sequel::SQL::Identifier
 
@@ -268,8 +268,9 @@ automatic qualification or aliasing happens for them:
 
 The following shortcuts exist for creating Sequel::SQL::Identifier objects:
 
+  Sequel.expr(:column)
   Sequel.identifier(:col__umn)
-  :col__umn.identifier
+  :col__umn.identifier # core_extensions extension
 
 === Sequel::SQL::QualifiedIdentifier
 
@@ -279,8 +280,9 @@ Sequel::SQL::QualifiedIdentifier objects represent qualified identifiers:
 
 The following shortcuts exist for creating Sequel::SQL::QualifiedIdentifier objects:
 
+  Sequel.expr(:table__column)
   Sequel.qualify(:table, :column)
-  :column.qualify(:table)
+  :column.qualify(:table) # core_extensions extension
 
 === Sequel::SQL::AliasedExpression
 
@@ -291,8 +293,9 @@ is treated as an identifier, but the expression can be an arbitrary Sequel expre
 
 The following shortcuts exist for creating Sequel::SQL::AliasedExpression objects:
 
+  Sequel.expr(:column___alias)
   Sequel.as(:column, :alias)
-  :column.as(:alias)
+  :column.as(:alias) # core_extensions extension
   
 === Sequel::SQL::ComplexExpression
 
@@ -309,13 +312,13 @@ There are separate subclasses for representing boolean operations such as AND an
 There are many shortcuts for creating Sequel::SQL::ComplexExpression objects:
 
   Sequel.or(:col1, :col2)
-  :col1 | :col2
+  :col1 | :col2 # core_extensions extension
 
   Sequel.+(:column, 2)
-  :column + 2
+  :column + 2 # core_extensions extension
 
   Sequel.join([:column, 'b'])
-  :column + 'b'
+  :column + 'b' # core_extensions extension
 
 === Sequel::SQL::CaseExpression
 
@@ -339,8 +342,8 @@ The following shortcuts exist for creating Sequel::SQL::CaseExpression objects:
   Sequel.case({2=>1}, 0, :a)
   Sequel.case({{:a=>2}=>1}, 0)
 
-  {2=>1}.case(0, :a)
-  {{:a=>2}=>1}.case(0)
+  {2=>1}.case(0, :a) # core_extensions extension
+  {{:a=>2}=>1}.case(0) # core_extensions extension
 
 === Sequel::SQL::Cast
 
@@ -360,8 +363,8 @@ The following shortcuts exist for creating Sequel::SQL::Cast objects:
   Sequel.cast(:a, String)
   Sequel.cast(:a, :int4)
 
-  :a.cast(String)
-  :a.cast(:int4)
+  :a.cast(String) # core_extensions extension
+  :a.cast(:int4) # core_extensions extension
 
 === Sequel::SQL::ColumnAll
 
@@ -374,7 +377,8 @@ take arguments.  Still, it's possible they are still useful in some code:
 
 The following shortcut exists for creating Sequel::SQL::Cast objects:
 
-  :table.*
+  Sequel.expr(:table).*
+  :table.* # core_extensions extension
 
 === Sequel::SQL::Constant
 
@@ -399,7 +403,7 @@ name and any arguments:
 The following shortcuts exist for creating Sequel::SQL::Function objects:
 
   Sequel.function(:func, :a, 2)
-  :func.sql_function(:a, 2)
+  :func.sql_function(:a, 2) # core_extensions extension
 
 === Sequel::SQL::JoinClause
 
@@ -436,8 +440,8 @@ objects:
   Sequel.lit(':b = :v', :b=>:a, :v=>1)
   Sequel.lit(['', ' = '], :a, 1)
 
-  '? = ?'.lit(:a, 1)
-  ':b = :v'.lit(:b=>:a, :v=>1)
+  '? = ?'.lit(:a, 1) # core_extensions extension
+  ':b = :v'.lit(:b=>:a, :v=>1) # core_extensions extension
 
 === Sequel::SQL::OrderedExpression
 
@@ -461,10 +465,10 @@ The following shortcuts exist for creating Sequel::SQL::OrderedExpression object
   Sequel.asc(:a, :nulls=>:first)
   Sequel.desc(:a, :nulls=>:last)
 
-  :a.asc
-  :a.desc
-  :a.asc(:nulls=>:first)
-  :a.desc(:nulls=>:last)
+  :a.asc # core_extensions extension
+  :a.desc # core_extensions extension
+  :a.asc(:nulls=>:first) # core_extensions extension
+  :a.desc(:nulls=>:last) # core_extensions extension
 
 === Sequel::SQL::Subscript
 
@@ -479,17 +483,17 @@ The following shortcuts exist for creating Sequel::SQL::Subscript objects:
   Sequel.subscript(:a, 1)
   Sequel.subscript(:a, 1, 2)
 
-  :a.sql_subscript(1)
-  :a.sql_subscript(1, 2)
+  :a.sql_subscript(1) # core_extensions extension
+  :a.sql_subscript(1, 2) # core_extensions extension
   
 === Sequel::SQL::VirtualRow
 
 Sequel::SQL::VirtualRow is a BasicObject subclass that is the backbone behind the
 block expression support:
 
-  DB[:table].filter{a < 1}
+  DB[:table].where{a < 1}
 
-In the above code, the block is instance-evaled instead a VirtualRow instance.
+In the above code, the block is instance-evaled inside a VirtualRow instance.
 
 These objects are usually not instantiated manually.  See the
 {Virtual Row Guide}[link:files/doc/virtual_rows_rdoc.html] for details.

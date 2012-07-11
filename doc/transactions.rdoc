@@ -5,7 +5,7 @@ Sequel uses autocommit mode by default for all of its database adapters, so in g
 * Dataset#import to insert many records at once
 * Model#save
 * Model#destroy
-* Migrations
+* Migrations if the database supports transactional schema
 * A few model plugins
 
 Everywhere else, it is up to use to use a database transaction if you want to.

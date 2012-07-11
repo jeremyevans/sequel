@@ -75,7 +75,7 @@ Sequel's +hook_class_methods+ plugin is modeled directly on ActiveRecord's callb
     end
   end
 
-Observers can be implemented completely by hooks, so Sequel doesn't allow you to define them separately.
+Observers can be implemented completely by hooks, so Sequel doesn't offer a separate observer class.
 
 == Inheritance
 
@@ -150,15 +150,11 @@ Sequel supports logging of all database queries by allowing multiple loggers for
 Sequel supports migrations and has a migrator similar to ActiveRecord:
 
   Sequel.migration do
-    up do
+    change do
       create_table(:albums) do
         primary_key :id
         String :name
       end
-    end
-
-    down do
-      drop_table(:albums)
     end
   end
 
@@ -175,7 +171,7 @@ Unlike ActiveRecord 2, Sequel uses method chains on datasets for retrieving obje
 
 Sequel uses:
 
-  Album.filter{name > 'RF'}.filter(:artist_id=>1).order(:copies_sold).
+  Album.where{name > 'RF'}.where(:artist_id=>1).order(:copies_sold).
     select(:id, :name).all
 
 Note that the records aren't retrieved until +all+ is called.
@@ -184,11 +180,11 @@ ActiveRecord 3 adopts this method chaining approach, so if you are familiar with
 
 === No Need for SQL String Fragments
 
-As the example above shows, most ActiveRecord code uses SQL string fragments.  With Sequel, you rarely need to.  Sequel's DSL allows you to create complex queries without ever specifying SQL string fragments (called literal strings in Sequel).
+Like the example above, most ActiveRecord code uses SQL string fragments.  With Sequel, you rarely need to.  Sequel's DSL allows you to create complex queries without ever specifying SQL string fragments (called literal strings in Sequel).
 
-If you want to use SQL string fragments, Sequel makes it easy by using the <tt>String#lit</tt> method:
+If you want to use SQL string fragments, Sequel makes it easy by using the <tt>Sequel.lit</tt> method:
 
-  Album.select('id, name'.lit)
+  Album.select(Sequel.lit('id, name'))
 
 This usage is not encouraged, though.  The recommended way is to use symbols to represent the columns:
 
@@ -214,17 +210,17 @@ A third reason to not use SQL string fragments is database independence.  For ex
 
 This is because LIKE is case sensitive on PostgreSQL, but case insensitive on MySQL.  With Sequel, you would do:
 
-  Album.filter(:name.ilike('A%'))
+  Album.filter(Sequel.ilike(:name, 'A%'))
 
 This will do a case insensitive search on both databases.  If you want a case sensitive search on both, you can use +like+ instead of +ilike+.
 
 String concatenation is a similar area, where MySQL and PostgreSQL handle things differently.  With Sequel, the same code can work on both databases:
 
-  Album.select(:name.sql_string + ' - Name')
+  Album.select(Sequel.join([:name, ' - Name']))
 
 == Flexible Overriding
 
-Unlike ActiveRecord, which forces you to alias methods if you want to override them, with Sequel you just override the methods and call super:
+Unlike ActiveRecord 2, which forces you to alias methods if you want to override them, with Sequel you just override the methods and call super:
 
   class Sequel::Model
     def after_update
@@ -254,7 +250,7 @@ You can override almost all model class or instance methods this way, just remem
 
 == +method_missing+ Missing
 
-Sequel does not use +method_missing+ unless the object truely needs it. Neither <tt>Sequel::Model</tt> nor <tt>Sequel::Dataset</tt> nor <tt>Sequel::Database</tt> implement +method_missing+ at either a class or model level.  So if you call +methods+, you can see which methods are available, and if they aren't listed, then the object won't respond to them.  Among other things, this means Sequel does not support dynamic finders.  So instead of:
+Sequel does not use +method_missing+ unless it's required that the object respond to potentially any method. Neither <tt>Sequel::Model</tt> nor <tt>Sequel::Dataset</tt> nor <tt>Sequel::Database</tt> implement +method_missing+ at either a class or instance level.  So if you call +methods+, you can see which methods are available, and if they aren't listed, then the object won't respond to them.  Among other things, this means Sequel does not support dynamic finders.  So instead of:
 
   Album.find_or_create_by_name("RF")
 
@@ -309,7 +305,7 @@ Sequel supports the same basic association hooks/callbacks as ActiveRecord.  It 
 If you pass a block to an association method, it's used to return a modified dataset used for the association, instead of to create an association extension:
 
   Artist.one_to_many :gold_albums, :class=>:Album do |ds|
-    ds.filter{copies_sold > 500000}
+    ds.where{copies_sold > 500000}
   end
 
 If you want to create an association extension, you can use the <tt>:extend</tt> association option with a module, which ActiveRecord also supports.  In Sequel, the extensions are applied to the association dataset, not to the array of associated objects.  You can access the association dataset using the +association_dataset+ method:
@@ -319,13 +315,13 @@ If you want to create an association extension, you can use the <tt>:extend</tt>
 
 Association datasets are just like any other Sequel dataset, in that you can filter them and manipulate them further:
 
-  gold_albums = artist.albums_dataset.filter{copies_sold > 500000}.order(:name).all  
+  gold_albums = artist.albums_dataset.where{copies_sold > 500000}.order(:name).all  
 
 Sequel caches associated objects similarly to ActiveRecord, and you can skip the cache by passing +true+ to the association method, just like ActiveRecord.
 
 === Eager Loading
 
-ActiveRecord tries to guess whether to use preloading or JOINs for eager loading by scanning the SQL string fragments you provide for table names.  This is error prone and Sequel avoids it by giving you separate methods.  In Sequel, +eager+ is used for preloading and +eager_graph+ is used for JOINs.  Both have the same API:
+ActiveRecord 2 tries to guess whether to use preloading or JOINs for eager loading by scanning the SQL string fragments you provide for table names.  This is error prone and Sequel avoids it by giving you separate methods.  In Sequel, +eager+ is used for preloading and +eager_graph+ is used for JOINs.  Both have the same API:
 
   Artist.eager(:albums=>[:tags, :tracks])
   Album.eager_graph(:artist, :tracks)
@@ -361,6 +357,24 @@ Table aliasing when eager loading via +eager_graph+ is different in Sequel than 
   #  LEFT OUTER JOIN nodes AS children_0 ON (children_0.parent_id = children.id) -- grandchildren
   #  LEFT OUTER JOIN nodes AS children_1 ON (children_1.parent_id = children_0.id) -- great grandchildren
 
+You can specify aliases on a per join basis, too:
+
+  Node.eager_graph(:parent=>Sequel.as(:parent, :grandparent),
+    :children=>{Sequel.as(:children, :grandchildren)=>Sequel.as(:children, :great_grandchildren)}).all
+
+  # SELECT nodes.id, nodes.parent_id,
+  #  parent.id AS parent_id_0, parent.parent_id AS parent_parent_id,
+  #  grandparent.id AS grandparent_id, grandparent.parent_id AS grandparent_parent_id,
+  #  children.id AS children_id, children.parent_id AS children_parent_id,
+  #  grandchildren.id AS grandchildren_id, grandchildren.parent_id AS grandchildren_parent_id,
+  # great_grandchildren.id AS great_grandchildren_id, great_grandchildren.parent_id AS great_grandchildren_parent_id
+  # FROM nodes
+  #  LEFT OUTER JOIN nodes AS parent ON (parent.id = nodes.parent_id)
+  #  LEFT OUTER JOIN nodes AS grandparent ON (grandparent.id = parent.parent_id)
+  #  LEFT OUTER JOIN nodes AS children ON (children.parent_id = nodes.id)
+  #  LEFT OUTER JOIN nodes AS grandchildren ON (grandchildren.parent_id = children.id)
+  #  LEFT OUTER JOIN nodes AS great_grandchildren ON (great_grandchildren.parent_id = grandchildren.id)
+
 === Options 
 
 Sequel supports many more association options than ActiveRecord, but here's a mapping of ActiveRecord association options to Sequel association options.  Note that when you specify columns in Sequel, you use symbols, not strings.  Where ActiveRecord would use an SQL string fragment with embedded commas for multiple columns, Sequel would use an array of column symbols.
@@ -383,7 +397,7 @@ ActiveRecord option :: Sequel option
 <tt>:polymorphic</tt>, <tt>:as</tt>, <tt>:source_type</tt> :: The +sequel_polymorphic+ external plugin
 <tt>:include</tt> :: <tt>:eager</tt>, <tt>:eager_graph</tt>
 <tt>:readonly</tt> :: No equivalent, the Sequel <tt>:read_only</tt> option just means the modification methods are not created (it makes the association read only, not records retrieved through the association)
-<tt>:through</tt>, <tt>:source</tt> :: Use a +many_to_many+ association
+<tt>:through</tt>, <tt>:source</tt> :: Use a +many_to_many+ association, or the +many_through_many+ plugin
 <tt>:touch</tt> :: The +touch+ plugin
 <tt>:autosave</tt> :: A +before_save+ or +after_save+ hook
 <tt>:finder_sql</tt> :: <tt>:dataset</tt> to set a custom dataset
@@ -505,15 +519,15 @@ You can call +with_sql+ to set the SQL to use, and the +single_value+ to retriev
 
 Calling +delete+ directly on the class will probably delete all rows in the table.  You want to filter first, then call +delete+:
 
-  Album.filter(:id=>id).delete
-  Album.filter("artist_id = ?", 5).delete
+  Album.where(:id=>id).delete
+  Album.where("artist_id = ?", 5).delete
 
 ==== +destroy+, +destroy_all+
 
 Similar to +delete+, you filter first, then +destroy+:
 
-  Album.filter(:id=>id).destroy
-  Album.filter("artist_id = ?", 5).destroy
+  Album.where(:id=>id).destroy
+  Album.where("artist_id = ?", 5).destroy
 
 ==== +establish_connection+
 
@@ -531,7 +545,7 @@ If you want a specific dataset in that database, you can use +set_dataset+ or <t
 
 You need to filter the dataset first, then call <tt>empty?</tt> and invert the result:
 
-  !Album.filter(:id=>1).empty?
+  !Album.where(:id=>1).empty?
 
 ==== +find+
 
@@ -543,21 +557,21 @@ Note that Sequel returns nil if no record is found, it doesn't raise an exceptio
 
 If you want to find multiple objects using an array of primary keys:
 
-  Album.filter(:id=>[1, 2, 3]).all
+  Album.where(:id=>[1, 2, 3]).all
 
 If you are using <tt>find(:first, ...)</tt>, you use a method chain instead of passing the options, and end it with +first+:
 
-  Album.filter(:artist_id=>1).order(:name).first
+  Album.where(:artist_id=>1).order(:name).first
 
 If you are using <tt>find(:last, ...)</tt>, you need to specify an order in Sequel, but the same method chain approach is used, which you end with +last+:
 
-  Album.filter(:artist_id=>1).order(:name).last
+  Album.where(:artist_id=>1).order(:name).last
   # You could also do:
-  Album.filter(:artist_id=>1).order(:name.desc).first
+  Album.where(:artist_id=>1).reverse_order(:name).first
 
 If you are using <tt>find(:all, ...)</tt>, you use a method chain instead of passing the options, and end it with +all+:
 
-  Album.filter(:artist_id=>1).order(:name).all
+  Album.where(:artist_id=>1).order(:name).all
   
 Here's a mapping of ActiveRecord +find+ options to <tt>Sequel::Dataset</tt> methods:
 
@@ -583,13 +597,13 @@ Similar to +count_by_sql+, you use +with_sql+, followed by +all+:
 
 Just like with <tt>find(:first, ...)</tt>, you use a method chain instead of passing the options, and end it with +first+:
 
-  Album.filter(:artist_id=>1).order(:name).first
+  Album.where(:artist_id=>1).order(:name).first
 
 ==== +last+
 
 Just like with <tt>find(:last, ...)</tt>, you use a method chain instead of passing the options, make sure it includes an order, and end it with +last+:
 
-  Album.filter(:artist_id=>1).order(:name).last
+  Album.where(:artist_id=>1).order(:name).last
 
 ==== +named_scope+
 
@@ -598,12 +612,17 @@ For a pure filter, you can use +subset+:
   Album.subset(:debut, :position => 1)
   Album.subset(:gold){copies_sold > 500000}
 
-For anything more complex, you can use +def_dataset_method+:
+For anything more complex, you can use +dataset_module+:
 
-  Album.def_dataset_method(:by_artist) do |artist_id|
-    filter(:artist_id=>artist_id)
+  Album.dataset_module do
+    def by_artist(artist_id)
+      where(:artist_id=>artist_id)
+    end
+    
+    def by_release_date
+      order(:release_date)
+    end
   end
-  Album.def_dataset_method(:by_release_date){order(:release_date)}
 
 ==== +reset_column_information+
 
@@ -613,13 +632,13 @@ If you want to completely reload the schema for the table:
 
 ==== +serialize+, +seralized_attributes+
 
-Sequel ships with a +serialization+ plugin that you can use.  It's more flexible than ActiveRecord's, since you can serialize to marshal or json in addition to yaml:
+Sequel ships with a +serialization+ plugin that you can use.
 
   class Album < Sequel::Model
     plugin :serialization, :json, :permissions
   end
 
-For +serialized_attributes+, you can use +serialization_map+, which is also a hash, but keys are column symbols and values are either <tt>:marshal</tt>, <tt>:yaml</tt>, or <tt>:json</tt>, specifying the serialization format.
+For +serialized_attributes+, you can use +serialization_map+, which is also a hash, but keys are column symbols and values are callable objects used to serialize the values.
 
 ==== +set_inheritance_column+
 
@@ -657,13 +676,13 @@ As mentioned earlier, +transaction+ is a database method in Sequel, which you ca
 
 Just like +delete+ and +destroy+, you filter first, then +update+:
 
-  Album.filter(:id=>id).update(:name=>'RF')
-  Album.filter("artist_id = ?", 5).update(:copies_sold=>0)
+  Album.where(:id=>id).update(:name=>'RF')
+  Album.where("artist_id = ?", 5).update(:copies_sold=>0)
 
 Note that +update+ in that case will operate on a dataset, so it won't run model validations or hooks.  If you want those run:
 
   Album[id].update(:name=>'RF')
-  Album.filter("artist_id = ?", 5).all{|a| a.update(:copies_sold=>0)}
+  Album.where("artist_id = ?", 5).all{|a| a.update(:copies_sold=>0)}
 
 ==== +with_scope+
 
@@ -694,7 +713,7 @@ ActiveRecord Method :: Sequel Method
 +set_primary_key+ :: +set_primary_key+
 +sum+ :: +sum+
 +table_name+ :: +table_name+
-+unescoped+ :: +unfiltered+
++unscoped+ :: +unfiltered+
 
 === Class Methods without an Equivalent
 
@@ -715,12 +734,12 @@ ActiveRecord Method :: Notes, Workarounds
 <tt>clear_active_connections!</tt> :: Sequel doesn't leak connections like ActiveRecord, so you don't need to worry about this
 <tt>clear_reloadable_connections!</tt> :: Sequel doesn't leak connections like ActiveRecord, so you don't need to worry about this
 +content_columns+ :: Not needed internally, you can probably do <tt>Album.columns.map{|x| x.to_s}.delete_if{|x| x == Album.primary_key || x =~ /_(id|count)\z/}</tt>
-+decrement_counter+ :: <tt>Album.filter(:id=>:id).update(:counter_name=>:counter_name - 1)</tt>
++decrement_counter+ :: <tt>Album.where(:id=>:id).update(:counter_name=>:counter_name - 1)</tt>
 +define_attribute_methods+, +define_read_methods+ :: <tt>def_column_accessor(*columns)</tt>, a private method
 <tt>descends_from_active_record?</tt> :: Not needed internally, if using single table inheritance, <tt>Album.sti_dataset.model == Album</tt>
 +find_each+, +find_in_batches+ :: Use the +pagination+ extension
 <tt>generated_methods?</tt> :: No equivalent
-+increment_counter+ :: <tt>Album.filter(:id=>:id).update(:counter_name=>:counter_name + 1)</tt>
++increment_counter+ :: <tt>Album.where(:id=>:id).update(:counter_name=>:counter_name + 1)</tt>
 <tt>instance_method_already_implemented?</tt> :: No equivalent, Sequel does not create column accessors that override other methods, it just skips them.
 <tt>match_attribute_method?</tt> :: No equivalent
 +readonly_attributes+ :: No equivalent
@@ -729,7 +748,7 @@ ActiveRecord Method :: Notes, Workarounds
 +silence+ :: No equivalent.  Because the logger is handled at the <tt>Sequel::Database</tt> level, there is no thread-safe way to turn it off for specific blocks.
 +scopes+ :: No equivalent
 +sti_name+ :: No equivalent.
-+update_counters+ :: <tt>Album.filter(:id=>:id).update(:counter_name=>:counter_name + 1, :other_counter=>:other_counter - 1)</tt>
++update_counters+ :: <tt>Album.where(:id=>:id).update(:counter_name=>:counter_name + 1, :other_counter=>:other_counter - 1)</tt>
 +uncached+ :: No equivalent
 
 === Instance Methods with Significantly Different Behavior
@@ -788,13 +807,6 @@ Assuming you want the full behavior of saving just one column without validating
   album.values[:column] ||= 0
   album.values[:column] -= 1 # or += 1 for increment!
   album.save(:column, :validate=>false)
-
-==== +freeze+, <tt>frozen?</tt>
-
-Sequel doesn't support freezing objects directly, but you can do it yourself:
-
-  album.values.freeze
-  album.values.frozen?
 
 ==== <tt>has_attribute?</tt>
 
@@ -870,6 +882,8 @@ ActiveRecord Method :: Sequel Method
 +destroy+ :: +destroy+
 <tt>eql?</tt> :: <tt>===</tt>
 +errors+ :: +errors+
++freeze+ :: +freeze+
+<tt>frozen?</tt> :: <tt>frozen?</tt>
 +hash+ :: +hash+
 +id+ :: +pk+
 +inspect+ :: +inspect+
@@ -884,12 +898,13 @@ ActiveRecord Method :: Sequel Method
 
 ActiveRecord Method :: Notes, Workarounds
 +after_validation_on_create+, +after_validation_on_update+ :: Use +after_validation+ and <tt>if new?</tt> or <tt>unless new?</tt>
-+as_json+, +from_json+, +to_json+, +from_xml+, +to_xml+ :: No equivalent
++as_json+, +from_json+, +to_json+ :: Use the +json_serializer+ plugin
++from_xml+, +to_xml+ :: Use the +xml_serializer+ plugin
 +attribute_for_inspect+ :: <tt>album[:column].inspect</tt>
 <tt>attribute_present?</tt> :: <tt>!album[:column].blank?</tt> if using the +blank+ extension
 +attributes_before_type_cast+ :: Sequel typecasts at a low level, so model objects never see values before they are type cast
 +before_validation_on_create+, +before_validation_on_update+ :: Use +before_validation+ and <tt>if new?</tt> or <tt>unless new?</tt>
-<tt>id=</tt> :: Sequel doesn't have a special primary key setter method, but you can use: <tt>album.send("#{primary_key}=", value)</tt>
+<tt>id=</tt> :: Sequel doesn't have a special primary key setter method, but you can use: <tt>album.send("#{Album.primary_key}=", value)</tt>
 +mark_for_destruction+, <tt>marked_for_destruction?</tt> :: Use a +before_save+ or +after_save+ hook or the +instance_hooks+ plugin
 <tt>readonly!</tt> :: No equivalent
 <tt>readonly?</tt> :: No equivalent

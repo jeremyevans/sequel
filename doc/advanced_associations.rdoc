@@ -14,7 +14,7 @@ a different block when eager loading via <tt>Dataset#eager</tt>. Association blo
 useful for things like:
 
   Artist.one_to_many :gold_albums, :class=>:Album do |ds|
-    ds.filter{copies_sold > 500000}
+    ds.where{copies_sold > 500000}
   end
 
 There are a whole bunch of options for changing how the association is eagerly
@@ -50,12 +50,12 @@ These can be used like this:
     
   # Only returns albums that have sold more than 500,000 copies
   Artist.one_to_many :gold_albums, :class=>:Album, \
-    :graph_block=>proc{|j,lj,js| :copies_sold.qualify(j) > 500000}
+    :graph_block=>proc{|j,lj,js| Sequel.qualify(j, :copies_sold) > 500000}
     
   # Handles the case where the tables are associated by a case insensitive name string
   Artist.one_to_many :albums, :key=>:artist_name, \
     :graph_only_conditions=>nil, \
-    :graph_block=>proc{|j,lj,js| {:lower.sql_function(artist_name.qualify(j))=>:lower.sql_function(name.qualify(lj))}}
+    :graph_block=>proc{|j,lj,js| {Sequel.function(:lower, Sequel.qualify(j, :artist_name))=>Sequel.function(:lower, Sequel.qualify(lj, :name))}}
     
   # Handles the case where both key columns have the name artist_name, and you want to use
   # a JOIN USING
@@ -235,9 +235,9 @@ require different approaches or custom <tt>:eager_loader</tt> options.
 
 === Association callbacks
 
-Sequel supports the same callbacks that ActiveRecord does on +one_to_many+ and
+Sequel supports the same callbacks that ActiveRecord does for +one_to_many+ and
 +many_to_many+ associations: <tt>:before_add</tt>, <tt>:before_remove</tt>, <tt>:after_add</tt>, and
-<tt>:after_remove</tt>. One +many_to_one+ associations and +one_to_one+ associations, Sequel
+<tt>:after_remove</tt>. For +many_to_one+ associations and +one_to_one+ associations, Sequel
 supports the <tt>:before_set</tt> and <tt>:after_set</tt> callbacks.  On all associations,
 Sequel supports <tt>:after_load</tt>, which is called after the association has been
 loaded.
@@ -260,7 +260,7 @@ otherwise modified:
   class Author < Sequel::Model
     one_to_many :authorships
   end
-  Author.first.authorships_dataset.filter{|o| o.number < 10}.first
+  Author.first.authorships_dataset.where{number < 10}.first
  
 You can extend a dataset with a module using the <tt>:extend</tt> association option.  You can reference
 the model object that created the association dataset via the dataset's
@@ -381,7 +381,7 @@ Polymorphic associations break referential integrity and are significantly more
 complex than non-polymorphic associations, so their use is not recommended unless
 you are stuck with an existing design that uses them.
 
-If you must use them, look for the sequel_polymorphic plugin, as it makes using
+If you must use them, look for the sequel_polymorphic external plugin, as it makes using
 polymorphic associations in Sequel about as easy as it is in ActiveRecord.  However,
 here's how they can be done using Sequel's custom associations (the sequel_polymorphic
 plugin is just a generic version of this code):
@@ -409,7 +409,7 @@ Sequel::Model:
     many_to_one :attachable, :reciprocal=>:assets, \
       :dataset=>(proc do
         klass = attachable_type.constantize
-        klass.filter(klass.primary_key=>attachable_id)
+        klass.where(klass.primary_key=>attachable_id)
       end), \
       :eager_loader=>(proc do |eo|
         id_map = {}
@@ -419,7 +419,7 @@ Sequel::Model:
         end
         id_map.each do |klass_name, id_map|
           klass = klass_name.constantize
-          klass.filter(klass.primary_key=>id_map.keys).all do |attach|
+          klass.where(klass.primary_key=>id_map.keys).all do |attach|
             id_map[attach.pk].each do |asset|
               asset.associations[:attachable] = attach
             end
@@ -436,48 +436,34 @@ Sequel::Model:
   end 
 
   class Post < Sequel::Model
-    one_to_many :assets, :key=>:attachable_id do |ds|
-      ds.filter(:attachable_type=>'Post')
-    end 
+    one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Post'}
   
     private
 
     def _add_asset(asset)
-      asset.attachable_id = pk
-      asset.attachable_type = 'Post'
-      asset.save
-    end 
+      asset.update(:attachable_id=>pk, :attachable_type=>'Post')
+    end
     def _remove_asset(asset)
-      asset.attachable_id = nil 
-      asset.attachable_type = nil 
-      asset.save
-    end 
+      asset.update(:attachable_id=>nil, :attachable_type=>nil)
+    end
     def _remove_all_assets
-      Asset.filter(:attachable_id=>pk, :attachable_type=>'Post')\
-        .update(:attachable_id=>nil, :attachable_type=>nil)
+      assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)
     end
   end
 
   class Note < Sequel::Model
-    one_to_many :assets, :key=>:attachable_id do |ds|
-      ds.filter(:attachable_type=>'Note')
-    end
+    one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Note'}     
 
     private
 
     def _add_asset(asset)
-      asset.attachable_id = pk
-      asset.attachable_type = 'Note'
-      asset.save
+      asset.update(:attachable_id=>pk, :attachable_type=>'Note')
     end
     def _remove_asset(asset)
-      asset.attachable_id = nil
-      asset.attachable_type = nil
-      asset.save
+      asset.update(:attachable_id=>nil, :attachable_type=>nil)
     end
     def _remove_all_assets
-      Asset.filter(:attachable_id=>pk, :attachable_type=>'Note')\
-        .update(:attachable_id=>nil, :attachable_type=>nil)
+      assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)
     end
   end
 
@@ -519,7 +505,7 @@ node.children.  You can even eager load the relationship up to a certain depth:
   # Eager load three generations of generations of children for a given node 
   Node.filter(:id=>1).eager(:children=>{:children=>:children}).all.first
   # Load parents and grandparents for a group of nodes
-  Node.filter{|o| o.id < 10}.eager(:parent=>:parent).all
+  Node.filter{id < 10}.eager(:parent=>:parent).all
 
 What if you want to get all ancestors up to the root node, or all descendents,
 without knowing the depth of the tree?
@@ -544,7 +530,7 @@ without knowing the depth of the tree?
         non_root_nodes.each{|n| (id_map[n.parent_id] ||= []) << n}
         # Doesn't cause an infinte loop, because when only the root node
         # is left, this is not called.
-        Node.filter(Node.primary_key=>id_map.keys).eager(:ancestors).all do |node|
+        Node.where(Node.primary_key=>id_map.keys).eager(:ancestors).all do |node|
           # Populate the parent association for each node
           id_map[node.pk].each{|n| n.associations[:parent] = node}
         end 
@@ -562,7 +548,7 @@ without knowing the depth of the tree?
       # if no records are returned.  Exclude id = parent_id to avoid infinite loop
       # if the root note is one of the returned records and it has parent_id = id
       # instead of parent_id = NULL.
-      Node.filter(:parent_id=>id_map.keys).exclude(:id=>:parent_id).eager(:descendants).all do |node|
+      Node.where(:parent_id=>id_map.keys).exclude(:id=>:parent_id).eager(:descendants).all do |node|
         # Get the parent from the identity map
         parent = id_map[node.parent_id]
         # Set the child's parent association to the parent 
@@ -585,7 +571,7 @@ this easy:
 
 === Joining multiple keys to a single key, through a third table
 
-Let's say you have a database, of songs, lyrics, and artists.  Each song
+Let's say you have a database of songs, lyrics, and artists.  Each song
 may or may not have a lyric (most songs are instrumental).  The lyric can be
 associated to an artist in each of four ways: composer, arranger, vocalist,
 or lyricist.  These may all be the same, or they could all be different, and
@@ -598,14 +584,15 @@ name, with no duplicates?
 
   class Artist < Sequel::Model
     one_to_many :songs, :order=>:songs__name, \
-      :dataset=>proc{Song.select(:songs.*).join(Lyric, :id=>:lyric_id, id=>[:composer_id, :arranger_id, :vocalist_id, :lyricist_id])}, \
+      :dataset=>proc{Song.select_all(:songs).join(Lyric, :id=>:lyric_id, id=>[:composer_id, :arranger_id, :vocalist_id, :lyricist_id])}, \
       :eager_loader=>(proc do |eo|
         h = eo[:id_map]
         ids = h.keys
         eo[:rows].each{|r| r.associations[:songs] = []}
-        Song.select(:songs.*, :lyrics__composer_id, :lyrics__arranger_id, :lyrics__vocalist_id, :lyrics__lyricist_id)\
-         .join(Lyric, :id=>:lyric_id){{:composer_id=>ids, :arranger_id=>ids, :vocalist_id=>ids, :lyricist_id=>ids}.sql_or}\
-         .order(:songs__name).all do |song|
+        Song.select_all(:songs).
+          select_append(:lyrics__composer_id, :lyrics__arranger_id, :lyrics__vocalist_id, :lyrics__lyricist_id).
+          join(Lyric, :id=>:lyric_id){Sequel.or(:composer_id=>ids, :arranger_id=>ids, :vocalist_id=>ids, :lyricist_id=>ids)}.
+          order(:songs__name).all do |song|
           [:composer_id, :arranger_id, :vocalist_id, :lyricist_id].each do |x|
             recs = h[song.values.delete(x)]
             recs.each{|r| r.associations[:songs] << song} if recs
@@ -628,12 +615,12 @@ associated tickets.
   class Project < Sequel::Model
     one_to_many :tickets
     many_to_one :ticket_hours, :read_only=>true, :key=>:id,
-     :dataset=>proc{Ticket.filter(:project_id=>id).select{sum(hours).as(hours)}},
+     :dataset=>proc{Ticket.where(:project_id=>id).select{sum(hours).as(hours)}},
      :eager_loader=>(proc do |eo|
       eo[:rows].each{|p| p.associations[:ticket_hours] = nil}
-      Ticket.filter(:project_id=>eo[:id_map].keys).
-       group(:project_id).
-       select{[project_id, sum(hours).as(hours)]}.
+      Ticket.where(:project_id=>eo[:id_map].keys).
+       select_group(:project_id).
+       select_append{sum(hours).as(hours)}.
        all do |t|
         p = eo[:id_map][t.values.delete(:project_id)].first
         p.associations[:ticket_hours] = t
@@ -654,6 +641,4 @@ associated tickets.
   end
 
 Note that it is often better to use a sum cache instead of this approach.  You can implement
-a sum cache using +after_create+ and +after_delete+ hooks, or using a database trigger
-(the preferred method if you only have to support one database and that database supports
-triggers).
+a sum cache using +after_create+ and +after_delete+ hooks, or preferrably using a database trigger.

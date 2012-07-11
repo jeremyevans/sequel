@@ -58,12 +58,12 @@ The hash may also contain entries for:
 
 Database#schema takes a table symbol and returns column information in an array with each element being an array with two elements.  The first elements of the subarray is a column symbol, and the second element is a hash of information about that column.  The hash should include the following keys:
 
-* :allow_null - Whether NULL/nil is an allowed value for this column. Used by the Sequel::Model typecasting code.
-* :db_type - The type of column the database provided, as a string.  Used by the schema_dumper plugin for a more specific type translation.
-* :default - The default value of the column, as either a string or nil.  Uses a database specific format. Used by the schema_dumper plugin for converting to a ruby value.
-* :primary_key - Whether this column is one of the primary key columns for the table.  Used by the Sequel::Model code to determine primary key columns.
-* :ruby_default - The default value of the column as a ruby object, or nil if there is no default or the default could not be successfully parsed into a ruby object.
-* :type - The type of column, as a symbol (e.g. :string).  Used by the Sequel::Model typecasting code.
+:allow_null :: Whether NULL/nil is an allowed value for this column. Used by the Sequel::Model typecasting code.
+:db_type :: The type of column the database provided, as a string.  Used by the schema_dumper plugin for a more specific type translation.
+:default :: The default value of the column, as either a string or nil.  Uses a database specific format. Used by the schema_dumper plugin for converting to a ruby value.
+:primary_key :: Whether this column is one of the primary key columns for the table.  Used by the Sequel::Model code to determine primary key columns.
+:ruby_default :: The default value of the column as a ruby object, or nil if there is no default or the default could not be successfully parsed into a ruby object.
+:type :: The type of column, as a symbol (e.g. :string).  Used by the Sequel::Model typecasting code.
 
 Example:
 

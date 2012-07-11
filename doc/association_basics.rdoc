@@ -345,7 +345,7 @@ The association dataset is just like any other Sequel dataset, in that
 it can be further filtered, ordered, etc.:
 
   @artist.albums_dataset.
-   filter(:name.like('A%')).
+   where(Sequel.like(:name, 'A%')).
    order(:copies_sold).
    limit(10)
   # SELECT * FROM albums
@@ -364,19 +364,14 @@ Similar to the +_dataset+ method, you can provide a block to the association
 method to customize the dataset that will be used to retrieve the records.  So
 you can apply a filter in either of these two ways:
 
-  @artist.albums_dataset.filter(:name.like('A%'))
-  @artist.albums{|ds| ds.filter(:name.like('A%'))}
+  @artist.albums_dataset.where(Sequel.like(:name, 'A%'))
+  @artist.albums{|ds| ds.where(Sequel.like(:name, 'A%'))}
 
 While they both apply the same filter, using the +_dataset+ method does not
 apply any of the association callbacks or handle association reciprocals (see
 below for details about callbacks and reciprocals).  Using a block instead handles
 all those things, and also caches its results in the associations cache (ignoring
 any previously cached value).
-
-Note that if you are using ruby 1.8.6, you can't pass a block to the association
-method, you have to pass a proc as an argument:
-
-  @artist.albums(proc{|ds| ds.filter(:name.like('A%'))})
 
 == Filtering By Associations
 
@@ -389,35 +384,35 @@ all albums for a given artist, you would usually do:
 
 You can also do the following:
 
-  Album.filter(:artist=>@artist).all
+  Album.where(:artist=>@artist).all
   # or leave off the .all for a dataset
 
 For filtering by a single association, this isn't very useful.  However, unlike
 using the association method, using a filter allows you to filter by multiple
 associations:
 
-  Album.filter(:artist=>@artist, :publisher=>@publisher)
+  Album.where(:artist=>@artist, :publisher=>@publisher)
 
 This will return all albums by that artist and published by that publisher.
 This isn't possible using just the association method approach, though you
 can combine the approaches:
 
-  @artist.albums_dataset.filter(:publisher=>@publisher)
+  @artist.albums_dataset.where(:publisher=>@publisher)
 
 This doesn't just work for +many_to_one+ associations, it also works for
 +one_to_one+, +one_to_many+, and +many_to_many+ associations:
 
   Album.one_to_one :album_info
   # The album related to that AlbumInfo instance
-  Album.filter(:album_info=>AlbumInfo[2])
+  Album.where(:album_info=>AlbumInfo[2])
 
   Album.one_to_many :tracks
   # The album related to that Track instance
-  Album.filter(:tracks=>Track[3])
+  Album.where(:tracks=>Track[3])
 
   Album.many_to_many :tags
   # All albums related to that Tag instance
-  Album.filter(:tags=>Tag[4])
+  Album.where(:tags=>Tag[4])
 
 Note that for +one_to_many+ and +many_to_many+ associations, you still
 use the plural form even though only a single model object is given.
@@ -430,7 +425,7 @@ This will return all albums not by that artist.
 
 You can also provide an array with multiple model objects:
 
-  Album.filter(:artist=>[@artist1, @artist2]).all
+  Album.where(:artist=>[@artist1, @artist2]).all
 
 Similar to using an array of integers or strings, this will return
 all albums whose artist is one of those two artists.  You can also
@@ -442,28 +437,28 @@ If you are using a +one_to_many+ or +many_to_many+ association, you
 may want to return records where the records matches all of multiple
 records, instead of matching any of them.  For example:
 
-  Album.filter(:tags=>[@tag1, @tag2])
+  Album.where(:tags=>[@tag1, @tag2])
   
 This matches albums that are associated with either @tag1 or @tag2 or
 both.  If you only want ones that you are associated with both, you can
 use separate filter calls:
 
-  Album.filter(:tags=>@tag1).filter(:tags=>@tag2)
+  Album.where(:tags=>@tag1).where(:tags=>@tag2)
 
 Or the the array form of condition specifiers:
 
-  Album.filter([[:tags, @tag1], [:tags, @tag2]])
+  Album.where([[:tags, @tag1], [:tags, @tag2]])
 
 These will return albums associated with both @tag1 and @tag2.
 
 You can also provide a dataset value when filtering by associations:
 
-  Album.filter(:artist=>Artist.filter(:name.like('A%'))).all
+  Album.where(:artist=>Artist.where(Sequel.like(:name, 'A%'))).all
 
 This will return all albums whose artist starts with 'A'. Like
 the other forms, this can be inverted:
 
-  Album.exclude(:artist=>Artist.filter(:name.like('A%'))).all
+  Album.exclude(:artist=>Artist.where(Sequel.like(:name, 'A%'))).all
  
 This will return all albums whose artist does not start with 'A'.
 
@@ -562,6 +557,8 @@ wanted to add an albums_artists join table to create the following schema:
 
 You could use the following Sequel code:
 
+  DB.create_join_table(:album_id=>:albums, :artist_id=>:artists)
+  # or
   DB.create_table(:albums_artists) do
     foreign_key :album_id, :albums
     foreign_key :artist_id, :artists
@@ -717,7 +714,7 @@ The <i>association</i>_dataset method returns a dataset that represents
 all associated objects.  This dataset is like any other Sequel dataset,
 in that it can be filtered, ordered, etc.:
 
-  ds = @artist.albums_dataset.filter(:name.like('A%')).order(:copies_sold)
+  ds = @artist.albums_dataset.where(Sequel.like(:name, 'A%')).order(:copies_sold)
 
 Unlike most other Sequel datasets, association datasets have a couple of
 added methods:
@@ -828,7 +825,7 @@ that returns all albums of an artist that went gold (sold at least
 500,000 copies):
 
   Artist.one_to_many :gold_albums, :class=>:Album do |ds|
-    ds.filter{copies_sold > 500000}
+    ds.where{copies_sold > 500000}
   end
 
 ==== :class
@@ -847,7 +844,7 @@ default class guessed will be wrong:
 
   # guesses GoldAlbum
   Artist.one_to_many :gold_albums do |ds|
-    ds.filter{copies_sold > 500000}
+    ds.where{copies_sold > 500000}
   end
 
 You can specify the :class option using the class itself, a Symbol,
@@ -872,13 +869,13 @@ symbol.  Defaults to :"#{self.name.underscore}_id".
 
   Artist.one_to_many :albums # :key=>:artist_id
 
-In both cases an array of symbols for a composite key association:
+In both cases an array of symbols can be used for a composite key association:
 
   Apartment.many_to_one :building # :key=>[:city, :address]
 
 ==== :conditions
 
-The conditions to use to filter the association, can be any argument passed to filter.
+The conditions to use to filter the association, can be any argument passed to +where+.
 If you use a hash or an array of two element arrays, this will also be used as a
 filter when using eager_graph to load the association.
 
@@ -911,7 +908,7 @@ columns that have the same name in both the join table and the associated
 table.  Example:
 
   Artist.one_to_many :albums, :select=>[:id, :name]
-  Album.many_to_many :tags, :select=>[:tags.*, :albums_tags__number]
+  Album.many_to_many :tags, :select=>[Sequel.expr(:tags).*, :albums_tags__number]
 
 ==== :limit
 
@@ -928,8 +925,6 @@ Use an array with two arguments for the value to specify a limit and an offset.
 This probably doesn't make a lot of sense for *_to_one associations, though you
 could use it to specify an offset.
 
-This option is ignored when eager loading.
-
 ==== :join_table [+many_to_many+]
 
 Name of table that includes the foreign keys to both the current model and the
@@ -944,7 +939,7 @@ Here's an example of the defaults:
 ==== :left_key [+many_to_many+]
 
 Foreign key in join table that points to current model's primary key, as a
-symbol.  Defaults to :"#{self.name.underscore}_id".
+symbol.  Defaults to :"#{model_name.underscore}_id".
 
   Album.many_to_many :tags # :left_key=>:album_id
 
@@ -953,9 +948,9 @@ Can use an array of symbols for a composite key association.
 ==== :right_key [+many_to_many+]
 
 Foreign key in join table that points to associated model's primary key, as a
-symbol.  Defaults to :"#{name.to_s.singularize}_id".
+symbol.  Defaults to :"#{association_name.singularize}_id".
 
-  Album.many_to_many :tags # :left_key=>:tag_id
+  Album.many_to_many :tags # :right_key=>:tag_id
   
 Can use an array of symbols for a composite key association.
 
@@ -1006,7 +1001,7 @@ Here's an example of an association of songs to artists through lyrics, where
 the artist can perform any one of four tasks for the lyric:
 
   Album.one_to_many :songs, :dataset=>(proc do
-    Song.select(:songs.*).
+    Song.select_all(:songs).
      join(Lyric, :id=>:lyricid,
       id=>[:composer_id, :arranger_id, :vocalist_id, :lyricist_id])
   end)
@@ -1025,8 +1020,8 @@ set up association extensions.  For more information , please see the
 ==== :primary_key
 
 The column that the :key option references, as a symbol. For +many_to_one+
-associations, this column in the associated table. For +one_to_one+ and
-+one_to_many+ associations, this column in the current table.  In both cases,
+associations, this column is in the associated table. For +one_to_one+ and
++one_to_many+ associations, this column is in the current table.  In both cases,
 it defaults to the primary key of the table. Can use an
 array of symbols for a composite key association.
 
@@ -1063,7 +1058,7 @@ applies to the join table.  It can be used to make sure additional columns are
 used when inserting, or that filters are used when deleting.
 
   Artist.many_to_many :lead_guitar_albums, :join_table_block=>proc do |ds|
-    ds.filter(:instrument_id=>5).set_overrides(:instrument_id=>5)
+    ds.where(:instrument_id=>5).set_overrides(:instrument_id=>5)
   end
 
 === Callback Options
@@ -1158,8 +1153,7 @@ Called after the _<i>association</i>= method is called to modify the objects:
 
 ==== :after_load
 
-Called after retrieving the associated records from the database. Not called
-when eager loading via eager_graph, but called when eager loading via eager.
+Called after retrieving the associated records from the database.
 
   class Artist
     # Cache all album names to a single string when retrieving the
@@ -1176,8 +1170,7 @@ when eager loading via eager_graph, but called when eager loading via eager.
   end
 
 Generally used if you know you will always want a certain action done
-when retrieving the association.  However, you need to be careful if you
-also plan on using eager_graph to eagerly load the association.
+when retrieving the association.
 
 For +one_to_many+ and +many_to_many+ associations, both the argument to
 symbol callbacks and the second argument to proc callbacks will be an
@@ -1242,7 +1235,7 @@ association based on dependent associations:
 
   Artist.one_to_many :albums_with_short_tracks, :class=>:Album,
    :eager_graph=>:tracks do |ds|
-    ds.filter{tracks__seconds < 120}
+    ds.where{tracks__seconds < 120}
   end
   Artist.one_to_many :albums_by_track_name, :class=>:Album,
    :eager_graph=>:tracks do |ds|
@@ -1274,13 +1267,13 @@ via eager_graph.  This is useful to specify conditions that can't be specified
 in a hash or array of two element arrays.
 
   Artist.one_to_many :gold_albums, :class=>:Album,
-    :graph_block=>proc{|j,lj,js| :copies_sold.qualify(j) > 500000}
+    :graph_block=>proc{|j,lj,js| Sequel.qualify(j, :copies_sold) > 500000}
 
 ==== :graph_join_type
 
 The type of SQL join to use when eagerly loading the association via
 eager_graph.  Defaults to :left_outer.  This is useful if you want to
-ensure that all return only artists that have albums:
+ensure that only artists that have albums are returned:
 
   Artist.one_to_many :albums, :graph_join_type=>:inner
   # Will exclude artists without an album
@@ -1306,8 +1299,8 @@ where the artist's name differs in case:
 
   Artist.one_to_many :albums, :key=>:artist_name, 
     :graph_only_conditions=>nil, 
-    :graph_block=>proc{|j,lj,js| {:lower.sql_function(artist_name.qualify(j))=>
-      :lower.sql_function(name.qualify(lj))}}
+    :graph_block=>proc{|j,lj,js| {Sequel.function(:lower, Sequel.qualify(j, :artist_name))=>
+      Sequel.function(:lower, Sequel.qualify(lj, :name))}}
 
 Note how :graph_only_conditions is set to nil to ignore any existing conditions,
 and :graph_block is used to set up the case insensitive comparison.
@@ -1345,8 +1338,8 @@ Sets up a custom grapher to use when eager loading the objects via eager_graph.
 This is the eager_graph analogue to the :eager_loader option. This isn't generally
 needed, as one of the other eager_graph related association options is usually sufficient.
 
-If specified, should be a proc that accepts one or three three arguments.
-If the proc takes one argument, it will be given a hash with the following keys:
+If specified, should be a proc that accepts a single hash argument, which will contain
+at least the following keys:
 
 :self :: The dataset that is doing the eager loading
 :table_alias :: An alias to use for the table to graph for this association.
@@ -1355,10 +1348,7 @@ If the proc takes one argument, it will be given a hash with the following keys:
              current dataset, before such graphing is done. This is nil if no callback
              proc is used.
 
-If the proc takes three arguments, it gets passed the :self, :association_alias,
-and :table_alias values. The 3 argument procs are allowed for backwards
-compatibility, and it is recommended to use the 1 argument proc format
-for new code.
+Example:
 
   Artist.one_to_many :self_title_albums, :class=>:Album,
    :eager_grapher=>(proc do |eo|
@@ -1407,7 +1397,7 @@ has received a bachelor's degree (degree starting with B):
 
   Person.many_to_many :bachelor_degree_colleges, :class=>:College,
     :join_table=>:degrees_received,
-    :graph_join_table_block=>proc{|j,lj,js| :degree.qualify(j).like('B%')}
+    :graph_join_table_block=>proc{|j,lj,js| Sequel.qualify(j, :degree).like('B%')}
 
 This should be done when graphing the join table, instead of when graphing the
 final table, as :degree is a column of the join table.

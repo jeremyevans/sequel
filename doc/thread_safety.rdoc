@@ -4,7 +4,7 @@ Most Sequel usage (and all common Sequel usage) is thread safe by default.  Spec
 
 == Connection Pool
 
-In order to allow multiple threads to operate on the same database at the same time, Sequel uses a connection pool.  The connection pool is designed so that a thread uses a connection for the minimum amount of time, returning the connection to the pool as soon as it is done using the connection.  If a thread requests a connection and the pool is empty, the thread will block (actually busy-wait) until a connection is available or the the connection pool timeout has elapsed (in which case a PoolTimeout error will be raised).
+In order to allow multiple threads to operate on the same database at the same time, Sequel uses a connection pool.  The connection pool is designed so that a thread uses a connection for the minimum amount of time, returning the connection to the pool as soon as it is done using the connection.  If a thread requests a connection and the pool does not have an available connection, a new connection will be created.  If the maximum number of connections in the pool has already been reached, the thread will block (actually busy-wait) until a connection is available or the the connection pool timeout has elapsed (in which case a PoolTimeout error will be raised).
 
 == Exceptions
 

@@ -284,7 +284,7 @@ You can mix and match the two approaches.  For example, if all albums should hav
 
 +validates_unique+ also accepts a block to scope the uniqueness constraint.  For example, if you want to ensure that all active albums have a unique name, but inactive albums can duplicate the name:
 
-  validates_unique(:name){|ds| ds.filter(:active)}
+  validates_unique(:name){|ds| ds.where(:active)}
 
 If you provide a block, it is called with the dataset to use for the uniqueness check, which you can then filter to scope the uniqueness validation to a subset of the model's dataset.
 

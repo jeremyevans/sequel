@@ -241,12 +241,12 @@ both take the same options as +index+.
   end
   
 Instead of using a block, you can use arguments that will be handled similarly
-to <tt>Dataset#filter</tt>:
+to <tt>Dataset#where</tt>:
 
   create_table(:artists) do
     primary_key :id
     String :name
-    constraint(:name_length_range, :char_length.sql_function(:name)=>3..50)
+    constraint(:name_length_range, Sequel.function(:char_length, :name)=>3..50)
   end
   
 ==== +check+
@@ -298,9 +298,6 @@ hash:
   alter_table(:albums) do
     add_column :copies_sold, Integer, :default=>0
   end
-
-When adding a column, it's a good idea to provide a default value, unless you
-want the value for all rows to be set to NULL.
 
 === +drop_column+
 
@@ -439,7 +436,7 @@ There is no database independent method to drop an unnamed constraint.  Generall
 database will give it a name automatically, and you will have to figure out what it is.
 For that reason, you should not add unnamed constraints that you ever might need to remove.
 
-On MySQL, you must specify the type of constraint via a <tt>:type</tt> option:
+On some databases, you must specify the type of constraint via a <tt>:type</tt> option:
 
   alter_table(:albums) do
     drop_constraint(:albums_pk, :type=>:primary_key)
@@ -513,6 +510,16 @@ if you are using foreign keys and the database is enforcing referential
 integrity.  In general, you need to drop the tables containing the foreign
 keys before the tables containing the primary keys they reference.
 
+=== <tt>drop_table?</tt>
+
+<tt>drop_table?</tt> is similar to drop_table, except that it only drops
+the table if the table does not already exist.  On some databases, it uses
+<tt>IF NOT EXISTS</tt>, on others it does a separate query to check for
+existence.
+
+This should not be used inside migrations, as if the the tbale does not
+exist, it may mess up the migration.
+
 === +rename_table+
 
 You can rename an existing table using +rename_table+.  Like +rename_column+,
@@ -522,7 +529,7 @@ the first argument is the current name, and the second is the new name:
 
 === <tt>create_table!</tt>
 
-<tt>create_table!</tt> with the bang drops the table if it exists
+<tt>create_table!</tt> drops the table if it exists
 before attempting to create it, so:
 
   create_table!(:artists)
@@ -531,7 +538,7 @@ before attempting to create it, so:
 
 is the same as:
 
-  drop_table(:artists) if table_exists?(:artists)
+  drop_table?(:artists)
   create_table(:artists)
     primary_key :id
   end
@@ -541,7 +548,7 @@ mess up the migration.
 
 === <tt>create_table?</tt>
 
-<tt>create_table?</tt> with a question mark only creates the table if it does
+<tt>create_table?</tt> only creates the table if it does
 not already exist, so:
 
   create_table?(:artists)
@@ -550,9 +557,11 @@ not already exist, so:
 
 is the same as:
 
-  create_table(:artists)
-    primary_key :id
-  end unless table_exists?(:artists)
+  unless table_exists?(:artists)
+    create_table(:artists)
+      primary_key :id
+    end 
+  end
 
 Like <tt>create_table!</tt>, it should not be used inside migrations.
 
@@ -564,7 +573,7 @@ the same name, while +create_view+ will probably raise an error.  Both methods
 take the name as the first argument, and either an string or a dataset as the
 second argument:
 
-  create_view(:gold_albums, DB[:albums].filter{copies_sold > 500000})
+  create_view(:gold_albums, DB[:albums].where{copies_sold > 500000})
   create_or_replace_view(:gold_albums, "SELECT * FROM albums WHERE copies_sold > 500000")
 
 === +drop_view+

@@ -2,7 +2,7 @@
 
 == Introduction
 
-Datasets are probably the thing that separate Sequel from other database libraries.  While most database libraries have specific support for updating all records or only a single record, Sequel's ability to represent SQL queries themselves as objects is what gives Sequel most of its power.  However, if you haven't been exposed to the dataset concept before, it can be a little disorienting.  This document aims to give a basic introduction to datasets and how to use them.
+Datasets are the primary way Sequel uses to access the database. While most database libraries have specific support for updating all records or only a single record, Sequel's ability to represent SQL queries themselves as objects is what gives Sequel most of its power.  However, if you haven't been exposed to the dataset concept before, it can be a little disorienting.  This document aims to give a basic introduction to datasets and how to use them.
 
 == What a Dataset Represents
 
@@ -24,23 +24,23 @@ Here, DB represents your Sequel::Database object, and ds is your dataset, with t
 
 One of the core dataset ideas that should be understood is that datasets use a functional style of modification, in which methods called on the dataset return modified copies of the dataset, they don't modify the dataset themselves:
 
-  ds2 = ds.filter(:id=>1)
+  ds2 = ds.where(:id=>1)
   ds2
   # SELECT * FROM posts WHERE id = 1
   ds
   # SELECT * FROM posts
   
-Note how ds itself is not modified.  This is because ds.filter returns a modified copy of ds, instead of modifying ds itself.  This makes using datasets both thread safe and easy to chain:
+Note how ds itself is not modified.  This is because ds.where returns a modified copy of ds, instead of modifying ds itself.  This makes using datasets both thread safe and easy to chain:
 
   # Thread safe:
   100.times do |i|
     Thread.new do
-      ds.filter(:id=>i).first
+      ds.where(:id=>i).first
     end
   end
   
   # Easy to chain:
-  ds3 = ds.select(:id, :name).order(:name).filter{id < 100}
+  ds3 = ds.select(:id, :name).order(:name).where{id < 100}
   # SELECT id, name FROM posts WHERE id < 100 ORDER BY name
 
 Thread safety you don't really need to worry about, but chainability is core to how Sequel is generally used.  Almost all dataset methods that affect the SQL produced return modified copies of the receiving dataset.

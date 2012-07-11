@@ -53,8 +53,8 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 == Update/Delete rows
 
-  dataset.filter(~:active).delete
-  dataset.filter('price < ?', 100).update(:active => true)
+  dataset.exclude(:active).delete
+  dataset.where('price < ?', 100).update(:active => true)
 
 == Datasets are Enumerable
 
@@ -68,17 +68,17 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 === Equality
 
-  dataset.filter(:name => 'abc')
-  dataset.filter('name = ?', 'abc')
+  dataset.where(:name => 'abc')
+  dataset.where('name = ?', 'abc')
 
 === Inequality
 
-  dataset.filter{value > 100}
+  dataset.where{value > 100}
   dataset.exclude{value <= 100}
 
 === Inclusion
 
-  dataset.filter(:value => 50..100)
+  dataset.where(:value => 50..100)
   dataset.where{(value >= 50) & (value <= 100)}
 
   dataset.where('value IN ?', [50,75,100])
@@ -89,34 +89,34 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 === Subselects as scalar values
 
   dataset.where('price > (SELECT avg(price) + 100 FROM table)')
-  dataset.filter{price > dataset.select(avg(price) + 100)}
+  dataset.where{price > dataset.select(avg(price) + 100)}
 
 === LIKE/Regexp
 
-  DB[:items].filter(:name.like('AL%'))
-  DB[:items].filter(:name => /^AL/)
+  DB[:items].where(Sequel.like(:name, 'AL%'))
+  DB[:items].where(:name => /^AL/)
 
 === AND/OR/NOT
 
-  DB[:items].filter{(x > 5) & (y > 10)}.sql 
+  DB[:items].where{(x > 5) & (y > 10)}.sql 
   # SELECT * FROM items WHERE ((x > 5) AND (y > 10))
 
-  DB[:items].filter({:x => 1, :y => 2}.sql_or & ~{:z => 3}).sql 
+  DB[:items].where({:x => 1, :y => 2}.sql_or & Sequel.~(:z => 3)).sql 
   # SELECT * FROM items WHERE (((x = 1) OR (y = 2)) AND (z != 3))
 
 === Mathematical operators
 
-  DB[:items].filter((:x + :y) > :z).sql 
+  DB[:items].where{x + y > z}.sql 
   # SELECT * FROM items WHERE ((x + y) > z)
 
-  DB[:items].filter{price - 100 < avg(price)}.sql 
+  DB[:items].where{price - 100 < avg(price)}.sql 
   # SELECT * FROM items WHERE ((price - 100) < avg(price))
 
 == Ordering
 
   dataset.order(:kind)
   dataset.reverse_order(:kind)
-  dataset.order(:kind.desc, :name)
+  dataset.order(Sequel.desc(:kind), :name)
 
 == Limit/Offset
 
@@ -140,15 +140,15 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   dataset.sum(:stock)
 
   dataset.group_and_count(:category)
-  dataset.group(:category).select(:category, :AVG.sql_function(:price))
+  dataset.group(:category).select(:category, Sequel.function(:AVG, :price))
 
 == SQL Functions / Literals
 
-  dataset.update(:updated_at => :NOW.sql_function)
-  dataset.update(:updated_at => 'NOW()'.lit)
+  dataset.update(:updated_at => Sequel.function(:NOW))
+  dataset.update(:updated_at => Sequel.lit('NOW()'))
 
-  dataset.update(:updated_at => "DateValue('1/1/2001')".lit)
-  dataset.update(:updated_at => :DateValue.sql_function('1/1/2001'))
+  dataset.update(:updated_at => Sequel.lit("DateValue('1/1/2001')")
+  dataset.update(:updated_at => Sequel.function(:DateValue, '1/1/2001'))
 
 == Schema Manipulation
 
@@ -171,7 +171,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 == Aliasing
 
-  DB[:items].select(:name.as(:item_name))
+  DB[:items].select(Sequel.as(:name, :item_name))
   DB[:items].select(:name___item_name)
   DB[:items___items_table].select(:items_table__name___item_name)
   # SELECT items_table.name AS item_name FROM items AS items_table

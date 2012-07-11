@@ -25,7 +25,7 @@ To handle cases where different columns are allowed in different cases, you can 
   # admin case
   post.set_only(params[:post], :title, :body, :deleted)
 
-In this case, only the <tt>title=</tt> and <tt>body=</tt> methods will be allowed in the mass assignment.
+In this case, only the <tt>title=</tt> and <tt>body=</tt> methods will be allowed in the mass assignment in the user case, and only <tt>title=</tt>, <tt>body=</tt>, and <tt>deleted=</tt> will be allowed for mass assignment in the admin case.
 
 By default, if an invalid setter method call is attempted, Sequel raises a <tt>Sequel::Error</tt> exception.  You can have Sequel silently ignore invalid calls by doing:
 
