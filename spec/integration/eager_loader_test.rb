@@ -333,7 +333,7 @@ describe "Polymorphic Associations" do
       many_to_one :attachable, :reciprocal=>:assets, \
         :dataset=>(proc do
           klass = m.call(attachable_type)
-          klass.filter(klass.primary_key=>attachable_id)
+          klass.where(klass.primary_key=>attachable_id)
         end), \
         :eager_loader=>(proc do |eo|
           id_map = {}
@@ -343,7 +343,7 @@ describe "Polymorphic Associations" do
           end 
           id_map.each do |klass_name, id_map|
             klass = m.call(klass_name)
-            klass.filter(klass.primary_key=>id_map.keys).all do |attach|
+            klass.where(klass.primary_key=>id_map.keys).all do |attach|
               id_map[attach.pk].each do |asset|
                 asset.associations[:attachable] = attach
               end 
@@ -363,25 +363,18 @@ describe "Polymorphic Associations" do
       primary_key :id
     end
     class ::Post < Sequel::Model
-      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable do |ds|
-        ds.filter(:attachable_type=>'Post')
-      end 
+      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Post'}
       
       private
 
       def _add_asset(asset)
-        asset.attachable_id = pk
-        asset.attachable_type = 'Post'
-        asset.save
+        asset.update(:attachable_id=>pk, :attachable_type=>'Post')
       end
       def _remove_asset(asset)
-        asset.attachable_id = nil
-        asset.attachable_type = nil
-        asset.save
+        asset.update(:attachable_id=>nil, :attachable_type=>nil)
       end
       def _remove_all_assets
-        Asset.filter(:attachable_id=>pk, :attachable_type=>'Post')\
-          .update(:attachable_id=>nil, :attachable_type=>nil)
+        assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)
       end
     end 
   
@@ -389,25 +382,18 @@ describe "Polymorphic Associations" do
       primary_key :id
     end
     class ::Note < Sequel::Model
-      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable do |ds|
-        ds.filter(:attachable_type=>'Note')
-      end 
-      
+      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Note'}     
+
       private
 
       def _add_asset(asset)
-        asset.attachable_id = pk
-        asset.attachable_type = 'Note'
-        asset.save
+        asset.update(:attachable_id=>pk, :attachable_type=>'Note')
       end
       def _remove_asset(asset)
-        asset.attachable_id = nil
-        asset.attachable_type = nil
-        asset.save
+        asset.update(:attachable_id=>nil, :attachable_type=>nil)
       end
       def _remove_all_assets
-        Asset.filter(:attachable_id=>pk, :attachable_type=>'Note')\
-          .update(:attachable_id=>nil, :attachable_type=>nil)
+        assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)
       end
     end
   end
@@ -630,8 +616,8 @@ describe "statistics associations" do
        :eager_loader=>(proc do |eo|
         eo[:rows].each{|p| p.associations[:ticket_hours] = nil}
         Ticket.filter(:project_id=>eo[:id_map].keys).
-         group(:project_id).
-         select{[project_id.as(project_id), sum(hours).as(hours)]}.
+         select_group(:project_id).
+         select_append{sum(hours).as(hours)}.
          all do |t|
           p = eo[:id_map][t.values.delete(:project_id)].first
           p.associations[:ticket_hours] = t
