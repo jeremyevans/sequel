@@ -431,7 +431,8 @@ module Sequel
       # Support fractional seconds for Time objects used in bound variables
       def java_sql_timestamp(time)
         ts = java.sql.Timestamp.new(time.to_i * 1000)
-        ts.setNanos(RUBY_VERSION >= '1.9.0' ? time.nsec : time.usec * 1000)
+        # Work around jruby 1.6 ruby 1.9 mode bug
+        ts.setNanos((RUBY_VERSION >= '1.9.0' && time.nsec != 0) ? time.nsec : time.usec * 1000)
         ts
       end 
       
