@@ -25,8 +25,8 @@ module Sequel
         
         # Use setNull for nil arguments as the default behavior of setString
         # with nil doesn't appear to work correctly on PostgreSQL.
-        def set_ps_arg(cps, arg, i)
-          arg.nil? ? cps.setNull(i, JavaSQL::Types::NULL) : super
+        def set_ps_arg_nil(cps, i)
+          cps.setNull(i, JavaSQL::Types::NULL)
         end
 
         # Execute the connection configuration SQL queries on the connection.

@@ -66,7 +66,7 @@ module Sequel
       end,
       :jtds=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/jtds'
-        db.extend(Sequel::JDBC::MSSQL::DatabaseMethods)
+        db.extend(Sequel::JDBC::JTDS::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::JTDS::Dataset
         db.send(:set_mssql_unicode_strings)
         JDBC.load_gem('jtds')
@@ -477,7 +477,7 @@ module Sequel
         when TrueClass, FalseClass
           cps.setBoolean(i, arg)
         when NilClass
-          cps.setString(i, nil)
+          set_ps_arg_nil(cps, i)
         when DateTime
           cps.setTimestamp(i, java_sql_datetime(arg))
         when Date
@@ -491,6 +491,11 @@ module Sequel
         else
           cps.setObject(i, arg)
         end
+      end
+
+      # Use setString with a nil value by default, but this doesn't work on all subadapters.
+      def set_ps_arg_nil(cps, i)
+        cps.setString(i, nil)
       end
       
       # Return the connection.  Used to do configuration on the

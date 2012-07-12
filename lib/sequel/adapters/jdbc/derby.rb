@@ -114,6 +114,11 @@ module Sequel
           end
         end
 
+        # Handle nil values by using setNull with the correct parameter type.
+        def set_ps_arg_nil(cps, i)
+          cps.setNull(i, cps.getParameterMetaData.getParameterType(i))
+        end
+      
         # Derby uses RENAME TABLE syntax to rename tables.
         def rename_table_sql(name, new_name)
           "RENAME TABLE #{quote_schema_table(name)} TO #{quote_schema_table(new_name)}"

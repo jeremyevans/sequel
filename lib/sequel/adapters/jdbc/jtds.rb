@@ -5,6 +5,17 @@ module Sequel
     # Database and Dataset instance methods for JTDS specific
     # support via JDBC.
     module JTDS
+      module DatabaseMethods
+        include Sequel::JDBC::MSSQL::DatabaseMethods
+
+        private
+
+        # Handle nil values by using setNull with the correct parameter type.
+        def set_ps_arg_nil(cps, i)
+          cps.setNull(i, cps.getParameterMetaData.getParameterType(i))
+        end
+      end
+
       # Dataset class for JTDS datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::MSSQL::DatasetMethods
