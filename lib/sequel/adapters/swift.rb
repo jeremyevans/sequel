@@ -139,7 +139,10 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |res|
           @columns = res.fields
-          res.each{|h| yield h}
+          res.each do |h|
+            h.to_a.each{|k,v| h[k] = SQL::Blob.new(v.read) if v.is_a?(StringIO)}
+            yield h
+          end
         end
         self
       end
