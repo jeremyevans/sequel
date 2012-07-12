@@ -303,20 +303,29 @@ describe "Bound Argument Types" do
     @ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
   end
 
-  cspecify "should handle time type with fractional seconds", [:do], [:jdbc, :sqlite], [:oracle] do
+  cspecify "should handle time type with fractional seconds", [:do], [:jdbc, :sqlite], [:oracle], [:swift, :postgres] do
     fract_time = @vs[:t] + 0.5
     @ds.prepare(:update, :ps_time_up, :t=>:$x).call(:x=>fract_time)
     @ds.literal(@ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>fract_time)[:t]).should == @ds.literal(fract_time)
   end
 
-  cspecify "should handle blob type", [:swift], [:odbc], [:jdbc, :db2], :oracle, :derby do
-    @ds.filter(:file=>:$x).prepare(:first, :ps_blob).call(:x=>@vs[:file])[:file].should == @vs[:file]
+  cspecify "should handle blob type", [:odbc], [:jdbc, :db2], :oracle do
+    @ds.delete
+    @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>@vs[:file])
+    @ds.get(:file).should == @vs[:file]
   end
 
-  cspecify "should handle blob type with embedded zeros", [:swift], [:odbc], [:jdbc, :db2], :oracle, :derby do
+  cspecify "should handle blob type with nil values", [:jdbc, :db2], :oracle, [:tinytds], [:jdbc, proc{|db| defined?(Sequel::JDBC::SQLServer::DatabaseMethods) && db.is_a?(Sequel::JDBC::SQLServer::DatabaseMethods)}] do
+    @ds.delete
+    @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>nil)
+    @ds.get(:file).should == nil
+  end
+
+  cspecify "should handle blob type with embedded zeros", [:odbc], [:jdbc, :db2], :oracle do
     zero_blob = Sequel::SQL::Blob.new("a\0"*100)
-    @ds.prepare(:update, :ps_blob_up, :file=>:$x).call(:x=>zero_blob)
-    @ds.filter(:file=>:$x).prepare(:first, :ps_blob).call(:x=>zero_blob)[:file].should == zero_blob
+    @ds.delete
+    @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>zero_blob)
+    @ds.get(:file).should == zero_blob
   end
 
   cspecify "should handle float type", [:swift, :sqlite] do
@@ -330,7 +339,7 @@ describe "Bound Argument Types" do
   cspecify "should handle boolean type", [:do, :sqlite], [:odbc, :mssql], [:jdbc, :sqlite], [:jdbc, :db2], :oracle do
     @ds.filter(:b=>:$x).prepare(:first, :ps_string).call(:x=>@vs[:b])[:b].should == @vs[:b]
   end
-end unless Sequel.guarded?([:swift, :postgres])
+end
 
 describe "Dataset#unbind" do
   before do
