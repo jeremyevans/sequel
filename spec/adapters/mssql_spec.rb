@@ -542,3 +542,38 @@ describe "A MSSQL database adds index with include" do
     @db.indexes(@table_name).should have_key("#{@table_name}_col1_index".to_sym)
   end
 end
+
+describe "MSSQL::Database#default_contrainst_name" do
+  let(:table_name) { :items }
+  let(:constraint_name) { MSSQL_DB.default_constraint_name(table_name, :name) }
+
+  after do
+    MSSQL_DB.drop_table(table_name)
+  end
+
+  specify "returns a constraint name for columns with a default value" do
+    MSSQL_DB.create_table!(table_name){ String :name, :default => 'widget' }
+    constraint_name.should_not be_nil
+  end
+
+  specify "returns nil for columns without a default value" do
+    MSSQL_DB.create_table!(table_name){ String :name }
+    constraint_name.should be_nil
+  end
+  
+  context "with a schema namespace" do
+    before(:all) do
+      MSSQL_DB.execute_ddl "create schema test"
+    end
+    after(:all) do
+      MSSQL_DB.execute_ddl "drop schema test"
+    end
+
+    let(:table_name) { :test__items }
+
+    specify "returns a constraint name for columns with a default value" do
+      MSSQL_DB.create_table!(table_name){ String :name, :default => 'widget' }
+      constraint_name.should_not be_nil
+    end    
+  end
+end

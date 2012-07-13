@@ -93,6 +93,13 @@ module Sequel
       def views(opts={})
         information_schema_tables('VIEW', opts)
       end
+      
+      # MSSQL implements column default values as constraints.
+      # This function takes a table and column name. It returns the name of the default constraint or nil if there is not a default value for the column
+      def default_constraint_name(table, column_name)
+        table_name = schema_and_table(table).compact.join('.')
+        self[:sys__default_constraints].where(:parent_object_id => :object_id[table_name]).and(:col_name[:parent_object_id, :parent_column_id] => column_name.to_s).get(:name)
+      end
 
       private
       
