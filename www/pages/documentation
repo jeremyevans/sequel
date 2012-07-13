@@ -60,8 +60,23 @@
 
 <h3>Release Notes</h3>
 <ul>
-  <% %w'3 2 1'.each do |i| %>
-    <li>
+  <li>Sequel 3:<ul>
+    <% 
+       lines = []
+       Dir["../doc/release_notes/3.*.txt"].map{|f| File.basename(f)}.each do |f|
+         (lines[f.split('.')[1].to_i/10] ||= []) << f
+       end
+       lines.reverse.each do |fs|
+    %>
+      <li>
+        <% fs.sort_by{|f| f.split('.').map{|x| x.to_i}}.reverse.each do |f| %>
+          <a href="rdoc/files/doc/release_notes/<%= f.gsub('.', '_') %>.html"><%= f.sub(/\.txt$/, '').sub(/(..)\.0$/, '\\1') %></a> |
+        <% end %>
+      </li>
+    <% end %>
+  </ul></li>
+  <% %w'2 1'.each do |i| %>
+    <li>Sequel <%= i %>: 
       <% Dir["../doc/release_notes/#{i}.*.txt"].map{|f| File.basename(f)}.sort_by{|f| f.split('.').map{|x| x.to_i}}.reverse.each do |f| %>
         <a href="rdoc/files/doc/release_notes/<%= f.gsub('.', '_') %>.html"><%= f.sub(/\.txt$/, '').sub(/(..)\.0$/, '\\1') %></a> |
       <% end %>
