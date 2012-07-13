@@ -1,4 +1,11 @@
-require File.join(File.dirname(File.expand_path(__FILE__)), 'extensions', 'spec_helper')
+unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
+  $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
+  require 'sequel/no_core_ext'
+end
+
+Sequel.quote_identifiers = false
+Sequel.identifier_input_method = nil
+Sequel.identifier_output_method = nil
 
 Regexp.send(:include, Sequel::SQL::StringMethods)
 String.send(:include, Sequel::SQL::StringMethods)
