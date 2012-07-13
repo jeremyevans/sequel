@@ -3,30 +3,40 @@
 <h3>General Info, Guides, Examples, and Tutorials</h3>
 
 <ul>
-  <li><a href="rdoc/files/README_rdoc.html">README</a> (Introduction to Sequel, start here if new)</li>
-  <li><a href="rdoc/files/doc/cheat_sheet_rdoc.html">Cheat Sheet</a></li>
-  <li><a href="rdoc/files/doc/opening_databases_rdoc.html">Connecting to a Database</a></li>
-  <li><a href="rdoc/files/doc/dataset_basics_rdoc.html">Dataset Basics</a></li>
-  <li><a href="rdoc/files/doc/querying_rdoc.html">Querying in Sequel</a></li>
-  <li><a href="rdoc/files/doc/dataset_filtering_rdoc.html">Dataset Filtering</a></li>
-  <li><a href="rdoc/files/doc/mass_assignment_rdoc.html">Model Mass Assignment</a></li>
-  <li><a href="rdoc/files/doc/validations_rdoc.html">Model Validations</a></li>
-  <li><a href="rdoc/files/doc/model_hooks_rdoc.html">Model Hooks</a></li>
-  <li><a href="rdoc/files/doc/association_basics_rdoc.html">Model Associations Basics</a></li>
-  <li><a href="rdoc/files/doc/advanced_associations_rdoc.html">Advanced Model Associations</a></li>
-  <li><a href="rdoc/files/doc/prepared_statements_rdoc.html">Prepared Statements/Bound Variables</a></li>
-  <li><a href="rdoc/files/doc/sharding_rdoc.html">Master/Slave Databases and Sharding</a></li>
-  <li><a href="rdoc/files/doc/schema_modification_rdoc.html">Schema Modification</a></li>
-  <li><a href="rdoc/files/doc/migration_rdoc.html">Migrations</a></li>
-  <li><a href="rdoc/files/doc/virtual_rows_rdoc.html">Virtual Row Blocks</a></li>
-  <li><a href="rdoc/files/doc/reflection_rdoc.html">Reflection</a></li>
-  <li><a href="rdoc/files/doc/transactions_rdoc.html">Database Transactions</a></li>
-  <li><a href="rdoc/files/doc/thread_safety_rdoc.html">Thread Safety</a></li>
-  <li><a href="rdoc/files/doc/sql_rdoc.html">Sequel for SQL Users</a></li>
-  <li><a href="rdoc/files/doc/active_record_rdoc.html">Sequel for ActiveRecord Users</a></li>
-  <li><a href="rdoc/files/doc/testing_rdoc.html">Testing With Sequel</a></li>
-  <li><a href="rdoc/files/doc/object_model_rdoc.html">Sequel Object Model</a></li>
-  <li><a href="rdoc/files/doc/core_extensions_rdoc.html">Core Extensions</a></li>
+  <li>General Overviews<ul>
+    <li><a href="rdoc/files/README_rdoc.html">README</a> (Introduction to Sequel, start here if new)</li>
+    <li><a href="rdoc/files/doc/cheat_sheet_rdoc.html">Cheat Sheet</a></li>
+    <li><a href="rdoc/files/doc/sql_rdoc.html">Sequel for SQL Users</a></li>
+    <li><a href="rdoc/files/doc/active_record_rdoc.html">Sequel for ActiveRecord Users</a></li>
+    <li><a href="rdoc/files/doc/object_model_rdoc.html">Sequel Object Model</a></li>
+  </ul></li>
+  <li>Databases<ul>
+    <li><a href="rdoc/files/doc/opening_databases_rdoc.html">Connecting to a Database</a></li>
+    <li><a href="rdoc/files/doc/transactions_rdoc.html">Database Transactions</a></li>
+    <li><a href="rdoc/files/doc/schema_modification_rdoc.html">Schema Modification</a></li>
+    <li><a href="rdoc/files/doc/migration_rdoc.html">Migrations</a></li>
+    <li><a href="rdoc/files/doc/sharding_rdoc.html">Master/Slave Databases and Sharding</a></li>
+  </ul></li>
+  <li>Datasets<ul>
+    <li><a href="rdoc/files/doc/dataset_basics_rdoc.html">Dataset Basics</a></li>
+    <li><a href="rdoc/files/doc/dataset_filtering_rdoc.html">Dataset Filtering</a></li>
+    <li><a href="rdoc/files/doc/querying_rdoc.html">Querying in Sequel</a></li>
+    <li><a href="rdoc/files/doc/prepared_statements_rdoc.html">Prepared Statements/Bound Variables</a></li>
+    <li><a href="rdoc/files/doc/virtual_rows_rdoc.html">Virtual Row Blocks</a></li>
+  </ul></li>
+  <li>Models<ul>
+    <li><a href="rdoc/files/doc/mass_assignment_rdoc.html">Model Mass Assignment</a></li>
+    <li><a href="rdoc/files/doc/validations_rdoc.html">Model Validations</a></li>
+    <li><a href="rdoc/files/doc/model_hooks_rdoc.html">Model Hooks</a></li>
+    <li><a href="rdoc/files/doc/association_basics_rdoc.html">Model Associations Basics</a></li>
+    <li><a href="rdoc/files/doc/advanced_associations_rdoc.html">Advanced Model Associations</a></li>
+  </ul></li>
+  <li>Misc.<ul>
+    <li><a href="rdoc/files/doc/reflection_rdoc.html">Reflection</a></li>
+    <li><a href="rdoc/files/doc/thread_safety_rdoc.html">Thread Safety</a></li>
+    <li><a href="rdoc/files/doc/testing_rdoc.html">Testing With Sequel</a></li>
+    <li><a href="rdoc/files/doc/core_extensions_rdoc.html">Core Extensions</a></li>
+  </ul></li>
 </ul>
 
 <h3>RDoc</h3>
