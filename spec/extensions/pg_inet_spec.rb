@@ -31,7 +31,7 @@ describe "pg_inet extension" do
   end
 
   it "should support using IPAddr instances in array types in bound variables" do
-    @db.bound_variable_arg([IPAddr.new('127.0.0.1')].pg_array, nil).should == '{"127.0.0.1/32"}'
+    @db.bound_variable_arg(Sequel.pg_array([IPAddr.new('127.0.0.1')]), nil).should == '{"127.0.0.1/32"}'
   end
 
   it "should parse inet/cidr type from the schema correctly" do

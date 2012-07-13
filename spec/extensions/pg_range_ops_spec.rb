@@ -3,21 +3,28 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "Sequel::Postgres::RangeOp" do
   before do
     @ds = Sequel.connect('mock://postgres', :quote_identifiers=>false).dataset
-    @h = :h.pg_range
+    @h = Sequel.pg_range_op(:h)
   end
 
   it "#pg_range should return self" do
     @h.pg_range.should equal(@h)
   end
 
-  it "#pg_range should return a RangeOp for symbols, literal strings, and expressions" do
-    @ds.literal(:h.pg_range.lower).should == "lower(h)"
+  it "Sequel.pg_range_op should return argument if already a RangeOp" do
+    Sequel.pg_range_op(@h).should equal(@h)
+  end
+
+  it "Sequel.pg_range should return a new RangeOp if not given a range" do
+    @ds.literal(Sequel.pg_range(:h).lower).should == "lower(h)"
+  end
+
+  it "#pg_range should return a RangeOp for literal strings, and expressions" do
     @ds.literal(Sequel.function(:b, :h).pg_range.lower).should == "lower(b(h))"
     @ds.literal(Sequel.lit('h').pg_range.lower).should == "lower(h)"
   end
 
   it "PGRange#op should return a RangeOp" do
-    @ds.literal((1..2).pg_range(:numrange).op.lower).should == "lower('[1,2]'::numrange)"
+    @ds.literal(Sequel.pg_range(1..2, :numrange).op.lower).should == "lower('[1,2]'::numrange)"
   end
 
   it "should define methods for all of the the PostgreSQL range operators" do

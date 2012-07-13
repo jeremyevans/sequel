@@ -5,8 +5,22 @@
 #
 #   Sequel.extension :pg_array_ops
 #
-# The most common usage is taking an object that represents an SQL
-# identifier (such as a :symbol), and calling #pg_array on it:
+# The most common usage is passing an expression to Sequel.pg_array_op:
+#
+#   ia = Sequel.pg_array_op(:int_array_column)
+#
+# If you have also loaded the pg_array extension, you can use
+# Sequel.pg_array as well:
+#
+#   ia = Sequel.pg_array(:int_array_column)
+#
+# Also, on most Sequel expression objects, you can call the pg_array
+# method:
+#
+#   ia = Sequel.expr(:int_array_column).pg_array
+#
+# If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
+# you can also call Symbol#pg_array:
 #
 #   ia = :int_array_column.pg_array
 #
@@ -211,6 +225,18 @@ module Sequel
     end
   end
 
+  module SQL::Builders
+    # Return the object wrapped in an Postgres::ArrayOp.
+    def pg_array_op(v)
+      case v
+      when Postgres::ArrayOp
+        v
+      else
+        Postgres::ArrayOp.new(v)
+      end
+    end
+  end
+
   class SQL::GenericExpression
     include Sequel::Postgres::ArrayOpMethods
   end
@@ -220,6 +246,8 @@ module Sequel
   end
 end
 
-class Symbol
-  include Sequel::Postgres::ArrayOpMethods
+if Sequel.core_extensions?
+  class Symbol
+    include Sequel::Postgres::ArrayOpMethods
+  end
 end

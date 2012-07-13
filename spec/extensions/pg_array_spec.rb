@@ -146,15 +146,29 @@ describe "pg_array extension" do
     @db.literal(@m::PGArray.new([nil, "{},[]'\""], :"varchar(255)")).should == "ARRAY[NULL,'{},[]''\"']::varchar(255)[]"
   end
 
-  it "should have Array#pg_array method for easy PGArray creation" do
-    @db.literal([1].pg_array).should == 'ARRAY[1]'
-    @db.literal([1, 2].pg_array(:int4)).should == 'ARRAY[1,2]::int4[]'
-    @db.literal([[[1], [2]], [[3], [4]]].pg_array(:real)).should == 'ARRAY[[[1],[2]],[[3],[4]]]::real[]'
+  it "should have Sequel.pg_array method for easy PGArray creation" do
+    @db.literal(Sequel.pg_array([1])).should == 'ARRAY[1]'
+    @db.literal(Sequel.pg_array([1, 2], :int4)).should == 'ARRAY[1,2]::int4[]'
+    @db.literal(Sequel.pg_array([[[1], [2]], [[3], [4]]], :real)).should == 'ARRAY[[[1],[2]],[[3],[4]]]::real[]'
+  end
+
+  it "should have Sequel.pg_array return existing PGArrays as-is" do
+    a = Sequel.pg_array([1])
+    Sequel.pg_array(a).should equal(a)
+  end
+
+  it "should have Sequel.pg_array create a new PGArrays if type of existing does not match" do
+    a = Sequel.pg_array([1], :int4)
+    b = Sequel.pg_array(a, :int8)
+    a.should == b
+    a.should_not equal(b)
+    a.array_type.should == :int4
+    b.array_type.should == :int8
   end
 
   it "should support using arrays as bound variables" do
     @db.bound_variable_arg(1, nil).should == 1
-    @db.bound_variable_arg([1,2].pg_array, nil).should == '{1,2}'
+    @db.bound_variable_arg(Sequel.pg_array([1,2]), nil).should == '{1,2}'
     @db.bound_variable_arg([1,2], nil).should == '{1,2}'
     @db.bound_variable_arg([[1,2]], nil).should == '{{1,2}}'
     @db.bound_variable_arg([1.0,2.0], nil).should == '{1.0,2.0}'
@@ -192,7 +206,7 @@ describe "pg_array extension" do
         v.should == [value]
         v.first.should be_a_kind_of(klass)
         v.array_type.should_not be_nil
-        @db.typecast_value(meth, [value].pg_array).should == v
+        @db.typecast_value(meth, Sequel.pg_array([value])).should == v
         @db.typecast_value(meth, v).should equal(v)
       end
 
@@ -201,7 +215,7 @@ describe "pg_array extension" do
         v.should == [[value]]
         v.first.first.should be_a_kind_of(klass)
         v.array_type.should_not be_nil
-        @db.typecast_value(meth, [[value]].pg_array).should == v
+        @db.typecast_value(meth, Sequel.pg_array([[value]])).should == v
         @db.typecast_value(meth, v).should equal(v)
       end
 

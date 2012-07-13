@@ -17,15 +17,22 @@
 # This is done so that Sequel does not treat JSONArray and JSONHash
 # like Array and Hash by default, which would cause issues.
 #
-# To turn an existing Array or Hash into a JSONArray or JSONHash:
+# To turn an existing Array or Hash into a JSONArray or JSONHash,
+# use Sequel.pg_json:
+#
+#   Sequel.pg_json(array)
+#   Sequel.pg_json(hash)
+#
+# If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
+# you can also use Array#pg_json and Hash#pg_json:
 #
 #   array.pg_json
 #   hash.pg_json
 #
 # So if you want to insert an array or hash into an json database column:
 #
-#   DB[:table].insert(:column=>[1, 2, 3].pg_json)
-#   DB[:table].insert(:column=>{'a'=>1, 'b'=>2}.pg_json)
+#   DB[:table].insert(:column=>Sequel.pg_json([1, 2, 3]))
+#   DB[:table].insert(:column=>Sequel.pg_json({'a'=>1, 'b'=>2}))
 #
 # If you would like to use PostgreSQL json columns in your model
 # objects, you probably want to modify the schema parsing/typecasting
@@ -168,23 +175,41 @@ module Sequel
     end
   end
 
+  module SQL::Builders
+    # Wrap the array or hash in a Postgres::JSONArray or Postgres::JSONHash.
+    def pg_json(v)
+      case v
+      when Postgres::JSONArray, Postgres::JSONHash
+        v
+      when Array
+        Postgres::JSONArray.new(v)
+      when Hash
+        Postgres::JSONHash.new(v)
+      else
+        raise Error, "Sequel.pg_json requires a hash or array argument"
+      end
+    end
+  end
+
   Database.register_extension(:pg_json, Postgres::JSONDatabaseMethods)
 end
 
-class Array
-  # Return a Sequel::Postgres::JSONArray proxy to the receiver.
-  # This is mostly useful as a short cut for creating JSONArray
-  # objects that didn't come from the database.
-  def pg_json
-    Sequel::Postgres::JSONArray.new(self)
+if Sequel.core_extensions?
+  class Array
+    # Return a Sequel::Postgres::JSONArray proxy to the receiver.
+    # This is mostly useful as a short cut for creating JSONArray
+    # objects that didn't come from the database.
+    def pg_json
+      Sequel::Postgres::JSONArray.new(self)
+    end
   end
-end
 
-class Hash
-  # Return a Sequel::Postgres::JSONHash proxy to the receiver.
-  # This is mostly useful as a short cut for creating JSONHash
-  # objects that didn't come from the database.
-  def pg_json
-    Sequel::Postgres::JSONHash.new(self)
+  class Hash
+    # Return a Sequel::Postgres::JSONHash proxy to the receiver.
+    # This is mostly useful as a short cut for creating JSONHash
+    # objects that didn't come from the database.
+    def pg_json
+      Sequel::Postgres::JSONHash.new(self)
+    end
   end
 end

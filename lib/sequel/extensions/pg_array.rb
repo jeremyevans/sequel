@@ -15,15 +15,21 @@
 #
 # To turn an existing Array into a PGArray:
 #
+#   Sequel.pg_array(array)
+#
+# If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
+# you can also use Array#pg_array:
+#
 #   array.pg_array
 #
 # You can also provide a type, though it many cases it isn't necessary:
 #
+#   Sequel.pg_array(array, :varchar) # or :integer, :"double precision", etc.
 #   array.pg_array(:varchar) # or :integer, :"double precision", etc.
 #
 # So if you want to insert an array into an integer[] database column:
 #
-#   DB[:table].insert(:column=>[1, 2, 3].pg_array)
+#   DB[:table].insert(:column=>Sequel.pg_array([1, 2, 3]))
 #
 # If you would like to use PostgreSQL arrays in your model objects, you
 # probably want to modify the schema parsing/typecasting so that it
@@ -497,15 +503,36 @@ module Sequel
     end
   end
 
+  module SQL::Builders
+    # Return a Postgres::PGArray proxy for the given array and database array type.
+    def pg_array(v, array_type=nil)
+      case v
+      when Postgres::PGArray
+        if array_type.nil? || v.array_type == array_type
+          v
+        else
+          Postgres::PGArray.new(v.to_a, array_type)
+        end
+      when Array
+        Postgres::PGArray.new(v, array_type)
+      else
+        # May not be defined unless the pg_array_ops extension is used
+        pg_array_op(v)
+      end
+    end
+  end
+
   Database.register_extension(:pg_array, Postgres::PGArray::DatabaseMethods)
 end
 
-class Array
-  # Return a PGArray proxy to the receiver, using a
-  # specific database type if given.  This is mostly useful
-  # as a short cut for creating PGArray objects that didn't
-  # come from the database.
-  def pg_array(type=nil)
-    Sequel::Postgres::PGArray.new(self, type)
+if Sequel.core_extensions?
+  class Array
+    # Return a PGArray proxy to the receiver, using a
+    # specific database type if given.  This is mostly useful
+    # as a short cut for creating PGArray objects that didn't
+    # come from the database.
+    def pg_array(type=nil)
+      Sequel::Postgres::PGArray.new(self, type)
+    end
   end
 end

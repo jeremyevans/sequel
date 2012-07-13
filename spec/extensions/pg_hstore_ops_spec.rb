@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "Sequel::Postgres::HStoreOp" do
   before do
     @ds = Sequel.connect('mock://postgres', :quote_identifiers=>false).dataset
-    @h = :h.hstore
+    @h = Sequel.hstore_op(:h)
   end
 
   it "#- should use the - operator" do
@@ -117,6 +117,14 @@ describe "Sequel::Postgres::HStoreOp" do
     @ds.literal(@h.avals).should == "avals(h)"
   end
 
+  it "should have Sequel.hstore_op return HStoreOp instances as-is" do
+    Sequel.hstore_op(@h).should equal(@h)
+  end
+
+  it "should have Sequel.hstore return HStoreOp instances" do
+    Sequel.hstore(:h).should == @h
+  end
+
   it "should be able to turn expressions into hstore ops using hstore" do
     @ds.literal(Sequel.qualify(:b, :a).hstore['a']).should == "(b.a -> 'a')"
     @ds.literal(Sequel.function(:a, :b).hstore['a']).should == "(a(b) -> 'a')"
@@ -126,11 +134,7 @@ describe "Sequel::Postgres::HStoreOp" do
     @ds.literal(Sequel.lit('a').hstore['a']).should == "(a -> 'a')"
   end
 
-  it "should be able to turn symbols into hstore ops using hstore" do
-    @ds.literal(:a.hstore['a']).should == "(a -> 'a')"
-  end
-
   it "should allow transforming HStore instances into HStoreOp instances" do
-    @ds.literal({'a'=>'b'}.hstore.op['a']).should == "('\"a\"=>\"b\"'::hstore -> 'a')"
+    @ds.literal(Sequel.hstore('a'=>'b').op['a']).should == "('\"a\"=>\"b\"'::hstore -> 'a')"
   end
 end

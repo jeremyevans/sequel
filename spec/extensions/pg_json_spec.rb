@@ -43,36 +43,39 @@ describe "pg_json extension" do
   end
 
   it "should literalize HStores to strings correctly" do
-    @db.literal([].pg_json).should == "'[]'::json"
-    @db.literal([1, [2], {'a'=>'b'}].pg_json).should == "'[1,[2],{\"a\":\"b\"}]'::json"
-    @db.literal({}.pg_json).should == "'{}'::json"
-    @db.literal({'a'=>'b'}.pg_json).should == "'{\"a\":\"b\"}'::json"
+    @db.literal(Sequel.pg_json([])).should == "'[]'::json"
+    @db.literal(Sequel.pg_json([1, [2], {'a'=>'b'}])).should == "'[1,[2],{\"a\":\"b\"}]'::json"
+    @db.literal(Sequel.pg_json({})).should == "'{}'::json"
+    @db.literal(Sequel.pg_json('a'=>'b')).should == "'{\"a\":\"b\"}'::json"
   end
 
-  it "should have Hash#pg_json method for creating JSONHash instances" do
-    {}.pg_json.should be_a_kind_of(@hc)
+  it "should have Sequel.pg_json return JSONHash and JSONArray as is" do
+    a = Sequel.pg_json({})
+    Sequel.pg_json(a).should equal(a)
+    a = Sequel.pg_json([])
+    Sequel.pg_json(a).should equal(a)
   end
 
-  it "should have Array#pg_json method for creating JSONArray instances" do
-    [].pg_json.should be_a_kind_of(@ac)
+  it "should have Sequel.pg_json raise an Error if called with a non-hash or array" do
+    proc{Sequel.pg_json(:a)}.should raise_error(Sequel::Error)
   end
 
   it "should have JSONHash#to_hash method for getting underlying hash" do
-    {}.pg_json.to_hash.should be_a_kind_of(Hash)
+    Sequel.pg_json({}).to_hash.should be_a_kind_of(Hash)
   end
 
   it "should have JSONArray#to_a method for getting underlying array" do
-    [].pg_json.to_a.should be_a_kind_of(Array)
+    Sequel.pg_json([]).to_a.should be_a_kind_of(Array)
   end
 
   it "should support using JSONHash and JSONArray as bound variables" do
     @db.bound_variable_arg(1, nil).should == 1
-    @db.bound_variable_arg([1].pg_json, nil).should == '[1]'
-    @db.bound_variable_arg({'a'=>'b'}.pg_json, nil).should == '{"a":"b"}'
+    @db.bound_variable_arg(Sequel.pg_json([1]), nil).should == '[1]'
+    @db.bound_variable_arg(Sequel.pg_json('a'=>'b'), nil).should == '{"a":"b"}'
   end
 
   it "should support using json[] types in bound variables" do
-    @db.bound_variable_arg([[{"a"=>1}].pg_json, {"b"=>[1, 2]}.pg_json].pg_array, nil).should == '{"[{\\"a\\":1}]","{\\"b\\":[1,2]}"}'
+    @db.bound_variable_arg(Sequel.pg_array([Sequel.pg_json([{"a"=>1}]), Sequel.pg_json("b"=>[1, 2])]), nil).should == '{"[{\\"a\\":1}]","{\\"b\\":[1,2]}"}'
   end
 
   it "should parse json type from the schema correctly" do
@@ -81,16 +84,16 @@ describe "pg_json extension" do
   end
 
   it "should support typecasting for the json type" do
-    h = {1=>2}.pg_json
-    a = [1].pg_json
+    h = Sequel.pg_json(1=>2)
+    a = Sequel.pg_json([1])
     @db.typecast_value(:json, h).should equal(h)
     @db.typecast_value(:json, h.to_hash).should == h
     @db.typecast_value(:json, h.to_hash).should be_a_kind_of(@hc)
     @db.typecast_value(:json, a).should equal(a)
     @db.typecast_value(:json, a.to_a).should == a
     @db.typecast_value(:json, a.to_a).should be_a_kind_of(@ac)
-    @db.typecast_value(:json, '[]').should == [].pg_json
-    @db.typecast_value(:json, '{"a": "b"}').should == {"a"=>"b"}.pg_json
+    @db.typecast_value(:json, '[]').should == Sequel.pg_json([])
+    @db.typecast_value(:json, '{"a": "b"}').should == Sequel.pg_json("a"=>"b")
     proc{@db.typecast_value(:json, '')}.should raise_error(Sequel::InvalidValue)
     proc{@db.typecast_value(:json, 1)}.should raise_error(Sequel::InvalidValue)
   end

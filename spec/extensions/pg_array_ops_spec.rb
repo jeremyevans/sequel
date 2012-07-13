@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "Sequel::Postgres::ArrayOp" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
-    @a = :a.pg_array
+    @a = Sequel.pg_array_op(:a)
   end
 
   it "should support the standard mathematical operators" do
@@ -76,6 +76,10 @@ describe "Sequel::Postgres::ArrayOp" do
     @a.pg_array.should equal(@a)
   end
 
+  it "Sequel.pg_array_op should return arg for ArrayOp" do
+    Sequel.pg_array_op(@a).should equal(@a)
+  end
+
   it "should be able to turn expressions into array ops using pg_array" do
     @db.literal(Sequel.qualify(:b, :a).pg_array.push(3)).should == "(b.a || 3)"
     @db.literal(Sequel.function(:a, :b).pg_array.push(3)).should == "(a(b) || 3)"
@@ -85,11 +89,15 @@ describe "Sequel::Postgres::ArrayOp" do
     @db.literal(Sequel.lit('a').pg_array.unnest).should == "unnest(a)"
   end
 
-  it "should be able to turn symbols into array ops using pg_array" do
-    @db.literal(:a.pg_array.unnest).should == "unnest(a)"
+  it "should be able to turn symbols into array ops using Sequel.pg_array_op" do
+    @db.literal(Sequel.pg_array_op(:a).unnest).should == "unnest(a)"
+  end
+
+  it "should be able to turn symbols into array ops using Sequel.pg_array" do
+    @db.literal(Sequel.pg_array(:a).unnest).should == "unnest(a)"
   end
 
   it "should allow transforming PGArray instances into ArrayOp instances" do
-    @db.literal([1,2].pg_array.op.push(3)).should == "(ARRAY[1,2] || 3)"
+    @db.literal(Sequel.pg_array([1,2]).op.push(3)).should == "(ARRAY[1,2] || 3)"
   end
 end

@@ -37,8 +37,8 @@ describe "pg_interval extension" do
   end
 
   it "should support using ActiveSupport::Duration instances in array types in bound variables" do
-    @db.bound_variable_arg([ActiveSupport::Duration.new(0, [[:seconds, 0]])].pg_array, nil).should == '{"0"}'
-    @db.bound_variable_arg([ActiveSupport::Duration.new(0, [[:seconds, -10.000001], [:minutes, -20], [:days, -3], [:months, -4], [:years, -6]])].pg_array, nil).should == '{"-6 years -4 months -3 days -20 minutes -10.000001 seconds "}'
+    @db.bound_variable_arg(Sequel.pg_array([ActiveSupport::Duration.new(0, [[:seconds, 0]])]), nil).should == '{"0"}'
+    @db.bound_variable_arg(Sequel.pg_array([ActiveSupport::Duration.new(0, [[:seconds, -10.000001], [:minutes, -20], [:days, -3], [:months, -4], [:years, -6]])]), nil).should == '{"-6 years -4 months -3 days -20 minutes -10.000001 seconds "}'
   end
 
   it "should parse interval type from the schema correctly" do

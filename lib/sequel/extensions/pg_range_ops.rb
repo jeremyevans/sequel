@@ -5,8 +5,22 @@
 #
 #   Sequel.extension :pg_range_ops
 #
-# The most common usage is taking an object that represents an SQL
-# identifier (such as a :symbol), and calling #pg_range on it:
+# The most common usage is passing an expression to Sequel.pg_range_op:
+#
+#   r = Sequel.pg_range_op(:range)
+#
+# If you have also loaded the pg_range extension, you can use
+# Sequel.pg_range as well:
+#
+#   r = Sequel.pg_range(:range)
+#
+# Also, on most Sequel expression objects, you can call the pg_range
+# method:
+#
+#   r = Sequel.expr(:range).pg_range
+#
+# If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
+# you can also call Symbol#pg_range:
 #
 #   r = :range.pg_range
 #
@@ -108,6 +122,18 @@ module Sequel
     end
   end
 
+  module SQL::Builders
+    # Return the expression wrapped in the Postgres::RangeOp.
+    def pg_range_op(v)
+      case v
+      when Postgres::RangeOp
+        v
+      else
+        Postgres::RangeOp.new(v)
+      end
+    end
+  end
+
   class SQL::GenericExpression
     include Sequel::Postgres::RangeOpMethods
   end
@@ -117,6 +143,8 @@ module Sequel
   end
 end
 
-class Symbol
-  include Sequel::Postgres::RangeOpMethods
+if Sequel.core_extensions?
+  class Symbol
+    include Sequel::Postgres::RangeOpMethods
+  end
 end

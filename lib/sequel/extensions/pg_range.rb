@@ -20,12 +20,18 @@
 # for both PGRange and Range that use the standard Sequel literalization
 # callbacks, so they work on all adapters.
 #
-# To turn an existing Range into a PGRange:
+# To turn an existing Range into a PGRange, use Sequel.pg_range:
+#
+#   Sequel.pg_range(range)
+#
+# If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
+# you can also use Range#pg_range:
 #
 #   range.pg_range 
 #
 # You may want to specify a specific range type:
 #
+#   Sequel.pg_range(range, :daterange)
 #   range.pg_range(:daterange)
 #
 # If you specify the range database type, Sequel will automatically cast
@@ -475,13 +481,34 @@ module Sequel
     end
   end
 
+  module SQL::Builders
+    # Convert the object to a Postgres::PGRange.
+    def pg_range(v, db_type=nil)
+      case v
+      when Postgres::PGRange
+        if db_type.nil? || v.db_type == db_type
+          v
+        else
+          Postgres::PGRange.new(v.begin, v.end, :exclude_begin=>v.exclude_begin?, :exclude_end=>v.exclude_end?, :db_type=>db_type)
+        end
+      when Range
+        Postgres::PGRange.from_range(v, db_type)
+      else
+        # May not be defined unless the pg_range_ops extension is used
+        pg_range_op(v)
+      end
+    end
+  end
+
   Database.register_extension(:pg_range, Postgres::PGRange::DatabaseMethods)
 end
 
-class Range 
-  # Create a new PGRange using the receiver as the input range,
-  # with the given database type.
-  def pg_range(db_type=nil)
-    Sequel::Postgres::PGRange.from_range(self, db_type)
+if Sequel.core_extensions?
+  class Range 
+    # Create a new PGRange using the receiver as the input range,
+    # with the given database type.
+    def pg_range(db_type=nil)
+      Sequel::Postgres::PGRange.from_range(self, db_type)
+    end
   end
 end

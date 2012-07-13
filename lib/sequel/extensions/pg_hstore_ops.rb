@@ -6,7 +6,22 @@
 #   Sequel.extension :pg_hstore_ops
 #
 # The most common usage is taking an object that represents an SQL
-# expression (such as a :symbol), and calling #hstore on it:
+# expression (such as a :symbol), and calling Sequel.hstore_op with it:
+#
+#   h = Sequel.hstore_op(:hstore_column)
+#
+# If you have also loaded the pg_hstore extension, you can use
+# Sequel.hstore as well:
+#
+#   h = Sequel.hstore(:hstore_column)
+#
+# Also, on most Sequel expression objects, you can call the hstore 
+# method:
+#
+#   h = Sequel.expr(:hstore_column).hstore
+#
+# If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
+# you can also call Symbol#hstore:
 #
 #   h = :hstore_column.hstore
 #
@@ -250,6 +265,18 @@ module Sequel
     end
   end
 
+  module SQL::Builders
+    # Return the object wrapped in an Postgres::HStoreOp.
+    def hstore_op(v)
+      case v
+      when Postgres::HStoreOp
+        v
+      else
+        Postgres::HStoreOp.new(v)
+      end
+    end
+  end
+
   class SQL::GenericExpression
     include Sequel::Postgres::HStoreOpMethods
   end
@@ -259,6 +286,8 @@ module Sequel
   end
 end
 
-class Symbol
-  include Sequel::Postgres::HStoreOpMethods
+if Sequel.core_extensions?
+  class Symbol
+    include Sequel::Postgres::HStoreOpMethods
+  end
 end

@@ -15,8 +15,13 @@
 # for HStore using the standard Sequel literalization callbacks, so
 # they work with on all adapters.
 #
-# To turn an existing Hash into an HStore:
+# To turn an existing Hash into an HStore, use Sequel.hstore:
 #
+#   Sequel.hstore(hash)
+#
+# If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
+# you can also use Hash#hstore:
+# 
 #   hash.hstore
 #
 # Since the hstore type only supports strings, non string keys and
@@ -282,17 +287,34 @@ module Sequel
     PG_NAMED_TYPES[:hstore] = HStore.method(:parse)
   end
 
+  module SQL::Builders
+    # Return a Postgres::HStore proxy for the given hash.
+    def hstore(v)
+      case v
+      when Postgres::HStore
+        v
+      when Hash
+        Postgres::HStore.new(v)
+      else
+        # May not be defined unless the pg_hstore_ops extension is used
+        hstore_op(v)
+      end
+    end
+  end
+
   Database.register_extension(:pg_hstore, Postgres::HStore::DatabaseMethods)
 end
 
-class Hash
-  # Create a new HStore using the receiver as the input
-  # hash.  Note that the HStore created will not use the
-  # receiver as the backing store, since it has to
-  # modify the hash.  To get the new backing store, use:
-  #
-  #   hash.hstore.to_hash
-  def hstore
-    Sequel::Postgres::HStore.new(self)
+if Sequel.core_extensions?
+  class Hash
+    # Create a new HStore using the receiver as the input
+    # hash.  Note that the HStore created will not use the
+    # receiver as the backing store, since it has to
+    # modify the hash.  To get the new backing store, use:
+    #
+    #   hash.hstore.to_hash
+    def hstore
+      Sequel::Postgres::HStore.new(self)
+    end
   end
 end

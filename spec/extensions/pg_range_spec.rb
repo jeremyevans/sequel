@@ -240,8 +240,26 @@ describe "pg_range extension" do
       @r3.db_type.should == 'int8range'
     end
 
-    it "should be able to be created by Range#pg_range" do
-      (1..2).pg_range.should == @r1
+    it "should be able to be created by Sequel.pg_range" do
+      Sequel.pg_range(1..2).should == @r1
+    end
+
+    it "should have Sequel.pg_range be able to take a database type" do
+      Sequel.pg_range(1..2, :int4range).should == @R.new(1, 2, :db_type=>:int4range)
+    end
+
+    it "should have Sequel.pg_range return a PGRange as is" do
+      a = Sequel.pg_range(1..2)
+      Sequel.pg_range(a).should equal(a)
+    end
+
+    it "should have Sequel.pg_range return a new PGRange if the database type differs" do
+      a = Sequel.pg_range(1..2, :int4range)
+      b = Sequel.pg_range(a, :int8range)
+      a.to_range.should == b.to_range
+      a.should_not equal(b)
+      a.db_type.should == :int4range
+      b.db_type.should == :int8range
     end
 
     it "should have #initialize raise if requesting an empty range with beginning or ending" do

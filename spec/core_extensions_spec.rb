@@ -572,3 +572,44 @@ describe "Symbol" do
     :abc.extract(:year).to_s(@ds).should == "extract(year FROM abc)"
   end
 end
+
+describe "Postgres extensions integration" do
+  before do
+    @db = Sequel.mock
+    Sequel.extension(:pg_array, :pg_array_ops, :pg_hstore, :pg_hstore_ops, :pg_json, :pg_range, :pg_range_ops)
+  end
+
+  it "Symbol#pg_array should return an ArrayOp" do
+    @db.literal(:a.pg_array.unnest).should == "unnest(a)"
+  end
+
+  it "Symbol#hstore should return an HStoreOp" do
+    @db.literal(:a.hstore['a']).should == "(a -> 'a')"
+  end
+
+  it "Symbol#pg_range should return a RangeOp" do
+    @db.literal(:a.pg_range.lower).should == "lower(a)"
+  end
+
+  it "Array#pg_array should return a PGArray" do
+    @db.literal([1].pg_array.op.unnest).should == "unnest(ARRAY[1])"
+    @db.literal([1].pg_array(:int4).op.unnest).should == "unnest(ARRAY[1]::int4[])"
+  end
+
+  it "Array#pg_json should return a JSONArray" do
+    @db.literal([1].pg_json).should == "'[1]'::json"
+  end
+
+  it "Hash#hstore should return an HStore" do
+    @db.literal({'a'=>1}.hstore.op['a']).should == '(\'"a"=>"1"\'::hstore -> \'a\')'
+  end
+
+  it "Hash#pg_json should return an JSONHash" do
+    @db.literal({'a'=>'b'}.pg_json).should == "'{\"a\":\"b\"}'::json"
+  end
+
+  it "Range#pg_range should return an PGRange" do
+    @db.literal((1..2).pg_range).should == "'[1,2]'"
+    @db.literal((1..2).pg_range(:int4range)).should == "'[1,2]'::int4range"
+  end
+end
