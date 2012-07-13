@@ -166,8 +166,10 @@ module Sequel
         ROWS = " ROWS".freeze
         FETCH_FIRST = " FETCH FIRST ".freeze
         ROWS_ONLY = " ROWS ONLY".freeze
-        BOOL_TRUE = '(1 = 1)'.freeze
-        BOOL_FALSE = '(1 = 0)'.freeze
+        BOOL_TRUE_OLD = '(1 = 1)'.freeze
+        BOOL_FALSE_OLD = '(1 = 0)'.freeze
+        BOOL_TRUE = 'TRUE'.freeze
+        BOOL_FALSE = 'FALSE'.freeze
         SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit lock')
 
         # Derby doesn't support an expression between CASE and WHEN,
@@ -250,7 +252,11 @@ module Sequel
         # Derby uses an expression yielding false for false values.
         # Newer versions can use the FALSE literal, but the latest gem version cannot.
         def literal_false
-          BOOL_FALSE
+          if db.svn_version >= 1040133
+            BOOL_FALSE
+          else
+            BOOL_FALSE_OLD
+          end
         end
 
         # Derby handles fractional seconds in timestamps, but not in times
@@ -261,7 +267,11 @@ module Sequel
         # Derby uses an expression yielding true for true values.
         # Newer versions can use the TRUE literal, but the latest gem version cannot.
         def literal_true
-          BOOL_TRUE
+          if db.svn_version >= 1040133
+            BOOL_TRUE
+          else
+            BOOL_TRUE_OLD
+          end
         end
 
         # Derby doesn't support common table expressions.
