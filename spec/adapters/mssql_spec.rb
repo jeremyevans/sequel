@@ -542,3 +542,50 @@ describe "A MSSQL database adds index with include" do
     @db.indexes(@table_name).should have_key("#{@table_name}_col1_index".to_sym)
   end
 end
+
+describe "MSSQL::Database#drop_column" do
+  let(:table_name) { :items }
+
+  after do
+    MSSQL_DB.drop_table(table_name)
+  end
+  
+  context "when using the :cascade option" do
+    specify "drops columns with a default value" do
+      MSSQL_DB.create_table!(table_name){ Integer :id; String :name, :default => 'widget' }
+      expect { MSSQL_DB.drop_column(table_name, :name, :cascade => true) }.to_not raise_error
+      MSSQL_DB[table_name].columns.should_not include(:name)
+    end
+
+    specify "drops columns without a default value" do
+      MSSQL_DB.create_table!(table_name){ Integer :id; String :name }
+      expect { MSSQL_DB.drop_column(table_name, :name, :cascade => true) }.to_not raise_error
+      MSSQL_DB[table_name].columns.should_not include(:name)
+    end
+
+    context "with a schema namespace" do
+      before(:all) do
+        MSSQL_DB.execute_ddl "create schema test"
+      end
+      after(:all) do
+        MSSQL_DB.execute_ddl "drop schema test"
+      end
+
+      let(:table_name) { :test__items }
+
+      specify "drops columns with a default value" do
+        MSSQL_DB.create_table!(table_name){ Integer :id; String :name, :default => 'widget' }
+        expect { MSSQL_DB.drop_column(table_name, :name, :cascade => true) }.to_not raise_error
+        MSSQL_DB[table_name].columns.should_not include(:name)
+      end
+    end
+  end
+  
+  context "when not using the :cascade option" do
+    specify "can not drop columns with a default value" do
+      MSSQL_DB.create_table!(table_name){ Integer :id; String :name, :default => 'widget' }
+      expect { MSSQL_DB.drop_column(table_name, :name) }.to raise_error
+      MSSQL_DB[table_name].columns.should include(:name)
+    end
+  end
+end
