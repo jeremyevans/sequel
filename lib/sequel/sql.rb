@@ -628,7 +628,7 @@ module Sequel
     #
     #   :price.sql_number/10 > 100
     module ComplexExpressionMethods
-      # Extract a datetime_part (e.g. year, month) from self:
+      # Extract a datetime part (e.g. year, month) from self:
       #
       #   :date.extract(:year) # extract(year FROM "date")
       #
