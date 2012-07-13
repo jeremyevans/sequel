@@ -10,7 +10,9 @@ aims to be a gentle introduction to Sequel's querying support.
 
 While you can easily use raw SQL with Sequel, a large part of the
 advantage you get from using Sequel is Sequel's ability to abstract
-SQL from you and give you a much nicer interface.
+SQL from you and give you a much nicer interface. Sequel also ships with
+a {core_extensions extension}[link:files/doc/core_extensions_rdoc.html],
+which better integrates Sequel's DSL into the ruby language.
 
 == Retrieving Objects
 

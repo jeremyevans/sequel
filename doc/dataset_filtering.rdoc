@@ -29,6 +29,10 @@ If you are specifying a filter/selection/order, you can use a virtual row block:
 
   items.select{avg(price)}
 
+You can also use the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html] and the +sql_function+ method:
+
+  :avg.sql_function(:price)
+
 == Filtering using a hash
 
 If you just need to compare records against values, you can supply a hash:

@@ -296,6 +296,16 @@ You can also specify descending order:
   posts.order(Sequel.desc(:stamp))
   # ORDER BY stamp DESC
 
+=== Core Extensions
+
+Note the use of <tt>Sequel.desc(:stamp)</tt> in the above example.  Much of Sequel's DSL uses this style, calling methods on the Sequel module that return SQL expression objects.  Sequel also ships with a {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]) that integrates Sequel's DSL better into the ruby language, allowing you to write:
+
+  :stamp.desc
+
+instead of:
+
+  Sequel.desc(:stamp)
+
 === Selecting Columns
 
 Selecting specific columns to be returned is also simple using +select+:

@@ -26,6 +26,7 @@
   <li><a href="rdoc/files/doc/active_record_rdoc.html">Sequel for ActiveRecord Users</a></li>
   <li><a href="rdoc/files/doc/testing_rdoc.html">Testing With Sequel</a></li>
   <li><a href="rdoc/files/doc/object_model_rdoc.html">Sequel Object Model</a></li>
+  <li><a href="rdoc/files/doc/core_extensions_rdoc.html">Core Extensions</a></li>
 </ul>
 
 <h3>RDoc</h3>

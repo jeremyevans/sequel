@@ -64,7 +64,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   dataset.inject(0){|sum, r| sum + r[:value]}
   dataset.sum(:value) # same as above
 
-== Filtering (see also doc/dataset_filtering.rdoc)
+== Filtering (see also {Dataset Filtering}[link:files/doc/dataset_filtering_rdoc.html])
 
 === Equality
 

@@ -78,6 +78,10 @@ Almost everywhere in Sequel, you can drop down to literal SQL by providing a lit
   DB[:albums].select('name') # SELECT 'name' FROM albums
   DB[:albums].select(Sequel.lit('name')) # SELECT name FROM albums
 
+For a simpler way of creating literal strings, you can also use the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html], which adds the <tt>String#lit</tt> method, and other methods that integrate Sequel's DSL with the ruby language:
+
+  DB[:albums].select('name'.lit)
+
 So you can use Sequel's DSL everywhere you find it helpful, and fallback to literal SQL if the DSL can't do what you want or you just find literal SQL easier.
 
 == Translating SQL Expressions into Sequel

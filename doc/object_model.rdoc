@@ -204,6 +204,8 @@ If Sequel needs to represent an SQL concept that does not map directly to an exi
 ruby class, it will generally use a Sequel::SQL::Expression subclass to represent that
 concept.
 
+Some of the examples below show examples that require the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html].
+
 === Sequel::LiteralString
 
 Sequel::LiteralString is not actually a Sequel::SQL::Expression subclass.  It is
