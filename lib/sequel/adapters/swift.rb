@@ -1,11 +1,8 @@
-require 'swift'
-
 module Sequel
-  # Module holding the Swift support for Sequel.  Swift is a
-  # ruby front-end for dbic++, a fast database access library
-  # written in C++.
+  # Module holding the Swift DB support for Sequel.  Swift DB is a
+  # collection of drivers used in Swift ORM.
   #
-  # The Swift adapter currently supports PostgreSQL and MySQL:
+  # The Swift adapter currently supports PostgreSQL, MySQL and SQLite3
   #
   #   Sequel.connect('swift://user:password@host/database?db_type=postgres')
   #   Sequel.connect('swift://user:password@host/database?db_type=mysql')
@@ -14,18 +11,21 @@ module Sequel
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {:postgres=>proc do |db|
         Sequel.ts_require 'adapters/swift/postgres'
+        require 'swift/db/postgres'
         db.extend(Sequel::Swift::Postgres::DatabaseMethods)
         db.extend_datasets Sequel::Postgres::DatasetMethods
         db.swift_class = ::Swift::DB::Postgres
       end,
       :mysql=>proc do |db|
         Sequel.ts_require 'adapters/swift/mysql'
+        require 'swift/db/mysql'
         db.extend(Sequel::Swift::MySQL::DatabaseMethods)
         db.dataset_class = Sequel::Swift::MySQL::Dataset
         db.swift_class = ::Swift::DB::Mysql
       end,
       :sqlite=>proc do |db|
         Sequel.ts_require 'adapters/swift/sqlite'
+        require 'swift/db/sqlite3'
         db.extend(Sequel::Swift::SQLite::DatabaseMethods)
         db.dataset_class = Sequel::Swift::SQLite::Dataset
         db.swift_class = ::Swift::DB::Sqlite3
@@ -70,7 +70,7 @@ module Sequel
             res = log_yield(sql){conn.execute(sql)}
             yield res if block_given?
             nil
-          rescue SwiftError => e
+          rescue ::Swift::Error => e
             raise_error(e)
           end
         end
@@ -81,8 +81,8 @@ module Sequel
       def execute_dui(sql, opts={})
         synchronize(opts[:server]) do |conn|
           begin
-            log_yield(sql){conn.execute(sql).rows}
-          rescue SwiftError => e
+            log_yield(sql){conn.execute(sql).affected_rows}
+          rescue ::Swift::Error => e
             raise_error(e)
           end
         end
@@ -94,7 +94,7 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           begin
             log_yield(sql){conn.execute(sql).insert_id}
-          rescue SwiftError => e
+          rescue ::Swift::Error => e
             raise_error(e)
           end
         end
