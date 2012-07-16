@@ -96,6 +96,14 @@ module Sequel
 
       private
       
+      # Add dropping of the default constraint to the list of SQL queries.
+      # This is necessary before dropping the column or changing its type.
+      def add_drop_default_constraint_sql(sqls, table, column)
+        if constraint = default_constraint_name(table, column)
+          sqls << "ALTER TABLE #{quote_schema_table(table)} DROP CONSTRAINT #{constraint}"
+        end
+      end
+
       # MSSQL uses the IDENTITY(1,1) column for autoincrementing columns.
       def auto_increment_sql
         AUTO_INCREMENT
@@ -106,6 +114,10 @@ module Sequel
         case op[:op]
         when :add_column
           "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op)}"
+        when :drop_column
+          sqls = []
+          add_drop_default_constraint_sql(sqls, table, op[:name])
+          sqls << super
         when :rename_column
           "sp_rename #{literal("#{quote_schema_table(table)}.#{quote_identifier(op[:name])}")}, #{literal(op[:new_name].to_s)}, 'COLUMN'"
         when :set_column_type
@@ -113,9 +125,7 @@ module Sequel
           if sch = schema(table)
             if cs = sch.each{|k, v| break v if k == op[:name]; nil}
               cs = cs.dup
-              if constraint = default_constraint_name(table, op[:name])
-                sqls << "ALTER TABLE #{quote_schema_table(table)} DROP CONSTRAINT #{constraint}"
-              end
+              add_drop_default_constraint_sql(sqls, table, op[:name])
               cs[:default] = cs[:ruby_default]
               op = cs.merge!(op)
               default = op.delete(:default)
