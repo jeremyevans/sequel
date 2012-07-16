@@ -1,3 +1,5 @@
+require 'rubygems'
+
 unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
   require 'sequel/no_core_ext'
