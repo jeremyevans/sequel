@@ -69,6 +69,10 @@ describe "A PostgreSQL database" do
       @db.drop_table(:public__testfk)
     end
   end
+
+  specify "should return uuid fields as strings" do
+    @db.get(Sequel.cast('550e8400-e29b-41d4-a716-446655440000', :uuid)).should == '550e8400-e29b-41d4-a716-446655440000'
+  end
 end
 
 describe "A PostgreSQL dataset" do
