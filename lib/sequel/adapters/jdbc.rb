@@ -642,6 +642,7 @@ module Sequel
       JAVA_BUFFERED_READER  = Java::JavaIo::BufferedReader
       JAVA_BIG_DECIMAL      = Java::JavaMath::BigDecimal
       JAVA_BYTE_ARRAY       = Java::byte[]
+      JAVA_UUID             = Java::JavaUtil::UUID
 
       # Handle type conversions for common Java types.
       class TYPE_TRANSLATOR
@@ -662,6 +663,7 @@ module Sequel
           end
           lines
         end
+        def uuid(v) v.to_string end
       end
       TYPE_TRANSLATOR_INSTANCE = tt = TYPE_TRANSLATOR.new
 
@@ -674,6 +676,7 @@ module Sequel
       BYTE_ARRAY_METHOD = tt.method(:byte_array)
       BLOB_METHOD = tt.method(:blob)
       CLOB_METHOD = tt.method(:clob)
+      UUID_METHOD = tt.method(:uuid)
 
       # Convert the given Java timestamp to an instance of Sequel.datetime_class.
       def convert_type_timestamp(v)
@@ -701,6 +704,8 @@ module Sequel
           BLOB_METHOD
         when JAVA_SQL_CLOB
           CLOB_METHOD
+        when JAVA_UUID
+          UUID_METHOD
         else
           false
         end
