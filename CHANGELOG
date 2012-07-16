@@ -8,7 +8,7 @@
 
 * Work around JRuby 1.6 ruby 1.9 mode bug in Time#nsec for Time prepared statement arguments on jdbc (jeremyevans)
 
-* Handle blob prepared statement arguments on jdbc/db2 (jeremyevans)
+* Handle blob prepared statement arguments on jdbc/db2 and jdbc/oracle (jeremyevans)
 
 * Handle blob values in the swift adapter (jeremyevans)
 
