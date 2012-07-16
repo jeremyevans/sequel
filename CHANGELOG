@@ -1,6 +1,6 @@
 === HEAD
 
-* Fix dropping of columns with constraints on Microsoft SQL Server (jeremyevans) (#515)
+* Fix dropping of columns with constraints on Microsoft SQL Server (mluu, jeremyevans) (#515, #518)
 
 * Don't have pg_* extensions add methods to core classes unless the core_extensions extension is loaded (jeremyevans)
 

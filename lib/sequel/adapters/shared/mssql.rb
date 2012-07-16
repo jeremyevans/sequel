@@ -93,7 +93,7 @@ module Sequel
       def views(opts={})
         information_schema_tables('VIEW', opts)
       end
-
+      
       private
       
       # Add dropping of the default constraint to the list of SQL queries.
@@ -186,15 +186,15 @@ module Sequel
       end
     
       # The name of the constraint for setting the default value on the table and column.
-      def default_constraint_name(table, column)
-        from(:sysobjects___c_obj).
-          join(:syscomments___com, :id=>:id).
-          join(:sysobjects___t_obj, :id=>:c_obj__parent_obj).
-          join(:sysconstraints___con, :constid=>:c_obj__id).
-          join(:syscolumns___col, :id=>:t_obj__id, :colid=>:colid).
-          where{{c_obj__uid=>user_id{}}}.
-          where(:c_obj__xtype=>'D', :t_obj__name=>table.to_s, :col__name=>column.to_s).
-          get(:c_obj__name)
+      # The SQL used to select default constraints utilizes MSSQL catalog views which were introduced in 2005.
+      # This method intentionally does not support MSSQL 2000.
+      def default_constraint_name(table, column_name)
+        if server_version >= 9000000
+          table_name = schema_and_table(table).compact.join('.')
+          self[:sys__default_constraints].
+            where{{:parent_object_id => object_id(table_name), col_name(:parent_object_id, :parent_column_id) => column_name.to_s}}.
+            get(:name)
+        end
       end
 
       # The SQL to drop an index for the table.

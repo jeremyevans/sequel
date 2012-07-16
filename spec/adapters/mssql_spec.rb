@@ -542,3 +542,19 @@ describe "A MSSQL database adds index with include" do
     @db.indexes(@table_name).should have_key("#{@table_name}_col1_index".to_sym)
   end
 end
+
+describe "MSSQL::Database#drop_column with a schema" do
+  before do
+    MSSQL_DB.run "create schema test" rescue nil
+  end
+  after do
+    MSSQL_DB.drop_table(:test__items)
+    MSSQL_DB.run "drop schema test" rescue nil
+  end
+
+  specify "drops columns with a default value" do
+    MSSQL_DB.create_table!(:test__items){ Integer :id; String :name, :default => 'widget' }
+    MSSQL_DB.drop_column(:test__items, :name)
+    MSSQL_DB[:test__items].columns.should == [:id]
+  end
+end
