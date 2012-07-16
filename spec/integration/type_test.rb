@@ -108,4 +108,13 @@ describe "Supported types" do
     ds.insert(:number => true)
     ds.all.should == [{:number=>true}]
   end
+  
+  cspecify "should support generic boolean type with defaults", [:do, :sqlite], [:jdbc, :sqlite], [:jdbc, :db2], [:odbc, :mssql], :oracle do
+    ds = create_items_table_with_column(:number, TrueClass, :default=>true)
+    ds.insert
+    ds.all.should == [{:number=>true}]
+    ds = create_items_table_with_column(:number, FalseClass, :default=>false)
+    ds.insert
+    ds.all.should == [{:number=>false}]
+  end
 end

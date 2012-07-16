@@ -526,27 +526,40 @@ describe "Database schema modifiers" do
     proc{@ds.insert(1, 2)}.should_not raise_error
   end
 
-  cspecify "should remove columns from tables correctly", :h2, :mssql, [:jdbc, :db2], :hsqldb do
+  specify "should remove columns from tables correctly" do
+    @db.create_table!(:items) do
+      primary_key :id
+      Integer :i
+    end
+    @ds.insert(:i=>10)
+    @db.drop_column(:items, :i)
+    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id]
+    @ds.columns!.should == [:id]
+  end
+
+  specify "should remove columns with defaults from tables correctly" do
+    @db.create_table!(:items) do
+      primary_key :id
+      Integer :i, :default=>20
+    end
+    @ds.insert(:i=>10)
+    @db.drop_column(:items, :i)
+    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id]
+    @ds.columns!.should == [:id]
+  end
+
+  cspecify "should remove foreign key columns from tables correctly", :h2, :mssql, [:jdbc, :db2], :hsqldb do
     # MySQL with InnoDB cannot drop foreign key columns unless you know the
     # name of the constraint, see Bug #14347
     @db.create_table!(:items, :engine=>:MyISAM) do
       primary_key :id
-      String :name
-      Integer :number
+      Integer :i
       foreign_key :item_id, :items
     end
-    @ds.insert(:number=>10)
-    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :name, :number, :item_id]
-    @ds.columns!.should == [:id, :name, :number, :item_id]
-    @db.drop_column(:items, :number)
-    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :name, :item_id]
-    @ds.columns!.should == [:id, :name, :item_id]
-    @db.drop_column(:items, :name)
-    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :item_id]
-    @ds.columns!.should == [:id, :item_id]
+    @ds.insert(:i=>10)
     @db.drop_column(:items, :item_id)
-    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id]
-    @ds.columns!.should == [:id]
+    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :i]
+    @ds.columns!.should == [:id, :i]
   end
 
   cspecify "should remove multiple columns in a single alter_table block", [:jdbc, :db2] do
