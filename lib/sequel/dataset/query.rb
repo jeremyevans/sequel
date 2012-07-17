@@ -500,7 +500,7 @@ module Sequel
     #   # SELECT * FROM a LEFT JOIN b AS c USING (d)
     #
     #   DB[:a].natural_join(:b).join_table(:inner, :c) do |ta, jta, js|
-    #     (:d.qualify(ta) > :e.qualify(jta)) & {:f.qualify(ta)=>DB.from(js.first.table).select(:g)}
+    #     (Sequel.qualify(ta, :d) > Sequel.qualify(jta, :e)) & {Sequel.qualify(ta, :f)=>DB.from(js.first.table).select(:g)}
     #   end
     #   # SELECT * FROM a NATURAL JOIN b INNER JOIN c
     #   #   ON ((c.d > b.e) AND (c.f IN (SELECT g FROM b)))
@@ -657,10 +657,10 @@ module Sequel
     #
     #   DB[:items].order(:name) # SELECT * FROM items ORDER BY name
     #   DB[:items].order(:a, :b) # SELECT * FROM items ORDER BY a, b
-    #   DB[:items].order('a + b'.lit) # SELECT * FROM items ORDER BY a + b
+    #   DB[:items].order(Sequel.lit('a + b')) # SELECT * FROM items ORDER BY a + b
     #   DB[:items].order(:a + :b) # SELECT * FROM items ORDER BY (a + b)
-    #   DB[:items].order(:name.desc) # SELECT * FROM items ORDER BY name DESC
-    #   DB[:items].order(:name.asc(:nulls=>:last)) # SELECT * FROM items ORDER BY name ASC NULLS LAST
+    #   DB[:items].order(Sequel.desc(:name)) # SELECT * FROM items ORDER BY name DESC
+    #   DB[:items].order(Sequel.asc(:name, :nulls=>:last)) # SELECT * FROM items ORDER BY name ASC NULLS LAST
     #   DB[:items].order{sum(name).desc} # SELECT * FROM items ORDER BY sum(name) DESC
     #   DB[:items].order(nil) # SELECT * FROM items
     def order(*columns, &block)
@@ -756,7 +756,7 @@ module Sequel
     #
     #   DB[:items].reverse(:id) # SELECT * FROM items ORDER BY id DESC
     #   DB[:items].order(:id).reverse # SELECT * FROM items ORDER BY id DESC
-    #   DB[:items].order(:id).reverse(:name.asc) # SELECT * FROM items ORDER BY name ASC
+    #   DB[:items].order(:id).reverse(Sequel.desc(:name)) # SELECT * FROM items ORDER BY name ASC
     def reverse(*order)
       order(*invert_order(order.empty? ? @opts[:order] : order))
     end
@@ -1119,8 +1119,8 @@ module Sequel
     # Inverts the given order by breaking it into a list of column references
     # and inverting them.
     #
-    #   DB[:items].invert_order([:id.desc]]) #=> [:id]
-    #   DB[:items].invert_order(:category, :price.desc]) #=> [:category.desc, :price]
+    #   DB[:items].invert_order([Sequel.desc(:id)]]) #=> [Sequel.asc(:id)]
+    #   DB[:items].invert_order([:category, Sequel.desc(:price)]) #=> [Sequel.desc(:category), Sequel.asc(:price)]
     def invert_order(order)
       return nil unless order
       new_order = []

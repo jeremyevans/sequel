@@ -340,7 +340,7 @@ module Sequel
     #   DB[:table].order(:id).last # SELECT * FROM table ORDER BY id DESC LIMIT 1
     #   # => {:id=>10}
     #
-    #   DB[:table].order(:id.desc).last(2) # SELECT * FROM table ORDER BY id ASC LIMIT 2
+    #   DB[:table].order(Sequel.desc(:id)).last(2) # SELECT * FROM table ORDER BY id ASC LIMIT 2
     #   # => [{:id=>1}, {:id=>2}]
     def last(*args, &block)
       raise(Error, 'No order specified') unless @opts[:order]

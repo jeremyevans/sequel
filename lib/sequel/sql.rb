@@ -217,7 +217,7 @@ module Sequel
     module AliasMethods
       # Create an SQL alias (+AliasedExpression+) of the receiving column or expression to the given alias.
       #
-      #   :column.as(:alias) # "column" AS "alias"
+      #   Sequel.function(:func).as(:alias) # func() AS "alias"
       def as(aliaz)
         AliasedExpression.new(self, aliaz)
       end
@@ -587,8 +587,8 @@ module Sequel
       # Cast the reciever to the given SQL type.  You can specify a ruby class as a type,
       # and it is handled similarly to using a database independent type in the schema methods.
       #
-      #   :a.cast(:integer) # CAST(a AS integer)
-      #   :a.cast(String) # CAST(a AS varchar(255))
+      #   Sequel.function(:func).cast(:integer) # CAST(func() AS integer)
+      #   Sequel.function(:func).cast(String) # CAST(func() AS varchar(255))
       def cast(sql_type)
         Cast.new(self, sql_type)
       end
@@ -597,8 +597,8 @@ module Sequel
       # and return the result as a +NumericExpression+, so you can use the bitwise operators
       # on the result. 
       #
-      #   :a.cast_numeric # CAST(a AS integer)
-      #   :a.cast_numeric(Float) # CAST(a AS double precision)
+      #   Sequel.function(:func).cast_numeric # CAST(func() AS integer)
+      #   Sequel.function(:func).cast_numeric(Float) # CAST(func() AS double precision)
       def cast_numeric(sql_type = nil)
         cast(sql_type || Integer).sql_number
       end
@@ -607,8 +607,8 @@ module Sequel
       # and return the result as a +StringExpression+, so you can use +
       # directly on the result for SQL string concatenation.
       #
-      #   :a.cast_string # CAST(a AS varchar(255))
-      #   :a.cast_string(:text) # CAST(a AS text)
+      #   Sequel.function(:func).cast_string # CAST(func() AS varchar(255))
+      #   Sequel.function(:func).cast_string(:text) # CAST(func() AS text)
       def cast_string(sql_type = nil)
         cast(sql_type || String).sql_string
       end
@@ -672,13 +672,12 @@ module Sequel
     end
 
     # This module includes the inequality methods (>, <, >=, <=) that are defined on objects that can be 
-    # used in a numeric or string context in SQL (+Symbol+ (except on ruby 1.9), +LiteralString+, 
-    # <tt>SQL::GenericExpression</tt>).
+    # used in a numeric or string context in SQL.
     #
-    #   'a'.lit > :b # a > "b"
-    #   'a'.lit < :b # a > "b"
-    #   'a'.lit >= :b # a >= "b"
-    #   'a'.lit <= :b # a <= "b"
+    #   Sequel.lit('a') > :b # a > "b"
+    #   Sequel.lit('a') < :b # a > "b"
+    #   Sequel.lit('a') >= :b # a >= "b"
+    #   Sequel.lit('a') <= :b # a <= "b"
     module InequalityMethods
       ComplexExpression::INEQUALITY_OPERATORS.each do |o|
         module_eval("def #{o}(o) BooleanExpression.new(#{o.inspect}, self, o) end", __FILE__, __LINE__)
@@ -802,9 +801,9 @@ module Sequel
 
       # Qualify the receiver with the given +qualifier+ (table for column/schema for table).
       #
-      #   :column.qualify(:table) # "table"."column"
-      #   :table.qualify(:schema) # "schema"."table"
-      #   :column.qualify(:table).qualify(:schema) # "schema"."table"."column"
+      #   Sequel.expr(:column).qualify(:table) # "table"."column"
+      #   Sequel.expr(:table).qualify(:schema) # "schema"."table"
+      #   Sequel.qualify(:table, :column).qualify(:schema) # "schema"."table"."column"
       def qualify(qualifier)
         QualifiedIdentifier.new(qualifier, self)
       end

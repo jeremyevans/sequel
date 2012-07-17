@@ -24,7 +24,7 @@ module Sequel
     #   In this case, the code will currently use unqualified column names for all columns
     #   the dataset returns, except for the columns given.
     # * This dataset has an existing explicit selection containing an item that returns
-    #   multiple database columns (e.g. :table.*, 'column1, column2'.lit).  In this case,
+    #   multiple database columns (e.g. Sequel.expr(:table).*, Sequel.lit('column1, column2')).  In this case,
     #   the behavior is undefined and this method should not be used.
     #
     # There may be other cases where this method does not work correctly, use it with caution.

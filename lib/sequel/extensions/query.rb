@@ -20,13 +20,13 @@ module Sequel
     #
     #   dataset = DB[:items].query do
     #     select :x, :y, :z
-    #     filter{|o| (o.x > 1) & (o.y > 2)}
-    #     order :z.desc
+    #     filter{(x > 1) & (y > 2)}
+    #     reverse :z
     #   end
     #
     # Which is the same as:
     #
-    #  dataset = DB[:items].select(:x, :y, :z).filter{|o| (o.x > 1) & (o.y > 2)}.order(:z.desc)
+    #  dataset = DB[:items].select(:x, :y, :z).filter{(x > 1) & (y > 2)}.reverse(:z)
     #
     # Note that inside a call to query, you cannot call each, insert, update,
     # or delete (or any method that calls those), or Sequel will raise an

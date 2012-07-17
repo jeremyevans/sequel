@@ -33,7 +33,7 @@
 #    manually or use a literal string:
 #
 #      DB[:table].select(:a, :b).order(:b, :a)
-#      DB[:table].select(:a, :b).order('2, 1'.lit)
+#      DB[:table].select(:a, :b).order(Sequel.lit('2, 1'))
 #
 # 2. In order to avoid many type errors, it attempts to guess the
 #    appropriate type and automatically casts all placeholders.
