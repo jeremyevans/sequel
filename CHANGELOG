@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove Sequel::SQL::IdentifierMethods (jeremyevans)
+
 * Don't have the schema_dumper extension produce code that relies on the core_extensions (jeremyevans)
 
 * Fix dropping of columns with constraints on Microsoft SQL Server (mluu, jeremyevans) (#515, #518)

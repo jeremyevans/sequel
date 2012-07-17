@@ -660,17 +660,6 @@ module Sequel
       end
     end
 
-    # Includes an +identifier+ method that returns <tt>Identifier</tt>s.
-    module IdentifierMethods
-      # Return self wrapped as an <tt>SQL::Identifier</tt>.
-      #
-      #   :a__b # "a"."b"
-      #   :a__b.identifier # "a__b"
-      def identifier
-        Identifier.new(self)
-      end
-    end
-
     # This module includes the inequality methods (>, <, >=, <=) that are defined on objects that can be 
     # used in a numeric or string context in SQL.
     #

@@ -199,7 +199,6 @@ end
 
 # Sequel extends +Symbol+ to add methods to implement the SQL DSL.
 class Symbol
-  include Sequel::SQL::IdentifierMethods
   include Sequel::SQL::AliasMethods
   include Sequel::SQL::CastMethods
   include Sequel::SQL::OrderMethods
@@ -210,6 +209,15 @@ class Symbol
   include Sequel::SQL::SubscriptMethods
   include Sequel::SQL::ComplexExpressionMethods
   include Sequel::SQL::InequalityMethods if RUBY_VERSION < '1.9.0'
+
+  # Returns receiver wrapped in an <tt>Sequel::SQL::Identifier</tt>.  Usually used to
+  # prevent splitting the symbol.
+  #
+  #   :a__b # SQL: "a"."b"
+  #   :a__b.identifier # SQL: "a__b"
+  def identifier
+    Sequel::SQL::Identifier.new(self)
+  end
 
   # Returns a <tt>Sequel::SQL::Function</tt> with this as the function name,
   # and the given arguments. This is aliased as <tt>Symbol#[]</tt> if the RUBY_VERSION
