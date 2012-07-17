@@ -97,14 +97,13 @@ END_MIG
 
     private
         
-    # If a database default exists and can't be converted, return the string with the inspect
-    # method modified so that .lit is always appended after it, only if the
-    # :same_db option is used.
+    # If a database default exists and can't be converted, and we are dumping with :same_db,
+    # return a string with the inspect method modified a literal string is created if the code is evaled.  
     def column_schema_to_ruby_default_fallback(default, options)
       if default.is_a?(String) && options[:same_db] && use_column_schema_to_ruby_default_fallback?
-        default = default.to_s
+        default = default.dup
         def default.inspect
-          "#{super}.lit"  # core_sql use
+          "Sequel::LiteralString.new(#{super})"
         end
         default
       end
@@ -371,7 +370,7 @@ END_MIG
       [sorted_tables, skipped_foreign_keys]
     end
     
-    # Don't use the "...".lit fallback on MySQL, since the defaults it uses aren't
+    # Don't use a literal string fallback on MySQL, since the defaults it uses aren't
     # valid literal SQL values.
     def use_column_schema_to_ruby_default_fallback?
       database_type != :mysql
