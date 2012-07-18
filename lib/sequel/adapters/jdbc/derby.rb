@@ -238,6 +238,23 @@ module Sequel
 
         private
 
+        JAVA_SQL_CLOB         = Java::JavaSQL::Clob
+
+        class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
+          def derby_clob(v) v.getSubString(1, v.length) end
+        end
+
+        DERBY_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:derby_clob)
+      
+        # Handle clobs on Derby as strings.
+        def convert_type_proc(v)
+          if v.is_a?(JAVA_SQL_CLOB)
+            DERBY_CLOB_METHOD
+          else
+            super
+          end
+        end
+        
         # Derby needs a hex string casted to BLOB for blobs.
         def literal_blob_append(sql, v)
           sql << BLOB_OPEN << v.unpack(HSTAR).first << BLOB_CLOSE
