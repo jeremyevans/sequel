@@ -12,16 +12,16 @@ Make sure you are using Sequel 3.29.0 or above when using these examples, as old
 
   class Spec::Example::ExampleGroup
     def execute(*args, &block)
-      x = nil
-      Sequel::Model.db.transaction(:rollback=>:always){x = super(*args, &block)}
-      x
+      result = nil
+      Sequel::Model.db.transaction(:rollback=>:always){result = super(*args, &block)}
+      result
     end
   end
 
-=== RSpec 2
+=== RSpec 2, <2.8
 
   class RSpec::Core::ExampleGroup
-    # Setting an around filter globally doesn't appear to work in 2.7 (and maybe other versions),
+    # Setting an around filter globally doesn't appear to work in <2.8,
     # so set one up for each subclass.
     def self.inherited(subclass)
       super
@@ -31,22 +31,47 @@ Make sure you are using Sequel 3.29.0 or above when using these examples, as old
     end
   end
 
+=== RSpec 2, >=2.8
+
+  # Global around filters should work
+  RSpec.configure do |c|
+    c.around(:each) do |example|
+      DB.transaction(:rollback=>:always){example.run}
+    end
+  end
+
 === Test::Unit
 
   # Must use this class as the base class for your tests
   class SequelTestCase < Test::Unit::TestCase
     def run(*args, &block)
-      Sequel::Model.db.transaction(:rollback=>:always){super}
+      result = nil
+      Sequel::Model.db.transaction(:rollback=>:always){result = super}
+      result
+    end
+  end
+
+  # Or you could override the base implementation like this
+  class Test::Unit::TestCase
+    alias_method :_original_run, :run
+
+    def run(*args, &block)
+      result = nil
+      Sequel::Model.db.transaction(:rollback => :always) do
+        result = _original_run(*args, &block)
+      end
+      result
     end
   end
 
 === MiniTest::Unit
 
+  # Add a subclass
   # Must use this class as the base class for your tests
   class SequelTestCase < MiniTest::Unit::TestCase
     def run(*args, &block)
       result = nil
-      Sequel::Model.db.transaction(:rollback=>:always){ result = super }
+      Sequel::Model.db.transaction(:rollback=>:always){result = super}
       result
     end
   end
