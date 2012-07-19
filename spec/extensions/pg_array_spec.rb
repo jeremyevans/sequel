@@ -255,6 +255,11 @@ describe "pg_array extension" do
     @db.typecast_value(:foo_array, '{"t"}').should == [true]
   end
 
+  it "should support using a given conversion procs hash via the :type_procs option" do
+    Sequel::Postgres::PGArray.register('foo', :scalar_oid=>16, :type_procs=>{16=>proc{|s| "!#{s}"}})
+    @db.typecast_value(:foo_array, '{"t"}').should == ["!t"]
+  end
+
   it "should raise an error if using :scalar_oid option with unexisting scalar conversion proc" do
     proc{Sequel::Postgres::PGArray.register('foo', :scalar_oid=>0)}.should raise_error(Sequel::Error)
   end

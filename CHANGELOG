@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow custom registered array types in the pg_array extension to take a :type_procs option (jeremyevans)
+
 * Remove Sequel::SQL::IdentifierMethods (jeremyevans)
 
 * Don't have the schema_dumper extension produce code that relies on the core_extensions (jeremyevans)
