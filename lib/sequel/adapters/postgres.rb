@@ -452,7 +452,7 @@ module Sequel
         procs = PG_TYPES.dup
         procs[1184] = procs[1114] = method(:to_application_timestamp)
         unless (pgnt = PG_NAMED_TYPES).empty?
-          conn.execute("SELECT oid, typname FROM pg_type where typtype = 'b' AND typname IN ('#{pgnt.keys.map{|type| conn.escape_string(type.to_s)}.join("', '")}')") do |res|
+          conn.execute("SELECT oid, typname FROM pg_type WHERE typtype = 'b' AND typname IN ('#{pgnt.keys.map{|type| conn.escape_string(type.to_s)}.join("', '")}')") do |res|
             res.ntuples.times do |i|
               procs[res.getvalue(i, 0).to_i] ||= pgnt[res.getvalue(i, 1).untaint.to_sym]
             end
