@@ -135,7 +135,7 @@ begin
   DB = connect_proc[db]
   load_dirs.each{|d| d.is_a?(Array) ? require(d.first) : Dir["#{d}/**/*.rb"].each{|f| load(f)}}
   if migrate_dir
-    Sequel.extension :migration
+    Sequel.extension :migration, :core_extensions
     Sequel::Migrator.apply(DB, migrate_dir, migrate_ver)
     exit
   end
