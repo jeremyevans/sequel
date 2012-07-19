@@ -260,6 +260,14 @@ describe "pg_array extension" do
     @db.typecast_value(:foo_array, '{"t"}').should == ["!t"]
   end
 
+  it "should support adding methods to the given module via the :typecast_methods_module option" do
+    m = Module.new
+    Sequel::Postgres::PGArray.register('foo15', :scalar_oid=>16, :typecast_methods_module=>m)
+    @db.typecast_value(:foo15_array, '{"t"}').should == '{"t"}'
+    @db.extend(m)
+    @db.typecast_value(:foo15_array, '{"t"}').should == [true]
+  end
+
   it "should raise an error if using :scalar_oid option with unexisting scalar conversion proc" do
     proc{Sequel::Postgres::PGArray.register('foo', :scalar_oid=>0)}.should raise_error(Sequel::Error)
   end

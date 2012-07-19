@@ -1,6 +1,6 @@
 === HEAD
 
-* Allow custom registered array types in the pg_array extension to take a :type_procs option (jeremyevans)
+* Allow custom registered array types in the pg_array extension to be Database instance specific (jeremyevans)
 
 * Remove Sequel::SQL::IdentifierMethods (jeremyevans)
 

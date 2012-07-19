@@ -141,6 +141,8 @@ module Sequel
       #                     typecast method.  For example, for an array of integers, this could be set to
       #                     :integer, so that the typecast_value_integer method is called on all of the
       #                     array elements.  Defaults to :type_symbol option.
+      # :type_procs :: A hash mapping oids to conversion procs, used for looking up the :scalar_oid and
+      #                value and setting the :oid value.  Defaults to the global Sequel::Postgres::PG_TYPES.
       # :type_symbol :: The base of the schema type symbol for this type.  For example, if you provide
       #                 :integer, Sequel will recognize this type as :integer_array during schema parsing.
       #                 Defaults to the db_type argument.
@@ -148,8 +150,8 @@ module Sequel
       #                     typecasting method to be created in the database.  This should only be used
       #                     to alias existing array types.  For example, if there is an array type that can be
       #                     treated just like an integer array, you can do :typecast_method=>:integer.
-      # :type_procs :: A hash mapping oids to conversion procs, used for looking up the :scalar_oid and
-      #                value and setting the :oid value.  Defaults to the global Sequel::Postgres::PG_TYPES.
+      # :typecast_methods_module :: If given, a module object to add the typecasting method to.  Defaults
+      #                             to DatabaseMethods.
       #
       # If a block is given, it is treated as the :converter option.
       def self.register(db_type, opts={}, &block)
@@ -157,6 +159,7 @@ module Sequel
         typecast_method = opts[:typecast_method]
         type = (typecast_method || opts[:type_symbol] || db_type).to_sym
         type_procs = opts[:type_procs] || PG_TYPES
+        mod = opts[:typecast_methods_module] || DatabaseMethods
 
         if converter = opts[:converter]
           raise Error, "can't provide both a block and :converter option to register" if block
@@ -174,8 +177,7 @@ module Sequel
 
         ARRAY_TYPES[db_type] = :"#{type}_array"
 
-        # Add ability to define it just on the instance given
-        DatabaseMethods.define_array_typecast_method(type, creator, opts.fetch(:scalar_typecast, type)) unless typecast_method
+        define_array_typecast_method(mod, type, creator, opts.fetch(:scalar_typecast, type)) unless typecast_method
 
         if oid = opts[:oid]
           type_procs[oid] = creator
@@ -183,6 +185,18 @@ module Sequel
 
         nil
       end
+
+      # Define a private array typecasting method in the given module for the given type that uses
+      # the creator argument to do the type conversion.
+      def self.define_array_typecast_method(mod, type, creator, scalar_typecast)
+        mod.class_eval do
+          meth = :"typecast_value_#{type}_array"
+          scalar_typecast_method = :"typecast_value_#{scalar_typecast}"
+          define_method(meth){|v| typecast_value_pg_array(v, creator, scalar_typecast_method)}
+          private meth
+        end
+      end
+      private_class_method :define_array_typecast_method
 
       module DatabaseMethods
         APOS = "'".freeze
@@ -196,15 +210,6 @@ module Sequel
         # postgres adapter.
         def self.extended(db)
           db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)
-        end
-
-        # Define a private array typecasting method for the given type that uses
-        # the creator argument to do the type conversion.
-        def self.define_array_typecast_method(type, creator, scalar_typecast)
-          meth = :"typecast_value_#{type}_array"
-          scalar_typecast_method = :"typecast_value_#{scalar_typecast}"
-          define_method(meth){|v| typecast_value_pg_array(v, creator, scalar_typecast_method)}
-          private meth
         end
 
         # Handle arrays in bound variables
