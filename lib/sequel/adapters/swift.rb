@@ -15,6 +15,7 @@ module Sequel
         db.extend(Sequel::Swift::Postgres::DatabaseMethods)
         db.extend_datasets Sequel::Postgres::DatasetMethods
         db.swift_class = ::Swift::DB::Postgres
+        Sequel::Postgres::CONVERTED_EXCEPTIONS << ::Swift::Error
       end,
       :mysql=>proc do |db|
         Sequel.ts_require 'adapters/swift/mysql'
