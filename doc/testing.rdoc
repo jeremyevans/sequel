@@ -45,7 +45,22 @@ Make sure you are using Sequel 3.29.0 or above when using these examples, as old
   # Must use this class as the base class for your tests
   class SequelTestCase < MiniTest::Unit::TestCase
     def run(*args, &block)
-      Sequel::Model.db.transaction(:rollback=>:always){super}
+      result = nil
+      Sequel::Model.db.transaction(:rollback=>:always){ result = super }
+      result
+    end
+  end
+
+  # Or you could override the base implementation like this
+  class MiniTest::Unit::TestCase
+    alias_method :_original_run, :run
+
+    def run(*args, &block)
+      result = nil
+      Sequel::Model.db.transaction(:rollback => :always) do
+        result = _original_run(*args, &block)
+      end
+      result
     end
   end
 
