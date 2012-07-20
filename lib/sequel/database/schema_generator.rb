@@ -98,6 +98,8 @@ module Sequel
       #               (:restrict, :cascade, :set_null, :set_default, :no_action).
       # :primary_key :: Make the column as a single primary key column.  This should only
       #                 be used if you have a single, nonautoincrementing primary key column.
+      # :type :: Overrides the type given as the argument.  Generally not used by column
+      #          itself, but can be passed as an option to other methods that call column.
       # :unique :: Mark the column as unique, generally has the same effect as
       #            creating a unique index on the column.
       def column(name, type, opts = {})
@@ -122,6 +124,7 @@ module Sequel
       #   foreign_key(:artist_id) # artist_id INTEGER
       #   foreign_key(:artist_id, :artists) # artist_id INTEGER REFERENCES artists
       #   foreign_key(:artist_id, :artists, :key=>:id) # artist_id INTEGER REFERENCES artists(id)
+      #   foreign_key(:artist_id, :artists, :type=>String) # artist_id varchar(255) REFERENCES artists(id)
       #
       # If you want a foreign key constraint without adding a column (usually because it is a
       # composite foreign key), you can provide an array of columns as the first argument, and
