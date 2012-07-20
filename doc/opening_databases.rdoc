@@ -387,6 +387,12 @@ swift is a ruby 1.9 only library, so you'll need to be running ruby 1.9.  It
 can connect to SQLite, MySQL, and PostgreSQL, and you must specify which
 database using the db_type option.
 
+You need to install one of the swift db adapters
+
+* swift-db-sqlite3
+* swift-db-mysql
+* swift-db-postgres
+
 Examples:
 
   swift:///?database=:memory:&db_type=sqlite
