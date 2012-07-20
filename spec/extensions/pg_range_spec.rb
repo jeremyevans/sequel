@@ -1,6 +1,13 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "pg_range extension" do
+  before(:all) do
+    @pg_types = Sequel::Postgres::PG_TYPES.dup
+  end
+  after(:all) do
+    Sequel::Postgres::PG_TYPES.replace(@pg_types)
+  end
+
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     @R = Sequel::Postgres::PGRange
