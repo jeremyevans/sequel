@@ -30,6 +30,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ManyToOnePkLookup.html">many_to_one_pk_lookup</a>: Uses optimized simple primary key lookups for most many_to_one associations (great if associated class uses caching).</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/NestedAttributes.html">nested_attributes</a>: Allows you to modified associated objects directly through a model object, similar to ActiveRecord's Nested Attributes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking</a>: Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/PgRow.html">pg_row</a>: Allows Sequel::Model classes to implement PostgreSQL row-valued/composite types.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatements.html">prepared_statements</a>: Makes models use prepared statements for deletes, inserts, updates, and lookups by primary key.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatementsAssociations.html">prepared_statements_associations</a>: Makes models use prepared statements for regular loading of associations.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatementsSafe.html">prepared_statements_safe</a>: Makes use of prepared_statements plugin more safe by setting explicit defaults for model columns when inserting and saving whole rows instead of changed columns.</li>
@@ -106,6 +107,8 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_json_rb.html">pg_json</a>: Adds support for the PostgreSQL json type.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_rb.html">pg_range</a>: Adds support for PostgreSQL range types.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_ops_rb.html">pg_range_ops</a>: Adds DSL support for calling PostgreSQL range operators and functions.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_rb.html">pg_row</a>: Adds support for PostgreSQL row-valued/composite types.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_ops_rb.html">pg_row_ops</a>: Adds DSL support for dealing with PostgreSQL row-valued/composite types.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_statement_cache_rb.html">pg_statement_cache</a>: Automatically uses prepared statements for most queries when using postgres adapter with the pg driver.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_caching_rb.html">schema_caching</a>: Speeds up loading a large number of models by caching database schema and loading it from a file.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>

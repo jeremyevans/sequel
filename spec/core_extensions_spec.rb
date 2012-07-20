@@ -578,11 +578,15 @@ end
 describe "Postgres extensions integration" do
   before do
     @db = Sequel.mock
-    Sequel.extension(:pg_array, :pg_array_ops, :pg_hstore, :pg_hstore_ops, :pg_json, :pg_range, :pg_range_ops)
+    Sequel.extension(:pg_array, :pg_array_ops, :pg_hstore, :pg_hstore_ops, :pg_json, :pg_range, :pg_range_ops, :pg_row, :pg_row_ops)
   end
 
   it "Symbol#pg_array should return an ArrayOp" do
     @db.literal(:a.pg_array.unnest).should == "unnest(a)"
+  end
+
+  it "Symbol#pg_row should return a PGRowOp" do
+    @db.literal(:a.pg_row[:a]).should == "(a).a"
   end
 
   it "Symbol#hstore should return an HStoreOp" do
@@ -600,6 +604,10 @@ describe "Postgres extensions integration" do
 
   it "Array#pg_json should return a JSONArray" do
     @db.literal([1].pg_json).should == "'[1]'::json"
+  end
+
+  it "Array#pg_row should return a ArrayRow" do
+    @db.literal([1].pg_row).should == "ROW(1)"
   end
 
   it "Hash#hstore should return an HStore" do

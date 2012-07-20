@@ -2360,3 +2360,209 @@ describe 'PostgreSQL interval types' do
   end
 end if ((require 'active_support/duration'; require 'active_support/inflector'; require 'active_support/core_ext/string/inflections'; true) rescue false)
 
+describe 'PostgreSQL row-valued/composite types' do
+  before(:all) do
+    @db = POSTGRES_DB
+    @db.extension :pg_array, :pg_row
+    @ds = @db[:person]
+
+    @db.create_table!(:address) do
+      String :street
+      String :city
+      String :zip
+    end
+    @db.create_table!(:person) do
+      Integer :id
+      address :address
+    end
+    @db.create_table!(:company) do
+      Integer :id
+      column :employees, 'person[]'
+    end
+    @db.register_row_type(:address)
+    @db.register_row_type(:person)
+    @db.register_row_type(:company)
+
+    @native = POSTGRES_DB.adapter_scheme == :postgres
+  end
+  after(:all) do
+    @db.drop_table?(:company, :person, :address)
+    @db.row_types.clear
+    @db.reset_conversion_procs if @native
+  end
+  after do
+    [:company, :person, :address].each{|t| @db[t].delete}
+  end
+
+  specify 'insert and retrieve row types' do
+    @ds.insert(:id=>1, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))
+    @ds.count.should == 1
+    if @native
+      # Single row valued type
+      rs = @ds.all
+      v = rs.first[:address]
+      v.should_not be_a_kind_of(Hash)
+      v.to_hash.should be_a_kind_of(Hash)
+      v.to_hash.should == {:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+
+      # Nested row value type
+      p = @ds.get(:person)
+      p[:id].should == 1
+      p[:address].should == v
+    end
+  end
+
+  specify 'insert and retrieve arrays of row types' do
+    @ds = @db[:company]
+    @ds.insert(:id=>1, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))
+    @ds.count.should == 1
+    if @native
+      v = @ds.get(:company)
+      v.should_not be_a_kind_of(Hash)
+      v.to_hash.should be_a_kind_of(Hash)
+      v[:id].should == 1
+      employees = v[:employees]
+      employees.should_not be_a_kind_of(Array)
+      employees.to_a.should be_a_kind_of(Array)
+      employees.should == [{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]
+      @ds.delete
+      @ds.insert(v[:id], v[:employees])
+      @ds.get(:company).should == v
+    end
+  end
+
+  specify 'use row types in bound variables' do
+    @ds.call(:insert, {:address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])}, {:address=>:$address, :id=>1})
+    @ds.get(:address).should == {:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}
+    @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))[:id].should == 1
+    @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])).should == nil
+  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+
+  specify 'use arrays of row types in bound variables' do
+    @ds = @db[:company]
+    @ds.call(:insert, {:employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])])}, {:employees=>:$employees, :id=>1})
+    @ds.get(:company).should == {:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]}
+    @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))[:id].should == 1
+    @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).should == nil
+  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+
+  specify 'operations/functions with pg_row_ops' do
+    Sequel.extension :pg_row_ops, :pg_array_ops
+    @ds.insert(:id=>1, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))
+    @ds.get(Sequel.pg_row(:address)[:street]).should == '123 Sesame St'
+    @ds.get(Sequel.pg_row(:address)[:city]).should == 'Somewhere'
+    @ds.get(Sequel.pg_row(:address)[:zip]).should == '12345'
+
+    @ds = @db[:company]
+    @ds.insert(:id=>1, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))
+    @ds.get(Sequel.pg_row(:company)[:id]).should == 1
+    if @native
+      @ds.get(Sequel.pg_row(:company)[:employees]).should == [{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]
+      @ds.get(Sequel.pg_row(:company)[:employees][1]).should == {:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}
+      @ds.get(Sequel.pg_row(:company)[:employees][1][:address]).should == {:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}
+    end
+    @ds.get(Sequel.pg_row(:company)[:employees][1][:id]).should == 1
+    @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:street]).should == '123 Sesame St'
+    @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:city]).should == 'Somewhere'
+    @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:zip]).should == '12345'
+  end
+
+  context "with models" do
+    before(:all) do
+      class Address < Sequel::Model(:address)
+        plugin :pg_row
+      end
+      class Person < Sequel::Model(:person)
+        plugin :pg_row
+      end
+      class Company < Sequel::Model(:company)
+        plugin :pg_row
+      end
+      @a = Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
+      @es = Sequel.pg_array([Person.new(:id=>1, :address=>@a)])
+    end
+    after(:all) do
+      Object.send(:remove_const, :Address) rescue nil
+      Object.send(:remove_const, :Person) rescue nil
+      Object.send(:remove_const, :Company) rescue nil
+    end
+
+    specify 'insert and retrieve row types as model objects' do
+      @ds.insert(:id=>1, :address=>@a)
+      @ds.count.should == 1
+      if @native
+        # Single row valued type
+        rs = @ds.all
+        v = rs.first[:address]
+        v.should be_a_kind_of(Address)
+        v.should == @a
+        @ds.delete
+        @ds.insert(rs.first)
+        @ds.all.should == rs
+
+        # Nested row value type
+        p = @ds.get(:person)
+        p.should be_a_kind_of(Person)
+        p.id.should == 1
+        p.address.should be_a_kind_of(Address)
+        p.address.should == @a
+      end
+    end
+
+    specify 'insert and retrieve arrays of row types as model objects' do
+      @ds = @db[:company]
+      @ds.insert(:id=>1, :employees=>@es)
+      @ds.count.should == 1
+      if @native
+        v = @ds.get(:company)
+        v.should be_a_kind_of(Company)
+        v.id.should == 1
+        employees = v[:employees]
+        employees.should_not be_a_kind_of(Array)
+        employees.to_a.should be_a_kind_of(Array)
+        employees.should == @es
+        @ds.delete
+        @ds.insert(v.id, v.employees)
+        @ds.get(:company).should == v
+      end
+    end
+
+    specify 'use model objects in bound variables' do
+      @ds.call(:insert, {:address=>@a}, {:address=>:$address, :id=>1})
+      @ds.get(:address).should == @a
+      @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>@a)[:id].should == 1
+      @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12356')).should == nil
+    end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+
+    specify 'use arrays of model objects in bound variables' do
+      @ds = @db[:company]
+      @ds.call(:insert, {:employees=>@es}, {:employees=>:$employees, :id=>1})
+      @ds.get(:company).should == Company.new(:id=>1, :employees=>@es)
+      @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>@es)[:id].should == 1
+      @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).should == nil
+    end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+
+    specify 'model typecasting' do
+      Person.plugin :typecast_on_load, :address unless @native
+      a = Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
+      o = Person.create(:id=>1, :address=>['123 Sesame St', 'Somewhere', '12345'])
+      o.address.should == a
+      o = Person.create(:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'})
+      o.address.should == a
+      o = Person.create(:id=>1, :address=>a)
+      o.address.should == a
+
+      Company.plugin :typecast_on_load, :employees unless @native
+      e = Person.new(:id=>1, :address=>a)
+      unless @db.adapter_scheme == :jdbc
+        o = Company.create(:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}])
+        o.employees.should == [e]
+        o = Company.create(:id=>1, :employees=>[e])
+        o.employees.should == [e]
+      end
+    end
+  end
+end

@@ -1,5 +1,11 @@
 === HEAD
 
+* Add pg_row plugin, for using Sequel::Model classes to represent PostgreSQL row-valued/composite types (jeremyevans)
+
+* Add pg_row_ops extension for DSL support for PostgreSQL row-valued/composite types (jeremyevans)
+
+* Add pg_row extension for dealing with PostgreSQL row-valued/composite types (jeremyevans)
+
 * Allow custom registered array types in the pg_array extension to be Database instance specific (jeremyevans)
 
 * Remove Sequel::SQL::IdentifierMethods (jeremyevans)
