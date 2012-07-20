@@ -65,11 +65,7 @@
 #
 #   DB[:table].insert(:address=>DB.row_type(:address, :street=>'123 Sesame St.', :city=>'Some City', :zip=>'12345'))
 #
-# This extension requires both the strscan and delegate libraries,
-# and also loads the pg_array extension.
-
-# Required because it needs the shared support for bound variables
-Sequel.extension :pg_array
+# This extension requires both the strscan and delegate libraries.
 
 require 'delegate'
 require 'strscan'
@@ -479,7 +475,7 @@ module Sequel
           parser = Parser.new(parser_opts)
           @conversion_procs[parser.oid] = parser
 
-          if array_oid && array_oid > 0
+          if defined?(PGArray) && PGArray.respond_to?(:register) && array_oid && array_oid > 0
             PGArray.register(db_type, :oid=>array_oid, :converter=>parser, :type_procs=>@conversion_procs, :scalar_typecast=>schema_type_symbol)
           end
 
@@ -559,7 +555,9 @@ module Sequel
 
     # Register the default anonymous record type
     PG_TYPES[2249] = PGRow::Parser.new(:converter=>PGRow::ArrayRow)
-    PGArray.register('record', :oid=>2287, :scalar_oid=>2249)
+    if defined?(PGArray) && PGArray.respond_to?(:register)
+      PGArray.register('record', :oid=>2287, :scalar_oid=>2249)
+    end
   end
 
   module SQL::Builders
