@@ -49,21 +49,21 @@
 #
 # You can then create values of that type by using Database#row_type:
 #
-#   DB.row_type(:address, ['street', 'city', 'zip'])
+#   DB.row_type(:address, ['123 Sesame St.', 'Some City', '12345'])
 #
 # Let's say table address has columns street, city, and zip.  This would return
 # something similar to:
 #
-#   {:street=>'street', :city=>'city', :zip=>'zip'}
+#   {:street=>'123 Sesame St.', :city=>'Some City', :zip=>'12345'}
 #
 # You can also use a hash:
 #
-#   DB.row_type(:address, :street=>'street', :city=>'city', :zip=>'zip')
+#   DB.row_type(:address, :street=>'123 Sesame St.', :city=>'Some City', :zip=>'12345')
 #
 # So if you have a person table that has an address column, here's how you
 # could insert into the column:
 #
-#   DB[:table].insert(:address=>DB.row_type(:address, :street=>'street', :city=>'city', :zip=>'zip'))
+#   DB[:table].insert(:address=>DB.row_type(:address, :street=>'123 Sesame St.', :city=>'Some City', :zip=>'12345'))
 #
 # This extension requires both the strscan and delegate libraries,
 # and also loads the pg_array extension.
