@@ -189,25 +189,25 @@ describe "pg_array extension" do
 
   it "should support typecasting of the various array types" do
     {
-      :integer=>{:class=>Integer, :convert=>['1', '1', 1, '1']},
-      :float=>{:db_type=>'double precision',  :class=>Float, :convert=>['1.1', '1.1', 1.1, '1.1']},
-      :decimal=>{:db_type=>'numeric', :class=>BigDecimal, :convert=>['1.00000000000000000000000001', '1.00000000000000000000000001', BigDecimal.new('1.00000000000000000000000001'), '1.00000000000000000000000001']},
-      :string=>{:db_type=>'text', :class=>String, :convert=>['1', 1, '1', "'1'"]},
-      :bigint=>{:class=>Integer, :convert=>['1', '1', 1, '1']},
-      :boolean=>{:class=>TrueClass, :convert=>['t', 't', true, 'true']},
-      :blob=>{:db_type=>'bytea', :class=>Sequel::SQL::Blob, :convert=>['1', '1', '1', "'1'"]},
-      :date=>{:class=>Date, :convert=>['2011-10-12', '2011-10-12', Date.new(2011, 10, 12), "'2011-10-12'"]},
-      :time=>{:db_type=>'time without time zone', :class=>Sequel::SQLTime, :convert=>['01:02:03', '01:02:03', Sequel::SQLTime.create(1, 2, 3), "'01:02:03'"]},
-      :datetime=>{:db_type=>'timestamp without time zone', :class=>Time, :convert=>['2011-10-12 01:02:03', '2011-10-12 01:02:03', Time.local(2011, 10, 12, 1, 2, 3), "'2011-10-12 01:02:03'"]},
-      :time_timezone=>{:db_type=>'time with time zone', :class=>Sequel::SQLTime, :convert=>['01:02:03', '01:02:03', Sequel::SQLTime.create(1, 2, 3), "'01:02:03'"]},
-      :datetime_timezone=>{:db_type=>'timestamp with time zone', :class=>Time, :convert=>['2011-10-12 01:02:03', '2011-10-12 01:02:03', Time.local(2011, 10, 12, 1, 2, 3), "'2011-10-12 01:02:03'"]},
+      :integer=>{:class=>Integer, :convert=>['1', 1, '1']},
+      :float=>{:db_type=>'double precision',  :class=>Float, :convert=>['1.1', 1.1, '1.1']},
+      :decimal=>{:db_type=>'numeric', :class=>BigDecimal, :convert=>['1.00000000000000000000000001', BigDecimal.new('1.00000000000000000000000001'), '1.00000000000000000000000001']},
+      :string=>{:db_type=>'text', :class=>String, :convert=>[1, '1', "'1'"]},
+      :bigint=>{:class=>Integer, :convert=>['1', 1, '1']},
+      :boolean=>{:class=>TrueClass, :convert=>['t', true, 'true']},
+      :blob=>{:db_type=>'bytea', :class=>Sequel::SQL::Blob, :convert=>['1', '1', "'1'"]},
+      :date=>{:class=>Date, :convert=>['2011-10-12', Date.new(2011, 10, 12), "'2011-10-12'"]},
+      :time=>{:db_type=>'time without time zone', :class=>Sequel::SQLTime, :convert=>['01:02:03', Sequel::SQLTime.create(1, 2, 3), "'01:02:03'"]},
+      :datetime=>{:db_type=>'timestamp without time zone', :class=>Time, :convert=>['2011-10-12 01:02:03', Time.local(2011, 10, 12, 1, 2, 3), "'2011-10-12 01:02:03'"]},
+      :time_timezone=>{:db_type=>'time with time zone', :class=>Sequel::SQLTime, :convert=>['01:02:03', Sequel::SQLTime.create(1, 2, 3), "'01:02:03'"]},
+      :datetime_timezone=>{:db_type=>'timestamp with time zone', :class=>Time, :convert=>['2011-10-12 01:02:03', Time.local(2011, 10, 12, 1, 2, 3), "'2011-10-12 01:02:03'"]},
     }.each do |type, h|
       meth = :"#{type}_array"
       db_type = h[:db_type]||type
       klass = h[:class]
-      text_in, array_in, value, output = h[:convert]
+      array_in, value, output = h[:convert]
 
-      ["{#{text_in}}", [array_in]].each do |input|
+      [[array_in]].each do |input|
         v = @db.typecast_value(meth, input)
         v.should == [value]
         v.first.should be_a_kind_of(klass)
@@ -216,7 +216,7 @@ describe "pg_array extension" do
         @db.typecast_value(meth, v).should equal(v)
       end
 
-      ["{{#{text_in}}}", [[array_in]]].each do |input|
+      [[[array_in]]].each do |input|
         v = @db.typecast_value(meth, input)
         v.should == [[value]]
         v.first.first.should be_a_kind_of(klass)
@@ -226,8 +226,7 @@ describe "pg_array extension" do
       end
 
       @db.literal(@db.typecast_value(meth, [array_in])).should == "ARRAY[#{output}]::#{db_type}[]"
-      @db.typecast_value(meth, '{}').should == []
-      @db.literal(@db.typecast_value(meth, '{}')).should == "ARRAY[]::#{db_type}[]"
+      @db.literal(@db.typecast_value(meth, [])).should == "ARRAY[]::#{db_type}[]"
     end
     proc{@db.typecast_value(:integer_array, {})}.should raise_error(Sequel::InvalidValue)
   end
@@ -247,31 +246,32 @@ describe "pg_array extension" do
   end
 
   it "should support using a block as a custom conversion proc given as block" do
-    Sequel::Postgres::PGArray.register('foo'){|s| (s*2).to_i}
-    @db.typecast_value(:foo_array, '{1}').should == [11]
+    Sequel::Postgres::PGArray.register('foo', :oid=>1234){|s| (s*2).to_i}
+    @converter[1234].call('{1}').should == [11]
   end
 
   it "should support using a block as a custom conversion proc given as :converter option" do
-    Sequel::Postgres::PGArray.register('foo', :converter=>proc{|s| (s*2).to_i})
-    @db.typecast_value(:foo_array, '{1}').should == [11]
+    Sequel::Postgres::PGArray.register('foo', :oid=>1234, :converter=>proc{|s| (s*2).to_i})
+    @converter[1234].call('{1}').should == [11]
   end
 
   it "should support using an existing scaler conversion proc via the :scalar_oid option" do
-    Sequel::Postgres::PGArray.register('foo', :scalar_oid=>16)
-    @db.typecast_value(:foo_array, '{"t"}').should == [true]
+    Sequel::Postgres::PGArray.register('foo', :oid=>1234, :scalar_oid=>16)
+    @converter[1234].call('{t}').should == [true]
   end
 
   it "should support using a given conversion procs hash via the :type_procs option" do
-    Sequel::Postgres::PGArray.register('foo', :scalar_oid=>16, :type_procs=>{16=>proc{|s| "!#{s}"}})
-    @db.typecast_value(:foo_array, '{"t"}').should == ["!t"]
+    h = {16=>proc{|s| "!#{s}"}}
+    Sequel::Postgres::PGArray.register('foo', :oid=>1234, :scalar_oid=>16, :type_procs=>h)
+    h[1234].call('{t}').should == ["!t"]
   end
 
   it "should support adding methods to the given module via the :typecast_methods_module option" do
     m = Module.new
-    Sequel::Postgres::PGArray.register('foo15', :scalar_oid=>16, :typecast_methods_module=>m)
-    @db.typecast_value(:foo15_array, '{"t"}').should == '{"t"}'
+    Sequel::Postgres::PGArray.register('foo15', :scalar_typecast=>:boolean, :typecast_methods_module=>m)
+    @db.typecast_value(:foo15_array, ['t']).should == ['t']
     @db.extend(m)
-    @db.typecast_value(:foo15_array, '{"t"}').should == [true]
+    @db.typecast_value(:foo15_array, ['t']).should == [true]
   end
 
   it "should raise an error if using :scalar_oid option with unexisting scalar conversion proc" do

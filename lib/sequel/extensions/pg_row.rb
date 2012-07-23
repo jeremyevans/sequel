@@ -508,12 +508,6 @@ module Sequel
             else
               raise InvalidValue, "Database#row_type requires the #{db_type.inspect} type have a registered parser and typecaster when called with a hash"
             end
-          when String
-            if parser
-              parser.call(obj)
-            else
-              raise InvalidValue, "Database#row_type requires the #{db_type.inspect} type have a registered parser when called with a string"
-            end
           else
             raise InvalidValue, "cannot convert #{obj.inspect} to row type #{db_type.inspect}"
           end

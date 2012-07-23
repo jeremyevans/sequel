@@ -168,8 +168,6 @@ module Sequel
             value
           when Hash
             HStore.new(value)
-          when String
-            HStore.parse(value)
           else
             raise Sequel::InvalidValue, "invalid value for hstore: #{value.inspect}"
           end

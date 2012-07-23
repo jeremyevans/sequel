@@ -286,8 +286,6 @@ module Sequel
               value = Sequel.recursive_map(value, method(scalar_typecast_method))
             end
             PGArray.new(value, creator.type)
-          when String
-            creator.call(value)
           else
             raise Sequel::InvalidValue, "invalid value for array type: #{value.inspect}"
           end

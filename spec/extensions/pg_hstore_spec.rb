@@ -186,9 +186,6 @@ describe "pg_hstore extension" do
   it "should support typecasting for the hstore type" do
     h = Sequel.hstore(1=>2)
     @db.typecast_value(:hstore, h).should equal(h)
-    @db.typecast_value(:hstore, '').should be_a_kind_of(@c)
-    @db.typecast_value(:hstore, '').should == Sequel.hstore({})
-    @db.typecast_value(:hstore, '"a"=>"b"').should == Sequel.hstore("a"=>"b")
     @db.typecast_value(:hstore, {}).should be_a_kind_of(@c)
     @db.typecast_value(:hstore, {}).should == Sequel.hstore({})
     @db.typecast_value(:hstore, {'a'=>'b'}).should == Sequel.hstore("a"=>"b")

@@ -276,13 +276,12 @@ describe "pg_row extension" do
     @db.conversion_procs[4] = p4 = proc{|s| s.to_i}
     @db.conversion_procs[5] = p5 = proc{|s| s * 2}
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
-    @db.register_row_type(:foo, :typecaster=>proc{|h| {:bar=>(h[:bar]||0).to_i, :baz=>(h[:baz] || 'a')*2}})
-    @db.literal(@db.row_type(:foo, '(1,b)')).should == "ROW(1, 'bb')::foo"
+    @db.register_row_type(:foo, :typecaster=>proc{|h| @m::HashRow.subclass(:foo, [:bar, :baz]).new(:bar=>(h[:bar]||0).to_i, :baz=>(h[:baz] || 'a')*2)})
+    @db.literal(@db.row_type(:foo, ['1', 'b'])).should == "ROW(1, 'bb')::foo"
   end
 
-  it "should raise an error if attempt to use Database#row_type with an unregistered type and string or hash" do
+  it "should raise an error if attempt to use Database#row_type with an unregistered type and hash" do
     proc{@db.literal(@db.row_type(:foo, {:bar=>'1', :baz=>'b'}))}.should raise_error(Sequel::Error)
-    proc{@db.literal(@db.row_type(:foo, '(1,b)'))}.should raise_error(Sequel::Error)
   end
 
   it "should raise an error if attempt to use Database#row_type with an unhandled type" do
