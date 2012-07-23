@@ -31,6 +31,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/NestedAttributes.html">nested_attributes</a>: Allows you to modified associated objects directly through a model object, similar to ActiveRecord's Nested Attributes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking</a>: Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PgRow.html">pg_row</a>: Allows Sequel::Model classes to implement PostgreSQL row-valued/composite types.</li>
+<li><a href='rdoc-plugins/classes/Sequel/Plugins/PgTypecastOnLoad.html'>pg_typecast_on_load</a>: Handles typecasting of PostgreSQL array/hstore/composite types when loading model objects via jdbc, do, or swift adapters.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatements.html">prepared_statements</a>: Makes models use prepared statements for deletes, inserts, updates, and lookups by primary key.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatementsAssociations.html">prepared_statements_associations</a>: Makes models use prepared statements for regular loading of associations.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatementsSafe.html">prepared_statements_safe</a>: Makes use of prepared_statements plugin more safe by setting explicit defaults for model columns when inserting and saving whole rows instead of changed columns.</li>
