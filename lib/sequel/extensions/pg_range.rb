@@ -183,7 +183,6 @@ module Sequel
         # Reset the conversion procs if using the native postgres adapter,
         # and extend the datasets to correctly literalize ruby Range values.
         def self.extended(db)
-          db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)
           db.extend_datasets(DatasetMethods)
         end
 

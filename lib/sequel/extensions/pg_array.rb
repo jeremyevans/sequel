@@ -205,13 +205,6 @@ module Sequel
         ESCAPE_REPLACEMENT = '\\\\\1'.freeze
         BLOB_RANGE = 1...-1
 
-        # Reset the conversion procs when extending the Database object, so
-        # it will pick up the array converters.  This is only done for the native
-        # postgres adapter.
-        def self.extended(db)
-          db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)
-        end
-
         # Handle arrays in bound variables
         def bound_variable_arg(arg, conn)
           case arg

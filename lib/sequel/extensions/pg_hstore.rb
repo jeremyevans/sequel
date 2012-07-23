@@ -133,11 +133,6 @@ module Sequel
       end
 
       module DatabaseMethods
-        # Reset the conversion procs if using the native postgres adapter.
-        def self.extended(db)
-          db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)
-        end
-
         # Handle hstores in bound variables
         def bound_variable_arg(arg, conn)
           case arg

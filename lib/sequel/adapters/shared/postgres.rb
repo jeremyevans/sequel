@@ -148,6 +148,9 @@ module Sequel
       end_sql
       ).strip.gsub(/\s+/, ' ').freeze
 
+      # The Sequel extensions that require reseting of the conversion procs.
+      RESET_PROCS_EXTENSIONS = [:pg_array, :pg_hstore, :pg_inet, :pg_interval, :pg_json, :pg_range].freeze
+
       # A hash of conversion procs, keyed by type integer (oid) and
       # having callable values for the conversion proc for that type.
       attr_reader :conversion_procs
@@ -254,6 +257,17 @@ module Sequel
       #   * :if_exists : Don't raise an error if the function doesn't exist.
       def drop_trigger(table, name, opts={})
         self << drop_trigger_sql(table, name, opts)
+      end
+
+      # If any of the extensions that require reseting the conversion procs
+      # is loaded, reset them.  This is done here so that if you load
+      # multiple pg_* extensions in the same call, the conversion procs are
+      # only reset once instead of once for every extension.
+      def extension(*exts)
+        super
+        unless (RESET_PROCS_EXTENSIONS & exts).empty?
+          reset_conversion_procs
+        end
       end
 
       # Return full foreign key information using the pg system tables, including

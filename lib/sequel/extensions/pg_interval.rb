@@ -119,7 +119,6 @@ module Sequel
       # Reset the conversion procs if using the native postgres adapter,
       # and extend the datasets to correctly literalize ActiveSupport::Duration values.
       def self.extended(db)
-        db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)
         db.extend_datasets(IntervalDatasetMethods)
       end
 

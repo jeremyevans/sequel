@@ -1,5 +1,7 @@
 === HEAD
 
+* When loading multiple pg_* extensions via Database#extension, only reset the conversion procs once (jeremyevans)
+
 * Don't allow model typecasting from string to postgres array, hstore, or composite types (jeremyevans)
 
 * Add pg_typecast_on_load plugin for converting advanced PostgreSQL types on load the {jdbc,do,swift}/postgres adapters (jeremyevans)
