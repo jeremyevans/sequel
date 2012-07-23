@@ -257,9 +257,8 @@ module Sequel
         def get_conversion_procs
           procs = super
 
-          converter = method(:to_application_timestamp)
-          procs[1115] = Creator.new("timestamp without time zone", converter)
-          procs[1185] = Creator.new("timestamp with time zone", converter)
+          procs[1115] = Creator.new("timestamp without time zone", procs[1114])
+          procs[1185] = Creator.new("timestamp with time zone", procs[1184])
 
           procs
         end

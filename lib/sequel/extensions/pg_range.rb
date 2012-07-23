@@ -225,9 +225,8 @@ module Sequel
         def get_conversion_procs
           procs = super
 
-          converter = method(:to_application_timestamp)
-          procs[3908] = Parser.new("tsrange", converter)
-          procs[3910] = Parser.new("tstzrange", converter)
+          procs[3908] = Parser.new("tsrange", procs[1114])
+          procs[3910] = Parser.new("tstzrange", procs[1184])
           if defined?(PGArray::Creator)
             procs[3909] = PGArray::Creator.new("tsrange", procs[3908])
             procs[3911] = PGArray::Creator.new("tstzrange", procs[3910])
