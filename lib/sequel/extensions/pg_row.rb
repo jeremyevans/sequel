@@ -441,9 +441,9 @@ module Sequel
           parser_opts[:column_converters] = parser_opts[:column_oids].map do |oid|
             if pr = procs[oid]
               pr
-            else
-              # It's possible a conversion proc for this oid will be added later,
-              # so do a runtime check for it.
+            elsif !Sequel::Postgres::STRING_TYPES.include?(oid)
+              # It's not a string type, and it's possible a conversion proc for this
+              # oid will be added later, so do a runtime check for it.
               lambda{|s| (pr = procs[oid]) ? pr.call(s) : s}
             end
           end

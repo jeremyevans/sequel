@@ -39,6 +39,11 @@ module Sequel
       end
     end.new
 
+    # Type OIDs for string types used by PostgreSQL.  These types don't
+    # have conversion procs associated with them (since the data is
+    # already in the form of a string).
+    STRING_TYPES = [18, 19, 25, 1042, 1043]
+
     # Hash with type name strings/symbols and callable values for converting PostgreSQL types.
     # Non-builtin types that don't have fixed numbers should use this to register
     # conversion procs.
