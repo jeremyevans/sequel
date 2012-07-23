@@ -60,29 +60,38 @@ module Sequel
 
     # Base class for all SQL expression objects.
     class Expression
-      # Expression objects are assumed to be value objects, where their
-      # attribute values can't change after assignment.  In order to make
-      # it easy to define equality and hash methods, subclass
-      # instances assume that the only values that affect the results of
-      # such methods are the values of the object's attributes.
-      def self.attr_reader(*args)
-        super
-        comparison_attrs.concat(args)
-      end
+      @comparison_attrs = []
 
-      # All attributes used for equality and hash methods.
-      def self.comparison_attrs
-        @comparison_attrs ||= self == Expression ? [] : superclass.comparison_attrs.clone
-      end
+      class << self
+        # All attributes used for equality and hash methods.
+        attr_reader :comparison_attrs
 
-      # Create a to_s instance method that takes a dataset, and calls
-      # the method provided on the dataset with args as the argument (self by default).
-      # Used to DRY up some code.
-      def self.to_s_method(meth, args=:self) # :nodoc:
-        class_eval("def to_s(ds) ds.#{meth}(#{args}) end", __FILE__, __LINE__)
-        class_eval("def to_s_append(ds, sql) ds.#{meth}_append(sql, #{args}) end", __FILE__, __LINE__)
+        # Expression objects are assumed to be value objects, where their
+        # attribute values can't change after assignment.  In order to make
+        # it easy to define equality and hash methods, subclass
+        # instances assume that the only values that affect the results of
+        # such methods are the values of the object's attributes.
+        def attr_reader(*args)
+          super
+          comparison_attrs.concat(args)
+        end
+
+        # Copy the comparison_attrs into the subclass.
+        def inherited(subclass)
+          super
+          subclass.instance_variable_set(:@comparison_attrs, comparison_attrs.dup)
+        end
+
+          private
+
+        # Create a to_s instance method that takes a dataset, and calls
+        # the method provided on the dataset with args as the argument (self by default).
+        # Used to DRY up some code.
+        def to_s_method(meth, args=:self) # :nodoc:
+          class_eval("def to_s(ds) ds.#{meth}(#{args}) end", __FILE__, __LINE__)
+          class_eval("def to_s_append(ds, sql) ds.#{meth}_append(sql, #{args}) end", __FILE__, __LINE__)
+        end
       end
-      private_class_method :to_s_method
 
       # Alias of <tt>eql?</tt>
       def ==(other)
