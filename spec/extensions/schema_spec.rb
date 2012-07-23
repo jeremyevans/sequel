@@ -3,6 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe Sequel::Model, "dataset & schema" do
   before do
     @model = Class.new(Sequel::Model(:items))
+    @model.plugin :schema
   end 
 
   specify "sets schema with implicit table name" do
@@ -22,27 +23,17 @@ describe Sequel::Model, "dataset & schema" do
   end
 end
 
-describe Sequel::Model, "table_exists?" do
-  before do
-    MODEL_DB.reset
-    @model = Class.new(Sequel::Model(:items))
-  end
-
-  it "should get the table name and question the model's db if table_exists?" do
-    @model.db.should_receive(:table_exists?).and_return(false)
-    @model.table_exists?.should == false
-  end
-end
-
 describe Sequel::Model, "create_table and schema" do
   before do
-    MODEL_DB.reset
-    @model = Class.new(Sequel::Model) do
+    @model = Class.new(Sequel::Model)
+    @model.class_eval do
+      plugin :schema
       set_schema(:items) do
         text :name
         float :price, :null => false
       end
     end
+    MODEL_DB.reset
   end
 
   it "should get the create table SQL list from the db and execute it line by line" do
@@ -74,61 +65,47 @@ describe Sequel::Model, "create_table and schema" do
 
   it "should return nil if no schema is present" do
     @model = Class.new(Sequel::Model)
+    @model.plugin :schema
     @model.schema.should == nil
     @submodel = Class.new(@model)
     @submodel.schema.should == nil
   end
 end
 
-describe Sequel::Model, "drop_table" do
+describe Sequel::Model, "schema methods" do
   before do
     @model = Class.new(Sequel::Model(:items))
+    @model.plugin :schema
     MODEL_DB.reset
   end
 
-  it "should drop the related table" do
+  it "table_exists? should get the table name and question the model's db if table_exists?" do
+    @model.db.should_receive(:table_exists?).and_return(false)
+    @model.table_exists?.should == false
+  end
+
+  it "drop_table should drop the related table" do
     @model.drop_table
     MODEL_DB.sqls.should == ['DROP TABLE items']
   end
-end
 
-describe Sequel::Model, "drop_table?" do
-  before do
-    @model = Class.new(Sequel::Model(:items))
-    MODEL_DB.reset
-  end
-
-  it "should drop the table if it exists" do
+  it "drop_table? should drop the table if it exists" do
     @model.drop_table?
     MODEL_DB.sqls.should == ["SELECT NULL FROM items LIMIT 1", 'DROP TABLE items']
   end
-end
-
-describe Sequel::Model, "create_table!" do
-  before do
-    MODEL_DB.reset
-    @model = Class.new(Sequel::Model(:items))
-  end
   
-  it "should drop table if it exists and then create the table" do
+  it "create_table! should drop table if it exists and then create the table" do
     @model.create_table!
     MODEL_DB.sqls.should == ["SELECT NULL FROM items LIMIT 1", 'DROP TABLE items', 'CREATE TABLE items ()']
   end
-end
-
-describe Sequel::Model, "create_table?" do
-  before do
-    MODEL_DB.reset
-    @model = Class.new(Sequel::Model(:items))
-  end
   
-  it "should not create the table if it already exists" do
+  it "create_table? should not create the table if it already exists" do
     @model.should_receive(:table_exists?).and_return(true)
     @model.create_table?
     MODEL_DB.sqls.should == []
   end
 
-  it "should create the table if it doesn't exist" do
+  it "create_table? should create the table if it doesn't exist" do
     @model.should_receive(:table_exists?).and_return(false)
     @model.create_table?
     MODEL_DB.sqls.should == ['CREATE TABLE items ()']

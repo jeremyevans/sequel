@@ -1,8 +1,15 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
+model_class = proc do |klass, &block|
+  c = Class.new(klass)
+  c.plugin :validation_class_methods
+  c.class_eval(&block) if block
+  c
+end
+
 describe Sequel::Model do
   before do
-    @c = Class.new(Sequel::Model) do
+    @c = model_class.call Sequel::Model do
       def self.validates_coolness_of(attr)
         validates_each(attr) {|o, a, v| o.errors[a] << 'is not cool' if v != :cool}
       end
@@ -135,8 +142,7 @@ end
 
 describe Sequel::Model do
   before do
-    @c = Class.new(Sequel::Model)
-    @c.class_eval do
+    @c = model_class.call Sequel::Model do
       columns :score
       validates_each :score do |o, a, v|
         o.errors[a] << 'too low' if v < 87
@@ -165,11 +171,11 @@ describe Sequel::Model do
   end
 end
 
-describe Sequel::Plugins::ValidationClassMethods::ClassMethods::Generator do
+describe "Sequel::Plugins::ValidationClassMethods::ClassMethods::Generator" do
   before do
     $testit = nil
     
-    @c = Class.new(Sequel::Model) do
+    @c = model_class.call Sequel::Model do
       def self.validates_blah
         $testit = 1324
       end
@@ -186,7 +192,7 @@ end
 
 describe Sequel::Model do
   before do
-    @c = Class.new(Sequel::Model) do
+    @c = model_class.call Sequel::Model do
       columns :value
       
       def self.filter(*args)
@@ -579,8 +585,7 @@ end
 
 describe "Superclass validations" do
   before do
-    @c1 = Class.new(Sequel::Model)
-    @c1.class_eval do
+    @c1 = model_class.call Sequel::Model do
       columns :value
       validates_length_of :value, :minimum => 5
     end
@@ -624,8 +629,7 @@ end
 
 describe ".validates with block" do
   specify "should support calling .each" do
-    @c = Class.new(Sequel::Model)
-    @c.class_eval do
+    @c = model_class.call Sequel::Model do
       columns :vvv
       validates do
         each :vvv do |o, a, v|
@@ -646,23 +650,35 @@ describe Sequel::Model, "Validations" do
 
   before(:all) do
     class ::Person < Sequel::Model
+      plugin :validation_class_methods
       columns :id,:name,:first_name,:last_name,:middle_name,:initials,:age, :terms
     end
 
     class ::Smurf < Person
     end
+
+    class ::Can < Sequel::Model
+      plugin :validation_class_methods
+      columns :id, :name
+    end
     
     class ::Cow < Sequel::Model
+      plugin :validation_class_methods
       columns :id, :name, :got_milk
     end
 
     class ::User < Sequel::Model
+      plugin :validation_class_methods
       columns :id, :username, :password
     end
     
     class ::Address < Sequel::Model
+      plugin :validation_class_methods
       columns :id, :zip_code
     end
+  end
+  after(:all) do
+    [:Person, :Smurf, :Cow, :User, :Address].each{|c| Object.send(:remove_const, c)}
   end
   
   it "should validate the acceptance of a column" do
@@ -741,8 +757,7 @@ describe Sequel::Model, "Validations" do
   end
   
   it "should validate that a column doesn't have a string value" do
-    p = Class.new(Sequel::Model)
-    p.class_eval do
+    p = model_class.call Sequel::Model do
       columns :age, :price, :confirmed
       self.raise_on_typecast_failure = false
       validates_not_string :age
@@ -941,8 +956,6 @@ describe Sequel::Model, "Validations" do
 
   it "should validate correctly instances initialized with string keys" do
     class ::Can < Sequel::Model
-      columns :id, :name
-      
       validates_length_of :name, :minimum => 4
     end
     
@@ -954,8 +967,7 @@ end
 
 describe "Model#save" do
   before do
-    @c = Class.new(Sequel::Model(:people))
-    @c.class_eval do
+    @c = model_class.call Sequel::Model(:people) do
       columns :id, :x
 
       validates_each :x do |o, a, v|

@@ -1,14 +1,20 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe "Model hooks" do
+model_class = proc do |klass, &block|
+  c = Class.new(klass)
+  c.plugin :hook_class_methods
+  c.class_eval(&block) if block
+  c
+end
+
+describe Sequel::Model, "hook_class_methods plugin" do
   before do
     MODEL_DB.reset
   end
   
   specify "should be definable using a block" do
     adds = []
-    c = Class.new(Sequel::Model)
-    c.class_eval do
+    c = model_class.call Sequel::Model do
       before_save{adds << 'hi'}
     end
     
@@ -18,8 +24,7 @@ describe "Model hooks" do
   
   specify "should be definable using a method name" do
     adds = []
-    c = Class.new(Sequel::Model)
-    c.class_eval do
+    c = model_class.call Sequel::Model do
       define_method(:bye){adds << 'bye'}
       before_save :bye
     end
@@ -30,8 +35,7 @@ describe "Model hooks" do
 
   specify "should be additive" do
     adds = []
-    c = Class.new(Sequel::Model)
-    c.class_eval do
+    c = model_class.call Sequel::Model do
       after_save{adds << 'hyiyie'}
       after_save{adds << 'byiyie'}
     end
@@ -42,8 +46,7 @@ describe "Model hooks" do
   
   specify "before hooks should run in reverse order" do
     adds = []
-    c = Class.new(Sequel::Model)
-    c.class_eval do
+    c = model_class.call Sequel::Model do
       before_save{adds << 'hyiyie'}
       before_save{adds << 'byiyie'}
     end
@@ -54,8 +57,7 @@ describe "Model hooks" do
 
   specify "should not be additive if the method or tag already exists" do
     adds = []
-    c = Class.new(Sequel::Model)
-    c.class_eval do
+    c = model_class.call Sequel::Model do
       define_method(:bye){adds << 'bye'}
       before_save :bye
       before_save :bye
@@ -65,8 +67,7 @@ describe "Model hooks" do
     adds.should == ['bye']
 
     adds = []
-    d = Class.new(Sequel::Model)
-    d.class_eval do
+    d = model_class.call Sequel::Model do
       before_save(:bye){adds << 'hyiyie'}
       before_save(:bye){adds << 'byiyie'}
     end
@@ -75,8 +76,7 @@ describe "Model hooks" do
     adds.should == ['byiyie']
 
     adds = []
-    e = Class.new(Sequel::Model)
-    e.class_eval do
+    e = model_class.call Sequel::Model do
       define_method(:bye){adds << 'bye'}
       before_save :bye
       before_save(:bye){adds << 'byiyie'}
@@ -86,8 +86,7 @@ describe "Model hooks" do
     adds.should == ['byiyie']
 
     adds = []
-    e = Class.new(Sequel::Model)
-    e.class_eval do
+    e = model_class.call Sequel::Model do
       define_method(:bye){adds << 'bye'}
       before_save(:bye){adds << 'byiyie'}
       before_save :bye
@@ -99,8 +98,7 @@ describe "Model hooks" do
   
   specify "should be inheritable" do
     adds = []
-    a = Class.new(Sequel::Model)
-    a.class_eval do
+    a = model_class.call Sequel::Model do
       after_save{adds << '123'}
     end
     
@@ -116,8 +114,7 @@ describe "Model hooks" do
   
   specify "should be overridable in descendant classes" do
     adds = []
-    a = Class.new(Sequel::Model)
-    a.class_eval do
+    a = model_class.call Sequel::Model do
       before_save{adds << '123'}
     end
     
@@ -137,8 +134,7 @@ describe "Model hooks" do
     flag = true
     adds = []
     
-    a = Class.new(Sequel::Model)
-    a.class_eval do
+    a = model_class.call Sequel::Model do
       before_save{adds << 'cruel'; flag}
       before_save{adds << 'blah'; flag}
     end
@@ -173,8 +169,7 @@ describe "Model#after_initialize" do
     values1 = nil
     reached_after_initialized = false
     
-    a = Class.new(Sequel::Model)
-    a.class_eval do
+    a = model_class.call Sequel::Model do
       columns :x, :y
       after_initialize do
         values1 = @values.clone
@@ -192,8 +187,7 @@ describe "Model#before_create && Model#after_create" do
   before do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items))
-    @c.class_eval do
+    @c = model_class.call Sequel::Model(:items)  do
       columns :x
       no_primary_key
       
@@ -226,8 +220,7 @@ describe "Model#before_update && Model#after_update" do
   before do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items))
-    @c.class_eval do
+    @c = model_class.call(Sequel::Model(:items)) do
       after_update {MODEL_DB << "BLAH after"}
     end
   end
@@ -258,8 +251,7 @@ describe "Model#before_save && Model#after_save" do
   before do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items))
-    @c.class_eval do
+    @c = model_class.call(Sequel::Model(:items)) do
       columns :x
       after_save {MODEL_DB << "BLAH after"}
     end
@@ -298,8 +290,7 @@ describe "Model#before_destroy && Model#after_destroy" do
   before do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items))
-    @c.class_eval do
+    @c = model_class.call(Sequel::Model(:items)) do
       after_destroy {MODEL_DB << "BLAH after"}
     end
   end
@@ -329,8 +320,8 @@ describe "Model#before_validation && Model#after_validation" do
   before do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items))
-    @c.class_eval do
+    @c = model_class.call(Sequel::Model(:items)) do
+      plugin :validation_class_methods
       after_validation{MODEL_DB << "BLAH after"}
 
       def self.validate(o)
@@ -382,7 +373,7 @@ end
 
 describe "Model.has_hooks?" do
   before do
-    @c = Class.new(Sequel::Model(:items))
+    @c = model_class.call(Sequel::Model(:items))
   end
   
   specify "should return false if no hooks are defined" do
@@ -403,6 +394,7 @@ end
 describe "Model#add_hook_type" do
   before do
     class ::Foo < Sequel::Model(:items)
+      plugin :hook_class_methods
       add_hook_type :before_bar, :after_bar
 
       def bar
