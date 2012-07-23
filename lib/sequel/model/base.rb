@@ -872,6 +872,7 @@ module Sequel
       #   Artist.new(:name=>'Bob').values # => {:name=>'Bob'}
       #   Artist[1].values # => {:id=>1, :name=>'Jim', ...}
       attr_reader :values
+      alias to_hash values
 
       # Creates new instance and passes the given values to set.
       # If a block is given, yield the instance to the block unless

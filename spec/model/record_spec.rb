@@ -1,5 +1,21 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
+describe "Model#values" do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+  end
+
+  it "should return the hash of model values" do
+    hash = {:x=>1}
+    @c.load(hash).values.should equal(hash)
+  end
+
+  it "should be aliased as to_hash" do
+    hash = {:x=>1}
+    @c.load(hash).to_hash.should equal(hash)
+  end
+end
+
 describe "Model#save server use" do
   before do
     @db = Sequel.mock(:autoid=>proc{|sql| 10}, :fetch=>{:x=>1, :id=>10}, :servers=>{:blah=>{}, :read_only=>{}})
