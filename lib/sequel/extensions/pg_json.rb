@@ -109,7 +109,7 @@ module Sequel
       end
 
       # Reset the conversion procs when extending the Database object, so
-      # it will pick up the json convertor.  This is only done for the native
+      # it will pick up the json converter.  This is only done for the native
       # postgres adapter.
       def self.extended(db)
         db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)

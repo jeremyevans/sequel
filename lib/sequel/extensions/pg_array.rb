@@ -206,7 +206,7 @@ module Sequel
         BLOB_RANGE = 1...-1
 
         # Reset the conversion procs when extending the Database object, so
-        # it will pick up the array convertors.  This is only done for the native
+        # it will pick up the array converters.  This is only done for the native
         # postgres adapter.
         def self.extended(db)
           db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)
@@ -254,7 +254,7 @@ module Sequel
         # Manually override the typecasting for timestamp array types so that
         # they use the database's timezone instead of the global Sequel
         # timezone.
-        def get_conversion_procs(conn)
+        def get_conversion_procs
           procs = super
 
           converter = method(:to_application_timestamp)

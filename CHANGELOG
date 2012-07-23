@@ -1,5 +1,7 @@
 === HEAD
 
+* Make all adapters that connect to PostgreSQL store type conversion procs (jeremyevans)
+
 * Add type oid to column schema on PostgreSQL (jeremyevans)
 
 * Add pg_row plugin, for using Sequel::Model classes to represent PostgreSQL row-valued/composite types (jeremyevans)

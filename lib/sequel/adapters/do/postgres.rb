@@ -15,10 +15,7 @@ module Sequel
         # Add the primary_keys and primary_key_sequences instance variables,
         # so we can get the correct return values for inserted rows.
         def self.extended(db)
-          db.instance_eval do
-            @primary_keys = {}
-            @primary_key_sequences = {}
-          end
+          db.send(:initialize_postgres_adapter)
         end
         
         private

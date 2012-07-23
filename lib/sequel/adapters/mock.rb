@@ -50,12 +50,17 @@ module Sequel
         'postgres' => lambda do |db|
           db.instance_eval do
             @server_version = 90103
-            @primary_keys = {}
-            @primary_key_sequences = {}
+            initialize_postgres_adapter
+          end
+          db.extend(Module.new do
+            def bound_variable_arg(arg, conn)
+              arg
+            end
+
             def primary_key(table)
               :id
             end
-          end
+          end)
         end
       }
 
@@ -127,6 +132,7 @@ module Sequel
       def initialize(opts={})
         super
         opts = @opts
+        @sqls = opts[:sqls] || []
         if mod_name = SHARED_ADAPTERS[opts[:host]]
           @shared_adapter = true
           require "sequel/adapters/shared/#{opts[:host]}"
@@ -141,7 +147,7 @@ module Sequel
         self.fetch = opts[:fetch]
         self.numrows = opts[:numrows]
         extend(opts[:extend]) if opts[:extend]
-        @sqls = opts[:sqls] || []
+        sqls
       end
 
       # Return a related Connection option connecting to the given shard.

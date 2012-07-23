@@ -1,3 +1,5 @@
+Sequel.require 'adapters/utils/pg_types'
+
 module Sequel
   # Top level module for holding all PostgreSQL-related modules and classes
   # for Sequel.  There are a few module level accessors that are added via
@@ -145,6 +147,10 @@ module Sequel
           AND cons.contype = 'p'
       end_sql
       ).strip.gsub(/\s+/, ' ').freeze
+
+      # A hash of conversion procs, keyed by type integer (oid) and
+      # having callable values for the conversion proc for that type.
+      attr_reader :conversion_procs
 
       # Commit an existing prepared transaction with the given transaction
       # identifier string.
@@ -379,6 +385,12 @@ module Sequel
             literal(SQL::QualifiedIdentifier.new(pks[:schema], LiteralString.new(pks[:sequence])))
           end
         end
+      end
+      
+      # Reset the database's conversion procs, requires a server query if there
+      # any named types.
+      def reset_conversion_procs
+        @conversion_procs = get_conversion_procs
       end
 
       # Reset the primary key sequence for the given table, baseing it on the
@@ -643,6 +655,18 @@ module Sequel
         end
       end
 
+      # Return a hash with oid keys and callable values, used for converting types.
+      def get_conversion_procs
+        procs = PG_TYPES.dup
+        procs[1184] = procs[1114] = method(:to_application_timestamp)
+        unless (pgnt = PG_NAMED_TYPES).empty?
+          from(:pg_type).where(:typtype=>'b', :typname=>pgnt.keys.map{|t| t.to_s}).select_map([:oid, :typname]).each do |oid, name|
+            procs[oid.to_i] ||= pgnt[name.untaint.to_sym]
+          end
+        end
+        procs
+      end
+
       # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
       def identifier_input_method_default
         nil
@@ -674,6 +698,13 @@ module Sequel
           index_type = :gist
         end
         "CREATE #{unique}INDEX#{' CONCURRENTLY' if index[:concurrently]} #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
+      end
+
+      # Setup datastructures shared by all postgres adapters.
+      def initialize_postgres_adapter
+        @primary_keys = {}
+        @primary_key_sequences = {}
+        reset_conversion_procs
       end
 
       # Backbone of the tables and views support.

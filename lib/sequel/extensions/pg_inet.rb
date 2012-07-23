@@ -35,7 +35,7 @@ module Sequel
     module InetDatabaseMethods
 
       # Reset the conversion procs when extending the Database object, so
-      # it will pick up the inet/cidr convertor.  Also, extend the datasets
+      # it will pick up the inet/cidr converter.  Also, extend the datasets
       # with support for literalizing the IPAddr types.
       def self.extended(db)
         db.reset_conversion_procs if db.respond_to?(:reset_conversion_procs)

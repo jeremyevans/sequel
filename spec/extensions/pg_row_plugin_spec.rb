@@ -3,7 +3,6 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "Sequel::Plugins::PgRow" do
   before(:all) do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
-    @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
     @db.extension(:pg_array)
     @c = Class.new(Sequel::Model(@db[:address]))
     @c.columns :street, :city
@@ -11,7 +10,6 @@ describe "Sequel::Plugins::PgRow" do
     @c.db_schema[:city][:type] = :string
     @db.fetch = [[{:oid=>1098, :typrelid=>2, :typarray=>3}], [{:attname=>'street', :atttypid=>1324}, {:attname=>'city', :atttypid=>1324}]]
     @c.plugin :pg_row
-    @db.extend(Module.new{attr_reader :conversion_procs})
 
     @c2 = Class.new(Sequel::Model(@db[:company]))
     @c2.columns :address

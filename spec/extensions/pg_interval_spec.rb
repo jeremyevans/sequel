@@ -8,7 +8,6 @@ else
 describe "pg_interval extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
-    @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
     @db.extension(:pg_array, :pg_interval)
   end
 

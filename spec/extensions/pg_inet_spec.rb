@@ -4,9 +4,7 @@ describe "pg_inet extension" do
   ipv6_broken = (IPAddr.new('::1'); false) rescue true
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
-    @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
-    @db.extension(:pg_array)
-    @db.extension(:pg_inet)
+    @db.extension(:pg_array, :pg_inet)
   end
 
   it "should literalize IPAddr v4 instances to strings correctly" do

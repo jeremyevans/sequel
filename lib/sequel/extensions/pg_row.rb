@@ -368,30 +368,10 @@ module Sequel
           # time).
           return if db.row_types
 
-          db.instance_variable_set(:@row_types, {})
-          db.instance_variable_set(:@row_schema_types, {})
-
-          # This is the module that the typecasting methods are added to.
-          method_module = Module.new
-          db.instance_variable_set(:@row_type_method_module, method_module)
-          db.extend(method_module)
-
-          if db.respond_to?(:conversion_procs)
-            # Used by the native postgres adapter.  When reseting
-            # conversion procs, reregister all the row types so that
-            # the system tables are introspected again, picking up
-            # database changes.
-            def db.reset_conversion_procs
-              super
-              row_types.each do |db_type, opts|
-                register_row_type(db_type, opts)
-              end
-            end
-          else
-            # Used by the other adapters (e.g. jdbc).  Copy PG_TYPES
-            # so that conversion procs for members of composite types
-            # can be found.
-            db.instance_variable_set(:@conversion_procs, PG_TYPES.dup)
+          db.instance_eval do
+            @row_types = {}
+            @row_schema_types = {}
+            extend(@row_type_method_module = Module.new)
           end
         end
 
@@ -490,6 +470,18 @@ module Sequel
           end
 
           nil
+        end
+
+        # When reseting conversion procs, reregister all the row types so that
+        # the system tables are introspected again, picking up database changes.
+        def reset_conversion_procs
+          procs = super
+
+          row_types.each do |db_type, opts|
+            register_row_type(db_type, opts)
+          end
+
+          procs
         end
 
         # Handle typecasting of the given object to the given database type.

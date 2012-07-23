@@ -3,10 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "pg_row extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
-    @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
     @db.extension(:pg_array, :pg_row)
-    @db.extend(Module.new{attr_accessor :conversion_procs})
-    @db.conversion_procs = Sequel::Postgres::PG_TYPES.dup
     @m = Sequel::Postgres::PGRow
     @db.sqls
   end
@@ -138,23 +135,15 @@ describe "pg_row extension" do
   end
 
   it "should reload registered row types when reseting conversion procs" do
-    db = Sequel.mock
-    db.instance_variable_set(:@conversion_procs, {})
-    db.extend(Module.new do
-      def conversion_procs; @conversion_procs; end 
-      def reset_conversion_procs; nil; end 
-    end)
+    db = Sequel.mock(:host=>'postgres')
     db.extension(:pg_row)
-    db.reset_conversion_procs
     db.conversion_procs[4] = p4 = proc{|s| s.to_i}
     db.conversion_procs[5] = p5 = proc{|s| s * 2}
+    db.sqls
     db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     db.register_row_type(:foo)
-    db.sqls
-    db.fetch = [[{:oid=>1, :typrelid=>7, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
-    db.reset_conversion_procs
     db.sqls.should == ["SELECT pg_type.oid, typrelid, typarray FROM pg_type WHERE ((typtype = 'c') AND (typname = 'foo')) LIMIT 1",
-      "SELECT attname, atttypid FROM pg_attribute WHERE ((attrelid = 7) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
+      "SELECT attname, atttypid FROM pg_attribute WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
   end
 
   it "should handle ArrayRows and HashRows in bound variables" do

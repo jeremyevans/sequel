@@ -3,7 +3,6 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "pg_hstore extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
-    @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end})
     @m = Sequel::Postgres
     @c = @m::HStore
     @db.extension :pg_hstore

@@ -11,10 +11,8 @@ describe "pg_range extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     @R = Sequel::Postgres::PGRange
-    @db.extend(Module.new{def get_conversion_procs(conn) {} end; def bound_variable_arg(arg, conn) arg end})
     @db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
-    @db.extension(:pg_array)
-    @db.extension(:pg_range)
+    @db.extension(:pg_array, :pg_range)
   end
 
   it "should literalize Range instances to strings correctly" do
@@ -211,13 +209,13 @@ describe "pg_range extension" do
   end
 
   it "should set appropriate timestamp range conversion procs when getting conversion procs" do
-    procs = @db.send(:get_conversion_procs, nil)
+    procs = @db.conversion_procs
     procs[3908].call('[2011-10-20 11:12:13,2011-10-20 11:12:14]').should == (Time.local(2011, 10, 20, 11, 12, 13)..(Time.local(2011, 10, 20, 11, 12, 14)))
     procs[3910].call('[2011-10-20 11:12:13,2011-10-20 11:12:14]').should == (Time.local(2011, 10, 20, 11, 12, 13)..(Time.local(2011, 10, 20, 11, 12, 14)))
   end
 
   it "should set appropriate timestamp range array conversion procs when getting conversion procs" do
-    procs = @db.send(:get_conversion_procs, nil)
+    procs = @db.conversion_procs
     procs[3909].call('{"[2011-10-20 11:12:13,2011-10-20 11:12:14]"}').should == [Time.local(2011, 10, 20, 11, 12, 13)..Time.local(2011, 10, 20, 11, 12, 14)]
     procs[3911].call('{"[2011-10-20 11:12:13,2011-10-20 11:12:14]"}').should == [Time.local(2011, 10, 20, 11, 12, 13)..Time.local(2011, 10, 20, 11, 12, 14)]
   end

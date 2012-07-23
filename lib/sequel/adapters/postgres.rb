@@ -1,5 +1,4 @@
 Sequel.require 'adapters/shared/postgres'
-Sequel.require 'adapters/utils/pg_types'
 
 begin 
   require 'pg' 
@@ -157,10 +156,6 @@ module Sequel
       
       set_adapter_scheme :postgres
 
-      # A hash of conversion procs, keyed by type integer (oid) and
-      # having callable values for the conversion proc for that type.
-      attr_reader :conversion_procs
-
       # Whether infinite timestamps should be converted on retrieval.  By default, no
       # conversion is done, so an error is raised if you attempt to retrieve an infinite
       # timestamp.  You can set this to :nil to convert to nil, :string to leave
@@ -172,8 +167,7 @@ module Sequel
       def initialize(*args)
         super
         @convert_infinite_timestamps = false
-        @primary_keys = {}
-        @primary_key_sequences = {}
+        initialize_postgres_adapter
       end
 
       # Convert given argument so that it can be used directly by pg.  Currently, pg doesn't
@@ -232,7 +226,6 @@ module Sequel
         conn.instance_variable_set(:@db, self)
         conn.instance_variable_set(:@prepared_statements, {}) if SEQUEL_POSTGRES_USES_PG
         connection_configuration_sqls.each{|sql| conn.execute(sql)}
-        @conversion_procs ||= get_conversion_procs(conn)
         conn
       end
       
@@ -354,12 +347,6 @@ module Sequel
         end
       end
 
-      # Reset the database's conversion procs, requires a server query if there
-      # any named types.
-      def reset_conversion_procs
-        synchronize{|conn| @conversion_procs = get_conversion_procs(conn)}
-      end
-
       # If convert_infinite_timestamps is true and the value is infinite, return an appropriate
       # value based on the convert_infinite_timestamps setting.
       def to_application_timestamp(value)
@@ -445,20 +432,6 @@ module Sequel
         ensure
           q.clear
         end
-      end
-
-      # Return the conversion procs hash to use for this database.
-      def get_conversion_procs(conn)
-        procs = PG_TYPES.dup
-        procs[1184] = procs[1114] = method(:to_application_timestamp)
-        unless (pgnt = PG_NAMED_TYPES).empty?
-          conn.execute("SELECT oid, typname FROM pg_type WHERE typtype = 'b' AND typname IN ('#{pgnt.keys.map{|type| conn.escape_string(type.to_s)}.join("', '")}')") do |res|
-            res.ntuples.times do |i|
-              procs[res.getvalue(i, 0).to_i] ||= pgnt[res.getvalue(i, 1).untaint.to_sym]
-            end
-          end
-        end
-        procs
       end
 
       # Return an appropriate value for the given infinite timestamp string.

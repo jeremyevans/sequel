@@ -222,7 +222,7 @@ module Sequel
         # Manually override the typecasting for tsrange and tstzrange types so that
         # they use the database's timezone instead of the global Sequel
         # timezone.
-        def get_conversion_procs(conn)
+        def get_conversion_procs
           procs = super
 
           converter = method(:to_application_timestamp)

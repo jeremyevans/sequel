@@ -10,15 +10,14 @@ describe "pg_array extension" do
 
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
-    @db.extend(Module.new{def bound_variable_arg(arg, conn) arg end; def get_conversion_procs(conn) {} end})
     @db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
     @db.extension(:pg_array)
     @m = Sequel::Postgres
-    @convertor = @m::PG_TYPES
+    @converter = @m::PG_TYPES
   end
 
   it "should parse single dimensional text arrays" do
-    c = @convertor[1009]
+    c = @converter[1009]
     c.call("{a}").to_a.first.should be_a_kind_of(String)
     c.call("{}").to_a.should == []
     c.call("{a}").to_a.should == ['a']
@@ -27,7 +26,7 @@ describe "pg_array extension" do
   end
 
   it "should parse multi-dimensional text arrays" do
-    c = @convertor[1009]
+    c = @converter[1009]
     c.call("{{}}").to_a.should == [[]]
     c.call("{{a},{b}}").to_a.should == [['a'], ['b']]
     c.call('{{"a b"},{c}}').to_a.should == [['a b'], ['c']]
@@ -36,12 +35,12 @@ describe "pg_array extension" do
   end
 
   it "should parse text arrays with embedded deliminaters" do
-    c = @convertor[1009]
+    c = @converter[1009]
     c.call('{{"{},","\\",\\,\\\\\\"\\""}}').to_a.should == [['{},', '",,\\""']]
   end
 
   it "should parse single dimensional integer arrays" do
-    c = @convertor[1007]
+    c = @converter[1007]
     c.call("{1}").to_a.first.should be_a_kind_of(Integer)
     c.call("{}").to_a.should == []
     c.call("{1}").to_a.should == [1]
@@ -50,7 +49,7 @@ describe "pg_array extension" do
   end
 
   it "should parse multiple dimensional integer arrays" do
-    c = @convertor[1007]
+    c = @converter[1007]
     c.call("{{}}").to_a.should == [[]]
     c.call("{{1}}").to_a.should == [[1]]
     c.call('{{2},{3}}').to_a.should == [[2], [3]]
@@ -58,7 +57,7 @@ describe "pg_array extension" do
   end
 
   it "should parse single dimensional float arrays" do
-    c = @convertor[1022]
+    c = @converter[1022]
     c.call("{}").to_a.should == []
     c.call("{1.5}").to_a.should == [1.5]
     c.call('{2.5,3.5}').to_a.should == [2.5, 3.5]
@@ -66,7 +65,7 @@ describe "pg_array extension" do
   end
 
   it "should parse multiple dimensional float arrays" do
-    c = @convertor[1022]
+    c = @converter[1022]
     c.call("{{}}").to_a.should == [[]]
     c.call("{{1.5}}").to_a.should == [[1.5]]
     c.call('{{2.5},{3.5}}').to_a.should == [[2.5], [3.5]]
@@ -74,14 +73,14 @@ describe "pg_array extension" do
   end
 
   it "should parse integers in float arrays as floats" do
-    c = @convertor[1022]
+    c = @converter[1022]
     c.call("{1}").to_a.first.should be_a_kind_of(Float)
     c.call("{1}").to_a.should == [1.0]
     c.call('{{{1,2},{3,4}},{{5,6},{7,8}}}').to_a.should == [[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]]
   end
 
   it "should parse single dimensional decimal arrays" do
-    c = @convertor[1231]
+    c = @converter[1231]
     c.call("{}").to_a.should == []
     c.call("{1.5}").to_a.should == [BigDecimal.new('1.5')]
     c.call('{2.5,3.5}').to_a.should == [BigDecimal.new('2.5'), BigDecimal.new('3.5')]
@@ -89,7 +88,7 @@ describe "pg_array extension" do
   end
 
   it "should parse multiple dimensional decimal arrays" do
-    c = @convertor[1231]
+    c = @converter[1231]
     c.call("{{}}").to_a.should == [[]]
     c.call("{{1.5}}").to_a.should == [[BigDecimal.new('1.5')]]
     c.call('{{2.5},{3.5}}').to_a.should == [[BigDecimal.new('2.5')], [BigDecimal.new('3.5')]]
@@ -97,20 +96,20 @@ describe "pg_array extension" do
   end
 
   it "should parse decimal values with arbitrary precision" do
-    c = @convertor[1231]
+    c = @converter[1231]
     c.call("{1.000000000000000000005}").to_a.should == [BigDecimal.new('1.000000000000000000005')]
     c.call("{{1.000000000000000000005,2.000000000000000000005},{3.000000000000000000005,4.000000000000000000005}}").to_a.should == [[BigDecimal.new('1.000000000000000000005'), BigDecimal.new('2.000000000000000000005')], [BigDecimal.new('3.000000000000000000005'), BigDecimal.new('4.000000000000000000005')]]
   end
 
   it "should parse integers in decimal arrays as BigDecimals" do
-    c = @convertor[1231]
+    c = @converter[1231]
     c.call("{1}").to_a.first.should be_a_kind_of(BigDecimal)
     c.call("{1}").to_a.should == [BigDecimal.new('1')]
     c.call('{{{1,2},{3,4}},{{5,6},{7,8}}}').to_a.should == [[[BigDecimal.new('1'), BigDecimal.new('2')], [BigDecimal.new('3'), BigDecimal.new('4')]], [[BigDecimal.new('5'), BigDecimal.new('6')], [BigDecimal.new('7'), BigDecimal.new('8')]]]
   end
 
   it "should parse arrays with NULL values" do
-    @convertor.values_at(1007, 1009, 1022, 1231).each do |c|
+    @converter.values_at(1007, 1009, 1022, 1231).each do |c|
       c.call("{NULL}").should == [nil]
       c.call("{NULL,NULL}").should == [nil,nil]
       c.call("{{NULL,NULL},{NULL,NULL}}").should == [[nil,nil],[nil,nil]]
@@ -118,7 +117,7 @@ describe "pg_array extension" do
   end
 
   it 'should parse arrays with "NULL" values' do
-    c = @convertor[1009]
+    c = @converter[1009]
     c.call('{NULL,"NULL",NULL}').to_a.should == [nil, "NULL", nil]
     c.call('{NULLA,"NULL",NULL}').to_a.should == ["NULLA", "NULL", nil]
   end
@@ -297,7 +296,7 @@ describe "pg_array extension" do
     Sequel::Postgres::PG_TYPES[2].should be_a_kind_of(Sequel::Postgres::PGArray::JSONCreator)
   end
 
-  it "should support registering convertors with :parser=>:json option" do
+  it "should support registering converters with :parser=>:json option" do
     Sequel::Postgres::PGArray.register('foo', :oid=>4, :parser=>:json){|s| s * 2}
     Sequel::Postgres::PG_TYPES[4].call('{{1, 2}, {3, 4}}').should == [[2, 4], [6, 8]]
   end
@@ -314,7 +313,7 @@ describe "pg_array extension" do
   end
 
   it "should set appropriate timestamp conversion procs when getting conversion procs" do
-    procs = @db.send(:get_conversion_procs, nil)
+    procs = @db.conversion_procs
     procs[1185].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
     procs[1115].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
   end
