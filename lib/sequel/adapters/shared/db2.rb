@@ -197,6 +197,7 @@ module Sequel
       PAREN_CLOSE = Dataset::PAREN_CLOSE
       PAREN_OPEN = Dataset::PAREN_OPEN
       BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}
+      EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       CAST_STRING_OPEN = "RTRIM(CHAR(".freeze

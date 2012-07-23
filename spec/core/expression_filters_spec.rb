@@ -381,6 +381,10 @@ describe "Blockless Ruby Filters" do
     @d.lit(d.like(:b)).should == '((SELECT a FROM items) LIKE b)'
     @d.lit(d.ilike(:b)).should == '((SELECT a FROM items) ILIKE b)'
   end
+
+  it "should handled emulated char_length function" do
+    @d.lit(Sequel.char_length(:a)).should == 'char_length(a)'
+  end
 end
 
 describe Sequel::SQL::VirtualRow do

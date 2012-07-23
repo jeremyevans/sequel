@@ -413,6 +413,7 @@ module Sequel
     module DatasetMethods
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
+      EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
       EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%f'"}
       NOT_SPACE = Dataset::NOT_SPACE
       COMMA = Dataset::COMMA
@@ -578,7 +579,7 @@ module Sequel
           col
         end
       end
-      
+
       # SQL fragment specifying a list of identifiers
       def identifier_list(columns)
         columns.map{|i| quote_identifier(i)}.join(COMMA)

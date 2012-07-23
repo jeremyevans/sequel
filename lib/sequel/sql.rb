@@ -361,6 +361,15 @@ module Sequel
         cast(arg, sql_type || String).sql_string
       end
 
+      # Return an emulated function call for getting the number of characters
+      # in the argument:
+      #
+      #   Sequel.char_length(:a) # char_length(a) -- Most databases
+      #   Sequel.char_length(:a) # length(a) -- SQLite
+      def char_length(arg)
+        SQL::EmulatedFunction.new(:char_length, arg)
+      end
+
       # Order the given argument descending.
       # Options:
       #
@@ -1118,6 +1127,12 @@ module Sequel
       end
 
       to_s_method :function_sql
+    end
+
+    # Represents an SQL function call that is translated/emulated
+    # on databases that lack support for such a function.
+    class EmulatedFunction < Function
+      to_s_method :emulated_function_sql
     end
     
     class GenericExpression

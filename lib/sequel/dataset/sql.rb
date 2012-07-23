@@ -178,6 +178,9 @@ module Sequel
       clauses.map{|clause| :"#{type}_#{clause}_sql"}.freeze
     end
 
+    # Map of emulated function names to native function names.
+    EMULATED_FUNCTION_MAP = {}
+
     WILDCARD = LiteralString.new('*').freeze
     ALL = ' ALL'.freeze
     AND_SEPARATOR = " AND ".freeze
@@ -489,15 +492,18 @@ module Sequel
       sql << constant.to_s
     end
 
-    # SQL fragment specifying an SQL function call
+    # SQL fragment specifying an emulated SQL function call.
+    # By default, assumes just the function name may need to
+    # be emulated, adapters should set an EMULATED_FUNCTION_MAP
+    # hash mapping emulated functions to native functions in
+    # their dataset class to setup the emulation.
+    def emulated_function_sql_append(sql, f)
+      _function_sql_append(sql, native_function_name(f.f), f.args)
+    end
+
+    # SQL fragment specifying an SQL function call without emulation.
     def function_sql_append(sql, f)
-      sql << f.f.to_s
-      args = f.args
-      if args.empty?
-        sql << FUNCTION_EMPTY
-      else
-        literal_append(sql, args)
-      end
+      _function_sql_append(sql, f.f, f.args)
     end
 
     # SQL fragment specifying a JOIN clause without ON or USING.
@@ -713,6 +719,16 @@ module Sequel
     end
     
     private
+
+    # Backbone of function_sql_append and emulated_function_sql_append.
+    def _function_sql_append(sql, name, args)
+      sql << name.to_s
+      if args.empty?
+        sql << FUNCTION_EMPTY
+      else
+        literal_append(sql, args)
+      end
+    end
 
     # Formats the truncate statement.  Assumes the table given has already been
     # literalized.
@@ -1121,6 +1137,11 @@ module Sequel
     # SQL fragment for true
     def literal_true
       BOOL_TRUE
+    end
+
+    # Get the native function name given the emulated function name.
+    def native_function_name(emulated_function)
+      self.class.const_get(:EMULATED_FUNCTION_MAP).fetch(emulated_function, emulated_function)
     end
 
     # Returns a qualified column name (including a table name) if the column

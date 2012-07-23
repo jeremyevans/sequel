@@ -430,6 +430,19 @@ module Sequel
         mutation_method(:disable_insert_output)
       end
 
+      # There is no function on Microsoft SQL Server that does character length
+      # and respects trailing spaces (datalength respects trailing spaces, but
+      # counts bytes instead of characters).  Use a hack to work around the
+      # trailing spaces issue.
+      def emulated_function_sql_append(sql, f)
+        case f.f
+        when :char_length
+          literal_append(sql, SQL::Function.new(:len, Sequel.join([f.args.first, 'x'])) - 1)
+        else
+          super
+        end
+      end
+      
       # MSSQL uses the CONTAINS keyword for full text search
       def full_text_search(cols, terms, opts = {})
         terms = "\"#{terms.join('" OR "')}\"" if terms.is_a?(Array)

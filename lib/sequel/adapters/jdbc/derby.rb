@@ -171,6 +171,7 @@ module Sequel
         BOOL_TRUE = 'TRUE'.freeze
         BOOL_FALSE = 'FALSE'.freeze
         SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit lock')
+        EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
 
         # Derby doesn't support an expression between CASE and WHEN,
         # so emulate it by using an equality statement for all of the

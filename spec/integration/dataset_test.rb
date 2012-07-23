@@ -1523,3 +1523,26 @@ if INTEGRATION_DB.dataset.supports_modifying_joins?
     end
   end
 end
+
+describe "Emulated functions" do
+  before(:all) do
+    @db = INTEGRATION_DB
+    @db.create_table!(:a){String :a}
+    @ds = @db[:a]
+  end
+  after(:all) do
+    @db.drop_table?(:a)
+  end
+  after do
+    @ds.delete
+  end
+  
+  specify "Sequel.char_length should return the length of characters in the string" do
+    @ds.get(Sequel.char_length(:a)).should == nil
+    @ds.insert(:a=>'foo')
+    @ds.get(Sequel.char_length(:a)).should == 3
+    # Check behavior with leading/trailing blanks
+    @ds.update(:a=>' foo22 ')
+    @ds.get(Sequel.char_length(:a)).should == 7
+  end
+end
