@@ -1588,7 +1588,7 @@ describe 'PostgreSQL array handling' do
       column :t, 'text[]'
     end
     c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :typecast_on_load, :i, :f, :d, :t unless @native
+    c.plugin :pg_typecast_on_load, :i, :f, :d, :t unless @native
     o = c.create(:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal.new('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']])
     o.i.should == [1, 2, nil]
     o.f.should == [[1, 2.5], [3, 4.5]]
@@ -1718,7 +1718,7 @@ describe 'PostgreSQL hstore handling' do
     end
     Sequel.extension :pg_hstore_ops
     c.plugin :many_through_many
-    c.plugin :typecast_on_load, :h unless @native
+    c.plugin :pg_typecast_on_load, :h unless @native
 
     h = {'item_id'=>"2", 'left_item_id'=>"1"}
     o2 = c.create(:id=>2)
@@ -1969,7 +1969,7 @@ describe 'PostgreSQL json type' do
       json :h
     end
     c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :typecast_on_load, :h unless @native
+    c.plugin :pg_typecast_on_load, :h unless @native
     c.create(:h=>Sequel.pg_json(@h)).h.should == @h
     c.create(:h=>Sequel.pg_json(@a)).h.should == @a
   end
@@ -2082,7 +2082,7 @@ describe 'PostgreSQL inet/cidr types' do
       cidr :c
     end
     c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :typecast_on_load, :i, :c unless @native
+    c.plugin :pg_typecast_on_load, :i, :c unless @native
     c.create(:i=>@v4, :c=>@v4nm).values.values_at(:i, :c).should == [@ipv4, @ipv4nm]
     unless ipv6_broken
       c.create(:i=>@ipv6, :c=>@ipv6nm).values.values_at(:i, :c).should == [@ipv6, @ipv6nm]
@@ -2180,7 +2180,7 @@ describe 'PostgreSQL range types' do
   specify 'with models' do
     @db.create_table!(:items){primary_key :id; int4range :i4; int8range :i8; numrange :n; daterange :d; tsrange :t; tstzrange :tz}
     c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
+    c.plugin :pg_typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
     v = c.create(@r).values
     v.delete(:id)
     v.should == @r
@@ -2188,7 +2188,7 @@ describe 'PostgreSQL range types' do
     unless @db.adapter_scheme == :jdbc
       @db.create_table!(:items){primary_key :id; column :i4, 'int4range[]'; column :i8, 'int8range[]'; column :n, 'numrange[]'; column :d, 'daterange[]'; column :t, 'tsrange[]'; column :tz, 'tstzrange[]'}
       c = Class.new(Sequel::Model(@db[:items]))
-      c.plugin :typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
+      c.plugin :pg_typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
       v = c.create(@ra).values
       v.delete(:id)
       v.each{|k,v| v.should == @ra[k].to_a}
@@ -2352,7 +2352,7 @@ describe 'PostgreSQL interval types' do
       interval :i
     end
     c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :typecast_on_load, :i, :c unless @native
+    c.plugin :pg_typecast_on_load, :i, :c unless @native
     v = c.create(:i=>'1 year 2 mons 25 days 05:06:07').i
     v.is_a?(ActiveSupport::Duration).should be_true
     v.should == ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
@@ -2546,7 +2546,7 @@ describe 'PostgreSQL row-valued/composite types' do
     end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
     specify 'model typecasting' do
-      Person.plugin :typecast_on_load, :address unless @native
+      Person.plugin :pg_typecast_on_load, :address unless @native
       a = Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
       o = Person.create(:id=>1, :address=>['123 Sesame St', 'Somewhere', '12345'])
       o.address.should == a
@@ -2555,7 +2555,7 @@ describe 'PostgreSQL row-valued/composite types' do
       o = Person.create(:id=>1, :address=>a)
       o.address.should == a
 
-      Company.plugin :typecast_on_load, :employees unless @native
+      Company.plugin :pg_typecast_on_load, :employees unless @native
       e = Person.new(:id=>1, :address=>a)
       unless @db.adapter_scheme == :jdbc
         o = Company.create(:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}])

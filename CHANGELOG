@@ -1,5 +1,7 @@
 === HEAD
 
+* Add pg_typecast_on_load plugin for converting advanced PostgreSQL types on load the {jdbc,do,swift}/postgres adapters (jeremyevans)
+
 * Make all adapters that connect to PostgreSQL store type conversion procs (jeremyevans)
 
 * Add type oid to column schema on PostgreSQL (jeremyevans)
