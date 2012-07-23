@@ -138,9 +138,15 @@ module Sequel
       # Set the columns and yield the hashes to the block.
       def fetch_rows(sql)
         execute(sql) do |res|
-          @columns = res.fields
-          res.each do |h|
-            h.to_a.each{|k,v| h[k] = SQL::Blob.new(v.read) if v.is_a?(StringIO)}
+          col_map = {}
+          @columns = res.fields.map do |c|
+            col_map[c] = output_identifier(c)
+          end
+          res.each do |r|
+            h = {}
+            r.each do |k, v|
+              h[col_map[k]] = v.is_a?(StringIO) ? SQL::Blob.new(v.read) : v
+            end
             yield h
           end
         end

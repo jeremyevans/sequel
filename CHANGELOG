@@ -1,5 +1,7 @@
 === HEAD
 
+* Support an output identifier method in the swift adapter (jeremyevans)
+
 * Add Model#to_hash as an alias to Model#values (jeremyevans)
 
 * When loading multiple pg_* extensions via Database#extension, only reset the conversion procs once (jeremyevans)

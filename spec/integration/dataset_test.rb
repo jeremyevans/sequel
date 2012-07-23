@@ -1438,7 +1438,7 @@ describe "Dataset identifier methods" do
     @db.drop_table?(:a)
   end
   
-  cspecify "#identifier_output_method should change how identifiers are output", [:swift] do
+  specify "#identifier_output_method should change how identifiers are output" do
     @ds.identifier_output_method = :upcase
     @ds.first.should == {:AB=>1}
     @ds.identifier_output_method = :uprev
