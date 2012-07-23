@@ -52,12 +52,12 @@ describe "A PostgreSQL database" do
 
   specify "should correctly parse the schema" do
     @db.schema(:test3, :reload=>true).should == [
-      [:value, {:type=>:integer, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"integer", :primary_key=>false}],
-      [:time, {:type=>:datetime, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"timestamp without time zone", :primary_key=>false}]
+      [:value, {:oid=>23, :type=>:integer, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"integer", :primary_key=>false}],
+      [:time, {:oid=>1114, :type=>:datetime, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"timestamp without time zone", :primary_key=>false}]
     ]
     @db.schema(:test4, :reload=>true).should == [
-      [:name, {:type=>:string, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"character varying(20)", :primary_key=>false}],
-      [:value, {:type=>:blob, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"bytea", :primary_key=>false}]
+      [:name, {:oid=>1043, :type=>:string, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"character varying(20)", :primary_key=>false}],
+      [:value, {:oid=>17, :type=>:blob, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"bytea", :primary_key=>false}]
     ]
   end
 

@@ -716,6 +716,7 @@ module Sequel
         m = output_identifier_meth(opts[:dataset])
         m2 = input_identifier_meth(opts[:dataset])
         ds = metadata_dataset.select(:pg_attribute__attname___name,
+            SQL::Cast.new(:pg_attribute__atttypid, :integer).as(:oid),
             SQL::Function.new(:format_type, :pg_type__oid, :pg_attribute__atttypmod).as(:db_type),
             SQL::Function.new(:pg_get_expr, :pg_attrdef__adbin, :pg_class__oid).as(:default),
             SQL::BooleanExpression.new(:NOT, :pg_attribute__attnotnull).as(:allow_null),
