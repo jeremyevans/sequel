@@ -40,6 +40,37 @@ module Sequel
     # changing the values of the Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS hash.  You
     # change change the default options on a per model basis
     # by overriding a private instance method default_validation_helpers_options.
+    #
+    # By changing the default options, you can setup internationalization of the
+    # error messages.  For example, you would modify the default options:
+    #
+    #   Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS.merge!(
+    #     :exact_length=>{:message=>lambda{|exact| I18n.t("errors.exact_length", :exact => exact)}},
+    #     :integer=>{:message=>lambda{I18n.t("errors.integer")}},
+    #     ...
+    #   )
+    #
+    # and then use something like this in your yaml translation file:
+    #
+    #   en:
+    #     errors:
+    #       exact_length: "is not %{exact} characters"
+    #       integer: "is not a number"
+    #
+    # Note that if you want to support internationalization of Errors#full_messages,
+    # you need to override the method.  Here's an example:
+    #   
+    #   class Sequel::Model::Errors
+    #     ATTRIBUTE_JOINER = I18n.t('errors.joiner').freeze
+    #     def full_messages
+    #       inject([]) do |m, kv|
+    #         att, errors = *kv
+    #         att.is_a?(Array) ? Array(att).map!{|v| I18n.t("attributes.#{v}")} : att = I18n.t("attributes.#{att}")
+    #         errors.each {|e| m << (e.is_a?(LiteralString) ? e : "#{Array(att).join(ATTRIBUTE_JOINER)} #{e}")}
+    #         m
+    #       end
+    #     end
+    #   end
     module ValidationHelpers
       # Default validation options used by Sequel.  Can be modified to change the error
       # messages for all models (e.g. for internationalization), or to set certain
