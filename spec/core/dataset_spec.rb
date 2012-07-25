@@ -328,7 +328,7 @@ end
 
 describe "Dataset#exists" do
   before do
-    @ds1 = Sequel::Dataset.new(nil).from(:test)
+    @ds1 = Sequel.mock[:test]
     @ds2 = @ds1.filter(Sequel.expr(:price) < 100)
     @ds3 = @ds1.filter(Sequel.expr(:price) > 50)
   end
@@ -348,7 +348,7 @@ end
 
 describe "Dataset#where" do
   before do
-    @dataset = Sequel::Dataset.new(nil).from(:test)
+    @dataset = Sequel.mock[:test]
     @d1 = @dataset.where(:region => 'Asia')
     @d2 = @dataset.where('region = ?', 'Asia')
     @d3 = @dataset.where("a = 1")
@@ -3106,7 +3106,7 @@ end
 
 describe "Dataset#grep" do
   before do
-    @ds = Sequel::Dataset.new(nil).from(:posts)
+    @ds = Sequel.mock[:posts]
   end
   
   specify "should format a SQL filter correctly" do
@@ -3153,7 +3153,13 @@ describe "Dataset#grep" do
     @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :all_columns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE ((title ILIKE 'abc') AND (body ILIKE 'abc') AND (title ILIKE 'def') AND (body ILIKE 'def'))"
   end
 
-  specify "should support regexps though the database may not support it" do
+  specify "should not support regexps if the database doesn't supports it" do
+    proc{@ds.grep(:title, /ruby/).sql}.should raise_error(Sequel::InvalidOperation)
+    proc{@ds.grep(:title, [/^ruby/, 'ruby']).sql}.should raise_error(Sequel::InvalidOperation)
+  end
+
+  specify "should support regexps if the database supports it" do
+    def @ds.supports_regexp?; true end
     @ds.grep(:title, /ruby/).sql.should == "SELECT * FROM posts WHERE ((title ~ 'ruby'))"
     @ds.grep(:title, [/^ruby/, 'ruby']).sql.should == "SELECT * FROM posts WHERE ((title ~ '^ruby') OR (title LIKE 'ruby'))"
   end

@@ -271,6 +271,7 @@ module Sequel
     TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S%N%z'".freeze
     STANDARD_TIMESTAMP_FORMAT = "TIMESTAMP #{TIMESTAMP_FORMAT}".freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
+    REGEXP_OPERATORS = ::Sequel::SQL::ComplexExpression::REGEXP_OPERATORS
     UNDERSCORE = '_'.freeze
     UPDATE = 'UPDATE'.freeze
     UPDATE_CLAUSE_METHODS = clause_methods(:update, %w'update table set where')
@@ -455,6 +456,9 @@ module Sequel
           sql << PAREN_CLOSE
         end
       when *TWO_ARITY_OPERATORS
+        if REGEXP_OPERATORS.include?(op) && !supports_regexp?
+          raise InvalidOperation, "Pattern matching via regular expressions is not supported on #{db.database_type}"
+        end
         sql << PAREN_OPEN
         literal_append(sql, args.at(0))
         sql << SPACE << op.to_s << SPACE

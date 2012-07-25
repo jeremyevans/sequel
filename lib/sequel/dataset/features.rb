@@ -114,6 +114,11 @@ module Sequel
       supports_distinct_on?
     end
     
+    # Whether the dataset supports pattern matching by regular expressions.
+    def supports_regexp?
+      false
+    end
+
     # Whether the RETURNING clause is supported for the given type of query.
     # +type+ can be :insert, :update, or :delete.
     def supports_returning?(type)

@@ -446,13 +446,11 @@ module Sequel
         end
       end
 
-      # SQLite does not support pattern matching via regular expressions.
-      # SQLite is case insensitive (depending on pragma), so use LIKE for
-      # ILIKE.
+      # SQLite is case insensitive (depending on pragma), so use LIKE for ILIKE.
+      # It also doesn't support a NOT LIKE b, you need to use NOT (a LIKE b).
+      # It doesn't support xor or the extract function natively, so those have to be emulated.
       def complex_expression_sql_append(sql, op, args)
         case op
-        when :~, :'!~', :'~*', :'!~*'
-          raise Error, "SQLite does not support pattern matching via regular expressions"
         when :ILIKE
           super(sql, :LIKE, args.map{|a| SQL::Function.new(:upper, a)})
         when :"NOT LIKE", :"NOT ILIKE"

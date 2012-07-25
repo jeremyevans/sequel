@@ -60,10 +60,12 @@ describe "Blockless Ruby Filters" do
   end
   
   it "should support ~ via Hash and Regexp (if supported by database)" do
+    def @d.supports_regexp?; true end
     @d.l(:x => /blah/).should == '(x ~ \'blah\')'
   end
   
   it "should support !~ via inverted Hash and Regexp" do
+    def @d.supports_regexp?; true end
     @d.l(~Sequel.expr(:x => /blah/)).should == '(x !~ \'blah\')'
   end
   
@@ -141,7 +143,7 @@ describe "Blockless Ruby Filters" do
     @d.l(Sequel.expr(Sequel.lit('y') => Sequel.lit('z')) & Sequel.lit('x')).should == '((y = z) AND x)'
     @d.l((Sequel.lit('x') > 200) & (Sequel.lit('y') < 200)).should == '((x > 200) AND (y < 200))'
     @d.l(~(Sequel.lit('x') + 1 > 100)).should == '((x + 1) <= 100)'
-    @d.l(Sequel.lit('x').like(/a/)).should == '(x ~ \'a\')'
+    @d.l(Sequel.lit('x').like('a')).should == '(x LIKE \'a\')'
     @d.l(Sequel.lit('x') + 1 > 100).should == '((x + 1) > 100)'
     @d.l((Sequel.lit('x') * :y) < 100.01).should == '((x * y) < 100.01)'
     @d.l((Sequel.lit('x') - Sequel.expr(:y)/2) >= 100000000000000000000000000000000000).should == '((x - (y / 2)) >= 100000000000000000000000000000000000)'
@@ -531,12 +533,14 @@ end
 describe "Sequel core extension replacements" do
   before do
     @db = Sequel::Database.new
+    @ds = @db.dataset 
+    def @ds.supports_regexp?; true end
     @o = Object.new
     def @o.sql_literal(ds) 'foo' end
   end
 
   def l(arg, should)
-    @db.literal(arg).should == should
+    @ds.literal(arg).should == should
   end
 
   it "Sequel.expr should return items wrapped in Sequel objects" do

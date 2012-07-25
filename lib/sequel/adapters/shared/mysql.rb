@@ -689,6 +689,11 @@ module Sequel
         false
       end
     
+      # MySQL supports pattern matching via regular expressions
+      def supports_regexp?
+        true
+      end
+
       # MySQL does support fractional timestamps in literal timestamps, but it
       # ignores them.  Also, using them seems to cause problems on 1.9.  Since
       # they are ignored anyway, not using them is probably best.

@@ -1402,7 +1402,7 @@ describe "Dataset string methods" do
     @ds.filter(Sequel.expr(:b).like('baR')).all.should == []
     @ds.filter(Sequel.expr(:a).like('FOO', 'BAR')).all.should == []
     @ds.exclude(Sequel.expr(:a).like('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
-    @ds.exclude(Sequel.expr(:a).like('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.exclude(Sequel.expr(:b).like('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.exclude(Sequel.expr(:a).like('FOO', 'BAR')).all.should == [{:a=>'foo', :b=>'bar'}]
   end
   
@@ -1414,6 +1414,45 @@ describe "Dataset string methods" do
     @ds.exclude(Sequel.expr(:a).ilike('Foo')).all.should == []
     @ds.exclude(Sequel.expr(:a).ilike('baR')).all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.exclude(Sequel.expr(:a).ilike('FOO', 'BAR')).all.should == []
+  end
+  
+  if INTEGRATION_DB.dataset.supports_regexp?
+    it "#like with regexp return matching rows" do
+      @ds.insert('foo', 'bar')
+      @ds.filter(Sequel.expr(:a).like(/fo/)).all.should == [{:a=>'foo', :b=>'bar'}]
+      @ds.filter(Sequel.expr(:a).like(/fo$/)).all.should == []
+      @ds.filter(Sequel.expr(:a).like(/fo/, /ar/)).all.should == [{:a=>'foo', :b=>'bar'}]
+      @ds.exclude(Sequel.expr(:a).like(/fo/)).all.should == []
+      @ds.exclude(Sequel.expr(:a).like(/fo$/)).all.should == [{:a=>'foo', :b=>'bar'}]
+      @ds.exclude(Sequel.expr(:a).like(/fo/, /ar/)).all.should == []
+    end
+    
+    it "#like with regexp should be case sensitive if regexp is case sensitive" do
+      @ds.insert('foo', 'bar')
+      @ds.filter(Sequel.expr(:a).like(/Fo/)).all.should == []
+      @ds.filter(Sequel.expr(:b).like(/baR/)).all.should == []
+      @ds.filter(Sequel.expr(:a).like(/FOO/, /BAR/)).all.should == []
+      @ds.exclude(Sequel.expr(:a).like(/Fo/)).all.should == [{:a=>'foo', :b=>'bar'}]
+      @ds.exclude(Sequel.expr(:b).like(/baR/)).all.should == [{:a=>'foo', :b=>'bar'}]
+      @ds.exclude(Sequel.expr(:a).like(/FOO/, /BAR/)).all.should == [{:a=>'foo', :b=>'bar'}]
+
+      @ds.filter(Sequel.expr(:a).like(/Fo/i)).all.should == [{:a=>'foo', :b=>'bar'}]
+      @ds.filter(Sequel.expr(:b).like(/baR/i)).all.should == [{:a=>'foo', :b=>'bar'}]
+      @ds.filter(Sequel.expr(:a).like(/FOO/i, /BAR/i)).all.should == [{:a=>'foo', :b=>'bar'}]
+      @ds.exclude(Sequel.expr(:a).like(/Fo/i)).all.should == []
+      @ds.exclude(Sequel.expr(:b).like(/baR/i)).all.should == []
+      @ds.exclude(Sequel.expr(:a).like(/FOO/i, /BAR/i)).all.should == []
+    end
+    
+    it "#ilike with regexp should return matching rows, in a case insensitive manner" do
+      @ds.insert('foo', 'bar')
+      @ds.filter(Sequel.expr(:a).ilike(/Fo/)).all.should == [{:a=>'foo', :b=>'bar'}]
+      @ds.filter(Sequel.expr(:b).ilike(/baR/)).all.should == [{:a=>'foo', :b=>'bar'}]
+      @ds.filter(Sequel.expr(:a).ilike(/FOO/, /BAR/)).all.should == [{:a=>'foo', :b=>'bar'}]
+      @ds.exclude(Sequel.expr(:a).ilike(/Fo/)).all.should == []
+      @ds.exclude(Sequel.expr(:b).ilike(/baR/)).all.should == []
+      @ds.exclude(Sequel.expr(:a).ilike(/FOO/, /BAR/)).all.should == []
+    end
   end
   
   it "should work with strings created with Sequel.join" do

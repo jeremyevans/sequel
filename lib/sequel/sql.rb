@@ -149,6 +149,9 @@ module Sequel
       # Bitwise mathematical operators used in +NumericMethods+
       BITWISE_OPERATORS = [:&, :|, :^, :<<, :>>, :%]
 
+      # Operators that check for equality
+      EQUALITY_OPERATORS = [:'=', :'!=']
+
       # Inequality operators used in +InequalityMethods+
       INEQUALITY_OPERATORS = [:<, :>, :<=, :>=]
 
@@ -161,10 +164,14 @@ module Sequel
       # Operators that use IS, used for special casing to override literal true/false values
       IS_OPERATORS = [:IS, :'IS NOT']
 
+      # Operators that do pattern matching via regular expressions
+      REGEXP_OPERATORS = [:~, :'!~', :'~*', :'!~*']
+      
+      # Operators that do pattern matching via LIKE
+      LIKE_OPERATORS = [:LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE']
+
       # Operator symbols that take exactly two arguments
-      TWO_ARITY_OPERATORS = [:'=', :'!=', :LIKE, :'NOT LIKE', \
-        :~, :'!~', :'~*', :'!~*', :ILIKE, :'NOT ILIKE'] + \
-        INEQUALITY_OPERATORS + IS_OPERATORS + IN_OPERATORS
+      TWO_ARITY_OPERATORS = EQUALITY_OPERATORS + INEQUALITY_OPERATORS + IS_OPERATORS + IN_OPERATORS + REGEXP_OPERATORS + LIKE_OPERATORS
 
       # Operator symbols that take one or more arguments
       N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS + BITWISE_OPERATORS

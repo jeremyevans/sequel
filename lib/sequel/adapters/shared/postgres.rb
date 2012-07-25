@@ -1030,6 +1030,11 @@ module Sequel
         true
       end
 
+      # PostgreSQL supports pattern matching via regular expressions
+      def supports_regexp?
+        true
+      end
+
       # PostgreSQL supports timezones in literal timestamps
       def supports_timestamp_timezones?
         true
