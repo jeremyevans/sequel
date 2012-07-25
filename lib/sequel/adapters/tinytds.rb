@@ -6,13 +6,25 @@ module Sequel
     class Database < Sequel::Database
       include Sequel::MSSQL::DatabaseMethods
       set_adapter_scheme :tinytds
+
+      # Choose whether to use unicode strings on initialization
+      def initialize(*)
+        super
+        set_mssql_unicode_strings
+      end
       
       # Transfer the :user option to the :username option.
       def connect(server)
         opts = server_opts(server)
         opts[:username] = opts[:user]
-        set_mssql_unicode_strings
-        TinyTds::Client.new(opts)
+        c = TinyTds::Client.new(opts)
+
+        if (ts = opts[:textsize])
+          sql = "SET TEXTSIZE #{typecast_value_integer(ts)}"
+          log_yield(sql){c.execute(sql)}
+        end
+      
+        c
       end
       
       # Execute the given +sql+ on the server.  If the :return option

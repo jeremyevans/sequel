@@ -405,6 +405,14 @@ should specify the :dataserver option with that name as the value.  Some other
 options that you may want to set are :login_timeout, :timeout, :tds_version, :azure,
 :appname, and :encoding, see the tiny_tds README for details.
 
+Other Sequel specific options:
+
+:textsize :: Override the default TEXTSIZE setting for this connection.  The FreeTDS
+             default is small (around 64000 bytes), but can be set up to around 2GB.
+             This should be specified as an integer.  If you plan on setting large
+             text or blob values via tinytds, you should use this option or modify
+             your freetds.conf file.
+
 For highest performance, you should disable any identifier output method when
 using the tinytds adapter, which probably means disabling any identifier input method
 as well.  The default for Microsoft SQL Server is to :downcase identifiers on output

@@ -19,20 +19,20 @@ end
 MSSQL_DB.loggers = [logger]
 
 MSSQL_DB.create_table! :test do
-  text :name
-  integer :value, :index => true
+  String :name, :type=>:text
+  Integer :value, :index => true
 end
 MSSQL_DB.create_table! :test2 do
-  text :name
-  integer :value
+  String :name, :type=>:text
+  Integer :value
 end
 MSSQL_DB.create_table! :test3 do
-  integer :value
-  timestamp :time
+  Integer :value
+  Time :time
 end
 MSSQL_DB.create_table! :test4 do
-  varchar :name, :size => 20
-  varbinary :value
+  String :name, :size => 20
+  column :value, 'varbinary(max)'
 end
 
 describe "A MSSQL database" do
@@ -383,6 +383,7 @@ describe "MSSSQL::Dataset#insert" do
     @ds = @db[:test5]
   end
   after do
+    @db[:test4].delete
     @db.drop_table?(:test5)
   end
 
@@ -399,6 +400,14 @@ describe "MSSSQL::Dataset#insert" do
     h = @ds.insert_select(:value=>10)
     h[:value].should == 10
     @ds.first(:xid=>h[:xid])[:value].should == 10
+  end
+
+  cspecify "should allow large text and binary values", :odbc do
+    blob = Sequel::SQL::Blob.new("0" * (65*1024))
+    @db[:test4].insert(:name => 'max varbinary test', :value => blob)
+    b = @db[:test4].where(:name => 'max varbinary test').get(:value)
+    b.length.should == blob.length
+    b.should == blob
   end
 end
 
