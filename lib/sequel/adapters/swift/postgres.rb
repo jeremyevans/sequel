@@ -1,7 +1,8 @@
+require 'swift/db/postgres'
 Sequel.require 'adapters/shared/postgres'
 
 module Sequel
-  Postgres::CONVERTED_EXCEPTIONS << ::SwiftError
+  Postgres::CONVERTED_EXCEPTIONS << ::Swift::Error
   
   module Swift
     # Adapter, Database, and Dataset support for accessing a PostgreSQL

@@ -1,3 +1,4 @@
+require 'swift/db/mysql'
 Sequel.require 'adapters/shared/mysql'
 
 module Sequel

@@ -1,3 +1,4 @@
+require 'swift/db/sqlite3'
 Sequel.require 'adapters/shared/sqlite'
 
 module Sequel
@@ -25,7 +26,7 @@ module Sequel
         
         # Use Swift's escape method for quoting.
         def literal_string_append(sql, s)
-          sql << db.synchronize{|c| c.escape(s)}
+          sql << APOS << db.synchronize{|c| c.escape(s)} << APOS
         end
       end
     end

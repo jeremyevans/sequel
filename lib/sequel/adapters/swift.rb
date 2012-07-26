@@ -1,11 +1,8 @@
-require 'swift'
-
 module Sequel
-  # Module holding the Swift support for Sequel.  Swift is a
-  # ruby front-end for dbic++, a fast database access library
-  # written in C++.
+  # Module holding the Swift DB support for Sequel.  Swift DB is a
+  # collection of drivers used in Swift ORM.
   #
-  # The Swift adapter currently supports PostgreSQL and MySQL:
+  # The Swift adapter currently supports PostgreSQL, MySQL and SQLite3
   #
   #   Sequel.connect('swift://user:password@host/database?db_type=postgres')
   #   Sequel.connect('swift://user:password@host/database?db_type=mysql')
@@ -60,7 +57,9 @@ module Sequel
       
       # Create an instance of swift_class for the given options.
       def connect(server)
-        setup_connection(swift_class.new(server_opts(server)))
+        opts = server_opts(server)
+        opts[:pass] = opts[:password]
+        setup_connection(swift_class.new(opts))
       end
       
       # Execute the given SQL, yielding a Swift::Result if a block is given.
@@ -70,7 +69,7 @@ module Sequel
             res = log_yield(sql){conn.execute(sql)}
             yield res if block_given?
             nil
-          rescue SwiftError => e
+          rescue ::Swift::Error => e
             raise_error(e)
           end
         end
@@ -81,8 +80,8 @@ module Sequel
       def execute_dui(sql, opts={})
         synchronize(opts[:server]) do |conn|
           begin
-            log_yield(sql){conn.execute(sql).rows}
-          rescue SwiftError => e
+            log_yield(sql){conn.execute(sql).affected_rows}
+          rescue ::Swift::Error => e
             raise_error(e)
           end
         end
@@ -94,7 +93,7 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           begin
             log_yield(sql){conn.execute(sql).insert_id}
-          rescue SwiftError => e
+          rescue ::Swift::Error => e
             raise_error(e)
           end
         end

@@ -252,7 +252,7 @@ describe "Database schema modifiers" do
     @ds.columns!.should == [:number]
   end
   
-  specify "should create tables from select statements correctly" do
+  cspecify "should create tables from select statements correctly", [:swift, :sqlite] do
     @db.create_table!(:items){Integer :number}
     @ds.insert([10])
     @db.create_table(:items2, :as=>@db[:items])

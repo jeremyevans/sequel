@@ -1,5 +1,7 @@
 === HEAD
 
+* The swift adapters now require swift-db-* instead of swift itself (deepfryed, jeremyevans) (#526)
+
 * Add :textsize option to tinytds adapter to override the default TEXTSIZE (jeremyevans, wardrop) (#525)
 
 * Support an output identifier method in the swift adapter (jeremyevans)
