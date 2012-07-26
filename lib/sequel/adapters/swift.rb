@@ -10,38 +10,22 @@ module Sequel
     # Contains procs keyed on sub adapter type that extend the
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {:postgres=>proc do |db|
+        require 'swift/db/postgres'
         Sequel.ts_require 'adapters/swift/postgres'
-        begin
-          require 'swift/db/postgres'
-        rescue LoadError => e
-          $stderr.puts $/, 'Please install swift-db-postgres', $/
-          raise e
-        end
         db.extend(Sequel::Swift::Postgres::DatabaseMethods)
         db.extend_datasets Sequel::Postgres::DatasetMethods
         db.swift_class = ::Swift::DB::Postgres
-        Sequel::Postgres::CONVERTED_EXCEPTIONS << ::Swift::Error
       end,
       :mysql=>proc do |db|
+        require 'swift/db/mysql'
         Sequel.ts_require 'adapters/swift/mysql'
-        begin
-          require 'swift/db/mysql'
-        rescue LoadError => e
-          $stderr.puts $/, 'Please install swift-db-mysql', $/
-          raise e
-        end
         db.extend(Sequel::Swift::MySQL::DatabaseMethods)
         db.dataset_class = Sequel::Swift::MySQL::Dataset
         db.swift_class = ::Swift::DB::Mysql
       end,
       :sqlite=>proc do |db|
+        require 'swift/db/sqlite3'
         Sequel.ts_require 'adapters/swift/sqlite'
-        begin
-          require 'swift/db/sqlite3'
-        rescue LoadError => e
-          $stderr.puts $/, 'Please install swift-db-sqlite3', $/
-          raise e
-        end
         db.extend(Sequel::Swift::SQLite::DatabaseMethods)
         db.dataset_class = Sequel::Swift::SQLite::Dataset
         db.swift_class = ::Swift::DB::Sqlite3
