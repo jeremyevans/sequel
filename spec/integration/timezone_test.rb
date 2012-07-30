@@ -58,7 +58,7 @@ describe "Sequel timezone support" do
     test_timezone
   end
 
-  cspecify "should support using UTC for both database storage and for application", [:swift], [:do, :mysql], [:do, :postgres], [:oracle] do
+  cspecify "should support using UTC for both database storage and for application", [:do, :mysql], [:do, :postgres], [:oracle] do
     Sequel.default_timezone = :utc
     test_timezone
     Sequel.database_timezone = :local

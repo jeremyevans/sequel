@@ -322,7 +322,7 @@ describe "Many Through Many Plugin" do
     c.exclude(:related_artists=>c.filter(:artists__id=>@artist1.id)).all.map{|a| a.name}.sort.should == %w'3'
   end
 
-  cspecify "should handle extreme case with 5 join tables", [:swift, :sqlite] do
+  specify "should handle extreme case with 5 join tables" do
     Artist.many_through_many :related_albums, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id], [:artists, :id, :id], [:albums_artists, :artist_id, :album_id]], :class=>Album, :distinct=>true
     @db[:albums_artists].delete
     @album1.add_artist(@artist1)
@@ -1265,7 +1265,7 @@ describe "List plugin with a scope" do
     @db.drop_table?(:pages)
   end
 
-  cspecify "should return rows in order of position", [:swift, :sqlite] do
+  specify "should return rows in order of position" do
     @c.map(:name).should == %w[ Hm Ps Au P1 P2 P3 ]
   end
 
@@ -1286,7 +1286,7 @@ describe "List plugin with a scope" do
     @c[:name => "P3"].next.should == nil
   end
 
-  cspecify "should define move_to", [:swift, :sqlite] do
+  specify "should define move_to" do
     @c[:name => "P2"].move_to(1)
     @c.map(:name).should == %w[ Hm Ps Au P2 P1 P3 ]
 
@@ -1297,7 +1297,7 @@ describe "List plugin with a scope" do
     proc { @c[:name => "P2"].move_to(10) }.should raise_error(Sequel::Error)
   end
 
-  cspecify "should define move_to_top and move_to_bottom", [:swift, :sqlite] do
+  specify "should define move_to_top and move_to_bottom" do
     @c[:name => "Au"].move_to_top
     @c.map(:name).should == %w[ Hm Au Ps P1 P2 P3 ]
 
@@ -1305,7 +1305,7 @@ describe "List plugin with a scope" do
     @c.map(:name).should == %w[ Hm Ps Au P1 P2 P3 ]
   end
 
-  cspecify "should define move_up and move_down", [:swift, :sqlite] do
+  specify "should define move_up and move_down" do
     @c[:name => "P2"].move_up
     @c.map(:name).should == %w[ Hm Ps Au P2 P1 P3 ]
 

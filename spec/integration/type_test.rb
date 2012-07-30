@@ -33,7 +33,7 @@ describe "Supported types" do
     ds.all.should == [{:number=>2}]
   end
   
-  cspecify "should support generic bignum type", [:swift, :sqlite] do
+  specify "should support generic bignum type" do
     ds = create_items_table_with_column(:number, Bignum)
     ds.insert(:number => 2**34)
     ds.all.should == [{:number=>2**34}]
@@ -93,7 +93,7 @@ describe "Supported types" do
     ds.first[:tim].strftime('%Y%m%d%H%M%S').should == t.strftime('%Y%m%d%H%M%S')
   end
   
-  cspecify "should support generic file type", [:do], [:odbc, :mssql], [:mysql2], [:swift], [:tinytds] do
+  cspecify "should support generic file type", [:do], [:odbc, :mssql], [:mysql2], [:tinytds] do
     ds = create_items_table_with_column(:name, File)
     ds.insert(:name =>Sequel.blob("a\0"*300))
     ds.all.should == [{:name=>Sequel.blob("a\0"*300)}]

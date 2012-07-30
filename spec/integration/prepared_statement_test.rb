@@ -287,12 +287,12 @@ describe "Bound Argument Types" do
     @ds.filter(:d=>:$x).prepare(:first, :ps_date).call(:x=>@vs[:d])[:d].should == @vs[:d]
   end
 
-  cspecify "should handle datetime type", [:do], [:mysql2], [:swift], [:jdbc, :sqlite], [:tinytds], [:oracle] do
+  cspecify "should handle datetime type", [:do], [:mysql2], [:jdbc, :sqlite], [:tinytds], [:oracle] do
     Sequel.datetime_class = DateTime
     @ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>@vs[:dt])[:dt].should == @vs[:dt]
   end
 
-  cspecify "should handle datetime type with fractional seconds", [:do], [:mysql2], [:swift], [:jdbc, :sqlite], [:tinytds], [:oracle] do
+  cspecify "should handle datetime type with fractional seconds", [:do], [:mysql2], [:jdbc, :sqlite], [:tinytds], [:oracle] do
     Sequel.datetime_class = DateTime
     fract_time = DateTime.parse('2010-10-12 13:14:15.500000')
     @ds.prepare(:update, :ps_datetime_up, :dt=>:$x).call(:x=>fract_time)
