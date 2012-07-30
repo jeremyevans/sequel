@@ -385,6 +385,10 @@ describe "Blockless Ruby Filters" do
   it "should handled emulated char_length function" do
     @d.lit(Sequel.char_length(:a)).should == 'char_length(a)'
   end
+
+  it "should handled emulated trim function" do
+    @d.lit(Sequel.trim(:a)).should == 'trim(a)'
+  end
 end
 
 describe Sequel::SQL::VirtualRow do

@@ -1545,4 +1545,13 @@ describe "Emulated functions" do
     @ds.update(:a=>' foo22 ')
     @ds.get(Sequel.char_length(:a)).should == 7
   end
+  
+  specify "Sequel.trim should return the string with spaces trimmed from both sides" do
+    @ds.get(Sequel.trim(:a)).should == nil
+    @ds.insert(:a=>'foo')
+    @ds.get(Sequel.trim(:a)).should == 'foo'
+    # Check behavior with leading/trailing blanks
+    @ds.update(:a=>' foo22 ')
+    @ds.get(Sequel.trim(:a)).should == 'foo22'
+  end
 end

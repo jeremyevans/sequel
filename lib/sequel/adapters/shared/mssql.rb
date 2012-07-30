@@ -438,6 +438,8 @@ module Sequel
         case f.f
         when :char_length
           literal_append(sql, SQL::Function.new(:len, Sequel.join([f.args.first, 'x'])) - 1)
+        when :trim
+          literal_append(sql, SQL::Function.new(:ltrim, SQL::Function.new(:rtrim, f.args.first)))
         else
           super
         end

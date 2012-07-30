@@ -585,6 +585,15 @@ module Sequel
         SQL::Subscript.new(exp, subs.flatten)
       end
 
+      # Return an emulated function call for trimming a string of spaces from
+      # both sides (similar to ruby's String#strip).
+      #
+      #   Sequel.trim(:a) # trim(a) -- Most databases
+      #   Sequel.trim(:a) # ltrim(rtrim(a)) -- Microsoft SQL Server
+      def trim(arg)
+        SQL::EmulatedFunction.new(:trim, arg)
+      end
+
       # Return a <tt>SQL::ValueList</tt> created from the given array.  Used if the array contains
       # all two element arrays and you want it treated as an SQL value list (IN predicate) 
       # instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using
