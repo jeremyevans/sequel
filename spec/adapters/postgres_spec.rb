@@ -1811,8 +1811,8 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(h2.merge(h3).keys.pg_array.length).should == 2
     @ds.get(h1.merge(h3).keys.pg_array.length).should == 3
 
-    unless [:do, :swift].include?(@db.adapter_scheme)
-      # Broken DataObjects and Swift thinks operators with ? represent placeholders
+    unless [:do].include?(@db.adapter_scheme)
+      # Broken DataObjects thinks operators with ? represent placeholders
       @ds.get(h1.contain_all(Sequel.pg_array(%w'a c'))).should == true
       @ds.get(h1.contain_all(Sequel.pg_array(%w'a d'))).should == false
 
@@ -1836,7 +1836,7 @@ describe 'PostgreSQL hstore handling' do
 
     @ds.from(Sequel.hstore('a'=>'b', 'c'=>nil).op.each).order(:key).all.should == [{:key=>'a', :value=>'b'}, {:key=>'c', :value=>nil}]
 
-    unless [:do, :swift].include?(@db.adapter_scheme)
+    unless [:do].include?(@db.adapter_scheme)
       @ds.get(h1.has_key?('c')).should == true
       @ds.get(h1.include?('c')).should == true
       @ds.get(h1.key?('c')).should == true

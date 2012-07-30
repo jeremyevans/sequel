@@ -33,6 +33,7 @@ module Sequel
         # Extend the adapter with the Swift PostgreSQL AdapterMethods.
         def setup_connection(conn)
           conn = super(conn)
+          conn.native_bind_format = true
           connection_configuration_sqls.each{|sql| log_yield(sql){conn.execute(sql)}}
           conn
         end
