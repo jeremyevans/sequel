@@ -712,6 +712,20 @@ end
 END_MIG
   end
 
+  it "should convert mysql types to ruby types" do
+    types = ['double(15,2)', 'double(7,1) unsigned']
+    @d.meta_def(:schema) do |t, *o|
+      i = 0
+      types.map{|x| [:"c#{i+=1}", {:db_type=>x, :allow_null=>true}]}
+    end
+    @d.dump_table_schema(:x).should == (<<END_MIG).chomp
+create_table(:x) do
+  Float :c1
+  Float :c2
+end
+END_MIG
+  end
+
   it "should use separate primary_key call with non autoincrementable types" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'varchar(8)', :primary_key=>true}]]}
     @d.dump_table_schema(:t3).should == "create_table(:t3) do\n  String :c1, :size=>8\n  \n  primary_key [:c1]\nend"
