@@ -161,7 +161,7 @@ END_MIG
         {:type =>schema[:type] == :boolean ? TrueClass : Integer}
       when /\Abigint(?:\((?:\d+)\))?(?: unsigned)?\z/o
         {:type=>Bignum}
-      when /\A(?:real|float|double(?: precision)?)\z/o
+      when /\A(?:real|float|double(?: precision)?|double\(\d+,\d+\)(?: unsigned)?)\z/o
         {:type=>Float}
       when 'boolean'
         {:type=>TrueClass}
