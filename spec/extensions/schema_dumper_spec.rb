@@ -722,6 +722,8 @@ END_MIG
 create_table(:x) do
   Float :c1
   Float :c2
+  
+  check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c2), 0)
 end
 END_MIG
   end

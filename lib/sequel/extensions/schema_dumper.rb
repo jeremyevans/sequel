@@ -136,7 +136,7 @@ END_MIG
           gen.foreign_key(name, table, col_opts)
         else
           gen.column(name, type, col_opts)
-          if (type == Integer || type == Bignum) && schema[:db_type] =~ / unsigned\z/io
+          if [Integer, Bignum, Float].include?(type) && schema[:db_type] =~ / unsigned\z/io
             Sequel.extension :eval_inspect
             gen.check(Sequel::SQL::Identifier.new(name) >= 0)
           end

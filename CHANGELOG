@@ -1,6 +1,8 @@
 === HEAD
 
-* The swift adapters now require swift-db-* instead of swift itself (deepfryed, jeremyevans) (#526)
+* Sequel now recognizes the double(x, y) and double(x, y) unsigned MySQL types (Slike9, jeremyevans) (#528)
+
+* The swift subadapters now require swift-db-* instead of swift itself (deepfryed, jeremyevans) (#526)
 
 * Add :textsize option to tinytds adapter to override the default TEXTSIZE (jeremyevans, wardrop) (#525)
 
