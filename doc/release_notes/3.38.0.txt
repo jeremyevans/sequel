@@ -1,0 +1,234 @@
+= New Features
+
+* A pg_row extension has been added that supports PostgreSQL's
+  row-valued/composite types.  You can register support for
+  specific row types:
+
+    DB.register_row_type(:address)
+
+  Then you can create values of that row type:
+
+    ad = DB.row_type(:address, ['555 Foo St.', 'Bar City', '98765'])
+    # or
+    ad = DB.row_type(:address, :street=>'555 Foo St.',
+                          :city=>'Bar City', :zip=>'98765')
+
+  Which you can use in your datasets:
+
+    DB[:people].insert(:name=>'Me', :address=>ad)
+  
+  If you are using the native postgres adapter, when retreiving
+  row type values, they will be returned as instances of the row
+  type, which are hash-like objects:
+
+    ad = DB[:people].get(:address)
+    ad[:street] # => '555 Foo St.'
+    ad[:city]   # => 'Bar City'
+    ad[:zip]    # => '98765'
+
+  If you are also using the pg_array extension, then arrays of
+  composite types are supported automatically.  Composite
+  types can also include arrays of other types as well as other
+  composite types, though recursive composite types are not
+  allowed by PostgreSQL.
+
+  Using arrays and composite types brings one of the benefits
+  of document databases to PostgreSQL, allowing you to store
+  nested structures inside a single row.
+
+* A pg_row_ops extension has been added that adds DSL support
+  for accessing members of row-valued/composite types. You
+  first create a row op:
+
+    r = Sequel.pg_row_op(:row_column)
+
+  Then you can get DSL support for accessing members of that
+  row_column via the #[] method:
+
+    r[:a] # (row_column).a
+
+  This works with composite types containing composite types:
+
+    r[:a][:b] # ((row_column).a).b
+
+  When used in conjunction with the pg_array_ops extension,
+  there is support for composite types that include arrays,
+  as well as arrays of composite types:
+
+    r[1][:a] # (row_column[1]).a
+    r[:a][1] # (row_column).a[1]
+
+  The extension offers additional support for referencing
+  a table's type when it contains a column with the same
+  name, see the RDoc for details.
+
+* A pg_row plugin has been added, that works with the pg_row
+  extension, and allows you to represent row-valued types as
+  Sequel::Model objects (instead of the hash-like objects
+  they use by default).  In your model class, you load the
+  plugin:
+
+    class Address < Sequel::Model(:address)
+      plugin :pg_row
+    end
+
+  Then you can use Address instances in your datasets:
+  
+    ad = Address.new(:street=>'555 Foo St.',
+                     :city=>'Bar City', :zip=>'98765')
+    DB[:people].insert(:name=>'Me', :address=>ad)
+
+  And if you are using the native postgres adapter, the dataset
+  will return the type as a model instance:
+
+    ad = DB[:people].get(:address)
+    ad.street # => '555 Foo St.'
+    ad.city   # => 'Bar City'
+    ad.zip    # => '98765'
+ 
+* A pg_typecast_on_load plugin has been added.  This plugin is
+  designed for use with the jdbc/postgres, do/postgres, and
+  swift/postgres adapters, and it is similar to the
+  typecast_on_load plugin.  However, while the typecast_on_load
+  plugin uses setter methods, the pg_typecast_on_load plugin
+  uses the same code that the native postgres adapter uses for
+  typecasting.
+
+* The tinytds adapter now supports a :textsize option to override
+  the default TEXTSIZE setting.  The FreeTDS default is fairly
+  small (~64k), so if you want to use large blob or text columns,
+  you should probably set this to a value larger than the
+  largest text/blob you want to use.
+
+* Sequel.expr when called with a symbol now splits the symbol and
+  returns an Identifier, QualifiedIdentifier, or AliasedExpression, 
+  depending on the content of the symbol.  Previously, it only
+  wrapped the symbol using a Wrapper.
+
+* Identifier#* and QualifiedIdentifier#* when called without any
+  argument now represent a selection of all columns from the
+  represented table:
+
+    Sequel.expr(:table).*          # table.*
+    Sequel.expr(:schema__table).*  # schema.table.*
+
+  This makes it easier to represent the selection of all columns
+  in a table without using the core extensions.
+
+* Model#values now has a Model#to_hash alias.
+
+* SQL::Blob values now have as, cast, and lit methods even if the
+  core extensions are not loaded.
+
+= Other Improvements
+
+* When loading multiple pg_* extensions into a Database instance,
+  the conversion procs are only reset once instead of once per
+  extension.
+
+* All adapters that access PostgreSQL now store type conversion
+  procs, similar to the native postgres adapter.  This has been
+  added to make it easier to write extensions that support
+  advanced PostgreSQL types.
+
+* Database#schema output on PostgreSQL now includes the type oid
+  for each column.
+
+* You can now register custom array types to specific Database
+  instances, using the :type_procs and :typecast_methods_module
+  options, so it is now possible to have custom array types
+  without affecting global state.
+
+* Dropping of columns with defaults now works correctly on
+  Microsoft SQL Server.  Before, it would fail as the related
+  constraint was not dropped first.
+
+* The MySQL type "double(x,y)" is now recognized as a float type.
+
+* The jdbc/jtds and jdbc/derby adapters now handle nil prepared
+  statement values in more cases.
+
+* Blob prepared statement arguments are now handled correctly on
+  jdbc/db2 and jdbc/oracle.
+
+* Sequel now works around a Time#nsec bug in JRuby 1.6 ruby 1.9 mode
+  when using Time values in prepared statements in the jdbc adapter.
+
+* Java::JavaUtil::UUID types are now returned as ruby strings
+  when converting types in the jdbc adapter.
+
+* Real boolean literals are now used on derby 10.7+.  On derby <10.7
+  Sequel still uses (1 = 1) and (1 != 1) for true and false.  This
+  allows you to use boolean columns with a true/false default on
+  derby 10.7+.
+
+* Clobs are now treated as string types instead of blobs on derby,
+  since treating clob as blob doesn't work there.
+
+* The swift adapter now supports an output identifier method.
+
+* The swift adapter now returns blobs as SQL::Blob instances.
+
+* The schema_dumper extension no longer produces code that requires
+  the core extensions.
+
+* All of Sequel's specs now run without the core extensions loaded,
+  ensuring that none of the internals depend on the core extensions.
+  The only exception is the specs for the core extensions themselves.
+
+= Backwards Compatibility
+
+* The pg_* extensions no longer modify core classes if the
+  core_extensions extension is not loaded.  All methods they added now
+  have equivalent methods on the main Sequel module:
+
+    Sequel.pg_array
+    Sequel.pg_array_op
+    Sequel.hstore
+    Sequel.hstore_op
+    Sequel.pg_json
+    Sequel.pg_range
+    Sequel.pg_range_op
+
+* The Sequel::SQL::IdentifierMethods module has been removed.  This
+  module was only included in Symbol if the core_extensions were
+  enabled.  Since it only defined a single method, now the core
+  extensions just define that method directly on Symbol.
+
+* The swift adapter now requires swift-db-{postgres,mysql,sqlite3}
+  gems instead of the swift gem.  swift/postgres requires
+  swift-db-postgres 0.2.0+, swift/sqlite requires swift-db-sqlite
+  0.1.2+, and swift/mysql requires swift-db-mysql.
+
+* Sequel will no longer typecast a string to a PostgreSQL array
+  or hstore column in a model column setter.  This is because the
+  parsers that Sequel uses were designed to support only
+  PostgreSQL's output format.  It's unlikely that a user would
+  provide that format for typecasting, and while there aren't known
+  security issues with the parsers, they were not designed to handle
+  arbtirary user input, so typecasting from string is no longer
+  allowed and will now raise an error.
+
+  The only reason such typecasting was allowed in the first place
+  was to work around issues in the jdbc/postgres, do/postgres, and
+  swift/postgres adapters, using the the typecast_on_load plugin.
+  If you were previously using the typecast_on_load plugin for
+  hstore or array columns, you need to switch to using the new
+  pg_typecast_on_load plugin.
+
+* The private get_conversion_procs method in the postgres adapter
+  no longer accepts an argument.
+
+* The Sequel::Postgres::PGArray::DatabaseMethods singleton
+  define_array_typecast_method method has been removed.  This
+  method was designed for internal use.
+
+* The change to make Sequel.expr split symbols can cause the
+  following type of code to break:
+
+    Sequel.expr(:column___alias).desc
+
+  This is because expr now returns an AliasedExpression, which
+  doesn't support the desc method.  However, as you can't
+  apply an order to an aliased expression, nobody should be
+  relying on this.

@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.38.0 (2012-08-01)
 
 * Sequel now recognizes the double(x, y) and double(x, y) unsigned MySQL types (Slike9, jeremyevans) (#528)
 
