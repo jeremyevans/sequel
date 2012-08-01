@@ -23,6 +23,7 @@ describe "Core extensions" do
   before do
     db = Sequel::Database.new
     @d = db[:items]
+    def @d.supports_regexp?; true end
     def @d.l(*args, &block)
       literal(filter_expr(*args, &block))
     end

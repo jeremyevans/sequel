@@ -1,5 +1,15 @@
 === HEAD
 
+* Add constraint_validations plugin for automatic validations of constaints defined by extension (jeremyevans)
+
+* Add constraint_validations extension for defining database constraints similar to validations (jeremyevans)
+
+* Add Database#supports_regexp? for checking for regular expression support (jeremyevans)
+
+* Add Sequel.trim for cross platform trim function (jeremyevans)
+
+* Add Sequel.char_length for cross platform char_length function (jeremyevans)
+
 * Fixing caching of MySQL server version (hannesg) (#536)
 
 * Allow overriding the convert_tinyint_to_bool setting on a per-Dataset basis in the mysql and mysql2 adapters (jeremyevans)

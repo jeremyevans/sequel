@@ -248,6 +248,20 @@ module Sequel
         end
       end
 
+      # Oracle treats empty strings like NULL values, and doesn't support
+      # char_length, so make char_length use length with a nonempty string.
+      # Unfortunately, as Oracle treats the empty string as NULL, there is
+      # no way to get trim to return an empty string instead of nil if
+      # the string only contains spaces.
+      def emulated_function_sql_append(sql, f)
+        case f.f
+        when :char_length
+          literal_append(sql, Sequel::SQL::Function.new(:length, Sequel.join([f.args.first, 'x'])) - 1)
+        else
+          super
+        end
+      end
+      
       # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
       def except(dataset, opts={})
         opts = {:all=>opts} unless opts.is_a?(Hash)

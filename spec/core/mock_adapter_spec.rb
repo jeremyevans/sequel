@@ -446,4 +446,8 @@ describe "Sequel Mock Adapter" do
   specify "should stub out the primary_key method for postgres" do
     Sequel.mock(:host=>'postgres').primary_key(:t).should == :id
   end
+
+  specify "should handle creating tables on oracle" do
+    proc{Sequel.mock(:host=>'oracle').create_table(:a){String :b}}.should_not raise_error
+  end
 end

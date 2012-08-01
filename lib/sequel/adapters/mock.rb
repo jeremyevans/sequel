@@ -61,6 +61,11 @@ module Sequel
               :id
             end
           end)
+        end,
+        'oracle' => lambda do |db|
+          db.instance_eval do
+            @primary_key_sequences = {}
+          end
         end
       }
 
