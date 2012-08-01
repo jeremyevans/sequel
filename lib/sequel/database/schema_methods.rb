@@ -70,7 +70,7 @@ module Sequel
     def alter_table(name, generator=nil, &block)
       generator ||= alter_table_generator(&block)
       remove_cached_schema(name)
-      apply_alter_table(name, generator.operations)
+      apply_alter_table_generator(name, generator)
       nil
     end
 
@@ -336,6 +336,11 @@ module Sequel
       alter_table_sql_list(name, ops).flatten.each{|sql| execute_ddl(sql)}
     end
     
+    # Apply the operations in the given generator to the table given by name.
+    def apply_alter_table_generator(name, generator)
+      apply_alter_table(name, generator.operations)
+    end
+
     # The class used for alter_table generators.
     def alter_table_generator_class
       Schema::AlterTableGenerator
