@@ -232,10 +232,8 @@ module Sequel
             duplicate_table(table){|columns| columns.each{|s| s[:primary_key] = nil}}
           when :foreign_key
             duplicate_table(table, :no_foreign_keys=>true)
-          when :unique
-            duplicate_table(table)
           else
-            raise Error, "Unsupported :type option for drop_constraint: #{op[:type].inspect}"
+            duplicate_table(table)
           end
         when :add_constraint
           duplicate_table(table, :constraints=>[op])
