@@ -13,7 +13,7 @@ module Sequel
     # the column method, which makes for a nicer DSL.
     #
     # For more information on Sequel's support for schema modification, see
-    # the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
+    # the {"Schema Modification" guide}[link:files/doc/schema_modification_rdoc.html].
     class CreateTableGenerator
       # Classes specifying generic types that Sequel will convert to database-specific types.
       GENERIC_TYPES=[String, Integer, Fixnum, Bignum, Float, Numeric, BigDecimal,
@@ -270,7 +270,7 @@ module Sequel
     # alter a table's description.
     #
     # For more information on Sequel's support for schema modification, see
-    # the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
+    # the {"Schema Modification" guide}[link:files/doc/schema_modification_rdoc.html].
     class AlterTableGenerator
       # An array of DDL operations to perform
       attr_reader :operations
@@ -294,7 +294,7 @@ module Sequel
       # Add a constraint with the given name and args to the DDL for the table.
       # See CreateTableGenerator#constraint.
       #
-      #   add_constraint(:valid_name, :name.like('A%'))
+      #   add_constraint(:valid_name, Sequel.like(:name, 'A%'))
       #   # ADD CONSTRAINT valid_name CHECK (name LIKE 'A%')
       def add_constraint(name, *args, &block)
         @operations << {:op => :add_constraint, :name => name, :type => :check, :check => block || args}
