@@ -33,6 +33,7 @@ module Sequel
       CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}
       COLUMN_DEFINITION_ORDER = [:collate, :null, :default, :unique, :primary_key, :auto_increment, :references]
       PRIMARY = 'PRIMARY'.freeze
+      MYSQL_TIMESTAMP_RE = /\ACURRENT_(?:DATE|TIMESTAMP)?\z/
       
       # MySQL's cast rules are restrictive in that you can't just cast to any possible
       # database type.
@@ -214,6 +215,17 @@ module Sequel
         end
       end
 
+      # Handle MySQL specific default format.
+      def column_schema_to_ruby_default(default, type)
+        unless default.nil?
+          if column_schema_default_string_type?(type)
+            return if [:date, :datetime, :time].include?(type) && MYSQL_TIMESTAMP_RE.match(default)
+            default = "'#{default.gsub("'", "''").gsub('\\', '\\\\')}'"
+          end
+          super(default, type)
+        end
+      end
+
       # The SQL queries to execute on initial connection
       def mysql_connection_setting_sqls
         sqls = []
@@ -364,6 +376,16 @@ module Sequel
           log_connection_execute(conn, "XA END #{literal(s)}")
           log_connection_execute(conn, "XA PREPARE #{literal(s)}")
           log_connection_execute(conn, "XA ROLLBACK #{literal(s)}")
+        else
+          super
+        end
+      end
+
+      # Recognize MySQL set type.
+      def schema_column_type(db_type)
+        case db_type
+        when /\Aset/io
+          :set
         else
           super
         end

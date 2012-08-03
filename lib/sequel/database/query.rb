@@ -21,10 +21,8 @@ module Sequel
       :repeatable=>'REPEATABLE READ'.freeze,
       :serializable=>'SERIALIZABLE'.freeze}
     
-    POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/
-    MSSQL_DEFAULT_RE = /\A(?:\(N?('.*')\)|\(\((-?\d+(?:\.\d+)?)\)\))\z/
-    MYSQL_TIMESTAMP_RE = /\ACURRENT_(?:DATE|TIMESTAMP)?\z/
     STRING_DEFAULT_RE = /\A'(.*)'\z/
+    COLUMN_SCHEMA_STRING_TYPES = [:string, :blob, :date, :datetime, :time, :enum, :set, :interval]
 
     # The prepared statement object hash for this database, keyed by name symbol
     attr_reader :prepared_statements
@@ -390,26 +388,21 @@ module Sequel
       SQL_BEGIN
     end
 
+    # Whether the type should be treated as a string type when parsing the
+    # column schema default value.
+    def column_schema_default_string_type?(type)
+      COLUMN_SCHEMA_STRING_TYPES.include?(type)
+    end
+
     # Convert the given default, which should be a database specific string, into
     # a ruby object.
     def column_schema_to_ruby_default(default, type)
       return if default.nil?
-      orig_default = default
-      if database_type == :postgres and m = POSTGRES_DEFAULT_RE.match(default)
-        default = m[1] || m[2]
-      end
-      if database_type == :mssql and m = MSSQL_DEFAULT_RE.match(default)
-        default = m[1] || m[2]
-      end
-      if [:string, :blob, :date, :datetime, :time, :enum].include?(type)
-        if database_type == :mysql
-          return if [:date, :datetime, :time].include?(type) && MYSQL_TIMESTAMP_RE.match(default)
-          orig_default = default = "'#{default.gsub("'", "''").gsub('\\', '\\\\')}'"
-        end
+      if column_schema_default_string_type?(type)
         return unless m = STRING_DEFAULT_RE.match(default)
         default = m[1].gsub("''", "'")
       end
-      res = begin
+      begin
         case type
         when :boolean
           case default 
@@ -418,7 +411,7 @@ module Sequel
           when /[t1]/i
             true
           end
-        when :string, :enum
+        when :string, :enum, :set, :interval
           default
         when :blob
           Sequel::SQL::Blob.new(default)
@@ -568,8 +561,6 @@ module Sequel
     # such as :integer or :string.
     def schema_column_type(db_type)
       case db_type
-      when /\Ainterval\z/io
-        :interval
       when /\A(character( varying)?|n?(var)?char|n?text)/io
         :string
       when /\A(int(eger)?|(big|small|tiny)int)/io

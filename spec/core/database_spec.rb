@@ -2063,8 +2063,7 @@ end
 describe "Database#column_schema_to_ruby_default" do
   specify "should handle converting many default formats" do
     db = Sequel::Database.new
-    m = db.method(:column_schema_to_ruby_default)
-    p = lambda{|d,t| m.call(d,t)}
+    p = lambda{|d,t| db.send(:column_schema_to_ruby_default, d, t)}
     p[nil, :integer].should be_nil
     p['1', :integer].should == 1
     p['-1', :integer].should == -1
@@ -2092,7 +2091,7 @@ describe "Database#column_schema_to_ruby_default" do
     p["'10:20:30'", :time].should == Time.parse('10:20:30')
     p["NaN", :float].should be_nil
 
-    db.meta_def(:database_type){:postgres}
+    db = Sequel.mock(:host=>'postgres')
     p["''::text", :string].should == ""
     p["'\\a''b'::character varying", :string].should == "\\a'b"
     p["'a'::bpchar", :string].should == "a"
@@ -2105,7 +2104,7 @@ describe "Database#column_schema_to_ruby_default" do
     p["'2009-10-29 10:20:30.241343'::timestamp without time zone", :datetime].should == DateTime.parse('2009-10-29 10:20:30.241343')
     p["'10:20:30'::time without time zone", :time].should == Time.parse('10:20:30')
 
-    db.meta_def(:database_type){:mysql}
+    db = Sequel.mock(:host=>'mysql')
     p["\\a'b", :string].should == "\\a'b"
     p["a", :string].should == "a"
     p["NULL", :string].should == "NULL"
@@ -2117,8 +2116,9 @@ describe "Database#column_schema_to_ruby_default" do
     p["CURRENT_DATE", :date].should be_nil
     p["CURRENT_TIMESTAMP", :datetime].should be_nil
     p["a", :enum].should == "a"
+    p["a,b", :set].should == "a,b"
     
-    db.meta_def(:database_type){:mssql}
+    db = Sequel.mock(:host=>'mssql')
     p["(N'a')", :string].should == "a"
     p["((-12))", :integer].should == -12
     p["((12.1))", :float].should == 12.1

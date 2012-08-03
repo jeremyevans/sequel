@@ -77,9 +77,13 @@ end
 
 describe "A PostgreSQL dataset" do
   before do
-    @d = POSTGRES_DB[:test]
+    @db = POSTGRES_DB
+    @d = @db[:test]
     @d.delete
-    POSTGRES_DB.sqls.clear
+    @db.sqls.clear
+  end
+  after do
+    @db.drop_table?(:atest)
   end
 
   specify "should quote columns and tables using double quotes if quoting identifiers" do
@@ -130,68 +134,52 @@ describe "A PostgreSQL dataset" do
   end
 
   specify "should support exclusion constraints when creating or altering tables" do
-    begin
-      @db = POSTGRES_DB
-      @db.create_table!(:atest){Integer :t; exclude [[Sequel.desc(:t, :nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}}
-      @db[:atest].insert(1)
-      @db[:atest].insert(2)
-      proc{@db[:atest].insert(2)}.should raise_error(Sequel::DatabaseError)
+    @db.create_table!(:atest){Integer :t; exclude [[Sequel.desc(:t, :nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}}
+    @db[:atest].insert(1)
+    @db[:atest].insert(2)
+    proc{@db[:atest].insert(2)}.should raise_error(Sequel::DatabaseError)
 
-      @db.create_table!(:atest){Integer :t}
-      @db.alter_table(:atest){add_exclusion_constraint [[:t, '=']], :using=>:btree, :name=>'atest_ex'}
-      @db[:atest].insert(1)
-      @db[:atest].insert(2)
-      proc{@db[:atest].insert(2)}.should raise_error(Sequel::DatabaseError)
-      @db.alter_table(:atest){drop_constraint 'atest_ex'}
-    ensure
-      @db.drop_table?(:atest)
-    end
+    @db.create_table!(:atest){Integer :t}
+    @db.alter_table(:atest){add_exclusion_constraint [[:t, '=']], :using=>:btree, :name=>'atest_ex'}
+    @db[:atest].insert(1)
+    @db[:atest].insert(2)
+    proc{@db[:atest].insert(2)}.should raise_error(Sequel::DatabaseError)
+    @db.alter_table(:atest){drop_constraint 'atest_ex'}
   end if POSTGRES_DB.server_version >= 90000
 
   specify "should support adding foreign key constarints that are not yet valid, and validating them later" do
-    begin
-      @db = POSTGRES_DB
-      @db.create_table!(:atest){primary_key :id; Integer :fk}
-      @db[:atest].insert(1, 5)
-      @db.alter_table(:atest){add_foreign_key [:fk], :atest, :not_valid=>true, :name=>:atest_fk}
-      @db[:atest].insert(2, 1)
-      proc{@db[:atest].insert(3, 4)}.should raise_error(Sequel::DatabaseError)
+    @db.create_table!(:atest){primary_key :id; Integer :fk}
+    @db[:atest].insert(1, 5)
+    @db.alter_table(:atest){add_foreign_key [:fk], :atest, :not_valid=>true, :name=>:atest_fk}
+    @db[:atest].insert(2, 1)
+    proc{@db[:atest].insert(3, 4)}.should raise_error(Sequel::DatabaseError)
 
-      proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.should raise_error(Sequel::DatabaseError)
-      @db[:atest].where(:id=>1).update(:fk=>2)
-      @db.alter_table(:atest){validate_constraint :atest_fk}
-      proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.should_not raise_error
-    ensure
-      @db.drop_table?(:atest)
-    end
+    proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.should raise_error(Sequel::DatabaseError)
+    @db[:atest].where(:id=>1).update(:fk=>2)
+    @db.alter_table(:atest){validate_constraint :atest_fk}
+    proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.should_not raise_error
   end if POSTGRES_DB.server_version >= 90200
 
   specify "should support :using when altering a column's type" do
-    begin
-      @db = POSTGRES_DB
-      @db.create_table!(:atest){Integer :t}
-      @db[:atest].insert(1262304000)
-      @db.alter_table(:atest){set_column_type :t, Time, :using=>Sequel.cast('epoch', Time) + Sequel.cast('1 second', :interval) * :t}
-      @db[:atest].get(Sequel.extract(:year, :t)).should == 2010
-    ensure
-      @db.drop_table?(:atest)
-    end
+    @db.create_table!(:atest){Integer :t}
+    @db[:atest].insert(1262304000)
+    @db.alter_table(:atest){set_column_type :t, Time, :using=>Sequel.cast('epoch', Time) + Sequel.cast('1 second', :interval) * :t}
+    @db[:atest].get(Sequel.extract(:year, :t)).should == 2010
   end
 
   specify "should support :using with a string when altering a column's type" do
-    begin
-      @db = POSTGRES_DB
-      @db.create_table!(:atest){Integer :t}
-      @db[:atest].insert(1262304000)
-      @db.alter_table(:atest){set_column_type :t, Time, :using=>"'epoch'::timestamp + '1 second'::interval * t"}
-      @db[:atest].get(Sequel.extract(:year, :t)).should == 2010
-    ensure
-      @db.drop_table?(:atest)
-    end
+    @db.create_table!(:atest){Integer :t}
+    @db[:atest].insert(1262304000)
+    @db.alter_table(:atest){set_column_type :t, Time, :using=>"'epoch'::timestamp + '1 second'::interval * t"}
+    @db[:atest].get(Sequel.extract(:year, :t)).should == 2010
+  end
+
+  specify "should be able to parse the default value for an interval type" do
+    @db.create_table!(:atest){interval :t, :default=>'1 week'}
+    @db.schema(:atest).first.last[:ruby_default].should == '7 days'
   end
 
   specify "should have #transaction support various types of synchronous options" do
-    @db = POSTGRES_DB
     @db.transaction(:synchronous=>:on){}
     @db.transaction(:synchronous=>true){}
     @db.transaction(:synchronous=>:off){}
@@ -216,7 +204,6 @@ describe "A PostgreSQL dataset" do
   end
 
   specify "should have #transaction support read only transactions" do
-    @db = POSTGRES_DB
     @db.transaction(:read_only=>true){}
     @db.transaction(:read_only=>false){}
     @db.transaction(:isolation=>:serializable, :read_only=>true){}
@@ -225,7 +212,6 @@ describe "A PostgreSQL dataset" do
   end
 
   specify "should have #transaction support deferrable transactions" do
-    @db = POSTGRES_DB
     @db.transaction(:deferrable=>true){}
     @db.transaction(:deferrable=>false){}
     @db.transaction(:deferrable=>true, :read_only=>true){}
@@ -236,43 +222,42 @@ describe "A PostgreSQL dataset" do
   end if POSTGRES_DB.server_version >= 90100
 
   specify "should support creating indexes concurrently" do
-    POSTGRES_DB.sqls.clear
-    POSTGRES_DB.add_index :test, [:name, :value], :concurrently=>true
-    POSTGRES_DB.sqls.should == ['CREATE INDEX CONCURRENTLY "test_name_value_index" ON "test" ("name", "value")'] if check_sqls
+    @db.add_index :test, [:name, :value], :concurrently=>true
+    @db.sqls.should == ['CREATE INDEX CONCURRENTLY "test_name_value_index" ON "test" ("name", "value")'] if check_sqls
   end
 
   specify "should support dropping indexes only if they already exist" do
-    POSTGRES_DB.add_index :test, [:name, :value], :name=>'tnv1'
-    POSTGRES_DB.sqls.clear
-    POSTGRES_DB.drop_index :test, [:name, :value], :if_exists=>true, :name=>'tnv1'
-    POSTGRES_DB.sqls.should == ['DROP INDEX IF EXISTS "tnv1"']
+    @db.add_index :test, [:name, :value], :name=>'tnv1'
+    @db.sqls.clear
+    @db.drop_index :test, [:name, :value], :if_exists=>true, :name=>'tnv1'
+    @db.sqls.should == ['DROP INDEX IF EXISTS "tnv1"']
   end
 
   specify "should support CASCADE when dropping indexes" do
-    POSTGRES_DB.add_index :test, [:name, :value], :name=>'tnv2'
-    POSTGRES_DB.sqls.clear
-    POSTGRES_DB.drop_index :test, [:name, :value], :cascade=>true, :name=>'tnv2'
-    POSTGRES_DB.sqls.should == ['DROP INDEX "tnv2" CASCADE']
+    @db.add_index :test, [:name, :value], :name=>'tnv2'
+    @db.sqls.clear
+    @db.drop_index :test, [:name, :value], :cascade=>true, :name=>'tnv2'
+    @db.sqls.should == ['DROP INDEX "tnv2" CASCADE']
   end
 
   specify "should support dropping indexes concurrently" do
-    POSTGRES_DB.add_index :test, [:name, :value], :name=>'tnv2'
-    POSTGRES_DB.sqls.clear
-    POSTGRES_DB.drop_index :test, [:name, :value], :concurrently=>true, :name=>'tnv2'
-    POSTGRES_DB.sqls.should == ['DROP INDEX CONCURRENTLY "tnv2"']
+    @db.add_index :test, [:name, :value], :name=>'tnv2'
+    @db.sqls.clear
+    @db.drop_index :test, [:name, :value], :concurrently=>true, :name=>'tnv2'
+    @db.sqls.should == ['DROP INDEX CONCURRENTLY "tnv2"']
   end if POSTGRES_DB.server_version >= 90200
 
   specify "#lock should lock table if inside a transaction" do
-    POSTGRES_DB.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}
+    @db.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}
   end
 
   specify "#lock should return nil" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}.should == nil
-    POSTGRES_DB.transaction{@d.lock('EXCLUSIVE').should == nil; @d.insert(:name=>'a')}
+    @db.transaction{@d.lock('EXCLUSIVE').should == nil; @d.insert(:name=>'a')}
   end
 
   specify "should raise an error if attempting to update a joined dataset with a single FROM table" do
-    proc{POSTGRES_DB[:test].join(:test2, [:name]).update(:name=>'a')}.should raise_error(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
+    proc{@db[:test].join(:test2, [:name]).update(:name=>'a')}.should raise_error(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
   end
 
   specify "should truncate with options" do

@@ -12,6 +12,7 @@ module Sequel
       SQL_ROLLBACK = "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION".freeze
       SQL_ROLLBACK_TO_SAVEPOINT = 'IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION autopoint_%d'.freeze
       SQL_SAVEPOINT = 'SAVE TRANSACTION autopoint_%d'.freeze
+      MSSQL_DEFAULT_RE = /\A(?:\(N?('.*')\)|\(\((-?\d+(?:\.\d+)?)\)\))\z/
       
       # Whether to use N'' to quote strings, which allows unicode characters inside the
       # strings.  True by default for compatibility, can be set to false for a possible
@@ -158,6 +159,16 @@ module Sequel
         SQL_BEGIN
       end
       
+      # Handle MSSQL specific default format.
+      def column_schema_to_ruby_default(default, type)
+        unless default.nil?
+          if m = MSSQL_DEFAULT_RE.match(default)
+            default = m[1] || m[2]
+          end
+          super(default, type)
+        end
+      end
+
       # Commit the active transaction on the connection, does not commit/release
       # savepoints.
       def commit_transaction(conn, opts={})

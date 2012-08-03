@@ -96,6 +96,7 @@ module Sequel
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
       FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'.freeze=>:no_action, 'r'.freeze=>:restrict, 'c'.freeze=>:cascade, 'n'.freeze=>:set_null, 'd'.freeze=>:set_default}.freeze
+      POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/
 
       # SQL fragment for custom sequences (ones not created by serial primary key),
       # Returning the schema and literal form of the sequence name, by parsing
@@ -549,6 +550,16 @@ module Sequel
         end
       end
       
+      # Handle PostgreSQL specific default format.
+      def column_schema_to_ruby_default(default, type)
+        unless default.nil?
+          if m = POSTGRES_DEFAULT_RE.match(default)
+            default = m[1] || m[2]
+          end
+          super(default, type)
+        end
+      end
+
       # If the :prepare option is given and we aren't in a savepoint,
       # prepare the transaction for a two-phase commit.
       def commit_transaction(conn, opts={})
@@ -754,6 +765,16 @@ module Sequel
       # using a nextval function call as a default.
       def schema_autoincrementing_primary_key?(schema)
         super && schema[:default] =~ /\Anextval/io
+      end
+
+      # Recognize PostgreSQL interval type.
+      def schema_column_type(db_type)
+        case db_type
+        when /\Ainterval\z/io
+          :interval
+        else
+          super
+        end
       end
 
       # The dataset used for parsing table schemas, using the pg_* system catalogs.

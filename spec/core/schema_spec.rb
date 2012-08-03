@@ -1251,11 +1251,13 @@ describe "Schema Parser" do
   end
 
   specify "should correctly parse all supported data types" do
-    @db.meta_def(:schema_parse_table) do |t, opts|
-      [[:x, {:type=>schema_column_type(t.to_s)}]]
+    sm = Module.new do
+      def schema_parse_table(t, opts)
+        [[:x, {:type=>schema_column_type(t.to_s)}]]
+      end
     end
+    @db.extend(sm)
     @db.schema(:tinyint).first.last[:type].should == :integer
-    @db.schema(:interval).first.last[:type].should == :interval
     @db.schema(:int).first.last[:type].should == :integer
     @db.schema(:integer).first.last[:type].should == :integer
     @db.schema(:bigint).first.last[:type].should == :integer
@@ -1277,6 +1279,7 @@ describe "Schema Parser" do
     @db.schema(:real).first.last[:type].should == :float
     @db.schema(:float).first.last[:type].should == :float
     @db.schema(:double).first.last[:type].should == :float
+    @db.schema(:"double(1,2)").first.last[:type].should == :float
     @db.schema(:"double precision").first.last[:type].should == :float
     @db.schema(:number).first.last[:type].should == :decimal
     @db.schema(:numeric).first.last[:type].should == :decimal
@@ -1296,5 +1299,13 @@ describe "Schema Parser" do
     @db.schema(:binary).first.last[:type].should == :blob
     @db.schema(:varbinary).first.last[:type].should == :blob
     @db.schema(:enum).first.last[:type].should == :enum
+
+    @db = Sequel.mock(:host=>'postgres')
+    @db.extend(sm)
+    @db.schema(:interval).first.last[:type].should == :interval
+
+    @db = Sequel.mock(:host=>'mysql')
+    @db.extend(sm)
+    @db.schema(:set).first.last[:type].should == :set
   end
 end

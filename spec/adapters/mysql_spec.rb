@@ -86,6 +86,13 @@ describe "MySQL", '#create_table' do
     @db[:dolls].insert
     @db[:dolls].select_map(:name).should == ["foo"]
   end
+
+  specify "should be able to parse the default value for set and enum types" do
+    @db.create_table!(:dolls){column :t, "set('a', 'b', 'c', 'd')", :default=>'a,b'}
+    @db.schema(:dolls).first.last[:ruby_default].should == 'a,b'
+    @db.create_table!(:dolls){column :t, "enum('a', 'b', 'c', 'd')", :default=>'b'}
+    @db.schema(:dolls).first.last[:ruby_default].should == 'b'
+  end
 end
 
 describe "A MySQL database" do
