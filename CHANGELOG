@@ -1,5 +1,7 @@
 === HEAD
 
+* Make identity_map plugin work with models lacking a primary key (jeremyevans)
+
 * Recognize MySQL set type and default value (jeremyevans) (#529)
 
 === 3.38.0 (2012-08-01)

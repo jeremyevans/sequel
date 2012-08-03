@@ -153,7 +153,8 @@ module Sequel
         # The identity map key for an object of the current class with the given pk.
         # May not always be correct for a class which uses STI.
         def identity_map_key(pk)
-          "#{self}:#{pk ? Array(pk).join(',') : "nil:#{rand}"}"
+          pk = Array(pk)
+          "#{self}:#{pk.join(',')}" unless pk.compact.empty?
         end
 
         # If the identity map is in use, check it for a current copy of the object.
@@ -164,12 +165,14 @@ module Sequel
         # fields and request other, potentially overlapping fields in a new query,
         # and not have the second query override fields you modified.
         def call(row)
-          return super unless idm = identity_map
-          if o = idm[identity_map_key(Array(primary_key).map{|x| row[x]})]
+          return super unless (idm = identity_map) && (pk = primary_key)
+          if (k = identity_map_key(Array(pk).map{|x| row[x]})) && (o = idm[k])
             o.merge_db_update(row)
           else
             o = super
-            idm[identity_map_key(o.pk)] = o
+            if (k = identity_map_key(o.pk))
+              idm[k] = o
+            end
           end
           o
         end
@@ -196,7 +199,7 @@ module Sequel
         # Check the current identity map if it exists for the object with
         # the matching pk.  If one is found, return it, otherwise call super.
         def primary_key_lookup(pk)
-          (idm = identity_map and o = idm[identity_map_key(pk)]) ? o : super
+          ((idm = identity_map) && (k = identity_map_key(pk)) && (o = idm[k])) ? o : super
         end
       end
 
@@ -204,8 +207,8 @@ module Sequel
         # Remove instances from the identity map cache if they are deleted.
         def delete
           super
-          if idm = model.identity_map
-            idm.delete(model.identity_map_key(pk))
+          if (idm = model.identity_map) && (k = model.identity_map_key(pk))
+            idm.delete(k)
           end
           self
         end
@@ -239,7 +242,8 @@ module Sequel
           if cache_lookup &&
             !dynamic_opts[:callback] &&
             (idm = klass.identity_map) &&
-            (o = idm[klass.identity_map_key(_associated_object_pk(opts[:key]))])
+            (k = klass.identity_map_key(_associated_object_pk(opts[:key]))) && 
+            (o = idm[k])
             o
           else
             super

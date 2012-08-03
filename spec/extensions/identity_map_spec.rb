@@ -55,8 +55,17 @@ describe "Sequel::Plugins::IdentityMap" do
     @c.identity_map_key(1).should_not == @c.identity_map_key(2)
   end
 
-  it "#identity_map_key should be different if the pk is nil" do
-    @c.identity_map_key(nil).should_not == @c.identity_map_key(nil)
+  it "#identity_map_key should be nil for an empty pk values" do
+    @c.identity_map_key(nil).should == nil
+    @c.identity_map_key([]).should == nil
+    @c.identity_map_key([nil]).should == nil
+  end
+
+  it "#load should work even if model doesn't have a primary key" do
+    c = Class.new(@c)
+    c.no_primary_key
+    proc{c.with_identity_map{c.load({})}}.should_not raise_error
+    c.with_identity_map{c.load({}).should_not equal(c.load({}))}
   end
 
   it "#load should return an object if there is no current identity map" do
