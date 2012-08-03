@@ -112,6 +112,21 @@ module Sequel
         end
       end
 
+      # Use the (identifier).* syntax to reference the members
+      # of the composite type as separate columns.  Generally
+      # used when you want to expand the columns of a composite
+      # type to be separate columns in the result set.
+      #
+      #   Sequel.pg_row_op(:a).*     # (a).*
+      #   Sequel.pg_row_op(:a)[:b].* # ((a).b).*
+      def *(ce=(arg=false;nil))
+        if arg == false
+          Sequel::SQL::ColumnAll.new([self])
+        else
+          super(ce)
+        end
+      end
+
       # Use the (identifier.*) syntax to indicate that this
       # expression represents the composite type of one
       # of the tables being referenced, if it has the same
@@ -120,6 +135,9 @@ module Sequel
       # (which should be a symbol representing the composite type).
       # This is used if you want to return whole table row as a
       # composite type.
+      #
+      #   Sequel.pg_row_op(:a).splat[:b] # (a.*).b
+      #   Sequel.pg_row_op(:a).splat(:a) # (a.*)::a
       def splat(cast_to=nil)
         if args.length > 1
           raise Error, 'cannot splat a PGRowOp with multiple arguments'

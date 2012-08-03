@@ -2348,6 +2348,7 @@ end if ((require 'active_support/duration'; require 'active_support/inflector'; 
 describe 'PostgreSQL row-valued/composite types' do
   before(:all) do
     @db = POSTGRES_DB
+    Sequel.extension :pg_array_ops, :pg_row_ops
     @db.extension :pg_array, :pg_row
     @ds = @db[:person]
 
@@ -2435,7 +2436,6 @@ describe 'PostgreSQL row-valued/composite types' do
   end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'operations/functions with pg_row_ops' do
-    Sequel.extension :pg_row_ops, :pg_array_ops
     @ds.insert(:id=>1, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))
     @ds.get(Sequel.pg_row(:address)[:street]).should == '123 Sesame St'
     @ds.get(Sequel.pg_row(:address)[:city]).should == 'Somewhere'
@@ -2453,6 +2453,45 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:street]).should == '123 Sesame St'
     @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:city]).should == 'Somewhere'
     @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:zip]).should == '12345'
+  end
+
+  context "#splat and #*" do
+    before(:all) do
+      @db.create_table!(:a){Integer :a}
+      @db.create_table!(:b){a :b; Integer :a}
+      @db.register_row_type(:a)
+      @db.register_row_type(:b)
+      @db[:b].insert(:a=>1, :b=>@db.row_type(:a, [2]))
+    end
+    after(:all) do
+      @db.drop_table?(:b, :a)
+    end
+
+    specify "splat should reference the table type" do
+      @db[:b].select(:a).first.should == {:a=>1}
+      @db[:b].select(:b__a).first.should == {:a=>1}
+      @db[:b].select(Sequel.pg_row(:b)[:a]).first.should == {:a=>2}
+      @db[:b].select(Sequel.pg_row(:b).splat[:a]).first.should == {:a=>1}
+
+      if @native
+        @db[:b].select(:b).first.should == {:b=>{:a=>2}}
+        @db[:b].select(Sequel.pg_row(:b).splat).first.should == {:a=>1, :b=>{:a=>2}}
+        @db[:b].select(Sequel.pg_row(:b).splat(:b)).first.should == {:b=>{:a=>1, :b=>{:a=>2}}}
+      end
+    end
+
+    specify "* should expand the table type into separate columns" do
+      ds = @db[:b].select(Sequel.pg_row(:b).splat(:b)).from_self(:alias=>:t)
+      if @native
+        ds.first.should == {:b=>{:a=>1, :b=>{:a=>2}}}
+        ds.select(Sequel.pg_row(:b).*).first.should == {:a=>1, :b=>{:a=>2}}
+        ds.select(Sequel.pg_row(:b)[:b]).first.should == {:b=>{:a=>2}}
+        ds.select(Sequel.pg_row(:t__b).*).first.should == {:a=>1, :b=>{:a=>2}}
+        ds.select(Sequel.pg_row(:t__b)[:b]).first.should == {:b=>{:a=>2}}
+      end
+      ds.select(Sequel.pg_row(:b)[:a]).first.should == {:a=>1}
+      ds.select(Sequel.pg_row(:t__b)[:a]).first.should == {:a=>1}
+    end
   end
 
   context "with models" do

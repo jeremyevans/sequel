@@ -22,7 +22,7 @@ describe "Sequel::Postgres::PGRowOp" do
     @db.literal(@a[1][:b]).should == "(a[1]).b"
   end
 
-  it "#splat should return a splatted argument" do
+  it "#splat should return a splatted argument inside parentheses" do
     @db.literal(@a.splat).should == "(a.*)"
   end
 
@@ -32,6 +32,16 @@ describe "Sequel::Postgres::PGRowOp" do
 
   it "#splat should not work on an already accessed composite type" do
     proc{@a[:a].splat(:b)}.should raise_error(Sequel::Error)
+  end
+
+  it "#* should reference all members of the composite type as separate columns if given no arguments" do
+    @db.literal(@a.*).should == "(a).*"
+    @db.literal(@a[:b].*).should == "((a).b).*"
+  end
+
+  it "#* should use a multiplication operation if any arguments are given" do
+    @db.literal(@a.*(1)).should == "(a * 1)"
+    @db.literal(@a[:b].*(1)).should == "((a).b * 1)"
   end
 
   it "#pg_row should be callable on literal strings" do
