@@ -588,7 +588,7 @@ module Sequel
         $1 && ['0', 'false'].include?($1) ? :integer : :decimal
       when /bytea|[bc]lob|image|(var)?binary/io
         :blob
-      when /\Aenum/io
+      when /\A(enum|set)/io
         :enum
       end
     end
