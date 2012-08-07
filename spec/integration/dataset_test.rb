@@ -428,6 +428,9 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
     @ds2.insert(:number=>10)
     @ds2.insert(:number=>30)
   end
+  after do
+    INTEGRATION_DB.drop_table?(:i1, :i2, :i3)
+  end
   
   specify "should give the correct results for simple UNION, EXCEPT, and INTERSECT" do
     @ds1.union(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'10 20 30'
