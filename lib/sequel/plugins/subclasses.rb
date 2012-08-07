@@ -15,13 +15,27 @@ module Sequel
     #   sc2.subclasses  # []
     #   ssc1.subclasses # []
     #   c.descendents   # [sc1, ssc1, sc2]
+    #
+    # You can provide a block when loading the plugin, and it will be called
+    # with each subclass created:
+    #
+    #   a = []
+    #   Sequel::Model.plugin(:subclasses){|sc| a << sc}
+    #   class A < Sequel::Model; end
+    #   class B < Sequel::Model; end
+    #   a # => [A, B]
     module Subclasses
       # Initialize the subclasses instance variable for the model.
-      def self.apply(model)
+      def self.apply(model, &block)
         model.instance_variable_set(:@subclasses, [])
+        model.instance_variable_set(:@on_subclass, block)
       end
 
       module ClassMethods
+        # Callable object that should be called with every descendent
+        # class created.
+        attr_reader :on_subclass
+
         # All subclasses for the current model.  Does not
         # include the model itself.
         attr_reader :subclasses
@@ -38,6 +52,10 @@ module Sequel
           super
           Sequel.synchronize{subclasses << subclass}
           subclass.instance_variable_set(:@subclasses, [])
+          if on_subclass
+            subclass.instance_variable_set(:@on_subclass, on_subclass)
+            on_subclass.call(subclass)
+          end
         end
 
         private

@@ -49,4 +49,18 @@ describe Sequel::Model, "Subclasses plugin" do
     ssc1.descendents.should == [sssc1]
     sssc1.descendents.should == []
   end
+
+  specify "plugin block should be called with each subclass created" do
+    c = Class.new(Sequel::Model)
+    a = []
+    c.plugin(:subclasses){|sc| a << sc}
+    sc1 = Class.new(c)
+    a.should == [sc1]
+    sc2 = Class.new(c)
+    a.should == [sc1, sc2]
+    sc3 = Class.new(sc1)
+    a.should == [sc1, sc2, sc3]
+    sc4 = Class.new(sc3)
+    a.should == [sc1, sc2, sc3, sc4]
+  end
 end
