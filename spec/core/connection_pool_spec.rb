@@ -365,6 +365,28 @@ shared_examples_for "A threaded connection pool" do
       Thread.new{@pool.hold{|cc2| cc2.should == c}}
     end
   end
+
+  specify "should not store connections if :connection_handling=>:disconnect" do
+    @pool = Sequel::ConnectionPool.get_pool(@cp_opts.merge(:connection_handling=>:disconnect)){@invoked_count += 1}
+    d = []
+    @pool.disconnection_proc = proc{|c| d << c}
+    c = @pool.hold do |cc|
+      cc.should == 1
+      Thread.new{@pool.hold{|cc2| cc2.should == 2}}.join
+      d.should == [2]
+      @pool.hold{|cc3| cc3.should == 1}
+    end
+    @pool.size.should == 0
+    d.should == [2, 1]
+
+    @pool.hold{|cc| cc.should == 3}
+    @pool.size.should == 0
+    d.should == [2, 1, 3]
+
+    @pool.hold{|cc| cc.should == 4}
+    @pool.size.should == 0
+    d.should == [2, 1, 3, 4]
+  end
 end
 
 describe "Threaded Unsharded Connection Pool" do

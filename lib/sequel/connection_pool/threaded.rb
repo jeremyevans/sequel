@@ -27,7 +27,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     @max_size = Integer(opts[:max_connections] || 4)
     raise(Sequel::Error, ':max_connections must be positive') if @max_size < 1
     @mutex = Mutex.new  
-    @queue = opts[:connection_handling] == :queue
+    @connection_handling = opts[:connection_handling]
     @available_connections = []
     @allocated = {}
     @timeout = Integer(opts[:pool_timeout] || 5)
@@ -157,10 +157,15 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # Releases the connection assigned to the supplied thread back to the pool.
   # The calling code should already have the mutex before calling this.
   def release(thread)
-    if @queue
-      @available_connections.unshift(@allocated.delete(thread))
+    conn = @allocated.delete(thread)
+
+    case @connection_handling
+    when :queue
+      @available_connections.unshift(conn)
+    when :disconnect
+      @disconnection_proc.call(conn) if @disconnection_proc
     else
-      @available_connections << @allocated.delete(thread)
+      @available_connections << conn
     end
   end
 

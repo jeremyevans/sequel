@@ -221,10 +221,15 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     if @connections_to_remove.include?(conn)
       remove(thread, conn, server)
     else
-      if @queue
-        available_connections(server).unshift(allocated(server).delete(thread))
+      conn = allocated(server).delete(thread)
+
+      case @connection_handling
+      when :queue
+        available_connections(server).unshift(conn)
+      when :disconnect
+        @disconnection_proc.call(conn) if @disconnection_proc
       else
-        available_connections(server) << allocated(server).delete(thread)
+        available_connections(server) << conn
       end
     end
   end
