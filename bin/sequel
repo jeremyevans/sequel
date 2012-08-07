@@ -4,6 +4,7 @@ require 'rubygems'
 require 'optparse'
 require 'sequel'
 
+code = nil
 copy_databases = nil
 dump_migration = nil
 dump_schema = nil
@@ -18,7 +19,7 @@ loggers = []
 
 opts = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
-  opts.define_head "Usage: sequel <uri|path> [options]"
+  opts.define_head "Usage: sequel [options] <uri|path> [file]"
   opts.separator ""
   opts.separator "Examples:"
   opts.separator "  sequel sqlite://blog.db"
@@ -34,6 +35,11 @@ opts = OptionParser.new do |opts|
     exit
   end
 
+  opts.on("-c", "--code CODE", "run the given code and exit") do  |v|
+    code = v
+    exclusive_options << :c
+  end
+  
   opts.on("-C", "--copy-databases", "copy one database to another") do 
     copy_databases = true
   end
@@ -83,7 +89,7 @@ opts = OptionParser.new do |opts|
     test = false
   end
 
-  opts.on("-r", "--require lib", "require the library, before executing your script") do |v|
+  opts.on("-r", "--require LIB", "require the library, before executing your script") do |v|
     load_dirs << [v]
   end
 
@@ -205,6 +211,10 @@ begin
       puts "Primary key sequences reset successfully"
     end
     puts "Database copy finished in #{Time.now - start_time} seconds"
+    exit
+  end
+  if code
+    eval(code)
     exit
   end
 rescue => e

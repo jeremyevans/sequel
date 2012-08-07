@@ -1,5 +1,7 @@
 === HEAD
 
+* Add bin/sequel -c support, for running code string instead of using an IRB prompt (jeremyevans)
+
 * Allow subclasses plugin to take a block, which is called with all subclasses created (jeremyevans)
 
 * Add :where option to validates_unique, for custom uniqueness filters (jeremyevans)
