@@ -340,7 +340,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
 
     ds1 = @c.dataset.filter([[:username, '0records']])
     ds2 = ds1.exclude(:id=>1)
-    @c.dataset.should_receive(:filter).with([[:username, '0records']]).twice.and_return(ds1)
+    @c.dataset.should_receive(:where).with([[:username, '0records']]).twice.and_return(ds1)
     ds1.should_receive(:exclude).with(:id=>1).once.and_return(ds2)
 
     @user = @c.load(:id=>1, :username => "0records", :password => "anothertest")
@@ -378,7 +378,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
 
     ds1 = @c.dataset.filter([[:username, '0records'], [:password, 'anothertest']])
     ds2 = ds1.exclude(:id=>1)
-    @c.dataset.should_receive(:filter).with([[:username, '0records'], [:password, 'anothertest']]).twice.and_return(ds1)
+    @c.dataset.should_receive(:where).with([[:username, '0records'], [:password, 'anothertest']]).twice.and_return(ds1)
     ds1.should_receive(:exclude).with(:id=>1).once.and_return(ds2)
 
     @user = @c.load(:id=>1, :username => "0records", :password => "anothertest")
