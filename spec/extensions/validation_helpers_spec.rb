@@ -402,6 +402,19 @@ describe "Sequel::Plugins::ValidationHelpers" do
                     "SELECT COUNT(*) AS count FROM items WHERE ((username = '0records') AND active AND (id != 3)) LIMIT 1"]
   end
 
+  it "should support validates_unique with a custom filter" do
+    @c.columns(:id, :username, :password)
+    @c.set_dataset MODEL_DB[:items]
+    @c.set_validations{validates_unique(:username, :where=>proc{|ds, obj, cols| ds.where(cols.map{|c| [Sequel.function(:lower, c), obj.send(c).downcase]})})}
+    @c.dataset._fetch = {:v=>0}
+    
+    MODEL_DB.reset
+    @c.new(:username => "0RECORDS", :password => "anothertest").should be_valid
+    @c.load(:id=>3, :username => "0RECORDS", :password => "anothertest").should be_valid
+    MODEL_DB.sqls.should == ["SELECT COUNT(*) AS count FROM items WHERE (lower(username) = '0records') LIMIT 1",
+                    "SELECT COUNT(*) AS count FROM items WHERE ((lower(username) = '0records') AND (id != 3)) LIMIT 1"]
+  end
+
   it "should support :only_if_modified option for validates_unique, and not check uniqueness for existing records if values haven't changed" do
     @c.columns(:id, :username, :password)
     @c.set_dataset MODEL_DB[:items]

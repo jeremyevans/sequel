@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :where option to validates_unique, for custom uniqueness filters (jeremyevans)
+
 * Add :connection_handling=>:disconnect option for threaded connection pools (jeremyevans)
 
 * Add Postgres::PGRowOp#* for referencing the members of the composite type as separate columns (jeremyevans)
