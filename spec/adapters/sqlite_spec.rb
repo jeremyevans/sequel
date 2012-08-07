@@ -18,6 +18,7 @@ describe "An SQLite database" do
     @fk = @db.foreign_keys
   end
   after do
+    @db.drop_table?(:fk)
     @db.foreign_keys = @fk
     @db.case_sensitive_like = true
     Sequel.datetime_class = Time
@@ -74,16 +75,14 @@ describe "An SQLite database" do
     @db.foreign_keys = false
   end
   
-  if SQLITE_DB.sqlite_version >= 30619
-    specify "should enforce foreign key integrity if foreign_keys pragma is set" do
-      @db.foreign_keys = true
-      @db.create_table!(:fk){primary_key :id; foreign_key :parent_id, :fk}
-      @db[:fk].insert(1, nil)
-      @db[:fk].insert(2, 1)
-      @db[:fk].insert(3, 3)
-      proc{@db[:fk].insert(4, 5)}.should raise_error(Sequel::Error)
-    end
-  end
+  specify "should enforce foreign key integrity if foreign_keys pragma is set" do
+    @db.foreign_keys = true
+    @db.create_table!(:fk){primary_key :id; foreign_key :parent_id, :fk}
+    @db[:fk].insert(1, nil)
+    @db[:fk].insert(2, 1)
+    @db[:fk].insert(3, 3)
+    proc{@db[:fk].insert(4, 5)}.should raise_error(Sequel::Error)
+  end if SQLITE_DB.sqlite_version >= 30619
   
   specify "should not enforce foreign key integrity if foreign_keys pragma is unset" do
     @db.foreign_keys = false
@@ -93,24 +92,22 @@ describe "An SQLite database" do
   end
   
   specify "should support a use_timestamp_timezones setting" do
-    @db.create_table!(:time){Time :time}
-    @db[:time].insert(Time.now)
-    @db[:time].get(Sequel.cast(:time, String)).should =~ /[-+]\d\d\d\d\z/
+    @db.create_table!(:fk){Time :time}
+    @db[:fk].insert(Time.now)
+    @db[:fk].get(Sequel.cast(:time, String)).should =~ /[-+]\d\d\d\d\z/
     @db.use_timestamp_timezones = false
-    @db[:time].delete
-    @db[:time].insert(Time.now)
-    @db[:time].get(Sequel.cast(:time, String)).should_not =~ /[-+]\d\d\d\d\z/
+    @db[:fk].delete
+    @db[:fk].insert(Time.now)
+    @db[:fk].get(Sequel.cast(:time, String)).should_not =~ /[-+]\d\d\d\d\z/
     @db.use_timestamp_timezones = true
   end
   
   specify "should provide a list of existing tables" do
-    @db.drop_table?(:testing)
+    @db.drop_table?(:fk)
     @db.tables.should be_a_kind_of(Array)
-    @db.tables.should_not include(:testing)
-    @db.create_table! :testing do
-      text :name
-    end
-    @db.tables.should include(:testing)
+    @db.tables.should_not include(:fk)
+    @db.create_table!(:fk){String :name}
+    @db.tables.should include(:fk)
   end
 
   specify "should support getting and setting the synchronous pragma" do
@@ -136,23 +133,23 @@ describe "An SQLite database" do
   end
   
   cspecify "should support timestamps and datetimes and respect datetime_class", :do, :jdbc, :amalgalite, :swift do
-    @db.create_table!(:time){timestamp :t; datetime :d}
+    @db.create_table!(:fk){timestamp :t; datetime :d}
     t1 = Time.at(1)
-    @db[:time] << {:t => t1, :d => t1}
-    @db[:time].map(:t).should == [t1]
-    @db[:time].map(:d).should == [t1]
+    @db[:fk] << {:t => t1, :d => t1}
+    @db[:fk].map(:t).should == [t1]
+    @db[:fk].map(:d).should == [t1]
     Sequel.datetime_class = DateTime
     t2 = Sequel.string_to_datetime(t1.iso8601)
-    @db[:time].map(:t).should == [t2]
-    @db[:time].map(:d).should == [t2]
+    @db[:fk].map(:t).should == [t2]
+    @db[:fk].map(:d).should == [t2]
   end
   
   specify "should support sequential primary keys" do
-    @db.create_table!(:with_pk) {primary_key :id; text :name}
-    @db[:with_pk] << {:name => 'abc'}
-    @db[:with_pk] << {:name => 'def'}
-    @db[:with_pk] << {:name => 'ghi'}
-    @db[:with_pk].order(:name).all.should == [
+    @db.create_table!(:fk) {primary_key :id; text :name}
+    @db[:fk] << {:name => 'abc'}
+    @db[:fk] << {:name => 'def'}
+    @db[:fk] << {:name => 'ghi'}
+    @db[:fk].order(:name).all.should == [
       {:id => 1, :name => 'abc'},
       {:id => 2, :name => 'def'},
       {:id => 3, :name => 'ghi'}
@@ -160,8 +157,21 @@ describe "An SQLite database" do
   end
   
   specify "should correctly parse the schema" do
-    @db.create_table!(:time2) {timestamp :t}
-    @db.schema(:time2, :reload=>true).should == [[:t, {:type=>:datetime, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"timestamp", :primary_key=>false}]]
+    @db.create_table!(:fk) {timestamp :t}
+    @db.schema(:fk, :reload=>true).should == [[:t, {:type=>:datetime, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"timestamp", :primary_key=>false}]]
+  end
+
+  specify "should handle and return BigDecimal values for numeric columns" do
+    SQLITE_DB.create_table!(:fk){numeric :d}
+    d = SQLITE_DB[:fk]
+    d.insert(:d=>BigDecimal.new('80.0'))
+    d.insert(:d=>BigDecimal.new('NaN'))
+    d.insert(:d=>BigDecimal.new('Infinity'))
+    d.insert(:d=>BigDecimal.new('-Infinity'))
+    ds = d.all
+    ds.shift.should == {:d=>BigDecimal.new('80.0')}
+    ds.map{|x| x[:d].to_s}.should == %w'NaN Infinity -Infinity'
+    SQLITE_DB
   end
 end
 
@@ -262,20 +272,6 @@ describe "An SQLite dataset" do
     proc{@d.literal(~Sequel.expr(:x).like(/a/))}.should raise_error(Sequel::Error)
     proc{@d.literal(Sequel.expr(:x).like(/a/i))}.should raise_error(Sequel::Error)
     proc{@d.literal(~Sequel.expr(:x).like(/a/i))}.should raise_error(Sequel::Error)
-  end
-end
-
-describe "An SQLite numeric column" do
-  specify "should handle and return BigDecimal values" do
-    SQLITE_DB.create_table!(:d){numeric :d}
-    d = SQLITE_DB[:d]
-    d.insert(:d=>BigDecimal.new('80.0'))
-    d.insert(:d=>BigDecimal.new('NaN'))
-    d.insert(:d=>BigDecimal.new('Infinity'))
-    d.insert(:d=>BigDecimal.new('-Infinity'))
-    ds = d.all
-    ds.shift.should == {:d=>BigDecimal.new('80.0')}
-    ds.map{|x| x[:d].to_s}.should == %w'NaN Infinity -Infinity'
   end
 end
 
@@ -407,6 +403,9 @@ describe "A SQLite database" do
       integer :value
     end
   end
+  after do
+    @db.drop_table?(:test2)
+  end
 
   specify "should support add_column operations" do
     @db.add_column :test2, :xyz, :text
@@ -533,6 +532,7 @@ describe "A SQLite database" do
     @db.from(table_name).all.should == [{:"s s"=>1}]
     @db.rename_column table_name, :"s s", :"t t"
     @db.from(table_name).all.should == [{:"t t"=>1}]
+    @db.drop_table?(table_name)
   end
   
   specify "should choose a temporary table name that isn't already used when dropping or renaming columns" do
@@ -574,6 +574,7 @@ describe "A SQLite database" do
     @db[:test3_backup1].columns.should == [:k]
     @db[:test3_backup2].columns.should == [:l]
     @db.loggers.delete(l)
+    @db.drop_table?(:test3, :test3_backup0, :test3_backup1, :test3_backup2)
   end
   
   specify "should support add_index" do

@@ -24,26 +24,14 @@ end
 POSTGRES_DB.loggers << logger
 
 #POSTGRES_DB.instance_variable_set(:@server_version, 80200)
-POSTGRES_DB.create_table! :test do
-  text :name
-  integer :value, :index => true
-end
-POSTGRES_DB.create_table! :test2 do
-  text :name
-  integer :value
-end
-POSTGRES_DB.create_table! :test3 do
-  integer :value
-  timestamp :time
-end
-POSTGRES_DB.create_table! :test4 do
-  varchar :name, :size => 20
-  bytea :value
-end
 
 describe "A PostgreSQL database" do
-  before do
+  before(:all) do
     @db = POSTGRES_DB
+    @db.create_table!(:public__testfk){primary_key :id; foreign_key :i, :public__testfk}
+  end
+  after(:all) do
+    @db.drop_table?(:public__testfk)
   end
 
   specify "should provide the server version" do
@@ -51,23 +39,13 @@ describe "A PostgreSQL database" do
   end
 
   specify "should correctly parse the schema" do
-    @db.schema(:test3, :reload=>true).should == [
-      [:value, {:oid=>23, :type=>:integer, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"integer", :primary_key=>false}],
-      [:time, {:oid=>1114, :type=>:datetime, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"timestamp without time zone", :primary_key=>false}]
-    ]
-    @db.schema(:test4, :reload=>true).should == [
-      [:name, {:oid=>1043, :type=>:string, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"character varying(20)", :primary_key=>false}],
-      [:value, {:oid=>17, :type=>:blob, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"bytea", :primary_key=>false}]
-    ]
+    @db.schema(:public__testfk, :reload=>true).should == [
+      [:id, {:type=>:integer, :ruby_default=>nil, :db_type=>"integer", :default=>"nextval('testfk_id_seq'::regclass)", :oid=>23, :primary_key=>true, :allow_null=>false}],
+      [:i, {:type=>:integer, :ruby_default=>nil, :db_type=>"integer", :default=>nil, :oid=>23, :primary_key=>false, :allow_null=>true}]]
   end
 
   specify "should parse foreign keys for tables in a schema" do
-    begin
-      @db.create_table!(:public__testfk){primary_key :id; foreign_key :i, :public__testfk}
-      @db.foreign_key_list(:public__testfk).should == [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>Sequel.qualify(:public, :testfk), :name=>:testfk_i_fkey}]
-    ensure
-      @db.drop_table(:public__testfk)
-    end
+    @db.foreign_key_list(:public__testfk).should == [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>Sequel.qualify(:public, :testfk), :name=>:testfk_i_fkey}]
   end
 
   specify "should return uuid fields as strings" do
@@ -76,14 +54,23 @@ describe "A PostgreSQL database" do
 end
 
 describe "A PostgreSQL dataset" do
-  before do
+  before(:all) do
     @db = POSTGRES_DB
     @d = @db[:test]
+    @db.create_table! :test do
+      text :name
+      integer :value, :index => true
+    end
+  end
+  before do
     @d.delete
     @db.sqls.clear
   end
   after do
     @db.drop_table?(:atest)
+  end
+  after(:all) do
+    @db.drop_table?(:test)
   end
 
   specify "should quote columns and tables using double quotes if quoting identifiers" do
@@ -257,7 +244,7 @@ describe "A PostgreSQL dataset" do
   end
 
   specify "should raise an error if attempting to update a joined dataset with a single FROM table" do
-    proc{@db[:test].join(:test2, [:name]).update(:name=>'a')}.should raise_error(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
+    proc{@db[:test].join(:test, [:name]).update(:name=>'a')}.should raise_error(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
   end
 
   specify "should truncate with options" do
@@ -273,9 +260,9 @@ describe "A PostgreSQL dataset" do
   end
 
   specify "should truncate multiple tables at once" do
-    tables = [:test, :test2, :test3, :test4]
+    tables = [:test, :test]
     tables.each{|t| @d.from(t).insert}
-    @d.from(:test, :test2, :test3, :test4).truncate
+    @d.from(:test, :test).truncate
     tables.each{|t| @d.from(t).count.should == 0}
   end
 end
@@ -362,13 +349,22 @@ if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
 end
 
 describe "A PostgreSQL dataset with a timestamp field" do
-  before do
+  before(:all) do
     @db = POSTGRES_DB
+    @db.create_table! :test3 do
+      integer :value
+      timestamp :time
+    end
     @d = @db[:test3]
+  end
+  before do
     @d.delete
   end
   after do
     @db.convert_infinite_timestamps = false if @db.adapter_scheme == :postgres
+  end
+  after(:all) do
+    @db.drop_table?(:test3)
   end
 
   cspecify "should store milliseconds in time fields for Time objects", :do, :swift do
@@ -417,19 +413,29 @@ describe "A PostgreSQL dataset with a timestamp field" do
       c.new(:time=>-1.0/0.0).time.should == -1.0/0.0
     end
   end
-end
 
-describe "PostgreSQL's EXPLAIN and ANALYZE" do
-  specify "should not raise errors" do
+  specify "explain and analyze should not raise errors" do
     @d = POSTGRES_DB[:test3]
     proc{@d.explain}.should_not raise_error
     proc{@d.analyze}.should_not raise_error
+  end
+
+  specify "#locks should be a dataset returning database locks " do
+    @db.locks.should be_a_kind_of(Sequel::Dataset)
+    @db.locks.all.should be_a_kind_of(Array)
   end
 end
 
 describe "A PostgreSQL database" do
   before do
     @db = POSTGRES_DB
+    @db.create_table! :test2 do
+      text :name
+      integer :value
+    end
+  end
+  after do
+    @db.drop_table?(:test2)
   end
 
   specify "should support column operations" do
@@ -462,11 +468,6 @@ describe "A PostgreSQL database" do
     @db.set_column_type :test2, :xyz, :integer
 
     @db[:test2].first[:xyz].should == 57
-  end
-
-  specify "#locks should be a dataset returning database locks " do
-    @db.locks.should be_a_kind_of(Sequel::Dataset)
-    @db.locks.all.should be_a_kind_of(Array)
   end
 end
 
@@ -664,9 +665,9 @@ describe "Postgres::Dataset#insert" do
   end
 
   specify "should return nil if the table has no primary key" do
-    ds = POSTGRES_DB[:test4]
-    ds.delete
-    ds.insert(:name=>'a').should == nil
+    @db.create_table!(:test5){String :name; Integer :value}
+    @ds.delete
+    @ds.insert(:name=>'a').should == nil
   end
 end
 
@@ -957,19 +958,20 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
 end
 
 if POSTGRES_DB.server_version >= 80300
-
-  POSTGRES_DB.create_table! :test6 do
-    text :title
-    text :body
-    full_text_index [:title, :body]
-  end
-
   describe "PostgreSQL tsearch2" do
-    before do
+    before(:all) do
+      POSTGRES_DB.create_table! :test6 do
+        text :title
+        text :body
+        full_text_index [:title, :body]
+      end
       @ds = POSTGRES_DB[:test6]
     end
     after do
       POSTGRES_DB[:test6].delete
+    end
+    after(:all) do
+      POSTGRES_DB.drop_table?(:test6)
     end
 
     specify "should search by indexed column" do

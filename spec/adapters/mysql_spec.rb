@@ -14,10 +14,6 @@ INTEGRATION_DB = MYSQL_DB unless defined?(INTEGRATION_DB)
 
 MYSQL_URI = URI.parse(MYSQL_DB.uri)
 
-MYSQL_DB.create_table! :test2 do
-  text :name
-  integer :value
-end
 def MYSQL_DB.sqls
   (@sqls ||= [])
 end
@@ -95,22 +91,8 @@ describe "MySQL", '#create_table' do
   end
 end
 
-describe "A MySQL database" do
-  specify "should provide the server version" do
-    MYSQL_DB.server_version.should >= 40000
-  end
-
-  specify "should handle the creation and dropping of an InnoDB table with foreign keys" do
-    proc{MYSQL_DB.create_table!(:test_innodb, :engine=>:InnoDB){primary_key :id; foreign_key :fk, :test_innodb, :key=>:id}}.should_not raise_error
-  end
-
-  specify "should support for_share" do
-    MYSQL_DB.transaction{MYSQL_DB[:test2].for_share.all.should == []}
-  end
-end
-
 if MYSQL_DB.adapter_scheme == :mysql
-  describe "Sequel::MySQL.convert_tinyint_to_bool" do
+  describe "Sequel::MySQL::Database#convert_tinyint_to_bool" do
     before do
       @db = MYSQL_DB
       @db.create_table(:booltest){column :b, 'tinyint(1)'; column :i, 'tinyint(4)'}
@@ -349,8 +331,33 @@ describe "Joined MySQL dataset" do
 end
 
 describe "A MySQL database" do
-  before do
+  after do
+    MYSQL_DB.drop_table?(:test_innodb)
+  end
+
+  specify "should handle the creation and dropping of an InnoDB table with foreign keys" do
+    proc{MYSQL_DB.create_table!(:test_innodb, :engine=>:InnoDB){primary_key :id; foreign_key :fk, :test_innodb, :key=>:id}}.should_not raise_error
+  end
+end
+
+describe "A MySQL database" do
+  before(:all) do
     @db = MYSQL_DB
+    @db.create_table! :test2 do
+      text :name
+      integer :value
+    end
+  end
+  after(:all) do
+    @db.drop_table?(:test2)
+  end
+
+  specify "should provide the server version" do
+    MYSQL_DB.server_version.should >= 40000
+  end
+
+  specify "should support for_share" do
+    MYSQL_DB.transaction{MYSQL_DB[:test2].for_share.all.should == []}
   end
 
   specify "should support add_column operations" do
@@ -631,6 +638,9 @@ describe "A grouped MySQL dataset" do
     MYSQL_DB[:test2] << {:name => '12', :value => 10}
     MYSQL_DB[:test2] << {:name => '12', :value => 20}
     MYSQL_DB[:test2] << {:name => '13', :value => 10}
+  end
+  after do
+    MYSQL_DB.drop_table?(:test2)
   end
 
   specify "should return the correct count for raw sql query" do

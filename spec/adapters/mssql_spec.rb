@@ -18,23 +18,6 @@ def logger.method_missing(m, msg)
 end
 MSSQL_DB.loggers = [logger]
 
-MSSQL_DB.create_table! :test do
-  String :name, :type=>:text
-  Integer :value, :index => true
-end
-MSSQL_DB.create_table! :test2 do
-  String :name, :type=>:text
-  Integer :value
-end
-MSSQL_DB.create_table! :test3 do
-  Integer :value
-  Time :time
-end
-MSSQL_DB.create_table! :test4 do
-  String :name, :size => 20
-  column :value, 'varbinary(max)'
-end
-
 describe "A MSSQL database" do
   before do
     @db = MSSQL_DB
@@ -54,7 +37,20 @@ describe "A MSSQL database" do
     proc{@db.server_version}.should_not raise_error
     proc{@db.dataset.server_version}.should_not raise_error
   end
+end
   
+describe "A MSSQL database" do
+  before do
+    @db = MSSQL_DB
+    @db.create_table! :test3 do
+      Integer :value
+      Time :time
+    end
+  end
+  after do
+    @db.drop_table?(:test3)
+  end
+
   specify "should work with NOLOCK" do
     @db.transaction{@db[:test3].nolock.all.should == []}
   end
@@ -379,12 +375,15 @@ describe "MSSSQL::Dataset#insert" do
   before do
     @db = MSSQL_DB
     @db.create_table!(:test5){primary_key :xid; Integer :value}
+    @db.create_table! :test4 do
+      String :name, :size => 20
+      column :value, 'varbinary(max)'
+    end
     @db.sqls.clear
     @ds = @db[:test5]
   end
   after do
-    @db[:test4].delete
-    @db.drop_table?(:test5)
+    @db.drop_table?(:test5, :test4)
   end
 
   specify "should have insert_select return nil if disable_insert_output is used" do
@@ -409,11 +408,9 @@ describe "MSSSQL::Dataset#insert" do
     b.length.should == blob.length
     b.should == blob
   end
-end
 
-describe "MSSSQL::Dataset#disable_insert_output" do
   specify "should play nicely with simple_select_all?" do
-    MSSQL_DB[:test].disable_insert_output.send(:simple_select_all?).should == true
+    MSSQL_DB[:test4].disable_insert_output.send(:simple_select_all?).should == true
   end
 end
 
@@ -462,16 +459,20 @@ describe "A MSSQL database" do
 end
 
 describe "MSSQL::Database#rename_table" do
+  after do
+    MSSQL_DB.drop_table?(:foo)
+  end
+
   specify "should work on non-schema bound tables which need escaping" do
     MSSQL_DB.quote_identifiers = true
     MSSQL_DB.create_table! :'foo bar' do
       text :name
     end
-    MSSQL_DB.drop_table? :baz
-    proc { MSSQL_DB.rename_table 'foo bar', 'baz' }.should_not raise_error
+    MSSQL_DB.drop_table? :foo
+    proc { MSSQL_DB.rename_table 'foo bar', 'foo' }.should_not raise_error
   end
   
-  specify "should workd on schema bound tables" do
+  specify "should work on schema bound tables" do
     MSSQL_DB.execute(<<-SQL)
       IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'MY')
         EXECUTE sp_executesql N'create schema MY'
