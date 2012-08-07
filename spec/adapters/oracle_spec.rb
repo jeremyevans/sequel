@@ -5,25 +5,34 @@ unless defined?(ORACLE_DB)
 end
 INTEGRATION_DB = ORACLE_DB unless defined?(INTEGRATION_DB)
 
-ORACLE_DB.create_table!(:items) do
-  String :name, :size => 50
-  Integer :value
-  Date :date_created
-  index :value
-end
-
-ORACLE_DB.create_table!(:books) do
-  Integer :id
-  String :title, :size => 50
-  Integer :category_id
-end
-
-ORACLE_DB.create_table!(:categories) do
-  Integer :id
-  String :cat_name, :size => 50
-end
-
 describe "An Oracle database" do
+  before(:all) do
+    ORACLE_DB.create_table!(:items) do
+      String :name, :size => 50
+      Integer :value
+      Date :date_created
+      index :value
+    end
+
+    ORACLE_DB.create_table!(:books) do
+      Integer :id
+      String :title, :size => 50
+      Integer :category_id
+    end
+
+    ORACLE_DB.create_table!(:categories) do
+      Integer :id
+      String :cat_name, :size => 50
+    end
+    @d = ORACLE_DB[:items]
+  end
+  after do
+    @d.delete
+  end
+  after(:all) do
+    ORACLE_DB.drop_table?(:items, :books, :categories)
+  end
+
   specify "should provide disconnect functionality" do
     ORACLE_DB.execute("select user from dual")
     ORACLE_DB.pool.size.should == 1
@@ -82,14 +91,7 @@ describe "An Oracle database" do
       index :name, :unique => true
     end
   end
-end
 
-describe "An Oracle dataset" do
-  before do
-    @d = ORACLE_DB[:items]
-    @d.delete # remove all records
-  end
-  
   specify "should return the correct record count" do
     @d.count.should == 0
     @d << {:name => 'abc', :value => 123}
@@ -194,8 +196,6 @@ describe "An Oracle dataset" do
     @d << {:name => 'def', :value => 789}
     @d.filter(:name => 'abc').update(:value => 530)
     
-    # the third record should stay the same
-    # floating-point precision bullshit
     @d[:name => 'def'][:value].should == 789
     @d.filter(:value => 530).count.should == 2
   end
@@ -230,24 +230,20 @@ describe "An Oracle dataset" do
 
     @d.count.should == 1
   end
-end
 
-describe "Joined Oracle dataset" do
-  before do
+  specify "should return correct result" do
     @d1 = ORACLE_DB[:books]
-    @d1.delete # remove all records
+    @d1.delete
     @d1 << {:id => 1, :title => 'aaa', :category_id => 100}
     @d1 << {:id => 2, :title => 'bbb', :category_id => 100}
     @d1 << {:id => 3, :title => 'ccc', :category_id => 101}
     @d1 << {:id => 4, :title => 'ddd', :category_id => 102}
     
     @d2 = ORACLE_DB[:categories]
-    @d2.delete # remove all records
+    @d2.delete
     @d2 << {:id => 100, :cat_name => 'ruby'}
     @d2 << {:id => 101, :cat_name => 'rails'}
-  end
   
-  specify "should return correct result" do
     @d1.join(:categories, :id => :category_id).select(:books__id, :title, :cat_name).order(:books__id).to_a.should == [
       {:id => 1, :title => 'aaa', :cat_name => 'ruby'},
       {:id => 2, :title => 'bbb', :cat_name => 'ruby'},
@@ -271,18 +267,14 @@ describe "Joined Oracle dataset" do
       {:id => 3, :title => 'ccc', :cat_name => 'rails'}
     ]      
   end  
-end
 
-describe "Oracle aliasing" do
-  before do
+  specify "should allow columns to be renamed" do
     @d1 = ORACLE_DB[:books]
-    @d1.delete # remove all records
+    @d1.delete
     @d1 << {:id => 1, :title => 'aaa', :category_id => 100}
     @d1 << {:id => 2, :title => 'bbb', :category_id => 100}
     @d1 << {:id => 3, :title => 'bbb', :category_id => 100}
-  end
 
-  specify "should allow columns to be renamed" do
     @d1.select(Sequel.as(:title, :name)).order_by(:id).to_a.should == [
       { :name => 'aaa' },
       { :name => 'bbb' },
@@ -291,22 +283,14 @@ describe "Oracle aliasing" do
   end
 
   specify "nested queries should work" do
-    @d1.select(:title).group_by(:title).count.should == 2
-  end
-end
-
-describe "Row locks in Oracle" do
-  before do
-    @d1 = ORACLE_DB[:books]
-    @d1.delete
-    @d1 << {:id => 1, :title => 'aaa'}
+    ORACLE_DB[:books].select(:title).group_by(:title).count.should == 2
   end
 
   specify "#for_update should use FOR UPDATE" do
-    @d1.for_update.sql.should == 'SELECT * FROM "BOOKS" FOR UPDATE'
+    ORACLE_DB[:books].for_update.sql.should == 'SELECT * FROM "BOOKS" FOR UPDATE'
   end
 
   specify "#lock_style should accept symbols" do
-    @d1.lock_style(:update).sql.should == 'SELECT * FROM "BOOKS" FOR UPDATE'
+    ORACLE_DB[:books].lock_style(:update).sql.should == 'SELECT * FROM "BOOKS" FOR UPDATE'
   end
 end
