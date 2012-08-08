@@ -133,7 +133,7 @@ module Sequel
         begin
           block_given? ? yield(q) : q.cmd_tuples
         ensure
-          q.clear if q
+          q.clear if q && q.respond_to?(:clear)
         end
       end
 
@@ -373,6 +373,11 @@ module Sequel
         end
       end
 
+      # Execute the prepared statement name with the given arguments on the connection.
+      def _execute_prepared_statement(conn, ps_name, args, opts)
+        conn.exec_prepared(ps_name, args)
+      end
+
       # Convert exceptions raised from the block into DatabaseErrors.
       def check_database_errors
         begin
@@ -426,11 +431,11 @@ module Sequel
           log_sql << ")"
         end
 
-        q = conn.check_disconnect_errors{log_yield(log_sql, args){conn.exec_prepared(ps_name, args)}}
+        q = conn.check_disconnect_errors{log_yield(log_sql, args){_execute_prepared_statement(conn, ps_name, args, opts)}}
         begin
           block_given? ? yield(q) : q.cmd_tuples
         ensure
-          q.clear
+          q.clear if q && q.respond_to?(:clear)
         end
       end
 
