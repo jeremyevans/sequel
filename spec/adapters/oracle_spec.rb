@@ -90,6 +90,7 @@ describe "An Oracle database" do
       primary_key :id, :integer, :null => false
       index :name, :unique => true
     end
+    ORACLE_DB.drop_table?(:test_tmp)
   end
 
   specify "should return the correct record count" do
