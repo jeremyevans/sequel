@@ -1726,16 +1726,17 @@ describe "Database#typecast_value" do
   end
 
   specify "should typecast datetime values to Sequel.datetime_class with correct timezone handling" do
-    t = Time.utc(2011, 1, 2, 3, 4, 5) # UTC Time
-    t2 = Time.mktime(2011, 1, 2, 3, 4, 5) # Local Time
-    t3 = Time.utc(2011, 1, 2, 3, 4, 5) - (t - t2) # Local Time in UTC Time
-    t4 = Time.mktime(2011, 1, 2, 3, 4, 5) + (t - t2) # UTC Time in Local Time
-    dt = DateTime.civil(2011, 1, 2, 3, 4, 5)
+    t = Time.utc(2011, 1, 2, 3, 4, 5, 500000) # UTC Time
+    t2 = Time.mktime(2011, 1, 2, 3, 4, 5, 500000) # Local Time
+    t3 = Time.utc(2011, 1, 2, 3, 4, 5, 500000) - (t - t2) # Local Time in UTC Time
+    t4 = Time.mktime(2011, 1, 2, 3, 4, 5, 500000) + (t - t2) # UTC Time in Local Time
+    secs = defined?(Rational) ? Rational(11, 2) : 5.5
     r1 = defined?(Rational) ? Rational(t2.utc_offset, 86400) : t2.utc_offset/86400.0
     r2 = defined?(Rational) ? Rational((t - t2).to_i, 86400) : (t - t2).to_i/86400.0
-    dt2 = DateTime.civil(2011, 1, 2, 3, 4, 5, r1)
-    dt3 = DateTime.civil(2011, 1, 2, 3, 4, 5) - r2
-    dt4 = DateTime.civil(2011, 1, 2, 3, 4, 5, r1) + r2
+    dt = DateTime.civil(2011, 1, 2, 3, 4, secs)
+    dt2 = DateTime.civil(2011, 1, 2, 3, 4, secs, r1)
+    dt3 = DateTime.civil(2011, 1, 2, 3, 4, secs) - r2
+    dt4 = DateTime.civil(2011, 1, 2, 3, 4, secs, r1) + r2
 
     t.should == t4
     t2.should == t3
@@ -1751,25 +1752,26 @@ describe "Database#typecast_value" do
         v.offset.should == o.offset
       end
     end
+    @db.extend_datasets(Module.new{def supports_timestamp_timezones?; true; end})
     begin
       @db.typecast_value(:datetime, dt).should == t
       @db.typecast_value(:datetime, dt2).should == t2
       @db.typecast_value(:datetime, t).should == t
       @db.typecast_value(:datetime, t2).should == t2
-      @db.typecast_value(:datetime, dt.to_s).should == t
-      @db.typecast_value(:datetime, dt.strftime('%F %T')).should == t2
+      @db.typecast_value(:datetime, @db.literal(dt)[1...-1]).should == t
+      @db.typecast_value(:datetime, dt.strftime('%F %T.%N')).should == t2
       @db.typecast_value(:datetime, Date.civil(2011, 1, 2)).should == Time.mktime(2011, 1, 2, 0, 0, 0)
-      @db.typecast_value(:datetime, :year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec).should == t2
+      @db.typecast_value(:datetime, :year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec, :nanos=>500000000).should == t2
 
       Sequel.datetime_class = DateTime
       @db.typecast_value(:datetime, dt).should == dt
       @db.typecast_value(:datetime, dt2).should == dt2
       @db.typecast_value(:datetime, t).should == dt
       @db.typecast_value(:datetime, t2).should == dt2
-      @db.typecast_value(:datetime, dt.to_s).should == dt
-      @db.typecast_value(:datetime, dt.strftime('%F %T')).should == dt
+      @db.typecast_value(:datetime, @db.literal(dt)[1...-1]).should == dt
+      @db.typecast_value(:datetime, dt.strftime('%F %T.%N')).should == dt
       @db.typecast_value(:datetime, Date.civil(2011, 1, 2)).should == DateTime.civil(2011, 1, 2, 0, 0, 0)
-      @db.typecast_value(:datetime, :year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec).should == dt
+      @db.typecast_value(:datetime, :year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec, :nanos=>500000000).should == dt
 
       Sequel.application_timezone = :utc
       Sequel.typecast_timezone = :local
@@ -1778,20 +1780,20 @@ describe "Database#typecast_value" do
       check[dt2, t3]
       check[t, t]
       check[t2, t3]
-      check[dt.to_s, t]
-      check[dt.strftime('%F %T'), t3]
+      check[@db.literal(dt)[1...-1], t]
+      check[dt.strftime('%F %T.%N'), t3]
       check[Date.civil(2011, 1, 2), Time.utc(2011, 1, 2, 0, 0, 0)]
-      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, t3]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec, :nanos=>500000000}, t3]
 
       Sequel.datetime_class = DateTime
       check[dt, dt]
       check[dt2, dt3]
       check[t, dt]
       check[t2, dt3]
-      check[dt.to_s, dt]
-      check[dt.strftime('%F %T'), dt3]
+      check[@db.literal(dt)[1...-1], dt]
+      check[dt.strftime('%F %T.%N'), dt3]
       check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0)]
-      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, dt3]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec, :nanos=>500000000}, dt3]
 
       Sequel.typecast_timezone = :utc
       Sequel.datetime_class = Time
@@ -1799,20 +1801,20 @@ describe "Database#typecast_value" do
       check[dt2, t3]
       check[t, t]
       check[t2, t3]
-      check[dt.to_s, t]
-      check[dt.strftime('%F %T'), t]
+      check[@db.literal(dt)[1...-1], t]
+      check[dt.strftime('%F %T.%N'), t]
       check[Date.civil(2011, 1, 2), Time.utc(2011, 1, 2, 0, 0, 0)]
-      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, t]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec, :nanos=>500000000}, t]
 
       Sequel.datetime_class = DateTime
       check[dt, dt]
       check[dt2, dt3]
       check[t, dt]
       check[t2, dt3]
-      check[dt.to_s, dt]
-      check[dt.strftime('%F %T'), dt]
+      check[@db.literal(dt)[1...-1], dt]
+      check[dt.strftime('%F %T.%N'), dt]
       check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0)]
-      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, dt]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec, :nanos=>500000000}, dt]
 
       Sequel.application_timezone = :local
       Sequel.datetime_class = Time
@@ -1820,20 +1822,20 @@ describe "Database#typecast_value" do
       check[dt2, t2]
       check[t, t4]
       check[t2, t2]
-      check[dt.to_s, t4]
-      check[dt.strftime('%F %T'), t4]
+      check[@db.literal(dt)[1...-1], t4]
+      check[dt.strftime('%F %T.%N'), t4]
       check[Date.civil(2011, 1, 2), Time.local(2011, 1, 2, 0, 0, 0)]
-      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, t4]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec, :nanos=>500000000}, t4]
 
       Sequel.datetime_class = DateTime
       check[dt, dt4]
       check[dt2, dt2]
       check[t, dt4]
       check[t2, dt2]
-      check[dt.to_s, dt4]
-      check[dt.strftime('%F %T'), dt4]
+      check[@db.literal(dt)[1...-1], dt4]
+      check[dt.strftime('%F %T.%N'), dt4]
       check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0, r1)]
-      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, dt4]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec, :nanos=>500000000}, dt4]
 
       Sequel.typecast_timezone = :local
       Sequel.datetime_class = Time
@@ -1841,20 +1843,20 @@ describe "Database#typecast_value" do
       check[dt2, t2]
       check[t, t4]
       check[t2, t2]
-      check[dt.to_s, t4]
-      check[dt.strftime('%F %T'), t2]
+      check[@db.literal(dt)[1...-1], t4]
+      check[dt.strftime('%F %T.%N'), t2]
       check[Date.civil(2011, 1, 2), Time.local(2011, 1, 2, 0, 0, 0)]
-      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, t2]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec, :nanos=>500000000}, t2]
 
       Sequel.datetime_class = DateTime
       check[dt, dt4]
       check[dt2, dt2]
       check[t, dt4]
       check[t2, dt2]
-      check[dt.to_s, dt4]
-      check[dt.strftime('%F %T'), dt2]
+      check[@db.literal(dt)[1...-1], dt4]
+      check[dt.strftime('%F %T.%N'), dt2]
       check[Date.civil(2011, 1, 2), DateTime.civil(2011, 1, 2, 0, 0, 0, r1)]
-      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec}, dt2]
+      check[{:year=>dt.year, :month=>dt.month, :day=>dt.day, :hour=>dt.hour, :minute=>dt.min, :second=>dt.sec, :nanos=>500000000}, dt2]
 
     ensure
       Sequel.default_timezone = nil
