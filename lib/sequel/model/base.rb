@@ -557,7 +557,7 @@ module Sequel
       # approach such as set_allowed_columns or the instance level set_only or set_fields methods
       # is usually a better choice.  So use of this method is generally a bad idea.
       #
-      #   Artist.set_restricted_column(:records_sold)
+      #   Artist.set_restricted_columns(:records_sold)
       #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
       #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
       def set_restricted_columns(*cols)
