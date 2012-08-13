@@ -459,7 +459,6 @@ module Sequel
     # * type - The type of join to do (e.g. :inner)
     # * table - Depends on type:
     #   * Dataset - a subselect is performed with an alias of tN for some value of N
-    #   * Model (or anything responding to :table_name) - table.table_name
     #   * String, Symbol: table
     # * expr - specifies conditions, depends on type:
     #   * Hash, Array of two element arrays - Assumes key (1st arg) is column of joined table (unless already
@@ -536,7 +535,6 @@ module Sequel
         end
         table_name = table_alias
       else
-        table = table.table_name if table.respond_to?(:table_name)
         table, implicit_table_alias = split_alias(table)
         table_alias ||= implicit_table_alias
         table_name = table_alias || table

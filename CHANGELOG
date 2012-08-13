@@ -1,5 +1,9 @@
 === HEAD
 
+* Use subselects for model classes as tables in join methods in model datasets if the model's dataset isn't a simple select (jeremyevans)
+
+* No longer handle model classes as tables in join/graph methods in plain (non-model) datasets (jeremyevans)
+
 * Make Time->DateTime and DateTime->Time typecasts retain fractional seconds on ruby 1.8 (jeremyevans) (#531)
 
 * Add bin/sequel -c support, for running code string instead of using an IRB prompt (jeremyevans)

@@ -69,3 +69,30 @@ describe Sequel::Model::DatasetMethods, "#to_hash"  do
     proc{@d.to_hash}.should raise_error(Sequel::Error)
   end
 end
+
+describe Sequel::Model::DatasetMethods, "#join_table"  do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+  end
+
+  specify "should allow use to use a model class when joining" do
+    @c.join(Class.new(Sequel::Model(:categories)), :item_id => :id).sql.should == 'SELECT * FROM items INNER JOIN categories ON (categories.item_id = items.id)'
+  end
+
+  specify "should handle model classes that aren't simple selects using a subselect" do
+    @c.join(Class.new(Sequel::Model(MODEL_DB[:categories].where(:foo=>1))), :item_id => :id).sql.should == 'SELECT * FROM items INNER JOIN (SELECT * FROM categories WHERE (foo = 1)) AS t1 ON (t1.item_id = items.id)'
+  end
+end 
+
+describe Sequel::Model::DatasetMethods, "#graph"  do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+    @c.columns :id
+  end
+
+  specify "should allow use to use a model class when joining" do
+    c = Class.new(Sequel::Model(:categories))
+    c.columns :id
+    @c.graph(c, :item_id => :id).sql.should == 'SELECT items.id, categories.id AS categories_id FROM items LEFT OUTER JOIN categories ON (categories.item_id = items.id)'
+  end
+end 

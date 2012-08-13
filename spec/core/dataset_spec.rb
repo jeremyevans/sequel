@@ -2159,12 +2159,6 @@ describe "Dataset#join_table" do
       'RIGHT OUTER JOIN (SELECT * FROM attributes WHERE (name = \'blah\')) AS "t3" ON ("t3"."attribute_id" = "t2"."id")'
   end
 
-  specify "should support joining objects that respond to :table_name" do
-    ds = Object.new
-    def ds.table_name; :categories end
-    @d.join(ds, :item_id => :id).sql.should == 'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."item_id" = "items"."id")'
-  end
-  
   specify "should support using an SQL String as the join condition" do
     @d.join(:categories, "c.item_id = items.id", :c).sql.should == 'SELECT * FROM "items" INNER JOIN "categories" AS "c" ON (c.item_id = items.id)'
   end

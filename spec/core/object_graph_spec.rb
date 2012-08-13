@@ -92,19 +92,6 @@ describe Sequel::Dataset, " graphing" do
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
   end
 
-  it "#graph should accept an object that responds to dataset as the dataset" do
-    oc = Class.new
-    o = oc.new
-    ds = @ds2
-    oc.send(:define_method, :dataset){ds} 
-    ds = @ds1.graph(o, :x=>:id)
-    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
-    ds = :lines
-    oc.send(:define_method, :dataset){ds} 
-    ds = @ds1.graph(o, :x=>:id)
-    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
-  end
-
   it "#graph should raise an error if a symbol, dataset, or model is not used" do
     proc{@ds1.graph(Object.new, :x=>:id)}.should raise_error(Sequel::Error)
   end

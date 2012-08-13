@@ -73,9 +73,8 @@ module Sequel
     #                 alias the table.  You will get an error if the the alias (or table) name is
     #                 used more than once.
     def graph(dataset, join_conditions = nil, options = {}, &block)
-      # Allow the use of a model, dataset, or symbol as the first argument
+      # Allow the use of a dataset or symbol as the first argument
       # Find the table name/dataset based on the argument
-      dataset = dataset.dataset if dataset.respond_to?(:dataset)
       table_alias = options[:table_alias]
       case dataset
       when Symbol
@@ -91,7 +90,7 @@ module Sequel
           table_alias ||= dataset_alias((@opts[:num_dataset_sources] || 0)+1)
         end
       else
-        raise Error, "The dataset argument should be a symbol, dataset, or model"
+        raise Error, "The dataset argument should be a symbol or dataset"
       end
 
       # Raise Sequel::Error with explanation that the table alias has been used

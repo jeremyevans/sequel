@@ -1871,6 +1871,36 @@ module Sequel
         model.use_transactions ? @db.transaction(:server=>opts[:server], &pr) : pr.call
       end
 
+      # Allow Sequel::Model classes to be used as dataset arguments when graphing:
+      #
+      #   Artist.graph(Album, :artist_id=>id)
+      #   # SELECT artists.id, artists.name, albums.id AS albums_id, albums.artist_id, albums.name AS albums_name
+      #   # FROM artists LEFT OUTER JOIN albums ON (albums.artist_id = artists.id)
+      def graph(table, *args, &block)
+        if table.is_a?(Class) && table < Sequel::Model
+          super(table.dataset, *args, &block)
+        else
+          super
+        end
+      end
+
+      # Allow Sequel::Model classes to be used as table name arguments in dataset
+      # join methods:
+      #
+      #   Artist.join(Album, :artist_id=>id)
+      #   # SELECT * FROM artists INNER JOIN albums ON (albums.artist_id = artists.id)
+      def join_table(type, table, *args, &block)
+        if table.is_a?(Class) && table < Sequel::Model
+          if table.dataset.simple_select_all?
+            super(type, table.table_name, *args, &block)
+          else
+            super(type, table.dataset, *args, &block)
+          end
+        else
+          super
+        end
+      end
+
       # This allows you to call +to_hash+ without any arguments, which will
       # result in a hash with the primary key value being the key and the
       # model object being the value.
