@@ -1884,6 +1884,20 @@ module Sequel
         end
       end
 
+      # Handle Sequel::Model instances when inserting, using the model instance's
+      # values for the insert, unless the model instance can be used directly in
+      # SQL.
+      #
+      #   Album.insert(Album.load(:name=>'A'))
+      #   # INSERT INTO albums (name) VALUES ('A')
+      def insert_sql(*values)
+        if values.size == 1 && (v = values.at(0)).is_a?(Sequel::Model) && !v.respond_to?(:sql_literal_append)
+          super(v.to_hash)
+        else
+          super
+        end
+      end
+
       # Allow Sequel::Model classes to be used as table name arguments in dataset
       # join methods:
       #

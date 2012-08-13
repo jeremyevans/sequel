@@ -241,16 +241,6 @@ describe "A simple dataset" do
       should match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
   end
   
-  specify "should format an insert statement with an object that respond_to? :values" do
-    v = Object.new
-    def v.values; {:a => 1}; end
-    
-    @dataset.insert_sql(v).should == "INSERT INTO test (a) VALUES (1)"
-    
-    def v.values; {}; end
-    @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES"
-  end
-  
   specify "should format an insert statement with an arbitrary value" do
     @dataset.insert_sql(123).should == "INSERT INTO test VALUES (123)"
   end
@@ -3048,18 +3038,6 @@ describe "Dataset#insert_sql" do
   
   specify "should accept an array of columns and an LiteralString" do
     @ds.insert_sql([:a, :b, :c], Sequel.lit('VALUES (1, 2, 3)')).should == "INSERT INTO items (a, b, c) VALUES (1, 2, 3)"
-  end
-  
-  specify "should accept an object that responds to values and returns a hash by using that hash as the columns and values" do
-    o = Object.new
-    def o.values; {:c=>'d'}; end
-    @ds.insert_sql(o).should == "INSERT INTO items (c) VALUES ('d')"
-  end
-  
-  specify "should accept an object that responds to values and returns something other than a hash by using the object itself as a single value" do
-    o = Date.civil(2000, 1, 1)
-    def o.values; self; end
-    @ds.insert_sql(o).should == "INSERT INTO items VALUES ('2000-01-01')"
   end
 end
 

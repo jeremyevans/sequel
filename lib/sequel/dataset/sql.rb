@@ -49,10 +49,6 @@ module Sequel
           end
         when Dataset, Array, LiteralString
           values = vals
-        else
-          if vals.respond_to?(:values) && (v = vals.values).is_a?(Hash)
-            return insert_sql(v) 
-          end
         end
       when 2
         if (v0 = values.at(0)).is_a?(Array) && ((v1 = values.at(1)).is_a?(Array) || v1.is_a?(Dataset) || v1.is_a?(LiteralString))

@@ -1,5 +1,9 @@
 === HEAD
 
+* Make dataset.insert(model) assume a single column if model uses the pg_row plugin (jeremyevans)
+
+* No longer handle model instances in plain (non-model) datasets when inserting (jeremyevans)
+
 * Use subselects for model classes as tables in join methods in model datasets if the model's dataset isn't a simple select (jeremyevans)
 
 * No longer handle model classes as tables in join/graph methods in plain (non-model) datasets (jeremyevans)

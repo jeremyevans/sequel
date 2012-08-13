@@ -96,3 +96,14 @@ describe Sequel::Model::DatasetMethods, "#graph"  do
     @c.graph(c, :item_id => :id).sql.should == 'SELECT items.id, categories.id AS categories_id FROM items LEFT OUTER JOIN categories ON (categories.item_id = items.id)'
   end
 end 
+
+describe Sequel::Model::DatasetMethods, "#insert_sql"  do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+    @c.columns :id
+  end
+
+  specify "should handle a single model instance as an argument" do
+    @c.insert_sql(@c.load(:id=>1)).should == 'INSERT INTO items (id) VALUES (1)'
+  end
+end 

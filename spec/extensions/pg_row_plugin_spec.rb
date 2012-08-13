@@ -42,4 +42,8 @@ describe "Sequel::Plugins::PgRow" do
     @db.bound_variable_arg(1, nil).should == 1
     @db.bound_variable_arg(Sequel.pg_array([@c.load(:street=>'123 Foo St', :city=>'Bar City')]), nil).should == '{"(\\"123 Foo St\\",\\"Bar City\\")"}'
   end
+
+  it "should allow inserting just this model value" do
+    @c2.insert_sql(@c.load(:street=>'123', :city=>'Bar')).should == "INSERT INTO company VALUES (ROW('123', 'Bar')::address)"
+  end
 end
