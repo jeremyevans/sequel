@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Dataset#count to take an argument or virtual row block (jeremyevans)
+
 * Attempt to recognize CURRENT_{DATE,TIMESTAMP} defaults and return them as Sequel::CURRENT_{DATE,TIMESTAMP} (jeremyevans)
 
 * Make dataset.insert(model) assume a single column if model uses the pg_row plugin (jeremyevans)

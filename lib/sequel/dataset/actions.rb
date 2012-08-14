@@ -93,12 +93,30 @@ module Sequel
       columns
     end
     
-    # Returns the number of records in the dataset.
+    # Returns the number of records in the dataset. If an argument is provided,
+    # it is used as the argument to count.  If a block is provided, it is
+    # treated as a virtual row, and the result is used as the argument to
+    # count.
     #
     #   DB[:table].count # SELECT COUNT(*) AS count FROM table LIMIT 1
     #   # => 3
-    def count
-      aggregate_dataset.get{COUNT(:*){}.as(count)}.to_i
+    #   DB[:table].count(:column) # SELECT COUNT(column) AS count FROM table LIMIT 1
+    #   # => 2
+    #   DB[:table].count{foo(column)} # SELECT COUNT(foo(column)) AS count FROM table LIMIT 1
+    #   # => 1
+    def count(arg=(no_arg=true), &block)
+      if no_arg
+        if block
+          arg = Sequel.virtual_row(&block)
+          aggregate_dataset.get{COUNT(arg).as(count)}
+        else
+          aggregate_dataset.get{COUNT(:*){}.as(count)}.to_i
+        end
+      elsif block
+        raise Error, 'cannot provide both argument and block to Dataset#count'
+      else
+        aggregate_dataset.get{COUNT(arg).as(count)}
+      end
     end
     
     # Deletes the records in the dataset.  The returned value should be 

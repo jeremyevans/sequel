@@ -1826,6 +1826,25 @@ describe "Dataset#count" do
     @db.sqls.should == ['SELECT COUNT(*) AS count FROM test LIMIT 1']
   end
   
+  specify "should accept an argument" do
+    @dataset.count(:foo).should == 1
+    @db.sqls.should == ['SELECT COUNT(foo) AS count FROM test LIMIT 1']
+  end
+  
+  specify "should work with a nil argument" do
+    @dataset.count(nil).should == 1
+    @db.sqls.should == ['SELECT COUNT(NULL) AS count FROM test LIMIT 1']
+  end
+  
+  specify "should accept a virtual row block" do
+    @dataset.count{foo(bar)}.should == 1
+    @db.sqls.should == ['SELECT COUNT(foo(bar)) AS count FROM test LIMIT 1']
+  end
+  
+  specify "should raise an Error if given an argument and a block" do
+    proc{@dataset.count(:foo){foo(bar)}}.should raise_error(Sequel::Error)
+  end
+  
   specify "should include the where clause if it's there" do
     @dataset.filter(Sequel.expr(:abc) < 30).count.should == 1
     @db.sqls.should == ['SELECT COUNT(*) AS count FROM test WHERE (abc < 30) LIMIT 1']
