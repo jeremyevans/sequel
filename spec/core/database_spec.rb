@@ -2086,8 +2086,14 @@ describe "Database#column_schema_to_ruby_default" do
     p["'\\a''b'", :string].should == "\\a'b"
     p["'NULL'", :string].should == "NULL"
     p["'2009-10-29'", :date].should == Date.new(2009,10,29)
-    p["CURRENT_TIMESTAMP", :date].should be_nil
-    p["today()", :date].should be_nil
+    p["CURRENT_TIMESTAMP", :date].should == Sequel::CURRENT_DATE
+    p["CURRENT_DATE", :date].should == Sequel::CURRENT_DATE
+    p["now()", :date].should == Sequel::CURRENT_DATE
+    p["getdate()", :date].should == Sequel::CURRENT_DATE
+    p["CURRENT_TIMESTAMP", :datetime].should == Sequel::CURRENT_TIMESTAMP
+    p["CURRENT_DATE", :datetime].should == Sequel::CURRENT_TIMESTAMP
+    p["now()", :datetime].should == Sequel::CURRENT_TIMESTAMP
+    p["getdate()", :datetime].should == Sequel::CURRENT_TIMESTAMP
     p["'2009-10-29T10:20:30-07:00'", :datetime].should == DateTime.parse('2009-10-29T10:20:30-07:00')
     p["'2009-10-29 10:20:30'", :datetime].should == DateTime.parse('2009-10-29 10:20:30')
     p["'10:20:30'", :time].should == Time.parse('10:20:30')
@@ -2115,8 +2121,6 @@ describe "Database#column_schema_to_ruby_default" do
     p["2009-10-29", :date].should == Date.new(2009,10,29)
     p["2009-10-29 10:20:30", :datetime].should == DateTime.parse('2009-10-29 10:20:30')
     p["10:20:30", :time].should == Time.parse('10:20:30')
-    p["CURRENT_DATE", :date].should be_nil
-    p["CURRENT_TIMESTAMP", :datetime].should be_nil
     p["a", :enum].should == "a"
     p["a,b", :set].should == "a,b"
     

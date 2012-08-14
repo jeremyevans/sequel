@@ -216,14 +216,12 @@ module Sequel
       end
 
       # Handle MySQL specific default format.
-      def column_schema_to_ruby_default(default, type)
-        unless default.nil?
-          if column_schema_default_string_type?(type)
-            return if [:date, :datetime, :time].include?(type) && MYSQL_TIMESTAMP_RE.match(default)
-            default = "'#{default.gsub("'", "''").gsub('\\', '\\\\')}'"
-          end
-          super(default, type)
+      def column_schema_normalize_default(default, type)
+        if column_schema_default_string_type?(type)
+          return if [:date, :datetime, :time].include?(type) && MYSQL_TIMESTAMP_RE.match(default)
+          default = "'#{default.gsub("'", "''").gsub('\\', '\\\\')}'"
         end
+        super(default, type)
       end
 
       # The SQL queries to execute on initial connection

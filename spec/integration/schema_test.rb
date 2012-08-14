@@ -108,6 +108,16 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == 'blah'
   end
 
+  specify "should parse current timestamp defaults from the schema properly" do
+    INTEGRATION_DB.create_table!(:items){Time :a, :default=>Sequel::CURRENT_TIMESTAMP}
+    INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == Sequel::CURRENT_TIMESTAMP
+  end
+
+  cspecify "should parse current date defaults from the schema properly", :mysql do
+    INTEGRATION_DB.create_table!(:items){Date :a, :default=>Sequel::CURRENT_DATE}
+    INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == Sequel::CURRENT_DATE
+  end
+
   cspecify "should parse types from the schema properly", [:jdbc, :db2], :oracle do
     INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items).first.last[:type].should == :integer

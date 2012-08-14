@@ -551,13 +551,11 @@ module Sequel
       end
       
       # Handle PostgreSQL specific default format.
-      def column_schema_to_ruby_default(default, type)
-        unless default.nil?
-          if m = POSTGRES_DEFAULT_RE.match(default)
-            default = m[1] || m[2]
-          end
-          super(default, type)
+      def column_schema_normalize_default(default, type)
+        if m = POSTGRES_DEFAULT_RE.match(default)
+          default = m[1] || m[2]
         end
+        super(default, type)
       end
 
       # If the :prepare option is given and we aren't in a savepoint,

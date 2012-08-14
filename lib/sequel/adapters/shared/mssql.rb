@@ -160,13 +160,11 @@ module Sequel
       end
       
       # Handle MSSQL specific default format.
-      def column_schema_to_ruby_default(default, type)
-        unless default.nil?
-          if m = MSSQL_DEFAULT_RE.match(default)
-            default = m[1] || m[2]
-          end
-          super(default, type)
+      def column_schema_normalize_default(default, type)
+        if m = MSSQL_DEFAULT_RE.match(default)
+          default = m[1] || m[2]
         end
+        super(default, type)
       end
 
       # Commit the active transaction on the connection, does not commit/release

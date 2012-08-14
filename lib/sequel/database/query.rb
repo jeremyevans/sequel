@@ -22,6 +22,8 @@ module Sequel
       :serializable=>'SERIALIZABLE'.freeze}
     
     STRING_DEFAULT_RE = /\A'(.*)'\z/
+    CURRENT_TIMESTAMP_RE = /now|CURRENT|getdate/io
+    COLUMN_SCHEMA_DATETIME_TYPES = [:date, :datetime]
     COLUMN_SCHEMA_STRING_TYPES = [:string, :blob, :date, :datetime, :time, :enum, :set, :interval]
 
     # The prepared statement object hash for this database, keyed by name symbol
@@ -394,45 +396,64 @@ module Sequel
       COLUMN_SCHEMA_STRING_TYPES.include?(type)
     end
 
+    # Transform the given normalized default string into a ruby object for the
+    # given type.
+    def column_schema_default_to_ruby_value(default, type)
+      case type
+      when :boolean
+        case default 
+        when /[f0]/i
+          false
+        when /[t1]/i
+          true
+        end
+      when :string, :enum, :set, :interval
+        default
+      when :blob
+        Sequel::SQL::Blob.new(default)
+      when :integer
+        Integer(default)
+      when :float
+        Float(default)
+      when :date
+        Sequel.string_to_date(default)
+      when :datetime
+        DateTime.parse(default)
+      when :time
+        Sequel.string_to_time(default)
+      when :decimal
+        BigDecimal.new(default)
+      end
+    end
+   
+    # Normalize the default value string for the given type
+    # and return the normalized value.
+    def column_schema_normalize_default(default, type)
+      if column_schema_default_string_type?(type)
+        return unless m = STRING_DEFAULT_RE.match(default)
+        m[1].gsub("''", "'")
+      else
+        default
+      end
+    end
+
     # Convert the given default, which should be a database specific string, into
     # a ruby object.
     def column_schema_to_ruby_default(default, type)
       return if default.nil?
-      if column_schema_default_string_type?(type)
-        return unless m = STRING_DEFAULT_RE.match(default)
-        default = m[1].gsub("''", "'")
-      end
-      begin
-        case type
-        when :boolean
-          case default 
-          when /[f0]/i
-            false
-          when /[t1]/i
-            true
+      if COLUMN_SCHEMA_DATETIME_TYPES.include?(type)
+        if CURRENT_TIMESTAMP_RE.match(default)
+          if type == :date
+            return Sequel::CURRENT_DATE
+          else
+            return Sequel::CURRENT_TIMESTAMP
           end
-        when :string, :enum, :set, :interval
-          default
-        when :blob
-          Sequel::SQL::Blob.new(default)
-        when :integer
-          Integer(default)
-        when :float
-          Float(default)
-        when :date
-          Sequel.string_to_date(default)
-        when :datetime
-          DateTime.parse(default)
-        when :time
-          Sequel.string_to_time(default)
-        when :decimal
-          BigDecimal.new(default)
         end
-      rescue
-        nil
       end
+      default = column_schema_normalize_default(default, type)
+      column_schema_default_to_ruby_value(default, type) rescue nil
     end
-   
+
     if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or RUBY_ENGINE == 'rbx') and RUBY_VERSION < '1.9'
       # Whether to commit the current transaction. On ruby 1.8 and rubinius,
       # Thread.current.status is checked because Thread#kill skips rescue
