@@ -1,5 +1,9 @@
 === HEAD
 
+* Add set_column_not_null to alter table generator for marking a column as not null (jeremyevans)
+
+* Default second argument of set_column_allow_null to true in alter table generator (jeremyevans)
+
 * Allow Dataset#count to take an argument or virtual row block (jeremyevans)
 
 * Attempt to recognize CURRENT_{DATE,TIMESTAMP} defaults and return them as Sequel::CURRENT_{DATE,TIMESTAMP} (jeremyevans)

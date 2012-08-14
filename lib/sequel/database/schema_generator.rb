@@ -430,11 +430,18 @@ module Sequel
         @operations << {:op => :set_column_type, :name => name, :type => type}.merge(opts)
       end
       
-      # Modify a column's NOT NULL constraint.
+      # Set a given column as allowing NULL values.
       #
-      #   set_column_allow_null(:artist_name, false) # ALTER COLUMN artist_name SET NOT NULL
-      def set_column_allow_null(name, allow_null)
+      #   set_column_allow_null(:artist_name) # ALTER COLUMN artist_name DROP NOT NULL
+      def set_column_allow_null(name, allow_null=true)
         @operations << {:op => :set_column_null, :name => name, :null => allow_null}
+      end
+
+      # Set a given column as not allowing NULL values.
+      #
+      #   set_column_not_null(:artist_name) # ALTER COLUMN artist_name SET NOT NULL
+      def set_column_not_null(name)
+        set_column_allow_null(name, false)
       end
 
       private

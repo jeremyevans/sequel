@@ -757,16 +757,30 @@ describe "DB#alter_table" do
     @db = Sequel.mock
   end
   
-  specify "should allow adding not null constraint" do
+  specify "should allow adding not null constraint via set_column_allow_null with false argument" do
     @db.alter_table(:cats) do
       set_column_allow_null :score, false
     end
     @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score SET NOT NULL"]
   end
   
-  specify "should allow droping not null constraint" do
+  specify "should allow removing not null constraint via set_column_allow_null with true argument" do
     @db.alter_table(:cats) do
       set_column_allow_null :score, true
+    end
+    @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score DROP NOT NULL"]
+  end
+
+  specify "should allow adding not null constraint via set_column_not_null" do
+    @db.alter_table(:cats) do
+      set_column_not_null :score
+    end
+    @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score SET NOT NULL"]
+  end
+  
+  specify "should allow removing not null constraint via set_column_allow_null without argument" do
+    @db.alter_table(:cats) do
+      set_column_allow_null :score
     end
     @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score DROP NOT NULL"]
   end
