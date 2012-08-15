@@ -300,7 +300,7 @@ module Sequel
             # Pretend tinyint is another integer type if its length is not 1, to
             # avoid casting to boolean if Sequel::MySQL.convert_tinyint_to_bool
             # is set.
-            type_proc = f.type == 1 && f.length != 1 ? cps[2] : cps[f.type]
+            type_proc = f.type == 1 && cast_tinyint_integer?(f) ? cps[2] : cps[f.type]
             [output_identifier(f.name), type_proc, i+=1]
           end
           @columns = cols.map{|c| c.first}
@@ -338,6 +338,13 @@ module Sequel
       end
       
       private
+
+      # Whether a tinyint field should be casted as an integer.  By default,
+      # casts to integer if the field length is not 1.  Can be overwritten
+      # to make tinyint casting dataset dependent.
+      def cast_tinyint_integer?(field)
+        field.length != 1
+      end
       
       # Set the :type option to :select if it hasn't been set.
       def execute(sql, opts={}, &block)

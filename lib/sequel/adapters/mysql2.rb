@@ -87,7 +87,7 @@ module Sequel
       # yield the connection if a block is given.
       def _execute(conn, sql, opts)
         begin
-          r = log_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql){conn.query(sql, :database_timezone => timezone, :application_timezone => Sequel.application_timezone, :cast_booleans => convert_tinyint_to_bool)}
+          r = log_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql){conn.query(sql, :database_timezone => timezone, :application_timezone => Sequel.application_timezone)}
           if opts[:type] == :select
             yield r if r
           elsif block_given?
@@ -150,7 +150,7 @@ module Sequel
             cols = r.fields
             @columns = cols2 = cols.map{|c| output_identifier(c.to_s)}
             cs = cols.zip(cols2)
-            r.each do |row|
+            r.each(:cast_booleans=>convert_tinyint_to_bool?) do |row|
               h = {}
               cs.each do |a, b|
                 h[b] = row[a]
@@ -159,13 +159,20 @@ module Sequel
             end
           else
             @columns = r.fields
-            r.each{|h| yield h}
+            r.each(:cast_booleans=>convert_tinyint_to_bool?){|h| yield h}
           end
         end
         self
       end
 
       private
+
+      # Whether to cast tinyint(1) columns to integer instead of boolean.
+      # By default, uses the opposite of the database's convert_tinyint_to_bool
+      # setting.  Exists for compatibility with the mysql adapter.
+      def convert_tinyint_to_bool?
+        @db.convert_tinyint_to_bool
+      end
 
       # Set the :type option to :select if it hasn't been set.
       def execute(sql, opts={}, &block)

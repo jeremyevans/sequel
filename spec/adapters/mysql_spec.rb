@@ -91,7 +91,7 @@ describe "MySQL", '#create_table' do
   end
 end
 
-if MYSQL_DB.adapter_scheme == :mysql
+if [:mysql, :mysql2].include?(MYSQL_DB.adapter_scheme)
   describe "Sequel::MySQL::Database#convert_tinyint_to_bool" do
     before do
       @db = MYSQL_DB
@@ -137,6 +137,17 @@ if MYSQL_DB.adapter_scheme == :mysql
       @ds.delete
       @ds << {:b=>0, :i=>0}
       @ds.all.should == [{:b=>0, :i=>0}]
+    end
+
+    specify "should allow disabling the conversion on a per-dataset basis" do
+      @db.convert_tinyint_to_bool = true
+      ds = @ds.clone
+      ds.meta_def(:cast_tinyint_integer?){|f| true} # mysql
+      ds.meta_def(:convert_tinyint_to_bool?){false} # mysql2
+      ds.delete
+      ds << {:b=>true, :i=>10}
+      ds.all.should == [{:b=>1, :i=>10}]
+      @ds.all.should == [{:b=>true, :i=>10}]
     end
   end
 end
