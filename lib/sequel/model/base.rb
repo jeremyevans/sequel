@@ -1226,7 +1226,7 @@ module Sequel
         set_server(opts[:server]) if opts[:server] 
         if opts[:validate] != false
           unless checked_save_failure(opts){_valid?(true, opts)}
-            raise(ValidationFailed.new(errors)) if raise_on_failure?(opts)
+            raise(ValidationFailed.new(self)) if raise_on_failure?(opts)
             return
           end
         end
@@ -1477,12 +1477,12 @@ module Sequel
         called = false
         around_destroy do
           called = true
-          raise_hook_failure(:destroy) if before_destroy == false
+          raise_hook_failure(:before_destroy) if before_destroy == false
           _destroy_delete
           after_destroy
           true
         end
-        raise_hook_failure(:destroy) unless called
+        raise_hook_failure(:around_destroy) unless called
         db.after_commit(sh){after_destroy_commit} if uacr
         self
       end
@@ -1551,12 +1551,12 @@ module Sequel
         called_cu = false
         around_save do
           called_save = true
-          raise_hook_failure(:save) if before_save == false
+          raise_hook_failure(:before_save) if before_save == false
           if new?
             was_new = true
             around_create do
               called_cu = true
-              raise_hook_failure(:create) if before_create == false
+              raise_hook_failure(:before_create) if before_create == false
               pk = _insert
               @this = nil
               @new = false
@@ -1564,11 +1564,11 @@ module Sequel
               after_create
               true
             end
-            raise_hook_failure(:create) unless called_cu
+            raise_hook_failure(:around_create) unless called_cu
           else
             around_update do
               called_cu = true
-              raise_hook_failure(:update) if before_update == false
+              raise_hook_failure(:before_update) if before_update == false
               if columns.empty?
                 @columns_updated = if opts[:changed]
                   @values.reject{|k,v| !changed_columns.include?(k)}
@@ -1585,12 +1585,12 @@ module Sequel
               after_update
               true
             end
-            raise_hook_failure(:update) unless called_cu
+            raise_hook_failure(:around_update) unless called_cu
           end
           after_save
           true
         end
-        raise_hook_failure(:save) unless called_save
+        raise_hook_failure(:around_save) unless called_save
         if was_new
           @was_new = nil
           pk ? _save_refresh : changed_columns.clear
@@ -1659,7 +1659,7 @@ module Sequel
           called = true
           if before_validation == false
             if raise_errors
-              raise_hook_failure(:validation)
+              raise_hook_failure(:before_validation)
             else
               error = true
             end
@@ -1673,7 +1673,7 @@ module Sequel
         error = true unless called
         if error
           if raise_errors
-            raise_hook_failure(:validation)
+            raise_hook_failure(:around_validation)
           else
             false
           end
@@ -1731,7 +1731,7 @@ module Sequel
       # Raise an error appropriate to the hook type. May be swallowed by
       # checked_save_failure depending on the raise_on_failure? setting.
       def raise_hook_failure(type)
-        raise HookFailed, "one of the before_#{type} hooks returned false"
+        raise HookFailed.new("the #{type} hook failed", self)
       end
   
       # Set the columns, filtered by the only and except arrays.

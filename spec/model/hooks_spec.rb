@@ -140,6 +140,12 @@ describe "Model#before_save && Model#after_save" do
     @c.load(:id => 2233).save.should == nil
     MODEL_DB.sqls.should == []
   end
+
+  specify "#save should have a raised exception reference the model instance" do
+    @c.send(:define_method, :before_save){false}
+    proc{@c.create(:x => 2233)}.should raise_error(Sequel::HookFailed){|e| e.model.should == @c.load(:x=>2233)}
+    MODEL_DB.sqls.should == []
+  end
 end
 
 describe "Model#before_destroy && Model#after_destroy" do

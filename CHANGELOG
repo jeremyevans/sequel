@@ -1,5 +1,7 @@
 === HEAD
 
+* Make ValidationFailed and HookFailed exceptions have model method that returns the related model (jeremyevans)
+
 * Automatically wrap array arguments to most PGArrayOp methods in PGArrays (jeremyevans)
 
 * Add set_column_not_null to alter table generator for marking a column as not null (jeremyevans)

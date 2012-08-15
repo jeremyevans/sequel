@@ -128,6 +128,28 @@ describe Sequel::Model do
     @o.errors[:blah].should be_empty
   end
   
+  specify "should allow raising of ValidationFailed with a Model instance with errors" do
+    @o.errors.add(:score, 'is too low')
+    begin
+      raise Sequel::ValidationFailed, @o
+    rescue Sequel::ValidationFailed => e
+    end
+    e.model.should equal(@o)
+    e.errors.should equal(@o.errors)
+    e.message.should == 'score is too low'
+  end
+  
+  specify "should allow raising of ValidationFailed with an Errors instance" do
+    @o.errors.add(:score, 'is too low')
+    begin
+      raise Sequel::ValidationFailed, @o.errors
+    rescue Sequel::ValidationFailed => e
+    end
+    e.model.should be_nil
+    e.errors.should equal(@o.errors)
+    e.message.should == 'score is too low'
+  end
+
   specify "should allow raising of ValidationFailed with a string" do
     proc{raise Sequel::ValidationFailed, "no reason"}.should raise_error(Sequel::ValidationFailed, "no reason")
   end
@@ -165,8 +187,11 @@ describe "Model#save" do
     MODEL_DB.sqls.should == ['UPDATE people SET x = 6 WHERE (id = 4)']
   end
 
-  specify "should raise error if validations fail and raise_on_save_faiure is true" do
-    proc{@m.save}.should raise_error(Sequel::ValidationFailed){|e| e.errors.should == @m.errors }
+  specify "should raise error if validations fail and raise_on_save_failure is true" do
+    proc{@m.save}.should(raise_error(Sequel::ValidationFailed) do |e|
+      e.model.should equal(@m)
+      e.errors.should equal(@m.errors)
+    end)
   end
 
   specify "should raise error if validations fail and :raise_on_failure option is true" do
