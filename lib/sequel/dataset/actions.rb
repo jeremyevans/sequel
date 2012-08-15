@@ -311,7 +311,7 @@ module Sequel
     #   # INSERT INTO table (x) VALUES (1)
     #   # INSERT INTO table (x) VALUES (2)
     #
-    #   DB[:table].insert_multiple([{:x=>1}, {:x=>2}]){|row| row[:y] = row[:x] * 2}
+    #   DB[:table].insert_multiple([{:x=>1}, {:x=>2}]){|row| row[:y] = row[:x] * 2; row }
     #   # => [6, 7]
     #   # INSERT INTO table (x, y) VALUES (1, 2)
     #   # INSERT INTO table (x, y) VALUES (2, 4)

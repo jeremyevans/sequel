@@ -2307,6 +2307,12 @@ describe "Dataset#insert_multiple" do
   specify "should return array of inserted ids" do
     @ds.insert_multiple(['aa', 5, 3, {:a => 2}]).should == [2, 3, 4, 5]
   end
+
+  specify "should work exactly like in metioned in the example" do
+    @ds.insert_multiple([{:x=>1}, {:x=>2}]){|row| row[:y] = row[:x] * 2 ; row }
+    @db.sqls.should == ["INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (2, 4)"]
+  end
 end
 
 describe "Dataset aggregate methods" do
