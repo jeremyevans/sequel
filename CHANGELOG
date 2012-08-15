@@ -1,5 +1,7 @@
 === HEAD
 
+* Automatically wrap array arguments to most PGArrayOp methods in PGArrays (jeremyevans)
+
 * Add set_column_not_null to alter table generator for marking a column as not null (jeremyevans)
 
 * Default second argument of set_column_allow_null to true in alter table generator (jeremyevans)

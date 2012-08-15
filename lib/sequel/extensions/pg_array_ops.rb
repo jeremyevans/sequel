@@ -106,14 +106,14 @@ module Sequel
       #
       #   array_op.contains(:a) # (array @> a)
       def contains(other)
-        bool_op(CONTAINS, other)
+        bool_op(CONTAINS, wrap_array(other))
       end
 
       # Use the contained by (<@) operator:
       #
       #   array_op.contained_by(:a) # (array <@ a)
       def contained_by(other)
-        bool_op(CONTAINED_BY, other)
+        bool_op(CONTAINED_BY, wrap_array(other))
       end
 
       # Call the array_dims method:
@@ -143,7 +143,7 @@ module Sequel
       #
       #   array_op.overlaps(:a) # (array && a)
       def overlaps(other)
-        bool_op(OVERLAPS, other)
+        bool_op(OVERLAPS, wrap_array(other))
       end
 
       # Use the concatentation (||) operator:
@@ -151,7 +151,7 @@ module Sequel
       #   array_op.push(:a) # (array || a)
       #   array_op.concat(:a) # (array || a)
       def push(other)
-        array_op(CONCAT, [self, other])
+        array_op(CONCAT, [self, wrap_array(other)])
       end
       alias concat push
 
@@ -182,7 +182,7 @@ module Sequel
       #
       #   array_op.unshift(:a) # (a || array)
       def unshift(other)
-        array_op(CONCAT, [other, self])
+        array_op(CONCAT, [wrap_array(other), self])
       end
 
       private
@@ -203,6 +203,16 @@ module Sequel
       # argument, with any additional arguments given.
       def function(name, *args)
         SQL::Function.new(name, self, *args)
+      end
+
+      # Automatically wrap argument in a PGArray if it is a plain Array.
+      # Requires that the pg_array extension has been loaded to work.
+      def wrap_array(arg)
+        if arg.instance_of?(Array)
+          Sequel.pg_array(arg)
+        else
+          arg
+        end
       end
     end
 

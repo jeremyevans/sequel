@@ -100,4 +100,13 @@ describe "Sequel::Postgres::ArrayOp" do
   it "should allow transforming PGArray instances into ArrayOp instances" do
     @db.literal(Sequel.pg_array([1,2]).op.push(3)).should == "(ARRAY[1,2] || 3)"
   end
+
+  it "should wrap array arguments in PGArrays" do
+    @db.literal(@a.contains([1, 2])).should == "(a @> ARRAY[1,2])"
+    @db.literal(@a.contained_by([1, 2])).should == "(a <@ ARRAY[1,2])"
+    @db.literal(@a.overlaps([1, 2])).should == "(a && ARRAY[1,2])"
+    @db.literal(@a.push([1, 2])).should == "(a || ARRAY[1,2])"
+    @db.literal(@a.concat([1, 2])).should == "(a || ARRAY[1,2])"
+    @db.literal(@a.unshift([1, 2])).should == "(ARRAY[1,2] || a)"
+  end
 end
