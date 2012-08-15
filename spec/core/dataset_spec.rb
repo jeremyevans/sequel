@@ -2310,8 +2310,9 @@ describe "Dataset#insert_multiple" do
 
   specify "should work exactly like in metioned in the example" do
     @ds.insert_multiple([{:x=>1}, {:x=>2}]){|row| row[:y] = row[:x] * 2 ; row }
-    @db.sqls.should == ["INSERT INTO items (x, y) VALUES (1, 2)",
-      "INSERT INTO items (x, y) VALUES (2, 4)"]
+    sqls = @db.sqls
+    ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].should include(sqls[0])
+    ["INSERT INTO items (x, y) VALUES (2, 4)", "INSERT INTO items (y, x) VALUES (4, 2)"].should include(sqls[1])
   end
 end
 
