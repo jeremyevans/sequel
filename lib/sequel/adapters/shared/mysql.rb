@@ -111,8 +111,10 @@ module Sequel
 
       # Get version of MySQL server, used for determined capabilities.
       def server_version
-        m = /(\d+)\.(\d+)\.(\d+)/.match(get(SQL::Function.new(:version)))
-        @server_version ||= (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
+        @server_version ||= begin
+          m = /(\d+)\.(\d+)\.(\d+)/.match(get(SQL::Function.new(:version)))
+          (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
+        end
       end
       
       # MySQL supports CREATE TABLE IF NOT EXISTS syntax.
