@@ -1,5 +1,7 @@
 === HEAD
 
+* Fixing caching of MySQL server version (hannesg) (#536)
+
 * Allow overriding the convert_tinyint_to_bool setting on a per-Dataset basis in the mysql and mysql2 adapters (jeremyevans)
 
 * Make ValidationFailed and HookFailed exceptions have model method that returns the related model (jeremyevans)

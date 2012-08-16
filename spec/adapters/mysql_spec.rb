@@ -269,7 +269,6 @@ end
 describe "MySQL join expressions" do
   before do
     @ds = MYSQL_DB[:nodes]
-    @ds.db.meta_def(:server_version) {50014}
   end
 
   specify "should raise error for :full_outer join requests." do
@@ -364,19 +363,19 @@ describe "A MySQL database" do
   end
 
   specify "should provide the server version" do
-    MYSQL_DB.server_version.should >= 40000
+    @db.server_version.should >= 40000
   end
 
   specify "should cache the server version" do
     # warm cache:
-    MYSQL_DB.server_version
-    expect{
-      100.times{ MYSQL_DB.server_version }
-    }.not_to change(MYSQL_DB.sqls, :size)
+    @db.server_version
+    @db.sqls.clear
+    3.times{@db.server_version}
+    @db.sqls.should be_empty
   end
 
   specify "should support for_share" do
-    MYSQL_DB.transaction{MYSQL_DB[:test2].for_share.all.should == []}
+    @db.transaction{@db[:test2].for_share.all.should == []}
   end
 
   specify "should support add_column operations" do
