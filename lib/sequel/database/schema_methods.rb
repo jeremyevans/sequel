@@ -21,6 +21,11 @@ module Sequel
     # The default options for join table columns.
     DEFAULT_JOIN_TABLE_COLUMN_OPTIONS = {:null=>false}
 
+    # The alter table operations that are combinable.
+    COMBINABLE_ALTER_TABLE_OPS = [:add_column, :drop_column, :rename_column,
+      :set_column_type, :set_column_default, :set_column_null,
+      :add_constraint, :drop_constraint]
+
     # Adds a column to the specified table. This method expects a column name,
     # a datatype and optionally a hash with additional constraints and options:
     #
@@ -333,7 +338,7 @@ module Sequel
 
     # Apply the changes in the given alter table ops to the table given by name.
     def apply_alter_table(name, ops)
-      alter_table_sql_list(name, ops).flatten.each{|sql| execute_ddl(sql)}
+      alter_table_sql_list(name, ops).each{|sql| execute_ddl(sql)}
     end
     
     # Apply the operations in the given generator to the table given by name.
@@ -346,9 +351,8 @@ module Sequel
       Schema::AlterTableGenerator
     end
     
-    # The SQL to execute to modify the DDL for the given table name.  op
-    # should be one of the operations returned by the AlterTableGenerator.
-    def alter_table_sql(table, op)
+    # SQL fragment for given alter table operation.
+    def alter_table_op_sql(table, op)
       quoted_name = quote_identifier(op[:name]) if op[:name]
       alter_table_op = case op[:op]
       when :add_column
@@ -363,24 +367,56 @@ module Sequel
         "ALTER COLUMN #{quoted_name} SET DEFAULT #{literal(op[:default])}"
       when :set_column_null
         "ALTER COLUMN #{quoted_name} #{op[:null] ? 'DROP' : 'SET'} NOT NULL"
-      when :add_index
-        return index_definition_sql(table, op)
-      when :drop_index
-        return drop_index_sql(table, op)
       when :add_constraint
         "ADD #{constraint_definition_sql(op)}"
       when :drop_constraint
         "DROP CONSTRAINT #{quoted_name}#{' CASCADE' if op[:cascade]}"
       else
-        raise Error, "Unsupported ALTER TABLE operation"
+        raise Error, "Unsupported ALTER TABLE operation: #{op[:op]}"
       end
-      "ALTER TABLE #{quote_schema_table(table)} #{alter_table_op}"
+    end
+
+    # The SQL to execute to modify the DDL for the given table name.  op
+    # should be one of the operations returned by the AlterTableGenerator.
+    def alter_table_sql(table, op)
+      case op[:op]
+      when :add_index
+        index_definition_sql(table, op)
+      when :drop_index
+        drop_index_sql(table, op)
+      else
+        "ALTER TABLE #{quote_schema_table(table)} #{alter_table_op_sql(table, op)}"
+      end
     end
 
     # Array of SQL DDL modification statements for the given table,
     # corresponding to the DDL changes specified by the operations.
     def alter_table_sql_list(table, operations)
-      operations.map{|op| alter_table_sql(table, op)}
+      if supports_combining_alter_table_ops?
+        grouped_ops = []
+        last_combinable = false
+        operations.each do |op|
+          if combinable_alter_table_op?(op)
+            if sql = alter_table_op_sql(table, op)
+              grouped_ops << [] unless last_combinable
+              grouped_ops.last << sql
+              last_combinable = true
+            end
+          elsif sql = alter_table_sql(table, op)
+            grouped_ops << sql
+            last_combinable = false
+          end
+        end
+        grouped_ops.map do |gop|
+          if gop.is_a?(Array)
+            "ALTER TABLE #{quote_schema_table(table)} #{gop.join(', ')}"
+          else
+            gop
+          end
+        end
+      else
+        operations.map{|op| alter_table_sql(table, op)}.flatten.compact
+      end
     end
     
     # The SQL string specify the autoincrement property, generally used by
@@ -461,6 +497,12 @@ module Sequel
     # SQL DDL fragment for table foreign key references (table constraints)
     def column_references_table_constraint_sql(constraint)
       "FOREIGN KEY #{literal(constraint[:columns])}#{column_references_sql(constraint)}"
+    end
+
+    # Whether the given alter table operation is combinable.
+    def combinable_alter_table_op?(op)
+      # Use a dynamic lookup for easier overriding in adapters
+      COMBINABLE_ALTER_TABLE_OPS.include?(op[:op])
     end
 
     # SQL DDL fragment specifying a constraint on a table.
@@ -654,6 +696,12 @@ module Sequel
     # The dataset to use for proxying certain schema methods.
     def schema_utility_dataset
       @schema_utility_dataset ||= dataset
+    end
+
+    # Whether the database supports combining multiple alter table
+    # operations into a single query, false by default.
+    def supports_combining_alter_table_ops?
+      false
     end
 
     # SQL DDL fragment for temporary table

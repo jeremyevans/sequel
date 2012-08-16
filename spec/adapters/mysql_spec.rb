@@ -504,8 +504,7 @@ describe "A MySQL database" do
     @db.alter_table(:items){add_foreign_key :p_id, :users, :key => :id, :null => false, :on_delete => :cascade}
     @db.sqls.should == ["CREATE TABLE `items` (`id` integer)",
       "CREATE TABLE `users` (`id` integer PRIMARY KEY AUTO_INCREMENT)",
-      "ALTER TABLE `items` ADD COLUMN `p_id` integer NOT NULL",
-      "ALTER TABLE `items` ADD FOREIGN KEY (`p_id`) REFERENCES `users`(`id`) ON DELETE CASCADE"]
+      "ALTER TABLE `items` ADD COLUMN `p_id` integer NOT NULL, ADD FOREIGN KEY (`p_id`) REFERENCES `users`(`id`) ON DELETE CASCADE"]
   end
 
   specify "should have rename_column support keep existing options" do
@@ -532,7 +531,7 @@ describe "A MySQL database" do
   specify "should have set_column_type pass through options" do
     @db.create_table(:items){integer :id; enum :list, :elements=>%w[one]}
     @db.alter_table(:items){set_column_type :id, :int, :unsigned=>true, :size=>8; set_column_type :list, :enum, :elements=>%w[two]}
-    @db.sqls.should == ["CREATE TABLE `items` (`id` integer, `list` enum('one'))", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` int(8) UNSIGNED NULL", "ALTER TABLE `items` CHANGE COLUMN `list` `list` enum('two') NULL"]
+    @db.sqls.should == ["CREATE TABLE `items` (`id` integer, `list` enum('one'))", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` int(8) UNSIGNED NULL, CHANGE COLUMN `list` `list` enum('two') NULL"]
   end
 
   specify "should have set_column_default support keep existing options" do

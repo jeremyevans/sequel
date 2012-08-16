@@ -953,6 +953,40 @@ describe "DB#alter_table" do
       "ALTER TABLE cats ALTER COLUMN score TYPE varchar(30)",
       "ALTER TABLE cats ALTER COLUMN score TYPE enum('a', 'b')"]
   end
+
+  specify "should combine operations into a single query if the database supports it" do
+    @db.meta_def(:supports_combining_alter_table_ops?){true}
+    @db.alter_table(:cats) do
+      add_column :a, Integer
+      drop_column :b
+      set_column_not_null :c
+      rename_column :d, :e
+      set_column_default :f, 'g'
+      set_column_type :h, Integer
+      add_constraint(:i){a > 1}
+      drop_constraint :j
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD COLUMN a integer, DROP COLUMN b, ALTER COLUMN c SET NOT NULL, RENAME COLUMN d TO e, ALTER COLUMN f SET DEFAULT 'g', ALTER COLUMN h TYPE integer, ADD CONSTRAINT i CHECK (a > 1), DROP CONSTRAINT j"]
+  end
+  
+  specify "should combine operations into consecutive groups of combinable operations if the database supports combining operations" do
+    @db.meta_def(:supports_combining_alter_table_ops?){true}
+    @db.alter_table(:cats) do
+      add_column :a, Integer
+      drop_column :b
+      set_column_not_null :c
+      rename_column :d, :e
+      add_index :e
+      set_column_default :f, 'g'
+      set_column_type :h, Integer
+      add_constraint(:i){a > 1}
+      drop_constraint :j
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD COLUMN a integer, DROP COLUMN b, ALTER COLUMN c SET NOT NULL, RENAME COLUMN d TO e",
+      "CREATE INDEX cats_e_index ON cats (e)",
+      "ALTER TABLE cats ALTER COLUMN f SET DEFAULT 'g', ALTER COLUMN h TYPE integer, ADD CONSTRAINT i CHECK (a > 1), DROP CONSTRAINT j"]
+  end
+  
 end
 
 describe "Database#create_table" do

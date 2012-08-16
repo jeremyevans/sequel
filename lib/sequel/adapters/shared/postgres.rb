@@ -514,7 +514,7 @@ module Sequel
       end
     
       # Handle :using option for set_column_type op, and the :validate_constraint op.
-      def alter_table_sql(table, op)
+      def alter_table_op_sql(table, op)
         case op[:op]
         when :set_column_type
           s = super
@@ -525,7 +525,7 @@ module Sequel
           end
           s
         when :validate_constraint
-          "ALTER TABLE #{quote_schema_table(table)} VALIDATE CONSTRAINT #{quote_identifier(op[:name])}"
+          "VALIDATE CONSTRAINT #{quote_identifier(op[:name])}"
         else
           super
         end
@@ -566,6 +566,12 @@ module Sequel
         else
           super
         end
+      end
+
+      # PostgreSQL can't combine rename_column operations, and it can combine
+      # the custom validate_constraint operation.
+      def combinable_alter_table_op?(op)
+        (super || op[:op] == :validate_constraint) && op[:op] != :rename_column
       end
 
       # The SQL queries to execute when starting a new connection.
@@ -830,6 +836,11 @@ module Sequel
       # Turns an array of argument specifiers into an SQL fragment used for function arguments.  See create_function_sql.
       def sql_function_args(args)
         "(#{Array(args).map{|a| Array(a).reverse.join(' ')}.join(', ')})"
+      end
+
+      # PostgreSQL can combine multiple alter table ops into a single query.
+      def supports_combining_alter_table_ops?
+        true
       end
 
       # Handle bigserial type if :serial option is present

@@ -203,18 +203,17 @@ module Sequel
         end
       end
     
-      # Use MySQL specific syntax for rename column, set column type, and
-      # drop index cases.
-      def alter_table_sql(table, op)
+      # Use MySQL specific syntax for some alter table operations.
+      def alter_table_op_sql(table, op)
         case op[:op]
         when :add_column
           if related = op.delete(:table)
-            sql = super(table, op)
+            sql = super
             op[:table] = related
             op[:key] ||= primary_key_from_schema(related)
-            [sql, "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])})#{column_references_sql(op)}"]
+            sql << ", ADD FOREIGN KEY (#{quote_identifier(op[:name])})#{column_references_sql(op)}"
           else
-            super(table, op)
+            super
           end
         when :rename_column, :set_column_type, :set_column_null, :set_column_default
           o = op[:op]
@@ -225,28 +224,33 @@ module Sequel
           opts[:null] = o == :set_column_null ? op[:null] : opts[:allow_null]
           opts[:default] = o == :set_column_default ? op[:default] : opts[:ruby_default]
           opts.delete(:default) if opts[:default] == nil
-          "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(op.merge(opts))}"
-        when :drop_index
-          "#{drop_index_sql(table, op)} ON #{quote_schema_table(table)}"
+          "CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(op.merge(opts))}"
         when :drop_constraint
           type = case op[:type]
           when :primary_key
-            return "ALTER TABLE #{quote_schema_table(table)} DROP PRIMARY KEY"
+            "DROP PRIMARY KEY"
           when :foreign_key
-            'FOREIGN KEY'
+            "DROP FOREIGN KEY #{quote_identifier(op[:name])}"
           when :unique
-            'INDEX'
-          else
-            raise(Error, "must specify constraint type via :type=>(:foreign_key|:primary_key|:unique) when dropping constraints on MySQL")
+            "DROP INDEX #{quote_identifier(op[:name])}"
           end
-          "ALTER TABLE #{quote_schema_table(table)} DROP #{type} #{quote_identifier(op[:name])}"
         when :add_constraint
           if op[:type] == :foreign_key
             op[:key] ||= primary_key_from_schema(op[:table])
           end
-          super(table, op)
+          super
         else
-          super(table, op)
+          super
+        end
+      end
+
+      # MySQL server requires table names when dropping indexes.
+      def alter_table_sql(table, op)
+        case op[:op]
+        when :drop_index
+          "#{drop_index_sql(table, op)} ON #{quote_schema_table(table)}"
+        else
+          super
         end
       end
 
@@ -257,6 +261,13 @@ module Sequel
           default = "'#{default.gsub("'", "''").gsub('\\', '\\\\')}'"
         end
         super(default, type)
+      end
+
+      # Don't allow combining adding foreign key operations with other
+      # operations, since in some cases adding a foreign key constraint in
+      # the same query as other operations results in MySQL error 150.
+      def combinable_alter_table_op?(op)
+        super && !(op[:op] == :add_constraint && op[:type] == :foreign_key)
       end
 
       # The SQL queries to execute on initial connection
@@ -440,6 +451,11 @@ module Sequel
           row[:type] = schema_column_type(row[:db_type])
           [m.call(row.delete(:Field)), row]
         end
+      end
+
+      # MySQL can combine multiple alter table ops into a single query.
+      def supports_combining_alter_table_ops?
+        true
       end
 
       # Respect the :size option if given to produce

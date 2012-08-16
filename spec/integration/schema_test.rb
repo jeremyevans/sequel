@@ -585,6 +585,30 @@ describe "Database schema modifiers" do
     end
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id]
   end
+
+  specify "should work correctly with many operations in a single alter_table call" do
+    @db.create_table!(:items) do
+      primary_key :id
+      String :name2
+      String :number2
+      constraint :bar, Sequel.~(:id=>nil)
+    end
+    @ds.insert(:name2=>'A12')
+    @db.alter_table(:items) do
+      add_column :number, Integer
+      drop_column :number2
+      rename_column :name2, :name
+      drop_constraint :bar
+      set_column_not_null :name
+      set_column_default :name, 'A13'
+      add_constraint :foo, Sequel.like(:name, 'A%')
+    end
+    @db[:items].first.should == {:id=>1, :name=>'A12', :number=>nil}
+    @db[:items].delete
+    proc{@db[:items].insert(:name=>nil)}.should raise_error(Sequel::DatabaseError)
+    @db[:items].insert(:number=>1)
+    @db[:items].get(:name).should == 'A13'
+  end
 end
 
 test_tables = begin
