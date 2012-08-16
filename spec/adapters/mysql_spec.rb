@@ -367,6 +367,14 @@ describe "A MySQL database" do
     MYSQL_DB.server_version.should >= 40000
   end
 
+  specify "should cache the server version" do
+    # warm cache:
+    MYSQL_DB.server_version
+    expect{
+      100.times{ MYSQL_DB.server_version }
+    }.not_to change(MYSQL_DB.sqls, :size)
+  end
+
   specify "should support for_share" do
     MYSQL_DB.transaction{MYSQL_DB[:test2].for_share.all.should == []}
   end
