@@ -261,6 +261,10 @@ describe "MySQL join expressions" do
     @ds.db.meta_def(:server_version) {50014}
   end
 
+  after do
+    @ds.db.meta_remove(:server_version)
+  end
+
   specify "should raise error for :full_outer join requests." do
     lambda{@ds.join_table(:full_outer, :nodes)}.should raise_error(Sequel::Error)
   end
