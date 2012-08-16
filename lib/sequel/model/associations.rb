@@ -745,9 +745,10 @@ module Sequel
         #                              than one row for each row in the current table (default: 0 for
         #                              many_to_one and one_to_one associations, 1 for one_to_many and
         #                              many_to_many associations).
-        # :class :: The associated class or its name. If not
+        # :class :: The associated class or its name as a string or symbol. If not
         #           given, uses the association's name, which is camelized (and
-        #           singularized unless the type is :many_to_one or :one_to_one)
+        #           singularized unless the type is :many_to_one or :one_to_one).  If this is specified
+        #           as a string or symbol, you must specify the full class name (e.g. "SomeModule::MyModel"). 
         # :clone :: Merge the current options and block into the options and block used in defining
         #           the given association.  Can be used to DRY up a bunch of similar associations that
         #           all share the same options such as :class and :key, while changing the order and block used.

@@ -607,6 +607,19 @@ To fix this, you need to specify the full model class name using the
     end
   end
 
+If both classes are in the same module, but the default class name
+used is not correct, you need to specify the full class name with the
+:class option:
+
+  module App1
+    class AlbumArtist < Sequel::Model
+      one_to_many :albums
+    end
+    class Album < Sequel::Model
+      many_to_one :artist, :class=>"App1::AlbumArtist"
+    end
+  end
+
 == Method Details
 
 In all of these methods, _association_ is replaced by the symbol you
