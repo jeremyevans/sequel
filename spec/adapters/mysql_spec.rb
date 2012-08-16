@@ -271,6 +271,10 @@ describe "MySQL join expressions" do
     @ds = MYSQL_DB[:nodes]
   end
 
+  after do
+    @ds.db.meta_remove(:server_version)
+  end
+
   specify "should raise error for :full_outer join requests." do
     lambda{@ds.join_table(:full_outer, :nodes)}.should raise_error(Sequel::Error)
   end
@@ -372,6 +376,14 @@ describe "A MySQL database" do
     @db.sqls.clear
     3.times{@db.server_version}
     @db.sqls.should be_empty
+  end
+
+  specify "should cache the server version" do
+    # warm cache:
+    MYSQL_DB.server_version
+    expect{
+      100.times{ MYSQL_DB.server_version }
+    }.not_to change(MYSQL_DB.sqls, :size)
   end
 
   specify "should support for_share" do
