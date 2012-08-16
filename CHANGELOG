@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle sets of alter_table operations on mysql and mssql where later operations depend on earlier ones (jeremyevans)
+
 * Add constraint_validations plugin for automatic validations of constaints defined by extension (jeremyevans)
 
 * Add constraint_validations extension for defining database constraints similar to validations (jeremyevans)
