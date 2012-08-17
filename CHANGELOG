@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#copy_into when using postgres adapter with pg driver, for very fast inserts into tables (jeremyevans)
+
 * Combine multiple alter_table operations into a single query where possible on MySQL and PostgreSQL (jeremyevans)
 
 * Handle sets of alter_table operations on MySQL and MSSQL where later operations depend on earlier ones (jeremyevans)

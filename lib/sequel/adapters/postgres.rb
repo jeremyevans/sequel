@@ -235,13 +235,11 @@ module Sequel
       end
 
       if SEQUEL_POSTGRES_USES_PG
-        # +copy_table+ uses PostgreSQL's +COPY+ SQL statement to return formatted
+        # +copy_table+ uses PostgreSQL's +COPY TO STDOUT+ SQL statement to return formatted
         # results directly to the caller.  This method is only supported if pg is the
         # underlying ruby driver.  This method should only be called if you want
-        # results returned to the client.  If you are using +COPY FROM+ or +COPY TO+
-        # with a filename, you should just use +run+ instead of this method.  This
-        # method does not currently support +COPY FROM STDIN+, but that may be supported
-        # in the future.
+        # results returned to the client.  If you are using +COPY TO+
+        # with a filename, you should just use +run+ instead of this method.
         #
         # The table argument supports the following types:
         #
@@ -293,6 +291,67 @@ module Sequel
               end
             ensure
               raise DatabaseDisconnectError, "disconnecting as a partial COPY may leave the connection in an unusable state" if buf
+            end
+          end 
+        end
+
+        # +copy_into+ uses PostgreSQL's +COPY FROM STDIN+ SQL statement to do very fast inserts 
+        # into a table using input preformatting in either CSV or PostgreSQL text format.
+        # This method is only supported if pg is the underlying ruby driver.  This method should only be called if you want
+        # results returned to the client.  If you are using +COPY FROM+
+        # with a filename, you should just use +run+ instead of this method.
+        #
+        # The following options are respected:
+        #
+        # :columns :: The columns to insert into, with the same order as the columns in the
+        #             input data.  If this isn't given, uses all columns in the table.
+        # :data :: The data to copy to PostgreSQL, which should already be in CSV or PostgreSQL
+        #          text format.  This can be either a string, or any object that responds to
+        #          each and yields string.
+        # :format :: The format to use.  text is the default, so this should be :csv or :binary.
+        # :options :: An options SQL string to use, which should contain comma separated options.
+        # :server :: The server on which to run the query.
+        #
+        # If a block is provided and :data option is not, this will yield to the block repeatedly.
+        # The block should return a string, or nil to signal that it is finished.
+        def copy_into(table, opts={})
+          sql = "COPY #{literal(table)}"
+          if cols = opts[:columns]
+            sql << literal(Array(cols))
+          end
+          sql << " FROM STDIN"
+          if opts[:options] || opts[:format]
+            sql << " ("
+            sql << "FORMAT #{opts[:format]}" if opts[:format]
+            sql << "#{', ' if opts[:format]}#{opts[:options]}" if opts[:options]
+            sql << ')'
+          end
+          
+          data = opts[:data]
+          data = Array(data) if data.is_a?(String)
+
+          if block_given? && data
+            raise Error, "Cannot provide both a :data option and a block to copy_into"
+          elsif !block_given? && !data
+            raise Error, "Must provide either a :data option or a block to copy_into"
+          end
+
+          synchronize(opts[:server]) do |conn| 
+            conn.execute(sql)
+            begin
+              if block_given?
+                while buf = yield
+                  conn.put_copy_data(buf)
+                end
+              else
+                data.each{|buf| conn.put_copy_data(buf)}
+              end
+            rescue Exception => e
+              conn.put_copy_end("ruby exception occurred while copying data into PostgreSQL")
+              raise
+            ensure
+              conn.put_copy_end unless e
+              conn.get_result
             end
           end 
         end
