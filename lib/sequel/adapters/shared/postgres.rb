@@ -375,30 +375,31 @@ module Sequel
       # Return primary key for the given table.
       def primary_key(table, opts={})
         quoted_table = quote_schema_table(table)
-        @primary_keys.fetch(quoted_table) do
-          schema, table = schema_and_table(table)
-          sql = "#{SELECT_PK_SQL} AND pg_class.relname = #{literal(table)}"
-          sql << " AND pg_namespace.nspname = #{literal(schema)}" if schema
-          @primary_keys[quoted_table] = fetch(sql).single_value
-        end
+        Sequel.synchronize{return @primary_keys[quoted_table] if @primary_keys.has_key?(quoted_table)}
+        schema, table = schema_and_table(table)
+        sql = "#{SELECT_PK_SQL} AND pg_class.relname = #{literal(table)}"
+        sql << " AND pg_namespace.nspname = #{literal(schema)}" if schema
+        value = fetch(sql).single_value
+        Sequel.synchronize{@primary_keys[quoted_table] = value}
       end
 
       # Return the sequence providing the default for the primary key for the given table.
       def primary_key_sequence(table, opts={})
         quoted_table = quote_schema_table(table)
-        @primary_key_sequences.fetch(quoted_table) do
-          schema, table = schema_and_table(table)
-          table = literal(table)
-          sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND t.relname = #{table}"
+        Sequel.synchronize{return @primary_key_sequences[quoted_table] if @primary_key_sequences.has_key?(quoted_table)}
+        schema, table = schema_and_table(table)
+        table = literal(table)
+        sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND t.relname = #{table}"
+        sql << " AND name.nspname = #{literal(schema)}" if schema
+        if pks = fetch(sql).single_record
+          value = literal(SQL::QualifiedIdentifier.new(pks[:schema], pks[:sequence]))
+          Sequel.synchronize{@primary_key_sequences[quoted_table] = value}
+        else
+          sql = "#{SELECT_CUSTOM_SEQUENCE_SQL} AND t.relname = #{table}"
           sql << " AND name.nspname = #{literal(schema)}" if schema
           if pks = fetch(sql).single_record
-            @primary_key_sequences[quoted_table] = literal(SQL::QualifiedIdentifier.new(pks[:schema], pks[:sequence]))
-          else
-            sql = "#{SELECT_CUSTOM_SEQUENCE_SQL} AND t.relname = #{table}"
-            sql << " AND name.nspname = #{literal(schema)}" if schema
-            if pks = fetch(sql).single_record
-              @primary_key_sequences[quoted_table] = literal(SQL::QualifiedIdentifier.new(pks[:schema], LiteralString.new(pks[:sequence])))
-            end
+            value = literal(SQL::QualifiedIdentifier.new(pks[:schema], LiteralString.new(pks[:sequence])))
+            Sequel.synchronize{@primary_key_sequences[quoted_table] = value}
           end
         end
       end
@@ -409,7 +410,7 @@ module Sequel
         @conversion_procs = get_conversion_procs
       end
 
-      # Reset the primary key sequence for the given table, baseing it on the
+      # Reset the primary key sequence for the given table, basing it on the
       # maximum current value of the table's primary key.
       def reset_primary_key_sequence(table)
         return unless seq = primary_key_sequence(table)
@@ -755,8 +756,10 @@ module Sequel
       # changed.
       def remove_cached_schema(table)
         tab = quote_schema_table(table)
-        @primary_keys.delete(tab)
-        @primary_key_sequences.delete(tab)
+        Sequel.synchronize do
+          @primary_keys.delete(tab)
+          @primary_key_sequences.delete(tab)
+        end
         super
       end
 
