@@ -1105,7 +1105,7 @@ module Sequel
     
     # Represents inverse boolean constants (currently only +NOTNULL+). A
     # special class to allow for special behavior.
-    class NegativeBooleanConstant < BooleanConstant
+    class NegativeBooleanConstant < Constant
       to_s_method :negative_boolean_constant_sql, '@constant'
     end
     
