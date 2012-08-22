@@ -137,7 +137,7 @@ module Sequel
       SELECT_SERIAL_SEQUENCE_SQL = (<<-end_sql
         SELECT  name.nspname AS "schema", seq.relname AS "sequence"
         FROM pg_class seq, pg_attribute attr, pg_depend dep,
-          pg_namespace name, pg_constraint cons
+          pg_namespace name, pg_constraint cons, pg_class t
         WHERE seq.oid = dep.objid
           AND seq.relnamespace  = name.oid
           AND seq.relkind = 'S'
@@ -145,6 +145,7 @@ module Sequel
           AND attr.attnum = dep.refobjsubid
           AND attr.attrelid = cons.conrelid
           AND attr.attnum = cons.conkey[1]
+          AND attr.attrelid = t.oid
           AND cons.contype = 'p'
       end_sql
       ).strip.gsub(/\s+/, ' ').freeze
@@ -377,7 +378,7 @@ module Sequel
         @primary_keys.fetch(quoted_table) do
           schema, table = schema_and_table(table)
           sql = "#{SELECT_PK_SQL} AND pg_class.relname = #{literal(table)}"
-          sql << "AND pg_namespace.nspname = #{literal(schema)}" if schema
+          sql << " AND pg_namespace.nspname = #{literal(schema)}" if schema
           @primary_keys[quoted_table] = fetch(sql).single_value
         end
       end
@@ -388,16 +389,16 @@ module Sequel
         @primary_key_sequences.fetch(quoted_table) do
           schema, table = schema_and_table(table)
           table = literal(table)
-          sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND seq.relname = #{table}"
+          sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND t.relname = #{table}"
           sql << " AND name.nspname = #{literal(schema)}" if schema
-          unless pks = fetch(sql).single_record
+          if pks = fetch(sql).single_record
+            @primary_key_sequences[quoted_table] = literal(SQL::QualifiedIdentifier.new(pks[:schema], pks[:sequence]))
+          else
             sql = "#{SELECT_CUSTOM_SEQUENCE_SQL} AND t.relname = #{table}"
             sql << " AND name.nspname = #{literal(schema)}" if schema
-            pks = fetch(sql).single_record
-          end
-
-          @primary_key_sequences[quoted_table] = if pks
-            literal(SQL::QualifiedIdentifier.new(pks[:schema], LiteralString.new(pks[:sequence])))
+            if pks = fetch(sql).single_record
+              @primary_key_sequences[quoted_table] = literal(SQL::QualifiedIdentifier.new(pks[:schema], LiteralString.new(pks[:sequence])))
+            end
           end
         end
       end

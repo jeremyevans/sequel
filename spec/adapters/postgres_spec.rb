@@ -749,7 +749,7 @@ describe "Postgres::Database schema qualified tables" do
 
   specify "should be able to get serial sequences for tables in a given schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
-    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test".schema_test_i_seq'
+    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
   end
 
   specify "should be able to get serial sequences for tables that have spaces in the name in a given schema" do
@@ -775,7 +775,7 @@ describe "Postgres::Database schema qualified tables" do
     POSTGRES_DB.table_exists?(:schema_test).should == true
     POSTGRES_DB.tables.should == [:schema_test]
     POSTGRES_DB.primary_key(:schema_test__schema_test).should == 'i'
-    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test".schema_test_i_seq'
+    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
   end
 end
 
