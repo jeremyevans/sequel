@@ -8,6 +8,8 @@
 #
 #   Sequel.extension :schema_dumper
 
+Sequel.extension :eval_inspect
+
 module Sequel
   class Database
     # Dump foreign key constraints for all tables as a migration. This complements
@@ -137,7 +139,6 @@ END_MIG
         else
           gen.column(name, type, col_opts)
           if [Integer, Bignum, Float].include?(type) && schema[:db_type] =~ / unsigned\z/io
-            Sequel.extension :eval_inspect
             gen.check(Sequel::SQL::Identifier.new(name) >= 0)
           end
         end
@@ -473,16 +474,7 @@ END_MIG
       def opts_inspect(opts)
         if opts[:default]
           opts = opts.dup
-          de = case d = opts.delete(:default)
-          when BigDecimal, Sequel::SQL::Blob
-            "#{d.class.name}.new(#{d.to_s.inspect})"
-          when DateTime, Date
-            "#{d.class.name}.parse(#{d.to_s.inspect})"
-          when Time
-            "#{d.class.name}.parse(#{d.strftime('%H:%M:%S').inspect})"
-          else
-            d.inspect
-          end
+          de = Sequel.eval_inspect(opts.delete(:default)) 
           ", :default=>#{de}#{", #{opts.inspect[1...-1]}" if opts.length > 0}"
         else
           ", #{opts.inspect[1...-1]}" if opts.length > 0
