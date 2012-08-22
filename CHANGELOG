@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix defaults_setter to set false default values (jeremyevans)
+
 * Fix serial sequence query in Database#primary_key_sequence on PostgreSQL (jeremyevans) (#538)
 
 * Add Database#copy_into when using postgres adapter with pg driver, for very fast inserts into tables (jeremyevans)

@@ -9,6 +9,9 @@ describe "Sequel::Plugins::DefaultsSetter" do
     @c.columns :a
     @pr = proc{|x| db.meta_def(:schema){|*| [[:a, {:ruby_default => x}]]}; c.dataset = c.dataset; c}
   end
+  after do
+    Sequel.datetime_class = Time
+  end
 
   it "should set default value upon initialization" do
     @pr.call(2).new.values.should == {:a=>2}
@@ -20,6 +23,27 @@ describe "Sequel::Plugins::DefaultsSetter" do
 
   it "should not set a default of nil" do
     @pr.call(nil).new.values.should == {}
+  end
+
+  it "should set a default of false" do
+    @pr.call(false).new.values.should == {:a=>false}
+  end
+
+  it "should handle Sequel::CURRENT_DATE default by using the current Date" do
+    @pr.call(Sequel::CURRENT_DATE).new.a.should == Date.today
+  end
+
+  it "should handle Sequel::CURRENT_TIMESTAMP default by using the current Time" do
+    t = @pr.call(Sequel::CURRENT_TIMESTAMP).new.a
+    t.should be_a_kind_of(Time)
+    (t - Time.now).should < 1
+  end
+
+  it "should handle Sequel::CURRENT_TIMESTAMP default by using the current DateTime if Sequel.datetime_class is DateTime" do
+    Sequel.datetime_class = DateTime
+    t = @pr.call(Sequel::CURRENT_TIMESTAMP).new.a
+    t.should be_a_kind_of(DateTime)
+    (t - DateTime.now).should < 1/86400.0
   end
 
   it "should not override a given value" do

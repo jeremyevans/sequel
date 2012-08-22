@@ -37,10 +37,24 @@ module Sequel
 
         private
 
+        # Parse the cached database schema for this model and set the default values appropriately.
         def set_default_values
           h = {}
-          @db_schema.each{|k, v| h[k] = v[:ruby_default] if v[:ruby_default]} if @db_schema
+          @db_schema.each{|k, v| h[k] = convert_default_value(v[:ruby_default]) unless v[:ruby_default].nil?} if @db_schema
           @default_values = h
+        end
+
+        # Handle the CURRENT_DATE and CURRENT_TIMESTAMP values specially by returning an appropriate Date or
+        # Time/DateTime value.
+        def convert_default_value(v)
+          case v
+          when Sequel::CURRENT_DATE
+            Date.today
+          when Sequel::CURRENT_TIMESTAMP
+            Sequel.datetime_class.now
+          else
+            v
+          end
         end
       end
 
