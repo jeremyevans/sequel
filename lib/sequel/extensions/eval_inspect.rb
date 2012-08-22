@@ -92,6 +92,20 @@ module Sequel
       end
     end
 
+    class Constant
+      # Constants to lookup in the Sequel module.
+      INSPECT_LOOKUPS = [:CURRENT_DATE, :CURRENT_TIMESTAMP, :CURRENT_TIME, :SQLTRUE, :SQLFALSE, :NULL, :NOTNULL]
+
+      # Reference the constant in the Sequel module if there is
+      # one that matches.
+      def inspect
+        INSPECT_LOOKUPS.each do |c|
+          return "Sequel::#{c}" if Sequel.const_get(c) == self
+        end
+        super
+      end
+    end
+
     class CaseExpression
       private
 

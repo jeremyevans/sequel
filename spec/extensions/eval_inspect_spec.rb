@@ -17,6 +17,13 @@ describe "eval_inspect extension" do
       Sequel::SQL::ColumnAll.new(:a),
       Sequel::SQL::ComplexExpression.new(:'=', :b, :a),
       Sequel::SQL::Constant.new(:a),
+      Sequel::CURRENT_DATE,
+      Sequel::CURRENT_TIMESTAMP,
+      Sequel::CURRENT_TIME,
+      Sequel::SQLTRUE,
+      Sequel::SQLFALSE,
+      Sequel::NULL,
+      Sequel::NOTNULL,
       Sequel::SQL::Function.new(:a, :b, :c),
       Sequel::SQL::Identifier.new(:a),
       Sequel::SQL::JoinClause.new(:inner, :b, :c),
@@ -49,6 +56,8 @@ describe "eval_inspect extension" do
       Sequel::SQL::AliasedExpression.new(Time.utc(2011, 9, 11, 10, 20, 30), :a),
       Sequel::SQL::AliasedExpression.new(Time.utc(2011, 9, 11, 10, 20, 30, 500000.125), :a),
       Sequel::SQL::AliasedExpression.new(BigDecimal.new('1.000000000000000000000000000000000000000000000001'), :a),
+      Sequel::SQL::AliasedExpression.new(Sequel::CURRENT_DATE, :a),
+      Sequel::SQL::AliasedExpression.new(Sequel::CURRENT_TIMESTAMP, :a),
     ].each do |o|
       v = eval(o.inspect)
       v.should == o
