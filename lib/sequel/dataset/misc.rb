@@ -31,9 +31,9 @@ module Sequel
     end
 
     # Define a hash value such that datasets with the same DB, opts, and SQL
-    # will be consider equal.
+    # will be considered equal.
     def ==(o)
-      o.is_a?(self.class) && db == o.db  && opts == o.opts && sql == o.sql
+      o.is_a?(self.class) && db == o.db && opts == o.opts && sql == o.sql
     end
 
     # Alias for ==

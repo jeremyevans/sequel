@@ -532,14 +532,14 @@ the first argument is the current name, and the second is the new name:
 <tt>create_table!</tt> drops the table if it exists
 before attempting to create it, so:
 
-  create_table!(:artists)
+  create_table!(:artists) do
     primary_key :id
   end
 
 is the same as:
 
   drop_table?(:artists)
-  create_table(:artists)
+  create_table(:artists) do
     primary_key :id
   end
 
@@ -551,14 +551,14 @@ mess up the migration.
 <tt>create_table?</tt> only creates the table if it does
 not already exist, so:
 
-  create_table?(:artists)
+  create_table?(:artists) do
     primary_key :id
   end
 
 is the same as:
 
   unless table_exists?(:artists)
-    create_table(:artists)
+    create_table(:artists) do
       primary_key :id
     end 
   end

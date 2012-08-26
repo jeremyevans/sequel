@@ -14,7 +14,7 @@ module Sequel
     #   artist.name                   # => 'Foo'
     #   artist.column_changed?(:name) # false
     #
-    # It allows makes changed_columns more accurate in that it
+    # It also makes changed_columns more accurate in that it
     # can detect when a the column value is changed and then
     # changed back:
     #
@@ -183,7 +183,7 @@ module Sequel
 
         # If the values hash does not contain the column, make sure missing_initial_values
         # does so that it doesn't get deleted from changed_columns if changed back,
-        # and so that reseting the column value can be handled correctly.
+        # and so that resetting the column value can be handled correctly.
         def check_missing_initial_value(column)
           unless values.has_key?(column) || (miv = missing_initial_values).include?(column)
             miv << column

@@ -104,7 +104,7 @@ have the following associations
   Album.many_to_one :artist
   Album.one_to_many :tracks
     
-and the following two albums in the database:
+and the following three albums in the database:
 
   album1 = Album.create(:artist_id=>3) # id: 1
   album2 = Album.create(:artist_id=>3) # id: 2
