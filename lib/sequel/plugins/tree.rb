@@ -4,7 +4,7 @@ module Sequel
     # treat a Model as a tree.  
     #
     # A column for holding the parent key is required and is :parent_id by default.  
-    # This may be overridden by passing column name via :key
+    # This may be overridden by passing column name via :key.
     #
     # Optionally, a column to control order of nodes returned can be specified
     # by passing column name via :order.
@@ -98,7 +98,7 @@ module Sequel
           nodes 
         end
 
-        # Returns the root node of the tree that this node descends from
+        # Returns the root node of the tree that this node descends from.
         # This node is returned if it is a root node itself.
         def root
           ancestors.last || self
@@ -124,7 +124,7 @@ module Sequel
         end
       end
 
-      # Plugin included when :single_root option is passed
+      # Plugin included when :single_root option is passed.
       module SingleRoot
         module ClassMethods
           # Returns the single root node.

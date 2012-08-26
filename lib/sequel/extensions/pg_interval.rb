@@ -5,7 +5,7 @@
 # as instances of ActiveSupport::Duration.
 #
 # In addition to the parser, this extension adds literalizers for
-# ActiveSupport::Duration ithat use the standard Sequel literalization
+# ActiveSupport::Duration that use the standard Sequel literalization
 # callbacks, so they work on all adapters.
 #
 # If you would like to use interval columns in your model objects, you
@@ -122,7 +122,7 @@ module Sequel
         db.extend_datasets(IntervalDatasetMethods)
       end
 
-      # Handle ActiveSupport::Duration values in bound variables
+      # Handle ActiveSupport::Duration values in bound variables.
       def bound_variable_arg(arg, conn)
         case arg
         when ActiveSupport::Duration
