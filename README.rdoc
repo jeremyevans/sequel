@@ -93,11 +93,11 @@ Since datasets retrieve records only when needed, they can be stored and later r
   
 Sequel also offers convenience methods for extracting data from Datasets, such as an extended +map+ method:
 
-  middle_east.map(:name) #=> ['Egypt', 'Greece', 'Israel', ...]
+  middle_east.map(:name) #=> ['Egypt', 'Turkey', 'Israel', ...]
   
 Or getting results as a hash via +to_hash+, with one column as key and another as value:
 
-  middle_east.to_hash(:name, :area) #=> {'Israel' => 20000, 'Greece' => 120000, ...}
+  middle_east.to_hash(:name, :area) #=> {'Israel' => 20000, 'Turkey' => 120000, ...}
 
 == Getting Started
 
