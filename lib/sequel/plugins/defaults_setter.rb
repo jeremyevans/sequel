@@ -49,9 +49,9 @@ module Sequel
         def convert_default_value(v)
           case v
           when Sequel::CURRENT_DATE
-            Date.today
+            lambda{Date.today}
           when Sequel::CURRENT_TIMESTAMP
-            Sequel.datetime_class.now
+            lambda{Sequel.datetime_class.now}
           else
             v
           end
