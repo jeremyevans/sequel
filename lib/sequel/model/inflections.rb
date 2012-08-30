@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 module Sequel
   # Yield the Inflections module if a block is given, and return
   # the Inflections module.
@@ -29,7 +31,7 @@ module Sequel
     DEMODULIZE_CONVERT_REGEXP = /^.*::/.freeze
     EMPTY_STRING= ''.freeze
     SLASH = '/'.freeze
-    VALID_CONSTANT_NAME_REGEXP = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.freeze
+    VALID_CONSTANT_NAME_REGEXP = /\A(?:::)?([A-Z][A-ZÅÄÖa-zåäö]*(?:::[A-Z][A-ZÅÄÖa-zåäö]*)*)\z/.freeze
     UNDERSCORE = '_'.freeze
     UNDERSCORE_CONVERT_REGEXP1 = /([A-Z]+)([A-Z][a-z])/.freeze
     UNDERSCORE_CONVERT_REGEXP2 = /([a-z\d])([A-Z])/.freeze
