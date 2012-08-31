@@ -1,0 +1,237 @@
+= New Features
+
+* A constraint_validations extension and plugin have been added,
+  which allow you to define validations when creating tables,
+  which are enforced by database constraints, and have those
+  validations be automatically discovered and used by your
+  Sequel::Model classes.
+
+  The extension is designed to be used in your migrations/schema
+  modification code:
+
+    DB.extension(:constraint_validations)
+    DB.create_constraint_validations_table
+    DB.create_table(:foos) do
+      primary_key :id
+      String :name
+
+      validate do
+        min_length 5, :name
+      end
+    end
+
+  This creates a database CHECK constraint that ensures that the
+  minimum length for the column is 5 characters.  It also adds
+  metadata about the validation to the
+  sequel_constraint_validations table.
+
+  To have the model class automatically create validations, just
+  include the plugin in the model:
+
+    class Foo < Sequel::Model
+      plugin :constraint_validations
+    end
+
+  Note that MySQL does not enforce CHECK constraints (it parses
+  but ignores them), so using the extension on MySQL does not
+  actually enforce constraints at the database level (though it
+  still does support the automatic model validations if the plugin
+  is used).
+
+* Dataset#count now takes an argument or a virtual row block,
+  allowing you to do:
+
+    DB[:table].count(:column_name)
+    DB[:table].count{function_name(column1, column2)}
+
+  When count is given an argument, instead of returning the total
+  number of rows, it returns the number of rows where the
+  argument has a non-NULL value.
+
+* Database#copy_into has been added to the postgres adapter when
+  the pg driver is being used, and can be used for very fast
+  inserts into tables if you already have the input preformatted
+  in PostgreSQL text or CSV format.
+
+* set_table_not_null has been added to the alter table generator,
+  for a nicer API:
+
+    alter_table(:t){set_column_not_null :col}
+    # instead of
+    alter_table(:t){set_column_allow_null :col, false}
+
+  Additionally, set_column_allow_null now defaults the second
+  argument to true for a nicer API:
+
+    alter_table(:t){set_column_allow_null :col}
+    # instead of
+    alter_table(:t){set_column_allow_null :col, true}
+
+* Database#supports_regexp? has been added for checking if the
+  database supports Regexp in filters.  Currently, on MySQL and
+  PostgreSQL support that.
+
+  Attempting to use a Regexp on a database that doesn't support it
+  now raises an error when attempting to generate the SQL, instead
+  of sending invalid SQL to the database.
+
+* Sequel.char_length has been added for a cross platform
+  char_length function (emulated when char_length is not supported
+  natively by the database).
+
+* Sequel.trim has been added for a cross platform trim function
+  (emulated when trim is not supported natively by the database).
+
+* ValidationFailed and HookFailed exceptions now have a model method
+  that returns the model instance related to the exception.  This
+  makes it possible to use Model.create inside a begin/rescue block
+  and get access to the underlying instance if there is a validation
+  or before/around hook error.
+
+* The subclasses plugin now accepts a block, which is called with
+  each model class created.  This is useful if you want to apply
+  changes to classes created in the future instead of just existing
+  classes.
+
+* The validates_unique validation in the validation_helpers plugin
+  now accepts a :where option for a custom uniqueness filter.  Among
+  other things this makes it easy to implement a case insensitive
+  uniqueness validation on a case sensitive column.
+
+* The threaded connection pools now support a
+  :connection_handling=>:disconnect option, which makes them disconnect
+  connections after use instead of returning them to the pool.  This
+  makes it possible to completely control connection lifetime using
+  Database#synchronize.
+
+* The pg_row_op extension now has support for PGRowOp#*, for referencing
+  the members of the composite type as separate columns.
+
+* MySQL's set type and default value are now recognized.
+
+* bin/sequel now accepts a -c argument for running an arbitrary
+  code string instead of using an IRB prompt.
+
+= Other Improvements
+
+* Sequel now parses current date/timestamp column defaults when
+  parsing the schema for a table.  The values will be returned
+  as Sequel::CURRENT_DATE for date columns and
+  Sequel::CURRENT_TIMESTAMP for timestamp columns.
+
+  The schema_dumper extension will work with these defaults, so
+  if you dump the schema for a table with a column that uses
+  a current timestamp default, the dumped schema will include
+  the default.
+
+  The defaults setter plugin also works with these changes, so
+  that when new model objects are instantiated, they get the
+  current Date/Time/DateTime values set.
+
+* On MySQL and PostgreSQL, Sequel will now by default attempt
+  to combine multiple alter_table operations into a single
+  query where it believes it can do so correctly.  This can
+  potentially improve performance ~N times, where N is the number
+  of alter table operations.
+
+  This can change the SQL used for old migrations (though it
+  shouldn't change the result), and is a potentially risky
+  change.  This may be disabled by default in future versions
+  if it causes problems.
+
+* The defaults_setter plugin now correctly sets false default
+  values.
+
+* The schema_dumper plugin now preserves fractional seconds
+  in timestamp column defaults when dumping.
+
+* Time->DateTime and DateTime->Time typecasts now retain
+  fractional seconds on ruby 1.8.
+
+* Array arguments passed to most PGArrayOp methods are now
+  automatically wrapped in a PGArray.  If you want to use this
+  support, you need to make sure to load both the pg_array
+  and pg_array_op extensions.
+
+* Sequel now does a better job of finding the sequence for a
+  given table on PostgreSQL, handling more corner cases.  A small
+  side effect of this is sometimes sequence names will be quoted.
+
+* Some potential thread-safety issues when using Sequel with
+  PostgreSQL on a non-GVL ruby implementation have been fixed.
+
+* Sequel now correctly caches the server version query on MySQL.
+
+* Sets of alter_table operations on MySQL and Microsoft SQL Server
+  that require parsing the current database schema, where later
+  alter_table operations depend on earlier ones, should now work
+  correctly.
+
+* You can now drop check constraints on tables on SQLite, though
+  doing so drops all check constraints on the table, not only the
+  specific check constraint given.
+
+* The identity_map plugin no longer breaks if used with a model
+  without a primary key.
+
+* Sequel::SQL::NegativeBooleanConstant now inherits from Constant
+  instead of BooleanConstant.  This means that
+
+    Sequel::NULL == Sequel::NOTNULL
+
+  is now false instead of true.
+
+* You can now override the convert_tinyint_to_bool settings on a
+  per-Dataset basis in the mysql and mysql2 adapters, though
+  the overriding is different depending on the adapter.  Check the
+  commit log for details.
+
+* timestamp(N) types are now recognized as datetime, which should
+  fix certain cases on Oracle.
+
+* Dataset#insert now handles a single model instance argument
+  as a single value if the model uses the pg_row plugin.
+
+* When joining a model dataset using a model class as the table
+  argument, a subselect is used unless the model is a simple select
+  from the underlying table.
+
+* The specs now cleanup after themselves, dropping the tables that
+  they create for testing.
+
+= Backwards Compatibility
+
+* The defaults_setter plugin's behavior changed due to the 
+  current date/timestamp support.  Previously, it would not set
+  a value for the column, since the default wasn't recognized.
+  Therefore, the database would use the default value on insert,
+  which would be the database's current timestamp.
+
+  Now, the value is set to the current Date/Time/DateTime on
+  model object instantiation, so the database wouldn't use the
+  column default.  Instead of the database's current timestamp
+  on insert, the column value will be the application's
+  current timestamp on model instantiation.
+
+  Users who don't want this behavior can remove the default values
+  in the model:
+
+    Model.default_values.delete(:column_name)
+
+* Plain (non-model) datasets no longer allow insert to accept
+  a single model instance argument.  Also, they no longer call
+  values on a single argument if the object responds to it.
+
+* Plain (non-model) datasets no longer accept model classes as
+  tables in the join/graph methods.  Also, they no longer call
+  table_name on the argument if the object responds to it.
+
+* The schema_dumper extension now requires the eval_inspect
+  extension, which changes inspect output for
+  Sequel::SQL::Expression objects.
+
+* Custom adapters that override Database#alter_table_sql_list now
+  need to make sure it returns an already flattened array.
+
+* The identity_map_key method in the identity_map plugin now returns
+  nil instead of a random string if the given pk is nil.
