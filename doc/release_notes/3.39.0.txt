@@ -34,9 +34,9 @@
 
   Note that MySQL does not enforce CHECK constraints (it parses
   but ignores them), so using the extension on MySQL does not
-  actually enforce constraints at the database level (though it
+  actually enforce constraints at the database level, though it
   still does support the automatic model validations if the plugin
-  is used).
+  is used.
 
 * Dataset#count now takes an argument or a virtual row block,
   allowing you to do:
@@ -68,8 +68,8 @@
     alter_table(:t){set_column_allow_null :col, true}
 
 * Database#supports_regexp? has been added for checking if the
-  database supports Regexp in filters.  Currently, on MySQL and
-  PostgreSQL support that.
+  database supports Regexp in filters.  Currently, only MySQL and
+  PostgreSQL support Regexps.
 
   Attempting to use a Regexp on a database that doesn't support it
   now raises an error when attempting to generate the SQL, instead
