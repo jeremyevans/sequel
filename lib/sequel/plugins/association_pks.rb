@@ -61,7 +61,11 @@ module Sequel
               ds = _join_table_dataset(opts).filter(opts[:left_key]=>send(opts[:left_primary_key]))
               ds.exclude(opts[:right_key]=>pks).delete
               pks -= ds.select_map(opts[:right_key])
-              pks.each{|pk| ds.insert(opts[:left_key]=>send(opts[:left_primary_key]), opts[:right_key]=>pk)}
+              pks.each do |pk|
+                insert = Hash[Array(opts[:right_key]).zip(Array(pk))]
+                insert[opts[:left_key]] = send(opts[:left_primary_key])
+                ds.insert(insert)
+              end
             end
           end
         end
