@@ -12,14 +12,25 @@ describe "Sequel::Plugins::AssociationPks" do
         a << {:tag_id=>2} if $1 != '3'
         a << {:tag_id=>3} if $1 == '2'
         a
+      when "SELECT first_name, last_name FROM vocalists WHERE (vocalists.album_id = 1)"
+        [{:first_name=>"F1", :last_name=>"L1"}, {:first_name=>"F2", :last_name=>"L2"}]
+      when /SELECT first_name, last_name FROM albums_vocalists WHERE \(album_id = (\d)\)/
+        a = []
+        a << {:first_name=>"F1", :last_name=>"L1"} if $1 == '1'
+        a << {:first_name=>"F2", :last_name=>"L2"} if $1 != '3'
+        a << {:first_name=>"F3", :last_name=>"L3"} if $1 == '2'
+        a
       end
     end)
     @Artist = Class.new(Sequel::Model(@db[:artists]))
     @Artist.columns :id
-    @Album= Class.new(Sequel::Model(@db[:albums]))
+    @Album = Class.new(Sequel::Model(@db[:albums]))
     @Album.columns :id, :artist_id
     @Tag = Class.new(Sequel::Model(@db[:tags]))
     @Tag.columns :id
+    @Vocalist = Class.new(Sequel::Model(@db[:vocalists]))
+    @Vocalist.columns :first_name, :last_name, :album_id
+    @Vocalist.set_primary_key [:first_name, :last_name]
     @Artist.plugin :association_pks
     @Album.plugin :association_pks
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
@@ -57,6 +68,37 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
     sqls[1].should == 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
     sqls[2].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
+    sqls.length.should == 3
+  end
+
+  specify "should return correct associated cpks for one_to_many associations" do
+    @Album.one_to_many :vocalists, :class=>@Vocalist, :key=>:album_id
+    @Album.load(:id=>1).vocalist_pks.should == [["F1", "L1"], ["F2", "L2"]]
+    @Album.load(:id=>2).vocalist_pks.should == []
+  end
+
+  specify "should return correct associated cpks for many_to_many associations" do
+    @Album.many_to_many :vocalists, :class=>@Vocalist, :join_table=>:albums_vocalists, :left_key=>:album_id, :right_key=>[:first_name, :last_name]
+    @Album.load(:id=>1).vocalist_pks.should == [["F1", "L1"], ["F2", "L2"]]
+    @Album.load(:id=>2).vocalist_pks.should == [["F2", "L2"], ["F3", "L3"]]
+    @Album.load(:id=>3).vocalist_pks.should == []
+  end
+
+  specify "should set associated cpks correctly for a one_to_many association" do
+    @Album.one_to_many :vocalists, :class=>@Vocalist, :key=>:album_id
+    @Album.load(:id=>1).vocalist_pks = [["F1", "L1"], ["F2", "L2"]]
+    @db.sqls.should == ["UPDATE vocalists SET album_id = 1 WHERE ((first_name, last_name) IN (('F1', 'L1'), ('F2', 'L2')))",
+      "UPDATE vocalists SET album_id = NULL WHERE ((vocalists.album_id = 1) AND ((first_name, last_name) NOT IN (('F1', 'L1'), ('F2', 'L2'))))"]
+  end
+
+  specify "should set associated cpks correctly for a many_to_many association" do
+    @Album.many_to_many :vocalists, :class=>@Vocalist, :join_table=>:albums_vocalists, :left_key=>:album_id, :right_key=>[:first_name, :last_name]
+    @Album.load(:id=>2).vocalist_pks = [["F1", "L1"], ["F2", "L2"]]
+    sqls = @db.sqls
+    sqls[0].should == "DELETE FROM albums_vocalists WHERE ((album_id = 2) AND ((first_name, last_name) NOT IN (('F1', 'L1'), ('F2', 'L2'))))"
+    sqls[1].should == 'SELECT first_name, last_name FROM albums_vocalists WHERE (album_id = 2)'
+    sqls[2] =~ /INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/
+    Hash[$1.split(', ').zip($2.split(', '))].should == {"first_name"=>"'F1'", "last_name"=>"'L1'", "album_id"=>"2"}
     sqls.length.should == 3
   end
 
