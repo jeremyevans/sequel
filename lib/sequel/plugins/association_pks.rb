@@ -21,9 +21,6 @@ module Sequel
     # not call any callbacks.  If you have any association callbacks,
     # you probably should not use the setter methods.
     #
-    # This plugin only works with singular primary keys, it does not work
-    # with composite primary keys.
-    # 
     # Usage:
     #
     #   # Make all model subclass *_to_many associations have association_pks
@@ -53,15 +50,21 @@ module Sequel
         def def_many_to_many(opts)
           super
           def_association_pks_getter(opts) do
-            _join_table_dataset(opts).filter(opts[:left_key]=>send(opts[:left_primary_key])).select_map(opts[:right_key])
+            left_pk = Array(opts[:left_primary_key]).map{|k| send(k)}
+            _join_table_dataset(opts).filter(opts[:left_key]=>[left_pk]).select_map(opts[:right_key])
           end
           def_association_pks_setter(opts) do |pks|
             pks = convert_pk_array(opts, pks)
             checked_transaction do
-              ds = _join_table_dataset(opts).filter(opts[:left_key]=>send(opts[:left_primary_key]))
+              left_pk = Array(opts[:left_primary_key]).map{|k| send(k)}
+              ds = _join_table_dataset(opts).filter(opts[:left_key]=>[left_pk])
               ds.exclude(opts[:right_key]=>pks).delete
               pks -= ds.select_map(opts[:right_key])
-              pks.each{|pk| ds.insert(opts[:left_key]=>send(opts[:left_primary_key]), opts[:right_key]=>pk)}
+              pks.each do |pk|
+                left = Array(opts[:left_key]).zip(left_pk)
+                right = Array(opts[:right_key]).zip(Array(pk))
+                ds.insert(Hash[left + right])
+              end
             end
           end
         end
@@ -79,9 +82,9 @@ module Sequel
             checked_transaction do
               ds = send(opts.dataset_method)
               primary_key = opts.associated_class.primary_key
-              key = opts[:key]
-              ds.unfiltered.filter(primary_key=>pks).update(key=>pk)
-              ds.exclude(primary_key=>pks).update(key=>nil)
+              key = Array(opts[:key])
+              ds.unfiltered.filter(primary_key=>pks).update(Hash[key.zip(Array(pk))])
+              ds.exclude(primary_key=>pks).update(Hash[key.zip])
             end
           end
         end

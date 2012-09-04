@@ -1069,7 +1069,7 @@ end
 describe "AssociationPks plugin" do 
   before(:all) do
     @db = INTEGRATION_DB
-    @db.drop_table?(:albums_tags, :tags, :albums, :artists)
+    @db.drop_table?(:albums_tags, :albums_vocalists, :vocalists_instruments, :vocalists_hits, :hits, :instruments, :vocalists, :tags, :albums, :artists)
     @db.create_table(:artists) do
       primary_key :id
       String :name
@@ -1087,6 +1087,46 @@ describe "AssociationPks plugin" do
       foreign_key :album_id, :albums
       foreign_key :tag_id, :tags
     end
+    @db.create_table(:vocalists) do
+      String :first
+      String :last
+      primary_key [:first, :last]
+      foreign_key :album_id, :albums
+    end
+    @db.create_table(:albums_vocalists) do
+      foreign_key :album_id, :albums
+      String :first
+      String :last
+      foreign_key [:first, :last], :vocalists
+    end
+    @db.create_table(:instruments) do
+      primary_key :id
+      String :first
+      String :last
+      foreign_key [:first, :last], :vocalists
+    end
+    @db.create_table(:vocalists_instruments) do
+      String :first
+      String :last
+      foreign_key [:first, :last], :vocalists
+      foreign_key :instrument_id, :instruments
+    end
+    @db.create_table(:hits) do
+      Integer :year
+      Integer :week
+      primary_key [:year, :week]
+      String :first
+      String :last
+      foreign_key [:first, :last], :vocalists
+    end
+    @db.create_table(:vocalists_hits) do
+      String :first
+      String :last
+      foreign_key [:first, :last], :vocalists
+      Integer :year
+      Integer :week
+      foreign_key [:year, :week], :hits
+    end
     class ::Artist < Sequel::Model
       plugin :association_pks
       one_to_many :albums, :order=>:id
@@ -1097,9 +1137,17 @@ describe "AssociationPks plugin" do
     end 
     class ::Tag < Sequel::Model
     end 
+    class ::Vocalist < Sequel::Model
+      plugin :association_pks
+    end
+    class ::Instrument < Sequel::Model
+      plugin :association_pks
+    end
+    class ::Hit < Sequel::Model
+    end
   end
   before do
-    [:albums_tags, :tags, :albums, :artists].each{|t| @db[t].delete}
+    [:albums_tags, :albums_vocalists, :vocalists_instruments, :vocalists_hits, :hits, :instruments, :vocalists, :tags, :albums, :artists].each{|t| @db[t].delete}
     @ar1 =@db[:artists].insert(:name=>'YJM')
     @ar2 =@db[:artists].insert(:name=>'AS')
     @al1 =@db[:albums].insert(:name=>'RF', :artist_id=>@ar1)
@@ -1111,10 +1159,34 @@ describe "AssociationPks plugin" do
     {@al1=>[@t1, @t2, @t3], @al2=>[@t2]}.each do |aid, tids|
       tids.each{|tid| @db[:albums_tags].insert([aid, tid])}
     end
+    @v1 = ['F1', 'L1']
+    @v2 = ['F2', 'L2']
+    @v3 = ['F3', 'L3']
+    @db[:vocalists].insert(@v1 + [@al1])
+    @db[:vocalists].insert(@v2 + [@al1])
+    @db[:vocalists].insert(@v3 + [@al1])
+    @i1 = @db[:instruments].insert([:first, :last], @v1)
+    @i2 = @db[:instruments].insert([:first, :last], @v1)
+    @i3 = @db[:instruments].insert([:first, :last], @v1)
+    @h1 = [1997, 1]
+    @h2 = [1997, 2]
+    @h3 = [1997, 3]
+    @db[:hits].insert(@h1 + @v1)
+    @db[:hits].insert(@h2 + @v1)
+    @db[:hits].insert(@h3 + @v1)
+    {@al1=>[@v1, @v2, @v3], @al2=>[@v2]}.each do |aid, vids|
+      vids.each{|vid| @db[:albums_vocalists].insert([aid] + vid)}
+    end
+    {@v1=>[@i1, @i2, @i3], @v2=>[@i2]}.each do |vid, iids|
+      iids.each{|iid| @db[:vocalists_instruments].insert(vid + [iid])}
+    end
+    {@v1=>[@h1, @h2, @h3], @v2=>[@h2]}.each do |vid, hids|
+      hids.each{|hid| @db[:vocalists_hits].insert(vid + hid)}
+    end
   end
   after(:all) do
-    @db.drop_table? :albums_tags, :tags, :albums, :artists
-    [:Artist, :Album, :Tag].each{|s| Object.send(:remove_const, s)}
+    @db.drop_table? :albums_tags, :albums_vocalists, :vocalists_instruments, :vocalists_hits, :hits, :instruments, :vocalists, :tags, :albums, :artists
+    [:Artist, :Album, :Tag, :Vocalist, :Instrument, :Hit].each{|s| Object.send(:remove_const, s)}
   end
 
   specify "should return correct associated pks for one_to_many associations" do
@@ -1123,6 +1195,36 @@ describe "AssociationPks plugin" do
 
   specify "should return correct associated pks for many_to_many associations" do
     Album.order(:id).all.map{|a| a.tag_pks.sort}.should == [[@t1, @t2, @t3], [@t2], []]
+  end
+
+  specify "should return correct associated right-side cpks for one_to_many associations" do
+    Album.one_to_many :vocalists, :order=>:first
+    Album.order(:id).all.map{|a| a.vocalist_pks.sort}.should == [[@v1, @v2, @v3], [], []]
+  end
+
+  specify "should return correct associated right-side cpks for many_to_many associations" do
+    Album.many_to_many :vocalists, :join_table=>:albums_vocalists, :right_key=>[:first, :last], :order=>:first
+    Album.order(:id).all.map{|a| a.vocalist_pks.sort}.should == [[@v1, @v2, @v3], [@v2], []]
+  end
+
+  specify "should return correct associated pks for left-side cpks for one_to_many associations" do
+    Vocalist.one_to_many :instruments, :key=>[:first, :last], :order=>:id
+    Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.should == [[@i1, @i2, @i3], [], []]
+  end
+
+  specify "should return correct associated pks for left-side cpks for many_to_many associations" do
+    Vocalist.many_to_many :instruments, :join_table=>:vocalists_instruments, :left_key=>[:first, :last], :order=>:id
+    Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.should == [[@i1, @i2, @i3], [@i2], []]
+  end
+
+  specify "should return correct associated right-side cpks for left-side cpks for one_to_many associations" do
+    Vocalist.one_to_many :hits, :key=>[:first, :last], :order=>:week
+    Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.should == [[@h1, @h2, @h3], [], []]
+  end
+
+  specify "should return correct associated right-side cpks for left-side cpks for many_to_many associations" do
+    Vocalist.many_to_many :hits, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week], :order=>:week
+    Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.should == [[@h1, @h2, @h3], [@h2], []]
   end
 
   specify "should set associated pks correctly for a one_to_many association" do
@@ -1162,8 +1264,130 @@ describe "AssociationPks plugin" do
     Album[@al3].tag_pks = []
     @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == []
   end
-end
 
+  specify "should set associated right-side cpks correctly for a one_to_many association" do
+    Album.use_transactions = true
+    Album.one_to_many :vocalists, :order=>:first
+    Album.order(:id).all.map{|a| a.vocalist_pks.sort}.should == [[@v1, @v2, @v3], [], []]
+
+    Album[@al2].vocalist_pks = [@v1, @v3]
+    Album[@al1].vocalist_pks.should == [@v2]
+    Vocalist.order(:first, :last).select_map(:album_id).should == [@al2, @al1, @al2]
+
+    Album[@al1].vocalist_pks = [@v1]
+    Album[@al2].vocalist_pks.should == [@v3]
+    Vocalist.order(:first, :last).select_map(:album_id).should == [@al1, nil, @al2]
+
+    Album[@al1].vocalist_pks = [@v1, @v2]
+    Album[@al2].vocalist_pks.should == [@v3]
+    Vocalist.order(:first, :last).select_map(:album_id).should == [@al1, @al1, @al2]
+  end
+
+  specify "should set associated right-side cpks correctly for a many_to_many association" do
+    Album.use_transactions = true
+    Album.many_to_many :vocalists, :join_table=>:albums_vocalists, :right_key=>[:first, :last], :order=>:first
+
+    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).should == [@v1, @v2, @v3]
+    Album[@al1].vocalist_pks = [@v1, @v3]
+    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).should == [@v1, @v3]
+    Album[@al1].vocalist_pks = []
+    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).should == []
+
+    @db[:albums_vocalists].filter(:album_id=>@al2).select_order_map([:first, :last]).should == [@v2]
+    Album[@al2].vocalist_pks = [@v1, @v2]
+    @db[:albums_vocalists].filter(:album_id=>@al2).select_order_map([:first, :last]).should == [@v1, @v2]
+    Album[@al2].vocalist_pks = []
+    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).should == []
+
+    @db[:albums_vocalists].filter(:album_id=>@al3).select_order_map([:first, :last]).should == []
+    Album[@al3].vocalist_pks = [@v1, @v3]
+    @db[:albums_vocalists].filter(:album_id=>@al3).select_order_map([:first, :last]).should == [@v1, @v3]
+    Album[@al3].vocalist_pks = []
+    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).should == []
+  end
+
+  specify "should set associated pks correctly with left-side cpks for a one_to_many association" do
+    Vocalist.use_transactions = true
+    Vocalist.one_to_many :instruments, :key=>[:first, :last], :order=>:id
+    Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.should == [[@i1, @i2, @i3], [], []]
+
+    Vocalist[@v2].instrument_pks = [@i1, @i3]
+    Vocalist[@v1].instrument_pks.should == [@i2]
+    Instrument.order(:id).select_map([:first, :last]).should == [@v2, @v1, @v2]
+
+    Vocalist[@v1].instrument_pks = [@i1]
+    Vocalist[@v2].instrument_pks.should == [@i3]
+    Instrument.order(:id).select_map([:first, :last]).should == [@v1, [nil, nil], @v2]
+
+    Vocalist[@v1].instrument_pks = [@i1, @i2]
+    Vocalist[@v2].instrument_pks.should == [@i3]
+    Instrument.order(:id).select_map([:first, :last]).should == [@v1, @v1, @v2]
+  end
+
+  specify "should set associated pks correctly with left-side cpks for a many_to_many association" do
+    Vocalist.use_transactions = true
+    Vocalist.many_to_many :instruments, :join_table=>:vocalists_instruments, :left_key=>[:first, :last], :order=>:id
+
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).should == [@i1, @i2, @i3]
+    Vocalist[@v1].instrument_pks = [@i1, @i3]
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).should == [@i1, @i3]
+    Vocalist[@v1].instrument_pks = []
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).should == []
+
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v2]).select_order_map(:instrument_id).should == [@i2]
+    Vocalist[@v2].instrument_pks = [@i1, @i2]
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v2]).select_order_map(:instrument_id).should == [@i1, @i2]
+    Vocalist[@v2].instrument_pks = []
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).should == []
+
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v3]).select_order_map(:instrument_id).should == []
+    Vocalist[@v3].instrument_pks = [@i1, @i3]
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v3]).select_order_map(:instrument_id).should == [@i1, @i3]
+    Vocalist[@v3].instrument_pks = []
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).should == []
+  end
+
+  specify "should set associated right-side cpks correctly with left-side cpks for a one_to_many association" do
+    Vocalist.use_transactions = true
+    Vocalist.one_to_many :hits, :key=>[:first, :last], :order=>:week
+    Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.should == [[@h1, @h2, @h3], [], []]
+
+    Vocalist[@v2].hit_pks = [@h1, @h3]
+    Vocalist[@v1].hit_pks.should == [@h2]
+    Hit.order(:year, :week).select_map([:first, :last]).should == [@v2, @v1, @v2]
+
+    Vocalist[@v1].hit_pks = [@h1]
+    Vocalist[@v2].hit_pks.should == [@h3]
+    Hit.order(:year, :week).select_map([:first, :last]).should == [@v1, [nil, nil], @v2]
+
+    Vocalist[@v1].hit_pks = [@h1, @h2]
+    Vocalist[@v2].hit_pks.should == [@h3]
+    Hit.order(:year, :week).select_map([:first, :last]).should == [@v1, @v1, @v2]
+  end
+
+  specify "should set associated right-side cpks correctly with left-side cpks for a many_to_many association" do
+    Vocalist.use_transactions = true
+    Vocalist.many_to_many :hits, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week], :order=>:week
+
+    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).should == [@h1, @h2, @h3]
+    Vocalist[@v1].hit_pks = [@h1, @h3]
+    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).should == [@h1, @h3]
+    Vocalist[@v1].hit_pks = []
+    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).should == []
+
+    @db[:vocalists_hits].filter([:first, :last]=>[@v2]).select_order_map([:year, :week]).should == [@h2]
+    Vocalist[@v2].hit_pks = [@h1, @h2]
+    @db[:vocalists_hits].filter([:first, :last]=>[@v2]).select_order_map([:year, :week]).should == [@h1, @h2]
+    Vocalist[@v2].hit_pks = []
+    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).should == []
+
+    @db[:vocalists_hits].filter([:first, :last]=>[@v3]).select_order_map([:year, :week]).should == []
+    Vocalist[@v3].hit_pks = [@h1, @h3]
+    @db[:vocalists_hits].filter([:first, :last]=>[@v3]).select_order_map([:year, :week]).should == [@h1, @h3]
+    Vocalist[@v3].hit_pks = []
+    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).should == []
+  end
+end
 
 describe "List plugin without a scope" do
   before(:all) do
