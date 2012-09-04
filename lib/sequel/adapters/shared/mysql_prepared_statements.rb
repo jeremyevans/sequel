@@ -6,6 +6,17 @@ module Sequel
     # prepared statements and stored procedures.
     module PreparedStatements
       module DatabaseMethods
+        disconnect_errors = <<-END.split("\n").map{|l| l.strip}
+        Commands out of sync; you can't run this command now
+        Can't connect to local MySQL server through socket
+        MySQL server has gone away
+        Lost connection to MySQL server during query
+        This connection is still waiting for a result, try again once you have the result
+        closed MySQL connection
+        END
+        # Error messages for mysql and mysql2 that indicate the current connection should be disconnected
+        MYSQL_DATABASE_DISCONNECT_ERRORS = /\A#{Regexp.union(disconnect_errors)}/o
+       
         # Support stored procedures on MySQL
         def call_sproc(name, opts={}, &block)
           args = opts[:args] || [] 

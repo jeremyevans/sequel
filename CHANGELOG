@@ -1,5 +1,7 @@
 === HEAD
 
+* Combine disconnect error detection for mysql and mysql2 adapters (jeremyevans)
+
 * Update the association_pks plugin to handle composite primary keys (chanks, jeremyevans) (#544)
 
 === 3.39.0 (2012-09-01)

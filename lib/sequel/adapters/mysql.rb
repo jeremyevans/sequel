@@ -41,9 +41,6 @@ module Sequel
       include Sequel::MySQL::DatabaseMethods
       include Sequel::MySQL::PreparedStatements::DatabaseMethods
       
-      # Mysql::Error messages that indicate the current connection should be disconnected
-      MYSQL_DATABASE_DISCONNECT_ERRORS = /\A(Commands out of sync; you can't run this command now|Can't connect to local MySQL server through socket|MySQL server has gone away|Lost connection to MySQL server during query)/
-       
       # Regular expression used for getting accurate number of rows
       # matched by an update statement.
       AFFECTED_ROWS_RE = /Rows matched:\s+(\d+)\s+Changed:\s+\d+\s+Warnings:\s+\d+/.freeze
