@@ -49,21 +49,84 @@ module Sequel
         # a setter that deletes from or inserts into the join table.
         def def_many_to_many(opts)
           super
-          def_association_pks_getter(opts) do
-            left_pk = Array(opts[:left_primary_key]).map{|k| send(k)}
-            _join_table_dataset(opts).filter(opts[:left_key]=>[left_pk]).select_map(opts[:right_key])
-          end
-          def_association_pks_setter(opts) do |pks|
-            pks = convert_pk_array(opts, pks)
-            checked_transaction do
-              left_pk = Array(opts[:left_primary_key]).map{|k| send(k)}
-              ds = _join_table_dataset(opts).filter(opts[:left_key]=>[left_pk])
-              ds.exclude(opts[:right_key]=>pks).delete
-              pks -= ds.select_map(opts[:right_key])
-              pks.each do |pk|
-                left = Array(opts[:left_key]).zip(left_pk)
-                right = Array(opts[:right_key]).zip(Array(pk))
-                ds.insert(Hash[left + right])
+          # Grab values from the reflection so that the hash lookup only needs to be
+          # done once instead of inside ever method call.
+          lk, lpk, rk = opts.values_at(:left_key, :left_primary_key, :right_key)
+
+          # Add 2 separate implementations of the getter method optimized for the
+          # composite and singular left key cases, and 4 separate implementations of the setter
+          # method optimized for each combination of composite and singular keys for both
+          # the left and right keys.
+          if lpk.is_a?(Array)
+            def_association_pks_getter(opts) do
+              h = {}
+              lk.zip(lpk).each{|k, pk| h[k] = send(pk)}
+              _join_table_dataset(opts).filter(h).select_map(rk)
+            end
+
+            if rk.is_a?(Array)
+              def_association_pks_setter(opts) do |pks|
+                pks = convert_cpk_array(opts, pks)
+                checked_transaction do
+                  lpkv = lpk.map{|k| send(k)}
+                  ds = _join_table_dataset(opts).filter(lk.zip(lpkv))
+                  ds.exclude(rk=>pks).delete
+                  pks -= ds.select_map(rk)
+                  h = {}
+                  lk.zip(lpkv).each{|k, v| h[k] = v}
+                  pks.each do |pk|
+                    ih = h.dup
+                    rk.zip(pk).each{|k, v| ih[k] = v}
+                    ds.insert(ih)
+                  end
+                end
+              end
+            else
+              def_association_pks_setter(opts) do |pks|
+                pks = convert_pk_array(opts, pks)
+                checked_transaction do
+                  lpkv = lpk.map{|k| send(k)}
+                  ds = _join_table_dataset(opts).filter(lk.zip(lpkv))
+                  ds.exclude(rk=>pks).delete
+                  pks -= ds.select_map(rk)
+                  h = {}
+                  lk.zip(lpkv).each{|k, v| h[k] = v}
+                  pks.each do |pk|
+                    ds.insert(h.merge(rk=>pk))
+                  end
+                end
+              end
+            end
+          else
+            def_association_pks_getter(opts) do
+              _join_table_dataset(opts).filter(lk=>send(lpk)).select_map(rk)
+            end
+
+            if rk.is_a?(Array)
+              def_association_pks_setter(opts) do |pks|
+                pks = convert_cpk_array(opts, pks)
+                checked_transaction do
+                  lpkv = send(lpk)
+                  ds = _join_table_dataset(opts).filter(lk=>lpkv)
+                  ds.exclude(rk=>pks).delete
+                  pks -= ds.select_map(rk)
+                  pks.each do |pk|
+                    h = {lk=>lpkv}
+                    rk.zip(pk).each{|k, v| h[k] = v}
+                    ds.insert(h)
+                  end
+                end
+              end
+            else
+              def_association_pks_setter(opts) do |pks|
+                pks = convert_pk_array(opts, pks)
+                checked_transaction do
+                  lpkv = send(lpk)
+                  ds = _join_table_dataset(opts).filter(lk=>lpkv)
+                  ds.exclude(rk=>pks).delete
+                  pks -= ds.select_map(rk)
+                  pks.each{|pk| ds.insert(lk=>lpkv, rk=>pk)}
+                end
               end
             end
           end
@@ -74,17 +137,40 @@ module Sequel
         def def_one_to_many(opts)
           super
           return if opts[:type] == :one_to_one
+
+          key = opts[:key]
+
           def_association_pks_getter(opts) do
             send(opts.dataset_method).select_map(opts.associated_class.primary_key)
           end
+
           def_association_pks_setter(opts) do |pks|
-            pks = convert_pk_array(opts, pks)
+            primary_key = opts.associated_class.primary_key
+
+            pks = if primary_key.is_a?(Array)
+              convert_cpk_array(opts, pks)
+            else
+              convert_pk_array(opts, pks)
+            end
+
+            pkh = {primary_key=>pks}
+
+            if key.is_a?(Array)
+              h = {}
+              nh = {}
+              key.zip(pk).each do|k, v|
+                h[k] = v
+                nh[k] = nil
+              end
+            else
+              h = {key=>pk}
+              nh = {key=>nil}
+            end
+
             checked_transaction do
               ds = send(opts.dataset_method)
-              primary_key = opts.associated_class.primary_key
-              key = Array(opts[:key])
-              ds.unfiltered.filter(primary_key=>pks).update(Hash[key.zip(Array(pk))])
-              ds.exclude(primary_key=>pks).update(Hash[key.zip])
+              ds.unfiltered.filter(pkh).update(h)
+              ds.exclude(pkh).update(nh)
             end
           end
         end
@@ -92,6 +178,20 @@ module Sequel
 
       module InstanceMethods
         private
+
+        # If any of associated class's composite primary key column types is integer,
+        # typecast the appropriate values to integer before using them.
+        def convert_cpk_array(opts, cpks)
+          if klass = opts.associated_class and sch = klass.db_schema and (cols = sch.values_at(*klass.primary_key)).all? and (convs = cols.map{|c| c[:type] == :integer}).any?
+            cpks.map do |cpk|
+              cpk.zip(convs).map do |pk, conv|
+                conv ? model.db.typecast_value(:integer, pk) : pk
+              end
+            end
+          else
+            cpks
+          end
+        end
 
         # If the associated class's primary key column type is integer,
         # typecast all provided values to integer before using them.

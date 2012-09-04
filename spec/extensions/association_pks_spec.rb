@@ -6,7 +6,7 @@ describe "Sequel::Plugins::AssociationPks" do
       case sql
       when "SELECT id FROM albums WHERE (albums.artist_id = 1)"
         [{:id=>1}, {:id=>2}, {:id=>3}]
-      when /SELECT tag_id FROM albums_tags WHERE \(album_id IN \(\((\d)\)\)\)/
+      when /SELECT tag_id FROM albums_tags WHERE \(album_id = (\d)\)/
         a = []
         a << {:tag_id=>1} if $1 == '1'
         a << {:tag_id=>2} if $1 != '3'
@@ -14,7 +14,7 @@ describe "Sequel::Plugins::AssociationPks" do
         a
       when "SELECT first, last FROM vocalists WHERE (vocalists.album_id = 1)"
         [{:first=>"F1", :last=>"L1"}, {:first=>"F2", :last=>"L2"}]
-      when /SELECT first, last FROM albums_vocalists WHERE \(album_id IN \(\((\d)\)\)\)/
+      when /SELECT first, last FROM albums_vocalists WHERE \(album_id = (\d)\)/
         a = []
         a << {:first=>"F1", :last=>"L1"} if $1 == '1'
         a << {:first=>"F2", :last=>"L2"} if $1 != '3'
@@ -22,19 +22,19 @@ describe "Sequel::Plugins::AssociationPks" do
         a
       when "SELECT id FROM instruments WHERE ((instruments.first = 'F1') AND (instruments.last = 'L1'))"
         [{:id=>1}, {:id=>2}]
-      when /SELECT instrument_id FROM vocalists_instruments WHERE \(\(first, last\) IN \(\((.*)\)\)\)/
+      when /SELECT instrument_id FROM vocalists_instruments WHERE \(\((?:first|last) = '?[FL1](\d)/
         a = []
-        a << {:instrument_id=>1} if $1 == "'F1', 'L1'"
-        a << {:instrument_id=>2} if $1 != "'F3', 'L3'"
-        a << {:instrument_id=>3} if $1 == "'F2', 'L2'"
+        a << {:instrument_id=>1} if $1 == "1"
+        a << {:instrument_id=>2} if $1 != "3"
+        a << {:instrument_id=>3} if $1 == "2"
         a
       when "SELECT year, week FROM hits WHERE ((hits.first = 'F1') AND (hits.last = 'L1'))"
         [{:year=>1997, :week=>1}, {:year=>1997, :week=>2}]
-      when /SELECT year, week FROM vocalists_hits WHERE \(\(first, last\) IN \(\((.*)\)\)\)/
+      when /SELECT year, week FROM vocalists_hits WHERE \(\((?:first|last) = '?[FL1](\d)/
         a = []
-        a << {:year=>1997, :week=>1} if $1 == "'F1', 'L1'"
-        a << {:year=>1997, :week=>2} if $1 != "'F3', 'L3'"
-        a << {:year=>1997, :week=>3} if $1 == "'F2', 'L2'"
+        a << {:year=>1997, :week=>1} if $1 == "1"
+        a << {:year=>1997, :week=>2} if $1 != "3"
+        a << {:year=>1997, :week=>3} if $1 == "2"
         a
       end
     end)
@@ -87,8 +87,8 @@ describe "Sequel::Plugins::AssociationPks" do
   specify "should set associated pks correctly for a many_to_many association" do
     @Album.load(:id=>2).tag_pks = [1, 3]
     sqls = @db.sqls
-    sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id IN ((2))) AND (tag_id NOT IN (1, 3)))"
-    sqls[1].should == 'SELECT tag_id FROM albums_tags WHERE (album_id IN ((2)))'
+    sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
+    sqls[1].should == 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
     sqls[2].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
     sqls.length.should == 3
   end
@@ -117,8 +117,8 @@ describe "Sequel::Plugins::AssociationPks" do
     @Album.many_to_many :vocalists, :class=>@Vocalist, :join_table=>:albums_vocalists, :left_key=>:album_id, :right_key=>[:first, :last]
     @Album.load(:id=>2).vocalist_pks = [["F1", "L1"], ["F2", "L2"]]
     sqls = @db.sqls
-    sqls[0].should == "DELETE FROM albums_vocalists WHERE ((album_id IN ((2))) AND ((first, last) NOT IN (('F1', 'L1'), ('F2', 'L2'))))"
-    sqls[1].should == 'SELECT first, last FROM albums_vocalists WHERE (album_id IN ((2)))'
+    sqls[0].should == "DELETE FROM albums_vocalists WHERE ((album_id = 2) AND ((first, last) NOT IN (('F1', 'L1'), ('F2', 'L2'))))"
+    sqls[1].should == 'SELECT first, last FROM albums_vocalists WHERE (album_id = 2)'
     match = sqls[2].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"'F1'", "last"=>"'L1'", "album_id"=>"2"}
     sqls.length.should == 3
@@ -150,8 +150,8 @@ describe "Sequel::Plugins::AssociationPks" do
     @Vocalist.many_to_many :instruments, :class=>@Instrument, :join_table=>:vocalists_instruments, :left_key=>[:first, :last]
     @Vocalist.load(:first=>'F2', :last=>'L2').instrument_pks = [1, 2]
     sqls = @db.sqls
-    sqls[0].should == "DELETE FROM vocalists_instruments WHERE (((first, last) IN (('F2', 'L2'))) AND (instrument_id NOT IN (1, 2)))"
-    sqls[1].should == "SELECT instrument_id FROM vocalists_instruments WHERE ((first, last) IN (('F2', 'L2')))"
+    sqls[0].should == "DELETE FROM vocalists_instruments WHERE ((first = 'F2') AND (last = 'L2') AND (instrument_id NOT IN (1, 2)))"
+    sqls[1].should == "SELECT instrument_id FROM vocalists_instruments WHERE ((first = 'F2') AND (last = 'L2'))"
     match = sqls[2].match(/INSERT INTO vocalists_instruments \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"'F2'", "last"=>"'L2'", "instrument_id"=>"1"}
     sqls.length.should == 3
@@ -183,8 +183,8 @@ describe "Sequel::Plugins::AssociationPks" do
     @Vocalist.many_to_many :hits, :class=>@Hit, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week]
     @Vocalist.load(:first=>'F2', :last=>'L2').hit_pks = [[1997, 1], [1997, 2]]
     sqls = @db.sqls
-    sqls[0].should == "DELETE FROM vocalists_hits WHERE (((first, last) IN (('F2', 'L2'))) AND ((year, week) NOT IN ((1997, 1), (1997, 2))))"
-    sqls[1].should == "SELECT year, week FROM vocalists_hits WHERE ((first, last) IN (('F2', 'L2')))"
+    sqls[0].should == "DELETE FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2') AND ((year, week) NOT IN ((1997, 1), (1997, 2))))"
+    sqls[1].should == "SELECT year, week FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2'))"
     match = sqls[2].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"'F2'", "last"=>"'L2'", "year"=>"1997", "week"=>"1"}
     sqls.length.should == 3
@@ -204,8 +204,8 @@ describe "Sequel::Plugins::AssociationPks" do
     album.tag_pks = [1, 3]
     sqls = @db.sqls
     sqls[0].should == "BEGIN"
-    sqls[1].should == "DELETE FROM albums_tags WHERE ((album_id IN ((2))) AND (tag_id NOT IN (1, 3)))"
-    sqls[2].should == 'SELECT tag_id FROM albums_tags WHERE (album_id IN ((2)))'
+    sqls[1].should == "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
+    sqls[2].should == 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
     sqls[3].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
     sqls[4].should == "COMMIT"
     sqls.length.should == 5
@@ -218,19 +218,19 @@ describe "Sequel::Plugins::AssociationPks" do
       "UPDATE albums SET artist_id = NULL WHERE ((albums.artist_id = 1) AND (id NOT IN (1, 2)))"]
   end
 
-  specify "should not automatically convert keys if the primary key is not an integer for many_to_many associations" do
+  specify "should not automatically convert keys if the primary key is not an integer for one_to_many associations" do
     @Album.db_schema[:id][:type] = :string
     @Artist.load(:id=>1).album_pks = %w'1 2'
     @db.sqls.should == ["UPDATE albums SET artist_id = 1 WHERE (id IN ('1', '2'))",
       "UPDATE albums SET artist_id = NULL WHERE ((albums.artist_id = 1) AND (id NOT IN ('1', '2')))"]
   end
 
-  specify "should automatically convert keys to numbers if the primary key is an integer for one_to_many associations" do
+  specify "should automatically convert keys to numbers if the primary key is an integer for many_to_many associations" do
     @Tag.db_schema[:id][:type] = :integer
     @Album.load(:id=>2).tag_pks = %w'1 3'
     sqls = @db.sqls
-    sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id IN ((2))) AND (tag_id NOT IN (1, 3)))"
-    sqls[1].should == 'SELECT tag_id FROM albums_tags WHERE (album_id IN ((2)))'
+    sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
+    sqls[1].should == 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
     sqls[2].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
     sqls.length.should == 3
   end
@@ -239,11 +239,41 @@ describe "Sequel::Plugins::AssociationPks" do
     @Tag.db_schema[:id][:type] = :string
     @Album.load(:id=>2).tag_pks = %w'1 3'
     sqls = @db.sqls
-    sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id IN ((2))) AND (tag_id NOT IN ('1', '3')))"
-    sqls[1].should == 'SELECT tag_id FROM albums_tags WHERE (album_id IN ((2)))'
+    sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN ('1', '3')))"
+    sqls[1].should == 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
     sqls[2].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '1'|'1', 2)\)/
     sqls[3].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '3'|'3', 2)\)/
     sqls.length.should == 4
   end
 
+  specify "should automatically convert keys to numbers for appropriate integer primary key for composite key associations" do
+    @Hit.db_schema[:year][:type] = :integer
+    @Hit.db_schema[:week][:type] = :integer
+    @Vocalist.many_to_many :hits, :class=>@Hit, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week]
+    @Vocalist.load(:first=>'F2', :last=>'L2').hit_pks = [['1997', '1'], ['1997', '2']]
+    sqls = @db.sqls
+    sqls[0].should == "DELETE FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2') AND ((year, week) NOT IN ((1997, 1), (1997, 2))))"
+    sqls[1].should == "SELECT year, week FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2'))"
+    match = sqls[2].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
+    Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"'F2'", "last"=>"'L2'", "year"=>"1997", "week"=>"1"}
+    sqls.length.should == 3
+
+    @Vocalist.db_schema[:first][:type] = :integer
+    @Vocalist.db_schema[:last][:type] = :integer
+    @Album.one_to_many :vocalists, :class=>@Vocalist, :key=>:album_id
+    @Album.load(:id=>1).vocalist_pks = [["11", "11"], ["12", "12"]]
+    @db.sqls.should == ["UPDATE vocalists SET album_id = 1 WHERE ((first, last) IN ((11, 11), (12, 12)))",
+      "UPDATE vocalists SET album_id = NULL WHERE ((vocalists.album_id = 1) AND ((first, last) NOT IN ((11, 11), (12, 12))))"]
+
+    @Album.many_to_many :vocalists, :class=>@Vocalist, :join_table=>:albums_vocalists, :left_key=>:album_id, :right_key=>[:first, :last]
+    @Album.load(:id=>2).vocalist_pks = [["11", "11"], ["12", "12"]]
+    sqls = @db.sqls
+    sqls[0].should == "DELETE FROM albums_vocalists WHERE ((album_id = 2) AND ((first, last) NOT IN ((11, 11), (12, 12))))"
+    sqls[1].should == 'SELECT first, last FROM albums_vocalists WHERE (album_id = 2)'
+    match = sqls[2].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
+    Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"11", "last"=>"11", "album_id"=>"2"}
+    match = sqls[3].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
+    Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"12", "last"=>"12", "album_id"=>"2"}
+    sqls.length.should == 4
+  end
 end
