@@ -1,5 +1,7 @@
 === HEAD
 
+* Support table schema and index parsing when using Access via the ado adapter (ericgj, jeremyevans) (#545)
+
 * Combine disconnect error detection for mysql and mysql2 adapters (jeremyevans)
 
 * Update the association_pks plugin to handle composite primary keys (chanks, jeremyevans) (#544)

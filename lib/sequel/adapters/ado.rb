@@ -12,9 +12,9 @@ module Sequel
         super
         case @opts[:conn_string]
         when /Microsoft\.(Jet|ACE)\.OLEDB/io
-          Sequel.ts_require 'adapters/shared/access'
-          extend Sequel::Access::DatabaseMethods
-          extend_datasets(Sequel::Access::DatasetMethods)
+          Sequel.ts_require 'adapters/ado/access'
+          extend Sequel::ADO::Access::DatabaseMethods
+          @dataset_class = ADO::Access::Dataset
         else
           @opts[:driver] ||= 'SQL Server'
           case @opts[:driver]
