@@ -2,14 +2,14 @@ Sequel.require 'adapters/shared/access'
 
 module Sequel
   module ADO
-    # Database and Dataset instance methods for MSSQL specific
+    # Database and Dataset instance methods for Access specific
     # support via ADO.
     module Access
       class AdoSchema
         QUERY_TYPE = {
-          'columns' => 4,
-          'indexes' => 12,
-          'tables'  => 20
+          :columns => 4,
+          :indexes => 12,
+          :tables  => 20
         }
         
         attr_reader :type, :criteria
@@ -91,6 +91,11 @@ module Sequel
     
         DECIMAL_TYPE_RE = /decimal/io
 
+        def tables(opts={})
+          m = output_identifier_meth
+          ado_schema_tables.map {|tbl| m.call(tbl['TABLE_NAME'])}
+        end
+        
         def indexes(table_name,opts={})
           m = output_identifier_meth
           idxs = ado_schema_indexes(table_name).inject({}) do |memo, idx|
@@ -145,9 +150,17 @@ module Sequel
           }
         end
         
+        def ado_schema_tables
+          rows=[]
+          fetch_ado_schema(:tables, [nil,nil,nil,'TABLE']) do |row|
+            rows << row
+          end
+          rows
+        end
+        
         def ado_schema_indexes(table_name)
           rows=[]
-          fetch_ado_schema('indexes', [nil,nil,nil,nil,table_name.to_s]) do |row|
+          fetch_ado_schema(:indexes, [nil,nil,nil,nil,table_name.to_s]) do |row|
             rows << row
           end
           rows
@@ -155,7 +168,7 @@ module Sequel
         
         def ado_schema_columns(table_name)
           rows=[]
-          fetch_ado_schema('columns', [nil,nil,table_name.to_s,nil]) do |row| 
+          fetch_ado_schema(:columns, [nil,nil,table_name.to_s,nil]) do |row| 
             rows << AdoSchema::Column.new(row)
           end
           rows.sort!{|a,b| a["ORDINAL_POSITION"] <=> b["ORDINAL_POSITION"]}
