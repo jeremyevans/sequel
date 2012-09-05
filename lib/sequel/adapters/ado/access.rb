@@ -9,7 +9,8 @@ module Sequel
         QUERY_TYPE = {
           :columns => 4,
           :indexes => 12,
-          :tables  => 20
+          :tables  => 20,
+          :foreign_keys => 27
         }
         
         attr_reader :type, :criteria
@@ -109,7 +110,22 @@ module Sequel
           end
           idxs
         end
-              
+
+        def foreign_key_list(table, opts={})
+          m = output_identifier_meth
+          ado_schema_foreign_keys(table).map {|row| 
+            specs = {
+              :columns => [m.call(row['FK_COLUMN_NAME'])],
+              :table   => m.call(row['PK_TABLE_NAME']),
+              :key     => [m.call(row['PK_COLUMN_NAME'])],
+              :deferrable => row['DEFERRABILITY'],
+              :name    => row['FK_NAME'],
+              :on_delete => row['DELETE_RULE'],
+              :on_update => row['UPDATE_RULE']
+            }
+          }
+        end
+                
         private
           
         def schema_column_type(db_type)
@@ -149,7 +165,7 @@ module Sequel
             [ m.call(row["COLUMN_NAME"]), specs ]
           }
         end
-        
+
         def ado_schema_tables
           rows=[]
           fetch_ado_schema(:tables, [nil,nil,nil,'TABLE']) do |row|
@@ -173,7 +189,15 @@ module Sequel
           end
           rows.sort!{|a,b| a["ORDINAL_POSITION"] <=> b["ORDINAL_POSITION"]}
         end
-              
+        
+        def ado_schema_foreign_keys(table_name)
+          rows=[]
+          fetch_ado_schema(:foreign_keys, [nil,nil,nil,nil,nil,table_name.to_s]) do |row| 
+            rows << row
+          end
+          rows.sort!{|a,b| a["ORDINAL"] <=> b["ORDINAL"]}
+        end
+        
         def fetch_ado_schema(type, criteria=[])
           execute_open_ado_schema(type, criteria) do |s|
             cols = s.Fields.extend(Enumerable).map {|c| c.Name}
