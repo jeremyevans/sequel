@@ -96,7 +96,8 @@ module Sequel
           m = output_identifier_meth
           ado_schema_tables.map {|tbl| m.call(tbl['TABLE_NAME'])}
         end
-        
+
+        # Note OpenSchema returns compound indexes as multiple rows
         def indexes(table_name,opts={})
           m = output_identifier_meth
           idxs = ado_schema_indexes(table_name).inject({}) do |memo, idx|
@@ -111,19 +112,25 @@ module Sequel
           idxs
         end
 
+        # Note OpenSchema returns compound foreign key relationships as multiple rows
         def foreign_key_list(table, opts={})
           m = output_identifier_meth
-          ado_schema_foreign_keys(table).map {|row| 
-            specs = {
-              :columns => [m.call(row['FK_COLUMN_NAME'])],
-              :table   => m.call(row['PK_TABLE_NAME']),
-              :key     => [m.call(row['PK_COLUMN_NAME'])],
-              :deferrable => row['DEFERRABILITY'],
-              :name    => row['FK_NAME'],
-              :on_delete => row['DELETE_RULE'],
-              :on_update => row['UPDATE_RULE']
+          fks = ado_schema_foreign_keys(table).inject({}) do |memo, fk|
+            name = m.call(fk['FK_NAME'])
+            specs = memo[name] ||= {
+              :columns => [],
+              :table   => m.call(fk['PK_TABLE_NAME']),
+              :key     => [],
+              :deferrable => fk['DEFERRABILITY'],
+              :name    => name,
+              :on_delete => fk['DELETE_RULE'],
+              :on_update => fk['UPDATE_RULE']
             }
-          }
+            specs[:columns] << m.call(fk['FK_COLUMN_NAME'])
+            specs[:key]     << m.call(fk['PK_COLUMN_NAME'])
+            memo
+          end
+          fks.values
         end
                 
         private
