@@ -7,9 +7,9 @@ module Sequel
       end
 
       # Doesn't work, due to security restrictions on MSysObjects
-      def tables
-        from(:MSysObjects).filter(:Type=>1, :Flags=>0).select_map(:Name).map{|x| x.to_sym}
-      end
+      #def tables
+      #  from(:MSysObjects).filter(:Type=>1, :Flags=>0).select_map(:Name).map{|x| x.to_sym}
+      #end
 
       # Access uses type Counter for an autoincrementing keys
       def serial_primary_key_options
