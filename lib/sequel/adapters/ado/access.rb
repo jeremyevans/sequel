@@ -17,14 +17,8 @@ module Sequel
         attr_reader :type, :criteria
 
         def initialize(type, crit)
-          @type     = lookup_type(type)
+          @type     = QUERY_TYPE[type]
           @criteria = Array(crit)
-        end
-        
-        def lookup_type(type)
-          return Integer(type)
-        rescue
-          QUERY_TYPE[type]
         end
         
         class Column
