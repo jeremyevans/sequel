@@ -73,6 +73,12 @@ module Sequel
       def supports_multiple_column_in?
         false
       end
+
+      # Access doesn't support truncate, so do a delete instead.
+      def truncate
+        delete
+        nil
+      end
       
       private
 
