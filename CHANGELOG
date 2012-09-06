@@ -1,6 +1,10 @@
 === HEAD
 
-* Support Database#{schema,tables,views,indexes,foreign_key_list} when using Access via the ado adapter (ericgj, jeremyevans) (#545, #546)
+* Make ado/access adapter have insert return the autoincremented primary key value (jeremyevans)
+
+* Support Database#{schema,tables,views,indexes,foreign_key_list} when using ado/access adapter (ericgj) (#545, #546)
+
+* Add ado/access adapter for accessing Microsoft Access via the ado adapter (jeremyevans)
 
 * Combine disconnect error detection for mysql and mysql2 adapters (jeremyevans)
 

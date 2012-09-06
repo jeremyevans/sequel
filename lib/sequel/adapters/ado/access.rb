@@ -92,6 +92,20 @@ module Sequel
         include Sequel::Access::DatabaseMethods
     
         DECIMAL_TYPE_RE = /decimal/io
+        LAST_INSERT_ID = "SELECT @@IDENTITY".freeze
+
+        def execute_insert(sql, opts={})
+          synchronize(opts[:server]) do |conn|
+            begin
+              r = log_yield(sql){conn.Execute(sql)}
+              res = log_yield(LAST_INSERT_ID){conn.Execute(LAST_INSERT_ID)}
+              res.getRows.transpose.each{|r| return r.shift}
+            rescue ::WIN32OLERuntimeError => e
+              raise_error(e)
+            end
+          end
+          nil
+        end
 
         def tables(opts={})
           m = output_identifier_meth
