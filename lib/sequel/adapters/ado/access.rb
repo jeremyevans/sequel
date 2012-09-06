@@ -88,6 +88,13 @@ module Sequel
         DECIMAL_TYPE_RE = /decimal/io
         LAST_INSERT_ID = "SELECT @@IDENTITY".freeze
 
+        # Access doesn't let you disconnect if inside a transaction, so
+        # try rolling back an existing transaction first.
+        def disconnect_connection(conn)
+          conn.RollbackTrans rescue nil
+          super
+        end
+
         def execute_insert(sql, opts={})
           synchronize(opts[:server]) do |conn|
             begin
@@ -148,6 +155,18 @@ module Sequel
         end
                 
         private
+
+        def begin_transaction(conn, opts={})
+          log_yield('Transaction.begin'){conn.BeginTrans}
+        end
+          
+        def commit_transaction(conn, opts={})
+          log_yield('Transaction.commit'){conn.CommitTrans}
+        end
+          
+        def rollback_transaction(conn, opts={})
+          log_yield('Transaction.rollback'){conn.RollbackTrans}
+        end
           
         def schema_column_type(db_type)
           case db_type.downcase
