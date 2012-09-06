@@ -25,6 +25,16 @@ module Sequel
       def identifier_output_method_default
         nil
       end
+      
+      # Access doesn't have a true boolean class, so it uses bit
+      def type_literal_generic_trueclass(column)
+        :bit
+      end
+      
+      # Access uses image type for blobs
+      def type_literal_generic_file(column)
+        :image
+      end
     end
   
     module DatasetMethods
@@ -37,6 +47,8 @@ module Sequel
       PAREN_CLOSE = Dataset::PAREN_CLOSE
       PAREN_OPEN = Dataset::PAREN_OPEN
       NOT_EQUAL = ' <> '.freeze
+      BOOL_FALSE = '0'.freeze
+      BOOL_TRUE = '-1'.freeze
 
       def complex_expression_sql_append(sql, op, args)
         case op
@@ -73,6 +85,16 @@ module Sequel
         t.strftime(TIMESTAMP_FORMAT)
       end
       alias literal_time literal_datetime
+
+      # Use 0 for false on MSSQL
+      def literal_false
+        BOOL_FALSE
+      end
+
+      # Use 0 for false on MSSQL
+      def literal_true
+        BOOL_TRUE
+      end
 
       # Access uses TOP for limits
       def select_limit_sql(sql)
