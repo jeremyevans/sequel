@@ -86,7 +86,7 @@ else
   INTEGRATION_DB = Sequel.sqlite
 end
 
-if INTEGRATION_DB.adapter_scheme == :ibmdb
+if INTEGRATION_DB.adapter_scheme == :ibmdb || (INTEGRATION_DB.adapter_scheme == :ado && INTEGRATION_DB.database_type == :access)
   def INTEGRATION_DB.drop_table(*tables)
     super
   rescue Sequel::DatabaseError
