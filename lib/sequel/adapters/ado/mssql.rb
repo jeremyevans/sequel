@@ -11,12 +11,6 @@ module Sequel
         # delete query.
         ROWS_AFFECTED = "SELECT @@ROWCOUNT AS AffectedRows"
         
-        # Just execute so it doesn't attempt to return the number of rows modified.
-        def execute_ddl(sql, opts={})
-          execute(sql, opts)
-        end
-        alias execute_insert execute_ddl
-        
         # Issue a separate query to get the rows modified.  ADO appears to
         # use pass by reference with an integer variable, which is obviously
         # not supported directly in ruby, and I'm not aware of a workaround.
