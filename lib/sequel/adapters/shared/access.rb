@@ -46,6 +46,7 @@ module Sequel
       BRACKET_OPEN = Dataset::BRACKET_OPEN
       PAREN_CLOSE = Dataset::PAREN_CLOSE
       PAREN_OPEN = Dataset::PAREN_OPEN
+      FROM = Dataset::FROM
       NOT_EQUAL = ' <> '.freeze
       BOOL_FALSE = '0'.freeze
       BOOL_TRUE = '-1'.freeze
@@ -94,6 +95,27 @@ module Sequel
       # Use 0 for false on MSSQL
       def literal_true
         BOOL_TRUE
+      end
+
+      # Access requires parentheses when joining more than one table
+      def select_from_sql(sql)
+        if f = @opts[:from]
+          sql << FROM
+          if (j = @opts[:join]) && !j.empty?
+            sql << (PAREN_OPEN * j.length)
+          end
+          source_list_append(sql, f)
+        end
+      end
+
+      # Access requires parentheses when joining more than one table
+      def select_join_sql(sql)
+        if js = @opts[:join]
+          js.each do |j|
+            literal_append(sql, j)
+            sql << PAREN_CLOSE
+          end
+        end
       end
 
       # Access uses TOP for limits
