@@ -34,6 +34,22 @@ module Sequel
       TOP = " TOP ".freeze
       BRACKET_CLOSE = Dataset::BRACKET_CLOSE
       BRACKET_OPEN = Dataset::BRACKET_OPEN
+      PAREN_CLOSE = Dataset::PAREN_CLOSE
+      PAREN_OPEN = Dataset::PAREN_OPEN
+      NOT_EQUAL = ' <> '.freeze
+
+      def complex_expression_sql_append(sql, op, args)
+        case op
+        when :'!='
+          sql << PAREN_OPEN
+          literal_append(sql, args.at(0))
+          sql << NOT_EQUAL
+          literal_append(sql, args.at(1))
+          sql << PAREN_CLOSE
+        else
+          super
+        end
+      end
 
       # Access doesn't support INTERSECT or EXCEPT
       def supports_intersect_except?
