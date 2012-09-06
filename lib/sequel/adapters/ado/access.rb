@@ -10,6 +10,7 @@ module Sequel
           :columns => 4,
           :indexes => 12,
           :tables  => 20,
+          :views   => 23,
           :foreign_keys => 27
         }
         
@@ -97,6 +98,11 @@ module Sequel
           ado_schema_tables.map {|tbl| m.call(tbl['TABLE_NAME'])}
         end
 
+        def views(opts={})
+          m = output_identifier_meth
+          ado_schema_views.map {|tbl| m.call(tbl['TABLE_NAME'])}
+        end
+        
         # Note OpenSchema returns compound indexes as multiple rows
         def indexes(table_name,opts={})
           m = output_identifier_meth
@@ -176,6 +182,14 @@ module Sequel
         def ado_schema_tables
           rows=[]
           fetch_ado_schema(:tables, [nil,nil,nil,'TABLE']) do |row|
+            rows << row
+          end
+          rows
+        end
+
+        def ado_schema_views
+          rows=[]
+          fetch_ado_schema(:views, [nil,nil,nil]) do |row|
             rows << row
           end
           rows
