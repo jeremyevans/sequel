@@ -56,6 +56,11 @@ module Sequel
         false
       end
 
+      # Access does not support multiple columns for the IN/NOT IN operators
+      def supports_multiple_column_in?
+        false
+      end
+      
       private
 
       # Access uses # to quote dates
