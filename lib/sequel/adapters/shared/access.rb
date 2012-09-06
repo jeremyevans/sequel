@@ -38,7 +38,7 @@ module Sequel
     end
   
     module DatasetMethods
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select limit distinct columns from join where group order having compounds')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct limit columns from join where group order having compounds')
       DATE_FORMAT = '#%Y-%m-%d#'.freeze
       TIMESTAMP_FORMAT = '#%Y-%m-%d %H:%M:%S#'.freeze
       TOP = " TOP ".freeze
