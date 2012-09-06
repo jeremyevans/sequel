@@ -50,6 +50,16 @@ module Sequel
       NOT_EQUAL = ' <> '.freeze
       BOOL_FALSE = '0'.freeze
       BOOL_TRUE = '-1'.freeze
+      CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}
+
+      # Access doesn't support CAST, it uses separate functions for
+      # type conversion
+      def cast_sql_append(sql, expr, type)
+        sql << CAST_TYPES.fetch(type, type).to_s
+        sql << PAREN_OPEN
+        literal_append(sql, expr)
+        sql << PAREN_CLOSE
+      end
 
       def complex_expression_sql_append(sql, op, args)
         case op
