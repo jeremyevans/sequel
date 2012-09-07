@@ -1,4 +1,5 @@
 Sequel.require 'adapters/shared/access'
+Sequel.require 'adapters/utils/split_alter_table'
 
 module Sequel
   module ADO
@@ -84,6 +85,7 @@ module Sequel
 
       module DatabaseMethods
         include Sequel::Access::DatabaseMethods
+        include Sequel::Database::SplitAlterTable
     
         DECIMAL_TYPE_RE = /decimal/io
         LAST_INSERT_ID = "SELECT @@IDENTITY".freeze
