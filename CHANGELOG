@@ -1,6 +1,6 @@
 === HEAD
 
-* Make ado/access adapter have insert return the autoincremented primary key value (jeremyevans)
+* Greatly improved support on Microsoft Access (jeremyevans)
 
 * Support Database#{schema,tables,views,indexes,foreign_key_list} when using ado/access adapter (ericgj) (#545, #546)
 
