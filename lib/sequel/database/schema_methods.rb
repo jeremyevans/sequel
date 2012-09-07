@@ -354,7 +354,7 @@ module Sequel
     # SQL fragment for given alter table operation.
     def alter_table_op_sql(table, op)
       quoted_name = quote_identifier(op[:name]) if op[:name]
-      alter_table_op = case op[:op]
+      case op[:op]
       when :add_column
         "ADD COLUMN #{column_definition_sql(op)}"
       when :drop_column
