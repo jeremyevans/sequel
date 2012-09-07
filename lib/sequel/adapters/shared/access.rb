@@ -18,6 +18,15 @@ module Sequel
 
       private
 
+      # Access doesn't support CREATE TABLE AS, it only supports SELECT INTO.
+      # Emulating CREATE TABLE AS using SELECT INTO is only possible if a dataset
+      # is given as the argument, it can't work with a string, so raise an
+      # Error if a string is given.
+      def create_table_as(name, ds, options)
+        raise(Error, "must provide dataset instance as value of create_table :as option on Access") unless ds.is_a?(Sequel::Dataset)
+        run(ds.into(name).sql)
+      end
+    
       # The SQL to drop an index for the table.
       def drop_index_sql(table, op)
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
@@ -49,7 +58,7 @@ module Sequel
     end
   
     module DatasetMethods
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct limit columns from join where group order having compounds')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct limit columns into from join where group order having compounds')
       DATE_FORMAT = '#%Y-%m-%d#'.freeze
       TIMESTAMP_FORMAT = '#%Y-%m-%d %H:%M:%S#'.freeze
       TOP = " TOP ".freeze
@@ -57,6 +66,7 @@ module Sequel
       BRACKET_OPEN = Dataset::BRACKET_OPEN
       PAREN_CLOSE = Dataset::PAREN_CLOSE
       PAREN_OPEN = Dataset::PAREN_OPEN
+      INTO = Dataset::INTO
       FROM = Dataset::FROM
       NOT_EQUAL = ' <> '.freeze
       OPS = {:'%'=>' Mod '.freeze, :'||'=>' & '.freeze}
@@ -147,6 +157,11 @@ module Sequel
         end
       end
       
+      # Specify a table for a SELECT ... INTO query.
+      def into(table)
+        clone(:into => table)
+      end
+
       # Access doesn't support INTERSECT or EXCEPT
       def supports_intersect_except?
         false
@@ -204,6 +219,13 @@ module Sequel
             sql << (PAREN_OPEN * j.length)
           end
           source_list_append(sql, f)
+        end
+      end
+
+      def select_into_sql(sql)
+        if i = @opts[:into]
+          sql << INTO
+          identifier_append(sql, i)
         end
       end
 
