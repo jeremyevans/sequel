@@ -1,9 +1,8 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-# H2 and MSSQL don't support USING joins
 # DB2 does not seem to support USING joins in every version; it seems to be
 # valid expression in DB2 iSeries UDB though.
-unless Sequel.guarded?(:h2, :mssql, :db2)
+unless !INTEGRATION_DB.dataset.supports_join_using? || Sequel.guarded?(:db2)
 describe "Class Table Inheritance Plugin" do
   before(:all) do
     @db = INTEGRATION_DB
