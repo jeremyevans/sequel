@@ -56,6 +56,10 @@ module Sequel
       TIME_FUNCTION = 'Time()'.freeze
       CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}
 
+      EXTRACT_MAP = {:year=>"'yyyy'", :month=>"'m'", :day=>"'d'", :hour=>"'h'", :minute=>"'n'", :second=>"'s'"}
+      COMMA = Dataset::COMMA
+      DATEPART_OPEN = "datepart(".freeze
+
       # Access doesn't support CASE, but it can be emulated with nested
       # IIF function calls.
       def case_expression_sql_append(sql, ce)
@@ -88,6 +92,12 @@ module Sequel
             literal_append(sql, a)
             c ||= true
           end
+          sql << PAREN_CLOSE
+        when :extract
+          part = args.at(0)
+          raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
+          sql << DATEPART_OPEN << format.to_s << COMMA
+          literal_append(sql, args.at(1))
           sql << PAREN_CLOSE
         else
           super
