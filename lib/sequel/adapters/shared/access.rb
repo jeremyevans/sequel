@@ -48,6 +48,7 @@ module Sequel
       PAREN_OPEN = Dataset::PAREN_OPEN
       FROM = Dataset::FROM
       NOT_EQUAL = ' <> '.freeze
+      OPS = {:'%'=>' Mod '.freeze, :'||'=>' & '.freeze}
       BOOL_FALSE = '0'.freeze
       BOOL_TRUE = '-1'.freeze
       DATE_FUNCTION = 'Date()'.freeze
@@ -70,6 +71,16 @@ module Sequel
           literal_append(sql, args.at(0))
           sql << NOT_EQUAL
           literal_append(sql, args.at(1))
+          sql << PAREN_CLOSE
+        when :'%', :'||'
+          sql << PAREN_OPEN
+          c = false
+          op_str = OPS[op]
+          args.each do |a|
+            sql << op_str if c
+            literal_append(sql, a)
+            c ||= true
+          end
           sql << PAREN_CLOSE
         else
           super
