@@ -183,8 +183,10 @@ module Sequel
         
         def schema_parse_table(table_name, opts)
           m = output_identifier_meth(opts[:dataset])
-          idxs = ado_schema_indexes(table_name)
-          ado_schema_columns(table_name).map {|row|
+          m2 = input_identifier_meth(opts[:dataset])
+          tn = m2.call(table_name.to_s)
+          idxs = ado_schema_indexes(tn)
+          ado_schema_columns(tn).map {|row|
             specs = { 
               :allow_null => row.allow_null,
               :db_type => row.db_type,
