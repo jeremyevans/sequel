@@ -50,6 +50,8 @@ module Sequel
       NOT_EQUAL = ' <> '.freeze
       BOOL_FALSE = '0'.freeze
       BOOL_TRUE = '-1'.freeze
+      DATE_FUNCTION = 'Date()'.freeze
+      NOW_FUNCTION = 'Now()'.freeze
       CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}
 
       # Access doesn't support CAST, it uses separate functions for
@@ -74,11 +76,28 @@ module Sequel
         end
       end
 
+      # Use Date() and Now() for CURRENT_DATE and CURRENT_TIMESTAMP
+      def constant_sql_append(sql, constant)
+        case constant
+        when :CURRENT_DATE
+          sql << DATE_FUNCTION
+        when :CURRENT_TIMESTAMP
+          sql << NOW_FUNCTION
+        else
+          super
+        end
+      end
+
       # Access doesn't support INTERSECT or EXCEPT
       def supports_intersect_except?
         false
       end
 
+      # Access does not support IS TRUE
+      def supports_is_true?
+        false
+      end
+      
       # Access does not support multiple columns for the IN/NOT IN operators
       def supports_multiple_column_in?
         false
