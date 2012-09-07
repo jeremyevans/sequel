@@ -146,6 +146,11 @@ module Sequel
         false
       end
       
+      # Access doesn't support JOIN USING
+      def supports_join_using?
+        false
+      end
+
       # Access does not support multiple columns for the IN/NOT IN operators
       def supports_multiple_column_in?
         false
