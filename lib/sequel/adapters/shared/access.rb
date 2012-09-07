@@ -31,6 +31,12 @@ module Sequel
         nil
       end
       
+      # Access doesn't have a 64-bit integer type, so use integer and hope
+      # the user isn't using more than 32 bits.
+      def type_literal_generic_bignum(column)
+        :integer
+      end
+
       # Access doesn't have a true boolean class, so it uses bit
       def type_literal_generic_trueclass(column)
         :bit
