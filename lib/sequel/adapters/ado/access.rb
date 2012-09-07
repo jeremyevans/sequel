@@ -88,6 +88,13 @@ module Sequel
         DECIMAL_TYPE_RE = /decimal/io
         LAST_INSERT_ID = "SELECT @@IDENTITY".freeze
 
+        # Remove cached schema after altering a table, since otherwise it can be cached
+        # incorrectly in the rename column case.
+        def alter_table(name, *)
+          super
+          remove_cached_schema(name)
+        end
+
         # Access doesn't let you disconnect if inside a transaction, so
         # try rolling back an existing transaction first.
         def disconnect_connection(conn)
@@ -155,6 +162,23 @@ module Sequel
         end
                 
         private
+
+        # Emulate rename_column by adding the column, copying data from the old
+        # column, and dropping the old column.
+        def alter_table_sql(table, op)
+          case op[:op]
+          when :rename_column
+            raise(Error, "can't find existing schema entry for #{op[:name]}") unless sch = schema(table).find{|c| c.first == op[:name]}
+            sch = sch.last
+            [
+              alter_table_sql(table, :op=>:add_column, :name=>op[:new_name], :default=>sch[:ruby_default], :type=>sch[:db_type], :null=>sch[:allow_null]),
+              from(table).update_sql(op[:new_name]=>op[:name]),
+              alter_table_sql(table, :op=>:drop_column, :name=>op[:name])
+            ]
+          else
+            super
+          end
+        end
 
         def begin_transaction(conn, opts={})
           log_yield('Transaction.begin'){conn.BeginTrans}
