@@ -25,6 +25,15 @@ module Sequel
 
       private
 
+      def alter_table_op_sql(table, op)
+        case op[:op]
+        when :set_column_type
+          "ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(op)}"
+        else
+          super
+        end
+      end
+
       # Access doesn't support CREATE TABLE AS, it only supports SELECT INTO.
       # Emulating CREATE TABLE AS using SELECT INTO is only possible if a dataset
       # is given as the argument, it can't work with a string, so raise an
