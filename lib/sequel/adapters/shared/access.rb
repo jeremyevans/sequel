@@ -105,6 +105,11 @@ module Sequel
         end
       end
 
+      # Emulate cross join by using multiple tables in the FROM clause.
+      def cross_join(table)
+        clone(:from=>@opts[:from] + [table])
+      end
+
       # Access doesn't support INTERSECT or EXCEPT
       def supports_intersect_except?
         false
