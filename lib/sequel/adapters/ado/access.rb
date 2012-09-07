@@ -93,6 +93,7 @@ module Sequel
         def alter_table(name, *)
           super
           remove_cached_schema(name)
+          nil
         end
 
         # Access doesn't let you disconnect if inside a transaction, so
@@ -168,12 +169,28 @@ module Sequel
         def alter_table_sql(table, op)
           case op[:op]
           when :rename_column
-            raise(Error, "can't find existing schema entry for #{op[:name]}") unless sch = schema(table).find{|c| c.first == op[:name]}
-            sch = sch.last
+            unless sch = op[:schema]
+              raise(Error, "can't find existing schema entry for #{op[:name]}") unless sch = op[:schema] || schema(table).find{|c| c.first == op[:name]}
+              sch = sch.last
+            end
             [
               alter_table_sql(table, :op=>:add_column, :name=>op[:new_name], :default=>sch[:ruby_default], :type=>sch[:db_type], :null=>sch[:allow_null]),
               from(table).update_sql(op[:new_name]=>op[:name]),
               alter_table_sql(table, :op=>:drop_column, :name=>op[:name])
+            ]
+          when :set_column_null, :set_column_default
+            raise(Error, "can't find existing schema entry for #{op[:name]}") unless sch = op[:schema] || schema(table).find{|c| c.first == op[:name]}
+            sch = sch.last
+
+            sch = if op[:op] == :set_column_null
+              sch.merge(:allow_null=>op[:null])
+            else
+              sch.merge(:ruby_default=>op[:default])
+            end
+
+            [
+              alter_table_sql(table, :op=>:rename_column, :name=>op[:name], :new_name=>:sequel_access_backup_column, :schema=>sch),
+              alter_table_sql(table, :op=>:rename_column, :new_name=>op[:name], :name=>:sequel_access_backup_column, :schema=>sch)
             ]
           else
             super
