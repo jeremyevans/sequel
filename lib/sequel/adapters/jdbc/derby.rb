@@ -174,15 +174,10 @@ module Sequel
         EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
 
         # Derby doesn't support an expression between CASE and WHEN,
-        # so emulate it by using an equality statement for all of the
+        # so remove 
         # conditions.
         def case_expression_sql_append(sql, ce)
-          if ce.expression?
-            e = ce.expression
-            case_expression_sql_append(sql, ::Sequel::SQL::CaseExpression.new(ce.conditions.map{|c, r| [::Sequel::SQL::BooleanExpression.new(:'=', e, c), r]}, ce.default))
-          else
-            super
-          end
+          super(sql, ce.with_merged_expression)
         end
 
         # If the type is String, trim the extra spaces since CHAR is used instead

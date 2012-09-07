@@ -942,6 +942,19 @@ describe Sequel::SQL::Subscript do
   end
 end
 
+describe Sequel::SQL::CaseExpression, "#with_merged_expression" do
+  specify "should return self if it has no expression" do
+    c = Sequel.case({1=>0}, 3)
+    c.with_merged_expression.should equal(c)
+  end
+
+  specify "should merge expression into conditions if it has an expression" do
+    db = Sequel::Database.new
+    c = Sequel.case({1=>0}, 3, 4)
+    db.literal(c.with_merged_expression).should == db.literal(Sequel.case({{4=>1}=>0}, 3))
+  end
+end
+
 describe "Sequel.recursive_map" do
   specify "should recursively convert an array using a callable" do
     Sequel.recursive_map(['1'], proc{|s| s.to_i}).should == [1]

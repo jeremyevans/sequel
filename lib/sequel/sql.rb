@@ -1030,6 +1030,17 @@ module Sequel
         !@no_expression
       end
 
+      # Merge the CASE expression into the conditions, useful for databases that
+      # don't support CASE expressions.
+      def with_merged_expression
+        if expression?
+          e = expression
+          CaseExpression.new(conditions.map{|c, r| [::Sequel::SQL::BooleanExpression.new(:'=', e, c), r]}, default)
+        else
+          self
+        end
+      end
+
       to_s_method :case_expression_sql
     end
 
