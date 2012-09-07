@@ -77,6 +77,10 @@ module Sequel
 
       def complex_expression_sql_append(sql, op, args)
         case op
+        when :ILIKE
+          super(sql, :LIKE, args)
+        when :'NOT ILIKE'
+          super(sql, :'NOT LIKE', args)
         when :'!='
           sql << PAREN_OPEN
           literal_append(sql, args.at(0))
