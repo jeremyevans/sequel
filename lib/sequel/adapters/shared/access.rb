@@ -53,6 +53,7 @@ module Sequel
       BOOL_TRUE = '-1'.freeze
       DATE_FUNCTION = 'Date()'.freeze
       NOW_FUNCTION = 'Now()'.freeze
+      TIME_FUNCTION = 'Time()'.freeze
       CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}
 
       # Access doesn't support CASE, but it can be emulated with nested
@@ -100,6 +101,8 @@ module Sequel
           sql << DATE_FUNCTION
         when :CURRENT_TIMESTAMP
           sql << NOW_FUNCTION
+        when :CURRENT_TIME
+          sql << TIME_FUNCTION
         else
           super
         end
