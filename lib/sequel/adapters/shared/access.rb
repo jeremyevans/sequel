@@ -127,6 +127,15 @@ module Sequel
         clone(:from=>@opts[:from] + [table])
       end
 
+      def emulated_function_sql_append(sql, f)
+        case f.f
+        when :char_length
+          literal_append(sql, SQL::Function.new(:len, f.args.first))
+        else
+          super
+        end
+      end
+      
       # Access doesn't support INTERSECT or EXCEPT
       def supports_intersect_except?
         false
