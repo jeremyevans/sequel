@@ -18,6 +18,11 @@ module Sequel
 
       private
 
+      # The SQL to drop an index for the table.
+      def drop_index_sql(table, op)
+        "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
+      end
+      
       def identifier_input_method_default
         nil
       end
