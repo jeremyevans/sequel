@@ -1,4 +1,4 @@
-Sequel.require 'adapters/utils/emulate_offset_with_row_number'
+Sequel.require %w'emulate_offset_with_row_number split_alter_table', 'adapters/utils/'
 
 module Sequel
   Dataset::NON_SQL_OPTIONS << :disable_insert_output
@@ -13,6 +13,8 @@ module Sequel
       SQL_ROLLBACK_TO_SAVEPOINT = 'IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION autopoint_%d'.freeze
       SQL_SAVEPOINT = 'SAVE TRANSACTION autopoint_%d'.freeze
       MSSQL_DEFAULT_RE = /\A(?:\(N?('.*')\)|\(\((-?\d+(?:\.\d+)?)\)\))\z/
+
+      include Sequel::Database::SplitAlterTable
       
       # Whether to use N'' to quote strings, which allows unicode characters inside the
       # strings.  True by default for compatibility, can be set to false for a possible
@@ -110,39 +112,6 @@ module Sequel
         AUTO_INCREMENT
       end
       
-      # Preprocess the array of operations.  If it looks like some operations depend
-      # on results of earlier operations and may require reloading the schema to
-      # work correctly, split those operations into separate lists, and between each
-      # list, remove the cached schema so that the later operations deal with the
-      # then current table schema.
-      def apply_alter_table(name, ops)
-        modified_columns = []
-        op_groups = [[]]
-        ops.each do |op|
-          case op[:op]
-          when :add_column, :set_column_type, :set_column_null
-            if modified_columns.include?(op[:name])
-              op_groups << []
-            else
-              modified_columns << op[:name]
-            end
-          when :rename_column
-            if modified_columns.include?(op[:name]) || modified_columns.include?(op[:new_name])
-              op_groups << []
-            end
-            modified_columns << op[:name] unless modified_columns.include?(op[:name])
-            modified_columns << op[:new_name] unless modified_columns.include?(op[:new_name])
-          end
-          op_groups.last << op
-        end
-
-        op_groups.each do |ops|
-          next if ops.empty?
-          alter_table_sql_list(name, ops).each{|sql| execute_ddl(sql)}
-          remove_cached_schema(name)
-        end
-      end
-    
       # MSSQL specific syntax for altering tables.
       def alter_table_sql(table, op)
         case op[:op]

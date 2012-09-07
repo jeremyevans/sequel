@@ -1,3 +1,5 @@
+Sequel.require 'adapters/utils/split_alter_table'
+
 module Sequel
   Dataset::NON_SQL_OPTIONS << :insert_ignore
   Dataset::NON_SQL_OPTIONS << :update_ignore
@@ -34,6 +36,8 @@ module Sequel
       COLUMN_DEFINITION_ORDER = [:collate, :null, :default, :unique, :primary_key, :auto_increment, :references]
       PRIMARY = 'PRIMARY'.freeze
       MYSQL_TIMESTAMP_RE = /\ACURRENT_(?:DATE|TIMESTAMP)?\z/
+
+      include Sequel::Database::SplitAlterTable
       
       # MySQL's cast rules are restrictive in that you can't just cast to any possible
       # database type.
@@ -170,39 +174,6 @@ module Sequel
       
       private
       
-      # Preprocess the array of operations.  If it looks like some operations depend
-      # on results of earlier operations and may require reloading the schema to
-      # work correctly, split those operations into separate lists, and between each
-      # list, remove the cached schema so that the later operations deal with the
-      # then current table schema.
-      def apply_alter_table(name, ops)
-        modified_columns = []
-        op_groups = [[]]
-        ops.each do |op|
-          case op[:op]
-          when :add_column, :set_column_type, :set_column_null, :set_column_default
-            if modified_columns.include?(op[:name])
-              op_groups << []
-            else
-              modified_columns << op[:name]
-            end
-          when :rename_column
-            if modified_columns.include?(op[:name]) || modified_columns.include?(op[:new_name])
-              op_groups << []
-            end
-            modified_columns << op[:name] unless modified_columns.include?(op[:name])
-            modified_columns << op[:new_name] unless modified_columns.include?(op[:new_name])
-          end
-          op_groups.last << op
-        end
-
-        op_groups.each do |ops|
-          next if ops.empty?
-          alter_table_sql_list(name, ops).each{|sql| execute_ddl(sql)}
-          remove_cached_schema(name)
-        end
-      end
-    
       # Use MySQL specific syntax for some alter table operations.
       def alter_table_op_sql(table, op)
         case op[:op]
