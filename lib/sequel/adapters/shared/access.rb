@@ -55,6 +55,12 @@ module Sequel
       NOW_FUNCTION = 'Now()'.freeze
       CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}
 
+      # Access doesn't support CASE, but it can be emulated with nested
+      # IIF function calls.
+      def case_expression_sql_append(sql, ce)
+        literal_append(sql, ce.with_merged_expression.conditions.reverse.inject(ce.default){|exp,(cond,val)| Sequel::SQL::Function.new(:IIF, cond, val, exp)})
+      end
+
       # Access doesn't support CAST, it uses separate functions for
       # type conversion
       def cast_sql_append(sql, expr, type)
