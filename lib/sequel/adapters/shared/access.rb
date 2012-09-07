@@ -10,6 +10,13 @@ module Sequel
       #def tables
       #  from(:MSysObjects).filter(:Type=>1, :Flags=>0).select_map(:Name).map{|x| x.to_sym}
       #end
+      
+      # Access doesn't support renaming tables from an SQL query,
+      # so create a copy of the table and then drop the from table.
+      def rename_table(from_table, to_table)
+        create_table(to_table, :as=>from(from_table))
+        drop_table(from_table)
+      end
 
       # Access uses type Counter for an autoincrementing keys
       def serial_primary_key_options
