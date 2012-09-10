@@ -95,7 +95,7 @@ module Sequel
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
     class Adapter < ::PGconn
-      DISCONNECT_ERROR_RE = /\Acould not receive data from server: Software caused connection abort/
+      DISCONNECT_ERROR_RE = /\Acould not receive data from server/
       
       self.translate_results = false if respond_to?(:translate_results=)
       
@@ -109,7 +109,7 @@ module Sequel
       def check_disconnect_errors
         begin
           yield
-        rescue PGError =>e
+        rescue PGError => e
           disconnect = false
           begin
             s = status
@@ -121,7 +121,7 @@ module Sequel
           disconnect ||= e.message =~ DISCONNECT_ERROR_RE
           disconnect ? raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError)) : raise
         ensure
-          block if status_ok
+          block if status_ok && !disconnect
         end
       end
 
