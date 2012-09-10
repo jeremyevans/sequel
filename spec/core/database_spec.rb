@@ -617,6 +617,18 @@ shared_examples_for "Database#transaction" do
                        'BEGIN', 'SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', 'DROP TABLE serializable', 'COMMIT']
   end
   
+  specify "should support :disconnect=>:retry option for automatically retrying on disconnect" do
+    a = []
+    @db.transaction(:disconnect=>:retry){a << 1; raise Sequel::DatabaseDisconnectError if a.length < 2}
+    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'BEGIN', 'COMMIT']
+    a.should == [1, 1]
+  end
+  
+  specify "should raise an error if attempting to use :disconnect=>:retry inside another transaction" do
+    proc{@db.transaction{@db.transaction(:disconnect=>:retry){}}}.should raise_error(Sequel::Error)
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
+  end
+  
   specify "should handle returning inside of the block by committing" do
     def @db.ret_commit
       transaction do

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :disconnect=>:retry option to Database#transaction, for automatically retrying the transaction on disconnect (jeremyevans)
+
 * Greatly improved support on Microsoft Access (jeremyevans)
 
 * Support Database#{schema,tables,views,indexes,foreign_key_list} when using ado/access adapter (ericgj) (#545, #546)

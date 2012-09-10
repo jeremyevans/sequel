@@ -234,6 +234,14 @@ module Sequel
     #
     # The following general options are respected:
     #
+    # :disconnect :: Can be set to :retry to automatically retry the transaction with
+    #                a new connection object if it detects a disconnect on the connection.
+    #                Note that this should not be used unless the entire transaction
+    #                block is idempotent, as otherwise it can cause non-idempotent
+    #                behavior to execute multiple times.  This does no checking for
+    #                infinite loops, so if your transaction will repeatedly raise a
+    #                disconnection error, this will cause the transaction block to loop
+    #                indefinitely.
     # :isolation :: The transaction isolation level to use for this transaction,
     #               should be :uncommitted, :committed, :repeatable, or :serializable,
     #               used if given and the database/adapter supports customizable
@@ -258,9 +266,22 @@ module Sequel
     #                 appropriately.  Valid values true, :on, false, :off, :local (9.1+),
     #                 and :remote_write (9.2+).
     def transaction(opts={}, &block)
-      synchronize(opts[:server]) do |conn|
-        return yield(conn) if already_in_transaction?(conn, opts)
-        _transaction(conn, opts, &block)
+      if opts[:disconnect] == :retry
+        begin
+          transaction(opts.merge(:disconnect=>:disallow), &block)
+        rescue Sequel::DatabaseDisconnectError
+          retry
+        end
+      else
+        synchronize(opts[:server]) do |conn|
+          if already_in_transaction?(conn, opts)
+            if opts[:disconnect] == :disallow
+              raise Sequel::Error, "cannot set :disconnect=>:retry if you are already inside a transaction"
+            end
+            return yield(conn)
+          end
+          _transaction(conn, opts, &block)
+        end
       end
     end
     
