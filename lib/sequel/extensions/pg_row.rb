@@ -321,7 +321,7 @@ module Sequel
         # ruby objects, one for each converter.
         def convert_columns(arr)
           if ccs = @column_converters
-            arr.zip(ccs).map{|v, pr| pr ? pr.call(v) : v}
+            arr.zip(ccs).map{|v, pr| (v && pr) ? pr.call(v) : v}
           else
             arr 
           end

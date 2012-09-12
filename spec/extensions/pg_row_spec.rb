@@ -247,6 +247,16 @@ describe "pg_row extension" do
     @db.conversion_procs[1].call('(1,b)').should == [{:bar=>1, :baz=>'bb'}]
   end
 
+  it "should handle nil values when converting columns" do
+    @db.conversion_procs[5] = p5 = proc{|s| s * 2}
+    @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}]]
+    called = false
+    @db.conversion_procs[4] = proc{|s| called = true; s}
+    @db.register_row_type(:foo)
+    @db.conversion_procs[1].call('()').should == {:bar=>nil}
+    called.should be_false
+  end
+
   it "should registering array type for row type if type has an array oid" do
     @db.conversion_procs[4] = p4 = proc{|s| s.to_i}
     @db.conversion_procs[5] = p5 = proc{|s| s * 2}
