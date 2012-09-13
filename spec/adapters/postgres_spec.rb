@@ -1320,6 +1320,26 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
       end.should == 'foo'
       called.should be_true
 
+      # Check weird identifier names
+      called = false
+      @db.listen('FOO bar', :after_listen=>proc{@db.notify('FOO bar')}) do |ev, pid, payload|
+        ev.should == 'FOO bar'
+        pid.should == notify_pid
+        ['', nil].should include(payload)
+        called = true
+      end.should == 'FOO bar'
+      called.should be_true
+
+      # Check identifier symbols
+      called = false
+      @db.listen(:foo, :after_listen=>proc{@db.notify(:foo)}) do |ev, pid, payload|
+        ev.should == 'foo'
+        pid.should == notify_pid
+        ['', nil].should include(payload)
+        called = true
+      end.should == 'foo'
+      called.should be_true
+
       called = false
       @db.listen('foo', :after_listen=>proc{@db.notify('foo', :payload=>'bar')}) do |ev, pid, payload|
         ev.should == 'foo'

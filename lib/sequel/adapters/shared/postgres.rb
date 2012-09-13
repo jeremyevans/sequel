@@ -369,7 +369,7 @@ module Sequel
       # :server :: The server to which to send the NOTIFY statement, if the sharding support
       #            is being used.
       def notify(channel, opts={})
-        execute_ddl("NOTIFY #{channel}#{", #{literal(opts[:payload].to_s)}" if opts[:payload]}", opts)
+        execute_ddl("NOTIFY #{dataset.send(:table_ref, channel)}#{", #{literal(opts[:payload].to_s)}" if opts[:payload]}", opts)
       end
 
       # Return primary key for the given table.

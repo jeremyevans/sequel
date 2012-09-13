@@ -1,5 +1,7 @@
 === HEAD
 
+* Quote channel identifier names when using LISTEN/NOTIFY on PostgreSQL (jeremyevans)
+
 * Handle nil values when formatting bound variable arguments in the pg_row extension (jeremyevans) (#548)
 
 * Handle nil values when parsing composite types in the pg_row extension (jeremyevans) (#548)
