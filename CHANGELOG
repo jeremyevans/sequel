@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle nil values when formatting bound variable arguments in the pg_row extension (jeremyevans) (#548)
+
 * Handle nil values when parsing composite types in the pg_row extension (jeremyevans) (#548)
 
 * Add :disconnect=>:retry option to Database#transaction, for automatically retrying the transaction on disconnect (jeremyevans)

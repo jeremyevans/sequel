@@ -379,10 +379,10 @@ module Sequel
         def bound_variable_arg(arg, conn)
           case arg
           when ArrayRow
-            "(#{arg.map{|v| bound_variable_array(v)}.join(COMMA)})"
+            "(#{arg.map{|v| bound_variable_array(v) if v}.join(COMMA)})"
           when HashRow
             arg.check_columns!
-            "(#{arg.values_at(*arg.columns).map{|v| bound_variable_array(v)}.join(COMMA)})"
+            "(#{arg.values_at(*arg.columns).map{|v| bound_variable_array(v) if v}.join(COMMA)})"
           else
             super
           end
@@ -528,10 +528,10 @@ module Sequel
         def bound_variable_array(arg)
           case arg
           when ArrayRow
-            "\"(#{arg.map{|v| bound_variable_array(v)}.join(COMMA).gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)})\""
+            "\"(#{arg.map{|v| bound_variable_array(v) if v}.join(COMMA).gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)})\""
           when HashRow
             arg.check_columns!
-            "\"(#{arg.values_at(*arg.columns).map{|v| bound_variable_array(v)}.join(COMMA).gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)})\""
+            "\"(#{arg.values_at(*arg.columns).map{|v| bound_variable_array(v) if v}.join(COMMA).gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)})\""
           else
             super
           end

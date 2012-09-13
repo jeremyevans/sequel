@@ -1592,6 +1592,11 @@ describe 'PostgreSQL array handling' do
     @ds.filter(:i=>:$i).call(:first, :i=>[1,2]).should == {:i=>[1,2]}
     @ds.filter(:i=>:$i).call(:first, :i=>[1,3]).should == nil
 
+    # NULL values
+    @ds.delete
+    @ds.call(:insert, {:i=>[nil,nil]}, {:i=>:$i})
+    @ds.first.should == {:i=>[nil, nil]}
+
     @db.create_table!(:items) do
       column :i, 'text[]'
     end
@@ -1750,6 +1755,10 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(:i).should == @h
     @ds.filter(:i=>:$i).call(:first, :i=>Sequel.hstore(@h)).should == {:i=>@h}
     @ds.filter(:i=>:$i).call(:first, :i=>Sequel.hstore({})).should == nil
+
+    @ds.delete
+    @ds.call(:insert, {:i=>Sequel.hstore('a'=>nil)}, {:i=>:$i})
+    @ds.get(:i).should == Sequel.hstore('a'=>nil)
 
     @ds.delete
     @ds.call(:insert, {:i=>@h}, {:i=>:$i})
@@ -2013,6 +2022,10 @@ describe 'PostgreSQL json type' do
     @ds.get(:i).should == @a
     @ds.filter(Sequel.cast(:i, String)=>:$i).call(:first, :i=>Sequel.pg_json(@a)).should == {:i=>@a}
     @ds.filter(Sequel.cast(:i, String)=>:$i).call(:first, :i=>Sequel.pg_json([])).should == nil
+
+    @ds.delete
+    @ds.call(:insert, {:i=>Sequel.pg_json('a'=>nil)}, {:i=>:$i})
+    @ds.get(:i).should == Sequel.pg_json('a'=>nil)
 
     @db.create_table!(:items){column :i, 'json[]'}
     j = Sequel.pg_array([Sequel.pg_json('a'=>1), Sequel.pg_json(['b', 2])], :text)
@@ -2499,6 +2512,10 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds.get(:address).should == {:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}
     @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))[:id].should == 1
     @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])).should == nil
+
+    @ds.delete
+    @ds.call(:insert, {:address=>Sequel.pg_row([nil, nil, nil])}, {:address=>:$address, :id=>1})
+    @ds.get(:address).should == {:street=>nil, :city=>nil, :zip=>nil}
   end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'use arrays of row types in bound variables' do
@@ -2507,6 +2524,11 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds.get(:company).should == {:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]}
     @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))[:id].should == 1
     @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).should == nil
+
+
+    @ds.delete
+    @ds.call(:insert, {:employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row([nil, nil, nil])])])}, {:employees=>:$employees, :id=>1})
+    @ds.get(:employees).should == [{:address=>{:city=>nil, :zip=>nil, :street=>nil}, :id=>1}]
   end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'operations/functions with pg_row_ops' do
