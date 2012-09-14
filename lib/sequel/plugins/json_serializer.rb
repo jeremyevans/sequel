@@ -61,6 +61,25 @@ module Sequel
     #
     #   Album.to_json(:array=>[Album[1], Album[2]])
     #
+    # Note that active_support/json makes incompatible changes to the to_json API,
+    # and breaks some aspects of the json_serializer plugin.  You can undo the damage
+    # done by active_support/json by doing:
+    #
+    #   class Array
+    #     def to_json(options = {})
+    #       JSON.generate(self)
+    #     end
+    #   end
+    #
+    #   class Hash
+    #     def to_json(options = {})
+    #       JSON.generate(self)
+    #     end
+    #   end
+    #
+    # Note that this will probably cause active_support/json to no longer work
+    # correctly in some cases.
+    #
     # Usage:
     #
     #   # Add JSON output capability to all model subclass instances (called before loading subclasses)
