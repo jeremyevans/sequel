@@ -407,6 +407,10 @@ module Sequel
       # Reset the database's conversion procs, requires a server query if there
       # any named types.
       def reset_conversion_procs
+        procs = PG_TYPES.dup
+        procs[1184] = procs[1114] = method(:to_application_timestamp)
+        @conversion_procs = procs
+
         @conversion_procs = get_conversion_procs
       end
 
