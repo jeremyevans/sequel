@@ -232,3 +232,9 @@ class Symbol
   end
   alias_method(:[], :sql_function) if RUBY_VERSION < '1.9.0'
 end
+
+class NilClass
+  def ~
+    Sequel::SQL::Constants::NOTNULL
+  end
+end

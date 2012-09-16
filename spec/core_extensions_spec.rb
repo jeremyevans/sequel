@@ -245,6 +245,10 @@ describe "Core extensions" do
     @d.l({:y => :z} | :x).should == '((y = z) OR x)'
     @d.l({:x => :a} | {:y => :z}).should == '((x = a) OR (y = z))'
   end
+
+  it "should support ~ on nil" do
+    @d.l({:x => ~nil}).should == '(x IS NOT NULL)'
+  end
 end
 
 describe "Array#case and Hash#case" do
