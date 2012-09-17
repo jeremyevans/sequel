@@ -735,6 +735,7 @@ module Sequel
       def initialize_postgres_adapter
         @primary_keys = {}
         @primary_key_sequences = {}
+        @conversion_procs = PG_TYPES.dup
         reset_conversion_procs
       end
 
