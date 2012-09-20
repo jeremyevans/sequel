@@ -123,10 +123,10 @@ module Sequel
       end
 
       # Supply columns with NOT NULL if they are part of a composite
-      # primary/foreign key
+      # primary key or unique constraint
       def column_list_sql(g)
         ks = []
-        g.constraints.each{|c| ks = c[:columns] if [:primary_key, :foreign_key].include? c[:type]} 
+        g.constraints.each{|c| ks = c[:columns] if [:primary_key, :unique].include?(c[:type])} 
         g.columns.each{|c| c[:null] = false if ks.include?(c[:name]) }
         super
       end
