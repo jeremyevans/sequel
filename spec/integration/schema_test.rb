@@ -420,18 +420,14 @@ describe "Database schema modifiers" do
   end
 
   specify "should rename columns when the table is referenced by a foreign key" do
-    begin
-      @db.create_table!(:itemsfk){primary_key :id; Integer :a}
-      @db.create_table!(:items){foreign_key :id, :itemsfk}
-      @db[:itemsfk].insert(:a=>10)
-      @ds.insert(:id=>1)
-      @db.alter_table(:itemsfk){rename_column :a, :b}
-      @db[:itemsfk].insert(:b=>20)
-      @ds.insert(:id=>2)
-      @db[:itemsfk].select_order_map([:id, :b]).should == [[1, 10], [2, 20]]
-    ensure
-      @db.drop_table(:items, :itemsfk)
-    end
+    @db.create_table!(:items2){primary_key :id; Integer :a}
+    @db.create_table!(:items){Integer :id, :primary_key=>true; foreign_key :items_id, :items2}
+    @db[:items2].insert(:a=>10)
+    @ds.insert(:id=>1)
+    @db.alter_table(:items2){rename_column :a, :b}
+    @db[:items2].insert(:b=>20)
+    @ds.insert(:id=>2)
+    @db[:items2].select_order_map([:id, :b]).should == [[1, 10], [2, 20]]
   end
 
   cspecify "should set column NULL/NOT NULL correctly", [:jdbc, :db2], [:db2] do
