@@ -306,7 +306,6 @@ module Sequel
       window_function_sql
     END
     PRIVATE_APPEND_METHODS = (<<-END).split.map{|x| x.to_sym}
-      argument_list
       as_sql
       column_list
       compound_dataset_sql
@@ -783,16 +782,6 @@ module Sequel
       options_overlap(COUNT_FROM_SELF_OPTS) ? from_self : unordered
     end
 
-    def argument_list_append(sql, args)
-      c = false
-      comma = COMMA
-      args.each do |a|
-        sql << comma if c
-        sql << a.to_s
-        c ||= true
-      end
-    end
-
     # SQL fragment for specifying an alias.  expression should already be literalized.
     def as_sql_append(sql, aliaz)
       sql << AS
@@ -940,6 +929,17 @@ module Sequel
     end
     alias table_ref_append identifier_append 
     
+    # Append all identifiers in args interspersed by commas.
+    def identifier_list_append(sql, args)
+      c = false
+      comma = COMMA
+      args.each do |a|
+        sql << comma if c
+        identifier_append(sql, a)
+        c ||= true
+      end
+    end
+
     # Modify the identifier returned from the database based on the
     # identifier_output_method.
     def input_identifier(v)
@@ -962,13 +962,7 @@ module Sequel
       columns = opts[:columns]
       if columns && !columns.empty?
         sql << PAREN_SPACE_OPEN
-        c = false
-        co = COMMA
-        columns.each do |col|
-          sql << co if c
-          identifier_append(sql, col)
-          c ||= true
-        end
+        identifier_list_append(sql, columns)
         sql << PAREN_CLOSE
       end 
     end
@@ -1311,7 +1305,7 @@ module Sequel
         quote_identifier_append(sql, w[:name])
         if args = w[:args]
          sql << PAREN_OPEN
-         argument_list_append(sql, args)
+         identifier_list_append(sql, args)
          sql << PAREN_CLOSE
         end
         sql << AS
@@ -1332,13 +1326,7 @@ module Sequel
     # Converts an array of source names into into a comma separated list.
     def source_list_append(sql, sources)
       raise(Error, 'No source specified for query') if sources.nil? || sources == []
-      c = false
-      co = COMMA
-      sources.each do |s|
-        sql << co if c
-        identifier_append(sql, s)
-        c ||= true
-      end
+      identifier_list_append(sql, sources)
     end
     
     # Delegate to Sequel.split_symbol.

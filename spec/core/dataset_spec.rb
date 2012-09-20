@@ -3020,6 +3020,11 @@ describe "Dataset#insert_sql" do
     @ds.insert_sql('c' => 'd').should == "INSERT INTO items (c) VALUES ('d')"
   end
 
+  specify "should quote string keys" do
+    @ds.quote_identifiers = true
+    @ds.insert_sql('c' => 'd').should == "INSERT INTO \"items\" (\"c\") VALUES ('d')"
+  end
+
   specify "should accept array subscript references" do
     @ds.insert_sql((Sequel.subscript(:day, 1)) => 'd').should == "INSERT INTO items (day[1]) VALUES ('d')"
   end
@@ -3664,6 +3669,12 @@ describe "Sequel::Dataset #with and #with_recursive" do
   specify "#with and #with_recursive should take an :args option" do
     @ds.with(:t, @db[:x], :args=>[:b]).sql.should == 'WITH t(b) AS (SELECT * FROM x) SELECT * FROM t'
     @ds.with_recursive(:t, @db[:x], @db[:t], :args=>[:b, :c]).sql.should == 'WITH t(b, c) AS (SELECT * FROM x UNION ALL SELECT * FROM t) SELECT * FROM t'
+  end
+  
+  specify "#with and #with_recursive should quote the columns in the :args option" do
+    @ds.quote_identifiers = true
+    @ds.with(:t, @db[:x], :args=>[:b]).sql.should == 'WITH "t"("b") AS (SELECT * FROM x) SELECT * FROM "t"'
+    @ds.with_recursive(:t, @db[:x], @db[:t], :args=>[:b, :c]).sql.should == 'WITH "t"("b", "c") AS (SELECT * FROM x UNION ALL SELECT * FROM t) SELECT * FROM "t"'
   end
   
   specify "#with_recursive should take an :union_all=>false option" do
