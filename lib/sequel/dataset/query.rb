@@ -974,17 +974,16 @@ module Sequel
     # :args :: Specify the arguments/columns for the CTE, should be an array of symbols.
     # :union_all :: Set to false to use UNION instead of UNION ALL combining the nonrecursive and recursive parts.
     #
-    #   DB[:t].select(:i___id, :pi___parent_id).
-    #    with_recursive(:t,
-    #                   DB[:i1].filter(:parent_id=>nil),
-    #                   DB[:t].join(:t, :i=>:parent_id).select(:i1__id, :i1__parent_id),
-    #                   :args=>[:i, :pi])
-    #   # WITH RECURSIVE t(i, pi) AS (
-    #   #   SELECT * FROM i1 WHERE (parent_id IS NULL)
+    #   DB[:t].with_recursive(:t,
+    #     DB[:i1].select(:id, :parent_id).filter(:parent_id=>nil),
+    #     DB[:i1].join(:t, :id=>:parent_id).select(:i1__id, :i1__parent_id),
+    #     :args=>[:id, :parent_id])
+    #   
+    #   # WITH RECURSIVE "t"("id", "parent_id") AS (
+    #   #   SELECT "id", "parent_id" FROM "i1" WHERE ("parent_id" IS NULL)
     #   #   UNION ALL
-    #   #   SELECT i1.id, i1.parent_id FROM t INNER JOIN t ON (t.i = t.parent_id)
-    #   # )
-    #   # SELECT i AS id, pi AS parent_id FROM t
+    #   #   SELECT "i1"."id", "i1"."parent_id" FROM "i1" INNER JOIN "t" ON ("t"."id" = "i1"."parent_id")
+    #   # ) SELECT * FROM "t"
     def with_recursive(name, nonrecursive, recursive, opts={})
       raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
       if hoist_cte?(nonrecursive)
