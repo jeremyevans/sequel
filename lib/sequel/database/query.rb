@@ -195,7 +195,9 @@ module Sequel
       opts[:schema] = sch if sch && !opts.include?(:schema)
 
       Sequel.synchronize{@schemas.delete(quoted_name)} if opts[:reload]
-      return Sequel.synchronize{@schemas[quoted_name]} if @schemas[quoted_name]
+      if v = Sequel.synchronize{@schemas[quoted_name]}
+        return v
+      end
 
       cols = schema_parse_table(table_name, opts)
       raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
