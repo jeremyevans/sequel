@@ -456,7 +456,7 @@ This part of the guide will list Sequel equivalents for ActiveRecord methods, ho
 
 ==== +abstract_class+, <tt>abstract_class=</tt>, <tt>abstract_class?</tt>
 
-With Sequel, these methods don't exist because it doesn't default to using single table inheritance in subclasses.  ActiveRecord assumes that subclasses of Model classes use single table inheritance, and you have to set <tt>abstract_class = true</tt> to use an abstract class.  In Sequel, you must use the +single_table_inheritance+ or +class_tabble_inheritance+ plugin to configure inheritance in the database.
+With Sequel, these methods don't exist because it doesn't default to using single table inheritance in subclasses.  ActiveRecord assumes that subclasses of Model classes use single table inheritance, and you have to set <tt>abstract_class = true</tt> to use an abstract class.  In Sequel, you must use the +single_table_inheritance+ or +class_table_inheritance+ plugin to configure inheritance in the database.
 
 ==== +all+
 
