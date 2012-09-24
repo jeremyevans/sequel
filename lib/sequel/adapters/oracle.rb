@@ -13,7 +13,10 @@ module Sequel
       # ORA-03114: not connected to ORACLE
       CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ]      
       
-      ORACLE_TYPES = {:blob=>lambda{|b| Sequel::SQL::Blob.new(b.read)}}
+      ORACLE_TYPES = {
+        :blob=>lambda{|b| Sequel::SQL::Blob.new(b.read)},
+        :clob=>lambda{|b| b.read}
+      }
 
       # Hash of conversion procs for this database.
       attr_reader :conversion_procs

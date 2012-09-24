@@ -1,5 +1,7 @@
 === HEAD
 
+* Return OCI8::CLOB values as ruby Strings in the Oracle adapter (jeremyevans)
+
 * Use clob for String :text=>true types on Oracle, DB2, HSQLDB, and Derby (jeremyevans) (#555)
 
 * Allowing marshalling of Sequel::Postgres::HStore (jeremyevans) (#556)
