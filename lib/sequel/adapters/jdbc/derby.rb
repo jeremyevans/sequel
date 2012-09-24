@@ -148,6 +148,11 @@ module Sequel
             super
           end
         end
+
+        # Derby uses clob for text types.
+        def uses_clob_for_text?
+          true
+        end
       end
       
       # Dataset class for Derby datasets accessed via JDBC.

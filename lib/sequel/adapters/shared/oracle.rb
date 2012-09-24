@@ -178,6 +178,11 @@ module Sequel
       def temporary_table_sql
         TEMPORARY
       end
+
+      # Oracle uses clob for text types.
+      def uses_clob_for_text?
+        true
+      end
     end
 
     module DatasetMethods

@@ -1,5 +1,7 @@
 === HEAD
 
+* Use clob for String :text=>true types on Oracle, DB2, HSQLDB, and Derby (jeremyevans) (#555)
+
 * Allowing marshalling of Sequel::Postgres::HStore (jeremyevans) (#556)
 
 * Quote channel identifier names when using LISTEN/NOTIFY on PostgreSQL (jeremyevans)

@@ -189,6 +189,11 @@ module Sequel
         :smallint
       end
       alias type_literal_generic_falseclass type_literal_generic_trueclass
+
+      # DB2 uses clob for text types.
+      def uses_clob_for_text?
+        true
+      end
     end
 
     module DatasetMethods

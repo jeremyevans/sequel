@@ -783,7 +783,7 @@ module Sequel
     # :text option is used, Sequel uses the :text type.
     def type_literal_generic_string(column)
       if column[:text]
-        :text
+        uses_clob_for_text? ? :clob : :text
       elsif column[:fixed]
         "char(#{column[:size]||255})"
       else
@@ -810,6 +810,11 @@ module Sequel
       column[:size] ||= 255 if type.to_s == 'varchar'
       elements = column[:size] || column[:elements]
       "#{type}#{literal(Array(elements)) if elements}#{UNSIGNED if column[:unsigned]}"
+    end
+
+    # Whether clob should be used for String :text=>true columns.
+    def uses_clob_for_text?
+      false
     end
   end
 end
