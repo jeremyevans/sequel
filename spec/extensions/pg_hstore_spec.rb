@@ -191,4 +191,10 @@ describe "pg_hstore extension" do
     @db.typecast_value(:hstore, {'a'=>'b'}).should == Sequel.hstore("a"=>"b")
     proc{@db.typecast_value(:hstore, [])}.should raise_error(Sequel::InvalidValue)
   end
+
+  it "should be serializable" do 
+    v = Sequel.hstore('foo'=>'bar')
+    dump = Marshal.dump(v) 
+    Marshal.load(dump).should == v    
+  end 
 end

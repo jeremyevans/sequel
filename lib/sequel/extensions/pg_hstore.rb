@@ -182,6 +182,20 @@ module Sequel
       ESCAPE_REPLACE = '\\\\\1'.freeze
       HSTORE_CAST = '::hstore'.freeze
 
+      if RUBY_VERSION >= '1.9'
+        # Undef 1.9 marshal_{dump,load} methods in the delegate class,
+        # so that ruby 1.9 uses the old style _dump/_load methods defined
+        # in the delegate class, instead of the marshal_{dump,load} methods
+        # in the Hash class.
+        undef_method :marshal_load
+        undef_method :marshal_dump
+      end
+
+      # Use custom marshal loading, since underlying hash uses a default proc.
+      def self._load(args)
+        new(Hash[Marshal.load(args)])
+      end
+
       # Parse the given string into an HStore, assuming the str is in PostgreSQL
       # hstore output format.
       def self.parse(str)
@@ -207,6 +221,11 @@ module Sequel
       # values before using them.
       %w'initialize merge! update replace'.each do |m|
         class_eval("def #{m}(h, &block) super(convert_hash(h), &block) end", __FILE__, __LINE__)
+      end
+
+      # Use custom marshal dumping, since underlying hash uses a default proc.
+      def _dump(*)
+        Marshal.dump(to_a)
       end
 
       # Override to force the key argument to a string.

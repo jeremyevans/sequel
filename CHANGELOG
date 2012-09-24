@@ -1,5 +1,7 @@
 === HEAD
 
+* Allowing marshalling of Sequel::Postgres::HStore (jeremyevans) (#556)
+
 * Quote channel identifier names when using LISTEN/NOTIFY on PostgreSQL (jeremyevans)
 
 * Handle nil values when formatting bound variable arguments in the pg_row extension (jeremyevans) (#548)
