@@ -906,21 +906,21 @@ end
 describe "Sequel::Dataset main SQL methods" do
   before(:all) do
     @db = INTEGRATION_DB
-    @db.create_table!(:a){Integer :a; Integer :b}
-    @ds = @db[:a].order(:a)
+    @db.create_table!(:d){Integer :a; Integer :b}
+    @ds = @db[:d].order(:a)
   end
   before do
     @ds.delete
   end
   after(:all) do
-    @db.drop_table?(:a)
+    @db.drop_table?(:d)
   end
   
   it "#exists should return a usable exists clause" do
-    @ds.filter(@db[:a___c].filter(:c__a=>:a__b).exists).all.should == []
+    @ds.filter(@db[:d___c].filter(:c__a=>:d__b).exists).all.should == []
     @ds.insert(20, 30)
     @ds.insert(10, 20)
-    @ds.filter(@db[:a___c].filter(:c__a=>:a__b).exists).all.should == [{:a=>10, :b=>20}]
+    @ds.filter(@db[:d___c].filter(:c__a=>:d__b).exists).all.should == [{:a=>10, :b=>20}]
   end
   
   it "#filter and #exclude should work with placeholder strings" do
