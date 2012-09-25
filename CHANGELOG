@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a cubrid adapter for accessing CUBRID databases via the cubrid gem (jeremyevans)
+
 * Add a jdbc/cubrid adapter for accessing CUBRID databases via JDBC on JRuby (jeremyevans)
 
 * Return OCI8::CLOB values as ruby Strings in the Oracle adapter (jeremyevans)

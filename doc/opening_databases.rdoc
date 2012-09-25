@@ -148,6 +148,12 @@ Without a database argument, assumes a memory database, so you can do:
 Handles paths in the connection string similar to the SQLite adapter, so see
 the sqlite section below for details.
 
+=== cubrid
+
+cubrid is a ruby extension for accessing a CUBRID database.  Currently,
+the ruby cubrid gem is in fairly rough state, with broken transaction
+support and some other issues, but most things work.
+
 === db2 
 
 Requires: db2/db2cli
