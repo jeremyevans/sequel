@@ -122,6 +122,12 @@ module Sequel
         db.extend(Sequel::JDBC::Progress::DatabaseMethods)
         db.extend_datasets Sequel::Progress::DatasetMethods
         com.progress.sql.jdbc.JdbcProgressDriver
+      end,
+      :cubrid=>proc do |db|
+        Sequel.ts_require 'adapters/jdbc/cubrid'
+        db.extend(Sequel::JDBC::Cubrid::DatabaseMethods)
+        db.extend_datasets Sequel::Cubrid::DatasetMethods
+        Java::cubrid.jdbc.driver.CUBRIDDriver
       end
     }
     
