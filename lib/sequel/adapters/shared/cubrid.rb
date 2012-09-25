@@ -46,21 +46,37 @@ module Sequel
         end
       end
 
+      def auto_increment_sql
+        AUTOINCREMENT
+      end
+
+      # CUBRID requires auto increment before primary key
+      def column_definition_order
+        COLUMN_DEFINITION_ORDER
+      end
+
+      # CUBRID requires FOREIGN KEY keywords before a column reference
       def column_references_sql(column)
         sql = super
         sql = " FOREIGN KEY#{sql}" unless column[:columns]
         sql
       end
 
-      # The order of the column definition, as an array of symbols.
-      def column_definition_order
-        COLUMN_DEFINITION_ORDER
+      def connection_execute_method
+        :query
       end
 
-      def auto_increment_sql
-        AUTOINCREMENT
+      # CUBRID is case insensitive, so don't modify identifiers
+      def identifier_input_method_default
+        nil
       end
 
+      # CUBRID is case insensitive, so don't modify identifiers
+      def identifier_output_method_default
+        nil
+      end
+
+      # CUBRID doesn't support booleans, it recommends using smallint.
       def type_literal_generic_trueclass(column)
         :smallint
       end
