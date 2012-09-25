@@ -12,11 +12,71 @@ module Sequel
         :cubrid
       end
 
+      def indexes(table, opts={})
+        m = output_identifier_meth
+        m2 = input_identifier_meth
+        indexes = {}
+        metadata_dataset.
+          from(:db_index___i).
+          join(:db_index_key___k, :index_name=>:index_name, :class_name=>:class_name).
+          where(:i__class_name=>m2.call(table), :is_primary_key=>'NO').
+          order(:k__key_order).
+          select(:i__index_name, :k__key_attr_name___column, :is_unique).
+          each do |row|
+            index = indexes[m.call(row[:index_name])] ||= {:columns=>[], :unique=>row[:is_unique]=='YES'}
+            index[:columns] << m.call(row[:column])
+          end
+        indexes
+      end
+
       def supports_savepoints?
         false
       end
-      
+
+      def schema_parse_table(table_name, opts)
+        m = output_identifier_meth(opts[:dataset])
+        m2 = input_identifier_meth(opts[:dataset])
+
+        pks = metadata_dataset.
+          from(:db_index___i).
+          join(:db_index_key___k, :index_name=>:index_name, :class_name=>:class_name).
+          where(:i__class_name=>m2.call(table_name), :is_primary_key=>'YES').
+          order(:k__key_order).
+          select_map(:k__key_attr_name).
+          map{|c| m.call(c)}
+
+        metadata_dataset.
+          from(:db_attribute).
+          where(:class_name=>m2.call(table_name)).
+          order(:def_order).
+          select(:attr_name, :data_type___db_type, :default_value___default, :is_nullable___allow_null).
+          map do |row|
+            name = m.call(row.delete(:attr_name))
+            row[:allow_null] = row[:allow_null] == 'YES'
+            row[:primary_key] = pks.include?(name)
+            row[:type] = schema_column_type(row[:db_type])
+            [name, row]
+          end
+      end
+
+      def tables(opts={})
+        _tables('CLASS')
+      end
+
+      def views(opts={})
+        _tables('VCLASS')
+      end
+
       private
+
+      def _tables(type)
+        m = output_identifier_meth
+        metadata_dataset.
+          from(:db_class).
+          where(:is_system_class=>'NO', :class_type=>type).
+          select_map(:class_name).
+          map{|c| m.call(c)}
+      end
 
       def alter_table_op_sql(table, op)
         case op[:op]
