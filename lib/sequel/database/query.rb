@@ -605,7 +605,7 @@ module Sequel
     # such as :integer or :string.
     def schema_column_type(db_type)
       case db_type
-      when /\A(character( varying)?|n?(var)?char|n?text)/io
+      when /\A(character( varying)?|n?(var)?char|n?text|string)/io
         :string
       when /\A(int(eger)?|(big|small|tiny)int)/io
         :integer
