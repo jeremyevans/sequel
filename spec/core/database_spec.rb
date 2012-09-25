@@ -2079,12 +2079,16 @@ describe "Database#column_schema_to_ruby_default" do
     db = Sequel::Database.new
     p = lambda{|d,t| db.send(:column_schema_to_ruby_default, d, t)}
     p[nil, :integer].should be_nil
+    p[1, :integer].should == 1
     p['1', :integer].should == 1
     p['-1', :integer].should == -1
+    p[1.0, :float].should == 1.0
     p['1.0', :float].should == 1.0
     p['-1.0', :float].should == -1.0
     p['1.0', :decimal].should == BigDecimal.new('1.0')
     p['-1.0', :decimal].should == BigDecimal.new('-1.0')
+    p[true, :boolean].should == true
+    p[false, :boolean].should == false
     p['1', :boolean].should == true
     p['0', :boolean].should == false
     p['true', :boolean].should == true
@@ -2097,6 +2101,7 @@ describe "Database#column_schema_to_ruby_default" do
     p["''", :string].should == ''
     p["'\\a''b'", :string].should == "\\a'b"
     p["'NULL'", :string].should == "NULL"
+    p[Date.today, :date].should == Date.today
     p["'2009-10-29'", :date].should == Date.new(2009,10,29)
     p["CURRENT_TIMESTAMP", :date].should == Sequel::CURRENT_DATE
     p["CURRENT_DATE", :date].should == Sequel::CURRENT_DATE

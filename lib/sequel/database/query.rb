@@ -463,7 +463,7 @@ module Sequel
     # Convert the given default, which should be a database specific string, into
     # a ruby object.
     def column_schema_to_ruby_default(default, type)
-      return if default.nil?
+      return default unless default.is_a?(String)
       if COLUMN_SCHEMA_DATETIME_TYPES.include?(type)
         if CURRENT_TIMESTAMP_RE.match(default)
           if type == :date
