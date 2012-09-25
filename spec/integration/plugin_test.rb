@@ -1137,12 +1137,14 @@ describe "AssociationPks plugin" do
     class ::Tag < Sequel::Model
     end 
     class ::Vocalist < Sequel::Model
+      set_primary_key [:first, :last]
       plugin :association_pks
     end
     class ::Instrument < Sequel::Model
       plugin :association_pks
     end
     class ::Hit < Sequel::Model
+      set_primary_key [:year, :week]
     end
   end
   before do
