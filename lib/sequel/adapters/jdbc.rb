@@ -248,13 +248,7 @@ module Sequel
               when :ddl
                 log_yield(sql){stmt.execute(sql)}
               when :insert
-                log_yield(sql) do
-                  if requires_return_generated_keys?
-                    stmt.executeUpdate(sql, JavaSQL::Statement.RETURN_GENERATED_KEYS)
-                  else
-                    stmt.executeUpdate(sql)
-                  end
-                end
+                log_yield(sql){execute_statement_insert(stmt, sql)}
                 last_insert_id(conn, opts.merge(:stmt=>stmt))
               else
                 log_yield(sql){stmt.executeUpdate(sql)}
@@ -264,7 +258,7 @@ module Sequel
         end
       end
       alias execute_dui execute
-      
+
       # Execute the given DDL SQL, which should not return any
       # values or rows.
       def execute_ddl(sql, opts={})
@@ -361,7 +355,7 @@ module Sequel
             cps = cps[1]
           else
             log_yield("CLOSE #{name}"){cps[1].close} if cps
-            cps = log_yield("PREPARE#{" #{name}:" if name} #{sql}"){conn.prepareStatement(sql)}
+            cps = log_yield("PREPARE#{" #{name}:" if name} #{sql}"){prepare_jdbc_statement(conn, sql, opts)}
             cps_sync(conn){|cpsh| cpsh[name] = [sql, cps]} if name
           end
           i = 0
@@ -380,8 +374,8 @@ module Sequel
               when :ddl
                 log_yield(msg, args){cps.execute}
               when :insert
-                log_yield(msg, args){cps.executeUpdate}
-                last_insert_id(conn, opts.merge(:prepared=>true))
+                log_yield(msg, args){execute_prepared_statement_insert(cps)}
+                last_insert_id(conn, opts.merge(:prepared=>true, :stmt=>cps))
               else
                 log_yield(msg, args){cps.executeUpdate}
               end
@@ -394,6 +388,16 @@ module Sequel
         end
       end
 
+      # Execute the prepared insert statement
+      def execute_prepared_statement_insert(stmt)
+        stmt.executeUpdate
+      end
+      
+      # Execute the insert SQL using the statement
+      def execute_statement_insert(stmt, sql)
+        stmt.executeUpdate(sql)
+      end
+      
       # Gets the connection from JNDI.
       def get_connection_from_jndi
         jndi_name = JNDI_URI_REGEXP.match(uri)[1]
@@ -459,6 +463,11 @@ module Sequel
             result.close
           end
         end
+      end
+
+      # Created a JDBC prepared statement on the connection with the given SQL.
+      def prepare_jdbc_statement(conn, sql, opts)
+        conn.prepareStatement(sql)
       end
 
       # Java being java, you need to specify the type of each argument
@@ -544,13 +553,6 @@ module Sequel
         raise_error(e)
       ensure
         stmt.close if stmt
-      end
-
-      # This method determines whether or not to add
-      # Statement.RETURN_GENERATED_KEYS as an argument when inserting rows.
-      # Sub-adapters that require this should override this method.
-      def requires_return_generated_keys?
-        false
       end
     end
     

@@ -42,12 +42,17 @@ module Sequel
           end
         end
 
-        # MySQL 5.1.12 JDBC adapter requires this to be true,
+        # MySQL 5.1.12 JDBC adapter requires generated keys
         # and previous versions don't mind.
-        def requires_return_generated_keys?
-          true
+        def execute_statement_insert(stmt, sql)
+          stmt.executeUpdate(sql, JavaSQL::Statement.RETURN_GENERATED_KEYS)
         end
-      
+
+        # Return generated keys for insert statements.
+        def prepare_jdbc_statement(conn, sql, opts)
+          opts[:type] == :insert ? conn.prepareStatement(sql, JavaSQL::Statement.RETURN_GENERATED_KEYS) : super
+        end
+
         # Convert tinyint(1) type to boolean
         def schema_column_type(db_type)
           db_type == 'tinyint(1)' ? :boolean : super
