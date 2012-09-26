@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.40.0 (2012-09-26)
 
 * Add a cubrid adapter for accessing CUBRID databases via the cubrid gem (jeremyevans)
 

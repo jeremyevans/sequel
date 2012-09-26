@@ -1,0 +1,73 @@
+= New Features
+
+* Sequel now has vastly improved support for Microsoft Access.
+
+* Sequel now supports the CUBRID database, with a cubrid adapter
+  that uses the cubrid gem, and a jdbc/cubrid adapter for accessing
+  CUBRID via JDBC on JRuby.
+
+* The association_pks plugin now supports composite keys.
+
+* Database#transaction now accepts a :disconnect=>:retry option,
+  in which case it will automatically retry the block if it
+  detects a disconnection.  This is potentially dangerous, and
+  should only be used if the entire block is idempotent.  There
+  is also no checking against an infinite retry loop.
+
+* SQL::CaseExpression#with_merged_expression has been added, for
+  converting a CaseExpression with an associated expression to
+  one without an associated expression, by merging the expression
+  into each condition.
+
+= Other Improvements
+
+* Sequel now quotes arguments/columns in common table expressions.
+
+* Sequel now handles nil values correctly in the pg_row extension.
+
+* Sequel::Postgres::HStore instances can now be marshalled.
+
+* Sequel now uses clob for String :text=>true types on databases that
+  don't support a text type.
+
+* On PostgreSQL, Sequel now quotes channel identifier names when using
+  LISTEN/NOTIFY.
+
+* On PostgreSQL, Sequel now correctly handles the case where named
+  type conversion procs have been added before the Database object is
+  instantiated.
+
+* On DB2, Sequel now explicitly sets NOT NULL for unique constraint
+  columns instead of foreign key columns.  DB2 does not allow columns
+  in unique constraints to be NULL, but does allow foreign key columns
+  to be NULL.
+
+* In the oracle adapter, clob values are now returned as ruby strings
+  upon retrieval.
+
+* Sequel now detects more types of disconnections in the postgres,
+  mysql, and mysql2 adapters.
+
+* If a database provides a default column value that isn't a ruby
+  string, it is used directly as the ruby default, instead of causing
+  the schema parsing to fail.
+
+= Backwards Compatibility
+
+* Code using Sequel's oracle adapter that expected clob values to be
+  returned as OCI8::CLOB instances needs to be modified to work with
+  ruby strings.
+
+* Because Sequel now quotes column names in common table expressions,
+  those names are now case sensitive, which could break certain poorly
+  coded queries.  Similar issues exist with the quoting of channel
+  identifier names in LISTEN/NOTIFY on PostgreSQL.
+
+* The private Database#requires_return_generated_keys? method
+  has been removed from the jdbc adapter.  Custom jdbc subadapters
+  relying on this method should override the private
+  Database#execute_statement_insert method instead to ensure that
+  RETURN_GENERATED_KEYS is used for insert statements.
+
+* The private Dataset#argument_list and #argument_list_append methods
+  have been removed.
