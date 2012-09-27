@@ -176,6 +176,11 @@ module Sequel
         "CALL ADMIN_CMD(#{literal("REORG TABLE #{table}")})"
       end
 
+      # Treat clob as blob if use_clob_as_blob is true
+      def schema_column_type(db_type)
+        (::Sequel::DB2::use_clob_as_blob && db_type.downcase == 'clob') ? :blob : super
+      end
+
       # We uses the clob type by default for Files.
       # Note: if user select to use blob, then insert statement should use 
       # use this for blob value:

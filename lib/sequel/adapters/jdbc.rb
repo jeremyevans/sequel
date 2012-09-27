@@ -108,7 +108,7 @@ module Sequel
       :db2=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/db2'
         db.extend(Sequel::JDBC::DB2::DatabaseMethods)
-        db.extend_datasets Sequel::DB2::DatasetMethods
+        db.dataset_class = Sequel::JDBC::DB2::Dataset
         com.ibm.db2.jcc.DB2Driver
       end,
       :firebirdsql=>proc do |db|

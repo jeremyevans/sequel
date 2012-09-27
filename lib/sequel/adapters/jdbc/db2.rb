@@ -51,6 +51,28 @@ module Sequel
           PRIMARY_KEY_INDEX_RE
         end
       end
+
+      class Dataset < JDBC::Dataset
+        include Sequel::DB2::DatasetMethods
+
+        class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
+          def db2_clob(v) Sequel::SQL::Blob.new(v.getSubString(1, v.length)) end
+        end
+
+        DB2_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:db2_clob)
+      
+        private
+
+        # Return clob as blob if use_clob_as_blob is true
+        def convert_type_proc(v)
+          case v
+          when JAVA_SQL_CLOB
+            ::Sequel::DB2::use_clob_as_blob ? DB2_CLOB_METHOD : super
+          else
+            super
+          end
+        end
+      end
     end
   end
 end
