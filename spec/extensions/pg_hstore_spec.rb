@@ -24,12 +24,12 @@ describe "pg_hstore extension" do
   end
 
   it "should literalize HStores to strings correctly" do
-    @db.literal({}.hstore).should == '\'\'::hstore'
-    @db.literal({"a"=>"b"}.hstore).should == '\'"a"=>"b"\'::hstore'
-    @db.literal({"c"=>nil}.hstore).should == '\'"c"=>NULL\'::hstore'
-    @db.literal({"c"=>'NULL'}.hstore).should == '\'"c"=>"NULL"\'::hstore'
-    @db.literal({'c'=>'\ "\'=>'}.hstore).should == '\'"c"=>"\\\\ \\"\'\'=>"\'::hstore'
-    ['\'"a"=>"b","c"=>"d"\'::hstore', '\'"c"=>"d","a"=>"b"\'::hstore'].should include(@db.literal({"a"=>"b","c"=>"d"}.hstore))
+    @db.literal({}.hstore).should == 'E\'\'::hstore'
+    @db.literal({"a"=>"b"}.hstore).should == 'E\'"a"=>"b"\'::hstore'
+    @db.literal({"c"=>nil}.hstore).should == 'E\'"c"=>NULL\'::hstore'
+    @db.literal({"c"=>'NULL'}.hstore).should == 'E\'"c"=>"NULL"\'::hstore'
+    @db.literal({'c'=>'\ "\'=>'}.hstore).should == 'E\'"c"=>"\\\\ \\"\'\'=>"\'::hstore'
+    ['E\'"a"=>"b","c"=>"d"\'::hstore', 'E\'"c"=>"d","a"=>"b"\'::hstore'].should include(@db.literal({"a"=>"b","c"=>"d"}.hstore))
   end
 
   it "should have Hash#hstore method for creating HStore instances" do

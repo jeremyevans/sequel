@@ -227,6 +227,7 @@ module Sequel
 
       # Append a literalize version of the hstore to the sql.
       def sql_literal_append(ds, sql)
+        sql << 'E'
         ds.literal_append(sql, unquoted_literal)
         sql << HSTORE_CAST
       end
