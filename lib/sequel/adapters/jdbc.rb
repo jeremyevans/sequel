@@ -660,7 +660,7 @@ module Sequel
         def decimal(v) BigDecimal.new(v.to_string) end
         def byte_array(v) Sequel::SQL::Blob.new(String.from_java_bytes(v)) end
         def blob(v) Sequel::SQL::Blob.new(String.from_java_bytes(v.getBytes(1, v.length))) end
-        def clob(v) Sequel::SQL::Blob.new(v.getSubString(1, v.length)) end
+        def clob(v) v.getSubString(1, v.length) end
         def buffered_reader(v)
           lines = ""
           c = false

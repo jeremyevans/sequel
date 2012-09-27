@@ -605,7 +605,7 @@ module Sequel
     # such as :integer or :string.
     def schema_column_type(db_type)
       case db_type
-      when /\A(character( varying)?|n?(var)?char|n?text|string)/io
+      when /\A(character( varying)?|n?(var)?char|n?text|string|clob)/io
         :string
       when /\A(int(eger)?|(big|small|tiny)int)/io
         :integer
@@ -621,7 +621,7 @@ module Sequel
         :float
       when /\A(?:(?:(?:num(?:ber|eric)?|decimal)(?:\(\d+,\s*(\d+|false|true)\))?)|(?:small)?money)\z/io
         $1 && ['0', 'false'].include?($1) ? :integer : :decimal
-      when /bytea|[bc]lob|image|(var)?binary/io
+      when /bytea|blob|image|(var)?binary/io
         :blob
       when /\Aenum/io
         :enum

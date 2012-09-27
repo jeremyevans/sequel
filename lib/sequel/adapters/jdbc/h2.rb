@@ -110,11 +110,6 @@ module Sequel
           PRIMARY_KEY_INDEX_RE
         end
 
-        # Treat clob as string instead of blob
-        def schema_column_type(db_type)
-          db_type.downcase == 'clob' ? :string : super
-        end
-
         # Use BIGINT IDENTITY for identity columns that use bigint, fixes
         # the case where primary_key :column, :type=>Bignum is used.
         def type_literal_generic_bignum(column)

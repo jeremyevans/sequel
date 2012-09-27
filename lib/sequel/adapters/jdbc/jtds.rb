@@ -21,7 +21,7 @@ module Sequel
         include Sequel::MSSQL::DatasetMethods
 
         class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
-          def jtds_clob(v) Sequel::SQL::Blob.new(v.getSubString(1, v.length)) end
+          def jtds_clob(v) v.getSubString(1, v.length) end
         end
 
         JTDS_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:jtds_clob)

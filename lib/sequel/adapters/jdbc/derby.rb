@@ -129,11 +129,6 @@ module Sequel
           PRIMARY_KEY_INDEX_RE
         end
 
-        # Treat clob as string instead of blob
-        def schema_column_type(db_type)
-          db_type.downcase == 'clob' ? :string : super
-        end
-        
         # If an :identity option is present in the column, add the necessary IDENTITY SQL.
         def type_literal(column)
           if column[:identity]
