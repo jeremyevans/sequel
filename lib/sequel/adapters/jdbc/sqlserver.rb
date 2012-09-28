@@ -60,6 +60,12 @@ module Sequel
         def metadata_dataset
           super.extend(MetadataDatasetMethods)
         end
+
+        private
+
+        def disconnect_error?(exception, opts)
+          super || (exception.message =~ /connection is closed/)
+        end
       end
     end
   end
