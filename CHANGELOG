@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle failure to create a prepared statement better in the postgres, mysql, and mysql2 adapters (jeremyevans) (#560)
+
 * Treat clob columns as strings instead of blobs (jeremyevans)
 
 === 3.40.0 (2012-09-26)

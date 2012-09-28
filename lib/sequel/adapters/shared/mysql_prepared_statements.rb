@@ -56,8 +56,8 @@ module Sequel
           sql = ps.prepared_sql
           synchronize(opts[:server]) do |conn|
             unless conn.prepared_statements[ps_name] == sql
-              conn.prepared_statements[ps_name] = sql
               _execute(conn, "PREPARE #{ps_name} FROM #{literal(sql)}", opts)
+              conn.prepared_statements[ps_name] = sql
             end
             i = 0
             _execute(conn, "SET " + args.map {|arg| "@sequel_arg_#{i+=1} = #{literal(arg)}"}.join(", "), opts) unless args.empty?

@@ -479,8 +479,8 @@ module Sequel
 
         unless conn.prepared_statements[ps_name] == sql
           conn.execute("DEALLOCATE #{ps_name}") if conn.prepared_statements.include?(ps_name)
-          conn.prepared_statements[ps_name] = sql
           conn.check_disconnect_errors{log_yield("PREPARE #{ps_name} AS #{sql}"){conn.prepare(ps_name, sql)}}
+          conn.prepared_statements[ps_name] = sql
         end
 
         log_sql = "EXECUTE #{ps_name}"
