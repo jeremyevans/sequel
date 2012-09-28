@@ -524,7 +524,7 @@ with the database independent ruby class types, while <tt>-D</tt> will use
 the +column+ method with string types.
 
 Note that Sequel cannot dump constraints other than primary key and possibly
-foreign key constraints constraints.  If you are using database features such
+foreign key constraints.  If you are using database features such
 as constraints or triggers, you should use your database's dump and restore
 programs instead of Sequel's schema dumper.
 
