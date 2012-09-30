@@ -231,6 +231,10 @@ describe "pg_array extension" do
     proc{@db.typecast_value(:integer_array, {})}.should raise_error(Sequel::InvalidValue)
   end
 
+  it "should support SQL::AliasMethods" do
+    @db.select(Sequel.pg_array([1], :integer).as(:col1)).sql.should == 'SELECT ARRAY[1]::integer[] AS col1'
+  end
+
   it "should support registering custom array types" do
     Sequel::Postgres::PGArray.register('foo')
     @db.typecast_value(:foo_array, []).should be_a_kind_of(Sequel::Postgres::PGArray)

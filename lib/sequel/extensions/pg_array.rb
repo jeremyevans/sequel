@@ -99,6 +99,8 @@ module Sequel
   module Postgres
     # Represents a PostgreSQL array column value.
     class PGArray < DelegateClass(Array)
+      include Sequel::SQL::AliasMethods
+
       ARRAY = "ARRAY".freeze
       DOUBLE_COLON = '::'.freeze
       EMPTY_BRACKET = '[]'.freeze
