@@ -568,3 +568,81 @@ describe "MSSQL::Database#drop_column with a schema" do
     MSSQL_DB[:test__items].columns.should == [:id]
   end
 end
+
+describe "Database#foreign_key_list" do
+  before(:all) do
+    MSSQL_DB.create_table! :items do
+      primary_key :id
+      integer     :sku
+    end
+    MSSQL_DB.create_table! :prices do
+      integer     :item_id
+      datetime    :valid_from
+      float       :price
+      primary_key [:item_id, :valid_from]
+      foreign_key [:item_id], :items, :key => :id, :name => :fk_prices_items
+    end
+    MSSQL_DB.create_table! :sales do
+      integer  :id
+      integer  :price_item_id
+      datetime :price_valid_from
+      foreign_key [:price_item_id, :price_valid_from], :prices, :key => [:item_id, :valid_from], :name => :fk_sales_prices, :on_delete => :cascade
+    end
+  end
+  after(:all) do
+    MSSQL_DB.drop_table :sales
+    MSSQL_DB.drop_table :prices
+    MSSQL_DB.drop_table :items
+  end
+  it "should support typical foreign keys" do
+    MSSQL_DB.foreign_key_list(:prices).should == [{:name      => :fk_prices_items, 
+                                                   :table     => :items, 
+                                                   :columns   => [:item_id], 
+                                                   :key       => [:id], 
+                                                   :on_update => :no_action, 
+                                                   :on_delete => :no_action }]
+  end
+  it "should support a foreign key with multiple columns" do
+    MSSQL_DB.foreign_key_list(:sales).should == [{:name      => :fk_sales_prices, 
+                                                  :table     => :prices, 
+                                                  :columns   => [:price_item_id, :price_valid_from], 
+                                                  :key       => [:item_id, :valid_from], 
+                                                  :on_update => :no_action, 
+                                                  :on_delete => :cascade }]
+  end
+
+  context "with multiple schemas" do
+    before(:all) do
+      MSSQL_DB.execute_ddl "create schema vendor"
+      MSSQL_DB.create_table! :vendor__vendors do
+        primary_key :id
+        varchar     :name
+      end
+      MSSQL_DB.create_table! :vendor__mapping do
+        integer :vendor_id
+        integer :item_id
+        foreign_key [:vendor_id], :vendor__vendors, :name => :fk_mapping_vendor
+        foreign_key [:item_id], :items, :name => :fk_mapping_item
+      end
+    end
+    after(:all) do
+      MSSQL_DB.drop_table :vendor__mapping
+      MSSQL_DB.drop_table :vendor__vendors
+      MSSQL_DB.execute_ddl "drop schema vendor"
+    end
+    it "should support mixed schema bound tables" do
+      MSSQL_DB.foreign_key_list(:vendor__mapping).should == [{:name      => :fk_mapping_item, 
+                                                              :table     => :items, 
+                                                              :columns   => [:item_id], 
+                                                              :key       => [:id], 
+                                                              :on_update => :no_action, 
+                                                              :on_delete => :no_action },
+                                                             {:name      => :fk_mapping_vendor, 
+                                                              :table     => :vendor__vendors, 
+                                                              :columns   => [:vendor_id], 
+                                                              :key       => [:id], 
+                                                              :on_update => :no_action, 
+                                                              :on_delete => :no_action }]
+    end
+  end
+end

@@ -13,6 +13,7 @@ module Sequel
       SQL_ROLLBACK_TO_SAVEPOINT = 'IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION autopoint_%d'.freeze
       SQL_SAVEPOINT = 'SAVE TRANSACTION autopoint_%d'.freeze
       MSSQL_DEFAULT_RE = /\A(?:\(N?('.*')\)|\(\((-?\d+(?:\.\d+)?)\)\))\z/
+      FOREIGN_KEY_ACTION_MAP = {0 => :no_action, 1 => :cascade, 2 => :set_null, 3 => :set_default}.freeze
 
       include Sequel::Database::SplitAlterTable
       
@@ -34,6 +35,47 @@ module Sequel
       # Microsoft SQL Server namespaces indexes per table.
       def global_index_namespace?
         false
+      end
+
+      # Return foreign key information using the system views, including
+      # :name, :on_delete, and :on_update entries in the hashes.
+      def foreign_key_list(table, opts={})
+        m = output_identifier_meth
+        im = input_identifier_meth
+        schema, table = schema_and_table(table)
+        current_schema = m.call(get(Sequel.function('schema_name')))
+        fk_action_map = FOREIGN_KEY_ACTION_MAP
+        ds = metadata_dataset.from(:sys__foreign_keys___fk).
+          join(:sys__foreign_key_columns___fkc, :constraint_object_id => :object_id).
+          join(:sys__all_columns___pc, :object_id => :fkc__parent_object_id,     :column_id => :fkc__parent_column_id).
+          join(:sys__all_columns___rc, :object_id => :fkc__referenced_object_id, :column_id => :fkc__referenced_column_id).
+          where{{object_schema_name(:fk__parent_object_id) => im.call(schema || current_schema)}}.
+          where{{object_name(:fk__parent_object_id) => im.call(table)}}.
+          select{[:fk__name, 
+                  :fk__delete_referential_action, 
+                  :fk__update_referential_action, 
+                  :pc__name___column, 
+                  :rc__name___referenced_column, 
+                  object_schema_name(:fk__referenced_object_id).as(:schema), 
+                  object_name(:fk__referenced_object_id).as(:table)]}.
+          order(:name)
+        h = {}
+        ds.each do |row|
+          if r = h[row[:name]]
+            r[:columns] << m.call(row[:column])
+            r[:key] << m.call(row[:referenced_column])
+          else
+            referenced_schema = m.call(row[:schema])
+            referenced_table = m.call(row[:table])
+            h[row[:name]] = { :name      => m.call(row[:name]), 
+                              :table     => (referenced_schema == current_schema) ? referenced_table : :"#{referenced_schema}__#{referenced_table}",
+                              :columns   => [m.call(row[:column])], 
+                              :key       => [m.call(row[:referenced_column])], 
+                              :on_update => fk_action_map[row[:update_referential_action]], 
+                              :on_delete => fk_action_map[row[:delete_referential_action]] }
+          end
+        end
+        h.values
       end
 
       # Use the system tables to get index information
