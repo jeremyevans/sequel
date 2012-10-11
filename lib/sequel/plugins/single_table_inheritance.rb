@@ -35,6 +35,17 @@ module Sequel
     #   Employee.plugin :single_table_inheritance, :type,
     #     :model_map=>{'line staff'=>:Staff, 'supervisor'=>:Manager}
     #
+    #   # By default the plugin sets the respective column value
+    #   # when a new instance is created.
+    #   Staff.create.type == 'line staff'
+    #   Manager.create.type == 'supervisor'
+    #
+    #   # You can customize this behavior with the :key_chooser option.
+    #   # This is most useful when using a non-bijective mapping.
+    #   Employee.plugin :single_table_inheritance, :type,
+    #     :model_map=>{'line staff'=>:Staff, 'supervisor'=>:Manager},
+    #     :key_chooser=>proc{|instance| instance.model.sti_key_map[instance.model.to_s].first || 'stranger' }
+    #
     #   # Using custom procs, with :model_map taking column values
     #   # and yielding either a class, string, symbol, or nil, 
     #   # and :key_map taking a class object and returning the column
@@ -42,6 +53,15 @@ module Sequel
     #   Employee.plugin :single_table_inheritance, :type,
     #     :model_map=>proc{|v| v.reverse},
     #     :key_map=>proc{|klass| klass.name.reverse}
+    #
+    #   # You can use the same class for multiple values.
+    #   # This is mainly useful when the sti_key column contains multiple values
+    #   # which are different but do not require different code.
+    #   Employee.plugin :single_table_inheritance, :type,
+    #     :model_map=>{'staff' => "Staff",
+    #                  'manager => "Manager",
+    #                  'overpayed staff => "Staff",
+    #                  'underpayed staff' => "Staff"}
     #
     # One minor issue to note is that if you specify the <tt>:key_map</tt>
     # option as a hash, instead of having it inferred from the <tt>:model_map</tt>,
@@ -57,20 +77,38 @@ module Sequel
           @sti_model_map = opts[:model_map] || lambda{|v| v if v && v != ''}
           @sti_key_map = if km = opts[:key_map]
             if km.is_a?(Hash)
-              h = Hash.new{|h,k| h[k.to_s] unless k.is_a?(String)}
-              h.merge!(km)
+              h = Hash.new do |h,k| 
+                unless k.is_a?(String)
+                  h[k.to_s]
+                else
+                  []
+                end
+              end
+              km.each do |k,v|
+                h[k.to_s] = [ ] unless h.key?(k.to_s)
+                h[k.to_s].push( *Array(v) )
+              end
+              h
             else
               km
             end
           elsif sti_model_map.is_a?(Hash)
-            h = Hash.new{|h,k| h[k.to_s] unless k.is_a?(String)}
+            h = Hash.new do |h,k| 
+              unless k.is_a?(String)
+                h[k.to_s]
+              else
+                []
+              end
+            end
             sti_model_map.each do |k,v|
-              h[v.to_s] = k
+              h[v.to_s] = [ ] unless h.key?(v.to_s)
+              h[v.to_s] << k
             end
             h
           else
             lambda{|klass| klass.name.to_s}
           end
+          @sti_key_chooser = opts[:key_chooser] || lambda{|inst| Array(inst.model.sti_key_map[inst.model]).last }
           dataset.row_proc = lambda{|r| model.sti_load(r)}
         end
       end
@@ -97,6 +135,10 @@ module Sequel
         # the value of the sti_key column to the appropriate class to use.
         attr_reader :sti_model_map
 
+        # A proc which returns the value to use for new instances.
+        # This defaults to a lookup in the key map.
+        attr_reader :sti_key_chooser
+
         # Copy the necessary attributes to the subclasses, and filter the
         # subclass's dataset based on the sti_kep_map entry for the class.
         def inherited(subclass)
@@ -105,18 +147,19 @@ module Sequel
           sd = sti_dataset
           skm = sti_key_map
           smm = sti_model_map
-          key = skm[subclass] 
+          skc = sti_key_chooser
+          key = Array(skm[subclass]).dup
           sti_subclass_added(key)
-          ska = [key]
           rp = dataset.row_proc
-          subclass.set_dataset(sd.filter(SQL::QualifiedIdentifier.new(table_name, sk)=>ska), :inherited=>true)
+          subclass.set_dataset(sd.filter(SQL::QualifiedIdentifier.new(table_name, sk)=>key), :inherited=>true)
           subclass.instance_eval do
             dataset.row_proc = rp
             @sti_key = sk
-            @sti_key_array = ska
+            @sti_key_array = key
             @sti_dataset = sd
             @sti_key_map = skm
             @sti_model_map = smm
+            @sti_key_chooser = skc
             self.simple_table = nil
           end
         end
@@ -131,7 +174,7 @@ module Sequel
         # keys for all of their descendant classes.
         def sti_subclass_added(key)
           if sti_key_array
-            Sequel.synchronize{sti_key_array << key}
+            Sequel.synchronize{sti_key_array.push(*Array(key))}
             superclass.sti_subclass_added(key)
           end
         end
@@ -159,7 +202,7 @@ module Sequel
       module InstanceMethods
         # Set the sti_key column based on the sti_key_map.
         def before_create
-          send("#{model.sti_key}=", model.sti_key_map[model]) unless self[model.sti_key]
+          send("#{model.sti_key}=", model.sti_key_chooser.call(self)) unless self[model.sti_key]
           super
         end
       end

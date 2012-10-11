@@ -181,5 +181,47 @@ describe Sequel::Model, "#sti_key" do
       proc{StiTest2.dataset.row_proc.call(:kind=>1)}.should raise_error(Sequel::Error)
       proc{StiTest2.dataset.row_proc.call(:kind=>2)}.should raise_error(Sequel::Error)
     end
+
+    it "should work with non-bijective mappings" do
+      StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>'StiTest3', 1=>'StiTest3', 2=>'StiTest4'}
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+      StiTest2.dataset.row_proc.call(:kind=>0).should be_a_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
+
+      StiTest3.create.kind.should == 1
+      StiTest4.create.kind.should == 2
+    end
+
+    it "should work with non-bijective mappings and key map procs" do
+      StiTest2.plugin :single_table_inheritance, :kind,
+        :key_map=>proc{|model| model.to_s == 'StiTest4' ? 2 : [0,1] }
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+
+      StiTest2.dataset.sql.should == "SELECT * FROM sti_test2s"
+      StiTest3.dataset.sql.should == "SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (0, 1))"
+      StiTest4.dataset.sql.should == "SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (2))"
+    end
+
+    it "should create correct sql with non-bijective mappings" do
+      StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>'StiTest3', 1=>'StiTest3', 2=>'StiTest4'}
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+    
+      StiTest2.dataset.sql.should == "SELECT * FROM sti_test2s"
+      StiTest3.dataset.sql.should == "SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (0, 1))"
+    end
+
+    it "should honor a :key_chooser" do
+      StiTest2.plugin :single_table_inheritance, :kind, :key_chooser => proc{|inst| inst.model.to_s.downcase }
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+
+      StiTest3.create.kind.should == 'stitest3'
+      StiTest4.create.kind.should == 'stitest4'
+    end
+
   end
 end
