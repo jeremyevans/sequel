@@ -65,6 +65,18 @@ Remember, using +eager_graph+ is generally only necessary when you need to
 filter/order based on columns in an associated table, it is recommended to
 use +eager+ for eager loading if possible.
 
+One advantage of using +eager_graph+ is that you can easily filter/order
+on columns in an associated table on a per-query basis, using regular
+Sequel dataset methods.  For example, if you only want to retrieve artists
+who have albums that start with A, and eager load just those albums,
+ordered by the albums name, you can do:
+
+  albums = Artist.
+    eager_graph(:albums).
+    where(Sequel.like(:albums__name, 'A%')).
+    order(:albums__name).
+    all
+
 For lazy loading (e.g. Model[1].association), the <tt>:dataset</tt> option can be used
 to specify an arbitrary dataset (one that uses different keys, multiple keys,
 joins to other tables, etc.).
