@@ -1,5 +1,11 @@
 === HEAD
 
+* Make single_table_inheritance plugin handle non-bijective mappings (hannesg) (#567)
+
+* Support foreign key parsing on MSSQL (munkyboy) (#564)
+
+* Include SQL::AliasMethods in Postgres::PGArray (treydempsey (#563)
+
 * Handle failure to create a prepared statement better in the postgres, mysql, and mysql2 adapters (jeremyevans) (#560)
 
 * Treat clob columns as strings instead of blobs (jeremyevans)
