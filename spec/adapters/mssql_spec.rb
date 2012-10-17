@@ -631,18 +631,7 @@ describe "Database#foreign_key_list" do
       MSSQL_DB.execute_ddl "drop schema vendor"
     end
     it "should support mixed schema bound tables" do
-      MSSQL_DB.foreign_key_list(:vendor__mapping).should == [{:name      => :fk_mapping_item, 
-                                                              :table     => :items, 
-                                                              :columns   => [:item_id], 
-                                                              :key       => [:id], 
-                                                              :on_update => :no_action, 
-                                                              :on_delete => :no_action },
-                                                             {:name      => :fk_mapping_vendor, 
-                                                              :table     => :vendor__vendors, 
-                                                              :columns   => [:vendor_id], 
-                                                              :key       => [:id], 
-                                                              :on_update => :no_action, 
-                                                              :on_delete => :no_action }]
+ MSSQL_DB.foreign_key_list(:vendor__mapping).sort_by{|h| h[:name].to_s}.should == [{:name => :fk_mapping_item, :table => :items, :columns => [:item_id], :key => [:id], :on_update => :no_action, :on_delete => :no_action }, {:name => :fk_mapping_vendor, :table => :vendor__vendors, :columns => [:vendor_id], :key => [:id], :on_update => :no_action, :on_delete => :no_action }]
     end
   end
 end

@@ -177,7 +177,7 @@ module Sequel
       # :concurrently :: Create the index concurrently, so it doesn't block
       #                  operations on the table while the index is being
       #                  built.
-      # :op_class :: Use a specific operator class in the index.
+      # :opclass :: Use a specific operator class in the index.
       #
       # Microsoft SQL Server specific options:
       #
