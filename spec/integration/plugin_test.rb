@@ -542,7 +542,7 @@ describe "Touch plugin" do
       foreign_key :artist_id, :artists
       DateTime :updated_at
     end
-    @db.create_join_table(:album_id=>:albums, :artist_id=>:artists)
+    @db.create_join_table({:album_id=>:albums, :artist_id=>:artists}, :no_index=>true)
   end
   before do
     @db[:albums].delete
