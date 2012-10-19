@@ -59,6 +59,7 @@ Sequel.require 'adapters/utils/pg_types'
 module Sequel
   module Postgres
     class PGRange
+      include Sequel::SQL::AliasMethods
 
       # Map of string database type names to type symbols (e.g. 'int4range' => :int4range),
       # used in the schema parsing.

@@ -6,7 +6,7 @@
 
 * Support foreign key parsing on MSSQL (munkyboy) (#564)
 
-* Include SQL::AliasMethods in Postgres::PGArray (treydempsey) (#563)
+* Include SQL::AliasMethods in most pg_* extension objects (treydempsey, jeremyevans) (#563)
 
 * Handle failure to create a prepared statement better in the postgres, mysql, and mysql2 adapters (jeremyevans) (#560)
 

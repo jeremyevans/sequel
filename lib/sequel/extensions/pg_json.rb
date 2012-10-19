@@ -63,6 +63,8 @@ module Sequel
 
     # Class representating PostgreSQL JSON column array values.
     class JSONArray < DelegateClass(Array)
+      include Sequel::SQL::AliasMethods
+
       # Convert the array to a string using to_json, append a
       # literalized version of the string to the sql, and explicitly
       # cast the string to json.
@@ -74,6 +76,8 @@ module Sequel
 
     # Class representating PostgreSQL JSON column hash/object values.
     class JSONHash < DelegateClass(Hash)
+      include Sequel::SQL::AliasMethods
+
       # Convert the array to a string using to_json, append a
       # literalized version of the string to the sql, and explicitly
       # cast the string to json.

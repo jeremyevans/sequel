@@ -81,6 +81,8 @@ module Sequel
       # this is only used for generic PostgreSQL record types, as registered
       # types use HashRow by default.
       class ArrayRow < DelegateClass(Array)
+        include Sequel::SQL::AliasMethods
+
         class << self
           # The database type for this class.  May be nil if this class
           # done not have a specific database type.
@@ -125,6 +127,8 @@ module Sequel
       # Types registered via Database#register_row_type will use this
       # class by default.
       class HashRow < DelegateClass(Hash)
+        include Sequel::SQL::AliasMethods
+
         class << self
           # The columns associated with this class.
           attr_accessor :columns

@@ -86,6 +86,8 @@ require 'strscan'
 module Sequel
   module Postgres
     class HStore < DelegateClass(Hash)
+      include Sequel::SQL::AliasMethods
+
       # Parser for PostgreSQL hstore output format.
       class Parser < StringScanner
         QUOTE_RE = /"/.freeze
