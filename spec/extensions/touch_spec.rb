@@ -110,6 +110,46 @@ describe "Touch plugin" do
       "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 1)"]
   end
 
+  specify "should be able to touch many_to_one associations" do
+    @Album.plugin :touch, :associations=>:artist
+    @Album.load(:id=>3, :artist_id=>4).touch
+    MODEL_DB.sqls.should == ["UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 3)",
+      "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 4)"]
+  end
+
+  specify "should be able to touch many_to_one associations" do
+    @Artist.one_to_one :album, :class=>@Album, :key=>:artist_id
+    @Artist.plugin :touch, :associations=>:album
+    @a.touch
+    MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
+      "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (albums.artist_id = 1)"]
+  end
+
+  specify "should be able to touch many_to_many associations" do
+    @Artist.many_to_many :albums, :class=>@Album, :left_key=>:artist_id, :join_table=>:aa
+    @Artist.plugin :touch, :associations=>:albums
+    @a.touch
+    MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
+      "SELECT albums.* FROM albums INNER JOIN aa ON ((aa.album_id = albums.id) AND (aa.artist_id = 1))",
+      "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
+  end
+
+  specify "should be able to touch many_through_many associations" do
+    @Artist.plugin :many_through_many
+    @Artist.many_through_many :albums, [[:aa, :artist_id, :album_id]], :class=>@Album
+    @Artist.plugin :touch, :associations=>:albums
+    @a.touch
+    MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
+      "SELECT albums.* FROM albums INNER JOIN aa ON ((aa.album_id = albums.id) AND (aa.artist_id = 1))",
+      "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
+  end
+
+  specify "should handle touching many_to_one associations with no associated object" do
+    @Album.plugin :touch, :associations=>:artist
+    @Album.load(:id=>3, :artist_id=>nil).touch
+    MODEL_DB.sqls.should == ["UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 3)"]
+  end
+
   specify "should not update a column that doesn't exist" do
     @Album.plugin :touch, :column=>:x
     a = @Album.load(:id=>1)

@@ -530,46 +530,48 @@ end
 describe "Touch plugin" do
   before(:all) do
     @db = INTEGRATION_DB
-    @db.instance_variable_set(:@schemas, {})
-    @db.create_table!(:artists) do
+    @db.drop_table? :albums_artists, :albums, :artists
+    @db.create_table(:artists) do
       primary_key :id
       String :name
       DateTime :updated_at
     end
-    @db.create_table!(:albums) do
+    @db.create_table(:albums) do
       primary_key :id
       String :name
       foreign_key :artist_id, :artists
       DateTime :updated_at
     end
+    @db.create_join_table(:album_id=>:albums, :artist_id=>:artists)
   end
   before do
     @db[:albums].delete
     @db[:artists].delete
     class ::Album < Sequel::Model(@db)
-      many_to_one :artist
-      plugin :touch, :associations=>:artist
     end
     class ::Artist < Sequel::Model(@db)
     end 
     
     @artist = Artist.create(:name=>'1')
-    @album = Album.create(:name=>'A', :artist=>@artist)
+    @album = Album.create(:name=>'A', :artist_id=>@artist.id)
   end
   after do
     [:Album, :Artist].each{|s| Object.send(:remove_const, s)}
   end
   after(:all) do
-    @db.drop_table? :albums, :artists
+    @db.drop_table? :albums_artists, :albums, :artists
   end
 
   specify "should update the timestamp column when touching the record" do
+    Album.plugin :touch
     @album.updated_at.should == nil
     @album.touch
     @album.updated_at.to_i.should be_within(2).of(Time.now.to_i)
   end
   
-  cspecify "should update the timestamp column for associated records when the record is updated or destroyed", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
+  cspecify "should update the timestamp column for many_to_one associated records when the record is updated or destroyed", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
+    Album.many_to_one :artist
+    Album.plugin :touch, :associations=>:artist
     @artist.updated_at.should == nil
     @album.update(:name=>'B')
     ua = @artist.reload.updated_at
@@ -580,6 +582,33 @@ describe "Touch plugin" do
     end
     @artist.update(:updated_at=>nil)
     @album.destroy
+    if ua.is_a?(Time)
+      ua.to_i.should be_within(2).of(Time.now.to_i)
+    else
+      (DateTime.now - ua).should be_within(2.0/86400).of(0)
+    end
+  end
+
+  cspecify "should update the timestamp column for one_to_many associated records when the record is updated", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
+    Artist.one_to_many :albums
+    Artist.plugin :touch, :associations=>:albums
+    @album.updated_at.should == nil
+    @artist.update(:name=>'B')
+    ua = @album.reload.updated_at
+    if ua.is_a?(Time)
+      ua.to_i.should be_within(2).of(Time.now.to_i)
+    else
+      (DateTime.now - ua).should be_within(2.0/86400).of(0)
+    end
+  end
+
+  cspecify "should update the timestamp column for many_to_many associated records when the record is updated", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
+    Artist.many_to_many :albums
+    Artist.plugin :touch, :associations=>:albums
+    @artist.add_album(@album)
+    @album.updated_at.should == nil
+    @artist.update(:name=>'B')
+    ua = @album.reload.updated_at
     if ua.is_a?(Time)
       ua.to_i.should be_within(2).of(Time.now.to_i)
     else

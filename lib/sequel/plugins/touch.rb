@@ -52,7 +52,7 @@ module Sequel
         attr_accessor :touch_column
 
         # A hash specifying the associations to touch when instances are
-        # updated or destroyed. Keys are association dataset method name symbols and values
+        # updated or destroyed. Keys are association name symbols and values
         # are column name symbols.
         attr_reader :touched_associations
 
@@ -71,8 +71,8 @@ module Sequel
           associations.flatten.each do |a|
             a = {a=>touch_column} if a.is_a?(Symbol)
             a.each do |k,v|
-              raise(Error, "invalid association: #{k}") unless r = association_reflection(k)
-              touched_associations[r.dataset_method] = v
+              raise(Error, "invalid association: #{k}") unless association_reflection(k)
+              touched_associations[k] = v
             end
           end
         end
@@ -113,10 +113,22 @@ module Sequel
           Sequel::CURRENT_TIMESTAMP
         end
 
-        # Directly update the database using the association dataset for each association.
+        # Update the updated at field for all associated objects that should be touched.
         def touch_associations
-          model.touched_associations.each do |meth, column|
-            send(meth).update(column=>touch_association_value)
+          model.touched_associations.each do |assoc, column|
+            r = model.association_reflection(assoc)
+            next unless r.can_have_associated_objects?(self)
+            ds = send(r.dataset_method)
+
+            if ds.send(:joined_dataset?)
+              # Can't update all values at once, so update each instance individually.
+              # Instead if doing a simple save, update via the instance's dataset,
+              # to avoid going into an infinite loop in some cases.
+              send(r[:name]).each{|x| x.this.update(column=>touch_association_value)}
+            else
+              # Update all values at once for performance reasons.
+              ds.update(column=>touch_association_value)
+            end
           end
         end
 
