@@ -11,7 +11,8 @@ module Sequel
     # of prepared statements that can be created, unless you tightly control how your
     # model instances are saved.
     # 
-    # This plugin probably does not work correctly with the instance filters plugin.
+    # This plugin does not work correctly with the instance filters plugin
+    # or the update_primary_key plugin.
     # 
     # Usage:
     #
