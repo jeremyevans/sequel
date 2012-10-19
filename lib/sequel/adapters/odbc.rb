@@ -48,6 +48,10 @@ module Sequel
         conn
       end      
 
+      def disconnect_connection(c)
+        c.disconnect
+      end
+
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
           begin
@@ -81,10 +85,6 @@ module Sequel
 
       def database_error_classes
         [::ODBC::Error]
-      end
-
-      def disconnect_connection(c)
-        c.disconnect
       end
 
       def disconnect_error?(e, opts)

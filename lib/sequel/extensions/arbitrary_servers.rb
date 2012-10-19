@@ -97,7 +97,7 @@ module Sequel
         a = @allocated[thread]
         a.delete(server)
         @allocated.delete(thread) if a.empty?
-        @disconnection_proc.call(conn) if @disconnection_proc
+        db.disconnect_connection(conn)
       else  
         super
       end

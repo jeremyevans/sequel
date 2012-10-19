@@ -97,10 +97,6 @@ module Sequel
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
 
-      def disconnect_connection(c)
-        c.close
-      end
-
       def remove_transaction(conn, committed)
         conn.auto_commit = true
       ensure

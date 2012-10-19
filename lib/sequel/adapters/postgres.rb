@@ -229,6 +229,14 @@ module Sequel
         conn
       end
       
+      # Disconnect given connection
+      def disconnect_connection(conn)
+        begin
+          conn.finish
+        rescue PGError
+        end
+      end
+      
       # Execute the given SQL with the given args on an available connection.
       def execute(sql, opts={}, &block)
         synchronize(opts[:server]){|conn| check_database_errors{_execute(conn, sql, opts, &block)}}
@@ -453,14 +461,6 @@ module Sequel
         sqls
       end
 
-      # Disconnect given connection
-      def disconnect_connection(conn)
-        begin
-          conn.finish
-        rescue PGError
-        end
-      end
-      
       # Execute the prepared statement with the given name on an available
       # connection, using the given args.  If the connection has not prepared
       # a statement with the given name yet, prepare it.  If the connection

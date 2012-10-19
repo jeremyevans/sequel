@@ -62,6 +62,10 @@ module Sequel
         setup_connection(swift_class.new(opts))
       end
       
+      # Close the given database connection.
+      def disconnect_connection(c)
+      end
+      
       # Execute the given SQL, yielding a Swift::Result if a block is given.
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
@@ -105,10 +109,6 @@ module Sequel
       # not return any rows.
       def connection_execute_method
         :execute
-      end
-      
-      # Close the given database connection.
-      def disconnect_connection(c)
       end
       
       # Execute SQL on the connection

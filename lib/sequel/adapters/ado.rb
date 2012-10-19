@@ -57,6 +57,10 @@ module Sequel
         handle
       end
       
+      def disconnect_connection(conn)
+        conn.Close
+      end
+
       # Just execute so it doesn't attempt to return the number of rows modified.
       def execute_ddl(sql, opts={})
         execute(sql, opts)
@@ -111,10 +115,6 @@ module Sequel
 
       def database_error_classes
         [::WIN32OLERuntimeError]
-      end
-
-      def disconnect_connection(conn)
-        conn.Close
       end
 
       def disconnect_error?(e, opts)

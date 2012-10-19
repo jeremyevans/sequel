@@ -2,15 +2,13 @@
 # on.  This class is not instantiated directly, but subclasses should at
 # the very least implement the following API:
 #
-# initialize(Hash, &block) :: The +block+ is used as the connection proc,
-#                             which should accept a single symbol argument.
+# initialize(Database, Hash) :: Initialize using the passed Sequel::Database
+#                               object and options hash.
 # hold(Symbol, &block) :: Yield a connection object (obtained from calling
 #                         the block passed to +initialize+) to the current block. For sharded
 #                         connection pools, the Symbol passed is the shard/server to use.
-# disconnect(Symbol, &block) :: Disconnect the connection object.  If a
-#                               block is given, pass the connection option to it, otherwise use the
-#                               <tt>:disconnection_proc</tt> option in the hash passed to initialize.  For sharded
-#                               connection pools, the Symbol passed is the shard/server to use.
+# disconnect(Symbol) :: Disconnect the connection object.  For sharded
+#                       connection pools, the Symbol passed is the shard/server to use.
 # servers :: An array of shard/server symbols for all shards/servers that this
 #            connection pool recognizes.
 # size :: an integer representing the total number of connections in the pool,
@@ -39,13 +37,13 @@ class Sequel::ConnectionPool
     # option is provided is provided, use that pool class, otherwise
     # use a new instance of an appropriate pool subclass based on the
     # <tt>:single_threaded</tt> and <tt>:servers</tt> options.
-    def get_pool(opts = {}, &block)
+    def get_pool(db, opts = {})
       case v = connection_pool_class(opts)
       when Class
-        v.new(opts, &block)
+        v.new(db, opts)
       when Symbol
         Sequel.ts_require("connection_pool/#{v}")
-        connection_pool_class(opts).new(opts, &block) || raise(Sequel::Error, "No connection pool class found")
+        connection_pool_class(opts).new(db, opts) || raise(Sequel::Error, "No connection pool class found")
       end
     end
     
@@ -62,10 +60,9 @@ class Sequel::ConnectionPool
   # connection made, and is usually used to set custom per-connection settings.
   attr_accessor :after_connect
 
-  # The disconnect_proc used for the pool.  This is called with each connection
-  # that is disconnected, usually to clean up related resources.
-  attr_accessor :disconnection_proc
-  
+  # The Sequel::Database object tied to this connection pool.
+  attr_accessor :db
+
   # Instantiates a connection pool with the given options.  The block is called
   # with a single symbol (specifying the server/shard to use) every time a new
   # connection is needed.  The following options are respected for all connection
@@ -73,11 +70,8 @@ class Sequel::ConnectionPool
   # :after_connect :: The proc called after each new connection is made, with the
   #                   connection object, useful for customizations that you want to apply to all
   #                   connections.
-  # :disconnection_proc :: The proc called when removing connections from the pool,
-  #                        which is passed the connection to disconnect.
-  def initialize(opts={}, &block)
-    raise(Sequel::Error, "No connection proc specified") unless @connection_proc = block
-    @disconnection_proc = opts[:disconnection_proc]
+  def initialize(db, opts={})
+    @db = db
     @after_connect = opts[:after_connect]
   end
   
@@ -97,7 +91,7 @@ class Sequel::ConnectionPool
   # and checking for connection errors.
   def make_new(server)
     begin
-      conn = @connection_proc.call(server)
+      conn = @db.connect(server)
       @after_connect.call(conn) if @after_connect
     rescue Exception=>exception
       raise Sequel.convert_exception_class(exception, Sequel::DatabaseConnectionError)

@@ -62,6 +62,10 @@ module Sequel
         end
         ::DBI.connect(dbname, opts[:user], opts[:password])
       end
+
+      def disconnect_connection(c)
+        c.disconnect
+      end
       
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
@@ -75,12 +79,6 @@ module Sequel
         synchronize(opts[:server]){|conn| log_yield(sql){conn.do(sql)}}
       end
       alias_method :execute_dui, :do
-
-      private
-
-      def disconnect_connection(c)
-        c.disconnect
-      end
     end
     
     class Dataset < Sequel::Dataset

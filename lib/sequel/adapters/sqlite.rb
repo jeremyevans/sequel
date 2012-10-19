@@ -117,6 +117,12 @@ module Sequel
         
         db
       end
+
+      # Disconnect given connections from the database.
+      def disconnect_connection(c)
+        c.prepared_statements.each_value{|v| v.first.close}
+        c.close
+      end
       
       # Run the given SQL with the given arguments and yield each row.
       def execute(sql, opts={}, &block)
@@ -247,12 +253,6 @@ module Sequel
       # The main error class that SQLite3 raises
       def database_error_classes
         [SQLite3::Exception]
-      end
-
-      # Disconnect given connections from the database.
-      def disconnect_connection(c)
-        c.prepared_statements.each_value{|v| v.first.close}
-        c.close
       end
     end
     

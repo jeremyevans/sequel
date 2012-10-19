@@ -23,12 +23,6 @@ module Sequel
         synchronize(opts[:server]){|c| yield log_yield(sql){c.cursor(sql)}}
       end
       alias_method :query, :execute
-      
-      private
-
-      def disconnect_connection(c)
-        c.close
-      end
     end
     
     class Dataset < Sequel::Dataset

@@ -60,6 +60,12 @@ module Sequel
         conn
       end
 
+      def disconnect_connection(c)
+        c.logoff
+      rescue OCIInvalidHandle
+        nil
+      end
+
       def execute(sql, opts={}, &block)
         _execute(nil, sql, opts, &block)
       end
@@ -185,12 +191,6 @@ module Sequel
       
       def commit_transaction(conn, opts={})
         log_yield(TRANSACTION_COMMIT){conn.commit}
-      end
-
-      def disconnect_connection(c)
-        c.logoff
-      rescue OCIInvalidHandle
-        nil
       end
 
       def disconnect_error?(e, opts)

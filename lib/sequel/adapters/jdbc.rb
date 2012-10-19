@@ -239,6 +239,12 @@ module Sequel
         end
         setup_connection(conn)
       end
+
+      # Close given adapter connections, and delete any related prepared statements.
+      def disconnect_connection(c)
+        @connection_prepared_statements_mutex.synchronize{@connection_prepared_statements.delete(c)}
+        c.close
+      end
       
       # Execute the given SQL.  If a block is given, if should be a SELECT
       # statement or something else that returns rows.
@@ -328,12 +334,6 @@ module Sequel
         @connection_prepared_statements_mutex.synchronize{yield(@connection_prepared_statements[conn] ||= {})}
       end
 
-      # Close given adapter connections, and delete any related prepared statements.
-      def disconnect_connection(c)
-        @connection_prepared_statements_mutex.synchronize{@connection_prepared_statements.delete(c)}
-        c.close
-      end
-      
       # Raise a disconnect error if the SQL state of the cause of the exception indicates so.
       def disconnect_error?(exception, opts)
         cause = exception.respond_to?(:cause) ? exception.cause : exception

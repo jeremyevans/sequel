@@ -1,5 +1,7 @@
 === HEAD
 
+* Major change in the Database <-> ConnectionPool interface (jeremyevans)
+
 * Make touch plugin handle touching of many_*_many associations (jeremyevans)
 
 * Make single_table_inheritance plugin handle non-bijective mappings (hannesg) (#567)

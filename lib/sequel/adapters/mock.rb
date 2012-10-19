@@ -160,6 +160,9 @@ module Sequel
         Connection.new(self, server, server_opts(server))
       end
 
+      def disconnect_connection(c)
+      end
+
       # Store the sql used for later retrieval with #sqls, and return
       # the appropriate value using either the #autoid, #fetch, or
       # #numrows methods.
@@ -304,9 +307,6 @@ module Sequel
         else
           raise Error, "Invalid @columns attribute: #{cs.inspect}"
         end
-      end
-
-      def disconnect_connection(c)
       end
 
       def quote_identifiers_default

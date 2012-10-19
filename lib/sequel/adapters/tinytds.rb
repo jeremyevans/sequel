@@ -108,11 +108,6 @@ module Sequel
         [TinyTds::Error]
       end
 
-      # Close the TinyTds::Client object.
-      def disconnect_connection(c)
-        c.close
-      end
-
       # Return true if the :conn argument is present and not active.
       def disconnect_error?(e, opts)
         super || (opts[:conn] && !opts[:conn].active?)

@@ -49,7 +49,6 @@ module Sequel
     #
     # Accepts the following options:
     # :default_schema :: The default schema to use, see #default_schema.
-    # :disconnection_proc :: A proc used to disconnect the connection
     # :identifier_input_method :: A string method symbol to call on identifiers going into the database
     # :identifier_output_method :: A string method symbol to call on identifiers coming from the database
     # :logger :: A specific logger to use
@@ -59,14 +58,12 @@ module Sequel
     # :single_threaded :: Whether to use a single-threaded connection pool
     # :sql_log_level :: Method to use to log SQL to a logger, :info by default.
     #
-    # All options given are also passed to the connection pool.  If a block
-    # is given, it is used as the connection_proc for the ConnectionPool.
+    # All options given are also passed to the connection pool.
     def initialize(opts = {}, &block)
       @opts ||= opts
       @opts = connection_pool_default_options.merge(@opts)
       @loggers = Array(@opts[:logger]) + Array(@opts[:loggers])
       self.log_warn_duration = @opts[:log_warn_duration]
-      @opts[:disconnection_proc] ||= proc{|conn| disconnect_connection(conn)}
       block ||= proc{|server| connect(server)}
       @opts[:servers] = {} if @opts[:servers].is_a?(String)
       @opts[:adapter_class] = self.class
@@ -84,7 +81,7 @@ module Sequel
       @cache_schema = typecast_value_boolean(@opts.fetch(:cache_schema, true))
       @dataset_modules = []
       self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
-      @pool = ConnectionPool.get_pool(@opts, &block)
+      @pool = ConnectionPool.get_pool(self, @opts)
 
       Sequel.synchronize{::Sequel::DATABASES.push(self)}
     end

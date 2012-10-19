@@ -173,6 +173,13 @@ module Sequel
       pool.disconnect(opts)
     end
 
+    # Should only be called by the connection pool code to disconnect a connection.
+    # By default, calls the close method on the connection object, since most
+    # adapters use that, but should be overwritten on other adapters.
+    def disconnect_connection(conn)
+      conn.close
+    end
+
     # Yield a new Database instance for every server in the connection pool.
     # Intended for use in sharded environments where there is a need to make schema
     # modifications (DDL queries) on each shard.

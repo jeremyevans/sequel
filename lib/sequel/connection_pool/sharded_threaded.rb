@@ -8,13 +8,12 @@ Sequel.require 'connection_pool/threaded'
 class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # The following additional options are respected:
   # * :servers - A hash of servers to use.  Keys should be symbols.  If not
-  #   present, will use a single :default server.  The server name symbol will
-  #   be passed to the connection_proc.
+  #   present, will use a single :default server.
   # * :servers_hash - The base hash to use for the servers.  By default,
   #   Sequel uses Hash.new(:default).  You can use a hash with a default proc
   #   that raises an error if you want to catch all cases where a nonexistent
   #   server is used.
-  def initialize(opts = {}, &block)
+  def initialize(db, opts = {})
     super
     @available_connections = {}
     @connections_to_remove = []
@@ -87,11 +86,10 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # creates new connections to the database. Options:
   # * :server - Should be a symbol specifing the server to disconnect from,
   #   or an array of symbols to specify multiple servers.
-  def disconnect(opts={}, &block)
-    block ||= @disconnection_proc
+  def disconnect(opts={})
     sync do
       (opts[:server] ? Array(opts[:server]) : @servers.keys).each do |s|
-        disconnect_server(s, &block)
+        disconnect_server(s)
       end
     end
   end
@@ -145,7 +143,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       raise(Sequel::Error, "cannot remove default server") if servers.include?(:default)
       servers.each do |server|
         if @servers.include?(server)
-          disconnect_server(server, &@disconnection_proc)
+          disconnect_server(server)
           @available_connections.delete(server)
           @allocated.delete(server)
           @servers.delete(server)
@@ -183,9 +181,9 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # immediately, and schedules currently allocated connections for disconnection
   # as soon as they are returned to the pool. The calling code should already
   # have the mutex before calling this.
-  def disconnect_server(server, &block)
+  def disconnect_server(server)
     if conns = available_connections(server)
-      conns.each{|conn| block.call(conn)} if block
+      conns.each{|conn| db.disconnect_connection(conn)}
       conns.clear
     end
     @connections_to_remove.concat(allocated(server).values)
@@ -227,7 +225,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       when :queue
         available_connections(server).unshift(conn)
       when :disconnect
-        @disconnection_proc.call(conn) if @disconnection_proc
+        db.disconnect_connection(conn)
       else
         available_connections(server) << conn
       end
@@ -239,7 +237,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   def remove(thread, conn, server)
     @connections_to_remove.delete(conn)
     allocated(server).delete(thread) if @servers.include?(server)
-    @disconnection_proc.call(conn) if @disconnection_proc
+    db.disconnect_connection(conn)
   end
   
   CONNECTION_POOL_MAP[[false, true]] = self

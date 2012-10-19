@@ -65,10 +65,6 @@ module Sequel
         [Fb::Error]
       end
 
-      def disconnect_connection(c)
-        c.close
-      end
-
       def rollback_transaction(conn, opts={})
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end

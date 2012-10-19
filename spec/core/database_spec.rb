@@ -37,7 +37,8 @@ describe "A new Database" do
   
   specify "should pass the supplied block to the connection pool" do
     cc = nil
-    d = Sequel::Database.new {1234}
+    d = Sequel::Database.new
+    d.meta_def(:connect){|c| 1234}
     d.synchronize {|c| cc = c}
     cc.should == 1234
   end
@@ -538,7 +539,8 @@ end
 
 describe "Database#synchronize" do
   before do
-    @db = Sequel::Database.new(:max_connections => 1){12345}
+    @db = Sequel::Database.new(:max_connections => 1)
+    @db.meta_def(:connect){|c| 12345}
   end
   
   specify "should wrap the supplied block in pool.hold" do
@@ -561,7 +563,9 @@ end
 
 describe "Database#test_connection" do
   before do
-    @db = Sequel::Database.new{@test = rand(100)}
+    @db = Sequel::Database.new
+    pr = proc{@test = rand(100)}
+    @db.meta_def(:connect){|c| pr.call}
   end
   
   specify "should attempt to get a connection" do
@@ -1258,7 +1262,8 @@ end
 describe "A single threaded database" do
   before do
     conn = 1234567
-    @db = Sequel::Database.new(:single_threaded => true) do
+    @db = Sequel::Database.new(:single_threaded => true)
+    @db.meta_def(:connect) do |c|
       conn += 1
     end
   end

@@ -57,6 +57,11 @@ module Sequel
         dbc
       end
       
+      def disconnect_connection(conn)
+        checked_error("Could not disconnect from database"){DB2CLI.SQLDisconnect(conn)}
+        checked_error("Could not free Database handle"){DB2CLI.SQLFreeHandle(DB2CLI::SQL_HANDLE_DBC, conn)}
+      end
+
       def execute(sql, opts={}, &block)
         synchronize(opts[:server]){|conn| log_connection_execute(conn, sql, &block)}
       end
@@ -152,11 +157,6 @@ module Sequel
         else
           super
         end
-      end
-
-      def disconnect_connection(conn)
-        checked_error("Could not disconnect from database"){DB2CLI.SQLDisconnect(conn)}
-        checked_error("Could not free Database handle"){DB2CLI.SQLFreeHandle(DB2CLI::SQL_HANDLE_DBC, conn)}
       end
     end
     

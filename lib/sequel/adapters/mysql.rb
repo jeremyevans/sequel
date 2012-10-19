@@ -129,6 +129,13 @@ module Sequel
         conn
       end
       
+      # Closes given database connection.
+      def disconnect_connection(c)
+        c.close
+      rescue Mysql::Error
+        nil
+      end
+      
       # Modify the type translators for the date, time, and timestamp types
       # depending on the value given.
       def convert_invalid_date_time=(v)
@@ -264,13 +271,6 @@ module Sequel
       # the :database option.
       def database_name
         @opts[:database]
-      end
-      
-      # Closes given database connection.
-      def disconnect_connection(c)
-        c.close
-      rescue Mysql::Error
-        nil
       end
       
       # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true

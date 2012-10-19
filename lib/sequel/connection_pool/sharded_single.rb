@@ -1,18 +1,15 @@
 # A ShardedSingleConnectionPool is a single threaded connection pool that
 # works with multiple shards/servers.
 class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
-  # Initializes the instance with the supplied block as the connection_proc.
-  #
   # The single threaded pool takes the following options:
   #
   # * :servers - A hash of servers to use.  Keys should be symbols.  If not
-  #   present, will use a single :default server.  The server name symbol will
-  #   be passed to the connection_proc.
+  #   present, will use a single :default server.
   # * :servers_hash - The base hash to use for the servers.  By default,
   #   Sequel uses Hash.new(:default).  You can use a hash with a default proc
   #   that raises an error if you want to catch all cases where a nonexistent
   #   server is used.
-  def initialize(opts={}, &block)
+  def initialize(db, opts={})
     super
     @conns = {}
     @servers = opts.fetch(:servers_hash, Hash.new(:default))
@@ -41,9 +38,8 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   # #hold, the connection is reestablished. Options:
   # * :server - Should be a symbol specifing the server to disconnect from,
   #   or an array of symbols to specify multiple servers.
-  def disconnect(opts={}, &block)
-    block ||= @disconnection_proc
-    (opts[:server] ? Array(opts[:server]) : servers).each{|s| disconnect_server(s, &block)}
+  def disconnect(opts={})
+    (opts[:server] ? Array(opts[:server]) : servers).each{|s| disconnect_server(s)}
   end
   
   # Yields the connection to the supplied block for the given server.
@@ -53,7 +49,7 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
       server = pick_server(server)
       yield(@conns[server] ||= make_new(server))
     rescue Sequel::DatabaseDisconnectError
-      disconnect_server(server, &@disconnection_proc)
+      disconnect_server(server)
       raise
     end
   end
@@ -65,7 +61,7 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   def remove_servers(servers)
     raise(Sequel::Error, "cannot remove default server") if servers.include?(:default)
     servers.each do |server|
-      disconnect_server(server, &@disconnection_proc)
+      disconnect_server(server)
       @servers.delete(server)
     end
   end
@@ -83,9 +79,9 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   private
   
   # Disconnect from the given server, if connected.
-  def disconnect_server(server, &block)
+  def disconnect_server(server)
     if conn = @conns.delete(server)
-      block.call(conn) if block
+      db.disconnect_connection(conn)
     end
   end
 

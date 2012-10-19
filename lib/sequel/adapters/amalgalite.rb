@@ -147,11 +147,6 @@ module Sequel
       def database_error_classes
         [::Amalgalite::Error, ::Amalgalite::SQLite3::Error]
       end
-
-      # Disconnect given connections from the database.
-      def disconnect_connection(c)
-        c.close
-      end
     end
     
     # Dataset class for SQLite datasets that use the amalgalite driver.

@@ -122,11 +122,6 @@ module Sequel
         @opts[:database]
       end
 
-      # Closes given database connection.
-      def disconnect_connection(c)
-        c.close
-      end
-
       # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true
       def schema_column_type(db_type)
         convert_tinyint_to_bool && db_type == 'tinyint(1)' ? :boolean : super

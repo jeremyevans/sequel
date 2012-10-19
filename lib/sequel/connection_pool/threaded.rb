@@ -22,7 +22,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   #   a connection again (default 0.001)
   # * :pool_timeout - The amount of seconds to wait to acquire a connection
   #   before raising a PoolTimeoutError (default 5)
-  def initialize(opts = {}, &block)
+  def initialize(db, opts = {})
     super
     @max_size = Integer(opts[:max_connections] || 4)
     raise(Sequel::Error, ':max_connections must be positive') if @max_size < 1
@@ -64,10 +64,9 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # 
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database.
-  def disconnect(opts={}, &block)
-    block ||= @disconnection_proc
+  def disconnect(opts={})
     sync do
-      @available_connections.each{|conn| block.call(conn)} if block
+      @available_connections.each{|conn| db.disconnect_connection(conn)}
       @available_connections.clear
     end
   end
@@ -106,7 +105,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     rescue Sequel::DatabaseDisconnectError
       oconn = conn
       conn = nil
-      @disconnection_proc.call(oconn) if @disconnection_proc && oconn
+      db.disconnect_connection(oconn) if oconn
       @allocated.delete(t)
       raise
     ensure
@@ -147,7 +146,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     end
     super if (n || size) < @max_size
   end
-  
+
   # Returns the connection owned by the supplied thread,
   # if any. The calling code should NOT already have the mutex before calling this.
   def owned_connection(thread)
@@ -163,7 +162,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     when :queue
       @available_connections.unshift(conn)
     when :disconnect
-      @disconnection_proc.call(conn) if @disconnection_proc
+      db.disconnect_connection(conn)
     else
       @available_connections << conn
     end

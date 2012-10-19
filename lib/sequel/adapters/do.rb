@@ -126,11 +126,6 @@ module Sequel
         [::DataObjects::Error]
       end
 
-      # Close the given database connection.
-      def disconnect_connection(c)
-        c.close
-      end
-
       # Recognize DataObjects::ConnectionError instances as disconnect errors.
       def disconnect_error?(e, opts)
         super || (e.is_a?(::DataObjects::Error) && (e.is_a?(::DataObjects::ConnectionError) || e.message =~ DISCONNECT_ERROR_RE))
