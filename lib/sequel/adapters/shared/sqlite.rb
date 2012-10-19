@@ -10,6 +10,11 @@ module Sequel
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'".freeze
       TEMP_STORE = [:default, :file, :memory].freeze
       VIEWS_FILTER = "type = 'view'".freeze
+      TRANSACTION_MODE = {
+        :deferred => "BEGIN DEFERRED TRANSACTION".freeze,
+        :immediate => "BEGIN IMMEDIATE TRANSACTION".freeze,
+        :exclusive => "BEGIN EXCLUSIVE TRANSACTION".freeze,
+      }.freeze
 
       # Whether to use integers for booleans in the database.  SQLite recommends
       # booleans be stored as integers, but historically Sequel has used 't'/'f'.
@@ -242,6 +247,12 @@ module Sequel
         else
           raise Error, "Unsupported ALTER TABLE operation: #{op[:op].inspect}"
         end
+      end
+
+      def begin_new_transaction(conn, opts)
+        sql = TRANSACTION_MODE[opts[:mode]] || begin_transaction_sql
+        log_connection_execute(conn, sql)
+        set_transaction_isolation(conn, opts)
       end
 
       # A name to use for the backup table

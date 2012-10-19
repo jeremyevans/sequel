@@ -595,4 +595,22 @@ describe "A SQLite database" do
     @db.drop_column :a, :b
     @db.indexes(:a).should == {:a_a_index=>{:unique=>false, :columns=>[:a]}}
   end
-end  
+
+  specify "should have support for various #transaction modes" do
+    sqls = []
+    @db.loggers << (l=Class.new{%w'info error'.each{|m| define_method(m){|sql| sqls << sql}}}.new)
+
+    @db.transaction(:mode => :immediate) do
+      sqls.last.should == "BEGIN IMMEDIATE TRANSACTION"
+    end
+    @db.transaction(:mode => :exclusive) do
+      sqls.last.should == "BEGIN EXCLUSIVE TRANSACTION"
+    end
+    @db.transaction(:mode => :deferred) do
+      sqls.last.should == "BEGIN DEFERRED TRANSACTION"
+    end
+    @db.transaction do
+      sqls.last.should == Sequel::Database::SQL_BEGIN
+    end
+  end
+end
