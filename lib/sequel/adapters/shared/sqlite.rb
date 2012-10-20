@@ -14,6 +14,7 @@ module Sequel
         :deferred => "BEGIN DEFERRED TRANSACTION".freeze,
         :immediate => "BEGIN IMMEDIATE TRANSACTION".freeze,
         :exclusive => "BEGIN EXCLUSIVE TRANSACTION".freeze,
+        nil => Sequel::Database::SQL_BEGIN,
       }.freeze
 
       # Whether to use integers for booleans in the database.  SQLite recommends
@@ -38,6 +39,19 @@ module Sequel
       # Consider using the :case_sensitive_like Database option instead.
       def case_sensitive_like=(value)
         pragma_set(:case_sensitive_like, !!value ? 'on' : 'off') if sqlite_version >= 30203
+      end
+
+      # A symbol signifying the value of the default transaction mode
+      def transaction_mode
+        defined?(@transaction_mode) ? @transaction_mode : (@transaction_mode = nil)
+      end
+
+      def transaction_mode=(value)
+        if TRANSACTION_MODE.include?(value)
+          @transaction_mode = value
+        else
+          raise Error, "Invalid value for transaction_mode.  Please specify one of :deferred, :immediate, :exclusive, nil"
+        end
       end
 
       # SQLite uses the :sqlite database type.
@@ -250,7 +264,8 @@ module Sequel
       end
 
       def begin_new_transaction(conn, opts)
-        sql = TRANSACTION_MODE[opts[:mode]] || begin_transaction_sql
+        mode = opts[:mode] || @transaction_mode
+        sql = TRANSACTION_MODE[mode] or raise Error, "transaction :mode must be one of: :deferred, :immediate, :exclusive, nil"
         log_connection_execute(conn, sql)
         set_transaction_isolation(conn, opts)
       end

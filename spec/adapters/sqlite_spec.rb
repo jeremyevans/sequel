@@ -612,5 +612,20 @@ describe "A SQLite database" do
     @db.transaction do
       sqls.last.should == Sequel::Database::SQL_BEGIN
     end
+
+    @db.transaction_mode.should == nil
+    @db.transaction_mode = :immediate
+    @db.transaction_mode.should == :immediate
+    @db.transaction do
+      sqls.last.should == "BEGIN IMMEDIATE TRANSACTION"
+    end
+    @db.transaction(:mode => :exclusive) do
+      sqls.last.should == "BEGIN EXCLUSIVE TRANSACTION"
+    end
+
+    proc {@db.transaction_mode = :invalid}.should raise_error(Sequel::Error)
+
+    @db.transaction_mode.should == :immediate
+    proc {@db.transaction(:mode => :invalid) {}}.should raise_error(Sequel::Error)
   end
 end
