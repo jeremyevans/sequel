@@ -10,6 +10,12 @@ module Sequel
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'".freeze
       TEMP_STORE = [:default, :file, :memory].freeze
       VIEWS_FILTER = "type = 'view'".freeze
+      TRANSACTION_MODE = {
+        :deferred => "BEGIN DEFERRED TRANSACTION".freeze,
+        :immediate => "BEGIN IMMEDIATE TRANSACTION".freeze,
+        :exclusive => "BEGIN EXCLUSIVE TRANSACTION".freeze,
+        nil => Sequel::Database::SQL_BEGIN,
+      }.freeze
 
       # Whether to use integers for booleans in the database.  SQLite recommends
       # booleans be stored as integers, but historically Sequel has used 't'/'f'.
@@ -33,6 +39,19 @@ module Sequel
       # Consider using the :case_sensitive_like Database option instead.
       def case_sensitive_like=(value)
         pragma_set(:case_sensitive_like, !!value ? 'on' : 'off') if sqlite_version >= 30203
+      end
+
+      # A symbol signifying the value of the default transaction mode
+      def transaction_mode
+        defined?(@transaction_mode) ? @transaction_mode : (@transaction_mode = nil)
+      end
+
+      def transaction_mode=(value)
+        if TRANSACTION_MODE.include?(value)
+          @transaction_mode = value
+        else
+          raise Error, "Invalid value for transaction_mode.  Please specify one of :deferred, :immediate, :exclusive, nil"
+        end
       end
 
       # SQLite uses the :sqlite database type.
@@ -242,6 +261,13 @@ module Sequel
         else
           raise Error, "Unsupported ALTER TABLE operation: #{op[:op].inspect}"
         end
+      end
+
+      def begin_new_transaction(conn, opts)
+        mode = opts[:mode] || @transaction_mode
+        sql = TRANSACTION_MODE[mode] or raise Error, "transaction :mode must be one of: :deferred, :immediate, :exclusive, nil"
+        log_connection_execute(conn, sql)
+        set_transaction_isolation(conn, opts)
       end
 
       # A name to use for the backup table
