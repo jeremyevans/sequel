@@ -245,7 +245,7 @@ module Sequel
         if server_version >= 9000000
           table_name = schema_and_table(table).compact.join('.')
           self[:sys__default_constraints].
-            where{{:parent_object_id => object_id(table_name), col_name(:parent_object_id, :parent_column_id) => column_name.to_s}}.
+            where{{:parent_object_id => Sequel::SQL::Function.new(:object_id, table_name), col_name(:parent_object_id, :parent_column_id) => column_name.to_s}}.
             get(:name)
         end
       end
