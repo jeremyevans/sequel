@@ -551,8 +551,8 @@ describe "Sequel core extension replacements" do
     Sequel.expr({1=>2}).should be_a_kind_of(Sequel::SQL::BooleanExpression)
     Sequel.expr([[1, 2]]).should be_a_kind_of(Sequel::SQL::BooleanExpression)
     Sequel.expr([1]).should be_a_kind_of(Sequel::SQL::Wrapper)
-    Sequel.expr{|o| o.should be_a_kind_of(Sequel::SQL::VirtualRow)}
-    Sequel.expr{self.should be_a_kind_of(Sequel::SQL::VirtualRow)}
+    Sequel.expr{|o| o.a}.should be_a_kind_of(Sequel::SQL::Identifier)
+    Sequel.expr{a}.should be_a_kind_of(Sequel::SQL::Identifier)
     Sequel.expr(:a).should be_a_kind_of(Sequel::SQL::Identifier)
     Sequel.expr(:a__b).should be_a_kind_of(Sequel::SQL::QualifiedIdentifier)
     Sequel.expr(:a___c).should be_a_kind_of(Sequel::SQL::AliasedExpression)
