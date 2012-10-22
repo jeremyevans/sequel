@@ -113,7 +113,11 @@ module Sequel
       
       # Execute SQL on the connection
       def log_connection_execute(conn, sql)
-        log_yield(sql){conn.execute(sql)}
+        begin
+          log_yield(sql){conn.execute(sql)}
+        rescue ::Swift::Error => e
+          raise_error(e)
+        end
       end
       
       # Set the :db entry to the same as the :database entry, since
