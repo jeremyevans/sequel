@@ -134,6 +134,10 @@ module Sequel
         end
       end
 
+      def connection_execute_method
+        :exec
+      end
+
       def database_error_classes
         [OCIException, RuntimeError]
       end
