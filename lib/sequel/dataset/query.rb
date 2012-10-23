@@ -592,7 +592,7 @@ module Sequel
     #   DB[:items].limit(10...20) # SELECT * FROM items LIMIT 10 OFFSET 10
     #   DB[:items].limit(10..20) # SELECT * FROM items LIMIT 11 OFFSET 10
     #   DB[:items].limit(nil, 20) # SELECT * FROM items OFFSET 20
-    def limit(l, o = nil)
+    def limit(l, o = (no_offset = true; nil))
       return from_self.limit(l, o) if @opts[:sql]
 
       if Range === l
@@ -610,6 +610,8 @@ module Sequel
           raise(Error, 'Offsets must be greater than or equal to 0') unless o >= 0
         end
         opts[:offset] = o
+      elsif !no_offset
+        opts[:offset] = nil
       end
       clone(opts)
     end

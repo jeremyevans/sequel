@@ -1620,6 +1620,12 @@ describe "Dataset#limit" do
     @dataset.limit(6, Sequel.function(:a) - 1).sql.should == 'SELECT * FROM test LIMIT 6 OFFSET (a() - 1)'
   end
   
+  specify "should be able to reset limit and offset with nil values" do
+    @dataset.limit(6).limit(nil).sql.should == 'SELECT * FROM test'
+    @dataset.limit(6, 1).limit(nil).sql.should == 'SELECT * FROM test OFFSET 1'
+    @dataset.limit(6, 1).limit(nil, nil).sql.should == 'SELECT * FROM test'
+  end
+  
   specify "should work with fixed sql datasets" do
     @dataset.opts[:sql] = 'select * from cccc'
     @dataset.limit(6, 10).sql.should == 'SELECT * FROM (select * from cccc) AS t1 LIMIT 6 OFFSET 10'

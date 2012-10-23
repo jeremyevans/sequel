@@ -1,5 +1,7 @@
 === HEAD
 
+* Make dataset.limit(nil, nil) reset offset as well as limit (jeremyevans) (#571)
+
 * Support IMMEDIATE/EXCLUSIVE/DEFERRED transaction modes on SQLite (Eric Wong)
 
 * Major change in the Database <-> ConnectionPool interface (jeremyevans)
