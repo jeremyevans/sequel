@@ -19,7 +19,7 @@ module Sequel
 
     # Log a message at error level, with information about the exception.
     def log_exception(exception, message)
-      log_each(:error, "#{exception.class}: #{exception.message.strip}: #{message}")
+      log_each(:error, "#{exception.class}: #{exception.message.strip if exception.message}: #{message}")
     end
 
     # Log a message at level info to all loggers.
