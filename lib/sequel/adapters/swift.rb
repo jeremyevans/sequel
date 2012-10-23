@@ -62,10 +62,6 @@ module Sequel
         setup_connection(swift_class.new(opts))
       end
       
-      # Close the given database connection.
-      def disconnect_connection(c)
-      end
-      
       # Execute the given SQL, yielding a Swift::Result if a block is given.
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
@@ -111,15 +107,10 @@ module Sequel
         :execute
       end
       
-      # Execute SQL on the connection
-      def log_connection_execute(conn, sql)
-        begin
-          log_yield(sql){conn.execute(sql)}
-        rescue ::Swift::Error => e
-          raise_error(e)
-        end
+      def database_error_classes
+        [::Swift::Error]
       end
-      
+
       # Set the :db entry to the same as the :database entry, since
       # Swift uses :db.
       def server_opts(o)
