@@ -60,6 +60,10 @@ module Sequel
       def connect(server)
         setup_connection(::DataObjects::Connection.new(uri(server_opts(server))))
       end
+
+      def disconnect_connection(conn)
+        conn.dispose
+      end
       
       # Execute the given SQL.  If a block is given, the DataObjects::Reader
       # created is yielded to it. A block should not be provided unless a
