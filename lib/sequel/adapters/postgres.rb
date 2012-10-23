@@ -461,6 +461,10 @@ module Sequel
         sqls
       end
 
+      def database_error_classes
+        [PGError]
+      end
+
       # Execute the prepared statement with the given name on an available
       # connection, using the given args.  If the connection has not prepared
       # a statement with the given name yet, prepare it.  If the connection

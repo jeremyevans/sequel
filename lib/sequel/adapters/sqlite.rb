@@ -250,9 +250,10 @@ module Sequel
         end
       end
       
-      # The main error class that SQLite3 raises
+      # SQLite3 raises ArgumentError in addition to SQLite3::Exception in
+      # some cases, such as operations on a closed database.
       def database_error_classes
-        [SQLite3::Exception]
+        [SQLite3::Exception, ArgumentError]
       end
     end
     

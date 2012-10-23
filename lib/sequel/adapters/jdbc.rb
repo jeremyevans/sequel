@@ -334,6 +334,10 @@ module Sequel
         @connection_prepared_statements_mutex.synchronize{yield(@connection_prepared_statements[conn] ||= {})}
       end
 
+      def database_error_classes
+        [NativeException]
+      end
+
       # Raise a disconnect error if the SQL state of the cause of the exception indicates so.
       def disconnect_error?(exception, opts)
         cause = exception.respond_to?(:cause) ? exception.cause : exception

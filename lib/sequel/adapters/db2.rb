@@ -116,6 +116,10 @@ module Sequel
 
       private
 
+      def database_error_classes
+        [DB2Error]
+      end
+
       def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN){DB2CLI.SQLSetConnectAttr(conn, DB2CLI::SQL_ATTR_AUTOCOMMIT, DB2CLI::SQL_AUTOCOMMIT_OFF)}
       end

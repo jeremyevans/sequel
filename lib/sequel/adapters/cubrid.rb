@@ -97,6 +97,10 @@ module Sequel
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
 
+      def database_error_classes
+        [StandardError]
+      end
+
       def remove_transaction(conn, committed)
         conn.auto_commit = true
       ensure

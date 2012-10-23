@@ -309,6 +309,10 @@ module Sequel
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
     
+      def database_error_classes
+        [Connection::Error]
+      end
+
       # Don't convert smallint to boolean for the metadata
       # dataset, since the DB2 metadata does not use
       # boolean columns, and some smallint columns are

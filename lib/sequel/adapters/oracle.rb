@@ -134,6 +134,10 @@ module Sequel
         end
       end
 
+      def database_error_classes
+        [OCIException, RuntimeError]
+      end
+
       def execute_prepared_statement(conn, type, name, opts)
         ps = prepared_statement(name)
         sql = ps.prepared_sql
