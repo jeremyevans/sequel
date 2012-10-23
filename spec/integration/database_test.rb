@@ -35,4 +35,11 @@ describe Sequel::Database do
   specify "should not have the connection pool swallow non-StandardError based exceptions" do
     proc{INTEGRATION_DB.pool.hold{raise Interrupt, "test"}}.should raise_error(Interrupt)
   end
+
+  specify "should provide ability to check connections for validity" do
+    conn = INTEGRATION_DB.synchronize{|c| c}
+    INTEGRATION_DB.valid_connection?(conn).should be_true
+    INTEGRATION_DB.disconnect
+    INTEGRATION_DB.valid_connection?(conn).should be_false
+  end
 end

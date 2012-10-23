@@ -148,6 +148,11 @@ module Sequel
         def uses_clob_for_text?
           true
         end
+
+        # The SQL query to issue to check if a connection is valid.
+        def valid_connection_sql
+          @valid_connection_sql ||= select(1).sql
+        end
       end
       
       # Dataset class for Derby datasets accessed via JDBC.

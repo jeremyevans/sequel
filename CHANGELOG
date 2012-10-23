@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#valid_connection? for checking whether a given connection is valid (jeremyevans)
+
 * Make dataset.limit(nil, nil) reset offset as well as limit (jeremyevans) (#571)
 
 * Support IMMEDIATE/EXCLUSIVE/DEFERRED transaction modes on SQLite (Eric Wong)

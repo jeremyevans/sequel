@@ -140,7 +140,7 @@ module Sequel
         @pool.add_servers(servers.keys)
       end
     end
-    
+
     # Connects to the database. This method should be overridden by descendants.
     def connect(server)
       raise NotImplemented, "#connect should be overridden by adapters"
@@ -250,6 +250,21 @@ module Sequel
       true
     end
 
+    # Check whether the given connection is currently valid, by
+    # running a query against it.  If the query fails, the
+    # connection should probably be removed from the connection
+    # pool.
+    def valid_connection?(conn)
+      sql = valid_connection_sql
+      begin
+        log_connection_execute(conn, sql)
+      rescue Sequel::DatabaseError, *database_error_classes
+        false
+      else
+        true
+      end
+    end
+
     private
     
     # The default options for the connection pool.
@@ -277,6 +292,11 @@ module Sequel
       end
       opts.delete(:servers)
       opts
+    end
+
+    # The SQL query to issue to check if a connection is valid.
+    def valid_connection_sql
+      @valid_connection_sql ||= select(nil).sql
     end
   end
 end
