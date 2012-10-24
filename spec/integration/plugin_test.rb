@@ -576,16 +576,16 @@ describe "Touch plugin" do
     @album.update(:name=>'B')
     ua = @artist.reload.updated_at
     if ua.is_a?(Time)
-      ua.to_i.should be_within(2).of(Time.now.to_i)
+      ua.to_i.should be_within(60).of(Time.now.to_i)
     else
-      (DateTime.now - ua).should be_within(2.0/86400).of(0)
+      (DateTime.now - ua).should be_within(60.0/86400).of(0)
     end
     @artist.update(:updated_at=>nil)
     @album.destroy
     if ua.is_a?(Time)
-      ua.to_i.should be_within(2).of(Time.now.to_i)
+      ua.to_i.should be_within(60).of(Time.now.to_i)
     else
-      (DateTime.now - ua).should be_within(2.0/86400).of(0)
+      (DateTime.now - ua).should be_within(60.0/86400).of(0)
     end
   end
 
@@ -596,9 +596,9 @@ describe "Touch plugin" do
     @artist.update(:name=>'B')
     ua = @album.reload.updated_at
     if ua.is_a?(Time)
-      ua.to_i.should be_within(2).of(Time.now.to_i)
+      ua.to_i.should be_within(60).of(Time.now.to_i)
     else
-      (DateTime.now - ua).should be_within(2.0/86400).of(0)
+      (DateTime.now - ua).should be_within(60.0/86400).of(0)
     end
   end
 
@@ -610,9 +610,9 @@ describe "Touch plugin" do
     @artist.update(:name=>'B')
     ua = @album.reload.updated_at
     if ua.is_a?(Time)
-      ua.to_i.should be_within(2).of(Time.now.to_i)
+      ua.to_i.should be_within(60).of(Time.now.to_i)
     else
-      (DateTime.now - ua).should be_within(2.0/86400).of(0)
+      (DateTime.now - ua).should be_within(60.0/86400).of(0)
     end
   end
 end

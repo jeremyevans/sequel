@@ -717,19 +717,19 @@ describe Sequel::SQL::Constants do
   cspecify "should have working CURRENT_TIME", [:do, :mysql], [:jdbc, :sqlite], [:mysql2] do
     @db.create_table!(:constants){Time :t, :only_time=>true}
     @ds.insert(:t=>Sequel::CURRENT_TIME)
-    (Time.now - @c[@ds.get(:t)]).should be_within(2).of(0)
+    (Time.now - @c[@ds.get(:t)]).should be_within(60).of(0)
   end
 
   cspecify "should have working CURRENT_TIMESTAMP", [:jdbc, :sqlite], [:swift] do
     @db.create_table!(:constants){DateTime :ts}
     @ds.insert(:ts=>Sequel::CURRENT_TIMESTAMP)
-    (Time.now - @c[@ds.get(:ts)]).should be_within(2).of(0)
+    (Time.now - @c[@ds.get(:ts)]).should be_within(60).of(0)
   end
 
   cspecify "should have working CURRENT_TIMESTAMP when used as a column default", [:jdbc, :sqlite], [:swift] do
     @db.create_table!(:constants){DateTime :ts, :default=>Sequel::CURRENT_TIMESTAMP}
     @ds.insert
-    (Time.now - @c[@ds.get(:ts)]).should be_within(2).of(0)
+    (Time.now - @c[@ds.get(:ts)]).should be_within(60).of(0)
   end
 end
 
