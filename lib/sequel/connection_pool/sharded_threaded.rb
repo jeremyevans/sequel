@@ -174,7 +174,21 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # available, tries to create a new connection. The calling code should already
   # have the mutex before calling this.
   def available(server)
-    available_connections(server).pop || make_new(server)
+    next_available(server) || make_new(server)
+  end
+
+  # Return a connection to the pool of available connections for the server,
+  # returns the connection. The calling code should already have the mutex
+  # before calling this.
+  def checkin_connection(server, conn)
+    case @connection_handling
+    when :queue
+      available_connections(server).unshift(conn)
+    else
+      available_connections(server) << conn
+    end
+
+    conn
   end
 
   # Disconnect from the given server.  Disconnects available connections
@@ -199,6 +213,13 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     end
     default_make_new(server) if (n || size(server)) < @max_size
   end
+
+  # Return the next available connection in the pool for the given server, or nil
+  # if there is not currently an available connection for the server.
+  # The calling code should already have the mutex before calling this.
+  def next_available(server)
+    available_connections(server).pop
+  end
   
   # Returns the connection owned by the supplied thread for the given server,
   # if any. The calling code should NOT already have the mutex before calling this.
@@ -221,13 +242,10 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     else
       conn = allocated(server).delete(thread)
 
-      case @connection_handling
-      when :queue
-        available_connections(server).unshift(conn)
-      when :disconnect
+      if @connection_handling == :disconnect
         db.disconnect_connection(conn)
       else
-        available_connections(server) << conn
+        checkin_connection(server, conn)
       end
     end
   end

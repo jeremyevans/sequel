@@ -130,7 +130,20 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # available, tries to create a new connection. The calling code should already
   # have the mutex before calling this.
   def available
-    @available_connections.pop || make_new(DEFAULT_SERVER)
+    next_available || make_new(DEFAULT_SERVER)
+  end
+
+  # Return a connection to the pool of available connections, returns the connection.
+  # The calling code should already have the mutex before calling this.
+  def checkin_connection(conn)
+    case @connection_handling
+    when :queue
+      @available_connections.unshift(conn)
+    else
+      @available_connections << conn
+    end
+
+    conn
   end
 
   # Alias the default make_new method, so subclasses can call it directly.
@@ -147,6 +160,13 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     super if (n || size) < @max_size
   end
 
+  # Return the next available connection in the pool, or nil if there
+  # is not currently an available connection.  The calling code should already
+  # have the mutex before calling this.
+  def next_available
+    @available_connections.pop
+  end
+
   # Returns the connection owned by the supplied thread,
   # if any. The calling code should NOT already have the mutex before calling this.
   def owned_connection(thread)
@@ -158,13 +178,10 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   def release(thread)
     conn = @allocated.delete(thread)
 
-    case @connection_handling
-    when :queue
-      @available_connections.unshift(conn)
-    when :disconnect
+    if @connection_handling == :disconnect
       db.disconnect_connection(conn)
     else
-      @available_connections << conn
+      checkin_connection(conn)
     end
   end
 
