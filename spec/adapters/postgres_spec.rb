@@ -6,14 +6,6 @@ unless defined?(POSTGRES_DB)
 end
 INTEGRATION_DB = POSTGRES_DB unless defined?(INTEGRATION_DB)
 
-# Automatic parameterization changes the SQL used, so don't check
-# for expected SQL if it is being used.
-if defined?(Sequel::Postgres::AutoParameterize)
-  check_sqls = false
-else
-  check_sqls = true
-end
-
 def POSTGRES_DB.sqls
   (@sqls ||= [])
 end
@@ -74,18 +66,18 @@ describe "A PostgreSQL dataset" do
   end
 
   specify "should quote columns and tables using double quotes if quoting identifiers" do
-    @d.select(:name).sql.should == 'SELECT "name" FROM "test"'
-    @d.select(Sequel.lit('COUNT(*)')).sql.should == 'SELECT COUNT(*) FROM "test"'
-    @d.select(Sequel.function(:max, :value)).sql.should == 'SELECT max("value") FROM "test"'
-    @d.select(Sequel.function(:NOW)).sql.should == 'SELECT NOW() FROM "test"'
-    @d.select(Sequel.function(:max, :items__value)).sql.should == 'SELECT max("items"."value") FROM "test"'
-    @d.order(Sequel.desc(:name)).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC'
-    @d.select(Sequel.lit('test.name AS item_name')).sql.should == 'SELECT test.name AS item_name FROM "test"'
-    @d.select(Sequel.lit('"name"')).sql.should == 'SELECT "name" FROM "test"'
-    @d.select(Sequel.lit('max(test."name") AS "max_name"')).sql.should == 'SELECT max(test."name") AS "max_name" FROM "test"'
-    @d.insert_sql(:x => :y).should =~ /\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/
+    check_sqls do
+      @d.select(:name).sql.should == 'SELECT "name" FROM "test"'
+      @d.select(Sequel.lit('COUNT(*)')).sql.should == 'SELECT COUNT(*) FROM "test"'
+      @d.select(Sequel.function(:max, :value)).sql.should == 'SELECT max("value") FROM "test"'
+      @d.select(Sequel.function(:NOW)).sql.should == 'SELECT NOW() FROM "test"'
+      @d.select(Sequel.function(:max, :items__value)).sql.should == 'SELECT max("items"."value") FROM "test"'
+      @d.order(Sequel.desc(:name)).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC'
+      @d.select(Sequel.lit('test.name AS item_name')).sql.should == 'SELECT test.name AS item_name FROM "test"'
+      @d.select(Sequel.lit('"name"')).sql.should == 'SELECT "name" FROM "test"'
+      @d.select(Sequel.lit('max(test."name") AS "max_name"')).sql.should == 'SELECT max(test."name") AS "max_name" FROM "test"'
+      @d.insert_sql(:x => :y).should =~ /\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/
 
-    if check_sqls
       @d.select(Sequel.function(:test, :abc, 'hello')).sql.should == "SELECT test(\"abc\", 'hello') FROM \"test\""
       @d.select(Sequel.function(:test, :abc__def, 'hello')).sql.should == "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
       @d.select(Sequel.function(:test, :abc__def, 'hello').as(:x2)).sql.should == "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
@@ -94,10 +86,12 @@ describe "A PostgreSQL dataset" do
   end
 
   specify "should quote fields correctly when reversing the order if quoting identifiers" do
-    @d.reverse_order(:name).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC'
-    @d.reverse_order(Sequel.desc(:name)).sql.should == 'SELECT * FROM "test" ORDER BY "name" ASC'
-    @d.reverse_order(:name, Sequel.desc(:test)).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC, "test" ASC'
-    @d.reverse_order(Sequel.desc(:name), :test).sql.should == 'SELECT * FROM "test" ORDER BY "name" ASC, "test" DESC'
+    check_sqls do
+      @d.reverse_order(:name).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC'
+      @d.reverse_order(Sequel.desc(:name)).sql.should == 'SELECT * FROM "test" ORDER BY "name" ASC'
+      @d.reverse_order(:name, Sequel.desc(:test)).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC, "test" ASC'
+      @d.reverse_order(Sequel.desc(:name), :test).sql.should == 'SELECT * FROM "test" ORDER BY "name" ASC, "test" DESC'
+    end
   end
 
   specify "should support regexps" do
@@ -175,17 +169,23 @@ describe "A PostgreSQL dataset" do
 
     @db.sqls.clear
     @db.transaction(:synchronous=>nil){}
-    @db.sqls.should == ['BEGIN', 'COMMIT']
+    check_sqls do
+      @db.sqls.should == ['BEGIN', 'COMMIT']
+    end
 
     if @db.server_version >= 90100
       @db.sqls.clear
       @db.transaction(:synchronous=>:local){}
-      @db.sqls.grep(/synchronous/).should == ["SET LOCAL synchronous_commit = local"]
+      check_sqls do
+        @db.sqls.grep(/synchronous/).should == ["SET LOCAL synchronous_commit = local"]
+      end
 
       if @db.server_version >= 90200
         @db.sqls.clear
         @db.transaction(:synchronous=>:remote_write){}
-        @db.sqls.grep(/synchronous/).should == ["SET LOCAL synchronous_commit = remote_write"]
+        check_sqls do
+          @db.sqls.grep(/synchronous/).should == ["SET LOCAL synchronous_commit = remote_write"]
+        end
       end
     end
   end
@@ -210,28 +210,36 @@ describe "A PostgreSQL dataset" do
 
   specify "should support creating indexes concurrently" do
     @db.add_index :test, [:name, :value], :concurrently=>true
-    @db.sqls.should == ['CREATE INDEX CONCURRENTLY "test_name_value_index" ON "test" ("name", "value")'] if check_sqls
+    check_sqls do
+      @db.sqls.should == ['CREATE INDEX CONCURRENTLY "test_name_value_index" ON "test" ("name", "value")']
+    end
   end
 
   specify "should support dropping indexes only if they already exist" do
     @db.add_index :test, [:name, :value], :name=>'tnv1'
     @db.sqls.clear
     @db.drop_index :test, [:name, :value], :if_exists=>true, :name=>'tnv1'
-    @db.sqls.should == ['DROP INDEX IF EXISTS "tnv1"']
+    check_sqls do
+      @db.sqls.should == ['DROP INDEX IF EXISTS "tnv1"']
+    end
   end
 
   specify "should support CASCADE when dropping indexes" do
     @db.add_index :test, [:name, :value], :name=>'tnv2'
     @db.sqls.clear
     @db.drop_index :test, [:name, :value], :cascade=>true, :name=>'tnv2'
-    @db.sqls.should == ['DROP INDEX "tnv2" CASCADE']
+    check_sqls do
+      @db.sqls.should == ['DROP INDEX "tnv2" CASCADE']
+    end
   end
 
   specify "should support dropping indexes concurrently" do
     @db.add_index :test, [:name, :value], :name=>'tnv2'
     @db.sqls.clear
     @db.drop_index :test, [:name, :value], :concurrently=>true, :name=>'tnv2'
-    @db.sqls.should == ['DROP INDEX CONCURRENTLY "tnv2"']
+    check_sqls do
+      @db.sqls.should == ['DROP INDEX CONCURRENTLY "tnv2"']
+    end
   end if POSTGRES_DB.server_version >= 90200
 
   specify "#lock should lock table if inside a transaction" do
@@ -511,19 +519,23 @@ describe "A PostgreSQL database" do
 
   specify "should support opclass specification" do
     @db.create_table(:posts){text :title; text :body; integer :user_id; index(:user_id, :opclass => :int4_ops, :type => :btree)}
-    @db.sqls.should == [
-    'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer)',
-    'CREATE INDEX "posts_user_id_index" ON "posts" USING btree ("user_id" int4_ops)'
-    ]
+    check_sqls do
+      @db.sqls.should == [
+      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer)',
+      'CREATE INDEX "posts_user_id_index" ON "posts" USING btree ("user_id" int4_ops)'
+      ]
+    end
   end
 
   specify "should support fulltext indexes and searching" do
     @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french'}
-    @db.sqls.should == [
-      %{CREATE TABLE "posts" ("title" text, "body" text)},
-      %{CREATE INDEX "posts_title_body_index" ON "posts" USING gin (to_tsvector('simple'::regconfig, (COALESCE("title", '') || ' ' || COALESCE("body", ''))))},
-      %{CREATE INDEX "posts_title_index" ON "posts" USING gin (to_tsvector('french'::regconfig, (COALESCE("title", ''))))}
-    ] if check_sqls
+    check_sqls do
+      @db.sqls.should == [
+        %{CREATE TABLE "posts" ("title" text, "body" text)},
+        %{CREATE INDEX "posts_title_body_index" ON "posts" USING gin (to_tsvector('simple'::regconfig, (COALESCE("title", '') || ' ' || COALESCE("body", ''))))},
+        %{CREATE INDEX "posts_title_index" ON "posts" USING gin (to_tsvector('french'::regconfig, (COALESCE("title", ''))))}
+      ]
+    end
 
     @db[:posts].insert(:title=>'ruby rails', :body=>'yowsa')
     @db[:posts].insert(:title=>'sequel', :body=>'ruby')
@@ -533,10 +545,12 @@ describe "A PostgreSQL database" do
     @db[:posts].full_text_search(:title, 'rails').all.should == [{:title=>'ruby rails', :body=>'yowsa'}]
     @db[:posts].full_text_search([:title, :body], ['yowsa', 'rails']).all.should == [:title=>'ruby rails', :body=>'yowsa']
     @db[:posts].full_text_search(:title, 'scooby', :language => 'french').all.should == [{:title=>'ruby scooby', :body=>'x'}]
-    @db.sqls.should == [
-      %{SELECT * FROM "posts" WHERE (to_tsvector('simple'::regconfig, (COALESCE("title", ''))) @@ to_tsquery('simple'::regconfig, 'rails'))},
-      %{SELECT * FROM "posts" WHERE (to_tsvector('simple'::regconfig, (COALESCE("title", '') || ' ' || COALESCE("body", ''))) @@ to_tsquery('simple'::regconfig, 'yowsa | rails'))},
-      %{SELECT * FROM "posts" WHERE (to_tsvector('french'::regconfig, (COALESCE("title", ''))) @@ to_tsquery('french'::regconfig, 'scooby'))}] if check_sqls
+    check_sqls do
+      @db.sqls.should == [
+        %{SELECT * FROM "posts" WHERE (to_tsvector('simple'::regconfig, (COALESCE("title", ''))) @@ to_tsquery('simple'::regconfig, 'rails'))},
+        %{SELECT * FROM "posts" WHERE (to_tsvector('simple'::regconfig, (COALESCE("title", '') || ' ' || COALESCE("body", ''))) @@ to_tsquery('simple'::regconfig, 'yowsa | rails'))},
+        %{SELECT * FROM "posts" WHERE (to_tsvector('french'::regconfig, (COALESCE("title", ''))) @@ to_tsquery('french'::regconfig, 'scooby'))}]
+    end
 
     @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
     @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
@@ -544,42 +558,52 @@ describe "A PostgreSQL database" do
 
   specify "should support spatial indexes" do
     @db.create_table(:posts){box :geom; spatial_index [:geom]}
-    @db.sqls.should == [
-      'CREATE TABLE "posts" ("geom" box)',
-      'CREATE INDEX "posts_geom_index" ON "posts" USING gist ("geom")'
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        'CREATE TABLE "posts" ("geom" box)',
+        'CREATE INDEX "posts_geom_index" ON "posts" USING gist ("geom")'
+      ]
+    end
   end
 
   specify "should support indexes with index type" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'hash'}
-    @db.sqls.should == [
-      'CREATE TABLE "posts" ("title" varchar(5))',
-      'CREATE INDEX "posts_title_index" ON "posts" USING hash ("title")'
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        'CREATE TABLE "posts" ("title" varchar(5))',
+        'CREATE INDEX "posts_title_index" ON "posts" USING hash ("title")'
+      ]
+    end
   end
 
   specify "should support unique indexes with index type" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'btree', :unique => true}
-    @db.sqls.should == [
-      'CREATE TABLE "posts" ("title" varchar(5))',
-      'CREATE UNIQUE INDEX "posts_title_index" ON "posts" USING btree ("title")'
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        'CREATE TABLE "posts" ("title" varchar(5))',
+        'CREATE UNIQUE INDEX "posts_title_index" ON "posts" USING btree ("title")'
+      ]
+    end
   end
 
   specify "should support partial indexes" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
-    @db.sqls.should == [
-      'CREATE TABLE "posts" ("title" varchar(5))',
-      'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        'CREATE TABLE "posts" ("title" varchar(5))',
+        'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
+      ]
+    end
   end
 
   specify "should support identifiers for table names in indicies" do
     @db.create_table(Sequel::SQL::Identifier.new(:posts)){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
-    @db.sqls.should == [
-      'CREATE TABLE "posts" ("title" varchar(5))',
-      'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        'CREATE TABLE "posts" ("title" varchar(5))',
+        'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
+      ]
+    end
   end
 
   specify "should support renaming tables" do
@@ -602,7 +626,9 @@ describe "Postgres::Dataset#import" do
 
   specify "#import should a single insert statement" do
     @ds.import([:x, :y], [[1, 2], [3, 4]])
-    @db.sqls.should == ['BEGIN', 'INSERT INTO "test" ("x", "y") VALUES (1, 2), (3, 4)', 'COMMIT']
+    check_sqls do
+      @db.sqls.should == ['BEGIN', 'INSERT INTO "test" ("x", "y") VALUES (1, 2), (3, 4)', 'COMMIT']
+    end
     @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
 
@@ -646,7 +672,9 @@ describe "Postgres::Dataset#insert" do
 
   specify "should use INSERT RETURNING" do
     @ds.insert(:value=>10).should == 1
-    @db.sqls.last.should == 'INSERT INTO "test5" ("value") VALUES (10) RETURNING "xid"' if check_sqls
+    check_sqls do
+      @db.sqls.last.should == 'INSERT INTO "test5" ("value") VALUES (10) RETURNING "xid"'
+    end
   end
 
   specify "should have insert_select insert the record and return the inserted record" do
@@ -1124,10 +1152,14 @@ if POSTGRES_DB.adapter_scheme == :postgres
     specify "should respect the :rows_per_fetch option" do
       @db.sqls.clear
       @ds.use_cursor.all
-      @db.sqls.length.should == 6
-      @db.sqls.clear
+      check_sqls do
+        @db.sqls.length.should == 6
+        @db.sqls.clear
+      end
       @ds.use_cursor(:rows_per_fetch=>100).all
-      @db.sqls.length.should == 15
+      check_sqls do
+        @db.sqls.length.should == 15
+      end
     end
 
     specify "should handle returning inside block" do
@@ -1396,7 +1428,7 @@ describe 'PostgreSQL special float handling' do
     @db.drop_table?(:test5)
   end
 
-  if check_sqls
+  check_sqls do
     specify 'should quote NaN' do
       nan = 0.0/0.0
       @ds.insert_sql(:value => nan).should == %q{INSERT INTO "test5" ("value") VALUES ('NaN')}

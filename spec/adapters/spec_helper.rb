@@ -51,4 +51,11 @@ end
       specify(message, &block)
     end
   end
+
+  def check_sqls
+    yield unless ENV['SEQUEL_NO_CHECK_SQLS']
+  end
+  def self.check_sqls
+    yield unless ENV['SEQUEL_NO_CHECK_SQLS']
+  end
 end

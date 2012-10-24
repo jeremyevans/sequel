@@ -39,22 +39,30 @@ describe "MySQL", '#create_table' do
 
   specify "should allow to specify options for MySQL" do
     @db.create_table(:dolls, :engine => 'MyISAM', :charset => 'latin2'){text :name}
-    @db.sqls.should == ["CREATE TABLE `dolls` (`name` text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `dolls` (`name` text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
+    end
   end
 
   specify "should create a temporary table" do
     @db.create_table(:tmp_dolls, :temp => true, :engine => 'MyISAM', :charset => 'latin2'){text :name}
-    @db.sqls.should == ["CREATE TEMPORARY TABLE `tmp_dolls` (`name` text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TEMPORARY TABLE `tmp_dolls` (`name` text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
+    end
   end
 
   specify "should not use a default for a String :text=>true type" do
     @db.create_table(:dolls){String :name, :text=>true, :default=>'blah'}
-    @db.sqls.should == ["CREATE TABLE `dolls` (`name` text)"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `dolls` (`name` text)"]
+    end
   end
 
   specify "should not use a default for a File type" do
     @db.create_table(:dolls){File :name, :default=>'blah'}
-    @db.sqls.should == ["CREATE TABLE `dolls` (`name` blob)"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `dolls` (`name` blob)"]
+    end
   end
 
   specify "should respect the size option for File type" do
@@ -464,17 +472,23 @@ describe "A MySQL database with table options" do
 
   specify "should allow to pass custom options (engine, charset, collate) for table creation" do
     @db.create_table(:items, @options){Integer :size; text :name}
-    @db.sqls.should == ["CREATE TABLE `items` (`size` integer, `name` text) ENGINE=MyISAM DEFAULT CHARSET=latin1 DEFAULT COLLATE=latin1_swedish_ci"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`size` integer, `name` text) ENGINE=MyISAM DEFAULT CHARSET=latin1 DEFAULT COLLATE=latin1_swedish_ci"]
+    end
   end
 
   specify "should use default options if specified (engine, charset, collate) for table creation" do
     @db.create_table(:items){Integer :size; text :name}
-    @db.sqls.should == ["CREATE TABLE `items` (`size` integer, `name` text) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE=utf8_general_ci"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`size` integer, `name` text) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE=utf8_general_ci"]
+    end
   end
 
   specify "should not use default if option has a nil value" do
     @db.create_table(:items, :engine=>nil, :charset=>nil, :collate=>nil){Integer :size; text :name}
-    @db.sqls.should == ["CREATE TABLE `items` (`size` integer, `name` text)"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`size` integer, `name` text)"]
+    end
   end
 end
 
@@ -490,27 +504,35 @@ describe "A MySQL database" do
 
   specify "should support defaults for boolean columns" do
     @db.create_table(:items){TrueClass :active1, :default=>true; FalseClass :active2, :default => false}
-    @db.sqls.should == ["CREATE TABLE `items` (`active1` tinyint(1) DEFAULT 1, `active2` tinyint(1) DEFAULT 0)"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`active1` tinyint(1) DEFAULT 1, `active2` tinyint(1) DEFAULT 0)"]
+    end
   end
 
   specify "should correctly format CREATE TABLE statements with foreign keys" do
     @db.create_table(:items){primary_key :id; foreign_key :p_id, :items, :key => :id, :null => false, :on_delete => :cascade}
-    @db.sqls.should == ["CREATE TABLE `items` (`id` integer PRIMARY KEY AUTO_INCREMENT, `p_id` integer NOT NULL, UNIQUE (`id`), FOREIGN KEY (`p_id`) REFERENCES `items`(`id`) ON DELETE CASCADE)"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`id` integer PRIMARY KEY AUTO_INCREMENT, `p_id` integer NOT NULL, UNIQUE (`id`), FOREIGN KEY (`p_id`) REFERENCES `items`(`id`) ON DELETE CASCADE)"]
+    end
   end
 
   specify "should correctly format ALTER TABLE statements with foreign keys" do
     @db.create_table(:items){Integer :id}
     @db.create_table(:users){primary_key :id}
     @db.alter_table(:items){add_foreign_key :p_id, :users, :key => :id, :null => false, :on_delete => :cascade}
-    @db.sqls.should == ["CREATE TABLE `items` (`id` integer)",
-      "CREATE TABLE `users` (`id` integer PRIMARY KEY AUTO_INCREMENT)",
-      "ALTER TABLE `items` ADD COLUMN `p_id` integer NOT NULL, ADD FOREIGN KEY (`p_id`) REFERENCES `users`(`id`) ON DELETE CASCADE"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`id` integer)",
+        "CREATE TABLE `users` (`id` integer PRIMARY KEY AUTO_INCREMENT)",
+        "ALTER TABLE `items` ADD COLUMN `p_id` integer NOT NULL, ADD FOREIGN KEY (`p_id`) REFERENCES `users`(`id`) ON DELETE CASCADE"]
+    end
   end
 
   specify "should have rename_column support keep existing options" do
     @db.create_table(:items){String :id, :null=>false, :default=>'blah'}
     @db.alter_table(:items){rename_column :id, :nid}
-    @db.sqls.should == ["CREATE TABLE `items` (`id` varchar(255) NOT NULL DEFAULT 'blah')", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `nid` varchar(255) NOT NULL DEFAULT 'blah'"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`id` varchar(255) NOT NULL DEFAULT 'blah')", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `nid` varchar(255) NOT NULL DEFAULT 'blah'"]
+    end
     @db[:items].insert
     @db[:items].all.should == [{:nid=>'blah'}]
     proc{@db[:items].insert(:nid=>nil)}.should raise_error(Sequel::DatabaseError)
@@ -519,7 +541,9 @@ describe "A MySQL database" do
   specify "should have set_column_type support keep existing options" do
     @db.create_table(:items){Integer :id, :null=>false, :default=>5}
     @db.alter_table(:items){set_column_type :id, Bignum}
-    @db.sqls.should == ["CREATE TABLE `items` (`id` integer NOT NULL DEFAULT 5)", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` bigint NOT NULL DEFAULT 5"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`id` integer NOT NULL DEFAULT 5)", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` bigint NOT NULL DEFAULT 5"]
+    end
     @db[:items].insert
     @db[:items].all.should == [{:id=>5}]
     proc{@db[:items].insert(:id=>nil)}.should raise_error(Sequel::DatabaseError)
@@ -531,13 +555,17 @@ describe "A MySQL database" do
   specify "should have set_column_type pass through options" do
     @db.create_table(:items){integer :id; enum :list, :elements=>%w[one]}
     @db.alter_table(:items){set_column_type :id, :int, :unsigned=>true, :size=>8; set_column_type :list, :enum, :elements=>%w[two]}
-    @db.sqls.should == ["CREATE TABLE `items` (`id` integer, `list` enum('one'))", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` int(8) UNSIGNED NULL, CHANGE COLUMN `list` `list` enum('two') NULL"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`id` integer, `list` enum('one'))", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` int(8) UNSIGNED NULL, CHANGE COLUMN `list` `list` enum('two') NULL"]
+    end
   end
 
   specify "should have set_column_default support keep existing options" do
     @db.create_table(:items){Integer :id, :null=>false, :default=>5}
     @db.alter_table(:items){set_column_default :id, 6}
-    @db.sqls.should == ["CREATE TABLE `items` (`id` integer NOT NULL DEFAULT 5)", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` int(11) NOT NULL DEFAULT 6"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`id` integer NOT NULL DEFAULT 5)", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` int(11) NOT NULL DEFAULT 6"]
+    end
     @db[:items].insert
     @db[:items].all.should == [{:id=>6}]
     proc{@db[:items].insert(:id=>nil)}.should raise_error(Sequel::DatabaseError)
@@ -546,7 +574,9 @@ describe "A MySQL database" do
   specify "should have set_column_allow_null support keep existing options" do
     @db.create_table(:items){Integer :id, :null=>false, :default=>5}
     @db.alter_table(:items){set_column_allow_null :id, true}
-    @db.sqls.should == ["CREATE TABLE `items` (`id` integer NOT NULL DEFAULT 5)", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` int(11) NULL DEFAULT 5"]
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`id` integer NOT NULL DEFAULT 5)", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` int(11) NULL DEFAULT 5"]
+    end
     @db[:items].insert
     @db[:items].all.should == [{:id=>5}]
     proc{@db[:items].insert(:id=>nil)}.should_not
@@ -683,11 +713,13 @@ describe "A MySQL database" do
 
   specify "should support fulltext indexes and full_text_search" do
     @db.create_table(:posts, :engine=>:MyISAM){text :title; text :body; full_text_index :title; full_text_index [:title, :body]}
-    @db.sqls.should == [
-      "CREATE TABLE `posts` (`title` text, `body` text) ENGINE=MyISAM",
-      "CREATE FULLTEXT INDEX `posts_title_index` ON `posts` (`title`)",
-      "CREATE FULLTEXT INDEX `posts_title_body_index` ON `posts` (`title`, `body`)"
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        "CREATE TABLE `posts` (`title` text, `body` text) ENGINE=MyISAM",
+        "CREATE FULLTEXT INDEX `posts_title_index` ON `posts` (`title`)",
+        "CREATE FULLTEXT INDEX `posts_title_body_index` ON `posts` (`title`, `body`)"
+      ]
+    end
 
     @db[:posts].insert(:title=>'ruby rails', :body=>'y')
     @db[:posts].insert(:title=>'sequel', :body=>'ruby')
@@ -697,10 +729,12 @@ describe "A MySQL database" do
     @db[:posts].full_text_search(:title, 'rails').all.should == [{:title=>'ruby rails', :body=>'y'}]
     @db[:posts].full_text_search([:title, :body], ['sequel', 'ruby']).all.should == [{:title=>'sequel', :body=>'ruby'}]
     @db[:posts].full_text_search(:title, '+ruby -rails', :boolean => true).all.should == [{:title=>'ruby scooby', :body=>'x'}]
-    @db.sqls.should == [
-      "SELECT * FROM `posts` WHERE (MATCH (`title`) AGAINST ('rails'))",
-      "SELECT * FROM `posts` WHERE (MATCH (`title`, `body`) AGAINST ('sequel ruby'))",
-      "SELECT * FROM `posts` WHERE (MATCH (`title`) AGAINST ('+ruby -rails' IN BOOLEAN MODE))"]
+    check_sqls do
+      @db.sqls.should == [
+        "SELECT * FROM `posts` WHERE (MATCH (`title`) AGAINST ('rails'))",
+        "SELECT * FROM `posts` WHERE (MATCH (`title`, `body`) AGAINST ('sequel ruby'))",
+        "SELECT * FROM `posts` WHERE (MATCH (`title`) AGAINST ('+ruby -rails' IN BOOLEAN MODE))"]
+    end
 
     @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').should == [{:title=>'ruby rails', :body=>'y'}]
     @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').should == [{:title=>'ruby rails', :body=>'y'}]
@@ -708,26 +742,32 @@ describe "A MySQL database" do
 
   specify "should support spatial indexes" do
     @db.create_table(:posts, :engine=>:MyISAM){point :geom, :null=>false; spatial_index [:geom]}
-    @db.sqls.should == [
-      "CREATE TABLE `posts` (`geom` point NOT NULL) ENGINE=MyISAM",
-      "CREATE SPATIAL INDEX `posts_geom_index` ON `posts` (`geom`)"
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        "CREATE TABLE `posts` (`geom` point NOT NULL) ENGINE=MyISAM",
+        "CREATE SPATIAL INDEX `posts_geom_index` ON `posts` (`geom`)"
+      ]
+    end
   end
 
   specify "should support indexes with index type" do
     @db.create_table(:posts){Integer :id; index :id, :type => :btree}
-    @db.sqls.should == [
-      "CREATE TABLE `posts` (`id` integer)",
-      "CREATE INDEX `posts_id_index` USING btree ON `posts` (`id`)"
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        "CREATE TABLE `posts` (`id` integer)",
+        "CREATE INDEX `posts_id_index` USING btree ON `posts` (`id`)"
+      ]
+    end
   end
 
   specify "should support unique indexes with index type" do
     @db.create_table(:posts){Integer :id; index :id, :type => :btree, :unique => true}
-    @db.sqls.should == [
-      "CREATE TABLE `posts` (`id` integer)",
-      "CREATE UNIQUE INDEX `posts_id_index` USING btree ON `posts` (`id`)"
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        "CREATE TABLE `posts` (`id` integer)",
+        "CREATE UNIQUE INDEX `posts_id_index` USING btree ON `posts` (`id`)"
+      ]
+    end
   end
 
   specify "should not dump partial indexes" do
@@ -755,19 +795,25 @@ describe "MySQL::Dataset#insert and related methods" do
 
   specify "#insert should insert record with default values when no arguments given" do
     @d.insert
-    MYSQL_DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
+    check_sqls do
+      MYSQL_DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
+    end
     @d.all.should == [{:name => nil, :value => nil}]
   end
 
   specify "#insert  should insert record with default values when empty hash given" do
     @d.insert({})
-    MYSQL_DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
+    check_sqls do
+      MYSQL_DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
+    end
     @d.all.should == [{:name => nil, :value => nil}]
   end
 
   specify "#insert should insert record with default values when empty array given" do
     @d.insert []
-    MYSQL_DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
+    check_sqls do
+      MYSQL_DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
+    end
     @d.all.should == [{:name => nil, :value => nil}]
   end
 
@@ -778,10 +824,12 @@ describe "MySQL::Dataset#insert and related methods" do
     @d.on_duplicate_key_update(:name, :value => 6).insert(:name => 'abc', :value => 1)
     @d.on_duplicate_key_update(:name, :value => 6).insert(:name => 'def', :value => 2)
 
-    MYSQL_DB.sqls.length.should == 3
-    MYSQL_DB.sqls[0].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\)\z/
-    MYSQL_DB.sqls[1].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/
-    MYSQL_DB.sqls[2].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('def'|2), (2|'def')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/
+    check_sqls do
+      MYSQL_DB.sqls.length.should == 3
+      MYSQL_DB.sqls[0].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\)\z/
+      MYSQL_DB.sqls[1].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/
+      MYSQL_DB.sqls[2].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('def'|2), (2|'def')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/
+    end
 
     @d.all.should == [{:name => 'abc', :value => 6}, {:name => 'def', :value => 2}]
   end
@@ -789,11 +837,13 @@ describe "MySQL::Dataset#insert and related methods" do
   specify "#multi_replace should insert multiple records in a single statement" do
     @d.multi_replace([{:name => 'abc'}, {:name => 'def'}])
 
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "REPLACE INTO `items` (`name`) VALUES ('abc'), ('def')",
-      SQL_COMMIT
-    ]
+    check_sqls do
+      MYSQL_DB.sqls.should == [
+        SQL_BEGIN,
+        "REPLACE INTO `items` (`name`) VALUES ('abc'), ('def')",
+        SQL_COMMIT
+      ]
+    end
 
     @d.all.should == [
       {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
@@ -804,14 +854,16 @@ describe "MySQL::Dataset#insert and related methods" do
     @d.multi_replace([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
       :commit_every => 2)
 
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "REPLACE INTO `items` (`value`) VALUES (1), (2)",
-      SQL_COMMIT,
-      SQL_BEGIN,
-      "REPLACE INTO `items` (`value`) VALUES (3), (4)",
-      SQL_COMMIT
-    ]
+    check_sqls do
+      MYSQL_DB.sqls.should == [
+        SQL_BEGIN,
+        "REPLACE INTO `items` (`value`) VALUES (1), (2)",
+        SQL_COMMIT,
+        SQL_BEGIN,
+        "REPLACE INTO `items` (`value`) VALUES (3), (4)",
+        SQL_COMMIT
+      ]
+    end
 
     @d.all.should == [
       {:name => nil, :value => 1}, 
@@ -825,14 +877,16 @@ describe "MySQL::Dataset#insert and related methods" do
     @d.multi_replace([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
       :slice => 2)
 
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "REPLACE INTO `items` (`value`) VALUES (1), (2)",
-      SQL_COMMIT,
-      SQL_BEGIN,
-      "REPLACE INTO `items` (`value`) VALUES (3), (4)",
-      SQL_COMMIT
-    ]
+    check_sqls do
+      MYSQL_DB.sqls.should == [
+        SQL_BEGIN,
+        "REPLACE INTO `items` (`value`) VALUES (1), (2)",
+        SQL_COMMIT,
+        SQL_BEGIN,
+        "REPLACE INTO `items` (`value`) VALUES (3), (4)",
+        SQL_COMMIT
+      ]
+    end
 
     @d.all.should == [
       {:name => nil, :value => 1}, 
@@ -845,11 +899,13 @@ describe "MySQL::Dataset#insert and related methods" do
   specify "#multi_insert should insert multiple records in a single statement" do
     @d.multi_insert([{:name => 'abc'}, {:name => 'def'}])
 
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "INSERT INTO `items` (`name`) VALUES ('abc'), ('def')",
-      SQL_COMMIT
-    ]
+    check_sqls do
+      MYSQL_DB.sqls.should == [
+        SQL_BEGIN,
+        "INSERT INTO `items` (`name`) VALUES ('abc'), ('def')",
+        SQL_COMMIT
+      ]
+    end
 
     @d.all.should == [
       {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
@@ -860,14 +916,16 @@ describe "MySQL::Dataset#insert and related methods" do
     @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
       :commit_every => 2)
 
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "INSERT INTO `items` (`value`) VALUES (1), (2)",
-      SQL_COMMIT,
-      SQL_BEGIN,
-      "INSERT INTO `items` (`value`) VALUES (3), (4)",
-      SQL_COMMIT
-    ]
+    check_sqls do
+      MYSQL_DB.sqls.should == [
+        SQL_BEGIN,
+        "INSERT INTO `items` (`value`) VALUES (1), (2)",
+        SQL_COMMIT,
+        SQL_BEGIN,
+        "INSERT INTO `items` (`value`) VALUES (3), (4)",
+        SQL_COMMIT
+      ]
+    end
 
     @d.all.should == [
       {:name => nil, :value => 1}, 
@@ -881,14 +939,16 @@ describe "MySQL::Dataset#insert and related methods" do
     @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
       :slice => 2)
 
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "INSERT INTO `items` (`value`) VALUES (1), (2)",
-      SQL_COMMIT,
-      SQL_BEGIN,
-      "INSERT INTO `items` (`value`) VALUES (3), (4)",
-      SQL_COMMIT
-    ]
+    check_sqls do
+      MYSQL_DB.sqls.should == [
+        SQL_BEGIN,
+        "INSERT INTO `items` (`value`) VALUES (1), (2)",
+        SQL_COMMIT,
+        SQL_BEGIN,
+        "INSERT INTO `items` (`value`) VALUES (3), (4)",
+        SQL_COMMIT
+      ]
+    end
 
     @d.all.should == [
       {:name => nil, :value => 1}, 
@@ -901,11 +961,13 @@ describe "MySQL::Dataset#insert and related methods" do
   specify "#import should support inserting using columns and values arrays" do
     @d.import([:name, :value], [['abc', 1], ['def', 2]])
 
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2)",
-      SQL_COMMIT
-    ]
+    check_sqls do
+      MYSQL_DB.sqls.should == [
+        SQL_BEGIN,
+        "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2)",
+        SQL_COMMIT
+      ]
+    end
 
     @d.all.should == [
       {:name => 'abc', :value => 1}, 
@@ -916,11 +978,13 @@ describe "MySQL::Dataset#insert and related methods" do
   specify "#insert_ignore should add the IGNORE keyword when inserting" do
     @d.insert_ignore.multi_insert([{:name => 'abc'}, {:name => 'def'}])
 
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "INSERT IGNORE INTO `items` (`name`) VALUES ('abc'), ('def')",
-      SQL_COMMIT
-    ]
+    check_sqls do
+      MYSQL_DB.sqls.should == [
+        SQL_BEGIN,
+        "INSERT IGNORE INTO `items` (`name`) VALUES ('abc'), ('def')",
+        SQL_COMMIT
+      ]
+    end
 
     @d.all.should == [
       {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
@@ -929,19 +993,23 @@ describe "MySQL::Dataset#insert and related methods" do
 
   specify "#insert_ignore should add the IGNORE keyword for single inserts" do
     @d.insert_ignore.insert(:name => 'ghi')
-    MYSQL_DB.sqls.should == ["INSERT IGNORE INTO `items` (`name`) VALUES ('ghi')"]
+    check_sqls do
+      MYSQL_DB.sqls.should == ["INSERT IGNORE INTO `items` (`name`) VALUES ('ghi')"]
+    end
     @d.all.should == [{:name => 'ghi', :value => nil}]
   end
 
   specify "#on_duplicate_key_update should add the ON DUPLICATE KEY UPDATE and ALL columns when no args given" do
     @d.on_duplicate_key_update.import([:name,:value], [['abc', 1], ['def',2]])
 
-    MYSQL_DB.sqls.should == [
-      "SELECT * FROM `items` LIMIT 1",
-      SQL_BEGIN,
-      "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `value`=VALUES(`value`)",
-      SQL_COMMIT
-    ]
+    check_sqls do
+      MYSQL_DB.sqls.should == [
+        "SELECT * FROM `items` LIMIT 1",
+        SQL_BEGIN,
+        "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `value`=VALUES(`value`)",
+        SQL_COMMIT
+      ]
+    end
 
     @d.all.should == [
       {:name => 'abc', :value => 1}, {:name => 'def', :value => 2}
@@ -953,11 +1021,13 @@ describe "MySQL::Dataset#insert and related methods" do
       [['abc', 1], ['def',2]]
     )
 
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE `value`=VALUES(`value`)",
-      SQL_COMMIT
-    ]
+    check_sqls do
+      MYSQL_DB.sqls.should == [
+        SQL_BEGIN,
+        "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE `value`=VALUES(`value`)",
+        SQL_COMMIT
+      ]
+    end
 
     @d.all.should == [
       {:name => 'abc', :value => 1}, {:name => 'def', :value => 2}
@@ -981,7 +1051,9 @@ describe "MySQL::Dataset#update and related methods" do
     proc{@d.where(:value => 1).update(:name => 'cow')}.should raise_error(Sequel::DatabaseError)
     MYSQL_DB.sqls.clear
     @d.update_ignore.where(:value => 1).update(:name => 'cow')
-    MYSQL_DB.sqls.should == ["UPDATE IGNORE `items` SET `name` = 'cow' WHERE (`value` = 1)"]
+    check_sqls do
+      MYSQL_DB.sqls.should == ["UPDATE IGNORE `items` SET `name` = 'cow' WHERE (`value` = 1)"]
+    end
     @d.order(:name).all.should == [{:name => 'cat', :value => 1}, {:name => 'cow', :value => 0}]
   end
 end
@@ -1073,13 +1145,17 @@ describe "MySQL::Dataset#calc_found_rows" do
     MYSQL_DB[:items].multi_insert([{:a => 1}, {:a => 1}, {:a => 2}])
     MYSQL_DB.sqls.clear
 
-    MYSQL_DB[:items].calc_found_rows.filter(:a => 1).limit(1).all.should == [{:a => 1}]
-    MYSQL_DB.dataset.select(Sequel.function(:FOUND_ROWS).as(:rows)).all.should == [{:rows => 2 }]
+    MYSQL_DB.synchronize do
+      MYSQL_DB[:items].calc_found_rows.filter(:a => 1).limit(1).all.should == [{:a => 1}]
+      MYSQL_DB.dataset.select(Sequel.function(:FOUND_ROWS).as(:rows)).all.should == [{:rows => 2 }]
+    end
 
-    MYSQL_DB.sqls.should == [
-      'SELECT SQL_CALC_FOUND_ROWS * FROM `items` WHERE (`a` = 1) LIMIT 1',
-      'SELECT FOUND_ROWS() AS `rows`',
-    ]
+    check_sqls do
+      MYSQL_DB.sqls.should == [
+        'SELECT SQL_CALC_FOUND_ROWS * FROM `items` WHERE (`a` = 1) LIMIT 1',
+        'SELECT FOUND_ROWS() AS `rows`',
+      ]
+    end
   end
 end
 

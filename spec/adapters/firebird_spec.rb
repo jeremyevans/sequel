@@ -253,68 +253,82 @@ describe "A Firebird database" do
 
   specify "should allow us to name the sequences" do
     @db.create_table(:posts){primary_key :id, :sequence_name => "seq_test"}
-    @db.sqls.should == [
-      "DROP SEQUENCE SEQ_TEST",
-      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
-      "CREATE SEQUENCE SEQ_TEST",
-      "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_test;\n                end\n              end\n\n"
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        "DROP SEQUENCE SEQ_TEST",
+        "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+        "CREATE SEQUENCE SEQ_TEST",
+        "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_test;\n                end\n              end\n\n"
+      ]
+    end
   end
 
   specify "should allow us to set the starting position for the sequences" do
     @db.create_table(:posts){primary_key :id, :sequence_start_position => 999}
-    @db.sqls.should == [
-      "DROP SEQUENCE SEQ_POSTS_ID",
-      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
-      "CREATE SEQUENCE SEQ_POSTS_ID",
-      "ALTER SEQUENCE SEQ_POSTS_ID RESTART WITH 999",
-      "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        "DROP SEQUENCE SEQ_POSTS_ID",
+        "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+        "CREATE SEQUENCE SEQ_POSTS_ID",
+        "ALTER SEQUENCE SEQ_POSTS_ID RESTART WITH 999",
+        "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
+      ]
+    end
   end
 
   specify "should allow us to name and set the starting position for the sequences" do
     @db.create_table(:posts){primary_key :id, :sequence_name => "seq_test", :sequence_start_position => 999}
-    @db.sqls.should == [
-      "DROP SEQUENCE SEQ_TEST",
-      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
-      "CREATE SEQUENCE SEQ_TEST",
-      "ALTER SEQUENCE SEQ_TEST RESTART WITH 999",
-      "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_test;\n                end\n              end\n\n"
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        "DROP SEQUENCE SEQ_TEST",
+        "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+        "CREATE SEQUENCE SEQ_TEST",
+        "ALTER SEQUENCE SEQ_TEST RESTART WITH 999",
+        "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_test;\n                end\n              end\n\n"
+      ]
+    end
   end
 
   specify "should allow us to name the triggers" do
     @db.create_table(:posts){primary_key :id, :trigger_name => "trig_test"}
-    @db.sqls.should == [
-      "DROP SEQUENCE SEQ_POSTS_ID",
-      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
-      "CREATE SEQUENCE SEQ_POSTS_ID",
-      "          CREATE TRIGGER TRIG_TEST for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        "DROP SEQUENCE SEQ_POSTS_ID",
+        "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+        "CREATE SEQUENCE SEQ_POSTS_ID",
+        "          CREATE TRIGGER TRIG_TEST for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
+      ]
+    end
   end
 
   specify "should allow us to not create the sequence" do
     @db.create_table(:posts){primary_key :id, :create_sequence => false}
-    @db.sqls.should == [
-      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
-      "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+        "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
+      ]
+    end
   end
 
   specify "should allow us to not create the trigger" do
     @db.create_table(:posts){primary_key :id, :create_trigger => false}
-    @db.sqls.should == [
-      "DROP SEQUENCE SEQ_POSTS_ID",
-      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
-      "CREATE SEQUENCE SEQ_POSTS_ID",
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        "DROP SEQUENCE SEQ_POSTS_ID",
+        "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+        "CREATE SEQUENCE SEQ_POSTS_ID",
+      ]
+    end
   end
 
   specify "should allow us to not create either the sequence nor the trigger" do
     @db.create_table(:posts){primary_key :id, :create_sequence => false, :create_trigger => false}
-    @db.sqls.should == [
-      "CREATE TABLE POSTS (ID integer PRIMARY KEY )"
-    ]
+    check_sqls do
+      @db.sqls.should == [
+        "CREATE TABLE POSTS (ID integer PRIMARY KEY )"
+      ]
+    end
   end
 
   specify "should support column operations" do
