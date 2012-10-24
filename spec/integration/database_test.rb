@@ -36,7 +36,14 @@ describe Sequel::Database do
     proc{INTEGRATION_DB.pool.hold{raise Interrupt, "test"}}.should raise_error(Interrupt)
   end
 
-  specify "should provide ability to check connections for validity" do
+  specify "should be able to disconnect connections more than once without exceptions" do
+    conn = INTEGRATION_DB.synchronize{|c| c}
+    INTEGRATION_DB.disconnect
+    INTEGRATION_DB.disconnect_connection(conn)
+    INTEGRATION_DB.disconnect_connection(conn)
+  end
+
+  cspecify "should provide ability to check connections for validity", [:do, :postgres] do
     conn = INTEGRATION_DB.synchronize{|c| c}
     INTEGRATION_DB.valid_connection?(conn).should be_true
     INTEGRATION_DB.disconnect
