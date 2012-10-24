@@ -94,3 +94,10 @@ if INTEGRATION_DB.adapter_scheme == :ibmdb || (INTEGRATION_DB.adapter_scheme == 
     super
   end
 end
+
+if ENV['SEQUEL_CONNECTION_VALIDATOR']
+  ENV['SEQUEL_NO_CHECK_SQLS'] = '1'
+  INTEGRATION_DB.extension(:connection_validator)
+  INTEGRATION_DB.pool.connection_validation_timeout = -1
+end
+

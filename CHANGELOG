@@ -1,5 +1,7 @@
 === HEAD
 
+* Add connection_validator extension for automatically checking connections and transparently handling disconnects (jeremyevans)
+
 * Add Database#valid_connection? for checking whether a given connection is valid (jeremyevans)
 
 * Make dataset.limit(nil, nil) reset offset as well as limit (jeremyevans) (#571)
