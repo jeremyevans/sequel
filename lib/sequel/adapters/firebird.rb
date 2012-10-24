@@ -28,6 +28,14 @@ module Sequel
           :password => opts[:password]).connect
       end
 
+      def disconnect_connection(conn)
+        begin
+          conn.close
+        rescue Fb::Error
+          nil
+        end
+      end
+
       def execute(sql, opts={})
         begin
           synchronize(opts[:server]) do |conn|
