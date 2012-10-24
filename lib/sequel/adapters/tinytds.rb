@@ -113,6 +113,11 @@ module Sequel
         super || (opts[:conn] && !opts[:conn].active?)
       end
 
+      # Dispose of any possible results of execution.
+      def log_connection_execute(conn, sql)
+        log_yield(sql){conn.execute(sql).each}
+      end
+
       # Return a 2 element array with the literal value and type to use
       # in the prepared statement call for the given value and connection.
       def ps_arg_type(v)
