@@ -430,6 +430,15 @@ describe "Database schema modifiers" do
     @db[:items2].select_order_map([:id, :b]).should == [[1, 10], [2, 20]]
   end
 
+  cspecify "should rename primary_key columns correctly", :db2 do
+    @db.create_table!(:items){Integer :id, :primary_key=>true}
+    @ds.insert(:id=>10)
+    @db.alter_table(:items){rename_column :id, :id2}
+    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id2]
+    @ds.columns!.should == [:id2]
+    @ds.all.should == [{:id2=>10}]
+  end
+
   cspecify "should set column NULL/NOT NULL correctly", [:jdbc, :db2], [:db2] do
     @db.create_table!(:items, :engine=>:InnoDB){Integer :id}
     @ds.insert(:id=>10)

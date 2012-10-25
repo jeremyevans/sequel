@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for renaming primary key columns on MySQL (jeremyevans)
+
 * Add connection_validator extension for automatically checking connections and transparently handling disconnects (jeremyevans)
 
 * Add Database#valid_connection? for checking whether a given connection is valid (jeremyevans)
