@@ -74,7 +74,7 @@ module Sequel
     # has been idle for longer than the connection validation timeout,
     # test the connection for validity.  If it is not valid,
     # disconnect the connection, and retry with the next available
-    # connection.  If no avialable connections are valid, this will
+    # connection.  If no available connections are valid, this will
     # return nil.
     def next_available(*)
       begin
