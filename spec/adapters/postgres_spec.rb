@@ -1,3 +1,4 @@
+# coding: utf-8
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 unless defined?(POSTGRES_DB)
@@ -1550,6 +1551,16 @@ describe 'PostgreSQL array handling' do
       @ds.insert(rs.first)
       @ds.all.should == rs
     end
+  end
+
+  specify 'insert and retrieve UTF-8 encoded string arrays' do
+    @db.create_table!(:items) do
+      column :t, 'text[]'
+    end
+    @ds.insert(Sequel.pg_array(['é']))
+    @ds.count.should == 1
+    rs = @ds.all
+    rs.first[:t].first.encoding.should == Encoding.find("UTF-8")
   end
 
   specify 'insert and retrieve string arrays' do
