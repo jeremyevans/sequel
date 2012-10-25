@@ -389,6 +389,11 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:id=>i, :item_id=>nil}]
   end
 
+  specify "should not allow NULLs in a primary key" do
+    @db.create_table!(:items){String :id, :primary_key=>true}
+    proc{@ds.insert(:id=>nil)}.should raise_error(Sequel::DatabaseError)
+  end
+
   specify "should rename columns correctly" do
     @db.create_table!(:items){Integer :id}
     @ds.insert(:id=>10)

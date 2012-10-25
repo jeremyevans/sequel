@@ -284,6 +284,12 @@ module Sequel
         sql << " DEFAULT (#{literal(column[:default])})" if column.include?(:default)
       end
     
+      # Add null/not null SQL fragment to column creation SQL.
+      def column_definition_null_sql(sql, column)
+        column = column.merge(:null=>false) if column[:primary_key]
+        super(sql, column)
+      end
+    
       # Array of PRAGMA SQL statements based on the Database options that should be applied to
       # new connections.
       def connection_pragmas

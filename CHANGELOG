@@ -1,5 +1,7 @@
 === HEAD
 
+* Explicitly mark primary keys as NOT NULL on SQLite (jeremyevans)
+
 * Add support for renaming primary key columns on MySQL (jeremyevans)
 
 * Add connection_validator extension for automatically checking connections and transparently handling disconnects (jeremyevans)
