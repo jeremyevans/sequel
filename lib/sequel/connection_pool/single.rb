@@ -30,5 +30,9 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
     end
   end
 
+  def pool_type
+    :single
+  end
+  
   CONNECTION_POOL_MAP[[true, false]] = self
 end

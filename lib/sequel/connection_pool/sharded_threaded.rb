@@ -157,6 +157,10 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     sync{@servers.keys}
   end
 
+  def pool_type
+    :sharded_threaded
+  end
+  
   private
 
   # Assigns a connection to the supplied thread for the given server, if one

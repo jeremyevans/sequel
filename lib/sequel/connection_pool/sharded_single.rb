@@ -76,6 +76,10 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
     @conns.length
   end
   
+  def pool_type
+    :sharded_single
+  end
+  
   private
   
   # Disconnect from the given server, if connected.

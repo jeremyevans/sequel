@@ -854,6 +854,10 @@ describe "A single threaded pool with multiple servers" do
 end
 
 shared_examples_for "All connection pools classes" do
+  specify "should have pool_type return a symbol" do
+    @class.new(mock_db.call{123}, {}).pool_type.should be_a_kind_of(Symbol)
+  end
+
   specify "should have all_connections yield current and available connections" do
     p = @class.new(mock_db.call{123}, {})
     p.hold{|c| p.all_connections{|c1| c.should == c1}}

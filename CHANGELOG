@@ -1,5 +1,7 @@
 === HEAD
 
+* Add ConnectionPool#pool_type to get the type of connection pool in use (jeremyevans)
+
 * Explicitly mark primary keys as NOT NULL on SQLite (jeremyevans)
 
 * Add support for renaming primary key columns on MySQL (jeremyevans)

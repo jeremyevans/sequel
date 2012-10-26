@@ -112,6 +112,10 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
       sync{release(t)} if conn
     end
   end
+
+  def pool_type
+    :threaded
+  end
   
   private
 
