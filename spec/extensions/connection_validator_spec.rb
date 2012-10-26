@@ -94,6 +94,13 @@ shared_examples_for "Sequel::ConnectionValidator" do
     @db.pool.instance_variable_get(:@connection_timestamps).should_not have_key(c1)
     @db.pool.instance_variable_get(:@connection_timestamps).should have_key(c2)
   end
+
+  it "should handle case where determining validity requires a connection" do
+    @db.meta_def(:valid_connection?){|c| synchronize{}; true}
+    @db.pool.connection_validation_timeout = -1
+    c1 = @db.synchronize{|c| c}
+    @db.synchronize{|c| c}.should equal(c1)
+  end
 end
 
 describe "Sequel::ConnectionValidator with threaded pool" do

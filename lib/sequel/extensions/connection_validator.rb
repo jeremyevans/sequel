@@ -59,6 +59,12 @@ module Sequel
         @connection_timestamps ||= {}
         @connection_validation_timeout = 3600
       end
+
+      # Make sure the valid connection SQL query is precached,
+      # otherwise it's possible it will happen at runtime. While
+      # it should work correctly at runtime, it's better to avoid
+      # the possibility of failure altogether.
+      pool.db.send(:valid_connection_sql)
     end
 
     private
@@ -70,18 +76,23 @@ module Sequel
       conn
     end
 
-    # If an available connection is being checked out, and it has
-    # has been idle for longer than the connection validation timeout,
+    # When acquiring a connection, if it has been
+    # idle for longer than the connection validation timeout,
     # test the connection for validity.  If it is not valid,
-    # disconnect the connection, and retry with the next available
-    # connection.  If no available connections are valid, this will
-    # return nil.
-    def next_available(*)
+    # disconnect the connection, and retry with a new connection.
+    def acquire(*a)
       begin
         if (conn = super) &&
-           (t = @connection_timestamps.delete(conn)) &&
+           (t = sync{@connection_timestamps.delete(conn)}) &&
            Time.now - t > @connection_validation_timeout &&
            !db.valid_connection?(conn)
+
+          if pool_type == :sharded_threaded
+            sync{allocated(a.last).delete(Thread.current)}
+          else
+            sync{@allocated.delete(Thread.current)}
+          end
+
           db.disconnect_connection(conn)
           raise Retry
         end
