@@ -578,7 +578,7 @@ describe Sequel::Model do
   specify "should validate uniqueness_of with allow_missing => true" do
     @c.validates_uniqueness_of :value, :allow_missing => true
     @m.should be_valid
-    @m.value = nil
+    @m.value = 1
     @m.should_not be_valid
   end
 end
@@ -858,6 +858,12 @@ describe Sequel::Model, "Validations" do
     @user = User.new(:username => "0records", :password => "anothertest")
     @user.should be_valid
     @user.errors.full_messages.should == []
+
+    User.db.sqls
+    @user = User.new(:password => "anothertest")
+    @user.should be_valid
+    @user.errors.full_messages.should == []
+    User.db.sqls.should == []
   end
   
   it "should validate the uniqueness of multiple columns" do
@@ -907,6 +913,18 @@ describe Sequel::Model, "Validations" do
     @user = User.new(:username => "0records", :password => "anothertest")
     @user.should be_valid
     @user.errors.full_messages.should == []
+
+    User.db.sqls
+    @user = User.new(:password => "anothertest")
+    @user.should be_valid
+    @user.errors.full_messages.should == []
+    @user = User.new(:username => "0records")
+    @user.should be_valid
+    @user.errors.full_messages.should == []
+    @user = User.new
+    @user.should be_valid
+    @user.errors.full_messages.should == []
+    User.db.sqls.should == []
   end
   
   it "should have a validates block that contains multiple validations" do

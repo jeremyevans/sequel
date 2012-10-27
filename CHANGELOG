@@ -1,5 +1,7 @@
 === HEAD
 
+* Make uniqueness validations correctly handle nil values (jeremyevans)
+
 * Add ConnectionPool#pool_type to get the type of connection pool in use (jeremyevans)
 
 * Explicitly mark primary keys as NOT NULL on SQLite (jeremyevans)

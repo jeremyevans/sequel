@@ -224,7 +224,9 @@ module Sequel
             ds = if where
               where.call(model.dataset, self, arr)
             else
-              model.where(arr.map{|x| [x, send(x)]})
+              vals = arr.map{|x| send(x)}
+              next unless vals.all?
+              model.where(arr.zip(vals))
             end
             ds = yield(ds) if block_given?
             ds = ds.exclude(pk_hash) unless new?

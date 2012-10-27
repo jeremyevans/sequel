@@ -385,6 +385,7 @@ module Sequel
             error_field = a
             a = Array(a)
             v = Array(v)
+            next if v.empty? || !v.all?
             ds = o.class.filter(a.zip(v))
             num_dups = ds.count
             allow = if num_dups == 0

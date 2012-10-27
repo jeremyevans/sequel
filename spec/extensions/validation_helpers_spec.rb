@@ -331,6 +331,11 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @user = @c.load(:id=>3, :username => "0records", :password => "anothertest")
     @user.should be_valid
 
+    MODEL_DB.sqls
+    @user = @c.new(:password => "anothertest")
+    @user.should be_valid
+    MODEL_DB.sqls.should == []
+
     @user = @c.new(:username => "1record", :password => "anothertest")
     @user.should_not be_valid
     @user.errors.full_messages.should == ['username is already taken']
@@ -368,6 +373,18 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @user.should be_valid
     @user = @c.load(:id=>3, :username => "0records", :password => "anothertest")
     @user.should be_valid
+
+    MODEL_DB.sqls
+    @user = @c.new(:password => "anothertest")
+    @user.should be_valid
+    @user.errors.full_messages.should == []
+    @user = @c.new(:username => "0records")
+    @user.should be_valid
+    @user.errors.full_messages.should == []
+    @user = @c.new
+    @user.should be_valid
+    @user.errors.full_messages.should == []
+    MODEL_DB.sqls.should == []
 
     @user = @c.new(:username => "1record", :password => "anothertest")
     @user.should_not be_valid
