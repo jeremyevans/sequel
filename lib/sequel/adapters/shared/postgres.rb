@@ -97,6 +97,7 @@ module Sequel
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
       FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'.freeze=>:no_action, 'r'.freeze=>:restrict, 'c'.freeze=>:cascade, 'n'.freeze=>:set_null, 'd'.freeze=>:set_default}.freeze
       POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/
+      UNLOGGED = 'UNLOGGED '.freeze
 
       # SQL fragment for custom sequences (ones not created by serial primary key),
       # Returning the schema and literal form of the sequence name, by parsing
@@ -632,6 +633,22 @@ module Sequel
       # SQL for creating a schema.
       def create_schema_sql(name)
         "CREATE SCHEMA #{quote_identifier(name)}"
+      end
+
+      # SQL fragment for unlogged table.
+      def unlogged_table_sql
+        self.class.const_get(:UNLOGGED)
+      end
+
+      # DDL statement for creating a table with the given name, columns, and options
+      def create_table_prefix_sql(name, options)
+        raise(Error, "can't provide both :temp and :unlogged to create_table") if options[:temp] && options[:unlogged]
+        temp_or_unlogged_sql = if options[:temp]
+                                 temporary_table_sql
+                               elsif options[:unlogged]
+                                 unlogged_table_sql
+                               end
+        "CREATE #{temp_or_unlogged_sql}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"
       end
 
       # Use a PostgreSQL-specific create table generator

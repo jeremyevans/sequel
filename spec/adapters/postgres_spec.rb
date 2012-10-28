@@ -17,6 +17,37 @@ POSTGRES_DB.loggers << logger
 
 #POSTGRES_DB.instance_variable_set(:@server_version, 80200)
 
+describe "PostgreSQL", '#create_table' do
+  before do
+    @db = POSTGRES_DB
+    POSTGRES_DB.sqls.clear
+  end
+  after do
+    @db.drop_table?(:tmp_dolls)
+    @db.drop_table?(:unlogged_dolls)
+  end
+
+  specify "should create a temporary table" do
+    @db.create_table(:tmp_dolls, :temp => true){text :name}
+    check_sqls do
+      @db.sqls.should == ['CREATE TEMPORARY TABLE "tmp_dolls" ("name" text)']
+    end
+  end
+
+  specify "should create an unlogged table" do
+    @db.create_table(:unlogged_dolls, :unlogged => true){text :name}
+    check_sqls do
+      @db.sqls.should == ['CREATE UNLOGGED TABLE "unlogged_dolls" ("name" text)']
+    end
+  end
+
+  specify "should not allow to pass both :temp and :unlogged" do
+    proc do
+      @db.create_table(:temp_unlogged_dolls, :temp => true, :unlogged => true){text :name}
+    end.should raise_error(Sequel::Error, "can't provide both :temp and :unlogged to create_table")
+  end
+end
+
 describe "A PostgreSQL database" do
   before(:all) do
     @db = POSTGRES_DB
