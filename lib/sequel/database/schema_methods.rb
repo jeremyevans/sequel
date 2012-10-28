@@ -154,6 +154,9 @@ module Sequel
     # :collate :: The collation to use for the table.
     # :engine :: The table engine to use for the table.
     #
+    # PostgreSQL specific options:
+    # :unlogged :: Create the table as an unlogged table.
+    #
     # See <tt>Schema::Generator</tt> and the {"Schema Modification" guide}[link:files/doc/schema_modification_rdoc.html].
     def create_table(name, options={}, &block)
       remove_cached_schema(name)
