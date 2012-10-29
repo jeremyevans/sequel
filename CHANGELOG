@@ -1,6 +1,10 @@
 === HEAD
 
+* Add Sequel.delay for generic delayed evaluation (jeremyevans)
+
 * Make uniqueness validations correctly handle nil values (jeremyevans)
+
+* Support :unlogged option for create_table on PostgreSQL (JonathanTron) (#575)
 
 * Add ConnectionPool#pool_type to get the type of connection pool in use (jeremyevans)
 

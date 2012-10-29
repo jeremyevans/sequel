@@ -966,3 +966,27 @@ describe "Sequel.recursive_map" do
     Sequel.recursive_map([[nil]], proc{|s| s.to_i}).should == [[nil]]
   end
 end
+
+describe "Sequel.delay" do
+  specify "should delay calling the block until literalization" do
+    o = Class.new do
+      def a
+        @a ||= 0
+        @a += 1
+      end
+      def _a
+        @a
+      end
+    end.new
+    ds = Sequel.mock[:b].where(:a=>Sequel.delay{o.a})
+    o._a.should be_nil
+    ds.sql.should == "SELECT * FROM b WHERE (a = 1)"
+    o._a.should == 1
+    ds.sql.should == "SELECT * FROM b WHERE (a = 2)"
+    o._a.should == 2
+  end
+
+  specify "should raise if called without a block" do
+    proc{Sequel.delay}.should raise_error(Sequel::Error)
+  end
+end

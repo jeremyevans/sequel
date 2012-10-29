@@ -290,6 +290,7 @@ module Sequel
       column_all_sql
       complex_expression_sql
       constant_sql
+      delayed_evaluation_sql
       function_sql
       join_clause_sql
       join_on_clause_sql
@@ -493,6 +494,12 @@ module Sequel
     # SQL fragment for constants
     def constant_sql_append(sql, constant)
       sql << constant.to_s
+    end
+
+    # SQL fragment for delayed evaluations, evaluating the
+    # object and literalizing the returned value.
+    def delayed_evaluation_sql_append(sql, callable)
+      literal_append(sql, callable.call)
     end
 
     # SQL fragment specifying an emulated SQL function call.

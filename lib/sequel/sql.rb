@@ -377,6 +377,27 @@ module Sequel
         SQL::EmulatedFunction.new(:char_length, arg)
       end
 
+      # Return a delayed evaluation that uses the passed block. This is used
+      # to delay evaluations of the code to runtime.  For example, with
+      # the following code:
+      #
+      #   ds = DB[:table].where{column > Time.now}
+      #
+      # The filter is fixed to the time that where was called. Unless you are
+      # only using the dataset once immediately after creating it, that's
+      # probably not desired.  If you just want to set it to the time when the
+      # query is sent to the database, you can wrap it in Sequel.delay:
+      #
+      #   ds = DB[:table].where{column > Sequel.delay{Time.now}}
+      #
+      # Note that for dates and timestamps, you are probably better off using
+      # Sequel::CURRENT_DATE and Sequel::CURRENT_TIMESTAMP instead of this
+      # generic delayed evaluation facility.
+      def delay(&block)
+        raise(Error, "Sequel.delay requires a block") unless block
+        SQL::DelayedEvaluation.new(block)
+      end
+
       # Order the given argument descending.
       # Options:
       #
@@ -1138,6 +1159,21 @@ module Sequel
       # A hash of the opposite for each constant, used for inverting constants.
       CONSTANT_INVERSIONS = {Constants::TRUE=>Constants::FALSE, Constants::FALSE=>Constants::TRUE,
                              Constants::NULL=>Constants::NOTNULL, Constants::NOTNULL=>Constants::NULL}
+    end
+
+    # Represents a delayed evaluation, encapsulating a callable
+    # object which returns the value to use when called.
+    class DelayedEvaluation < GenericExpression
+      # A callable object that returns the value of the evaluation
+      # when called. 
+      attr_reader :callable
+
+      # Set the callable object
+      def initialize(callable)
+        @callable = callable
+      end
+
+      to_s_method :delayed_evaluation_sql, '@callable'
     end
 
     # Represents an SQL function call.

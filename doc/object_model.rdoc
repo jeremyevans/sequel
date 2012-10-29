@@ -395,6 +395,35 @@ These objects are usually used as values in queries:
 
   DB[:table].insert(:time=>Sequel::CURRENT_TIMESTAMP)
 
+=== Sequel::SQL::DelayedEvaluation
+
+Sequel::SQL::DelayedEvaluation objects represent an evaluation that is delayed
+until query literalization.
+
+  Sequel::SQL::DelayedEvaluation.new(proc{some_model.updated_at})
+
+The following shortcut exists for creating Sequel::SQL::DelayedEvaluation
+objects:
+
+  Sequel.delay{some_model.updated_at}
+
+Note how Sequel.delay requires a block, while Sequel::SQL::DelayedEvaluation.new
+accepts a generic callable object.
+
+Let's say you wanted a dataset for the number of objects greater than some
+attribute of another object:
+
+  ds = DB[:table].where{updated_at > some_model.updated_at}
+
+The problem with the above query is that it evaluates "some_model.updated_at"
+statically, so if you change some_model.updated_at later, it won't affect this
+dataset.  You can use Sequel.delay to fix this:
+
+  ds = DB[:table].where{updated_at > Sequel.delay{some_model.updated_at}}
+
+This will evaluate "some_model.updated_at" every time you literalize the
+dataset (usually every time it is executed).
+
 === Sequel::SQL::Function
 
 Sequel::SQL::Function objects represents database function calls, which take a function
