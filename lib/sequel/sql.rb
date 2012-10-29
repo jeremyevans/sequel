@@ -962,27 +962,33 @@ module Sequel
       #   ~from_value_pairs(hash)
       #   from_value_pairs(hash, :OR, true)
       def self.from_value_pairs(pairs, op=:AND, negate=false)
-        pairs = pairs.collect do |l,r|
-          ce = case r
-          when Range
-            new(:AND, new(:>=, l, r.begin), new(r.exclude_end? ? :< : :<=, l, r.end))
-          when ::Array, ::Sequel::Dataset
-            new(:IN, l, r)
-          when NegativeBooleanConstant
-            new(:"IS NOT", l, r.constant)
-          when BooleanConstant
-            new(:IS, l, r.constant)
-          when NilClass, TrueClass, FalseClass
-            new(:IS, l, r)
-          when Regexp
-            StringExpression.like(l, r)
-          else
-            new(:'=', l, r)
-          end
-          negate ? invert(ce) : ce
-        end
+        pairs = pairs.map{|l,r| from_value_pair(l, r)}
+        pairs.map!{|ce| invert(ce)} if negate
         pairs.length == 1 ? pairs.at(0) : new(op, *pairs)
       end
+
+      # Return a BooleanExpression based on the right side of the pair.
+      def self.from_value_pair(l, r)
+        case r
+        when Range
+          new(:AND, new(:>=, l, r.begin), new(r.exclude_end? ? :< : :<=, l, r.end))
+        when ::Array, ::Sequel::Dataset
+          new(:IN, l, r)
+        when NegativeBooleanConstant
+          new(:"IS NOT", l, r.constant)
+        when BooleanConstant
+          new(:IS, l, r.constant)
+        when NilClass, TrueClass, FalseClass
+          new(:IS, l, r)
+        when Regexp
+          StringExpression.like(l, r)
+        when DelayedEvaluation
+          Sequel.delay{from_value_pair(l, r.callable.call)}
+        else
+          new(:'=', l, r)
+        end
+      end
+      private_class_method :from_value_pair
       
       # Invert the expression, if possible.  If the expression cannot
       # be inverted, raise an error.  An inverted expression should match everything that the

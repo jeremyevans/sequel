@@ -968,8 +968,8 @@ describe "Sequel.recursive_map" do
 end
 
 describe "Sequel.delay" do
-  specify "should delay calling the block until literalization" do
-    o = Class.new do
+  before do
+    @o = Class.new do
       def a
         @a ||= 0
         @a += 1
@@ -977,13 +977,27 @@ describe "Sequel.delay" do
       def _a
         @a
       end
+
+      attr_accessor :b
     end.new
-    ds = Sequel.mock[:b].where(:a=>Sequel.delay{o.a})
-    o._a.should be_nil
+  end
+
+  specify "should delay calling the block until literalization" do
+    ds = Sequel.mock[:b].where(:a=>Sequel.delay{@o.a})
+    @o._a.should be_nil
     ds.sql.should == "SELECT * FROM b WHERE (a = 1)"
-    o._a.should == 1
+    @o._a.should == 1
     ds.sql.should == "SELECT * FROM b WHERE (a = 2)"
-    o._a.should == 2
+    @o._a.should == 2
+  end
+
+  specify "should have the condition specifier handling respect delayed evaluations" do
+    ds = Sequel.mock[:b].where(:a=>Sequel.delay{@o.b})
+    ds.sql.should == "SELECT * FROM b WHERE (a IS NULL)"
+    @o.b = 1
+    ds.sql.should == "SELECT * FROM b WHERE (a = 1)"
+    @o.b = [1, 2]
+    ds.sql.should == "SELECT * FROM b WHERE (a IN (1, 2))"
   end
 
   specify "should raise if called without a block" do
