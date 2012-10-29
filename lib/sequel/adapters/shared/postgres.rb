@@ -635,19 +635,14 @@ module Sequel
         "CREATE SCHEMA #{quote_identifier(name)}"
       end
 
-      # SQL fragment for unlogged table.
-      def unlogged_table_sql
-        self.class.const_get(:UNLOGGED)
-      end
-
       # DDL statement for creating a table with the given name, columns, and options
       def create_table_prefix_sql(name, options)
-        raise(Error, "can't provide both :temp and :unlogged to create_table") if options[:temp] && options[:unlogged]
         temp_or_unlogged_sql = if options[:temp]
-                                 temporary_table_sql
-                               elsif options[:unlogged]
-                                 unlogged_table_sql
-                               end
+         raise(Error, "can't provide both :temp and :unlogged to create_table") if options[:unlogged]
+         temporary_table_sql
+       elsif options[:unlogged]
+         UNLOGGED
+       end
         "CREATE #{temp_or_unlogged_sql}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"
       end
 
