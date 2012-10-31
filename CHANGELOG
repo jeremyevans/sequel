@@ -1,5 +1,7 @@
 === HEAD
 
+* Add bin/sequel usage guide (jeremyevans)
+
 * Make Dataset#reverse and #reverse_order accept virtual row blocks (jeremyevans)
 
 * Add Sequel.delay for generic delayed evaluation (jeremyevans)
