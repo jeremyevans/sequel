@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#reverse and #reverse_order accept virtual row blocks (jeremyevans)
+
 * Add Sequel.delay for generic delayed evaluation (jeremyevans)
 
 * Make uniqueness validations correctly handle nil values (jeremyevans)

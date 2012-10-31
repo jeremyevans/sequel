@@ -755,15 +755,17 @@ module Sequel
     # given, the existing order is inverted.
     #
     #   DB[:items].reverse(:id) # SELECT * FROM items ORDER BY id DESC
+    #   DB[:items].reverse{foo(bar)} # SELECT * FROM items ORDER BY foo(bar) DESC
     #   DB[:items].order(:id).reverse # SELECT * FROM items ORDER BY id DESC
     #   DB[:items].order(:id).reverse(Sequel.desc(:name)) # SELECT * FROM items ORDER BY name ASC
-    def reverse(*order)
+    def reverse(*order, &block)
+      virtual_row_columns(order, block)
       order(*invert_order(order.empty? ? @opts[:order] : order))
     end
 
     # Alias of +reverse+
-    def reverse_order(*order)
-      reverse(*order)
+    def reverse_order(*order, &block)
+      reverse(*order, &block)
     end
 
     # Returns a copy of the dataset with the columns selected changed

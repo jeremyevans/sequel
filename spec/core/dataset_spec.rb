@@ -1588,6 +1588,15 @@ describe "Dataset#reverse_order" do
   specify "should have #reverse alias" do
     @dataset.order(:name).reverse.sql.should == 'SELECT * FROM test ORDER BY name DESC'
   end
+
+  specify "should accept a block" do
+    @dataset.reverse{name}.sql.should == 'SELECT * FROM test ORDER BY name DESC'
+    @dataset.reverse_order{name}.sql.should == 'SELECT * FROM test ORDER BY name DESC'
+    @dataset.reverse(:foo){name}.sql.should == 'SELECT * FROM test ORDER BY foo DESC, name DESC'
+    @dataset.reverse_order(:foo){name}.sql.should == 'SELECT * FROM test ORDER BY foo DESC, name DESC'
+    @dataset.reverse(Sequel.desc(:foo)){name}.sql.should == 'SELECT * FROM test ORDER BY foo ASC, name DESC'
+    @dataset.reverse_order(Sequel.desc(:foo)){name}.sql.should == 'SELECT * FROM test ORDER BY foo ASC, name DESC'
+  end
 end
 
 describe "Dataset#limit" do
