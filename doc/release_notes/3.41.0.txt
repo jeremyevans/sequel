@@ -1,0 +1,155 @@
+= New Features
+
+* A connection_validator extension has been added, which
+  automatically determines if connections checked out from the pool
+  are still valid.  If they are not valid, the connection is
+  disconnected and another connection is used automatically,
+  transparent to user code.
+
+  Checking if connections are valid requires a query, so this
+  extension causes a performance hit.  For that reason, connections
+  are only checked by default if they have been inactive for more than
+  a configured amount of time (1 hour by default).  You can choose to
+  validate connections on every checkout via:
+
+    DB.pool.connection_validation_timeout = -1
+
+  However, this can cause a substantial performance hit unless you are
+  purposely using coarse connection checkouts via manual calls to
+  Database#synchronize (for example, in a Rack middleware).  Using
+  coarse checkouts can greatly reduce the amount of concurrency that
+  Sequel supports (for example, limiting the number of concurrent
+  requests to the number of database connections), so this method is
+  not without its tradeoffs.
+
+* Sequel.delay has been added for a generic form of delayed
+  evaluation.  This method takes a block and delays evaluating it
+  until query literalization.  By default, Sequel evaluates most
+  arguments immediately:
+
+    foo = 1
+    ds = DB[:bar].where(:baz=>foo)
+    # SELECT * FROM bar WHERE (baz = 1)
+    foo = 2
+    ds
+    # SELECT * FROM bar WHERE (baz = 1)
+
+  Using Sequel.delay, you can delay the evaluation:
+
+    foo = 1
+    ds = DB[:bar].where(:baz=>Sequel.delay{foo})
+    # SELECT * FROM bar WHERE (baz = 1)
+    foo = 2
+    ds
+    # SELECT * FROM bar WHERE (baz = 2)
+
+* Sequel now supports the :unlogged option when creating tables on
+  PostgreSQL, to create an UNLOGGED table.
+
+* On SQLite, Database#transaction now supports a :mode option for
+  setting up IMMEDIATE/EXCLUSIVE SQLite transactions.  Sequel also
+  supports a Database#transaction_mode accessor for setting the
+  default transaction mode on SQLite.
+
+* Most pg_* extension objects (e.g. PGArray) now support the #as
+  method for creating an SQL::AliasedExpression object.
+
+* The single_table_inheritance plugin now supports non-bijective
+  mappings.  In lay terms, this means that a one-to-one mapping
+  of column values to classes is no longer required.  You can now
+  have multiple column values that map to a single class in the
+  :model_map option, and specify a :key_chooser option to choose
+  which column value to use for the given model class.
+
+* The touch plugin now handles the touching of many_to_many
+  associations, and other associations that use joined datasets.
+
+* ConnectionPool#pool_type has been added. It returns a symbol
+  representing the type of connection pool in use (similar to
+  Database#database_type).
+
+* Database#valid_connection? has been added for checking if a given
+  connection is still valid.
+
+* Database#disconnect_connection is now part of the public API, and
+  can be used to disconnect a given connection.
+
+= Other Improvements
+
+* Uniqueness validation now correctly handles nil values.
+  Previously, it checked the underlying table for other rows where
+  the column IS NULL, but that is incorrect behavior.  Sequel's new
+  (correct) behavior is to skip the uniqueness check if the column
+  is nil.
+
+* Foreign key parsing is now supported on Microsoft SQL Server.
+
+* Dataset#reverse and #reverse_order now accept virtual row blocks.
+
+* Changing the name of the primary key column, and possibly other
+  schema changes on the primary key column, are now supported on
+  MySQL.
+
+* Primary key columns are now specifically marked as NOT NULL on
+  SQLite, as non-integer primary keys on SQLite are not considered
+  NOT NULL by default.
+
+* Failure to create a native prepared statement is now handled
+  better in the postgres, mysql, and mysql2 adapters.
+
+* Firebird now emulates selecting data without an underlying table
+  (e.g. DB.get(1)).
+
+* Finding the name of the constraint that sets column defaults on
+  Microsoft SQL Server now works correctly on JRuby 1.7.
+
+* An additional type of disconnect error is now recognized in the
+  jdbc/sqlserver adapter.
+
+* Many adapters have been fixed so that they don't raise an exception
+  if trying to disconnect an already disconnected connection.
+
+* Many adapters have been fixed so that
+  Database#log_connection_execute logs and executes the given SQL
+  on the connection.
+
+* Many adapters have been fixed so that
+  Database#database_error_classes returns an array of database
+  exception classes for that adapter.
+
+* Database#log_exception now handles a nil exception message.
+
+* Dataset#limit(nil, nil) now resets offset in addition to limit, but
+  you should still use Dataset#unlimited instead.
+
+* A bin/sequel usage quide has been added to the documentation.
+
+= Backwards Compatibility
+
+* Sequel now treats clob columns as strings instead of blobs
+  (except on DB2 when use_clob_as_blob = true).  This can make it
+  so the values are returned as strings instead of SQL::Blob values.
+  Since SQL::Blob is a String subclass, this generally will
+  not affect user code unless you are passing the values as input
+  to a separate blob column.
+
+* The Database <-> ConnectionPool interface was completely changed.
+  Sequel no longer supports custom connection procs or disconnection
+  procs in the connection pools.  The :disconnection_proc Database
+  option is no longer respected, and blocks passed to Database.new
+  are now ignored.
+
+  This change should not be user-visible, but if you had any code
+  that was monkeying with the connection pool internals, you may
+  need to modify it.
+
+* Code that was using the uniqueness check to also check for presence
+  should add a separate check for presence.  Such code was broken,
+  as it only worked if there was already a NULL column value in the
+  table. If you were relying on this broken behavior, you should
+  clean up the NULL data in the column and then mark the database
+  column as NOT NULL.
+
+* If you have code that specifically abuses the fact that non-integer
+  primary keys on SQLite allow NULL values by default, it will no
+  longer work.
