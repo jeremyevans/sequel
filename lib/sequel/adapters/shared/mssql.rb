@@ -380,6 +380,7 @@ module Sequel
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'with insert into columns output values')
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with select distinct limit columns into from lock join where group having order compounds')
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with update limit table set output from where')
+      UPDATE_CLAUSE_METHODS_2000 = Dataset.clause_methods(:update, %w'update table set output from where')
       NOLOCK = ' WITH (NOLOCK)'.freeze
       UPDLOCK = ' WITH (UPDLOCK)'.freeze
       WILDCARD = LiteralString.new('*').freeze
@@ -801,10 +802,15 @@ module Sequel
       alias delete_output_sql output_sql
       alias update_output_sql output_sql
 
-      # MSSQL supports the OUTPUT clause for UPDATE statements.
-      # It also allows prepending a WITH clause.
+      # MSSQL supports the OUTPUT and TOP clause for UPDATE statements.
+      # It also allows prepending a WITH clause.  For MSSQL 2000
+      # and below, exclude WITH and TOP.
       def update_clause_methods
-        UPDATE_CLAUSE_METHODS
+        if is_2005_or_later?
+          UPDATE_CLAUSE_METHODS
+        else
+          UPDATE_CLAUSE_METHODS_2000
+        end
       end
 
       # Only include the primary table in the main update clause

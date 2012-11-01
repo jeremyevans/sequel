@@ -1,3 +1,7 @@
+=== HEAD
+
+* Make Dataset#update not use a limit (TOP) on Microsoft SQL Server 2000 (jeremyevans) (#578)
+
 === 3.41.0 (2012-11-01)
 
 * Add bin/sequel usage guide (jeremyevans)
