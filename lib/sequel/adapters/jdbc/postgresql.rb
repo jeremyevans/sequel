@@ -17,6 +17,37 @@ module Sequel
         def self.extended(db)
           db.send(:initialize_postgres_adapter)
         end
+
+        # See Sequel::Postgres::Adapter#copy_into
+        def copy_into(table, opts={})
+          data = opts[:data]
+          data = Array(data) if data.is_a?(String)
+
+          if block_given? && data
+            raise Error, "Cannot provide both a :data option and a block to copy_into"
+          elsif !block_given? && !data
+            raise Error, "Must provide either a :data option or a block to copy_into"
+          end
+
+          transaction(opts) do |conn|
+            begin
+              copy_manager = org.postgresql.copy.CopyManager.new(conn)
+              copier = copy_manager.copy_in(copy_into_sql(table, opts))
+              if block_given?
+                while buf = yield
+                  copier.writeToCopy(buf.to_java_bytes, 0, buf.length)
+                end
+              else
+                data.each { |d| copier.writeToCopy(d.to_java_bytes, 0, d.length) }
+              end
+            rescue Exception => e
+              copier.endCopy
+              raise
+            ensure
+              copier.endCopy unless e
+            end
+          end
+        end
         
         private
         
