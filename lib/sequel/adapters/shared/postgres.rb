@@ -603,6 +603,42 @@ module Sequel
         end
       end
 
+      # SQL for doing fast table insert from stdin.
+      def copy_into_sql(table, opts)
+        sql = "COPY #{literal(table)}"
+        if cols = opts[:columns]
+          sql << literal(Array(cols))
+        end
+        sql << " FROM STDIN"
+        if opts[:options] || opts[:format]
+          sql << " ("
+          sql << "FORMAT #{opts[:format]}" if opts[:format]
+          sql << "#{', ' if opts[:format]}#{opts[:options]}" if opts[:options]
+          sql << ')'
+        end
+        sql
+      end
+
+      # SQL for doing fast table output to stdout.
+      def copy_table_sql(table, opts)
+         if table.is_a?(String)
+           return table
+         else
+           if opts[:options] || opts[:format]
+             options = " ("
+             options << "FORMAT #{opts[:format]}" if opts[:format]
+             options << "#{', ' if opts[:format]}#{opts[:options]}" if opts[:options]
+             options << ')'
+           end
+           table = if table.is_a?(::Sequel::Dataset)
+             "(#{table.sql})"
+           else
+             literal(table)
+           end
+          return "COPY #{table} TO STDOUT#{options}"
+         end
+       end
+
       # SQL statement to create database function.
       def create_function_sql(name, definition, opts={})
         args = opts[:args]
