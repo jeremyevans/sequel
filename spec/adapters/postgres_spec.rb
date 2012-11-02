@@ -1263,9 +1263,7 @@ if ((POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || POST
       proc{@db.copy_into(:test_copy)}.should raise_error(Sequel::Error)
     end
   end
-end
 
-if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRES_DB.server_version >= 90000
   describe "Postgres::Database#copy_table" do
     before(:all) do
       @db = POSTGRES_DB
@@ -1336,7 +1334,9 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
       @db[:test_copy].select_order_map(:x).should == [1, 3]
     end
   end
+end
 
+if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRES_DB.server_version >= 90000
   describe "Postgres::Database LISTEN/NOTIFY" do
     before(:all) do
       @db = POSTGRES_DB
