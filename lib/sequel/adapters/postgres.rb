@@ -268,24 +268,8 @@ module Sequel
         # per row.  If a block is not provided, a single string is returned with all
         # of the data.
         def copy_table(table, opts={})
-          sql = if table.is_a?(String)
-            sql = table
-          else
-            if opts[:options] || opts[:format]
-              options = " ("
-              options << "FORMAT #{opts[:format]}" if opts[:format]
-              options << "#{', ' if opts[:format]}#{opts[:options]}" if opts[:options]
-              options << ')'
-            end
-            table = if table.is_a?(::Sequel::Dataset)
-              "(#{table.sql})"
-            else
-              literal(table)
-            end
-           sql = "COPY #{table} TO STDOUT#{options}"
-          end
-          synchronize(opts[:server]) do |conn| 
-            conn.execute(sql)
+          synchronize(opts[:server]) do |conn|
+            conn.execute(copy_table_sql(table, opts))
             begin
               if block_given?
                 while buf = conn.get_copy_data
@@ -323,18 +307,6 @@ module Sequel
         # If a block is provided and :data option is not, this will yield to the block repeatedly.
         # The block should return a string, or nil to signal that it is finished.
         def copy_into(table, opts={})
-          sql = "COPY #{literal(table)}"
-          if cols = opts[:columns]
-            sql << literal(Array(cols))
-          end
-          sql << " FROM STDIN"
-          if opts[:options] || opts[:format]
-            sql << " ("
-            sql << "FORMAT #{opts[:format]}" if opts[:format]
-            sql << "#{', ' if opts[:format]}#{opts[:options]}" if opts[:options]
-            sql << ')'
-          end
-          
           data = opts[:data]
           data = Array(data) if data.is_a?(String)
 
@@ -344,8 +316,8 @@ module Sequel
             raise Error, "Must provide either a :data option or a block to copy_into"
           end
 
-          synchronize(opts[:server]) do |conn| 
-            conn.execute(sql)
+          synchronize(opts[:server]) do |conn|
+            conn.execute(copy_into_sql(table, opts))
             begin
               if block_given?
                 while buf = yield
