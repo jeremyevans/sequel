@@ -1,5 +1,7 @@
 === HEAD
 
+* Support Database#copy_table and #copy_into on jdbc/postgres (bdon) (#580)
+
 * Make Dataset#update not use a limit (TOP) on Microsoft SQL Server 2000 (jeremyevans) (#578)
 
 === 3.41.0 (2012-11-01)

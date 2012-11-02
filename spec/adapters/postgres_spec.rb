@@ -1222,7 +1222,79 @@ if POSTGRES_DB.adapter_scheme == :postgres
   end
 end
 
-if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRES_DB.server_version >= 90000
+if ((POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || POSTGRES_DB.adapter_scheme == :jdbc) && POSTGRES_DB.server_version >= 90000
+  describe "Postgres::Database#copy_into" do
+    before(:all) do
+      @db = POSTGRES_DB
+      @db.create_table!(:test_copy){Integer :x; Integer :y}
+      @ds = @db[:test_copy].order(:x, :y)
+    end
+    before do
+      @db[:test_copy].delete
+    end
+    after(:all) do
+      @db.drop_table?(:test_copy)
+    end
+
+    specify "should work with a :data option containing data in PostgreSQL text format" do
+      @db.copy_into(:test_copy, :data=>"1\t2\n3\t4\n")
+      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+    end
+
+    specify "should work with :format=>:csv option and :data option containing data in CSV format" do
+      @db.copy_into(:test_copy, :format=>:csv, :data=>"1,2\n3,4\n")
+      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+    end
+
+    specify "should respect given :options" do
+      @db.copy_into(:test_copy, :options=>"FORMAT csv, HEADER TRUE", :data=>"x,y\n1,2\n3,4\n")
+      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+    end
+
+    specify "should respect given :options options when :format is used" do
+      @db.copy_into(:test_copy, :options=>"QUOTE '''', DELIMITER '|'", :format=>:csv, :data=>"'1'|'2'\n'3'|'4'\n")
+      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+    end
+
+    specify "should accept :columns option to online copy the given columns" do
+      @db.copy_into(:test_copy, :data=>"1\t2\n3\t4\n", :columns=>[:y, :x])
+      @ds.select_map([:x, :y]).should == [[2, 1], [4, 3]]
+    end
+
+    specify "should accept a block and use returned values for the copy in data stream" do
+      buf = ["1\t2\n", "3\t4\n"]
+      @db.copy_into(:test_copy){buf.shift}
+      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+    end
+
+    specify "should work correctly with a block and :format=>:csv" do
+      buf = ["1,2\n", "3,4\n"]
+      @db.copy_into(:test_copy, :format=>:csv){buf.shift}
+      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+    end
+
+    specify "should accept an enumerable as the :data option" do
+      @db.copy_into(:test_copy, :data=>["1\t2\n", "3\t4\n"])
+      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+    end
+
+    specify "should have an exception, cause a rollback of copied data and still have a usable connection" do
+      2.times do
+        sent = false
+        proc{@db.copy_into(:test_copy){raise ArgumentError if sent; sent = true; "1\t2\n"}}.should raise_error(ArgumentError)
+        @ds.select_map([:x, :y]).should == []
+      end
+    end
+
+    specify "should raise an Error if both :data and a block are provided" do
+      proc{@db.copy_into(:test_copy, :data=>["1\t2\n", "3\t4\n"]){}}.should raise_error(Sequel::Error)
+    end
+
+    specify "should raise an Error if neither :data or a block are provided" do
+      proc{@db.copy_into(:test_copy)}.should raise_error(Sequel::Error)
+    end
+  end
+
   describe "Postgres::Database#copy_table" do
     before(:all) do
       @db = POSTGRES_DB
@@ -1293,79 +1365,9 @@ if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRE
       @db[:test_copy].select_order_map(:x).should == [1, 3]
     end
   end
+end
 
-  describe "Postgres::Database#copy_table_from" do
-    before(:all) do
-      @db = POSTGRES_DB
-      @db.create_table!(:test_copy){Integer :x; Integer :y}
-      @ds = @db[:test_copy].order(:x, :y)
-    end
-    before do
-      @db[:test_copy].delete
-    end
-    after(:all) do
-      @db.drop_table?(:test_copy)
-    end
-
-    specify "should work with a :data option containing data in PostgreSQL text format" do
-      @db.copy_into(:test_copy, :data=>"1\t2\n3\t4\n")
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
-    end
-
-    specify "should work with :format=>:csv option and :data option containing data in CSV format" do
-      @db.copy_into(:test_copy, :format=>:csv, :data=>"1,2\n3,4\n")
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
-    end
-
-    specify "should respect given :options" do
-      @db.copy_into(:test_copy, :options=>"FORMAT csv, HEADER TRUE", :data=>"x,y\n1,2\n3,4\n")
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
-    end
-
-    specify "should respect given :options options when :format is used" do
-      @db.copy_into(:test_copy, :options=>"QUOTE '''', DELIMITER '|'", :format=>:csv, :data=>"'1'|'2'\n'3'|'4'\n")
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
-    end
-
-    specify "should accept :columns option to online copy the given columns" do
-      @db.copy_into(:test_copy, :data=>"1\t2\n3\t4\n", :columns=>[:y, :x])
-      @ds.select_map([:x, :y]).should == [[2, 1], [4, 3]]
-    end
-
-    specify "should accept a block and use returned values for the copy in data stream" do
-      buf = ["1\t2\n", "3\t4\n"]
-      @db.copy_into(:test_copy){buf.shift}
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
-    end
-
-    specify "should work correctly with a block and :format=>:csv" do
-      buf = ["1,2\n", "3,4\n"]
-      @db.copy_into(:test_copy, :format=>:csv){buf.shift}
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
-    end
-
-    specify "should accept an enumerable as the :data option" do
-      @db.copy_into(:test_copy, :data=>["1\t2\n", "3\t4\n"])
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
-    end
-
-    specify "should have an exception should cause a rollback of copied data and still have a usable connection" do
-      2.times do
-        sent = false
-        proc{@db.copy_into(:test_copy){raise ArgumentError if sent; sent = true; "1\t2\n"}}.should raise_error(ArgumentError)
-        @ds.select_map([:x, :y]).should == []
-      end
-    end
-
-    specify "should raise an Error if both :data and a block are provided" do
-      proc{@db.copy_into(:test_copy, :data=>["1\t2\n", "3\t4\n"]){}}.should raise_error(Sequel::Error)
-    end
-
-    specify "should raise an Error if neither :data or a block are provided" do
-      proc{@db.copy_into(:test_copy)}.should raise_error(Sequel::Error)
-    end
-  end
-
+if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRES_DB.server_version >= 90000
   describe "Postgres::Database LISTEN/NOTIFY" do
     before(:all) do
       @db = POSTGRES_DB

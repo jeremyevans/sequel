@@ -232,7 +232,7 @@ module Sequel
     
     # Starts a database transaction.  When a database transaction is used,
     # either all statements are successful or none of the statements are
-    # successful.  Note that MySQL MyISAM tabels do not support transactions.
+    # successful.  Note that MySQL MyISAM tables do not support transactions.
     #
     # The following general options are respected:
     #
