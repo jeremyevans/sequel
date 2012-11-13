@@ -1101,7 +1101,7 @@ module Sequel
       when String
         LiteralString.new("(#{expr})")
       else
-        raise(Error, 'Invalid filter argument')
+        raise(Error, "Invalid filter argument #{expr.inspect}")
       end
     end
     
