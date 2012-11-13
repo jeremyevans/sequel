@@ -304,6 +304,7 @@ END_MIG
         end
       end
       h[:unique] = true if index_opts[:unique]
+      h[:deferrable] = true if index_opts[:deferrable]
       h
     end
 
