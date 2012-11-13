@@ -601,7 +601,7 @@ module Sequel
           sql
         else
           super
-        end
+        end + "#{"#{' NOT' unless constraint[:deferrable]} DEFERRABLE" unless constraint[:deferrable].nil?}"
       end
 
       # SQL for doing fast table insert from stdin.
