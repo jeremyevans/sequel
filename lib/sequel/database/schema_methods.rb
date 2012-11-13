@@ -45,6 +45,9 @@ module Sequel
     # Options:
     # :ignore_errors :: Ignore any DatabaseErrors that are raised
     #
+    # PostgreSQL specific options:
+    # :deferrable :: Allow the constraint to be deferred
+    #
     # See <tt>alter_table</tt>.
     def add_index(table, columns, options={})
       e = options[:ignore_errors]
