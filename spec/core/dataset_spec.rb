@@ -1885,6 +1885,11 @@ describe "Dataset#count" do
     @db.sqls.should == ["SELECT COUNT(*) AS count FROM (SELECT * FROM test LIMIT 5) AS t1 LIMIT 1"]
   end
   
+  specify "should work correctly with offsets" do
+    @dataset.limit(nil, 5).count.should == 1
+    @db.sqls.should == ["SELECT COUNT(*) AS count FROM (SELECT * FROM test OFFSET 5) AS t1 LIMIT 1"]
+  end
+  
   it "should work on a graphed_dataset" do
     @dataset.should_receive(:columns).twice.and_return([:a])
     @dataset.graph(@dataset, [:a], :table_alias=>:test2).count.should == 1

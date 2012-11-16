@@ -206,7 +206,7 @@ module Sequel
     COMMA_SEPARATOR = COMMA
     CONDITION_FALSE = '(1 = 0)'.freeze
     CONDITION_TRUE = '(1 = 1)'.freeze
-    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
+    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :offset, :compounds]
     COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, WILDCARD).as(:count)
     DATASET_ALIAS_BASE_NAME = 't'.freeze
     DEFAULT = LiteralString.new('DEFAULT').freeze
