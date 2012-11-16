@@ -343,16 +343,17 @@ module Sequel
           join(:pg_index___ind, :indrelid=>:oid, im.call(table)=>:relname).
           join(:pg_class___indc, :oid=>:indexrelid).
           join(:pg_attribute___att, :attrelid=>:tab__oid, :attnum=>attnums).
+          left_join(:pg_constraint___con, :conname=>:indc__relname).
           filter(:indc__relkind=>'i', :ind__indisprimary=>false, :indexprs=>nil, :indpred=>nil, :indisvalid=>true).
           order(:indc__relname, SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}, 32, :att__attnum)).
-          select(:indc__relname___name, :ind__indisunique___unique, :att__attname___column)
+          select(:indc__relname___name, :ind__indisunique___unique, :att__attname___column, :con__condeferrable___deferrable)
 
         ds.join!(:pg_namespace___nsp, :oid=>:tab__relnamespace, :nspname=>schema.to_s) if schema
         ds.filter!(:indisready=>true, :indcheckxmin=>false) if server_version >= 80300
 
         indexes = {}
         ds.each do |r|
-          i = indexes[m.call(r[:name])] ||= {:columns=>[], :unique=>r[:unique]}
+          i = indexes[m.call(r[:name])] ||= {:columns=>[], :unique=>r[:unique], :deferrable=>r[:deferrable]}
           i[:columns] << m.call(r[:column])
         end
         indexes
@@ -601,7 +602,7 @@ module Sequel
           sql
         else
           super
-        end
+        end + "#{"#{' NOT' unless constraint[:deferrable]} DEFERRABLE" unless constraint[:deferrable].nil?}"
       end
 
       # SQL for doing fast table insert from stdin.

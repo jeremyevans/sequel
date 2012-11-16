@@ -1,5 +1,9 @@
 === HEAD
 
+* Dump deferrable status of unique indexes on PostgreSQL (radford) (#583)
+
+* Support :deferrable constraints on PostgreSQL (radford) (#583)
+
 * Support Database#copy_table and #copy_into on jdbc/postgres (bdon) (#580)
 
 * Make Dataset#update not use a limit (TOP) on Microsoft SQL Server 2000 (jeremyevans) (#578)

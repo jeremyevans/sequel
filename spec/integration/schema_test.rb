@@ -163,20 +163,23 @@ describe "Database index parsing" do
   end
 
   specify "should parse indexes into a hash" do
+    # Delete :deferrable entry, since not all adapters implement it
+    f = lambda{h = INTEGRATION_DB.indexes(:items); h.values.each{|h2| h2.delete(:deferrable)}; h}
+
     INTEGRATION_DB.create_table!(:items){Integer :n; Integer :a}
-    INTEGRATION_DB.indexes(:items).should == {}
+    f.call.should == {}
     INTEGRATION_DB.add_index(:items, :n)
-    INTEGRATION_DB.indexes(:items).should == {:items_n_index=>{:columns=>[:n], :unique=>false}}
+    f.call.should == {:items_n_index=>{:columns=>[:n], :unique=>false}}
     INTEGRATION_DB.drop_index(:items, :n)
-    INTEGRATION_DB.indexes(:items).should == {}
+    f.call.should == {}
     INTEGRATION_DB.add_index(:items, :n, :unique=>true, :name=>:blah_blah_index)
-    INTEGRATION_DB.indexes(:items).should == {:blah_blah_index=>{:columns=>[:n], :unique=>true}}
+    f.call.should == {:blah_blah_index=>{:columns=>[:n], :unique=>true}}
     INTEGRATION_DB.add_index(:items, [:n, :a])
-    INTEGRATION_DB.indexes(:items).should == {:blah_blah_index=>{:columns=>[:n], :unique=>true}, :items_n_a_index=>{:columns=>[:n, :a], :unique=>false}}
+    f.call.should == {:blah_blah_index=>{:columns=>[:n], :unique=>true}, :items_n_a_index=>{:columns=>[:n, :a], :unique=>false}}
     INTEGRATION_DB.drop_index(:items, :n, :name=>:blah_blah_index)
-    INTEGRATION_DB.indexes(:items).should == {:items_n_a_index=>{:columns=>[:n, :a], :unique=>false}}
+    f.call.should == {:items_n_a_index=>{:columns=>[:n, :a], :unique=>false}}
     INTEGRATION_DB.drop_index(:items, [:n, :a])
-    INTEGRATION_DB.indexes(:items).should == {}
+    f.call.should == {}
   end
   
   specify "should not include a primary key index" do
