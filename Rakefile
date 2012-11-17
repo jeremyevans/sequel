@@ -32,6 +32,18 @@ task :release=>[:package] do
   sh %{gem push ./#{NAME}-#{VERS.call}.gem}
 end
 
+### Website
+
+desc "Make local version of website"
+task :website do
+  sh %{#{FileUtils::RUBY} www/make_www.rb}
+end
+
+desc "Update Non-RDoc section of sequel.rubyforge.org"
+task :website_rf_base=>[:website] do
+  sh %{rsync -rt www/public/*.html rubyforge.org:/var/www/gforge-projects/sequel/}
+end
+
 ### RDoc
 
 RDOC_DEFAULT_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', 'Sequel: The Database Toolkit for Ruby']
@@ -41,54 +53,47 @@ rdoc_task_class = begin
   RDOC_DEFAULT_OPTS.concat(['-f', 'hanna'])
   RDoc::Task
 rescue LoadError
-  require "rake/rdoctask"
-  Rake::RDocTask
+  begin
+    require "rake/rdoctask"
+    Rake::RDocTask
+  rescue LoadError
+  end
 end
 
-RDOC_OPTS = RDOC_DEFAULT_OPTS + ['--main', 'README.rdoc']
+if rdoc_task_class
+  RDOC_OPTS = RDOC_DEFAULT_OPTS + ['--main', 'README.rdoc']
 
-rdoc_task_class.new do |rdoc|
-  rdoc.rdoc_dir = "rdoc"
-  rdoc.options += RDOC_OPTS
-  rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/**/*.rb doc/*.rdoc doc/release_notes/*.txt"
-end
+  rdoc_task_class.new do |rdoc|
+    rdoc.rdoc_dir = "rdoc"
+    rdoc.options += RDOC_OPTS
+    rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/**/*.rb doc/*.rdoc doc/release_notes/*.txt"
+  end if rdoc_task_class
 
-### Website
+  desc "Make rdoc for website"
+  task :website_rdoc=>[:website_rdoc_main, :website_rdoc_adapters, :website_rdoc_plugins]
 
-desc "Make local version of website"
-task :website do
-  sh %{#{FileUtils::RUBY} www/make_www.rb}
-end
+  rdoc_task_class.new(:website_rdoc_main) do |rdoc|
+    rdoc.rdoc_dir = "www/public/rdoc"
+    rdoc.options += RDOC_OPTS
+    rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/*.rb lib/sequel/*.rb lib/sequel/{connection_pool,dataset,database,model}/*.rb doc/*.rdoc doc/release_notes/*.txt lib/sequel/extensions/migration.rb"
+  end
 
-desc "Make rdoc for website"
-task :website_rdoc=>[:website_rdoc_main, :website_rdoc_adapters, :website_rdoc_plugins]
+  rdoc_task_class.new(:website_rdoc_adapters) do |rdoc|
+    rdoc.rdoc_dir = "www/public/rdoc-adapters"
+    rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel'
+    rdoc.rdoc_files.add %w"lib/sequel/adapters/**/*.rb"
+  end
 
-rdoc_task_class.new(:website_rdoc_main) do |rdoc|
-  rdoc.rdoc_dir = "www/public/rdoc"
-  rdoc.options += RDOC_OPTS
-  rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/*.rb lib/sequel/*.rb lib/sequel/{connection_pool,dataset,database,model}/*.rb doc/*.rdoc doc/release_notes/*.txt lib/sequel/extensions/migration.rb"
-end
+  rdoc_task_class.new(:website_rdoc_plugins) do |rdoc|
+    rdoc.rdoc_dir = "www/public/rdoc-plugins"
+    rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel'
+    rdoc.rdoc_files.add %w"lib/sequel/{extensions,plugins}/**/*.rb"
+  end
 
-rdoc_task_class.new(:website_rdoc_adapters) do |rdoc|
-  rdoc.rdoc_dir = "www/public/rdoc-adapters"
-  rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel'
-  rdoc.rdoc_files.add %w"lib/sequel/adapters/**/*.rb"
-end
-
-rdoc_task_class.new(:website_rdoc_plugins) do |rdoc|
-  rdoc.rdoc_dir = "www/public/rdoc-plugins"
-  rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel'
-  rdoc.rdoc_files.add %w"lib/sequel/{extensions,plugins}/**/*.rb"
-end
-
-desc "Update Non-RDoc section of sequel.rubyforge.org"
-task :website_rf_base=>[:website] do
-  sh %{rsync -rt www/public/*.html rubyforge.org:/var/www/gforge-projects/sequel/}
-end
-
-desc "Update sequel.rubyforge.org"
-task :website_rf=>[:website, :website_rdoc] do
-  sh %{rsync -rvt www/public/* rubyforge.org:/var/www/gforge-projects/sequel/}
+  desc "Update sequel.rubyforge.org"
+  task :website_rf=>[:website, :website_rdoc] do
+    sh %{rsync -rvt www/public/* rubyforge.org:/var/www/gforge-projects/sequel/}
+  end
 end
 
 ### Specs
