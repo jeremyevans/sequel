@@ -2387,6 +2387,13 @@ describe "Dataset aggregate methods" do
     d.min(:a).should == 'SELECT min(a) FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
     d.max(:a).should == 'SELECT max(a) FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
   end
+  
+  specify "should accept virtual row blocks" do
+    @d.avg{a(b)}.should == 'SELECT avg(a(b)) FROM test LIMIT 1'
+    @d.sum{a(b)}.should == 'SELECT sum(a(b)) FROM test LIMIT 1'
+    @d.min{a(b)}.should == 'SELECT min(a(b)) FROM test LIMIT 1'
+    @d.max{a(b)}.should == 'SELECT max(a(b)) FROM test LIMIT 1'
+  end
 end
 
 describe "Dataset#range" do
@@ -2411,6 +2418,11 @@ describe "Dataset#range" do
     @ds.order(:stamp).limit(5).range(:stamp).should == (1..10)
     @db.sqls.should == ['SELECT min(stamp) AS v1, max(stamp) AS v2 FROM (SELECT * FROM test ORDER BY stamp LIMIT 5) AS t1 LIMIT 1']
   end
+  
+  specify "should accept virtual row blocks" do
+    @ds.range{a(b)}
+    @db.sqls.should == ["SELECT min(a(b)) AS v1, max(a(b)) AS v2 FROM test LIMIT 1"]
+  end
 end
 
 describe "Dataset#interval" do
@@ -2430,6 +2442,11 @@ describe "Dataset#interval" do
   specify "should use a subselect for the same conditions as count" do
     @ds.order(:stamp).limit(5).interval(:stamp).should == 1234
     @db.sqls.should == ['SELECT (max(stamp) - min(stamp)) FROM (SELECT * FROM test ORDER BY stamp LIMIT 5) AS t1 LIMIT 1']
+  end
+
+  specify "should accept virtual row blocks" do
+    @ds.interval{a(b)}
+    @db.sqls.should == ["SELECT (max(a(b)) - min(a(b))) FROM test LIMIT 1"]
   end
 end
 

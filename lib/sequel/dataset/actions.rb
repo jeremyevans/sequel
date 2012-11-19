@@ -58,11 +58,14 @@ module Sequel
       a
     end
     
-    # Returns the average value for the given column.
+    # Returns the average value for the given column/expression.
+    # Uses a virtual row block if no argument is given.
     #
     #   DB[:table].avg(:number) # SELECT avg(number) FROM table LIMIT 1
     #   # => 3
-    def avg(column)
+    #   DB[:table].avg{function(column)} # SELECT avg(function(column)) FROM table LIMIT 1
+    #   # => 1
+    def avg(column=Sequel.virtual_row(&Proc.new))
       aggregate_dataset.get{avg(column)}
     end
   
@@ -342,11 +345,13 @@ module Sequel
     end
     
     # Returns the interval between minimum and maximum values for the given 
-    # column.
+    # column/expression. Uses a virtual row block if no argument is given.
     #
     #   DB[:table].interval(:id) # SELECT (max(id) - min(id)) FROM table LIMIT 1
     #   # => 6
-    def interval(column)
+    #   DB[:table].interval{function(column)} # SELECT (max(function(column)) - min(function(column))) FROM table LIMIT 1
+    #   # => 7
+    def interval(column=Sequel.virtual_row(&Proc.new))
       aggregate_dataset.get{max(column) - min(column)}
     end
 
@@ -393,19 +398,25 @@ module Sequel
       end
     end
 
-    # Returns the maximum value for the given column.
+    # Returns the maximum value for the given column/expression.
+    # Uses a virtual row block if no argument is given.
     #
     #   DB[:table].max(:id) # SELECT max(id) FROM table LIMIT 1
     #   # => 10
-    def max(column)
+    #   DB[:table].max{function(column)} # SELECT max(function(column)) FROM table LIMIT 1
+    #   # => 7
+    def max(column=Sequel.virtual_row(&Proc.new))
       aggregate_dataset.get{max(column)}
     end
 
-    # Returns the minimum value for the given column.
+    # Returns the minimum value for the given column/expression.
+    # Uses a virtual row block if no argument is given.
     #
     #   DB[:table].min(:id) # SELECT min(id) FROM table LIMIT 1
     #   # => 1
-    def min(column)
+    #   DB[:table].min{function(column)} # SELECT min(function(column)) FROM table LIMIT 1
+    #   # => 0
+    def min(column=Sequel.virtual_row(&Proc.new))
       aggregate_dataset.get{min(column)}
     end
 
@@ -428,11 +439,13 @@ module Sequel
     end
 
     # Returns a +Range+ instance made from the minimum and maximum values for the
-    # given column.
+    # given column/expression.  Uses a virtual row block if no argument is given.
     #
     #   DB[:table].range(:id) # SELECT max(id) AS v1, min(id) AS v2 FROM table LIMIT 1
     #   # => 1..10
-    def range(column)
+    #   DB[:table].interval{function(column)} # SELECT max(function(column)) AS v1, min(function(column)) AS v2 FROM table LIMIT 1
+    #   # => 0..7
+    def range(column=Sequel.virtual_row(&Proc.new))
       if r = aggregate_dataset.select{[min(column).as(v1), max(column).as(v2)]}.first
         (r[:v1]..r[:v2])
       end
@@ -543,11 +556,14 @@ module Sequel
       end
     end
     
-    # Returns the sum for the given column.
+    # Returns the sum for the given column/expression.
+    # Uses a virtual row block if no column is given.
     #
     #   DB[:table].sum(:id) # SELECT sum(id) FROM table LIMIT 1
     #   # => 55
-    def sum(column)
+    #   DB[:table].sum{function(column)} # SELECT sum(function(column)) FROM table LIMIT 1
+    #   # => 10
+    def sum(column=Sequel.virtual_row(&Proc.new))
       aggregate_dataset.get{sum(column)}
     end
 

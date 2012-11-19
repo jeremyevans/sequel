@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#avg, #interval, #min, #max, #range, and #sum accept virtual row blocks (jeremyevans)
+
 * Make Dataset#count use a subselect when the dataset has an offset without a limit (jeremyevans) (#587)
 
 * Dump deferrable status of unique indexes on PostgreSQL (radford) (#583)
