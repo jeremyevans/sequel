@@ -106,7 +106,7 @@ module Sequel
     # Class instance variables that are inherited in subclasses.  If the value is <tt>:dup</tt>, dup is called
     # on the superclass's instance variable when creating the instance variable in the subclass.
     # If the value is +nil+, the superclass's instance variable is used directly in the subclass.
-    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@dataset_methods=>:dup, 
+    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup,
       :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil,
       :@raise_on_save_failure=>nil, :@require_modification=>nil, 
       :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
@@ -129,7 +129,6 @@ module Sequel
     @db = nil
     @db_schema = nil
     @dataset_method_modules = []
-    @dataset_methods = {}
     @overridable_methods_module = nil
     @plugins = []
     @primary_key = :id
@@ -147,7 +146,7 @@ module Sequel
     @use_after_commit_rollback = true
     @use_transactions = true
 
-    Sequel.require %w"default_inflections inflections plugins base exceptions errors", "model"
+    Sequel.require %w"default_inflections inflections plugins dataset_module base exceptions errors", "model"
     if !defined?(::SEQUEL_NO_ASSOCIATIONS) && !ENV.has_key?('SEQUEL_NO_ASSOCIATIONS')
       Sequel.require 'associations', 'model'
       plugin Model::Associations

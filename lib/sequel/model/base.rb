@@ -24,11 +24,6 @@ module Sequel
       # with all of these modules.
       attr_reader :dataset_method_modules
 
-      # Hash of dataset methods with method name keys and proc values that are
-      # stored so when the dataset changes, methods defined with def_dataset_method
-      # will be applied to the new dataset.
-      attr_reader :dataset_methods
-
       # SQL string fragment used for faster DELETE statement creation when deleting/destroying
       # model instances, or nil if the optimization should not be used. For internal use only.
       attr_reader :fast_instance_delete_sql
@@ -179,13 +174,19 @@ module Sequel
       end
 
       # Extend the dataset with a module, similar to adding
-      # a plugin with the methods defined in DatasetMethods.  If a block
-      # is given, an anonymous module is created and the module_evaled, otherwise
-      # the argument should be a module.  Returns the module given or the anonymous
-      # module created.
+      # a plugin with the methods defined in DatasetMethods.
+      # This is the recommended way to add methods to model datasets.
       #
+      # If an argument, it should be a module, and is used to extend
+      # the underlying dataset.  Otherwise an anonymous module is created, and
+      # if a block is given, it is module_evaled, allowing you do define
+      # dataset methods directly using the standard ruby def syntax.
+      # Returns the module given or the anonymous module created.
+      #
+      #   # Usage with existing module
       #   Artist.dataset_module Sequel::ColumnsIntrospection
       #
+      #   # Usage with anonymous module
       #   Artist.dataset_module do
       #     def foo
       #       :bar
@@ -195,13 +196,24 @@ module Sequel
       #   # => :bar
       #   Artist.foo
       #   # => :bar
+      #
+      # Any anonymous modules created are actually instances of Sequel::Model::DatasetModule
+      # (a Module subclass), which allows you to call the subset method on them:
+      #
+      #   Artist.dataset_module do
+      #     subset :released, Sequel.identifier(release_date) > Sequel::CURRENT_DATE
+      #   end
+      #
+      # Any public methods in the dataset module will have class methods created that
+      # call the method on the dataset, assuming that the class method is not already
+      # defined.
       def dataset_module(mod = nil)
         if mod
           raise Error, "can't provide both argument and block to Model.dataset_module" if block_given?
           dataset_extend(mod)
           mod
         else
-          @dataset_module ||= Module.new
+          @dataset_module ||= DatasetModule.new(self)
           @dataset_module.module_eval(&Proc.new) if block_given?
           dataset_extend(@dataset_module)
           @dataset_module
@@ -270,6 +282,10 @@ module Sequel
       # If a block is not given, just define a class method on the model for each argument
       # that calls the dataset method of the same argument name.
       #
+      # It is recommended that you define methods inside a block passed to #dataset_module
+      # instead of using this method, as #dataset_module allows you to use normal
+      # ruby def syntax.
+      #
       #   # Add new dataset method and class method that calls it
       #   Artist.def_dataset_method(:by_name){order(:name)}
       #   Artist.filter(:name.like('A%')).by_name
@@ -280,18 +296,12 @@ module Sequel
       #   Artist.server!(:server1)
       def def_dataset_method(*args, &block)
         raise(Error, "No arguments given") if args.empty?
+
         if block
           raise(Error, "Defining a dataset method using a block requires only one argument") if args.length > 1
-          meth = args.first
-          @dataset_methods[meth] = block
-          dataset.meta_def(meth, &block) if @dataset
-        end
-        args.each do |arg|
-          if arg.to_s =~ NORMAL_METHOD_NAME_REGEXP
-            instance_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__) unless respond_to?(arg, true)
-          else
-            def_model_dataset_method_block(arg)
-          end
+          dataset_module{define_method(args.first, &block)}
+        else
+          args.each{|arg| def_model_dataset_method(arg)}
         end
       end
 
@@ -483,8 +493,7 @@ module Sequel
       # Returns self.
       #
       # This changes the row_proc of the dataset to return
-      # model objects, extends the dataset with the dataset_method_modules,
-      # and defines methods on the dataset using the dataset_methods.
+      # model objects and extends the dataset with the dataset_method_modules.
       # It also attempts to determine the database schema for the model,
       # based on the given dataset.
       #
@@ -514,7 +523,6 @@ module Sequel
           @columns = @dataset.columns rescue nil
         else
           @dataset_method_modules.each{|m| @dataset.extend(m)} if @dataset_method_modules
-          @dataset_methods.each{|meth, block| @dataset.meta_def(meth, &block)} if @dataset_methods
         end
         @dataset.model = self if @dataset.respond_to?(:model=)
         check_non_connection_error{@db_schema = (inherited ? superclass.db_schema : get_db_schema)}
@@ -577,8 +585,8 @@ module Sequel
         end
       end
   
-      # Shortcut for +def_dataset_method+ that is restricted to modifying the
-      # dataset's filter. Sometimes thought of as a scope, and like most dataset methods,
+      # Sets up a dataset method that returns a filtered dataset.
+      # Sometimes thought of as a scope, and like most dataset methods,
       # they can be chained.
       # For example:
       #
@@ -597,9 +605,10 @@ module Sequel
       # Both the args given and the block are passed to <tt>Dataset#filter</tt>.
       #
       # This method creates dataset methods that do not accept arguments.  To create
-      # dataset methods that accept arguments, you have to use def_dataset_method.
+      # dataset methods that accept arguments, you should use define a
+      # method directly inside a #dataset_module block.
       def subset(name, *args, &block)
-        def_dataset_method(name){filter(*args, &block)}
+        dataset_module.subset(name, *args, &block)
       end
       
       # Returns name of primary table for the dataset. If the table for the dataset
@@ -642,8 +651,7 @@ module Sequel
       def dataset_extend(mod)
         dataset.extend(mod) if @dataset
         dataset_method_modules << mod
-        meths = mod.public_instance_methods.reject{|x| NORMAL_METHOD_NAME_REGEXP !~ x.to_s}
-        def_dataset_method(*meths) unless meths.empty?
+        mod.public_instance_methods.each{|meth| def_model_dataset_method(meth)}
       end
 
       # Create a column accessor for a column with a method name that is hard to use in ruby code.
@@ -671,8 +679,14 @@ module Sequel
       # Define a model method that calls the dataset method with the same name,
       # only used for methods with names that can't be presented directly in
       # ruby code.
-      def def_model_dataset_method_block(arg)
-        meta_def(arg){|*args, &block| dataset.send(arg, *args, &block)}
+      def def_model_dataset_method(meth)
+        return if respond_to?(meth, true)
+
+        if meth.to_s =~ NORMAL_METHOD_NAME_REGEXP
+          instance_eval("def #{meth}(*args, &block); dataset.#{meth}(*args, &block) end", __FILE__, __LINE__)
+        else
+          meta_def(meth){|*args, &block| dataset.send(meth, *args, &block)}
+        end
       end
 
       # Get the schema from the database, fall back on checking the columns

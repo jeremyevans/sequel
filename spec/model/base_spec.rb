@@ -187,6 +187,11 @@ describe Sequel::Model, ".dataset_module" do
     @c.return_3.should == 3
   end
 
+  it "should add methods defined in the module outside the block to the class" do
+    @c.dataset_module.module_eval{def return_3() 3 end}
+    @c.return_3.should == 3
+  end
+
   it "should cache calls and readd methods if set_dataset is used" do
     @c.dataset_module{def return_3() 3 end}
     @c.set_dataset :items
@@ -249,6 +254,12 @@ describe Sequel::Model, ".dataset_module" do
 
   it "should return the argument if given one" do
     Object.new.extend(@c.dataset_module Module.new{def return_3() 3 end}).return_3.should == 3
+  end
+
+  it "should have dataset_module support a subset method" do
+    @c.dataset_module{subset :released, :released}
+    @c.released.sql.should == 'SELECT * FROM items WHERE released'
+    @c.where(:foo).released.sql.should == 'SELECT * FROM items WHERE (foo AND released)'
   end
 
   it "should raise error if called with both an argument and ablock" do
