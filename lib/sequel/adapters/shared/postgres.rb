@@ -224,6 +224,16 @@ module Sequel
         :postgres
       end
 
+      # Use PostgreSQL's DO syntax to execute an anonymous code block.  The code should
+      # be the literal code string to use in the underlying procedural language.  Options:
+      #
+      # :language :: The procedural language the code is written in.  The PostgreSQL
+      #              default is plpgsql.  Can be specified as a string or a symbol.
+      def do(code, opts={})
+        language = opts[:language]
+        run "DO #{"LANGUAGE #{literal(language.to_s)} " if language}#{literal(code)}"
+      end
+
       # Drops the function from the database. Arguments:
       # * name : name of the function to drop
       # * opts : options hash:

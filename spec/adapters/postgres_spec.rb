@@ -159,6 +159,15 @@ describe "A PostgreSQL dataset" do
     @db.alter_table(:atest){drop_constraint 'atest_ex'}
   end if POSTGRES_DB.server_version >= 90000
 
+  specify "should support Database#do for executing anonymous code blocks" do
+    @db.drop_table?(:btest)
+    @db.do "BEGIN EXECUTE 'CREATE TABLE btest (a INTEGER)'; EXECUTE 'INSERT INTO btest VALUES (1)'; END"
+    @db[:btest].select_map(:a).should == [1]
+
+    @db.do "BEGIN EXECUTE 'DROP TABLE btest; CREATE TABLE atest (a INTEGER)'; EXECUTE 'INSERT INTO atest VALUES (1)'; END", :language=>:plpgsql
+    @db[:atest].select_map(:a).should == [1]
+  end if POSTGRES_DB.server_version >= 90000
+
   specify "should support deferrable constraints when creating or altering tables" do
     @db.create_table!(:atest){Integer :t; unique [:t], :name=>:atest_def, :deferrable=>true, :using=>:btree}
     @db[:atest].insert(1)

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#do on PostgreSQL for using the DO anonymous code block execution statement (jeremyevans)
+
 * Remove Model.dataset_methods (jeremyevans)
 
 * Allow subset to be called inside a dataset_module block (jeremyevans)
