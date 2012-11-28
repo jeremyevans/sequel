@@ -1,5 +1,7 @@
 === HEAD
 
+* Make the force_encoding plugin work with frozen strings (jeremyevans)
+
 * Add Database#do on PostgreSQL for using the DO anonymous code block execution statement (jeremyevans)
 
 * Remove Model.dataset_methods (jeremyevans)

@@ -63,7 +63,10 @@ module Sequel
         # Force the encoding of all returned strings to the model's forced_encoding.
         def typecast_value(column, value)
           s = super
-          s.force_encoding(model.forced_encoding) if s.is_a?(String) && model.forced_encoding
+          if s.is_a?(String) && (fe = model.forced_encoding)
+            s = s.dup if s.frozen?
+            s.force_encoding(fe)
+          end
           s
         end
       end

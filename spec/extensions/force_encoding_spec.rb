@@ -25,6 +25,15 @@ describe "force_encoding plugin" do
     o.x.encoding.should == @e1
   end
   
+  specify "should work correctly when given a frozen string" do
+    s = 'blah'
+    s.force_encoding('US-ASCII')
+    s.freeze
+    o = @c.new(:x=>s)
+    o.x.should == 'blah'
+    o.x.encoding.should == @e1
+  end
+  
   specify "should have a forced_encoding class accessor" do
     s = 'blah'
     s.force_encoding('US-ASCII')
