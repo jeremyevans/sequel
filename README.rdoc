@@ -154,6 +154,8 @@ Datasets are the primary way records are retrieved and manipulated.  They are ge
 
   posts = DB.from(:posts)
   posts = DB[:posts] # same
+  # Can also qualify with a database name
+  posts = DB[:other_database__posts]
 
 Datasets will only fetch records when you tell them to. They can be manipulated to filter records, change ordering, join tables, etc..
 
