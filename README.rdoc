@@ -154,8 +154,6 @@ Datasets are the primary way records are retrieved and manipulated.  They are ge
 
   posts = DB.from(:posts)
   posts = DB[:posts] # same
-  # Can also qualify with a database name
-  posts = DB[:other_database__posts]
 
 Datasets will only fetch records when you tell them to. They can be manipulated to filter records, change ordering, join tables, etc..
 
@@ -397,10 +395,10 @@ and not raise an exception outside the block, you can raise the
 Sequel makes it easy to join tables:
 
   order_items = DB[:items].join(:order_items, :item_id => :id).
-    where(:order_items__order_id => 1234)
+    where(:order_id => 1234)
   # SELECT * FROM items INNER JOIN order_items
   # ON order_items.item_id = items.id 
-  # WHERE order_items.order_id = 1234
+  # WHERE order_id = 1234
 
 The important thing to note here is that item_id is automatically qualified with
 the table being joined, and id is automatically qualified with the last table
@@ -439,9 +437,10 @@ Ruby strings are generally treated as SQL strings:
   items.where(:x => 'x')
   # SELECT * FROM items WHERE (x = 'x')
 
-=== Qualifying column names
+=== Qualifying identifiers (column/table names)
 
-Column references can be qualified by using the double underscore special notation <tt>:table__column</tt>:
+An identifier in SQL is a name that represents a column, table, or schema.
+Identifiers can be qualified by using the double underscore special notation <tt>:table__column</tt>:
 
   items.literal(:items__price)
   # items.price
@@ -451,9 +450,15 @@ Another way to qualify columns is to use the <tt>Sequel.qualify</tt> method:
   items.literal(Sequel.qualify(:items, :price))
   # items.price
 
-=== Column aliases
+While it is more common to qualify column identifiers with table identifiers, you can also qualify table identifiers with schema identifiers
+to select from a qualified table:
 
-You can also alias columns by using the triple undersecore special notation <tt>:column___alias</tt> or <tt>:table__column___alias</tt>:
+  posts = DB[:some_schema__posts]
+  # SELECT * FROM some_schema.posts
+
+=== Identifier aliases
+
+You can also alias identifiers by using the triple undersecore special notation <tt>:column___alias</tt> or <tt>:table__column___alias</tt>:
 
   items.literal(:price___p)
   # price AS p
@@ -464,6 +469,11 @@ Another way to alias columns is to use the <tt>Sequel.as</tt> method:
 
   items.literal(Sequel.as(:price, :p))
   # price AS p
+
+You can use the <tt>Sequel.as</tt> method to alias arbitrary expressions, not just identifiers:
+
+  items.literal(Sequel.as(DB[:posts].select{max(id)}, :p))
+  # (SELECT max(id) FROM posts) AS p
 
 == Sequel Models
 
