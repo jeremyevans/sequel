@@ -1,5 +1,7 @@
 === HEAD
 
+* If an exception occurs while committing a transaction, attempt to rollback (jeremyevans)
+
 * Support setting default string column sizes on a per-Database basis via default_string_column_size (jeremyevans)
 
 * Reset Model.instance_dataset when extending the model's dataset (jeremyevans)

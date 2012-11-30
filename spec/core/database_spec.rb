@@ -683,7 +683,7 @@ shared_examples_for "Database#transaction" do
     end
     e.should_not be_nil
     e.wrapped_exception.should be_a_kind_of(ec)
-    @db.sqls.should == ['BEGIN', 'DROP TABLE test;']
+    @db.sqls.should == ['BEGIN', 'DROP TABLE test;', 'ROLLBACK']
   end
   
   specify "should handle errors when sending ROLLBACK" do

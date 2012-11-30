@@ -333,7 +333,15 @@ module Sequel
         begin
           committed = commit_or_rollback_transaction(e, conn, opts)
         rescue Exception => e2
-          raise_error(e2, :classes=>database_error_classes, :conn=>conn)
+          begin
+            raise_error(e2, :classes=>database_error_classes, :conn=>conn)
+          rescue Sequel::DatabaseError => e4
+            begin
+              rollback_transaction(conn, opts)
+            ensure
+              raise e4
+            end
+          end
         ensure
           remove_transaction(conn, committed)
         end
