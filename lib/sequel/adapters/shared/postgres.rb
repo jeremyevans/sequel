@@ -466,6 +466,16 @@ module Sequel
         server_version >= 90100
       end
 
+      # PostgreSQL 9.0+ supports some types of deferrable constraints beyond foreign key constraints.
+      def supports_deferrable_constraints?
+        server_version >= 90000
+      end
+
+      # PostgreSQL supports deferrable foreign key constraints.
+      def supports_deferrable_foreign_key_constraints?
+        true
+      end
+
       # PostgreSQL supports DROP TABLE IF EXISTS
       def supports_drop_table_if_exists?
         true
@@ -612,7 +622,7 @@ module Sequel
           sql
         else
           super
-        end + "#{"#{' NOT' unless constraint[:deferrable]} DEFERRABLE" unless constraint[:deferrable].nil?}"
+        end
       end
 
       # SQL for doing fast table insert from stdin.

@@ -49,6 +49,11 @@ module Sequel
         metadata_dataset.from(:tab).filter(:tname =>m.call(name), :tabtype => 'VIEW').count > 0 
       end 
 
+      # Oracle supports deferrable constraints.
+      def supports_deferrable_constraints?
+        true
+      end
+
       private
 
       # Handle Oracle specific ALTER TABLE SQL

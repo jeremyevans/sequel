@@ -168,22 +168,6 @@ describe "A PostgreSQL dataset" do
     @db[:atest].select_map(:a).should == [1]
   end if POSTGRES_DB.server_version >= 90000
 
-  specify "should support deferrable constraints when creating or altering tables" do
-    @db.create_table!(:atest){Integer :t; unique [:t], :name=>:atest_def, :deferrable=>true, :using=>:btree}
-    @db[:atest].insert(1)
-    @db[:atest].insert(2)
-    proc{@db[:atest].insert(2)}.should raise_error(Sequel::DatabaseError)
-    proc{@db.transaction{@db.run 'SET CONSTRAINTS atest_def DEFERRED'; proc{@db[:atest].insert(2)}.should_not raise_error(Sequel::DatabaseError)}}.should raise_error(Sequel::DatabaseError)
-
-    @db.create_table!(:atest){Integer :t}
-    @db.alter_table(:atest){add_unique_constraint [:t], :name=>:atest_def, :deferrable=>true, :using=>:btree}
-    @db[:atest].insert(1)
-    @db[:atest].insert(2)
-    proc{@db[:atest].insert(2)}.should raise_error(Sequel::DatabaseError)
-    proc{@db.transaction{@db.run 'SET CONSTRAINTS atest_def DEFERRED'; proc{@db[:atest].insert(2)}.should_not raise_error(Sequel::DatabaseError)}}.should raise_error(Sequel::DatabaseError)
-    @db.alter_table(:atest){drop_constraint 'atest_def'}
-  end if POSTGRES_DB.server_version >= 90000
-
   specify "should support adding foreign key constarints that are not yet valid, and validating them later" do
     @db.create_table!(:atest){primary_key :id; Integer :fk}
     @db[:atest].insert(1, 5)

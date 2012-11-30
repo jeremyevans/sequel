@@ -79,10 +79,11 @@ module Sequel
       # The following options are supported:
       #
       # :default :: The default value for the column.
-      # :deferrable :: This ensure Referential Integrity will work even if
-      #                reference table will use for its foreign key a value that does not
-      #                exists(yet) on referenced table. Basically it adds
-      #                DEFERRABLE INITIALLY DEFERRED on key creation.
+      # :deferrable :: For foreign key columns, this ensures referential integrity will work even if
+      #                referencing table uses a foreign key value that does not
+      #                yet exist on referenced table (but will exist before the transaction commits).
+      #                Basically it adds DEFERRABLE INITIALLY DEFERRED on key creation.
+      #                If you use :immediate as the value, uses DEFERRABLE INITIALLY IMMEDIATE.
       # :index :: Create an index on this column.  If given a hash, use the hash as the
       #           options for the index.
       # :key :: For foreign key columns, the column in the associated table
@@ -239,6 +240,8 @@ module Sequel
       # Add a unique constraint on the given columns to the DDL.
       #
       #   unique(:name) # UNIQUE (name)
+      #
+      # Supports the same :deferrable option as #column.
       def unique(columns, opts = {})
         constraints << {:type => :unique, :columns => Array(columns)}.merge(opts)
       end
@@ -304,6 +307,8 @@ module Sequel
       #
       #   add_unique_constraint(:name) # ADD UNIQUE (name)
       #   add_unique_constraint(:name, :name=>:unique_name) # ADD CONSTRAINT unique_name UNIQUE (name)
+      #
+      # Supports the same :deferrable option as CreateTableGenerator#column.
       def add_unique_constraint(columns, opts = {})
         @operations << {:op => :add_constraint, :type => :unique, :columns => Array(columns)}.merge(opts)
       end

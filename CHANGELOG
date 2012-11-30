@@ -18,7 +18,7 @@
 
 * Dump deferrable status of unique indexes on PostgreSQL (radford) (#583)
 
-* Support :deferrable constraints on PostgreSQL (radford) (#583)
+* Extend deferrable constraint support to all types of constraints, not just foreign keys (radford, jeremyevans) (#583)
 
 * Support Database#copy_table and #copy_into on jdbc/postgres (bdon) (#580)
 

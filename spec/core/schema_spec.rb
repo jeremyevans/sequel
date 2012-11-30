@@ -147,6 +147,33 @@ describe "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (id integer, name text UNIQUE)"]
   end
   
+  specify "should handle not deferred unique constraints" do
+    @db.create_table(:cats) do
+      integer :id
+      text :name
+      unique :name, :deferrable=>false
+    end
+    @db.sqls.should == ["CREATE TABLE cats (id integer, name text, UNIQUE (name) NOT DEFERRABLE)"]
+  end
+  
+  specify "should handle deferred unique constraints" do
+    @db.create_table(:cats) do
+      integer :id
+      text :name
+      unique :name, :deferrable=>true
+    end
+    @db.sqls.should == ["CREATE TABLE cats (id integer, name text, UNIQUE (name) DEFERRABLE INITIALLY DEFERRED)"]
+  end
+  
+  specify "should handle deferred initially immediate unique constraints" do
+    @db.create_table(:cats) do
+      integer :id
+      text :name
+      unique :name, :deferrable=>:immediate
+    end
+    @db.sqls.should == ["CREATE TABLE cats (id integer, name text, UNIQUE (name) DEFERRABLE INITIALLY IMMEDIATE)"]
+  end
+  
   specify "should accept unsigned definition" do
     @db.create_table(:cats) do
       integer :value, :unsigned => true

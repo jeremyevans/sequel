@@ -140,6 +140,11 @@ module Sequel
         sqlite_version >= 30300
       end
       
+      # SQLite 3.6.19+ supports deferrable foreign key constraints.
+      def supports_deferrable_foreign_key_constraints?
+        sqlite_version >= 30619
+      end
+
       # SQLite 3.6.8+ supports savepoints. 
       def supports_savepoints?
         sqlite_version >= 30608

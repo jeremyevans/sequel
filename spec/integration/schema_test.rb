@@ -622,6 +622,28 @@ describe "Database schema modifiers" do
     @db[:items].insert(:number=>1)
     @db[:items].get(:name).should == 'A13'
   end
+
+  specify "should support deferrable foreign key constraints" do
+    @db.create_table!(:items2){Integer :id, :primary_key=>true}
+    @db.create_table!(:items){foreign_key :id, :items2, :deferrable=>true}
+    proc{@db[:items].insert(1)}.should raise_error(Sequel::DatabaseError)
+    proc{@db.transaction{proc{@db[:items].insert(1)}.should_not raise_error}}.should raise_error(Sequel::DatabaseError)
+  end if INTEGRATION_DB.supports_deferrable_foreign_key_constraints?
+
+  specify "should support deferrable unique constraints when creating or altering tables" do
+    @db.create_table!(:items){Integer :t; unique [:t], :name=>:atest_def, :deferrable=>true, :using=>:btree}
+    @db[:items].insert(1)
+    @db[:items].insert(2)
+    proc{@db[:items].insert(2)}.should raise_error(Sequel::DatabaseError)
+    proc{@db.transaction{proc{@db[:items].insert(2)}.should_not raise_error}}.should raise_error(Sequel::DatabaseError)
+
+    @db.create_table!(:items){Integer :t}
+    @db.alter_table(:items){add_unique_constraint [:t], :name=>:atest_def, :deferrable=>true, :using=>:btree}
+    @db[:items].insert(1)
+    @db[:items].insert(2)
+    proc{@db[:items].insert(2)}.should raise_error(Sequel::DatabaseError)
+    proc{@db.transaction{proc{@db[:items].insert(2)}.should_not raise_error}}.should raise_error(Sequel::DatabaseError)
+  end if INTEGRATION_DB.supports_deferrable_constraints?
 end
 
 test_tables = begin

@@ -214,6 +214,18 @@ module Sequel
       false
     end
 
+    # Whether the database supports deferrable constraints, false
+    # by default as few databases do.
+    def supports_deferrable_constraints?
+      false
+    end
+
+    # Whether the database supports deferrable foreign key constraints,
+    # false by default as few databases do.
+    def supports_deferrable_foreign_key_constraints?
+      supports_deferrable_constraints?
+    end
+
     # Whether the database supports DROP TABLE IF EXISTS syntax,
     # default is the same as #supports_create_table_if_not_exists?.
     def supports_drop_table_if_exists?

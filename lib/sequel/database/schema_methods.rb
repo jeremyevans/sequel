@@ -45,9 +45,6 @@ module Sequel
     # Options:
     # :ignore_errors :: Ignore any DatabaseErrors that are raised
     #
-    # PostgreSQL specific options:
-    # :deferrable :: Allow the constraint to be deferred
-    #
     # See <tt>alter_table</tt>.
     def add_index(table, columns, options={})
       e = options[:ignore_errors]
@@ -496,7 +493,7 @@ module Sequel
       sql << "(#{Array(column[:key]).map{|x| quote_identifier(x)}.join(COMMA_SEPARATOR)})" if column[:key]
       sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
       sql << " ON UPDATE #{on_update_clause(column[:on_update])}" if column[:on_update]
-      sql << " DEFERRABLE INITIALLY DEFERRED" if column[:deferrable]
+      constraint_deferrable_sql_append(sql, column[:deferrable])
       sql
     end
   
@@ -527,7 +524,21 @@ module Sequel
       else
         raise Error, "Invalid constriant type #{constraint[:type]}, should be :check, :primary_key, :foreign_key, or :unique"
       end
+      constraint_deferrable_sql_append(sql, constraint[:deferrable])
       sql
+    end
+
+    # SQL DDL fragment specifying the deferrable constraint attributes.
+    def constraint_deferrable_sql_append(sql, defer)
+      case defer
+      when nil
+      when false
+        sql << ' NOT DEFERRABLE'
+      when :immediate
+        sql << ' DEFERRABLE INITIALLY IMMEDIATE'
+      else
+        sql << ' DEFERRABLE INITIALLY DEFERRED'
+      end
     end
 
     # Execute the create table statements using the generator.
