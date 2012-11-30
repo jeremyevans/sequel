@@ -526,7 +526,7 @@ module Sequel
         end
         @dataset.model = self if @dataset.respond_to?(:model=)
         check_non_connection_error{@db_schema = (inherited ? superclass.db_schema : get_db_schema)}
-        @instance_dataset = @dataset.limit(1).naked
+        reset_instance_dataset
         self
       end
 
@@ -649,7 +649,8 @@ module Sequel
       # module if the model has a dataset.  Add dataset methods to the class for all
       # public dataset methods.
       def dataset_extend(mod)
-        dataset.extend(mod) if @dataset
+        @dataset.extend(mod) if @dataset
+        reset_instance_dataset
         dataset_method_modules << mod
         mod.public_instance_methods.each{|meth| def_model_dataset_method(meth)}
       end
@@ -812,6 +813,12 @@ module Sequel
         @fast_instance_delete_sql = if @simple_table && @simple_pk
           "DELETE FROM #@simple_table WHERE #@simple_pk = ".freeze
         end
+      end
+
+      # Reset the instance dataset to a modified copy of the current dataset,
+      # should be used whenever the model's dataset is modified.
+      def reset_instance_dataset
+        @instance_dataset = @dataset.limit(1).naked if @dataset
       end
   
       # Set the columns for this model and create accessor methods for each column.

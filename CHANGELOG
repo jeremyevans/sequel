@@ -1,5 +1,7 @@
 === HEAD
 
+* Reset Model.instance_dataset when extending the model's dataset (jeremyevans)
+
 * Make the force_encoding plugin work with frozen strings (jeremyevans)
 
 * Add Database#do on PostgreSQL for using the DO anonymous code block execution statement (jeremyevans)

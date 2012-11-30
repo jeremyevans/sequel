@@ -182,6 +182,11 @@ describe Sequel::Model, ".dataset_module" do
     @c.dataset.return_3.should == 3
   end
 
+  it "should also extend the instance_dataset with the module if the model has a dataset" do
+    @c.dataset_module{def return_3() 3 end}
+    @c.instance_dataset.return_3.should == 3
+  end
+
   it "should add methods defined in the module to the class" do
     @c.dataset_module{def return_3() 3 end}
     @c.return_3.should == 3
