@@ -60,7 +60,7 @@ module Sequel
       module DatasetMethods
         private
 
-        # Set the reteived_with and retrieved_by attributes for the object
+        # Set the retrieved_with and retrieved_by attributes for the object
         # with the current dataset and array of all objects.
         def post_load(objects)
           super
