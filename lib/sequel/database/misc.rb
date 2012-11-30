@@ -10,6 +10,10 @@ module Sequel
     # in the extension).
     EXTENSIONS = {}
 
+    # The general default size for string columns for all Sequel::Database
+    # instances.
+    DEFAULT_STRING_COLUMN_SIZE = 255
+
     # Register an extension callback for Database objects.  ext should be the
     # extension name symbol, and mod should either be a Module that the
     # database is extended with, or a callable object called with the database
@@ -44,11 +48,15 @@ module Sequel
     # Set the timezone to use for this database, overridding <tt>Sequel.database_timezone</tt>.
     attr_writer :timezone
     
+    # The specific default size of string columns for this Sequel::Database, usually 255 by default.
+    attr_accessor :default_string_column_size
+
     # Constructs a new instance of a database connection with the specified
     # options hash.
     #
     # Accepts the following options:
     # :default_schema :: The default schema to use, see #default_schema.
+    # :default_string_column_size :: The default size of string columns, 255 by default.
     # :identifier_input_method :: A string method symbol to call on identifiers going into the database
     # :identifier_output_method :: A string method symbol to call on identifiers coming from the database
     # :logger :: A specific logger to use
@@ -71,6 +79,7 @@ module Sequel
       @opts[:single_threaded] = @single_threaded = typecast_value_boolean(@opts.fetch(:single_threaded, @@single_threaded))
       @schemas = {}
       @default_schema = @opts.fetch(:default_schema, default_schema_default)
+      @default_string_column_size = @opts[:default_string_column_size] || DEFAULT_STRING_COLUMN_SIZE
       @prepared_statements = {}
       @transactions = {}
       @identifier_input_method = nil

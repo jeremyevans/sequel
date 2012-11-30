@@ -791,9 +791,9 @@ module Sequel
       if column[:text]
         uses_clob_for_text? ? :clob : :text
       elsif column[:fixed]
-        "char(#{column[:size]||255})"
+        "char(#{column[:size]||default_string_column_size})"
       else
-        "varchar(#{column[:size]||255})"
+        "varchar(#{column[:size]||default_string_column_size})"
       end
     end
     
@@ -813,7 +813,7 @@ module Sequel
     def type_literal_specific(column)
       type = column[:type]
       type = "double precision" if type.to_s == 'double'
-      column[:size] ||= 255 if type.to_s == 'varchar'
+      column[:size] ||= default_string_column_size if type.to_s == 'varchar'
       elements = column[:size] || column[:elements]
       "#{type}#{literal(Array(elements)) if elements}#{UNSIGNED if column[:unsigned]}"
     end

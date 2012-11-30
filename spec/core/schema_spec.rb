@@ -67,6 +67,20 @@ describe "DB#create_table" do
     @db.sqls.should == ['CREATE TABLE cats (o varchar(255) PRIMARY KEY AUTOINCREMENT, a varchar(255), b integer, c integer, d bigint, e double precision, f numeric, g date, h timestamp, i timestamp, j numeric, k blob, l boolean, m boolean, n integer, p date REFERENCES f)']
   end
 
+  specify "should transform types given as ruby classes to database-specific types" do
+    @db.default_string_column_size = 50
+    @db.create_table(:cats) do
+      String :a
+      String :a2, :size=>13
+      String :a3, :fixed=>true
+      String :a4, :size=>13, :fixed=>true
+      String :a5, :text=>true
+      varchar :a6
+      varchar :a7, :size=>13
+    end
+    @db.sqls.should == ['CREATE TABLE cats (a varchar(50), a2 varchar(13), a3 char(50), a4 char(13), a5 text, a6 varchar(50), a7 varchar(13))']
+  end
+
   specify "should allow the use of modifiers with ruby class types" do
     @db.create_table(:cats) do
       String :a, :size=>50

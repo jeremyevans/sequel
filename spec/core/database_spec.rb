@@ -22,10 +22,18 @@ describe "A new Database" do
     Sequel::Database.new(1 => 2, :logger => 4, :loggers => 3).loggers.should == [4,3]
     Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).loggers.should == [4,3]
   end
+
+  specify "should handle the default string column size" do
+    @db.default_string_column_size.should == 255
+    db = Sequel::Database.new(:default_string_column_size=>50)
+    db.default_string_column_size.should == 50
+    db.default_string_column_size = 2
+    db.default_string_column_size.should == 2
+  end
   
   specify "should set the sql_log_level from opts[:sql_log_level]" do
-    db = Sequel::Database.new(1 => 2, :sql_log_level=>:debug).sql_log_level.should == :debug
-    db = Sequel::Database.new(1 => 2, :sql_log_level=>'debug').sql_log_level.should == :debug
+    Sequel::Database.new(1 => 2, :sql_log_level=>:debug).sql_log_level.should == :debug
+    Sequel::Database.new(1 => 2, :sql_log_level=>'debug').sql_log_level.should == :debug
   end
   
   specify "should create a connection pool" do
