@@ -1,0 +1,74 @@
+= New Features
+
+* Dataset#avg, #interval, #min, #max, #range, and #sum now
+  accept virtual row blocks, allowing you to more easily get
+  aggregate values of expressions based on the table:
+
+    DB[:table].sum{some_function(column1, column2)} # => 134
+    # SELECT sum(some_function(column1, column2)) FROM table
+
+* Database#do has been added on PostgreSQL for using the DO
+  anonymous code block execution statement.
+
+* Model.dataset_module now uses a Module subclass, which allows
+  you to call subset inside a dataset_module block, making
+  it easier to consolidate dataset method code:
+
+    class Album < Sequel::Model
+      dataset_module do
+        subset(:gold){copies_sold > 500000}
+      end
+    end
+
+* Database#copy_table and #copy_into are now supported on
+  jdbc/postgres.
+
+* Sequel now supports deferred constraints on constraint types other
+  than foreign keys.  The only databases that appear to implement
+  this are Oracle and PostgreSQL.
+
+* Sequel now supports INITIALLY IMMEDIATE deferred constraints via
+  the :deferrable=>:immediate constraint/column option.
+
+* Sequel now supports setting the default size of string columns,
+  via the default_string_column_size option or accessor.  In some
+  cases, Sequel's default string column size of 255 is too large
+  (e.g. MySQL with utf8mb4 character set), and this allows you to
+  change it.
+
+= Other Improvements
+
+* Dataset#count and other methods now use a subselect in the case
+  where the dataset has an offset but no limit.
+
+* If an error occurs while attempting to commit a transaction, Sequel
+  now attempts to rollback the transaction.  Some databases do this
+  automatically, but not all.  Among other things, this fixes issues
+  with deferred foreign key constraint violations on SQLite.
+
+* When extending a model's dataset, the model's instance_dataset is
+  reset, insuring that it will also be extended with the module.
+
+* When passing an invalid argument to Dataset#filter, the exception
+  message now includes the argument.
+
+* The force_encoding plugin now works with frozen string values.
+
+* Public methods added to a model dataset_module now have model
+  class methods created for them even if the method was added outside
+  of a dataset_module block.
+
+* On PostgreSQL, Database#indexes now includes a :deferrable entry
+  for each index hash, which will be true for unique indexes where
+  the underlying constraint is deferrable.
+
+* On Microsoft SQL Server 2000, Dataset#update no longer includes a
+  limit (TOP), allowing it to work correctly. 
+
+= Backwards Compatibility
+
+* Model.dataset_methods has been removed.  This was used to store
+  blocks for methods created via def_dataset_method and subset.
+  The internals have been changed so that a dataset_module is
+  always used in these cases, therefore there was no longer a reason
+  for this method.
