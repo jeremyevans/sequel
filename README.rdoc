@@ -295,7 +295,7 @@ You can also specify descending order:
   posts.reverse_order(:stamp)
   # ORDER BY stamp DESC
   posts.order(Sequel.desc(:stamp))
-  # ORDER BY stamp DESC
+  # ORDER BY stamp ASC
 
 === Core Extensions
 
