@@ -338,8 +338,8 @@ The following additional options are supported:
 
 :autosequence :: Set to true to use Sequel's conventions to guess the sequence to use for datasets.  False
                  by default.
-:prefetch_rows :: The number of rows to prefetch.  Defaults to 1, a larger number can be specified
-                  and will improve performance when retrieving a large number of rows.
+:prefetch_rows :: The number of rows to prefetch.  Defaults to 100, a larger number can be specified
+                  and may improve performance when retrieving a large number of rows.
 :privilege :: The Oracle privilege level.
 
 === postgres
