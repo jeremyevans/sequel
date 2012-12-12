@@ -13,6 +13,11 @@ describe "Sequel::Plugins::StringStripper" do
     @o.name = ' name '
     @o.name.should == 'name'
   end
+  
+  it "should gracefully ignore non UTF-8 strings" do
+    @o.name = " \xEF"
+    @o.name.should == " \xEF"
+  end
 
   it "should not affect other types" do
     @o.name = 1
