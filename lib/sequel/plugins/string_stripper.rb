@@ -18,7 +18,7 @@ module Sequel
         # Strip value if it is a string, before attempting to assign
         # it to the model's values.
         def []=(k, v)
-          v.is_a?(String) ? super(k, v.strip) : super
+          v.is_a?(String) ? super(k, (v.strip rescue v)) : super
         end
       end
     end
