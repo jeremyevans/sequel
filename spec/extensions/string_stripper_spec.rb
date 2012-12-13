@@ -1,3 +1,5 @@
+#encoding: utf-8
+
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::StringStripper" do
@@ -12,6 +14,11 @@ describe "Sequel::Plugins::StringStripper" do
   it "should strip all input strings" do
     @o.name = ' name '
     @o.name.should == 'name'
+  end
+  
+  it "should gracefully ignore non UTF-8 strings" do
+    @o.name = " \xEF"
+    @o.name.should == " \xEF"
   end
 
   it "should not affect other types" do
