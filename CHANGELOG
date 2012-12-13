@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#schema_and_table always return strings for the schema and table (jeremyevans)
+
 * Skip stripping of blob columns in the string_stripper plugin (jeremyevans) (#593)
 
 * Allow Database#get to take an array to return multiple values, similar to map/select_map (jeremyevans)

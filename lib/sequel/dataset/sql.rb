@@ -636,19 +636,26 @@ module Sequel
       sql << QUOTE << name.to_s.gsub(QUOTE_RE, DOUBLE_QUOTE) << QUOTE
     end
 
-    # Split the schema information from the table
+    # Split the schema information from the table, returning two strings,
+    # one for the schema and one for the table.  The returned schema may
+    # be nil, but the table will always have a string value.
+    #
+    # Note that this function does not handle tables with more than one
+    # level of qualification (e.g. database.schema.table on Microsoft
+    # SQL Server).
     def schema_and_table(table_name)
       sch = db.default_schema if db
+      sch = sch.to_s if sch
       case table_name
       when Symbol
         s, t, a = split_symbol(table_name)
         [s||sch, t]
       when SQL::QualifiedIdentifier
-        [table_name.table, table_name.column]
+        [table_name.table.to_s, table_name.column.to_s]
       when SQL::Identifier
-        [sch, table_name.value]
+        [sch, table_name.value.to_s]
       when String
-        [sch, table_name]
+        [sch, table_name.to_s]
       else
         raise Error, 'table_name should be a Symbol, SQL::QualifiedIdentifier, SQL::Identifier, or String'
       end

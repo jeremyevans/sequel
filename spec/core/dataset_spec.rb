@@ -4448,3 +4448,34 @@ describe "Dataset extensions" do
     proc{@ds.extension(:foo2)}.should raise_error(Sequel::Error)
   end
 end
+
+describe "Dataset#schema_and_table" do
+  before do
+    @ds = Sequel.mock[:test]
+  end
+
+  it "should correctly handle symbols" do
+    @ds.schema_and_table(:s).should == [nil, 's']
+    @ds.schema_and_table(:s___a).should == [nil, 's']
+    @ds.schema_and_table(:t__s).should == ['t', 's']
+    @ds.schema_and_table(:t__s___a).should == ['t', 's']
+  end
+
+  it "should correctly handle strings" do
+    @ds.schema_and_table('s').should == [nil, 's']
+  end
+
+  it "should correctly handle identifiers" do
+    @ds.schema_and_table(Sequel.identifier(:s)).should == [nil, 's']
+  end
+
+  it "should correctly handle qualified identifiers" do
+    @ds.schema_and_table(Sequel.qualify(:t, :s)).should == ['t', 's']
+  end
+
+  it "should respect default_schema" do
+    @ds.db.default_schema = :foo
+    @ds.schema_and_table(:s).should == ['foo', 's']
+  end
+end
+
