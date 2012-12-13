@@ -2,7 +2,7 @@
 
 source 'http://rubygems.org'
 
-gem 'rake'
+gem 'rake', '<10.0.0'
 gem 'rspec', '<2.10.0'
 
 # Plugin/Extension Dependencies
