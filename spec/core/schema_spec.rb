@@ -1327,16 +1327,27 @@ describe "Schema Parser" do
 
   specify "should convert various types of table name arguments" do
     @db.meta_def(:schema_parse_table) do |t, opts|
-      [[t, {:db_type=>t}]]
+      [[t, opts]]
     end
     s1 = @db.schema(:x)
-    s1.should == [['x', {:db_type=>'x', :ruby_default=>nil}]]
+    s1.should == [['x', {:ruby_default=>nil}]]
     @db.schema(:x).object_id.should == s1.object_id
     @db.schema(Sequel.identifier(:x)).object_id.should == s1.object_id
+
     s2 = @db.schema(:x__y)
-    s2.should == [['y', {:db_type=>'y', :ruby_default=>nil}]]
+    s2.should == [['y', {:schema=>'x', :ruby_default=>nil}]]
     @db.schema(:x__y).object_id.should == s2.object_id
     @db.schema(Sequel.qualify(:x, :y)).object_id.should == s2.object_id
+
+    s2 = @db.schema(Sequel.qualify(:v, :x__y))
+    s2.should == [['y', {:schema=>'x', :ruby_default=>nil, :information_schema_schema=>Sequel.identifier('v')}]]
+    @db.schema(Sequel.qualify(:v, :x__y)).object_id.should == s2.object_id
+    @db.schema(Sequel.qualify(:v__x, :y)).object_id.should == s2.object_id
+
+    s2 = @db.schema(Sequel.qualify(:u__v, :x__y))
+    s2.should == [['y', {:schema=>'x', :ruby_default=>nil, :information_schema_schema=>Sequel.qualify('u', 'v')}]]
+    @db.schema(Sequel.qualify(:u__v, :x__y)).object_id.should == s2.object_id
+    @db.schema(Sequel.qualify(Sequel.qualify(:u, :v), Sequel.qualify(:x, :y))).object_id.should == s2.object_id
   end
 
   specify "should correctly parse all supported data types" do

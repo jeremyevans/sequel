@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#schema handle [host.]database.schema.table qualified tables on Microsoft SQL Server (jeremyevans)
+
 * Add Dataset#split_qualifiers helper method for splitting a qualifier identifier into array of strings (jeremyevans)
 
 * Make Database#schema_and_table always return strings for the schema and table (jeremyevans)

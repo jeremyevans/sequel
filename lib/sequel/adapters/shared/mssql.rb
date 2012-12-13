@@ -314,15 +314,19 @@ module Sequel
         m2 = input_identifier_meth(opts[:dataset])
         tn = m2.call(table_name.to_s)
         table_id = get{object_id(tn)}
-        pk_index_id = metadata_dataset.from(:sysindexes).
+        info_sch_sch = opts[:information_schema_schema]
+        inf_sch_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, s) : Sequel.expr(s)}
+        sys_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, Sequel.qualify(Sequel.lit(''), s)) : Sequel.expr(s)}
+
+        pk_index_id = metadata_dataset.from(sys_qual.call(:sysindexes)).
           where(:id=>table_id, :indid=>1..254){{(status & 2048)=>2048}}.
           get(:indid)
-        pk_cols = metadata_dataset.from(:sysindexkeys___sik).
-          join(:syscolumns___sc, :id=>:id, :colid=>:colid).
+        pk_cols = metadata_dataset.from(sys_qual.call(:sysindexkeys).as(:sik)).
+          join(sys_qual.call(:syscolumns).as(:sc), :id=>:id, :colid=>:colid).
           where(:sik__id=>table_id, :sik__indid=>pk_index_id).
           select_order_map(:sc__name)
-        ds = metadata_dataset.from(:information_schema__tables___t).
-         join(:information_schema__columns___c, :table_catalog=>:table_catalog,
+        ds = metadata_dataset.from(inf_sch_qual.call(:information_schema__tables).as(:t)).
+         join(inf_sch_qual.call(:information_schema__columns).as(:c), :table_catalog=>:table_catalog,
               :table_schema => :table_schema, :table_name => :table_name).
          select(:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, :column_default___default, :is_nullable___allow_null, :numeric_precision___column_size, :numeric_scale___scale).
          filter(:c__table_name=>tn)

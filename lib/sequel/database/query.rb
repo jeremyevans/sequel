@@ -180,19 +180,34 @@ module Sequel
       raise(Error, 'schema parsing is not implemented on this database') unless respond_to?(:schema_parse_table, true)
 
       opts = opts.dup
-      if table.is_a?(Dataset)
+      tab = if table.is_a?(Dataset)
         o = table.opts
         from = o[:from]
         raise(Error, "can only parse the schema for a dataset with a single from table") unless from && from.length == 1 && !o.include?(:join) && !o.include?(:sql)
-        tab = table.first_source_table
-        sch, table_name = schema_and_table(tab)
+        table.first_source_table
+      else
+        table
+      end
+
+      qualifiers = split_qualifiers(tab)
+      table_name = qualifiers.pop
+      sch = qualifiers.pop
+      information_schema_schema = case qualifiers.length
+      when 1
+        Sequel.identifier(*qualifiers)
+      when 2
+        Sequel.qualify(*qualifiers)
+      end
+
+      if table.is_a?(Dataset)
         quoted_name = table.literal(tab)
         opts[:dataset] = table
       else
-        sch, table_name = schema_and_table(table)
-        quoted_name = quote_schema_table(table)
+        quoted_name = schema_utility_dataset.literal(table)
       end
+
       opts[:schema] = sch if sch && !opts.include?(:schema)
+      opts[:information_schema_schema] = information_schema_schema if information_schema_schema && !opts.include?(:information_schema_schema)
 
       Sequel.synchronize{@schemas.delete(quoted_name)} if opts[:reload]
       if v = Sequel.synchronize{@schemas[quoted_name]}
