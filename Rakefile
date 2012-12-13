@@ -56,7 +56,7 @@ rescue LoadError
   begin
     require "rake/rdoctask"
     Rake::RDocTask
-  rescue LoadError
+  rescue LoadError, StandardError
   end
 end
 
