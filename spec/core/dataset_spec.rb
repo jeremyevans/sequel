@@ -2686,6 +2686,40 @@ describe "Dataset#get" do
     @d.get(false).should == "SELECT 'f' FROM test LIMIT 1"
     @d.get(nil).should == "SELECT NULL FROM test LIMIT 1"
   end
+
+  specify "should support an array of expressions to get an array of results" do
+    @d._fetch = {:name=>1, :abc=>2}
+    @d.get([:name, :abc]).should == [1, 2]
+    @d.db.sqls.should == ['SELECT name, abc FROM test LIMIT 1']
+  end
+  
+  specify "should support an array with a single expression" do
+    @d.get([:name]).should == ['SELECT name FROM test LIMIT 1']
+  end
+  
+  specify "should handle an array with aliases" do
+    @d._fetch = {:name=>1, :abc=>2}
+    @d.get([:n___name, Sequel.as(:a, :abc)]).should == [1, 2]
+    @d.db.sqls.should == ['SELECT n AS name, a AS abc FROM test LIMIT 1']
+  end
+  
+  specify "should raise an Error if an alias cannot be determined" do
+    @d._fetch = {:name=>1, :abc=>2}
+    proc{@d.get([Sequel.+(:a, 1), :a])}.should raise_error(Sequel::Error)
+  end
+  
+  specify "should support an array of expressions in a virtual row" do
+    @d._fetch = {:name=>1, :abc=>2}
+    @d.get{[name, n__abc]}.should == [1, 2]
+    @d.db.sqls.should == ['SELECT name, n.abc FROM test LIMIT 1']
+  end
+  
+  specify "should work with static SQL" do
+    @d.with_sql('SELECT foo').get(:name).should == "SELECT foo"
+    @d._fetch = {:name=>1, :abc=>2}
+    @d.with_sql('SELECT foo').get{[name, n__abc]}.should == [1, 2]
+    @d.db.sqls.should == ['SELECT foo'] * 2
+  end
 end
 
 describe "Dataset#set_row_proc" do

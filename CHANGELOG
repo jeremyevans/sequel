@@ -1,6 +1,8 @@
 === HEAD
 
-* Default :prefetch_rows to 100 in the Oracle adapter (andrewhr)
+* Allow Database#get to take an array to return multiple values, similar to map/select_map (jeremyevans)
+
+* Default :prefetch_rows to 100 in the Oracle adapter (andrewhr) (#592)
 
 === 3.42.0 (2012-12-03)
 

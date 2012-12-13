@@ -225,12 +225,35 @@ module Sequel
     #
     #   ds.get{sum(id)} # SELECT sum(id) FROM table LIMIT 1
     #   # => 6
+    #
+    # You can pass an array of arguments to return multiple arguments,
+    # but you must make sure each element in the array has an alias that
+    # Sequel can determine:
+    #
+    #   DB[:table].get([:id, :name]) # SELECT id, name FROM table LIMIT 1
+    #   # => [3, 'foo']
+    #
+    #   DB[:table].get{[sum(id).as(sum), name]} # SELECT sum(id) AS sum, name FROM table LIMIT 1
+    #   # => [6, 'foo']
     def get(column=(no_arg=true; nil), &block)
+      ds = naked
       if block
         raise(Error, ARG_BLOCK_ERROR_MSG) unless no_arg
-        select(&block).single_value
+        ds = ds.select(&block)
+        column = ds.opts[:select]
+        column = nil if column.is_a?(Array) && column.length < 2
       else
-        select(column).single_value
+        ds = if column.is_a?(Array)
+          ds.select(*column)
+        else
+          ds.select(column)
+        end
+      end
+
+      if column.is_a?(Array)
+        ds.single_record.values_at(*column.map{|c| hash_key_symbol(c)})
+      else
+        ds.single_value
       end
     end
     
