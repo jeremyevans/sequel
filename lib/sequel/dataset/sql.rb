@@ -643,8 +643,7 @@ module Sequel
     # Note that this function does not handle tables with more than one
     # level of qualification (e.g. database.schema.table on Microsoft
     # SQL Server).
-    def schema_and_table(table_name)
-      sch = db.default_schema if db
+    def schema_and_table(table_name, sch=(db.default_schema if db))
       sch = sch.to_s if sch
       case table_name
       when Symbol
@@ -658,6 +657,22 @@ module Sequel
         [sch, table_name.to_s]
       else
         raise Error, 'table_name should be a Symbol, SQL::QualifiedIdentifier, SQL::Identifier, or String'
+      end
+    end
+
+    # Splits table_name into an array of strings.
+    #
+    #   ds.split_qualifiers(:s) # ['s']
+    #   ds.split_qualifiers(:t__s) # ['t', 's']
+    #   ds.split_qualifiers(Sequel.qualify(:d, :t__s)) # ['d', 't', 's']
+    #   ds.split_qualifiers(Sequel.qualify(:h__d, :t__s)) # ['h', 'd', 't', 's']
+    def split_qualifiers(table_name, *args)
+      case table_name
+      when SQL::QualifiedIdentifier
+        split_qualifiers(table_name.table, nil) + split_qualifiers(table_name.column, nil)
+      else
+        sch, table = schema_and_table(table_name, *args)
+        sch ? [sch, table] : [table]
       end
     end
 

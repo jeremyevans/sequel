@@ -715,6 +715,11 @@ module Sequel
       @schema_utility_dataset ||= dataset
     end
 
+    # Split the schema information from the table
+    def split_qualifiers(table_name)
+      schema_utility_dataset.split_qualifiers(table_name)
+    end
+
     # Whether the database supports combining multiple alter table
     # operations into a single query, false by default.
     def supports_combining_alter_table_ops?
