@@ -97,10 +97,16 @@ module Sequel
           db.to_application_timestamp(v.to_string)
         end
       
+        def convert_type_oracle_timestamptz(v)
+          convert_type_oracle_timestamp(db.synchronize{|c| v.timestampValue(c)})
+        end
+      
         def convert_type_proc(v)
           case v
           when JAVA_BIG_DECIMAL
             ORACLE_DECIMAL_METHOD
+          when Java::OracleSql::TIMESTAMPTZ
+            method(:convert_type_oracle_timestamptz)
           when Java::OracleSql::TIMESTAMP
             method(:convert_type_oracle_timestamp)
           else
