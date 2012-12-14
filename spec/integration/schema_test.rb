@@ -382,7 +382,7 @@ describe "Database schema modifiers" do
     proc{@ds.insert(10)}.should_not raise_error
   end
 
-  specify "should add foreign key columns to tables correctly" do
+  cspecify "should add foreign key columns to tables correctly", :hsqldb do
     @db.create_table!(:items){primary_key :id}
     @ds.insert
     i = @ds.get(:id)

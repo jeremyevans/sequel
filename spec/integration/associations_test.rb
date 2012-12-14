@@ -608,7 +608,7 @@ describe "Sequel::Model Simple Associations" do
       @els = {:eager_limit_strategy=>:correlated_subquery}
     end
     it_should_behave_like "eager limit strategies"
-  end unless Sequel.guarded?(:mysql, :db2, :oracle, :h2, :cubrid)
+  end unless Sequel.guarded?(:mysql, :db2, :oracle, :h2, :cubrid, :hsqldb)
 
   specify "should handle many_to_one associations with same name as :key" do
     Album.def_column_alias(:artist_id_id, :artist_id)
@@ -821,7 +821,7 @@ describe "Sequel::Model Composite Key Associations" do
       @els = {:eager_limit_strategy=>:correlated_subquery}
     end
     it_should_behave_like "eager limit strategies"
-  end if INTEGRATION_DB.dataset.supports_multiple_column_in? && !Sequel.guarded?(:mysql, :db2, :oracle)
+  end if INTEGRATION_DB.dataset.supports_multiple_column_in? && !Sequel.guarded?(:mysql, :db2, :oracle, :hsqldb)
 
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums
