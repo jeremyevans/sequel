@@ -138,6 +138,11 @@ module Sequel
           true
         end
 
+        # HSQLDB requires SQL standard datetimes in some places.
+        def requires_sql_standard_datetimes?
+          true
+        end
+
         # HSQLDB does not support IS TRUE.
         def supports_is_true?
           false
