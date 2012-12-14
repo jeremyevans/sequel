@@ -92,6 +92,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/columns_introspection_rb.html">columns_introspection</a>: Attemps to skip database queries by introspecting the selected columns if possible.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/connection_validator_rb.html">connection_validator</a>: Automatically validates connections on pool checkout and handles disconnections transparently.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations</a>: Creates database constraints when creating/altering tables, with metadata for <a href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">automatic model validations via the constraint_validations plugin</a>.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/date_arithmetic_rb.html">date_arithmetic</a>: Allows for database-independent date calculations (adding/subtracting an interval to/from a date/timestamp).</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/eval_inspect_rb.html">eval_inspect</a>: Makes inspect on Sequel's expression objects attempt to return a string suitable for eval.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/inflector_rb.html">inflector</a>: Adds instance-level inflection methods to String.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/looser_typecasting_rb.html">looser_typecasting</a>: Uses .to_f and .to_i instead of Kernel.Float and Kernel.Integer when typecasting floats and integers.</li>

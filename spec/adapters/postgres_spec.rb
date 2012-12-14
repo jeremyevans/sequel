@@ -2524,7 +2524,7 @@ describe 'PostgreSQL interval types' do
     v.should == ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
     v.parts.sort_by{|k,v| k.to_s}.should == [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,v| k.to_s}
   end
-end if ((require 'active_support/duration'; require 'active_support/inflector'; require 'active_support/core_ext/string/inflections'; true) rescue false)
+end if (begin require 'active_support/duration'; require 'active_support/inflector'; require 'active_support/core_ext/string/inflections'; true; rescue LoadError; false end)
 
 describe 'PostgreSQL row-valued/composite types' do
   before(:all) do

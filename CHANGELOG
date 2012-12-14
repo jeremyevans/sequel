@@ -1,5 +1,7 @@
 === HEAD
 
+* Add date_arithmetic extension for database-independent date calculations (jeremyevans)
+
 * Make Database#schema handle [host.]database.schema.table qualified tables on Microsoft SQL Server (jeremyevans)
 
 * Add Dataset#split_qualifiers helper method for splitting a qualifier identifier into array of strings (jeremyevans)
