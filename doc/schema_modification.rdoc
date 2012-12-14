@@ -162,6 +162,25 @@ column, but create a foreign key constraint:
     foreign_key [:artist_name, :artist_location], :artists
   end
 
+When using an array of symbols, you can also provide a :name option to name the constraint:
+
+  create_table(:albums) do
+    String :artist_name
+    String :artist_location
+    String :name
+    foreign_key [:artist_name, :artist_location], :artists, :name=>'albums_artist_name_location_fkey'
+  end
+
+If you want to add a foreign key for a single column with a named constraint, you must use
+the array form with a single symbol:
+
+  create_table(:albums) do
+    primary_key :id
+    Integer :artist_id
+    String :name
+    foreign_key [:artist_id], :artists, :name=>'albums_artist_id_fkey'
+  end
+
 ==== +index+
 
 +index+ creates indexes on the table.  For single columns, calling index is the same as using the
