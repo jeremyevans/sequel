@@ -13,6 +13,29 @@ module Sequel
     #
     # Which will give you the tags for all of the artist's albums.
     #
+    # Let's break down the 2nd argument of the many_through_many call:
+    #
+    #   [[:albums_artists, :artist_id, :album_id],
+    #    [:albums, :id, :id],
+    #    [:albums_tags, :album_id, :tag_id]]
+    #
+    # This argument is an array of arrays with three elements.  Each entry in the main array represents a JOIN in SQL:
+    #
+    # * The first element in each array represents the name of the table to join.
+    # * The second element in each array represents the column used to join to the previous table.
+    # * The third element in each array represents the column used to join to the next table.
+    #
+    # So the "Artist.many_through_many :tags" is translated into something similar to:
+    #
+    #   FROM artists
+    #   JOIN albums_artists ON (artists.id = albums_artists.artist_id)
+    #   JOIN albums ON (albums_artists.album_id = albums.id)
+    #   JOIN albums_tags ON (albums.id = albums_tag.album_id)
+    #   JOIN tags ON (albums_tags.tag_id = tags.id)
+    #
+    # The "artists.id" and "tags.id" criteria come from other association options (defaulting to the primary keys of the current and
+    # associated tables), but hopefully you can see how each argument in the array is used in the JOIN clauses.
+    #
     # Here are some more examples:
     #
     #   # Same as Artist.many_to_many :albums
