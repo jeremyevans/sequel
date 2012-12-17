@@ -1122,10 +1122,10 @@ module Sequel
           lcpks = opts[:left_primary_keys] = Array(left_pk)
           lpkc = opts[:left_primary_key_column] ||= left_pk
           lpkcs = opts[:left_primary_key_columns] ||= Array(lpkc)
-          raise(Error, "mismatched number of left composite keys: #{lcks.inspect} vs #{lcpks.inspect}") unless lcks.length == lcpks.length
+          raise(Error, "mismatched number of left keys: #{lcks.inspect} vs #{lcpks.inspect}") unless lcks.length == lcpks.length
           if opts[:right_primary_key]
             rcpks = Array(opts[:right_primary_key])
-            raise(Error, "mismatched number of right composite keys: #{rcks.inspect} vs #{rcpks.inspect}") unless rcks.length == rcpks.length
+            raise(Error, "mismatched number of right keys: #{rcks.inspect} vs #{rcpks.inspect}") unless rcks.length == rcpks.length
           end
           uses_lcks = opts[:uses_left_composite_keys] = lcks.length > 1
           uses_rcks = opts[:uses_right_composite_keys] = rcks.length > 1
@@ -1221,7 +1221,7 @@ module Sequel
           opts[:qualified_key] = opts.qualify_cur(key)
           if opts[:primary_key]
             cpks = Array(opts[:primary_key])
-            raise(Error, "mismatched number of composite keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
+            raise(Error, "mismatched number of keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           end
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
           qualify = opts[:qualify] != false
@@ -1281,7 +1281,7 @@ module Sequel
           cpks = opts[:primary_keys] = Array(primary_key)
           pkc = opts[:primary_key_column] ||= primary_key
           pkcs = opts[:primary_key_columns] ||= Array(pkc)
-          raise(Error, "mismatched number of composite keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
+          raise(Error, "mismatched number of keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
           opts[:dataset] ||= proc do
             opts.associated_class.filter(opts.predicate_keys.zip(cpks.map{|k| send(k)}))
