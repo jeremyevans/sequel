@@ -38,21 +38,33 @@ describe Sequel::Database do
 end
 
 describe "Simple Dataset operations" do
-  before do
+  before(:all) do
     DB2_DB.create_table!(:items) do
       Integer :id, :primary_key => true
       Integer :number
+      column  :bin_string, 'varchar(20) for bit data'
+      column  :bin_blob, 'blob'
     end
-    @ds = DB2_DB[:items]
-    @ds.insert(:number=>10, :id => 1 )
   end
-  after do
+  let(:ds) { DB2_DB[:items] }
+
+  after(:each) do
+    ds.delete
+  end
+
+  after(:all) do
     DB2_DB.drop_table(:items)
   end
-  cspecify "should insert with a primary key specified", :mssql do
-    @ds.insert(:id=>100, :number=>20)
-    @ds.count.should == 2
-    @ds.order(:id).all.should == [{:id=>1, :number=>10}, {:id=>100, :number=>20}]
+
+  specify "should insert with a primary key specified" do
+    ds.insert(:id => 1,   :number => 10)
+    ds.insert(:id => 100, :number => 20)
+    ds.select_hash(:id, :number).should == {1 => 10, 100 => 20}
+  end
+
+  specify "should insert into binary columns" do
+    ds.insert(:id => 1, :bin_string => Sequel.blob("\1"), :bin_blob => Sequel.blob("\2"))
+    ds.select(:bin_string, :bin_blob).first.should == {:bin_string => "\1", :bin_blob => "\2"}
   end
 end
 
