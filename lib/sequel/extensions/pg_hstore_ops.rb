@@ -21,7 +21,8 @@
 #   h = Sequel.expr(:hstore_column).hstore
 #
 # If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
-# you can also call Symbol#hstore:
+# or you have loaded the {core_refinements extension}[link:files/doc/core_refinements_rdoc.html])
+# and have activated refinements for the file, you can also use Symbol#hstore:
 #
 #   h = :hstore_column.hstore
 #
@@ -289,5 +290,13 @@ end
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::HStoreOpMethods
+  end
+end
+
+if defined?(Sequel::CoreRefinements)
+  module Sequel::CoreRefinements
+    refine Symbol do
+      include Sequel::Postgres::HStoreOpMethods
+    end
   end
 end

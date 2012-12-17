@@ -24,7 +24,8 @@
 #   Sequel.pg_json(hash)
 #
 # If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
-# you can also use Array#pg_json and Hash#pg_json:
+# or you have loaded the {core_refinements extension}[link:files/doc/core_refinements_rdoc.html])
+# and have activated refinements for the file, you can also use Array#pg_json and Hash#pg_json:
 #
 #   array.pg_json
 #   hash.pg_json
@@ -207,6 +208,22 @@ if Sequel.core_extensions?
     # objects that didn't come from the database.
     def pg_json
       Sequel::Postgres::JSONHash.new(self)
+    end
+  end
+end
+
+if defined?(Sequel::CoreRefinements)
+  module Sequel::CoreRefinements
+    refine Array do
+      def pg_json
+        Sequel::Postgres::JSONArray.new(self)
+      end
+    end
+
+    refine Hash do
+      def pg_json
+        Sequel::Postgres::JSONHash.new(self)
+      end
     end
   end
 end

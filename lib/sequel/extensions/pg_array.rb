@@ -18,7 +18,8 @@
 #   Sequel.pg_array(array)
 #
 # If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
-# you can also use Array#pg_array:
+# or you have loaded the {core_refinements extension}[link:files/doc/core_refinements_rdoc.html])
+# and have activated refinements for the file, you can also use Array#pg_array:
 #
 #   array.pg_array
 #
@@ -534,6 +535,16 @@ if Sequel.core_extensions?
     # come from the database.
     def pg_array(type=nil)
       Sequel::Postgres::PGArray.new(self, type)
+    end
+  end
+end
+
+if defined?(Sequel::CoreRefinements)
+  module Sequel::CoreRefinements
+    refine Array do
+      def pg_array(type=nil)
+        Sequel::Postgres::PGArray.new(self, type)
+      end
     end
   end
 end

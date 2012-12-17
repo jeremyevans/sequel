@@ -20,7 +20,8 @@
 #   Sequel.hstore(hash)
 #
 # If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
-# you can also use Hash#hstore:
+# or you have loaded the {core_refinements extension}[link:files/doc/core_refinements_rdoc.html])
+# and have activated refinements for the file, you can also use Hash#hstore:
 # 
 #   hash.hstore
 #
@@ -329,6 +330,16 @@ if Sequel.core_extensions?
     #   hash.hstore.to_hash
     def hstore
       Sequel::Postgres::HStore.new(self)
+    end
+  end
+end
+
+if defined?(Sequel::CoreRefinements)
+  module Sequel::CoreRefinements
+    refine Hash do
+      def hstore
+        Sequel::Postgres::HStore.new(self)
+      end
     end
   end
 end

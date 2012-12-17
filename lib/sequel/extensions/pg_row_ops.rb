@@ -20,7 +20,8 @@
 #   r = Sequel.expr(:row_column).pg_row
 #
 # If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
-# you can also call Symbol#pg_row:
+# or you have loaded the {core_refinements extension}[link:files/doc/core_refinements_rdoc.html])
+# and have activated refinements for the file, you can also use Symbol#pg_row:
 #
 #   r = :row_column.pg_row
 #
@@ -178,5 +179,13 @@ end
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::PGRowOp::ExpressionMethods
+  end
+end
+
+if defined?(Sequel::CoreRefinements)
+  module Sequel::CoreRefinements
+    refine Symbol do
+      include Sequel::Postgres::PGRowOp::ExpressionMethods
+    end
   end
 end

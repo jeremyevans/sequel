@@ -20,7 +20,8 @@
 #   ia = Sequel.expr(:int_array_column).pg_array
 #
 # If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
-# you can also call Symbol#pg_array:
+# or you have loaded the {core_refinements extension}[link:files/doc/core_refinements_rdoc.html])
+# and have activated refinements for the file, you can also use Symbol#pg_array:
 #
 #   ia = :int_array_column.pg_array
 #
@@ -259,5 +260,13 @@ end
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::ArrayOpMethods
+  end
+end
+
+if defined?(Sequel::CoreRefinements)
+  module Sequel::CoreRefinements
+    refine Symbol do
+      include Sequel::Postgres::ArrayOpMethods
+    end
   end
 end

@@ -28,7 +28,8 @@
 #   Sequel.pg_row(array)
 #
 # If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
-# you can also use Array#pg_row:
+# or you have loaded the {core_refinements extension}[link:files/doc/core_refinements_rdoc.html])
+# and have activated refinements for the file, you can also use Array#pg_row:
 #
 #   array.pg_row
 #
@@ -576,6 +577,16 @@ if Sequel.core_extensions?
     # Wraps the receiver in an anonymous Sequel::Postgres::PGRow::ArrayRow instance.
     def pg_row
       Sequel::Postgres::PGRow::ArrayRow.new(self)
+    end
+  end
+end
+
+if defined?(Sequel::CoreRefinements)
+  module Sequel::CoreRefinements
+    refine Array do
+      def pg_row
+        Sequel::Postgres::PGRow::ArrayRow.new(self)
+      end
     end
   end
 end

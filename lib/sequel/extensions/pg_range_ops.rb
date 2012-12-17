@@ -20,7 +20,8 @@
 #   r = Sequel.expr(:range).pg_range
 #
 # If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
-# you can also call Symbol#pg_range:
+# or you have loaded the {core_refinements extension}[link:files/doc/core_refinements_rdoc.html])
+# and have activated refinements for the file, you can also use Symbol#pg_range:
 #
 #   r = :range.pg_range
 #
@@ -146,5 +147,13 @@ end
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::RangeOpMethods
+  end
+end
+
+if defined?(Sequel::CoreRefinements)
+  module Sequel::CoreRefinements
+    refine Symbol do
+      include Sequel::Postgres::RangeOpMethods
+    end
   end
 end

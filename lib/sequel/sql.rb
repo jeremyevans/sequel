@@ -655,7 +655,7 @@ module Sequel
       #   Sequel.function(:func).cast_numeric # CAST(func() AS integer)
       #   Sequel.function(:func).cast_numeric(Float) # CAST(func() AS double precision)
       def cast_numeric(sql_type = nil)
-        cast(sql_type || Integer).sql_number
+        Cast.new(self, sql_type || Integer).sql_number
       end
 
       # Cast the reciever to the given SQL type (or the database's default String type if none given),
@@ -665,7 +665,7 @@ module Sequel
       #   Sequel.function(:func).cast_string # CAST(func() AS varchar(255))
       #   Sequel.function(:func).cast_string(:text) # CAST(func() AS text)
       def cast_string(sql_type = nil)
-        cast(sql_type || String).sql_string
+        Cast.new(self, sql_type || String).sql_string
       end
     end
 

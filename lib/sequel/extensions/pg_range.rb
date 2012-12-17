@@ -25,7 +25,8 @@
 #   Sequel.pg_range(range)
 #
 # If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
-# you can also use Range#pg_range:
+# or you have loaded the {core_refinements extension}[link:files/doc/core_refinements_rdoc.html])
+# and have activated refinements for the file, you can also use Range#pg_range:
 #
 #   range.pg_range 
 #
@@ -508,6 +509,16 @@ if Sequel.core_extensions?
     # with the given database type.
     def pg_range(db_type=nil)
       Sequel::Postgres::PGRange.from_range(self, db_type)
+    end
+  end
+end
+
+if defined?(Sequel::CoreRefinements)
+  module Sequel::CoreRefinements
+    refine Range do
+      def pg_range(db_type=nil)
+        Sequel::Postgres::PGRange.from_range(self, db_type)
+      end
     end
   end
 end

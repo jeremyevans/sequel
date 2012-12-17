@@ -1,5 +1,7 @@
 === HEAD
 
+* Add core_refinements extension, providing refinement versions of Sequel's core extensions (jeremyevans)
+
 * Make Database#copy_into raise a DatabaseError if the database signals an error in the postgres adapter (jeremyevans)
 
 * Define respond_to_missing? where method_missing is defined and the object supports respond_to? (jeremyevans)
