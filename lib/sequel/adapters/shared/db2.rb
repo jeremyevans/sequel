@@ -204,7 +204,6 @@ module Sequel
     module DatasetMethods
       include EmulateOffsetWithRowNumber
 
-      APOS = Dataset::APOS
       PAREN_CLOSE = Dataset::PAREN_CLOSE
       PAREN_OPEN = Dataset::PAREN_OPEN
       BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}
@@ -217,9 +216,9 @@ module Sequel
       FETCH_FIRST = " FETCH FIRST ".freeze
       ROWS_ONLY = " ROWS ONLY".freeze
       EMPTY_FROM_TABLE = ' FROM "SYSIBM"."SYSDUMMY1"'.freeze
-      HEX_START = 'X'.freeze
       HSTAR = "H*".freeze
-      CAST_BLOB_OPEN = "BLOB(".freeze
+      BLOB_OPEN = "BLOB(X'".freeze
+      BLOB_CLOSE = "')".freeze
 
       # DB2 casts strings using RTRIM and CHAR instead of VARCHAR.
       def cast_sql_append(sql, expr, type)
@@ -322,7 +321,11 @@ module Sequel
 
       # DB2 uses a literal hexidecimal number for blob strings
       def literal_blob_append(sql, v)
-        sql << CAST_BLOB_OPEN << HEX_START << APOS << v.unpack(HSTAR).first << APOS << PAREN_CLOSE
+        if ::Sequel::DB2.use_clob_as_blob
+          super
+        else
+          sql << BLOB_OPEN << v.unpack(HSTAR).first << BLOB_CLOSE
+        end
       end
 
       # Add a fallback table for empty from situation

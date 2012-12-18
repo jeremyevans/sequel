@@ -1,5 +1,7 @@
 === HEAD
 
+* Cast blobs correctly on DB2 when use_clob_as_blob is false (mluu, jeremyevans) (#594)
+
 * Add date_arithmetic extension for database-independent date calculations (jeremyevans)
 
 * Make Database#schema handle [host.]database.schema.table qualified tables on Microsoft SQL Server (jeremyevans)

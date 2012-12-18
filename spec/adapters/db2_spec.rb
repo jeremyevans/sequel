@@ -39,32 +39,32 @@ end
 
 describe "Simple Dataset operations" do
   before(:all) do
+    Sequel::DB2.use_clob_as_blob = false
     DB2_DB.create_table!(:items) do
       Integer :id, :primary_key => true
       Integer :number
       column  :bin_string, 'varchar(20) for bit data'
       column  :bin_blob, 'blob'
     end
+    @ds = DB2_DB[:items]
   end
-  let(:ds) { DB2_DB[:items] }
-
   after(:each) do
-    ds.delete
+    @ds.delete
   end
-
   after(:all) do
+    Sequel::DB2.use_clob_as_blob = true
     DB2_DB.drop_table(:items)
   end
 
   specify "should insert with a primary key specified" do
-    ds.insert(:id => 1,   :number => 10)
-    ds.insert(:id => 100, :number => 20)
-    ds.select_hash(:id, :number).should == {1 => 10, 100 => 20}
+    @ds.insert(:id => 1,   :number => 10)
+    @ds.insert(:id => 100, :number => 20)
+    @ds.select_hash(:id, :number).should == {1 => 10, 100 => 20}
   end
 
   specify "should insert into binary columns" do
-    ds.insert(:id => 1, :bin_string => Sequel.blob("\1"), :bin_blob => Sequel.blob("\2"))
-    ds.select(:bin_string, :bin_blob).first.should == {:bin_string => "\1", :bin_blob => "\2"}
+    @ds.insert(:id => 1, :bin_string => Sequel.blob("\1"), :bin_blob => Sequel.blob("\2"))
+    @ds.select(:bin_string, :bin_blob).first.should == {:bin_string => "\1", :bin_blob => "\2"}
   end
 end
 
