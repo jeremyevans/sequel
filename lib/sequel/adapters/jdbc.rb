@@ -33,14 +33,14 @@ module Sequel
         Sequel.ts_require 'adapters/jdbc/postgresql'
         db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::Postgres::Dataset
-        JDBC.load_gem('postgres')
+        JDBC.load_gem(:Postgres)
         org.postgresql.Driver
       end,
       :mysql=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/mysql'
         db.extend(Sequel::JDBC::MySQL::DatabaseMethods)
         db.extend_datasets Sequel::MySQL::DatasetMethods
-        JDBC.load_gem('mysql')
+        JDBC.load_gem(:MySQL)
         com.mysql.jdbc.Driver
       end,
       :sqlite=>proc do |db|
@@ -48,7 +48,7 @@ module Sequel
         db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
         db.extend_datasets Sequel::SQLite::DatasetMethods
         db.set_integer_booleans
-        JDBC.load_gem('sqlite3')
+        JDBC.load_gem(:SQLite3)
         org.sqlite.JDBC
       end,
       :oracle=>proc do |db|
@@ -69,14 +69,14 @@ module Sequel
         db.extend(Sequel::JDBC::JTDS::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::JTDS::Dataset
         db.send(:set_mssql_unicode_strings)
-        JDBC.load_gem('jtds')
+        JDBC.load_gem(:JTDS)
         Java::net.sourceforge.jtds.jdbc.Driver
       end,
       :h2=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/h2'
         db.extend(Sequel::JDBC::H2::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::H2::Dataset
-        JDBC.load_gem('h2')
+        JDBC.load_gem(:H2)
         org.h2.Driver
       end,
       :hsqldb=>proc do |db|
@@ -90,7 +90,7 @@ module Sequel
         Sequel.ts_require 'adapters/jdbc/derby'
         db.extend(Sequel::JDBC::Derby::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::Derby::Dataset
-        JDBC.load_gem('derby')
+        JDBC.load_gem(:Derby)
         org.apache.derby.jdbc.EmbeddedDriver
       end,
       :as400=>proc do |db|
@@ -135,9 +135,14 @@ module Sequel
     # works for PostgreSQL, MySQL, and SQLite.
     def self.load_gem(name)
       begin
-        Sequel.tsk_require "jdbc/#{name}"
+        Sequel.tsk_require "jdbc/#{name.to_s.downcase}"
       rescue LoadError
         # jdbc gem not used, hopefully the user has the .jar in their CLASSPATH
+      else
+        if defined?(::Jdbc) && ( ::Jdbc.const_defined?(name) rescue nil )
+          jdbc_module = ::Jdbc.const_get(name) # e.g. Jdbc::SQLite3
+          jdbc_module.load_driver if jdbc_module.respond_to?(:load_driver)
+        end
       end
     end
 
