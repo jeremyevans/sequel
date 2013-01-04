@@ -26,9 +26,9 @@ toolkit for Ruby.
 * {RDoc}[http://sequel.rubyforge.org/rdoc]
 
 To check out the source code:
-  
+
   git clone git://github.com/jeremyevans/sequel.git
-  
+
 === Contact
 
 If you have any comments or suggestions please post to the Google group.
@@ -36,30 +36,30 @@ If you have any comments or suggestions please post to the Google group.
 == Installation
 
   sudo gem install sequel
-  
+
 == A Short Example
 
   require 'rubygems'
   require 'sequel'
-  
+
   DB = Sequel.sqlite # memory database
-  
+
   DB.create_table :items do
     primary_key :id
     String :name
     Float :price
   end
-  
+
   items = DB[:items] # Create a dataset
-  
+
   # Populate the table
   items.insert(:name => 'abc', :price => rand * 100)
   items.insert(:name => 'def', :price => rand * 100)
   items.insert(:name => 'ghi', :price => rand * 100)
-  
+
   # Print out the number of records
   puts "Item count: #{items.count}"
-  
+
   # Print out the average price
   puts "The average price is: #{items.avg(:price)}"
 
@@ -82,7 +82,7 @@ Sequel uses the concept of datasets to retrieve data. A Dataset object encapsula
 For example, the following one-liner returns the average GDP for countries in the middle east region:
 
   DB[:countries].filter(:region => 'Middle East').avg(:GDP)
-  
+
 Which is equivalent to:
 
   SELECT avg(GDP) FROM countries WHERE region = 'Middle East'
@@ -91,11 +91,11 @@ Since datasets retrieve records only when needed, they can be stored and later r
 
   middle_east = DB[:countries].filter(:region => 'Middle East')
   middle_east.order(:name).each{|r| puts r[:name]}
-  
+
 Sequel also offers convenience methods for extracting data from Datasets, such as an extended +map+ method:
 
   middle_east.map(:name) #=> ['Egypt', 'Turkey', 'Israel', ...]
-  
+
 Or getting results as a hash via +to_hash+, with one column as key and another as value:
 
   middle_east.to_hash(:name, :area) #=> {'Israel' => 20000, 'Turkey' => 120000, ...}
@@ -108,7 +108,7 @@ To connect to a database you simply provide <tt>Sequel.connect</tt> with a URL:
 
   require 'sequel'
   DB = Sequel.connect('sqlite://blog.db')
-  
+
 The connection URL can also include such stuff as the user name, password, and port:
 
   DB = Sequel.connect('postgres://user:password@host:port/database_name')
@@ -174,49 +174,49 @@ Or perform more advanced stuff:
 
   names_and_dates = posts.map([:name, :date])
   old_posts, recent_posts = posts.partition{|r| r[:date] < Date.today - 7}
-  
+
 You can also retrieve the first record in a dataset:
 
   posts.first
   # SELECT * FROM posts LIMIT 1
-  
+
 Or retrieve a single record with a specific value:
 
   posts[:id => 1]
   # SELECT * FROM posts WHERE id = 1 LIMIT 1
-  
+
 If the dataset is ordered, you can also ask for the last record:
 
   posts.order(:stamp).last
   # SELECT * FROM posts ORDER BY stamp DESC LIMIT 1
-  
+
 === Filtering Records
 
 An easy way to filter records is to provide a hash of values to match to +where+:
 
   my_posts = posts.where(:category => 'ruby', :author => 'david')
   # WHERE category = 'ruby' AND author = 'david'
-  
+
 You can also specify ranges:
 
   my_posts = posts.where(:stamp => (Date.today - 14)..(Date.today - 7))
   # WHERE stamp >= '2010-06-30' AND stamp <= '2010-07-07'
-  
+
 Or arrays of values:
 
   my_posts = posts.where(:category => ['ruby', 'postgres', 'linux'])
   # WHERE category IN ('ruby', 'postgres', 'linux')
-  
+
 Sequel also accepts expressions:
-  
+
   my_posts = posts.where{stamp > Date.today << 1}
   # WHERE stamp > '2010-06-14'
-  
+
 Some adapters will also let you specify Regexps:
 
   my_posts = posts.where(:category => /ruby/i)
   # WHERE category ~* 'ruby'
-  
+
 You can also use an inverse filter via +exclude+:
 
   my_posts = posts.exclude(:category => ['ruby', 'postgres', 'linux'])
@@ -241,7 +241,7 @@ Datasets can also be used as subqueries:
 After filtering, you can retrieve the matching records by using any of the retrieval methods:
 
   my_posts.each{|row| p row}
-  
+
 See the {Dataset Filtering}[link:files/doc/dataset_filtering_rdoc.html] file for more details.
 
 === Summarizing Records
@@ -255,17 +255,17 @@ And you can also query maximum/minimum values via +max+ and +min+:
 
   max = DB[:history].max(:value)
   # SELECT max(value) FROM history
-  
+
   min = DB[:history].min(:value)
   # SELECT min(value) FROM history
-  
+
 Or calculate a sum or average via +sum+ and +avg+:
 
   sum = DB[:items].sum(:price)
   # SELECT sum(price) FROM items
   avg = DB[:items].avg(:price)
   # SELECT avg(price) FROM items
-  
+
 === Ordering Records
 
 Ordering datasets is simple using +order+:
@@ -284,12 +284,12 @@ The +order_append+ method chains this way, though:
 
   posts.order(:stamp).order_append(:name)
   # ORDER BY stamp, name
-  
+
 The +order_prepend+ method can be used as well:
 
   posts.order(:stamp).order_prepend(:name)
   # ORDER BY name, stamp
-  
+
 You can also specify descending order:
 
   posts.reverse_order(:stamp)
@@ -325,14 +325,14 @@ As you might expect, there is an +order_append+ equivalent for +select+ called +
 
   posts.select(:stamp).select_append(:name)
   # SELECT stamp, name FROM posts
-  
+
 === Deleting Records
 
 Deleting records from the table is done with +delete+:
 
   posts.where('stamp < ?', Date.today - 3).delete
   # DELETE FROM posts WHERE stamp < '2010-07-11'
-  
+
 Be very careful when deleting, as +delete+ affects all rows in the dataset.
 Call +where+ first and +delete+ second:
 
@@ -347,7 +347,7 @@ Inserting records into the table is done with +insert+:
 
   posts.insert(:category => 'ruby', :author => 'david')
   # INSERT INTO posts (category, author) VALUES ('ruby', 'david')
-  
+
 === Updating Records
 
 Updating records in the table is done with +update+:
@@ -397,7 +397,7 @@ Sequel makes it easy to join tables:
   order_items = DB[:items].join(:order_items, :item_id => :id).
     where(:order_id => 1234)
   # SELECT * FROM items INNER JOIN order_items
-  # ON order_items.item_id = items.id 
+  # ON order_items.item_id = items.id
   # WHERE order_id = 1234
 
 The important thing to note here is that item_id is automatically qualified with
@@ -410,7 +410,7 @@ You can then do anything you like with the dataset:
   # SELECT sum(price) FROM items INNER JOIN order_items
   # ON order_items.item_id = items.id
   # WHERE order_items.order_id = 1234
-  
+
 === Graphing Datasets
 
 When retrieving records from joined datasets, you get the results in a single hash, which is subject to clobbering if you have columns with the same name in multiple tables:
@@ -550,7 +550,7 @@ You can read the record values as object attributes, assuming the attribute name
 
   post.id #=> 123
   post.title #=> 'hello world'
-  
+
 If the record's attributes names are not valid columns in the model's dataset (maybe because you used +select_append+ to add a computed value column), you can use <tt>Model#[]</tt> to access the values:
 
   post[:id] #=> 123
@@ -559,9 +559,9 @@ If the record's attributes names are not valid columns in the model's dataset (m
 You can also modify record values using attribute setters, the <tt>[]=</tt> method, or the +set+ method:
 
   post.title = 'hey there'
-  # or 
+  # or
   post[:title] = 'hey there'
-  # or 
+  # or
   post.set(:title=>'hey there')
 
 That will just change the value for the object, it will not update the row in the database.  To update the database row, call the +save+ method:
@@ -624,8 +624,8 @@ Records can also be deleted en-masse by calling <tt>Model.delete</tt> and <tt>Mo
   Post.where(:category => 32).delete # => bypasses hooks
   Post.where(:category => 32).destroy # => runs hooks
 
-Please note that if <tt>Model.destroy</tt> is called, each record is deleted 
-separately, but <tt>Model.delete</tt> deletes all matching records with a single 
+Please note that if <tt>Model.destroy</tt> is called, each record is deleted
+separately, but <tt>Model.delete</tt> deletes all matching records with a single
 SQL query.
 
 === Associations
@@ -658,7 +658,7 @@ Associations are used in order to specify relationships between model classes th
   post.add_tag(tag)
   post.remove_tag(tag)
   post.remove_all_tags
-  
+
 Note that the remove_* and remove_all_* methods do not delete the object from the database, they merely disassociate the associated object from the receiver.
 
 All associations add a dataset method that can be used to further filter or reorder the returned objects, or modify all of them:
@@ -699,21 +699,21 @@ Associations can be eagerly loaded via +eager+ and the <tt>:eager</tt> associati
 
   # eager is a dataset method, so it works with filters/orders/limits/etc.
   Post.where{topic > 'M'}.order(:date).limit(5).eager(:person).all
-  
+
   person = Person.first
   # Eager loading via :eager (will eagerly load the tags for this person's posts)
   person.posts
-  
+
   # These are equivalent
   Post.eager(:person, :tags).all
   Post.eager(:person).eager(:tags).all
-  
+
   # Cascading via .eager
   Tag.eager(:posts=>:replies).all
-  
+
   # Will also grab all associated posts' tags (because of :eager)
   Reply.eager(:person=>:posts).all
-  
+
   # No depth limit (other than memory/stack), and will also grab posts' tags
   # Loads all people, their posts, their posts' tags, replies to those posts,
   # the person for each reply, the tag for each reply, and all posts and
