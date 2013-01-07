@@ -429,6 +429,8 @@ module Sequel
         pk = SQL::Identifier.new(primary_key(table))
         db = self
         seq_ds = db.from(LiteralString.new(seq))
+        s, t = schema_and_table(table)
+        table = Sequel.qualify(s, t) if s
         get{setval(seq, db[table].select{coalesce(max(pk)+seq_ds.select{:increment_by}, seq_ds.select(:min_value))}, false)}
       end
 

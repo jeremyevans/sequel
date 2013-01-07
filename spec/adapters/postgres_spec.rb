@@ -539,6 +539,25 @@ describe "A PostgreSQL database" do
     @db[:posts].insert.should == 21
     @db[:posts].order(:a).map(:a).should == [1, 2, 10, 20, 21]
   end
+    
+  specify "should support resetting the primary key sequence with default_schema" do
+    begin
+      @db.run("DROP SCHEMA p") rescue nil
+      @db.run("CREATE SCHEMA p")
+      @db.default_schema = :p
+      @db.create_table(:posts){primary_key :a}
+      @db[:p__posts].insert(:a=>20).should == 20
+      @db[:p__posts].insert.should == 1
+      @db[:p__posts].insert.should == 2
+      @db[:p__posts].insert(:a=>10).should == 10
+      @db.reset_primary_key_sequence(:posts).should == 21
+      @db[:p__posts].insert.should == 21
+      @db[:p__posts].order(:a).map(:a).should == [1, 2, 10, 20, 21]
+    ensure
+      @db.default_schema = nil
+      @db.run("DROP SCHEMA p CASCADE")
+    end
+  end
 
   specify "should support specifying Integer/Bignum/Fixnum types in primary keys and have them be auto incrementing" do
     @db.create_table(:posts){primary_key :a, :type=>Integer}

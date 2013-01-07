@@ -1,5 +1,7 @@
 === HEAD
 
+* Support default_schema when reseting primary key sequences on PostgreSQL (jeremyevans) (#596)
+
 * Allow treating tinyint(1) unsigned columns as booleans in the mysql adapters (jeremyevans)
 
 * Support the jdbc-hsqldb gem in the jdbc adapter, since it has been updated to 2.2.9 (jeremyevans)
