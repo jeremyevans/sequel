@@ -390,7 +390,7 @@ module Sequel
     vr = SQL::VirtualRow.new
     case block.arity
     when -1, 0
-      vr.instance_eval(&block)
+      vr.instance_exec(&block)
     else
       block.call(vr)
     end  

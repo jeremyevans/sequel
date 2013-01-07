@@ -6,7 +6,7 @@ module Sequel
     class BasicObject
       # The instance methods to not remove from the class when removing
       # other methods.
-      KEEP_METHODS = %w"__id__ __send__ __metaclass__ instance_eval == equal? initialize method_missing"
+      KEEP_METHODS = %w"__id__ __send__ __metaclass__ instance_eval instance_exec == equal? initialize method_missing"
 
       # Remove all but the most basic instance methods from the class.  A separate
       # method so that it can be called again if necessary if you load libraries

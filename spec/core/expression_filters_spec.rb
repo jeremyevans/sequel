@@ -594,6 +594,11 @@ describe "Sequel core extension replacements" do
     l(Sequel.expr(proc{|v| @o}) + 1, "(foo + 1)")
   end
 
+  it "Sequel.expr should handle lambda proc virtual rows" do
+    l(Sequel.expr(&lambda{1}), "1")
+    l(Sequel.expr(&lambda{|| 1}), "1")
+  end
+
   it "Sequel.expr should raise an error if given an argument and a block" do
     proc{Sequel.expr(nil){}}.should raise_error(Sequel::Error)
   end
