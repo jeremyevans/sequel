@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle schema-qualified row_types in the pg_array integration in the pg_row extension (jeremyevans) (#595)
+
 * Support default_schema when reseting primary key sequences on PostgreSQL (jeremyevans) (#596)
 
 * Allow treating tinyint(1) unsigned columns as booleans in the mysql adapters (jeremyevans)

@@ -2566,8 +2566,8 @@ describe 'PostgreSQL row-valued/composite types' do
       column :employees, 'person[]'
     end
     @db.register_row_type(:address)
-    @db.register_row_type(:person)
-    @db.register_row_type(:company)
+    @db.register_row_type(Sequel.qualify(:public, :person))
+    @db.register_row_type(:public__company)
 
     @native = POSTGRES_DB.adapter_scheme == :postgres
   end

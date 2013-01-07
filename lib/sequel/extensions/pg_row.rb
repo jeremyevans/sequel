@@ -460,7 +460,12 @@ module Sequel
           @conversion_procs[parser.oid] = parser
 
           if defined?(PGArray) && PGArray.respond_to?(:register) && array_oid && array_oid > 0
-            PGArray.register(db_type, :oid=>array_oid, :converter=>parser, :type_procs=>@conversion_procs, :scalar_typecast=>schema_type_symbol)
+            array_type_name = if type_schema
+              "#{type_schema}.#{type_name}"
+            else
+              type_name
+            end
+            PGArray.register(array_type_name, :oid=>array_oid, :converter=>parser, :type_procs=>@conversion_procs, :scalar_typecast=>schema_type_symbol)
           end
 
           @row_types[db_type] = opts.merge(:parser=>parser)
