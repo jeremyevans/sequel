@@ -83,7 +83,7 @@ module Sequel
         Sequel.ts_require 'adapters/jdbc/hsqldb'
         db.extend(Sequel::JDBC::HSQLDB::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::HSQLDB::Dataset
-        # Current gem is 1.8.1.3, but Sequel supports 2.2.5
+        JDBC.load_gem(:HSQLDB)
         org.hsqldb.jdbcDriver
       end,
       :derby=>proc do |db|

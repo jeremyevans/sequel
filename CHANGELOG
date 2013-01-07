@@ -1,5 +1,9 @@
 === HEAD
 
+* Support the jdbc-hsqldb gem in the jdbc adapter, since it has been updated to 2.2.9 (jeremyevans)
+
+* Work with new jdbc-* gems that require manual driver loading (kares) (#598)
+
 * Cast blobs correctly on DB2 when use_clob_as_blob is false (mluu, jeremyevans) (#594)
 
 * Add date_arithmetic extension for database-independent date calculations (jeremyevans)
