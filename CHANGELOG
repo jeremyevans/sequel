@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow treating tinyint(1) unsigned columns as booleans in the mysql adapters (jeremyevans)
+
 * Support the jdbc-hsqldb gem in the jdbc adapter, since it has been updated to 2.2.9 (jeremyevans)
 
 * Work with new jdbc-* gems that require manual driver loading (kares) (#598)

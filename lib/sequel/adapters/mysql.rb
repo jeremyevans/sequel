@@ -275,7 +275,7 @@ module Sequel
       
       # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true
       def schema_column_type(db_type)
-        convert_tinyint_to_bool && db_type == 'tinyint(1)' ? :boolean : super
+        convert_tinyint_to_bool && db_type =~ /\Atinyint\(1\)/ ? :boolean : super
       end
     end
     

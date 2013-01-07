@@ -20,7 +20,7 @@ module Sequel
 
         # Recognize the tinyint(1) column as boolean.
         def schema_column_type(db_type)
-          db_type == 'tinyint(1)' ? :boolean : super
+          db_type =~ /\Atinyint\(1\)/ ? :boolean : super
         end
 
         # Apply the connectiong setting SQLs for every new connection.

@@ -55,7 +55,7 @@ module Sequel
 
         # Convert tinyint(1) type to boolean
         def schema_column_type(db_type)
-          db_type == 'tinyint(1)' ? :boolean : super
+          db_type =~ /\Atinyint\(1\)/ ? :boolean : super
         end
       
         # Run the default connection setting SQL statements.
