@@ -5,6 +5,8 @@
 # To load the extension, do:
 #
 #   Sequel.extension :query
+#
+# This extension uses Object#extend at runtime, which can hurt performance.
 
 module Sequel
   class Database

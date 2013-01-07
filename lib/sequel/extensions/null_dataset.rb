@@ -24,6 +24,8 @@
 # dataset and the dataset doesn't have an already cached
 # version of the columns, it will create a new dataset with
 # the same options to get the columns.
+#
+# This extension uses Object#extend at runtime, which can hurt performance.
 
 module Sequel
   class Dataset

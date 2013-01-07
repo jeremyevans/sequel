@@ -75,6 +75,13 @@ and update queries, the hash to insert/update is passed to +prepare+:
   ps2.call(:n=>'Jim', :new_n=>'Bob')
   DB.call(:update_name, :n=>'Jim', :new_n=>'Bob') # same as above
 
+== Implementation Issues
+
+Currently, creating a prepared statement uses Object#extend, which can hurt
+performance.  For high performance applications, it's recommended to create
+all of your prepared statements upon application initialization, and not
+to create prepared statements dynamically at runtime.
+
 == Database support
 
 === PostgreSQL

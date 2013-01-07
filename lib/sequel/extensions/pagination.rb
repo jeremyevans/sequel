@@ -5,6 +5,8 @@
 # To load the extension:
 #
 #   Sequel.extension :pagination
+#
+# This extension uses Object#extend at runtime, which can hurt performance.
 
 module Sequel
   class Dataset
