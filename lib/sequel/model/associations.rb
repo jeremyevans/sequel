@@ -69,11 +69,6 @@ module Sequel
           :"#{self[:name]}_dataset"
         end
       
-        # Name symbol for the _helper internal association method
-        def dataset_helper_method
-          :"_#{self[:name]}_dataset_helper"
-        end
-      
         # Whether the dataset needs a primary key to function, true by default.
         def dataset_need_primary_key?
           true
@@ -1096,9 +1091,6 @@ module Sequel
       
         # Adds the association dataset methods to the association methods module.
         def def_association_dataset_methods(opts)
-          # If a block is given, define a helper method for it, because it takes
-          # an argument.  This is unnecessary in Ruby 1.9, as that has instance_exec.
-          association_module_private_def(opts.dataset_helper_method, opts, &opts[:block]) if opts[:block]
           association_module_private_def(opts._dataset_method, opts, &opts[:dataset])
           association_module_def(opts.dataset_method, opts){_dataset(opts)}
           def_association_method(opts)
@@ -1452,7 +1444,7 @@ module Sequel
           ds = ds.eager(*opts[:eager]) if opts[:eager]
           ds = ds.distinct if opts[:distinct]
           ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph] && opts.eager_graph_lazy_dataset?
-          ds = send(opts.dataset_helper_method, ds) if opts[:block]
+          ds = instance_exec(ds, &opts[:block]) if opts[:block]
           ds
         end
 
