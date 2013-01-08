@@ -199,6 +199,11 @@ module Sequel
       def method_missing(type, name = nil, opts = {})
         name ? column(name, type, opts) : super
       end
+
+      # This object responds to all methods.
+      def respond_to_missing?(meth, include_private)
+        true
+      end
       
       # Adds an autoincrementing primary key column or a primary key constraint to the DDL.
       # To create a constraint, the first argument should be an array of column symbols

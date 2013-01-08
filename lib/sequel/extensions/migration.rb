@@ -61,6 +61,11 @@ module Sequel
       @db.send(method_sym, *args, &block)
     end
 
+    # This object responds to all methods the database responds to.
+    def respond_to_missing?(meth, include_private)
+      @db.respond_to?(meth, include_private)
+    end
+
     # The default up action does nothing
     def up
     end

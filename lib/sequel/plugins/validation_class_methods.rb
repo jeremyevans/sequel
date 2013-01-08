@@ -51,6 +51,11 @@ module Sequel
           def method_missing(m, *args, &block)
             @receiver.send(:"validates_#{m}", *args, &block)
           end
+
+          # This object responds to all validates_* methods the model responds to.
+          def respond_to_missing?(meth, include_private)
+            @receiver.respond_to?(:"validates_#{meth}", include_private)
+          end
         end
     
         # Returns true if validations are defined.

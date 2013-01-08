@@ -1,5 +1,7 @@
 === HEAD
 
+* Define respond_to_missing? where method_missing is defined and the object supports respond_to? (jeremyevans)
+
 * Allow lambda procs with 0 arity as virtual row blocks on ruby 1.9 (jeremyevans)
 
 * Handle schema-qualified row_types in the pg_array integration in the pg_row extension (jeremyevans) (#595)
