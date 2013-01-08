@@ -1085,11 +1085,11 @@ module Sequel
       def hash
         case primary_key
         when Array
-          [model, !pk.all? ? @values.sort_by{|k,v| k.to_s} : pk].hash
+          [model, !pk.all? ? @values : pk].hash
         when Symbol
-          [model, pk.nil? ? @values.sort_by{|k,v| k.to_s} : pk].hash
+          [model, pk.nil? ? @values : pk].hash
         else
-          [model, @values.sort_by{|k,v| k.to_s}].hash
+          [model, @values].hash
         end
       end
   
