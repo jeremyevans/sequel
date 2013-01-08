@@ -22,6 +22,8 @@ rescue LoadError
   nil
 end
 
+Sequel.extension :meta_def
+
 # Load core_refinements extension first, so pg_* extensions add their own refinements
 Sequel.extension :core_refinements if RUBY_VERSION >= '2.0.0'
 

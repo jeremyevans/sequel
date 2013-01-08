@@ -23,8 +23,6 @@ module Sequel
   #
   # For more information, see the {"Dataset Basics" guide}[link:files/doc/dataset_basics_rdoc.html].
   class Dataset
-    extend Metaprogramming
-    include Metaprogramming
     include Enumerable
     include SQL::AliasMethods
     include SQL::BooleanMethods

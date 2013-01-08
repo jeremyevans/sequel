@@ -2,8 +2,6 @@ module Sequel
   class Model
     extend Enumerable
     extend Inflections
-    extend Metaprogramming
-    include Metaprogramming
 
     # Class methods for Sequel::Model that implement basic model functionality.
     #

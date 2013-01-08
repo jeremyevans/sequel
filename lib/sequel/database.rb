@@ -13,8 +13,6 @@ module Sequel
   # The Database class is meant to be subclassed by database adapters in order
   # to provide the functionality needed for executing queries.
   class Database
-    extend Metaprogramming
-    include Metaprogramming
   end
 
   require(%w"connecting dataset dataset_defaults logging misc query schema_generator schema_methods", 'database')

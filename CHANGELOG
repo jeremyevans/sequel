@@ -1,5 +1,7 @@
 === HEAD
 
+* Move the #meta_def support for Database, Dataset, and Model to the meta_def extension (jeremyevans)
+
 * Fix Database#copy_into on jdbc/postgres when an exception is raised (jeremyevans)
 
 * Add core_refinements extension, providing refinement versions of Sequel's core extensions (jeremyevans)

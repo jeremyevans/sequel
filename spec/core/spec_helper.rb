@@ -6,6 +6,8 @@ unless Object.const_defined?('Sequel')
   require 'sequel/core'
 end
 
+Sequel.extension :meta_def
+
 if ENV['SEQUEL_COLUMNS_INTROSPECTION']
   Sequel.extension :columns_introspection
   Sequel::Dataset.introspect_all_columns
