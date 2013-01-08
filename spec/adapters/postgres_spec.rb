@@ -1314,6 +1314,13 @@ if ((POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || POST
       end
     end
 
+    specify "should handle database errors with a rollback of copied data and still have a usable connection" do
+      2.times do
+        proc{@db.copy_into(:test_copy, :data=>["1\t2\n", "3\ta\n"])}.should raise_error(Sequel::DatabaseError)
+        @ds.select_map([:x, :y]).should == []
+      end
+    end
+
     specify "should raise an Error if both :data and a block are provided" do
       proc{@db.copy_into(:test_copy, :data=>["1\t2\n", "3\t4\n"]){}}.should raise_error(Sequel::Error)
     end

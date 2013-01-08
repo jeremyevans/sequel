@@ -328,10 +328,12 @@ module Sequel
               end
             rescue Exception => e
               conn.put_copy_end("ruby exception occurred while copying data into PostgreSQL")
-              raise
             ensure
               conn.put_copy_end unless e
-              conn.get_result
+              while res = conn.get_result
+                raise e if e
+                check_database_errors{res.check}
+              end
             end
           end 
         end

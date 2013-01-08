@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#copy_into raise a DatabaseError if the database signals an error in the postgres adapter (jeremyevans)
+
 * Define respond_to_missing? where method_missing is defined and the object supports respond_to? (jeremyevans)
 
 * Allow lambda procs with 0 arity as virtual row blocks on ruby 1.9 (jeremyevans)
