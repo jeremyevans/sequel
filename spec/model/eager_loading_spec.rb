@@ -150,7 +150,7 @@ describe Sequel::Model, "#eager" do
   end
   
   it "should eagerly load a single one_to_one association using the :distinct_on strategy" do
-    EagerTrack.dataset.meta_def(:supports_distinct_on?){true}
+    def (EagerTrack.dataset).supports_distinct_on?() true end
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>true
     a = EagerAlbum.eager(:track).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
@@ -160,7 +160,7 @@ describe Sequel::Model, "#eager" do
   end
   
   it "should eagerly load a single one_to_one association using the :window_function strategy" do
-    EagerTrack.dataset.meta_def(:supports_window_functions?){true}
+    def (EagerTrack.dataset).supports_window_functions?() true end
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>true, :order=>:name
     a = EagerAlbum.eager(:track).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
@@ -562,7 +562,7 @@ describe Sequel::Model, "#eager" do
   end
 
   it "should respect the :limit option on a one_to_many association using the :window_function strategy" do
-    EagerTrack.dataset.meta_def(:supports_window_functions?){true}
+    def (EagerTrack.dataset).supports_window_functions?() true end
     EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>true, :order=>:name, :limit=>2
     a = EagerAlbum.eager(:tracks).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
@@ -572,7 +572,7 @@ describe Sequel::Model, "#eager" do
   end
   
   it "should respect the :limit option with an offset on a one_to_many association using the :window_function strategy" do
-    EagerTrack.dataset.meta_def(:supports_window_functions?){true}
+    def (EagerTrack.dataset).supports_window_functions?() true end
     EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>true, :order=>:name, :limit=>[2, 1]
     a = EagerAlbum.eager(:tracks).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
@@ -616,7 +616,7 @@ describe Sequel::Model, "#eager" do
   end
 
   it "should respect the limit option on a many_to_many association using the :window_function strategy" do
-    EagerGenre.dataset.meta_def(:supports_window_functions?){true}
+    def (EagerGenre.dataset).supports_window_functions?() true end
     EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :eager_limit_strategy=>true, :limit=>2, :order=>:name
     EagerGenre.dataset._fetch = [{:x_foreign_key_x=>2, :id=>5}, {:x_foreign_key_x=>2, :id=>6}]
     as = EagerAlbum.eager(:first_two_genres).all

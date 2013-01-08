@@ -150,8 +150,8 @@ if [:mysql, :mysql2].include?(MYSQL_DB.adapter_scheme)
     specify "should allow disabling the conversion on a per-dataset basis" do
       @db.convert_tinyint_to_bool = true
       ds = @ds.clone
-      ds.meta_def(:cast_tinyint_integer?){|f| true} # mysql
-      ds.meta_def(:convert_tinyint_to_bool?){false} # mysql2
+      def ds.cast_tinyint_integer?(f) true end #mysql
+      def ds.convert_tinyint_to_bool?() false end #mysql2
       ds.delete
       ds << {:b=>true, :i=>10}
       ds.all.should == [{:b=>1, :i=>10}]

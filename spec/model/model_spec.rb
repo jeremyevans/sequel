@@ -248,22 +248,22 @@ describe Sequel::Model, "dataset & schema" do
   end
 
   it "should raise an error on set_dataset if there is an error connecting to the database" do
-    @model.meta_def(:columns){raise Sequel::DatabaseConnectionError}
+    def @model.columns() raise Sequel::DatabaseConnectionError end
     proc{@model.set_dataset(Sequel::Database.new[:foo].join(:blah))}.should raise_error
   end
 
   it "should not raise an error if there is a problem getting the columns for a dataset" do
-    @model.meta_def(:columns){raise Sequel::Error}
+    def @model.columns() raise Sequel::Error end
     proc{@model.set_dataset(MODEL_DB[:foo].join(:blah))}.should_not raise_error
   end
 
   it "doesn't raise an error on set_dataset if there is an error raised getting the schema" do
-    @model.meta_def(:get_db_schema){raise Sequel::Error}
+    def @model.get_db_schema(*) raise Sequel::Error end
     proc{@model.set_dataset(MODEL_DB[:foo])}.should_not raise_error
   end
 
   it "doesn't raise an error on inherited if there is an error setting the dataset" do
-    @model.meta_def(:set_dataset){raise Sequel::Error}
+    def @model.set_dataset(*) raise Sequel::Error end
     proc{Class.new(@model)}.should_not raise_error
   end
 end
@@ -376,7 +376,7 @@ describe Sequel::Model, ".subset" do
   end
 
   specify "should not override existing model methods" do
-    @c.meta_def(:active){true}
+    def @c.active() true end
     @c.subset(:active, :active)
     @c.active.should == true
   end
@@ -652,7 +652,7 @@ describe "Model.db_schema" do
   specify "should automatically set a singular primary key based on the schema" do
     ds = @dataset
     d = ds.db
-    d.meta_def(:schema){|table, *opts| [[:x, {:primary_key=>true}]]}
+    def d.schema(table, *opts) [[:x, {:primary_key=>true}]] end
     @c.primary_key.should == :id
     @c.dataset = ds
     @c.db_schema.should == {:x=>{:primary_key=>true}}
@@ -662,7 +662,7 @@ describe "Model.db_schema" do
   specify "should automatically set the composite primary key based on the schema" do
     ds = @dataset
     d = ds.db
-    d.meta_def(:schema){|table, *opts| [[:x, {:primary_key=>true}], [:y, {:primary_key=>true}]]}
+    def d.schema(table, *opts) [[:x, {:primary_key=>true}], [:y, {:primary_key=>true}]] end
     @c.primary_key.should == :id
     @c.dataset = ds
     @c.db_schema.should == {:x=>{:primary_key=>true}, :y=>{:primary_key=>true}}
@@ -672,7 +672,7 @@ describe "Model.db_schema" do
   specify "should automatically set no primary key based on the schema" do
     ds = @dataset
     d = ds.db
-    d.meta_def(:schema){|table, *opts| [[:x, {:primary_key=>false}], [:y, {:primary_key=>false}]]}
+    def d.schema(table, *opts) [[:x, {:primary_key=>false}], [:y, {:primary_key=>false}]] end
     @c.primary_key.should == :id
     @c.dataset = ds
     @c.db_schema.should == {:x=>{:primary_key=>false}, :y=>{:primary_key=>false}}
@@ -682,7 +682,7 @@ describe "Model.db_schema" do
   specify "should not modify the primary key unless all column schema hashes have a :primary_key entry" do
     ds = @dataset
     d = ds.db
-    d.meta_def(:schema){|table, *opts| [[:x, {:primary_key=>false}], [:y, {}]]}
+    def d.schema(table, *opts) [[:x, {:primary_key=>false}], [:y, {}]] end
     @c.primary_key.should == :id
     @c.dataset = ds
     @c.db_schema.should == {:x=>{:primary_key=>false}, :y=>{}}

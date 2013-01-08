@@ -588,9 +588,9 @@ end
 describe Sequel::Model, ".require_modification" do
   before do
     @ds1 = MODEL_DB[:items]
-    @ds1.meta_def(:provides_accurate_rows_matched?){false}
+    def @ds1.provides_accurate_rows_matched?() false end
     @ds2 = MODEL_DB[:items]
-    @ds2.meta_def(:provides_accurate_rows_matched?){true}
+    def @ds2.provides_accurate_rows_matched?() true end
   end
   after do
     Sequel::Model.require_modification = nil

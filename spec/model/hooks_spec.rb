@@ -385,19 +385,19 @@ describe "Model around filters" do
     @c.raise_on_save_failure = false
 
     o = @c.load(:id => 1)
-    o.meta_def(:around_save){}
+    def o.around_save() end
     o.save.should == nil
 
     o = @c.load(:id => 1)
-    o.meta_def(:around_update){}
+    def o.around_update() end
     o.save.should == nil
 
     o = @c.new
-    o.meta_def(:around_create){}
+    def o.around_create() end
     o.save.should == nil
 
     o = @c.new
-    o.meta_def(:around_validation){}
+    def o.around_validation() end
     o.save.should == nil
   end
 end

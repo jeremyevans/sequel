@@ -190,7 +190,7 @@ end
 describe Sequel::Model::Associations::AssociationReflection do
   before do
     @c = Class.new(Sequel::Model(:foo))
-    @c.meta_def(:name){"C"}
+    def @c.name() "C" end
   end
 
   it "#eager_loading_predicate_key should be an alias of predicate_key for backwards compatibility" do
@@ -276,13 +276,13 @@ describe Sequel::Model::Associations::AssociationReflection, "#eager_limit_strat
   end
 
   it "should use :distinct_on for one_to_one associations if picking and the association dataset supports ordered distinct on" do
-    @c.dataset.meta_def(:supports_ordered_distinct_on?){true}
+    def (@c.dataset).supports_ordered_distinct_on?() true end
     @c.one_to_one :c, :class=>@c, :eager_limit_strategy=>true
     @c.association_reflection(:c).eager_limit_strategy.should == :distinct_on
   end
 
   it "should use :window_function for associations if picking and the association dataset supports window functions" do
-    @c.dataset.meta_def(:supports_window_functions?){true}
+    def (@c.dataset).supports_window_functions?() true end
     @c.one_to_one :c, :class=>@c, :eager_limit_strategy=>true
     @c.association_reflection(:c).eager_limit_strategy.should == :window_function
     @c.one_to_many :cs, :class=>@c, :eager_limit_strategy=>true, :limit=>1
@@ -314,7 +314,7 @@ describe Sequel::Model::Associations::AssociationReflection, "#eager_limit_strat
     c.dataset = :a
     c.one_to_many :cs, :class=>c, :limit=>1
     c.association_reflection(:cs).eager_limit_strategy.should == :ruby
-    c.dataset.meta_def(:supports_window_functions?){true}
+    def (c.dataset).supports_window_functions?() true end
     c.many_to_many :cs, :class=>c, :limit=>1
     c.association_reflection(:cs).eager_limit_strategy.should == :window_function
 

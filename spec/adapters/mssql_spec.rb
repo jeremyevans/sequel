@@ -390,7 +390,7 @@ describe "MSSSQL::Dataset#insert" do
   end
   
   specify "should have insert_select return nil if the server version is not 2005+" do
-    @ds.meta_def(:server_version){8000760}
+    def @ds.server_version() 8000760 end
     @ds.insert_select(:value=>10).should == nil
   end
 

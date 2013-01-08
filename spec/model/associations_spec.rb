@@ -602,7 +602,7 @@ describe Sequel::Model, "many_to_one" do
     c = @c2.load(:id=>123)
     p.raise_on_save_failure = false
     @c2.many_to_one :parent, :class => @c2, :before_set=>:bs
-    p.meta_def(:bs){|x| false}
+    def p.bs(x) false end
     p.should_not_receive(:_parent=)
     proc{p.parent = c}.should raise_error(Sequel::Error)
     
@@ -1038,7 +1038,7 @@ describe Sequel::Model, "one_to_one" do
     c = @c2.load(:id=>123)
     p.raise_on_save_failure = false
     @c2.one_to_one :parent, :class => @c2, :before_set=>:bs
-    p.meta_def(:bs){|x| false}
+    def p.bs(x) false end
     p.should_not_receive(:_parent=)
     proc{p.parent = c}.should raise_error(Sequel::Error)
     

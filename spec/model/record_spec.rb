@@ -96,7 +96,7 @@ describe "Model#save" do
     @c.unrestrict_primary_key
     @c.set_primary_key [:x, :y]
     o = @c.new(:x => 11)
-    o.meta_def(:autoincrementing_primary_key){:y}
+    def o.autoincrementing_primary_key() :y end
     o.save
     sqls = MODEL_DB.sqls
     sqls.length.should == 2
@@ -152,7 +152,7 @@ describe "Model#save" do
   end
   
   it "should mark all columns as not changed if this is a new record and insert_select was used" do
-    @c.dataset.meta_def(:insert_select){|h| h.merge(:id=>1)}
+    def (@c.dataset).insert_select(h) h.merge(:id=>1) end
     o = @c.new(:x => 1, :y => nil)
     o.x = 4
     o.changed_columns.should == [:x]
@@ -1088,17 +1088,17 @@ describe Sequel::Model, "#destroy with filtered dataset" do
   end
 
   it "should raise a NoExistingObject exception if the dataset delete call doesn't return 1" do
-    @instance.this.meta_def(:execute_dui){|*a| 0}
+    def (@instance.this).execute_dui(*a) 0 end
     proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
-    @instance.this.meta_def(:execute_dui){|*a| 2}
+    def (@instance.this).execute_dui(*a) 2 end
     proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
-    @instance.this.meta_def(:execute_dui){|*a| 1}
+    def (@instance.this).execute_dui(*a) 1 end
     proc{@instance.delete}.should_not raise_error
     
     @instance.require_modification = false
-    @instance.this.meta_def(:execute_dui){|*a| 0}
+    def (@instance.this).execute_dui(*a) 0 end
     proc{@instance.delete}.should_not raise_error
-    @instance.this.meta_def(:execute_dui){|*a| 2}
+    def (@instance.this).execute_dui(*a) 2 end
     proc{@instance.delete}.should_not raise_error
   end
 
@@ -1122,17 +1122,17 @@ describe Sequel::Model, "#destroy" do
   end
   
   it "should raise a NoExistingObject exception if the dataset delete call doesn't return 1" do
-    @model.dataset.meta_def(:execute_dui){|*a| 0}
+    def (@model.dataset).execute_dui(*a) 0 end
     proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
-    @model.dataset.meta_def(:execute_dui){|*a| 2}
+    def (@model.dataset).execute_dui(*a) 2 end
     proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
-    @model.dataset.meta_def(:execute_dui){|*a| 1}
+    def (@model.dataset).execute_dui(*a) 1 end
     proc{@instance.delete}.should_not raise_error
     
     @instance.require_modification = false
-    @model.dataset.meta_def(:execute_dui){|*a| 0}
+    def (@model.dataset).execute_dui(*a) 0 end
     proc{@instance.delete}.should_not raise_error
-    @model.dataset.meta_def(:execute_dui){|*a| 2}
+    def (@model.dataset).execute_dui(*a) 2 end
     proc{@instance.delete}.should_not raise_error
   end
 
@@ -1868,21 +1868,18 @@ describe "Model#lock!" do
   
   it "should do nothing if the record is a new record" do
     o = @c.new
-    called = false
-    o.meta_def(:_refresh){|x| called = true; super(x)}
+    def o._refresh(x) raise Sequel::Error; super(x) end
     x = o.lock!
     x.should == o
-    called.should == false
     MODEL_DB.sqls.should == []
   end
     
   it "should refresh the record using for_update if it is not a new record" do
     o = @c.load(:id => 1)
-    called = false
-    o.meta_def(:_refresh){|x| called = true; super(x)}
+    def o._refresh(x) instance_variable_set(:@a, 1); super(x) end
     x = o.lock!
     x.should == o
-    called.should == true
+    o.instance_variable_get(:@a).should == 1
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 1) LIMIT 1 FOR UPDATE"]
   end
 end
