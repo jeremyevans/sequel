@@ -1,0 +1,105 @@
+= New Features
+
+* A core_refinements extension has been added, which offers
+  refinement versions of Sequel's core extensions.  This requires
+  the new experimental refinement support added in ruby 2.0, and
+  allows you to use the Sequel DSL methods in a file without
+  actually modifying the Symbol, String, Array, and Hash classes.
+
+* A date_arithmetic extension has been added for performing
+  database-independent date calculations (adding/subtracting an
+  interval to/from a date):
+
+    Sequel.extension :date_arithmetic
+    e = Sequel.date_add(:date_column, :years=>1, :months=>2, :days=>3)
+    DB[:table].where(e > Sequel::CURRENT_DATE)
+
+  In addition to providing the interval as a hash, you can also
+  provide it as an ActiveSupport::Duration object.  This extension
+  is supported on 11 database types.
+
+* Dataset#get can now take an array of multiple expressions to get
+  an array of values, similar to map/select_map:
+
+    value1, value2 = DB[:table].get([:column1, :column2])
+
+* Sequel can now handle [host.]database.schema.table qualified
+  tables on Microsoft SQL Server.  To implement this support,
+  the split_qualifiers method has been added to Database and
+  Dataset for taking a possibly qualified identifier and splitting
+  it into an array of identifier strings.
+
+* The string_stripper plugin now offers the ability to manually
+  specify which columns to skip stripping for via
+  Model.skip_string_stripping. 
+
+= Other Improvements
+
+* The jdbc adapter now works with the new jdbc-* gems, which require
+  a manual load_driver step that the older jdbc-* gems did not
+  require.
+
+* The string_stripper plugin no longer strips blob columns or values.
+
+* Database#copy_into in both the postgres and jdbc/postgres adapters
+  has been fixed to better handle exceptions.  
+
+* Dataset#hash and Model#hash are now significantly faster.
+
+* Lambda procs with 0 arity can now be used as virtual row blocks
+  on ruby 1.9.  Previously, attempting to use a lambda proc with
+  0 arity as a virtual row block on ruby 1.9 would raise an exception.
+
+* Schema-qualified composite types are now handled correctly in
+  the pg_row extension.
+
+* Database#reset_primary_key_sequence on PostgreSQL now works
+  correctly when a default_schema is set.
+
+* tinyint(1) unsigned columns on MySQL are now parsed as booleans
+  instead of integers on MySQL if converting tinyint to boolean.
+   
+* The jdbc adapter now supports the jdbc-hsqldb gem, so you can
+  now install that instead of having to require the .jar manually.
+
+* Blobs are now casted correctly on DB2 when the use_clob_as_blob
+  setting is false.
+
+* Oracle timestamptz types are now handled correctly in the
+  jdbc/oracle adapter.
+
+* Sequel now defaults to :prefetch_rows = 100 in the oracle
+  adapter, which can significantly improve performance.
+
+* Sequel now defines respond_to_missing? where method_missing? is
+  defined and the object also responds to respond_to?.
+
+* Sequel::BasicObject now responds to instance_exec on ruby 1.8.
+
+= Backwards Compatibility
+
+* The meta_def method that was defined on Database, Dataset, and
+  Model classes and instances has been moved to an extension named
+  meta_def, and is no longer loaded by default.  This method was
+  previously used internally, and it wasn't designed for external
+  use.  If you have code that uses meta_def, you should now load the
+  extension manually:
+
+    Sequel.extension :meta_def
+
+* The private _*_dataset_helper model association methods are no
+  longer defined.  The AssociationReflection#dataset_helper_method
+  public method is also no longer defined.
+
+* Dataset#schema_and_table now always returns strings (or nil).
+  Before, in some cases it would return symbols.
+
+* Using a conditions specifier array with Dataset#get no longer
+  works due to the new multiple values support in Database#get.
+  So code such as:
+
+    DB[:table].get([[:a, 1], [:b, 2]])
+
+  should be changed to:
+
+    DB[:table].get(Sequel.expr([[:a, 1], [:b, 2]]))

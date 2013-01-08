@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.43.0 (2013-01-08)
 
 * Move the #meta_def support for Database, Dataset, and Model to the meta_def extension (jeremyevans)
 
@@ -34,7 +34,7 @@
 
 * Skip stripping of blob columns in the string_stripper plugin (jeremyevans) (#593)
 
-* Allow Database#get to take an array to return multiple values, similar to map/select_map (jeremyevans)
+* Allow Dataset#get to take an array to return multiple values, similar to map/select_map (jeremyevans)
 
 * Default :prefetch_rows to 100 in the Oracle adapter (andrewhr) (#592)
 
