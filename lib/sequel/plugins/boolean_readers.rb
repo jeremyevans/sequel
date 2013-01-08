@@ -26,8 +26,10 @@ module Sequel
       # Add the boolean_attribute? class method to the model, and create
       # attribute? boolean reader methods for the class's columns if the class has a dataset.
       def self.configure(model, &block)
-        model.meta_def(:boolean_attribute?, &(block || DEFAULT_BOOLEAN_ATTRIBUTE_PROC))
-        model.instance_eval{send(:create_boolean_readers) if @dataset}
+        model.instance_eval do
+          (class << self; self; end).send(:define_method, :boolean_attribute?, &(block || DEFAULT_BOOLEAN_ATTRIBUTE_PROC))
+          send(:create_boolean_readers) if @dataset
+        end
       end
 
       module ClassMethods

@@ -686,7 +686,7 @@ module Sequel
         if meth.to_s =~ NORMAL_METHOD_NAME_REGEXP
           instance_eval("def #{meth}(*args, &block); dataset.#{meth}(*args, &block) end", __FILE__, __LINE__)
         else
-          meta_def(meth){|*args, &block| dataset.send(meth, *args, &block)}
+          (class << self; self; end).send(:define_method, meth){|*args, &block| dataset.send(meth, *args, &block)}
         end
       end
 
