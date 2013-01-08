@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Database#copy_into on jdbc/postgres when an exception is raised (jeremyevans)
+
 * Add core_refinements extension, providing refinement versions of Sequel's core extensions (jeremyevans)
 
 * Make Database#copy_into raise a DatabaseError if the database signals an error in the postgres adapter (jeremyevans)

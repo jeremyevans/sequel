@@ -29,7 +29,7 @@ module Sequel
             raise Error, "Must provide either a :data option or a block to copy_into"
           end
 
-          transaction(opts) do |conn|
+          synchronize(opts) do |conn|
             begin
               copy_manager = org.postgresql.copy.CopyManager.new(conn)
               copier = copy_manager.copy_in(copy_into_sql(table, opts))
@@ -41,10 +41,16 @@ module Sequel
                 data.each { |d| copier.writeToCopy(d.to_java_bytes, 0, d.length) }
               end
             rescue Exception => e
-              copier.endCopy
+              copier.cancelCopy
               raise
             ensure
-              copier.endCopy unless e
+              unless e
+                begin
+                  copier.endCopy
+                rescue NativeException => e2
+                  raise_error(e2)
+                end
+              end
             end
           end
         end
