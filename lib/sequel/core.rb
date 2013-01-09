@@ -380,14 +380,14 @@ module Sequel
   end
 
   # If the supplied block takes a single argument,
-  # yield a new <tt>SQL::VirtualRow</tt> instance to the block
-  # argument.  Otherwise, evaluate the block in the context of a new
+  # yield an <tt>SQL::VirtualRow</tt> instance to the block
+  # argument.  Otherwise, evaluate the block in the context of a
   # <tt>SQL::VirtualRow</tt> instance.
   #
   #   Sequel.virtual_row{a} # Sequel::SQL::Identifier.new(:a)
   #   Sequel.virtual_row{|o| o.a{}} # Sequel::SQL::Function.new(:a)
   def self.virtual_row(&block)
-    vr = SQL::VirtualRow.new
+    vr = VIRTUAL_ROW
     case block.arity
     when -1, 0
       vr.instance_exec(&block)

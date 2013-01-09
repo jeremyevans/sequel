@@ -1,5 +1,7 @@
 === HEAD
 
+* Increase virtual row performance by using a shared VirtualRow instance (jeremyevans)
+
 * Allow the :dataset association option to accept the association reflection as an argument (jeremyevans)
 
 * Improve association method performance by caching intermediate dataset (jeremyevans)

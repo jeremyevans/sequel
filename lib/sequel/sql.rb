@@ -1497,8 +1497,8 @@ module Sequel
     #
     # An instance of this class is yielded to the block supplied to <tt>Dataset#filter</tt>, <tt>Dataset#order</tt>, and <tt>Dataset#select</tt>
     # (and the other methods that accept a block and pass it to one of those methods).
-    # If the block doesn't take an argument, the block is instance_evaled in the context of
-    # a new instance of this class.
+    # If the block doesn't take an argument, the block is instance_execed in the context of
+    # an instance of this class.
     #
     # +VirtualRow+ uses +method_missing+ to return either an +Identifier+, +QualifiedIdentifier+, +Function+, or +WindowFunction+, 
     # depending on how it is called.
@@ -1621,6 +1621,8 @@ module Sequel
           Function.new(m, *args)
         end
       end
+
+      Sequel::VIRTUAL_ROW = new
     end
 
     # A +Window+ is part of a window function specifying the window over which the function operates.
