@@ -19,6 +19,10 @@ describe Sequel::Schema::Generator do
     @columns, @indexes, @constraints = @generator.columns, @generator.indexes, @generator.constraints
   end
   
+  it "should respond to everything" do
+    @generator.respond_to?(:foo).should be_true
+  end if RUBY_VERSION >= '1.9'
+
   it "should primary key column first" do
     @columns.first[:name].should == :id
     @columns.first[:primary_key].should == true

@@ -479,6 +479,26 @@ describe "Database#extend_datasets" do
   end
 end
   
+describe "Database#disconnect_connection" do
+  specify "should call close on the connection" do
+    o = Object.new
+    def o.close() @closed=true end
+    Sequel::Database.new.disconnect_connection(o)
+    o.instance_variable_get(:@closed).should be_true
+  end
+end
+
+describe "Database#valid_connection?" do
+  specify "should issue a query to validate the connection" do
+    db = Sequel.mock
+    db.synchronize{|c| db.valid_connection?(c)}.should be_true
+    db.synchronize do |c|
+      def c.execute(*) raise Sequel::DatabaseError, "error" end
+      db.valid_connection?(c)
+    end.should be_false
+  end
+end
+
 describe "Database#execute" do
   specify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.execute('blah blah')}.should raise_error(Sequel::NotImplemented)
@@ -2015,6 +2035,18 @@ describe "Database#schema_autoincrementing_primary_key?" do
     m.call(:primary_key=>true, :db_type=>'integer').should == true
     m.call(:primary_key=>true, :db_type=>'varchar(255)').should == false
     m.call(:primary_key=>false, :db_type=>'integer').should == false
+  end
+end
+
+describe "Database#supports_deferrable_constraints?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_deferrable_constraints?.should == false
+  end
+end
+
+describe "Database#supports_deferrable_foreign_key_constraints?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_deferrable_foreign_key_constraints?.should == false
   end
 end
 
