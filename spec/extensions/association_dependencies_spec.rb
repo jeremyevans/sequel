@@ -33,13 +33,13 @@ describe "AssociationDependencies plugin" do
   specify "should allow destroying associated one_to_one associated object" do
     @Artist.add_association_dependencies :first_album=>:destroy
     @Artist.load(:id=>2, :name=>'Ar').destroy
-    MODEL_DB.sqls.should == ['SELECT * FROM albums WHERE ((albums.artist_id = 2) AND (position = 1)) LIMIT 1', 'DELETE FROM albums WHERE id = 1', 'DELETE FROM artists WHERE id = 2']
+    MODEL_DB.sqls.should == ['SELECT * FROM albums WHERE ((position = 1) AND (albums.artist_id = 2)) LIMIT 1', 'DELETE FROM albums WHERE id = 1', 'DELETE FROM artists WHERE id = 2']
   end
 
   specify "should allow deleting associated one_to_one associated object" do
     @Artist.add_association_dependencies :first_album=>:delete
     @Artist.load(:id=>2, :name=>'Ar').destroy
-    MODEL_DB.sqls.should == ['DELETE FROM albums WHERE ((albums.artist_id = 2) AND (position = 1))', 'DELETE FROM artists WHERE id = 2']
+    MODEL_DB.sqls.should == ['DELETE FROM albums WHERE ((position = 1) AND (albums.artist_id = 2))', 'DELETE FROM artists WHERE id = 2']
   end
 
   specify "should allow destroying associated one_to_many objects" do
@@ -57,7 +57,7 @@ describe "AssociationDependencies plugin" do
   specify "should allow nullifying associated one_to_one objects" do
     @Artist.add_association_dependencies :first_album=>:nullify
     @Artist.load(:id=>2, :name=>'Ar').destroy
-    MODEL_DB.sqls.should == ['UPDATE albums SET artist_id = NULL WHERE ((artist_id = 2) AND (position = 1))', 'DELETE FROM artists WHERE id = 2']
+    MODEL_DB.sqls.should == ['UPDATE albums SET artist_id = NULL WHERE ((position = 1) AND (artist_id = 2))', 'DELETE FROM artists WHERE id = 2']
   end
 
   specify "should allow nullifying associated one_to_many objects" do

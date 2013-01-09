@@ -92,7 +92,7 @@ describe "Sequel::Plugins::AssociationPks" do
   specify "should run a regular query if :conditions option is used when defining the association" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>1} 
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 1) AND (a = 1))"]
+    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 1) AND (albums.artist_id = 1))"]
   end
 
   specify "should run a regular query if :dataset option is used when defining the association" do
@@ -106,6 +106,6 @@ describe "Sequel::Plugins::AssociationPks" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>1} 
     @Artist.one_to_many :oalbums, :clone=>:albums
     @Artist.load(:id=>1).oalbums
-    @db.sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 1) AND (a = 1))"]
+    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 1) AND (albums.artist_id = 1))"]
   end
 end

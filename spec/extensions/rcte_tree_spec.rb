@@ -49,8 +49,8 @@ describe Sequel::Model, "rcte_tree" do
 
   it "should use the correct SQL for lazy associations with :conditions option" do
     @c.plugin :rcte_tree, :conditions => {:i => 1}
-    @o.parent_dataset.sql.should == 'SELECT * FROM nodes WHERE ((nodes.id = 1) AND (i = 1)) LIMIT 1'
-    @o.children_dataset.sql.should == 'SELECT * FROM nodes WHERE ((nodes.parent_id = 2) AND (i = 1))'
+    @o.parent_dataset.sql.should == 'SELECT * FROM nodes WHERE ((i = 1) AND (nodes.id = 1)) LIMIT 1'
+    @o.children_dataset.sql.should == 'SELECT * FROM nodes WHERE ((i = 1) AND (nodes.parent_id = 2))'
     @o.ancestors_dataset.sql.should == 'WITH t AS (SELECT * FROM nodes WHERE ((id = 1) AND (i = 1)) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.parent_id = nodes.id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)'
     @o.descendants_dataset.sql.should == 'WITH t AS (SELECT * FROM nodes WHERE ((parent_id = 2) AND (i = 1)) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)'
   end

@@ -250,11 +250,11 @@ describe Sequel::Model, "many_to_one" do
   it "should use :conditions option if given" do
     @c2.many_to_one :parent, :class => @c2, :key => :blah, :conditions=>{:a=>32}
     @c2.new(:id => 1, :blah => 567).parent
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.id = 567) AND (a = 32)) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((a = 32) AND (nodes.id = 567)) LIMIT 1"]
 
     @c2.many_to_one :parent, :class => @c2, :key => :blah, :conditions=>:a
     @c2.new(:id => 1, :blah => 567).parent
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.id = 567) AND a) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (a AND (nodes.id = 567)) LIMIT 1"]
   end
 
   it "should support :order, :limit (only for offset), and :dataset options, as well as a block" do
@@ -711,7 +711,7 @@ describe Sequel::Model, "one_to_one" do
     end
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 1234).attribute = attrib
-    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (a = 1) AND (b = 2) AND (id != 3))',
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((a = 1) AND (node_id = 1234) AND (b = 2) AND (id != 3))',
       "UPDATE attributes SET node_id = 1234 WHERE (id = 3)"]
   end
 
@@ -824,11 +824,11 @@ describe Sequel::Model, "one_to_one" do
   it "should use :conditions option if given" do
     @c2.one_to_one :parent, :class => @c2, :conditions=>{:a=>32}
     @c2.new(:id => 567).parent
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.node_id = 567) AND (a = 32)) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((a = 32) AND (nodes.node_id = 567)) LIMIT 1"]
 
     @c2.one_to_one :parent, :class => @c2, :conditions=>:a
     @c2.new(:id => 567).parent
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.node_id = 567) AND a) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (a AND (nodes.node_id = 567)) LIMIT 1"]
   end
 
   it "should support :order, :limit (only for offset), and :dataset options, as well as a block" do
@@ -1364,9 +1364,9 @@ describe Sequel::Model, "one_to_many" do
   
   it "should support a conditions option" do
     @c2.one_to_many :attributes, :class => @c1, :conditions => {:a=>32}
-    @c2.new(:id => 1234).attributes_dataset.sql.should == "SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (a = 32))"
+    @c2.new(:id => 1234).attributes_dataset.sql.should == "SELECT * FROM attributes WHERE ((a = 32) AND (attributes.node_id = 1234))"
     @c2.one_to_many :attributes, :class => @c1, :conditions => Sequel.~(:a)
-    @c2.new(:id => 1234).attributes_dataset.sql.should == "SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND NOT a)"
+    @c2.new(:id => 1234).attributes_dataset.sql.should == "SELECT * FROM attributes WHERE (NOT a AND (attributes.node_id = 1234))"
   end
   
   it "should support an order option" do
@@ -1555,7 +1555,7 @@ describe Sequel::Model, "one_to_many" do
       ds.filter(:b=>2)
     end
     @c2.new(:id => 1234).remove_all_attributes
-    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (a = 1) AND (b = 2))']
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((a = 1) AND (node_id = 1234) AND (b = 2))']
   end
 
   it "should have the remove_all_ method respect the :primary_key option" do

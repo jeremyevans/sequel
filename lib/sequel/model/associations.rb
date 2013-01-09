@@ -56,6 +56,29 @@ module Sequel
         def associated_class
           cached_fetch(:class){constantize(self[:class_name])}
         end
+
+        # The dataset associated via this association, with the non-instance specific
+        # changes already applied.
+        def associated_dataset
+          cached_fetch(:_dataset){apply_dataset_changes(associated_class.dataset.clone)}
+        end
+
+        # Apply all non-instance specific changes to the given dataset and return it.
+        def apply_dataset_changes(ds)
+          ds.extend(AssociationDatasetMethods)
+          ds.association_reflection = self
+          self[:extend].each{|m| ds.extend(m)}
+          ds = ds.select(*select) if select
+          if c = self[:conditions]
+            ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
+          end
+          ds = ds.order(*self[:order]) if self[:order]
+          ds = ds.limit(*self[:limit]) if self[:limit]
+          ds = ds.limit(1) if !returns_array? && self[:key]
+          ds = ds.eager(*self[:eager]) if self[:eager]
+          ds = ds.distinct if self[:distinct]
+          ds
+        end
         
         # Whether this association can have associated objects, given the current
         # object.  Should be false if obj cannot have associated objects because
@@ -688,7 +711,7 @@ module Sequel
         def apply_association_dataset_opts(opts, ds)
           ds = ds.select(*opts.select) if opts.select
           if c = opts[:conditions]
-            ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+            ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
           end
           ds = ds.order(*opts[:order]) if opts[:order]
           ds = ds.eager(opts[:eager]) if opts[:eager]
@@ -747,7 +770,7 @@ module Sequel
         # :clone :: Merge the current options and block into the options and block used in defining
         #           the given association.  Can be used to DRY up a bunch of similar associations that
         #           all share the same options such as :class and :key, while changing the order and block used.
-        # :conditions :: The conditions to use to filter the association, can be any argument passed to filter.
+        # :conditions :: The conditions to use to filter the association, can be any argument passed to where.
         # :dataset :: A proc that is instance_evaled to get the base dataset
         #             to use for the _dataset method (before the other options are applied).
         # :distinct :: Use the DISTINCT clause when selecting associating object, both when
@@ -1047,7 +1070,7 @@ module Sequel
           else
             SQL::QualifiedIdentifier.new(table, pk)
           end
-          ds.filter(pk=>subquery)
+          ds.where(pk=>subquery)
         end
 
         # Use a window function to limit the results of the eager loading dataset.
@@ -1127,7 +1150,7 @@ module Sequel
           graph_jt_conds = opts[:graph_join_table_conditions] = opts.fetch(:graph_join_table_conditions, []).to_a
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
-          opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, rcks.zip(opts.right_primary_keys) + opts.predicate_keys.zip(lcpks.map{|k| send(k)}), :qualify=>:deep)}
+          opts[:dataset] ||= proc{opts.associated_dataset.inner_join(join_table, rcks.zip(opts.right_primary_keys) + opts.predicate_keys.zip(lcpks.map{|k| send(k)}), :qualify=>:deep)}
 
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:id_map]
@@ -1190,10 +1213,10 @@ module Sequel
             _join_table_dataset(opts).insert(h)
           end
           association_module_private_def(opts._remove_method, opts) do |o|
-            _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_key_methods.map{|k| o.send(k)})).delete
+            _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_key_methods.map{|k| o.send(k)})).delete
           end
           association_module_private_def(opts._remove_all_method, opts) do
-            _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)})).delete
+            _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| send(k)})).delete
           end
       
           def_add_method(opts)
@@ -1219,8 +1242,7 @@ module Sequel
           qualify = opts[:qualify] != false
           opts[:cartesian_product_number] ||= 0
           opts[:dataset] ||= proc do
-            klass = opts.associated_class
-            klass.filter(opts.predicate_keys.zip(cks.map{|k| send(k)}))
+            opts.associated_dataset.where(opts.predicate_keys.zip(cks.map{|k| send(k)}))
           end
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:id_map]
@@ -1231,7 +1253,7 @@ module Sequel
             # Skip eager loading if no objects have a foreign key for this association
             unless keys.empty?
               klass = opts.associated_class
-              model.eager_loading_dataset(opts, klass.filter(opts.predicate_key=>keys), nil, eo[:associations], eo).all do |assoc_record|
+              model.eager_loading_dataset(opts, klass.where(opts.predicate_key=>keys), nil, eo[:associations], eo).all do |assoc_record|
                 hash_key = uses_cks ? opts.primary_key_methods.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key_method)
                 next unless objects = h[hash_key]
                 objects.each{|object| object.associations[name] = assoc_record}
@@ -1276,7 +1298,7 @@ module Sequel
           raise(Error, "mismatched number of keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
           opts[:dataset] ||= proc do
-            opts.associated_class.filter(opts.predicate_keys.zip(cpks.map{|k| send(k)}))
+            opts.associated_dataset.where(opts.predicate_keys.zip(cpks.map{|k| send(k)}))
           end
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:id_map]
@@ -1289,7 +1311,7 @@ module Sequel
             reciprocal = opts.reciprocal
             klass = opts.associated_class
             filter_keys = opts.predicate_key
-            ds = model.eager_loading_dataset(opts, klass.filter(filter_keys=>h.keys), nil, eo[:associations], eo)
+            ds = model.eager_loading_dataset(opts, klass.where(filter_keys=>h.keys), nil, eo[:associations], eo)
             case opts.eager_limit_strategy
             when :distinct_on
               ds = ds.distinct(*filter_keys).order_prepend(*filter_keys)
@@ -1351,7 +1373,7 @@ module Sequel
 
             if one_to_one
               association_module_private_def(opts._setter_method, opts) do |o|
-                up_ds = _apply_association_options(opts, opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)})))
+                up_ds = _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| send(k)})))
                 if o
                   up_ds = up_ds.exclude(o.pk_hash) unless o.new?
                   cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
@@ -1374,7 +1396,7 @@ module Sequel
                 o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
               end
               association_module_private_def(opts._remove_all_method, opts) do
-                _apply_association_options(opts, opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)}))).update(ck_nil_hash)
+                _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| send(k)}))).update(ck_nil_hash)
               end
               def_remove_methods(opts)
             end
@@ -1430,19 +1452,10 @@ module Sequel
         
         # Apply the association options such as :order and :limit to the given dataset, returning a modified dataset.
         def _apply_association_options(opts, ds)
-          ds.extend(AssociationDatasetMethods)
-          ds.model_object = self
-          ds.association_reflection = opts
-          opts[:extend].each{|m| ds.extend(m)}
-          ds = ds.select(*opts.select) if opts.select
-          if c = opts[:conditions]
-            ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+          unless ds.kind_of?(AssociationDatasetMethods)
+            ds = opts.apply_dataset_changes(ds)
           end
-          ds = ds.order(*opts[:order]) if opts[:order]
-          ds = ds.limit(*opts[:limit]) if opts[:limit]
-          ds = ds.limit(1) if !opts.returns_array? && opts[:key]
-          ds = ds.eager(*opts[:eager]) if opts[:eager]
-          ds = ds.distinct if opts[:distinct]
+          ds.model_object = self
           ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph] && opts.eager_graph_lazy_dataset?
           ds = instance_exec(ds, &opts[:block]) if opts[:block]
           ds
@@ -1601,7 +1614,7 @@ module Sequel
             o = remove_check_existing_object_from_pk(opts, o, *args)
           elsif !o.is_a?(klass)
             raise(Sequel::Error, "associated object #{o.inspect} not of correct type #{klass}")
-          elsif opts.remove_should_check_existing? && send(opts.dataset_method).filter(o.pk_hash).empty?
+          elsif opts.remove_should_check_existing? && send(opts.dataset_method).where(o.pk_hash).empty?
             raise(Sequel::Error, "associated object #{o.inspect} is not currently associated to #{inspect}")
           end
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") unless pk
@@ -1723,7 +1736,7 @@ module Sequel
       # allows you to customize it at association definition time. For example,
       # if you wanted artists with their albums since 1990:
       #
-      #   Artist.eager(:albums => proc{|ds| ds.filter{year > 1990}})
+      #   Artist.eager(:albums => proc{|ds| ds.where{year > 1990}})
       #
       # Or if you needed albums and their artist's name only, using a single query:
       #
@@ -1734,7 +1747,7 @@ module Sequel
       # the cascaded associations as the value.  This will load artists with their albums
       # since 1990, and also the tracks on those albums and the genre for those tracks:
       #
-      #   Artist.eager(:albums => {proc{|ds| ds.filter{year > 1990}}=>{:tracks => :genre}})
+      #   Artist.eager(:albums => {proc{|ds| ds.where{year > 1990}}=>{:tracks => :genre}})
       module DatasetMethods
         # Add the <tt>eager!</tt> and <tt>eager_graph!</tt> mutation methods to the dataset.
         def self.extended(obj)

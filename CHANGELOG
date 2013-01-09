@@ -1,3 +1,7 @@
+=== HEAD
+
+* Improve association method performance by caching intermediate dataset (jeremyevans)
+
 === 3.43.0 (2013-01-08)
 
 * Move the #meta_def support for Database, Dataset, and Model to the meta_def extension (jeremyevans)
