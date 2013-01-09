@@ -22,11 +22,6 @@ module Sequel
           :"_add_#{singularize(self[:name])}"
         end
       
-        # Name symbol for the _dataset association method
-        def _dataset_method
-          :"_#{self[:name]}_dataset"
-        end
-      
         # Name symbol for the _remove_all internal association method
         def _remove_all_method
           :"_remove_all_#{self[:name]}"
@@ -771,8 +766,9 @@ module Sequel
         #           the given association.  Can be used to DRY up a bunch of similar associations that
         #           all share the same options such as :class and :key, while changing the order and block used.
         # :conditions :: The conditions to use to filter the association, can be any argument passed to where.
-        # :dataset :: A proc that is instance_evaled to get the base dataset
-        #             to use for the _dataset method (before the other options are applied).
+        # :dataset :: A proc that is instance_execed to get the base dataset to use (before the other
+        #             options are applied).  If the proc accepts an argument, it is passed the related
+        #             association reflection.
         # :distinct :: Use the DISTINCT clause when selecting associating object, both when
         #              lazy loading and eager loading via .eager (but not when using .eager_graph).
         # :eager :: The associations to eagerly load via +eager+ when loading the associated object(s).
@@ -1114,7 +1110,6 @@ module Sequel
       
         # Adds the association dataset methods to the association methods module.
         def def_association_dataset_methods(opts)
-          association_module_private_def(opts._dataset_method, opts, &opts[:dataset])
           association_module_def(opts.dataset_method, opts){_dataset(opts)}
           def_association_method(opts)
         end
@@ -1473,7 +1468,12 @@ module Sequel
         # Return an association dataset for the given association reflection
         def _dataset(opts)
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
-          _apply_association_options(opts, send(opts._dataset_method))
+          ds = if opts[:dataset].arity == 1
+            instance_exec(opts, &opts[:dataset])
+          else
+            instance_exec(&opts[:dataset])
+          end
+          _apply_association_options(opts, ds)
         end
 
         # Dataset for the join table of the given many to many association reflection

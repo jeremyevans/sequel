@@ -1924,6 +1924,19 @@ describe Sequel::Model, "many_to_many" do
     MODEL_DB.sqls.should == ['SELECT * FROM attributes NATURAL JOIN an WHERE ((an.nodeid = 1234) AND (xxx = 555)) ORDER BY a LIMIT 10']
   end
 
+  it "should support a :dataset option that accepts the reflection as an argument" do
+    c1 = @c1
+    @c2.many_to_many :attributes, :class => @c1, :dataset=>lambda{|opts| opts.associated_dataset.join_table(:natural, :an).filter(:an__nodeid=>pk)}, :order=> :a, :limit=>10, :select=>nil do |ds|
+      ds.filter(:xxx => @xxx)
+    end
+
+    n = @c2.new(:id => 1234)
+    n.xxx = 555
+    n.attributes_dataset.sql.should == 'SELECT * FROM attributes NATURAL JOIN an WHERE ((an.nodeid = 1234) AND (xxx = 555)) ORDER BY a LIMIT 10'
+    n.attributes.should == [@c1.load({})]
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes NATURAL JOIN an WHERE ((an.nodeid = 1234) AND (xxx = 555)) ORDER BY a LIMIT 10']
+  end
+
   it "should support a :limit option" do
     @c2.many_to_many :attributes, :class => @c1 , :limit=>10
     @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 10'

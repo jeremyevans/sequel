@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow the :dataset association option to accept the association reflection as an argument (jeremyevans)
+
 * Improve association method performance by caching intermediate dataset (jeremyevans)
 
 === 3.43.0 (2013-01-08)

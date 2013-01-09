@@ -1007,14 +1007,21 @@ in additon to the :clone option.
 ==== :dataset
 
 This is generally only specified for custom associations that aren't based on
-primary/foreign key relationships.  It should be a proc that is instance evaled
+primary/foreign key relationships.  It should be a proc that is instance_execed
 to get the base dataset to use before the other options are applied.
+
+If the proc accepts an argument, it is passed the related association reflection.
+For best performance, it's recommended that custom associations call the
++associated_dataset+ method on the association reflection as the starting point
+for the dataset to return.  The +associated_dataset+ method will return a
+dataset based on the associated class with most of the association options
+already applied, and the proc should return a modified copy of this dataset.
 
 Here's an example of an association of songs to artists through lyrics, where
 the artist can perform any one of four tasks for the lyric:
 
-  Album.one_to_many :songs, :dataset=>(proc do
-    Song.select_all(:songs).
+  Album.one_to_many :songs, :dataset=>(proc do |r|
+    r.associated_dataset.select_all(:songs).
      join(Lyric, :id=>:lyricid,
       id=>[:composer_id, :arranger_id, :vocalist_id, :lyricist_id])
   end)
