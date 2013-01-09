@@ -12,6 +12,8 @@ module Sequel
     # #each, this is a bit of issue, but this plugin resolves the issue by cloning the dataset
     # and setting a new flag in the cloned dataset, so that each can check with the flag to
     # determine whether it should call all.
+    #
+    # This extension uses Object#extend at runtime, which can hurt performance.
     # 
     # Usage:
     #
