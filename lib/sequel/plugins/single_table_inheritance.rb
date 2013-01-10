@@ -59,8 +59,8 @@ module Sequel
     #   # which are different but do not require different code.
     #   Employee.plugin :single_table_inheritance, :type,
     #     :model_map=>{'staff' => "Staff",
-    #                  'manager => "Manager",
-    #                  'overpayed staff => "Staff",
+    #                  'manager' => "Manager",
+    #                  'overpayed staff' => "Staff",
     #                  'underpayed staff' => "Staff"}
     #
     # One minor issue to note is that if you specify the <tt>:key_map</tt>
