@@ -138,6 +138,14 @@ describe Sequel::Model do
     o.valid?.should == false
     o.errors.full_messages.should == ['blah is not cool']
   end
+
+  specify "should have the validates block have appropriate respond_to?" do
+    c = nil
+    @c.validates{c = respond_to?(:foo)}
+    c.should be_false
+    @c.validates{c = respond_to?(:length_of)}
+    c.should be_true
+  end if RUBY_VERSION >= '1.9'
 end
 
 describe Sequel::Model do

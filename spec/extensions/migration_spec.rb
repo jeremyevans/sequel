@@ -55,6 +55,12 @@ describe "Migration.apply" do
     m.apply(@db, :up).should == nil
     m.apply(@db, :down).should == nil
   end
+
+  specify "should respond to the methods the database responds to" do
+    m = Sequel::Migration.new(Sequel.mock)
+    m.respond_to?(:foo).should be_false
+    m.respond_to?(:execute).should be_true
+  end if RUBY_VERSION >= '1.9'
 end
 
 describe "SimpleMigration#apply" do

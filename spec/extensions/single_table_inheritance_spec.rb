@@ -158,6 +158,9 @@ describe Sequel::Model, "#sti_key" do
       StiTest2.create.kind.should == 4
       StiTest3.create.kind.should == 5
       StiTest4.create.kind.should == 6
+
+      class ::StiTest5 < ::StiTest4; end
+      StiTest5.create.kind.should == nil
     end
 
     it "should infer key_map from model_map if provided as a hash" do
