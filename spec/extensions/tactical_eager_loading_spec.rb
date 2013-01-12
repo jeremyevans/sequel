@@ -25,7 +25,7 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
     Object.send(:remove_const, :TaticalEagerLoadingModel)
   end
 
-  it "Dataset#all should set the retrieved_by and reteived_with attributes" do
+  it "Dataset#all should set the retrieved_by and retrieved_with attributes" do
     ts = @c.all
     ts.map{|x| [x.retrieved_by, x.retrieved_with]}.should == [[@ds,ts], [@ds,ts], [@ds,ts], [@ds,ts]]
   end

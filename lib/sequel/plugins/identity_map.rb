@@ -36,7 +36,7 @@ module Sequel
       module ClassMethods
         # Override the default :eager_loader option for many_*_many associations to work
         # with an identity_map.  If the :eager_graph association option is used, you'll probably have to use
-        # :uniq=>true on the current association amd :cartesian_product_number=>2 on the association
+        # :uniq=>true on the current association and :cartesian_product_number=>2 on the association
         # mentioned by :eager_graph, otherwise you'll end up with duplicates because the row proc will be
         # getting called multiple times for the same object.  If you do have duplicates and you use :eager_graph,
         # they'll probably be lost.  Making that work correctly would require changing a lot of the core

@@ -53,14 +53,14 @@ module Sequel
     end
 
     class CreateTableGenerator < Sequel::Schema::Generator
-      # Add an exclusion constraint when creating the table. elements should be
+      # Add an exclusion constraint when creating the table. Elements should be
       # an array of 2 element arrays, with the first element being the column or
       # expression the exclusion constraint is applied to, and the second element
       # being the operator to use for the column/expression to check for exclusion.
       #
       # Example:
       #
-      #   exclusion_constraint([[:col1, '&&'], [:col2, '=']])
+      #   exclude([[:col1, '&&'], [:col2, '=']])
       #   # EXCLUDE USING gist (col1 WITH &&, col2 WITH =)
       #
       # Options supported:
