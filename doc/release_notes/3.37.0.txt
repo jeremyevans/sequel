@@ -162,7 +162,7 @@
 
     DB.create_table(:t) do
       ...
-      exclusion_constraint([[:col1, '&&'], [:col2, '=']])
+      exclude([[:col1, '&&'], [:col2, '=']])
       # EXCLUDE USING gist (col1 WITH &&, col2 WITH =)
     end
 
