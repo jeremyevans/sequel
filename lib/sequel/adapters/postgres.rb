@@ -289,7 +289,8 @@ module Sequel
 
         # +copy_into+ uses PostgreSQL's +COPY FROM STDIN+ SQL statement to do very fast inserts 
         # into a table using input preformatting in either CSV or PostgreSQL text format.
-        # This method is only supported if pg is the underlying ruby driver.  This method should only be called if you want
+        # This method is only supported if pg 0.14.0+ is the underlying ruby driver.
+        # This method should only be called if you want
         # results returned to the client.  If you are using +COPY FROM+
         # with a filename, you should just use +run+ instead of this method.
         #
