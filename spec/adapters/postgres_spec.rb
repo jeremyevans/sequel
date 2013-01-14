@@ -61,6 +61,14 @@ describe "A PostgreSQL database" do
     @db.server_version.should > 70000
   end
 
+  specify "should not typecast the int2vector type incorrectly" do
+    @db.get(Sequel.cast('10 20', :int2vector)).should_not == 10
+  end
+
+  cspecify "should not typecast the money type incorrectly", :do do
+    @db.get(Sequel.cast('10.01', :money)).should_not == 0
+  end
+
   specify "should correctly parse the schema" do
     @db.schema(:public__testfk, :reload=>true).should == [
       [:id, {:type=>:integer, :ruby_default=>nil, :db_type=>"integer", :default=>"nextval('testfk_id_seq'::regclass)", :oid=>23, :primary_key=>true, :allow_null=>false}],
