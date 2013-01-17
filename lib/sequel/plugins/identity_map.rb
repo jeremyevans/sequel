@@ -52,6 +52,7 @@ module Sequel
             uses_lcks = opts[:uses_left_composite_keys]
             uses_rcks = opts[:uses_right_composite_keys]
             right = opts[:right_key]
+            rcks = opts[:right_keys]
             join_table = opts[:join_table]
             left = opts[:left_key]
             lcks = opts[:left_keys]
