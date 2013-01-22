@@ -654,7 +654,7 @@ module Sequel
       when SQL::Identifier
         [sch, table_name.value.to_s]
       when String
-        [sch, table_name.to_s]
+        [sch, table_name]
       else
         raise Error, 'table_name should be a Symbol, SQL::QualifiedIdentifier, SQL::Identifier, or String'
       end

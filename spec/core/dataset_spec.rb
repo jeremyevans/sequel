@@ -4465,6 +4465,11 @@ describe "Dataset#schema_and_table" do
     @ds.schema_and_table('s').should == [nil, 's']
   end
 
+  it "should correctly handle literal strings" do
+    s = Sequel.lit('s')
+    @ds.schema_and_table(s).last.should equal(s)
+  end
+
   it "should correctly handle identifiers" do
     @ds.schema_and_table(Sequel.identifier(:s)).should == [nil, 's']
   end
