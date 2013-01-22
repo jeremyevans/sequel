@@ -439,8 +439,9 @@ describe "Sequel Mock Adapter" do
     end
   end
 
-  specify "should automatically set version for postgres" do
+  specify "should automatically set version for postgres and mssql" do
     Sequel.mock(:host=>'postgres').server_version.should == 90103
+    Sequel.mock(:host=>'mssql').server_version.should == 10000000
   end
 
   specify "should stub out the primary_key method for postgres" do

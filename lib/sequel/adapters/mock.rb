@@ -66,6 +66,11 @@ module Sequel
           db.instance_eval do
             @primary_key_sequences = {}
           end
+        end,
+        'mssql' => lambda do |db|
+          db.instance_eval do
+            @server_version = 10000000
+          end
         end
       }
 
