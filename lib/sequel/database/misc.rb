@@ -14,6 +14,10 @@ module Sequel
     # instances.
     DEFAULT_STRING_COLUMN_SIZE = 255
 
+    # Empty exception regexp to class map, used by default if Sequel doesn't
+    # have specific support for the database in use.
+    DEFAULT_DATABASE_ERROR_REGEXPS = {}.freeze
+
     # Register an extension callback for Database objects.  ext should be the
     # extension name symbol, and mod should either be a Module that the
     # database is extended with, or a callable object called with the database
@@ -316,22 +320,48 @@ module Sequel
         obj.respond_to?(:empty?) ? obj.empty? : false
       end
     end
-    
+
     # Which transaction errors to translate, blank by default.
     def database_error_classes
       []
     end
 
+    # A hash with regexp keys and exception class values, used
+    # to match against underlying driver exception messages in
+    # order to raise a more specific Sequel::Error subclass.
+    def database_error_regexps
+      DEFAULT_DATABASE_ERROR_REGEXPS
+    end
+
+    # Return the Sequel::DatabaseError subclass to wrap the given
+    # exception in.
+    def database_error_class(exception, opts)
+      database_specific_error_class(exception, opts) || DatabaseError
+    end
+    
+    # Return a specific Sequel::DatabaseError exception class if
+    # one is appropriate for the underlying exception,
+    # or nil if there is no specific exception class.
+    def database_specific_error_class(exception, opts)
+      return DatabaseDisconnectError if disconnect_error?(exception, opts)
+
+      database_error_regexps.each do |regexp, klass|
+        return klass if exception.message =~ regexp
+      end
+
+      nil
+    end
+    
     # Return true if exception represents a disconnect error, false otherwise.
     def disconnect_error?(exception, opts)
       opts[:disconnect]
     end
     
-    # Convert the given exception to a DatabaseError, keeping message
-    # and traceback.
+    # Convert the given exception to an appropriate Sequel::DatabaseError
+    # subclass, keeping message and traceback.
     def raise_error(exception, opts={})
       if !opts[:classes] || Array(opts[:classes]).any?{|c| exception.is_a?(c)}
-        raise Sequel.convert_exception_class(exception, disconnect_error?(exception, opts) ? DatabaseDisconnectError : DatabaseError)
+        raise Sequel.convert_exception_class(exception, database_error_class(exception, opts))
       else
         raise exception
       end

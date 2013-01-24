@@ -136,6 +136,16 @@ module Sequel
         sql
       end
 
+      DATABASE_ERROR_REGEXPS = {
+        /unique constraint .+ violated/ => UniqueConstraintViolation,
+        /integrity constraint .+ violated/ => ForeignKeyConstraintViolation,
+        /check constraint .+ violated/ => CheckConstraintViolation,
+        /cannot insert NULL into|cannot update .+ to NULL/ => NotNullConstraintViolation,
+      }.freeze
+      def database_error_regexps
+        DATABASE_ERROR_REGEXPS
+      end
+
       def default_sequence_name(table, column)
         "seq_#{table}_#{column}"
       end

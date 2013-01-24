@@ -126,6 +126,15 @@ module Sequel
         :query
       end
 
+      DATABASE_ERROR_REGEXPS = {
+        /Operation would have caused one or more unique constraint violations/ => UniqueConstraintViolation,
+        /The constraint of the foreign key .+ is invalid|Update\/Delete operations are restricted by the foreign key/ => ForeignKeyConstraintViolation,
+        /cannot be made NULL/ => NotNullConstraintViolation,
+      }.freeze
+      def database_error_regexps
+        DATABASE_ERROR_REGEXPS
+      end
+
       # CUBRID is case insensitive, so don't modify identifiers
       def identifier_input_method_default
         nil

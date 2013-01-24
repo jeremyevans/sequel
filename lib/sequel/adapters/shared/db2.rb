@@ -154,6 +154,16 @@ module Sequel
         end
       end
 
+      DATABASE_ERROR_REGEXPS = {
+        /DB2 SQL Error: SQLCODE=-803, SQLSTATE=23505|One or more values in the INSERT statement, UPDATE statement, or foreign key update caused by a DELETE statement are not valid because the primary key, unique constraint or unique index/ => UniqueConstraintViolation,
+        /DB2 SQL Error: (SQLCODE=-530, SQLSTATE=23503|SQLCODE=-532, SQLSTATE=23504)|The insert or update value of the FOREIGN KEY .+ is not equal to any value of the parent key of the parent table|A parent row cannot be deleted because the relationship .+ restricts the deletion/ => ForeignKeyConstraintViolation,
+        /DB2 SQL Error: SQLCODE=-545, SQLSTATE=23513|The requested operation is not allowed because a row does not satisfy the check constraint/ => CheckConstraintViolation,
+        /DB2 SQL Error: SQLCODE=-407, SQLSTATE=23502|Assignment of a NULL value to a NOT NULL column/ => NotNullConstraintViolation,
+      }.freeze
+      def database_error_regexps
+        DATABASE_ERROR_REGEXPS
+      end
+
       # DB2 has issues with quoted identifiers, so
       # turn off database quoting by default.
       def quote_identifiers_default

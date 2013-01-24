@@ -52,6 +52,16 @@ module Sequel
           "#{create_table_prefix_sql(name, options)} AS (#{sql}) WITH DATA"
         end
 
+        DATABASE_ERROR_REGEXPS = {
+          /integrity constraint violation: unique constraint or index violation/ => UniqueConstraintViolation,
+          /integrity constraint violation: foreign key/ => ForeignKeyConstraintViolation,
+          /integrity constraint violation: check constraint/ => CheckConstraintViolation,
+          /integrity constraint violation: NOT NULL check constraint/ => NotNullConstraintViolation,
+        }.freeze
+        def database_error_regexps
+          DATABASE_ERROR_REGEXPS
+        end
+
         # Use IDENTITY() to get the last inserted id.
         def last_insert_id(conn, opts={})
           statement(conn) do |stmt|

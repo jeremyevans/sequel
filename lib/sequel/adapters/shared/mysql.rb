@@ -350,6 +350,15 @@ module Sequel
         "#{super}#{" ENGINE=#{engine}" if engine}#{" DEFAULT CHARSET=#{charset}" if charset}#{" DEFAULT COLLATE=#{collate}" if collate}"
       end
 
+      DATABASE_ERROR_REGEXPS = {
+        /Duplicate entry .+ for key/ => UniqueConstraintViolation,
+        /foreign key constraint fails/ => ForeignKeyConstraintViolation,
+        /cannot be null/ => NotNullConstraintViolation,
+      }.freeze
+      def database_error_regexps
+        DATABASE_ERROR_REGEXPS
+      end
+
       # Backbone of the tables and views support using SHOW FULL TABLES.
       def full_tables(type, opts)
         m = output_identifier_meth

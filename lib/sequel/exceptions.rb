@@ -19,32 +19,47 @@ module Sequel
   # connection parameters it was given.
   class DatabaseConnectionError < DatabaseError; end
 
-  # Error that should be raised by adapters when they determine that the connection
+  # Error raised by adapters when they determine that the connection
   # to the database has been lost.  Instructs the connection pool code to 
   # remove that connection from the pool so that other connections can be acquired
   # automatically.
   class DatabaseDisconnectError < DatabaseError; end
 
-  # Raised on an invalid operation, such as trying to update or delete
+  # Generic error raised when Sequel determines a database constraint has been violated.
+  class ConstraintViolation < DatabaseError; end
+
+  # Error raised when Sequel determines a database check constraint has been violated.
+  class CheckConstraintViolation < ConstraintViolation; end
+
+  # Error raised when Sequel determines a database foreign key constraint has been violated.
+  class ForeignKeyConstraintViolation < ConstraintViolation; end
+
+  # Error raised when Sequel determines a database NOT NULL constraint has been violated.
+  class NotNullConstraintViolation < ConstraintViolation; end
+
+  # Error raised when Sequel determines a database unique constraint has been violated.
+  class UniqueConstraintViolation < ConstraintViolation; end
+
+  # Error raised on an invalid operation, such as trying to update or delete
   # a joined or grouped dataset.
   class InvalidOperation < Error; end
 
-  # Raised when attempting an invalid type conversion.
+  # Error raised when attempting an invalid type conversion.
   class InvalidValue < Error ; end
 
-  # Raised when the adapter adapter hasn't implemented a method such as +tables+:
+  # Error raised when the adapter adapter hasn't implemented a method such as +tables+:
   class NotImplemented < Error; end
 
-  # Raised when the connection pool cannot acquire a database connection
+  # Error raised when the connection pool cannot acquire a database connection
   # before the timeout.
   class PoolTimeout < Error ; end
 
   # Exception that you should raise to signal a rollback of the current transaction.
   # The transaction block will catch this exception, rollback the current transaction,
-  # and won't reraise it.
+  # and won't reraise it (unless a reraise is requested).
   class Rollback < Error ; end
 
-  # Exception that occurs when unbinding a dataset that has multiple different values
+  # Error raised when unbinding a dataset that has multiple different values
   # for a given variable.
   class UnbindDuplicate < Error; end
 

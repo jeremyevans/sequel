@@ -30,6 +30,11 @@ module Sequel
 
         private
         
+        DATABASE_ERROR_REGEXPS = {/Abort due to constraint violation/ => ConstraintViolation}.freeze
+        def database_error_regexps
+          DATABASE_ERROR_REGEXPS
+        end
+
         # Use last_insert_rowid() to get the last inserted id.
         def last_insert_id(conn, opts={})
           statement(conn) do |stmt|

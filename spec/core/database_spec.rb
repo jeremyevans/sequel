@@ -1669,6 +1669,14 @@ describe "Database#raise_error" do
   specify "should convert the exception to a DatabaseDisconnectError if opts[:disconnect] is true" do
     proc{@db.send(:raise_error, Interrupt.new(''), :disconnect=>true)}.should raise_error(Sequel::DatabaseDisconnectError)
   end
+  
+  specify "should convert the exception to an appropriate error if exception message matches regexp" do
+    def @db.database_error_regexps
+      {/foo/ => Sequel::DatabaseDisconnectError, /bar/ => Sequel::ConstraintViolation}
+    end
+    proc{@db.send(:raise_error, Interrupt.new('foo'))}.should raise_error(Sequel::DatabaseDisconnectError)
+    proc{@db.send(:raise_error, Interrupt.new('bar'))}.should raise_error(Sequel::ConstraintViolation)
+  end
 end
 
 describe "Database#typecast_value" do

@@ -96,6 +96,16 @@ module Sequel
           uri == 'jdbc:h2:mem:' ? o.merge(:max_connections=>1) : o
         end
       
+        DATABASE_ERROR_REGEXPS = {
+          /Unique index or primary key violation/ => UniqueConstraintViolation,
+          /Referential integrity constraint violation/ => ForeignKeyConstraintViolation,
+          /Check constraint violation/ => CheckConstraintViolation,
+          /NULL not allowed for column/ => NotNullConstraintViolation,
+        }.freeze
+        def database_error_regexps
+          DATABASE_ERROR_REGEXPS
+        end
+
         # Use IDENTITY() to get the last inserted id.
         def last_insert_id(conn, opts={})
           statement(conn) do |stmt|

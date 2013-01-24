@@ -312,6 +312,16 @@ module Sequel
         ps
       end
 
+      DATABASE_ERROR_REGEXPS = {
+        /is not unique\z/ => UniqueConstraintViolation,
+        /foreign key constraint failed\z/ => ForeignKeyConstraintViolation,
+        /\A(SQLITE ERROR 19 \(CONSTRAINT\) : )?constraint failed\z/ => CheckConstraintViolation,
+        /may not be NULL\z/ => NotNullConstraintViolation,
+      }.freeze
+      def database_error_regexps
+        DATABASE_ERROR_REGEXPS
+      end
+
       # The array of column schema hashes for the current columns in the table
       def defined_columns_for(table)
         cols = parse_pragma(table, {})

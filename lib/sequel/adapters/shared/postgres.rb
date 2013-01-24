@@ -627,6 +627,16 @@ module Sequel
         end
       end
 
+      DATABASE_ERROR_REGEXPS = {
+        /duplicate key value violates unique constraint/ => UniqueConstraintViolation,
+        /violates foreign key constraint/ => ForeignKeyConstraintViolation,
+        /violates check constraint/ => CheckConstraintViolation,
+        /violates not-null constraint/ => NotNullConstraintViolation,
+      }.freeze
+      def database_error_regexps
+        DATABASE_ERROR_REGEXPS
+      end
+
       # SQL for doing fast table insert from stdin.
       def copy_into_sql(table, opts)
         sql = "COPY #{literal(table)}"

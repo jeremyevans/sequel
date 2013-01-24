@@ -104,6 +104,16 @@ module Sequel
           end
         end
 
+        DATABASE_ERROR_REGEXPS = {
+          /The statement was aborted because it would have caused a duplicate key value in a unique or primary key constraint or unique index/ => UniqueConstraintViolation,
+          /violation of foreign key constraint/ => ForeignKeyConstraintViolation,
+          /The check constraint .+ was violated/ => CheckConstraintViolation,
+          /cannot accept a NULL value/ => NotNullConstraintViolation,
+        }.freeze
+        def database_error_regexps
+          DATABASE_ERROR_REGEXPS
+        end
+
         # Use IDENTITY_VAL_LOCAL() to get the last inserted id.
         def last_insert_id(conn, opts={})
           statement(conn) do |stmt|

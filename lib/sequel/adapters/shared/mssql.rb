@@ -238,6 +238,16 @@ module Sequel
         run(ds.into(name).sql)
       end
     
+      DATABASE_ERROR_REGEXPS = {
+        /Violation of UNIQUE KEY constraint/ => UniqueConstraintViolation,
+        /conflicted with the (FOREIGN KEY.*|REFERENCE) constraint/ => ForeignKeyConstraintViolation,
+        /conflicted with the CHECK constraint/ => CheckConstraintViolation,
+        /column does not allow nulls/ => NotNullConstraintViolation,
+      }.freeze
+      def database_error_regexps
+        DATABASE_ERROR_REGEXPS
+      end
+
       # The name of the constraint for setting the default value on the table and column.
       # The SQL used to select default constraints utilizes MSSQL catalog views which were introduced in 2005.
       # This method intentionally does not support MSSQL 2000.

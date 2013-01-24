@@ -43,6 +43,16 @@ module Sequel
         run(ds.into(name).sql)
       end
     
+      DATABASE_ERROR_REGEXPS = {
+        /The changes you requested to the table were not successful because they would create duplicate values in the index, primary key, or relationship/ => UniqueConstraintViolation,
+        /You cannot add or change a record because a related record is required|The record cannot be deleted or changed because table/ => ForeignKeyConstraintViolation,
+        /One or more values are prohibited by the validation rule/ => CheckConstraintViolation,
+        /You must enter a value in the .+ field|cannot contain a Null value because the Required property for this field is set to True/ => NotNullConstraintViolation,
+      }.freeze
+      def database_error_regexps
+        DATABASE_ERROR_REGEXPS
+      end
+
       # The SQL to drop an index for the table.
       def drop_index_sql(table, op)
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
