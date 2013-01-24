@@ -89,6 +89,9 @@ module Sequel
       end
     end
 
+    # Error raised when Sequel determines a PostgreSQL exclusion constraint has been violated.
+    class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
+
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
       EXCLUDE_SCHEMAS = /pg_*|information_schema/i
@@ -632,6 +635,7 @@ module Sequel
         /violates foreign key constraint/ => ForeignKeyConstraintViolation,
         /violates check constraint/ => CheckConstraintViolation,
         /violates not-null constraint/ => NotNullConstraintViolation,
+        /conflicting key value violates exclusion constraint/ => ExclusionConstraintViolation,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS

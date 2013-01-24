@@ -157,13 +157,13 @@ describe "A PostgreSQL dataset" do
     @db.create_table!(:atest){Integer :t; exclude [[Sequel.desc(:t, :nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}}
     @db[:atest].insert(1)
     @db[:atest].insert(2)
-    proc{@db[:atest].insert(2)}.should raise_error(Sequel::DatabaseError)
+    proc{@db[:atest].insert(2)}.should raise_error(Sequel::Postgres::ExclusionConstraintViolation)
 
     @db.create_table!(:atest){Integer :t}
     @db.alter_table(:atest){add_exclusion_constraint [[:t, '=']], :using=>:btree, :name=>'atest_ex'}
     @db[:atest].insert(1)
     @db[:atest].insert(2)
-    proc{@db[:atest].insert(2)}.should raise_error(Sequel::DatabaseError)
+    proc{@db[:atest].insert(2)}.should raise_error(Sequel::Postgres::ExclusionConstraintViolation)
     @db.alter_table(:atest){drop_constraint 'atest_ex'}
   end if POSTGRES_DB.server_version >= 90000
 
