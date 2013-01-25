@@ -37,7 +37,9 @@ module Sequel
           dbname = opts[:host]
         end
         conn = OCI8.new(opts[:user], opts[:password], dbname, opts[:privilege])
-        conn.prefetch_rows = typecast_value_integer(opts.fetch(:prefetch_rows, 100))
+        if prefetch_rows = opts.fetch(:prefetch_rows, 100)
+          conn.prefetch_rows = typecast_value_integer(prefetch_rows)
+        end
         conn.autocommit = true
         conn.non_blocking = true
         
