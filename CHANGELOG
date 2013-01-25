@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#paged_each, for processing entire datasets without keeping all rows in memory (jeremyevans)
+
 * Add Sequel::ConstraintViolation exception class and subclasses for easier exception handling (jeremyevans)
 
 * Fix use of identity_map plugin with many_to_many associations with right composite keys (chanks) (#603)

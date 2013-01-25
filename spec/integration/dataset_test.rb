@@ -98,6 +98,28 @@ describe "Simple Dataset operations" do
     @ds.all.should == [{:id=>1, :number=>10}]
   end
 
+  specify "should iterate over records as they come in" do
+    called = false
+    @ds.each{|row| called = true; row.should == {:id=>1, :number=>10}}
+    called.should == true
+  end
+
+  specify "should support iterating over large numbers of records with paged_each" do
+    (2..100).each{|i| @ds.insert(:number=>i*10)}
+
+    rows = []
+    @ds.order(:number).paged_each(:rows_per_fetch=>5){|row| rows << row}
+    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+
+    rows = []
+    @ds.order(:number).paged_each(:rows_per_fetch=>3){|row| rows << row}
+    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+
+    rows = []
+    @ds.order(:number).limit(50, 25).paged_each(:rows_per_fetch=>3){|row| rows << row}
+    rows.should == (26..75).map{|i| {:id=>i, :number=>i*10}}
+  end
+
   specify "should fetch all results correctly" do
     @ds.all.should == [{:id=>1, :number=>10}]
   end

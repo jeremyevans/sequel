@@ -461,6 +461,55 @@ module Sequel
       import(columns, hashes.map{|h| columns.map{|c| h[c]}}, opts)
     end
 
+    # Yields each row in the dataset, but interally uses multiple queries as needed with
+    # limit and offset to process the entire result set without keeping all
+    # rows in the dataset in memory, even if the underlying driver buffers all
+    # query results in memory.
+    #
+    # Because this uses multiple queries internally, in order to remain consistent,
+    # it also uses a transaction internally.  Additionally, to make sure that all rows
+    # in the dataset are yielded and none are yielded twice, the dataset must have an
+    # unambiguous order.  Sequel requires that datasets using this method have an
+    # order, but it cannot ensure that the order is unambiguous.
+    #
+    # Options:
+    # :rows_per_fetch :: The number of rows to fetch per query.  Defaults to 1000.
+    def paged_each(opts={})
+      unless @opts[:order]
+        raise Sequel::Error, "Dataset#paged_each requires the dataset be ordered"
+      end
+
+      total_limit = @opts[:limit]
+      offset = @opts[:offset] || 0
+
+      if server = @opts[:server]
+        opts = opts.merge(:server=>server)
+      end
+
+      rows_per_fetch = opts[:rows_per_fetch] || 1000
+      num_rows_yielded = rows_per_fetch
+      total_rows = 0
+
+      db.transaction(opts) do
+        while num_rows_yielded == rows_per_fetch && (total_limit.nil? || total_rows < total_limit)
+          if total_limit && total_rows + rows_per_fetch > total_limit
+            rows_per_fetch = total_limit - total_rows
+          end
+
+          num_rows_yielded = 0
+          limit(rows_per_fetch, offset).each do |row|
+            num_rows_yielded += 1
+            total_rows += 1 if total_limit
+            yield row
+          end
+
+          offset += rows_per_fetch
+        end
+      end
+
+      self
+    end
+
     # Returns a +Range+ instance made from the minimum and maximum values for the
     # given column/expression.  Uses a virtual row block if no argument is given.
     #

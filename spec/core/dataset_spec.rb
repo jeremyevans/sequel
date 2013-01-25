@@ -40,6 +40,14 @@ describe "Dataset" do
     Sequel::Dataset.included_modules.should include(Enumerable)
   end
   
+  specify "should yield rows to each" do
+    ds = Sequel.mock[:t]
+    ds._fetch = {:x=>1}
+    called = false
+    ds.each{|a| called = true; a.should == {:x=>1}}
+    called.should be_true
+  end
+  
   specify "should get quote_identifiers default from database" do
     db = Sequel::Database.new(:quote_identifiers=>true)
     db[:a].quote_identifiers?.should == true
@@ -4523,6 +4531,84 @@ describe "Dataset#split_qualifiers" do
     @ds.split_qualifiers(:s).should == ['foo', 's']
     @ds.split_qualifiers(:s, nil).should == ['s']
     @ds.split_qualifiers(Sequel.qualify(:d__t, :s)).should == ['d', 't', 's']
+  end
+end
+
+describe "Dataset#paged_each" do
+  before do
+    @ds = Sequel.mock[:test].order(:x)
+    @db = (0...10).map{|i| {:x=>i}}
+    @ds._fetch = @db
+    @rows = []
+    @proc = lambda{|row| @rows << row}
+  end
+
+  it "should yield rows to the passed block" do
+    @ds.paged_each(&@proc)
+    @rows.should == @db
+  end
+
+  it "should respect the row_proc" do
+    @ds.row_proc = lambda{|row| {:x=>row[:x]*2}}
+    @ds.paged_each(&@proc)
+    @rows.should == @db.map{|row| {:x=>row[:x]*2}}
+  end
+
+  it "should use a transaction to ensure consistent results" do
+    @ds.paged_each(&@proc)
+    sqls = @ds.db.sqls
+    sqls[0].should == 'BEGIN'
+    sqls[-1].should == 'COMMIT'
+  end
+
+  it "should use a limit and offset to go through the dataset in chunks at a time" do
+    @ds.paged_each(&@proc)
+    @ds.db.sqls[1...-1].should == ['SELECT * FROM test ORDER BY x LIMIT 1000 OFFSET 0']
+  end
+
+  it "should accept a :rows_per_fetch option to change the number of rows per fetch" do
+    @ds._fetch = @db.each_slice(3).to_a
+    @ds.paged_each(:rows_per_fetch=>3, &@proc)
+    @rows.should == @db
+    @ds.db.sqls[1...-1].should == ['SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 0',
+      'SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 3',
+      'SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 6',
+      'SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 9']
+  end
+
+  it "should handle cases where the last query returns nothing" do
+    @ds._fetch = @db.each_slice(5).to_a
+    @ds.paged_each(:rows_per_fetch=>5, &@proc)
+    @rows.should == @db
+    @ds.db.sqls[1...-1].should == ['SELECT * FROM test ORDER BY x LIMIT 5 OFFSET 0',
+      'SELECT * FROM test ORDER BY x LIMIT 5 OFFSET 5',
+      'SELECT * FROM test ORDER BY x LIMIT 5 OFFSET 10']
+  end
+
+  it "should respect an existing server option to use" do
+    @ds = Sequel.mock(:servers=>{:foo=>{}})[:test].order(:x)
+    @ds._fetch = @db
+    @ds.server(:foo).paged_each(&@proc)
+    @rows.should == @db
+    @ds.db.sqls.should == ["BEGIN -- foo", "SELECT * FROM test ORDER BY x LIMIT 1000 OFFSET 0 -- foo", "COMMIT -- foo"]
+  end
+
+  it "should require an order" do
+    lambda{@ds.unordered.paged_each(&@proc)}.should raise_error(Sequel::Error)
+  end
+
+  it "should handle an existing limit and/or offset" do
+    @ds._fetch = @db.each_slice(3).to_a
+    @ds.limit(5).paged_each(:rows_per_fetch=>3, &@proc)
+    @ds.db.sqls[1...-1].should == ["SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 0", "SELECT * FROM test ORDER BY x LIMIT 2 OFFSET 3"]
+
+    @ds._fetch = @db.each_slice(3).to_a
+    @ds.limit(5, 2).paged_each(:rows_per_fetch=>3, &@proc)
+    @ds.db.sqls[1...-1].should == ["SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 2", "SELECT * FROM test ORDER BY x LIMIT 2 OFFSET 5"]
+
+    @ds._fetch = @db.each_slice(3).to_a
+    @ds.limit(nil, 2).paged_each(:rows_per_fetch=>3, &@proc)
+    @ds.db.sqls[1...-1].should == ["SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 2", "SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 5", "SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 8", "SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 11"]
   end
 end
 
