@@ -206,9 +206,9 @@ module Sequel
     #
     #   DB.create_or_replace_view(:cheap_items, "SELECT * FROM items WHERE price < 100")
     #   DB.create_or_replace_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
-    def create_or_replace_view(name, source)
+    def create_or_replace_view(name, source, options = {})
       source = source.sql if source.is_a?(Dataset)
-      execute_ddl("CREATE OR REPLACE VIEW #{quote_schema_table(name)} AS #{source}")
+      execute_ddl("CREATE OR REPLACE #{'TEMPORARY ' if options[:temp]}VIEW #{quote_schema_table(name)} AS #{source}")
       remove_cached_schema(name)
       nil
     end
@@ -217,9 +217,9 @@ module Sequel
     #
     #   DB.create_view(:cheap_items, "SELECT * FROM items WHERE price < 100")
     #   DB.create_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
-    def create_view(name, source)
+    def create_view(name, source, options = {})
       source = source.sql if source.is_a?(Dataset)
-      execute_ddl("CREATE VIEW #{quote_schema_table(name)} AS #{source}")
+      execute_ddl("CREATE #{'TEMPORARY ' if options[:temp]}VIEW #{quote_schema_table(name)} AS #{source}")
     end
     
     # Removes a column from the specified table:

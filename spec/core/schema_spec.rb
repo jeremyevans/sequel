@@ -1222,6 +1222,13 @@ describe "Database#create_view" do
     @db.sqls.should == ['CREATE OR REPLACE VIEW sch.test AS SELECT * FROM xyz']
   end
 
+  specify "should create a temporary view" do
+    @db.create_view :test, @db[:items].select(:a, :b).order(:c), :temp => true
+    @db.sqls.should == ['CREATE TEMPORARY VIEW test AS SELECT a, b FROM items ORDER BY c']
+    @db.create_or_replace_view :sch__test, "SELECT * FROM xyz", :temp => true
+    @db.sqls.should == ['CREATE OR REPLACE TEMPORARY VIEW sch.test AS SELECT * FROM xyz']
+  end
+
   specify "should construct proper SQL with dataset" do
     @db.create_or_replace_view :test, @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT a, b FROM items ORDER BY c']
