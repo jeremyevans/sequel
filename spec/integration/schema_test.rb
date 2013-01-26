@@ -298,6 +298,12 @@ describe "Database schema modifiers" do
   specify "should create temporary tables without raising an exception" do
     @db.create_table!(:items, :temp=>true){Integer :number}
   end
+
+  cspecify "should create temporary views without raising an exception" do
+    @db.create_table(:items){Integer :number}
+    @db.create_view(:items_view, @ds, :temp=>true)
+    @db.drop_view(:items_view)
+  end
   
   specify "should have create_table? only create the table if it doesn't already exist" do
     @db.create_table!(:items){String :a}
