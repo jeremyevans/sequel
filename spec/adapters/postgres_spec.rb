@@ -48,6 +48,28 @@ describe "PostgreSQL", '#create_table' do
   end
 end
 
+describe "PostgreSQL temporary views" do
+  before do
+    @db = POSTGRES_DB
+    @db.drop_view(:items_view) rescue nil
+    @db.create_table!(:items){Integer :number}
+    @db[:items].insert(10)
+    @db[:items].insert(20)
+  end
+  after do
+    @db.drop_table?(:items)
+  end
+
+  specify "should be supported" do
+    @db.create_view(:items_view, @db[:items].where(:number=>10), :temp=>true)
+    @db[:items_view].map(:number).should == [10]
+    @db.create_or_replace_view(:items_view, @db[:items].where(:number=>20),  :temp=>true)
+    @db[:items_view].map(:number).should == [20]
+    @db.disconnect
+    lambda{@db[:items_view].map(:number)}.should raise_error(Sequel::DatabaseError)
+  end
+end unless POSTGRES_DB.adapter_scheme == :do # Causes freezing later
+    
 describe "A PostgreSQL database" do
   before(:all) do
     @db = POSTGRES_DB

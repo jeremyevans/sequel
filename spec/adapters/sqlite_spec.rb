@@ -175,6 +175,26 @@ describe "An SQLite database" do
   end
 end
 
+describe "SQLite temporary views" do
+  before do
+    @db = SQLITE_DB
+    @db.drop_view(:items) rescue nil
+    @db.create_table!(:items){Integer :number}
+    @db[:items].insert(10)
+    @db[:items].insert(20)
+  end
+  after do
+    @db.drop_table?(:items)
+  end
+
+  specify "should be supported" do
+    @db.create_view(:items_view, @db[:items].where(:number=>10),  :temp=>true)
+    @db[:items_view].map(:number).should == [10]
+    @db.disconnect
+    lambda{@db[:items_view].map(:number)}.should raise_error(Sequel::DatabaseError)
+  end
+end
+    
 describe "SQLite type conversion" do
   before do
     @db = SQLITE_DB

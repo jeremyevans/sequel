@@ -312,6 +312,11 @@ module Sequel
         ps
       end
 
+      # SQLite support creating temporary views.
+      def create_view_prefix_sql(name, options)
+        "CREATE #{'TEMPORARY 'if options[:temp]}VIEW #{quote_schema_table(name)}"
+      end
+
       DATABASE_ERROR_REGEXPS = {
         /is not unique\z/ => UniqueConstraintViolation,
         /foreign key constraint failed\z/ => ForeignKeyConstraintViolation,

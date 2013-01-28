@@ -731,6 +731,11 @@ module Sequel
         "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
       end
 
+      # DDL fragment for initial part of CREATE VIEW statement
+      def create_view_prefix_sql(name, options)
+        "CREATE #{'OR REPLACE 'if options[:replace]}#{'TEMPORARY 'if options[:temp]}VIEW #{quote_schema_table(name)}"
+      end
+
       # The errors that the main adapters can raise, depends on the adapter being used
       def database_error_classes
         CONVERTED_EXCEPTIONS
