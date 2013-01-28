@@ -30,5 +30,4 @@ describe "Sequel::Plugins::EagerEach" do
     a.map{|c| c.associations[:children]}.should == [[@c.load(:id=>3, :parent_id=>1), @c.load(:id=>4, :parent_id=>1)], [@c.load(:id=>5, :parent_id=>2), @c.load(:id=>6, :parent_id=>2)]]
     @c.db.sqls.should == ['SELECT items.id, items.parent_id, children.id AS children_id, children.parent_id AS children_parent_id FROM items LEFT OUTER JOIN items AS children ON (children.parent_id = items.id)']
   end
-
 end

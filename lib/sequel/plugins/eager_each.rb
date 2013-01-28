@@ -13,8 +13,6 @@ module Sequel
     # and setting a new flag in the cloned dataset, so that each can check with the flag to
     # determine whether it should call all.
     #
-    # This extension uses Object#extend at runtime, which can hurt performance.
-    # 
     # Usage:
     #
     #   # Make all model subclass instances eagerly load for each (called before loading subclasses)
@@ -23,37 +21,33 @@ module Sequel
     #   # Make the Album class eagerly load for each
     #   Album.plugin :eager_each
     module EagerEach 
-      # Methods added to eagerly loaded datasets when the eager_each plugin is in use.
-      module EagerDatasetMethods
-        # Call #all instead of #each unless #each is being called by #all.
+      module DatasetMethods
+        # Call #all instead of #each if eager loading,
+        # uless #each is being called by #all.
         def each(&block)
-          if opts[:all_called]
-            super
-          else
+          if use_eager_all?
             all(&block)
+          else
+            super
           end
         end
 
-        # Clone the dataset and set a flag to let #each know not to call #all,
+        # If eager loading, clone the dataset and set a flag to let #each know not to call #all,
         # to avoid the infinite loop.
         def all(&block)
-          if opts[:all_called]
-            super
-          else
+          if use_eager_all?
             clone(:all_called=>true).all(&block)
+          else
+            super
           end
         end
-      end
 
-      module DatasetMethods
-        # Make sure calling each on this dataset will eagerly load the dataset.
-        def eager(*)
-          super.extend(EagerDatasetMethods)
-        end
-        
-        # Make sure calling each on this dataset will eagerly load the dataset.
-        def eager_graph(*)
-          super.extend(EagerDatasetMethods)
+        private
+
+        # Wether to use all when each is called, true when eager loading
+        # unless the flag has already been set.
+        def use_eager_all?
+          (opts[:eager] || opts[:eager_graph]) && !opts[:all_called]
         end
       end
     end
