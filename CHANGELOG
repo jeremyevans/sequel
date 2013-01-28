@@ -1,5 +1,7 @@
 === HEAD
 
+* Emulate Database#create_or_replace_view if not supported directly (jeremyevans)
+
 * Add Dataset#paged_each, for processing entire datasets without keeping all rows in memory (jeremyevans)
 
 * Add Sequel::ConstraintViolation exception class and subclasses for easier exception handling (jeremyevans)

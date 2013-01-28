@@ -274,6 +274,30 @@ describe "Database schema modifiers" do
     @db[:items2].all.should == [{:number=>10}]
   end
   
+  describe "views" do
+    before do
+      @db.drop_view(:items_view) rescue nil
+      @db.create_table(:items){Integer :number}
+      @ds.insert(:number=>1)
+      @ds.insert(:number=>2)
+    end
+    after do
+      @db.drop_view(:items_view)
+    end
+
+    specify "should create views correctly" do
+      @db.create_view(:items_view, @ds.where(:number=>1))
+      @db[:items_view].map(:number).should == [1]
+    end
+
+    specify "should create or replace views correctly" do
+      @db.create_or_replace_view(:items_view, @ds.where(:number=>1))
+      @db[:items_view].map(:number).should == [1]
+      @db.create_or_replace_view(:items_view, @ds.where(:number=>2))
+      @db[:items_view].map(:number).should == [2]
+    end
+  end
+  
   specify "should handle create table in a rolled back transaction" do
     @db.drop_table?(:items)
     @db.transaction(:rollback=>:always){@db.create_table(:items){Integer :number}}
@@ -299,12 +323,6 @@ describe "Database schema modifiers" do
     @db.create_table!(:items, :temp=>true){Integer :number}
   end
 
-  cspecify "should create temporary views without raising an exception" do
-    @db.create_table(:items){Integer :number}
-    @db.create_view(:items_view, @ds, :temp=>true)
-    @db.drop_view(:items_view)
-  end
-  
   specify "should have create_table? only create the table if it doesn't already exist" do
     @db.create_table!(:items){String :a}
     @db.create_table?(:items){String :b}

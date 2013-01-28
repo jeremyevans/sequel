@@ -1219,21 +1219,20 @@ describe "Database#create_view" do
     @db.create_view :test, @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
     @db.create_or_replace_view :sch__test, "SELECT * FROM xyz"
-    @db.sqls.should == ['CREATE OR REPLACE VIEW sch.test AS SELECT * FROM xyz']
-  end
-
-  specify "should create a temporary view" do
-    @db.create_view :test, @db[:items].select(:a, :b).order(:c), :temp => true
-    @db.sqls.should == ['CREATE TEMPORARY VIEW test AS SELECT a, b FROM items ORDER BY c']
-    @db.create_or_replace_view :sch__test, "SELECT * FROM xyz", :temp => true
-    @db.sqls.should == ['CREATE OR REPLACE TEMPORARY VIEW sch.test AS SELECT * FROM xyz']
+    @db.sqls.should == ['DROP VIEW sch.test', 'CREATE VIEW sch.test AS SELECT * FROM xyz']
   end
 
   specify "should construct proper SQL with dataset" do
     @db.create_or_replace_view :test, @db[:items].select(:a, :b).order(:c)
-    @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT a, b FROM items ORDER BY c']
+    @db.sqls.should == ['DROP VIEW test', 'CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
     @db.create_or_replace_view Sequel.identifier(:test), @db[:items].select(:a, :b).order(:c)
-    @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT a, b FROM items ORDER BY c']
+    @db.sqls.should == ['DROP VIEW test', 'CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
+  end
+
+  specify "should use CREATE OR REPLACE VIEW if such syntax is supported" do
+    def @db.supports_create_or_replace_view?() true end
+    @db.create_or_replace_view :test, @db[:items]
+    @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT * FROM items']
   end
 end
 

@@ -202,24 +202,34 @@ module Sequel
       create_table_generator_class.new(self, &block)
     end
     
-    # Creates a view, replacing it if it already exists:
+    # Creates a view, replacing a view with the same name if one already exists.
     #
-    #   DB.create_or_replace_view(:cheap_items, "SELECT * FROM items WHERE price < 100")
-    #   DB.create_or_replace_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
+    #   DB.create_or_replace_view(:some_items, "SELECT * FROM items WHERE price < 100")
+    #   DB.create_or_replace_view(:some_items, DB[:items].filter(:category => 'ruby'))
+    #
+    # For databases where replacing a view is not natively supported, support
+    # is emulated by dropping a view with the same name before creating the view.
     def create_or_replace_view(name, source, options = {})
-      source = source.sql if source.is_a?(Dataset)
-      execute_ddl("CREATE OR REPLACE #{'TEMPORARY ' if options[:temp]}VIEW #{quote_schema_table(name)} AS #{source}")
-      remove_cached_schema(name)
-      nil
+      if supports_create_or_replace_view?
+        options = options.merge(:replace=>true)
+      else
+        drop_view(name) rescue nil
+      end
+
+      create_view(name, source, options)
     end
     
     # Creates a view based on a dataset or an SQL string:
     #
     #   DB.create_view(:cheap_items, "SELECT * FROM items WHERE price < 100")
     #   DB.create_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
+    #
+    # PostgreSQL/SQLite specific option:
+    # :temp :: Create a temporary view, automatically dropped on disconnect.
     def create_view(name, source, options = {})
-      source = source.sql if source.is_a?(Dataset)
-      execute_ddl("CREATE #{'TEMPORARY ' if options[:temp]}VIEW #{quote_schema_table(name)} AS #{source}")
+      execute_ddl(create_view_sql(name, source, options))
+      remove_cached_schema(name)
+      nil
     end
     
     # Removes a column from the specified table:
@@ -581,9 +591,20 @@ module Sequel
       "#{create_table_prefix_sql(name, options)} AS #{sql}"
     end
 
-    # DDL statement for creating a table with the given name, columns, and options
+    # DDL fragment for initial part of CREATE TABLE statement
     def create_table_prefix_sql(name, options)
       "CREATE #{temporary_table_sql if options[:temp]}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"
+    end
+
+    # DDL statement for creating a view.
+    def create_view_sql(name, source, options)
+      source = source.sql if source.is_a?(Dataset)
+      "#{create_view_prefix_sql(name, options)} AS #{source}"
+    end
+
+    # DDL fragment for initial part of CREATE VIEW statement
+    def create_view_prefix_sql(name, options)
+      "CREATE #{'OR REPLACE 'if options[:replace]}VIEW #{quote_schema_table(name)}"
     end
 
     # Default index name for the table and columns, may be too long
