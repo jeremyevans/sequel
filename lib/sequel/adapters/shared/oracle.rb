@@ -170,6 +170,11 @@ module Sequel
         end
       end
 
+      # Oracle supports CREATE OR REPLACE VIEW.
+      def supports_create_or_replace_view?
+        true
+      end
+
       # Oracle's integer/:number type handles larger values than
       # most other databases's bigint types, so it should be
       # safe to use for Bignum.

@@ -439,6 +439,11 @@ module Sequel
         true
       end
 
+      # MySQL supports CREATE OR REPLACE VIEW.
+      def supports_create_or_replace_view?
+        true
+      end
+
       # Respect the :size option if given to produce
       # tinyblob, mediumblob, and longblob if :tiny,
       # :medium, or :long is given.

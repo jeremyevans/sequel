@@ -367,6 +367,12 @@ module Sequel
       end
     end
     
+    # Whether the database supports CREATE OR REPLACE VIEW.  If not, support
+    # will be emulated by dropping the view first. false by default.
+    def supports_create_or_replace_view?
+      false
+    end
+
     # Typecast the value to an SQL::Blob
     def typecast_value_blob(value)
       value.is_a?(Sequel::SQL::Blob) ? value : Sequel::SQL::Blob.new(value)

@@ -933,6 +933,11 @@ module Sequel
         true
       end
 
+      # PostgreSQL supports CREATE OR REPLACE VIEW.
+      def supports_create_or_replace_view?
+        true
+      end
+
       # Handle bigserial type if :serial option is present
       def type_literal_generic_bignum(column)
         column[:serial] ? :bigserial : super
