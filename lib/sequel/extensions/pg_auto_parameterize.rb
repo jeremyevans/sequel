@@ -102,6 +102,15 @@ module Sequel
           end
           super
         end
+
+        private
+
+        def create_view_sql(name, source, options)
+          if source.is_a?(DatasetMethods)
+            source = source.no_auto_parameterize
+          end
+          super
+        end
       end
 
       module DatasetMethods
