@@ -192,6 +192,32 @@ describe "Simple Dataset operations" do
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 1)).all.should == [{:id=>2, :number=>20}]
   end
   
+  specify "should fetch correctly when using limit and offset in a from_self" do
+    @ds.insert(:number=>20)
+    ds = @ds.order(:id).limit(1, 1).from_self
+    ds.all.should == [{:number=>20, :id=>2}]
+    ds.columns.should == [:id, :number]
+    @ds.order(:id).limit(1, 1).columns.should == [:id, :number]
+  end
+
+  specify "should fetch correctly when using nested limit and offset in a from_self" do
+    @ds.insert(:number=>20)
+    @ds.insert(:number=>30)
+    ds = @ds.order(:id).limit(2, 1).from_self.reverse_order(:number).limit(1, 1)
+    ds.all.should == [{:number=>20, :id=>2}]
+    ds.columns.should == [:id, :number]
+    @ds.order(:id).limit(2, 1).from_self.reverse_order(:number).limit(1, 1).columns.should == [:id, :number]
+
+    ds = @ds.order(:id).limit(3, 1).from_self.limit(2, 1).from_self.limit(1, 1)
+    ds.all.should == []
+    ds.columns.should == [:id, :number]
+
+    @ds.insert(:number=>40)
+    ds = @ds.order(:id).limit(3, 1).from_self.reverse_order(:number).limit(2, 1).reverse_order(:id).limit(1, 1)
+    ds.all.should == [{:number=>30, :id=>3}]
+    ds.columns.should == [:id, :number]
+  end
+
   specify "should alias columns correctly" do
     @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
   end
