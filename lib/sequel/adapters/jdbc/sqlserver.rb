@@ -18,7 +18,7 @@ module Sequel
         # than getObject() for this column avoids the problem.
         # Reference: http://social.msdn.microsoft.com/Forums/en/sqldataaccess/thread/20df12f3-d1bf-4526-9daa-239a83a8e435
         module MetadataDatasetMethods
-          def process_result_set_convert(cols, result, rn)
+          def process_result_set_convert(cols, result)
             while result.next
               row = {}
               cols.each do |n, i, p|
@@ -40,18 +40,16 @@ module Sequel
                   v
                 end
               end
-              row.delete(rn) if rn
               yield row
             end
           end
 
-          def process_result_set_no_convert(cols, result, rn)
+          def process_result_set_no_convert(cols, result)
             while result.next
               row = {}
               cols.each do |n, i|
                 row[n] = (n == :is_autoincrement ? result.getString(i) : result.getObject(i))
               end
-              row.delete(rn) if rn
               yield row
             end
           end
