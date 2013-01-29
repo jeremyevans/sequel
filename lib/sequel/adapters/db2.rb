@@ -181,12 +181,10 @@ module Sequel
 
       def fetch_rows(sql)
         execute(sql) do |sth|
-          offset = @opts[:offset]
           db = @db
           i = 1
           column_info = get_column_info(sth)
           cols = column_info.map{|c| c.at(1)}
-          cols.delete(row_number_column) if offset
           @columns = cols
           errors = [DB2CLI::SQL_NO_DATA_FOUND, DB2CLI::SQL_ERROR]
           until errors.include?(rc = DB2CLI.SQLFetch(sth))
@@ -202,7 +200,6 @@ module Sequel
                 v
               end
             end
-            row.delete(row_number_column) if offset
             yield row
           end
         end

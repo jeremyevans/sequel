@@ -51,8 +51,8 @@ shared_examples_for "eager limit strategies" do
   end
   
   specify "should correctly handle limits and offsets when eager loading many_to_many associations" do
-    if @els == {:eager_limit_strategy=>:correlated_subquery} && Sequel.guarded?(:derby)
-      pending("Derby errors with correlated subqueries on many_to_many associations")
+    if @els == {:eager_limit_strategy=>:correlated_subquery} && Sequel.guarded?(:derby, :mssql)
+      pending("correlated subqueries on many_to_many associations not supported")
     end
     Album.many_to_many :first_two_tags, {:clone=>:first_two_tags}.merge(@els) if @els
     Album.many_to_many :second_two_tags, {:clone=>:second_two_tags}.merge(@els) if @els
@@ -76,8 +76,8 @@ shared_examples_for "eager limit strategies" do
   end
   
   specify "should correctly handle limits and offsets when eager loading many_through_many associations" do
-    if @els == {:eager_limit_strategy=>:correlated_subquery} && Sequel.guarded?(:derby)
-      pending("Derby errors with correlated subqueries on many_through_many associations")
+    if @els == {:eager_limit_strategy=>:correlated_subquery} && Sequel.guarded?(:derby, :mssql)
+      pending("correlated subqueries on many_through_many associations not supported")
     end
     Artist.many_through_many :first_two_tags, {:clone=>:first_two_tags}.merge(@els) if @els
     Artist.many_through_many :second_two_tags, {:clone=>:second_two_tags}.merge(@els) if @els

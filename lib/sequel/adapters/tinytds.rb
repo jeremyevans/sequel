@@ -217,20 +217,13 @@ module Sequel
         execute(sql) do |result|
           each_opts = {:cache_rows=>false}
           each_opts[:timezone] = :utc if db.timezone == :utc
-          rn = row_number_column if offset = @opts[:offset]
           columns = cols = result.fields.map{|c| output_identifier(c)}
-          if offset
-            rn = row_number_column
-            columns = columns.dup
-            columns.delete(rn)
-          end
           @columns = columns
           #if identifier_output_method
             each_opts[:as] = :array
             result.each(each_opts) do |r|
               h = {}
               cols.zip(r).each{|k, v| h[k] = v}
-              h.delete(rn) if rn
               yield h
             end
 =begin

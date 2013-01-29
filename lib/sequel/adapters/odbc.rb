@@ -105,16 +105,11 @@ module Sequel
           i = -1
           cols = s.columns(true).map{|c| [output_identifier(c.name), i+=1]}
           columns = cols.map{|c| c.at(0)}
-          if opts[:offset] && offset_returns_row_number_column?
-            rn = row_number_column
-            columns.delete(rn)
-          end
           @columns = columns
           if rows = s.fetch_all
             rows.each do |row|
               hash = {}
               cols.each{|n,i| hash[n] = convert_odbc_value(row[i])}
-              hash.delete(rn) if rn
               yield hash
             end
           end

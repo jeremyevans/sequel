@@ -88,16 +88,10 @@ module Sequel
         execute(sql) do |s|
           begin
             columns = cols = s.column_names.map{|c| output_identifier(c)}
-            if opts[:offset] && offset_returns_row_number_column?
-              rn = row_number_column
-              columns = columns.dup
-              columns.delete(rn)
-            end
             @columns = columns
             s.fetch do |r|
               row = {}
               cols.each{|c| row[c] = r.shift}
-              row.delete(rn) if rn
               yield row
             end
           ensure

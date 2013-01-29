@@ -4367,10 +4367,6 @@ describe "Dataset feature defaults" do
   it "should not require placeholder type specifiers by default" do
     Sequel::Database.new.dataset.requires_placeholder_type_specifiers?.should be_false
   end
-
-  it "offset use should be returning a separate row number column by default" do
-    Sequel::Database.new.dataset.send(:offset_returns_row_number_column?).should be_false
-  end
 end
 
 describe "Dataset extensions" do

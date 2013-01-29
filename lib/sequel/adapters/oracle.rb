@@ -385,18 +385,14 @@ module Sequel
       
       def fetch_rows(sql)
         execute(sql) do |cursor|
-          offset = @opts[:offset]
-          rn = row_number_column
           cps = db.conversion_procs
           cols = columns = cursor.get_col_names.map{|c| output_identifier(c)}
           metadata = cursor.column_metadata
           cm = cols.zip(metadata).map{|c, m| [c, cps[m.data_type]]}
-          columns = cols.reject{|x| x == rn} if offset
           @columns = columns
           while r = cursor.fetch
             row = {}
             r.zip(cm).each{|v, (c, cp)| row[c] = ((v && cp) ? cp.call(v) : v)}
-            row.delete(rn) if offset
             yield row
           end
         end

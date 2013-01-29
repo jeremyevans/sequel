@@ -744,17 +744,13 @@ module Sequel
         i = 0
         meta.getColumnCount.times{cols << [output_identifier(meta.getColumnLabel(i+=1)), i]}
         columns = cols.map{|c| c.at(0)}
-        if opts[:offset] && offset_returns_row_number_column?
-          rn = row_number_column
-          columns.delete(rn)
-        end
         @columns = columns
         ct = @convert_types
         if (ct.nil? ? db.convert_types : ct)
           cols.each{|c| c << nil}
-          process_result_set_convert(cols, result, rn, &block)
+          process_result_set_convert(cols, result, &block)
         else
-          process_result_set_no_convert(cols, result, rn, &block)
+          process_result_set_no_convert(cols, result, &block)
         end
       ensure
         result.close
@@ -778,7 +774,7 @@ module Sequel
       #   the result of as the column's conversion proc to speed up
       #   later processing.  If the conversion proc exists, call it
       #   and return the result, otherwise, return the object.
-      def process_result_set_convert(cols, result, rn)
+      def process_result_set_convert(cols, result)
         while result.next
           row = {}
           cols.each do |n, i, p|
@@ -800,18 +796,16 @@ module Sequel
               v
             end
           end
-          row.delete(rn) if rn
           yield row
         end
       end
 
       # Yield rows without calling any conversion procs.  This
       # may yield Java values and not ruby values.
-      def process_result_set_no_convert(cols, result, rn)
+      def process_result_set_no_convert(cols, result)
         while result.next
           row = {}
           cols.each{|n, i| row[n] = result.getObject(i)}
-          row.delete(rn) if rn
           yield row
         end
       end

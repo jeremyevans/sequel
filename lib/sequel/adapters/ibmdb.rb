@@ -408,7 +408,6 @@ module Sequel
       # Fetch the rows from the database and yield plain hashes.
       def fetch_rows(sql)
         execute(sql) do |stmt|
-          offset = @opts[:offset]
           columns = []
           convert = convert_smallint_to_bool
           cps = db.conversion_procs
@@ -421,7 +420,6 @@ module Sequel
             columns << [key, cps[type]]
           end
           cols = columns.map{|c| c.at(0)}
-          cols.delete(row_number_column) if offset
           @columns = cols
 
           while res = stmt.fetch_array
@@ -429,7 +427,6 @@ module Sequel
             res.zip(columns).each do |v, (k, pr)|
               row[k] = ((pr ? pr.call(v) : v) if v)
             end
-            row.delete(row_number_column) if offset
             yield row
           end
         end

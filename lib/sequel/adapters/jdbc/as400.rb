@@ -38,29 +38,13 @@ module Sequel
       
       # Dataset class for AS400 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
+        include EmulateOffsetWithRowNumber
+
         WILDCARD = Sequel::LiteralString.new('*').freeze
         FETCH_FIRST_ROW_ONLY = " FETCH FIRST ROW ONLY".freeze
         FETCH_FIRST = " FETCH FIRST ".freeze
         ROWS_ONLY = " ROWS ONLY".freeze
         
-        # AS400 needs to use a couple of subselects for queries with offsets.
-        def select_sql
-          return super unless o = @opts[:offset]
-          l = @opts[:limit]
-          order = @opts[:order]
-          dsa1 = dataset_alias(1)
-          dsa2 = dataset_alias(2)
-          rn = row_number_column
-          irn = Sequel::SQL::Identifier.new(rn).qualify(dsa2)
-          subselect_sql(unlimited.
-              from_self(:alias=>dsa1).
-              select_more(Sequel::SQL::QualifiedIdentifier.new(dsa1, WILDCARD),
-              Sequel::SQL::WindowFunction.new(SQL::Function.new(:ROW_NUMBER), Sequel::SQL::Window.new(:order=>order)).as(rn)).
-              from_self(:alias=>dsa2).
-              select(Sequel::SQL::QualifiedIdentifier.new(dsa2, WILDCARD)).
-              where(l ? ((irn > o) & (irn <= l + o)) : (irn > o))) # Leave off limit in case of limit(nil, offset)
-        end
-
         # Modify the sql to limit the number of rows returned
         def select_limit_sql(sql)
           if l = @opts[:limit]
