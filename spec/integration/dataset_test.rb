@@ -213,8 +213,8 @@ describe "Simple Dataset operations" do
     ds.columns.should == [:id, :number]
 
     @ds.insert(:number=>40)
-    ds = @ds.order(:id).limit(3, 1).from_self.reverse_order(:number).limit(2, 1).reverse_order(:id).limit(1, 1)
-    ds.all.should == [{:number=>30, :id=>3}]
+    ds = @ds.order(:id).limit(3, 1).from_self.reverse_order(:number).limit(2, 1).from_self.reverse_order(:id).limit(1, 1)
+    ds.all.should == [{:number=>20, :id=>2}]
     ds.columns.should == [:id, :number]
   end
 
