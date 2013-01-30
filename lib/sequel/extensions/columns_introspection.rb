@@ -27,12 +27,24 @@ module Sequel
     # SQL::AliasedExpressions.
     def columns
       return @columns if @columns
-      return columns_without_introspection unless cols = opts[:select] and !cols.empty?
-      probable_columns = cols.map{|c| probable_column_name(c)}
-      if probable_columns.all?
-        @columns = probable_columns
+      if (pcs = probable_columns) && pcs.all?
+        @columns = pcs
       else
         columns_without_introspection
+      end
+    end
+
+    protected
+
+    # Return an array of probable column names for the dataset, or
+    # nil if it is not possible to determine that through
+    # introspection.
+    def probable_columns
+      if (cols = opts[:select]) && !cols.empty?
+        cols.map{|c| probable_column_name(c)}
+      elsif !opts[:join] && (f = opts[:from]) && f.length == 1 && (ds = f.first) &&
+            (ds.is_a?(Dataset) || (ds.is_a?(SQL::AliasedExpression) && (ds = ds.expression).is_a?(Dataset)))
+        ds.probable_columns
       end
     end
 

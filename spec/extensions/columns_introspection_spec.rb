@@ -74,6 +74,20 @@ describe "columns_introspection extension" do
     @db.sqls.length.should == 0
   end
 
+  specify "should handle single subselects with no joins without a database query if the subselect's columns can be handled" do
+    @ds.select(:x).from_self.columns.should == [:x]
+    @db.sqls.length.should == 0
+    @ds.select(:x).from_self.from_self.columns.should == [:x]
+    @db.sqls.length.should == 0
+  end
+
+  specify "should issue a database query for multiple subselects or joins" do
+    @ds.from(@ds.select(:x), @ds.select(:y)).columns
+    @db.sqls.length.should == 1
+    @ds.select(:x).from_self.natural_join(:a).columns
+    @db.sqls.length.should == 1
+  end
+
   specify "should issue a database query if the wildcard is selected" do
     @ds.columns
     @db.sqls.length.should == 1
