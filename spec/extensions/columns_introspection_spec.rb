@@ -25,10 +25,10 @@ end
 
 describe "columns_introspection extension" do
   before do
-    @db = MODEL_DB
+    @db = Sequel.mock
     @ds = @db[:a]
     @ds.extend(Sequel::ColumnsIntrospection.dup) # dup to allow multiple places in class hierarchy
-    @db.reset
+    @db.sqls
   end
 
   specify "should not issue a database query if the columns are already loaded" do
@@ -74,10 +74,16 @@ describe "columns_introspection extension" do
     @db.sqls.length.should == 0
   end
 
-  specify "should handle single subselects with no joins without a database query if the subselect's columns can be handled" do
+  specify "should handle selecting * from a single subselect with no joins without a database query if the subselect's columns can be handled" do
     @ds.select(:x).from_self.columns.should == [:x]
     @db.sqls.length.should == 0
     @ds.select(:x).from_self.from_self.columns.should == [:x]
+    @db.sqls.length.should == 0
+  end
+
+  specify "should handle selecting * from a single table with no joins without a database query if the database has cached schema columns for the table" do
+    @db.instance_variable_set(:@schemas, "a"=>[[:x, {}]])
+    @ds.columns.should == [:x]
     @db.sqls.length.should == 0
   end
 

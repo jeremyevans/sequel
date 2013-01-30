@@ -1,5 +1,7 @@
 === HEAD
 
+* Expand columns_introspection extension to consider cached schema values in the database (jeremyevans)
+
 * Expand columns_introspection extension to handle subselects (jeremyevans)
 
 * Have #last and #paged_each for model datasets order by the model's primary key by default (jeremyevans)

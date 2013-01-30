@@ -42,9 +42,20 @@ module Sequel
     def probable_columns
       if (cols = opts[:select]) && !cols.empty?
         cols.map{|c| probable_column_name(c)}
-      elsif !opts[:join] && (f = opts[:from]) && f.length == 1 && (ds = f.first) &&
-            (ds.is_a?(Dataset) || (ds.is_a?(SQL::AliasedExpression) && (ds = ds.expression).is_a?(Dataset)))
-        ds.probable_columns
+      elsif !opts[:join] && (from = opts[:from]) && from.length == 1 && (from = from.first)
+        if from.is_a?(SQL::AliasedExpression)
+          from = from.expression
+        end
+        
+        case from
+        when Dataset
+          from.probable_columns
+        when Symbol, SQL::Identifier, SQL::QualifiedIdentifier
+          schemas = db.instance_variable_get(:@schemas)
+          if schemas && (sch = Sequel.synchronize{schemas[literal(from)]})
+            sch.map{|c,_| c}
+          end
+        end
       end
     end
 
