@@ -1934,6 +1934,35 @@ module Sequel
         end
       end
 
+      # If there is no order already defined on this dataset, order it by
+      # the primary key and call last.
+      #
+      #   Album.last
+      #   # SELECT * FROM albums ORDER BY id DESC LIMIT 1
+      def last(*a, &block)
+        if opts[:order].nil? && model && (pk = model.primary_key)
+          order(*pk).last(*a, &block)
+        else
+          super
+        end
+      end
+
+      # If there is no order already defined on this dataset, order it by
+      # the primary key and call paged_each.
+      #
+      #   Album.paged_each{|row| ...}
+      #   # SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 0
+      #   # SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 1000
+      #   # SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 2000
+      #   # ...
+      def paged_each(*a, &block)
+        if opts[:order].nil? && model && (pk = model.primary_key)
+          order(*pk).paged_each(*a, &block)
+        else
+          super
+        end
+      end
+
       # This allows you to call +to_hash+ without any arguments, which will
       # result in a hash with the primary key value being the key and the
       # model object being the value.
@@ -1946,7 +1975,7 @@ module Sequel
         if key_column
           super
         else
-          raise(Sequel::Error, "No primary key for model") unless model and pk = model.primary_key
+          raise(Sequel::Error, "No primary key for model") unless model && (pk = model.primary_key)
           super(pk, value_column) 
         end
       end

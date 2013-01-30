@@ -70,40 +70,80 @@ describe Sequel::Model::DatasetMethods, "#to_hash"  do
   end
 end
 
-describe Sequel::Model::DatasetMethods, "#join_table"  do
-  before do
-    @c = Class.new(Sequel::Model(:items))
-  end
-
-  specify "should allow use to use a model class when joining" do
-    @c.join(Class.new(Sequel::Model(:categories)), :item_id => :id).sql.should == 'SELECT * FROM items INNER JOIN categories ON (categories.item_id = items.id)'
-  end
-
-  specify "should handle model classes that aren't simple selects using a subselect" do
-    @c.join(Class.new(Sequel::Model(MODEL_DB[:categories].where(:foo=>1))), :item_id => :id).sql.should == 'SELECT * FROM items INNER JOIN (SELECT * FROM categories WHERE (foo = 1)) AS t1 ON (t1.item_id = items.id)'
-  end
-end 
-
-describe Sequel::Model::DatasetMethods, "#graph"  do
+describe Sequel::Model::DatasetMethods  do
   before do
     @c = Class.new(Sequel::Model(:items))
     @c.columns :id
+    @c.db.reset
   end
 
-  specify "should allow use to use a model class when joining" do
+  specify "#join_table should allow use to use a model class when joining" do
+    @c.join(Class.new(Sequel::Model(:categories)), :item_id => :id).sql.should == 'SELECT * FROM items INNER JOIN categories ON (categories.item_id = items.id)'
+  end
+
+  specify "#join_table should handle model classes that aren't simple selects using a subselect" do
+    @c.join(Class.new(Sequel::Model(MODEL_DB[:categories].where(:foo=>1))), :item_id => :id).sql.should == 'SELECT * FROM items INNER JOIN (SELECT * FROM categories WHERE (foo = 1)) AS t1 ON (t1.item_id = items.id)'
+  end
+
+  specify "#graph should allow use to use a model class when joining" do
     c = Class.new(Sequel::Model(:categories))
     c.columns :id
     @c.graph(c, :item_id => :id).sql.should == 'SELECT items.id, categories.id AS categories_id FROM items LEFT OUTER JOIN categories ON (categories.item_id = items.id)'
   end
-end 
 
-describe Sequel::Model::DatasetMethods, "#insert_sql"  do
-  before do
-    @c = Class.new(Sequel::Model(:items))
-    @c.columns :id
+  specify "#insert_sql should handle a single model instance as an argument" do
+    @c.insert_sql(@c.load(:id=>1)).should == 'INSERT INTO items (id) VALUES (1)'
   end
 
-  specify "should handle a single model instance as an argument" do
-    @c.insert_sql(@c.load(:id=>1)).should == 'INSERT INTO items (id) VALUES (1)'
+  specify "#first should handle no primary key" do
+    @c.no_primary_key
+    @c.first.should be_a_kind_of(@c)
+    @c.db.sqls.should == ['SELECT * FROM items LIMIT 1']
+  end
+
+  specify "#last should reverse order by primary key if not already ordered" do
+    @c.last.should be_a_kind_of(@c)
+    @c.db.sqls.should == ['SELECT * FROM items ORDER BY id DESC LIMIT 1']
+    @c.where(:id=>2).last(:foo=>2){{bar=>3}}.should be_a_kind_of(@c)
+    @c.db.sqls.should == ['SELECT * FROM items WHERE ((id = 2) AND (bar = 3) AND (foo = 2)) ORDER BY id DESC LIMIT 1']
+  end
+
+  specify "#last should use existing order if there is one" do
+    @c.order(:foo).last.should be_a_kind_of(@c)
+    @c.db.sqls.should == ['SELECT * FROM items ORDER BY foo DESC LIMIT 1']
+  end
+
+  specify "#last should handle a composite primary key" do
+    @c.set_primary_key [:id1, :id2]
+    @c.last.should be_a_kind_of(@c)
+    @c.db.sqls.should == ['SELECT * FROM items ORDER BY id1 DESC, id2 DESC LIMIT 1']
+  end
+
+  specify "#last should raise an error if no primary key" do
+    @c.no_primary_key
+    proc{@c.last}.should raise_error(Sequel::Error)
+  end
+
+  specify "#paged_each should order by primary key if not already ordered" do
+    @c.paged_each{|r| r.should be_a_kind_of(@c)}
+    @c.db.sqls.should == ['BEGIN', 'SELECT * FROM items ORDER BY id LIMIT 1000 OFFSET 0', 'COMMIT']
+    @c.paged_each(:rows_per_fetch=>5){|r|}
+    @c.db.sqls.should == ['BEGIN', 'SELECT * FROM items ORDER BY id LIMIT 5 OFFSET 0', 'COMMIT']
+  end
+
+  specify "#paged_each should use existing order if there is one" do
+    @c.order(:foo).paged_each{|r| r.should be_a_kind_of(@c)}
+    @c.db.sqls.should == ['BEGIN', 'SELECT * FROM items ORDER BY foo LIMIT 1000 OFFSET 0', 'COMMIT']
+  end
+
+  specify "#paged_each should handle a composite primary key" do
+    @c.set_primary_key [:id1, :id2]
+    @c.paged_each{|r| r.should be_a_kind_of(@c)}
+    @c.db.sqls.should == ['BEGIN', 'SELECT * FROM items ORDER BY id1, id2 LIMIT 1000 OFFSET 0', 'COMMIT']
+  end
+
+  specify "#paged_each should raise an error if no primary key" do
+    @c.no_primary_key
+    proc{@c.paged_each{|r| }}.should raise_error(Sequel::Error)
   end
 end 

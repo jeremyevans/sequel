@@ -1,5 +1,7 @@
 === HEAD
 
+* Have #last and #paged_each for model datasets order by the model's primary key by default (jeremyevans)
+
 * Improve emulated offset support to handle subqueries (jeremyevans)
 
 * Remove use of Object#extend from the eager_each plugin (jeremyevans)
