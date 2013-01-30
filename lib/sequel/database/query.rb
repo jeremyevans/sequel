@@ -585,7 +585,7 @@ module Sequel
 
     # Remove the cached schema for the given schema name
     def remove_cached_schema(table)
-      @schemas.delete(quote_schema_table(table)) if @schemas
+      Sequel.synchronize{@schemas.delete(quote_schema_table(table))} if @schemas
     end
     
     # Remove the current thread from the list of active transactions
