@@ -2,8 +2,10 @@
 # selected columns for a dataset before issuing a query.  If it
 # thinks it can guess correctly at the columns the query will use,
 # it will return the columns without issuing a database query.
+#
 # This method is not fool-proof, it's possible that some databases
-# will use column names that Sequel does not expect.
+# will use column names that Sequel does not expect.  Also, it
+# may not correctly handle all cases. 
 #
 # To attempt to introspect columns for a single dataset:
 #
@@ -42,7 +44,7 @@ module Sequel
     def probable_columns
       if (cols = opts[:select]) && !cols.empty?
         cols.map{|c| probable_column_name(c)}
-      elsif !opts[:join] && (from = opts[:from]) && from.length == 1 && (from = from.first)
+      elsif !opts[:join] && !opts[:with] && (from = opts[:from]) && from.length == 1 && (from = from.first)
         if from.is_a?(SQL::AliasedExpression)
           from = from.expression
         end

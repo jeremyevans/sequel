@@ -94,6 +94,12 @@ describe "columns_introspection extension" do
     @db.sqls.length.should == 1
   end
 
+  specify "should issue a database query when common table expressions are used" do
+    @db.instance_variable_set(:@schemas, "a"=>[[:x, {}]])
+    @ds.with(:a, @ds).columns
+    @db.sqls.length.should == 1
+  end
+
   specify "should issue a database query if the wildcard is selected" do
     @ds.columns
     @db.sqls.length.should == 1
