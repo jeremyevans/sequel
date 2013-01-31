@@ -138,21 +138,12 @@ module Sequel
       # Yield all rows matching this dataset.
       def fetch_rows(sql)
         execute(sql) do |r|
-          if identifier_output_method
-            cols = r.fields
-            @columns = cols2 = cols.map{|c| output_identifier(c.to_s)}
-            cs = cols.zip(cols2)
-            r.each(:cast_booleans=>convert_tinyint_to_bool?) do |row|
-              h = {}
-              cs.each do |a, b|
-                h[b] = row[a]
-              end
-              yield h
-            end
+          @columns = if identifier_output_method
+            r.fields.map!{|c| output_identifier(c.to_s)}
           else
-            @columns = r.fields
-            r.each(:cast_booleans=>convert_tinyint_to_bool?){|h| yield h}
+            r.fields
           end
+          r.each(:cast_booleans=>convert_tinyint_to_bool?){|h| yield h}
         end
         self
       end
