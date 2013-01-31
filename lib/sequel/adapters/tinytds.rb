@@ -18,6 +18,7 @@ module Sequel
         opts = server_opts(server)
         opts[:username] = opts[:user]
         c = TinyTds::Client.new(opts)
+        c.query_options.merge!(:cache_rows=>false)
 
         if (ts = opts[:textsize])
           sql = "SET TEXTSIZE #{typecast_value_integer(ts)}"
@@ -215,33 +216,12 @@ module Sequel
       # various cases.
       def fetch_rows(sql)
         execute(sql) do |result|
-          each_opts = {:cache_rows=>false}
-          each_opts[:timezone] = :utc if db.timezone == :utc
-          columns = cols = result.fields.map{|c| output_identifier(c)}
-          @columns = columns
-          #if identifier_output_method
-            each_opts[:as] = :array
-            result.each(each_opts) do |r|
-              h = {}
-              cols.zip(r).each{|k, v| h[k] = v}
-              yield h
-            end
-=begin
-        # Temporarily disable this optimization, as tiny_tds uses string keys
-        # if result.fields is called before result.each(:symbolize_keys=>true).
-        # See https://github.com/rails-sqlserver/tiny_tds/issues/57
+          @columns = result.fields.map!{|c| output_identifier(c)}
+          if db.timezone == :utc
+            result.each(:timezone=>:utc){|r| yield r}
           else
-            each_opts[:symbolize_keys] = true
-            if offset
-              result.each(each_opts) do |r|
-                r.delete(rn) if rn
-                yield r
-              end
-            else
-              result.each(each_opts, &Proc.new)
-            end
+            result.each{|r| yield r}
           end
-=end
         end
         self
       end

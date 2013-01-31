@@ -1,5 +1,7 @@
 === HEAD
 
+* Speedup tinytds adapter fetch speed by up to 60% (jeremyevans)
+
 * Expand columns_introspection extension to consider cached schema values in the database (jeremyevans)
 
 * Expand columns_introspection extension to handle subselects (jeremyevans)
