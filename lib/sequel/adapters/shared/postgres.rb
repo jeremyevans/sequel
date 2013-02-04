@@ -636,6 +636,7 @@ module Sequel
         /violates check constraint/ => CheckConstraintViolation,
         /violates not-null constraint/ => NotNullConstraintViolation,
         /conflicting key value violates exclusion constraint/ => ExclusionConstraintViolation,
+        /could not serialize access/ => SerializationFailure,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS

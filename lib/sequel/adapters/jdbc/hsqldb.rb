@@ -57,6 +57,7 @@ module Sequel
           /integrity constraint violation: foreign key/ => ForeignKeyConstraintViolation,
           /integrity constraint violation: check constraint/ => CheckConstraintViolation,
           /integrity constraint violation: NOT NULL check constraint/ => NotNullConstraintViolation,
+          /serialization failure/ => SerializationFailure,
         }.freeze
         def database_error_regexps
           DATABASE_ERROR_REGEXPS

@@ -109,6 +109,7 @@ module Sequel
           /violation of foreign key constraint/ => ForeignKeyConstraintViolation,
           /The check constraint .+ was violated/ => CheckConstraintViolation,
           /cannot accept a NULL value/ => NotNullConstraintViolation,
+          /A lock could not be obtained due to a deadlock/ => SerializationFailure,
         }.freeze
         def database_error_regexps
           DATABASE_ERROR_REGEXPS

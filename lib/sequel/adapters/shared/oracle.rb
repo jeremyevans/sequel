@@ -146,6 +146,7 @@ module Sequel
         /integrity constraint .+ violated/ => ForeignKeyConstraintViolation,
         /check constraint .+ violated/ => CheckConstraintViolation,
         /cannot insert NULL into|cannot update .+ to NULL/ => NotNullConstraintViolation,
+        /can't serialize access for this transaction/ => SerializationFailure,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS

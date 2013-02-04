@@ -354,6 +354,7 @@ module Sequel
         /Duplicate entry .+ for key/ => UniqueConstraintViolation,
         /foreign key constraint fails/ => ForeignKeyConstraintViolation,
         /cannot be null/ => NotNullConstraintViolation,
+        /Deadlock found when trying to get lock; try restarting transaction/ => SerializationFailure,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS

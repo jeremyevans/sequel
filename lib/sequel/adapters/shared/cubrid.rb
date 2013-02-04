@@ -130,6 +130,7 @@ module Sequel
         /Operation would have caused one or more unique constraint violations/ => UniqueConstraintViolation,
         /The constraint of the foreign key .+ is invalid|Update\/Delete operations are restricted by the foreign key/ => ForeignKeyConstraintViolation,
         /cannot be made NULL/ => NotNullConstraintViolation,
+        /Your transaction .+ has been unilaterally aborted by the system/ => SerializationFailure,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS

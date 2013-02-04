@@ -164,6 +164,7 @@ module Sequel
         /DB2 SQL Error: (SQLCODE=-530, SQLSTATE=23503|SQLCODE=-532, SQLSTATE=23504)|The insert or update value of the FOREIGN KEY .+ is not equal to any value of the parent key of the parent table|A parent row cannot be deleted because the relationship .+ restricts the deletion/ => ForeignKeyConstraintViolation,
         /DB2 SQL Error: SQLCODE=-545, SQLSTATE=23513|The requested operation is not allowed because a row does not satisfy the check constraint/ => CheckConstraintViolation,
         /DB2 SQL Error: SQLCODE=-407, SQLSTATE=23502|Assignment of a NULL value to a NOT NULL column/ => NotNullConstraintViolation,
+        /DB2 SQL Error: SQLCODE=-911, SQLSTATE=40001|The current transaction has been rolled back because of a deadlock or timeout/ => SerializationFailure,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS

@@ -243,6 +243,7 @@ module Sequel
         /conflicted with the (FOREIGN KEY.*|REFERENCE) constraint/ => ForeignKeyConstraintViolation,
         /conflicted with the CHECK constraint/ => CheckConstraintViolation,
         /column does not allow nulls/ => NotNullConstraintViolation,
+        /was deadlocked on lock resources with another process and has been chosen as the deadlock victim/ => SerializationFailure,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS

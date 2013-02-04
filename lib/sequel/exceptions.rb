@@ -40,6 +40,9 @@ module Sequel
   # Error raised when Sequel determines a database unique constraint has been violated.
   class UniqueConstraintViolation < ConstraintViolation; end
 
+  # Error raised when Sequel determines a serialization failure/deadlock in the database.
+  class SerializationFailure < DatabaseError; end
+
   # Error raised on an invalid operation, such as trying to update or delete
   # a joined or grouped dataset.
   class InvalidOperation < Error; end

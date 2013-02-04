@@ -1,5 +1,7 @@
 === HEAD
 
+* Raise serialization failures/deadlocks as Sequel::SerializationFailure exceptions (jeremyevans)
+
 * Support transaction isolation levels on Oracle and DB2 (jeremyevans)
 
 * Support transaction isolation levels when using the JDBC transaction support (jeremyevans)

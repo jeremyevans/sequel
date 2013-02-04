@@ -101,6 +101,7 @@ module Sequel
           /Referential integrity constraint violation/ => ForeignKeyConstraintViolation,
           /Check constraint violation/ => CheckConstraintViolation,
           /NULL not allowed for column/ => NotNullConstraintViolation,
+          /Deadlock detected\. The current transaction was rolled back\./ => SerializationFailure,
         }.freeze
         def database_error_regexps
           DATABASE_ERROR_REGEXPS
