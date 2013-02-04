@@ -11,10 +11,31 @@ module Sequel
       # Check the JDBC DatabaseMetaData for savepoint support
       def supports_savepoints?
         return @supports_savepoints if defined?(@supports_savepoints)
-        @supports_savepoints = synchronize{|c| c.get_meta_data.supports_savepoints}
+        @supports_savepoints = synchronize{|c| c.getMetaData.supports_savepoints}
+      end
+
+      # Check the JDBC DatabaseMetaData for support for serializable isolation,
+      # since that's the value most people will use.
+      def supports_transaction_isolation_levels?
+        synchronize{|conn| conn.getMetaData.supportsTransactionIsolationLevel(JavaSQL::Connection::TRANSACTION_SERIALIZABLE)}
       end
 
       private
+
+      JDBC_TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>JavaSQL::Connection::TRANSACTION_READ_UNCOMMITTED,
+        :committed=>JavaSQL::Connection::TRANSACTION_READ_COMMITTED,
+        :repeatable=>JavaSQL::Connection::TRANSACTION_REPEATABLE_READ,
+        :serializable=>JavaSQL::Connection::TRANSACTION_SERIALIZABLE}
+
+      # Set the transaction isolation level on the given connection using
+      # the JDBC API.
+      def set_transaction_isolation(conn, opts)
+        level = opts.fetch(:isolation, transaction_isolation_level)
+        if (jdbc_level = JDBC_TRANSACTION_ISOLATION_LEVELS[level]) &&
+            conn.getMetaData.supportsTransactionIsolationLevel(jdbc_level)
+          log_yield("Transaction.isolation_level = #{level}"){conn.setTransactionIsolation(jdbc_level)}
+        end
+      end
 
       # Most JDBC drivers that support savepoints support releasing them.
       def supports_releasing_savepoints?
@@ -30,10 +51,12 @@ module Sequel
           else
             log_yield(TRANSACTION_BEGIN){conn.setAutoCommit(false)}
             th[:savepoints] = []
+            set_transaction_isolation(conn, opts)
           end
           th[:savepoint_level] += 1
         else
           log_yield(TRANSACTION_BEGIN){conn.setAutoCommit(false)}
+          set_transaction_isolation(conn, opts)
         end
       end
       
