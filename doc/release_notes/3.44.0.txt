@@ -1,0 +1,152 @@
+= New Features
+
+* Dataset#paged_each has been added, for processing entire datasets
+  without keeping all rows in memory, even if the underlying driver
+  keeps all query results in memory.  This is implemented using
+  limits and offsets, and requires an order (model datasets use a
+  default order by primary key).  It defaults to fetching 1000
+  rows at a time, but that can be changed via the :rows_per_fetch
+  option.
+
+  This method is drop-in compatible for each.  Previously, the
+  pagination extension's each_page method could be used for a
+  similar purpose, but users of each_page are now encouraged to
+  switch to paged_each.
+
+* Sequel now recognizes constraint violation exceptions on most
+  databases, and will raise specific exceptions for different
+  types of constraint violations, instead of the generic
+  Sequel::DatabaseError:
+
+  * Sequel::ConstraintViolation (generic superclass)
+  * Sequel::CheckConstraintViolation
+  * Sequel::NotNullConstraintViolation
+  * Sequel::ForeignKeyConstraintViolation
+  * Sequel::UniqueConstraintViolation
+  * Sequel::Postgres::ExclusionConstraintViolation
+
+* The :dataset association option can now take accept an optional
+  association reflection option.  Instead of doing:
+
+    Album.one_to_many :artists,
+      :dataset=>{Artist...}
+
+  you can now do:
+
+    Album.one_to_many :artists,
+      :dataset=>{|r| r.associated_dataset...}
+
+  This second form will preform better.
+
+* Temporary views are now supported on PostgreSQL and SQLite using
+  the :temp option to create_view.
+
+= Other Improvements
+
+* Row fetching speed in the tinytds adapter has been increased by
+  up to 60%.
+
+* Row fetching speed in the mysql2 adapter when using an identifier
+  output method has been increased by up to 50%.
+
+* On databases where offsets are emulated via the ROW_NUMBER window
+  function (Oracle, DB2, Microsoft SQL Server), using an offset in
+  a subselect is now supported.  For example, the following code
+  previously didn't work correctly with emulated offsets:
+
+    # Second 5 rows ordered by column2 of the second 10 rows ordered
+    # by column 1.
+    DB[:table].order(:column1).limit(10, 10).
+      from_self.order(:column2).limit(5, 5)
+
+  Row processing speed has been increased slightly for all adapters
+  that supported databases where offsets are emulated.
+
+* Association method performance has improved by caching an
+  intermediate dataset.  This can close to triple the performance
+  of the association_dataset method, and increase the performance
+  of the association method by close to 30%.
+
+* Virtual Row performance has increased about 30% in the typical
+  case by using a shared VirtualRow instance.
+
+* Database#create_or_replace_view is now emulated on databases that
+  don't support it directly by dropping the view before attempting
+  to create it.
+
+* The columns_introspection extension can now introspect for simple
+  select * queries from subselects, and it can now use the cached
+  schema information in the database for simple select * queries
+  from tables.
+
+* The identity_map plugin now works correctly with many-to-many
+  right-side composite keys.
+
+* Dataset#last for Model datasets now works even if you don't specify
+  an order explicitly, giving the last entry by primary key.  Note
+  that Dataset#first for model datasets still does not order by
+  default.
+
+* The eager_each plugin no longer uses Object#extend at runtime.
+
+* Database#remove_cached_schema is now thread-safe on non-GVL ruby
+  implementations.
+
+* Connection errors in the jdbc adapter now provide slightly more
+  helpful messages.
+
+* Sequel now uses the standard offset emulation code in the
+  jdbc/as400 adapter, instead of custom offset emulation code
+  specific to that adapter.
+
+* Database#create_view with a dataset now works correctly when using
+  the pg_auto_parameterize extension.
+
+* Database#columns no longer calls the row_proc.
+
+* Dataset#schema_and_table no longer turns a literal string into a
+  non-literal string.
+
+* The oracle adapter now works with a :prefetch_rows=>nil option,
+  which explicitly disables prefetching.
+
+* The mock mssql adapter now sets a server_version so that more
+  parts of it work.
+
+= Backwards Compatibility
+
+* Offset emulation via ROW_NUMBER works by moving the query to a
+  subselect that also selects from the ROW_NUMBER window function,
+  and filtering on the ROW_NUMBER in the main query.  Previously, the
+  ROW_NUMBER was also present in the output columns, and some
+  adapter code was needed to hide that fact.  Now, the outer select
+  selects all of the inner columns in the subselect except for the
+  ROW_NUMBER, reducing the adapter code needed. This has the side
+  effect of potentially requiring a query (or multiple queries for
+  multiple subselects) to determine the columns to use.  The
+  columns_introspection extension may reduce the number of queries
+  needed.
+
+* The correlated_subquery eager limit strategy is no longer supported
+  on Microsoft SQL Server for many_*_many associations.  As the
+  window_function eager limit strategy is supported there, there is
+  no reason to use the correlated_subquery strategy.
+
+* The public AssociationReflection#_dataset_method method has been
+  removed.
+
+* The private _*_dataset methods for associations (e.g.
+  _albums_dataset) have been removed.
+
+* The private Dataset#offset_returns_row_number_column? method has
+  been removed.
+
+* :conditions options for associations are now added to the
+  association dataset before the foreign key filters, instead of
+  after.  This should have no effect unless you were introspecting
+  the dataset's opts or sql and acting on it.
+
+* The added abilities in the columns_introspection plugin to use
+  cached schema for introspection can now cause it to return
+  incorrect results if the table's schema has changed since it was
+  cached by Sequel.
