@@ -72,6 +72,11 @@ module Sequel
         indexes
       end
 
+      # DB2 supports transaction isolation levels.
+      def supports_transaction_isolation_levels?
+        true
+      end
+
       private
 
       # Handle DB2 specific alter table operations.
@@ -189,6 +194,11 @@ module Sequel
       # Treat clob as blob if use_clob_as_blob is true
       def schema_column_type(db_type)
         (::Sequel::DB2::use_clob_as_blob && db_type.downcase == 'clob') ? :blob : super
+      end
+
+      # SQL to set the transaction isolation level
+      def set_transaction_isolation_sql(level)
+        "SET CURRENT ISOLATION #{Database::TRANSACTION_ISOLATION_LEVELS[level]}"
       end
 
       # We uses the clob type by default for Files.

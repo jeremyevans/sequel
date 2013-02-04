@@ -301,6 +301,7 @@ module Sequel
       # So starting a transaction just turns autocommit off.
       def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
+        set_transaction_isolation(conn, opts)
       end
 
       # This commits transaction in progress on the

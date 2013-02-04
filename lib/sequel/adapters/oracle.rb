@@ -197,6 +197,7 @@ module Sequel
 
       def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
+        set_transaction_isolation(conn, opts)
       end
       
       def commit_transaction(conn, opts={})

@@ -122,6 +122,7 @@ module Sequel
 
       def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN){DB2CLI.SQLSetConnectAttr(conn, DB2CLI::SQL_ATTR_AUTOCOMMIT, DB2CLI::SQL_AUTOCOMMIT_OFF)}
+        set_transaction_isolation(conn, opts)
       end
 
       def remove_transaction(conn, committed)

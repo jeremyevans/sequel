@@ -54,6 +54,11 @@ module Sequel
         true
       end
 
+      # DB2 supports transaction isolation levels.
+      def supports_transaction_isolation_levels?
+        true
+      end
+
       private
 
       # Handle Oracle specific ALTER TABLE SQL
