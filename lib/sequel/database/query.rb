@@ -251,21 +251,26 @@ module Sequel
     #
     # The following general options are respected:
     #
-    # :disconnect :: Can be set to :retry to automatically retry the transaction with
-    #                a new connection object if it detects a disconnect on the connection.
-    #                Note that this should not be used unless the entire transaction
-    #                block is idempotent, as otherwise it can cause non-idempotent
-    #                behavior to execute multiple times.  This does no checking for
-    #                infinite loops, so if your transaction will repeatedly raise a
-    #                disconnection error, this will cause the transaction block to loop
-    #                indefinitely.
+    # :disconnect :: If set to :retry, automatically sets the :retry_on option
+    #                with a Sequel::DatabaseDisconnectError.  This option is only
+    #                present for backwards compatibility, please use the :retry_on
+    #                option instead.
     # :isolation :: The transaction isolation level to use for this transaction,
     #               should be :uncommitted, :committed, :repeatable, or :serializable,
     #               used if given and the database/adapter supports customizable
     #               transaction isolation levels.
+    # :num_retries :: The number of times to retry if the :retry_on option is used.
+    #                 The default is 5 times.  Can be set to nil to retry indefinitely,
+    #                 but that is not recommended.
     # :prepare :: A string to use as the transaction identifier for a
     #             prepared transaction (two-phase commit), if the database/adapter
     #             supports prepared transactions.
+    # :retry_on :: An exception class or array of exception classes for which to
+    #              automatically retry the transaction.  Can only be set if not inside
+    #              an existing transaction.
+    #              Note that this should not be used unless the entire transaction
+    #              block is idempotent, as otherwise it can cause non-idempotent
+    #              behavior to execute multiple times.
     # :rollback :: Can the set to :reraise to reraise any Sequel::Rollback exceptions
     #              raised, or :always to always rollback even if no exceptions occur
     #              (useful for testing).
@@ -283,17 +288,29 @@ module Sequel
     #                 appropriately.  Valid values true, :on, false, :off, :local (9.1+),
     #                 and :remote_write (9.2+).
     def transaction(opts={}, &block)
+      retry_on = opts[:retry_on]
       if opts[:disconnect] == :retry
+        retry_on = Array(retry_on) + [Sequel::DatabaseDisconnectError]
+      end
+
+      if retry_on
+        num_retries = opts.fetch(:num_retries, 5)
         begin
-          transaction(opts.merge(:disconnect=>:disallow), &block)
-        rescue Sequel::DatabaseDisconnectError
-          retry
+          transaction(opts.merge(:retry_on=>nil, :disconnect=>nil, :retrying=>true), &block)
+        rescue *retry_on
+          if num_retries
+            num_retries -= 1
+            retry if num_retries >= 0
+          else
+            retry
+          end
+          raise
         end
       else
         synchronize(opts[:server]) do |conn|
           if already_in_transaction?(conn, opts)
-            if opts[:disconnect] == :disallow
-              raise Sequel::Error, "cannot set :disconnect=>:retry if you are already inside a transaction"
+            if opts[:retrying]
+              raise Sequel::Error, "cannot set :disconnect or :retry_on options if you are already inside a transaction"
             end
             return yield(conn)
           end

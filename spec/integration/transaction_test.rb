@@ -310,3 +310,42 @@ if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or (RUBY_ENGINE == 'rbx' &&
     end
   end
 end
+
+describe "Database transaction retrying" do
+  before(:all) do
+    @db = INTEGRATION_DB
+    @db.create_table!(:items, :engine=>'InnoDB'){String :a, :unique=>true, :null=>false}
+    @d = @db[:items]
+  end
+  before do
+    @d.delete
+  end
+  after(:all) do
+    @db.drop_table?(:items)
+  end
+
+  cspecify "should be supported using the :retry_on option", [:db2] do
+    @d.insert('b')
+    @d.insert('c')
+    s = 'a'
+    @db.transaction(:retry_on=>Sequel::ConstraintViolation) do
+      s = s.succ
+      @d.insert(s)
+    end
+    @d.select_order_map(:a).should == %w'b c d'
+  end
+
+  cspecify "should limit number of retries via the :num_retries option", [:db2] do
+    @d.insert('b')
+    @d.insert('c')
+    s = 'a'
+    lambda do
+      @db.transaction(:num_retries=>1, :retry_on=>Sequel::ConstraintViolation) do
+        s = s.succ
+        @d.insert(s)
+      end
+    end.should raise_error(Sequel::ConstraintViolation)
+    @d.select_order_map(:a).should == %w'b c'
+  end
+end
+

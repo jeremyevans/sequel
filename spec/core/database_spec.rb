@@ -656,6 +656,48 @@ shared_examples_for "Database#transaction" do
     a.should == [1, 1]
   end
   
+  specify "should support :retry_on option for automatically retrying transactions" do
+    a = []
+    @db.transaction(:retry_on=>Sequel::DatabaseDisconnectError){a << 1; raise Sequel::DatabaseDisconnectError if a.length < 2}
+    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'BEGIN', 'COMMIT']
+    a.should == [1, 1]
+
+    a = []
+    @db.transaction(:retry_on=>[Sequel::ConstraintViolation, Sequel::SerializationFailure]) do
+      a << 1
+      raise Sequel::SerializationFailure if a.length == 1
+      raise Sequel::ConstraintViolation if a.length == 2
+    end
+    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'BEGIN', 'ROLLBACK', 'BEGIN', 'COMMIT']
+    a.should == [1, 1, 1]
+  end
+  
+  specify "should support :num_retries option for limiting the number of retry times" do
+    a = []
+    lambda do
+      @db.transaction(:num_retries=>1, :retry_on=>[Sequel::ConstraintViolation, Sequel::SerializationFailure]) do
+        a << 1
+        raise Sequel::SerializationFailure if a.length == 1
+        raise Sequel::ConstraintViolation if a.length == 2
+      end
+    end.should raise_error(Sequel::ConstraintViolation)
+    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'BEGIN', 'ROLLBACK']
+    a.should == [1, 1]
+  end
+  
+  specify "should support :num_retries=>nil option to retry indefinitely" do
+    a = []
+    lambda do
+      @db.transaction(:num_retries=>nil, :retry_on=>[Sequel::ConstraintViolation]) do
+        a << 1
+        raise Sequel::SerializationFailure if a.length >= 100
+        raise Sequel::ConstraintViolation
+      end
+    end.should raise_error(Sequel::SerializationFailure)
+    @db.sqls.should == ['BEGIN', 'ROLLBACK'] * 100
+    a.should == [1] * 100
+  end
+  
   specify "should raise an error if attempting to use :disconnect=>:retry inside another transaction" do
     proc{@db.transaction{@db.transaction(:disconnect=>:retry){}}}.should raise_error(Sequel::Error)
     @db.sqls.should == ['BEGIN', 'ROLLBACK']

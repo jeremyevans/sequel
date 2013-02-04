@@ -135,3 +135,26 @@ The SQL standard supports 4 isolation levels: READ UNCOMMITTED, READ COMMITTED, 
     # SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
     DB[:foo].insert(1) # INSERT
   end # COMMIT
+
+== Automatically Restarting Transactions
+
+Sequel offers the ability to automatically restart transactions if specific types of errors are detected.  For example, if you want to automatically restart a transaction if a serialization failure is detected:
+
+  DB.transaction(:isolation => :serializable, :retry_on=>[Sequel::SerializationFailure]) do
+    ModelClass.find_or_create(:name=>'Foo')
+  end
+
+At the serializable transaction isolation level, find_or_create may raises a Sequel::SerializationFailure exception if multiple threads simultaneously run that code.  With the :retry_on option set, the transaction will be automatically retried until it succeeds.
+
+Note that automatic retrying should not be used unless the entire transaction
+block is idempotent, as otherwise it can cause non-idempotent
+behavior to execute multiple times.  For example, with the following code:
+
+  DB.transaction(:isolation => :serializable, :retry_on=>[Sequel::SerializationFailure]) do
+    logger.info 'Ensuring existence of ModelClass with name Foo'
+    ModelClass.find_or_create(:name=>'Foo')
+  end
+
+The logger.info method will be called multiple times if there is a serialization failure.
+
+The :num_retries option can be used to set the maxmimum number of times to retry.  It is set to 5 times by default.
