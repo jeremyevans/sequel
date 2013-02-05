@@ -41,7 +41,7 @@ module Sequel
       def connect(server)
         opts = server_opts(server)
         opts[:host] ||= 'localhost'
-        opts[:username] ||= opts[:user]
+        opts[:username] ||= opts.delete(:user)
         opts[:flags] = ::Mysql2::Client::FOUND_ROWS if ::Mysql2::Client.const_defined?(:FOUND_ROWS)
         conn = ::Mysql2::Client.new(opts)
         conn.query_options.merge!(:symbolize_keys=>true, :cache_rows=>false)
