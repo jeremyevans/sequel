@@ -326,9 +326,9 @@ module Sequel
       []
     end
 
-    # A hash with regexp keys and exception class values, used
+    # An enumerable yielding pairs of regexps and exception classes, used
     # to match against underlying driver exception messages in
-    # order to raise a more specific Sequel::Error subclass.
+    # order to raise a more specific Sequel::DatabaseError subclass.
     def database_error_regexps
       DEFAULT_DATABASE_ERROR_REGEXPS
     end

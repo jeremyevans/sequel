@@ -630,14 +630,17 @@ module Sequel
         end
       end
 
-      DATABASE_ERROR_REGEXPS = {
-        /duplicate key value violates unique constraint/ => UniqueConstraintViolation,
-        /violates foreign key constraint/ => ForeignKeyConstraintViolation,
-        /violates check constraint/ => CheckConstraintViolation,
-        /violates not-null constraint/ => NotNullConstraintViolation,
-        /conflicting key value violates exclusion constraint/ => ExclusionConstraintViolation,
-        /could not serialize access/ => SerializationFailure,
-      }.freeze
+      DATABASE_ERROR_REGEXPS = [
+        # Add this check first, since otherwise it's possible for users to control
+        # which exception class is generated.
+        [/invalid input syntax/, DatabaseError],
+        [/duplicate key value violates unique constraint/, UniqueConstraintViolation],
+        [/violates foreign key constraint/, ForeignKeyConstraintViolation],
+        [/violates check constraint/, CheckConstraintViolation],
+        [/violates not-null constraint/, NotNullConstraintViolation],
+        [/conflicting key value violates exclusion constraint/, ExclusionConstraintViolation],
+        [/could not serialize access/, SerializationFailure],
+      ].freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS
       end
