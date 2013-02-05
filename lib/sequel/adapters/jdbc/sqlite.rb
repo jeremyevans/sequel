@@ -30,7 +30,7 @@ module Sequel
 
         private
         
-        DATABASE_ERROR_REGEXPS = {/Abort due to constraint violation/ => ConstraintViolation}.freeze
+        DATABASE_ERROR_REGEXPS = Sequel::SQLite::DatabaseMethods::DATABASE_ERROR_REGEXPS.merge(/Abort due to constraint violation/ => ConstraintViolation).freeze
         def database_error_regexps
           DATABASE_ERROR_REGEXPS
         end
