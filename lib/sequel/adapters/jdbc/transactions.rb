@@ -33,6 +33,7 @@ module Sequel
         level = opts.fetch(:isolation, transaction_isolation_level)
         if (jdbc_level = JDBC_TRANSACTION_ISOLATION_LEVELS[level]) &&
             conn.getMetaData.supportsTransactionIsolationLevel(jdbc_level)
+          _trans(conn)[:original_jdbc_isolation_level] = conn.getTransactionIsolation
           log_yield("Transaction.isolation_level = #{level}"){conn.setTransactionIsolation(jdbc_level)}
         end
       end
@@ -76,6 +77,9 @@ module Sequel
       
       # Use JDBC connection's setAutoCommit to true to enable non-transactional behavior
       def remove_transaction(conn, committed)
+        if jdbc_level = _trans(conn)[:original_jdbc_isolation_level]
+          conn.setTransactionIsolation(jdbc_level)
+        end
         if supports_savepoints?
           sps = _trans(conn)[:savepoints]
           conn.setAutoCommit(true) if sps.empty?
