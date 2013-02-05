@@ -1,5 +1,7 @@
 === HEAD
 
+* Add unlimited_update plugin to work around MySQL warning in replicated environments (jeremyevans)
+
 * Add the :retry_on and :num_retries transaction options for automatically retrying transactions (jeremyevans)
 
 * Raise serialization failures/deadlocks as Sequel::SerializationFailure exceptions (jeremyevans)
