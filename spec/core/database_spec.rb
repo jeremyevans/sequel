@@ -698,8 +698,15 @@ shared_examples_for "Database#transaction" do
     a.should == [1] * 100
   end
   
-  specify "should raise an error if attempting to use :disconnect=>:retry inside another transaction" do
+  specify "should raise an error if using :disconnect=>:retry and :retry_on together" do
+    proc{@db.transaction(:disconnect=>:retry, :retry_on=>Sequel::ConstraintViolation){}}.should raise_error(Sequel::Error)
+    @db.sqls.should == []
+  end
+  
+  specify "should raise an error if attempting to use :disconnect=>:retry or :retry_on inside another transaction" do
     proc{@db.transaction{@db.transaction(:disconnect=>:retry){}}}.should raise_error(Sequel::Error)
+    @db.sqls.should == ['BEGIN', 'ROLLBACK']
+    proc{@db.transaction{@db.transaction(:retry_on=>Sequel::ConstraintViolation){}}}.should raise_error(Sequel::Error)
     @db.sqls.should == ['BEGIN', 'ROLLBACK']
   end
   

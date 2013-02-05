@@ -288,15 +288,15 @@ module Sequel
     #                 appropriately.  Valid values true, :on, false, :off, :local (9.1+),
     #                 and :remote_write (9.2+).
     def transaction(opts={}, &block)
-      retry_on = opts[:retry_on]
       if opts[:disconnect] == :retry
-        retry_on = Array(retry_on) + [Sequel::DatabaseDisconnectError]
+        raise(Error, 'cannot specify both :disconnect=>:retry and :retry_on') if opts[:retry_on]
+        return transaction(opts.merge(:retry_on=>Sequel::DatabaseDisconnectError, :disconnect=>nil), &block)
       end
 
-      if retry_on
+      if retry_on = opts[:retry_on]
         num_retries = opts.fetch(:num_retries, 5)
         begin
-          transaction(opts.merge(:retry_on=>nil, :disconnect=>nil, :retrying=>true), &block)
+          transaction(opts.merge(:retry_on=>nil, :retrying=>true), &block)
         rescue *retry_on
           if num_retries
             num_retries -= 1
@@ -310,7 +310,7 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           if already_in_transaction?(conn, opts)
             if opts[:retrying]
-              raise Sequel::Error, "cannot set :disconnect or :retry_on options if you are already inside a transaction"
+              raise Sequel::Error, "cannot set :disconnect=>:retry or :retry_on options if you are already inside a transaction"
             end
             return yield(conn)
           end
