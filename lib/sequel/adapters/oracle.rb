@@ -144,6 +144,23 @@ module Sequel
         [OCIException, RuntimeError]
       end
 
+      def database_specific_error_class(exception, opts)
+        case exception.code
+        when 1400, 1407
+          NotNullConstraintViolation
+        when 1
+          UniqueConstraintViolation
+        when 2291, 2292
+          ForeignKeyConstraintViolation
+        when 2290
+          CheckConstraintViolation
+        when 8177
+          SerializationFailure
+        else
+          super
+        end
+      end
+
       def execute_prepared_statement(conn, type, name, opts)
         ps = prepared_statement(name)
         sql = ps.prepared_sql
