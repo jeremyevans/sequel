@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Dataset#from_self! to no longer create a self-referential dataset (jeremyevans)
+
 * Use SQLSTATE or database error codes if available instead of regexp parsing for more specific DatabaseErrors (jeremyevans)
 
 * Add unlimited_update plugin to work around MySQL warning in replicated environments (jeremyevans)

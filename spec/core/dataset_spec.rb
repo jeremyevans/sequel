@@ -2047,6 +2047,11 @@ describe "Dataset#from_self" do
     ds.from(:a).with(:a, ds.from(:b)).from_self.sql.should == 'WITH a AS (SELECT * FROM b) SELECT * FROM (SELECT * FROM a) AS t1'
     ds.from(:a, :c).with(:a, ds.from(:b)).with(:c, ds.from(:d)).from_self.sql.should == 'WITH a AS (SELECT * FROM b), c AS (SELECT * FROM d) SELECT * FROM (SELECT * FROM a, c) AS t1'
   end
+
+  specify "should have working mutation method" do
+    @ds.from_self!
+    @ds.sql.should == 'SELECT * FROM (SELECT name FROM test LIMIT 1) AS t1'
+  end
 end
 
 describe "Dataset#join_table" do

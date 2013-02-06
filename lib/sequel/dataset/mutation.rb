@@ -6,7 +6,7 @@ module Sequel
     # ---------------------
     
     # All methods that should have a ! method added that modifies the receiver.
-    MUTATION_METHODS = QUERY_METHODS - [:paginate, :naked]
+    MUTATION_METHODS = QUERY_METHODS - [:paginate, :naked, :from_self]
     
     # Setup mutation (e.g. filter!) methods.  These operate the same as the
     # non-! methods, but replace the options of the current dataset with the
@@ -38,6 +38,12 @@ module Sequel
       meths.each do |meth|
         instance_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end", __FILE__, __LINE__)
       end
+    end
+
+    # Avoid self-referential dataset by cloning.
+    def from_self!(*args, &block)
+      @opts.merge!(clone.from_self(*args, &block).opts)
+      self
     end
 
     # Remove the row_proc from the current dataset.
