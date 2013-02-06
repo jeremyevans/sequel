@@ -1,5 +1,7 @@
 === HEAD
 
+* Use SQLSTATE or database error codes if available instead of regexp parsing for more specific DatabaseErrors (jeremyevans)
+
 * Add unlimited_update plugin to work around MySQL warning in replicated environments (jeremyevans)
 
 * Add the :retry_on and :num_retries transaction options for automatically retrying transactions (jeremyevans)

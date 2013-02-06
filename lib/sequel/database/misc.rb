@@ -339,17 +339,50 @@ module Sequel
       database_specific_error_class(exception, opts) || DatabaseError
     end
     
+    # Return the SQLState for the given exception, if one can be
+    # determined
+    def database_exception_sqlstate(exception, opts)
+      nil
+    end
+
     # Return a specific Sequel::DatabaseError exception class if
     # one is appropriate for the underlying exception,
     # or nil if there is no specific exception class.
     def database_specific_error_class(exception, opts)
       return DatabaseDisconnectError if disconnect_error?(exception, opts)
 
-      database_error_regexps.each do |regexp, klass|
-        return klass if exception.message =~ regexp
+      if sqlstate = database_exception_sqlstate(exception, opts)
+        if klass = database_specific_error_class_from_sqlstate(sqlstate)
+          return klass
+        end
+      else
+        database_error_regexps.each do |regexp, klass|
+          return klass if exception.message =~ regexp
+        end
       end
 
       nil
+    end
+    
+    NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
+    FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23506 23504'.freeze.each{|s| s.freeze}
+    UNIQUE_CONSTRAINT_SQLSTATES = %w'23505'.freeze.each{|s| s.freeze}
+    CHECK_CONSTRAINT_SQLSTATES = %w'23513 23514'.freeze.each{|s| s.freeze}
+    SERIALIZATION_CONSTRAINT_SQLSTATES = %w'40001'.freeze.each{|s| s.freeze}
+    # Given the SQLState, return the appropriate DatabaseError subclass.
+    def database_specific_error_class_from_sqlstate(sqlstate)
+      case sqlstate
+      when *NOT_NULL_CONSTRAINT_SQLSTATES
+        NotNullConstraintViolation
+      when *FOREIGN_KEY_CONSTRAINT_SQLSTATES
+        ForeignKeyConstraintViolation
+      when *UNIQUE_CONSTRAINT_SQLSTATES
+        UniqueConstraintViolation
+      when *CHECK_CONSTRAINT_SQLSTATES
+        CheckConstraintViolation
+      when *SERIALIZATION_CONSTRAINT_SQLSTATES
+        SerializationFailure
+      end
     end
     
     # Return true if exception represents a disconnect error, false otherwise.

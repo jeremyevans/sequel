@@ -105,6 +105,10 @@ module Sequel
         [::Mysql2::Error]
       end
 
+      def database_exception_sqlstate(exception, opts)
+        exception.sql_state
+      end
+
       # If a connection object is available, try pinging it.  Otherwise, if the
       # error is a Mysql2::Error, check the SQL state and exception message for
       # disconnects.

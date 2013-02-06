@@ -345,6 +345,21 @@ module Sequel
         [NativeException]
       end
 
+      def database_exception_sqlstate(exception, opts)
+        if database_exception_use_sqlstates?
+          while exception.respond_to?(:cause)
+            exception = exception.cause
+            return exception.getSQLState if exception.respond_to?(:getSQLState)
+          end
+        end
+        nil
+      end
+
+      # Whether the JDBC subadapter should use SQL states for exception handling, true by default.
+      def database_exception_use_sqlstates?
+        true
+      end
+
       # Raise a disconnect error if the SQL state of the cause of the exception indicates so.
       def disconnect_error?(exception, opts)
         cause = exception.respond_to?(:cause) ? exception.cause : exception

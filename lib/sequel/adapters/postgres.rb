@@ -440,6 +440,12 @@ module Sequel
         [PGError]
       end
 
+      def database_exception_sqlstate(exception, opts)
+        if exception.respond_to?(:result) && (result = exception.result)
+          result.error_field(::PGresult::PG_DIAG_SQLSTATE)
+        end
+      end
+
       # Execute the prepared statement with the given name on an available
       # connection, using the given args.  If the connection has not prepared
       # a statement with the given name yet, prepare it.  If the connection

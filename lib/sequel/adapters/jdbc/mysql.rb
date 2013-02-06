@@ -20,6 +20,11 @@ module Sequel
           (m = /\/(.*)/.match(u.path)) && m[1]
         end
         
+        # MySQL exception handling with SQLState is less accurate than with regexps.
+        def database_exception_use_sqlstates?
+          false
+        end
+
         # Get the last inserted id using LAST_INSERT_ID().
         def last_insert_id(conn, opts={})
           if stmt = opts[:stmt]

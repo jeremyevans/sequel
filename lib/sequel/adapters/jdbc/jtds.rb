@@ -10,6 +10,11 @@ module Sequel
 
         private
 
+        # JTDS exception handling with SQLState is less accurate than with regexps.
+        def database_exception_use_sqlstates?
+          false
+        end
+
         # Handle nil values by using setNull with the correct parameter type.
         def set_ps_arg_nil(cps, i)
           cps.setNull(i, cps.getParameterMetaData.getParameterType(i))

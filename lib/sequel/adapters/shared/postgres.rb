@@ -630,6 +630,15 @@ module Sequel
         end
       end
 
+      EXCLUSION_CONSTRAINT_SQL_STATE = '23P01'.freeze
+      def database_specific_error_class_from_sqlstate(sqlstate)
+        if sqlstate == EXCLUSION_CONSTRAINT_SQL_STATE
+          ExclusionConstraintViolation
+        else
+          super
+        end
+      end
+
       DATABASE_ERROR_REGEXPS = [
         # Add this check first, since otherwise it's possible for users to control
         # which exception class is generated.

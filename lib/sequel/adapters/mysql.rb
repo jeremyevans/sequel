@@ -261,6 +261,10 @@ module Sequel
         [Mysql::Error]
       end
 
+      def database_exception_sqlstate(exception, opts)
+        exception.sqlstate
+      end
+
       # Raise a disconnect error if the exception message matches the list
       # of recognized exceptions.
       def disconnect_error?(e, opts)

@@ -109,6 +109,21 @@ module Sequel
         [TinyTds::Error]
       end
 
+      # Stupid MSSQL maps foreign key and check constraint violations
+      # to the same error code, and doesn't expose the sqlstate.  Use
+      # database error numbers if present and unambiguous, otherwise
+      # fallback to the regexp mapping.
+      def database_specific_error_class(exception, opts)
+        case exception.db_error_number
+        when 515
+          NotNullConstraintViolation
+        when 2627
+          UniqueConstraintViolation
+        else
+          super
+        end
+      end
+
       # Return true if the :conn argument is present and not active.
       def disconnect_error?(e, opts)
         super || (opts[:conn] && !opts[:conn].active?)

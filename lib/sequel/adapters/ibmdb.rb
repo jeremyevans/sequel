@@ -35,6 +35,12 @@ module Sequel
 
       # Error class for exceptions raised by the connection.
       class Error < StandardError
+        attr_reader :sqlstate
+
+        def initialize(message, sqlstate)
+          @sqlstate = sqlstate
+          super(message)
+        end
       end
 
       # Create the underlying IBM_DB connection.
@@ -69,11 +75,16 @@ module Sequel
         IBM_DB.getErrormsg(@conn, IBM_DB::DB_CONN)
       end
 
+      # Return the related error message for the connection.
+      def error_sqlstate
+        IBM_DB.getErrorstate(@conn, IBM_DB::DB_CONN)
+      end
+
       # Execute the given SQL on the database, and return a Statement instance
       # holding the results.
       def execute(sql)
         stmt = IBM_DB.exec(@conn, sql)
-        raise Error, error_msg unless stmt
+        raise Error.new(error_msg, error_sqlstate) unless stmt
         Statement.new(stmt)
       end
 
@@ -83,7 +94,7 @@ module Sequel
         stmt = @prepared_statements[ps_name].last
         res = stmt.execute(*values)
         unless res
-          raise Error, "Error executing statement #{ps_name}: #{error_msg}"
+          raise Error.new("Error executing statement #{ps_name}: #{error_msg}", error_sqlstate)
         end
         stmt
       end
@@ -98,7 +109,7 @@ module Sequel
         else
           err = error_msg
           err = "Error preparing #{ps_name} with SQL: #{sql}" if error_msg.nil? || error_msg.empty?
-          raise Error, err
+          raise Error.new(err, error_sqlstate)
         end
       end
 
@@ -312,6 +323,10 @@ module Sequel
     
       def database_error_classes
         [Connection::Error]
+      end
+
+      def database_exception_sqlstate(exception, opts)
+        exception.sqlstate
       end
 
       # Don't convert smallint to boolean for the metadata
