@@ -21,6 +21,11 @@ module Sequel
         
         private
 
+        # Oracle exception handling with SQLState is less accurate than with regexps.
+        def database_exception_use_sqlstates?
+          false
+        end
+
         def last_insert_id(conn, opts)
           unless sequence = opts[:sequence]
             if t = opts[:table]
