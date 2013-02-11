@@ -431,7 +431,7 @@ module Sequel
         # recursive map of the output is done to make sure that the entires in the
         # correct type.
         def call(string)
-          array = JSON.parse(string.gsub(SUBST_RE){|m| SUBST[m]})
+          array = Sequel.parse_json(string.gsub(SUBST_RE){|m| SUBST[m]})
           array = Sequel.recursive_map(array, @converter) if @converter
           PGArray.new(array, @type)
         end

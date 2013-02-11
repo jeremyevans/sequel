@@ -84,7 +84,7 @@ module Sequel
       end
       register_format(:marshal, lambda{|v| [Marshal.dump(v)].pack('m')}, lambda{|v| Marshal.load(v.unpack('m')[0]) rescue Marshal.load(v)})
       register_format(:yaml, lambda{|v| v.to_yaml}, lambda{|v| YAML.load(v)})
-      register_format(:json, lambda{|v| v.to_json}, lambda{|v| JSON.parse(v)})
+      register_format(:json, lambda{|v| v.to_json}, lambda{|v| Sequel.parse_json(v)})
 
       module ClassMethods
         # A hash with column name symbols and callable values, with the value

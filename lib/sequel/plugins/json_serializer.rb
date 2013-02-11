@@ -36,20 +36,6 @@ module Sequel
     #   album.to_json(:root => true)
     #   # => '{"album":{"id":1,"name":"RF","artist_id":2}}'
     #
-    # In addition to creating JSON, this plugin also enables Sequel::Model
-    # objects to be automatically created when JSON is parsed:
-    #
-    #   json = album.to_json
-    #   album = JSON.parse(json)
-    #
-    # In addition, you can update existing model objects directly from JSON
-    # using +from_json+:
-    #
-    #   album.from_json(json)
-    #
-    # This works by parsing the JSON (which should return a hash), and then
-    # calling +set+ with the returned hash.
-    #
     # Additionally, +to_json+ also exists as a class and dataset method, both
     # of which return all objects in the dataset:
     #
@@ -60,6 +46,31 @@ module Sequel
     # JSON, you can call the class to_json method with the :array option:
     #
     #   Album.to_json(:array=>[Album[1], Album[2]])
+    #
+    # In addition to creating JSON, this plugin also enables Sequel::Model
+    # classes to create instances directly from JSON using the from_json class
+    # method:
+    #
+    #   json = album.to_json
+    #   album = Album.from_json(json)
+    #
+    # This should be able to roundtrip, such that:
+    #
+    #   Album.from_json(album.to_json) == album
+    #   Album.from_json(Album.order(:id).to_json) == Album.order(:id).all
+    #
+    # However, you should be extremely careful when using untrusted JSON
+    # input. The from_json class method can set any column values in the object,
+    # and can set arbitrary cached associations. You should only use the from_json
+    # class method if you are externally validating the input.
+    #
+    # A safer method is the #from_json instance method:
+    #
+    #   album.from_json(json)
+    #
+    # This works by parsing the JSON (which should return a hash), and then
+    # calling +set+ or +set_fields+ with the returned hash, and doesn't allow
+    # arbitrary column values or cached associations to be set.
     #
     # Note that active_support/json makes incompatible changes to the to_json API,
     # and breaks some aspects of the json_serializer plugin.  You can undo the damage
@@ -116,20 +127,46 @@ module Sequel
         # The default opts to use when serializing model objects to JSON.
         attr_reader :json_serializer_opts
 
+        def from_json(json)
+          v = Sequel.parse_json(json)
+          case v
+          when self
+            v
+          when Hash
+            json_create(v)
+          when Array
+            raise(Error, 'parsed json returned an array containing non-hashes') unless v.all?{|ve| ve.is_a?(Hash)}
+            v.map{|ve| json_create(ve)}
+          else
+            raise Error, "parsed json doesn't return a hash or instance of #{self}"
+          end
+        end
+
         # Create a new model object from the hash provided by parsing
         # JSON.  Handles column values (stored in +values+), associations
         # (stored in +associations+), and other values (by calling a
         # setter method).  If an entry in the hash is not a column or
         # an association, and no setter method exists, raises an Error.
         def json_create(hash)
+          unless hash.is_a?(Hash)
+            raise Error, "json_create argument must be a hash"
+          end
+
           obj = new
           cols = columns.map{|x| x.to_s}
-          assocs = associations.map{|x| x.to_s}
+          assocs = {}
+          association_reflections.each{|name, r| assocs[name.to_s] = r}
           meths = obj.send(:setter_methods, nil, nil)
           hash.delete(JSON.create_id)
           hash.each do |k, v|
-            if assocs.include?(k)
-              obj.associations[k.to_sym] = v
+            if r = assocs[k]
+              obj.associations[k.to_sym] = if v.is_a?(Array)
+                raise Error, "Attempt to populate non-array association with an array" unless r.returns_array?
+                v.map{|ve| r.associated_class.json_create(ve)}
+              else
+                raise Error, "Attempt to populate array association with a non-array" if r.returns_array?
+                r.associated_class.json_create(v)
+              end
             elsif meths.include?("#{k}=")
               obj.send("#{k}=", v)
             elsif cols.include?(k)
@@ -159,7 +196,11 @@ module Sequel
         # Parse the provided JSON, which should return a hash,
         # and call +set+ with that hash.
         def from_json(json, opts={})
-          h = JSON.parse(json)
+          h = Sequel.parse_json(json)
+          unless h.is_a?(Hash)
+            raise Error, "parsed json doesn't return a hash"
+          end
+
           if fields = opts[:fields]
             set_fields(h, fields, opts)
           else

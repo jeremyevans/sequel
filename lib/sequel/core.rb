@@ -208,6 +208,12 @@ module Sequel
   def self.identifier_output_method=(value)
     Database.identifier_output_method = value
   end
+
+  # Parse the string as JSON and return the result.
+  # This is solely for internal use, it should not be used externally.
+  def self.parse_json(json) # :nodoc:
+    JSON.parse(json, :create_additions=>false)
+  end
   
   # Set whether to quote identifiers for all databases by default. By default,
   # Sequel quotes identifiers in all SQL strings, so to turn that off:

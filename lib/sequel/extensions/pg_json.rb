@@ -98,7 +98,7 @@ module Sequel
       # parsing does not yield an array or hash.
       def self.parse_json(s)
         begin
-          value = JSON.parse(s)
+          value = Sequel.parse_json(s)
         rescue JSON::ParserError=>e
           raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
         end
