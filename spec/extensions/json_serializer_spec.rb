@@ -270,6 +270,10 @@ describe "Sequel::Plugins::JsonSerializer" do
     Artist.from_json(@artist.to_json, :all_columns=>true).should == @artist
   end
 
+  it "should raise an error if using :all_columns and non-column is in the JSON" do
+    proc{Artist.from_json('{"foo":"bar"}', :all_columns=>true)}.should raise_error(Sequel::Error)
+  end
+
   it "should raise an error if attempting to set a restricted column and :all_columns is not used" do
     Artist.restrict_primary_key
     proc{Artist.from_json(@artist.to_json)}.should raise_error(Sequel::Error)

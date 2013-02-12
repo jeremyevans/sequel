@@ -263,6 +263,8 @@ module Sequel
                 send(setter_meth, v)
               elsif cols.include?(k)
                 values[k.to_sym] = v
+              else
+                raise Error, "Entry in JSON not an association or column and no setter method exists: #{k}"
               end
             end
           else
