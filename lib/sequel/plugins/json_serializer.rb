@@ -127,6 +127,7 @@ module Sequel
         # The default opts to use when serializing model objects to JSON.
         attr_reader :json_serializer_opts
 
+        # Attempt to parse a single instance from the given JSON string.
         def from_json(json)
           v = Sequel.parse_json(json)
           case v
@@ -134,11 +135,19 @@ module Sequel
             v
           when Hash
             json_create(v)
-          when Array
-            raise(Error, 'parsed json returned an array containing non-hashes') unless v.all?{|ve| ve.is_a?(Hash)}
-            v.map{|ve| json_create(ve)}
           else
             raise Error, "parsed json doesn't return a hash or instance of #{self}"
+          end
+        end
+
+        # Attempt to parse an array of instances from the given JSON string.
+        def array_from_json(json)
+          v = Sequel.parse_json(json)
+          if v.is_a?(Array)
+            raise(Error, 'parsed json returned an array containing non-hashes') unless v.all?{|ve| ve.is_a?(Hash) || ve.is_a?(self)}
+            v.map{|ve| ve.is_a?(self) ? ve : json_create(ve)}
+          else
+            raise(Error, 'parsed json did not return an array')
           end
         end
 

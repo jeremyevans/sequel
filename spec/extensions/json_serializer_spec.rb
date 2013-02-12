@@ -168,9 +168,9 @@ describe "Sequel::Plugins::JsonSerializer" do
   it "should support a to_json class and dataset method" do
     Album.dataset._fetch = {:id=>1, :name=>'RF', :artist_id=>2}
     Artist.dataset._fetch = {:id=>2, :name=>'YJM'}
-    Album.from_json(Album.to_json).should == [@album]
-    Album.from_json(Album.to_json(:include=>:artist)).map{|x| x.artist}.should == [@artist]
-    Album.from_json(Album.dataset.to_json(:only=>:name)).should == [Album.load(:name=>@album.name)]
+    Album.array_from_json(Album.to_json).should == [@album]
+    Album.array_from_json(Album.to_json(:include=>:artist)).map{|x| x.artist}.should == [@artist]
+    Album.array_from_json(Album.dataset.to_json(:only=>:name)).should == [Album.load(:name=>@album.name)]
   end
 
   it "should have dataset to_json method work with naked datasets" do
@@ -182,13 +182,13 @@ describe "Sequel::Plugins::JsonSerializer" do
 
   it "should have dataset to_json method respect :array option for the array to use" do
     a = Album.load(:id=>1, :name=>'RF', :artist_id=>3)
-    Album.from_json(Album.to_json(:array=>[a])).should == [a]
+    Album.array_from_json(Album.to_json(:array=>[a])).should == [a]
 
     a.associations[:artist] = artist = Artist.load(:id=>3, :name=>'YJM')
-    Album.from_json(Album.to_json(:array=>[a], :include=>:artist)).first.artist.should == artist
+    Album.array_from_json(Album.to_json(:array=>[a], :include=>:artist)).first.artist.should == artist
 
     artist.associations[:albums] = [a]
-    x = Artist.from_json(Artist.to_json(:array=>[artist], :include=>:albums))
+    x = Artist.array_from_json(Artist.to_json(:array=>[artist], :include=>:albums))
     x.should == [artist]
     x.first.albums.should == [a]
   end
