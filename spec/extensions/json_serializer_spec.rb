@@ -7,6 +7,7 @@ describe "Sequel::Plugins::JsonSerializer" do
       plugin :json_serializer
       columns :id, :name
       def_column_accessor :id, :name
+      @db_schema = {:id=>{:type=>:integer}}
       one_to_many :albums
     end
     class ::Album < Sequel::Model
@@ -267,6 +268,11 @@ describe "Sequel::Plugins::JsonSerializer" do
   it "should allow overriding of :all_columns options in associated objects" do
     Album.restrict_primary_key
     Artist.from_json(@artist.to_json(:include=>:albums), :associations=>{:albums=>{:fields=>[:id, :name, :artist_id], :missing=>:raise}}, :all_columns=>true).albums.should == [@album]
+  end
+
+  it "should handle typecasting if setter columns exist when using :all_columns" do
+    Artist.restrict_primary_key
+    Artist.from_json('{"id":"2","name":"YJM","json_class":"Artist"}', :all_columns=>true).should == @artist
   end
 
   it "should allow setting columns that are restricted if :all_columns is used" do

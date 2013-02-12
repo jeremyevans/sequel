@@ -256,15 +256,12 @@ module Sequel
           if fields = opts[:fields]
             set_fields(hash, fields, opts)
           elsif opts[:all_columns]
-            meths = setter_methods(nil, nil)
-            cols = columns.map{|x| x.to_s}
+            meths = methods.collect{|x| x.to_s}.grep(Model::SETTER_METHOD_REGEXP) - Model::RESTRICTED_SETTER_METHODS
             hash.each do |k, v|
               if meths.include?(setter_meth = "#{k}=")
                 send(setter_meth, v)
-              elsif cols.include?(k)
-                values[k.to_sym] = v
               else
-                raise Error, "Entry in JSON not an association or column and no setter method exists: #{k}"
+                raise Error, "Entry in JSON does not have a matching setter method: #{k}"
               end
             end
           else
