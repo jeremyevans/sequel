@@ -127,64 +127,39 @@ module Sequel
         # The default opts to use when serializing model objects to JSON.
         attr_reader :json_serializer_opts
 
-        # Attempt to parse a single instance from the given JSON string.
-        def from_json(json)
+        # Attempt to parse a single instance from the given JSON string,
+        # with options passed to InstanceMethods#from_json_node.
+        def from_json(json, opts={})
           v = Sequel.parse_json(json)
           case v
           when self
             v
           when Hash
-            json_create(v)
+            new.from_json_node(v, opts)
           else
             raise Error, "parsed json doesn't return a hash or instance of #{self}"
           end
         end
 
-        # Attempt to parse an array of instances from the given JSON string.
-        def array_from_json(json)
+        # Attempt to parse an array of instances from the given JSON string,
+        # with options passed to InstanceMethods#from_json_node.
+        def array_from_json(json, opts={})
           v = Sequel.parse_json(json)
           if v.is_a?(Array)
             raise(Error, 'parsed json returned an array containing non-hashes') unless v.all?{|ve| ve.is_a?(Hash) || ve.is_a?(self)}
-            v.map{|ve| ve.is_a?(self) ? ve : json_create(ve)}
+            v.map{|ve| ve.is_a?(self) ? ve : new.from_json_node(ve, opts)}
           else
             raise(Error, 'parsed json did not return an array')
           end
         end
 
-        # Create a new model object from the hash provided by parsing
-        # JSON.  Handles column values (stored in +values+), associations
-        # (stored in +associations+), and other values (by calling a
-        # setter method).  If an entry in the hash is not a column or
-        # an association, and no setter method exists, raises an Error.
-        def json_create(hash)
-          unless hash.is_a?(Hash)
-            raise Error, "json_create argument must be a hash"
-          end
-
-          obj = new
-          cols = columns.map{|x| x.to_s}
-          assocs = {}
-          association_reflections.each{|name, r| assocs[name.to_s] = r}
-          meths = obj.send(:setter_methods, nil, nil)
-          hash.delete(JSON.create_id)
-          hash.each do |k, v|
-            if r = assocs[k]
-              obj.associations[k.to_sym] = if v.is_a?(Array)
-                raise Error, "Attempt to populate non-array association with an array" unless r.returns_array?
-                v.map{|ve| r.associated_class.json_create(ve)}
-              else
-                raise Error, "Attempt to populate array association with a non-array" if r.returns_array?
-                r.associated_class.json_create(v)
-              end
-            elsif meths.include?("#{k}=")
-              obj.send("#{k}=", v)
-            elsif cols.include?(k)
-              obj.values[k.to_sym] = v
-            else
-              raise Error, "Entry in JSON hash not an association or column and no setter method exists: #{k}"
-            end
-          end
-          obj
+        # Exists for compatibility with old json library which allows creation
+        # of arbitrary ruby objects by JSON.parse.  Creates a new instance
+        # and populates it using InstanceMethods#from_json_node with the
+        # :all_columns and :all_associations options.  Not recommended for usage
+        # in new code, consider calling the from_json method directly with the JSON string.
+        def json_create(hash, opts={})
+          new.from_json_node(hash, {:all_columns=>true, :all_associations=>true}.merge(opts))
         end
 
         # Call the dataset +to_json+ method.
@@ -203,18 +178,98 @@ module Sequel
 
       module InstanceMethods
         # Parse the provided JSON, which should return a hash,
-        # and call +set+ with that hash.
+        # and process the hash with from_json_node.
         def from_json(json, opts={})
-          h = Sequel.parse_json(json)
-          unless h.is_a?(Hash)
+          from_json_node(Sequel.parse_json(json), opts)
+        end
+
+        # Using the provided hash, update the instance with data contained in the hash. By default, just
+        # calls set with the hash values.
+        # 
+        # Options:
+        # :all_associations :: Indicates that all associations supported by the model should be tried.
+        #                      This option also cascades to associations if used, and can be reset in
+        #                      those associations using the :all_associations=>false or :associations option.
+        #                      This option only exists for backwards compatibility.  It is better to use the
+        #                      :associations option instead of this option.
+        # :all_columns :: Overrides the setting logic allowing all column values to be set, even if there
+        #                 isn't a setter method or access to the setter method is restricted.
+        #                 This option cascades to associations if used, and can be reset in those associations
+        #                 using the :all_columns=>false or :fields options.  This option is considered a
+        #                 security risk, and only exists for backwards compatibility.  It is better to use
+        #                 the :fields option appropriately instead of this option, or no option at all.
+        # :associations :: Indicates that the associations cache should be updated by creating
+        #                  a new associated object using data from the hash.  Should be a Symbol
+        #                  for a single association, an array of symbols for multiple associations,
+        #                  or a hash with symbol keys and dependent association option hash values.
+        # :fields :: Changes the behavior to call set_fields using the provided fields, instead of calling set.
+        def from_json_node(hash, opts={})
+          unless hash.is_a?(Hash)
             raise Error, "parsed json doesn't return a hash"
+          end
+          hash.delete(JSON.create_id)
+
+          unless assocs = opts[:associations]
+            if opts[:all_associations]
+              assocs = {}
+              model.associations.each{|v| assocs[v] = {}}
+            end
+          end
+
+          if assocs
+            assocs = case assocs
+            when Symbol
+              {assocs=>{}}
+            when Array
+              assocs_tmp = {}
+              assocs.each{|v| assocs_tmp[v] = {}}
+              assocs_tmp
+            when Hash
+              assocs
+            else
+              raise Error, ":associations should be Symbol, Array, or Hash if present"
+            end
+
+            if opts[:all_columns] || opts[:all_associations]
+              assocs.each_value do |assoc_opts|
+                assoc_opts[:all_columns] = true unless assoc_opts.has_key?(:fields) || assoc_opts.has_key?(:all_columns)
+              end
+            end
+
+            assocs.each do |assoc, assoc_opts|
+              if assoc_values = hash.delete(assoc.to_s)
+                unless r = model.association_reflection(assoc)
+                  raise Error, "Association #{assoc} is not defined for #{model}"
+                end
+
+                associations[assoc] = if r.returns_array?
+                  raise Error, "Attempt to populate array association with a non-array" unless assoc_values.is_a?(Array)
+                  assoc_values.map{|v| v.is_a?(r.associated_class) ? v : r.associated_class.new.from_json_node(v, assoc_opts)}
+                else
+                  raise Error, "Attempt to populate non-array association with an array" if assoc_values.is_a?(Array)
+                  assoc_values.is_a?(r.associated_class) ? assoc_values : r.associated_class.new.from_json_node(assoc_values, assoc_opts)
+                end
+              end
+            end
           end
 
           if fields = opts[:fields]
-            set_fields(h, fields, opts)
+            set_fields(hash, fields, opts)
+          elsif opts[:all_columns]
+            meths = setter_methods(nil, nil)
+            cols = columns.map{|x| x.to_s}
+            hash.each do |k, v|
+              if meths.include?(setter_meth = "#{k}=")
+                send(setter_meth, v)
+              elsif cols.include?(k)
+                values[k.to_sym] = v
+              end
+            end
           else
-            set(h)
+            set(hash)
           end
+
+          self
         end
 
         # Return a string in JSON format.  Accepts the following
