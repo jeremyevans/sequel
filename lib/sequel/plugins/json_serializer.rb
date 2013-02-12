@@ -212,7 +212,7 @@ module Sequel
           unless assocs = opts[:associations]
             if opts[:all_associations]
               assocs = {}
-              model.associations.each{|v| assocs[v] = {}}
+              model.associations.each{|v| assocs[v] = {:all_associations=>true}}
             end
           end
 
@@ -230,7 +230,7 @@ module Sequel
               raise Error, ":associations should be Symbol, Array, or Hash if present"
             end
 
-            if opts[:all_columns] || opts[:all_associations]
+            if opts[:all_columns]
               assocs.each_value do |assoc_opts|
                 assoc_opts[:all_columns] = true unless assoc_opts.has_key?(:fields) || assoc_opts.has_key?(:all_columns)
               end

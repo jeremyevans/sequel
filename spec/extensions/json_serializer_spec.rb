@@ -128,6 +128,10 @@ describe "Sequel::Plugins::JsonSerializer" do
     Album.from_json(@album.to_json(:include=>{:artist=>{:include=>{:albums=>{:only=>:name}}}}), :associations=>{:artist=>{:associations=>:albums}}).artist.albums.should == [Album.load(:name=>@album.name)]
   end
 
+  it "should automatically cascade parsing for all associations if :all_associations is used" do
+    Artist.from_json(@artist.to_json(:include=>{:albums=>{:include=>:artist}}), :all_associations=>true).albums.map{|a| a.artist}.should == [@artist]
+  end
+
   it "should handle the :include option cascading with an empty hash" do
     Album.from_json(@album.to_json(:include=>{:artist=>{}}), :associations=>:artist).artist.should == @artist
     Album.from_json(@album.to_json(:include=>{:blah=>{}})).blah.should == @album.blah
