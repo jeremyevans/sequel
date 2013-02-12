@@ -54,23 +54,36 @@ module Sequel
     #   json = album.to_json
     #   album = Album.from_json(json)
     #
-    # This should be able to roundtrip, such that:
+    # The array_from_json class method exists to parse arrays of model instances
+    # from json:
     #
-    #   Album.from_json(album.to_json) == album
-    #   Album.from_json(Album.order(:id).to_json) == Album.order(:id).all
+    #   json = Album.filter(:artist_id=>1).to_json
+    #   albums = Album.array_from_json(json)
     #
-    # However, you should be extremely careful when using untrusted JSON
-    # input. The from_json class method can set any column values in the object,
-    # and can set arbitrary cached associations. You should only use the from_json
-    # class method if you are externally validating the input.
+    # These does not necessarily round trip, since doing so would let users
+    # create model objects with arbitrary values.  By default, from_json will
+    # call set with the values in the hash.  If you want to specify the allowed
+    # fields, you can use the :fields option, which will call set_fields with
+    # the given fields:
     #
-    # A safer method is the #from_json instance method:
+    #   Album.from_json(album.to_json, :fields=>%w'id name')
+    #
+    # If you want to update an existing instance, you can use the from_json
+    # instance method:
     #
     #   album.from_json(json)
     #
-    # This works by parsing the JSON (which should return a hash), and then
-    # calling +set+ or +set_fields+ with the returned hash, and doesn't allow
-    # arbitrary column values or cached associations to be set.
+    # Both of these allow creation of cached associated objects, if you provide
+    # the :associations option:
+    #
+    #   album.from_json(json, :associations=>:artist)
+    #
+    # You can even provide options when setting up the associated objects:
+    #
+    #   album.from_json(json, :associations=>{:artist=>{:fields=>%w'id name', :associations=>:tags}})
+    #
+    # If the json is trusted and should be allowed to set all column and association
+    # values, you can use the :all_columns and :all_associations options.
     #
     # Note that active_support/json makes incompatible changes to the to_json API,
     # and breaks some aspects of the json_serializer plugin.  You can undo the damage
@@ -188,12 +201,11 @@ module Sequel
         # 
         # Options:
         # :all_associations :: Indicates that all associations supported by the model should be tried.
-        #                      This option also cascades to associations if used, and can be reset in
-        #                      those associations using the :all_associations=>false or :associations option.
-        #                      This option only exists for backwards compatibility.  It is better to use the
-        #                      :associations option instead of this option.
-        # :all_columns :: Overrides the setting logic allowing all column values to be set, even if there
-        #                 isn't a setter method or access to the setter method is restricted.
+        #                      This option also cascades to associations if used. It is better to use the
+        #                      :associations option instead of this option. This option only exists for
+        #                      backwards compatibility.
+        # :all_columns :: Overrides the setting logic allowing all setter methods be used,
+        #                 even if access to the setter method is restricted.
         #                 This option cascades to associations if used, and can be reset in those associations
         #                 using the :all_columns=>false or :fields options.  This option is considered a
         #                 security risk, and only exists for backwards compatibility.  It is better to use
