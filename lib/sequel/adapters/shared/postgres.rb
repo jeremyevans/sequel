@@ -513,8 +513,10 @@ module Sequel
       # otherwise, an array of symbols of table names is returned.
       #
       # Options:
-      # * :schema - The schema to search (default_schema by default)
-      # * :server - The server to use
+      # :qualify :: Return the tables as Sequel::SQL::QualifiedIdentifier instances,
+      #             using the schema the table is located in as the qualifier.
+      # :schema :: The schema to search (default_schema by default)
+      # :server :: The server to use
       def tables(opts={}, &block)
         pg_class_relname('r', opts, &block)
       end
@@ -529,8 +531,10 @@ module Sequel
       # Array of symbols specifying view names in the current database.
       #
       # Options:
-      # * :schema - The schema to search (default_schema by default)
-      # * :server - The server to use
+      # :qualify :: Return the views as Sequel::SQL::QualifiedIdentifier instances,
+      #             using the schema the view is located in as the qualifier.
+      # :schema :: The schema to search (default_schema by default)
+      # :server :: The server to use
       def views(opts={})
         pg_class_relname('v', opts)
       end
@@ -847,7 +851,13 @@ module Sequel
         ds = metadata_dataset.from(:pg_class).filter(:relkind=>type).select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace)
         ds = filter_schema(ds, opts)
         m = output_identifier_meth
-        block_given? ? yield(ds) : ds.map{|r| m.call(r[:relname])}
+        if block_given?
+          yield(ds)
+        elsif opts[:qualify]
+          ds.select_append(:pg_namespace__nspname).map{|r| Sequel.qualify(m.call(r[:nspname]), m.call(r[:relname]))}
+        else
+          ds.map{|r| m.call(r[:relname])}
+        end
       end
 
       # Use a dollar sign instead of question mark for the argument

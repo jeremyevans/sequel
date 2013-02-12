@@ -83,6 +83,16 @@ describe "A PostgreSQL database" do
     @db.server_version.should > 70000
   end
 
+  specify "should support a :qualify option to tables and views" do
+    @db.tables(:qualify=>true).should include(Sequel.qualify(:public, :testfk))
+    begin
+      @db.create_view(:testfkv, @db[:testfk])
+      @db.views(:qualify=>true).should include(Sequel.qualify(:public, :testfkv))
+    ensure
+      @db.drop_view(:testfkv)
+    end
+  end
+
   specify "should not typecast the int2vector type incorrectly" do
     @db.get(Sequel.cast('10 20', :int2vector)).should_not == 10
   end

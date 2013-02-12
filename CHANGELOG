@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#tables and #views accept a :qualify option on PostgreSQL to return qualified identifiers (jeremyevans)
+
 * Make json_serializer and xml_serializer plugins secure by default (jeremyevans)
 
 * Address JSON.parse vulnerabilities (jeremyevans)
