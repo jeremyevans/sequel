@@ -1009,3 +1009,19 @@ describe "Sequel.delay" do
     proc{Sequel.delay}.should raise_error(Sequel::Error)
   end
 end
+
+describe "Sequel.parse_json" do
+  before do
+    Sequel::JSON = Object.new
+    def (Sequel::JSON).parse(json, opts={})
+      [json, opts]
+    end
+  end
+  after do
+    Sequel.send(:remove_const, :JSON)
+  end
+
+  specify "should parse json correctly" do
+    Sequel.parse_json('[]').should == ['[]', {:create_additions=>false}]
+  end
+end
