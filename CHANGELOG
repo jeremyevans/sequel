@@ -1,5 +1,7 @@
 === HEAD
 
+* Make json_serializer and xml_serializer plugins secure by default (jeremyevans)
+
 * Address JSON.parse vulnerabilities (jeremyevans)
 
 * Fix Dataset#from_self! to no longer create a self-referential dataset (jeremyevans)

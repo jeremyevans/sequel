@@ -8,12 +8,14 @@ else
 describe "Sequel::Plugins::XmlSerializer" do
   before do
     class ::Artist < Sequel::Model
+      unrestrict_primary_key
       plugin :xml_serializer
       columns :id, :name
       @db_schema = {:id=>{:type=>:integer}, :name=>{:type=>:string}}
       one_to_many :albums
     end
     class ::Album < Sequel::Model
+      unrestrict_primary_key
       attr_accessor :blah
       plugin :xml_serializer
       columns :id, :name, :artist_id
@@ -39,9 +41,10 @@ describe "Sequel::Plugins::XmlSerializer" do
   it "should round trip successfully for namespaced models" do
     module XmlSerializerTest
       class Artist < Sequel::Model
-      plugin :xml_serializer
-      columns :id, :name
-      @db_schema = {:id=>{:type=>:integer}, :name=>{:type=>:string}}
+        unrestrict_primary_key
+        plugin :xml_serializer
+        columns :id, :name
+        @db_schema = {:id=>{:type=>:integer}, :name=>{:type=>:string}}
       end 
     end
     artist = XmlSerializerTest::Artist.load(:id=>2, :name=>'YJM')
@@ -69,8 +72,8 @@ describe "Sequel::Plugins::XmlSerializer" do
   end
 
   it "should handle the :include option for associations" do
-    Artist.from_xml(@artist.to_xml(:include=>:albums)).albums.should == [@album]
-    Album.from_xml(@album.to_xml(:include=>:artist)).artist.should == @artist
+    Artist.from_xml(@artist.to_xml(:include=>:albums), :associations=>:albums).albums.should == [@album]
+    Album.from_xml(@album.to_xml(:include=>:artist), :associations=>:artist).artist.should == @artist
   end
 
   it "should handle the :include option for arbitrary attributes" do
@@ -78,24 +81,28 @@ describe "Sequel::Plugins::XmlSerializer" do
   end
 
   it "should handle multiple inclusions using an array for the :include option" do
-    a = Album.from_xml(@album.to_xml(:include=>[:blah, :artist]))
+    a = Album.from_xml(@album.to_xml(:include=>[:blah, :artist]), :associations=>:artist)
     a.blah.should == @album.blah
     a.artist.should == @artist
   end
 
   it "should handle cascading using a hash for the :include option" do
-    Artist.from_xml(@artist.to_xml(:include=>{:albums=>{:include=>:artist}})).albums.map{|a| a.artist}.should == [@artist]
-    Album.from_xml(@album.to_xml(:include=>{:artist=>{:include=>:albums}})).artist.albums.should == [@album]
+    Artist.from_xml(@artist.to_xml(:include=>{:albums=>{:include=>:artist}}), :associations=>{:albums=>{:associations=>:artist}}).albums.map{|a| a.artist}.should == [@artist]
+    Album.from_xml(@album.to_xml(:include=>{:artist=>{:include=>:albums}}), :associations=>{:artist=>{:associations=>:albums}}).artist.albums.should == [@album]
 
-    Artist.from_xml(@artist.to_xml(:include=>{:albums=>{:only=>:name}})).albums.should == [Album.load(:name=>@album.name)]
-    Album.from_xml(@album.to_xml(:include=>{:artist=>{:except=>:name}})).artist.should == Artist.load(:id=>@artist.id)
+    Artist.from_xml(@artist.to_xml(:include=>{:albums=>{:only=>:name}}), :associations=>{:albums=>{:fields=>%w'name'}}).albums.should == [Album.load(:name=>@album.name)]
+    Album.from_xml(@album.to_xml(:include=>{:artist=>{:except=>:name}}), :associations=>:artist).artist.should == Artist.load(:id=>@artist.id)
 
-    Artist.from_xml(@artist.to_xml(:include=>{:albums=>{:include=>{:artist=>{:include=>:albums}}}})).albums.map{|a| a.artist.albums}.should == [[@album]]
-    Album.from_xml(@album.to_xml(:include=>{:artist=>{:include=>{:albums=>{:only=>:name}}}})).artist.albums.should == [Album.load(:name=>@album.name)]
+    Artist.from_xml(@artist.to_xml(:include=>{:albums=>{:include=>{:artist=>{:include=>:albums}}}}), :associations=>{:albums=>{:associations=>{:artist=>{:associations=>:albums}}}}).albums.map{|a| a.artist.albums}.should == [[@album]]
+    Album.from_xml(@album.to_xml(:include=>{:artist=>{:include=>{:albums=>{:only=>:name}}}}), :associations=>{:artist=>{:associations=>{:albums=>{:fields=>%w'name'}}}}).artist.albums.should == [Album.load(:name=>@album.name)]
   end
 
+  it "should automatically cascade parsing for all associations if :all_associations is used" do
+    Artist.from_xml(@artist.to_xml(:include=>{:albums=>{:include=>:artist}}), :all_associations=>true).albums.map{|a| a.artist}.should == [@artist]
+   end
+  
   it "should handle the :include option cascading with an empty hash" do
-    Album.from_xml(@album.to_xml(:include=>{:artist=>{}})).artist.should == @artist
+    Album.from_xml(@album.to_xml(:include=>{:artist=>{}}), :associations=>:artist).artist.should == @artist
     Album.from_xml(@album.to_xml(:include=>{:blah=>{}})).blah.should == @album.blah
   end
 
@@ -153,7 +160,7 @@ describe "Sequel::Plugins::XmlSerializer" do
     album = @album
     Album.dataset.meta_def(:all){[album]}
     Album.array_from_xml(Album.to_xml).should == [@album]
-    Album.array_from_xml(Album.to_xml(:include=>:artist)).map{|x| x.artist}.should == [@artist]
+    Album.array_from_xml(Album.to_xml(:include=>:artist), :associations=>:artist).map{|x| x.artist}.should == [@artist]
     Album.array_from_xml(Album.dataset.to_xml(:only=>:name)).should == [Album.load(:name=>@album.name)]
   end
 
@@ -162,16 +169,61 @@ describe "Sequel::Plugins::XmlSerializer" do
     Album.array_from_xml(Album.to_xml(:array=>[a])).should == [a]
 
     a.associations[:artist] = artist = Artist.load(:id=>3, :name=>'YJM')
-    Album.array_from_xml(Album.to_xml(:array=>[a], :include=>:artist)).first.artist.should == artist
+    Album.array_from_xml(Album.to_xml(:array=>[a], :include=>:artist), :associations=>:artist).first.artist.should == artist
 
     artist.associations[:albums] = [a]
-    x = Artist.array_from_xml(Artist.to_xml(:array=>[artist], :include=>:albums))
+    x = Artist.array_from_xml(Artist.to_xml(:array=>[artist], :include=>:albums), :associations=>:albums)
     x.should == [artist]
     x.first.albums.should == [a]
   end
 
   it "should raise an error if the dataset does not have a row_proc" do
     proc{Album.dataset.naked.to_xml}.should raise_error(Sequel::Error)
+  end
+
+  it "should have :associations option take precedence over :all_assocations" do
+    Artist.from_xml(@artist.to_xml(:include=>:albums), :associations=>[], :all_associations=>true, :fields=>[]).associations.should == {}
+  end
+
+  it "should allow overriding of :all_columns options in associated objects" do
+    Album.restrict_primary_key
+    Artist.from_xml(@artist.to_xml(:include=>:albums), :associations=>{:albums=>{:fields=>[:id, :name, :artist_id], :missing=>:raise}}, :all_columns=>true).albums
+  end
+
+  it "should allow setting columns that are restricted if :all_columns is used" do
+    Artist.restrict_primary_key
+    Artist.from_xml(@artist.to_xml, :all_columns=>true).should == @artist
+  end
+
+  it "should raise an error if using parsing empty xml" do
+    proc{Artist.from_xml("<?xml version=\"1.0\"?>\n")}.should raise_error(Sequel::Error)
+    proc{Artist.array_from_xml("<?xml version=\"1.0\"?>\n")}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if using :all_columns and non-column is in the XML" do
+    proc{Artist.from_xml("<?xml version=\"1.0\"?>\n<artist>\n  <foo>bar</foo>\n  <id>2</id>\n</artist>\n", :all_columns=>true)}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if attempting to set a restricted column and :all_columns is not used" do
+    Artist.restrict_primary_key
+    proc{Artist.from_xml(@artist.to_xml)}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if an unsupported association is passed in the :associations option" do
+    Artist.association_reflections.delete(:albums)
+    proc{Artist.from_xml(@artist.to_xml(:include=>:albums), :associations=>:albums)}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if using from_xml and XML represents an array" do
+    proc{Artist.from_xml(Artist.to_xml(:array=>[@artist]))}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if using array_from_xml and XML does not represent an array" do
+    proc{Artist.array_from_xml(@artist.to_xml)}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if using an unsupported :associations option" do
+    proc{Artist.from_xml(@artist.to_xml, :associations=>'')}.should raise_error(Sequel::Error)
   end
 end
 end

@@ -57,32 +57,54 @@ module Sequel
     #     </artist>
     #   </album>
     #
-    # In addition to creating XML, this plugin also enables Sequel::Model
-    # objects to be created by parsing XML:
-    #
-    #   xml = album.to_xml
-    #   album = Album.from_xml(xml)
-    #
-    # In addition, you can update existing model objects directly from XML
-    # using +from_xml+:
-    #
-    #   album.from_xml(xml)
-    #
-    # Additionally, +to_xml+ also exists as a class and dataset method, both
+    # +to_xml+ also exists as a class and dataset method, both
     # of which return all objects in the dataset:
     #
     #   Album.to_xml
     #   Album.filter(:artist_id=>1).to_xml(:include=>:tags)
     #
-    # Such XML can be loaded back into an array of Sequel::Model objects using
-    # +array_from_xml+:
-    #
-    #   Album.array_from_xml(Album.to_xml) # same as Album.all
-    #
     # If you have an existing array of model instances you want to convert to
     # XML, you can call the class to_xml method with the :array option:
     #
     #   Album.to_xml(:array=>[Album[1], Album[2]])
+    #
+    # In addition to creating XML, this plugin also enables Sequel::Model
+    # classes to create instances directly from XML using the from_xml class
+    # method:
+    #
+    #   xml = album.to_xml
+    #   album = Album.from_xml(xml)
+    #
+    # The array_from_xml class method exists to parse arrays of model instances
+    # from xml:
+    #
+    #   xml = Album.filter(:artist_id=>1).to_xml
+    #   albums = Album.array_from_xml(xml)
+    #
+    # These does not necessarily round trip, since doing so would let users
+    # create model objects with arbitrary values.  By default, from_xml will
+    # call set using values from the tags in the xml.  If you want to specify the allowed
+    # fields, you can use the :fields option, which will call set_fields with
+    # the given fields:
+    #
+    #   Album.from_xml(album.to_xml, :fields=>%w'id name')
+    #
+    # If you want to update an existing instance, you can use the from_xml
+    # instance method:
+    #
+    #   album.from_xml(xml)
+    #
+    # Both of these allow creation of cached associated objects, if you provide
+    # the :associations option:
+    #
+    #   album.from_xml(xml, :associations=>:artist)
+    #
+    # You can even provide options when setting up the associated objects:
+    #
+    #   album.from_xml(xml, :associations=>{:artist=>{:fields=>%w'id name', :associations=>:tags}})
+    #
+    # If the xml is trusted and should be allowed to set all column and association
+    # values, you can use the :all_columns and :all_associations options.
     #
     # Usage:
     #
@@ -109,7 +131,11 @@ module Sequel
         # Return an array of instances of this class based on
         # the provided XML.
         def array_from_xml(xml, opts={})
-          Nokogiri::XML(xml).children.first.children.reject{|c| c.is_a?(Nokogiri::XML::Text)}.map{|c| from_xml_node(c, opts)}
+          node = Nokogiri::XML(xml).children.first
+          unless node 
+            raise Error, "Malformed XML used"
+          end
+          node.children.reject{|c| c.is_a?(Nokogiri::XML::Text)}.map{|c| from_xml_node(c, opts)}
         end
 
         # Return an instance of this class based on the provided
@@ -193,30 +219,107 @@ module Sequel
 
         # Update the contents of this instance based on the given 
         # XML node, which should be a Nokogiri::XML::Node instance.
+        # By default, just calls set with a hash created from the content of the node.
+        # 
+        # Options:
+        # :all_associations :: Indicates that all associations supported by the model should be tried.
+        #                      This option also cascades to associations if used. It is better to use the
+        #                      :associations option instead of this option. This option only exists for
+        #                      backwards compatibility.
+        # :all_columns :: Overrides the setting logic allowing all setter methods be used,
+        #                 even if access to the setter method is restricted.
+        #                 This option cascades to associations if used, and can be reset in those associations
+        #                 using the :all_columns=>false or :fields options.  This option is considered a
+        #                 security risk, and only exists for backwards compatibility.  It is better to use
+        #                 the :fields option appropriately instead of this option, or no option at all.
+        # :associations :: Indicates that the associations cache should be updated by creating
+        #                  a new associated object using data from the hash.  Should be a Symbol
+        #                  for a single association, an array of symbols for multiple associations,
+        #                  or a hash with symbol keys and dependent association option hash values.
+        # :fields :: Changes the behavior to call set_fields using the provided fields, instead of calling set.
         def from_xml_node(parent, opts={})
-          cols = model.columns.map{|x| x.to_s}
-          assocs = {}
-          model.associations.map{|x| assocs[x.to_s] = model.association_reflection(x)}
-          meths = send(:setter_methods, nil, nil)
+          unless parent
+            raise Error, "Malformed XML used"
+          end
+          if !parent.children.empty? && parent.children.all?{|node| node.is_a?(Nokogiri::XML::Text)}
+            raise Error, "XML consisting of just text nodes used"
+          end
+
+          unless assocs = opts[:associations]
+            if opts[:all_associations]
+              assocs = {}
+              model.associations.each{|v| assocs[v] = {:all_associations=>true}}
+            end
+          end
+
+          if assocs
+            assocs = case assocs
+            when Symbol
+              {assocs=>{}}
+            when Array
+              assocs_tmp = {}
+              assocs.each{|v| assocs_tmp[v] = {}}
+              assocs_tmp
+            when Hash
+              assocs
+            else
+              raise Error, ":associations should be Symbol, Array, or Hash if present"
+            end
+
+            if opts[:all_columns]
+              assocs.each_value do |assoc_opts|
+                assoc_opts[:all_columns] = true unless assoc_opts.has_key?(:fields) || assoc_opts.has_key?(:all_columns)
+              end
+            end
+
+            assocs_hash = {}
+            assocs.each{|k,v| assocs_hash[k.to_s] = v}
+            assocs_present = []
+          end
+
+          hash = {}
           name_proc = model.xml_deserialize_name_proc(opts)
           parent.children.each do |node|
             next if node.is_a?(Nokogiri::XML::Text)
             k = name_proc[node.name]
-            if ar = assocs[k]
-              klass = ar.associated_class
-              associations[k.to_sym] = if ar.returns_array?
-                node.children.reject{|c| c.is_a?(Nokogiri::XML::Text)}.map{|c| klass.from_xml_node(c)}
-              else
-                klass.from_xml_node(node)
-              end
-            elsif cols.include?(k)
-              self[k.to_sym] = node.key?('nil') ? nil : node.children.first.to_s
-            elsif meths.include?("#{k}=")
-              send("#{k}=", node.key?('nil') ? nil : node.children.first.to_s)
+            if assocs_hash && (assoc = assocs_hash[k])
+              assocs_present << [k.to_sym, node]
             else
-              raise Error, "Entry in XML not an association or column and no setter method exists: #{k}"
+              hash[k] = node.key?('nil') ? nil : node.children.first.to_s
             end
           end
+
+          if assocs_present
+            assocs_present.each do |assoc, node|
+              assoc_opts = assocs[assoc]
+
+              unless r = model.association_reflection(assoc)
+                raise Error, "Association #{assoc} is not defined for #{model}"
+              end
+
+              associations[assoc] = if r.returns_array?
+                node.children.reject{|c| c.is_a?(Nokogiri::XML::Text)}.map{|c| r.associated_class.from_xml_node(c, assoc_opts)}
+              else
+                r.associated_class.from_xml_node(node, assoc_opts)
+              end
+            end
+          end
+
+          if fields = opts[:fields]
+            set_fields(hash, fields, opts)
+          elsif opts[:all_columns]
+            meths = methods.collect{|x| x.to_s}.grep(Model::SETTER_METHOD_REGEXP) - Model::RESTRICTED_SETTER_METHODS
+            hash.each do |k, v|
+              if meths.include?(setter_meth = "#{k}=")
+                send(setter_meth, v)
+              else
+                raise Error, "Entry in XML does not have a matching setter method: #{k}"
+              end
+            end
+          else
+            set(hash)
+          end
+
           self
         end
 
