@@ -164,17 +164,6 @@ module Sequel
       BOOL_FALSE = '0'.freeze
       BOOL_TRUE = '1'.freeze
 
-      def complex_expression_sql_append(sql, op, args)
-        case op
-        when :ILIKE
-          super(sql, :LIKE, [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1))])
-        when :"NOT ILIKE"
-          super(sql, :"NOT LIKE", [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1))])
-        else
-          super
-        end
-      end
-
       def supports_join_using?
         false
       end

@@ -252,14 +252,8 @@ module Sequel
         end
       end
 
-      # Handle DB2 specific LIKE and bitwise operator support, and
-      # emulate the extract method, which DB2 doesn't natively support.
       def complex_expression_sql_append(sql, op, args)
         case op
-        when :ILIKE
-          super(sql, :LIKE, [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
-        when :"NOT ILIKE"
-          super(sql, :"NOT LIKE", [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1)) ])
         when :&, :|, :^
           # works with db2 v9.5 and after
           op = BITWISE_METHOD_MAP[op]

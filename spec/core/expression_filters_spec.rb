@@ -381,7 +381,7 @@ describe "Blockless Ruby Filters" do
     @d.lit(d.desc).should == '(SELECT a FROM items) DESC'
 
     @d.lit(d.like(:b)).should == '((SELECT a FROM items) LIKE b ESCAPE \'\\\')'
-    @d.lit(d.ilike(:b)).should == '((SELECT a FROM items) ILIKE b ESCAPE \'\\\')'
+    @d.lit(d.ilike(:b)).should == '(UPPER((SELECT a FROM items)) LIKE UPPER(b) ESCAPE \'\\\')'
   end
 
   it "should handled emulated char_length function" do
@@ -788,10 +788,10 @@ describe "Sequel core extension replacements" do
   end
 
   it "Sequel.ilike should use an ILIKE expression" do
-    l(Sequel.ilike('a', 'b'), "('a' ILIKE 'b' ESCAPE '\\')")
-    l(Sequel.ilike(:a, :b), "(a ILIKE b ESCAPE '\\')")
+    l(Sequel.ilike('a', 'b'), "(UPPER('a') LIKE UPPER('b') ESCAPE '\\')")
+    l(Sequel.ilike(:a, :b), "(UPPER(a) LIKE UPPER(b) ESCAPE '\\')")
     l(Sequel.ilike(:a, /b/), "(a ~* 'b')")
-    l(Sequel.ilike(:a, 'c', /b/), "((a ILIKE 'c' ESCAPE '\\') OR (a ~* 'b'))")
+    l(Sequel.ilike(:a, 'c', /b/), "((UPPER(a) LIKE UPPER('c') ESCAPE '\\') OR (a ~* 'b'))")
   end
 
   it "Sequel.subscript should use an SQL subscript" do

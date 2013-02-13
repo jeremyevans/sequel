@@ -209,13 +209,8 @@ module Sequel
           end
         end
 
-        # Handle Derby specific LIKE, extract, and some bitwise compliment support.
         def complex_expression_sql_append(sql, op, args)
           case op
-          when :ILIKE
-            super(sql, :LIKE, [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1))])
-          when :"NOT ILIKE"
-            super(sql, :"NOT LIKE", [SQL::Function.new(:upper, args.at(0)), SQL::Function.new(:upper, args.at(1))])
           when :%
             sql << complex_expression_arg_pairs(args){|a, b| "MOD(#{literal(a)}, #{literal(b)})"}
           when :&, :|, :^, :<<, :>>

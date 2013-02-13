@@ -1033,6 +1033,8 @@ module Sequel
       PAREN_OPEN = Dataset::PAREN_OPEN
       PAREN_CLOSE = Dataset::PAREN_CLOSE
       COMMA = Dataset::COMMA
+      ESCAPE = Dataset::ESCAPE
+      BACKSLASH = Dataset::BACKSLASH
       AS = Dataset::AS
       XOR_OP = ' # '.freeze
       CRLF = "\r\n".freeze
@@ -1065,7 +1067,8 @@ module Sequel
       end
 
       # Handle converting the ruby xor operator (^) into the
-      # PostgreSQL xor operator (#).
+      # PostgreSQL xor operator (#), and use the ILIKE and NOT ILIKE
+      # operators.
       def complex_expression_sql_append(sql, op, args)
         case op
         when :^
@@ -1076,6 +1079,14 @@ module Sequel
             literal_append(sql, a)
             c ||= true
           end
+        when :ILIKE, :'NOT ILIKE'
+          sql << PAREN_OPEN
+          literal_append(sql, args.at(0))
+          sql << SPACE << op.to_s << SPACE
+          literal_append(sql, args.at(1))
+          sql << ESCAPE
+          literal_append(sql, BACKSLASH)
+          sql << PAREN_CLOSE
         else
           super
         end

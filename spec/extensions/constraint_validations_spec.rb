@@ -247,7 +247,7 @@ describe "constraint_validations extension" do
     @db.create_table(:foo){String :name; validate{ilike 'foo%', :name}}
     sqls = @db.sqls
     parse_insert(sqls.slice!(1)).should == {:validation_type=>"ilike", :column=>"name", :table=>"foo", :argument=>'foo%'}
-    sqls.should == ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name ILIKE 'foo%' ESCAPE '\\')))"]
+    sqls.should == ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (UPPER(name) LIKE UPPER('foo%') ESCAPE '\\')))"]
   end
 
   it "should support :unique constraint validation" do

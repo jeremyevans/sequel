@@ -94,6 +94,7 @@ module Sequel
       PAREN_OPEN = Dataset::PAREN_OPEN
       INTO = Dataset::INTO
       FROM = Dataset::FROM
+      SPACE = Dataset::SPACE
       NOT_EQUAL = ' <> '.freeze
       OPS = {:'%'=>' Mod '.freeze, :'||'=>' & '.freeze}
       BOOL_FALSE = '0'.freeze
@@ -125,9 +126,15 @@ module Sequel
       def complex_expression_sql_append(sql, op, args)
         case op
         when :ILIKE
-          super(sql, :LIKE, args)
+          complex_expression_sql_append(sql, :LIKE, args)
         when :'NOT ILIKE'
-          super(sql, :'NOT LIKE', args)
+          complex_expression_sql_append(sql, :'NOT LIKE', args)
+        when :LIKE, :'NOT LIKE'
+          sql << PAREN_OPEN
+          literal_append(sql, args.at(0))
+          sql << SPACE << op.to_s << SPACE
+          literal_append(sql, args.at(1))
+          sql << PAREN_CLOSE
         when :'!='
           sql << PAREN_OPEN
           literal_append(sql, args.at(0))
@@ -220,11 +227,6 @@ module Sequel
       end
       
       private
-
-      # Access doesn't support the ESCAPE caluse when escaping.
-      def like_uses_escape?
-        false
-      end
 
       # Access uses # to quote dates
       def literal_date(d)

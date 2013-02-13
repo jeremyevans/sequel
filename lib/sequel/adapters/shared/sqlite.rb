@@ -496,13 +496,10 @@ module Sequel
         end
       end
 
-      # SQLite is case insensitive (depending on pragma), so use LIKE for ILIKE.
-      # It also doesn't support a NOT LIKE b, you need to use NOT (a LIKE b).
+      # SQLite doesn't support a NOT LIKE b, you need to use NOT (a LIKE b).
       # It doesn't support xor or the extract function natively, so those have to be emulated.
       def complex_expression_sql_append(sql, op, args)
         case op
-        when :ILIKE
-          super(sql, :LIKE, args.map{|a| SQL::Function.new(:upper, a)})
         when :"NOT LIKE", :"NOT ILIKE"
           sql << NOT_SPACE
           complex_expression_sql_append(sql, (op == :"NOT ILIKE" ? :ILIKE : :LIKE), args)

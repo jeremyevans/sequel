@@ -85,19 +85,19 @@ describe "Core refinements" do
   end
 
   it "should support ILIKE via Symbol#ilike" do
-    @d.l(:x.ilike('a')).should == '(x ILIKE \'a\' ESCAPE \'\\\')'
+    @d.l(:x.ilike('a')).should == '(UPPER(x) LIKE UPPER(\'a\') ESCAPE \'\\\')'
     @d.l(:x.ilike(/a/)).should == '(x ~* \'a\')'
-    @d.l(:x.ilike('a', 'b')).should == '((x ILIKE \'a\' ESCAPE \'\\\') OR (x ILIKE \'b\' ESCAPE \'\\\'))'
+    @d.l(:x.ilike('a', 'b')).should == '((UPPER(x) LIKE UPPER(\'a\') ESCAPE \'\\\') OR (UPPER(x) LIKE UPPER(\'b\') ESCAPE \'\\\'))'
     @d.l(:x.ilike(/a/, /b/i)).should == '((x ~* \'a\') OR (x ~* \'b\'))'
-    @d.l(:x.ilike('a', /b/)).should == '((x ILIKE \'a\' ESCAPE \'\\\') OR (x ~* \'b\'))'
+    @d.l(:x.ilike('a', /b/)).should == '((UPPER(x) LIKE UPPER(\'a\') ESCAPE \'\\\') OR (x ~* \'b\'))'
   end
 
   it "should support NOT ILIKE via Symbol#ilike and Symbol#~" do
-    @d.l(~:x.ilike('a')).should == '(x NOT ILIKE \'a\' ESCAPE \'\\\')'
+    @d.l(~:x.ilike('a')).should == '(UPPER(x) NOT LIKE UPPER(\'a\') ESCAPE \'\\\')'
     @d.l(~:x.ilike(/a/)).should == '(x !~* \'a\')'
-    @d.l(~:x.ilike('a', 'b')).should == '((x NOT ILIKE \'a\' ESCAPE \'\\\') AND (x NOT ILIKE \'b\' ESCAPE \'\\\'))'
+    @d.l(~:x.ilike('a', 'b')).should == '((UPPER(x) NOT LIKE UPPER(\'a\') ESCAPE \'\\\') AND (UPPER(x) NOT LIKE UPPER(\'b\') ESCAPE \'\\\'))'
     @d.l(~:x.ilike(/a/, /b/i)).should == '((x !~* \'a\') AND (x !~* \'b\'))'
-    @d.l(~:x.ilike('a', /b/)).should == '((x NOT ILIKE \'a\' ESCAPE \'\\\') AND (x !~* \'b\'))'
+    @d.l(~:x.ilike('a', /b/)).should == '((UPPER(x) NOT LIKE UPPER(\'a\') ESCAPE \'\\\') AND (x !~* \'b\'))'
   end
 
   it "should support sql_expr on arrays with all two pairs" do

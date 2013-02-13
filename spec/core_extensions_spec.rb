@@ -131,16 +131,16 @@ describe "Core extensions" do
   end
 
   it "should support ILIKE via Symbol#ilike" do
-    @d.l(:x.ilike('a')).should == '(x ILIKE \'a\' ESCAPE \'\\\')'
+    @d.l(:x.ilike('a')).should == '(UPPER(x) LIKE UPPER(\'a\') ESCAPE \'\\\')'
     @d.l(:x.ilike(/a/)).should == '(x ~* \'a\')'
-    @d.l(:x.ilike('a', 'b')).should == '((x ILIKE \'a\' ESCAPE \'\\\') OR (x ILIKE \'b\' ESCAPE \'\\\'))'
+    @d.l(:x.ilike('a', 'b')).should == '((UPPER(x) LIKE UPPER(\'a\') ESCAPE \'\\\') OR (UPPER(x) LIKE UPPER(\'b\') ESCAPE \'\\\'))'
     @d.l(:x.ilike(/a/, /b/i)).should == '((x ~* \'a\') OR (x ~* \'b\'))'
-    @d.l(:x.ilike('a', /b/)).should == '((x ILIKE \'a\' ESCAPE \'\\\') OR (x ~* \'b\'))'
+    @d.l(:x.ilike('a', /b/)).should == '((UPPER(x) LIKE UPPER(\'a\') ESCAPE \'\\\') OR (x ~* \'b\'))'
 
-    @d.l('a'.ilike(:x)).should == "('a' ILIKE x ESCAPE '\\')"
-    @d.l('a'.ilike(:x, 'b')).should == "(('a' ILIKE x ESCAPE '\\') OR ('a' ILIKE 'b' ESCAPE '\\'))"
-    @d.l('a'.ilike(:x, /b/)).should == "(('a' ILIKE x ESCAPE '\\') OR ('a' ~* 'b'))"
-    @d.l('a'.ilike(:x, /b/i)).should == "(('a' ILIKE x ESCAPE '\\') OR ('a' ~* 'b'))"
+    @d.l('a'.ilike(:x)).should == "(UPPER('a') LIKE UPPER(x) ESCAPE '\\')"
+    @d.l('a'.ilike(:x, 'b')).should == "((UPPER('a') LIKE UPPER(x) ESCAPE '\\') OR (UPPER('a') LIKE UPPER('b') ESCAPE '\\'))"
+    @d.l('a'.ilike(:x, /b/)).should == "((UPPER('a') LIKE UPPER(x) ESCAPE '\\') OR ('a' ~* 'b'))"
+    @d.l('a'.ilike(:x, /b/i)).should == "((UPPER('a') LIKE UPPER(x) ESCAPE '\\') OR ('a' ~* 'b'))"
 
     @d.l(/a/.ilike(:x)).should == "('a' ~* x)"
     @d.l(/a/.ilike(:x, 'b')).should == "(('a' ~* x) OR ('a' ~* 'b'))"
@@ -154,16 +154,16 @@ describe "Core extensions" do
   end
 
   it "should support NOT ILIKE via Symbol#ilike and Symbol#~" do
-    @d.l(~:x.ilike('a')).should == '(x NOT ILIKE \'a\' ESCAPE \'\\\')'
+    @d.l(~:x.ilike('a')).should == '(UPPER(x) NOT LIKE UPPER(\'a\') ESCAPE \'\\\')'
     @d.l(~:x.ilike(/a/)).should == '(x !~* \'a\')'
-    @d.l(~:x.ilike('a', 'b')).should == '((x NOT ILIKE \'a\' ESCAPE \'\\\') AND (x NOT ILIKE \'b\' ESCAPE \'\\\'))'
+    @d.l(~:x.ilike('a', 'b')).should == '((UPPER(x) NOT LIKE UPPER(\'a\') ESCAPE \'\\\') AND (UPPER(x) NOT LIKE UPPER(\'b\') ESCAPE \'\\\'))'
     @d.l(~:x.ilike(/a/, /b/i)).should == '((x !~* \'a\') AND (x !~* \'b\'))'
-    @d.l(~:x.ilike('a', /b/)).should == '((x NOT ILIKE \'a\' ESCAPE \'\\\') AND (x !~* \'b\'))'
+    @d.l(~:x.ilike('a', /b/)).should == '((UPPER(x) NOT LIKE UPPER(\'a\') ESCAPE \'\\\') AND (x !~* \'b\'))'
 
-    @d.l(~'a'.ilike(:x)).should == "('a' NOT ILIKE x ESCAPE '\\')"
-    @d.l(~'a'.ilike(:x, 'b')).should == "(('a' NOT ILIKE x ESCAPE '\\') AND ('a' NOT ILIKE 'b' ESCAPE '\\'))"
-    @d.l(~'a'.ilike(:x, /b/)).should == "(('a' NOT ILIKE x ESCAPE '\\') AND ('a' !~* 'b'))"
-    @d.l(~'a'.ilike(:x, /b/i)).should == "(('a' NOT ILIKE x ESCAPE '\\') AND ('a' !~* 'b'))"
+    @d.l(~'a'.ilike(:x)).should == "(UPPER('a') NOT LIKE UPPER(x) ESCAPE '\\')"
+    @d.l(~'a'.ilike(:x, 'b')).should == "((UPPER('a') NOT LIKE UPPER(x) ESCAPE '\\') AND (UPPER('a') NOT LIKE UPPER('b') ESCAPE '\\'))"
+    @d.l(~'a'.ilike(:x, /b/)).should == "((UPPER('a') NOT LIKE UPPER(x) ESCAPE '\\') AND ('a' !~* 'b'))"
+    @d.l(~'a'.ilike(:x, /b/i)).should == "((UPPER('a') NOT LIKE UPPER(x) ESCAPE '\\') AND ('a' !~* 'b'))"
 
     @d.l(~/a/.ilike(:x)).should == "('a' !~* x)"
     @d.l(~/a/.ilike(:x, 'b')).should == "(('a' !~* x) AND ('a' !~* 'b'))"

@@ -125,7 +125,7 @@ module Sequel
         def complex_expression_sql_append(sql, op, args)
           case op
           when :ILIKE, :"NOT ILIKE"
-            super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), [SQL::Function.new(:ucase, args.at(0)), SQL::Function.new(:ucase, args.at(1)) ])
+            super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args.map{|v| SQL::Function.new(:ucase, v)})
           when :&, :|, :^
             op = BITWISE_METHOD_MAP[op]
             sql << complex_expression_arg_pairs(args){|a, b| literal(SQL::Function.new(op, a, b))}

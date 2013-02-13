@@ -458,16 +458,16 @@ module Sequel
           literal_append(sql, vals)
           sql << PAREN_CLOSE
         end
-      when *LIKE_OPERATORS
+      when :LIKE, :'NOT LIKE'
         sql << PAREN_OPEN
         literal_append(sql, args.at(0))
         sql << SPACE << op.to_s << SPACE
         literal_append(sql, args.at(1))
-        if like_uses_escape?
-          sql << ESCAPE
-          literal_append(sql, BACKSLASH)
-        end
+        sql << ESCAPE
+        literal_append(sql, BACKSLASH)
         sql << PAREN_CLOSE
+      when :ILIKE, :'NOT ILIKE'
+        complex_expression_sql_append(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args.map{|v| Sequel.function(:UPPER, v)})
       when *TWO_ARITY_OPERATORS
         if REGEXP_OPERATORS.include?(op) && !supports_regexp?
           raise InvalidOperation, "Pattern matching via regular expressions is not supported on #{db.database_type}"

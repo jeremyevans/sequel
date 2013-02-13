@@ -3223,7 +3223,7 @@ describe "Dataset#grep" do
   end
   
   specify "should support the :case_insensitive option" do
-    @ds.grep([:title, :body], ['abc', 'def'], :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE ((title ILIKE 'abc' ESCAPE '\\') OR (title ILIKE 'def' ESCAPE '\\') OR (body ILIKE 'abc' ESCAPE '\\') OR (body ILIKE 'def' ESCAPE '\\'))"
+    @ds.grep([:title, :body], ['abc', 'def'], :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE ((UPPER(title) LIKE UPPER('abc') ESCAPE '\\') OR (UPPER(title) LIKE UPPER('def') ESCAPE '\\') OR (UPPER(body) LIKE UPPER('abc') ESCAPE '\\') OR (UPPER(body) LIKE UPPER('def') ESCAPE '\\'))"
   end
   
   specify "should support the :all_patterns and :all_columns options together" do
@@ -3231,15 +3231,15 @@ describe "Dataset#grep" do
   end
   
   specify "should support the :all_patterns and :case_insensitive options together" do
-    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE (((title ILIKE 'abc' ESCAPE '\\') OR (body ILIKE 'abc' ESCAPE '\\')) AND ((title ILIKE 'def' ESCAPE '\\') OR (body ILIKE 'def' ESCAPE '\\')))"
+    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE (((UPPER(title) LIKE UPPER('abc') ESCAPE '\\') OR (UPPER(body) LIKE UPPER('abc') ESCAPE '\\')) AND ((UPPER(title) LIKE UPPER('def') ESCAPE '\\') OR (UPPER(body) LIKE UPPER('def') ESCAPE '\\')))"
   end
   
   specify "should support the :all_columns and :case_insensitive options together" do
-    @ds.grep([:title, :body], ['abc', 'def'], :all_columns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE (((title ILIKE 'abc' ESCAPE '\\') OR (title ILIKE 'def' ESCAPE '\\')) AND ((body ILIKE 'abc' ESCAPE '\\') OR (body ILIKE 'def' ESCAPE '\\')))"
+    @ds.grep([:title, :body], ['abc', 'def'], :all_columns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE (((UPPER(title) LIKE UPPER('abc') ESCAPE '\\') OR (UPPER(title) LIKE UPPER('def') ESCAPE '\\')) AND ((UPPER(body) LIKE UPPER('abc') ESCAPE '\\') OR (UPPER(body) LIKE UPPER('def') ESCAPE '\\')))"
   end
   
   specify "should support the :all_patterns, :all_columns, and :case_insensitive options together" do
-    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :all_columns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE ((title ILIKE 'abc' ESCAPE '\\') AND (body ILIKE 'abc' ESCAPE '\\') AND (title ILIKE 'def' ESCAPE '\\') AND (body ILIKE 'def' ESCAPE '\\'))"
+    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :all_columns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE ((UPPER(title) LIKE UPPER('abc') ESCAPE '\\') AND (UPPER(body) LIKE UPPER('abc') ESCAPE '\\') AND (UPPER(title) LIKE UPPER('def') ESCAPE '\\') AND (UPPER(body) LIKE UPPER('def') ESCAPE '\\'))"
   end
 
   specify "should not support regexps if the database doesn't supports it" do

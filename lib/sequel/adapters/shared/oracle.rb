@@ -233,12 +233,6 @@ module Sequel
       FROM = Dataset::FROM
       BITCOMP_OPEN = "((0 - ".freeze
       BITCOMP_CLOSE = ") - 1)".freeze
-      ILIKE_0 = "(UPPER(".freeze
-      ILIKE_1 = ") ".freeze
-      ILIKE_2 = ' UPPER('.freeze
-      ILIKE_3 = "))".freeze
-      LIKE = 'LIKE'.freeze
-      NOT_LIKE = 'NOT LIKE'.freeze
       TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'".freeze
       TIMESTAMP_OFFSET_FORMAT = "%+03i:%02i".freeze
       BOOL_FALSE = "'N'".freeze
@@ -246,7 +240,6 @@ module Sequel
       HSTAR = "H*".freeze
       DUAL = ['DUAL'.freeze].freeze
 
-      # Oracle needs to emulate bitwise operators and ILIKE/NOT ILIKE operators.
       def complex_expression_sql_append(sql, op, args)
         case op
         when :&
@@ -265,14 +258,6 @@ module Sequel
           sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / power(2, #{literal b}))"}
         when :%
           sql << complex_expression_arg_pairs(args){|a, b| "MOD(#{literal(a)}, #{literal(b)})"}
-        when :ILIKE, :'NOT ILIKE'
-          sql << ILIKE_0
-          literal_append(sql, args.at(0))
-          sql << ILIKE_1
-          sql << (op == :ILIKE ? LIKE : NOT_LIKE)
-          sql<< ILIKE_2
-          literal_append(sql, args.at(1))
-          sql << ILIKE_3
         else
           super
         end
