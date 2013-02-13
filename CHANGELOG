@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#escape_like, for escaping LIKE metacharacters (jeremyevans) (#614)
+
 * The LIKE operators now use an explicit ESCAPE '\' clause for similar behavior across databases (jeremyevans)
 
 * Make Database#tables and #views accept a :qualify option on PostgreSQL to return qualified identifiers (jeremyevans)

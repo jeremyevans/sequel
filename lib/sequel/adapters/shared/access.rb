@@ -183,6 +183,11 @@ module Sequel
         end
       end
       
+      # Access uses [] to escape metacharacters, instead of backslashes.
+      def escape_like(string)
+        string.gsub(/[\\*#?\[]/){|m| "[#{m}]"}
+      end
+   
       # Specify a table for a SELECT ... INTO query.
       def into(table)
         clone(:into => table)

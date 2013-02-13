@@ -490,6 +490,11 @@ module Sequel
         mutation_method(:disable_insert_output)
       end
 
+      # MSSQL treats [] as a metacharacter in LIKE expresions.
+      def escape_like(string)
+        string.gsub(/[\\%_\[\]]/){|m| "\\#{m}"}
+      end
+   
       # There is no function on Microsoft SQL Server that does character length
       # and respects trailing spaces (datalength respects trailing spaces, but
       # counts bytes instead of characters).  Use a hack to work around the

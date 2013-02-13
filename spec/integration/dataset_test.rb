@@ -1464,6 +1464,34 @@ describe "Dataset string methods" do
     @ds.exclude(Sequel.expr(:a).ilike('FOO', 'BAR')).all.should == []
   end
   
+  it "#escape_like should escape any metacharacters" do
+    @ds.insert('foo', 'bar')
+    @ds.insert('foo.', 'bar..')
+    @ds.insert('foo\\..', 'bar\\..')
+    @ds.insert('foo\\_', 'bar\\%')
+    @ds.insert('foo_', 'bar%')
+    @ds.insert('foo_.', 'bar%.')
+    @ds.insert('foo_..', 'bar%..')
+    @ds.insert('[f#*?oo_]', '[bar%]')
+    @ds.filter(Sequel.expr(:a).like(@ds.escape_like('foo_'))).select_order_map(:a).should == ['foo_']
+    @ds.filter(Sequel.expr(:b).like(@ds.escape_like('bar%'))).select_order_map(:b).should == ['bar%']
+    @ds.filter(Sequel.expr(:a).like(@ds.escape_like('foo\\_'))).select_order_map(:a).should == ['foo\\_']
+    @ds.filter(Sequel.expr(:b).like(@ds.escape_like('bar\\%'))).select_order_map(:b).should == ['bar\\%']
+    @ds.filter(Sequel.expr(:a).like(@ds.escape_like('[f#*?oo_]'))).select_order_map(:a).should == ['[f#*?oo_]']
+    @ds.filter(Sequel.expr(:b).like(@ds.escape_like('[bar%]'))).select_order_map(:b).should == ['[bar%]']
+    @ds.filter(Sequel.expr(:b).like("#{@ds.escape_like('bar%')}_")).select_order_map(:b).should == ['bar%.']
+    @ds.filter(Sequel.expr(:b).like("#{@ds.escape_like('bar%')}%")).select_order_map(:b).should == ['bar%', 'bar%.', 'bar%..']
+
+    @ds.filter(Sequel.expr(:a).ilike(@ds.escape_like('Foo_'))).select_order_map(:a).should == ['foo_']
+    @ds.filter(Sequel.expr(:b).ilike(@ds.escape_like('Bar%'))).select_order_map(:b).should == ['bar%']
+    @ds.filter(Sequel.expr(:a).ilike(@ds.escape_like('Foo\\_'))).select_order_map(:a).should == ['foo\\_']
+    @ds.filter(Sequel.expr(:b).ilike(@ds.escape_like('Bar\\%'))).select_order_map(:b).should == ['bar\\%']
+    @ds.filter(Sequel.expr(:a).ilike(@ds.escape_like('[F#*?oo_]'))).select_order_map(:a).should == ['[f#*?oo_]']
+    @ds.filter(Sequel.expr(:b).ilike(@ds.escape_like('[Bar%]'))).select_order_map(:b).should == ['[bar%]']
+    @ds.filter(Sequel.expr(:b).ilike("#{@ds.escape_like('Bar%')}_")).select_order_map(:b).should == ['bar%.']
+    @ds.filter(Sequel.expr(:b).ilike("#{@ds.escape_like('Bar%')}%")).select_order_map(:b).should == ['bar%', 'bar%.', 'bar%..']
+  end
+  
   if INTEGRATION_DB.dataset.supports_regexp?
     it "#like with regexp return matching rows" do
       @ds.insert('foo', 'bar')

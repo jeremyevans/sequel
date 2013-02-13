@@ -4613,3 +4613,13 @@ describe "Dataset#paged_each" do
   end
 end
 
+describe "Dataset#escape_like" do
+  before do
+    @ds = Sequel.mock[:test]
+  end
+
+  it "should escape % and _ and \\ characters" do
+    @ds.escape_like("foo\\%_bar").should == "foo\\\\\\%\\_bar"
+  end
+end
+

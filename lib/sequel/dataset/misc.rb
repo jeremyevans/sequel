@@ -49,6 +49,15 @@ module Sequel
     def each_server
       db.servers.each{|s| yield server(s)}
     end
+
+    # Returns the string with the LIKE metacharacters (% and _) escaped.
+    # Useful for when the LIKE term is a user-provided string where metacharacters should not
+    # be recognized. Example:
+    #
+    #   ds.escape_like("foo\\%_") # 'foo\\\%\_'
+    def escape_like(string)
+      string.gsub(/[\\%_]/){|m| "\\#{m}"}
+    end
    
     # Alias of +first_source_alias+
     def first_source
