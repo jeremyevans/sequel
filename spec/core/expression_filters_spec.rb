@@ -96,9 +96,9 @@ describe "Blockless Ruby Filters" do
     @d.lit(Sequel.expr(:x) - ~Sequel.expr(:y)).should == '(x - NOT y)'
     @d.lit(Sequel.expr(:x) / (Sequel.expr(:y) & :z)).should == '(x / (y AND z))'
     @d.lit(Sequel.expr(:x) * (Sequel.expr(:y) | :z)).should == '(x * (y OR z))'
-    @d.lit(Sequel.expr(:x) + Sequel.expr(:y).like('a')).should == "(x + (y LIKE 'a'))"
-    @d.lit(Sequel.expr(:x) - ~Sequel.expr(:y).like('a')).should == "(x - (y NOT LIKE 'a'))"
-    @d.lit(Sequel.join([:x, ~Sequel.expr(:y).like('a')])).should == "(x || (y NOT LIKE 'a'))"
+    @d.lit(Sequel.expr(:x) + Sequel.expr(:y).like('a')).should == "(x + (y LIKE 'a' ESCAPE '\\'))"
+    @d.lit(Sequel.expr(:x) - ~Sequel.expr(:y).like('a')).should == "(x - (y NOT LIKE 'a' ESCAPE '\\'))"
+    @d.lit(Sequel.join([:x, ~Sequel.expr(:y).like('a')])).should == "(x || (y NOT LIKE 'a' ESCAPE '\\'))"
   end
 
   it "should support AND conditions via &" do
@@ -143,7 +143,7 @@ describe "Blockless Ruby Filters" do
     @d.l(Sequel.expr(Sequel.lit('y') => Sequel.lit('z')) & Sequel.lit('x')).should == '((y = z) AND x)'
     @d.l((Sequel.lit('x') > 200) & (Sequel.lit('y') < 200)).should == '((x > 200) AND (y < 200))'
     @d.l(~(Sequel.lit('x') + 1 > 100)).should == '((x + 1) <= 100)'
-    @d.l(Sequel.lit('x').like('a')).should == '(x LIKE \'a\')'
+    @d.l(Sequel.lit('x').like('a')).should == '(x LIKE \'a\' ESCAPE \'\\\')'
     @d.l(Sequel.lit('x') + 1 > 100).should == '((x + 1) > 100)'
     @d.l((Sequel.lit('x') * :y) < 100.01).should == '((x * y) < 100.01)'
     @d.l((Sequel.lit('x') - Sequel.expr(:y)/2) >= 100000000000000000000000000000000000).should == '((x - (y / 2)) >= 100000000000000000000000000000000000)'
@@ -380,8 +380,8 @@ describe "Blockless Ruby Filters" do
     @d.lit(d.asc).should == '(SELECT a FROM items) ASC'
     @d.lit(d.desc).should == '(SELECT a FROM items) DESC'
 
-    @d.lit(d.like(:b)).should == '((SELECT a FROM items) LIKE b)'
-    @d.lit(d.ilike(:b)).should == '((SELECT a FROM items) ILIKE b)'
+    @d.lit(d.like(:b)).should == '((SELECT a FROM items) LIKE b ESCAPE \'\\\')'
+    @d.lit(d.ilike(:b)).should == '((SELECT a FROM items) ILIKE b ESCAPE \'\\\')'
   end
 
   it "should handled emulated char_length function" do
@@ -781,17 +781,17 @@ describe "Sequel core extension replacements" do
   end
 
   it "Sequel.like should use a LIKE expression" do
-    l(Sequel.like('a', 'b'), "('a' LIKE 'b')")
-    l(Sequel.like(:a, :b), "(a LIKE b)")
+    l(Sequel.like('a', 'b'), "('a' LIKE 'b' ESCAPE '\\')")
+    l(Sequel.like(:a, :b), "(a LIKE b ESCAPE '\\')")
     l(Sequel.like(:a, /b/), "(a ~ 'b')")
-    l(Sequel.like(:a, 'c', /b/), "((a LIKE 'c') OR (a ~ 'b'))")
+    l(Sequel.like(:a, 'c', /b/), "((a LIKE 'c' ESCAPE '\\') OR (a ~ 'b'))")
   end
 
   it "Sequel.ilike should use an ILIKE expression" do
-    l(Sequel.ilike('a', 'b'), "('a' ILIKE 'b')")
-    l(Sequel.ilike(:a, :b), "(a ILIKE b)")
+    l(Sequel.ilike('a', 'b'), "('a' ILIKE 'b' ESCAPE '\\')")
+    l(Sequel.ilike(:a, :b), "(a ILIKE b ESCAPE '\\')")
     l(Sequel.ilike(:a, /b/), "(a ~* 'b')")
-    l(Sequel.ilike(:a, 'c', /b/), "((a ILIKE 'c') OR (a ~* 'b'))")
+    l(Sequel.ilike(:a, 'c', /b/), "((a ILIKE 'c' ESCAPE '\\') OR (a ~* 'b'))")
   end
 
   it "Sequel.subscript should use an SQL subscript" do
@@ -913,7 +913,7 @@ describe "Sequel::SQL::Wrapper" do
     @ds.literal(s & true).should == "(foo AND 't')"
     @ds.literal(s < 1).should == "(foo < 1)"
     @ds.literal(s.sql_subscript(1)).should == "foo[1]"
-    @ds.literal(s.like('a')).should == "(foo LIKE 'a')"
+    @ds.literal(s.like('a')).should == "(foo LIKE 'a' ESCAPE '\\')"
     @ds.literal(s.as(:a)).should == "foo AS a"
     @ds.literal(s.cast(Integer)).should == "CAST(foo AS integer)"
     @ds.literal(s.desc).should == "foo DESC"

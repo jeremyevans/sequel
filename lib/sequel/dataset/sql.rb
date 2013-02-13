@@ -189,6 +189,7 @@ module Sequel
     ARRAY_EMPTY = '(NULL)'.freeze
     AS = ' AS '.freeze
     ASC = ' ASC'.freeze
+    BACKSLASH = "\\".freeze
     BOOL_FALSE = "'f'".freeze
     BOOL_TRUE = "'t'".freeze
     BRACKET_CLOSE =  ']'.freeze
@@ -219,6 +220,7 @@ module Sequel
     DOUBLE_APOS = "''".freeze
     DOUBLE_QUOTE = '""'.freeze
     EQUAL = ' = '.freeze
+    ESCAPE = " ESCAPE ".freeze
     EXTRACT = 'extract('.freeze
     EXISTS = ['EXISTS '.freeze].freeze
     FOR_UPDATE = ' FOR UPDATE'.freeze
@@ -239,6 +241,7 @@ module Sequel
     INTO = " INTO ".freeze
     IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze
     IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
+    LIKE_OPERATORS = ::Sequel::SQL::ComplexExpression::LIKE_OPERATORS
     LIMIT = " LIMIT ".freeze
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
     NOT_SPACE = 'NOT '.freeze
@@ -455,6 +458,16 @@ module Sequel
           literal_append(sql, vals)
           sql << PAREN_CLOSE
         end
+      when *LIKE_OPERATORS
+        sql << PAREN_OPEN
+        literal_append(sql, args.at(0))
+        sql << SPACE << op.to_s << SPACE
+        literal_append(sql, args.at(1))
+        if like_uses_escape?
+          sql << ESCAPE
+          literal_append(sql, BACKSLASH)
+        end
+        sql << PAREN_CLOSE
       when *TWO_ARITY_OPERATORS
         if REGEXP_OPERATORS.include?(op) && !supports_regexp?
           raise InvalidOperation, "Pattern matching via regular expressions is not supported on #{db.database_type}"

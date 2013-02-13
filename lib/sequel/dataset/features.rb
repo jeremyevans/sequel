@@ -159,6 +159,12 @@ module Sequel
       true
     end
 
+    # Whether to use an ESCAPE clause for escaping metacharacters
+    # when using LIKE.
+    def like_uses_escape?
+      true
+    end
+
     # Whether the RETURNING clause is used for the given dataset.
     # +type+ can be :insert, :update, or :delete.
     def uses_returning?(type)

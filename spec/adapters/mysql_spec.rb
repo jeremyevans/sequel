@@ -1105,17 +1105,6 @@ describe "MySQL::Dataset#complex_expression_sql" do
     @d = MYSQL_DB.dataset
   end
 
-  specify "should handle pattern matches correctly" do
-    @d.literal(Sequel.expr(:x).like('a')).should == "(`x` LIKE BINARY 'a')"
-    @d.literal(~Sequel.expr(:x).like('a')).should == "(`x` NOT LIKE BINARY 'a')"
-    @d.literal(Sequel.expr(:x).ilike('a')).should == "(`x` LIKE 'a')"
-    @d.literal(~Sequel.expr(:x).ilike('a')).should == "(`x` NOT LIKE 'a')"
-    @d.literal(Sequel.expr(:x).like(/a/)).should == "(`x` REGEXP BINARY 'a')"
-    @d.literal(~Sequel.expr(:x).like(/a/)).should == "(`x` NOT REGEXP BINARY 'a')"
-    @d.literal(Sequel.expr(:x).like(/a/i)).should == "(`x` REGEXP 'a')"
-    @d.literal(~Sequel.expr(:x).like(/a/i)).should == "(`x` NOT REGEXP 'a')"
-  end
-
   specify "should handle string concatenation with CONCAT if more than one record" do
     @d.literal(Sequel.join([:x, :y])).should == "CONCAT(`x`, `y`)"
     @d.literal(Sequel.join([:x, :y], ' ')).should == "CONCAT(`x`, ' ', `y`)"

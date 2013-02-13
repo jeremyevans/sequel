@@ -394,7 +394,7 @@ describe Sequel::Model, ".find" do
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"]
 
     @c.find(Sequel.expr(:name).like('abc%')).should be_a_kind_of(@c)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (name LIKE 'abc%') LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (name LIKE 'abc%' ESCAPE '\\') LIMIT 1"]
   end
   
   specify "should accept filter blocks" do

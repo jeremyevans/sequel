@@ -506,6 +506,8 @@ module Sequel
       COMMA = Dataset::COMMA
       LIMIT = Dataset::LIMIT
       GROUP_BY = Dataset::GROUP_BY
+      ESCAPE = Dataset::ESCAPE
+      BACKSLASH = Dataset::BACKSLASH
       REGEXP = 'REGEXP'.freeze
       LIKE = 'LIKE'.freeze
       BINARY = 'BINARY '.freeze
@@ -552,6 +554,10 @@ module Sequel
           sql << SPACE
           sql << BINARY if [:~, :'!~', :LIKE, :'NOT LIKE'].include?(op)
           literal_append(sql, args.at(1))
+          if [:LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'].include?(op)
+            sql << ESCAPE
+            literal_append(sql, BACKSLASH)
+          end
           sql << PAREN_CLOSE
         when :'||'
           if args.length > 1

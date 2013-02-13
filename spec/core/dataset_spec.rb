@@ -575,8 +575,8 @@ describe "Dataset#where" do
     @dataset.filter{gdp > d}.sql.should == "SELECT * FROM test WHERE (gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia')))"
     @dataset.filter{a < 1}.sql.should == 'SELECT * FROM test WHERE (a < 1)'
     @dataset.filter{(a >= 1) & (b <= 2)}.sql.should == 'SELECT * FROM test WHERE ((a >= 1) AND (b <= 2))'
-    @dataset.filter{c.like 'ABC%'}.sql.should == "SELECT * FROM test WHERE (c LIKE 'ABC%')"
-    @dataset.filter{c.like 'ABC%', '%XYZ'}.sql.should == "SELECT * FROM test WHERE ((c LIKE 'ABC%') OR (c LIKE '%XYZ'))"
+    @dataset.filter{c.like 'ABC%'}.sql.should == "SELECT * FROM test WHERE (c LIKE 'ABC%' ESCAPE '\\')"
+    @dataset.filter{c.like 'ABC%', '%XYZ'}.sql.should == "SELECT * FROM test WHERE ((c LIKE 'ABC%' ESCAPE '\\') OR (c LIKE '%XYZ' ESCAPE '\\'))"
   end
   
   specify "should work for grouped datasets" do
@@ -3199,47 +3199,47 @@ describe "Dataset#grep" do
   end
   
   specify "should format a SQL filter correctly" do
-    @ds.grep(:title, 'ruby').sql.should == "SELECT * FROM posts WHERE ((title LIKE 'ruby'))"
+    @ds.grep(:title, 'ruby').sql.should == "SELECT * FROM posts WHERE ((title LIKE 'ruby' ESCAPE '\\'))"
   end
 
   specify "should support multiple columns" do
-    @ds.grep([:title, :body], 'ruby').sql.should == "SELECT * FROM posts WHERE ((title LIKE 'ruby') OR (body LIKE 'ruby'))"
+    @ds.grep([:title, :body], 'ruby').sql.should == "SELECT * FROM posts WHERE ((title LIKE 'ruby' ESCAPE '\\') OR (body LIKE 'ruby' ESCAPE '\\'))"
   end
   
   specify "should support multiple search terms" do
-    @ds.grep(:title, ['abc', 'def']).sql.should == "SELECT * FROM posts WHERE ((title LIKE 'abc') OR (title LIKE 'def'))"
+    @ds.grep(:title, ['abc', 'def']).sql.should == "SELECT * FROM posts WHERE ((title LIKE 'abc' ESCAPE '\\') OR (title LIKE 'def' ESCAPE '\\'))"
   end
   
   specify "should support multiple columns and search terms" do
-    @ds.grep([:title, :body], ['abc', 'def']).sql.should == "SELECT * FROM posts WHERE ((title LIKE 'abc') OR (title LIKE 'def') OR (body LIKE 'abc') OR (body LIKE 'def'))"
+    @ds.grep([:title, :body], ['abc', 'def']).sql.should == "SELECT * FROM posts WHERE ((title LIKE 'abc' ESCAPE '\\') OR (title LIKE 'def' ESCAPE '\\') OR (body LIKE 'abc' ESCAPE '\\') OR (body LIKE 'def' ESCAPE '\\'))"
   end
   
   specify "should support the :all_patterns option" do
-    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true).sql.should == "SELECT * FROM posts WHERE (((title LIKE 'abc') OR (body LIKE 'abc')) AND ((title LIKE 'def') OR (body LIKE 'def')))"
+    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true).sql.should == "SELECT * FROM posts WHERE (((title LIKE 'abc' ESCAPE '\\') OR (body LIKE 'abc' ESCAPE '\\')) AND ((title LIKE 'def' ESCAPE '\\') OR (body LIKE 'def' ESCAPE '\\')))"
   end
   
   specify "should support the :all_columns option" do
-    @ds.grep([:title, :body], ['abc', 'def'], :all_columns=>true).sql.should == "SELECT * FROM posts WHERE (((title LIKE 'abc') OR (title LIKE 'def')) AND ((body LIKE 'abc') OR (body LIKE 'def')))"
+    @ds.grep([:title, :body], ['abc', 'def'], :all_columns=>true).sql.should == "SELECT * FROM posts WHERE (((title LIKE 'abc' ESCAPE '\\') OR (title LIKE 'def' ESCAPE '\\')) AND ((body LIKE 'abc' ESCAPE '\\') OR (body LIKE 'def' ESCAPE '\\')))"
   end
   
   specify "should support the :case_insensitive option" do
-    @ds.grep([:title, :body], ['abc', 'def'], :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE ((title ILIKE 'abc') OR (title ILIKE 'def') OR (body ILIKE 'abc') OR (body ILIKE 'def'))"
+    @ds.grep([:title, :body], ['abc', 'def'], :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE ((title ILIKE 'abc' ESCAPE '\\') OR (title ILIKE 'def' ESCAPE '\\') OR (body ILIKE 'abc' ESCAPE '\\') OR (body ILIKE 'def' ESCAPE '\\'))"
   end
   
   specify "should support the :all_patterns and :all_columns options together" do
-    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :all_columns=>true).sql.should == "SELECT * FROM posts WHERE ((title LIKE 'abc') AND (body LIKE 'abc') AND (title LIKE 'def') AND (body LIKE 'def'))"
+    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :all_columns=>true).sql.should == "SELECT * FROM posts WHERE ((title LIKE 'abc' ESCAPE '\\') AND (body LIKE 'abc' ESCAPE '\\') AND (title LIKE 'def' ESCAPE '\\') AND (body LIKE 'def' ESCAPE '\\'))"
   end
   
   specify "should support the :all_patterns and :case_insensitive options together" do
-    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE (((title ILIKE 'abc') OR (body ILIKE 'abc')) AND ((title ILIKE 'def') OR (body ILIKE 'def')))"
+    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE (((title ILIKE 'abc' ESCAPE '\\') OR (body ILIKE 'abc' ESCAPE '\\')) AND ((title ILIKE 'def' ESCAPE '\\') OR (body ILIKE 'def' ESCAPE '\\')))"
   end
   
   specify "should support the :all_columns and :case_insensitive options together" do
-    @ds.grep([:title, :body], ['abc', 'def'], :all_columns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE (((title ILIKE 'abc') OR (title ILIKE 'def')) AND ((body ILIKE 'abc') OR (body ILIKE 'def')))"
+    @ds.grep([:title, :body], ['abc', 'def'], :all_columns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE (((title ILIKE 'abc' ESCAPE '\\') OR (title ILIKE 'def' ESCAPE '\\')) AND ((body ILIKE 'abc' ESCAPE '\\') OR (body ILIKE 'def' ESCAPE '\\')))"
   end
   
   specify "should support the :all_patterns, :all_columns, and :case_insensitive options together" do
-    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :all_columns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE ((title ILIKE 'abc') AND (body ILIKE 'abc') AND (title ILIKE 'def') AND (body ILIKE 'def'))"
+    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :all_columns=>true, :case_insensitive=>true).sql.should == "SELECT * FROM posts WHERE ((title ILIKE 'abc' ESCAPE '\\') AND (body ILIKE 'abc' ESCAPE '\\') AND (title ILIKE 'def' ESCAPE '\\') AND (body ILIKE 'def' ESCAPE '\\'))"
   end
 
   specify "should not support regexps if the database doesn't supports it" do
@@ -3250,11 +3250,11 @@ describe "Dataset#grep" do
   specify "should support regexps if the database supports it" do
     def @ds.supports_regexp?; true end
     @ds.grep(:title, /ruby/).sql.should == "SELECT * FROM posts WHERE ((title ~ 'ruby'))"
-    @ds.grep(:title, [/^ruby/, 'ruby']).sql.should == "SELECT * FROM posts WHERE ((title ~ '^ruby') OR (title LIKE 'ruby'))"
+    @ds.grep(:title, [/^ruby/, 'ruby']).sql.should == "SELECT * FROM posts WHERE ((title ~ '^ruby') OR (title LIKE 'ruby' ESCAPE '\\'))"
   end
 
   specify "should support searching against other columns" do
-    @ds.grep(:title, :body).sql.should == "SELECT * FROM posts WHERE ((title LIKE body))"
+    @ds.grep(:title, :body).sql.should == "SELECT * FROM posts WHERE ((title LIKE body ESCAPE '\\'))"
   end
 end
 

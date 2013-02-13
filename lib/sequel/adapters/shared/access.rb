@@ -216,6 +216,11 @@ module Sequel
       
       private
 
+      # Access doesn't support the ESCAPE caluse when escaping.
+      def like_uses_escape?
+        false
+      end
+
       # Access uses # to quote dates
       def literal_date(d)
         d.strftime(DATE_FORMAT)

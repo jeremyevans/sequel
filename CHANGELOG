@@ -1,5 +1,7 @@
 === HEAD
 
+* The LIKE operators now use an explicit ESCAPE '\' clause for similar behavior across databases (jeremyevans)
+
 * Make Database#tables and #views accept a :qualify option on PostgreSQL to return qualified identifiers (jeremyevans)
 
 * Make json_serializer and xml_serializer plugins secure by default (jeremyevans)
