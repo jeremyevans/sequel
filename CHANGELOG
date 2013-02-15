@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel.tzinfo_disambiguator= to the named_timezones plugin for automatically handling TZInfo::AmbiguousTime exceptions (jeremyevans) (#616)
+
 * Add Dataset#escape_like, for escaping LIKE metacharacters (jeremyevans) (#614)
 
 * The LIKE operators now use an explicit ESCAPE '\' clause for similar behavior across databases (jeremyevans)

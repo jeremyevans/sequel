@@ -19,6 +19,7 @@ describe "Sequel named_timezones extension" do
     Sequel.datetime_class = DateTime
   end
   after do
+    Sequel.tzinfo_disambiguator = nil
     Sequel.default_timezone = nil
     Sequel.datetime_class = Time
   end
@@ -53,6 +54,15 @@ describe "Sequel named_timezones extension" do
     dt.offset.should == -7/24.0
   end
     
+  it "should raise an error for ambiguous timezones by default" do
+    proc{Sequel.database_to_application_timestamp('2004-10-31T01:30:00')}.should raise_error(Sequel::InvalidValue)
+  end
+
+  it "should support tzinfo_disambiguator= to handle ambiguous timezones automatically" do
+    Sequel.tzinfo_disambiguator = proc{|datetime, periods| periods.first}
+    Sequel.database_to_application_timestamp('2004-10-31T01:30:00').should == DateTime.parse('2004-10-30T22:30:00-07:00')
+  end
+
   it "should assume datetimes coming out of the database that don't have an offset as coming from database_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30')
     dt.should == @dt

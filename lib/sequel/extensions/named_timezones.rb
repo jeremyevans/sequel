@@ -37,6 +37,13 @@ module Sequel
   self.datetime_class = DateTime
   
   module NamedTimezones
+    # Handles TZInfo::AmbiguousTime exceptions automatically by providing a
+    # proc called with both the datetime value being converted as well as
+    # the array of TZInfo::TimezonePeriod results. Example:
+    #
+    #   Sequel.tzinfo_disambiguator = proc{|datetime, periods| periods.first}
+    attr_accessor :tzinfo_disambiguator
+
     private 
     
     # Assume the given DateTime has a correct time but a wrong timezone.  It is
@@ -44,7 +51,7 @@ module Sequel
     # Keep the time the same but convert the timezone to the input_timezone.
     # Expects the input_timezone to be a TZInfo::Timezone instance.
     def convert_input_datetime_other(v, input_timezone)
-      local_offset = input_timezone.period_for_local(v).utc_total_offset_rational
+      local_offset = input_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset_rational
       (v - local_offset).new_offset(local_offset)
     end
 
@@ -54,7 +61,7 @@ module Sequel
       # TZInfo converts times, but expects the given DateTime to have an offset
       # of 0 and always leaves the timezone offset as 0
       v = output_timezone.utc_to_local(v.new_offset(0))
-      local_offset = output_timezone.period_for_local(v).utc_total_offset_rational
+      local_offset = output_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset_rational
       # Convert timezone offset from UTC to the offset for the output_timezone
       (v - local_offset).new_offset(local_offset)
     end
@@ -62,6 +69,15 @@ module Sequel
     # Returns TZInfo::Timezone instance if given a String.
     def convert_timezone_setter_arg(tz)
       tz.is_a?(String) ? TZInfo::Timezone.get(tz) : super
+    end
+
+    # Return a disambiguation proc that provides both the datetime value
+    # and the periods, in order to allow the choice of period to depend
+    # on the datetime value.
+    def tzinfo_disambiguator_for(v)
+      if pr = @tzinfo_disambiguator
+        proc{|periods| pr.call(v, periods)}
+      end
     end
   end
   
