@@ -611,8 +611,8 @@ module Sequel
       # The SQL queries to execute when starting a new connection.
       def connection_configuration_sqls
         sqls = []
-        sqls << "SET standard_conforming_strings = ON" if @opts.fetch(:force_standard_strings, Postgres.force_standard_strings)
-        if cmm = @opts.fetch(:client_min_messages, Postgres.client_min_messages)
+        sqls << "SET standard_conforming_strings = ON" if typecast_value_boolean(@opts.fetch(:force_standard_strings, Postgres.force_standard_strings))
+        if (cmm = @opts.fetch(:client_min_messages, Postgres.client_min_messages)) && !cmm.to_s.empty?
           sqls << "SET client_min_messages = '#{cmm.to_s.upcase}'"
         end
         sqls
