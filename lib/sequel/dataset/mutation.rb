@@ -12,8 +12,11 @@ module Sequel
     # non-! methods, but replace the options of the current dataset with the
     # options of the resulting dataset.
     def self.def_mutation_method(*meths)
+      options = meths.pop if meths.last.is_a?(Hash)
+      mod = options[:module] if options
+      mod ||= self
       meths.each do |meth|
-        class_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end", __FILE__, __LINE__)
+        mod.class_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end", __FILE__, __LINE__)
       end
     end
     
@@ -33,13 +36,6 @@ module Sequel
     # a single hash argument and returns the object you want #each to return.
     attr_accessor :row_proc
     
-    # Add a mutation method to this dataset instance.
-    def def_mutation_method(*meths)
-      meths.each do |meth|
-        instance_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end", __FILE__, __LINE__)
-      end
-    end
-
     # Avoid self-referential dataset by cloning.
     def from_self!(*args, &block)
       @opts.merge!(clone.from_self(*args, &block).opts)

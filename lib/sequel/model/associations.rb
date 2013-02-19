@@ -1749,10 +1749,7 @@ module Sequel
       #
       #   Artist.eager(:albums => {proc{|ds| ds.where{year > 1990}}=>{:tracks => :genre}})
       module DatasetMethods
-        # Add the <tt>eager!</tt> and <tt>eager_graph!</tt> mutation methods to the dataset.
-        def self.extended(obj)
-          obj.def_mutation_method(:eager, :eager_graph)
-        end
+        Sequel::Dataset.def_mutation_method(:eager, :eager_graph, :module=>self)
       
         # If the expression is in the form <tt>x = y</tt> where +y+ is a <tt>Sequel::Model</tt>
         # instance, array of <tt>Sequel::Model</tt> instances, or a <tt>Sequel::Model</tt> dataset,

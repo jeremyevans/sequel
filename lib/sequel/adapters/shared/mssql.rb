@@ -433,6 +433,8 @@ module Sequel
       DEFAULT_TIMESTAMP_FORMAT = "'%Y-%m-%dT%H:%M:%S%N%z'".freeze
       FORMAT_DATE = "'%Y%m%d'".freeze
 
+      Sequel::Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
+
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
       attr_accessor :mssql_unicode_strings
 
@@ -483,11 +485,6 @@ module Sequel
       # Disable the use of INSERT OUTPUT
       def disable_insert_output
         clone(:disable_insert_output=>true)
-      end
-
-      # Disable the use of INSERT OUTPUT, modifying the receiver
-      def disable_insert_output!
-        mutation_method(:disable_insert_output)
       end
 
       # MSSQL treats [] as a metacharacter in LIKE expresions.
@@ -569,11 +566,6 @@ module Sequel
         end
         output[:into] = into
         clone({:output => output})
-      end
-
-      # An output method that modifies the receiver.
-      def output!(into, values)
-        mutation_method(:output, into, values)
       end
 
       # MSSQL uses [] to quote identifiers.  MSSQL does not support
