@@ -1,5 +1,7 @@
 === HEAD
 
+* Switch query extension to use a proxy instead of Object#extend (chanks, jeremyevans)
+
 * Remove Dataset#def_mutiation_method instance method (jeremyevans)
 
 * Make foreign key parsing on MySQL not pick up foreign keys in other databases (jeremyevans)

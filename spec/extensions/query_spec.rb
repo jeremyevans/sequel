@@ -79,13 +79,7 @@ describe "Dataset#query" do
   end
   
   specify "should raise on non-chainable method calls" do
-    proc {@d.query {first_source}}.should raise_error(Sequel::Error)
-  end
-  
-  specify "should raise on each, insert, update, delete" do
-    proc {@d.query {each}}.should raise_error(Sequel::Error)
-    proc {@d.query {insert(:x => 1)}}.should raise_error(Sequel::Error)
-    proc {@d.query {update(:x => 1)}}.should raise_error(Sequel::Error)
-    proc {@d.query {delete}}.should raise_error(Sequel::Error)
+    proc {@d.query {row_proc}}.should raise_error(Sequel::Error)
+    proc {@d.query {all}}.should raise_error(Sequel::Error)
   end
 end

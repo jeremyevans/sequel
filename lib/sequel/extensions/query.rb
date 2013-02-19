@@ -1,12 +1,10 @@
 # The query extension adds Sequel::Dataset#query which allows
 # a different way to construct queries instead of the usual
-# method chaining.
+# method chaining.  See Sequel::Dataset#query for details.
 #
 # To load the extension, do:
 #
 #   Sequel.extension :query
-#
-# This extension uses Object#extend at runtime, which can hurt performance.
 
 module Sequel
   class Database
@@ -17,8 +15,9 @@ module Sequel
   end
 
   class Dataset
-    # Translates a query block into a dataset. Query blocks can be useful
-    # when expressing complex SELECT statements, e.g.:
+    # Translates a query block into a dataset. Query blocks are an
+    # alternative to Sequel's usual method chaining, by using
+    # instance_eval with a proxy object:
     #
     #   dataset = DB[:items].query do
     #     select :x, :y, :z
@@ -29,28 +28,23 @@ module Sequel
     # Which is the same as:
     #
     #  dataset = DB[:items].select(:x, :y, :z).filter{(x > 1) & (y > 2)}.reverse(:z)
-    #
-    # Note that inside a call to query, you cannot call each, insert, update,
-    # or delete (or any method that calls those), or Sequel will raise an
-    # error.
     def query(&block)
-      copy = clone({})
-      copy.extend(QueryBlockCopy)
-      copy.instance_eval(&block)
-      clone(copy.opts)
+      Query.new(self).instance_eval(&block).dataset
     end
 
-    # Module used by Dataset#query that has the effect of making all
-    # dataset methods into !-style methods that modify the receiver.
-    module QueryBlockCopy
-      %w'each insert update delete'.each do |meth|
-        define_method(meth){|*args| raise Error, "##{meth} cannot be invoked inside a query block."}
+    # Proxy object used by Dataset#query.
+    class Query < Sequel::BasicObject
+      # The current dataset in the query.  This changes on each method call.
+      attr_reader :dataset
+     
+      def initialize(dataset)
+        @dataset = dataset
       end
 
-      # Merge the given options into the receiver's options and return the receiver
-      # instead of cloning the receiver.
-      def clone(opts = {})
-        @opts.merge!(opts)
+      # Replace the query's dataset with dataset returned by the method call.
+      def method_missing(method, *args, &block)
+        @dataset = @dataset.send(method, *args, &block)
+        raise(Sequel::Error, "method #{method.inspect} did not return a dataset") unless @dataset.is_a?(Dataset)
         self
       end
     end
