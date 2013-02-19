@@ -1,5 +1,7 @@
 === HEAD
 
+* Make foreign key parsing on MySQL not pick up foreign keys in other databases (jeremyevans)
+
 * Allow per-instance overrides of Postgres.force_standard_strings and .client_min_messages (jeremyevans) (#618)
 
 * Add Sequel.tzinfo_disambiguator= to the named_timezones plugin for automatically handling TZInfo::AmbiguousTime exceptions (jeremyevans) (#616)
