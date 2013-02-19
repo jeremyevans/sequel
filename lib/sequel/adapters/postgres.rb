@@ -20,7 +20,11 @@ rescue LoadError => e
         else
           # Raise an error if no valid string escaping method can be found.
           def escape_string(obj)
-            raise Sequel::Error, "string escaping not supported with this postgres driver.  Try using ruby-pg, ruby-postgres, or postgres-pr."
+            if Sequel::Postgres.force_standard_strings
+              str.gsub("'", "''")
+            else
+              raise Sequel::Error, "string escaping not supported with this postgres driver.  Try using ruby-pg, ruby-postgres, or postgres-pr."
+            end
           end
         end
       end

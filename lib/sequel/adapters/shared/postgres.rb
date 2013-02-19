@@ -4,15 +4,16 @@ module Sequel
   # Top level module for holding all PostgreSQL-related modules and classes
   # for Sequel.  There are a few module level accessors that are added via
   # metaprogramming.  These are:
-  # * client_min_messages (only available when using the native adapter) -
-  #   Change the minimum level of messages that PostgreSQL will send to the
-  #   the client.  The PostgreSQL default is NOTICE, the Sequel default is
-  #   WARNING.  Set to nil to not change the server default.
-  # * force_standard_strings - Set to false to not force the use of
-  #   standard strings
-  # * use_iso_date_format (only available when using the native adapter) -
-  #   Set to false to not change the date format to
-  #   ISO.  This disables one of Sequel's optimizations.
+  #
+  # client_min_messages :: Change the minimum level of messages that PostgreSQL will send to the
+  #                        the client.  The PostgreSQL default is NOTICE, the Sequel default is
+  #                        WARNING.  Set to nil to not change the server default. Overridable on
+  #                        a per instance basis via the :client_min_messages option.
+  # force_standard_strings :: Set to false to not force the use of standard strings.  Overridable
+  #                           on a per instance basis via the :force_standard_strings option.
+  # use_iso_date_format :: (only available when using the native adapter)
+  #                        Set to false to not change the date format to
+  #                        ISO.  This disables one of Sequel's optimizations.
   #
   # Changes in these settings only affect future connections.  To make
   # sure that they are applied, they should generally be called right
@@ -610,8 +611,8 @@ module Sequel
       # The SQL queries to execute when starting a new connection.
       def connection_configuration_sqls
         sqls = []
-        sqls << "SET standard_conforming_strings = ON" if Postgres.force_standard_strings
-        if cmm = Postgres.client_min_messages
+        sqls << "SET standard_conforming_strings = ON" if @opts.fetch(:force_standard_strings, Postgres.force_standard_strings)
+        if cmm = @opts.fetch(:client_min_messages, Postgres.client_min_messages)
           sqls << "SET client_min_messages = '#{cmm.to_s.upcase}'"
         end
         sqls
