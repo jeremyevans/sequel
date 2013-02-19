@@ -82,7 +82,19 @@ module Sequel
       def self.register_format(format, serializer, deserializer)
         REGISTERED_FORMATS[format] = [serializer, deserializer]
       end
-      register_format(:marshal, lambda{|v| [Marshal.dump(v)].pack('m')}, lambda{|v| Marshal.load(v.unpack('m')[0]) rescue Marshal.load(v)})
+      register_format(:marshal, lambda{|v| [Marshal.dump(v)].pack('m')},
+        lambda do |v|
+          begin
+            Marshal.load(v.unpack('m')[0])
+          rescue => e
+            begin
+              # Backwards compatibility for unpacked marshal output.
+              Marshal.load(v)
+            rescue
+              raise e
+            end
+          end
+        end)
       register_format(:yaml, lambda{|v| v.to_yaml}, lambda{|v| YAML.load(v)})
       register_format(:json, lambda{|v| v.to_json}, lambda{|v| Sequel.parse_json(v)})
 
