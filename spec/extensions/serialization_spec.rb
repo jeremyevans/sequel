@@ -114,6 +114,26 @@ describe "Serialization plugin" do
       "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
   
+  it "should handle old non-base-64 encoded marshal serialization format" do
+    @c.set_primary_key :id
+    @c.plugin :serialization, :marshal, :abc, :def
+    @c.dataset._fetch = [:id => 1, :abc =>Marshal.dump(1), :def =>Marshal.dump('hello')]
+
+    o = @c.first
+    o.abc.should == 1
+    o.def.should == "hello"
+  end
+
+  it "should raise exception for bad marshal data" do
+    @c.set_primary_key :id
+    @c.plugin :serialization, :marshal, :abc, :def
+    @c.dataset._fetch = [:id => 1, :abc =>'foo', :def =>'bar']
+
+    o = @c.first
+    proc{o.abc}.should raise_error
+    proc{o.def}.should raise_error
+  end
+  
   it "should translate values to and from json serialization format using accessor methods" do
     @c.set_primary_key :id
     @c.plugin :serialization, :json, :abc, :def
