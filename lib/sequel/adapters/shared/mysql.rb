@@ -197,6 +197,9 @@ module Sequel
           opts[:default] = o == :set_column_default ? op[:default] : opts[:ruby_default]
           opts.delete(:default) if opts[:default] == nil
           opts.delete(:primary_key)
+          unless op[:type] || opts[:type]
+            raise Error, "cannot determine database type to use for CHANGE COLUMN operation"
+          end
           "CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(op.merge(opts))}"
         when :drop_constraint
           type = case op[:type]
