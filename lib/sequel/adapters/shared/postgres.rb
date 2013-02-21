@@ -291,14 +291,13 @@ module Sequel
       # :name, :on_delete, :on_update, and :deferrable entries in the hashes.
       def foreign_key_list(table, opts={})
         m = output_identifier_meth
-        im = input_identifier_meth
-        schema, table = schema_and_table(table)
+        schema, _ = opts.fetch(:schema, schema_and_table(table))
         range = 0...32
 
         base_ds = metadata_dataset.
-          where(:cl__relkind=>'r', :co__contype=>'f', :cl__relname=>im.call(table)).
           from(:pg_constraint___co).
-          join(:pg_class___cl, :oid=>:conrelid)
+          join(:pg_class___cl, :oid=>:conrelid).
+          where(:cl__relkind=>'r', :co__contype=>'f', :cl__oid=>regclass_oid(table))
 
         # We split the parsing into two separate queries, which are merged manually later.
         # This is because PostgreSQL stores both the referencing and referenced columns in
@@ -321,8 +320,6 @@ module Sequel
         # If a schema is given, we only search in that schema, and the returned :table
         # entry is schema qualified as well.
         if schema
-          ds = ds.join(:pg_namespace___nsp, :oid=>:cl__relnamespace).
-            where(:nsp__nspname=>im.call(schema))
           ref_ds = ref_ds.join(:pg_namespace___nsp2, :oid=>:cl2__relnamespace).
             select_more(:nsp2__nspname___schema)
         end
@@ -348,21 +345,18 @@ module Sequel
       # Use the pg_* system tables to determine indexes on a table
       def indexes(table, opts={})
         m = output_identifier_meth
-        im = input_identifier_meth
-        schema, table = schema_and_table(table)
         range = 0...32
         attnums = server_version >= 80100 ? SQL::Function.new(:ANY, :ind__indkey) : range.map{|x| SQL::Subscript.new(:ind__indkey, [x])}
         ds = metadata_dataset.
           from(:pg_class___tab).
-          join(:pg_index___ind, :indrelid=>:oid, im.call(table)=>:relname).
+          join(:pg_index___ind, :indrelid=>:oid).
           join(:pg_class___indc, :oid=>:indexrelid).
           join(:pg_attribute___att, :attrelid=>:tab__oid, :attnum=>attnums).
           left_join(:pg_constraint___con, :conname=>:indc__relname).
-          filter(:indc__relkind=>'i', :ind__indisprimary=>false, :indexprs=>nil, :indpred=>nil, :indisvalid=>true).
+          filter(:indc__relkind=>'i', :ind__indisprimary=>false, :indexprs=>nil, :indpred=>nil, :indisvalid=>true, :tab__oid=>regclass_oid(table, opts)).
           order(:indc__relname, SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}, 32, :att__attnum)).
           select(:indc__relname___name, :ind__indisunique___unique, :att__attname___column, :con__condeferrable___deferrable)
 
-        ds.join!(:pg_namespace___nsp, :oid=>:tab__relnamespace, :nspname=>schema.to_s) if schema
         ds.filter!(:indisready=>true, :indcheckxmin=>false) if server_version >= 80300
 
         indexes = {}
@@ -392,9 +386,7 @@ module Sequel
       def primary_key(table, opts={})
         quoted_table = quote_schema_table(table)
         Sequel.synchronize{return @primary_keys[quoted_table] if @primary_keys.has_key?(quoted_table)}
-        schema, table = schema_and_table(table)
-        sql = "#{SELECT_PK_SQL} AND pg_class.relname = #{literal(table)}"
-        sql << " AND pg_namespace.nspname = #{literal(schema)}" if schema
+        sql = "#{SELECT_PK_SQL} AND pg_class.oid = #{literal(regclass_oid(table, opts))}"
         value = fetch(sql).single_value
         Sequel.synchronize{@primary_keys[quoted_table] = value}
       end
@@ -403,16 +395,12 @@ module Sequel
       def primary_key_sequence(table, opts={})
         quoted_table = quote_schema_table(table)
         Sequel.synchronize{return @primary_key_sequences[quoted_table] if @primary_key_sequences.has_key?(quoted_table)}
-        schema, table = schema_and_table(table)
-        table = literal(table)
-        sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND t.relname = #{table}"
-        sql << " AND name.nspname = #{literal(schema)}" if schema
+        sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND t.oid = #{literal(regclass_oid(table, opts))}"
         if pks = fetch(sql).single_record
           value = literal(SQL::QualifiedIdentifier.new(pks[:schema], pks[:sequence]))
           Sequel.synchronize{@primary_key_sequences[quoted_table] = value}
         else
-          sql = "#{SELECT_CUSTOM_SEQUENCE_SQL} AND t.relname = #{table}"
-          sql << " AND name.nspname = #{literal(schema)}" if schema
+          sql = "#{SELECT_CUSTOM_SEQUENCE_SQL} AND t.oid = #{literal(regclass_oid(table, opts))}"
           if pks = fetch(sql).single_record
             value = literal(SQL::QualifiedIdentifier.new(pks[:schema], LiteralString.new(pks[:sequence])))
             Sequel.synchronize{@primary_key_sequences[quoted_table] = value}
@@ -867,6 +855,28 @@ module Sequel
         PREPARED_ARG_PLACEHOLDER
       end
 
+      # Return an expression the oid for the table expr.  Used by the metadata parsing
+      # code to disambiguate unqualified tables.
+      def regclass_oid(expr, opts={})
+        if expr.is_a?(String) && !expr.is_a?(LiteralString)
+          expr = Sequel.identifier(expr)
+        end
+
+        sch, table = schema_and_table(expr)
+        sch ||= opts[:schema]
+        if sch
+          expr = Sequel.qualify(sch, table)
+        end
+        
+        expr = if ds = opts[:dataset]
+          ds.literal(expr)
+        else
+          literal(expr)
+        end
+
+        Sequel.cast(expr.to_s,:regclass).cast(:oid)
+      end
+
       # Remove the cached entries for primary keys and sequences when a table is
       # changed.
       def remove_cached_schema(table)
@@ -903,35 +913,22 @@ module Sequel
       # The dataset used for parsing table schemas, using the pg_* system catalogs.
       def schema_parse_table(table_name, opts)
         m = output_identifier_meth(opts[:dataset])
-        m2 = input_identifier_meth(opts[:dataset])
         ds = metadata_dataset.select(:pg_attribute__attname___name,
             SQL::Cast.new(:pg_attribute__atttypid, :integer).as(:oid),
             SQL::Function.new(:format_type, :pg_type__oid, :pg_attribute__atttypmod).as(:db_type),
             SQL::Function.new(:pg_get_expr, :pg_attrdef__adbin, :pg_class__oid).as(:default),
             SQL::BooleanExpression.new(:NOT, :pg_attribute__attnotnull).as(:allow_null),
-            SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(:pg_attribute__attnum => SQL::Function.new(:ANY, :pg_index__indkey)), false).as(:primary_key),
-            :pg_namespace__nspname).
+            SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(:pg_attribute__attnum => SQL::Function.new(:ANY, :pg_index__indkey)), false).as(:primary_key)).
           from(:pg_class).
           join(:pg_attribute, :attrelid=>:oid).
           join(:pg_type, :oid=>:atttypid).
-          join(:pg_namespace, :oid=>:pg_class__relnamespace).
           left_outer_join(:pg_attrdef, :adrelid=>:pg_class__oid, :adnum=>:pg_attribute__attnum).
           left_outer_join(:pg_index, :indrelid=>:pg_class__oid, :indisprimary=>true).
           filter(:pg_attribute__attisdropped=>false).
           filter{|o| o.pg_attribute__attnum > 0}.
-          filter(:pg_class__relname=>m2.call(table_name)).
+          filter(:pg_class__oid=>regclass_oid(table_name, opts)).
           order(:pg_attribute__attnum)
-        ds = filter_schema(ds, opts)
-        current_schema = nil
         ds.map do |row|
-          sch = row.delete(:nspname)
-          if current_schema
-            if sch != current_schema
-              raise Error, "columns from tables in two separate schema were returned (please specify a schema): #{current_schema.inspect}, #{sch.inspect}"
-            end
-          else
-            current_schema = sch
-          end
           row[:default] = nil if blank_object?(row[:default])
           row[:type] = schema_column_type(row[:db_type])
           [m.call(row.delete(:name)), row]

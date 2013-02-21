@@ -800,109 +800,131 @@ end
 
 describe "Postgres::Database schema qualified tables" do
   before do
-    POSTGRES_DB << "CREATE SCHEMA schema_test"
-    POSTGRES_DB.instance_variable_set(:@primary_keys, {})
-    POSTGRES_DB.instance_variable_set(:@primary_key_sequences, {})
+    @db = POSTGRES_DB
+    @db << "CREATE SCHEMA schema_test"
+    @db.instance_variable_set(:@primary_keys, {})
+    @db.instance_variable_set(:@primary_key_sequences, {})
   end
   after do
-    POSTGRES_DB << "DROP SCHEMA schema_test CASCADE"
-    POSTGRES_DB.default_schema = nil
+    @db << "DROP SCHEMA schema_test CASCADE"
+    @db.default_schema = nil
   end
 
   specify "should be able to create, drop, select and insert into tables in a given schema" do
-    POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
-    POSTGRES_DB[:schema_test__schema_test].first.should == nil
-    POSTGRES_DB[:schema_test__schema_test].insert(:i=>1).should == 1
-    POSTGRES_DB[:schema_test__schema_test].first.should == {:i=>1}
-    POSTGRES_DB.from(Sequel.lit('schema_test.schema_test')).first.should == {:i=>1}
-    POSTGRES_DB.drop_table(:schema_test__schema_test)
-    POSTGRES_DB.create_table(Sequel.qualify(:schema_test, :schema_test)){integer :i}
-    POSTGRES_DB[:schema_test__schema_test].first.should == nil
-    POSTGRES_DB.from(Sequel.lit('schema_test.schema_test')).first.should == nil
-    POSTGRES_DB.drop_table(Sequel.qualify(:schema_test, :schema_test))
+    @db.create_table(:schema_test__schema_test){primary_key :i}
+    @db[:schema_test__schema_test].first.should == nil
+    @db[:schema_test__schema_test].insert(:i=>1).should == 1
+    @db[:schema_test__schema_test].first.should == {:i=>1}
+    @db.from(Sequel.lit('schema_test.schema_test')).first.should == {:i=>1}
+    @db.drop_table(:schema_test__schema_test)
+    @db.create_table(Sequel.qualify(:schema_test, :schema_test)){integer :i}
+    @db[:schema_test__schema_test].first.should == nil
+    @db.from(Sequel.lit('schema_test.schema_test')).first.should == nil
+    @db.drop_table(Sequel.qualify(:schema_test, :schema_test))
   end
 
   specify "#tables should not include tables in a default non-public schema" do
-    POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
-    POSTGRES_DB.tables.should include(:schema_test)
-    POSTGRES_DB.tables.should_not include(:pg_am)
-    POSTGRES_DB.tables.should_not include(:domain_udt_usage)
+    @db.create_table(:schema_test__schema_test){integer :i}
+    @db.tables.should include(:schema_test)
+    @db.tables.should_not include(:pg_am)
+    @db.tables.should_not include(:domain_udt_usage)
   end
 
   specify "#tables should return tables in the schema provided by the :schema argument" do
-    POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
-    POSTGRES_DB.tables(:schema=>:schema_test).should == [:schema_test]
+    @db.create_table(:schema_test__schema_test){integer :i}
+    @db.tables(:schema=>:schema_test).should == [:schema_test]
   end
 
   specify "#schema should not include columns from tables in a default non-public schema" do
-    POSTGRES_DB.create_table(:schema_test__domains){integer :i}
-    sch = POSTGRES_DB.schema(:domains)
+    @db.create_table(:schema_test__domains){integer :i}
+    sch = @db.schema(:schema_test__domains)
     cs = sch.map{|x| x.first}
     cs.should include(:i)
     cs.should_not include(:data_type)
   end
 
   specify "#schema should only include columns from the table in the given :schema argument" do
-    POSTGRES_DB.create_table!(:domains){integer :d}
-    POSTGRES_DB.create_table(:schema_test__domains){integer :i}
-    sch = POSTGRES_DB.schema(:domains, :schema=>:schema_test)
+    @db.create_table!(:domains){integer :d}
+    @db.create_table(:schema_test__domains){integer :i}
+    sch = @db.schema(:domains, :schema=>:schema_test)
     cs = sch.map{|x| x.first}
     cs.should include(:i)
     cs.should_not include(:d)
-    POSTGRES_DB.drop_table(:domains)
+    @db.drop_table(:domains)
   end
 
-  specify "#schema should raise an exception if columns from tables in two separate schema are returned" do
-    POSTGRES_DB.create_table!(:public__domains){integer :d}
-    POSTGRES_DB.create_table(:schema_test__domains){integer :i}
+  specify "#schema should not include columns in tables from other domains by default" do
+    @db.create_table!(:public__domains){integer :d}
+    @db.create_table(:schema_test__domains){integer :i}
     begin
-      proc{POSTGRES_DB.schema(:domains)}.should raise_error(Sequel::Error)
-      POSTGRES_DB.schema(:public__domains).map{|x| x.first}.should == [:d]
-      POSTGRES_DB.schema(:schema_test__domains).map{|x| x.first}.should == [:i]
+      @db.schema(:domains).map{|x| x.first}.should == [:d]
+      @db.schema(:schema_test__domains).map{|x| x.first}.should == [:i]
     ensure
-      POSTGRES_DB.drop_table?(:public__domains)
+      @db.drop_table?(:public__domains)
     end
   end
 
   specify "#table_exists? should see if the table is in a given schema" do
-    POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
-    POSTGRES_DB.table_exists?(:schema_test__schema_test).should == true
+    @db.create_table(:schema_test__schema_test){integer :i}
+    @db.table_exists?(:schema_test__schema_test).should == true
   end
 
   specify "should be able to get primary keys for tables in a given schema" do
-    POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
-    POSTGRES_DB.primary_key(:schema_test__schema_test).should == 'i'
+    @db.create_table(:schema_test__schema_test){primary_key :i}
+    @db.primary_key(:schema_test__schema_test).should == 'i'
   end
 
   specify "should be able to get serial sequences for tables in a given schema" do
-    POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
-    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
+    @db.create_table(:schema_test__schema_test){primary_key :i}
+    @db.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
   end
 
   specify "should be able to get serial sequences for tables that have spaces in the name in a given schema" do
-    POSTGRES_DB.create_table(:"schema_test__schema test"){primary_key :i}
-    POSTGRES_DB.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."schema test_i_seq"'
+    @db.create_table(:"schema_test__schema test"){primary_key :i}
+    @db.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."schema test_i_seq"'
   end
 
   specify "should be able to get custom sequences for tables in a given schema" do
-    POSTGRES_DB << "CREATE SEQUENCE schema_test.kseq"
-    POSTGRES_DB.create_table(:schema_test__schema_test){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.kseq'::regclass)")}
-    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test".kseq'
+    @db << "CREATE SEQUENCE schema_test.kseq"
+    @db.create_table(:schema_test__schema_test){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.kseq'::regclass)")}
+    @db.primary_key_sequence(:schema_test__schema_test).should == '"schema_test".kseq'
   end
 
   specify "should be able to get custom sequences for tables that have spaces in the name in a given schema" do
-    POSTGRES_DB << "CREATE SEQUENCE schema_test.\"ks eq\""
-    POSTGRES_DB.create_table(:"schema_test__schema test"){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.\"ks eq\"'::regclass)")}
-    POSTGRES_DB.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."ks eq"'
+    @db << "CREATE SEQUENCE schema_test.\"ks eq\""
+    @db.create_table(:"schema_test__schema test"){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.\"ks eq\"'::regclass)")}
+    @db.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."ks eq"'
   end
 
   specify "#default_schema= should change the default schema used from public" do
-    POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
-    POSTGRES_DB.default_schema = :schema_test
-    POSTGRES_DB.table_exists?(:schema_test).should == true
-    POSTGRES_DB.tables.should == [:schema_test]
-    POSTGRES_DB.primary_key(:schema_test__schema_test).should == 'i'
-    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
+    @db.create_table(:schema_test__schema_test){primary_key :i}
+    @db.default_schema = :schema_test
+    @db.table_exists?(:schema_test).should == true
+    @db.tables.should == [:schema_test]
+    @db.primary_key(:schema_test__schema_test).should == 'i'
+    @db.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
+  end
+
+  specify "should handle schema introspection cases with tables with same name in multiple schemas" do
+    begin
+      @db.create_table(:schema_test__schema_test) do
+        primary_key :id
+        foreign_key :i, :schema_test__schema_test, :index=>{:name=>:schema_test_sti}
+      end
+      @db.create_table!(:public__schema_test) do
+        primary_key :id
+        foreign_key :j, :public__schema_test, :index=>{:name=>:public_test_sti}
+      end
+
+      h = @db.schema(:schema_test)
+      h.length.should == 2
+      h.last.first.should == :j
+
+      @db.indexes(:schema_test).should == {:public_test_sti=>{:unique=>false, :columns=>[:j], :deferrable=>nil}}
+      @db.foreign_key_list(:schema_test).should == [{:on_update=>:no_action, :columns=>[:j], :deferrable=>false, :key=>[:id], :table=>:schema_test, :on_delete=>:no_action, :name=>:schema_test_j_fkey}]
+    ensure
+      @db.drop_table?(:public__schema_test)
+    end
   end
 end
 
