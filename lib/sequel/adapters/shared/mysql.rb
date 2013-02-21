@@ -64,11 +64,10 @@ module Sequel
         im = input_identifier_meth
         ds = metadata_dataset.
           from(:INFORMATION_SCHEMA__KEY_COLUMN_USAGE).
-          where(:TABLE_NAME=>im.call(table)).
+          where(:TABLE_NAME=>im.call(table), :TABLE_SCHEMA=>Sequel.function(:DATABASE)).
           exclude(:CONSTRAINT_NAME=>'PRIMARY').
           exclude(:REFERENCED_TABLE_NAME=>nil).
           select(:CONSTRAINT_NAME___name, :COLUMN_NAME___column, :REFERENCED_TABLE_NAME___table, :REFERENCED_COLUMN_NAME___key)
-        ds = ds.where(:TABLE_SCHEMA=>@opts[:database]) if @opts[:database]
         
         h = {}
         ds.each do |row|
