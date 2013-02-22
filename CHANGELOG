@@ -1,5 +1,7 @@
 === HEAD
 
+* Make the Database#quote_identifier method public (jeremyevans)
+
 * Make PostgreSQL metadata parsing handle tables with the same name in multiple schemas (jeremyevans)
 
 * Switch query extension to use a proxy instead of Object#extend (chanks, jeremyevans)

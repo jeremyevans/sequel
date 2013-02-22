@@ -201,6 +201,13 @@ module Sequel
       Sequel.synchronize{prepared_statements[name]}
     end
 
+    # Proxy the quote_identifier method to the dataset,
+    # useful for quoting unqualified identifiers for use
+    # outside of datasets.
+    def quote_identifier(v)
+      schema_utility_dataset.quote_identifier(v)
+    end
+    
     # Default serial primary key options, used by the table creation
     # code.
     def serial_primary_key_options

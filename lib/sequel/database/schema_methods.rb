@@ -705,11 +705,6 @@ module Sequel
       schema_utility_dataset.quote_schema_table(table)
     end
     
-    # Proxy the quote_identifier method to the dataset, used for quoting tables and columns.
-    def quote_identifier(v)
-      schema_utility_dataset.quote_identifier(v)
-    end
-    
     # SQL DDL statement for renaming a table.
     def rename_table_sql(name, new_name)
       "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_schema_table(new_name)}"
