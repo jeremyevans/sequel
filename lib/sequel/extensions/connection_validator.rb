@@ -21,7 +21,7 @@
 # Note that if you set the timeout to validate connections
 # on every checkout, you should probably manually control
 # connection checkouts on a coarse basis, using
-# Database#synchonrize.  In a web application, the optimal
+# Database#synchronize.  In a web application, the optimal
 # place for that would be a rack middleware.  Validating
 # connections on every checkout without setting up coarse
 # connection checkouts will hurt performance, in some cases
