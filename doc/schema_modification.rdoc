@@ -532,7 +532,7 @@ keys before the tables containing the primary keys they reference.
 === <tt>drop_table?</tt>
 
 <tt>drop_table?</tt> is similar to drop_table, except that it only drops
-the table if the table does not already exist.  On some databases, it uses
+the table if the table already exists.  On some databases, it uses
 <tt>IF NOT EXISTS</tt>, on others it does a separate query to check for
 existence.
 
