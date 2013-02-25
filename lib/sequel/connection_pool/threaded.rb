@@ -30,7 +30,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     @connection_handling = opts[:connection_handling]
     @available_connections = []
     @allocated = {}
-    @timeout = Integer(opts[:pool_timeout] || 5)
+    @timeout = Float(opts[:pool_timeout] || 5)
     @sleep_time = Float(opts[:pool_sleep_time] || 0.001)
   end
   
