@@ -125,10 +125,18 @@ begin
 
   spec_with_cov = lambda do |name, files, d, &b|
     spec.call(name, files, d)
-    t = spec.call("#{name}_cov", files, "#{d} with coverage")
-    t.rcov = true
-    t.rcov_opts = File.read("spec/rcov.opts").split("\n")
-    b.call(t) if b
+    if RUBY_VERSION < '1.9'
+      t = spec.call("#{name}_cov", files, "#{d} with coverage")
+      t.rcov = true
+      t.rcov_opts = File.read("spec/rcov.opts").split("\n")
+      b.call(t) if b
+    else
+      desc "#{d} with coverage"
+      task "#{name}_cov" do
+        ENV['COVERAGE'] = '1'
+        Rake::Task[name].invoke
+      end
+    end
     t
   end
 

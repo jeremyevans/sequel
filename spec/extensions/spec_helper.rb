@@ -8,6 +8,11 @@ if defined?(RSpec)
   end
 end
 
+if ENV['COVERAGE']
+  require File.join(File.dirname(File.expand_path(__FILE__)), "../sequel_coverage")
+  SimpleCov.sequel_coverage(:filter=>%r{lib/sequel/(extensions|plugins)/\w+\.rb\z})
+end
+
 unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
   require 'sequel/no_core_ext'

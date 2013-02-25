@@ -1,5 +1,11 @@
 require 'rubygems'
 require 'logger'
+
+if ENV['COVERAGE']
+  require File.join(File.dirname(File.expand_path(__FILE__)), "../sequel_coverage")
+  SimpleCov.sequel_coverage(:group=>%r{lib/sequel/adapters})
+end
+
 unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
   require 'sequel/no_core_ext'
