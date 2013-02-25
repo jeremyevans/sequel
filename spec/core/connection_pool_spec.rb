@@ -256,6 +256,22 @@ shared_examples_for "A threaded connection pool" do
     t.join
   end
 
+  specify "should wait until a connection is available if all are checked out" do
+    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>1, :pool_timeout=>0.1, :pool_sleep_time=>0))
+    q, q1 = Queue.new, Queue.new
+    t = Thread.new do
+      pool.hold do |c|
+        q1.push nil
+        3.times{Thread.pass}
+        q.pop
+      end
+    end
+    q1.pop
+    proc{pool.hold{}}.should raise_error(Sequel::PoolTimeout)
+    q.push nil
+    t.join
+  end
+
   specify "should not have all_connections yield all available connections" do
     pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>2, :pool_timeout=>0))
     q, q1 = Queue.new, Queue.new

@@ -2308,3 +2308,30 @@ describe "Database extensions" do
     proc{@db.extension(:foo2)}.should raise_error(Sequel::Error)
   end
 end
+
+describe "Database specific exception classes" do
+  before do
+    @db = Sequel.mock
+    class << @db
+      attr_accessor :sql_state
+
+      def database_exception_sqlstate(exception, opts={})
+        @sql_state
+      end
+    end
+  end
+
+  specify "should use appropriate exception classes for given SQL states" do
+    @db.fetch = ArgumentError
+    @db.sql_state = '23502'
+    proc{@db.get(1)}.should raise_error(Sequel::NotNullConstraintViolation)
+    @db.sql_state = '23503'
+    proc{@db.get(1)}.should raise_error(Sequel::ForeignKeyConstraintViolation)
+    @db.sql_state = '23505'
+    proc{@db.get(1)}.should raise_error(Sequel::UniqueConstraintViolation)
+    @db.sql_state = '23513'
+    proc{@db.get(1)}.should raise_error(Sequel::CheckConstraintViolation)
+    @db.sql_state = '40001'
+    proc{@db.get(1)}.should raise_error(Sequel::SerializationFailure)
+  end
+end

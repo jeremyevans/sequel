@@ -1025,3 +1025,29 @@ describe "Sequel.parse_json" do
     Sequel.parse_json('[]').should == ['[]', {:create_additions=>false}]
   end
 end
+
+describe "Sequel::LiteralString" do
+  before do
+    @s = Sequel::LiteralString.new("? = ?")
+  end
+
+  specify "should have lit return self if no arguments" do
+    @s.lit.should equal(@s)
+  end
+
+  specify "should have lit return self if return a placeholder literal string if arguments" do
+    @s.lit(1, 2).should be_a_kind_of(Sequel::SQL::PlaceholderLiteralString)
+    Sequel.mock.literal(@s.lit(1, :a)).should == '1 = a'
+  end
+
+  specify "should have to_sequel_blob convert to blob" do
+    @s.to_sequel_blob.should == @s
+    @s.to_sequel_blob.should be_a_kind_of(Sequel::SQL::Blob)
+  end
+end
+
+describe "Sequel core extensions" do
+  specify "should have Sequel.core_extensions? be false by default" do
+    Sequel.core_extensions?.should be_false
+  end
+end

@@ -448,6 +448,10 @@ describe "Sequel Mock Adapter" do
     Sequel.mock(:host=>'postgres').primary_key(:t).should == :id
   end
 
+  specify "should stub out the bound_variable_arg method for postgres" do
+    Sequel.mock(:host=>'postgres').bound_variable_arg(:t, nil).should == :t
+  end
+
   specify "should handle creating tables on oracle" do
     proc{Sequel.mock(:host=>'oracle').create_table(:a){String :b}}.should_not raise_error
   end
