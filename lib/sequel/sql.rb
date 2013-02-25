@@ -1,5 +1,6 @@
 module Sequel
   if RUBY_VERSION < '1.9.0'
+  # :nocov:
     # If on Ruby 1.8, create a <tt>Sequel::BasicObject</tt> class that is similar to the
     # the Ruby 1.9 +BasicObject+ class.  This is used in a few places where proxy
     # objects are needed that respond to any method call.
@@ -16,6 +17,7 @@ module Sequel
       end
       remove_methods!
     end
+  # :nocov:
   else
     # If on 1.9, create a <tt>Sequel::BasicObject</tt> class that is just like the
     # default +BasicObject+ class, except that missing constants are resolved in

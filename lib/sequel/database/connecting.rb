@@ -236,9 +236,11 @@ module Sequel
         @pool.hold(server || :default){|conn| yield conn}
       end
     else
+    # :nocov:
       def synchronize(server=nil, &block)
         @pool.hold(server || :default, &block)
       end
+    # :nocov:
     end
     
     # Attempts to acquire a database connection.  Returns true if successful.

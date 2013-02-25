@@ -780,7 +780,9 @@ module Sequel
         if RUBY_VERSION >= '1.9'
           plugin.const_defined?(submod, false)
         else
+        # :nocov:
           plugin.const_defined?(submod)
+        # :nocov:
         end
       end
   

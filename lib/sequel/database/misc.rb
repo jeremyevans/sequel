@@ -475,12 +475,14 @@ module Sequel
         (value.is_a?(String) && value =~ LEADING_ZERO_RE) ? Integer(value, 10) : Integer(value)
       end
     else
+    # :nocov:
       # Replacement string when replacing leading zeroes.
       LEADING_ZERO_REP = "\\1".freeze 
       # Typecast the value to an Integer
       def typecast_value_integer(value)
         Integer(value.is_a?(String) ? value.sub(LEADING_ZERO_RE, LEADING_ZERO_REP) : value)
       end
+    # :nocov:
     end
 
     # Typecast the value to a String

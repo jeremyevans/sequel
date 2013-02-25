@@ -168,9 +168,11 @@ module Sequel
           if v.respond_to?(:to_datetime)
             v.to_datetime
           else
+          # :nocov:
             # Ruby 1.8 code, %N not available and %z broken on Windows
             offset_hours, offset_minutes = (v.utc_offset/60).divmod(60)
             string_to_datetime(v.strftime("%Y-%m-%dT%H:%M:%S") << sprintf(".%06i%+03i%02i", v.usec, offset_hours, offset_minutes))
+          # :nocov:
           end
         else
           v
@@ -181,7 +183,9 @@ module Sequel
         elsif v.respond_to?(:to_time)
           v.to_time
         else
+        # :nocov:
           string_to_datetime(v.strftime("%FT%T.%N%z"))
+        # :nocov:
         end
       else
         raise InvalidValue, "Invalid convert_input_timestamp type: #{v.inspect}"

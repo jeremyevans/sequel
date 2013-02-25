@@ -254,6 +254,7 @@ module Sequel
         private
 
         if defined?(RUBY_ENGINE) && RUBY_ENGINE != 'ruby'
+        # :nocov:
           # On non-GVL rubies, assume the need to synchronize access.  Store the key
           # in a special sub-hash that always uses this method to synchronize access.
           def cached_fetch(key)
@@ -270,6 +271,7 @@ module Sequel
             h = self[:cache]
             Sequel.synchronize{h[key] = value}
           end
+        # :nocov:
         else
           # On MRI, use a plain fetch, since the GVL will synchronize access.
           def cached_fetch(key)
