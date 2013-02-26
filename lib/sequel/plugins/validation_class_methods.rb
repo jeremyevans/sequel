@@ -432,10 +432,12 @@ module Sequel
         # Handle the :if option for validations
         def validation_if_proc(o, i)
           case i
-          when Symbol then o.send(i)
-          when Proc then o.instance_eval(&i)
-          when nil then true
-          else raise(::Sequel::Error, "invalid value for :if validation option")
+          when Symbol
+            o.send(i)
+          when Proc
+            o.instance_eval(&i)
+          else
+            raise(::Sequel::Error, "invalid value for :if validation option")
           end
         end
       end
