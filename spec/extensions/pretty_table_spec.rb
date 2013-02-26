@@ -44,7 +44,7 @@ describe "PrettyTable" do
     @data3 = [
       {:aaa => 1},
       {:bb => 2},
-      {:c => 3}
+      {:c => 3.1}
     ]
 
     @output = StringIO.new
@@ -80,7 +80,7 @@ describe "PrettyTable" do
     Sequel::PrettyTable.print(@data3, [:aaa, :bb, :c])
     @output.rewind
     @output.read.should == \
-      "+---+--+-+\n|aaa|bb|c|\n+---+--+-+\n|  1|  | |\n|   | 2| |\n|   |  |3|\n+---+--+-+\n"
+      "+---+--+---+\n|aaa|bb|c  |\n+---+--+---+\n|  1|  |   |\n|   | 2|   |\n|   |  |3.1|\n+---+--+---+\n"
   end
   
   specify "should print only the specified columns" do

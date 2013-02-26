@@ -62,4 +62,9 @@ describe "pg_auto_parameterize extension" do
   it "should not auto parameterize when using cursors" do
     @db[:table].filter(:a=>1).use_cursor.opts[:no_auto_parameterize].should be_true
   end
+
+  it "should have a working create_view" do
+    @db.create_view :foo, @db[:table].filter(:a=>1)
+    @db.sqls.should == ["CREATE VIEW foo AS SELECT * FROM table WHERE (a = 1)"]
+  end
 end

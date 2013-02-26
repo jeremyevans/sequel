@@ -144,6 +144,17 @@ describe "pg_row extension" do
     db.register_row_type(:foo)
     db.sqls.should == ["SELECT pg_type.oid, typrelid, typarray FROM pg_type WHERE ((typtype = 'c') AND (typname = 'foo')) LIMIT 1",
       "SELECT attname, atttypid FROM pg_attribute WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
+
+    begin
+      pgnt = Sequel::Postgres::PG_NAMED_TYPES.dup
+      Sequel::Postgres::PG_NAMED_TYPES.clear
+      db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
+      db.reset_conversion_procs
+      db.sqls.should == ["SELECT pg_type.oid, typrelid, typarray FROM pg_type WHERE ((typtype = 'c') AND (typname = 'foo')) LIMIT 1",
+        "SELECT attname, atttypid FROM pg_attribute WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
+    ensure
+      Sequel::Postgres::PG_NAMED_TYPES.replace pgnt
+    end
   end
 
   it "should handle ArrayRows and HashRows in bound variables" do

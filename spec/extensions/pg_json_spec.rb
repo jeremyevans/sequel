@@ -39,6 +39,20 @@ describe "pg_json extension" do
   it "should raise an error when attempting to parse invalid json" do
     proc{@m.parse_json('')}.should raise_error(Sequel::InvalidValue)
     proc{@m.parse_json('1')}.should raise_error(Sequel::InvalidValue)
+
+    begin
+      Sequel.instance_eval do
+        alias pj parse_json
+        def parse_json(v)
+          v
+        end
+      end
+      proc{@m.parse_json('1')}.should raise_error(Sequel::InvalidValue)
+    ensure
+      Sequel.instance_eval do
+        alias parse_json pj
+      end
+    end
   end
 
   it "should literalize HStores to strings correctly" do
