@@ -19,8 +19,9 @@ unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
 end
 
 begin
-  # Attempt to load ActiveSupport inflector first, so Sequel inflector
-  # can override it.
+  # Attempt to load ActiveSupport blank extension and inflector first, so Sequel
+  # can override them.
+  require 'active_support/core_ext/object/blank'
   require 'active_support/inflector'
   require 'active_support/core_ext/string/inflections'
 rescue LoadError
