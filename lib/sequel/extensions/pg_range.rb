@@ -503,6 +503,7 @@ module Sequel
   Database.register_extension(:pg_range, Postgres::PGRange::DatabaseMethods)
 end
 
+# :nocov:
 if Sequel.core_extensions?
   class Range 
     # Create a new PGRange using the receiver as the input range,
@@ -522,3 +523,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
+# :nocov:

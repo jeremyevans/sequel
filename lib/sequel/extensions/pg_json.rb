@@ -192,6 +192,7 @@ module Sequel
   Database.register_extension(:pg_json, Postgres::JSONDatabaseMethods)
 end
 
+# :nocov:
 if Sequel.core_extensions?
   class Array
     # Return a Sequel::Postgres::JSONArray proxy to the receiver.
@@ -227,3 +228,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
+# :nocov:

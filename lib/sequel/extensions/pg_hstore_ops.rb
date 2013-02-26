@@ -287,6 +287,7 @@ module Sequel
   end
 end
 
+# :nocov:
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::HStoreOpMethods
@@ -300,3 +301,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
+# :nocov:

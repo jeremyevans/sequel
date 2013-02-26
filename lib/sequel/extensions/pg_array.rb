@@ -402,10 +402,12 @@ module Sequel
         end
 
         if Sequel::Postgres.respond_to?(:parse_pg_array)
+        # :nocov:
           # Use sequel_pg's C-based parser if it has already been defined.
           def call(string)
             PGArray.new(Sequel::Postgres.parse_pg_array(string, @converter), @type)
           end
+        # :nocov:
         else
           # Parse the string using Parser with the appropriate
           # converter, and return a PGArray with the appropriate database
@@ -527,6 +529,7 @@ module Sequel
   Database.register_extension(:pg_array, Postgres::PGArray::DatabaseMethods)
 end
 
+# :nocov:
 if Sequel.core_extensions?
   class Array
     # Return a PGArray proxy to the receiver, using a
@@ -548,3 +551,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
+# :nocov:

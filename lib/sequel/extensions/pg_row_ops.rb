@@ -176,6 +176,7 @@ module Sequel
   end
 end
 
+# :nocov:
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::PGRowOp::ExpressionMethods
@@ -189,3 +190,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
+# :nocov:

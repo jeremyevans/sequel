@@ -74,5 +74,7 @@ module Sequel
   end
 end
 else
+# :nocov:
   raise LoadError, 'ForceEncoding plugin only works on Ruby 1.9+'
+# :nocov:
 end

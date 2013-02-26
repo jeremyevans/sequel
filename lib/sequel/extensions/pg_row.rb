@@ -572,6 +572,7 @@ module Sequel
   Database.register_extension(:pg_row, Postgres::PGRow::DatabaseMethods)
 end
 
+# :nocov:
 if Sequel.core_extensions?
   class Array
     # Wraps the receiver in an anonymous Sequel::Postgres::PGRow::ArrayRow instance.
@@ -590,3 +591,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
+# :nocov:
