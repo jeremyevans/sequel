@@ -62,14 +62,6 @@ module Sequel
         ACCESS_DURATION_UNITS = DURATION_UNITS.zip(%w'yyyy m d h n s'.map{|s| s.freeze}).freeze
         DB2_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s).freeze}).freeze
 
-        # Return an SQL fragment for the literalized version of the
-        # DateAdd expression.
-        def date_add_sql(da)
-          sql = ''
-          date_arith_sql_append(sql, da)
-          sql
-        end
-
         # Append the SQL fragment for the DateAdd expression to the SQL query.
         def date_add_sql_append(sql, da)
           h = da.interval
