@@ -80,12 +80,13 @@ module Sequel
         private
 
         JAVA_BIG_DECIMAL = ::Sequel::JDBC::Dataset::JAVA_BIG_DECIMAL
+        JAVA_BIG_DECIMAL_CONSTRUCTOR = java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)
 
         class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
           def oracle_decimal(v)
             if v.scale == 0
               i = v.long_value
-              if v.equals(JAVA_BIG_DECIMAL.new(i))
+              if v.equals(JAVA_BIG_DECIMAL_CONSTRUCTOR.call(i))
                 i
               else
                 decimal(v)
