@@ -310,8 +310,10 @@ module Sequel
       # The closest MSSQL equivalent of a boolean datatype is the bit type.
       def schema_column_type(db_type)
         case db_type
-        when /\A(bit)\z/io
+        when /\A(?:bit)\z/io
           :boolean
+        when /\A(?:(?:small)?money)\z/io
+          :decimal
         else
           super
         end

@@ -1393,7 +1393,6 @@ describe "Schema Parser" do
     @db.schema(:"number(10,0)").first.last[:type].should == :integer
     @db.schema(:"numeric(10, 10)").first.last[:type].should == :decimal
     @db.schema(:"decimal(10,1)").first.last[:type].should == :decimal
-    @db.schema(:money).first.last[:type].should == :decimal
     @db.schema(:bytea).first.last[:type].should == :blob
     @db.schema(:blob).first.last[:type].should == :blob
     @db.schema(:image).first.last[:type].should == :blob
@@ -1401,7 +1400,6 @@ describe "Schema Parser" do
     @db.schema(:nvarchar).first.last[:type].should == :string
     @db.schema(:ntext).first.last[:type].should == :string
     @db.schema(:smalldatetime).first.last[:type].should == :datetime
-    @db.schema(:smallmoney).first.last[:type].should == :decimal
     @db.schema(:binary).first.last[:type].should == :blob
     @db.schema(:varbinary).first.last[:type].should == :blob
     @db.schema(:enum).first.last[:type].should == :enum

@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove bad model typecasting of money type on PostgreSQL (jeremyevans) (#624)
+
 * Use simplecov instead of rcov for coverage testing on 1.9+ (jeremyevans)
 
 * Make the Database#quote_identifier method public (jeremyevans)
