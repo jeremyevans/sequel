@@ -77,6 +77,15 @@ describe "Dataset#query" do
     q.class.should == @d.class
     q.sql.should == "SELECT * FROM xyz ORDER BY stamp"
   end
+
+  specify "should support blocks that end in nil" do
+    condition = false
+    q = @d.query do
+      from :xyz
+      order_by :stamp if condition
+    end
+    q.sql.should == "SELECT * FROM xyz"
+  end
   
   specify "should raise on non-chainable method calls" do
     proc {@d.query {row_proc}}.should raise_error(Sequel::Error)

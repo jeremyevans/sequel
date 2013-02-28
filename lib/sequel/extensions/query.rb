@@ -29,7 +29,9 @@ module Sequel
     #
     #  dataset = DB[:items].select(:x, :y, :z).filter{(x > 1) & (y > 2)}.reverse(:z)
     def query(&block)
-      Query.new(self).instance_eval(&block).dataset
+      query = Query.new(self)
+      query.instance_eval(&block)
+      query.dataset
     end
 
     # Proxy object used by Dataset#query.
