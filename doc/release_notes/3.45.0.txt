@@ -1,0 +1,179 @@
+= New Features
+
+* Database#transaction now recognizes a :retry_on option, which
+  should contain an exception class or array of exception classes.
+  If the transaction raises one of the given exceptions, Sequel
+  will automatically retry the transaction block.  It's a bad idea to
+  use this option if the transaction block is not idempotent.
+
+  By default, Sequel only retries the block 5 times by default,
+  to protect against infinite looping.  You can change the number
+  of retries with the :num_retries option.
+
+  Users of the :disconnect=>:retry option are encouraged to switch
+  to :retry_on=>Sequel::DatabaseDisconnectError.
+
+* Dataset#escape_like has been added for escaping LIKE
+  metacharacters.  This is designed for the case where part of
+  the LIKE pattern is based on user input that should not treat the
+  metacharacters specially.
+
+* Serialization failures/deadlocks are now raised as
+  Sequel::SerializationFailure exception instances.  This exception
+  class is a good candidate for the transaction :retry_on option.
+
+* On PostgreSQL, you can now provide the :force_standard_strings
+  and :client_min_messages Database options to override the defaults
+  on a per-instance basis.
+
+* On PostgreSQL, Database#tables and #views now recognizes a
+  :qualify option, which if true will return qualified identifiers
+  instead of plain symbols.
+
+* Transaction isolation levels are now supported on Oracle, DB2,
+  and all jdbc subadapters using the JDBC transaction support.
+
+* Dataset.def_mutation_method now accepts a :module option for
+  the module in which to define the methods (defaulting to self).
+
+* An unlimited_update plugin has been added.  It's sole purpose is to
+  eliminate a MySQL warning in replicated environments, since by
+  default Sequel::Model uses a LIMIT clause when updating on MySQL.
+
+* The named_timezones extension now adds a
+  Sequel.tzinfo_disambiguator accessor to automatically handle
+  TZInfo::AmbiguousTime exceptions.  This should be a callable object
+  that accepts two arguments, a DateTime instance and an array of
+  timezone periods, and returns the timezone period to use.
+
+= Other Improvements
+
+* Sequel now handles JSON securely, specifying the
+  :create_additions=>false option when using JSON.parse.  If you
+  really want to get the old vulnerable behavior back, override
+  Sequel.parse_json.
+
+* The json_serializer and xml_serializer plugins are now secure
+  by default.  Before, the default behavior of these plugins
+  allowed for round tripping, such that:
+
+    Album.from_xml(album.to_xml) == album
+
+  Unfortunately, that requires that the deserialization allow
+  the setting of any column.  Since the plugins also handle
+  associations, you could also set any column in any associated
+  object, even cascading to associated objects of those objects.
+
+  The new default behavior only allows deserialization to set
+  the same columns that mass-assignment would set, and not to
+  handle associated objects at all by default.  The following
+  additional options are supported:
+
+    :fields :: The specific fields to set (this was already supported
+               by the json_serializer plugin).
+    :associations :: The specific associations to handle.
+    :all_columns :: The previous behavior of setting all columns.
+    :all_associations :: The previous behavior of setting all
+                         associations.
+
+  Since JSON parsing no longer deserializes into arbitrary ruby
+  instances, from_json and array_from_json class methods have been
+  added to the json_serializer plugin, for deserializing into model
+  instances.  These mirror the from_xml and array_from_xml class
+  methods in the xml_serializer plugin.
+
+  Note that the :all_columns and :all_associations methods were
+  only added to make backwards compatibility easier.  It is
+  likely they will be removed in Sequel 4, along with the
+  json_create class method.
+
+* Sequel now attempts to use database specific error codes or
+  SQLState codes instead of regexp parsing to determine if a more
+  specific DatabaseError subclass should be used.  This should make
+  error handling faster and more robust.
+
+* Sequel now uses ESCAPE '\' when using LIKE, for similar behavior
+  across databases.  Previously, no ESCAPE clause was used, so
+  behavior differed across databases, with most not using escaping,
+  and PostgreSQL, MySQL, and H2 defaulting to backslash as the escape
+  character.
+
+* The query extension has been reimplemented and now uses a proxy
+  object instead of Object#extend.
+
+* The :pool_timeout Database option now supports fractional seconds.
+
+* Database#quote_identifier is now a public method.
+
+* Metadata parsing (schema, indexes, foreign_key_list) on PostgreSQL
+  now correctly handles the case where an unqualified table name is
+  used and tables with that name exist in multiple schemas.  It now
+  picks the first matching table in the schema_search_path, instead of
+  failing or returning results from all tables.
+
+* Sequel::Model instances no longer attempt to typecast the money
+  type on PostgreSQL, since the previous typecast didn't work
+  correctly, and correct typecasting is locale-dependent.
+
+* Sequel no longer picks up foreign keys for tables in other
+  databases when using Database#foreign_key_list on MySQL.
+
+* A warning when using the mysql2 3.12 beta has been eliminated.
+
+* A warning has been eliminated when using the jdbc/oracle adapter
+  on JRuby 1.7.
+
+* Sequel's ilike emulation should now work by default on databases
+  without specific syntax support.
+
+* Dataset#from_self! no longer creates a self referential dataset.
+
+* Coverage testing now uses simplecov instead of rcov on ruby 1.9+.
+
+= Backwards Compatibility
+
+* The switch to using JSON.parse :create_additions=>false means
+  that if your app expected JSON to deserialize into arbitrary
+  ruby objects, it is probably broken.  You should update your
+  application code to manually convert the deserialized hashes
+  into the ruby objects you want.
+
+  Note that it's not just this new version of Sequel that will
+  cause that, older versions of Sequel will break in the same
+  way if you update your JSON library to a version that is not
+  vulnerable by default.
+
+  This potentially affects the pg_json extension and serialization
+  plugin if you were expecting the JSON stored in the database
+  to be deserialized into arbitrary ruby objects.
+
+  See the json_serializer/xml_serializer changes mentioned in
+  the Other Improvements section.
+
+* The reimplemented query extension is not completely backwards
+  compatible.  For example, inside a query block, self refers to the
+  proxy object instead of a dataset, and calling methods that return
+  rows no longer raises an exception.
+
+* The metadata parsing methods on PostgreSQL no longer work with
+  unqualified tables where the table is not in the schema search
+  path.  This makes metadata parsing consistent with how datasets
+  operate.  For tables outside the schema search path, you must
+  qualify it before use now.
+
+  Additionally, using a nonexistent table name will raise an
+  exception instead of returning empty results in some cases.
+
+* The Dataset#def_mutation_method instance method has been removed.
+  This method added mutation methods directly on the dataset instance,
+  which is generally not desired.  Using the def_mutation_method class
+  method with the :module option is now the recommended approach.
+
+* The switch to using ESCAPE for LIKE characters is backwards
+  incompatible on databases that don't use escaping by default, 
+  when backslash is used in a LIKE pattern as a regular character.
+  Now you have to double the backslash in the pattern.
+
+* Database#database_error_regexps private method now can return any
+  enumerable yielding regexp/exception class pairs, it is no longer
+  specified to return a hash.

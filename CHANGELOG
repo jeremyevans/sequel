@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.45.0 (2013-03-01)
 
 * Remove bad model typecasting of money type on PostgreSQL (jeremyevans) (#624)
 
