@@ -1642,11 +1642,14 @@ describe Sequel::Model, "typecasting" do
     m.x.should == bd
     m.x = bd
     m.x.should == bd
+    m.x = '0'
+    m.x.should == 0
   end
 
   specify "should raise an error if invalid data is used in an decimal field" do
     @c.db_schema = {:x=>{:type=>:decimal}}
     proc{@c.new.x = Date.today}.should raise_error(Sequel::InvalidValue)
+    proc{@c.new.x = 'foo'}.should raise_error(Sequel::InvalidValue)
   end
 
   specify "should assign value if raise_on_typecast_failure is off and assigning invalid decimal" do

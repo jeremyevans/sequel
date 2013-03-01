@@ -1,3 +1,9 @@
+=== HEAD
+
+* Make the looser_typecasting extension use looser typecasting for decimal columns as well as integers and floats (jeremyevans)
+
+* Do strict typecasting of decimal columns by default, similar to integer/float typecasting (jeremyevans)
+
 === 3.45.0 (2013-03-01)
 
 * Remove bad model typecasting of money type on PostgreSQL (jeremyevans) (#624)

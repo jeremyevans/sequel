@@ -454,8 +454,21 @@ module Sequel
       case value
       when BigDecimal
         value
-      when String, Numeric
+      when Numeric
         BigDecimal.new(value.to_s)
+      when String
+        d = BigDecimal.new(value)
+        if d.zero?
+          # BigDecimal parsing is loose by default, returning a 0 value for
+          # invalid input.  If a zero value is received, use Float to check
+          # for validity.
+          begin
+            Float(value)
+          rescue ArgumentError
+            raise InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
+          end
+        end
+        d
       else
         raise InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
       end
