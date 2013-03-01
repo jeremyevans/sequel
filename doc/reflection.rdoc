@@ -99,12 +99,12 @@ You can get an array of association symbols with Model.associations:
 
 You can get the association reflection for a single association via the Model.association_reflection.  Association reflections are subclasses of hash, for ease of use and introspection (and backwards compatibility):
 
-  Model.association_reflection(:association1) # {:name=>:association1, :type=>:many_to_one, :model=>Model, :associated_class=>OtherModel, ...}
+  Model.association_reflection(:association1) # {:name=>:association1, :type=>:many_to_one, :model=>Model, ...}
 
 You can get an array of all association reflections via Model.all_association_reflections:
 
-  Model.all_association_reflections # [{:name=>:association1, :type=>:many_to_one, :model=>Model, :associated_class=>OtherModel, ...}, ...]
+  Model.all_association_reflections # [{:name=>:association1, :type=>:many_to_one, :model=>Model, ...}, ...]
 
 Finally, you can get a hash of association reflections via Model.association_reflections:
 
-  Model.association_reflections # {:association1=>{:name=>:association1, :type=>:many_to_one, :model=>Model, :associated_class=>OtherModel, ...}, ...}
+  Model.association_reflections # {:association1=>{:name=>:association1, :type=>:many_to_one, :model=>Model, ...}, ...}
