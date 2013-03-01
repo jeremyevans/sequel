@@ -11,25 +11,24 @@ SUDO = ENV['SUDO'] || 'sudo'
 
 # Gem Packaging and Release
 
-desc "Packages sequel"
+desc "Build sequel gem"
 task :package=>[:clean] do |p|
-  load './sequel.gemspec'
-  Gem::Builder.new(SEQUEL_GEMSPEC).build
+  sh %{#{FileUtils::RUBY} -S gem build sequel.gemspec}
 end
 
 desc "Install sequel gem"
 task :install=>[:package] do
-  sh %{#{SUDO} gem install ./#{NAME}-#{VERS.call} --local}
+  sh %{#{SUDO} #{FileUtils::RUBY} -S gem install ./#{NAME}-#{VERS.call} --local}
 end
 
 desc "Uninstall sequel gem"
 task :uninstall=>[:clean] do
-  sh %{#{SUDO} gem uninstall #{NAME}}
+  sh %{#{SUDO} #{FileUtils::RUBY} -S gem uninstall #{NAME}}
 end
 
-desc "Upload sequel gem to gemcutter"
+desc "Publish sequel gem to rubygems.org"
 task :release=>[:package] do
-  sh %{gem push ./#{NAME}-#{VERS.call}.gem}
+  sh %{#{FileUtils::RUBY} -S gem push ./#{NAME}-#{VERS.call}.gem}
 end
 
 ### Website
