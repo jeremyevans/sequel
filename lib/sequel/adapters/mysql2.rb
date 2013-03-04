@@ -27,17 +27,11 @@ module Sequel
       #   a filter for an autoincrement column equals NULL to return the last
       #   inserted row.
       # * :charset - Same as :encoding (:encoding takes precendence)
-      # * :config_default_group - The default group to read from the in
-      #   the MySQL config file.
-      # * :config_local_infile - If provided, sets the Mysql::OPT_LOCAL_INFILE
-      #   option on the connection with the given value.
-      # * :connect_timeout - Set the timeout in seconds before a connection
-      #   attempt is abandoned.
       # * :encoding - Set all the related character sets for this
       #   connection (connection, client, database, server, and results).
-      # * :socket - Use a unix socket file instead of connecting via TCP/IP.
-      # * :timeout - Set the timeout in seconds before the server will
-      #   disconnect this connection (a.k.a. @@wait_timeout).
+      #
+      # The options hash is also passed to mysql2, and can include mysql2
+      # options such as :local_infile.
       def connect(server)
         opts = server_opts(server)
         opts[:host] ||= 'localhost'
