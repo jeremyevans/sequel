@@ -43,7 +43,7 @@ module Sequel
         opts[:host] ||= 'localhost'
         opts[:username] ||= opts.delete(:user)
         opts[:flags] = ::Mysql2::Client::FOUND_ROWS if ::Mysql2::Client.const_defined?(:FOUND_ROWS)
-        opts[:flags] |= ::Mysql2::Client::LOCAL_FILES if opts.include?(:config_local_infile) && opts[:config_local_infile]
+        opts[:local_infile] = true if opts.include?(:config_local_infile) && opts[:config_local_infile]
         conn = ::Mysql2::Client.new(opts)
         conn.query_options.merge!(:symbolize_keys=>true, :cache_rows=>false)
 
