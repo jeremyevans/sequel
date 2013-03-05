@@ -205,7 +205,8 @@ module Sequel
           when :primary_key
             "DROP PRIMARY KEY"
           when :foreign_key
-            "DROP FOREIGN KEY #{quote_identifier(op[:name])}"
+            name = op[:name] || foreign_key_name(table, op[:columns])
+            "DROP FOREIGN KEY #{quote_identifier(name)}"
           when :unique
             "DROP INDEX #{quote_identifier(op[:name])}"
           end

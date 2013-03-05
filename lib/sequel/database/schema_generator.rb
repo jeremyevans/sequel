@@ -396,6 +396,21 @@ module Sequel
         @operations << {:op => :drop_constraint, :name => name}.merge(opts)
       end
       
+      # Remove a foreign key and the associated column from the DDL for the table. General options:
+      #
+      # :name :: The name of the constraint to drop.  If not given, uses the same name
+      #          that would be used by add_foreign_key with the same columns.
+      #
+      # NOTE: If you want to drop only the foreign key constraint but keep the column,
+      # use the composite key syntax even if it is only one column.
+      #
+      #   drop_foreign_key(:artist_id) # DROP CONSTRAINT table_artist_id_fkey, DROP COLUMN artist_id
+      #   drop_foreign_key([:name]) # DROP CONSTRAINT table_name_fkey
+      def drop_foreign_key(name, opts={})
+        drop_composite_foreign_key(Array(name), opts)
+        drop_column(name) unless name.is_a?(Array)
+      end
+      
       # Remove an index from the DDL for the table. General options:
       #
       # :name :: The name of the index to drop.  If not given, uses the same name
@@ -464,6 +479,11 @@ module Sequel
       # Add a composite foreign key constraint
       def add_composite_foreign_key(columns, table, opts)
         @operations << {:op => :add_constraint, :type => :foreign_key, :columns => columns, :table => table}.merge(opts)
+      end
+
+      # Drop a composite foreign key constraint
+      def drop_composite_foreign_key(columns, opts)
+        @operations << {:op => :drop_constraint, :type => :foreign_key, :columns => columns}.merge(opts)
       end
     end
   end
