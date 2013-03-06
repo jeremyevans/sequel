@@ -619,10 +619,9 @@ module Sequel
   
     # Get foreign key name for given table and columns.
     def foreign_key_name(table_name, columns)
-      foreign_key_list(table_name).each do |fk|
-        return fk[:name] if fk[:columns] == columns
-      end
-      default_index_name(table_name, columns).sub(/_index$/,'_fkey')
+      keys = foreign_key_list(table_name).select{|key| key[:columns] == columns}
+      raise(Error, "#{keys.empty? ? 'Missing' : 'Ambiguous'} foreign key for #{columns.inspect}") unless keys.size == 1
+      keys.first[:name]
     end
     
     # The SQL to drop an index for the table.
