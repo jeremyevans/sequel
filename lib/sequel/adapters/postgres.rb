@@ -164,7 +164,7 @@ module Sequel
       # conversion is done, so an error is raised if you attempt to retrieve an infinite
       # timestamp.  You can set this to :nil to convert to nil, :string to leave
       # as a string, or :float to convert to an infinite float.
-      attr_accessor :convert_infinite_timestamps
+      attr_reader :convert_infinite_timestamps
       
       # Add the primary_keys and primary_key_sequences instance variables,
       # so we can get the correct return values for inserted rows.
@@ -233,6 +233,22 @@ module Sequel
         conn
       end
       
+      def convert_infinite_timestamps=(v)
+        @convert_infinite_timestamps = v
+        pr = old_pr = Postgres.use_iso_date_format ? TYPE_TRANSLATOR.method(:date) : Sequel.method(:string_to_date)
+        if v
+          pr = lambda do |v|
+            case v
+            when *INFINITE_TIMESTAMP_STRINGS
+              infinite_timestamp_value(v)
+            else
+              old_pr.call(v)
+            end
+          end
+        end
+        conversion_procs[1082] = pr
+      end
+
       # Disconnect given connection
       def disconnect_connection(conn)
         begin
@@ -396,7 +412,7 @@ module Sequel
       # If convert_infinite_timestamps is true and the value is infinite, return an appropriate
       # value based on the convert_infinite_timestamps setting.
       def to_application_timestamp(value)
-        if c = convert_infinite_timestamps
+        if convert_infinite_timestamps
           case value
           when *INFINITE_TIMESTAMP_STRINGS
             infinite_timestamp_value(value)
@@ -502,6 +518,22 @@ module Sequel
       # Don't log, since logging is done by the underlying connection.
       def log_connection_execute(conn, sql)
         conn.execute(sql)
+      end
+
+      # If the value is an infinite value (either an infinite float or a string returned by
+      # by PostgreSQL for an infinite timestamp), return it without converting it if
+      # convert_infinite_timestamps is set.
+      def typecast_value_date(value)
+        if convert_infinite_timestamps
+          case value
+          when *INFINITE_DATETIME_VALUES
+            value
+          else
+            super
+          end
+        else
+          super
+        end
       end
 
       # If the value is an infinite value (either an infinite float or a string returned by

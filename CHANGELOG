@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle infinite dates in the postgrs adapter using Database#convert_infinite_timestamps (jeremyevans)
+
 * Make the looser_typecasting extension use looser typecasting for decimal columns as well as integers and floats (jeremyevans)
 
 * Do strict typecasting of decimal columns by default, similar to integer/float typecasting (jeremyevans)
