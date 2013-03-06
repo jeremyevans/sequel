@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle drop_constraint :type=>:primary_key on H2 (jeremyevans)
+
 * Handle infinite dates in the postgrs adapter using Database#convert_infinite_timestamps (jeremyevans)
 
 * Make the looser_typecasting extension use looser typecasting for decimal columns as well as integers and floats (jeremyevans)

@@ -85,6 +85,12 @@ module Sequel
             sql = "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(op)}"
             column_definition_order.each{|m| send(:"column_definition_#{m}_sql", sql, op)}
             sql
+          when :drop_constraint
+            if op[:type] == :primary_key
+              "ALTER TABLE #{quote_schema_table(table)} DROP PRIMARY KEY"
+            else
+              super(table, op)
+            end
           else
             super(table, op)
           end
