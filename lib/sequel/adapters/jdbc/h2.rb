@@ -127,6 +127,11 @@ module Sequel
           PRIMARY_KEY_INDEX_RE
         end
 
+        # H2 does not support named column constraints.
+        def supports_named_column_constraints?
+          false
+        end
+
         # Use BIGINT IDENTITY for identity columns that use bigint, fixes
         # the case where primary_key :column, :type=>Bignum is used.
         def type_literal_generic_bignum(column)

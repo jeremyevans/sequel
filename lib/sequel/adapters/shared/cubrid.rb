@@ -146,6 +146,11 @@ module Sequel
         nil
       end
 
+      # CUBRID does not support named column constraints.
+      def supports_named_column_constraints?
+        false
+      end
+
       # CUBRID doesn't support booleans, it recommends using smallint.
       def type_literal_generic_trueclass(column)
         :smallint

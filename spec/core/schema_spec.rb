@@ -113,6 +113,22 @@ describe "DB#create_table" do
     @db.sqls.should == ['CREATE TABLE cats (id serial PRIMARY KEY)']
   end
 
+  specify "should allow naming primary key constraint with :primary_key_constraint_name option" do
+    @db.create_table(:cats) do
+      primary_key :id, :primary_key_constraint_name=>:foo
+    end
+    @db.sqls.should == ['CREATE TABLE cats (id integer CONSTRAINT foo PRIMARY KEY AUTOINCREMENT)']
+  end
+
+  specify "should handling splitting named column constraints into table constraints if unsupported" do
+    def @db.supports_named_column_constraints?; false end
+    @db.create_table(:cats) do
+      primary_key :id, :primary_key_constraint_name=>:foo
+      foreign_key :cat_id, :cats, :unique=>true, :unique_constraint_name=>:bar, :foreign_key_constraint_name=>:baz, :deferrable=>true, :key=>:foo_id, :on_delete=>:cascade, :on_update=>:restrict
+    end
+    @db.sqls.should == ['CREATE TABLE cats (id integer AUTOINCREMENT, cat_id integer, CONSTRAINT foo PRIMARY KEY (id), CONSTRAINT baz FOREIGN KEY (cat_id) REFERENCES cats(foo_id) ON DELETE CASCADE ON UPDATE RESTRICT DEFERRABLE INITIALLY DEFERRED, CONSTRAINT bar UNIQUE (cat_id))']
+  end
+
   specify "should accept and literalize default values" do
     @db.create_table(:cats) do
       integer :id, :default => 123
@@ -145,6 +161,13 @@ describe "DB#create_table" do
       text :name, :unique => true
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer, name text UNIQUE)"]
+  end
+  
+  specify "should allow naming unique constraint with :unique_constraint_name option" do
+    @db.create_table(:cats) do
+      text :name, :unique => true, :unique_constraint_name=>:foo
+    end
+    @db.sqls.should == ["CREATE TABLE cats (name text CONSTRAINT foo UNIQUE)"]
   end
   
   specify "should handle not deferred unique constraints" do
@@ -225,6 +248,13 @@ describe "DB#create_table" do
       foreign_key :project_id, :projects, :default=>3
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer DEFAULT 3 REFERENCES projects)"]
+  end
+  
+  specify "should allowing naming foreign key constraint with :foreign_key_constraint_name option" do
+    @db.create_table(:cats) do
+      foreign_key :project_id, :projects, :foreign_key_constraint_name=>:foo
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer CONSTRAINT foo REFERENCES projects)"]
   end
   
   specify "should raise an error if the table argument to foreign_key isn't a hash, symbol, or nil" do

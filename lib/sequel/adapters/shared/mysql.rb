@@ -199,7 +199,9 @@ module Sequel
           unless op[:type] || opts[:type]
             raise Error, "cannot determine database type to use for CHANGE COLUMN operation"
           end
-          "CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(op.merge(opts))}"
+          opts = op.merge(opts)
+          opts.delete(:auto_increment) if op[:auto_increment] == false
+          "CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(opts)}"
         when :drop_constraint
           type = case op[:type]
           when :primary_key
@@ -224,6 +226,13 @@ module Sequel
         case op[:op]
         when :drop_index
           "#{drop_index_sql(table, op)} ON #{quote_schema_table(table)}"
+        when :drop_constraint
+          if op[:type] == :primary_key
+            if (pk = primary_key_from_schema(table)).length == 1
+              return [alter_table_sql(table, {:op=>:rename_column, :name=>pk.first, :new_name=>pk.first, :auto_increment=>false}), super]
+            end
+          end
+          super
         else
           super
         end
@@ -242,7 +251,7 @@ module Sequel
       # operations, since in some cases adding a foreign key constraint in
       # the same query as other operations results in MySQL error 150.
       def combinable_alter_table_op?(op)
-        super && !(op[:op] == :add_constraint && op[:type] == :foreign_key)
+        super && !(op[:op] == :add_constraint && op[:type] == :foreign_key) && !(op[:op] == :drop_constraint && op[:type] == :primary_key)
       end
 
       # The SQL queries to execute on initial connection
@@ -317,6 +326,7 @@ module Sequel
         collate = options.fetch(:collate, Sequel::MySQL.default_collate)
         generator.constraints.sort_by{|c| (c[:type] == :primary_key) ? -1 : 1}
 
+        # Proc for figuring out the primary key for a given table.
         key_proc = lambda do |t|
           if t == name 
             if pk = generator.primary_key_name
@@ -329,12 +339,17 @@ module Sequel
           end
         end
 
+        # Manually set the keys, since MySQL requires one, it doesn't use the primary
+        # key if none are specified.
         generator.constraints.each do |c|
           if c[:type] == :foreign_key
             c[:key] ||= key_proc.call(c[:table])
           end
         end
 
+        # Split column constraints into table constraints in some cases:
+        # * foreign key - Always
+        # * unique, primary_key - Only if constraint has a name
         generator.columns.each do |c|
           if t = c.delete(:table)
             same_table = t == name
@@ -346,7 +361,7 @@ module Sequel
               generator.constraints.unshift(:type=>:unique, :columns=>Array(k))
             end
 
-            generator.foreign_key([c[:name]], t, c.merge(:name=>nil, :type=>:foreign_key, :key=>key))
+            generator.foreign_key([c[:name]], t, c.merge(:name=>c[:foreign_key_constraint_name], :type=>:foreign_key, :key=>key))
           end
         end
 
@@ -446,6 +461,11 @@ module Sequel
       # MySQL supports CREATE OR REPLACE VIEW.
       def supports_create_or_replace_view?
         true
+      end
+
+      # MySQL does not support named column constraints.
+      def supports_named_column_constraints?
+        false
       end
 
       # Respect the :size option if given to produce

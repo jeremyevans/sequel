@@ -416,7 +416,7 @@ module Sequel
               last_combinable = true
             end
           elsif sql = alter_table_sql(table, op)
-            grouped_ops << sql
+            Array(sql).each{|s| grouped_ops << s}
             last_combinable = false
           end
         end
@@ -474,17 +474,32 @@ module Sequel
     
     # Add primary key SQL fragment to column creation SQL.
     def column_definition_primary_key_sql(sql, column)
-      sql << PRIMARY_KEY if column[:primary_key]
+      if column[:primary_key]
+        if name = column[:primary_key_constraint_name]
+          sql << " CONSTRAINT #{quote_identifier(name)}"
+        end
+        sql << PRIMARY_KEY
+      end
     end
     
     # Add foreign key reference SQL fragment to column creation SQL.
     def column_definition_references_sql(sql, column)
-      sql << column_references_column_constraint_sql(column) if column[:table]
+      if column[:table]
+        if name = column[:foreign_key_constraint_name]
+         sql << " CONSTRAINT #{quote_identifier(name)}"
+        end
+        sql << column_references_column_constraint_sql(column)
+      end
     end
     
     # Add unique constraint SQL fragment to column creation SQL.
     def column_definition_unique_sql(sql, column)
-      sql << UNIQUE if column[:unique]
+      if column[:unique]
+        if name = column[:unique_constraint_name]
+          sql << " CONSTRAINT #{quote_identifier(name)}"
+        end
+        sql << UNIQUE
+      end
     end
     
     # SQL for all given columns, used inside a CREATE TABLE block.
@@ -528,7 +543,7 @@ module Sequel
       when :primary_key
         sql << "PRIMARY KEY #{literal(constraint[:columns])}"
       when :foreign_key
-        sql << column_references_table_constraint_sql(constraint)
+        sql << column_references_table_constraint_sql(constraint.merge(:deferrable=>nil))
       when :unique
         sql << "UNIQUE #{literal(constraint[:columns])}"
       else
@@ -575,6 +590,23 @@ module Sequel
 
     # DDL statement for creating a table with the given name, columns, and options
     def create_table_sql(name, generator, options)
+      unless supports_named_column_constraints?
+        # Split column constraints into table constraints if they have a name
+        generator.columns.each do |c|
+          if (constraint_name = c.delete(:foreign_key_constraint_name)) && (table = c.delete(:table))
+            opts = {}
+            opts[:name] = constraint_name
+            [:key, :on_delete, :on_update, :deferrable].each{|k| opts[k] = c[k]}
+            generator.foreign_key([c[:name]], table, opts)
+          end
+          if (constraint_name = c.delete(:unique_constraint_name)) && c.delete(:unique)
+            generator.unique(c[:name], :name=>constraint_name)
+          end
+          if (constraint_name = c.delete(:primary_key_constraint_name)) && c.delete(:primary_key)
+            generator.primary_key([c[:name]], :name=>constraint_name)
+          end
+        end
+      end
       "#{create_table_prefix_sql(name, options)} (#{column_list_sql(generator)})"
     end
 
@@ -740,6 +772,14 @@ module Sequel
     # operations into a single query, false by default.
     def supports_combining_alter_table_ops?
       false
+    end
+
+    # Whether the database supports named column constraints. True
+    # by default.  Those that don't support named column constraints
+    # have to have column constraints converted to table constraints
+    # if the column constraints have names.
+    def supports_named_column_constraints?
+      true
     end
 
     # SQL DDL fragment for temporary table

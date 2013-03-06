@@ -99,10 +99,12 @@ module Sequel
       #               (:restrict, :cascade, :set_null, :set_default, :no_action).
       # :primary_key :: Make the column as a single primary key column.  This should only
       #                 be used if you have a single, nonautoincrementing primary key column.
+      # :primary_key_constraint_name :: The name to give the primary key constraint
       # :type :: Overrides the type given as the argument.  Generally not used by column
       #          itself, but can be passed as an option to other methods that call column.
       # :unique :: Mark the column as unique, generally has the same effect as
       #            creating a unique index on the column.
+      # :unique_constraint_name :: The name to give the unique key constraint
       def column(name, type, opts = {})
         columns << {:name => name, :type => type}.merge(opts)
         if index_opts = opts[:index]
@@ -126,6 +128,10 @@ module Sequel
       #   foreign_key(:artist_id, :artists) # artist_id INTEGER REFERENCES artists
       #   foreign_key(:artist_id, :artists, :key=>:id) # artist_id INTEGER REFERENCES artists(id)
       #   foreign_key(:artist_id, :artists, :type=>String) # artist_id varchar(255) REFERENCES artists(id)
+      #
+      # Additional Options:
+      #
+      # :foreign_key_constraint_name :: The name to give the foreign key constraint
       #
       # If you want a foreign key constraint without adding a column (usually because it is a
       # composite foreign key), you can provide an array of columns as the first argument, and
@@ -206,7 +212,7 @@ module Sequel
       end
       
       # Adds an autoincrementing primary key column or a primary key constraint to the DDL.
-      # To create a constraint, the first argument should be an array of column symbols
+      # To just create a constraint, the first argument should be an array of column symbols
       # specifying the primary key columns. To create an autoincrementing primary key
       # column, a single symbol can be used. In both cases, an options hash can be used
       # as the second argument.
@@ -214,10 +220,13 @@ module Sequel
       # If you want to create a primary key column that is not autoincrementing, you
       # should not use this method.  Instead, you should use the regular +column+ method
       # with a <tt>:primary_key=>true</tt> option.
+      #
+      # If an array of column symbols is used, you can specify the :name option
+      # to name the constraint.
       # 
       # Examples:
       #   primary_key(:id)
-      #   primary_key([:street_number, :house_number])
+      #   primary_key([:street_number, :house_number], :name=>:some constraint_name)
       def primary_key(name, *args)
         return composite_primary_key(name, *args) if name.is_a?(Array)
         @primary_key = @db.serial_primary_key_options.merge({:name => name})
@@ -246,7 +255,8 @@ module Sequel
       #
       #   unique(:name) # UNIQUE (name)
       #
-      # Supports the same :deferrable option as #column.
+      # Supports the same :deferrable option as #column. The :name option can be used
+      # to name the constraint.
       def unique(columns, opts = {})
         constraints << {:type => :unique, :columns => Array(columns)}.merge(opts)
       end
