@@ -71,7 +71,7 @@ Sequel includes an IRB console for quick access to databases (usually referred t
 
 You get an IRB session with the database object stored in DB.
 
-In addition to providing an IRB shell (the default behavior), bin/sequel also has support for migrating databases, dumping schema migrations, and copying databases.  See the {bin/sequel guide}[link:files/doc/bin_sequel_rdoc.html] for more details.
+In addition to providing an IRB shell (the default behavior), bin/sequel also has support for migrating databases, dumping schema migrations, and copying databases.  See the {bin/sequel guide}[link:doc/bin_sequel.rdoc] for more details.
 
 == An Introduction
 
