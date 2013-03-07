@@ -241,11 +241,14 @@ module Sequel
       @actions << [:drop_constraint, args.first]
     end
 
-    def add_foreign_key(*args)
+    def add_foreign_key(key, table, *args)
+      @actions << [:drop_foreign_key, key, *args]
+    end
+
+    def add_primary_key(*args)
       raise if args.first.is_a?(Array)
       @actions << [:drop_column, args.first]
     end
-    alias add_primary_key add_foreign_key
 
     def add_index(*args)
       @actions << [:drop_index, *args]
