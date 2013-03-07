@@ -796,6 +796,10 @@ end
 describe "DB#alter_table" do
   before do
     @db = Sequel.mock
+    # Mock foreign key name.
+    def @db.foreign_key_name(table_name, columns)
+      "#{table_name}_#{columns.join('_')}_fkey"
+    end
   end
   
   specify "should allow adding not null constraint via set_column_allow_null with false argument" do
@@ -947,6 +951,25 @@ describe "DB#alter_table" do
       drop_constraint :valid_score, :cascade=>true
     end
     @db.sqls.should == ["ALTER TABLE cats DROP CONSTRAINT valid_score CASCADE"]
+  end
+
+  specify "should support drop_foreign_key" do
+    @db.alter_table(:cats) do
+      drop_foreign_key :node_id
+    end
+    @db.sqls.should == ["ALTER TABLE cats DROP CONSTRAINT cats_node_id_fkey", "ALTER TABLE cats DROP COLUMN node_id"]
+  end
+
+  specify "should support drop_foreign_key with composite foreign keys" do
+    @db.alter_table(:cats) do
+      drop_foreign_key [:node_id, :prop_id]
+    end
+    @db.sqls.should == ["ALTER TABLE cats DROP CONSTRAINT cats_node_id_prop_id_fkey"]
+
+    @db.alter_table(:cats) do
+      drop_foreign_key [:node_id, :prop_id], :name => :cfk
+    end
+    @db.sqls.should == ["ALTER TABLE cats DROP CONSTRAINT cfk"]
   end
 
   specify "should support drop_index" do

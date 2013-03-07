@@ -128,6 +128,8 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
         add_column :d, String
         add_constraint :blah, 'd IS NOT NULL'
         add_foreign_key :e, :b
+        add_foreign_key [:e], :b, :name=>'e_fk'
+        add_foreign_key [:e, :a], :b
         add_primary_key :f, :b
         add_index :e, :name=>'e_n'
         add_full_text_index :e, :name=>'e_ft'
@@ -151,6 +153,8 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
         [:add_column, :d, String],
         [:add_constraint, :blah, "d IS NOT NULL"],
         [:add_foreign_key, :e, :b],
+        [:add_foreign_key, [:e], :b, {:name=>"e_fk"}],
+        [:add_foreign_key, [:e, :a], :b],
         [:add_primary_key, :f, :b],
         [:add_index, :e, {:name=>"e_n"}],
         [:add_full_text_index, :e, {:name=>"e_ft"}],
@@ -173,7 +177,9 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
         [:drop_index, :e, {:name=>"e_ft"}],
         [:drop_index, :e, {:name=>"e_n"}],
         [:drop_column, :f],
-        [:drop_column, :e],
+        [:drop_foreign_key, [:e, :a]],
+        [:drop_foreign_key, [:e], {:name=>"e_fk"}],
+        [:drop_foreign_key, :e],
         [:drop_constraint, :blah],
         [:drop_column, :d]]
       ],

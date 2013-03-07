@@ -121,6 +121,10 @@ describe Sequel::Schema::AlterTableGenerator do
       add_foreign_key :node_id, :nodes
       add_primary_key [:aaa, :bbb]
       add_foreign_key [:node_id, :prop_id], :nodes_props
+      add_foreign_key [:node_id, :prop_id], :nodes_props, :name => :fkey
+      drop_foreign_key :node_id
+      drop_foreign_key [:node_id, :prop_id]
+      drop_foreign_key [:node_id, :prop_id], :name => :fkey
     end
   end
   
@@ -144,7 +148,12 @@ describe Sequel::Schema::AlterTableGenerator do
       {:op => :add_column, :name => :id, :type => Integer, :primary_key=>true, :auto_increment=>true},
       {:op => :add_column, :name => :node_id, :type => Integer, :table=>:nodes},
       {:op => :add_constraint, :type => :primary_key, :columns => [:aaa, :bbb]},
-      {:op => :add_constraint, :type => :foreign_key, :columns => [:node_id, :prop_id], :table => :nodes_props}
+      {:op => :add_constraint, :type => :foreign_key, :columns => [:node_id, :prop_id], :table => :nodes_props},
+      {:op => :add_constraint, :type => :foreign_key, :columns => [:node_id, :prop_id], :table => :nodes_props, :name => :fkey},
+      {:op => :drop_constraint, :type => :foreign_key, :columns => [:node_id]},
+      {:op => :drop_column, :name => :node_id},
+      {:op => :drop_constraint, :type => :foreign_key, :columns => [:node_id, :prop_id]},
+      {:op => :drop_constraint, :type => :foreign_key, :columns => [:node_id, :prop_id], :name => :fkey},
     ]
   end
 end
