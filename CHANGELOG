@@ -1,5 +1,7 @@
 === HEAD
 
+* Add alter_table drop_foreign_key method for dropping foreign keys by column names (raxoft, jeremyevans) (#627)
+
 * Allow creation named column constraints via :*_constraint_name column options (jeremyevans)
 
 * Handle drop_constraint :type=>:primary_key on H2 (jeremyevans)

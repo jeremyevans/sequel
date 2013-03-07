@@ -826,10 +826,6 @@ end
 describe "DB#alter_table" do
   before do
     @db = Sequel.mock
-    # Mock foreign key name.
-    def @db.foreign_key_name(table_name, columns)
-      "#{table_name}_#{columns.join('_')}_fkey"
-    end
   end
   
   specify "should allow adding not null constraint via set_column_allow_null with false argument" do
@@ -984,6 +980,9 @@ describe "DB#alter_table" do
   end
 
   specify "should support drop_foreign_key" do
+    def @db.foreign_key_list(table_name)
+      [{:name=>:cats_node_id_fkey, :columns=>[:node_id]}] 
+    end
     @db.alter_table(:cats) do
       drop_foreign_key :node_id
     end
@@ -991,6 +990,9 @@ describe "DB#alter_table" do
   end
 
   specify "should support drop_foreign_key with composite foreign keys" do
+    def @db.foreign_key_list(table_name)
+      [{:name=>:cats_node_id_prop_id_fkey, :columns=>[:node_id, :prop_id]}] 
+    end
     @db.alter_table(:cats) do
       drop_foreign_key [:node_id, :prop_id]
     end
@@ -1000,6 +1002,20 @@ describe "DB#alter_table" do
       drop_foreign_key [:node_id, :prop_id], :name => :cfk
     end
     @db.sqls.should == ["ALTER TABLE cats DROP CONSTRAINT cfk"]
+  end
+
+  specify "should have drop_foreign_key raise Error if no name is found" do
+    def @db.foreign_key_list(table_name)
+      [{:name=>:cats_node_id_fkey, :columns=>[:foo_id]}] 
+    end
+    lambda{@db.alter_table(:cats){drop_foreign_key :node_id}}.should raise_error(Sequel::Error)
+  end
+
+  specify "should have drop_foreign_key raise Error if multiple foreign keys found" do
+    def @db.foreign_key_list(table_name)
+      [{:name=>:cats_node_id_fkey, :columns=>[:node_id]}, {:name=>:cats_node_id_fkey2, :columns=>[:node_id]}] 
+    end
+    lambda{@db.alter_table(:cats){drop_foreign_key :node_id}}.should raise_error(Sequel::Error)
   end
 
   specify "should support drop_index" do

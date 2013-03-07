@@ -85,8 +85,12 @@ method, the fourth argument is the options hash.  The following options are supp
 :null :: Mark the column as allowing NULL values (if true),
          or not allowing NULL values (if false).  If unspecified, will default
          to whatever the database default is.
+:primary_key :: Mark this column as the primary key.  This is used instead of the
+                primary key method if you want a non-autoincrementing primary key.
+:primary_key_constraint_name :: The name to give the primary key constraint.
 :unique :: Mark the column as unique, generally has the same effect as
            creating a unique index on the column.
+:unique_constraint_name :: The name to give the unique key constraint.
 
 === Other methods
 
@@ -110,12 +114,13 @@ method:
   create_table(:a2){String :name, :primary_key=>true} # varchar(255) primary key
 
 If you want to create a composite primary key, you should call the +primary_key+ method with an
-array of column symbols:
+array of column symbols.  You can provide a specific name to use for the primary key constraint
+via the :name option:
 
   create_table(:items) do
     Integer :group_id
     Integer :position
-    primary_key [:group_id, :position]
+    primary_key [:group_id, :position], :name=>:items_pk
   end 
 
 If provided with an array, +primary_key+ does not create a column, it just sets up the primary key constraint.
@@ -136,6 +141,7 @@ as it's third argument.  A simple example is:
 
 :deferrable :: Makes the foreign key constraint checks deferrable, so they aren't checked
                until the end of the transaction.
+:foreign_key_constraint_name :: The name to give the foreign key constraint.
 :key :: For foreign key columns, the column in the associated table
         that this column references.  Unnecessary if this column
         references the primary key of the associated table, at least
@@ -271,7 +277,7 @@ to <tt>Dataset#where</tt>:
 ==== +check+
 
 +check+ operates just like +constraint+, except that it doesn't take a name
-and it creates an unnamed constraint
+and it creates an unnamed constraint:
 
   create_table(:artists) do
     primary_key :id
@@ -279,6 +285,9 @@ and it creates an unnamed constraint
     check{char_length(name) > 2}
   end
   
+It's recommended that you use the +constraint+ method and provide a name for the
+constraint, as that makes it easier to drop the constraint later if necessary.
+
 == +create_join_table+
 
 +create_join_table+ is a shortcut that you can use to create simple many-to-many join tables:
@@ -371,18 +380,45 @@ creates a new column:
   end
 
 If you want to add a new foreign key constraint to an existing column, you provide an
-array with a single element:
+array with a single element.  It's encouraged to provide a name when adding the constraint,
+via the :name option:
 
   alter_table(:albums) do
-    add_foreign_key [:artist_id], :artists
+    add_foreign_key [:artist_id], :artists, :name=>:albums_artist_id_fkey
   end
 
 To set up a multiple column foreign key constraint, use an array with multiple column
 symbols:
 
   alter_table(:albums) do
-    add_foreign_key [:artist_name, :artist_location], :artists
+    add_foreign_key [:artist_name, :artist_location], :name=>:albums_artist_name_location_fkey
   end
+
+=== +drop_foreign_key+
+
++drop_foreign_key+ is used to drop foreign keys from tables.  If you provide a symbol as
+the first argument, it drops both the foreign key constraint and the column:
+
+  alter_table(:albums) do
+    drop_foreign_key :artist_id
+  end
+
+If you want to just drop the foreign key constraint without dropping the column, use
+an array.  It's encouraged to use the :name option to provide the constraint name to
+drop, though on some databases Sequel may be able to find the name through introspection:
+
+  alter_table(:albums) do
+    drop_foreign_key [:artist_id], :name=>:albums_artist_id_fkey
+  end
+
+An array is also used to drop a composite foreign key constraint:
+
+  alter_table(:albums) do
+    drop_foreign_key [:artist_name, :artist_location], :name=>:albums_artist_name_location_fkey
+  end
+
+If you do not provide a :name option and Sequel is not able to determine the name
+to use, it will probably raise a Sequel::Error exception.
 
 === +add_index+
 

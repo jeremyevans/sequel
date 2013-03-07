@@ -221,6 +221,7 @@ module Sequel
             ops.each{|op| alter_table_sql_list(table, [op]).flatten.each{|sql| execute_ddl(sql)}}
           end
         end
+      ensure
         self.foreign_keys = true if fks
       end
 
@@ -255,7 +256,11 @@ module Sequel
           when :primary_key
             duplicate_table(table){|columns| columns.each{|s| s[:primary_key] = nil}}
           when :foreign_key
-            duplicate_table(table, :no_foreign_keys=>true)
+            if op[:columns]
+              duplicate_table(table, :skip_foreign_key_columns=>op[:columns])
+            else
+              duplicate_table(table, :no_foreign_keys=>true)
+            end
           else
             duplicate_table(table)
           end
@@ -365,6 +370,12 @@ module Sequel
           # column, don't include it when building a copy of the table.
           if ocp = opts[:old_columns_proc]
             fks.delete_if{|c| ocp.call(c[:columns].dup) != c[:columns]}
+          end
+          
+          # Skip any foreign key columns where a constraint for those
+          # foreign keys is being dropped.
+          if sfkc = opts[:skip_foreign_key_columns]
+            fks.delete_if{|c| c[:columns] == sfkc}
           end
 
           constraints.concat(fks.each{|h| h[:type] = :foreign_key})
