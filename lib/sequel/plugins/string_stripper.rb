@@ -37,8 +37,9 @@ module Sequel
 
         # Set blob columns as skipping stripping when plugin is loaded.
         def set_dataset(*)
-          super
+          res = super
           set_skipped_string_stripping_columns
+          res
         end
 
         # Skip stripping for the given columns.
