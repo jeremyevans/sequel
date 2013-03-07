@@ -383,6 +383,9 @@ module Sequel
       when :add_constraint
         "ADD #{constraint_definition_sql(op)}"
       when :drop_constraint
+        if op[:type] == :foreign_key
+          quoted_name ||= quote_identifier(foreign_key_name(table, op[:columns]))
+        end
         "DROP CONSTRAINT #{quoted_name}#{' CASCADE' if op[:cascade]}"
       else
         raise Error, "Unsupported ALTER TABLE operation: #{op[:op]}"
@@ -547,7 +550,7 @@ module Sequel
       when :unique
         sql << "UNIQUE #{literal(constraint[:columns])}"
       else
-        raise Error, "Invalid constriant type #{constraint[:type]}, should be :check, :primary_key, :foreign_key, or :unique"
+        raise Error, "Invalid constraint type #{constraint[:type]}, should be :check, :primary_key, :foreign_key, or :unique"
       end
       constraint_deferrable_sql_append(sql, constraint[:deferrable])
       sql
@@ -646,6 +649,13 @@ module Sequel
       "#{"#{schema}_" if schema and schema != default_schema}#{table}_#{columns.map{|c| [String, Symbol].any?{|cl| c.is_a?(cl)} ? c : literal(c).gsub(/\W/, '_')}.join(UNDERSCORE)}_index"
     end
   
+    # Get foreign key name for given table and columns.
+    def foreign_key_name(table_name, columns)
+      keys = foreign_key_list(table_name).select{|key| key[:columns] == columns}
+      raise(Error, "#{keys.empty? ? 'Missing' : 'Ambiguous'} foreign key for #{columns.inspect}") unless keys.size == 1
+      keys.first[:name]
+    end
+    
     # The SQL to drop an index for the table.
     def drop_index_sql(table, op)
       "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))}"
