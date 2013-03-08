@@ -391,7 +391,7 @@ To set up a multiple column foreign key constraint, use an array with multiple c
 symbols:
 
   alter_table(:albums) do
-    add_foreign_key [:artist_name, :artist_location], :name=>:albums_artist_name_location_fkey
+    add_foreign_key [:artist_name, :artist_location], :artists, :name=>:albums_artist_name_location_fkey
   end
 
 === +drop_foreign_key+
