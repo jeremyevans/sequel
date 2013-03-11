@@ -8,7 +8,7 @@ Sequel uses autocommit mode by default for all of its database adapters, so in g
 * Migrations if the database supports transactional schema
 * A few model plugins
 
-Everywhere else, it is up to use to use a database transaction if you want to.
+Everywhere else, it is up to you to use a database transaction if you want to.
 
 == Basic Transaction Usage
 
