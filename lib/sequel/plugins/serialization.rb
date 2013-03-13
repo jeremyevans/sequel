@@ -168,34 +168,24 @@ module Sequel
       end
 
       module InstanceMethods
-        # Hash of deserialized values, used as a cache.
-        attr_reader :deserialized_values
-
-        # Set @deserialized_values to the empty hash
-        def initialize_set(values)
-          @deserialized_values = {}
-          super
-        end
-
         # Serialize deserialized values before saving
         def before_save
           serialize_deserialized_values
           super
         end
         
-        # Initialization the deserialized values for objects retrieved from the database.
-        def set_values(*)
+        # Hash of deserialized values, used as a cache.
+        def deserialized_values
           @deserialized_values ||= {}
+        end
+
+        # Initialization the deserialized values for objects retrieved from the database.
+        def set_values(hash)
+          @deserialized_values.clear if @deserialized_values
           super
         end
 
         private
-
-        # Empty the deserialized values when refreshing.
-        def _refresh(*)
-          @deserialized_values = {}
-          super
-        end
 
         # Deserialize the column value.  Called when the model column accessor is called to
         # return a deserialized value.

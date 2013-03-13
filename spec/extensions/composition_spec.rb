@@ -90,11 +90,30 @@ describe "Composition plugin" do
     called.should == true
   end
 
-  it "should clear compositions cache when reloading" do
+  it "should clear compositions cache when using set_values" do
     @c.composition :date, :composer=>proc{}, :decomposer=>proc{called = true}
     @o.date = Date.new(3, 4, 5)
-    @o.reload
+    @o.set_values(:id=>1)
     @o.compositions.should == {}
+  end
+
+  it "should clear compositions cache when refreshing" do
+    @c.composition :date, :composer=>proc{}, :decomposer=>proc{called = true}
+    @o.date = Date.new(3, 4, 5)
+    @o.refresh
+    @o.compositions.should == {}
+  end
+
+  it "should clear compositions cache when refreshing after save" do
+    @c.composition :date, :composer=>proc{}, :decomposer=>proc{called = true}
+    @c.create(:date=>Date.new(3, 4, 5)).compositions.should == {}
+  end
+
+  it "should clear compositions cache when saving with insert_select" do
+    def (@c.instance_dataset).supports_insert_select?() true end
+    def (@c.instance_dataset).insert_select(*) {:id=>1} end
+    @c.composition :date, :composer=>proc{}, :decomposer=>proc{called = true}
+    @c.create(:date=>Date.new(3, 4, 5)).compositions.should == {}
   end
 
   it "should instantiate compositions lazily" do

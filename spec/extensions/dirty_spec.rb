@@ -88,6 +88,11 @@ describe "Sequel::Plugins::Dirty" do
       @o.values.has_key?(:missing_changed).should == false
     end
     
+    it "set_values should clear the cached initial values" do
+      @o.set_values(:id=>1)
+      @o.column_changes.should == {}
+    end
+    
     it "refresh should clear the cached initial values" do
       @o.refresh
       @o.column_changes.should == {}
@@ -116,16 +121,6 @@ describe "Sequel::Plugins::Dirty" do
         o.column_change(:initial).should == [v, 'a']
       end
     end
-
-    it "save should clear the cached initial values" do
-      @o.save
-      @o.column_changes.should == {}
-    end
-
-    it "save_changes should clear the cached initial values" do
-      @o.save_changes
-      @o.column_changes.should == {}
-    end
   end
 
   describe "with new instance" do
@@ -136,6 +131,18 @@ describe "Sequel::Plugins::Dirty" do
     end
 
     it_should_behave_like "dirty plugin"
+
+    it "save should clear the cached initial values" do
+      @o.save
+      @o.column_changes.should == {}
+    end
+
+    it "save_changes should clear the cached initial values" do
+      def (@c.instance_dataset).supports_insert_select?() true end
+      def (@c.instance_dataset).insert_select(*) {:id=>1} end
+      @o.save
+      @o.column_changes.should == {}
+    end
   end
 
   describe "with existing instance" do

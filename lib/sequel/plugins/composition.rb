@@ -148,10 +148,10 @@ module Sequel
       end
 
       module InstanceMethods
-        # Clear the cached compositions when refreshing.
-        def _refresh(ds)
+        # Clear the cached compositions when setting values.
+        def set_values(hash)
+          @compositions.clear if @compositions
           super
-          compositions.clear
         end
 
         # For each composition, set the columns in the model class based

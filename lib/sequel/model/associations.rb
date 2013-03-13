@@ -1438,6 +1438,12 @@ module Sequel
           super
         end
       
+        # Clear the associations cache when refreshing
+        def set_values(hash)
+          @associations.clear if @associations
+          super
+        end
+
         # Formally used internally by the associations code, like pk but doesn't raise
         # an Error if the model has no primary key.  Not used any longer, deprecated.
         def pk_or_nil
@@ -1510,12 +1516,6 @@ module Sequel
           end
         end
         
-        # Clear the associations cache when refreshing
-        def _refresh(dataset)
-          associations.clear
-          super
-        end
-
         # Add the given associated object to the given association
         def add_associated_object(opts, o, *args)
           klass = opts.associated_class

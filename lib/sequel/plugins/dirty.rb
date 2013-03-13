@@ -115,6 +115,12 @@ module Sequel
           end
         end
 
+        # Reset the initial values when setting values.
+        def set_values(hash)
+          reset_initial_values
+          super
+        end
+
         # Manually specify that a column will change.  This should only be used
         # if you plan to modify a column value in place, which is not recommended.
         #
@@ -155,12 +161,6 @@ module Sequel
         def after_update
           super
           @previous_changes = column_changes
-        end
-
-        # Reset the initial values when refreshing.
-        def _refresh(dataset)
-          super
-          reset_initial_values
         end
 
         # When changing the column value, save the initial column value.  If the column
