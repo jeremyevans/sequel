@@ -161,7 +161,7 @@ module Sequel
         # Check if value is an instance of a class
         def validates_type(klass, atts, opts={})
           klass = klass.to_s.constantize if klass.is_a?(String) || klass.is_a?(Symbol)
-          validatable_attributes_for_type(:type, atts, opts){|a,v,m| validation_error_message(m, klass) if v && !v.is_a?(klass)}
+          validatable_attributes_for_type(:type, atts, opts){|a,v,m| validation_error_message(m, klass) if !v.nil? && !v.is_a?(klass)}
         end
     
         # Check attribute value(s) is not considered blank by the database, but allow false values.

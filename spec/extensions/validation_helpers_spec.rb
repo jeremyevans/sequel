@@ -294,6 +294,12 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = 123.05
     @m.should_not be_valid
     @m.errors.full_messages.should == ['value is not a Integer']
+    
+    @c.set_validations{validates_type(Integer, :value)}
+    @m.value = nil
+    @m.should be_valid
+    @m.value = false
+    @m.should_not be_valid
   end
 
   specify "should support validates_presence" do
