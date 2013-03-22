@@ -4038,6 +4038,11 @@ describe "Sequel::Dataset#select_map" do
     @ds.db.sqls.should == ['SELECT c, c FROM t']
   end
   
+  specify "should raise an error for plain strings" do
+    proc{@ds.select_map(['c', :c])}.should raise_error(Sequel::Error)
+    @ds.db.sqls.should == []
+  end
+  
   specify "should accept a block" do
     @ds.select_map{a(t__c)}.should == [1, 2]
     @ds.db.sqls.should == ['SELECT a(t.c) FROM t']

@@ -869,21 +869,25 @@ module Sequel
     # Return a plain symbol given a potentially qualified or aliased symbol,
     # specifying the symbol that is likely to be used as the hash key
     # for the column when records are returned.
-    def hash_key_symbol(s)
+    def hash_key_symbol(s, recursing=false)
       case s
       when Symbol
         _, c, a = split_symbol(s)
         (a || c).to_sym
       when SQL::Identifier, SQL::Wrapper
-        hash_key_symbol(s.value)
+        hash_key_symbol(s.value, true)
       when SQL::QualifiedIdentifier
-        hash_key_symbol(s.column)
+        hash_key_symbol(s.column, true)
       when SQL::AliasedExpression
-        hash_key_symbol(s.aliaz)
+        hash_key_symbol(s.aliaz, true)
       when String
-        s.to_sym
+        if recursing
+          s.to_sym
+        else
+          raise(Error, "#{s.inspect} is not supported, should be a Symbol, SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression") 
+        end
       else
-        raise(Error, "#{s.inspect} is not supported, should be a Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression") 
+        raise(Error, "#{s.inspect} is not supported, should be a Symbol, SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression") 
       end
     end
     
