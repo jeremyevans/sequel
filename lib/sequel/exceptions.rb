@@ -7,8 +7,8 @@ module Sequel
     attr_accessor :wrapped_exception
   end  
     
-  # Raised when the adapter requested doesn't exist or can't be loaded.
-  class AdapterNotFound < Error ; end
+  # Error raised when the adapter requested doesn't exist or can't be loaded.
+  class AdapterNotFound < Error; end
 
   # Generic error raised by the database adapters, indicating a
   # problem originating from the database server.  Usually raised
@@ -48,19 +48,23 @@ module Sequel
   class InvalidOperation < Error; end
 
   # Error raised when attempting an invalid type conversion.
-  class InvalidValue < Error ; end
+  class InvalidValue < Error; end
+
+  # Error raised when the user requests a record via the first! or similar
+  # method, and the dataset does not yield any rows.
+  class NoMatchingRow < Error; end
 
   # Error raised when the adapter adapter hasn't implemented a method such as +tables+:
   class NotImplemented < Error; end
 
   # Error raised when the connection pool cannot acquire a database connection
   # before the timeout.
-  class PoolTimeout < Error ; end
+  class PoolTimeout < Error; end
 
-  # Exception that you should raise to signal a rollback of the current transaction.
+  # Error that you should raise to signal a rollback of the current transaction.
   # The transaction block will catch this exception, rollback the current transaction,
   # and won't reraise it (unless a reraise is requested).
-  class Rollback < Error ; end
+  class Rollback < Error; end
 
   # Error raised when unbinding a dataset that has multiple different values
   # for a given variable.

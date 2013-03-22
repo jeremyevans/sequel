@@ -2465,8 +2465,7 @@ end
 
 describe "Dataset #first and #last" do
   before do
-    @db = Sequel.mock(:fetch=>proc{|s| {:s=>s}})
-    @d = @db[:test]
+    @d = Sequel.mock(:fetch=>proc{|s| {:s=>s}})[:test]
   end
   
   specify "should return a single record if no argument is given" do
@@ -2504,6 +2503,10 @@ describe "Dataset #first and #last" do
     i = rand(10) + 10
     r = @d.order(:a).last(i){z > 26}.should == [{:s=>"SELECT * FROM test WHERE (z > 26) ORDER BY a DESC LIMIT #{i}"}]
   end
+
+  specify "should return nil if no records match" do
+    Sequel.mock[:t].first.should == nil
+  end
   
   specify "#last should raise if no order is given" do
     proc {@d.last}.should raise_error(Sequel::Error)
@@ -2520,6 +2523,44 @@ describe "Dataset #first and #last" do
   end
 end
 
+describe "Dataset #first!" do
+  before do
+    @db = Sequel.mock(:fetch=>proc{|s| {:s=>s}})
+    @d = @db[:test]
+  end
+  
+  specify "should return a single record if no argument is given" do
+    @d.order(:a).first!.should == {:s=>'SELECT * FROM test ORDER BY a LIMIT 1'}
+  end
+
+  specify "should return the first! matching record if argument is not an Integer" do
+    @d.order(:a).first!(:z => 26).should == {:s=>'SELECT * FROM test WHERE (z = 26) ORDER BY a LIMIT 1'}
+    @d.order(:a).first!('z = ?', 15).should == {:s=>'SELECT * FROM test WHERE (z = 15) ORDER BY a LIMIT 1'}
+  end
+  
+  specify "should set the limit and return an array of records if the given number is > 1" do
+    i = rand(10) + 10
+    r = @d.order(:a).first!(i).should == [{:s=>"SELECT * FROM test ORDER BY a LIMIT #{i}"}]
+  end
+  
+  specify "should return the first! matching record if a block is given without an argument" do
+    @d.first!{z > 26}.should == {:s=>'SELECT * FROM test WHERE (z > 26) LIMIT 1'}
+  end
+  
+  specify "should combine block and standard argument filters if argument is not an Integer" do
+    @d.first!(:y=>25){z > 26}.should == {:s=>'SELECT * FROM test WHERE ((z > 26) AND (y = 25)) LIMIT 1'}
+  end
+  
+  specify "should filter and return an array of records if an Integer argument is provided and a block is given" do
+    i = rand(10) + 10
+    r = @d.order(:a).first!(i){z > 26}.should == [{:s=>"SELECT * FROM test WHERE (z > 26) ORDER BY a LIMIT #{i}"}]
+  end
+
+  specify "should raise NoMatchingRow exception if no rows match" do
+    proc{Sequel.mock[:t].first!}.should raise_error(Sequel::NoMatchingRow)
+  end
+end
+  
 describe "Dataset compound operations" do
   before do
     @a = Sequel::Dataset.new(nil).from(:a).filter(:z => 1)

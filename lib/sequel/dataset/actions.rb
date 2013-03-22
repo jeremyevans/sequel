@@ -176,8 +176,13 @@ module Sequel
     # matching records up to that limit.  If no argument is passed,
     # it returns the first matching record.  If any other type of
     # argument(s) is passed, it is given to filter and the
-    # first matching record is returned. If a block is given, it is used
-    # to filter the dataset before returning anything.  Examples:
+    # first matching record is returned.  If a block is given, it is used
+    # to filter the dataset before returning anything.
+    #
+    # If there are no records in the dataset, returns nil (or an empty
+    # array if an integer argument is given).
+    #
+    # Examples:
     # 
     #   DB[:table].first # SELECT * FROM table LIMIT 1
     #   # => {:id=>7}
@@ -215,6 +220,12 @@ module Sequel
           ds.filter(args).single_record
         end
       end
+    end
+
+    # Calls first.  If first returns nil (signaling that no
+    # row matches), raise a Sequel::NoMatchingRow exception.
+    def first!(*args, &block)
+      first(*args, &block) || raise(Sequel::NoMatchingRow)
     end
 
     # Return the column value for the first matching record in the dataset.

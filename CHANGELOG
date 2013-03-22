@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#first!, like #first, but raising a Sequel::NoMatchingRow exception instead of returning nil (jeremyevans)
+
 * Dataset #select_map, #select_order_map, and #get no longer support a plain string inside an array of arguments (jeremyevans)
 
 * Escape ] characters in identifiers on Microsoft SQL Server (jeremyevans)
