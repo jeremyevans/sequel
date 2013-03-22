@@ -45,11 +45,23 @@ end
 
 ### RDoc
 
-RDOC_DEFAULT_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', 'Sequel: The Database Toolkit for Ruby']
+RDOC_DEFAULT_OPTS = ["--line-numbers", "--inline-source", '--title', 'Sequel: The Database Toolkit for Ruby']
+
+allow_website_rdoc = begin
+  # Sequel uses hanna-nouveau for the website RDoc.
+  # Due to bugs in older versions of RDoc, and the
+  # fact that hanna-nouveau does not support RDoc 4,
+  # a specific version of rdoc is required.
+  gem 'rdoc', '= 3.12.2'
+  gem 'hanna-nouveau'
+  RDOC_DEFAULT_OPTS.concat(['-f', 'hanna'])
+  true
+rescue Gem::LoadError
+  false
+end
 
 rdoc_task_class = begin
   require "rdoc/task"
-  RDOC_DEFAULT_OPTS.concat(['-f', 'hanna'])
   RDoc::Task
 rescue LoadError
   begin
@@ -66,32 +78,34 @@ if rdoc_task_class
     rdoc.rdoc_dir = "rdoc"
     rdoc.options += RDOC_OPTS
     rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/**/*.rb doc/*.rdoc doc/release_notes/*.txt"
-  end if rdoc_task_class
-
-  desc "Make rdoc for website"
-  task :website_rdoc=>[:website_rdoc_main, :website_rdoc_adapters, :website_rdoc_plugins]
-
-  rdoc_task_class.new(:website_rdoc_main) do |rdoc|
-    rdoc.rdoc_dir = "www/public/rdoc"
-    rdoc.options += RDOC_OPTS
-    rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/*.rb lib/sequel/*.rb lib/sequel/{connection_pool,dataset,database,model}/*.rb doc/*.rdoc doc/release_notes/*.txt lib/sequel/extensions/migration.rb lib/sequel/extensions/core_extensions.rb"
   end
 
-  rdoc_task_class.new(:website_rdoc_adapters) do |rdoc|
-    rdoc.rdoc_dir = "www/public/rdoc-adapters"
-    rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel'
-    rdoc.rdoc_files.add %w"lib/sequel/adapters/**/*.rb"
-  end
-
-  rdoc_task_class.new(:website_rdoc_plugins) do |rdoc|
-    rdoc.rdoc_dir = "www/public/rdoc-plugins"
-    rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel'
-    rdoc.rdoc_files.add %w"lib/sequel/{extensions,plugins}/**/*.rb"
-  end
-
-  desc "Update sequel.rubyforge.org"
-  task :website_rf=>[:website, :website_rdoc] do
-    sh %{rsync -rvt www/public/* rubyforge.org:/var/www/gforge-projects/sequel/}
+  if allow_website_rdoc
+    desc "Make rdoc for website"
+    task :website_rdoc=>[:website_rdoc_main, :website_rdoc_adapters, :website_rdoc_plugins]
+  
+    rdoc_task_class.new(:website_rdoc_main) do |rdoc|
+      rdoc.rdoc_dir = "www/public/rdoc"
+      rdoc.options += RDOC_OPTS + %w'--no-ignore-invalid'
+      rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/*.rb lib/sequel/*.rb lib/sequel/{connection_pool,dataset,database,model}/*.rb doc/*.rdoc doc/release_notes/*.txt lib/sequel/extensions/migration.rb lib/sequel/extensions/core_extensions.rb"
+    end
+  
+    rdoc_task_class.new(:website_rdoc_adapters) do |rdoc|
+      rdoc.rdoc_dir = "www/public/rdoc-adapters"
+      rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel --no-ignore-invalid'
+      rdoc.rdoc_files.add %w"lib/sequel/adapters/**/*.rb"
+    end
+  
+    rdoc_task_class.new(:website_rdoc_plugins) do |rdoc|
+      rdoc.rdoc_dir = "www/public/rdoc-plugins"
+      rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel --no-ignore-invalid'
+      rdoc.rdoc_files.add %w"lib/sequel/{extensions,plugins}/**/*.rb"
+    end
+  
+    desc "Update sequel.rubyforge.org"
+    task :website_rf=>[:website, :website_rdoc] do
+      sh %{rsync -rvt www/public/* rubyforge.org:/var/www/gforge-projects/sequel/}
+    end
   end
 end
 
