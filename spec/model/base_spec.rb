@@ -693,7 +693,7 @@ describe Sequel::Model, ".[] optimization" do
   end
 end
 
-describe "Model datasets #with_pk" do
+describe "Model datasets #with_pk with #with_pk!" do
   before do
     @c = Class.new(Sequel::Model(:a))
     @ds = @c.dataset
@@ -704,15 +704,21 @@ describe "Model datasets #with_pk" do
   it "should return the first record where the primary key matches" do
     @ds.with_pk(1).should == @c.load(:id=>1)
     MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
+    @ds.with_pk!(1).should == @c.load(:id=>1)
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
   end
 
   it "should handle existing filters" do
     @ds.filter(:a=>2).with_pk(1)
     MODEL_DB.sqls.should == ["SELECT * FROM a WHERE ((a = 2) AND (a.id = 1)) LIMIT 1"]
+    @ds.filter(:a=>2).with_pk!(1)
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE ((a = 2) AND (a.id = 1)) LIMIT 1"]
   end
 
   it "should work with string values" do
     @ds.with_pk("foo")
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 'foo') LIMIT 1"]
+    @ds.with_pk!("foo")
     MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 'foo') LIMIT 1"]
   end
 
@@ -723,6 +729,20 @@ describe "Model datasets #with_pk" do
     ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1",
     "SELECT * FROM a WHERE ((a.id2 = 2) AND (a.id1 = 1)) LIMIT 1"].should include(sqls.pop)
     sqls.should == []
+
+    @ds.with_pk!([1, 2])
+    sqls = MODEL_DB.sqls
+    ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1",
+    "SELECT * FROM a WHERE ((a.id2 = 2) AND (a.id1 = 1)) LIMIT 1"].should include(sqls.pop)
+    sqls.should == []
+  end
+
+  it "should have with_pk return nil and with_pk! raise if no rows match" do
+    @ds._fetch = []
+    @ds.with_pk(1).should == nil
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
+    proc{@ds.with_pk!(1)}.should raise_error(Sequel::NoMatchingRow)
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
   end
 
   it "should have #[] consider an integer as a primary key lookup" do

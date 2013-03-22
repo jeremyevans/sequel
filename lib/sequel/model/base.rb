@@ -1983,7 +1983,7 @@ module Sequel
       end
 
       # Given a primary key value, return the first record in the dataset with that primary key
-      # value.
+      # value.  If no records matches, returns nil.
       #
       #   # Single primary key
       #   Artist.dataset.with_pk(1) # SELECT * FROM artists WHERE (id = 1) LIMIT 1
@@ -1993,6 +1993,12 @@ module Sequel
       #                                  # WHERE ((id1 = 1) AND (id2 = 2)) LIMIT 1
       def with_pk(pk)
         first(model.qualified_primary_key_hash(pk))
+      end
+
+      # Same as with_pk, but raises NoMatchingRow instead of returning nil if no
+      # row matches.
+      def with_pk!(pk)
+        with_pk(pk) || raise(NoMatchingRow)
       end
     end
 
