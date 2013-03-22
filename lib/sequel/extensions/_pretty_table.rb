@@ -39,12 +39,12 @@ module Sequel
       sizes = Hash.new {0}
       columns.each do |c|
         s = c.to_s.size
-        sizes[c.to_sym] = s if s > sizes[c.to_sym]
+        sizes[c] = s if s > sizes[c]
       end
       records.each do |r|
         columns.each do |c|
           s = r[c].to_s.size
-          sizes[c.to_sym] = s if s > sizes[c.to_sym]
+          sizes[c] = s if s > sizes[c]
         end
       end
       sizes
