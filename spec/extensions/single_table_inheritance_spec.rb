@@ -193,7 +193,7 @@ describe Sequel::Model, "#sti_key" do
       StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
       StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
 
-      StiTest3.create.kind.should == 1
+      [0,1].should include(StiTest3.create.kind)
       StiTest4.create.kind.should == 2
     end
 
@@ -214,7 +214,8 @@ describe Sequel::Model, "#sti_key" do
       class ::StiTest4 < ::StiTest2; end
     
       StiTest2.dataset.sql.should == "SELECT * FROM sti_test2s"
-      StiTest3.dataset.sql.should == "SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (0, 1))"
+      ["SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (0, 1))",
+       "SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (1, 0))"].should include(StiTest3.dataset.sql)
     end
 
     it "should honor a :key_chooser" do

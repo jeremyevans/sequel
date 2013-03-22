@@ -17,7 +17,10 @@ describe "Sequel::Plugins::EagerEach" do
     ds.each{|c| a << c}
     a.should == [@c.load(:id=>1, :parent_id=>nil), @c.load(:id=>2, :parent_id=>nil)]
     a.map{|c| c.associations[:children]}.should == [[@c.load(:id=>3, :parent_id=>1), @c.load(:id=>4, :parent_id=>1)], [@c.load(:id=>5, :parent_id=>2), @c.load(:id=>6, :parent_id=>2)]]
-    @c.db.sqls.should == ['SELECT * FROM items', 'SELECT * FROM items WHERE (items.parent_id IN (1, 2))']
+    sqls = @c.db.sqls
+    sqls.shift.should == 'SELECT * FROM items'
+    ['SELECT * FROM items WHERE (items.parent_id IN (1, 2))', 
+     'SELECT * FROM items WHERE (items.parent_id IN (2, 1))'].should include(sqls.pop)
   end
 
   it "should make #each on an eager_graph dataset do eager loading" do
