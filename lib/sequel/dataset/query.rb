@@ -161,23 +161,6 @@ module Sequel
       clone.extension!(*exts)
     end
 
-    # Load an extension into the receiver.  In addition to requiring the extension file, this
-    # also modifies the dataset to work with the extension (usually extending it with a
-    # module defined in the extension file).  If no related extension file exists or the
-    # extension does not have specific support for Database objects, an Error will be raised.
-    # Returns self.
-    def extension!(*exts)
-      Sequel.extension(*exts)
-      exts.each do |ext|
-        if pr = Sequel.synchronize{EXTENSIONS[ext]}
-          pr.call(self)
-        else
-          raise(Error, "Extension #{ext} does not have specific support handling individual datasets")
-        end
-      end
-      self
-    end
-
     # Returns a copy of the dataset with the given conditions imposed upon it.  
     # If the query already has a HAVING clause, then the conditions are imposed in the 
     # HAVING clause. If not, then they are imposed in the WHERE clause.

@@ -36,6 +36,23 @@ module Sequel
     # a single hash argument and returns the object you want #each to return.
     attr_accessor :row_proc
     
+    # Load an extension into the receiver.  In addition to requiring the extension file, this
+    # also modifies the dataset to work with the extension (usually extending it with a
+    # module defined in the extension file).  If no related extension file exists or the
+    # extension does not have specific support for Database objects, an Error will be raised.
+    # Returns self.
+    def extension!(*exts)
+      Sequel.extension(*exts)
+      exts.each do |ext|
+        if pr = Sequel.synchronize{EXTENSIONS[ext]}
+          pr.call(self)
+        else
+          raise(Error, "Extension #{ext} does not have specific support handling individual datasets")
+        end
+      end
+      self
+    end
+
     # Avoid self-referential dataset by cloning.
     def from_self!(*args, &block)
       @opts.merge!(clone.from_self(*args, &block).opts)
