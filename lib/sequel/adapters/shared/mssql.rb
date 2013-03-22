@@ -414,6 +414,7 @@ module Sequel
       APOS_RE = Dataset::APOS_RE
       DOUBLE_APOS = Dataset::DOUBLE_APOS
       INTO = Dataset::INTO
+      DOUBLE_BRACKET_CLOSE = ']]'.freeze
       DATEPART_SECOND_OPEN = "CAST((datepart(".freeze
       DATEPART_SECOND_MIDDLE = ') + datepart(ns, '.freeze
       DATEPART_SECOND_CLOSE = ")/1000000000.0) AS double precision)".freeze
@@ -570,10 +571,9 @@ module Sequel
         clone({:output => output})
       end
 
-      # MSSQL uses [] to quote identifiers.  MSSQL does not support
-      # escaping of ], so you cannot use that character in an identifier.
+      # MSSQL uses [] to quote identifiers.
       def quoted_identifier_append(sql, name)
-        sql << BRACKET_OPEN << name.to_s << BRACKET_CLOSE
+        sql << BRACKET_OPEN << name.to_s.gsub(/\]/, DOUBLE_BRACKET_CLOSE) << BRACKET_CLOSE
       end
       
       # The version of the database server.

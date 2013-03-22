@@ -361,6 +361,11 @@ describe Sequel::Database do
     INTEGRATION_DB.get(Sequel.cast(Sequel.blob("\1\2\3"), File).as(:a)).should == "\1\2\3"
   end
 
+  cspecify "should properly escape identifiers", :db2 do
+    INTEGRATION_DB.create_table(:"\\'\"[]"){Integer :id}
+    INTEGRATION_DB.drop_table(:"\\'\"[]")
+  end
+
   specify "should have a working table_exists?" do
     t = :basdfdsafsaddsaf
     INTEGRATION_DB.drop_table?(t)

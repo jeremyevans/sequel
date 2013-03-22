@@ -1,5 +1,7 @@
 === HEAD
 
+* Escape ] characters in identifiers on Microsoft SQL Server (jeremyevans)
+
 * Add security guide (jeremyevans)
 
 * Make validates_type handle false values correctly (jeremyevans) (#636)
