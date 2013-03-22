@@ -1,5 +1,7 @@
 === HEAD
 
+* Add security guide (jeremyevans)
+
 * Make validates_type handle false values correctly (jeremyevans) (#636)
 
 * Have associations, composition, serialization, and dirty plugins clear caches in some additional cases (jeremyevans) (#635)
