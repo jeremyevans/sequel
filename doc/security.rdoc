@@ -190,8 +190,8 @@ up to SQL injection if you use identifiers derived from user input.
 
 When Sequel quotes identifiers, using an identifier derived from user input does not lead to
 SQL injection, since the identifiers are also escaped when quoting.
-One exception is Microsoft Access, which uses <tt>[]</tt> for quoting identifiers, and can't
-escape identifiers containing <tt>]</tt>.
+Exceptions to this are Oracle (can't escape <tt>"</tt>) and Microsoft Access
+(can't escape <tt>]</tt>).
 
 In general, even if doesn't lead to SQL Injection, you should avoid using identifiers
 derived from user input unless absolutely necessary.
