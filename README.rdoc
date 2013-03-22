@@ -244,6 +244,12 @@ After filtering, you can retrieve the matching records by using any of the retri
   
 See the {Dataset Filtering}[link:files/doc/dataset_filtering_rdoc.html] file for more details.
 
+=== Security
+
+Designing apps with security in mind is a best practice.
+Please read the {Security Guide}[link:files/doc/security_rdoc.html] for details on security
+issues that you should be aware of when using Sequel.
+
 === Summarizing Records
 
 Counting records is easy using +count+:

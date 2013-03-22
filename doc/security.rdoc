@@ -19,10 +19,10 @@ could conceivably be abused to do so:
 * Sequel::Schema::CreateTableGenerator.add_type_method
 * Sequel::Dataset.def_mutation_method
 * Sequel::Dataset.def_append_methods
-* Sequel::Model::InstanceMethods.class_attr_overridable
-* Sequel::Model::InstanceMethods.class_attr_reader
-* Sequel::Plugins::HookClassMethods.add_hook_type
-* Sequel::SQL::Expression.to_s_method
+* Sequel::Model::InstanceMethods.class_attr_overridable (private)
+* Sequel::Model::InstanceMethods.class_attr_reader (private)
+* Sequel::SQL::Expression.to_s_method (private)
+* Sequel::Plugins::HookClassMethods::ClassMethods#add_hook_type
 
 As long as you don't call those with user input, you should not be
 vulnerable to code execution.
@@ -44,23 +44,34 @@ There are basically two kinds of possible SQL injections in Sequel:
 
 ==== Full SQL Strings
 
-Some Sequel methods are designed to execute raw SQL:
+Some Sequel methods are designed to execute raw SQL, including:
+
+* Sequel::Database#execute
+* Sequel::Database#run
+* Sequel::Database#<<
+* Sequel::Database#[]
+* Sequel::Database#fetch
+* Sequel::Dataset#with_sql
+
+Here are some examples of use:
 
   DB.run 'SQL'
   DB << 'SQL'
   DB.execute 'SQL'
   DB['SQL'].all
+  DB.fetch('SQL').all
   DB.dataset.with_sql('SQL').all
 
 If you pass a string to these methods that is derived from user input, you open
-yourself up to SQL injection.  The Database #run, #<<, and #execute methods
-are not designed to work at all with user input.  If you must use them with
-user input, you need to escape the user input manually via #literal:
+yourself up to SQL injection.  The Sequel::Database#run, Sequel::Database#<<, and
+Sequel::Database#execute methods are not designed to work at all with user input.
+If you must use them with user input, you should escape the user input manually
+via Sequel::Database#literal. Example:
 
   DB.run "SOME SQL #{DB.literal(params[:user].to_s)}"
 
-With Database#[] and Dataset#with_sql, you should use placeholders, in which case Sequel automatically
-literalizes the input:
+With Sequel::Database#[], Sequel::Database#fetch and Sequel::Dataset#with_sql, you should use placeholders,
+in which case Sequel automatically literalizes the input:
 
   DB['SELECT * FROM foo WHERE bar = ?', params[:user].to_s]
 
@@ -68,32 +79,52 @@ literalizes the input:
 
 Sequel generally treats ruby strings as SQL strings (escaping them correctly), and
 not as raw SQL.  However, you can convert a ruby string to a literal string, and
-Sequel will then treat it as raw SQL:
+Sequel will then treat it as raw SQL.  This is typically done through String#lit
+if the {core_extensions}[link:files/doc/core_extensions_rdoc.html] are in use,
+or Sequel.lit[rdoc-ref:Sequel::SQL::Builders#lit] if they are not in use.
 
   'a'.lit
   Sequel.lit('a')
 
-Using #lit to turn a ruby string into a literal string results in SQL injection
-if the string is derived from user input.
+Using String#lit or Sequel.lit[rdoc-ref:Sequel::SQL::Builders#lit] to turn a ruby string into a literal string results
+in SQL injection if the string is derived from user input.  With both of these
+methods, the strings can contain placeholders, which you can use to safely include
+user input inside a literal string:
+
+  'a = ?'.lit(params[:user_id].to_s)
+  Sequel.lit('a = ?', params[:user_id].to_s)
+
+Even though they have similar names, note that Sequel::Database#literal operates very differently from
+String#lit or Sequel.lit[rdoc-ref:Sequel::SQL::Builders#lit].
+Sequel::Database#literal is for taking any supported object,
+and getting an SQL representation of that object, while
+String#lit or Sequel.lit[rdoc-ref:Sequel::SQL::Builders#lit] are for treating
+a ruby string as raw SQL.  For example:
+
+  DB.literal(Date.today) # "'2013-03-22'"
+  DB.literal('a') # "'a'"
+  DB.literal(Sequel.lit('a')) # "a"
+  DB.literal(:a => 'a') # "(\"a\" = 'a')"
+  DB.literal(:a => Sequel.lit('a')) # "(\"a\" = a)"
 
 ==== SQL Filter Fragments
 
 The most common way to use raw SQL with Sequel is in filters:
 
-  DB[:table].where('id > 1')
+  DB[:table].where("name > 'M'")
 
 If a filter method is passed a string as the first argument, it treats the rest of
 the arguments (if any) as placeholders to the string.  So you should never do:
 
-  DB[:table].where("id > #{params[:id]}") # SQL Injection!
+  DB[:table].where("name > #{params[:id].to_s}") # SQL Injection!
 
 Instead, you should use a placeholder:
 
-  DB[:table].where("id > ?", params[:id]) # Safe
+  DB[:table].where("name > ?", params[:id].to_s) # Safe
  
 Note that for that type of query, Sequel generally encourages the following form:
 
-  DB[:table].where{|o| o.id > params[:id]} # Safe
+  DB[:table].where{|o| o.name > params[:id].to_s} # Safe
 
 Sequel's DSL supports a wide variety of SQL concepts, so it's possible to
 code most applications without every using raw SQL.
@@ -102,35 +133,36 @@ A large number of dataset methods ultimately pass down their arguments to a filt
 method, even some you may not expect, so you should be careful.  At least the
 following methods pass their arguments to a filter method:
 
-* where
-* having
-* filter
-* exclude
-* exclude_where
-* exclude_having
-* and
-* or
-* first
-* last
-* \[\]
-* []=
+* Sequel::Dataset#where
+* Sequel::Dataset#having
+* Sequel::Dataset#filter
+* Sequel::Dataset#exclude
+* Sequel::Dataset#exclude_where
+* Sequel::Dataset#exclude_having
+* Sequel::Dataset#and
+* Sequel::Dataset#or
+* Sequel::Dataset#first
+* Sequel::Dataset#last
+* Sequel::Dataset#[]
+* Sequel::Dataset#[]=
 
-The Model .find and .find_or_create class methods also call down to the filter methods.
+The Model.find[rdoc-ref:Sequel::Model::ClassMethods#find] and Model.find_or_create[rdoc-ref:Sequel::Model::ClassMethods#find_or_create]
+class methods also call down to the filter methods.
 
 ==== SQL Fragment passed to Dataset#update
 
-Similar to the filter methods, Dataset#update (and alias #set) also treat a
+Similar to the filter methods, Sequel::Dataset#update (and alias Sequel::Dataset#set) also treat a
 string argument as raw SQL:
 
   DB[:table].update("column = 1")
 
 So you should not do:
 
-  DB[:table].update("column = #{params[:value]}") # SQL Injection!
+  DB[:table].update("column = #{params[:value].to_s}") # SQL Injection!
 
 Instead, you should do:
 
-  DB[:table].update(:column => params[:value]) # Safe
+  DB[:table].update(:column => params[:value].to_s) # Safe
 
 === SQL Identifier Injections
 
@@ -139,24 +171,42 @@ strings as SQL strings.  However, there are some parts of Sequel
 that treat ruby strings as SQL identifiers if an SQL string would
 not make sense in the same context.
 
-For example, Database and Dataset#from will treat a string as
+For example, Sequel::Database#from and Sequel::Dataset#from will treat a string as
 a table name:
 
   DB.from('t') # SELECT * FROM "t"
 
-Note how the identifier is still quoted (Sequel quotes identifier by default).
-However, on some databases, it is not possible to correctly escape
-identifiers, and it is possible on those databases to get an SQL
-injection instead of just an arbitrary identifier.
-
-Other places where Sequel treats ruby strings as identifiers are
-the Dataset #insert and #update methods:
+Another place where Sequel treats ruby strings as identifiers are
+the Sequel::Dataset#insert and Sequel::Dataset#update methods:
 
   DB[:t].update('b'=>1) # UPDATE "t" SET "b" = 1
   DB[:t].insert('b'=>1) # INSERT INTO "t" ("b") VALUES (1)
 
-You should avoid passing strings derived from user input to the #from
-method or as keys in a hash passed to #insert or #update.
+Note how the identifier is still quoted in these cases.  Sequel quotes identifiers by default
+on most databases.  However, it does not quote identifiers by default on DB2 and Informix.
+On those databases using an identifier derived from user input can lead to SQL injection.
+Similarly, if you turn off identifier quoting manually on other databases, you open yourself
+up to SQL injection if you use identifiers derived from user input.
+
+When Sequel quotes identifiers, using an identifier derived from user input does not lead to
+SQL injection, since the identifiers are also escaped when quoting.
+One exception is Microsoft Access, which uses <tt>[]</tt> for quoting identifiers, and can't
+escape identifiers containing <tt>]</tt>.
+
+In general, even if doesn't lead to SQL Injection, you should avoid using identifiers
+derived from user input unless absolutely necessary.
+
+Sequel also allows you to create identifiers using
+Sequel.identifier[rdoc-ref:Sequel::SQL::Builders#identifier] for plain identifiers,
+Sequel.qualify[rdoc-ref:Sequel::SQL::Builders#qualify] for qualified identifiers, and
+Sequel.as[rdoc-ref:Sequel::SQL::Builders#as] for aliased expressions.  So if you
+pass any of those values derived from user input, you are dealing with the same scenario.
+
+Note that the issues with SQL identifiers do not just apply to places where
+strings are used as identifiers, they also apply to all places where Sequel
+uses symbols as identifiers.  However, if you are creating symbols from user input,
+you at least have a denial of service vulnerability, and possibly a more serious
+vulnerability.
 
 == Denial of Service
 
@@ -197,26 +247,26 @@ The more insidious cases are those where an explicit alias is not used at all, b
 an unaliased expression is used and the database chooses which alias to use.  For
 example, on SQLite, the following types of queries are vulnerable to denial of service:
 
-  DB[:table].get(params[:a])
-  DB[:table].select_map(params[:b])
-  DB[:table].select_order_map(params[:c])
+  DB[:table].get(params[:a].to_s)
+  DB[:table].select_map(params[:b].to_s)
+  DB[:table].select_order_map(params[:c].to_s)
 
 In these cases, the queries will work correctly, but an unused symbol will be created.
 To protect against the denial of service, use an explicit alias:
 
-  DB[:table].get(Sequel.as(params[:a], :a))
-  DB[:table].select_map(Sequel.as(params[:b], :a))
-  DB[:table].select_order_map(Sequel.as(params[:c], :a))
+  DB[:table].get(Sequel.as(params[:a].to_s, :a))
+  DB[:table].select_map(Sequel.as(params[:b].to_s, :a))
+  DB[:table].select_order_map(Sequel.as(params[:c].to_s, :a))
 
 While the above code is unlikely to be used in practice, variants that use expressions
 could be.  For example, if you want to select all values in a specific column, with
 a suffix provided by the user:
 
-  DB[:table].select_map(Sequel.join(:column, params[:suffix]))
+  DB[:table].select_map(Sequel.join(:column, params[:suffix].to_s))
 
 As above, you should use an explicit alias to protect against denial of service:
 
-  DB[:table].select_map(Sequel.join(:column, params[:suffix]).as(:a))
+  DB[:table].select_map(Sequel.join(:column, params[:suffix].to_s).as(:a))
 
 === Database Connection Options
 
@@ -244,31 +294,36 @@ based on the content of the hash.
 The security issue here is that mass assignement may allow the user to
 set columns that you didn't intend to allow.
 
-In Sequel, the <tt>Model#set</tt> and <tt>Model#update</tt> methods do mass
+The Model#set[rdoc-ref:Sequel::Model::InstanceMethods#set] and Model#update[rdoc-ref:Sequel::Model::InstanceMethods#update] methods do mass
 assignment.  The default configuration of Sequel::Model allows all model
-fields except for the primary key field to be set via mass assignement.
+columns except for the primary key column(s) to be set via mass assignement.
 
 Example:
 
   album = Album.new
   album.set(params[:album]) # Mass Assignment
 
-Both <tt>Model.new</tt> and <tt>Model.create</tt> call +set+ internally, so
+Both Model.new[rdoc-ref:Sequel::Model::InstanceMethods::new] and Model.create[rdoc-ref:Sequel::Model::ClassMethods#create]
+call Model#set[rdoc-ref:Sequel::Model::InstanceMethods#set] internally, so
 they also allow mass assignment:
 
   Album.new(params[:album]) # Mass Assignment
   Album.create(params[:album]) # Mass Assignment
 
-Instead of these methods, it is incouraged to either use the +set_only+, +update_only+,
-+set_fields+, or +update_fields+ methods, which allow you to specify which fields
+Instead of these methods, it is incouraged to either use the
+Model#set_only[rdoc-ref:Sequel::Model::InstanceMethods#set_only],
+Model#update_only[rdoc-ref:Sequel::Model::InstanceMethods#update_only],
+Model#set_fields[rdoc-ref:Sequel::Model::InstanceMethods#set_fields], or
+Model#update_fields[rdoc-ref:Sequel::Model::InstanceMethods#update_fields]
+methods, which allow you to specify which fields
 to allow on a per-call basis.  This pretty much eliminates the chance that the
 user will be able to set a column you did not intend to allow:
 
   album.set_only(params[:album], [:name, :copies_sold])
   album.set_fields(params[:album], [:name, :copies_sold])
 
-You can override the mass assignment columns to allow by default for
-+set+ and +update+ using the <tt>Model.set_allowed_columns</tt> class method.  This is a good
+You can override the columns to allow by default during mass assignment via
+the Model.set_allowed_columns[rdoc-ref:Sequel::Model::ClassMethods#set_allowed_columns] class method.  This is a good
 practice, though being explicit on a per-call basis is still recommended:
 
   Album.set_allowed_columns(:name, :copies_sold)
@@ -284,7 +339,7 @@ their type.  For example:
 
   Album.where(:id=>params[:id])
 
-Is probably a bad idea.  Assuming you are using a web framework, params[:id] could
+is probably a bad idea.  Assuming you are using a web framework, params\[:id\] could
 be a string, an array, a hash, or nil.
 
 Assuming that +id+ is an integer field, you probably want to do:

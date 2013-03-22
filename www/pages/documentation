@@ -5,6 +5,7 @@
 <ul>
   <li>General Overviews<ul>
     <li><a href="rdoc/files/README_rdoc.html">README</a> (Introduction to Sequel, start here if new)</li>
+    <li><a href="rdoc/files/doc/security_rdoc.html">Security</a></li>
     <li><a href="rdoc/files/doc/cheat_sheet_rdoc.html">Cheat Sheet</a></li>
     <li><a href="rdoc/files/doc/sql_rdoc.html">Sequel for SQL Users</a></li>
     <li><a href="rdoc/files/doc/active_record_rdoc.html">Sequel for ActiveRecord Users</a></li>
@@ -32,7 +33,6 @@
     <li><a href="rdoc/files/doc/advanced_associations_rdoc.html">Advanced Model Associations</a></li>
   </ul></li>
   <li>Misc.<ul>
-    <li><a href="rdoc/files/doc/security_rdoc.html">Security</a></li>
     <li><a href="rdoc/files/doc/reflection_rdoc.html">Reflection</a></li>
     <li><a href="rdoc/files/doc/thread_safety_rdoc.html">Thread Safety</a></li>
     <li><a href="rdoc/files/doc/testing_rdoc.html">Testing With Sequel</a></li>

@@ -74,7 +74,7 @@ if rdoc_task_class
   rdoc_task_class.new(:website_rdoc_main) do |rdoc|
     rdoc.rdoc_dir = "www/public/rdoc"
     rdoc.options += RDOC_OPTS
-    rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/*.rb lib/sequel/*.rb lib/sequel/{connection_pool,dataset,database,model}/*.rb doc/*.rdoc doc/release_notes/*.txt lib/sequel/extensions/migration.rb"
+    rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/*.rb lib/sequel/*.rb lib/sequel/{connection_pool,dataset,database,model}/*.rb doc/*.rdoc doc/release_notes/*.txt lib/sequel/extensions/migration.rb lib/sequel/extensions/core_extensions.rb"
   end
 
   rdoc_task_class.new(:website_rdoc_adapters) do |rdoc|
