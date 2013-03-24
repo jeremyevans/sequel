@@ -291,12 +291,12 @@ the connection URLs or are connecting to arbitrary databases at runtime.
 Mass assignment is the practice of passing a hash of columns and values
 to a single method, and having multiple column values for a given object set
 based on the content of the hash.
-The security issue here is that mass assignement may allow the user to
+The security issue here is that mass assignment may allow the user to
 set columns that you didn't intend to allow.
 
 The Model#set[rdoc-ref:Sequel::Model::InstanceMethods#set] and Model#update[rdoc-ref:Sequel::Model::InstanceMethods#update] methods do mass
 assignment.  The default configuration of Sequel::Model allows all model
-columns except for the primary key column(s) to be set via mass assignement.
+columns except for the primary key column(s) to be set via mass assignment.
 
 Example:
 
@@ -310,7 +310,7 @@ they also allow mass assignment:
   Album.new(params[:album]) # Mass Assignment
   Album.create(params[:album]) # Mass Assignment
 
-Instead of these methods, it is incouraged to either use the
+Instead of these methods, it is encouraged to either use the
 Model#set_only[rdoc-ref:Sequel::Model::InstanceMethods#set_only],
 Model#update_only[rdoc-ref:Sequel::Model::InstanceMethods#update_only],
 Model#set_fields[rdoc-ref:Sequel::Model::InstanceMethods#set_fields], or
