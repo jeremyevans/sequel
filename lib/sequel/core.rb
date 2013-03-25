@@ -20,7 +20,7 @@
 # Sequel currently adds methods to the Array, Hash, String and Symbol classes by
 # default.  You can either require 'sequel/no_core_ext' or set the
 # +SEQUEL_NO_CORE_EXTENSIONS+ constant or environment variable before requiring
-# sequel to have # Sequel not add methods to those classes.
+# sequel to have Sequel not add methods to those classes.
 #
 # For a more expanded introduction, see the {README}[link:files/README_rdoc.html].
 # For a quicker introduction, see the {cheat sheet}[link:files/doc/cheat_sheet_rdoc.html].
@@ -332,7 +332,7 @@ module Sequel
   else
     # Yield directly to the block.  You don't need to synchronize
     # access on MRI because the GVL makes certain methods atomic.
-    def self.synchronize(&block)
+    def self.synchronize
       yield
     end
   end
