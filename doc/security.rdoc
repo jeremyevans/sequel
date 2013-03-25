@@ -19,6 +19,7 @@ could conceivably be abused to do so:
 * Sequel::Schema::CreateTableGenerator.add_type_method
 * Sequel::Dataset.def_mutation_method
 * Sequel::Dataset.def_append_methods
+* Sequel.def_adapter_method (private)
 * Sequel::Model::InstanceMethods.class_attr_overridable (private)
 * Sequel::Model::InstanceMethods.class_attr_reader (private)
 * Sequel::SQL::Expression.to_s_method (private)
