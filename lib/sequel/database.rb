@@ -15,5 +15,5 @@ module Sequel
   class Database
   end
 
-  require(%w"connecting dataset dataset_defaults logging misc query schema_generator schema_methods", 'database')
+  require(%w"connecting dataset dataset_defaults logging features misc query transactions schema_generator schema_methods", 'database')
 end

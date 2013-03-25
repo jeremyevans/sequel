@@ -778,20 +778,6 @@ module Sequel
       schema_utility_dataset.split_qualifiers(table_name)
     end
 
-    # Whether the database supports combining multiple alter table
-    # operations into a single query, false by default.
-    def supports_combining_alter_table_ops?
-      false
-    end
-
-    # Whether the database supports named column constraints. True
-    # by default.  Those that don't support named column constraints
-    # have to have column constraints converted to table constraints
-    # if the column constraints have names.
-    def supports_named_column_constraints?
-      true
-    end
-
     # SQL DDL fragment for temporary table
     def temporary_table_sql
       self.class.const_get(:TEMPORARY)
