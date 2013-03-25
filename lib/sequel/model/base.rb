@@ -1187,7 +1187,7 @@ module Sequel
         end
       end
       
-      # Returns a hash identifying mapping the receivers primary key column(s) to their values.
+      # Returns a hash mapping the receivers primary key column(s) to their values.
       # 
       #   Artist[1].pk_hash # => {:id=>1}
       #   Artist[[1, 2]].pk_hash # => {:id1=>1, :id2=>2}
