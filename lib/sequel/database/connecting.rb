@@ -186,6 +186,7 @@ module Sequel
     #
     #   DB.each_server{|db| db.create_table(:users){primary_key :id; String :name}}
     def each_server(&block)
+      raise(Error, "Database#each_server must be passed a block") unless block
       servers.each{|s| self.class.connect(server_opts(s), &block)}
     end
 

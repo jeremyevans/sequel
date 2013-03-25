@@ -1663,6 +1663,10 @@ describe "Database#each_server with do/jdbc adapter connection string without :a
     end
     hosts.sort.should == [1, 3]
   end
+
+  specify "should raise if not given a block" do
+    proc{Sequel.mock.each_server}.should raise_error(Sequel::Error)
+  end
 end
 
 describe "Database#each_server" do
