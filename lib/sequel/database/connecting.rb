@@ -56,10 +56,7 @@ module Sequel
           uri_options = c.send(:uri_to_options, uri)
           uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v if k && !k.empty?} unless uri.query.to_s.strip.empty?
           uri_options.to_a.each{|k,v| uri_options[k] = URI.unescape(v) if v.is_a?(String)}
-          opts = opts.merge(:orig_opts=>opts.dup)
-          opts[:uri] = conn_string
-          opts = uri_options.merge(opts)
-          opts[:adapter] = scheme
+          opts = uri_options.merge(opts).merge!(:orig_opts=>opts.dup, :uri=>conn_string, :adapter=>scheme)
         end
       when Hash
         opts = conn_string.merge(opts)
@@ -77,14 +74,16 @@ module Sequel
       begin
         db = c.new(opts)
         db.test_connection if opts[:test] && db.send(:typecast_value_boolean, opts[:test])
-        result = yield(db) if block_given?
+        if block_given?
+          return yield(db)
+        end
       ensure
         if block_given?
           db.disconnect if db
           Sequel.synchronize{::Sequel::DATABASES.delete(db)}
         end
       end
-      block_given? ? result : db
+      db
     end
     
     # Sets the default single_threaded mode for new databases.
@@ -107,7 +106,7 @@ module Sequel
     #   Sequel.connect('mydb://user:password@dbserver/mydb')
     def self.set_adapter_scheme(scheme) # :nodoc:
       @scheme = scheme
-      ADAPTER_MAP[scheme.to_sym] = self
+      ADAPTER_MAP[scheme] = self
     end
     private_class_method :set_adapter_scheme
     
