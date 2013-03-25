@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow external connection pool classes to be loaded automatically (jeremyevans)
+
 * Add Dataset#with_pk! for model datasets, like #with_pk, but raising instead of returning nil (jeremyevans)
 
 * Add Dataset#first!, like #first, but raising a Sequel::NoMatchingRow exception instead of returning nil (jeremyevans)

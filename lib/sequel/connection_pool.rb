@@ -18,8 +18,8 @@
 #
 # add_servers(Array of Symbols) :: start recognizing all shards/servers specified
 #                                  by the array of symbols.
-# * remove_servers(Array of Symbols) :: no longer recognize all shards/servers
-#                                       specified by the array of symbols.
+# remove_servers(Array of Symbols) :: no longer recognize all shards/servers
+#                                     specified by the array of symbols.
 class Sequel::ConnectionPool
   # The default server to use
   DEFAULT_SERVER = :default
@@ -42,7 +42,7 @@ class Sequel::ConnectionPool
       when Class
         v.new(db, opts)
       when Symbol
-        Sequel.ts_require("connection_pool/#{v}")
+        Sequel.tsk_require("sequel/connection_pool/#{v}")
         connection_pool_class(opts).new(db, opts) || raise(Sequel::Error, "No connection pool class found")
       end
     end
