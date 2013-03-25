@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up threaded connection pools when :connection_handling=>:queue is used (jeremyevans)
+
 * Allow external connection pool classes to be loaded automatically (jeremyevans)
 
 * Add Dataset#with_pk! for model datasets, like #with_pk, but raising instead of returning nil (jeremyevans)

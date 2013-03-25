@@ -140,13 +140,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # Return a connection to the pool of available connections, returns the connection.
   # The calling code should already have the mutex before calling this.
   def checkin_connection(conn)
-    case @connection_handling
-    when :queue
-      @available_connections.unshift(conn)
-    else
-      @available_connections << conn
-    end
-
+    @available_connections << conn
     conn
   end
 
@@ -168,7 +162,12 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # is not currently an available connection.  The calling code should already
   # have the mutex before calling this.
   def next_available
-    @available_connections.pop
+    case @connection_handling
+    when :queue
+      @available_connections.shift
+    else
+      @available_connections.pop
+    end
   end
 
   # Returns the connection owned by the supplied thread,
