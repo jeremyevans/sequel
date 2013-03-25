@@ -1833,13 +1833,14 @@ module Sequel
           opt = opt ? opt.dup : {}
           associations.flatten.each do |association|
             case association
-              when Symbol
-                check_association(model, association)
-                opt[association] = nil
-              when Hash
-                association.keys.each{|assoc| check_association(model, assoc)}
-                opt.merge!(association)
-              else raise(Sequel::Error, 'Associations must be in the form of a symbol or hash')
+            when Symbol
+              check_association(model, association)
+              opt[association] = nil
+            when Hash
+              association.keys.each{|assoc| check_association(model, assoc)}
+              opt.merge!(association)
+            else
+              raise(Sequel::Error, 'Associations must be in the form of a symbol or hash')
             end
           end
           clone(:eager=>opt)
@@ -1956,7 +1957,8 @@ module Sequel
                 ds = ds.eager_graph_association(ds, model, ta, requirements, eager_graph_check_association(model, assoc), assoc_assocs)
               end
               ds
-            else raise(Sequel::Error, 'Associations must be in the form of a symbol or hash')
+            else
+              raise(Sequel::Error, 'Associations must be in the form of a symbol or hash')
             end
           end
           ds
