@@ -44,6 +44,9 @@ module Sequel
       # with that type as a constant.  Types given should either already
       # be constants/classes or a capitalized string/symbol with the same name
       # as a constant/class.
+      #
+      # Do not call this method with untrusted input, as that can result in
+      # arbitrary code execution.
       def self.add_type_method(*types)
         types.each do |type|
           class_eval("def #{type}(name, opts={}); column(name, #{type}, opts); end", __FILE__, __LINE__)

@@ -11,6 +11,9 @@ module Sequel
     # Setup mutation (e.g. filter!) methods.  These operate the same as the
     # non-! methods, but replace the options of the current dataset with the
     # options of the resulting dataset.
+    #
+    # Do not call this method with untrusted input, as that can result in
+    # arbitrary code execution.
     def self.def_mutation_method(*meths)
       options = meths.pop if meths.last.is_a?(Hash)
       mod = options[:module] if options

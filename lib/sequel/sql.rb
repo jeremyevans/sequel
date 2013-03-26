@@ -89,6 +89,9 @@ module Sequel
         # Create a to_s instance method that takes a dataset, and calls
         # the method provided on the dataset with args as the argument (self by default).
         # Used to DRY up some code.
+        #
+        # Do not call this method with untrusted input, as that can result in
+        # arbitrary code execution.
         def to_s_method(meth, args=:self) # :nodoc:
           class_eval("def to_s(ds) ds.#{meth}(#{args}) end", __FILE__, __LINE__)
           class_eval("def to_s_append(ds, sql) ds.#{meth}_append(sql, #{args}) end", __FILE__, __LINE__)

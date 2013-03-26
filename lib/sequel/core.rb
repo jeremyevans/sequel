@@ -422,6 +422,9 @@ module Sequel
 
   # Method that adds a database adapter class method to Sequel that calls
   # Sequel.adapter_method.
+  #
+  # Do not call this method with untrusted input, as that can result in
+  # arbitrary code execution.
   def self.def_adapter_method(*adapters) # :nodoc:
     adapters.each do |adapter|
       instance_eval("def #{adapter}(*args, &block); adapter_method('#{adapter}', *args, &block) end", __FILE__, __LINE__)

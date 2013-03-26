@@ -869,6 +869,9 @@ module Sequel
       # Define instance method(s) that calls class method(s) of the
       # same name, caching the result in an instance variable.  Define
       # standard attr_writer method for modifying that instance variable.
+      #
+      # Do not call this method with untrusted input, as that can result in
+      # arbitrary code execution.
       def self.class_attr_overridable(*meths) # :nodoc:
         meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (frozen? ? self.class.#{meth} : (@#{meth} = self.class.#{meth})) : @#{meth} end", __FILE__, __LINE__)}
         attr_writer(*meths) 
@@ -878,6 +881,9 @@ module Sequel
       # same name. Replaces the construct:
       #   
       #   define_method(meth){self.class.send(meth)}
+      #
+      # Do not call this method with untrusted input, as that can result in
+      # arbitrary code execution.
       def self.class_attr_reader(*meths) # :nodoc:
         meths.each{|meth| class_eval("def #{meth}; self.class.#{meth} end", __FILE__, __LINE__)}
       end

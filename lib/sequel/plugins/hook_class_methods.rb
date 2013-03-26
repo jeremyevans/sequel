@@ -69,6 +69,9 @@ module Sequel
         #     # move MyModel object to there
         #   end
         #  end
+        #
+        # Do not call this method with untrusted input, as that can result in
+        # arbitrary code execution.
         def add_hook_type(*hooks)
           Model::HOOKS.concat(hooks)
           hooks.each do |hook|

@@ -326,6 +326,13 @@ module Sequel
       subselect_sql
       table_ref
     END
+
+    # For each of the methods in the given array, define a method with
+    # that name that returns a string with the SQL fragment that the
+    # related *_append method would add.
+    #
+    # Do not call this method with untrusted input, as that can result in
+    # arbitrary code execution.
     def self.def_append_methods(meths)
       meths.each do |meth|
         class_eval(<<-END, __FILE__, __LINE__ + 1)
