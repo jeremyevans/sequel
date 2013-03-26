@@ -55,6 +55,27 @@ describe "A MSSQL database" do
   end
 end
 
+describe "MSSQL" do
+  before(:all) do
+    @db = MSSQL_DB
+    @db.create_table!(:test3){Integer :v3}
+    @db.create_table!(:test4){Integer :v4}
+    @db[:test3].import([:v3], [[1], [2]])
+    @db[:test4].import([:v4], [[1], [3]])
+  end
+  after(:all) do
+    @db.drop_table?(:test3, :test4)
+  end
+
+  specify "should should support CROSS APPLY" do
+    @db[:test3].cross_apply(@db[:test4].where(:test3__v3=>:test4__v4)).select_order_map([:v3, :v4]).should == [[1,1]]
+  end
+
+  specify "should should support OUTER APPLY" do
+    @db[:test3].outer_apply(@db[:test4].where(:test3__v3=>:test4__v4)).select_order_map([:v3, :v4]).should == [[1,1], [2, nil]]
+  end
+end
+
 # This spec is currently disabled as the SQL Server 2008 R2 Express doesn't support
 # full text searching.  Even if full text searching is supported,
 # you may need to create a full text catalog on the database first via:

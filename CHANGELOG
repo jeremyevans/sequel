@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#cross_apply and Dataset#outer_apply on Microsoft SQL Server (jeremyevans)
+
 * Speed up threaded connection pools when :connection_handling=>:queue is used (jeremyevans)
 
 * Allow external connection pool classes to be loaded automatically (jeremyevans)

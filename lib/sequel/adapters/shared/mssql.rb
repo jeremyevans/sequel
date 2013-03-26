@@ -435,6 +435,8 @@ module Sequel
       CASE_INSENSITIVE_COLLATION = 'Latin1_General_CI_AS'.freeze
       DEFAULT_TIMESTAMP_FORMAT = "'%Y-%m-%dT%H:%M:%S%N%z'".freeze
       FORMAT_DATE = "'%Y%m%d'".freeze
+      CROSS_APPLY = 'CROSS APPLY'.freeze
+      OUTER_APPLY = 'OUTER APPLY'.freeze
 
       Sequel::Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
 
@@ -485,6 +487,11 @@ module Sequel
         end
       end
       
+      # Uses CROSS APPLY to join the given table into the current dataset.
+      def cross_apply(table)
+        join_table(:cross_apply, table)
+      end
+
       # Disable the use of INSERT OUTPUT
       def disable_insert_output
         clone(:disable_insert_output=>true)
@@ -544,6 +551,11 @@ module Sequel
       # Allows you to do a dirty read of uncommitted data using WITH (NOLOCK).
       def nolock
         lock_style(:dirty)
+      end
+
+      # Uses OUTER APPLY to join the given table into the current dataset.
+      def outer_apply(table)
+        join_table(:outer_apply, table)
       end
 
       # Include an OUTPUT clause in the eventual INSERT, UPDATE, or DELETE query.
@@ -726,6 +738,18 @@ module Sequel
           sql << OUTPUT_INSERTED
         else
           output_sql(sql)
+        end
+      end
+
+      # Handle CROSS APPLY and OUTER APPLY JOIN types
+      def join_type_sql(join_type)
+        case join_type
+        when :cross_apply
+          CROSS_APPLY
+        when :outer_apply
+          OUTER_APPLY
+        else
+          super
         end
       end
 
