@@ -57,7 +57,9 @@
   were incorrectly converted to 0000-01-01.
 
 * The associations, composition, serialization, and dirty plugins
-  now clear caches stored in the instance in some additional cases.
+  now clear caches stored in the instance in some additional cases,
+  such as when saving model instances when the dataset supports
+  insert_select.
 
 * Model#validates_type in the validation_helpers plugin now handles
   false values correctly.
@@ -76,6 +78,28 @@
   to think about when using Sequel.
 
 = Backwards Compatibility
+
+* The change to make associations, composition, serialization, and
+  dirty now clear caches after saving when the dataset supports
+  insert_select can break code that expected the previous behavior.
+  For example:
+
+    artist = Artist[1]
+    artist.has_albums # => false
+
+    album = Album.new(:artist=>artist)
+    def album.after_create
+      super
+      artist.update(:has_albums=>true)
+    end
+    album.save
+
+    artist.has_albums # => false
+
+  Such code should either refresh the artist after saving the album,
+  or use album.artist.has_albums.  You already had to do that if
+  the dataset did not support insert_select; the impetus for this
+  change was to make the behavior consistent.
 
 * Decimal/numeric columns are now strictly typecast by default,
   similar to integer and real/double precision columns.  If you want
