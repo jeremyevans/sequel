@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.46.0 (2013-04-02)
 
 * Add Dataset#cross_apply and Dataset#outer_apply on Microsoft SQL Server (jeremyevans)
 

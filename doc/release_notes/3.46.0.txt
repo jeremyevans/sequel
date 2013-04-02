@@ -1,0 +1,98 @@
+= New Features
+ 
+* Dataset#first! has been added.  This is identical to #first,
+  except where #first would return nil due to no row matching,
+  #first! raises a Sequel::NoMatchingRow exception.  The main
+  benefit here is that a standard exception class is now used,
+  so external libraries can deal with these exceptions appropriately
+  (such as web applications returning a 404 error).
+
+* Dataset#with_pk! has been added to model datasets.  Similar to
+  #first!, this raises a Sequel::NoMatchingRow exception instead of
+  returning nil if there is no matching row.
+
+* A drop_foreign_key method has been added to the alter_table
+  generator:
+
+    alter_table(:tab){drop_foreign_key :col}
+
+  This relies on foreign_key_list working and including the name
+  of the foreign key.  Previously, you'd have to drop the foreign key
+  constraint before dropping the column in some cases.
+
+* Column constraints can now be named using :*_constraint_name
+  options:
+
+    create_table(:tab) do
+      primary_key :id, :primary_key_constraint_name=>:pk_name
+      foriegn_key :t_id, :t, :foreign_key_constraint_name=>:fk_name,
+        :unique=>true, :unique_constraint_name=>:uk_name
+    end
+
+  This makes it easier to name constraints, which has always been
+  recommended as it makes it easier to drop such constraints in the
+  future.
+
+* On Microsoft SQL Server, Dataset#cross_apply and #outer_apply have
+  been added to use CROSS/OUTER APPLY.  These are useful if you
+  want to join a table to the output of a function that takes the
+  table as an argument.
+
+= Other Improvements
+
+* The connection pools are now faster when using the
+  :connection_handling=>:queue option.
+
+* External connection pool classes can now be loaded automatically by
+  the :pool_class option.
+
+* Database#each_server now raises if not given a block.  Previously,
+  it just leaked Database references.
+
+* On Microsoft SQL Server, ] characters are now escaped correctly in
+  identifiers.
+
+* On PostgreSQL, infinite dates are also handled when using
+  Database#convert_infinite_timestamps.  Previously, infinite dates
+  were incorrectly converted to 0000-01-01.
+
+* The associations, composition, serialization, and dirty plugins
+  now clear caches stored in the instance in some additional cases.
+
+* Model#validates_type in the validation_helpers plugin now handles
+  false values correctly.
+
+* The string_stripper plugin has been fixed to not change the result
+  of Model.set_dataset.
+
+* You can now drop primary key constraints on H2, using:
+
+    alter_table(:tab){drop_constraint :foo, :type=>:primary_key}
+
+* The jdbc/as400 adapter has been fixed, it was broken starting in
+  Sequel 3.44.0.
+
+* A Security guide has been added explaining various security issues
+  to think about when using Sequel.
+
+= Backwards Compatibility
+
+* Decimal/numeric columns are now strictly typecast by default,
+  similar to integer and real/double precision columns.  If you want
+  the previous loose typecasting to for decimal/numeric columns,
+  use the looser_typecasting extension.
+
+* External adapters that called Database.set_adapter_scheme with a
+  string should change to using a symbol.
+
+* Dataset#select_map, #select_order_map, and #get now raise an
+  exception if they are passed a plain string inside an array.  
+  If you do want to use a plain string, you now need to alias it:
+  
+    dataset.get([Sequel.as('string', :some_alias)])
+
+= Sequel 4 Implementation Planning
+
+* Sequel 4 implementation planning has begun.  If you want to view
+  and/or provide feedback on the implementation plan, see
+  https://github.com/jeremyevans/sequel-4-plans
