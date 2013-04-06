@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Plugins.inherited_instance_variables for easily setting class instance variables when subclassing (jeremyevans)
+
 * Add Plugins.def_dataset_methods for easily defining class methods that call dataset methods (jeremyevans)
 
 * Make lazy_attributes plugin no longer depend on identity_map plugin (jeremyevans)

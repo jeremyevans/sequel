@@ -350,8 +350,7 @@ module Sequel
       def inherited(subclass)
         super
         ivs = subclass.instance_variables.collect{|x| x.to_s}
-        EMPTY_INSTANCE_VARIABLES.each{|iv| subclass.instance_variable_set(iv, nil) unless ivs.include?(iv.to_s)}
-        INHERITED_INSTANCE_VARIABLES.each do |iv, dup|
+        inherited_instance_variables.each do |iv, dup|
           next if ivs.include?(iv.to_s)
           sup_class_value = instance_variable_get(iv)
           sup_class_value = sup_class_value.dup if dup == :dup && sup_class_value
@@ -369,7 +368,7 @@ module Sequel
           end
         end
       end
-    
+
       # Returns the implicit table name for the model class, which is the demodulized,
       # underscored, pluralized name of the class.
       #
@@ -732,6 +731,14 @@ module Sequel
         schema_hash
       end
       
+      # A hash of instance variables to automatically set up in subclasses.
+      # See Sequel::Model::INHERITED_INSTANCE_VARIABLES.  It is safe to modify
+      # the hash returned by this method, though it may not be safe to modify
+      # values of the hash.
+      def inherited_instance_variables
+        INHERITED_INSTANCE_VARIABLES.dup
+      end
+    
       # For the given opts hash and default name or :class option, add a
       # :class_name option unless already present which contains the name
       # of the class to use as a string.  The purpose is to allow late
@@ -841,7 +848,7 @@ module Sequel
       end
 
       # Add model methods that call dataset methods
-      Plugins.def_dataset_methods(self, DATASET_METHODS + [:destroy, :with_pk, :with_pk!])
+      Plugins.def_dataset_methods(self, DATASET_METHODS)
   
       # Returns a copy of the model's dataset with custom SQL
       #

@@ -32,11 +32,7 @@ module Sequel
         # The string encoding to force on a column string values
         attr_accessor :forced_encoding
         
-        # Copy the forced_encoding value into the subclass
-        def inherited(subclass)
-          super
-          subclass.forced_encoding = forced_encoding
-        end
+        Plugins.inherited_instance_variables(self, :@forced_encoding=>nil)
       end
     
       module InstanceMethods

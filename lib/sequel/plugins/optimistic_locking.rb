@@ -38,11 +38,7 @@ module Sequel
         # The column holding the version of the lock
         attr_accessor :lock_column
         
-        # Copy the lock_column value into the subclass
-        def inherited(subclass)
-          super
-          subclass.lock_column = lock_column
-        end
+        Plugins.inherited_instance_variables(self, :@lock_column=>nil)
       end
     
       module InstanceMethods

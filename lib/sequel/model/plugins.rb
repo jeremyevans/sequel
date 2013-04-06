@@ -28,5 +28,13 @@ module Sequel
         mod.class_eval("def #{meth}(*args, &block); dataset.#{meth}(*args, &block) end", __FILE__, __LINE__)
       end
     end
+
+    # Add method that overrides inherited_instance_variables to include the
+    # values in this hash.
+    def self.inherited_instance_variables(mod, hash)
+      mod.send(:define_method, :inherited_instance_variables) do ||
+        super().merge!(hash)
+      end
+    end
   end
 end

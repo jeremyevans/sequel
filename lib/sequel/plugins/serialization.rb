@@ -111,16 +111,7 @@ module Sequel
         # call be overridden and call super to get the serialization behavior
         attr_accessor :serialization_module
 
-        # Copy the serialization_map and deserialization map into the subclass.
-        def inherited(subclass)
-          super
-          sm = serialization_map.dup
-          dsm = deserialization_map.dup
-          subclass.instance_eval do
-            @deserialization_map = dsm
-            @serialization_map = sm
-          end
-        end
+        Plugins.inherited_instance_variables(self, :@deserialization_map=>:dup, :@serialization_map=>:dup)
         
         # Create instance level reader that deserializes column values on request,
         # and instance level writer that stores new deserialized values.

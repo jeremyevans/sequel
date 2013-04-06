@@ -29,11 +29,7 @@ module Sequel
       end
 
       module ClassMethods
-        # Copy skipped stripping columns from superclass into subclass.
-        def inherited(subclass)
-          subclass.instance_variable_set(:@skipped_string_stripping_columns, @skipped_string_stripping_columns.dup)
-          super
-        end
+        Plugins.inherited_instance_variables(self, :@skipped_string_stripping_columns=>:dup)
 
         # Set blob columns as skipping stripping when plugin is loaded.
         def set_dataset(*)

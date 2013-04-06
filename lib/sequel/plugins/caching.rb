@@ -70,18 +70,7 @@ module Sequel
           "#{self}:#{Array(pk).join(',')}"
         end
         
-        # Copy the necessary class instance variables to the subclass.
-        def inherited(subclass)
-          super
-          store = @cache_store
-          ttl = @cache_ttl
-          cache_ignore_exceptions = @cache_ignore_exceptions
-          subclass.instance_eval do
-            @cache_store = store
-            @cache_ttl = ttl
-            @cache_ignore_exceptions = cache_ignore_exceptions
-          end
-        end 
+        Plugins.inherited_instance_variables(self, :@cache_store=>nil, :@cache_ttl=>nil, :@cache_ignore_exceptions=>nil)
 
         # Set the time to live for the cache store, in seconds (default is 3600, # so 1 hour).
         def set_cache_ttl(ttl)

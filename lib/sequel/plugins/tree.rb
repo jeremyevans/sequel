@@ -55,12 +55,7 @@ module Sequel
         # parent of the leaf.
         attr_accessor :parent_column
 
-        # Copy the +parent_column+ and +order_column+ to the subclass.
-        def inherited(subclass)
-          super
-          subclass.parent_column = parent_column
-          subclass.tree_order = tree_order 
-        end
+        Plugins.inherited_instance_variables(self, :@parent_column=>nil, :@tree_order=>nil)
 
         # Returns list of all root nodes (those with no parent nodes).
         #

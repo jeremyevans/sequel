@@ -41,11 +41,7 @@ module Sequel
           @pg_typecast_on_load_columns.concat(columns)
         end
 
-        # Give the subclass a copy of the columns to typecast on load.
-        def inherited(subclass)
-          super
-          subclass.instance_variable_set(:@pg_typecast_on_load_columns, pg_typecast_on_load_columns.dup)
-        end
+        Plugins.inherited_instance_variables(self, :@pg_typecast_on_load_columns=>:dup)
       end
 
       module InstanceMethods

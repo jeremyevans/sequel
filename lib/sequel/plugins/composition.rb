@@ -124,12 +124,7 @@ module Sequel
           define_composition_accessor(name, opts)
         end
         
-        # Copy the necessary class instance variables to the subclass.
-        def inherited(subclass)
-          super
-          c = compositions.dup
-          subclass.instance_eval{@compositions = c}
-        end
+        Plugins.inherited_instance_variables(self, :@compositions=>:dup)
         
         # Define getter and setter methods for the composition object.
         def define_composition_accessor(name, opts={})

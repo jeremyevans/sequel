@@ -78,12 +78,7 @@ module Sequel
         # proc should accept an instance and return a dataset representing the list.
         attr_accessor :scope_proc
 
-        # Copy the +position_field+ and +scope_proc+ to the subclass.
-        def inherited(subclass)
-          super
-          subclass.position_field = position_field
-          subclass.scope_proc = scope_proc
-        end
+        Plugins.inherited_instance_variables(self, :@position_field=>nil, :@scope_proc=>nil)
       end
 
       module InstanceMethods

@@ -36,11 +36,7 @@ module Sequel
           @typecast_on_load_columns.concat(columns)
         end
 
-        # Give the subclass a copy of the typecast on load columns.
-        def inherited(subclass)
-          super
-          subclass.instance_variable_set(:@typecast_on_load_columns, typecast_on_load_columns.dup)
-        end
+        Plugins.inherited_instance_variables(self, :@typecast_on_load_columns=>:dup)
       end
 
       module InstanceMethods

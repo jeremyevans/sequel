@@ -61,11 +61,7 @@ module Sequel
         # The name of the table containing the constraint validations metadata.
         attr_reader :constraint_validations_table
 
-        # Copy the name of the constraint validations metadata table into the subclass.
-        def inherited(subclass)
-          super
-          subclass.instance_variable_set(:@constraint_validations_table, @constraint_validations_table)
-        end
+        Plugins.inherited_instance_variables(self, :@constraint_validations_table=>nil)
 
         # Parse the constraint validations from the database whenever the dataset
         # changes.

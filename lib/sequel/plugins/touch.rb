@@ -56,13 +56,7 @@ module Sequel
         # are column name symbols.
         attr_reader :touched_associations
 
-        # Set the touch_column for the subclass to be the same as the current class.
-        # Also, create a copy of the touched_associations in the subclass.
-        def inherited(subclass)
-          super
-          subclass.touch_column = touch_column
-          subclass.instance_variable_set(:@touched_associations, touched_associations.dup)
-        end
+        Plugins.inherited_instance_variables(self, :@touched_associations=>:dup, :@touch_column=>nil)
 
         # Add additional associations to be touched.  See the :association option
         # of the Sequel::Plugin::Touch.configure method for the format of the associations

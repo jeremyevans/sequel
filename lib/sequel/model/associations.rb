@@ -990,13 +990,6 @@ module Sequel
           ds
         end
 
-        # Copy the association reflections to the subclass
-        def inherited(subclass)
-          super
-          subclass.instance_variable_set(:@association_reflections, association_reflections.dup)
-          subclass.default_eager_limit_strategy =  default_eager_limit_strategy
-        end
-      
         # Shortcut for adding a many_to_many association, see #associate
         def many_to_many(name, opts={}, &block)
           associate(:many_to_many, name, opts, &block)
@@ -1017,6 +1010,7 @@ module Sequel
           associate(:one_to_one, name, opts, &block)
         end
 
+        Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@default_eager_limit_strategy=>nil)
         Plugins.def_dataset_methods(self, [:eager, :eager_graph])
         
         private

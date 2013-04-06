@@ -47,13 +47,8 @@ module Sequel
           @create_timestamp_overwrite
         end
         
-        # Copy the class instance variables used from the superclass to the subclass
-        def inherited(subclass)
-          super
-          [:@create_timestamp_field, :@update_timestamp_field, :@create_timestamp_overwrite, :@set_update_timestamp_on_create].each do |iv|
-            subclass.instance_variable_set(iv, instance_variable_get(iv))
-          end
-        end
+        Plugins.inherited_instance_variables(self, :@create_timestamp_field=>nil, :@update_timestamp_field=>nil,
+          :@create_timestamp_overwrite=>nil, :@set_update_timestamp_on_create=>nil)
         
         # Whether to set the update timestamp to the create timestamp when creating
         def set_update_timestamp_on_create?
