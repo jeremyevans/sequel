@@ -2774,6 +2774,13 @@ describe "Dataset#get" do
     @d.with_sql('SELECT foo').get{[name, n__abc]}.should == [1, 2]
     @d.db.sqls.should == ['SELECT foo'] * 2
   end
+
+  specify "should handle cases where no rows are returned" do
+    @d._fetch = []
+    @d.get(:n).should == nil
+    @d.get([:n, :a]).should == nil
+    @d.db.sqls.should == ['SELECT n FROM test LIMIT 1', 'SELECT n, a FROM test LIMIT 1']
+  end
 end
 
 describe "Dataset#set_row_proc" do

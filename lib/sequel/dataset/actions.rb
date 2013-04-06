@@ -262,7 +262,9 @@ module Sequel
       end
 
       if column.is_a?(Array)
-        ds.single_record.values_at(*column.map{|c| hash_key_symbol(c)})
+       if r = ds.single_record
+         r.values_at(*column.map{|c| hash_key_symbol(c)})
+       end
       else
         ds.single_value
       end

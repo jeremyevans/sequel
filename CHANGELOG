@@ -1,3 +1,9 @@
+=== HEAD
+
+* Make Dataset#get with an array of values handle case where no row is returned (jeremyevans)
+
+* Make caching plugin handle memcached API for deletes if ignore_exceptions option is used (rintaun) (#639)
+
 === 3.46.0 (2013-04-02)
 
 * Add Dataset#cross_apply and Dataset#outer_apply on Microsoft SQL Server (jeremyevans)
