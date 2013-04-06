@@ -66,6 +66,14 @@
 #
 #   DB[:table].insert(:address=>DB.row_type(:address, :street=>'123 Sesame St.', :city=>'Some City', :zip=>'12345'))
 #
+# Note that registering row types without providing an explicit :converter option
+# creates anonymous classes.  This results in ruby being unable to Marshal such
+# objects.  You can work around this by assigning the anonymous class to a constant.
+# To get a list of such anonymous classes, you can use the following code:
+#
+#   DB.conversion_procs.select{|k,v| v.is_a?(Sequel::Postgres::PGRow::Parser) && \
+#     v.converter && (v.converter.name.nil? || v.converter.name == '') }.map{|k,v| v}
+# 
 # This extension requires both the strscan and delegate libraries.
 
 require 'delegate'
