@@ -1,5 +1,7 @@
 === HEAD
 
+* Make lazy_attributes plugin no longer depend on identity_map plugin (jeremyevans)
+
 * Make Dataset#get with an array of values handle case where no row is returned (jeremyevans)
 
 * Make caching plugin handle memcached API for deletes if ignore_exceptions option is used (rintaun) (#639)

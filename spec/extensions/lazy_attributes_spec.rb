@@ -68,17 +68,13 @@ describe "Sequel::Plugins::LazyAttributes" do
     m.name.should == '1'
   end
 
-  it "should lazily load the attribute for a single model object if there is an active identity map" do
-    @c.with_identity_map do
-      m = @c.first
-      m.values.should == {:id=>1}
-      m.name.should == '1'
-      m.values.should == {:id=>1, :name=>'1'}
-      @db.sqls.should == ['SELECT id FROM la LIMIT 1', 'SELECT name FROM la WHERE (id = 1) LIMIT 1']
-    end
+  it "should raise error if the model has no primary key" do
+    m = @c.first
+    @c.no_primary_key
+    proc{m.name}.should raise_error(Sequel::Error)
   end
 
-  it "should lazily load the attribute for a single model object if there is no active identity map" do
+  it "should lazily load the attribute for a single model object" do
     m = @c.first
     m.values.should == {:id=>1}
     m.name.should == '1'
@@ -87,33 +83,27 @@ describe "Sequel::Plugins::LazyAttributes" do
   end
 
   it "should not lazily load the attribute for a single model object if the value already exists" do
-    @c.with_identity_map do
-      m = @c.first
-      m.values.should == {:id=>1}
-      m[:name] = '1'
-      m.name.should == '1'
-      m.values.should == {:id=>1, :name=>'1'}
-      @db.sqls.should == ['SELECT id FROM la LIMIT 1']
-    end
+    m = @c.first
+    m.values.should == {:id=>1}
+    m[:name] = '1'
+    m.name.should == '1'
+    m.values.should == {:id=>1, :name=>'1'}
+    @db.sqls.should == ['SELECT id FROM la LIMIT 1']
   end
 
   it "should not lazily load the attribute for a single model object if it is a new record" do
-    @c.with_identity_map do
-      m = @c.new
-      m.values.should == {}
-      m.name.should == nil
-      @db.sqls.should == []
-    end
+    m = @c.new
+    m.values.should == {}
+    m.name.should == nil
+    @db.sqls.should == []
   end
 
   it "should eagerly load the attribute for all model objects reteived with it" do
-    @c.with_identity_map do
-      ms = @c.all
-      ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
-      ms.map{|m| m.name}.should == %w'1 2'
-      ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
-      @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
-    end
+    ms = @c.all
+    ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
+    ms.map{|m| m.name}.should == %w'1 2'
+    ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
+    @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
   end
 
   it "should add the accessors to a module included in the class, so they can be easily overridden" do
@@ -122,35 +112,29 @@ describe "Sequel::Plugins::LazyAttributes" do
         "#{super}-blah"
       end
     end
-    @c.with_identity_map do
-      ms = @c.all
-      ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
-      ms.map{|m| m.name}.should == %w'1-blah 2-blah'
-      ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
-      @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
-    end
+    ms = @c.all
+    ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
+    ms.map{|m| m.name}.should == %w'1-blah 2-blah'
+    ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
+    @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
   end
 
   it "should work with the serialization plugin" do
     @c.plugin :serialization, :yaml, :name
     @c.instance_dataset._fetch = @ds._fetch = [[{:id=>1}, {:id=>2}], [{:id=>1, :name=>"--- 3\n"}, {:id=>2, :name=>"--- 6\n"}], [{:id=>1}], [{:name=>"--- 3\n"}]]
-    @c.with_identity_map do
-      ms = @ds.all
-      ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
-      ms.map{|m| m.name}.should == [3,6]
-      ms.map{|m| m.values}.should == [{:id=>1, :name=>"--- 3\n"}, {:id=>2, :name=>"--- 6\n"}]
-      ms.map{|m| m.deserialized_values}.should == [{:name=>3}, {:name=>6}]
-      ms.map{|m| m.name}.should == [3,6]
-      @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
-    end
-    @c.with_identity_map do
-      m = @ds.first
-      m.values.should == {:id=>1}
-      m.name.should == 3
-      m.values.should == {:id=>1, :name=>"--- 3\n"}
-      m.deserialized_values.should == {:name=>3}
-      m.name.should == 3
-      @db.sqls.should == ["SELECT id FROM la LIMIT 1", "SELECT name FROM la WHERE (id = 1) LIMIT 1"]
-    end
+    ms = @ds.all
+    ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
+    ms.map{|m| m.name}.should == [3,6]
+    ms.map{|m| m.values}.should == [{:id=>1, :name=>"--- 3\n"}, {:id=>2, :name=>"--- 6\n"}]
+    ms.map{|m| m.deserialized_values}.should == [{:name=>3}, {:name=>6}]
+    ms.map{|m| m.name}.should == [3,6]
+    @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
+    m = @ds.first
+    m.values.should == {:id=>1}
+    m.name.should == 3
+    m.values.should == {:id=>1, :name=>"--- 3\n"}
+    m.deserialized_values.should == {:name=>3}
+    m.name.should == 3
+    @db.sqls.should == ["SELECT id FROM la LIMIT 1", "SELECT name FROM la WHERE (id = 1) LIMIT 1"]
   end
 end

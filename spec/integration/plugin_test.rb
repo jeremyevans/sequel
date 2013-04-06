@@ -429,14 +429,12 @@ describe "Lazy Attributes plugin" do
   
   specify "should load lazy attribute for all items returned when accessing any item if using identity map " do
     Item.create(:name=>'K', :num=>2)
-    Item.with_identity_map do
-      a = Item.order(:name).all
-      a.should == [Item.load(:id=>1, :name=>'J'), Item.load(:id=>2, :name=>'K')]
-      a.map{|x| x[:num]}.should == [nil, nil]
-      a.first.num.should == 1
-      a.map{|x| x[:num]}.should == [1, 2]
-      a.last.num.should == 2
-    end
+    a = Item.order(:name).all
+    a.should == [Item.load(:id=>1, :name=>'J'), Item.load(:id=>2, :name=>'K')]
+    a.map{|x| x[:num]}.should == [nil, nil]
+    a.first.num.should == 1
+    a.map{|x| x[:num]}.should == [1, 2]
+    a.last.num.should == 2
   end
 end
 

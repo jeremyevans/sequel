@@ -5,7 +5,7 @@ module Sequel
     # is needed after the instance has been retrieved, a database query is made to
     # retreive the value of the attribute.
     #
-    # This plugin depends on the identity_map and tactical_eager_loading plugin, and allows you to
+    # This plugin depends on the tactical_eager_loading plugin, and allows you to
     # eagerly load lazy attributes for all objects retrieved with the current object.
     # So the following code should issue one query to get the albums and one query to
     # get the reviews for all of those albums:
@@ -20,9 +20,8 @@ module Sequel
     #   # You can specify multiple columns to lazily load:
     #   Album.plugin :lazy_attributes, :review, :tracklist
     module LazyAttributes
-      # Lazy attributes requires the identity map and tactical eager loading plugins
+      # Lazy attributes requires the tactical_eager_loading plugin
       def self.apply(model, *attrs)
-        model.plugin :identity_map
         model.plugin :tactical_eager_loading  
       end
       
@@ -51,7 +50,7 @@ module Sequel
           include(self.lazy_attributes_module ||= Module.new) unless lazy_attributes_module
           lazy_attributes_module.class_eval do
             define_method(a) do
-              if !values.include?(a) && !new?
+              if !values.has_key?(a) && !new?
                 lazy_attribute_lookup(a)
               else
                 super()
@@ -69,9 +68,19 @@ module Sequel
         # the attribute for just the current object.  Return the value of
         # the attribute for the current object.
         def lazy_attribute_lookup(a)
-          primary_key = model.primary_key
-          model.select(*(Array(primary_key) + [a])).filter(primary_key=>retrieved_with.map{|o| o.pk}).all if model.identity_map && retrieved_with
-          values[a] = this.select(a).first[a] unless values.include?(a)
+          if retrieved_with
+            raise(Error, "Invalid primary key column for #{model}: #{pkc.inspect}") unless primary_key = model.primary_key
+            composite_pk = true if primary_key.is_a?(Array)
+            id_map = {}
+            retrieved_with.each{|o| id_map[o.pk] = o unless o.values.has_key?(a)}
+            model.select(*(Array(primary_key) + [a])).filter(primary_key=>id_map.keys).naked.each do |row|
+              obj = id_map[composite_pk ? row.values_at(*primary_key) : row[primary_key]]
+              if obj && !obj.values.has_key?(a)
+                obj.values[a] = row[a]
+              end
+            end
+          end
+          values[a] = this.select(a).first[a] unless values.has_key?(a)
           values[a]
         end
       end
