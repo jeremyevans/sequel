@@ -14,6 +14,7 @@ describe Sequel::Model, "caching" do
       attr_accessor :ttl
       def set(k, v, ttl); self[k] = v; @ttl = ttl; end
       def get(k); if self[k] then return self[k]; else raise ArgumentError; end end
+      def delete(k); if self[k] then super; else raise ArgumentError; end end
     end
     cache2 = @memcached_class.new
     @memcached = cache2
@@ -225,10 +226,15 @@ describe Sequel::Model, "caching" do
   
   it "should raise an exception if cache_store is memcached and ignore_exception is not enabled" do
     proc{@c3[1]}.should raise_error
+    m = @c3.new.save
+    proc{m.update({:name=>'blah'})}.should raise_error
   end
   
   it "should rescue an exception if cache_store is memcached and ignore_exception is enabled" do
     @c4[1].values.should == {:name => 'sharon', :id => 1}
+    m = @c4.new.save
+    proc{m.update({:name=>'blah'})}.should_not raise_error
+    m.values.should == {:name => 'blah', :id => 1, :x => 1}
   end
   
   it "should support Model.cache_get_pk for getting a value from the cache by primary key" do

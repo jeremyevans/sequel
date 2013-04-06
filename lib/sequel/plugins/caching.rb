@@ -92,7 +92,11 @@ module Sequel
     
         # Delete the entry with the matching key from the cache
         def cache_delete(ck)
-          @cache_store.delete(ck)
+          if @cache_ignore_exceptions
+            @cache_store.delete(ck) rescue nil
+          else
+            @cache_store.delete(ck)
+          end
           nil
         end
         
