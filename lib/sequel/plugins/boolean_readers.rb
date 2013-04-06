@@ -33,12 +33,7 @@ module Sequel
       end
 
       module ClassMethods
-        # Create boolean readers for the class using the columns from the new dataset.
-        def set_dataset(*args)
-          super
-          create_boolean_readers
-          self
-        end
+        Plugins.after_set_dataset(self, :create_boolean_readers)
 
         private
 

@@ -28,12 +28,7 @@ module Sequel
         # this hash to set specific default values, by default the ones will be parsed from the database.
         attr_reader :default_values
         
-        # Set the default values when loading the dataset.
-        def set_dataset(*)
-          x = super
-          set_default_values
-          x
-        end
+        Plugins.after_set_dataset(self, :set_default_values)
 
         private
 

@@ -34,13 +34,7 @@ module Sequel
         attr_reader :prepared_statements_column_defaults
         
         Plugins.inherited_instance_variables(self, :@prepared_statements_column_defaults=>:dup)
-
-        # Set the column defaults to use when creating on the subclass.
-        def set_dataset(*)
-          x = super
-          set_prepared_statements_column_defaults
-          x
-        end
+        Plugins.after_set_dataset(self, :set_prepared_statements_column_defaults)
 
         private
 

@@ -30,13 +30,7 @@ module Sequel
 
       module ClassMethods
         Plugins.inherited_instance_variables(self, :@skipped_string_stripping_columns=>:dup)
-
-        # Set blob columns as skipping stripping when plugin is loaded.
-        def set_dataset(*)
-          res = super
-          set_skipped_string_stripping_columns
-          res
-        end
+        Plugins.after_set_dataset(self, :set_skipped_string_stripping_columns)
 
         # Skip stripping for the given columns.
         def skip_string_stripping(*columns)

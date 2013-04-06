@@ -62,14 +62,7 @@ module Sequel
         attr_reader :constraint_validations_table
 
         Plugins.inherited_instance_variables(self, :@constraint_validations_table=>nil)
-
-        # Parse the constraint validations from the database whenever the dataset
-        # changes.
-        def set_dataset(*)
-          r = super
-          parse_constraint_validations
-          r
-        end
+        Plugins.after_set_dataset(self, :parse_constraint_validations)
 
         private
 

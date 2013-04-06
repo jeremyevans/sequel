@@ -58,12 +58,7 @@ module Sequel
           end
         end
 
-        # Reload the cache when the dataset changes.
-        def set_dataset(*)
-          s = super
-          load_cache
-          s
-        end
+        Plugins.after_set_dataset(self, :load_cache)
 
         # If no arguments are given, yield an identity map for the model with frozen primary keys
         # and instances, without issuing a database query. If any arguments are

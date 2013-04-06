@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Plugins.after_set_dataset for easily running after set_dataset (jeremyevans)
+
 * Add Plugins.inherited_instance_variables for easily setting class instance variables when subclassing (jeremyevans)
 
 * Add Plugins.def_dataset_methods for easily defining class methods that call dataset methods (jeremyevans)
