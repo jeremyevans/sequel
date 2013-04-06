@@ -236,7 +236,6 @@ describe Sequel::Model, "caching" do
     proc{m.update({:name=>'blah'})}.should_not raise_error
     m.values.should == {:name => 'blah', :id => 1, :x => 1}
   end
-
   
   it "should support Model.cache_get_pk for getting a value from the cache by primary key" do
     @c.cache_get_pk(1).should == nil
