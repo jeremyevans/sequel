@@ -20,5 +20,13 @@ module Sequel
   #   every time the Model.plugin method is called, after including/extending
   #   any modules.
   module Plugins
+    # In the given module +mod+, define methods that are call the same method
+    # on the dataset.  This is designed for plugins to define dataset methods
+    # inside ClassMethods that call the implementations in DatasetMethods.
+    def self.def_dataset_methods(mod, meths)
+      Array(meths).each do |meth|
+        mod.class_eval("def #{meth}(*args, &block); dataset.#{meth}(*args, &block) end", __FILE__, __LINE__)
+      end
+    end
   end
 end

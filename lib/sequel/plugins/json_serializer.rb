@@ -175,11 +175,6 @@ module Sequel
           new.from_json_node(hash, {:all_columns=>true, :all_associations=>true}.merge(opts))
         end
 
-        # Call the dataset +to_json+ method.
-        def to_json(*a)
-          dataset.to_json(*a)
-        end
-        
         # Copy the current model object's default json options into the subclass.
         def inherited(subclass)
           super
@@ -187,6 +182,8 @@ module Sequel
           json_serializer_opts.each{|k, v| opts[k] = (v.is_a?(Array) || v.is_a?(Hash)) ? v.dup : v}
           subclass.instance_variable_set(:@json_serializer_opts, opts)
         end
+
+        Plugins.def_dataset_methods(self, :to_json)
       end
 
       module InstanceMethods

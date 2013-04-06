@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Plugins.def_dataset_methods for easily defining class methods that call dataset methods (jeremyevans)
+
 * Make lazy_attributes plugin no longer depend on identity_map plugin (jeremyevans)
 
 * Make Dataset#get with an array of values handle case where no row is returned (jeremyevans)

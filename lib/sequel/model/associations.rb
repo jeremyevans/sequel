@@ -1016,6 +1016,8 @@ module Sequel
         def one_to_one(name, opts={}, &block)
           associate(:one_to_one, name, opts, &block)
         end
+
+        Plugins.def_dataset_methods(self, [:eager, :eager_graph])
         
         private
       

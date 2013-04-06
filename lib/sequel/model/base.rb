@@ -841,7 +841,7 @@ module Sequel
       end
 
       # Add model methods that call dataset methods
-      DATASET_METHODS.each{|arg| class_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__)}
+      Plugins.def_dataset_methods(self, DATASET_METHODS + [:destroy, :with_pk, :with_pk!])
   
       # Returns a copy of the model's dataset with custom SQL
       #

@@ -151,11 +151,6 @@ module Sequel
           new.from_xml_node(parent, opts)
         end
 
-        # Call the dataset +to_xml+ method.
-        def to_xml(opts={})
-          dataset.to_xml(opts)
-        end
-
         # Return an appropriate Nokogiri::XML::Builder instance
         # used to create the XML.  This should probably not be used
         # directly by user code.
@@ -201,6 +196,8 @@ module Sequel
           end
           proc{|s| "#{pr[s]}_"}
         end
+
+        Plugins.def_dataset_methods(self, :to_xml)
       end
 
       module InstanceMethods
