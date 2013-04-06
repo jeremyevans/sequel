@@ -245,6 +245,10 @@ module Sequel
       #
       #   Sequel::Model.db = DB1
       #   Artist.db = DB2
+      #
+      # Note that you should not use this to change the model's database
+      # at runtime.  If you have that need, you should look into Sequel's
+      # sharding support.
       def db=(db)
         @db = db
         set_dataset(db.dataset(@dataset.opts)) if @dataset
@@ -496,6 +500,10 @@ module Sequel
       #
       #   Artist.set_dataset(:tbl_artists)
       #   Artist.set_dataset(DB[:artists])
+      #
+      # Note that you should not use this to change the model's dataset
+      # at runtime.  If you have that need, you should look into Sequel's
+      # sharding support.
       def set_dataset(ds, opts={})
         inherited = opts[:inherited]
         @dataset = case ds
