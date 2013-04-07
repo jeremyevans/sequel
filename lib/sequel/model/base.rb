@@ -1092,7 +1092,7 @@ module Sequel
         errors
         validate
         errors.freeze
-        this.freeze unless new?
+        this.freeze if !new? && model.primary_key
         super
       end
   

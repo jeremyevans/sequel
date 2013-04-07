@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow freezing of model instances for models without primary keys (jeremyevans)
+
 * Reflect constraint_validations extension :allow_nil=>true setting in the database constraints (jeremyevans)
 
 * Add Plugins.after_set_dataset for easily running after set_dataset (jeremyevans)

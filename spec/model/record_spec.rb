@@ -367,6 +367,12 @@ describe "Model#freeze" do
     @o.frozen?.should be_true
   end
 
+  it "should freeze the object if the model doesn't have a primary key" do
+    Album.no_primary_key
+    @o = Album.load(:id=>1).freeze
+    @o.frozen?.should be_true
+  end
+
   it "should freeze the object's values, associations, changed_columns, errors, and this" do
     @o.values.frozen?.should be_true
     @o.changed_columns.frozen?.should be_true
