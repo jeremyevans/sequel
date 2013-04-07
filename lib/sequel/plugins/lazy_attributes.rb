@@ -68,11 +68,15 @@ module Sequel
         # the attribute for just the current object.  Return the value of
         # the attribute for the current object.
         def lazy_attribute_lookup(a)
+          if frozen?
+            return this.dup.select(a).get(a)
+          end
+
           if retrieved_with
             raise(Error, "Invalid primary key column for #{model}: #{pkc.inspect}") unless primary_key = model.primary_key
             composite_pk = true if primary_key.is_a?(Array)
             id_map = {}
-            retrieved_with.each{|o| id_map[o.pk] = o unless o.values.has_key?(a)}
+            retrieved_with.each{|o| id_map[o.pk] = o unless o.values.has_key?(a) || o.frozen?}
             model.select(*(Array(primary_key) + [a])).filter(primary_key=>id_map.keys).naked.each do |row|
               obj = id_map[composite_pk ? row.values_at(*primary_key) : row[primary_key]]
               if obj && !obj.values.has_key?(a)
@@ -80,7 +84,7 @@ module Sequel
               end
             end
           end
-          values[a] = this.select(a).first[a] unless values.has_key?(a)
+          values[a] = this.select(a).get(a) unless values.has_key?(a)
           values[a]
         end
       end

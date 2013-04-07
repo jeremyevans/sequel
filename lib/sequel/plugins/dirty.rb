@@ -101,6 +101,14 @@ module Sequel
           @initial_values ||= {}
         end
 
+        # Freeze internal data structures
+        def freeze
+          initial_values.freeze
+          missing_initial_values.freeze
+          @previous_changes.freeze if @previous_changes
+          super
+        end
+
         # Reset the column to its initial value.  If the column was not set
         # initial, removes it from the values.
         #

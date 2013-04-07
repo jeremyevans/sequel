@@ -42,4 +42,10 @@ describe "instance_filters plugin" do
     @p.update(:name=>'Bob')
     MODEL_DB.sqls.should == ["UPDATE people SET name = 'Bob' WHERE (id = 1)"]
   end
+
+  specify "shouldn't allow instance filters on frozen objects" do
+    @p.instance_filter(:name=>'Joe')
+    @p.freeze
+    proc{@p.instance_filter(:name=>'Jim')}.should raise_error
+  end 
 end

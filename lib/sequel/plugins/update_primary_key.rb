@@ -40,7 +40,11 @@ module Sequel
 
         # Cache the pk_hash instead of generating it every time
         def pk_hash
-          @pk_hash ||= super
+          if frozen?
+            super
+          else
+            @pk_hash ||= super
+          end
         end
       end
     end

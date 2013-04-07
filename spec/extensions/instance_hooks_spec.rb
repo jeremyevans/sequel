@@ -176,6 +176,18 @@ describe "InstanceHooks plugin" do
     @x.save.should_not == nil
     @r.should == [2, 1, 4, 3]
   end
+
+  it "should not allow addition of instance hooks to frozen instances" do
+    @x.after_destroy_hook{r 1}
+    @x.before_destroy_hook{r 2}
+    @x.before_update_hook{r 3}
+    @x.before_save_hook{r 4}
+    @x.freeze
+    proc{@x.after_destroy_hook{r 1}}.should raise_error(Sequel::Error)
+    proc{@x.before_destroy_hook{r 2}}.should raise_error(Sequel::Error)
+    proc{@x.before_update_hook{r 3}}.should raise_error(Sequel::Error)
+    proc{@x.before_save_hook{r 4}}.should raise_error(Sequel::Error)
+  end
 end
 
 describe "InstanceHooks plugin with transactions" do

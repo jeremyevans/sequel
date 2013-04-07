@@ -201,6 +201,13 @@ describe "Composition plugin" do
     sql.should include("day = NULL")
   end
 
+  it "should work with frozen instances" do
+    @c.composition :date, :mapping=>[:year, :month, :day]
+    @o.freeze
+    @o.date.should == Date.new(1, 2, 3)
+    proc{@o.date = Date.today}.should raise_error
+  end
+
   it "should work correctly with subclasses" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     c = Class.new(@c)

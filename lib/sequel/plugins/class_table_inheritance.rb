@@ -187,6 +187,7 @@ module Sequel
         # Delete the row from all backing tables, starting from the
         # most recent table and going through all superclasses.
         def delete
+          raise Sequel::Error, "can't delete frozen object" if frozen?
           m = model
           m.cti_tables.reverse.each do |table|
             m.db.from(table).filter(m.primary_key=>pk).delete

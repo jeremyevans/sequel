@@ -58,6 +58,12 @@ module Sequel
           super
           clear_instance_filters
         end
+
+        # Freeze the instance filters when freezing the object
+        def freeze
+          instance_filters.freeze
+          super
+        end
       
         # Add an instance filter to the array of instance filters
         # Both the arguments given and the block are passed to the

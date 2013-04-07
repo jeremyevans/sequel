@@ -68,4 +68,11 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
     @c.all.should == [@c.load(:a=>2, :b=>5)]
     MODEL_DB.sqls.should == ["SELECT * FROM a LIMIT 1", "UPDATE a SET a = 2 WHERE (a = 1)", "UPDATE a SET b = 4 WHERE (a = 2)", "UPDATE a SET b = 5 WHERE (a = 2)", "SELECT * FROM a"]
   end
+
+  specify "should handle frozen instances" do
+    o = @c.new
+    o.a = 1
+    o.freeze
+    o.pk_hash.should == {:a=>1}
+  end
 end

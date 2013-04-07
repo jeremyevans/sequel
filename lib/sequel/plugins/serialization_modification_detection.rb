@@ -40,8 +40,16 @@ module Sequel
         # Detect which serialized columns have changed.
         def changed_columns
           cc = super
+          cc = cc.dup if frozen?
           deserialized_values.each{|c, v| cc << c if !cc.include?(c) && original_deserialized_value(c) != v} 
           cc
+        end
+
+        # Freeze the original deserialized values when freezing the instance.
+        def freeze
+          @original_deserialized_values ||= {}
+          @original_deserialized_values.freeze
+          super
         end
 
         private
@@ -55,7 +63,11 @@ module Sequel
 
         # Return the original deserialized value of the column, caching it to improve performance.
         def original_deserialized_value(column)
-          (@original_deserialized_values ||= {})[column] ||= deserialize_value(column, self[column])
+          if frozen?
+            @original_deserialized_values[column] || deserialize_value(column, self[column])
+          else
+            (@original_deserialized_values ||= {})[column] ||= deserialize_value(column, self[column])
+          end
         end
       end
     end

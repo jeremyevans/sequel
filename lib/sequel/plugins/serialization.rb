@@ -145,6 +145,8 @@ module Sequel
               define_method(column) do 
                 if deserialized_values.has_key?(column)
                   deserialized_values[column]
+                elsif frozen?
+                  deserialize_value(column, super())
                 else
                   deserialized_values[column] = deserialize_value(column, super())
                 end
@@ -168,6 +170,11 @@ module Sequel
         # Hash of deserialized values, used as a cache.
         def deserialized_values
           @deserialized_values ||= {}
+        end
+
+        def freeze
+          deserialized_values.freeze
+          super
         end
 
         # Initialization the deserialized values for objects retrieved from the database.

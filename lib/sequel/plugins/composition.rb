@@ -132,7 +132,13 @@ module Sequel
           composer = opts[:composer]
           composition_module.class_eval do
             define_method(name) do 
-              compositions.include?(name) ? compositions[name] : (compositions[name] = instance_eval(&composer))
+              if compositions.has_key?(name)
+                compositions[name]
+              elsif frozen?
+                instance_eval(&composer)
+              else
+                compositions[name] = instance_eval(&composer)
+              end
             end
             define_method("#{name}=") do |v|
               modified!
@@ -159,6 +165,12 @@ module Sequel
         # Cache of composition objects for this class.
         def compositions
           @compositions ||= {}
+        end
+
+        # Freeze compositions hash when freezing model instance.
+        def freeze
+          compositions.freeze
+          super
         end
       end
     end

@@ -42,9 +42,9 @@ module Sequel
         # objects retrieved with the current object.
         def load_associated_objects(opts, reload=false)
           name = opts[:name]
-          if !associations.include?(name) && retrieved_by
+          if !associations.include?(name) && retrieved_by && !frozen?
             begin
-              retrieved_by.send(:eager_load, retrieved_with, name=>{})
+              retrieved_by.send(:eager_load, retrieved_with.reject{|o| o.frozen?}, name=>{})
             rescue Sequel::UndefinedAssociation
               # This can happen if class table inheritance is used and the association
               # is only defined in a subclass.  This particular instance can use the

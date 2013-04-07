@@ -29,7 +29,13 @@ module Sequel
         BEFORE_HOOKS = Sequel::Model::BEFORE_HOOKS
         AFTER_HOOKS = Sequel::Model::AFTER_HOOKS - [:after_initialize]
         HOOKS = BEFORE_HOOKS + AFTER_HOOKS
-        HOOKS.each{|h| class_eval("def #{h}_hook(&block); add_instance_hook(:#{h}, &block); self end", __FILE__, __LINE__)}
+        HOOKS.each{|h| class_eval(<<-END , __FILE__, __LINE__+1)}
+          def #{h}_hook(&block)
+            raise Sequel::Error, "can't add hooks to frozen object" if frozen?
+            add_instance_hook(:#{h}, &block)
+            self
+          end
+        END
         
         BEFORE_HOOKS.each{|h| class_eval("def #{h}; run_before_instance_hooks(:#{h}) == false ? false : super end", __FILE__, __LINE__)}
         AFTER_HOOKS.each{|h| class_eval(<<-END, __FILE__, __LINE__ + 1)}

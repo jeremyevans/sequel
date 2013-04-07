@@ -162,6 +162,13 @@ describe "class_table_inheritance plugin" do
     @db.sqls.should == ["DELETE FROM executives WHERE (id = 1)", "DELETE FROM managers WHERE (id = 1)", "DELETE FROM employees WHERE (id = 1)"]
   end
 
+  it "should not allow deletion of frozen object" do
+    o = Executive.load(:id=>1)
+    o.freeze
+    proc{o.delete}.should raise_error(Sequel::Error)
+    @db.sqls.should == []
+  end
+
   it "should insert the correct rows into all tables when inserting" do
     Executive.create(:num_managers=>3, :num_staff=>2, :name=>'E')
     sqls = @db.sqls

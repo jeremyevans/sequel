@@ -121,6 +121,12 @@ describe "Sequel::Plugins::Dirty" do
         o.column_change(:initial).should == [v, 'a']
       end
     end
+
+    it "should work when freezing objects" do
+      @o.freeze
+      @o.initial_value(:initial).should == 'i'
+      proc{@o.initial = 'b'}.should raise_error
+    end
   end
 
   describe "with new instance" do
@@ -157,6 +163,14 @@ describe "Sequel::Plugins::Dirty" do
     it "previous_changes should be the previous changes after saving" do
       @o.save
       @o.previous_changes.should == {:initial_changed=>['ic', 'ic2'], :missing_changed=>[nil, 'mc2']}
+    end
+
+    it "should work when freezing objects after saving" do
+      @o.initial = 'a'
+      @o.save
+      @o.freeze
+      @o.previous_changes[:initial].should == ['i', 'a']
+      proc{@o.initial = 'b'}.should raise_error
     end
   end
 end

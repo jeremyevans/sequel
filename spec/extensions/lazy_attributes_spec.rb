@@ -82,6 +82,15 @@ describe "Sequel::Plugins::LazyAttributes" do
     @db.sqls.should == ['SELECT id FROM la LIMIT 1', 'SELECT name FROM la WHERE (id = 1) LIMIT 1']
   end
 
+  it "should lazily load the attribute for a frozen model object" do
+    m = @c.first
+    m.freeze
+    m.name.should == '1'
+    @db.sqls.should == ['SELECT id FROM la LIMIT 1', 'SELECT name FROM la WHERE (id = 1) LIMIT 1']
+    m.name.should == '1'
+    @db.sqls.should == ['SELECT name FROM la WHERE (id = 1) LIMIT 1']
+  end
+
   it "should not lazily load the attribute for a single model object if the value already exists" do
     m = @c.first
     m.values.should == {:id=>1}
@@ -104,6 +113,13 @@ describe "Sequel::Plugins::LazyAttributes" do
     ms.map{|m| m.name}.should == %w'1 2'
     ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
     @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
+  end
+
+  it "should not eagerly load the attribute if model instance is frozen, and deal with other frozen instances if not frozen" do
+    ms = @c.all
+    ms.first.freeze
+    ms.map{|m| m.name}.should == %w'1 2'
+    @db.sqls.should == ['SELECT id FROM la', 'SELECT name FROM la WHERE (id = 1) LIMIT 1', 'SELECT id, name FROM la WHERE (id IN (2))']
   end
 
   it "should add the accessors to a module included in the class, so they can be easily overridden" do

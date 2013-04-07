@@ -1,5 +1,7 @@
 === HEAD
 
+* Make built-in model plugins deal with frozen instances (jeremyevans)
+
 * Allow freezing of model instances for models without primary keys (jeremyevans)
 
 * Reflect constraint_validations extension :allow_nil=>true setting in the database constraints (jeremyevans)

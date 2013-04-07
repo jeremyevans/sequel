@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::TacticalEagerLoading" do
   before do
-    class ::TaticalEagerLoadingModel < Sequel::Model
+    class ::TacticalEagerLoadingModel < Sequel::Model
       plugin :tactical_eager_loading
       columns :id, :parent_id
       many_to_one :parent, :class=>self
@@ -10,6 +10,8 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
       dataset._fetch = proc do |sql|
         if sql !~ /WHERE/
           [{:id=>1, :parent_id=>101}, {:id=>2, :parent_id=>102}, {:id=>101, :parent_id=>nil}, {:id=>102, :parent_id=>nil}]
+        elsif sql =~ /WHERE.*\bid = (\d+)/
+          [{:id=>$1.to_i, :parent_id=>nil}]
         elsif sql =~ /WHERE.*\bid IN \(([\d, ]*)\)/
           $1.split(', ').map{|x| {:id=>x.to_i, :parent_id=>nil}}
         elsif sql =~ /WHERE.*\bparent_id IN \(([\d, ]*)\)/
@@ -17,12 +19,12 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
         end
       end
     end
-    @c = ::TaticalEagerLoadingModel
-    @ds = TaticalEagerLoadingModel.dataset
+    @c = ::TacticalEagerLoadingModel
+    @ds = TacticalEagerLoadingModel.dataset
     MODEL_DB.reset
   end
   after do
-    Object.send(:remove_const, :TaticalEagerLoadingModel)
+    Object.send(:remove_const, :TacticalEagerLoadingModel)
   end
 
   it "Dataset#all should set the retrieved_by and retrieved_with attributes" do
@@ -60,4 +62,17 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
     @c.all{|x| x.parent2 if x.is_a?(c)}
   end
 
+  it "association getter methods should not eagerly load the association if an instance is frozen" do
+    ts = @c.all
+    ts.first.freeze
+    MODEL_DB.sqls.length.should == 1
+    ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
+    MODEL_DB.sqls.length.should == 2
+    ts.map{|x| x.children}.should == [[], [], [ts[0]], [ts[1]]]
+    MODEL_DB.sqls.length.should == 2
+    ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
+    MODEL_DB.sqls.length.should == 1
+    ts.map{|x| x.children}.should == [[], [], [ts[0]], [ts[1]]]
+    MODEL_DB.sqls.length.should == 1
+  end
 end
