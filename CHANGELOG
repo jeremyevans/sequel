@@ -1,5 +1,7 @@
 === HEAD
 
+* Reflect constraint_validations extension :allow_nil=>true setting in the database constraints (jeremyevans)
+
 * Add Plugins.after_set_dataset for easily running after set_dataset (jeremyevans)
 
 * Add Plugins.inherited_instance_variables for easily setting class instance variables when subclassing (jeremyevans)

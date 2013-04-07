@@ -1877,20 +1877,23 @@ describe "Sequel::Plugins::ConstraintValidations" do
     @db.create_constraint_validations_table
     @ds = @db[:cv_test]
     @regexp = regexp = @db.dataset.supports_regexp?
-    @validate_block = proc do
-      presence :pre, :name=>:p
-      exact_length 5, :exactlen, :name=>:el
-      min_length 5, :minlen, :name=>:minl
-      max_length 5, :maxlen, :name=>:maxl
-      length_range 3..5, :lenrange, :name=>:lr
+    @validation_opts = {}
+    opts_proc = proc{@validation_opts}
+    @validate_block = proc do |opts|
+      opts = opts_proc.call
+      presence :pre, opts.merge(:name=>:p)
+      exact_length 5, :exactlen, opts.merge(:name=>:el)
+      min_length 5, :minlen, opts.merge(:name=>:minl)
+      max_length 5, :maxlen, opts.merge(:name=>:maxl)
+      length_range 3..5, :lenrange, opts.merge(:name=>:lr)
       if regexp
-        format /^foo\d+/, :form, :name=>:f
+        format /^foo\d+/, :form, opts.merge(:name=>:f)
       end
-      like 'foo%', :lik, :name=>:l
-      ilike 'foo%', :ilik, :name=>:il
-      includes %w'abc def', :inc, :name=>:i
-      unique :uniq, :name=>:u
-      max_length 6, :minlen, :name=>:maxl2
+      like 'foo%', :lik, opts.merge(:name=>:l)
+      ilike 'foo%', :ilik, opts.merge(:name=>:il)
+      includes %w'abc def', :inc, opts.merge(:name=>:i)
+      unique :uniq, opts.merge(:name=>:u)
+      max_length 6, :minlen, opts.merge(:name=>:maxl2)
     end
     @valid_row = {:pre=>'a', :exactlen=>'12345', :minlen=>'12345', :maxlen=>'12345', :lenrange=>'1234', :lik=>'fooabc', :ilik=>'FooABC', :inc=>'abc', :uniq=>'u'}
     @violations = [
@@ -1925,6 +1928,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
         try = @valid_row.dup
         vals += ['1234567'] if col == :minlen
         vals.each do |val|
+          next if val.nil? && @validation_opts[:allow_nil]
           try[col] = val
           proc{@ds.insert(try)}.should raise_error(Sequel::DatabaseError)
         end
@@ -1948,32 +1952,36 @@ describe "Sequel::Plugins::ConstraintValidations" do
       @violations.each do |col, vals|
         try = @valid_row.dup
         vals.each do |val|
+          next if val.nil? && @validation_opts[:allow_nil]
           try[col] = val
           c.new(try).should_not be_valid
         end
       end
+      c.db.constraint_validations = nil
     end
   end
 
   describe "via create_table" do
     before(:all) do
-      regexp = @regexp
-      validate_block = @validate_block
-      @db.create_table!(:cv_test) do
-        primary_key :id
-        String :pre
-        String :exactlen
-        String :minlen
-        String :maxlen
-        String :lenrange
-        if regexp
-          String :form
+      @table_block = proc do
+        regexp = @regexp
+        validate_block = @validate_block
+        @db.create_table!(:cv_test) do
+          primary_key :id
+          String :pre
+          String :exactlen
+          String :minlen
+          String :maxlen
+          String :lenrange
+          if regexp
+            String :form
+          end
+          String :lik
+          String :ilik
+          String :inc
+          String :uniq, :null=>false
+          validate(&validate_block)
         end
-        String :lik
-        String :ilik
-        String :inc
-        String :uniq, :null=>false
-        validate(&validate_block)
       end
     end
     after(:all) do
@@ -1981,30 +1989,44 @@ describe "Sequel::Plugins::ConstraintValidations" do
       @db.drop_constraint_validations_for(:table=>:cv_test)
     end
 
-    it_should_behave_like "constraint validations"
+    describe "with :allow_nil=>true" do
+      before(:all) do
+        @validation_opts = {:allow_nil=>true}
+        @table_block.call
+      end
+      it_should_behave_like "constraint validations"
+    end
+    describe "with :allow_nil=>false" do
+      before(:all) do
+        @table_block.call
+      end
+      it_should_behave_like "constraint validations"
+    end
   end
 
   describe "via alter_table" do
     before(:all) do
-      regexp = @regexp
-      validate_block = @validate_block
-      @db.create_table!(:cv_test) do
-        primary_key :id
-        String :lik
-        String :ilik
-        String :inc
-        String :uniq, :null=>false
-      end
-      @db.alter_table(:cv_test) do
-        add_column :pre, String
-        add_column :exactlen, String
-        add_column :minlen, String
-        add_column :maxlen, String
-        add_column :lenrange, String
-        if regexp
-          add_column :form, String
+      @table_block = proc do
+        regexp = @regexp
+        validate_block = @validate_block
+        @db.create_table!(:cv_test) do
+          primary_key :id
+          String :lik
+          String :ilik
+          String :inc
+          String :uniq, :null=>false
         end
-        validate(&validate_block)
+        @db.alter_table(:cv_test) do
+          add_column :pre, String
+          add_column :exactlen, String
+          add_column :minlen, String
+          add_column :maxlen, String
+          add_column :lenrange, String
+          if regexp
+            add_column :form, String
+          end
+          validate(&validate_block)
+        end
       end
     end
     after(:all) do
@@ -2012,7 +2034,19 @@ describe "Sequel::Plugins::ConstraintValidations" do
       @db.drop_constraint_validations_for(:table=>:cv_test)
     end
 
-    it_should_behave_like "constraint validations"
+    describe "with :allow_nil=>true" do
+      before(:all) do
+        @validation_opts = {:allow_nil=>true}
+        @table_block.call
+      end
+      it_should_behave_like "constraint validations"
+    end
+    describe "with :allow_nil=>false" do
+      before(:all) do
+        @table_block.call
+      end
+      it_should_behave_like "constraint validations"
+    end
   end
 end
 

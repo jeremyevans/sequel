@@ -97,7 +97,7 @@ describe "constraint_validations extension" do
     @db.create_table(:foo){String :name; validate{presence :name, :allow_nil=>true}}
     sqls = @db.sqls
     parse_insert(sqls.slice!(1)).should == {:validation_type=>"presence", :column=>"name", :table=>"foo", :allow_nil=>'t'}
-    sqls.should == ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK (trim(name) != ''))"]
+    sqls.should == ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NULL) OR (trim(name) != '')))"]
   end
 
   it "should handle :name option when adding validations" do

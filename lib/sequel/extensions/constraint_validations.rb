@@ -410,7 +410,10 @@ module Sequel
     # Add the constraint to the generator, including a NOT NULL constraint
     # for all columns unless the :allow_nil option is given.
     def generator_add_constraint_from_validation(generator, val, cons)
-      unless val[:allow_nil]
+      if val[:allow_nil]
+        nil_cons = Sequel.expr(val[:columns].map{|c| [c, nil]})
+        cons = Sequel.|(nil_cons, cons) if cons
+      else
         nil_cons = Sequel.negate(val[:columns].map{|c| [c, nil]})
         cons = cons ? Sequel.&(nil_cons, cons) : nil_cons
       end
