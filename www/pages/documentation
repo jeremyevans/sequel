@@ -37,6 +37,7 @@
     <li><a href="rdoc/files/doc/thread_safety_rdoc.html">Thread Safety</a></li>
     <li><a href="rdoc/files/doc/testing_rdoc.html">Testing With Sequel</a></li>
     <li><a href="rdoc/files/doc/core_extensions_rdoc.html">Core Extensions</a></li>
+    <li><a href="rdoc/files/doc/postgresql_rdoc.html">PostgreSQL Specific Support</a></li>
     <li><a href="rdoc/files/doc/bin_sequel_rdoc.html">bin/sequel</a></li>
   </ul></li>
 </ul>

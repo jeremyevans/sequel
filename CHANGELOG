@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a guide detailing PostgreSQL-specific support (jeremyevans)
+
 * Make built-in model plugins deal with frozen instances (jeremyevans)
 
 * Allow freezing of model instances for models without primary keys (jeremyevans)

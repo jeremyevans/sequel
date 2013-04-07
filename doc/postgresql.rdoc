@@ -1,0 +1,302 @@
+= PostgreSQL-specific Support in Sequel
+
+Sequel's core database and dataset functions are designed to support the features
+shared by most common SQL database implementations.  However, Sequel's database
+adapters extend the core support to include support for database-specific features.
+
+By far the most extensive database-specific support in Sequel is for PostgreSQL. This
+support is roughly broken into the following areas:
+
+* Database Types
+* DDL Support
+* DML Support
+* sequel_pg
+
+Note that while this guide is extensive, it is not exhaustive.  There are additional
+rarely used PostgreSQL features that Sequel supports which are not mentioned here.
+
+== Adapter/Driver Specific Support
+
+Some of this this support depends on the specific adapter or underlying driver in use.  
+<tt>postgres only</tt> will denote support specific to the postgres adapter (i.e.
+not available when connecting to PostgreSQL via the jdbc, do, or swift adapters).
+<tt>postgres/pg only</tt> will denote support specific to the postgres adapter when
+pg is used as the underlying driver (i.e. not available when using the postgres-pr or
+postgres drivers).
+
+== PostgreSQL-specific Database Type Support
+
+Sequel's default support on PostgreSQL only includes common database types.  However,
+Sequel ships with support for many PostgreSQL-specific types via extensions.  In general,
+you load these extensions via <tt>Database#extension</tt>.  For example, to load support
+for arrays, you would do:
+
+  DB.extension :pg_array
+
+The following PostgreSQL-specific type extensions are available:
+
+pg_array :: arrays (single and multidimensional, for any scalar type), as a ruby Array-like object
+pg_hstore :: hstore, as a ruby Hash-like object
+pg_inet :: inet/cidr, as ruby IPAddr objects
+pg_interval :: interval, as ActiveSupport::Duration objects
+pg_json :: json, as either ruby Array-like or Hash-like objects
+pg_range :: ranges (for any scalar type), as a ruby Range-like object
+pg_row :: row-valued/composite types, as a ruby Hash-like or Sequel::Model object
+
+In general, these extensions just add support for Database objects to return retrieved
+column values as the appropriate type (<tt>postgres only</tt>), and support for literalizing
+the objects correctly for use in an SQL string, or using them as bound variable values (<tt>postgres/pg only</tt>).
+
+There are also type-specific extensions that make it easy to use database functions
+and operators related to the type.  These extensions are:
+
+pg_array_ops :: array-related functions and operators
+pg_hstore_ops :: hstore-related functions and operators
+pg_range_ops :: range-related functions and operators
+pg_row_ops :: row-valued/composite type syntax support
+
+== PostgreSQL-specific DDL Support
+
+=== Exclusion Constraints
+
+In +create_table+ blocks, you can use the +exclude+ method to set up exclusion constraints:
+
+  DB.create_table(:table) do
+    daterange :during
+    exclude([[:during, '&&']], :name=>:table_during_excl)
+  end
+  # CREATE TABLE "table" ("during" daterange,
+  #   CONSTRAINT "table_during_excl" EXCLUDE USING gist ("during" WITH &&))
+
+You can also add exclusion constraints in +alter_table+ blocks using add_exclusion_constraint:
+
+  DB.alter_table(:table) do
+    add_exclusion_constraint([[:during, '&&']], :name=>:table_during_excl)
+  end
+  # ALTER TABLE "table" ADD CONSTRAINT "table_during_excl" EXCLUDE USING gist ("during" WITH &&)
+
+=== Adding Foreign Key Constraints Without Initial Validation
+
+You can add a <tt>:not_valid=>true</tt> option when adding constraints to existing tables so
+that it doesn't check if all current rows are valid:
+
+  DB.alter_table(:table) do
+    # Assumes t_id column already exists
+    add_foreign_key([:t_id], :table, :not_valid=>true, :name=>:table_fk)
+  end
+  # ALTER TABLE "table" ADD CONSTRAINT "table_fk" FOREIGN KEY ("t_id") REFERENCES "table" NOT VALID
+
+Such constraints will be enforced for newly inserted and updated rows, but not for existing rows. After
+all existing rows have been fixed, you can validate the constraint:
+
+  DB.alter_table(:table) do
+    validate_constraint(:table_fk)
+  end
+  # ALTER TABLE "table" VALIDATE CONSTRAINT "table_fk"
+
+=== Creating Indexes Concurrently
+
+You can create indexes concurrently using the <tt>:concurrently=>true</tt> option:
+
+  DB.add_index(:table, :t_id, :concurrently=>true)
+  # CREATE INDEX CONCURRENTLY "table_t_id_index" ON "table" ("t_id")
+
+Similarly, you can drop indexes concurrently as well:
+
+  DB.drop_index(:table, :t_id, :concurrently=>true)
+  # DROP INDEX CONCURRENTLY "table_t_id_index"
+
+=== Specific Conversions When Altering Column Types
+
+When altering a column type, PostgreSQL allows the user to specify how to do the
+conversion via a USING clause, and Sequel supports this using the <tt>:using</tt> option:
+
+  DB.alter_table(:table) do
+    # Assume unix_time column is stored as an integer, and you want to change it to timestamp
+    set_column_type :unix_time, Time, :using=>(Sequel.cast('epoch', Time) + Sequel.cast('1 second', :interval) * :unix_time)
+  end
+  # ALTER TABLE "table" ALTER COLUMN "unix_time" TYPE timestamp
+  #   USING (CAST('epoch' AS timestamp) + (CAST('1 second' AS interval) * "unix_time"))
+
+=== Creating Unlogged Tables
+
+PostgreSQL allows users to create unlogged tables, which are faster but not crash safe.  Sequel
+allows you do create an unlogged table by specifying the <tt>:unlogged=>true</tt> option to +create_table+:
+
+  DB.create_table(:table, :unlogged=>true){Integer :i}
+  # CREATE UNLOGGED TABLE "table" ("i" integer)
+
+=== Creating/Dropping Schemas, Languages, Functions, and Triggers
+
+Sequel has built in support for creating and dropping PostgreSQL schemas, procedural languages, functions, and triggers:
+
+  DB.create_schema(:s)
+  # CREATE SCHEMA "s"
+  DB.drop_schema(:s)
+  # DROP SCHEMA "s"
+
+  DB.create_language(:plperl)
+  # CREATE LANGUAGE plperl
+  DB.drop_language(:plperl)
+  # DROP LANGUAGE plperl
+
+  DB.create_function(:set_updated_at, <<-SQL, :language=>:plpgsql, :returns=>:trigger)
+    BEGIN
+      NEW.updated_at := CURRENT_TIMESTAMP;
+      RETURN NEW;
+    END;
+  SQL
+  # CREATE FUNCTION set_updated_at() RETURNS trigger LANGUAGE plpgsql AS '
+  #  BEGIN
+  #    NEW.updated_at := CURRENT_TIMESTAMP;
+  #    RETURN NEW;
+  #  END;'
+  DB.drop_function(:set_updated_at)
+  # DROP FUNCTION set_updated_at()
+
+  DB.create_trigger(:table, :trg_updated_at, :set_updated_at, :events=>[:insert, :update], :each_row=>true)
+  # CREATE TRIGGER trg_updated_at BEFORE INSERT OR UPDATE ON "table" FOR EACH ROW EXECUTE PROCEDURE set_updated_at()
+  DB.drop_trigger(:table, :trg_updated_at)
+  # DROP TRIGGER trg_updated_at ON "table"
+
+== PostgreSQL-specific DML Support
+
+=== Returning Rows From Insert, Update, and Delete Statements
+
+Sequel supports the ability to return rows from insert, update, and delete statements, via
+<tt>Dataset#returning</tt>:
+
+  DB[:table].returning.insert
+  # INSERT INTO "table" DEFAULT VALUES RETURNING *
+
+  DB[:table].returning(:id).delete
+  # DELETE FROM "table" RETURNING "id"
+
+  DB[:table].returning(:id, Sequel.*(:id, :id).as(:idsq)).update(:id=>2)
+  # UPDATE "table" SET "id" = 2 RETURNING "id", ("id" * "id") AS "idsq"
+
+When returning is used, instead of returning the number of rows affected (for updated/delete)
+or the serial primary key value (for insert), it will return an array of hashes with the
+returned results.
+
+=== Distinct On Specific Columns
+
+Sequel allows passing columns to <tt>Dataset#distinct</tt>, which will make the dataset return
+rows that are distinct on just those columns:
+
+  DB[:table].distinct(:id).all
+  # SELECT DISTINCT ON ("id") * FROM "table"
+
+=== Using a Cursor to Process Large Datasets <tt>postgres only</tt>
+
+The postgres adapter offers a <tt>Dataset#use_cursor</tt> method to process large result sets
+without keeping all rows in memory:
+
+  DB[:table].use_cursor.each{|row| }
+  # BEGIN;
+  # DECLARE sequel_cursor NO SCROLL CURSOR WITHOUT HOLD FOR SELECT * FROM "table";
+  # FETCH FORWARD 1000 FROM sequel_cursor
+  # FETCH FORWARD 1000 FROM sequel_cursor
+  # ...
+  # FETCH FORWARD 1000 FROM sequel_cursor
+  # CLOSE sequel_cursor
+  # COMMIT
+
+=== Truncate Modifiers
+
+Sequel supports PostgreSQL-specific truncate options:
+
+  DB[:table].truncate(:cascade => true, :only=>true, :restart=>true)
+  # TRUNCATE TABLE ONLY "table" RESTART IDENTITY CASCADE
+
+=== COPY Support <tt>postgres/pg and jdbc/postgres only</tt> 
+
+PostgreSQL's COPY feature is pretty much the fastest way to get data in or out of the database.
+Sequel supports getting data out of the database via <tt>Database#copy_table</tt>, either for
+a specific table or for an arbitrary dataset:
+
+  DB.copy_table(:table, :format=>:csv)
+  # COPY "table" TO STDOUT (FORMAT csv)
+  DB.copy_table(DB[:table], :format=>:csv)
+  # COPY (SELECT * FROM "table") TO STDOUT (FORMAT csv)
+
+It supports putting data into the database via <tt>Database#copy_into</tt>:
+
+  DB.copy_into(:table, :format=>:csv, :columns=>[:column1, :column2], :data=>"1,2\n2,3\n")
+  # COPY "table"("column1", "column2") FROM STDIN (FORMAT csv)
+
+=== Anonymous Function Execution
+
+You can execute anonymous functions using a database procedural language via <tt>Database#do</tt> (the
+plpgsql language is the default):
+
+  DB.do <<-SQL
+    DECLARE r record;
+    BEGIN
+     FOR r IN SELECT table_schema, table_name FROM information_schema.tables
+       WHERE table_type = 'VIEW' AND table_schema = 'public'
+     LOOP
+       EXECUTE 'GRANT ALL ON ' || quote_ident(r.table_schema) || '.' || quote_ident(r.table_name) || ' TO webuser';
+     END LOOP;
+    END;
+  SQL
+
+=== Listening On and Notifying Channels
+
+You can use <tt>Database#notify</tt> to send notification to channels:
+
+  DB.notify(:channel)
+  # NOTIFY "channel"
+
+<tt>postgres/pg only</tt> You can listen on channels via <tt>Database#listen</tt>.  Note that
+this blocks until the listening thread is notified:
+
+  DB.listen(:channel)
+  # LISTEN "channel"
+  # after notification received:
+  # UNLISTEN *
+
+Note that +listen+ by default only listens for a single notification.  If you want to loop and process
+notifications:
+
+  DB.listen(:channel, :loop=>true){|channel| p channel}
+
+=== Locking Tables
+
+Sequel makes it easy to lock tables, though it is generally better to let the database
+handle locking:
+
+  DB[:table].lock('EXCLUSIVE') do
+    DB[:table].insert(:id=>DB[:table].max(:id)+1)
+  end
+  # BEGIN;
+  # LOCK TABLE "table" IN EXCLUSIVE MODE;
+  # SELECT max("id") FROM "table" LIMIT 1;
+  # INSERT INTO "table" ("id") VALUES (2) RETURNING NULL;
+  # COMMIT;
+
+== sequel_pg (<tt>postgres/pg only</tt>)
+
+When the postgres adapter is used with the pg driver, Sequel automatically checks for sequel_pg, and
+loads it if it is available.  sequel_pg is a C extension that optimizes the fetching of rows, generally
+resulting in a 2-6x speedup.  It is highly recommended to install sequel_pg if you are using the
+postgres adapter with pg.
+
+sequel_pg has additional optimizations when using the Dataset +map+, +to_hash+,
++to_hash_groups+, +select_hash+, +select_hash_groups+, +select_map+, and +select_order_map+ methods,
+which avoids creating intermediate hashes and can add further speedups.
+
+In addition to optimization, sequel_pg also adds streaming support if used on PostgreSQL 9.2. Streaming
+support is similar to using a cursor, but it is faster and more transparent.
+
+You can enable the streaming support:
+
+  DB.extension(:pg_streaming)
+
+Then you can stream individual datasets:
+
+  DB[:table].stream.each{|row| }
+
+Or stream all datasets by default:
+
+  DB.stream_all_queries = true
