@@ -446,6 +446,7 @@ module Sequel
         # Validates the object.
         def validate
           model.validate(self)
+          super
         end
       end
     end
