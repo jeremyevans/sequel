@@ -112,7 +112,10 @@ describe "Sequel::Plugins::LazyAttributes" do
     ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
     ms.map{|m| m.name}.should == %w'1 2'
     ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
-    @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
+    sqls = @db.sqls
+    ['SELECT id, name FROM la WHERE (id IN (1, 2))',
+     'SELECT id, name FROM la WHERE (id IN (2, 1))'].should include(sqls.pop)
+    sqls.should == ['SELECT id FROM la']
   end
 
   it "should not eagerly load the attribute if model instance is frozen, and deal with other frozen instances if not frozen" do
@@ -132,7 +135,10 @@ describe "Sequel::Plugins::LazyAttributes" do
     ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
     ms.map{|m| m.name}.should == %w'1-blah 2-blah'
     ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
-    @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
+    sqls = @db.sqls
+    ['SELECT id, name FROM la WHERE (id IN (1, 2))',
+     'SELECT id, name FROM la WHERE (id IN (2, 1))'].should include(sqls.pop)
+    sqls.should == ['SELECT id FROM la']
   end
 
   it "should work with the serialization plugin" do
@@ -144,7 +150,10 @@ describe "Sequel::Plugins::LazyAttributes" do
     ms.map{|m| m.values}.should == [{:id=>1, :name=>"--- 3\n"}, {:id=>2, :name=>"--- 6\n"}]
     ms.map{|m| m.deserialized_values}.should == [{:name=>3}, {:name=>6}]
     ms.map{|m| m.name}.should == [3,6]
-    @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
+    sqls = @db.sqls
+    ['SELECT id, name FROM la WHERE (id IN (1, 2))',
+     'SELECT id, name FROM la WHERE (id IN (2, 1))'].should include(sqls.pop)
+    sqls.should == ['SELECT id FROM la']
     m = @ds.first
     m.values.should == {:id=>1}
     m.name.should == 3
