@@ -27,9 +27,9 @@ module Sequel::Database::SplitAlterTable
       op_groups.last << op
     end
 
-    op_groups.each do |ops|
-      next if ops.empty?
-      alter_table_sql_list(name, ops).each{|sql| execute_ddl(sql)}
+    op_groups.each do |opgs|
+      next if opgs.empty?
+      alter_table_sql_list(name, opgs).each{|sql| execute_ddl(sql)}
       remove_cached_schema(name)
     end
   end

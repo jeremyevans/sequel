@@ -354,7 +354,6 @@ describe Sequel::Model, "many_through_many" do
   end
 
   it "should support a :uniq option that removes duplicates from the association" do
-    h = []
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :uniq=>true
     @c2.dataset._fetch = [{:id=>20}, {:id=>30}, {:id=>20}, {:id=>30}]
     @c1.load(:id=>10).tags.should == [@c2.load(:id=>20), @c2.load(:id=>30)]

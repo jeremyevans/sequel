@@ -163,7 +163,6 @@ describe Sequel::Dataset, " graphing" do
     @ds1.opts.should == o2
     ds1.opts.should_not == o1
     o3 = ds1.opts
-    o4 = o3.dup
     ds2 = ds1.add_graph_aliases(:y=>[:blah,:id])
     ds1.opts.should == o3
     ds1.opts.should == o3

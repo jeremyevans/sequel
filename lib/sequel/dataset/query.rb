@@ -495,7 +495,7 @@ module Sequel
       using_join = expr.is_a?(Array) && !expr.empty? && expr.all?{|x| x.is_a?(Symbol)}
       if using_join && !supports_join_using?
         h = {}
-        expr.each{|s| h[s] = s}
+        expr.each{|e| h[e] = e}
         return join_table(type, table, h, options)
       end
 
@@ -1107,7 +1107,6 @@ module Sequel
     #   DB[:items].invert_order([:category, Sequel.desc(:price)]) #=> [Sequel.desc(:category), Sequel.asc(:price)]
     def invert_order(order)
       return nil unless order
-      new_order = []
       order.map do |f|
         case f
         when SQL::OrderedExpression

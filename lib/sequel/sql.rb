@@ -1606,7 +1606,7 @@ module Sequel
           if args.empty?
             Function.new(m)
           else
-            case arg = args.shift
+            case args.shift
             when :*
               Function.new(m, WILDCARD)
             when :distinct

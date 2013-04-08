@@ -114,7 +114,6 @@ describe "Database transactions" do
       transaction do
         self[:items] << {:name => 'abc'}
         return
-        self[:items] << {:name => 'd'}
       end
     end
 

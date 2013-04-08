@@ -149,7 +149,7 @@ END_MIG
     # be :type.  The other options added should modify that type (e.g. :size).  If a
     # database type is not recognized, return it as a String type.
     def column_schema_to_ruby_type(schema)
-      case t = schema[:db_type].downcase
+      case schema[:db_type].downcase
       when /\A(medium|small)?int(?:eger)?(?:\((\d+)\))?( unsigned)?\z/o
         if !$1 && $2 && $2.to_i >= 10 && $3
           # Unsigned integer type with 10 digits can potentially contain values which

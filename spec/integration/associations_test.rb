@@ -6,7 +6,7 @@ shared_examples_for "eager limit strategies" do
     Artist.one_to_one  :last_album, {:clone=>:last_album}.merge(@els) if @els
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
-    al, ar, t = @pr.call
+    ar = @pr.call[1]
     
     a = Artist.eager(:first_album, :last_album).order(:name).all
     a.should == [@artist, ar]
@@ -33,7 +33,7 @@ shared_examples_for "eager limit strategies" do
     @album.update(:artist => @artist)
     middle_album = @middle_album.call
     diff_album = @diff_album.call
-    al, ar, t = @pr.call
+    ar = @pr.call[1]
     
     ars = Artist.eager(:first_two_albums, :second_two_albums, :last_two_albums).order(:name).all
     ars.should == [@artist, ar]
@@ -58,7 +58,7 @@ shared_examples_for "eager limit strategies" do
     Album.many_to_many :second_two_tags, {:clone=>:second_two_tags}.merge(@els) if @els
     Album.many_to_many :last_two_tags, {:clone=>:last_two_tags}.merge(@els) if @els
     tu, tv = @other_tags.call
-    al, ar, t = @pr.call
+    al = @pr.call.first
     
     als = Album.eager(:first_two_tags, :second_two_tags, :last_two_tags).order(:name).all
     als.should == [@album, al]
@@ -84,7 +84,7 @@ shared_examples_for "eager limit strategies" do
     Artist.many_through_many :last_two_tags, {:clone=>:last_two_tags}.merge(@els) if @els
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
-    al, ar, t = @pr.call
+    ar = @pr.call[1]
     
     ars = Artist.eager(:first_two_tags, :second_two_tags, :last_two_tags).order(:name).all
     ars.should == [@artist, ar]
@@ -229,7 +229,7 @@ shared_examples_for "filtering/excluding by associations" do
     @album.add_tag(@tag)
     @Album.filter(:tags=>@tag).all.should == [@album]
     @Album.filter(:alias_tags=>@tag).all.should == [@album]
-    album, artist, tag = @pr.call
+    album, tag = @pr.call.values_at(0, 2)
     @Album.exclude(:tags=>@tag).all.should == [album]
     @Album.exclude(:alias_tags=>@tag).all.should == [album]
     @Album.exclude(:tags=>tag).all.sort_by{|x| x.pk}.should == [@album, album]

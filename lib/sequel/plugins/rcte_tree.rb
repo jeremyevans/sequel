@@ -190,7 +190,7 @@ module Sequel
           elds = elds.select_append(ka) unless elds.opts[:select] == nil
           elds.all do |obj|
             opk = obj[prkey]
-            if in_pm = parent_map.has_key?(opk)
+            if parent_map.has_key?(opk)
               if idm_obj = parent_map[opk]
                 idm_obj.values[ka] = obj.values[ka]
                 obj = idm_obj
@@ -298,7 +298,7 @@ module Sequel
             end
             
             opk = obj[prkey]
-            if in_pm = parent_map.has_key?(opk)
+            if parent_map.has_key?(opk)
               if idm_obj = parent_map[opk]
                 idm_obj.values[ka] = obj.values[ka]
                 obj = idm_obj

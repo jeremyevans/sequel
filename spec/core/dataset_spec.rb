@@ -2540,7 +2540,7 @@ describe "Dataset #first!" do
   
   specify "should set the limit and return an array of records if the given number is > 1" do
     i = rand(10) + 10
-    r = @d.order(:a).first!(i).should == [{:s=>"SELECT * FROM test ORDER BY a LIMIT #{i}"}]
+    @d.order(:a).first!(i).should == [{:s=>"SELECT * FROM test ORDER BY a LIMIT #{i}"}]
   end
   
   specify "should return the first! matching record if a block is given without an argument" do
@@ -2553,7 +2553,7 @@ describe "Dataset #first!" do
   
   specify "should filter and return an array of records if an Integer argument is provided and a block is given" do
     i = rand(10) + 10
-    r = @d.order(:a).first!(i){z > 26}.should == [{:s=>"SELECT * FROM test WHERE (z > 26) ORDER BY a LIMIT #{i}"}]
+    @d.order(:a).first!(i){z > 26}.should == [{:s=>"SELECT * FROM test WHERE (z > 26) ORDER BY a LIMIT #{i}"}]
   end
 
   specify "should raise NoMatchingRow exception if no rows match" do
@@ -4394,7 +4394,6 @@ describe "Dataset#returning" do
 
   specify "should have insert, update, and delete return arrays of hashes if RETURNING is used and a block is not given" do
     @pr.call
-    h = {}
     @ds.delete.should == [{:foo=>"DELETE FROM t RETURNING foo"}]
     @ds.insert(1).should == [{:foo=>"INSERT INTO t VALUES (1) RETURNING foo"}]
     @ds.update(:foo=>1).should == [{:foo=>"UPDATE t SET foo = 1 RETURNING foo"}]
@@ -4431,13 +4430,16 @@ describe "Dataset extensions" do
   before(:all) do
     class << Sequel
       alias _extension extension
+      remove_method :extension
       def extension(*)
       end
     end
   end
   after(:all) do
     class << Sequel
+      remove_method :extension
       alias extension _extension
+      remove_method :_extension
     end
   end
   before do

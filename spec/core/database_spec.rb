@@ -572,7 +572,7 @@ describe "Database#synchronize" do
   end
   
   specify "should wrap the supplied block in pool.hold" do
-    q, q1, q2, q3 = Queue.new, Queue.new, Queue.new, Queue.new
+    q, q1, q2 = Queue.new, Queue.new, Queue.new
     c1, c2 = nil
     t1 = Thread.new{@db.synchronize{|c| c1 = c; q.push nil; q1.pop}; q.push nil}
     q.pop
@@ -715,7 +715,6 @@ shared_examples_for "Database#transaction" do
       transaction do
         execute 'DROP TABLE test;'
         return
-        execute 'DROP TABLE test2;';
       end
     end
     @db.ret_commit
@@ -815,7 +814,7 @@ shared_examples_for "Database#transaction" do
     @db.sqls.should == ['BEGIN', 'ROLLBACK']
     @db.transaction(:rollback=>:always){1}.should be_nil
     @db.sqls.should == ['BEGIN', 'ROLLBACK']
-    catch (:foo) do
+    catch(:foo) do
       @db.transaction(:rollback=>:always){throw :foo}
     end
     @db.sqls.should == ['BEGIN', 'ROLLBACK']
@@ -1073,7 +1072,6 @@ describe "Database#transaction with savepoints" do
       transaction do
         execute 'DROP TABLE test;'
         return
-        execute 'DROP TABLE test2;';
       end
     end
     @db.ret_commit
@@ -1086,7 +1084,6 @@ describe "Database#transaction with savepoints" do
         transaction(:savepoint=>true) do
           execute 'DROP TABLE test;'
           return
-          execute 'DROP TABLE test2;';
         end
       end
     end
@@ -1200,6 +1197,7 @@ describe "A Database adapter with a scheme" do
     Sequel.send(:def_adapter_method, :ccc)
     Sequel.ccc('db', :host=>'localhost', &p).should == returnValue
     @ccc::DISCONNECTS.should == [z, y, x]
+    class << Sequel; remove_method(:ccc) end
   end
 
   specify "should be accessible through Sequel.<adapter>" do
@@ -1223,6 +1221,7 @@ describe "A Database adapter with a scheme" do
     c = Sequel.ccc(:database => 'mydb', :host => 'localhost')
     c.should be_a_kind_of(@ccc)
     c.opts.values_at(:adapter, :database, :host, :adapter_class).should == [:ccc, 'mydb', 'localhost', @ccc]
+    class << Sequel; remove_method(:ccc) end
   end
   
   specify "should be accessible through Sequel.connect with options" do
@@ -2259,13 +2258,16 @@ describe "Database extensions" do
   before(:all) do
     class << Sequel
       alias _extension extension
+      remove_method :extension
       def extension(*)
       end
     end
   end
   after(:all) do
     class << Sequel
+      remove_method :extension
       alias extension _extension
+      remove_method :_extension
     end
   end
   before do

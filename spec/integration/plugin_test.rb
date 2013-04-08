@@ -1887,7 +1887,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
       max_length 5, :maxlen, opts.merge(:name=>:maxl)
       length_range 3..5, :lenrange, opts.merge(:name=>:lr)
       if regexp
-        format /^foo\d+/, :form, opts.merge(:name=>:f)
+        format(/^foo\d+/, :form, opts.merge(:name=>:f))
       end
       like 'foo%', :lik, opts.merge(:name=>:l)
       ilike 'foo%', :ilik, opts.merge(:name=>:il)

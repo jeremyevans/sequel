@@ -161,7 +161,7 @@ describe "sharding plugin" do
   end 
 
   specify "should not override a server already set on an associated object" do
-    album = @Album.server(:s1).first
+    @Album.server(:s1).first
     artist = @Artist.server(:s2).first
     @db.sqls.should == ["SELECT * FROM albums LIMIT 1 -- s1", "SELECT * FROM artists LIMIT 1 -- s2"]
 

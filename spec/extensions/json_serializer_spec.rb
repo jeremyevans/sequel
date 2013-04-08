@@ -182,7 +182,6 @@ describe "Sequel::Plugins::JsonSerializer" do
   end
 
   it "should have dataset to_json method work with naked datasets" do
-    album = @album
     ds = Album.dataset.naked
     ds._fetch = {:id=>1, :name=>'RF', :artist_id=>2}
     Sequel.parse_json(ds.to_json).should == [@album.values.inject({}){|h, (k, v)| h[k.to_s] = v; h}]

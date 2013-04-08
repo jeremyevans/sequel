@@ -193,7 +193,7 @@ describe "constraint_validations extension" do
   it "should support :format constraint validation" do
     @db = Sequel.mock(:host=>'postgres')
     @db.extension(:constraint_validations)
-    @db.create_table(:foo){String :name; validate{format /^foo.*/, :name}}
+    @db.create_table(:foo){String :name; validate{format(/^foo.*/, :name)}}
     sqls = @db.sqls
     parse_insert(sqls.slice!(1)).should == {:validation_type=>"format", :column=>"name", :table=>"foo", :argument=>'^foo.*'}
     sqls.should == ["BEGIN", "COMMIT", "CREATE TABLE foo (name text, CHECK ((name IS NOT NULL) AND (name ~ '^foo.*')))"]
@@ -202,7 +202,7 @@ describe "constraint_validations extension" do
   it "should support :format constraint validation with case insensitive format" do
     @db = Sequel.mock(:host=>'postgres')
     @db.extension(:constraint_validations)
-    @db.create_table(:foo){String :name; validate{format /^foo.*/i, :name}}
+    @db.create_table(:foo){String :name; validate{format(/^foo.*/i, :name)}}
     sqls = @db.sqls
     parse_insert(sqls.slice!(1)).should == {:validation_type=>"iformat", :column=>"name", :table=>"foo", :argument=>'^foo.*'}
     sqls.should == ["BEGIN", "COMMIT", "CREATE TABLE foo (name text, CHECK ((name IS NOT NULL) AND (name ~* '^foo.*')))"]

@@ -77,9 +77,9 @@ module Sequel
           @sti_model_map = opts[:model_map] || lambda{|v| v if v && v != ''}
           @sti_key_map = if km = opts[:key_map]
             if km.is_a?(Hash)
-              h = Hash.new do |h,k| 
+              h = Hash.new do |h1,k| 
                 unless k.is_a?(String)
-                  h[k.to_s]
+                  h1[k.to_s]
                 else
                   []
                 end
@@ -93,9 +93,9 @@ module Sequel
               km
             end
           elsif sti_model_map.is_a?(Hash)
-            h = Hash.new do |h,k| 
+            h = Hash.new do |h1,k| 
               unless k.is_a?(String)
-                h[k.to_s]
+                h1[k.to_s]
               else
                 []
               end

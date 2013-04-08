@@ -49,7 +49,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     hold do |c|
       sync do
         yield c
-        @available_connections.each{|c| yield c}
+        @available_connections.each{|conn| yield conn}
       end
     end
   end

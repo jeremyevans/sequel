@@ -106,7 +106,7 @@ module Sequel
         # This is done so that instances of this subclass are
         # automatically casted to the database type when literalizing.
         def self.subclass(db_type)
-          sc = Class.new(self) do
+          Class.new(self) do
             @db_type = db_type
           end
         end
@@ -154,7 +154,7 @@ module Sequel
         # Create a new subclass of this class with the given database
         # type and columns.
         def self.subclass(db_type, columns)
-          sc = Class.new(self) do
+          Class.new(self) do
             @db_type = db_type
             @columns = columns
           end

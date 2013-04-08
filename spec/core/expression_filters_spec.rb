@@ -481,6 +481,7 @@ describe Sequel::SQL::VirtualRow do
   end
 
   it "should raise an error if window functions are not supported" do
+    class << @d; remove_method :supports_window_functions? end
     @d.meta_def(:supports_window_functions?){false}
     proc{@d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}}.should raise_error(Sequel::Error)
     proc{Sequel::Dataset.new(nil).filter{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.sql}.should raise_error(Sequel::Error)
@@ -980,7 +981,7 @@ describe "Sequel.delay" do
         @a += 1
       end
       def _a
-        @a
+        @a if defined?(@a)
       end
 
       attr_accessor :b

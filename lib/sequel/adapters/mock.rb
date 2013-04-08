@@ -151,6 +151,8 @@ module Sequel
           if pr = SHARED_ADAPTER_SETUP[opts[:host]]
             pr.call(self)
           end
+        else
+          @shared_adapter = false
         end
         self.autoid = opts[:autoid]
         self.columns = opts[:columns]

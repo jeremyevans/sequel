@@ -91,7 +91,7 @@ module Sequel
         
         # Apply the instance filters to the given dataset
         def apply_instance_filters(ds)
-          instance_filters.inject(ds){|ds, i| ds.filter(*i[0], &i[1])}
+          instance_filters.inject(ds){|ds1, i| ds1.filter(*i[0], &i[1])}
         end
         
         # Clear the instance filters.

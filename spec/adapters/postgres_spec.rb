@@ -1217,7 +1217,7 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     args = ['tf', 'SELECT 1', {:returns=>:integer}]
     @d.send(:create_function_sql, *args).should =~ /\A\s*CREATE FUNCTION tf\(\)\s+RETURNS integer\s+LANGUAGE SQL\s+AS 'SELECT 1'\s*\z/
     @d.create_function(*args)
-    rows = @d['SELECT tf()'].all.should == [{:tf=>1}]
+    @d['SELECT tf()'].all.should == [{:tf=>1}]
     @d.send(:drop_function_sql, 'tf').should == 'DROP FUNCTION tf()'
     @d.drop_function('tf')
     proc{@d['SELECT tf()'].all}.should raise_error(Sequel::DatabaseError)
@@ -1229,7 +1229,7 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.create_function(*args)
     # Make sure replace works
     @d.create_function(*args)
-    rows = @d['SELECT tf(1, 2)'].all.should == [{:tf=>3}]
+    @d['SELECT tf(1, 2)'].all.should == [{:tf=>3}]
     args = ['tf', {:if_exists=>true, :cascade=>true, :args=>[[:integer, :a], :integer]}]
     @d.send(:drop_function_sql,*args).should == 'DROP FUNCTION IF EXISTS tf(a integer, integer) CASCADE'
     @d.drop_function(*args)
@@ -2300,7 +2300,7 @@ describe 'PostgreSQL inet/cidr types' do
       @ds.count.should == 1
       if @native
         rs = @ds.all
-        v = rs.first[:j]
+        rs.first[:j]
         rs.first[:i].should == @ipv6
         rs.first[:c].should == @ipv6nm
         rs.first[:i].should be_a_kind_of(IPAddr)
@@ -2472,7 +2472,7 @@ describe 'PostgreSQL range types' do
       c.plugin :pg_typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
       v = c.create(@ra).values
       v.delete(:id)
-      v.each{|k,v| v.should == @ra[k].to_a}
+      v.each{|k,v1| v1.should == @ra[k].to_a}
     end
   end
 
@@ -2637,7 +2637,7 @@ describe 'PostgreSQL interval types' do
     v = c.create(:i=>'1 year 2 mons 25 days 05:06:07').i
     v.is_a?(ActiveSupport::Duration).should be_true
     v.should == ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
-    v.parts.sort_by{|k,v| k.to_s}.should == [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,v| k.to_s}
+    v.parts.sort_by{|k,_| k.to_s}.should == [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,_| k.to_s}
   end
 end if (begin require 'active_support/duration'; require 'active_support/inflector'; require 'active_support/core_ext/string/inflections'; true; rescue LoadError; false end)
 

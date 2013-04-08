@@ -1030,7 +1030,7 @@ module Sequel
             oproc = lambda do |x|
               case x
               when Symbol
-                t, c, a = ds.send(:split_symbol, x)
+                t, c, _ = ds.send(:split_symbol, x)
                 if t && t.to_sym == table
                   SQL::QualifiedIdentifier.new(dsa, c)
                 else
@@ -1136,7 +1136,7 @@ module Sequel
             raise(Error, "mismatched number of right keys: #{rcks.inspect} vs #{rcpks.inspect}") unless rcks.length == rcpks.length
           end
           uses_lcks = opts[:uses_left_composite_keys] = lcks.length > 1
-          uses_rcks = opts[:uses_right_composite_keys] = rcks.length > 1
+          opts[:uses_right_composite_keys] = rcks.length > 1
           opts[:cartesian_product_number] ||= 1
           join_table = (opts[:join_table] ||= opts.default_join_table)
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
@@ -1232,7 +1232,6 @@ module Sequel
             raise(Error, "mismatched number of keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           end
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
-          qualify = opts[:qualify] != false
           opts[:cartesian_product_number] ||= 0
           opts[:dataset] ||= proc do
             opts.associated_dataset.where(opts.predicate_keys.zip(cks.map{|k| send(k)}))
@@ -1907,7 +1906,6 @@ module Sequel
           else
             alias_base = r[:graph_alias_base]
           end
-          assoc_name = r[:name]
           assoc_table_alias = ds.unused_table_alias(alias_base)
           loader = r[:eager_grapher]
           if !associations.empty?

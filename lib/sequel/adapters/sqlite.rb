@@ -356,8 +356,8 @@ module Sequel
           @columns = cols.map{|c| c.first}
           result.each do |values|
             row = {}
-            cols.each do |name,i,type_proc|
-              v = values[i]
+            cols.each do |name,id,type_proc|
+              v = values[id]
               if type_proc && v
                 v = type_proc.call(v)
               end

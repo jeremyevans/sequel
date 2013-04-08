@@ -190,7 +190,7 @@ module Sequel
           opts[:eager_loader_key] = left_pk unless opts.has_key?(:eager_loader_key)
           left_pks = opts[:left_primary_keys] = Array(left_pk)
           lpkc = opts[:left_primary_key_column] ||= left_pk
-          lpkcs = opts[:left_primary_key_columns] ||= Array(lpkc)
+          opts[:left_primary_key_columns] ||= Array(lpkc)
           opts[:dataset] ||= lambda do
             ds = opts.associated_dataset
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
@@ -267,7 +267,6 @@ module Sequel
           lpks = ref.qualify(model.table_name, lpks)
           edges = ref.edges
           first, rest = edges.first, edges[1..-1]
-          last = edges.last
           ds = model.db[first[:table]].select(*Array(ref.qualify(first[:table], first[:right])))
           rest.each{|e| ds = ds.join(e[:table], e.fetch(:only_conditions, (Array(e[:right]).zip(Array(e[:left])) + e[:conditions])), :table_alias=>ds.unused_table_alias(e[:table]), :qualify=>:deep, &e[:block])}
           last_alias = if rest.empty?

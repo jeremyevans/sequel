@@ -618,7 +618,7 @@ describe "A SQLite database" do
 
   specify "should have support for various #transaction modes" do
     sqls = []
-    @db.loggers << (l=Class.new{%w'info error'.each{|m| define_method(m){|sql| sqls << sql}}}.new)
+    @db.loggers << Class.new{%w'info error'.each{|m| define_method(m){|sql| sqls << sql}}}.new
 
     @db.transaction(:mode => :immediate) do
       sqls.last.should == "BEGIN IMMEDIATE TRANSACTION"

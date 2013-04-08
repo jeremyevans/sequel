@@ -345,7 +345,7 @@ module Sequel
       end
     end
     def_append_methods(PUBLIC_APPEND_METHODS + PRIVATE_APPEND_METHODS)
-    private *PRIVATE_APPEND_METHODS
+    private(*PRIVATE_APPEND_METHODS)
 
     # SQL fragment for AliasedExpression
     def aliased_expression_sql_append(sql, ae)
@@ -412,11 +412,11 @@ module Sequel
       when *IS_OPERATORS
         r = args.at(1)
         if r.nil? || supports_is_true?
-          raise(InvalidOperation, 'Invalid argument used for IS operator') unless v = IS_LITERALS[r]
+          raise(InvalidOperation, 'Invalid argument used for IS operator') unless val = IS_LITERALS[r]
           sql << PAREN_OPEN
           literal_append(sql, args.at(0))
           sql << SPACE << op.to_s << SPACE
-          sql << v << PAREN_CLOSE
+          sql << val << PAREN_CLOSE
         elsif op == :IS
           complex_expression_sql_append(sql, :"=", args)
         else
@@ -667,7 +667,7 @@ module Sequel
       sch = sch.to_s if sch
       case table_name
       when Symbol
-        s, t, a = split_symbol(table_name)
+        s, t, _ = split_symbol(table_name)
         [s||sch, t]
       when SQL::QualifiedIdentifier
         [table_name.table.to_s, table_name.column.to_s]
@@ -1195,7 +1195,7 @@ module Sequel
     # name isn't already qualified.
     def qualified_column_name(column, table)
       if Symbol === column 
-        c_table, column, c_alias = split_symbol(column)
+        c_table, column, _ = split_symbol(column)
         unless c_table
           case table
           when Symbol

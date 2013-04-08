@@ -81,7 +81,7 @@ module Sequel
       when SQL::AliasedExpression
         s.aliaz
       when Symbol
-        sch, table, aliaz = split_symbol(s)
+        _, _, aliaz = split_symbol(s)
         aliaz ? aliaz.to_sym : s
       else
         s

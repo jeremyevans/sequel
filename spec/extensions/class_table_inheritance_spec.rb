@@ -9,7 +9,7 @@ describe "class_table_inheritance plugin" do
        :executives=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}]],
        :staff=>[[:id, {:type=>:integer}], [:manager_id, {:type=>:integer}]],
        }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
-     end
+    end
     @db.extend_datasets do
       def columns
         {[:employees]=>[:id, :name, :kind],

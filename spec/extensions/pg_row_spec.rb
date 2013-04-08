@@ -137,8 +137,8 @@ describe "pg_row extension" do
   it "should reload registered row types when reseting conversion procs" do
     db = Sequel.mock(:host=>'postgres')
     db.extension(:pg_row)
-    db.conversion_procs[4] = p4 = proc{|s| s.to_i}
-    db.conversion_procs[5] = p5 = proc{|s| s * 2}
+    db.conversion_procs[4] = proc{|s| s.to_i}
+    db.conversion_procs[5] = proc{|s| s * 2}
     db.sqls
     db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     db.register_row_type(:foo)
@@ -230,8 +230,8 @@ describe "pg_row extension" do
   end
 
   it "should allow registering with a custom converter" do
-    @db.conversion_procs[4] = p4 = proc{|s| s.to_i}
-    @db.conversion_procs[5] = p5 = proc{|s| s * 2}
+    @db.conversion_procs[4] = proc{|s| s.to_i}
+    @db.conversion_procs[5] = proc{|s| s * 2}
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     c = proc{|h| [h]}
     @db.register_row_type(:foo, :converter=>c)
@@ -241,8 +241,8 @@ describe "pg_row extension" do
   end
 
   it "should allow registering with a custom typecaster" do
-    @db.conversion_procs[4] = p4 = proc{|s| s.to_i}
-    @db.conversion_procs[5] = p5 = proc{|s| s * 2}
+    @db.conversion_procs[4] = proc{|s| s.to_i}
+    @db.conversion_procs[5] = proc{|s| s * 2}
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     @db.register_row_type(:foo, :typecaster=>proc{|h| {:bar=>(h[:bar]||0).to_i, :baz=>(h[:baz] || 'a')*2}})
     @db.typecast_value(:pg_row_foo, %w'1 b').should be_a_kind_of(Hash)
@@ -257,16 +257,16 @@ describe "pg_row extension" do
   end
 
   it "should handle conversion procs that aren't added until later" do
-    @db.conversion_procs[5] = p5 = proc{|s| s * 2}
+    @db.conversion_procs[5] = proc{|s| s * 2}
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     c = proc{|h| [h]}
     @db.register_row_type(:foo, :converter=>c)
-    @db.conversion_procs[4] = p4 = proc{|s| s.to_i}
+    @db.conversion_procs[4] = proc{|s| s.to_i}
     @db.conversion_procs[1].call('(1,b)').should == [{:bar=>1, :baz=>'bb'}]
   end
 
   it "should handle nil values when converting columns" do
-    @db.conversion_procs[5] = p5 = proc{|s| s * 2}
+    @db.conversion_procs[5] = proc{|s| s * 2}
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}]]
     called = false
     @db.conversion_procs[4] = proc{|s| called = true; s}
@@ -276,8 +276,8 @@ describe "pg_row extension" do
   end
 
   it "should registering array type for row type if type has an array oid" do
-    @db.conversion_procs[4] = p4 = proc{|s| s.to_i}
-    @db.conversion_procs[5] = p5 = proc{|s| s * 2}
+    @db.conversion_procs[4] = proc{|s| s.to_i}
+    @db.conversion_procs[5] = proc{|s| s * 2}
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     @db.register_row_type(:foo, :typecaster=>proc{|h| {:bar=>(h[:bar]||0).to_i, :baz=>(h[:baz] || 'a')*2}})
     p3 = @db.conversion_procs[3]
@@ -292,8 +292,8 @@ describe "pg_row extension" do
   end
 
   it "should allow typecasting of registered row types via Database#row_type" do
-    @db.conversion_procs[4] = p4 = proc{|s| s.to_i}
-    @db.conversion_procs[5] = p5 = proc{|s| s * 2}
+    @db.conversion_procs[4] = proc{|s| s.to_i}
+    @db.conversion_procs[5] = proc{|s| s * 2}
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     @db.register_row_type(:foo, :typecaster=>proc{|h| @m::HashRow.subclass(:foo, [:bar, :baz]).new({:bar=>(h[:bar]||0).to_i, :baz=>(h[:baz] || 'a')*2})})
     @db.literal(@db.row_type(:foo, ['1', 'b'])).should == "ROW(1, 'bb')::foo"
@@ -301,8 +301,8 @@ describe "pg_row extension" do
   end
 
   it "should allow parsing when typecasting registered row types via Database#row_type" do
-    @db.conversion_procs[4] = p4 = proc{|s| s.to_i}
-    @db.conversion_procs[5] = p5 = proc{|s| s * 2}
+    @db.conversion_procs[4] = proc{|s| s.to_i}
+    @db.conversion_procs[5] = proc{|s| s * 2}
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     @db.register_row_type(:foo, :typecaster=>proc{|h| @m::HashRow.subclass(:foo, [:bar, :baz]).new(:bar=>(h[:bar]||0).to_i, :baz=>(h[:baz] || 'a')*2)})
     @db.literal(@db.row_type(:foo, ['1', 'b'])).should == "ROW(1, 'bb')::foo"

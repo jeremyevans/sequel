@@ -654,7 +654,7 @@ module Sequel
       # module if the model has a dataset.  Add dataset methods to the class for all
       # public dataset methods.
       def dataset_extend(mod)
-        @dataset.extend(mod) if @dataset
+        @dataset.extend(mod) if defined?(@dataset) && @dataset
         reset_instance_dataset
         dataset_method_modules << mod
         mod.public_instance_methods.each{|meth| def_model_dataset_method(meth)}
@@ -765,7 +765,7 @@ module Sequel
       # Module that the class includes that holds methods the class adds for column accessors and
       # associations so that the methods can be overridden with +super+.
       def overridable_methods_module
-        include(@overridable_methods_module = Module.new) unless @overridable_methods_module
+        include(@overridable_methods_module = Module.new) unless defined?(@overridable_methods_module) && @overridable_methods_module
         @overridable_methods_module
       end
       
@@ -833,7 +833,7 @@ module Sequel
       # Reset the instance dataset to a modified copy of the current dataset,
       # should be used whenever the model's dataset is modified.
       def reset_instance_dataset
-        @instance_dataset = @dataset.limit(1).naked if @dataset
+        @instance_dataset = @dataset.limit(1).naked if defined?(@dataset) && @dataset
       end
   
       # Set the columns for this model and create accessor methods for each column.
@@ -906,7 +906,7 @@ module Sequel
       private_class_method :class_attr_overridable, :class_attr_reader
 
       class_attr_reader :columns, :db, :primary_key, :db_schema
-      class_attr_overridable *BOOLEAN_SETTINGS
+      class_attr_overridable(*BOOLEAN_SETTINGS)
 
       # The hash of attribute values.  Keys are symbols with the names of the
       # underlying database columns.

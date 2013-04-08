@@ -159,12 +159,12 @@ describe "Sequel::Model basic support" do
   end
 
   specify ".to_hash should return a hash keyed on primary key if no argument provided" do
-    i = Item.create(:name=>'J')
+    Item.create(:name=>'J')
     Item.to_hash.should == {1=>Item.load(:id=>1, :name=>'J')}
   end
   
   specify ".to_hash should return a hash keyed on argument if one argument provided" do
-    i = Item.create(:name=>'J')
+    Item.create(:name=>'J')
     Item.to_hash(:name).should == {'J'=>Item.load(:id=>1, :name=>'J')}
   end
   

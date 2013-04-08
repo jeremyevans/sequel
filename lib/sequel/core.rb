@@ -369,7 +369,7 @@ module Sequel
     if rescue_rollback
       begin
         pr.call
-      rescue Sequel::Rollback => e
+      rescue Sequel::Rollback
         nil
       end
     else

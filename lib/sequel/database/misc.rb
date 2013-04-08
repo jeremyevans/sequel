@@ -306,8 +306,8 @@ module Sequel
           return klass
         end
       else
-        database_error_regexps.each do |regexp, klass|
-          return klass if exception.message =~ regexp
+        database_error_regexps.each do |regexp, klss|
+          return klss if exception.message =~ regexp
         end
       end
 

@@ -129,6 +129,13 @@ begin
   spec = lambda do |name, files, d|
     lib_dir = File.join(File.dirname(File.expand_path(__FILE__)), 'lib')
     ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{lib_dir}") : (ENV['RUBYLIB'] = lib_dir)
+
+    desc "#{d} with -w, some warnings filtered"
+    task "#{name}_w" do
+      ENV['RUBYOPT'] ? (ENV['RUBYOPT'] += " -w") : (ENV['RUBYOPT'] = '-w')
+      sh "#{FileUtils::RUBY} -S rake #{name} 2>&1 | egrep -v \"(spec/.*: warning: (possibly )?useless use of == in void context|: warning: instance variable @.* not initialized|: warning: method redefined; discarding old|: warning: previous definition of)|rspec\""
+    end
+
     desc d
     spec_class.new(name) do |t|
       t.send spec_files_meth, files
@@ -201,7 +208,6 @@ desc "Report code statistics (KLOCs, etc) from the application"
 task :stats do
   STATS_DIRECTORIES = [%w(Code lib/), %w(Spec spec)].map{|name, dir| [ name, "./#{dir}" ] }.select { |name, dir| File.directory?(dir)}
   require "./extra/stats"
-  verbose = true
   CodeStatistics.new(*STATS_DIRECTORIES).to_s
 end
 

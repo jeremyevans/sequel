@@ -357,7 +357,7 @@ module Sequel
         when :includes
           generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| {c => arg}}))
           if arg.is_a?(Range)
-            if (b = arg.begin).is_a?(Integer) && (e = arg.end).is_a?(Integer)
+            if arg.begin.is_a?(Integer) && arg.end.is_a?(Integer)
               validation_type = :includes_int_range
               arg = "#{arg.begin}..#{'.' if arg.exclude_end?}#{arg.end}"
             else

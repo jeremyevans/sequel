@@ -622,7 +622,6 @@ describe "Model.db_schema" do
   end
   
   specify "should use the database's schema_for_table and set the columns and dataset columns" do
-    d = @dataset.db
     def @db.schema(table, opts = {})
       [[:x, {:type=>:integer}], [:y, {:type=>:string}]]
     end

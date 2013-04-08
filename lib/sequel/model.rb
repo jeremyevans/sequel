@@ -114,7 +114,8 @@ module Sequel
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
       :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
-      :@fast_instance_delete_sql=>nil}
+      :@fast_instance_delete_sql=>nil, :@default_eager_limit_strategy=>nil,
+      :@db=>nil}
 
     # Regular expression that determines if a method name is normal in the sense that
     # it could be used literally in ruby code without using send.  Used to
@@ -128,8 +129,12 @@ module Sequel
     @allowed_columns = nil
     @db = nil
     @db_schema = nil
+    @dataset = nil
     @dataset_method_modules = []
+    @default_eager_limit_strategy = nil
     @overridable_methods_module = nil
+    @fast_pk_lookup_sql = nil
+    @fast_instance_delete_sql = nil
     @plugins = []
     @primary_key = :id
     @raise_on_save_failure = true

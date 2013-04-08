@@ -193,7 +193,6 @@ end
 describe "InstanceHooks plugin with transactions" do
   before do
     @db = Sequel.mock(:numrows=>1)
-    pr = proc{|x| r(x)}
     @c = Class.new(Sequel::Model(@db[:items])) do
       attr_accessor :rb
       def after_save

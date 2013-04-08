@@ -350,7 +350,7 @@ describe "Dataset#unbind" do
       end
       ds.insert(:c=>v)
     end
-    @u = proc{|ds| ds, bv = ds.unbind; ds.call(:first, bv)}
+    @u = proc{|ds1| ds2, bv = ds1.unbind; ds2.call(:first, bv)}
   end
   after do
     INTEGRATION_DB.drop_table?(:items)

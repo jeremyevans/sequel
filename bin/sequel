@@ -17,7 +17,7 @@ load_dirs = []
 exclusive_options = []
 loggers = []
 
-opts = OptionParser.new do |opts|
+options = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
   opts.define_head "Usage: sequel [options] <uri|path> [file]"
   opts.separator ""
@@ -107,6 +107,7 @@ opts = OptionParser.new do |opts|
     exit
   end
 end
+opts = options
 opts.parse!
 
 db = ARGV.shift

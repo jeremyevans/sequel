@@ -203,7 +203,7 @@ module Sequel
           opts.delete(:auto_increment) if op[:auto_increment] == false
           "CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(opts)}"
         when :drop_constraint
-          type = case op[:type]
+          case op[:type]
           when :primary_key
             "DROP PRIMARY KEY"
           when :foreign_key
@@ -881,7 +881,7 @@ module Sequel
       def limit_sql(sql)
         if l = @opts[:limit]
           sql << LIMIT
-          literal_append(sql, @opts[:limit])
+          literal_append(sql, l)
         end
       end
       alias delete_limit_sql limit_sql

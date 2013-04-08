@@ -279,7 +279,7 @@ module Sequel
           parent.children.each do |node|
             next if node.is_a?(Nokogiri::XML::Text)
             k = name_proc[node.name]
-            if assocs_hash && (assoc = assocs_hash[k])
+            if assocs_hash && assocs_hash[k]
               assocs_present << [k.to_sym, node]
             else
               hash[k] = node.key?('nil') ? nil : node.children.first.to_s

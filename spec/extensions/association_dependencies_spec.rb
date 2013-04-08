@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "AssociationDependencies plugin" do
   before do
-    mods = @mods = []
+    @mods = []
     @c = Class.new(Sequel::Model)
     @c.plugin :association_dependencies
     @Artist = Class.new(@c).set_dataset(:artists)

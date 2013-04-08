@@ -2,7 +2,6 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Sequel timezone support" do
   def test_timezone(timezone=Sequel.application_timezone)
-    tz = timezone
     Sequel.datetime_class = Time
     # Tests should cover both DST and non-DST times.
     [Time.now, Time.local(2010,1,1,12), Time.local(2010,6,1,12)].each do |t|

@@ -1426,14 +1426,14 @@ describe Sequel::Model, "one_to_many" do
   
   it "should accept a block" do
     @c2.one_to_many :attributes, :class => @c1 do |ds|
-      ds.filter(:xxx => @xxx)
+      ds.filter(:xxx => nil)
     end
     @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (xxx IS NULL))'
   end
   
   it "should support :order option with block" do
     @c2.one_to_many :attributes, :class => @c1, :order => :kind do |ds|
-      ds.filter(:xxx => @xxx)
+      ds.filter(:xxx => nil)
     end
     @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (xxx IS NULL)) ORDER BY kind'
   end
@@ -1965,7 +1965,6 @@ describe Sequel::Model, "many_to_many" do
   end
 
   it "should support a :dataset option that accepts the reflection as an argument" do
-    c1 = @c1
     @c2.many_to_many :attributes, :class => @c1, :dataset=>lambda{|opts| opts.associated_dataset.join_table(:natural, :an).filter(:an__nodeid=>pk)}, :order=> :a, :limit=>10, :select=>nil do |ds|
       ds.filter(:xxx => @xxx)
     end
@@ -2440,7 +2439,6 @@ describe Sequel::Model, "many_to_many" do
   it "should allow additional arguments given to the remove_all_ method and pass them onwards to the _remove_all_ method" do
     @c2.many_to_many :attributes, :class => @c1
     p = @c2.load(:id=>10)
-    c = @c1.load(:id=>123)
     def p._remove_all_attributes(*y)
       @y = y
     end

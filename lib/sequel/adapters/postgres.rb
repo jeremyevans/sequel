@@ -237,12 +237,12 @@ module Sequel
         @convert_infinite_timestamps = v
         pr = old_pr = Postgres.use_iso_date_format ? TYPE_TRANSLATOR.method(:date) : Sequel.method(:string_to_date)
         if v
-          pr = lambda do |v|
-            case v
+          pr = lambda do |val|
+            case val
             when *INFINITE_TIMESTAMP_STRINGS
-              infinite_timestamp_value(v)
+              infinite_timestamp_value(val)
             else
-              old_pr.call(v)
+              old_pr.call(val)
             end
           end
         end
@@ -345,7 +345,7 @@ module Sequel
                   conn.put_copy_data(buf)
                 end
               else
-                data.each{|buf| conn.put_copy_data(buf)}
+                data.each{|buff| conn.put_copy_data(buff)}
               end
             rescue Exception => e
               conn.put_copy_end("ruby exception occurred while copying data into PostgreSQL")

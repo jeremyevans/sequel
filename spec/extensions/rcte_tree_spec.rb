@@ -144,7 +144,7 @@ describe Sequel::Model, "rcte_tree" do
       [{:id=>2, :name=>'AA', :parent_id=>1, :x_root_x=>2},
        {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>1}, {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>2},
        {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>2}, {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>1}]]
-    os = @ds.eager(:ancestors).all
+    @ds.eager(:ancestors).all
     sqls = MODEL_DB.sqls
     sqls.first.should == "SELECT * FROM nodes"
     sqls.last.should =~ /WITH t AS \(SELECT id AS x_root_x, nodes\.\* FROM nodes WHERE \(\(id IN \([12], [12]\)\) AND \(i = 1\)\) UNION ALL SELECT t\.x_root_x, nodes\.\* FROM nodes INNER JOIN t ON \(t\.parent_id = nodes\.id\) WHERE \(i = 1\)\) SELECT \* FROM t AS nodes WHERE \(i = 1\)/
@@ -236,7 +236,7 @@ describe Sequel::Model, "rcte_tree" do
       [{:id=>6, :parent_id=>2, :name=>'C', :x_root_x=>2}, {:id=>9, :parent_id=>2, :name=>'E', :x_root_x=>2},
        {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>6}, {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>2},
        {:id=>4, :name=>'?', :parent_id=>7, :x_root_x=>7}, {:id=>5, :name=>'?', :parent_id=>4, :x_root_x=>7}]]
-    os = @ds.eager(:descendants).all
+    @ds.eager(:descendants).all
     sqls = MODEL_DB.sqls
     sqls.first.should == "SELECT * FROM nodes"
     sqls.last.should =~ /WITH t AS \(SELECT parent_id AS x_root_x, nodes\.\* FROM nodes WHERE \(\(parent_id IN \([267], [267], [267]\)\) AND \(i = 1\)\) UNION ALL SELECT t\.x_root_x, nodes\.\* FROM nodes INNER JOIN t ON \(t\.id = nodes\.parent_id\) WHERE \(i = 1\)\) SELECT \* FROM t AS nodes WHERE \(i = 1\)/

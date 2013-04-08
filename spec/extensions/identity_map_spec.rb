@@ -183,7 +183,6 @@ describe "Sequel::Plugins::IdentityMap" do
   end
 
   it "should not use the identity map as a lookup cache for a one_to_one association" do
-    c = @c2
     @c2.one_to_one :artist, :class=>@c1, :key=>:artist_id
     @c.with_identity_map do
       MODEL_DB.sqls.length.should == 0

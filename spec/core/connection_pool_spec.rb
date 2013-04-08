@@ -156,7 +156,7 @@ describe "ConnectionPool#hold" do
   
   specify "should be re-entrant by the same thread" do
     cc = nil
-    @pool.hold {|c| @pool.hold {|c| @pool.hold {|c| cc = c}}}
+    @pool.hold {|c| @pool.hold {|c1| @pool.hold {|c2| cc = c2}}}
     cc.should be_a_kind_of(@c)
   end
   
@@ -220,10 +220,10 @@ describe "A connection pool with a max size of 1" do
     c1, c2, c3 = nil
     @pool.hold do |c|
       c1 = c
-      @pool.hold do |c|
-        c2 = c
-        @pool.hold do |c|
-          c3 = c
+      @pool.hold do |cc2|
+        c2 = cc2
+        @pool.hold do |cc3|
+          c3 = cc3
         end
       end
     end
@@ -295,7 +295,6 @@ shared_examples_for "A threaded connection pool" do
   end
 
   specify "should raise a PoolTimeout error if a connection couldn't be acquired before timeout" do
-    x = nil
     q, q1 = Queue.new, Queue.new
     pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>1, :pool_timeout=>0))
     t = Thread.new{pool.hold{|c| q1.push nil; q.pop}}
@@ -397,7 +396,7 @@ shared_examples_for "A threaded connection pool" do
     @pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:connection_handling=>:disconnect))
     d = []
     @pool.db.meta_def(:disconnect_connection){|c| d << c}
-    c = @pool.hold do |cc|
+    @pool.hold do |cc|
       cc.should == 1
       Thread.new{@pool.hold{|cc2| cc2.should == 2}}.join
       d.should == [2]
@@ -923,13 +922,13 @@ shared_examples_for "All connection pools classes" do
   
   specify "should call the disconnection_proc option if the hold block raises a DatabaseDisconnectError" do
     x = nil
-    proc{c = @class.new(mock_db.call(proc{|c| x = c}){123}).hold{raise Sequel::DatabaseDisconnectError}}.should raise_error(Sequel::DatabaseDisconnectError)
+    proc{@class.new(mock_db.call(proc{|c| x = c}){123}).hold{raise Sequel::DatabaseDisconnectError}}.should raise_error(Sequel::DatabaseDisconnectError)
     x.should == 123
   end
   
   specify "should have a disconnect method that disconnects the connection" do
     x = nil
-    c = @class.new(mock_db.call(proc{|c| x = c}){123})
+    c = @class.new(mock_db.call(proc{|c1| x = c1}){123})
     c.hold{}
     x.should == nil
     c.disconnect

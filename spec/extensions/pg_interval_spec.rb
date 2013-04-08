@@ -2,8 +2,8 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 begin
   require 'active_support/duration'
-rescue LoadError => e
-  skip_warn "pg_interval plugin: can't load active_support/duration (#{e.class}: #{e})"
+rescue LoadError => exc
+  skip_warn "pg_interval plugin: can't load active_support/duration (#{exc.class}: #{exc})"
 else
 describe "pg_interval extension" do
   before do
@@ -46,7 +46,6 @@ describe "pg_interval extension" do
   end
 
   it "should support typecasting for the interval type" do
-    ip = IPAddr.new('127.0.0.1')
     d = ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
     @db.typecast_value(:interval, d).object_id.should == d.object_id
 

@@ -341,10 +341,10 @@ describe "Polymorphic Associations" do
             asset.associations[:attachable] = nil 
             ((id_map[asset.attachable_type] ||= {})[asset.attachable_id] ||= []) << asset
           end 
-          id_map.each do |klass_name, id_map|
+          id_map.each do |klass_name, idmap|
             klass = m.call(klass_name)
-            klass.where(klass.primary_key=>id_map.keys).all do |attach|
-              id_map[attach.pk].each do |asset|
+            klass.where(klass.primary_key=>idmap.keys).all do |attach|
+              idmap[attach.pk].each do |asset|
                 asset.associations[:attachable] = attach
               end 
             end 
@@ -596,7 +596,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
   end
 
   it "should remove all associated objects correctly" do
-    invs = @client1.remove_all_invoices
+    @client1.remove_all_invoices
     @invoice1.refresh.client.should == nil
     @invoice1.client_name.should == nil
     @invoice2.refresh.client.should == nil
