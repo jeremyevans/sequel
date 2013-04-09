@@ -2341,3 +2341,33 @@ describe "Database specific exception classes" do
     proc{@db.get(1)}.should raise_error(Sequel::SerializationFailure)
   end
 end
+
+describe "Post-initialization hooks" do
+
+  after do
+    Sequel::Database.instance_variable_set(:@initialize_hook, Proc.new {|db| })
+  end
+
+  specify "should allow a block to be run after each new instance is created" do
+    Sequel::Database.after_initialize{|db| db.sql_log_level = :debug }
+    db = Sequel.mock
+    db.sql_log_level.should == :debug
+  end
+
+  specify "should allow multiple hooks to be registered" do
+    Sequel::Database.after_initialize{|db| db.sql_log_level = :debug }
+    Sequel::Database.after_initialize{|db| db.loggers << 11 }
+
+    db = Sequel.mock
+
+    db.sql_log_level.should == :debug
+    db.loggers.should include(11)
+  end
+
+  specify "should raise an error if registration is called without a block" do
+    proc {
+      Sequel::Database.after_initialize
+    }.should raise_error(Sequel::Error, /must provide block/i)
+  end
+
+end
