@@ -274,13 +274,13 @@ describe "#desc" do
   end
   
   specify "should format a DESC clause for a column ref" do
-    :test.desc.to_s(@ds).should == 'test DESC'
+    @ds.literal(:test.desc).should == 'test DESC'
     
-    :items__price.desc.to_s(@ds).should == 'items.price DESC'
+    @ds.literal(:items__price.desc).should == 'items.price DESC'
   end
 
   specify "should format a DESC clause for a function" do
-    :avg.sql_function(:test).desc.to_s(@ds).should == 'avg(test) DESC'
+    @ds.literal(:avg.sql_function(:test).desc).should == 'avg(test) DESC'
   end
 end
 
@@ -290,13 +290,13 @@ describe "#asc" do
   end
   
   specify "should format a ASC clause for a column ref" do
-    :test.asc.to_s(@ds).should == 'test ASC'
+    @ds.literal(:test.asc).should == 'test ASC'
     
-    :items__price.asc.to_s(@ds).should == 'items.price ASC'
+    @ds.literal(:items__price.asc).should == 'items.price ASC'
   end
 
   specify "should format a ASC clause for a function" do
-    :avg.sql_function(:test).asc.to_s(@ds).should == 'avg(test) ASC'
+    @ds.literal(:avg.sql_function(:test).asc).should == 'avg(test) ASC'
   end
 end
 
@@ -306,17 +306,17 @@ describe "#as" do
   end
   
   specify "should format a AS clause for a column ref" do
-    :test.as(:t).to_s(@ds).should == 'test AS t'
+    @ds.literal(:test.as(:t)).should == 'test AS t'
     
-    :items__price.as(:p).to_s(@ds).should == 'items.price AS p'
+    @ds.literal(:items__price.as(:p)).should == 'items.price AS p'
   end
 
   specify "should format a AS clause for a function" do
-    :avg.sql_function(:test).as(:avg).to_s(@ds).should == 'avg(test) AS avg'
+    @ds.literal(:avg.sql_function(:test).as(:avg)).should == 'avg(test) AS avg'
   end
   
   specify "should format a AS clause for a literal value" do
-    'abc'.as(:abc).to_s(@ds).should == "'abc' AS abc"
+    @ds.literal('abc'.as(:abc)).should == "'abc' AS abc"
   end
 end
 
@@ -381,17 +381,17 @@ describe "Symbol#*" do
   end
   
   specify "should format a qualified wildcard if no argument" do
-    :xyz.*.to_s(@ds).should == 'xyz.*'
-    :abc.*.to_s(@ds).should == 'abc.*'
+    @ds.literal(:xyz.*).should == 'xyz.*'
+    @ds.literal(:abc.*).should == 'abc.*'
   end
 
   specify "should format a filter expression if an argument" do
-    :xyz.*(3).to_s(@ds).should == '(xyz * 3)'
-    :abc.*(5).to_s(@ds).should == '(abc * 5)'
+    @ds.literal(:xyz.*(3)).should == '(xyz * 3)'
+    @ds.literal(:abc.*(5)).should == '(abc * 5)'
   end
 
   specify "should support qualified symbols if no argument" do
-    :xyz__abc.*.to_s(@ds).should == 'xyz.abc.*'
+    @ds.literal(:xyz__abc.*).should == 'xyz.abc.*'
   end
 end
 
@@ -445,12 +445,12 @@ describe "Symbol" do
   end
   
   specify "should support sql_function method" do
-    :COUNT.sql_function('1').to_s(@ds).should == "COUNT('1')"
+    @ds.literal(:COUNT.sql_function('1')).should == "COUNT('1')"
     @ds.select(:COUNT.sql_function('1')).sql.should == "SELECT COUNT('1')"
   end
   
   specify "should support cast method" do
-    :abc.cast(:integer).to_s(@ds).should == "CAST(abc AS integer)"
+    @ds.literal(:abc.cast(:integer)).should == "CAST(abc AS integer)"
   end
 
   specify "should support sql array accesses via sql_subscript" do
@@ -463,19 +463,19 @@ describe "Symbol" do
   specify "should support cast_numeric and cast_string" do
     x = :abc.cast_numeric
     x.should be_a_kind_of(Sequel::SQL::NumericExpression)
-    x.to_s(@ds).should == "CAST(abc AS integer)"
+    @ds.literal(x).should == "CAST(abc AS integer)"
 
     x = :abc.cast_numeric(:real)
     x.should be_a_kind_of(Sequel::SQL::NumericExpression)
-    x.to_s(@ds).should == "CAST(abc AS real)"
+    @ds.literal(x).should == "CAST(abc AS real)"
 
     x = :abc.cast_string
     x.should be_a_kind_of(Sequel::SQL::StringExpression)
-    x.to_s(@ds).should == "CAST(abc AS varchar(255))"
+    @ds.literal(x).should == "CAST(abc AS varchar(255))"
 
     x = :abc.cast_string(:varchar)
     x.should be_a_kind_of(Sequel::SQL::StringExpression)
-    x.to_s(@ds).should == "CAST(abc AS varchar(255))"
+    @ds.literal(x).should == "CAST(abc AS varchar(255))"
   end
   
   specify "should allow database independent types when casting" do
@@ -485,16 +485,16 @@ describe "Symbol" do
       return :bar if type == String
       type
     end
-    :abc.cast(String).to_s(@ds).should == "CAST(abc AS bar)"
-    :abc.cast(String).to_s(@ds).should == "CAST(abc AS bar)"
-    :abc.cast_string.to_s(@ds).should == "CAST(abc AS bar)"
-    :abc.cast_string(Integer).to_s(@ds).should == "CAST(abc AS foo)"
-    :abc.cast_numeric.to_s(@ds).should == "CAST(abc AS foo)"
-    :abc.cast_numeric(String).to_s(@ds).should == "CAST(abc AS bar)"
+    @ds.literal(:abc.cast(String)).should == "CAST(abc AS bar)"
+    @ds.literal(:abc.cast(String)).should == "CAST(abc AS bar)"
+    @ds.literal(:abc.cast_string).should == "CAST(abc AS bar)"
+    @ds.literal(:abc.cast_string(Integer)).should == "CAST(abc AS foo)"
+    @ds.literal(:abc.cast_numeric).should == "CAST(abc AS foo)"
+    @ds.literal(:abc.cast_numeric(String)).should == "CAST(abc AS bar)"
   end
 
   specify "should support SQL EXTRACT function via #extract " do
-    :abc.extract(:year).to_s(@ds).should == "extract(year FROM abc)"
+    @ds.literal(:abc.extract(:year)).should == "extract(year FROM abc)"
   end
 end
 
