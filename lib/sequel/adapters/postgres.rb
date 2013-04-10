@@ -385,7 +385,11 @@ module Sequel
             synchronize(opts[:server]) do |conn|
               begin
                 channels = Array(channels)
-                channels.each{|channel| conn.execute("LISTEN #{dataset.send(:table_ref, channel)}")}
+                channels.each do |channel|
+                  sql = "LISTEN "
+                  dataset.send(:identifier_append, sql, channel)
+                  conn.execute(sql)
+                end
                 opts[:after_listen].call(conn) if opts[:after_listen]
                 timeout = opts[:timeout] ? [opts[:timeout]] : []
                 if l = opts[:loop]
