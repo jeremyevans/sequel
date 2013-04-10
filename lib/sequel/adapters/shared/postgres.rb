@@ -1044,6 +1044,7 @@ module Sequel
       BLOB_RE = /[\000-\037\047\134\177-\377]/n.freeze
       WINDOW = " WINDOW ".freeze
       EMPTY_STRING = ''.freeze
+      LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each{|s| s.freeze}
 
       # Shared methods for prepared statements when used with PostgreSQL databases.
       module PreparedStatementMethods
