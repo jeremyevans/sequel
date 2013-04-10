@@ -150,7 +150,9 @@ module Sequel
       else
         check_truncation_allowed!
         raise(InvalidOperation, "Can't truncate filtered datasets") if opts[:where] || opts[:having]
-        _truncate_sql(source_list(opts[:from]))
+        t = ''
+        source_list_append(t, opts[:from])
+        _truncate_sql(t)
       end
     end
 

@@ -1009,7 +1009,6 @@ module Sequel
       FOR_SHARE = ' FOR SHARE'.freeze
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'insert into columns values returning')
       INSERT_CLAUSE_METHODS_91 = Dataset.clause_methods(:insert, %w'with insert into columns values returning')
-      LOCK = 'LOCK TABLE %s IN %s MODE'.freeze
       NULL = LiteralString.new('NULL').freeze
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
       QUERY_PLAN = 'QUERY PLAN'.to_sym
@@ -1140,7 +1139,10 @@ module Sequel
         if block_given? # perform locking inside a transaction and yield to block
           @db.transaction(opts){lock(mode, opts); yield}
         else
-          @db.execute(LOCK % [source_list(@opts[:from]), mode], opts) # lock without a transaction
+          sql = 'LOCK TABLE '
+          source_list_append(sql, @opts[:from])
+          sql << " IN #{mode} MODE"
+          @db.execute(sql, opts) # lock without a transaction
         end
         nil
       end
