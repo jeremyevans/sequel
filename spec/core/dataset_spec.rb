@@ -223,7 +223,7 @@ describe "A simple dataset" do
   end
   
   specify "should format a truncate statement with multiple tables if supported" do
-    @dataset.meta_def(:check_truncation_allowed!){}
+    meta_def(@dataset, :check_truncation_allowed!){}
     @dataset.from(:test, :test2).truncate_sql.should == 'TRUNCATE TABLE test, test2'
   end
   
@@ -232,8 +232,8 @@ describe "A simple dataset" do
   end
   
   specify "should use a single column with a default value when the dataset doesn't support using insert statement with default values" do
-    @dataset.meta_def(:insert_supports_empty_values?){false}
-    @dataset.meta_def(:columns){[:a, :b]}
+    meta_def(@dataset, :insert_supports_empty_values?){false}
+    meta_def(@dataset, :columns){[:a, :b]}
     @dataset.insert_sql.should == 'INSERT INTO test (b) VALUES (DEFAULT)'
   end
   
@@ -512,7 +512,7 @@ describe "Dataset#where" do
   end
 
   specify "should handle IN/NOT IN queries with multiple columns and an array where the database doesn't support it" do
-    @dataset.meta_def(:supports_multiple_column_in?){false}
+    meta_def(@dataset, :supports_multiple_column_in?){false}
     @dataset.filter([:id1, :id2] => [[1, 2], [3,4]]).sql.should == "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
     @dataset.exclude([:id1, :id2] => [[1, 2], [3,4]]).sql.should == "SELECT * FROM test WHERE (((id1 != 1) OR (id2 != 2)) AND ((id1 != 3) OR (id2 != 4)))"
     @dataset.filter([:id1, :id2] => Sequel.value_list([[1, 2], [3,4]])).sql.should == "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
@@ -520,7 +520,7 @@ describe "Dataset#where" do
   end
 
   specify "should handle IN/NOT IN queries with multiple columns and a dataset where the database doesn't support it" do
-    @dataset.meta_def(:supports_multiple_column_in?){false}
+    meta_def(@dataset, :supports_multiple_column_in?){false}
     db = Sequel.mock(:fetch=>[{:id1=>1, :id2=>2}, {:id1=>3, :id2=>4}])
     d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
     @dataset.filter([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
@@ -530,7 +530,7 @@ describe "Dataset#where" do
   end
   
   specify "should handle IN/NOT IN queries with multiple columns and an empty dataset where the database doesn't support it" do
-    @dataset.meta_def(:supports_multiple_column_in?){false}
+    meta_def(@dataset, :supports_multiple_column_in?){false}
     db = Sequel.mock
     d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
     @dataset.filter([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
@@ -542,7 +542,7 @@ describe "Dataset#where" do
   specify "should handle IN/NOT IN queries with multiple columns and an empty dataset where the database doesn't support it with correct NULL handling" do
     begin
       Sequel.empty_array_handle_nulls = false
-      @dataset.meta_def(:supports_multiple_column_in?){false}
+      meta_def(@dataset, :supports_multiple_column_in?){false}
       db = Sequel.mock
       d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
       @dataset.filter([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (1 = 0)"
@@ -555,7 +555,7 @@ describe "Dataset#where" do
   end
   
   specify "should handle IN/NOT IN queries for datasets with row_procs" do
-    @dataset.meta_def(:supports_multiple_column_in?){false}
+    meta_def(@dataset, :supports_multiple_column_in?){false}
     db = Sequel.mock(:fetch=>[{:id1=>1, :id2=>2}, {:id1=>3, :id2=>4}])
     d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
     d1.row_proc = proc{|h| Object.new}
@@ -878,19 +878,19 @@ describe "Dataset#group_by" do
   end
 
   specify "should support a #group_rollup method if the database supports it" do
-    @dataset.meta_def(:supports_group_rollup?){true}
+    meta_def(@dataset, :supports_group_rollup?){true}
     @dataset.group(:type_id).group_rollup.select_sql.should == "SELECT * FROM test GROUP BY ROLLUP(type_id)"
     @dataset.group(:type_id, :b).group_rollup.select_sql.should == "SELECT * FROM test GROUP BY ROLLUP(type_id, b)"
-    @dataset.meta_def(:uses_with_rollup?){true}
+    meta_def(@dataset, :uses_with_rollup?){true}
     @dataset.group(:type_id).group_rollup.select_sql.should == "SELECT * FROM test GROUP BY type_id WITH ROLLUP"
     @dataset.group(:type_id, :b).group_rollup.select_sql.should == "SELECT * FROM test GROUP BY type_id, b WITH ROLLUP"
   end
 
   specify "should support a #group_cube method if the database supports it" do
-    @dataset.meta_def(:supports_group_cube?){true}
+    meta_def(@dataset, :supports_group_cube?){true}
     @dataset.group(:type_id).group_cube.select_sql.should == "SELECT * FROM test GROUP BY CUBE(type_id)"
     @dataset.group(:type_id, :b).group_cube.select_sql.should == "SELECT * FROM test GROUP BY CUBE(type_id, b)"
-    @dataset.meta_def(:uses_with_rollup?){true}
+    meta_def(@dataset, :uses_with_rollup?){true}
     @dataset.group(:type_id).group_cube.select_sql.should == "SELECT * FROM test GROUP BY type_id WITH CUBE"
     @dataset.group(:type_id, :b).group_cube.select_sql.should == "SELECT * FROM test GROUP BY type_id, b WITH CUBE"
   end
@@ -1052,7 +1052,7 @@ describe "Dataset#literal" do
   end
 
   specify "should literalize Time, DateTime, Date properly if SQL standard format is required" do
-    @dataset.meta_def(:requires_sql_standard_datetimes?){true}
+    meta_def(@dataset, :requires_sql_standard_datetimes?){true}
 
     t = Time.now
     s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S")
@@ -1068,7 +1068,7 @@ describe "Dataset#literal" do
   end
   
   specify "should literalize Time and DateTime properly if the database support timezones in timestamps" do
-    @dataset.meta_def(:supports_timestamp_timezones?){true}
+    meta_def(@dataset, :supports_timestamp_timezones?){true}
 
     t = Time.now.utc
     s = t.strftime("'%Y-%m-%d %H:%M:%S")
@@ -1080,7 +1080,7 @@ describe "Dataset#literal" do
   end
   
   specify "should literalize Time and DateTime properly if the database doesn't support usecs in timestamps" do
-    @dataset.meta_def(:supports_timestamp_usecs?){false}
+    meta_def(@dataset, :supports_timestamp_usecs?){false}
     
     t = Time.now.utc
     s = t.strftime("'%Y-%m-%d %H:%M:%S")
@@ -1090,7 +1090,7 @@ describe "Dataset#literal" do
     s = t.strftime("'%Y-%m-%d %H:%M:%S")
     @dataset.literal(t).should == "#{s}'"
     
-    @dataset.meta_def(:supports_timestamp_timezones?){true}
+    meta_def(@dataset, :supports_timestamp_timezones?){true}
     
     t = Time.now.utc
     s = t.strftime("'%Y-%m-%d %H:%M:%S")
@@ -1198,8 +1198,8 @@ describe "Dataset#from" do
   end
 
   specify "should hoist WITH clauses from subqueries if the dataset doesn't support CTEs in subselects" do
-    @dataset.meta_def(:supports_cte?){true}
-    @dataset.meta_def(:supports_cte_in_subselect?){false}
+    meta_def(@dataset, :supports_cte?){true}
+    meta_def(@dataset, :supports_cte_in_subselect?){false}
     @dataset.from(@dataset.from(:a).with(:a, @dataset.from(:b))).sql.should == 'WITH a AS (SELECT * FROM b) SELECT * FROM (SELECT * FROM a) AS t1'
     @dataset.from(@dataset.from(:a).with(:a, @dataset.from(:b)), @dataset.from(:c).with(:c, @dataset.from(:d))).sql.should == 'WITH a AS (SELECT * FROM b), c AS (SELECT * FROM d) SELECT * FROM (SELECT * FROM a) AS t1, (SELECT * FROM c) AS t2'
   end
@@ -1382,7 +1382,7 @@ describe "Dataset#select_append" do
   end
 
   specify "should select from all from and join tables if SELECT *, column not supported" do
-    @d.meta_def(:supports_select_all_and_column?){false}
+    meta_def(@d, :supports_select_all_and_column?){false}
     @d.select_append(:b).sql.should == 'SELECT test.*, b FROM test'
     @d.from(:test, :c).select_append(:b).sql.should == 'SELECT test.*, c.*, b FROM test, c'
     @d.cross_join(:c).select_append(:b).sql.should == 'SELECT test.*, c.*, b FROM test CROSS JOIN c'
@@ -1827,7 +1827,7 @@ describe "Dataset#distinct" do
   end
   
   specify "should use DISTINCT ON if columns are given and DISTINCT ON is supported" do
-    @dataset.meta_def(:supports_distinct_on?){true}
+    meta_def(@dataset, :supports_distinct_on?){true}
     @dataset.distinct(:a, :b).sql.should == 'SELECT DISTINCT ON (a, b) name FROM test'
     @dataset.distinct(Sequel.cast(:stamp, :integer), :node_id=>nil).sql.should == 'SELECT DISTINCT ON (CAST(stamp AS integer), (node_id IS NULL)) name FROM test'
   end
@@ -2042,8 +2042,8 @@ describe "Dataset#from_self" do
 
   specify "should hoist WITH clauses in current dataset if dataset doesn't support WITH in subselect" do
     ds = Sequel::Dataset.new(nil)
-    ds.meta_def(:supports_cte?){true}
-    ds.meta_def(:supports_cte_in_subselect?){false}
+    meta_def(ds, :supports_cte?){true}
+    meta_def(ds, :supports_cte_in_subselect?){false}
     ds.from(:a).with(:a, ds.from(:b)).from_self.sql.should == 'WITH a AS (SELECT * FROM b) SELECT * FROM (SELECT * FROM a) AS t1'
     ds.from(:a, :c).with(:a, ds.from(:b)).with(:c, ds.from(:d)).from_self.sql.should == 'WITH a AS (SELECT * FROM b), c AS (SELECT * FROM d) SELECT * FROM (SELECT * FROM a, c) AS t1'
   end
@@ -2225,13 +2225,13 @@ describe "Dataset#join_table" do
   end
 
   specify "should emulate JOIN USING (poorly) if the dataset doesn't support it" do
-    @d.meta_def(:supports_join_using?){false}
+    meta_def(@d, :supports_join_using?){false}
     @d.join(:categories, [:id]).sql.should == 'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."id" = "items"."id")'
   end
 
   specify "should hoist WITH clauses from subqueries if the dataset doesn't support CTEs in subselects" do
-    @d.meta_def(:supports_cte?){true}
-    @d.meta_def(:supports_cte_in_subselect?){false}
+    meta_def(@d, :supports_cte?){true}
+    meta_def(@d, :supports_cte_in_subselect?){false}
     @d.join(Sequel::Dataset.new(nil).from(:categories).with(:a, Sequel::Dataset.new(nil).from(:b)), [:id]).sql.should == 'WITH "a" AS (SELECT * FROM b) SELECT * FROM "items" INNER JOIN (SELECT * FROM categories) AS "t1" USING ("id")'
   end
 
@@ -2602,7 +2602,7 @@ describe "Dataset compound operations" do
   end
 
   specify "should raise an InvalidOperation if INTERSECT or EXCEPT is used and they are not supported" do
-    @a.meta_def(:supports_intersect_except?){false}
+    meta_def(@a, :supports_intersect_except?){false}
     proc{@a.intersect(@b)}.should raise_error(Sequel::InvalidOperation)
     proc{@a.intersect(@b, true)}.should raise_error(Sequel::InvalidOperation)
     proc{@a.except(@b)}.should raise_error(Sequel::InvalidOperation)
@@ -2610,7 +2610,7 @@ describe "Dataset compound operations" do
   end
     
   specify "should raise an InvalidOperation if INTERSECT ALL or EXCEPT ALL is used and they are not supported" do
-    @a.meta_def(:supports_intersect_except_all?){false}
+    meta_def(@a, :supports_intersect_except_all?){false}
     proc{@a.intersect(@b)}.should_not raise_error
     proc{@a.intersect(@b, true)}.should raise_error(Sequel::InvalidOperation)
     proc{@a.except(@b)}.should_not raise_error
@@ -2645,8 +2645,8 @@ describe "Dataset compound operations" do
 
   specify "should hoist WITH clauses in given dataset if dataset doesn't support WITH in subselect" do
     ds = Sequel::Dataset.new(nil)
-    ds.meta_def(:supports_cte?){true}
-    ds.meta_def(:supports_cte_in_subselect?){false}
+    meta_def(ds, :supports_cte?){true}
+    meta_def(ds, :supports_cte_in_subselect?){false}
     ds.from(:a).union(ds.from(:c).with(:c, ds.from(:d)), :from_self=>false).sql.should == 'WITH c AS (SELECT * FROM d) SELECT * FROM a UNION SELECT * FROM c'
     ds.from(:a).except(ds.from(:c).with(:c, ds.from(:d))).sql.should == 'WITH c AS (SELECT * FROM d) SELECT * FROM (SELECT * FROM a EXCEPT SELECT * FROM c) AS t1'
     ds.from(:a).with(:a, ds.from(:b)).intersect(ds.from(:c).with(:c, ds.from(:d)), :from_self=>false).sql.should == 'WITH a AS (SELECT * FROM b), c AS (SELECT * FROM d) SELECT * FROM a INTERSECT SELECT * FROM c'
@@ -3367,7 +3367,7 @@ describe "Dataset prepared statements and bound variables " do
   before do
     @db = Sequel.mock
     @ds = @db[:items]
-    @ds.meta_def(:insert_sql){|*v| "#{super(*v)}#{' RETURNING *' if opts.has_key?(:returning)}" }
+    meta_def(@ds, :insert_sql){|*v| "#{super(*v)}#{' RETURNING *' if opts.has_key?(:returning)}" }
   end
   
   specify "#call should take a type and bind hash and interpolate it" do
@@ -3448,7 +3448,7 @@ describe "Dataset prepared statements and bound variables " do
     
   specify "should handle columns on prepared statements correctly" do
     @db.columns = [:num]
-    @ds.meta_def(:select_where_sql){|sql| super(sql); sql << " OR #{columns.first} = 1" if opts[:where]}
+    meta_def(@ds, :select_where_sql){|sql| super(sql); sql << " OR #{columns.first} = 1" if opts[:where]}
     @ds.filter(:num=>:$n).prepare(:select, :sn).sql.should == 'SELECT * FROM items WHERE (num = $n) OR num = 1'
     @db.sqls.should == ['SELECT * FROM items LIMIT 1']
   end
@@ -3695,7 +3695,7 @@ describe "Sequel::Dataset#qualify_to_first_source" do
   end
 
   specify "should handle SQL::WindowFunctions" do
-    @ds.meta_def(:supports_window_functions?){true}
+    meta_def(@ds, :supports_window_functions?){true}
     @ds.select{sum(:over, :args=>:a, :partition=>:b, :order=>:c){}}.qualify_to_first_source.sql.should == 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
   end
 
@@ -3814,14 +3814,14 @@ describe "Sequel::Dataset #with and #with_recursive" do
   end
 
   specify "#with and #with_recursive should raise an error unless the dataset supports CTEs" do
-    @ds.meta_def(:supports_cte?){false}
+    meta_def(@ds, :supports_cte?){false}
     proc{@ds.with(:t, @db[:x], :args=>[:b])}.should raise_error(Sequel::Error)
     proc{@ds.with_recursive(:t, @db[:x], @db[:t], :args=>[:b, :c])}.should raise_error(Sequel::Error)
   end
 
   specify "#with should work on insert, update, and delete statements if they support it" do
     [:insert, :update, :delete].each do |m|
-      @ds.meta_def(:"#{m}_clause_methods"){[:"#{m}_with_sql"] + super()}
+      meta_def(@ds, :"#{m}_clause_methods"){[:"#{m}_with_sql"] + super()}
     end
     @ds.with(:t, @db[:x]).insert_sql(1).should == 'WITH t AS (SELECT * FROM x) INSERT INTO t VALUES (1)'
     @ds.with(:t, @db[:x]).update_sql(:foo=>1).should == 'WITH t AS (SELECT * FROM x) UPDATE t SET foo = 1'
@@ -3829,8 +3829,8 @@ describe "Sequel::Dataset #with and #with_recursive" do
   end
 
   specify "should hoist WITH clauses in given dataset(s) if dataset doesn't support WITH in subselect" do
-    @ds.meta_def(:supports_cte?){true}
-    @ds.meta_def(:supports_cte_in_subselect?){false}
+    meta_def(@ds, :supports_cte?){true}
+    meta_def(@ds, :supports_cte_in_subselect?){false}
     @ds.with(:t, @ds.from(:s).with(:s, @ds.from(:r))).sql.should == 'WITH s AS (SELECT * FROM r), t AS (SELECT * FROM s) SELECT * FROM t'
     @ds.with_recursive(:t, @ds.from(:s).with(:s, @ds.from(:r)), @ds.from(:q).with(:q, @ds.from(:p))).sql.should == 'WITH s AS (SELECT * FROM r), q AS (SELECT * FROM p), t AS (SELECT * FROM s UNION ALL SELECT * FROM q) SELECT * FROM t'
   end
@@ -3885,8 +3885,8 @@ describe "Sequel timezone support" do
   before do
     @db = Sequel::Database.new
     @dataset = @db.dataset
-    @dataset.meta_def(:supports_timestamp_timezones?){true}
-    @dataset.meta_def(:supports_timestamp_usecs?){false}
+    meta_def(@dataset, :supports_timestamp_timezones?){true}
+    meta_def(@dataset, :supports_timestamp_usecs?){false}
     @offset = sprintf("%+03i%02i", *(Time.now.utc_offset/60).divmod(60))
   end
   after do
@@ -4313,7 +4313,7 @@ end
 describe "Modifying joined datasets" do
   before do
     @ds = Sequel.mock.from(:b, :c).join(:d, [:id]).where(:id => 2)
-    @ds.meta_def(:supports_modifying_joins?){true}
+    meta_def(@ds, :supports_modifying_joins?){true}
   end
 
   specify "should allow deleting from joined datasets" do
@@ -4363,7 +4363,7 @@ describe "Dataset#returning" do
     @ds = Sequel.mock(:fetch=>proc{|s| {:foo=>s}})[:t].returning(:foo)
     @pr = proc do
       [:insert, :update, :delete].each do |m|
-        @ds.meta_def(:"#{m}_clause_methods"){super() + [:"#{m}_returning_sql"]}
+        meta_def(@ds, :"#{m}_clause_methods"){super() + [:"#{m}_returning_sql"]}
       end
     end
   end

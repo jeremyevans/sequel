@@ -443,7 +443,7 @@ describe "DB#create_table" do
   end
 
   specify "should ignore errors if the database raises an error on an index creation statement and the :ignore_index_errors option is used" do
-    @db.meta_def(:execute_ddl){|*a| raise Sequel::DatabaseError if /blah/.match(a.first); super(*a)}
+    meta_def(@db, :execute_ddl){|*a| raise Sequel::DatabaseError if /blah/.match(a.first); super(*a)}
     lambda{@db.create_table(:cats){Integer :id; index :blah; index :id}}.should raise_error(Sequel::DatabaseError)
     @db.sqls.should == ['CREATE TABLE cats (id integer)']
     lambda{@db.create_table(:cats, :ignore_index_errors=>true){Integer :id; index :blah; index :id}}.should_not raise_error(Sequel::DatabaseError)
@@ -643,13 +643,13 @@ describe "DB#create_table!" do
   end
   
   specify "should create the table if it does not exist" do
-    @db.meta_def(:table_exists?){|a| false}
+    meta_def(@db, :table_exists?){|a| false}
     @db.create_table!(:cats){|*a|}
     @db.sqls.should == ['CREATE TABLE cats ()']
   end
   
   specify "should drop the table before creating it if it already exists" do
-    @db.meta_def(:table_exists?){|a| true}
+    meta_def(@db, :table_exists?){|a| true}
     @db.create_table!(:cats){|*a|}
     @db.sqls.should == ['DROP TABLE cats', 'CREATE TABLE cats ()']
   end
@@ -661,19 +661,19 @@ describe "DB#create_table?" do
   end
   
   specify "should not create the table if the table already exists" do
-    @db.meta_def(:table_exists?){|a| true}
+    meta_def(@db, :table_exists?){|a| true}
     @db.create_table?(:cats){|*a|}
     @db.sqls.should == []
   end
   
   specify "should create the table if the table doesn't already exist" do
-    @db.meta_def(:table_exists?){|a| false}
+    meta_def(@db, :table_exists?){|a| false}
     @db.create_table?(:cats){|*a|}
     @db.sqls.should == ['CREATE TABLE cats ()']
   end
   
   specify "should use IF NOT EXISTS if the database supports that" do
-    @db.meta_def(:supports_create_table_if_not_exists?){true}
+    meta_def(@db, :supports_create_table_if_not_exists?){true}
     @db.create_table?(:cats){|*a|}
     @db.sqls.should == ['CREATE TABLE IF NOT EXISTS cats ()']
   end
@@ -787,37 +787,37 @@ describe "DB#drop_table?" do
   end
   
   specify "should drop the table if it exists" do
-    @db.meta_def(:table_exists?){|a| true}
+    meta_def(@db, :table_exists?){|a| true}
     @db.drop_table?(:cats)
     @db.sqls.should == ["DROP TABLE cats"]
   end
   
   specify "should do nothing if the table does not exist" do
-    @db.meta_def(:table_exists?){|a| false}
+    meta_def(@db, :table_exists?){|a| false}
     @db.drop_table?(:cats)
     @db.sqls.should == []
   end
   
   specify "should operate on multiple tables at once" do
-    @db.meta_def(:table_exists?){|a| a == :cats}
+    meta_def(@db, :table_exists?){|a| a == :cats}
     @db.drop_table? :cats, :dogs
     @db.sqls.should == ['DROP TABLE cats']
   end
 
   specify "should take an options hash and support the :cascade option" do
-    @db.meta_def(:table_exists?){|a| true}
+    meta_def(@db, :table_exists?){|a| true}
     @db.drop_table? :cats, :dogs, :cascade=>true
     @db.sqls.should == ['DROP TABLE cats CASCADE', 'DROP TABLE dogs CASCADE']
   end
 
   specify "should use IF NOT EXISTS if the database supports that" do
-    @db.meta_def(:supports_drop_table_if_exists?){true}
+    meta_def(@db, :supports_drop_table_if_exists?){true}
     @db.drop_table? :cats, :dogs
     @db.sqls.should == ['DROP TABLE IF EXISTS cats', 'DROP TABLE IF EXISTS dogs']
   end
 
   specify "should use IF NOT EXISTS with CASCADE if the database supports that" do
-    @db.meta_def(:supports_drop_table_if_exists?){true}
+    meta_def(@db, :supports_drop_table_if_exists?){true}
     @db.drop_table? :cats, :dogs, :cascade=>true
     @db.sqls.should == ['DROP TABLE IF EXISTS cats CASCADE', 'DROP TABLE IF EXISTS dogs CASCADE']
   end
@@ -926,7 +926,7 @@ describe "DB#alter_table" do
   end
 
   specify "should ignore errors if the database raises an error on an add_index call and the :ignore_errors option is used" do
-    @db.meta_def(:execute_ddl){|*a| raise Sequel::DatabaseError}
+    meta_def(@db, :execute_ddl){|*a| raise Sequel::DatabaseError}
     lambda{@db.add_index(:cats, :id)}.should raise_error(Sequel::DatabaseError)
     lambda{@db.add_index(:cats, :id, :ignore_errors=>true)}.should_not raise_error(Sequel::DatabaseError)
     @db.sqls.should == []
@@ -1065,7 +1065,7 @@ describe "DB#alter_table" do
   end
 
   specify "should combine operations into a single query if the database supports it" do
-    @db.meta_def(:supports_combining_alter_table_ops?){true}
+    meta_def(@db, :supports_combining_alter_table_ops?){true}
     @db.alter_table(:cats) do
       add_column :a, Integer
       drop_column :b
@@ -1080,7 +1080,7 @@ describe "DB#alter_table" do
   end
   
   specify "should combine operations into consecutive groups of combinable operations if the database supports combining operations" do
-    @db.meta_def(:supports_combining_alter_table_ops?){true}
+    meta_def(@db, :supports_combining_alter_table_ops?){true}
     @db.alter_table(:cats) do
       add_column :a, Integer
       drop_column :b
@@ -1342,21 +1342,21 @@ describe "Schema Parser" do
   end
 
   specify "should raise an error if there are no columns" do
-    @db.meta_def(:schema_parse_table) do |t, opts|
+    meta_def(@db, :schema_parse_table) do |t, opts|
       []
     end
     proc{@db.schema(:x)}.should raise_error(Sequel::Error)
   end
 
   specify "should cache data by default" do
-    @db.meta_def(:schema_parse_table) do |t, opts|
+    meta_def(@db, :schema_parse_table) do |t, opts|
       [[:a, {}]]
     end
     @db.schema(:x).should equal(@db.schema(:x))
   end
 
   specify "should not cache data if :reload=>true is given" do
-    @db.meta_def(:schema_parse_table) do |t, opts|
+    meta_def(@db, :schema_parse_table) do |t, opts|
       [[:a, {}]]
     end
     @db.schema(:x).should_not equal(@db.schema(:x, :reload=>true))
@@ -1364,7 +1364,7 @@ describe "Schema Parser" do
 
   specify "should not cache schema metadata if cache_schema is false" do
     @db.cache_schema = false
-    @db.meta_def(:schema_parse_table) do |t, opts|
+    meta_def(@db, :schema_parse_table) do |t, opts|
       [[:a, {}]]
     end
     @db.schema(:x).should_not equal(@db.schema(:x))
@@ -1372,7 +1372,7 @@ describe "Schema Parser" do
 
   specify "should provide options if given a table name" do
     c = nil
-    @db.meta_def(:schema_parse_table) do |t, opts|
+    meta_def(@db, :schema_parse_table) do |t, opts|
       c = [t, opts]
       [[:a, {:db_type=>t.to_s}]]
     end
@@ -1388,7 +1388,7 @@ describe "Schema Parser" do
   specify "should parse the schema correctly for a single table" do
     sqls = @sqls
     proc{@db.schema(:x)}.should raise_error(Sequel::Error)
-    @db.meta_def(:schema_parse_table) do |t, opts|
+    meta_def(@db, :schema_parse_table) do |t, opts|
       sqls << t
       [[:a, {:db_type=>t.to_s}]]
     end
@@ -1401,7 +1401,7 @@ describe "Schema Parser" do
   end
 
   specify "should convert various types of table name arguments" do
-    @db.meta_def(:schema_parse_table) do |t, opts|
+    meta_def(@db, :schema_parse_table) do |t, opts|
       [[t, opts]]
     end
     s1 = @db.schema(:x)

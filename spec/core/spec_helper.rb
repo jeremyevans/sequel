@@ -11,7 +11,11 @@ unless Object.const_defined?('Sequel')
   require 'sequel/core'
 end
 
-Sequel.extension :meta_def
+(defined?(RSpec) ? RSpec::Core::ExampleGroup : Spec::Example::ExampleGroup).class_eval do
+  def meta_def(obj, name, &block)
+    (class << obj; self end).send(:define_method, name, &block)
+  end
+end
 
 if ENV['SEQUEL_COLUMNS_INTROSPECTION']
   Sequel.extension :columns_introspection

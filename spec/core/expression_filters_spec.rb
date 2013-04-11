@@ -44,7 +44,7 @@ describe "Blockless Ruby Filters" do
   end
 
   it "should use = 't' and != 't' OR IS NULL if IS TRUE is not supported" do
-    @d.meta_def(:supports_is_true?){false}
+    meta_def(@d, :supports_is_true?){false}
     @d.l(:x => true).should == "(x = 't')"
     @d.l(~Sequel.expr(:x => true)).should == "((x != 't') OR (x IS NULL))"
     @d.l(:x => false).should == "(x = 'f')"
@@ -169,7 +169,7 @@ describe "Blockless Ruby Filters" do
   end
   
   it "should emulate multiple column in if not supported" do
-    @d.meta_def(:supports_multiple_column_in?){false}
+    meta_def(@d, :supports_multiple_column_in?){false}
     @d.l([:x, :y]=>Sequel.value_list([[1,2], [3,4]])).should == '(((x = 1) AND (y = 2)) OR ((x = 3) AND (y = 4)))'
     @d.l([:x, :y, :z]=>[[1,2,5], [3,4,6]]).should == '(((x = 1) AND (y = 2) AND (z = 5)) OR ((x = 3) AND (y = 4) AND (z = 6)))'
   end
@@ -398,7 +398,7 @@ describe Sequel::SQL::VirtualRow do
     db = Sequel::Database.new
     db.quote_identifiers = true
     @d = db[:items]
-    @d.meta_def(:supports_window_functions?){true}
+    meta_def(@d, :supports_window_functions?){true}
     def @d.l(*args, &block)
       literal(filter_expr(*args, &block))
     end
@@ -482,7 +482,7 @@ describe Sequel::SQL::VirtualRow do
 
   it "should raise an error if window functions are not supported" do
     class << @d; remove_method :supports_window_functions? end
-    @d.meta_def(:supports_window_functions?){false}
+    meta_def(@d, :supports_window_functions?){false}
     proc{@d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}}.should raise_error(Sequel::Error)
     proc{Sequel::Dataset.new(nil).filter{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.sql}.should raise_error(Sequel::Error)
   end

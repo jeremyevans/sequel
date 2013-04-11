@@ -46,7 +46,7 @@ describe "A new Database" do
   specify "should pass the supplied block to the connection pool" do
     cc = nil
     d = Sequel::Database.new
-    d.meta_def(:connect){|c| 1234}
+    meta_def(d, :connect){|c| 1234}
     d.synchronize {|c| cc = c}
     cc.should == 1234
   end
@@ -568,7 +568,7 @@ end
 describe "Database#synchronize" do
   before do
     @db = Sequel::Database.new(:max_connections => 1)
-    @db.meta_def(:connect){|c| 12345}
+    meta_def(@db, :connect){|c| 12345}
   end
   
   specify "should wrap the supplied block in pool.hold" do
@@ -593,7 +593,7 @@ describe "Database#test_connection" do
   before do
     @db = Sequel::Database.new
     pr = proc{@test = rand(100)}
-    @db.meta_def(:connect){|c| pr.call}
+    meta_def(@db, :connect){|c| pr.call}
   end
   
   specify "should attempt to get a connection" do
@@ -627,7 +627,7 @@ shared_examples_for "Database#transaction" do
   end
   
   specify "should support transaction isolation levels" do
-    @db.meta_def(:supports_transaction_isolation_levels?){true}
+    meta_def(@db, :supports_transaction_isolation_levels?){true}
     [:uncommitted, :committed, :repeatable, :serializable].each do |l|
       @db.transaction(:isolation=>l){@db.run "DROP TABLE #{l}"}
     end
@@ -638,7 +638,7 @@ shared_examples_for "Database#transaction" do
   end
 
   specify "should allow specifying a default transaction isolation level" do
-    @db.meta_def(:supports_transaction_isolation_levels?){true}
+    meta_def(@db, :supports_transaction_isolation_levels?){true}
     [:uncommitted, :committed, :repeatable, :serializable].each do |l|
       @db.transaction_isolation_level = l
       @db.transaction{@db.run "DROP TABLE #{l}"}
@@ -730,8 +730,8 @@ shared_examples_for "Database#transaction" do
   
   specify "should handle errors when sending BEGIN" do
     ec = Class.new(StandardError)
-    @db.meta_def(:database_error_classes){[ec]}
-    @db.meta_def(:log_connection_execute){|c, sql| sql =~ /BEGIN/ ? raise(ec, 'bad') : super(c, sql)}
+    meta_def(@db, :database_error_classes){[ec]}
+    meta_def(@db, :log_connection_execute){|c, sql| sql =~ /BEGIN/ ? raise(ec, 'bad') : super(c, sql)}
     begin
       @db.transaction{@db.execute 'DROP TABLE test;'}
     rescue Sequel::DatabaseError => e
@@ -743,8 +743,8 @@ shared_examples_for "Database#transaction" do
   
   specify "should handle errors when sending COMMIT" do
     ec = Class.new(StandardError)
-    @db.meta_def(:database_error_classes){[ec]}
-    @db.meta_def(:log_connection_execute){|c, sql| sql =~ /COMMIT/ ? raise(ec, 'bad') : super(c, sql)}
+    meta_def(@db, :database_error_classes){[ec]}
+    meta_def(@db, :log_connection_execute){|c, sql| sql =~ /COMMIT/ ? raise(ec, 'bad') : super(c, sql)}
     begin
       @db.transaction{@db.execute 'DROP TABLE test;'}
     rescue Sequel::DatabaseError => e
@@ -756,8 +756,8 @@ shared_examples_for "Database#transaction" do
   
   specify "should handle errors when sending ROLLBACK" do
     ec = Class.new(StandardError)
-    @db.meta_def(:database_error_classes){[ec]}
-    @db.meta_def(:log_connection_execute){|c, sql| sql =~ /ROLLBACK/ ? raise(ec, 'bad') : super(c, sql)}
+    meta_def(@db, :database_error_classes){[ec]}
+    meta_def(@db, :log_connection_execute){|c, sql| sql =~ /ROLLBACK/ ? raise(ec, 'bad') : super(c, sql)}
     begin
       @db.transaction{raise ArgumentError, 'asdf'}
     rescue Sequel::DatabaseError => e
@@ -821,10 +821,10 @@ shared_examples_for "Database#transaction" do
   end
   
   specify "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
-    @db.meta_def(:commit_transaction){raise ArgumentError}
+    meta_def(@db, :commit_transaction){raise ArgumentError}
     lambda{@db.transaction{}}.should raise_error(ArgumentError)
 
-    @db.meta_def(:database_error_classes){[ArgumentError]}
+    meta_def(@db, :database_error_classes){[ArgumentError]}
     lambda{@db.transaction{}}.should raise_error(Sequel::DatabaseError)
   end
   
@@ -941,13 +941,13 @@ shared_examples_for "Database#transaction" do
   end
 
   specify "should raise an error if you attempt to use after_commit inside a prepared transaction" do
-    @db.meta_def(:supports_prepared_transactions?){true}
+    meta_def(@db, :supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.after_commit{@db.execute('foo')}}}.should raise_error(Sequel::Error)
     @db.sqls.should == ['BEGIN', 'ROLLBACK']
   end
 
   specify "should raise an error if you attempt to use after_rollback inside a prepared transaction" do
-    @db.meta_def(:supports_prepared_transactions?){true}
+    meta_def(@db, :supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.after_rollback{@db.execute('foo')}}}.should raise_error(Sequel::Error)
     @db.sqls.should == ['BEGIN', 'ROLLBACK']
   end
@@ -961,7 +961,7 @@ describe "Database#transaction with savepoint support" do
   it_should_behave_like "Database#transaction"
 
   specify "should support after_commit inside savepoints" do
-    @db.meta_def(:supports_savepoints?){true}
+    meta_def(@db, :supports_savepoints?){true}
     @db.transaction do
       @db.after_commit{@db.execute('foo')}
       @db.transaction(:savepoint=>true){@db.after_commit{@db.execute('bar')}}
@@ -971,7 +971,7 @@ describe "Database#transaction with savepoint support" do
   end
 
   specify "should support after_rollback inside savepoints" do
-    @db.meta_def(:supports_savepoints?){true}
+    meta_def(@db, :supports_savepoints?){true}
     @db.transaction do
       @db.after_rollback{@db.execute('foo')}
       @db.transaction(:savepoint=>true){@db.after_rollback{@db.execute('bar')}}
@@ -982,15 +982,15 @@ describe "Database#transaction with savepoint support" do
   end
 
   specify "should raise an error if you attempt to use after_commit inside a savepoint in a prepared transaction" do
-    @db.meta_def(:supports_savepoints?){true}
-    @db.meta_def(:supports_prepared_transactions?){true}
+    meta_def(@db, :supports_savepoints?){true}
+    meta_def(@db, :supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_commit{@db.execute('foo')}}}}.should raise_error(Sequel::Error)
     @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
   end
 
   specify "should raise an error if you attempt to use after_rollback inside a savepoint in a prepared transaction" do
-    @db.meta_def(:supports_savepoints?){true}
-    @db.meta_def(:supports_prepared_transactions?){true}
+    meta_def(@db, :supports_savepoints?){true}
+    meta_def(@db, :supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_rollback{@db.execute('foo')}}}}.should raise_error(Sequel::Error)
     @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
   end
@@ -999,7 +999,7 @@ end
 describe "Database#transaction without savepoint support" do
   before do
     @db = Sequel.mock(:servers=>{:test=>{}})
-    @db.meta_def(:supports_savepoints?){false}
+    meta_def(@db, :supports_savepoints?){false}
   end
 
   it_should_behave_like "Database#transaction"
@@ -1128,11 +1128,11 @@ describe "Database#transaction with savepoints" do
   end
   
   specify "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
-    @db.meta_def(:commit_transaction){raise ArgumentError}
+    meta_def(@db, :commit_transaction){raise ArgumentError}
     lambda{@db.transaction{}}.should raise_error(ArgumentError)
     lambda{@db.transaction{@db.transaction(:savepoint=>true){}}}.should raise_error(ArgumentError)
 
-    @db.meta_def(:database_error_classes){[ArgumentError]}
+    meta_def(@db, :database_error_classes){[ArgumentError]}
     lambda{@db.transaction{}}.should raise_error(Sequel::DatabaseError)
     lambda{@db.transaction{@db.transaction(:savepoint=>true){}}}.should raise_error(Sequel::DatabaseError)
   end
@@ -1339,7 +1339,7 @@ describe "A single threaded database" do
   before do
     conn = 1234567
     @db = Sequel::Database.new(:single_threaded => true)
-    @db.meta_def(:connect) do |c|
+    meta_def(@db, :connect) do |c|
       conn += 1
     end
   end
@@ -1691,7 +1691,7 @@ describe "Database#each_server" do
     @db.each_server do |db|
       dbs << db
       Sequel::DATABASES.should include(db)
-      db.meta_def(:disconnect){dcs << db}
+      meta_def(db, :disconnect){dcs << db}
     end
     dbs.each do |db|
       Sequel::DATABASES.should_not include(db)
@@ -2135,8 +2135,8 @@ describe "Database#supports_savepoints_in_prepared_transactions?" do
 
   specify "should be true if both savepoints and prepared transactions are supported" do
     db = Sequel::Database.new
-    db.meta_def(:supports_savepoints?){true}
-    db.meta_def(:supports_prepared_transactions?){true}
+    meta_def(db, :supports_savepoints?){true}
+    meta_def(db, :supports_prepared_transactions?){true}
     db.supports_savepoints_in_prepared_transactions?.should == true
   end
 end

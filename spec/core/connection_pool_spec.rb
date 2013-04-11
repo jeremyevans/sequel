@@ -3,9 +3,9 @@ CONNECTION_POOL_DEFAULTS = {:pool_timeout=>5, :pool_sleep_time=>0.001, :max_conn
 
 mock_db = lambda do |*a, &b|
   db = Sequel.mock
-  db.meta_def(:connect){|c| b.arity == 1 ? b.call(c) : b.call} if b
+  (class << db; self end).send(:define_method, :connect){|c| b.arity == 1 ? b.call(c) : b.call} if b
   if b2 = a.shift
-    db.meta_def(:disconnect_connection){|c| b2.arity == 1 ? b2.call(c) : b2.call}
+    (class << db; self end).send(:define_method, :disconnect_connection){|c| b2.arity == 1 ? b2.call(c) : b2.call}
   end
   db
 end
@@ -395,7 +395,7 @@ shared_examples_for "A threaded connection pool" do
   specify "should not store connections if :connection_handling=>:disconnect" do
     @pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:connection_handling=>:disconnect))
     d = []
-    @pool.db.meta_def(:disconnect_connection){|c| d << c}
+    meta_def(@pool.db, :disconnect_connection){|c| d << c}
     @pool.hold do |cc|
       cc.should == 1
       Thread.new{@pool.hold{|cc2| cc2.should == 2}}.join
@@ -455,7 +455,7 @@ describe "ConnectionPool#disconnect" do
     @pool.available_connections.size.should == 5
     @pool.available_connections.each {|c| c[:id].should_not be_nil}
     conns = []
-    @pool.db.meta_def(:disconnect_connection){|c| conns << c}
+    meta_def(@pool.db, :disconnect_connection){|c| conns << c}
     @pool.disconnect
     conns.size.should == 5
   end
@@ -472,7 +472,7 @@ describe "ConnectionPool#disconnect" do
       @pool.available_connections.size.should == 4
       @pool.available_connections.each {|c| c.should_not be(conn)}
       conns = []
-      @pool.db.meta_def(:disconnect_connection){|c| conns << c}
+      meta_def(@pool.db, :disconnect_connection){|c| conns << c}
       @pool.disconnect
       conns.size.should == 4
       @pool.size.should == 1
@@ -574,7 +574,7 @@ describe "A connection pool with multiple servers" do
     conns = []
     @pool.size.should == 1
     @pool.size(:read_only).should == 1
-    @pool.db.meta_def(:disconnect_connection){|c| conns << c}
+    meta_def(@pool.db, :disconnect_connection){|c| conns << c}
     @pool.disconnect
     conns.sort.should == %w'default1 read_only1'
     @pool.size.should == 0
