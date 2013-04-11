@@ -166,6 +166,11 @@ Instead, you should do:
 
   DB[:table].update(:column => params[:value].to_s) # Safe
 
+==== SQL Fragment passed to Dataset#lock_style
+
+The Sequel::Dataset#lock_style method also treats an input string 
+as SQL code. This method should not be called with user input.
+
 === SQL Identifier Injections
 
 Usually, Sequel treats ruby symbols as SQL identifiers, and ruby

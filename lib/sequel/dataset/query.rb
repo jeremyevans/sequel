@@ -600,11 +600,14 @@ module Sequel
     end
     
     # Returns a cloned dataset with the given lock style.  If style is a
-    # string, it will be used directly.  Otherwise, a symbol may be used
-    # for database independent locking.  Currently :update is respected
-    # by most databases, and :share is supported by some.
+    # string, it will be used directly. You should never pass a string
+    # to this method that is derived from user input, as that can lead to
+    # SQL injection.
     #
-    #   DB[:items].lock_style('FOR SHARE') # SELECT * FROM items FOR SHARE
+    # A symbol may be used for database independent locking behavior, but
+    # all supported symbols have separate methods (e.g. for_update).
+    #
+    #   DB[:items].lock_style('FOR SHARE NOWAIT') # SELECT * FROM items FOR SHARE NOWAIT
     def lock_style(style)
       clone(:lock => style)
     end

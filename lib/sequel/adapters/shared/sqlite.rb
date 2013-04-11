@@ -661,7 +661,9 @@ module Sequel
         SELECT_CLAUSE_METHODS
       end
       
-      # Support FOR SHARE locking when using the :share lock style.
+      # SQLite does not support FOR UPDATE, but silently ignore it
+      # instead of raising an error for compatibility with other
+      # databases.
       def select_lock_sql(sql)
         super unless @opts[:lock] == :update
       end
