@@ -157,8 +157,14 @@ module Sequel
         IBM_DB.field_precision(@stmt, key)
       end
 
-      # Free the memory related to this result set.
+      # Free the memory related to this statement.
       def free
+        IBM_DB.free_stmt(@stmt)
+      end
+
+      # Free the memory related to this result set, only useful for prepared
+      # statements which have a different result set on every call.
+      def free_result
         IBM_DB.free_result(@stmt)
       end
 
@@ -223,7 +229,7 @@ module Sequel
           else
             _execute(c, sql, opts)
           end
-          _execute(c, "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1", opts){|stmt| i = stmt.fetch_array.first.to_i; stmt.free; i}
+          _execute(c, "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1", opts){|stmt| i = stmt.fetch_array.first.to_i; i}
         end
       rescue Connection::Error => e
         raise_error(e)
@@ -245,15 +251,15 @@ module Sequel
             log_sql << sql
             log_sql << ")"
           end
-          stmt = log_yield(log_sql, args){conn.execute_prepared(ps_name, *args)}
-          if block_given?
-            begin
+          begin
+            stmt = log_yield(log_sql, args){conn.execute_prepared(ps_name, *args)}
+            if block_given?
               yield(stmt)
-            ensure
-              stmt.free
+            else  
+              stmt.affected
             end
-          else  
-            stmt.affected
+          ensure
+            stmt.free_result if stmt
           end
         end
       end
@@ -283,14 +289,12 @@ module Sequel
       def _execute(conn, sql, opts)
         stmt = log_yield(sql){conn.execute(sql)}
         if block_given?
-          begin
-            yield(stmt)
-          ensure
-            stmt.free
-          end
+          yield(stmt)
         else  
           stmt.affected
         end
+      ensure
+        stmt.free if stmt
       end
 
       def adapter_initialize

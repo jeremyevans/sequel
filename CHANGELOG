@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix statement freeing in the ibmdb adapter (jeremyevans)
+
 * Make single and class table inheritance plugins handle usage of set_dataset in a subclass (jeremyevans)
 
 * Allow validates_schema_types in validation_helpers plugin accept an options hash (jeremyevans)
