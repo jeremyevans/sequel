@@ -1,16 +1,20 @@
 === HEAD
 
+* Handle more corner cases in the many_to_one_pk_lookup plugin (jeremyevans)
+
+* Handle database connection during initialization in jdbc adapter (jeremyevans) (#646)
+
 * Add Database.after_initialize, which takes a block and calls the block with each newly created Database instance (ged) (#641)
 
 * Add a guide detailing PostgreSQL-specific support (jeremyevans)
 
-* Make built-in model plugins deal with frozen instances (jeremyevans)
+* Make model plugins deal with frozen instances (jeremyevans)
 
 * Allow freezing of model instances for models without primary keys (jeremyevans)
 
 * Reflect constraint_validations extension :allow_nil=>true setting in the database constraints (jeremyevans)
 
-* Add Plugins.after_set_dataset for easily running after set_dataset (jeremyevans)
+* Add Plugins.after_set_dataset for easily running code after set_dataset (jeremyevans)
 
 * Add Plugins.inherited_instance_variables for easily setting class instance variables when subclassing (jeremyevans)
 

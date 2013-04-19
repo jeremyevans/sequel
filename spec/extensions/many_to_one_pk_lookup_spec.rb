@@ -2,7 +2,9 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::ManyToOnePkLookup" do
   before do
-    class ::LookupModel < ::Sequel::Model
+    @db = Sequel.mock
+
+    class ::LookupModel < ::Sequel::Model(@db)
       plugin :many_to_one_pk_lookup
       columns :id, :caching_model_id, :caching_model_id2
       many_to_one :caching_model
@@ -10,12 +12,10 @@ describe "Sequel::Plugins::ManyToOnePkLookup" do
     end
     @c = LookupModel
 
-    class ::CachingModel < Sequel::Model
+    class ::CachingModel < Sequel::Model(@db)
       columns :id, :id2
     end
     @cc = CachingModel
-
-    @db = MODEL_DB
   end
   after do
     Object.send(:remove_const, :CachingModel)
@@ -23,25 +23,25 @@ describe "Sequel::Plugins::ManyToOnePkLookup" do
   end
 
   shared_examples_for "many_to_one_pk_lookup with composite keys" do
-    it "should use a simple primary key lookup when retrieving many_to_one associated records" do
+    it "should use a simple primary key lookup when retrieving many_to_one associated records with a composite key" do
       @db.sqls.should == []
       @c.load(:id=>3, :caching_model_id=>1, :caching_model_id2=>2).caching_model2.should equal(@cm12)
       @c.load(:id=>3, :caching_model_id=>2, :caching_model_id2=>1).caching_model2.should equal(@cm21)
       @db.sqls.should == []
-      @c.load(:id=>4, :caching_model_id=>2, :caching_model_id2=>2).caching_model2
-      @db.sqls.should_not == []
+      @cc.dataset._fetch = []
+      @c.load(:id=>4, :caching_model_id=>2, :caching_model_id2=>2).caching_model2.should == nil
     end
   end
 
   shared_examples_for "many_to_one_pk_lookup" do
-    it "should use a simple primary key lookup when retrieving many_to_one associated records via a composite key" do
+    it "should use a simple primary key lookup when retrieving many_to_one associated records" do
       @cc.set_primary_key([:id, :id2])
       @db.sqls.should == []
       @c.load(:id=>3, :caching_model_id=>1).caching_model.should equal(@cm1)
       @c.load(:id=>4, :caching_model_id=>2).caching_model.should equal(@cm2)
       @db.sqls.should == []
-      @c.load(:id=>4, :caching_model_id=>3).caching_model
-      @db.sqls.should_not == []
+      @cc.dataset._fetch = []
+      @c.load(:id=>4, :caching_model_id=>3).caching_model.should == nil
     end
 
     it "should not use a simple primary key lookup if the assocation has a nil :key option" do
@@ -62,10 +62,41 @@ describe "Sequel::Plugins::ManyToOnePkLookup" do
       @db.sqls.should_not == []
     end
 
+    it "should not use a simple primary key lookup if the assocation has :conditions" do
+      @c.many_to_one :caching_model, :conditions=>{:a=>1}
+      @c.load(:id=>3, :caching_model_id=>1).caching_model
+      @db.sqls.should_not == []
+    end
+
+    it "should not use a simple primary key lookup if the assocation has :select" do
+      @c.many_to_one :caching_model, :select=>[:a, :b]
+      @c.load(:id=>3, :caching_model_id=>1).caching_model
+      @db.sqls.should_not == []
+    end
+
+    it "should not use a simple primary key lookup if the assocation has a block" do
+      @c.many_to_one(:caching_model){|ds| ds.where{a > 1}}
+      @c.load(:id=>3, :caching_model_id=>1).caching_model
+      @db.sqls.should_not == []
+    end
+
+    it "should not use a simple primary key lookup if the assocation has a non-default :dataset option" do
+      cc = @cc
+      @c.many_to_one :caching_model, :dataset=>proc{cc.where(:id=>caching_model_id)}
+      @c.load(:id=>3, :caching_model_id=>1).caching_model
+      @db.sqls.should_not == []
+    end
+
+    it "should use a simple primary key lookup if explicitly set" do
+      @c.many_to_one :caching_model, :select=>[:a, :b], :many_to_one_pk_lookup=>true
+      @c.load(:id=>3, :caching_model_id=>1).caching_model
+      @db.sqls.should == []
+    end
+
     it "should not use a simple primary key lookup if the prepared_statements_associations method is being used" do
-      c2 = Class.new(Sequel::Model(:not_caching_model))
+      c2 = Class.new(Sequel::Model(@db[:not_caching_model]))
       c2.dataset._fetch = {:id=>1}
-      c = Class.new(Sequel::Model(:lookup_model))
+      c = Class.new(Sequel::Model(@db[:lookup_model]))
       c.class_eval do
         plugin :prepared_statements_associations
         plugin :many_to_one_pk_lookup
@@ -106,7 +137,7 @@ describe "Sequel::Plugins::ManyToOnePkLookup" do
       @cm12 = @cc[1, 2]
       @cm21 = @cc[2, 1]
 
-      @db.reset
+      @db.sqls
     end
 
     it_should_behave_like "many_to_one_pk_lookup"
@@ -119,10 +150,17 @@ describe "Sequel::Plugins::ManyToOnePkLookup" do
       @cc.plugin :static_cache
       @cm1 = @cc[1]
       @cm2 = @cc[2]
-      @db.reset
+      @db.sqls
     end
 
     it_should_behave_like "many_to_one_pk_lookup"
+
+    it "should not issue regular query if primary key lookup returns no rows" do
+      def @cc.primary_key_lookup(pk); end
+      @c.many_to_one :caching_model
+      @c.load(:id=>3, :caching_model_id=>1).caching_model
+      @db.sqls.should == []
+    end
   end
 
   describe "With static_cache plugin with composite key" do
@@ -132,7 +170,7 @@ describe "Sequel::Plugins::ManyToOnePkLookup" do
       @cc.plugin :static_cache
       @cm12 = @cc[[1, 2]]
       @cm21 = @cc[[2, 1]]
-      @db.reset
+      @db.sqls
     end
 
     it_should_behave_like "many_to_one_pk_lookup with composite keys"
