@@ -35,6 +35,11 @@ module Sequel
           @all.dup
         end
 
+        # Get the number of records in the cache, without issuing a database query.
+        def count
+          @all.size
+        end
+
         # Return the frozen object with the given pk, or nil if no such object exists
         # in the cache, without issuing a database query.
         def cache_get_pk(pk)

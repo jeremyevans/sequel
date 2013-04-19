@@ -67,6 +67,11 @@ describe "Sequel::Plugins::StaticCache" do
     @db.sqls.should == []
   end
 
+  it "should have count not issue a query" do
+    @c.count.should == 2
+    @db.sqls.should == []
+  end
+
   it "should have map send a query if given an argument" do
     @c.map(:id).sort.should == [1, 2]
     @db.sqls.should == ["SELECT * FROM t"]
