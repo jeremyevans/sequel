@@ -1506,8 +1506,8 @@ module Sequel
             else
               _load_associated_object(opts, dynamic_opts)
             end
-          else
-            [] if opts.returns_array?
+          elsif opts.returns_array?
+            []
           end
         end
         
