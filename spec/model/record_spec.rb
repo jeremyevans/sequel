@@ -439,7 +439,7 @@ describe "Model#marshallable" do
   end
 end
 
-describe "Model#modified[!?]" do
+describe "Model#modified?" do
   before do
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval do
@@ -489,8 +489,47 @@ describe "Model#modified[!?]" do
     o.x = '2'
     o.modified?.should == true
   end
+
+  it "should be true if given a column argument and the column has been changed" do
+    o = @c.new
+    o.modified?(:id).should be_false
+    o.id = 1
+    o.modified?(:id).should be_true
+  end
 end
 
+describe "Model#modified!" do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval do
+      columns :id, :x
+    end
+    MODEL_DB.reset
+  end
+
+  it "should mark the object as modified so that save_changes still runs the callbacks" do
+    o = @c.load(:id=>1, :x=>2)
+    def o.after_save
+      values[:x] = 3
+    end
+    o.update({})
+    o.x.should == 2
+
+    o.modified!
+    o.update({})
+    o.x.should == 3
+    o.db.sqls.should == []
+  end
+
+  it "should mark given column argument as modified" do
+    o = @c.load(:id=>1, :x=>2)
+    o.modified!(:x)
+    o.changed_columns.should == [:x]
+    o.save
+    o.db.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 1)"]
+  end
+end
+  
 describe "Model#save_changes" do
   before do
     @c = Class.new(Sequel::Model(:items)) do

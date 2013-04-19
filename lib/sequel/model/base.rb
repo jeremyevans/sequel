@@ -1168,7 +1168,18 @@ module Sequel
       #   a.save_changes # No callbacks run, as no changes
       #   a.modified!
       #   a.save_changes # Callbacks run, even though no changes made
-      def modified!
+      #
+      # If a column is given, specifically marked that column as modified,
+      # so that +save_changes+/+update+ will include that column in the
+      # update. This should be used if you plan on mutating the column
+      # value instead of assigning a new column value:
+      #
+      #   a.modified!(:name)
+      #   a.name.gsub!(/[aeou]/, 'i')
+      def modified!(column=nil)
+        if column && !changed_columns.include?(column)
+          changed_columns << column
+        end
         @modified = true
       end
 
@@ -1180,8 +1191,19 @@ module Sequel
       #   a.modified? # => false
       #   a.set(:name=>'Jim')
       #   a.modified? # => true
-      def modified?
-        @modified || !changed_columns.empty?
+      #
+      # If a column is given, specifically check if the given column has
+      # been modified:
+      #
+      #   a.modified?(:num_albums) # => false
+      #   a.num_albums = 10
+      #   a.modified?(:num_albums) # => true
+      def modified?(column=nil)
+        if column
+          changed_columns.include?(column)
+        else
+          @modified || !changed_columns.empty?
+        end
       end
   
       # Returns true if the current instance represents a new record.

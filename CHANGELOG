@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow Model#modified! to take an optional column argument and mark that column as being modified (jeremyevans)
+
+* Allow Model#modified? to take an optional column argument and check if that column has been modified (jeremyevans)
+
 * Make Model.count not issue a database query if using the static_cache plugin (jeremyevans)
 
 * Handle more corner cases in the many_to_one_pk_lookup plugin (jeremyevans)
