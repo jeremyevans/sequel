@@ -247,6 +247,22 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.errors.full_messages.should == ['value is not a valid integer']
   end
 
+  specify "should support validates_schema_types" do
+    @c.set_validations{validates_schema_types}
+    @m.value = 123
+    @m.should be_valid
+    @m.value = '123'
+    @m.should be_valid
+    @m.meta_def(:db_schema){{:value=>{:type=>:integer}}}
+    @m.should_not be_valid
+    @m.errors.full_messages.should == ['value is not a valid integer']
+
+    @c.set_validations{validates_schema_types(:value)}
+    @m.meta_def(:db_schema){{:value=>{:type=>:integer}}}
+    @m.should_not be_valid
+    @m.errors.full_messages.should == ['value is not a valid integer']
+  end
+
   specify "should support validates_numeric" do
     @c.set_validations{validates_numeric(:value)}
     @m.value = 'blah'
@@ -279,21 +295,21 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should be_valid
     @m.value = '123'
     @m.should_not be_valid
-    @m.errors.full_messages.should == ['value is not a Integer']
+    @m.errors.full_messages.should == ['value is not a valid integer']
     
     @c.set_validations{validates_type(:String, :value)}
     @m.value = '123'
     @m.should be_valid
     @m.value = 123
     @m.should_not be_valid
-    @m.errors.full_messages.should == ['value is not a String']
+    @m.errors.full_messages.should == ['value is not a valid string']
     
     @c.set_validations{validates_type('Integer', :value)}
     @m.value = 123
     @m.should be_valid
     @m.value = 123.05
     @m.should_not be_valid
-    @m.errors.full_messages.should == ['value is not a Integer']
+    @m.errors.full_messages.should == ['value is not a valid integer']
     
     @c.set_validations{validates_type(Integer, :value)}
     @m.value = nil
@@ -310,6 +326,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should be_valid
     @m.value = BigDecimal.new('1.0')
     @m.should_not be_valid
+    @m.errors.full_messages.should == ['value is not a valid integer or float']
   end
 
   specify "should support validates_presence" do

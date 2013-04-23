@@ -11,8 +11,8 @@ module Sequel
     #     end
     #   end
     #
-    # The validates_unique validation has a unique API, but the other validations have
-    # the API explained here:
+    # The validates_unique and validates_schema_types methods have a unique API, but the other
+    # validations have the API explained here:
     #
     # Arguments:
     # atts :: Single attribute symbol or an array of attribute symbols specifying the
@@ -156,6 +156,16 @@ module Sequel
             rescue
               validation_error_message(m)
             end
+          end
+        end
+
+        # Validates for all of the model columns (or just the given columns)
+        # that the column value is an instance of the expected class based on
+        # the column's schema type.
+        def validates_schema_types(atts=keys)
+          Array(atts).each do |k|
+            next unless type = schema_type_class(k)
+            validates_type(type, k)
           end
         end
 

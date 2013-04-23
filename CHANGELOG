@@ -1,5 +1,7 @@
 === HEAD
 
+* Add validates_schema_types validation for validating column values are instances of an appropriate class (jeremyevans)
+
 * Allow validates_type validation to accept an array of allowable classes (jeremyevans)
 
 * Add Database#schema_type_class for getting the ruby class or classes related to the type symbol (jeremyevans)
