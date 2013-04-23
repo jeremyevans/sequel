@@ -300,6 +300,16 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should be_valid
     @m.value = false
     @m.should_not be_valid
+    
+    @c.set_validations{validates_type([Integer, Float], :value)}
+    @m.value = nil
+    @m.should be_valid
+    @m.value = 1
+    @m.should be_valid
+    @m.value = 1.0
+    @m.should be_valid
+    @m.value = BigDecimal.new('1.0')
+    @m.should_not be_valid
   end
 
   specify "should support validates_presence" do

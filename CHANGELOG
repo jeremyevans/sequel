@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow validates_type validation to accept an array of allowable classes (jeremyevans)
+
 * Add Database#schema_type_class for getting the ruby class or classes related to the type symbol (jeremyevans)
 
 * Add error_splitter plugin, for splitting multi-column errors into separate errors per column (jeremyevans)

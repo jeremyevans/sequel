@@ -86,7 +86,7 @@ module Sequel
         :min_length=>{:message=>lambda{|min| "is shorter than #{min} characters"}},
         :not_string=>{:message=>lambda{|type| type ? "is not a valid #{type}" : "is a string"}},
         :numeric=>{:message=>lambda{"is not a number"}},
-        :type=>{:message=>lambda{|klass| "is not a #{klass}"}},
+        :type=>{:message=>lambda{|klass| klass.is_a?(Array) ? "is not a valid #{klass.join(" or ").downcase}" : "is not a valid #{klass.to_s.downcase}"}},
         :presence=>{:message=>lambda{"is not present"}},
         :unique=>{:message=>lambda{'is already taken'}}
       }
@@ -159,12 +159,18 @@ module Sequel
           end
         end
 
-        # Check if value is an instance of a class
+        # Check if value is an instance of a class.  If +klass+ is an array,
+        # the value must be an instance of one of the classes in the array.
         def validates_type(klass, atts, opts={})
           klass = klass.to_s.constantize if klass.is_a?(String) || klass.is_a?(Symbol)
-          validatable_attributes_for_type(:type, atts, opts){|a,v,m| validation_error_message(m, klass) if !v.nil? && !v.is_a?(klass)}
+          validatable_attributes_for_type(:type, atts, opts) do |a,v,m|
+            next if v.nil?
+            if klass.is_a?(Array) ? !klass.any?{|kls| v.is_a?(kls)} : !v.is_a?(klass)
+              validation_error_message(m, klass)
+            end
+          end
         end
-    
+
         # Check attribute value(s) is not considered blank by the database, but allow false values.
         def validates_presence(atts, opts={})
           validatable_attributes_for_type(:presence, atts, opts){|a,v,m| validation_error_message(m) if model.db.send(:blank_object?, v) && v != false}
