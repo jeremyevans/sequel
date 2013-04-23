@@ -1,5 +1,7 @@
 === HEAD
 
+* Skip validates_unique validation if underlying columns are not valid (jeremyevans)
+
 * Add auto_validations plugin, for automatically adding presence, not_string, and unique validations (jeremyevans)
 
 * Allow Model#modified! to take an optional column argument and mark that column as being modified (jeremyevans)

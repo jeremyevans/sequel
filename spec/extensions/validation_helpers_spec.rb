@@ -466,4 +466,16 @@ describe "Sequel::Plugins::ValidationHelpers" do
     m.should be_valid
     MODEL_DB.sqls.should == ["SELECT COUNT(*) AS count FROM items WHERE ((username = '2') AND (password = '1') AND (id != 3)) LIMIT 1"]
   end
+
+  it "should not attempt a database query if the underlying columns have validation errors" do
+    @c.columns(:id, :username, :password)
+    @c.set_dataset MODEL_DB[:items]
+    @c.set_validations{validates_not_string(:username); validates_unique([:username, :password])}
+    @c.dataset._fetch = {:v=>0}
+    
+    MODEL_DB.reset
+    m = @c.new(:username => "1", :password => "anothertest")
+    m.should_not be_valid
+    MODEL_DB.sqls.should == []
+  end
 end 
