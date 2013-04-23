@@ -47,7 +47,7 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.valid?.should be_false
     @m.errors.should == {:d=>["is not a valid date"], :num=>["is not a valid integer"]}
 
-    @c.skip_auto_validations(:not_string)
+    @c.skip_auto_validations(:types)
     @m.valid?.should be_false
     @m.errors.should == {[:name, :num]=>["is already taken"]}
 

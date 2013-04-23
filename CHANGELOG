@@ -1,5 +1,7 @@
 === HEAD
 
+* Add auto_validations plugin, for automatically adding presence, type, and unique validations (jeremyevans)
+
 * Add validates_schema_types validation for validating column values are instances of an appropriate class (jeremyevans)
 
 * Allow validates_type validation to accept an array of allowable classes (jeremyevans)
@@ -9,8 +11,6 @@
 * Add error_splitter plugin, for splitting multi-column errors into separate errors per column (jeremyevans)
 
 * Skip validates_unique validation if underlying columns are not valid (jeremyevans)
-
-* Add auto_validations plugin, for automatically adding presence, not_string, and unique validations (jeremyevans)
 
 * Allow Model#modified! to take an optional column argument and mark that column as being modified (jeremyevans)
 
