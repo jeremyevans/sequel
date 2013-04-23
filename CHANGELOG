@@ -1,5 +1,7 @@
 === HEAD
 
+* Add error_splitter plugin, for splitting multi-column errors into separate errors per column (jeremyevans)
+
 * Skip validates_unique validation if underlying columns are not valid (jeremyevans)
 
 * Add auto_validations plugin, for automatically adding presence, not_string, and unique validations (jeremyevans)
