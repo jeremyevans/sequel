@@ -1931,3 +1931,11 @@ describe "Model#lock!" do
     MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 1) LIMIT 1 FOR UPDATE"]
   end
 end
+
+describe "Model#schema_type_class" do
+  specify "should return the class or array of classes for the given type symbol" do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval{@db_schema = {:id=>{:type=>:integer}}}
+    @c.new.send(:schema_type_class, :id).should == Integer
+  end
+end

@@ -1798,6 +1798,13 @@ module Sequel
         raise HookFailed.new("the #{type} hook failed", self)
       end
   
+      # Get the ruby class or classes related to the given column's type.
+      def schema_type_class(column)
+        if (sch = db_schema[column]) && (type = sch[:type])
+          db.schema_type_class(type)
+        end
+      end
+
       # Set the columns, filtered by the only and except arrays.
       def set_restricted(hash, only, except)
         return self if hash.empty?
