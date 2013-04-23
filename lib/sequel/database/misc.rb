@@ -18,6 +18,12 @@ module Sequel
     # have specific support for the database in use.
     DEFAULT_DATABASE_ERROR_REGEXPS = {}.freeze
 
+    # Mapping of schema type symbols to class or arrays of classes for that
+    # symbol.
+    SCHEMA_TYPE_CLASSES = {:string=>String, :integer=>Integer, :date=>Date, :datetime=>[Time, DateTime].freeze,
+      :time=>Sequel::SQLTime, :boolean=>[TrueClass, FalseClass].freeze, :float=>Float, :decimal=>BigDecimal,
+      :blob=>Sequel::SQL::Blob}.freeze
+
     # Nested hook Proc; each new hook Proc just wraps the previous one.
     @initialize_hook = Proc.new {|db| }
 
@@ -115,6 +121,7 @@ module Sequel
       @dataset_class = dataset_class_default
       @cache_schema = typecast_value_boolean(@opts.fetch(:cache_schema, true))
       @dataset_modules = []
+      @schema_type_classes = SCHEMA_TYPE_CLASSES.dup
       self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
       @pool = ConnectionPool.get_pool(self, @opts)
 
@@ -223,6 +230,11 @@ module Sequel
     # outside of datasets.
     def quote_identifier(v)
       schema_utility_dataset.quote_identifier(v)
+    end
+
+    # Return ruby class or array of classes for the given type symbol.
+    def schema_type_class(type)
+      @schema_type_classes[type]
     end
     
     # Default serial primary key options, used by the table creation
@@ -372,7 +384,7 @@ module Sequel
         raise exception
       end
     end
-    
+
     # Typecast the value to an SQL::Blob
     def typecast_value_blob(value)
       value.is_a?(Sequel::SQL::Blob) ? value : Sequel::SQL::Blob.new(value)

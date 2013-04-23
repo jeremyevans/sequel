@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#schema_type_class for getting the ruby class or classes related to the type symbol (jeremyevans)
+
 * Add error_splitter plugin, for splitting multi-column errors into separate errors per column (jeremyevans)
 
 * Skip validates_unique validation if underlying columns are not valid (jeremyevans)

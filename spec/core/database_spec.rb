@@ -2342,8 +2342,7 @@ describe "Database specific exception classes" do
   end
 end
 
-describe "Post-initialization hooks" do
-
+describe "Database.after_initialize" do
   after do
     Sequel::Database.instance_variable_set(:@initialize_hook, Proc.new {|db| })
   end
@@ -2369,5 +2368,15 @@ describe "Post-initialization hooks" do
       Sequel::Database.after_initialize
     }.should raise_error(Sequel::Error, /must provide block/i)
   end
+end
 
+describe "Database#schema_type_class" do
+  specify "should return the class or array of classes for the given type symbol" do
+    db = Sequel.mock
+    {:string=>String, :integer=>Integer, :date=>Date, :datetime=>[Time, DateTime],
+      :time=>Sequel::SQLTime, :boolean=>[TrueClass, FalseClass], :float=>Float, :decimal=>BigDecimal,
+      :blob=>Sequel::SQL::Blob}.each do |sym, klass|
+      db.schema_type_class(sym).should == klass
+    end
+  end
 end
