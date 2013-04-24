@@ -30,11 +30,11 @@ module Sequel
     #
     # == Example
     #
-    #   require 'sequel'
-    #   # Require json, as the plugin doesn't require it for you.
+    #   # Require json if you plan to use it, as the plugin doesn't require it for you.
     #   require 'json'
     #
-    #   # Register custom serializer/deserializer pair
+    #   # Register custom serializer/deserializer pair, if desired
+    #   require 'sequel/plugins/serialization'
     #   Sequel::Plugins::Serialization.register_format(:reverse,
     #     lambda{|v| v.reverse},
     #     lambda{|v| v.reverse})
