@@ -558,7 +558,7 @@ module Sequel
         raise(Error, "Duplicate migration version: #{version}") if files[version]
         files[version] = File.join(directory, file)
       end
-      1.upto(files.length - 1){|i| raise(Error, "Missing migration version: #{i}") unless files[i] || @allow_missing_migration_files}
+      1.upto(files.length - 1){|i| raise(Error, "Missing migration version: #{i}") unless files[i]} unless @allow_missing_migration_files
       files
     end
     
