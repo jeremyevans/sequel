@@ -7,7 +7,6 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
     @c.columns :a, :b
     @c.set_primary_key :a
     @c.unrestrict_primary_key
-    @o = @c.new
     @ds = @c.dataset
     MODEL_DB.reset
   end
@@ -67,6 +66,16 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
     @c.first.update(:a=>2).update(:b=>4).set(:b=>5).save
     @c.all.should == [@c.load(:a=>2, :b=>5)]
     MODEL_DB.sqls.should == ["SELECT * FROM a LIMIT 1", "UPDATE a SET a = 2 WHERE (a = 1)", "UPDATE a SET b = 4 WHERE (a = 2)", "UPDATE a SET b = 5 WHERE (a = 2)", "SELECT * FROM a"]
+  end
+
+  specify "should clear the associations cache of non-many_to_one associations when changing the primary key" do
+    @c.one_to_many :cs, :class=>@c
+    @c.many_to_one :c, :class=>@c
+    o = @c.new(:a=>1)
+    o.associations[:cs] = @c.new
+    o.associations[:c] = o2 = @c.new
+    o.a = 2
+    o.associations.should == {:c=>o2}
   end
 
   specify "should handle frozen instances" do

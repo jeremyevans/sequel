@@ -46,6 +46,25 @@ module Sequel
             @pk_hash ||= super
           end
         end
+
+        private
+
+        # If the primary key column changes, clear related associations.
+        def change_column_value(column, value)
+          pk = primary_key
+          clear_associations_using_primary_key if (pk.is_a?(Array) ? pk.include?(column) : pk == column)
+          super
+        end
+
+        # Clear associations that are likely to be tied to the primary key.
+        # Note that this currently can clear additional options that don't reference
+        # the primary key (such as one_to_many columns referencing a column other than the
+        # primary key).
+        def clear_associations_using_primary_key
+          associations.keys.each do |k|
+            associations.delete(k) if model.association_reflection(k)[:type] != :many_to_one
+          end
+        end
       end
     end
   end
