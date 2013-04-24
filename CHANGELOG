@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :allow_missing_migration_files option to migrators, for not raising if migration files are missing (bporterfield) (#652)
+
 * Fix race condition related to prepared_sql for newly prepared statements (jeremyevans) (#651)
 
 * Support :keep_reference=>false Database option for not adding reference to Sequel::DATABASES (jeremyevans)
