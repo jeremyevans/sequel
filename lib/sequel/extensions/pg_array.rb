@@ -32,15 +32,14 @@
 #
 #   DB[:table].insert(:column=>Sequel.pg_array([1, 2, 3]))
 #
-# If you would like to use PostgreSQL arrays in your model objects, you
-# probably want to modify the schema parsing/typecasting so that it
-# recognizes and correctly handles the arrays, which you can do by:
+# To use this extension, first load it into your Sequel::Database instance:
 #
 #   DB.extension :pg_array
 #
-# If you are not using the native postgres adapter, you probably
-# also want to use the typecast_on_load plugin in the model, and
-# set it to typecast the array column(s) on load.
+# If you are not using the native postgres adapter and are using array
+# types as model column values you probably should use the
+# pg_typecast_on_load plugin in the model, and set it to typecast the
+# array column(s) on load.
 #
 # This extension by default includes handlers for array types for
 # all scalar types that the native postgres adapter handles. It
@@ -48,18 +47,24 @@
 # general, you just need to make sure that the scalar type is
 # handled and has the appropriate converter installed in
 # Sequel::Postgres::PG_TYPES under the appropriate type OID.
-# Then you can call Sequel::Postgres::PGArray.register with
-# the appropriate arguments to automatically set up a handler
-# for the array type.
+# Then you can call
+# Sequel::Postgres::PGArray::DatabaseMethods#register_array_type
+# to automatically set up a handler for the array type.  So if you
+# want to support the foo[] type (assuming the foo type is already
+# supported):
 #
-# For example, if you add support for a scalar custom type named
-# foo which uses OID 1234, and you want to add support for the
-# foo[] type, which uses type OID 4321, you need to do:
+#   DB.register_array_type('foo')
 #
-#   DB.register_array_type('foo', :oid=>4321, :scalar_oid=>1234)
+# You can also register array types on a global basis using
+# Sequel::Postgres::PGArray.register.  In this case, you'll have
+# to specify the type oids:
 #
-# Sequel::Postgres::PGArray.register has many additional options
-# and should be able to handle most PostgreSQL array types.
+#   Sequel::Postgres::PGArray.register('foo', :oid=>4321, :scalar_oid=>1234)
+#
+# Both Sequel::Postgres::PGArray::DatabaseMethods#register_array_type
+# and Sequel::Postgres::PGArray.register support many options to
+# customize the array type handling.  See the Sequel::Postgres::PGArray.register
+# method documentation.
 #
 # If you want an easy way to call PostgreSQL array functions and
 # operators, look into the pg_array_ops extension.
@@ -233,9 +238,15 @@ module Sequel
 
         # Register a database specific array type.  This can be used to support
         # different array types per Database.  Use of this method does not
-        # affect global state, unlike PGArray.register.
+        # affect global state, unlike PGArray.register.  See PGArray.register for
+        # possible options.
         def register_array_type(db_type, opts={}, &block)
           opts = opts.merge(:type_procs=>conversion_procs, :typecast_method_map=>@pg_array_schema_types, :typecast_methods_module=>(class << self; self; end))
+          unless (opts.has_key?(:scalar_oid) || block) && opts.has_key?(:oid)
+            array_oid, scalar_oid = from(:pg_type).where(:typname=>db_type.to_s).get([:typarray, :oid])
+            opts[:scalar_oid] = scalar_oid unless opts.has_key?(:scalar_oid) || block
+            opts[:oid] = array_oid unless opts.has_key?(:oid)
+          end
           PGArray.register(db_type, opts, &block)
         end
 

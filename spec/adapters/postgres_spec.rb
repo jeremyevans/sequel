@@ -1792,6 +1792,42 @@ describe 'PostgreSQL array handling' do
     end
   end
 
+  specify 'insert and retrieve custom array types' do
+    int2vector = Class.new do
+      attr_reader :array
+      def initialize(array)
+        @array = array
+      end
+      def sql_literal_append(ds, sql)
+        sql << "'#{array.join(' ')}'"
+      end
+      def ==(other)
+        if other.is_a?(self.class)
+          array == other.array
+        else
+          super
+        end
+      end
+    end
+    @db.register_array_type(:int2vector){|s| int2vector.new(s.split.map{|i| i.to_i})}
+    @db.create_table!(:items) do
+      column :b, 'int2vector[]'
+    end
+    @tp.call.should == [:int2vector_array]
+    int2v = int2vector.new([1, 2])
+    @ds.insert(Sequel.pg_array([int2v], :int2vector))
+    @ds.count.should == 1
+    rs = @ds.all
+    if @native
+      rs.should == [{:b=>[int2v]}]
+      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
+      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+  end unless POSTGRES_DB.adapter_scheme == :jdbc
+
   specify 'use arrays in bound variables' do
     @db.create_table!(:items) do
       column :i, 'int4[]'
@@ -2734,7 +2770,6 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds.get(:company).should == {:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]}
     @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))[:id].should == 1
     @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).should == nil
-
 
     @ds.delete
     @ds.call(:insert, {:employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row([nil, nil, nil])])])}, {:employees=>:$employees, :id=>1})
