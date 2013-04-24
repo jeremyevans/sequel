@@ -259,6 +259,10 @@ describe "Sequel::IntegerMigrator" do
   specify "should raise and error if there is a missing integer migration version" do
     proc{Sequel::Migrator.apply(@db, "spec/files/missing_integer_migrations")}.should raise_error(Sequel::Migrator::Error)
   end
+  
+  specify "should not raise and error if there is a missing integer migration version and allow_missing_migration_files is true" do
+    Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true).should_not raise_error(Sequel::Migrator::Error)
+  end
 
   specify "should raise and error if there is a duplicate integer migration version" do
     proc{Sequel::Migrator.apply(@db, "spec/files/duplicate_integer_migrations")}.should raise_error(Sequel::Migrator::Error)
@@ -605,6 +609,18 @@ describe "Sequel::TimestampMigrator" do
 
     @dir = 'spec/files/missing_timestamped_migrations'
     proc{@m.apply(@db, @dir, 0)}.should raise_error(Sequel::Migrator::Error)
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+  end
+  
+  specify "should not raise error for applied migrations not in file system if :allow_missing_migration_files is true" do
+    @dir = 'spec/files/timestamped_migrations'
+    @m.apply(@db, @dir)
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+
+    @dir = 'spec/files/missing_timestamped_migrations'
+    proc{@m.run(@db, @dir, :allow_missing_migration_files => true)}.should_not raise_error(Sequel::Migrator::Error)
     [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
   end

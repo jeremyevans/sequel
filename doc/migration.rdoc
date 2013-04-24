@@ -356,6 +356,10 @@ With the +TimestampMigrator+, you are trading reliability for convenience.  That
 trade, especially if simultaneous related schema changes by separate developers are unlikely, but
 you should give it some thought before using it.
 
+== Ignoring missing migrations
+
+In some cases, you may want to allow a migration in the database that does not exist in the filesystem (deploying to an older version of code without running a down migration when deploy auto-migrates, for example). If required, you can pass <tt>:allow_missing_migration_files => true<tt> as an option. This will stop errors from being raised if there are migrations in the database that do not exist in the filesystem.
+
 == Modifying existing migrations
 
 Just don't do it.
