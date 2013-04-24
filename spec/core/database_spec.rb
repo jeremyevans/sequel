@@ -43,7 +43,7 @@ describe "A new Database" do
     Sequel::Database.new(:max_connections => 10).pool.max_size.should == 10
   end
   
-  specify "should pass the supplied block to the connection pool" do
+  specify "should have the connection pool use the connect method to get connections" do
     cc = nil
     d = Sequel::Database.new
     meta_def(d, :connect){|c| 1234}
