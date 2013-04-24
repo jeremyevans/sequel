@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Postgres::HStoreOp#- explicitly cast a string argument to text, to avoid PostgreSQL assuming it is an hstore (jeremyevans)
+
 * Add auto_validations plugin, for automatically adding presence, type, and unique validations (jeremyevans)
 
 * Add validates_schema_types validation for validating column values are instances of an appropriate class (jeremyevans)

@@ -2136,6 +2136,7 @@ describe 'PostgreSQL hstore handling' do
     @ds.from(:items___i).select(Sequel.hstore('t'=>'s').op.record_set(:i).as(:r)).from_self(:alias=>:s).select(Sequel.lit('(r).*')).from_self.select_map(:t).should == ['s']
 
     @ds.from(Sequel.hstore('t'=>'s', 'a'=>'b').op.skeys.as(:s)).select_order_map(:s).should == %w'a t'
+    @ds.from((Sequel.hstore('t'=>'s', 'a'=>'b').op - 'a').skeys.as(:s)).select_order_map(:s).should == %w't'
 
     @ds.get(h1.slice(Sequel.pg_array(%w'a c')).keys.pg_array.length).should == 2
     @ds.get(h1.slice(Sequel.pg_array(%w'd c')).keys.pg_array.length).should == 1

@@ -29,7 +29,7 @@
 # This creates a Sequel::Postgres::HStoreOp object that can be used
 # for easier querying:
 #
-#   h - 'a'    # hstore_column - 'a'
+#   h - 'a'    # hstore_column - CAST('a' AS text)
 #   h['a']     # hstore_column -> 'a'
 #
 #   h.concat(:other_hstore_column)       # ||
@@ -82,6 +82,9 @@ module Sequel
       #
       #   hstore_op - 'a' # (hstore - 'a')
       def -(other)
+        if other.is_a?(String) && !other.is_a?(Sequel::LiteralString)
+          other = Sequel.cast_string(other)
+        end
         HStoreOp.new(super)
       end
 

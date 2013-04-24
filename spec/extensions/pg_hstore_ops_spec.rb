@@ -7,11 +7,19 @@ describe "Sequel::Postgres::HStoreOp" do
   end
 
   it "#- should use the - operator" do
-    @ds.literal(@h - 'a').should == "(h - 'a')"
+    @ds.literal(@h - :a).should == "(h - a)"
+  end
+
+  it "#- should cast String argument to text when using - operator" do
+    @ds.literal(@h - 'a').should == "(h - CAST('a' AS text))"
+  end
+
+  it "#- should not cast LiteralString argument to text when using - operator" do
+    @ds.literal(@h - Sequel.lit('a')).should == "(h - a)"
   end
 
   it "#- should return an HStoreOp" do
-    @ds.literal((@h - 'a')['a']).should == "((h - 'a') -> 'a')"
+    @ds.literal((@h - :a)['a']).should == "((h - a) -> 'a')"
   end
 
   it "#[] should use the -> operator" do
