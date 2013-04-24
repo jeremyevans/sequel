@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#register_array_type to the pg_array extension, for registering database-specific array types (jeremyevans)
+
 * Speed up fetching model instances when using update_primary_key plugin (jeremyevans)
 
 * In the update_primary_key plugin, if the primary key column changes, clear related associations (jeremyevans)

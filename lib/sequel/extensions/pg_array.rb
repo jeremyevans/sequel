@@ -56,7 +56,7 @@
 # foo which uses OID 1234, and you want to add support for the
 # foo[] type, which uses type OID 4321, you need to do:
 #
-#   Sequel::Postgres::PGArray.register('foo', :oid=>4321, :scalar_oid=>1234)
+#   DB.register_array_type('foo', :oid=>4321, :scalar_oid=>1234)
 #
 # Sequel::Postgres::PGArray.register has many additional options
 # and should be able to handle most PostgreSQL array types.
@@ -115,8 +115,8 @@ module Sequel
       NULL = 'NULL'.freeze
       QUOTE = '"'.freeze
 
-      # Hash of database array type name strings to symbols (e.g. 'double precision' => :float),
-      # used by the schema parsing.
+      # Global hash of database array type name strings to symbols (e.g. 'double precision' => :float),
+      # used by the schema parsing for array types registered globally.
       ARRAY_TYPES = {}
 
       # Registers an array type that the extension should handle.  Makes a Database instance that
@@ -153,6 +153,8 @@ module Sequel
       #                     typecasting method to be created in the database.  This should only be used
       #                     to alias existing array types.  For example, if there is an array type that can be
       #                     treated just like an integer array, you can do :typecast_method=>:integer.
+      # :typecast_method_map :: The map in which to place the database type string to type symbol mapping.
+      #                         Defaults to ARRAY_TYPES.
       # :typecast_methods_module :: If given, a module object to add the typecasting method to.  Defaults
       #                             to DatabaseMethods.
       #
@@ -163,6 +165,7 @@ module Sequel
         type = (typecast_method || opts[:type_symbol] || db_type).to_sym
         type_procs = opts[:type_procs] || PG_TYPES
         mod = opts[:typecast_methods_module] || DatabaseMethods
+        typecast_method_map = opts[:typecast_method_map] || ARRAY_TYPES
 
         if converter = opts[:converter]
           raise Error, "can't provide both a block and :converter option to register" if block
@@ -178,7 +181,7 @@ module Sequel
         array_type = (opts[:array_type] || db_type).to_s.dup.freeze
         creator = (opts[:parser] == :json ? JSONCreator : Creator).new(array_type, converter)
 
-        ARRAY_TYPES[db_type] = :"#{type}_array"
+        typecast_method_map[db_type] = :"#{type}_array"
 
         define_array_typecast_method(mod, type, creator, opts.fetch(:scalar_typecast, type)) unless typecast_method
 
@@ -208,6 +211,14 @@ module Sequel
         ESCAPE_REPLACEMENT = '\\\\\1'.freeze
         BLOB_RANGE = 1...-1
 
+        # Create the local hash of database type strings to schema type symbols,
+        # used for array types local to this database.
+        def self.extended(db)
+          db.instance_eval do
+            @pg_array_schema_types ||= {}
+          end
+        end
+
         # Handle arrays in bound variables
         def bound_variable_arg(arg, conn)
           case arg
@@ -220,9 +231,17 @@ module Sequel
           end
         end
 
+        # Register a database specific array type.  This can be used to support
+        # different array types per Database.  Use of this method does not
+        # affect global state, unlike PGArray.register.
+        def register_array_type(db_type, opts={}, &block)
+          opts = opts.merge(:type_procs=>conversion_procs, :typecast_method_map=>@pg_array_schema_types, :typecast_methods_module=>(class << self; self; end))
+          PGArray.register(db_type, opts, &block)
+        end
+
         # Make the column type detection handle registered array types.
         def schema_column_type(db_type)
-          if (db_type =~ /\A([^(]+)(?:\([^(]+\))?\[\]\z/io) && (type = ARRAY_TYPES[$1])
+          if (db_type =~ /\A([^(]+)(?:\([^(]+\))?\[\]\z/io) && (type = pg_array_schema_type($1))
             type
           else
             super
@@ -257,6 +276,13 @@ module Sequel
           procs[1185] = Creator.new("timestamp with time zone", procs[1184])
 
           procs
+        end
+
+        # Look into both the current database's array schema types and the global
+        # array schema types to get the type symbol for the given database type
+        # string.
+        def pg_array_schema_type(type)
+          @pg_array_schema_types[type] || ARRAY_TYPES[type]
         end
 
         # Given a value to typecast and the type of PGArray subclass:

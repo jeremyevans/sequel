@@ -316,6 +316,23 @@ describe "pg_array extension" do
     @db.schema(:items).map{|e| e[1][:type]}.should == [:float_array]
   end
 
+  it "should support registering custom array types on a per-Database basis" do
+    @db.register_array_type('banana', :oid=>7865)
+    @db.typecast_value(:banana_array, []).should be_a_kind_of(Sequel::Postgres::PGArray)
+    @db.fetch = [{:name=>'id', :db_type=>'banana[]'}]
+    @db.schema(:items).map{|e| e[1][:type]}.should == [:banana_array]
+    @db.conversion_procs.should have_key(7865)
+    @db.respond_to?(:typecast_value_banana_array, true).should be_true
+
+    db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
+    db.extension(:pg_array)
+    db.fetch = [{:name=>'id', :db_type=>'banana[]'}]
+    db.schema(:items).map{|e| e[1][:type]}.should == [nil]
+    db.conversion_procs.should_not have_key(7865)
+    db.respond_to?(:typecast_value_banana_array, true).should be_false
+  end
+
   it "should set appropriate timestamp conversion procs when getting conversion procs" do
     procs = @db.conversion_procs
     procs[1185].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
