@@ -17,8 +17,8 @@
 #
 #   Sequel.pg_array(array)
 #
-# If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]),
-# or you have loaded the {core_refinements extension}[link:files/doc/core_refinements_rdoc.html])
+# If you have loaded the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html],
+# or you have loaded the {core_refinements extension}[link:files/doc/core_refinements_rdoc.html]
 # and have activated refinements for the file, you can also use Array#pg_array:
 #
 #   array.pg_array
