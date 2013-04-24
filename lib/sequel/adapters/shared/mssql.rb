@@ -1,4 +1,4 @@
-Sequel.require %w'emulate_offset_with_row_number split_alter_table', 'adapters/utils/'
+Sequel.require %w'emulate_offset_with_row_number split_alter_table', 'adapters/utils'
 
 module Sequel
   Dataset::NON_SQL_OPTIONS << :disable_insert_output
