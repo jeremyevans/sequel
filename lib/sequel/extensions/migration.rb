@@ -85,10 +85,14 @@ module Sequel
     # Whether to use transactions for this migration, default depends on the
     # database.
     attr_accessor :use_transactions
+    
+    # if true, do not raise errors when migrations present in database are not in the filesystem
+    attr_accessor :allow_missing_migration_files
 
     # Don't set transaction use by default.
     def initialize
       @use_transactions = nil
+      @allow_missing_migration_files = false
     end
 
     # Apply the appropriate block on the +Database+
@@ -435,6 +439,7 @@ module Sequel
       raise(Error, "Must supply a valid migration path") unless File.directory?(directory)
       @db = db
       @directory = directory
+      @allow_missing_migration_files = opts[:allow_missing_migration_files]
       @files = get_migration_files
       schema, table = @db.send(:schema_and_table, opts[:table]  || self.class.const_get(:DEFAULT_SCHEMA_TABLE))
       @table = schema ? Sequel::SQL::QualifiedIdentifier.new(schema, table) : table
@@ -553,7 +558,7 @@ module Sequel
         raise(Error, "Duplicate migration version: #{version}") if files[version]
         files[version] = File.join(directory, file)
       end
-      1.upto(files.length - 1){|i| raise(Error, "Missing migration version: #{i}") unless files[i]}
+      1.upto(files.length - 1){|i| raise(Error, "Missing migration version: #{i}") unless files[i]} unless @allow_missing_migration_files
       files
     end
     
@@ -674,7 +679,7 @@ module Sequel
     def get_applied_migrations
       am = ds.select_order_map(column)
       missing_migration_files = am - files.map{|f| File.basename(f).downcase}
-      raise(Error, "Applied migration files not in file system: #{missing_migration_files.join(', ')}") if missing_migration_files.length > 0
+      raise(Error, "Applied migration files not in file system: #{missing_migration_files.join(', ')}") if missing_migration_files.length > 0 && !@allow_missing_migration_files
       am
     end
     
