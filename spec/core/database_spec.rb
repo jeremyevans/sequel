@@ -204,6 +204,11 @@ describe "A new Database" do
   specify "should populate :adapter option when using connection string" do
     Sequel.connect('mock:/').opts[:adapter].should == "mock"
   end
+
+  specify "should respect the :keep_reference option for not keeping a reference in Sequel::DATABASES" do
+    db = Sequel.connect('mock:///?keep_reference=f')
+    Sequel::DATABASES.should_not include(db)
+  end
 end
 
 describe "Database#disconnect" do

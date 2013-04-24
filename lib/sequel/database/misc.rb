@@ -125,7 +125,9 @@ module Sequel
       self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
       @pool = ConnectionPool.get_pool(self, @opts)
 
-      Sequel.synchronize{::Sequel::DATABASES.push(self)}
+      unless typecast_value_boolean(@opts[:keep_reference]) == false
+        Sequel.synchronize{::Sequel::DATABASES.push(self)}
+      end
       Sequel::Database.run_after_initialize(self)
     end
 
