@@ -247,6 +247,7 @@ module Sequel
 
     # Cache the prepared statement object at the given name.
     def set_prepared_statement(name, ps)
+      ps.prepared_sql
       Sequel.synchronize{prepared_statements[name] = ps}
     end
 

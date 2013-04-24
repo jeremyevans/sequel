@@ -3499,7 +3499,10 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
     @ps << @ds.prepare(:delete, :d)
     @ps << @ds.prepare(:insert, :i, :num=>:$n)
     @ps << @ds.prepare(:update, :u, :num=>:$n)
-    @ps.each{|p| p.extend(Sequel::Dataset::UnnumberedArgumentMapper)}
+    @ps.each do |p|
+      p.extend(Sequel::Dataset::ArgumentMapper) # Work around for old rbx
+      p.extend(Sequel::Dataset::UnnumberedArgumentMapper)
+    end
   end
 
   specify "#inspect should show the actual SQL submitted to the database" do
@@ -3518,6 +3521,7 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
 
   specify "should handle unrecognized statement types as :all" do
     ps = @ds.prepare(:select_all, :s)
+    ps.extend(Sequel::Dataset::ArgumentMapper)  # Work around for old rbx
     ps.extend(Sequel::Dataset::UnnumberedArgumentMapper)
     ps.prepared_sql
     ps.call(:n=>1)
