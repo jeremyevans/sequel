@@ -20,39 +20,28 @@ module Sequel
     #   # Make the Album class support primary key updates
     #   Album.plugin :update_primary_key
     module UpdatePrimaryKey
-      module ClassMethods
-        # Cache the pk_hash when loading records
-        def call(h)
-          r = super(h)
-          r.pk_hash
-          r
-        end
-      end
-
       module InstanceMethods
-        # Clear the pk_hash and object dataset cache, and recache
-        # the pk_hash
+        # Clear the cached primary key.
         def after_update
           super
           @pk_hash = nil
-          pk_hash
         end
 
-        # Cache the pk_hash instead of generating it every time
+        # Use the cached primary key if one is present.
         def pk_hash
-          if frozen?
-            super
-          else
-            @pk_hash ||= super
-          end
+          @pk_hash || super
         end
 
         private
 
-        # If the primary key column changes, clear related associations.
+        # If the primary key column changes, clear related associations and cache
+        # the previous primary key values.
         def change_column_value(column, value)
           pk = primary_key
-          clear_associations_using_primary_key if (pk.is_a?(Array) ? pk.include?(column) : pk == column)
+          if (pk.is_a?(Array) ? pk.include?(column) : pk == column)
+            @pk_hash ||= pk_hash unless new?
+            clear_associations_using_primary_key
+          end
           super
         end
 

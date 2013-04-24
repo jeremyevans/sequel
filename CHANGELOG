@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up fetching model instances when using update_primary_key plugin (jeremyevans)
+
 * In the update_primary_key plugin, if the primary key column changes, clear related associations (jeremyevans)
 
 * Add :allow_missing_migration_files option to migrators, for not raising if migration files are missing (bporterfield) (#652)
