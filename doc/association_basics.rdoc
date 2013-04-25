@@ -747,7 +747,13 @@ method that is preceeded by an underscore that does the actual
 modification.  The public method without the underscore handles caching
 and callbacks, and shouldn't be overridden by the user.
 
-=== _<i>association</i>=
+In addition to overriding the private method in your class, you can also
+use association options to change which method Sequel defines.  The
+only difference between the two is that if you use an association option
+to change the method Sequel defines, you cannot call super to get the
+default behavior.
+
+=== _<i>association</i>= (:setter option)
 
 Let's say you want to set a specific field whenever associating an object
 using the association setter method.  For example, let's say you have
@@ -775,7 +781,7 @@ The above example is contrived, as you would generally use a before_save model
 hook to handle such a modification.  However, if you only modify the album's
 artist using the artist= method, this approach may perform better.
 
-=== \_add_<i>association</i>
+=== \_add_<i>association</i> (:adder option)
 
 Continuing with the same example, here's how would you handle the same case if
 you also wanted to handle the Artist#add_album method:
@@ -790,7 +796,7 @@ you also wanted to handle the Artist#add_album method:
     end
   end
 
-=== \_remove_<i>association</i>
+=== \_remove_<i>association</i> (:remover option)
 
 Continuing with the same example, here's how would you handle the same case if
 you also wanted to handle the Artist#remove_album method:
@@ -805,7 +811,7 @@ you also wanted to handle the Artist#remove_album method:
     end
   end
 
-=== \_remove_all_<i>association</i>
+=== \_remove_all_<i>association</i> (:clearer option)
 
 Continuing with the same example, here's how would you handle the same case if
 you also wanted to handle the Artist#remove_all_albums method:
@@ -1506,6 +1512,62 @@ Like the :left_primary_key option, but :left_primary_key references the method n
 
 Like the :right_primary_key option, but :right_primary_key references the column
 name, while :right_primary_key_method references the method name.
+
+=== Private Method Overriding Options
+
+These options override the private methods that Sequel defines to do
+the actual work of associating and deassociating objects.
+
+==== :setter [*_to_one associations]
+
+This overrides the default behavior when you call an association setter
+method.  Let's say you want to set a specific field whenever associating an object
+using the association setter method.
+
+  class Album < Sequel::Model
+    many_to_one :artist, :setter=>(proc do |artist|
+      if artist
+        self.artist_id = artist.id
+        self.file_under = "#{artist.name}-#{name}"
+      else
+        self.artist_id = nil
+        self.file_under = name
+      end
+    end)
+  end
+
+==== :adder [*_to_many associations]
+
+Continuing with the same example, here's how would you handle the same case if
+you also wanted to handle the Artist#add_album method:
+
+  class Artist < Sequel::Model
+    one_to_many :albums, :adder=>(proc do |album|
+      album.update(:artist_id => id, :file_under=>"#{name}-#{album.name}")
+    end)
+  end
+
+==== :remover [*_to_many associations]
+
+Continuing with the same example, here's how would you handle the same case if
+you also wanted to handle the Artist#remove_album method:
+
+  class Artist < Sequel::Model
+    one_to_many :albums, :remover=>(proc do |album|
+      album.update(:artist_id => nil, :file_under=>album.name)
+    end)
+  end
+
+==== :clearer [*_to_many associations]
+
+Continuing with the same example, here's how would you handle the same case if
+you also wanted to handle the Artist#remove_all_albums method:
+
+  class Artist < Sequel::Model
+    one_to_many :albums, :clearer=>(proc do
+      albums_dataset.update(:artist_id => nil, :file_under=>:name)
+    end)
+  end
 
 === Advanced Options
 

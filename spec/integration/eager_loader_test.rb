@@ -330,11 +330,15 @@ describe "Polymorphic Associations" do
     end
     class ::Asset < Sequel::Model
       m = method(:constantize)
-      many_to_one :attachable, :reciprocal=>:assets, \
+      many_to_one :attachable, :reciprocal=>:assets,
+        :setter=>(proc do |attachable|
+          self[:attachable_id] = (attachable.pk if attachable)
+          self[:attachable_type] = (attachable.class.name if attachable)
+        end),
         :dataset=>(proc do
           klass = m.call(attachable_type)
           klass.where(klass.primary_key=>attachable_id)
-        end), \
+        end),
         :eager_loader=>(proc do |eo|
           id_map = {}
           eo[:rows].each do |asset|
@@ -350,51 +354,26 @@ describe "Polymorphic Associations" do
             end 
           end 
         end)
-            
-      private
-
-      def _attachable=(attachable)
-        self[:attachable_id] = (attachable.pk if attachable)
-        self[:attachable_type] = (attachable.class.name if attachable)
-      end 
     end 
   
     INTEGRATION_DB.create_table!(:posts) do
       primary_key :id
     end
     class ::Post < Sequel::Model
-      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Post'}
-      
-      private
-
-      def _add_asset(asset)
-        asset.update(:attachable_id=>pk, :attachable_type=>'Post')
-      end
-      def _remove_asset(asset)
-        asset.update(:attachable_id=>nil, :attachable_type=>nil)
-      end
-      def _remove_all_assets
-        assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)
-      end
+      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Post'},
+        :adder=>proc{|asset| asset.update(:attachable_id=>pk, :attachable_type=>'Post')},
+        :remover=>proc{|asset| asset.update(:attachable_id=>nil, :attachable_type=>nil)},
+        :clearer=>proc{assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)}
     end 
   
     INTEGRATION_DB.create_table!(:notes) do
       primary_key :id
     end
     class ::Note < Sequel::Model
-      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Note'}     
-
-      private
-
-      def _add_asset(asset)
-        asset.update(:attachable_id=>pk, :attachable_type=>'Note')
-      end
-      def _remove_asset(asset)
-        asset.update(:attachable_id=>nil, :attachable_type=>nil)
-      end
-      def _remove_all_assets
-        assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)
-      end
+      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Note'},     
+        :adder=>proc{|asset| asset.update(:attachable_id=>pk, :attachable_type=>'Note')},
+        :remover=>proc{|asset| asset.update(:attachable_id=>nil, :attachable_type=>nil)},
+        :clearer=>proc{assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)}
     end
   end
   before do
@@ -475,8 +454,17 @@ describe "many_to_one/one_to_many not referencing primary key" do
       String :name
     end
     class ::Client < Sequel::Model
-      one_to_many :invoices, :reciprocal=>:client, \
-        :dataset=>proc{Invoice.filter(:client_name=>name)}, \
+      one_to_many :invoices, :reciprocal=>:client,
+        :adder=>(proc do |invoice|
+          invoice.client_name = name
+          invoice.save
+        end),
+        :remover=>(proc do |invoice|
+          invoice.client_name = nil
+          invoice.save
+        end),
+        :clearer=>proc{invoices_dataset.update(:client_name=>nil)},
+        :dataset=>proc{Invoice.filter(:client_name=>name)},
         :eager_loader=>(proc do |eo|
           id_map = {}
           eo[:rows].each do |client|
@@ -488,20 +476,6 @@ describe "many_to_one/one_to_many not referencing primary key" do
             client.associations[:invoices] << inv 
           end 
         end)
-
-      private
-
-      def _add_invoice(invoice)
-        invoice.client_name = name
-        invoice.save
-      end
-      def _remove_invoice(invoice)
-        invoice.client_name = nil
-        invoice.save
-      end
-      def _remove_all_invoices
-        Invoice.filter(:client_name=>name).update(:client_name=>nil)
-      end
     end 
   
     INTEGRATION_DB.create_table!(:invoices) do
@@ -509,8 +483,9 @@ describe "many_to_one/one_to_many not referencing primary key" do
       String :client_name
     end
     class ::Invoice < Sequel::Model
-      many_to_one :client, :key=>:client_name, \
-        :dataset=>proc{Client.filter(:name=>client_name)}, \
+      many_to_one :client, :key=>:client_name,
+        :setter=>proc{|client| self.client_name = (client.name if client)},
+        :dataset=>proc{Client.filter(:name=>client_name)},
         :eager_loader=>(proc do |eo|
           id_map = eo[:id_map]
           eo[:rows].each{|inv| inv.associations[:client] = nil}
@@ -518,12 +493,6 @@ describe "many_to_one/one_to_many not referencing primary key" do
             id_map[client.name].each{|inv| inv.associations[:client] = client}
           end 
         end)
-      
-      private
-
-      def _client=(client)
-        self.client_name = (client.name if client)
-      end
     end
   end
   before do

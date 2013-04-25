@@ -418,11 +418,15 @@ ActiveRecord:
 Sequel::Model:
 
   class Asset < Sequel::Model
-    many_to_one :attachable, :reciprocal=>:assets, \
+    many_to_one :attachable, :reciprocal=>:assets,
+      :setter=>(proc do |attachable|
+        self[:attachable_id] = (attachable.pk if attachable)
+        self[:attachable_type] = (attachable.class.name if attachable)
+      end),
       :dataset=>(proc do
         klass = attachable_type.constantize
         klass.where(klass.primary_key=>attachable_id)
-      end), \
+      end),
       :eager_loader=>(proc do |eo|
         id_map = {}
         eo[:rows].each do |asset|
@@ -438,45 +442,20 @@ Sequel::Model:
           end
         end
       end)
-  
-    private
-
-    def _attachable=(attachable)
-      self[:attachable_id] = (attachable.pk if attachable)
-      self[:attachable_type] = (attachable.class.name if attachable)
-    end 
   end 
 
   class Post < Sequel::Model
-    one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Post'}
-  
-    private
-
-    def _add_asset(asset)
-      asset.update(:attachable_id=>pk, :attachable_type=>'Post')
-    end
-    def _remove_asset(asset)
-      asset.update(:attachable_id=>nil, :attachable_type=>nil)
-    end
-    def _remove_all_assets
-      assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)
-    end
+    one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Post'},
+      :adder=>proc{|asset| asset.update(:attachable_id=>pk, :attachable_type=>'Post')},
+      :remover=>proc{|asset| asset.update(:attachable_id=>nil, :attachable_type=>nil)},
+      :clearer=>proc{assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)}
   end
 
   class Note < Sequel::Model
-    one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Note'}     
-
-    private
-
-    def _add_asset(asset)
-      asset.update(:attachable_id=>pk, :attachable_type=>'Note')
-    end
-    def _remove_asset(asset)
-      asset.update(:attachable_id=>nil, :attachable_type=>nil)
-    end
-    def _remove_all_assets
-      assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)
-    end
+    one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Note'},
+      :adder=>proc{|asset| asset.update(:attachable_id=>pk, :attachable_type=>'Note')},
+      :remover=>proc{|asset| asset.update(:attachable_id=>nil, :attachable_type=>nil)},
+      :clearer=>proc{assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)}
   end
 
   @asset.attachable = @post

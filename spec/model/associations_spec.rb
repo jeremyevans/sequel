@@ -583,6 +583,15 @@ describe Sequel::Model, "many_to_one" do
     p.instance_variable_get(:@x).should == c
   end
 
+  it "should have the :setter option define the _association= method" do
+    @c2.many_to_one :parent, :class => @c2, :setter=>proc{|x| @x = x}
+    p = @c2.new
+    c = @c2.load(:id=>123)
+    p.should_not_receive(:parent_id=)
+    p.parent = c
+    p.instance_variable_get(:@x).should == c
+  end
+
   it "should support (before|after)_set callbacks" do
     h = []
     @c2.many_to_one :parent, :class => @c2, :before_set=>[proc{|x,y| h << x.pk; h << (y ? -y.pk : :y)}, :blah], :after_set=>proc{h << 3}
@@ -1029,6 +1038,15 @@ describe Sequel::Model, "one_to_one" do
     def p._parent=(x)
       @x = x
     end
+    p.should_not_receive(:parent_id=)
+    p.parent = c
+    p.instance_variable_get(:@x).should == c
+  end
+
+  it "should have a :setter option define the _association= method" do
+    @c2.one_to_one :parent, :class => @c2, :setter=>proc{|x| @x = x}
+    c = @c2.new
+    p = @c2.load(:id=>123)
     p.should_not_receive(:parent_id=)
     p.parent = c
     p.instance_variable_get(:@x).should == c
@@ -1663,6 +1681,15 @@ describe Sequel::Model, "one_to_many" do
     p.instance_variable_get(:@x).should == c
   end
 
+  it "should support an :adder option for defining the _add_ method" do
+    @c2.one_to_many :attributes, :class => @c1, :adder=>proc{|x| @x = x}
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    c.should_not_receive(:node_id=)
+    p.add_attribute(c)
+    p.instance_variable_get(:@x).should == c
+  end
+
   it "should allow additional arguments given to the add_ method and pass them onwards to the _add_ method" do
     @c2.one_to_many :attributes, :class => @c1
     p = @c2.load(:id=>10)
@@ -1685,6 +1712,15 @@ describe Sequel::Model, "one_to_many" do
     def p._remove_attribute(x)
       @x = x
     end
+    c.should_not_receive(:node_id=)
+    p.remove_attribute(c)
+    p.instance_variable_get(:@x).should == c
+  end
+
+  it "should support a :remover option for defining the _remove_ method" do
+    @c2.one_to_many :attributes, :class => @c1, :remover=>proc{|x| @x = x}
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
     c.should_not_receive(:node_id=)
     p.remove_attribute(c)
     p.instance_variable_get(:@x).should == c
@@ -1723,6 +1759,13 @@ describe Sequel::Model, "one_to_many" do
     def p._remove_all_attributes
       @x = :foo
     end
+    p.remove_all_attributes
+    p.instance_variable_get(:@x).should == :foo
+  end
+
+  it "should support a :clearer option for defining the _remove_all_ method" do
+    @c2.one_to_many :attributes, :class => @c1, :clearer=>proc{@x = :foo}
+    p = @c2.load(:id=>10)
     p.remove_all_attributes
     p.instance_variable_get(:@x).should == :foo
   end
@@ -2397,6 +2440,15 @@ describe Sequel::Model, "many_to_many" do
     MODEL_DB.sqls.should == []
   end
 
+  it "should support an :adder option for defining the _add_ method" do
+    @c2.many_to_many :attributes, :class => @c1, :adder=>proc{|x| @x = x}
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    p.add_attribute(c)
+    p.instance_variable_get(:@x).should == c
+    MODEL_DB.sqls.should == []
+  end
+
   it "should allow additional arguments given to the add_ method and pass them onwards to the _add_ method" do
     @c2.many_to_many :attributes, :class => @c1
     p = @c2.load(:id=>10)
@@ -2418,6 +2470,15 @@ describe Sequel::Model, "many_to_many" do
     def p._remove_attribute(x)
       @x = x
     end
+    p.remove_attribute(c)
+    p.instance_variable_get(:@x).should == c
+    MODEL_DB.sqls.should == []
+  end
+
+  it "should support a :remover option for defining the _remove_ method" do
+    @c2.many_to_many :attributes, :class => @c1, :remover=>proc{|x| @x = x}
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
     p.remove_attribute(c)
     p.instance_variable_get(:@x).should == c
     MODEL_DB.sqls.should == []
@@ -2453,6 +2514,14 @@ describe Sequel::Model, "many_to_many" do
     def p._remove_all_attributes
       @x = :foo
     end
+    p.remove_all_attributes
+    p.instance_variable_get(:@x).should == :foo
+    MODEL_DB.sqls.should == []
+  end
+
+  it "should support a :clearer option for defining the _remove_all_ method" do
+    @c2.many_to_many :attributes, :class => @c1, :clearer=>proc{@x = :foo}
+    p = @c2.load(:id=>10)
     p.remove_all_attributes
     p.instance_variable_get(:@x).should == :foo
     MODEL_DB.sqls.should == []

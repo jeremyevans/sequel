@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :setter, :adder, :remover, and :clearer association options for overriding the default modification behavior (jeremyevans)
+
 * Add Database#register_array_type to the pg_array extension, for registering database-specific array types (jeremyevans)
 
 * Speed up fetching model instances when using update_primary_key plugin (jeremyevans)
