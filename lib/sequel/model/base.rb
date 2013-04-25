@@ -49,10 +49,9 @@ module Sequel
       # Whether to raise an error when unable to typecast data for a column
       # (default: true).  This should be set to false if you want to use
       # validations to display nice error messages to the user (e.g. most
-      # web applications).  You can use the validates_not_string validations
-      # (from either the validation_helpers or validation_class_methods standard
-      # plugins) in connection with option to check for typecast failures for
-      # columns that aren't blobs or strings.
+      # web applications).  You can use the validates_schema_types validation
+      # (from the validation_helpers plugin) in connection with this setting to
+      # check for typecast failures during validation.
       attr_accessor :raise_on_typecast_failure
       
       # Whether to raise an error if an UPDATE or DELETE query related to
