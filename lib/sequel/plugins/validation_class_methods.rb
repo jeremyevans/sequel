@@ -362,6 +362,28 @@ module Sequel
           end
         end
     
+        # Validates whether an attribute has the correct ruby type for the associated
+        # database type.  This is generally useful in conjunction with
+        # raise_on_typecast_failure = false, to handle typecasting errors at validation
+        # time instead of at setter time. 
+        #
+        # Possible Options:
+        # * :message - The message to use (default: 'is not a valid (integer|datetime|etc.)')
+        def validates_schema_type(*atts)
+          opts = {
+            :tag => :schema_type,
+          }.merge!(extract_options!(atts))
+          reflect_validation(:schema_type, opts, atts)
+          atts << opts
+          validates_each(*atts) do |o, a, v|
+            next if v.nil? || (klass = o.send(:schema_type_class, a)).nil?
+            if klass.is_a?(Array) ? !klass.any?{|kls| v.is_a?(kls)} : !v.is_a?(klass)
+              message = opts[:message] || "is not a valid #{Array(klass).join(" or ").downcase}"
+              o.errors.add(a, message)
+            end
+          end
+        end
+    
         # Validates only if the fields in the model (specified by atts) are
         # unique in the database.  Pass an array of fields instead of multiple
         # fields to specify that the combination of fields must be unique,

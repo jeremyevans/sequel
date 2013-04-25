@@ -799,6 +799,31 @@ describe Sequel::Model, "Validations" do
     @person.should be_valid
   end
   
+  it "should validate that a column has the correct type for the schema column" do
+    p = model_class.call Sequel::Model do
+      columns :age, :d
+      self.raise_on_typecast_failure = false
+      validates_schema_type :age
+      validates_schema_type :d, :message=>'is a bad choice'
+      @db_schema = {:age=>{:type=>:integer}, :d=>{:type=>:date}}
+    end
+    
+    @person = p.new
+    @person.should be_valid
+
+    @person.age = 'a'
+    @person.should_not be_valid
+    @person.errors.full_messages.should == ['age is not a valid integer']
+    @person.age = 1
+    @person.should be_valid
+
+    @person.d = 'a'
+    @person.should_not be_valid
+    @person.errors.full_messages.should == ['d is a bad choice']
+    @person.d = Date.today
+    @person.should be_valid
+  end
+
   it "should validate numericality of column" do
     class ::Person < Sequel::Model
       validations.clear
