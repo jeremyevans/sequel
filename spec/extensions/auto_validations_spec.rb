@@ -28,6 +28,10 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.valid?.should be_false
     @m.errors.should == {:d=>["is not present"], :name=>["is not present"]}
 
+    @m.name = ''
+    @m.valid?.should be_false
+    @m.errors.should == {:d=>["is not present"]}
+
     @m.set(:d=>'/', :num=>'a', :name=>'1')
     @m.valid?.should be_false
     @m.errors.should == {:d=>["is not a valid date"], :num=>["is not a valid integer"]}

@@ -97,7 +97,7 @@ module Sequel
         def validate
           super
           if presence_columns = model.auto_validate_presence_columns
-            validates_presence(presence_columns)
+            validates_not_null(presence_columns)
           end
 
           validates_schema_types if model.auto_validate_types?
