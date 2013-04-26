@@ -84,6 +84,7 @@ module Sequel
         :length_range=>{:message=>lambda{|range| "is too short or too long"}},
         :max_length=>{:message=>lambda{|max| "is longer than #{max} characters"}, :nil_message=>lambda{"is not present"}},
         :min_length=>{:message=>lambda{|min| "is shorter than #{min} characters"}},
+        :not_null=>{:message=>lambda{"is not present"}},
         :not_string=>{:message=>lambda{|type| type ? "is not a valid #{type}" : "is a string"}},
         :numeric=>{:message=>lambda{"is not a number"}},
         :type=>{:message=>lambda{|klass| klass.is_a?(Array) ? "is not a valid #{klass.join(" or ").downcase}" : "is not a valid #{klass.to_s.downcase}"}},
@@ -137,6 +138,11 @@ module Sequel
           validatable_attributes_for_type(:min_length, atts, opts){|a,v,m| validation_error_message(m, min) unless v && v.length >= min}
         end
 
+        # Check attribute value(s) are not NULL/nil.
+        def validates_not_null(atts, opts={})
+          validatable_attributes_for_type(:not_null, atts, opts){|a,v,m| validation_error_message(m) if v.nil?}
+        end
+        
         # Check that the attribute value(s) is not a string.  This is generally useful
         # in conjunction with raise_on_typecast_failure = false, where you are
         # passing in string values for non-string attributes (such as numbers and dates).

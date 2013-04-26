@@ -329,6 +329,23 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.errors.full_messages.should == ['value is not a valid integer or float']
   end
 
+  specify "should support validates_not_null" do
+    @c.set_validations{validates_not_null(:value)}
+    @m.should_not be_valid
+    @m.value = ''
+    @m.should be_valid
+    @m.value = 1234
+    @m.should be_valid
+    @m.value = nil
+    @m.should_not be_valid
+    @m.value = true
+    @m.should be_valid
+    @m.value = false
+    @m.should be_valid
+    @m.value = Time.now
+    @m.should be_valid
+  end
+  
   specify "should support validates_presence" do
     @c.set_validations{validates_presence(:value)}
     @m.should_not be_valid
