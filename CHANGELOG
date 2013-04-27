@@ -1,5 +1,7 @@
 === HEAD
 
+* Add input_transformer plugin, for automatically transform input to model column setters (jeremyevans)
+
 * Add auto_validations plugin, for automatically adding not null, type, and unique validations (jeremyevans)
 
 * Add validates_not_null to validation_helpers (jeremyevans)

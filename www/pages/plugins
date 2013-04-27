@@ -24,6 +24,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ForceEncoding.html">force_encoding</a>: Forces the all model column string values to a given encoding.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/HookClassMethods.html">hook_class_methods</a>: Adds backwards compatiblity for the legacy class-level hook methods (e.g. before_save :do_something).</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/IdentityMap.html">identity_map</a>: Allows you to create temporary identity maps which ensure a 1-1 correspondence of model objects to database rows.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/InputTransformer.html">input_transformer</a>: Automatically transform input to model column setters.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/InstanceFilters.html">instance_filters</a>: Allows you to add per instance filters that are used when updating or destroying the instance.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/InstanceHooks.html">instance_hooks</a>: Allows you to add hooks to specific model instances.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/JsonSerializer.html">json_serializer</a>: Allows you to serialize/deserialize model objects to/from JSON.</li>
