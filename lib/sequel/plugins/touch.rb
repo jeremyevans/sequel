@@ -30,6 +30,10 @@ module Sequel
       # The default column to update when touching
       TOUCH_COLUMN_DEFAULT = :updated_at
 
+      def self.apply(model, opts={})
+        model.instance_variable_set(:@touched_associations, {})
+      end
+
       # Set the touch_column and touched_associations variables for the model.
       # Options:
       # * :associations - The associations to touch when a model instance is
@@ -41,7 +45,6 @@ module Sequel
       # * :column - The column to modify when touching a model instance.
       def self.configure(model, opts={})
         model.touch_column = opts[:column] || TOUCH_COLUMN_DEFAULT if opts[:column] || !model.touch_column
-        model.instance_variable_set(:@touched_associations, {})
         model.touch_associations(opts[:associations]) if opts[:associations]
       end
 
