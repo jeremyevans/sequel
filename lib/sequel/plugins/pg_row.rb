@@ -113,7 +113,7 @@ module Sequel
           sql << ROW
           ds.literal_append(sql, values.values_at(*columns))
           sql << CAST
-          ds.quote_schema_table_append(sql, model.table_name)
+          ds.quote_schema_table_append(sql, model.dataset.first_source_table)
         end
       end
     end

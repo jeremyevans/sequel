@@ -15,6 +15,9 @@ describe "Sequel::Plugins::PgRow" do
     @c2.columns :address
     @c2.db_schema[:address].merge!(:type=>:pg_row_address)
   end
+  after do
+    @c.dataset.opts[:from] = [:address]
+  end
 
   it "should set up a parser for the type that creates a model class" do
     @db.conversion_procs[1098].call('(123 Foo St,Bar City)').should == @c.load(:street=>'123 Foo St', :city=>'Bar City')
@@ -30,6 +33,11 @@ describe "Sequel::Plugins::PgRow" do
   end
 
   it "should handle literalizing model instances" do
+    @db.literal(@c.load(:street=>'123 Foo St', :city=>'Bar City')).should == "ROW('123 Foo St', 'Bar City')::address"
+  end
+
+  it "should handle literalizing model instances when model table is aliased" do
+    @c.dataset.opts[:from] = [Sequel.as(:address, :a)]
     @db.literal(@c.load(:street=>'123 Foo St', :city=>'Bar City')).should == "ROW('123 Foo St', 'Bar City')::address"
   end
 
