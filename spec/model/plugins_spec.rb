@@ -245,3 +245,74 @@ describe Sequel::Model, ".plugin" do
     @c.plugins.should include(m)
   end
 end
+
+describe Sequel::Plugins do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+  end
+  
+  it "should have def_dataset_methods define methods that call methods on the dataset" do
+    m = Module.new do
+      module self::ClassMethods
+        Sequel::Plugins.def_dataset_methods(self, :one)
+      end
+      module self::DatasetMethods
+        def one
+          1
+        end
+      end
+    end
+    @c.plugin m
+    @c.one.should == 1
+  end
+  
+  it "should have def_dataset_methods accept an array with multiple methods" do
+    m = Module.new do
+      module self::ClassMethods
+        Sequel::Plugins.def_dataset_methods(self, [:one, :two])
+      end
+      module self::DatasetMethods
+        def one
+          1
+        end
+        def two 
+          2
+        end
+      end
+    end
+    @c.plugin m
+    @c.one.should == 1
+    @c.two.should == 2
+  end
+
+  it "should have inherited_instance_variables add instance variables to copy into the subclass" do
+    m = Module.new do
+      def self.apply(model)
+        model.instance_variable_set(:@one, 1)
+      end
+      module self::ClassMethods
+        attr_reader :one
+        Sequel::Plugins.inherited_instance_variables(self, :@one=>nil)
+      end
+    end
+    @c.plugin m
+    Class.new(@c).one.should == 1
+  end
+  
+  it "should have after_set_dataset add a method to call after set_dataset" do
+    m = Module.new do
+      module self::ClassMethods
+        Sequel::Plugins.after_set_dataset(self, :one)
+        private
+        def one
+          dataset.opts[:foo] = 1
+        end
+      end
+    end
+    @c.plugin m
+    @c.dataset.opts[:foo].should == nil
+    @c.set_dataset :blah
+    @c.dataset.opts[:foo].should == 1
+  end
+end
+  
