@@ -12,35 +12,46 @@ module Sequel
     #     album.artist # reloads associated artist
     #
     module AssociationAutoreloading
-      module ClassMethods
-        private
+      def self.apply(model)
+        model.instance_variable_set(:@autoreloading_associations, {})
+      end
 
-        # Create a setter method for +key+ in an anonymous module included
-        # in the class that calls super and clears the cache for
-        # the given array of associations.
-        def create_autoreloading_association_setter(key, assocs)
-          include(@autoreloading_associations_module ||= Module.new) unless @autoreloading_associations_module
-          @autoreloading_associations_module.class_eval do
-            unless method_defined?("#{key}=")
-              define_method("#{key}=") do |v|
-                o = send(key)
-                super(v)
-                assocs.each{|a| associations.delete(a)} if send(key) != o
-              end
-            end
-          end
+      module ClassMethods
+        # Hash with column symbol keys and arrays of many_to_one
+        # association symbols that should be cleared when the column
+        # value changes.
+        attr_reader :autoreloading_associations
+
+        # Do a deep clone of the related autoreloading associations.
+        def inherited(sc)
+          h = {}
+          @autoreloading_associations.each{|k,v| h[k] = v.dup}
+          sc.instance_variable_set(:@autoreloading_associations, h)
+          super
         end
 
-        # For each of the foreign keys in the association, create
-        # a setter method that will clear the association cache.
+        private
+
+        # Add the association to the array of associations to clear for
+        # each of the foreign key columns.
         def def_many_to_one(opts)
           super
-          @autoreloading_associations ||= {}
           opts[:keys].each do |key|
-            assocs = @autoreloading_associations[key] ||= []
-            assocs << opts[:name]
-            create_autoreloading_association_setter(key, assocs)
+            (@autoreloading_associations[key] ||= []) << opts[:name]
           end
+        end
+      end
+
+      module InstanceMethods
+        private
+
+        # If a foreign key column value changes, clear the related
+        # cached associations.
+        def change_column_value(column, value)
+          if assocs = model.autoreloading_associations[column]
+            assocs.each{|a| associations.delete(a)}
+          end
+          super
         end
       end
     end
