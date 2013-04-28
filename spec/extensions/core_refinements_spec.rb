@@ -16,45 +16,6 @@ describe "Core refinements" do
     end
   end
   
-  if RUBY_VERSION < '1.9.0'
-    it "should not allow inequality operations on true, false, or nil" do
-      @d.lit(:x > 1).should == "(x > 1)"
-      @d.lit(:x < true).should == "(x < 't')"
-      @d.lit(:x >= false).should == "(x >= 'f')"
-      @d.lit(:x <= nil).should == "(x <= NULL)"
-    end
-
-    it "should not allow inequality operations on boolean complex expressions" do
-      @d.lit(:x > (:y > 5)).should == "(x > (y > 5))"
-      @d.lit(:x < (:y < 5)).should == "(x < (y < 5))"
-      @d.lit(:x >= (:y >= 5)).should == "(x >= (y >= 5))"
-      @d.lit(:x <= (:y <= 5)).should == "(x <= (y <= 5))"
-      @d.lit(:x > {:y => nil}).should == "(x > (y IS NULL))"
-      @d.lit(:x < ~{:y => nil}).should == "(x < (y IS NOT NULL))"
-      @d.lit(:x >= {:y => 5}).should == "(x >= (y = 5))"
-      @d.lit(:x <= ~{:y => 5}).should == "(x <= (y != 5))"
-      @d.lit(:x >= {:y => [1,2,3]}).should == "(x >= (y IN (1, 2, 3)))"
-      @d.lit(:x <= ~{:y => [1,2,3]}).should == "(x <= (y NOT IN (1, 2, 3)))"
-    end
-    
-    it "should support >, <, >=, and <= via Symbol#>,<,>=,<=" do
-      @d.l(:x > 100).should == '(x > 100)'
-      @d.l(:x < 100.01).should == '(x < 100.01)'
-      @d.l(:x >= 100000000000000000000000000000000000).should == '(x >= 100000000000000000000000000000000000)'
-      @d.l(:x <= 100).should == '(x <= 100)'
-    end
-    
-    it "should support negation of >, <, >=, and <= via Symbol#~" do
-      @d.l(~(:x > 100)).should == '(x <= 100)'
-      @d.l(~(:x < 100.01)).should == '(x >= 100.01)'
-      @d.l(~(:x >= 100000000000000000000000000000000000)).should == '(x < 100000000000000000000000000000000000)'
-      @d.l(~(:x <= 100)).should == '(x > 100)'
-    end
-    
-    it "should support double negation via ~" do
-      @d.l(~~(:x > 100)).should == '(x > 100)'
-    end
-  end
   it "should support NOT via Symbol#~" do
     @d.l(~:x).should == 'NOT x'
     @d.l(~:x__y).should == 'NOT x.y'
@@ -361,17 +322,6 @@ describe "Blob" do
   specify "#to_sequel_blob should return self" do
     blob = "x".to_sequel_blob
     blob.to_sequel_blob.object_id.should == blob.object_id
-  end
-end
-
-if RUBY_VERSION < '1.9.0'
-  describe "Symbol#[]" do
-    specify "should format an SQL Function" do
-      ds = Sequel::Dataset.new(nil)
-      ds.literal(:xyz[]).should == 'xyz()'
-      ds.literal(:xyz[1]).should == 'xyz(1)'
-      ds.literal(:xyz[1, 2, :abc[3]]).should == 'xyz(1, 2, abc(3))'
-    end
   end
 end
 
