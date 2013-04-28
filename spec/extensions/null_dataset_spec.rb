@@ -71,7 +71,7 @@ describe "null_dataset extension" do
     @i.should == 1
   end
 
-  it "should have null! method modify receiver" do
+  it "should have nullify! method modify receiver" do
     ds = @db[:table]
     ds.nullify!.should equal(ds)
     ds.each(&@pr)

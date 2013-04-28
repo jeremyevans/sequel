@@ -100,7 +100,7 @@ describe "A connection pool handling connections" do
     @cpool.created_count.should <= @max_size
   end
 
-  specify ":disconnection_proc option should set the disconnection proc to use" do
+  specify "database's disconnect connection method should be called when a disconnect is detected" do
     @max_size.should == 2
     proc{@cpool.hold{raise Sequel::DatabaseDisconnectError}}.should raise_error(Sequel::DatabaseDisconnectError)
     @max_size.should == 3
@@ -144,7 +144,7 @@ describe "ConnectionPool#hold" do
     @pool = Sequel::ConnectionPool.get_pool(mock_db.call{c.new}, CONNECTION_POOL_DEFAULTS)
   end
   
-  specify "should pass the result of the connection maker proc to the supplied block" do
+  specify "shoulda use the database's connect method to get new connections" do
     res = nil
     @pool.hold {|c| res = c}
     res.should be_a_kind_of(@c)

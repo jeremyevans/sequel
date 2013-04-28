@@ -389,7 +389,7 @@ describe "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_id_index ON cats (id)"]
   end
 
-  specify "should accept unique index definitions" do
+  specify "should accept unique constraint definitions" do
     @db.create_table(:cats) do
       text :name
       unique :name

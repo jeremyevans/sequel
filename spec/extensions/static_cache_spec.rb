@@ -93,7 +93,7 @@ describe "Sequel::Plugins::StaticCache" do
     @db.sqls.should == []
   end
 
-  it "should have all just return the hashes' values" do
+  it "should have all just return the cached values" do
     a = @c.all.sort_by{|o| o.id}
     a.first.should equal(@c1)
     a.last.should equal(@c2)
@@ -122,7 +122,7 @@ describe "Sequel::Plugins::StaticCache" do
     @db.sqls.should == ['SELECT * FROM t']
   end
 
-  it "should have all not return a frozen object" do
+  it "should have to_hash not return a frozen object" do
     @c.to_hash.frozen?.should be_false
   end
 

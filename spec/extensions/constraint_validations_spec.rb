@@ -66,7 +66,7 @@ describe "constraint_validations extension" do
     @db.sqls.should == ["DELETE FROM cv WHERE (table = 'foo')"]
   end
 
-  it "should raise an error without deleting if attempting to drop validations with table, column, or constraint" do
+  it "should raise an error without deleting if attempting to drop validations without table, column, or constraint" do
     proc{@db.drop_constraint_validations_for({})}.should raise_error(Sequel::Error)
     @db.sqls.should == []
   end

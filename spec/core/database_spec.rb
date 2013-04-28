@@ -348,7 +348,7 @@ describe "Database#uri" do
 end
 
 describe "Database.adapter_scheme and #adapter_scheme" do
-  specify "should return the database schema" do
+  specify "should return the database scheme" do
     Sequel::Database.adapter_scheme.should be_nil
 
     @c = Class.new(Sequel::Database) do
@@ -475,7 +475,7 @@ describe "Database#extend_datasets" do
     @db[:t].select(:a, :b).sql.should == 'SELECT a, b FROM t ORDER BY a, b'
   end
 
-  specify "should reapply settings if dataset_class is chagned" do
+  specify "should reapply settings if dataset_class is changed" do
     c = Class.new(Sequel::Dataset)
     @db.dataset_class = c
     @db.dataset_class.superclass.should == c
@@ -1062,7 +1062,7 @@ describe "Database#transaction with savepoints" do
     @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
   end
   
-  specify "should not use a savepoints if no transaction is in progress" do
+  specify "should not use a savepoint if no transaction is in progress" do
     @db.transaction(:savepoint=>true){@db.execute 'DROP TABLE test;'}
     @db.sqls.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
   end

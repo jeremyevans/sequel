@@ -33,7 +33,7 @@ describe "Model attribute setters" do
     @o.changed_columns.should == [:x, :y]
   end
 
-  it "should have columns that can't be called like normal ruby methods" do
+  it "should handle columns that can't be called like normal ruby methods" do
     @o.send(:"x y=", 3)
     @o.changed_columns.should == [:"x y"]
     @o.values.should == {:"x y"=>3}
@@ -385,7 +385,7 @@ describe "Model.db" do
     Sequel::Model.db = @model_db
   end
 
-  specify "should be required when create named model classes" do
+  specify "should be required when creating named model classes" do
     begin
       proc{class ModelTest < Sequel::Model; end}.should raise_error(Sequel::Error)
     ensure
@@ -655,7 +655,7 @@ describe Sequel::Model, ".[] optimization" do
     @c.simple_table.should == '"b"."a"'
   end
 
-  it "should simple_pk and simple_table respect dataset's identifier input methods" do
+  it "should have simple_pk and simple_table respect dataset's identifier input methods" do
     ds = @db[:ab]
     ds.identifier_input_method = :reverse
     @c.set_dataset ds
@@ -672,7 +672,7 @@ describe Sequel::Model, ".[] optimization" do
     @c.simple_table.should == nil
   end
 
-  it "should have simple_table superclasses setting if inheriting" do
+  it "should have simple_table inherit superclass's setting" do
     Class.new(@c).simple_table.should == nil
     @c.set_dataset :a
     Class.new(@c).simple_table.should == '"a"'

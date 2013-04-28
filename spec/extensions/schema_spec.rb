@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe Sequel::Model, "dataset & schema" do
+describe Sequel::Model, "set_schema" do
   before do
     @model = Class.new(Sequel::Model(:items))
     @model.plugin :schema
@@ -8,7 +8,7 @@ describe Sequel::Model, "dataset & schema" do
 
   specify "sets schema with implicit table name" do
     @model.set_schema do
-      primary_key :ssn, :string
+      primary_key :ssn, :type=>:string
     end
     @model.primary_key.should == :ssn
     @model.table_name.should == :items

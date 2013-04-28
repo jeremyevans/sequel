@@ -136,7 +136,7 @@ describe Sequel::Model::Associations::AssociationReflection, "#select" do
     @c.association_reflection(:cs).keys.should_not include(:select)
     @c.association_reflection(:cs).select.should == Sequel::SQL::ColumnAll.new(:par_parents)
   end
-  it "should be if :select is not present for a many_to_one and one_to_many associaiton" do
+  it "should be blank if :select is not present for a many_to_one and one_to_many associaiton" do
     @c.one_to_many :cs, :class=>'ParParent'
     @c.association_reflection(:cs).keys.should_not include(:select)
     @c.association_reflection(:cs).select.should == nil

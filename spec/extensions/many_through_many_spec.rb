@@ -297,7 +297,7 @@ describe Sequel::Model, "many_through_many" do
     MODEL_DB.sqls.should == ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))']
   end
 
-  it "should set cached instance variable when accessed" do
+  it "should populate cache when accessed" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)
     n.associations[:tags].should == nil
@@ -308,7 +308,7 @@ describe Sequel::Model, "many_through_many" do
     MODEL_DB.sqls.length.should == 0
   end
 
-  it "should use cached instance variable if available" do
+  it "should use cache if available" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)
     n.associations[:tags] = []
@@ -316,7 +316,7 @@ describe Sequel::Model, "many_through_many" do
     MODEL_DB.sqls.should == []
   end
 
-  it "should not use cached instance variable if asked to reload" do
+  it "should not use cache if asked to reload" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)
     n.associations[:tags] = []

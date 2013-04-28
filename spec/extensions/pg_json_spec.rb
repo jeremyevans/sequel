@@ -55,7 +55,7 @@ describe "pg_json extension" do
     end
   end
 
-  it "should literalize HStores to strings correctly" do
+  it "should literalize JSONHash and JSONArray to strings correctly" do
     @db.literal(Sequel.pg_json([])).should == "'[]'::json"
     @db.literal(Sequel.pg_json([1, [2], {'a'=>'b'}])).should == "'[1,[2],{\"a\":\"b\"}]'::json"
     @db.literal(Sequel.pg_json({})).should == "'{}'::json"

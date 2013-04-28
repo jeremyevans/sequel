@@ -663,8 +663,8 @@ describe "Model#new?" do
   end
 end
 
-describe Sequel::Model, "w/ primary key" do
-  it "should default to ':id'" do
+describe Sequel::Model, "with a primary key" do
+  it "should default to :id" do
     model_a = Class.new Sequel::Model
     model_a.primary_key.should == :id
   end
@@ -685,7 +685,7 @@ describe Sequel::Model, "w/ primary key" do
   end
 end
 
-describe Sequel::Model, "w/o primary key" do
+describe Sequel::Model, "without a primary key" do
   it "should return nil for primary key" do
     Class.new(Sequel::Model){no_primary_key}.primary_key.should be_nil
   end
@@ -696,7 +696,7 @@ describe Sequel::Model, "w/o primary key" do
   end
 end
 
-describe Sequel::Model, "with this" do
+describe Sequel::Model, "#this" do
   before do
     @example = Class.new(Sequel::Model(:examples))
     @example.columns :id, :a, :x, :y
@@ -727,18 +727,18 @@ describe "Model#pk" do
     @m.columns :id, :x, :y
   end
   
-  it "should be default return the value of the :id column" do
+  it "should by default return the value of the :id column" do
     m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk.should == 111
   end
 
-  it "should be return the primary key value for custom primary key" do
+  it "should return the primary key value for custom primary key" do
     @m.set_primary_key :x
     m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk.should == 2
   end
 
-  it "should be return the primary key value for composite primary key" do
+  it "should return the primary key value for composite primary key" do
     @m.set_primary_key [:y, :x]
     m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk.should == [3, 2]
@@ -761,18 +761,18 @@ describe "Model#pk_hash" do
     @m.columns :id, :x, :y
   end
   
-  it "should be default return the value of the :id column" do
+  it "should by default return a hash with the value of the :id column" do
     m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk_hash.should == {:id => 111}
   end
 
-  it "should be return the primary key value for custom primary key" do
+  it "should return a hash with the primary key value for custom primary key" do
     @m.set_primary_key :x
     m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk_hash.should == {:x => 2}
   end
 
-  it "should be return the primary key value for composite primary key" do
+  it "should return a hash with the primary key values for composite primary key" do
     @m.set_primary_key [:y, :x]
     m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk_hash.should == {:y => 3, :x => 2}
@@ -1494,7 +1494,7 @@ describe Sequel::Model, ".create" do
     MODEL_DB.sqls.should == ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
-  it "should accept a block and run it" do
+  it "should accept a block and call it" do
     o1, o2, o3 =  nil, nil, nil
     o = @c.create {|o4| o1 = o4; o3 = o4; o2 = :blah; o3.x = 333}
     o.class.should == @c

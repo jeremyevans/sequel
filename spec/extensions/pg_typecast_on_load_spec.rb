@@ -23,7 +23,7 @@ describe Sequel::Model, "PgTypecastOnLoad plugin" do
     @c.create.values.should == {:id=>1, :b=>true, :y=>0}
   end
 
-  specify "should allowing setting columns separately via add_typecast_on_load_columns" do
+  specify "should allowing setting columns separately via add_pg_typecast_on_load_columns" do
     @c = Class.new(Sequel::Model(@db[:items]))
     @c.plugin :pg_typecast_on_load
     @c.first.values.should == {:id=>1, :b=>"t", :y=>"0"}

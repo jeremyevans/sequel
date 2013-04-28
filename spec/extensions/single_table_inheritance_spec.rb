@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe Sequel::Model, "#sti_key" do
+describe Sequel::Model, "single table inheritance plugin" do
   before do
     class ::StiTest < Sequel::Model
       columns :id, :kind, :blah

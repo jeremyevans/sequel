@@ -31,6 +31,6 @@ describe "LooserTypecasting Extension" do
 
   specify "should not affect conversions of other types in decimal columns" do
     @c.new(:d=>1).d.should == 1
-    @c.new(:d=>'a').d.should be_a_kind_of(BigDecimal)
+    @c.new(:d=>1).d.should be_a_kind_of(BigDecimal)
   end
 end

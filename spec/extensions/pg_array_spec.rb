@@ -301,7 +301,7 @@ describe "pg_array extension" do
     Sequel::Postgres::PG_TYPES[2].should be_a_kind_of(Sequel::Postgres::PGArray::JSONCreator)
   end
 
-  it "should support registering converters with :parser=>:json option" do
+  it "should support registering converters with :parser=>:json option and blocks" do
     Sequel::Postgres::PGArray.register('foo', :oid=>4, :parser=>:json){|s| s * 2}
     Sequel::Postgres::PG_TYPES[4].call('{{1, 2}, {3, 4}}').should == [[2, 4], [6, 8]]
   end

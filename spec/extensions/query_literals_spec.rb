@@ -34,7 +34,7 @@ describe "query_literals extension" do
       @ds.select_more('a, b, c').sql.should == 'SELECT d, a, b, c FROM t'
     end
 
-    it "should have #select_ use placeholder literal string if given a string and additional arguments" do
+    it "should have #select_more use placeholder literal string if given a string and additional arguments" do
       @ds.select_more('a, b, ?', 1).sql.should == 'SELECT d, a, b, 1 FROM t'
     end
 

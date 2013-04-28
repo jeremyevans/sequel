@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe "Sequel::Plugins::AssociationPks" do
+describe "Sequel::Plugins::PreparedStatementsAssociations" do
   before do
     @db = Sequel.mock
     @db.extend_datasets do

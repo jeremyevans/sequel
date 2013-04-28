@@ -23,7 +23,7 @@ describe "Sequel::Plugins::AssociationProxies" do
     @i.associations.has_key?(:tags).should == true
   end
   
-  it "should send method calls to the association dataset sent another method" do
+  it "should send method calls to the association dataset if sent a non-array method" do
     @i.associations.has_key?(:tags).should == false
     @t.filter(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
     @i.associations.has_key?(:tags).should == false

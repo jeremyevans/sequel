@@ -122,7 +122,7 @@ describe "Dataset#clone" do
     clone.row_proc.should == @dataset.row_proc
   end
   
-  specify "should deep-copy the dataset opts" do
+  specify "should copy the dataset opts" do
     clone = @dataset.clone
 
     clone.opts.should_not equal(@dataset.opts)
@@ -425,36 +425,18 @@ describe "Dataset#where" do
     @d3.select_sql.should == "SELECT * FROM test WHERE (a = 1)"
     @d3.delete_sql.should == "DELETE FROM test WHERE (a = 1)"
     @d3.update_sql(:GDP => 0).should == "UPDATE test SET GDP = 0 WHERE (a = 1)"
-    
   end
   
   specify "should be composable using AND operator (for scoping)" do
-    # hashes are merged, no problem
     @d1.where(:size => 'big').select_sql.should == "SELECT * FROM test WHERE ((region = 'Asia') AND (size = 'big'))"
-    
-    # hash and string
     @d1.where('population > 1000').select_sql.should == "SELECT * FROM test WHERE ((region = 'Asia') AND (population > 1000))"
     @d1.where('(a > 1) OR (b < 2)').select_sql.should == "SELECT * FROM test WHERE ((region = 'Asia') AND ((a > 1) OR (b < 2)))"
-    
-    # hash and array
     @d1.where('GDP > ?', 1000).select_sql.should == "SELECT * FROM test WHERE ((region = 'Asia') AND (GDP > 1000))"
-    
-    # array and array
     @d2.where('GDP > ?', 1000).select_sql.should == "SELECT * FROM test WHERE ((region = 'Asia') AND (GDP > 1000))"
-    
-    # array and hash
     @d2.where(:name => ['Japan', 'China']).select_sql.should == "SELECT * FROM test WHERE ((region = 'Asia') AND (name IN ('Japan', 'China')))"
-      
-    # array and string
     @d2.where('GDP > ?').select_sql.should == "SELECT * FROM test WHERE ((region = 'Asia') AND (GDP > ?))"
-    
-    # string and string
     @d3.where('b = 2').select_sql.should == "SELECT * FROM test WHERE ((a = 1) AND (b = 2))"
-    
-    # string and hash
     @d3.where(:c => 3).select_sql.should == "SELECT * FROM test WHERE ((a = 1) AND (c = 3))"
-      
-    # string and array
     @d3.where('d = ?', 4).select_sql.should == "SELECT * FROM test WHERE ((a = 1) AND (d = 4))"
   end
       
@@ -485,7 +467,7 @@ describe "Dataset#where" do
     @dataset.exclude([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
   end
 
-  specify "should handle all types of IN/NOT IN queries with empty arrays" do
+  specify "should handle all types of IN/NOT IN queries with empty arrays when empty_array_handle_nulls is false" do
     begin
       Sequel.empty_array_handle_nulls = false
       @dataset.filter(:id => []).sql.should == "SELECT * FROM test WHERE (1 = 0)"
@@ -539,7 +521,7 @@ describe "Dataset#where" do
     db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
   end
   
-  specify "should handle IN/NOT IN queries with multiple columns and an empty dataset where the database doesn't support it with correct NULL handling" do
+  specify "should handle IN/NOT IN queries with multiple columns and an empty dataset where the database doesn't support it when empty_array_handle nulls is true" do
     begin
       Sequel.empty_array_handle_nulls = false
       meta_def(@dataset, :supports_multiple_column_in?){false}
@@ -1773,7 +1755,7 @@ describe "Dataset#to_hash_groups" do
     @d = Sequel.mock(:fetch=>[{:a => 1, :b => 2}, {:a => 3, :b => 4}, {:a => 1, :b => 6}, {:a => 7, :b => 4}])[:items]
   end
   
-  specify "should provide a hash with the first column as key and the second as value" do
+  specify "should provide a hash with the first column as key and the second as arrays of matching values" do
     @d.to_hash_groups(:a, :b).should == {1 => [2, 6], 3 => [4], 7 => [4]}
     @d.to_hash_groups(:b, :a).should == {2 => [1], 4=>[3, 7], 6=>[1]}
   end
@@ -1948,7 +1930,7 @@ describe "Dataset#group_and_count" do
 end
 
 describe "Dataset#empty?" do
-  specify "should return true if records exist in the dataset" do
+  specify "should return true if no records exist in the dataset" do
     db = Sequel.mock(:fetch=>proc{|sql| {1=>1} unless sql =~ /WHERE 'f'/})
     db.from(:test).should_not be_empty
     db.sqls.should == ['SELECT 1 AS one FROM test LIMIT 1']
@@ -1983,7 +1965,7 @@ describe "Dataset#first_source_alias" do
   end
   
   specify "should raise exception if table doesn't have a source" do
-    proc{@ds.first_source_alias.should == :t}.should raise_error(Sequel::Error)
+    proc{@ds.first_source_alias}.should raise_error(Sequel::Error)
   end
 end
 
@@ -2006,7 +1988,7 @@ describe "Dataset#first_source_table" do
   end
   
   specify "should raise exception if table doesn't have a source" do
-    proc{@ds.first_source_table.should == :t}.should raise_error(Sequel::Error)
+    proc{@ds.first_source_table}.should raise_error(Sequel::Error)
   end
 end
 
@@ -3242,7 +3224,7 @@ describe "Dataset#grep" do
     @ds = Sequel.mock[:posts]
   end
   
-  specify "should format a SQL filter correctly" do
+  specify "should format a filter correctly" do
     @ds.grep(:title, 'ruby').sql.should == "SELECT * FROM posts WHERE ((title LIKE 'ruby' ESCAPE '\\'))"
   end
 
