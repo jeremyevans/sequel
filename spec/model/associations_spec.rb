@@ -665,28 +665,6 @@ describe Sequel::Model, "many_to_one" do
     @c2.many_to_one :parent, :class => @c2, :before_set=>Object.new
     proc{@c2.new.parent = @c2.load(:id=>1)}.should raise_error(Sequel::Error)
   end
-
-  it "should call the remove callbacks for the previous object and the add callbacks for the new object" do
-    c = @c2.load(:id=>123)
-    d = @c2.load(:id=>321)
-    p = @c2.new
-    p.associations[:parent] = d
-    @c2.many_to_one :parent, :class => @c2, :before_set=>:bs, :after_set=>:as
-    @c2.class_eval do
-      self::Foo = []
-      def []=(a, v)
-        a == :parent_id ? (model::Foo << 5) : super
-      end
-      def bs(x)
-        model::Foo << x.pk
-      end
-      def as(x)
-        model::Foo << x.pk * 2
-      end
-    end
-    p.parent = c
-    @c2::Foo.should == [123, 5, 246]
-  end
 end
 
 describe Sequel::Model, "one_to_one" do
@@ -1111,29 +1089,6 @@ describe Sequel::Model, "one_to_one" do
     proc{@c2.new.parent = @c2.load(:id=>1)}.should raise_error(Sequel::Error)
   end
 
-  it "should call the set callbacks" do
-    c = @c2.load(:id=>123)
-    d = @c2.load(:id=>321)
-    p = @c2.load(:id=>32)
-    p.associations[:parent] = [d]
-    h = []
-    @c2.one_to_one :parent, :class => @c2, :before_set=>:bs, :after_set=>:as
-    @c2.class_eval do
-      self::Foo = h
-      def []=(a, v)
-        a == :node_id ? (model::Foo << 5) : super
-      end
-      def bs(x)
-        model::Foo << x.pk
-      end
-      def as(x)
-        model::Foo << x.pk * 2
-      end
-    end
-    p.parent = c
-    h.should == [123, 5, 246]
-  end
-  
   it "should work_correctly when used with associate" do
     @c2.associate :one_to_one, :parent, :class => @c2
     @c2.load(:id => 567).parent.should == @c2.load({})

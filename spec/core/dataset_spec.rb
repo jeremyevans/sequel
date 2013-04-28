@@ -1011,10 +1011,6 @@ describe "Dataset#literal" do
     @dataset.literal(@a.new).should == "called ds"
   end
   
-  specify "should raise an error for unsupported types with no sql_literal method" do
-    proc {@dataset.literal(Object.new)}.should raise_error
-  end
-  
   specify "should literalize datasets as subqueries" do
     d = @dataset.from(:test)
     d.literal(d).should == "(#{d.sql})"
