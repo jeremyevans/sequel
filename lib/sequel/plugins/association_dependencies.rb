@@ -71,13 +71,7 @@ module Sequel
           end
         end
 
-        # Copy the current model object's association_dependencies into the subclass.
-        def inherited(subclass)
-          super
-          ad = association_dependencies.dup
-          ad.keys.each{|k| ad[k] = ad[k].dup}
-          subclass.instance_variable_set(:@association_dependencies, ad)
-        end
+        Plugins.inherited_instance_variables(self, :@association_dependencies=>:hash_dup)
       end
 
       module InstanceMethods

@@ -22,13 +22,7 @@ module Sequel
         # value changes.
         attr_reader :autoreloading_associations
 
-        # Do a deep clone of the related autoreloading associations.
-        def inherited(sc)
-          h = {}
-          @autoreloading_associations.each{|k,v| h[k] = v.dup}
-          sc.instance_variable_set(:@autoreloading_associations, h)
-          super
-        end
+        Plugins.inherited_instance_variables(self, :@autoreloading_associations=>:hash_dup)
 
         private
 

@@ -91,12 +91,7 @@ module Sequel
           @hooks[hook].each{|k,v| yield v}
         end
 
-        # Make a copy of the current class's hooks for the subclass.
-        def inherited(subclass)
-          hooks = subclass.instance_variable_set(:@hooks, {}) 
-          instance_variable_get(:@hooks).each{|k,v| hooks[k] = v.dup}
-          super
-        end
+        Plugins.inherited_instance_variables(self, :@hooks=>:hash_dup)
     
         private
     

@@ -36,11 +36,7 @@ module Sequel
       end
 
       module ClassMethods
-        # Setup the datastructure used to hold the prepared statements in the subclass.
-        def inherited(subclass)
-          super
-          subclass.instance_variable_set(:@prepared_statements, :insert=>{}, :insert_select=>{}, :update=>{}, :lookup_sql=>{}, :fixed=>{})
-        end
+        Plugins.inherited_instance_variables(self, :@prepared_statements=>lambda{|v| {:insert=>{}, :insert_select=>{}, :update=>{}, :lookup_sql=>{}, :fixed=>{}}})
 
         private
 

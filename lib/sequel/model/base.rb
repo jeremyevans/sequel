@@ -355,8 +355,20 @@ module Sequel
         ivs = subclass.instance_variables.collect{|x| x.to_s}
         inherited_instance_variables.each do |iv, dup|
           next if ivs.include?(iv.to_s)
-          sup_class_value = instance_variable_get(iv)
-          sup_class_value = sup_class_value.dup if dup == :dup && sup_class_value
+          if (sup_class_value = instance_variable_get(iv)) && dup
+            sup_class_value = case dup
+            when :dup
+              sup_class_value.dup
+            when :hash_dup
+              h = {}
+              sup_class_value.each{|k,v| h[k] = v.dup}
+              h
+            when Proc
+              dup.call(sup_class_value)
+            else
+              raise Error, "bad inherited instance variable type: #{dup.inspect}"
+            end
+          end
           subclass.instance_variable_set(iv, sup_class_value)
         end
         unless ivs.include?("@dataset")

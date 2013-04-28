@@ -45,17 +45,15 @@ module Sequel
           Sequel.synchronize{_descendents}
         end
 
+        Plugins.inherited_instance_variables(self, :@subclasses=>lambda{|v| []}, :@on_subclass=>nil)
+
         # Add the subclass to this model's current subclasses,
         # and initialize a new subclasses instance variable
         # in the subclass.
         def inherited(subclass)
           super
           Sequel.synchronize{subclasses << subclass}
-          subclass.instance_variable_set(:@subclasses, [])
-          if on_subclass
-            subclass.instance_variable_set(:@on_subclass, on_subclass)
-            on_subclass.call(subclass)
-          end
+          on_subclass.call(subclass) if on_subclass
         end
 
         private

@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :hash_dup and Proc Model inherited instance variable types (jeremyevans)
+
 * Handle aliased tables in the pg_row plugin (jeremyevans)
 
 * Add input_transformer plugin, for automatically transform input to model column setters (jeremyevans)

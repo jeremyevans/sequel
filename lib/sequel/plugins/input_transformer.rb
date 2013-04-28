@@ -43,14 +43,7 @@ module Sequel
         # The order in which to call the input transformers.
         attr_reader :input_transformer_order
 
-        def inherited(sc)
-          h = {}
-          @skip_input_transformer_columns.each{|k,v| h[k] = v.dup}
-          sc.instance_variable_set(:@skip_input_transformer_columns, h)
-          sc.instance_variable_set(:@input_transformers, @input_transformers.dup)
-          sc.instance_variable_set(:@input_transformer_order, @input_transformer_order.dup)
-          super
-        end
+        Plugins.inherited_instance_variables(self, :@skip_input_transformer_columns=>:hash_dup, :@input_transformers=>:dup, :@input_transformer_order=>:dup)
 
         # Add an input transformer to this model.
         def add_input_transformer(transformer_name, &block)

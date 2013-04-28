@@ -63,19 +63,8 @@ module Sequel
           !validations.empty?
         end
 
-        # Setup the validations and validation_reflections hash in the subclass.
-        def inherited(subclass)
-          vr = @validation_reflections
-          subclass.class_eval do
-            @validation_mutex = Mutex.new
-            @validations = {}
-            h = {}
-            vr.each{|k,v| h[k] = v.dup}
-            @validation_reflections = h
-          end
-          super
-        end
-    
+        Plugins.inherited_instance_variables(self, :@validations=>lambda{|v| {}}, :@validation_mutex=>lambda{|v| Mutex.new}, :@validation_reflections=>:hash_dup)
+
         # Instructs the model to skip validations defined in superclasses
         def skip_superclass_validations
           @skip_superclass_validations = true

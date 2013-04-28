@@ -266,6 +266,25 @@ describe Sequel::Model do
     def @model.set_dataset(*) raise Sequel::Error end
     proc{Class.new(@model)}.should_not raise_error
   end
+
+  it "should raise if bad inherited instance variable value is used" do
+    def @model.inherited_instance_variables() super.merge(:@a=>:foo) end
+    @model.instance_eval{@a=1}
+    proc{Class.new(@model)}.should raise_error(Sequel::Error)
+  end
+
+  it "copy inherited instance variables into subclass if set" do
+    def @model.inherited_instance_variables() super.merge(:@a=>nil, :@b=>:dup, :@c=>:hash_dup, :@d=>proc{|v| v * 2}) end
+    @model.instance_eval{@a=1; @b=[2]; @c={3=>[4]}; @d=10}
+    m = Class.new(@model)
+    @model.instance_eval{@a=5; @b << 6; @c[3] << 7; @c[8] = [9]; @d=40}
+    m.instance_eval do
+      @a.should == 1
+      @b.should == [2]
+      @c.should == {3=>[4]}
+      @d.should == 20
+    end
+  end
 end
 
 describe Sequel::Model, "constructors" do
