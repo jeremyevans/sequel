@@ -439,11 +439,12 @@ module Sequel
 
           # Get column names and oids for each of the members of the composite type.
           res = from(:pg_attribute).
+            join(:pg_type, :oid=>:atttypid).
             where(:attrelid=>rel_oid).
             where{attnum > 0}.
             exclude(:attisdropped).
             order(:attnum).
-            select_map([:attname, :atttypid])
+            select_map([:attname, Sequel.case({0=>:atttypid}, :pg_type__typbasetype, :pg_type__typbasetype).as(:atttypid)])
           if res.empty?
             raise Error, "no columns for row type #{db_type.inspect} in database"
           end

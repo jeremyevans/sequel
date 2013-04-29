@@ -2751,6 +2751,20 @@ describe 'PostgreSQL row-valued/composite types' do
     end
   end
 
+  specify 'insert and retrieve row types containing domains' do
+    begin
+      @db << "CREATE DOMAIN positive_integer AS integer CHECK (VALUE > 0)"
+      @db.create_table!(:domain_check) do
+        positive_integer :id
+      end
+      @db.register_row_type(:domain_check)
+      @db.get(@db.row_type(:domain_check, [1])).should == {:id=>1}
+    ensure
+      @db.drop_table(:domain_check)
+      @db << "DROP DOMAIN positive_integer"
+    end
+  end if POSTGRES_DB.adapter_scheme == :postgres
+
   specify 'insert and retrieve arrays of row types' do
     @ds = @db[:company]
     @ds.insert(:id=>1, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))

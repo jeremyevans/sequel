@@ -143,7 +143,7 @@ describe "pg_row extension" do
     db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     db.register_row_type(:foo)
     db.sqls.should == ["SELECT pg_type.oid, typrelid, typarray FROM pg_type WHERE ((typtype = 'c') AND (typname = 'foo')) LIMIT 1",
-      "SELECT attname, atttypid FROM pg_attribute WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
+      "SELECT attname, (CASE pg_type.typbasetype WHEN 0 THEN atttypid ELSE pg_type.typbasetype END) AS atttypid FROM pg_attribute INNER JOIN pg_type ON (pg_type.oid = pg_attribute.atttypid) WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
 
     begin
       pgnt = Sequel::Postgres::PG_NAMED_TYPES.dup
@@ -151,7 +151,7 @@ describe "pg_row extension" do
       db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
       db.reset_conversion_procs
       db.sqls.should == ["SELECT pg_type.oid, typrelid, typarray FROM pg_type WHERE ((typtype = 'c') AND (typname = 'foo')) LIMIT 1",
-        "SELECT attname, atttypid FROM pg_attribute WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
+        "SELECT attname, (CASE pg_type.typbasetype WHEN 0 THEN atttypid ELSE pg_type.typbasetype END) AS atttypid FROM pg_attribute INNER JOIN pg_type ON (pg_type.oid = pg_attribute.atttypid) WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
     ensure
       Sequel::Postgres::PG_NAMED_TYPES.replace pgnt
     end
@@ -182,7 +182,7 @@ describe "pg_row extension" do
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     @db.register_row_type(:foo)
     @db.sqls.should == ["SELECT pg_type.oid, typrelid, typarray FROM pg_type WHERE ((typtype = 'c') AND (typname = 'foo')) LIMIT 1",
-      "SELECT attname, atttypid FROM pg_attribute WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
+      "SELECT attname, (CASE pg_type.typbasetype WHEN 0 THEN atttypid ELSE pg_type.typbasetype END) AS atttypid FROM pg_attribute INNER JOIN pg_type ON (pg_type.oid = pg_attribute.atttypid) WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
     p1 = @db.conversion_procs[1]
     p1.columns.should == [:bar, :baz]
     p1.column_oids.should == [4, 5]
@@ -210,7 +210,7 @@ describe "pg_row extension" do
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     @db.register_row_type(:foo__bar)
     @db.sqls.should == ["SELECT pg_type.oid, typrelid, typarray FROM pg_type INNER JOIN pg_namespace ON ((pg_namespace.oid = pg_type.typnamespace) AND (pg_namespace.nspname = 'foo')) WHERE ((typtype = 'c') AND (typname = 'bar')) LIMIT 1",
-      "SELECT attname, atttypid FROM pg_attribute WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
+      "SELECT attname, (CASE pg_type.typbasetype WHEN 0 THEN atttypid ELSE pg_type.typbasetype END) AS atttypid FROM pg_attribute INNER JOIN pg_type ON (pg_type.oid = pg_attribute.atttypid) WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
     p1 = @db.conversion_procs[1]
     p1.columns.should == [:bar, :baz]
     p1.column_oids.should == [4, 5]

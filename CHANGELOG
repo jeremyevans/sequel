@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle domain types in composite types in the pg_row extension (jeremyevans)
+
 * Add Database.extension, for loading an extension into all future databases (jeremyevans)
 
 * Support a :search_path Database option for setting PostgreSQL search_path (jeremyevans)
