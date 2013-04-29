@@ -14,6 +14,14 @@ module Sequel
   #
   # It is not recommened you use these module-level accessors.  Instead,
   # use the database option to make the setting per-Database.
+  #
+  # All adapters that connect to PostgreSQL support the following option in
+  # addition to those mentioned above:
+  #
+  # :search_path :: Set the schema search_path for this Database's connections.
+  #                 Allows to to set which schemas do not need explicit
+  #                 qualification, and in which order to check the schemas when
+  #                 an unqualified object is referenced.
   module Postgres
     # Array of exceptions that need to be converted.  JDBC
     # uses NativeExceptions, the native adapter uses PGError.
@@ -589,10 +597,25 @@ module Sequel
       # The SQL queries to execute when starting a new connection.
       def connection_configuration_sqls
         sqls = []
+
         sqls << "SET standard_conforming_strings = ON" if typecast_value_boolean(@opts.fetch(:force_standard_strings, Postgres.force_standard_strings))
+
         if (cmm = @opts.fetch(:client_min_messages, Postgres.client_min_messages)) && !cmm.to_s.empty?
           sqls << "SET client_min_messages = '#{cmm.to_s.upcase}'"
         end
+
+        if search_path = @opts[:search_path]
+          case search_path
+          when String
+            search_path = search_path.split(",").map{|s| s.strip}
+          when Array
+            # nil
+          else
+            raise Error, "unrecognized value for :search_path option: #{search_path.inspect}"
+          end
+          sqls << "SET search_path = #{search_path.map{|s| "\"#{s.gsub('"', '""')}\""}.join(',')}"
+        end
+
         sqls
       end
 
