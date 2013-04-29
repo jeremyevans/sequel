@@ -1,6 +1,8 @@
 === HEAD
 
-* Support the :use_iso_date_format Database option in the postgres adapter, for per-Database specific behavior (jeremyevans)
+* Support a :convert_infinite_timestamps Database option in the postgres adapter (jeremyevans)
+
+* Support a :use_iso_date_format Database option in the postgres adapter, for per-Database specific behavior (jeremyevans)
 
 * Add Model.default_set_fields_options, for having a model-wide default setting (jeremyevans)
 

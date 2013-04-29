@@ -169,9 +169,9 @@ module Sequel
       
       set_adapter_scheme :postgres
 
-      # Whether infinite timestamps should be converted on retrieval.  By default, no
+      # Whether infinite timestamps/dates should be converted on retrieval.  By default, no
       # conversion is done, so an error is raised if you attempt to retrieve an infinite
-      # timestamp.  You can set this to :nil to convert to nil, :string to leave
+      # timestamp/date.  You can set this to :nil to convert to nil, :string to leave
       # as a string, or :float to convert to an infinite float.
       attr_reader :convert_infinite_timestamps
 
@@ -180,9 +180,9 @@ module Sequel
       def initialize(*args)
         super
         @use_iso_date_format = typecast_value_boolean(@opts.fetch(:use_iso_date_format, Postgres.use_iso_date_format))
-        @convert_infinite_timestamps = false
         initialize_postgres_adapter
         conversion_procs[1082] = TYPE_TRANSLATOR.method(:date) if @use_iso_date_format
+        self.convert_infinite_timestamps = @opts[:convert_infinite_timestamps]
       end
 
       # Convert given argument so that it can be used directly by pg.  Currently, pg doesn't
@@ -244,8 +244,24 @@ module Sequel
         conn
       end
       
+      # Set whether to allow infinite timestamps/dates.  Make sure the
+      # conversion proc for date reflects that setting.
       def convert_infinite_timestamps=(v)
-        @convert_infinite_timestamps = v
+        @convert_infinite_timestamps = case v
+        when Symbol
+          v
+        when 'nil'
+          :nil
+        when 'string'
+          :string
+        when 'float'
+          :float
+        when String
+          typecast_value_boolean(v)
+        else
+          false
+        end
+
         pr = old_pr = @use_iso_date_format ? TYPE_TRANSLATOR.method(:date) : Sequel.method(:string_to_date)
         if v
           pr = lambda do |val|

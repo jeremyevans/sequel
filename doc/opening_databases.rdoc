@@ -355,6 +355,10 @@ use pg are encouraged to install sequel_pg.
 The following additional options are supported:
 
 :charset :: Same as :encoding, :encoding takes precedence
+:convert_infinite_timestamps :: Whether infinite timestamps/dates should be converted on retrieval.  By default, no
+                                conversion is done, so an error is raised if you attempt to retrieve an infinite
+                                timestamp/date.  You can set this to :nil to convert to nil, :string to leave
+                                as a string, or :float to convert to an infinite float.
 :encoding :: Set the client_encoding to the given string
 :connect_timeout :: Set the number of seconds to wait for a connection (default 20, only respected
                     if using the pg library).

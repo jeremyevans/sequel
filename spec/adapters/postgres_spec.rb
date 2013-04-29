@@ -482,6 +482,23 @@ describe "A PostgreSQL dataset with a timestamp field" do
       @db[:test3].get(:time).should == 'infinity'
       @db.convert_infinite_timestamps = :float
       @db[:test3].get(:time).should == 1.0/0.0
+      @db.convert_infinite_timestamps = 'nil'
+      @db[:test3].get(:time).should == nil
+      @db.convert_infinite_timestamps = 'string'
+      @db[:test3].get(:time).should == 'infinity'
+      @db.convert_infinite_timestamps = 'float'
+      @db[:test3].get(:time).should == 1.0/0.0
+      @db.convert_infinite_timestamps = 't'
+      @db[:test3].get(:time).should == 1.0/0.0
+      if ((Time.parse('infinity'); nil) rescue true)
+        # Skip for loose time parsing (e.g. old rbx)
+        @db.convert_infinite_timestamps = 'f'
+        proc{@db[:test3].get(:time)}.should raise_error
+        @db.convert_infinite_timestamps = nil
+        proc{@db[:test3].get(:time)}.should raise_error
+        @db.convert_infinite_timestamps = false
+        proc{@db[:test3].get(:time)}.should raise_error
+      end
 
       @d.update(:time=>Sequel.cast('-infinity', DateTime))
       @db.convert_infinite_timestamps = :nil
