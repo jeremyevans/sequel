@@ -11,25 +11,9 @@ module Sequel
   #                        a per instance basis via the :client_min_messages option.
   # force_standard_strings :: Set to false to not force the use of standard strings.  Overridable
   #                           on a per instance basis via the :force_standard_strings option.
-  # use_iso_date_format :: (only available when using the native adapter)
-  #                        Set to false to not change the date format to
-  #                        ISO.  This disables one of Sequel's optimizations.
   #
-  # Changes in these settings only affect future connections.  To make
-  # sure that they are applied, they should generally be called right
-  # after the Database object is instantiated and before a connection
-  # is actually made. For example, to use whatever the server defaults are:
-  #
-  #   DB = Sequel.postgres(...)
-  #   Sequel::Postgres.client_min_messages = nil
-  #   Sequel::Postgres.force_standard_strings = false
-  #   Sequel::Postgres.use_iso_date_format = false
-  #   # A connection to the server is not made until here
-  #   DB[:t].all
-  #
-  # The reason they can't be done earlier is that the Sequel::Postgres
-  # module is not loaded until a Database object which uses PostgreSQL
-  # is created.
+  # It is not recommened you use these module-level accessors.  Instead,
+  # use the database option to make the setting per-Database.
   module Postgres
     # Array of exceptions that need to be converted.  JDBC
     # uses NativeExceptions, the native adapter uses PGError.
