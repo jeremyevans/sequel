@@ -52,28 +52,72 @@ module Sequel
           @all.each(&block)
         end
 
-        # If no arguments are given, yield each of the model's frozen instances to the block.
-        # and return a new array, without issuing a database query.  If any arguments are
-        # given, use the default Sequel behavior.
-        def map(*a)
-          if a.empty?
-            @all.map(&(Proc.new if block_given?))
+        # Use the cache instead of a query to get the results.
+        def map(column=nil, &block)
+          if column
+            raise(Error, "Cannot provide both column and block to map") if block
+            if column.is_a?(Array)
+              @all.map{|r| r.values.values_at(*column)}
+            else
+              @all.map{|r| r[column]}
+            end
           else
-            super
+            @all.map(&(Proc.new if block_given?))
           end
         end
 
         Plugins.after_set_dataset(self, :load_cache)
 
-        # If no arguments are given, yield an identity map for the model with frozen primary keys
-        # and instances, without issuing a database query. If any arguments are
-        # given, use the default Sequel behavior.
-        def to_hash(*a)
-          if a.empty?
-            cache.dup
+        # Use the cache instead of a query to get the results.
+        def to_hash(key_column = nil, value_column = nil)
+        return cache.dup if key_column.nil? && value_column.nil?
+
+        h = {}
+        if value_column
+          if value_column.is_a?(Array)
+            if key_column.is_a?(Array)
+              each{|r| h[r.values.values_at(*key_column)] = r.values.values_at(*value_column)}
+            else
+              each{|r| h[r[key_column]] = r.values.values_at(*value_column)}
+            end
           else
-            super
+            if key_column.is_a?(Array)
+              each{|r| h[r.values.values_at(*key_column)] = r[value_column]}
+            else
+              each{|r| h[r[key_column]] = r[value_column]}
+            end
           end
+        elsif key_column.is_a?(Array)
+          each{|r| h[r.values.values_at(*key_column)] = r}
+        else
+          each{|r| h[r[key_column]] = r}
+        end
+        h
+        end
+
+        # Use the cache instead of a query to get the results
+        def to_hash_groups(key_column, value_column = nil)
+          h = {}
+          if value_column
+            if value_column.is_a?(Array)
+              if key_column.is_a?(Array)
+                each{|r| (h[r.values.values_at(*key_column)] ||= []) << r.values.values_at(*value_column)}
+              else
+                each{|r| (h[r[key_column]] ||= []) << r.values.values_at(*value_column)}
+              end
+            else
+              if key_column.is_a?(Array)
+                each{|r| (h[r.values.values_at(*key_column)] ||= []) << r[value_column]}
+              else
+                each{|r| (h[r[key_column]] ||= []) << r[value_column]}
+              end
+            end
+          elsif key_column.is_a?(Array)
+            each{|r| (h[r.values.values_at(*key_column)] ||= []) << r}
+          else
+            each{|r| (h[r[key_column]] ||= []) << r}
+          end
+          h
         end
 
         private

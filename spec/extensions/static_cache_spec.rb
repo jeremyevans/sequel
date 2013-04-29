@@ -72,18 +72,24 @@ describe "Sequel::Plugins::StaticCache" do
     @db.sqls.should == []
   end
 
-  it "should have map send a query if given an argument" do
+  it "should have map not send a query if given an argument" do
     @c.map(:id).sort.should == [1, 2]
-    @db.sqls.should == ["SELECT * FROM t"]
+    @db.sqls.should == []
+    @c.map([:id,:id]).sort.should == [[1,1], [2,2]]
+    @db.sqls.should == []
   end
 
   it "should have map without a block or argument not raise an exception or issue a query" do
-    @c.map
+    @c.map.to_a.should == @c.all
     @db.sqls.should == []
   end
 
   it "should have map without a block not return a frozen object" do
     @c.map.frozen?.should be_false
+  end
+
+  it "should have map with a block and argument raise" do
+    proc{@c.map(:id){}}.should raise_error(Sequel::Error)
   end
 
   it "should have other enumerable methods work without sending a query" do
@@ -110,20 +116,52 @@ describe "Sequel::Plugins::StaticCache" do
 
   it "should have to_hash without arguments return the cached objects without a query" do
     a = @c.to_hash
+    a.should == {1=>@c1, 2=>@c2}
     a[1].should equal(@c1)
     a[2].should equal(@c2)
     @db.sqls.should == []
   end
 
-  it "should have to_hash with any arguments use a query" do
-    @c.to_hash(:id).should == {1=>@c1, 2=>@c2}
-    @db.sqls.should == ['SELECT * FROM t']
+  it "should have to_hash with arguments return the cached objects without a query" do
+    a = @c.to_hash(:id)
+    a.should == {1=>@c1, 2=>@c2}
+    a[1].should equal(@c1)
+    a[2].should equal(@c2)
+
+    a = @c.to_hash([:id])
+    a.should == {[1]=>@c1, [2]=>@c2}
+    a[[1]].should equal(@c1)
+    a[[2]].should equal(@c2)
+
     @c.to_hash(:id, :id).should == {1=>1, 2=>2}
-    @db.sqls.should == ['SELECT * FROM t']
+    @c.to_hash([:id], :id).should == {[1]=>1, [2]=>2}
+    @c.to_hash(:id, [:id]).should == {1=>[1], 2=>[2]}
+    @c.to_hash([:id], [:id]).should == {[1]=>[1], [2]=>[2]}
+
+    @db.sqls.should == []
   end
 
   it "should have to_hash not return a frozen object" do
     @c.to_hash.frozen?.should be_false
+  end
+
+  it "should have to_hash_groups without arguments return the cached objects without a query" do
+    a = @c.to_hash_groups(:id)
+    a.should == {1=>[@c1], 2=>[@c2]}
+    a[1].first.should equal(@c1)
+    a[2].first.should equal(@c2)
+
+    a = @c.to_hash_groups([:id])
+    a.should == {[1]=>[@c1], [2]=>[@c2]}
+    a[[1]].first.should equal(@c1)
+    a[[2]].first.should equal(@c2)
+
+    @c.to_hash_groups(:id, :id).should == {1=>[1], 2=>[2]}
+    @c.to_hash_groups([:id], :id).should == {[1]=>[1], [2]=>[2]}
+    @c.to_hash_groups(:id, [:id]).should == {1=>[[1]], 2=>[[2]]}
+    @c.to_hash_groups([:id], [:id]).should == {[1]=>[[1]], [2]=>[[2]]}
+
+    @db.sqls.should == []
   end
 
   it "all of the static cache values (model instances) should be frozen" do

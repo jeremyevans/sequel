@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Model.map, .to_hash, and .to_hash_groups work without a query when using the static_cache plugin (jeremyevans)
+
 * Support :hash_dup and Proc Model inherited instance variable types (jeremyevans)
 
 * Handle aliased tables in the pg_row plugin (jeremyevans)
