@@ -2287,13 +2287,16 @@ describe "Database extensions" do
   before do
     @db = Sequel.mock
   end
+  after do
+    Sequel::Database.instance_variable_set(:@initialize_hook, Proc.new {|db| })
+  end
 
-  specify "should be able to register an extension with a module Database#extension extend the module" do
+  specify "should be able to register an extension with a module have Database#extension extend the module" do
     Sequel::Database.register_extension(:foo, Module.new{def a; 1; end})
     @db.extension(:foo).a.should == 1
   end
 
-  specify "should be able to register an extension with a block and Database#extension call the block" do
+  specify "should be able to register an extension with a block and have Database#extension call the block" do
     @db.quote_identifiers = false
     Sequel::Database.register_extension(:foo){|db| db.quote_identifiers = true}
     @db.extension(:foo).quote_identifiers?.should be_true
@@ -2326,6 +2329,16 @@ describe "Database extensions" do
 
   specify "should raise an Error if attempting to load an incompatible extension" do
     proc{@db.extension(:foo2)}.should raise_error(Sequel::Error)
+  end
+
+  specify "should be able to load an extension into all future Databases with Database.extension" do
+    Sequel::Database.register_extension(:foo, Module.new{def a; 1; end})
+    Sequel::Database.register_extension(:bar, Module.new{def b; 2; end})
+    Sequel::Database.extension(:foo, :bar)
+    @db.should_not respond_to(:a)
+    @db.should_not respond_to(:b)
+    Sequel.mock.a.should == 1
+    Sequel.mock.b.should == 2
   end
 end
 

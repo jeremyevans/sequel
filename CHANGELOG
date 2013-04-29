@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database.extension, for loading an extension into all future databases (jeremyevans)
+
 * Support a :search_path Database option for setting PostgreSQL search_path (jeremyevans)
 
 * Support a :convert_infinite_timestamps Database option in the postgres adapter (jeremyevans)

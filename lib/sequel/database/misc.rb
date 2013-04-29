@@ -40,6 +40,11 @@ module Sequel
       end
     end
 
+    # Apply an extension to all Database objects created in the future.
+    def self.extension(*extensions)
+      after_initialize{|db| db.extension(*extensions)}
+    end
+
     # Register an extension callback for Database objects.  ext should be the
     # extension name symbol, and mod should either be a Module that the
     # database is extended with, or a callable object called with the database
