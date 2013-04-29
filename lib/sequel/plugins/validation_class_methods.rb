@@ -21,7 +21,6 @@ module Sequel
       # Setup the validations hash for the given model.
       def self.apply(model)
         model.class_eval do
-          @validation_mutex = Mutex.new
           @validations = {}
           @validation_reflections = {}
         end
@@ -63,7 +62,7 @@ module Sequel
           !validations.empty?
         end
 
-        Plugins.inherited_instance_variables(self, :@validations=>:hash_dup, :@validation_mutex=>lambda{|v| Mutex.new}, :@validation_reflections=>:hash_dup)
+        Plugins.inherited_instance_variables(self, :@validations=>:hash_dup, :@validation_reflections=>:hash_dup)
 
         # Instructs the model to skip validations defined in superclasses
         def skip_superclass_validations
@@ -193,7 +192,7 @@ module Sequel
           end
           tag = opts[:tag]
           atts.each do |a| 
-            a_vals = @validation_mutex.synchronize{validations[a] ||= []}
+            a_vals = Sequel.synchronize{validations[a] ||= []}
             if tag && (old = a_vals.find{|x| x[0] == tag})
               old[1] = blk
             else
