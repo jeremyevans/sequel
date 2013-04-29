@@ -63,10 +63,15 @@ module Sequel
           !validations.empty?
         end
 
-        Plugins.inherited_instance_variables(self, :@validations=>lambda{|v| {}}, :@validation_mutex=>lambda{|v| Mutex.new}, :@validation_reflections=>:hash_dup)
+        Plugins.inherited_instance_variables(self, :@validations=>:hash_dup, :@validation_mutex=>lambda{|v| Mutex.new}, :@validation_reflections=>:hash_dup)
 
         # Instructs the model to skip validations defined in superclasses
         def skip_superclass_validations
+          superclass.validations.each do |att, procs|
+            if ps = @validations[att]
+              @validations[att] -= procs
+            end
+          end
           @skip_superclass_validations = true
         end
         
@@ -96,7 +101,6 @@ module Sequel
     
         # Validates the given instance.
         def validate(o)
-          superclass.validate(o) if superclass.respond_to?(:validate) && !skip_superclass_validations?
           validations.each do |att, procs|
             v = case att
             when Array
