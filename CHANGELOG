@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.default_set_fields_options, for having a model-wide default setting (jeremyevans)
+
 * Database#table_exists? now assumes existence without a query if the table is in the cached schema (jeremyevans)
 
 * Make Model.map, .to_hash, and .to_hash_groups work without a query when using the static_cache plugin (jeremyevans)

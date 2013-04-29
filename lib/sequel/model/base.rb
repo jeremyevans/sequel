@@ -22,6 +22,10 @@ module Sequel
       # with all of these modules.
       attr_reader :dataset_method_modules
 
+      # The default options to use for Model#set_fields.  These are merged with
+      # the options given to set_fields.
+      attr_accessor :default_set_fields_options
+
       # SQL string fragment used for faster DELETE statement creation when deleting/destroying
       # model instances, or nil if the optimization should not be used. For internal use only.
       attr_reader :fast_instance_delete_sql
@@ -1379,28 +1383,30 @@ module Sequel
       #   artist.set_fields({}, [:name], :missing=>:raise)
       #   # Sequel::Error raised
       def set_fields(hash, fields, opts=nil)
-        if opts
-          case opts[:missing]
-          when :skip
-            fields.each do |f|
-              if hash.has_key?(f) 
-                send("#{f}=", hash[f])
-              elsif f.is_a?(Symbol) && hash.has_key?(sf = f.to_s)
-                send("#{sf}=", hash[sf])
-              end
+        opts = if opts
+          model.default_set_fields_options.merge(opts)
+        else
+          model.default_set_fields_options
+        end
+
+        case opts[:missing]
+        when :skip
+          fields.each do |f|
+            if hash.has_key?(f) 
+              send("#{f}=", hash[f])
+            elsif f.is_a?(Symbol) && hash.has_key?(sf = f.to_s)
+              send("#{sf}=", hash[sf])
             end
-          when :raise
-            fields.each do |f|
-              if hash.has_key?(f)
-                send("#{f}=", hash[f])
-              elsif f.is_a?(Symbol) && hash.has_key?(sf = f.to_s)
-                send("#{sf}=", hash[sf])
-              else
-                raise(Sequel::Error, "missing field in hash: #{f.inspect} not in #{hash.inspect}")
-              end
+          end
+        when :raise
+          fields.each do |f|
+            if hash.has_key?(f)
+              send("#{f}=", hash[f])
+            elsif f.is_a?(Symbol) && hash.has_key?(sf = f.to_s)
+              send("#{sf}=", hash[sf])
+            else
+              raise(Sequel::Error, "missing field in hash: #{f.inspect} not in #{hash.inspect}")
             end
-          else
-            fields.each{|f| send("#{f}=", hash[f])}
           end
         else
           fields.each{|f| send("#{f}=", hash[f])}

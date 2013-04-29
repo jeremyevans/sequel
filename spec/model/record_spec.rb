@@ -963,7 +963,6 @@ describe Sequel::Model, "#set_fields" do
       set_primary_key :id
       columns :x, :y, :z, :id
     end
-    @c.strict_param_setting = true 
     @o1 = @c.new
     MODEL_DB.reset
   end
@@ -1012,6 +1011,29 @@ describe Sequel::Model, "#set_fields" do
     MODEL_DB.sqls.should == []
   end
 
+  it "should respect model's default_set_fields_options" do
+    @c.default_set_fields_options = {:missing=>:skip}
+    @o1.set_fields({:x => 3}, [:x, :y])
+    @o1.values.should == {:x => 3}
+    @o1.set_fields({:x => 4}, [:x, :y], {})
+    @o1.values.should == {:x => 4}
+    proc{@o1.set_fields({:x => 3}, [:x, :y], :missing=>:raise)}.should raise_error(Sequel::Error)
+    @c.default_set_fields_options = {:missing=>:raise}
+    proc{@o1.set_fields({:x => 3}, [:x, :y])}.should raise_error(Sequel::Error)
+    proc{@o1.set_fields({:x => 3}, [:x, :y], {})}.should raise_error(Sequel::Error)
+    @o1.set_fields({:x => 5}, [:x, :y], :missing=>:skip)
+    @o1.values.should == {:x => 5}
+    @o1.set_fields({:x => 5}, [:x, :y], :missing=>nil)
+    @o1.values.should == {:x => 5, :y=>nil}
+    MODEL_DB.sqls.should == []
+  end
+
+  it "should respect model's default_set_fields_options in a subclass" do
+    @c.default_set_fields_options = {:missing=>:skip}
+    o = Class.new(@c).new
+    o.set_fields({:x => 3}, [:x, :y])
+    o.values.should == {:x => 3}
+  end
 end
 
 describe Sequel::Model, "#update_fields" do
@@ -1045,6 +1067,17 @@ describe Sequel::Model, "#update_fields" do
 
   it "should support :missing=>:raise option" do
     proc{@o1.update_fields({:x => 1}, [:x, :y], :missing=>:raise)}.should raise_error(Sequel::Error)
+  end
+
+  it "should respect model's default_set_fields_options" do
+    @c.default_set_fields_options = {:missing=>:skip}
+    @o1.update_fields({:x => 3}, [:x, :y])
+    @o1.values.should == {:x => 3, :id=>1}
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 3 WHERE (id = 1)"]
+
+    @c.default_set_fields_options = {:missing=>:raise}
+    proc{@o1.update_fields({:x => 3}, [:x, :y])}.should raise_error(Sequel::Error)
+    MODEL_DB.sqls.should == []
   end
 end
 

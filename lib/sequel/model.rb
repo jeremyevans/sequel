@@ -115,7 +115,7 @@ module Sequel
       :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
       :@fast_instance_delete_sql=>nil, :@default_eager_limit_strategy=>nil,
-      :@db=>nil}
+      :@db=>nil, :@default_set_fields_options=>:dup}
 
     # Regular expression that determines if a method name is normal in the sense that
     # it could be used literally in ruby code without using send.  Used to
@@ -132,6 +132,7 @@ module Sequel
     @dataset = nil
     @dataset_method_modules = []
     @default_eager_limit_strategy = nil
+    @default_set_fields_options = {}
     @overridable_methods_module = nil
     @fast_pk_lookup_sql = nil
     @fast_instance_delete_sql = nil
