@@ -616,12 +616,21 @@ describe "Database#test_connection" do
 end
 
 describe "Database#table_exists?" do
-  specify "should try to select the first record from the table's dataset" do
+  specify "should test existence by selecting a row from the table's dataset" do
     db = Sequel.mock(:fetch=>[Sequel::Error, [], [{:a=>1}]])
     db.table_exists?(:a).should be_false
     db.sqls.should == ["SELECT NULL FROM a LIMIT 1"]
     db.table_exists?(:b).should be_true
     db.table_exists?(:c).should be_true
+  end
+
+  specify "should assume table exists without a query if in the database schema" do
+    db = Sequel.mock(:fetch=>[Sequel::Error, []])
+    db.instance_variable_get(:@schemas)['a'] = [[:id, {}]]
+    db.table_exists?(:a).should be_true
+    db.table_exists?(:b).should be_false
+    db.table_exists?(:c).should be_true
+    db.sqls.should == ["SELECT NULL FROM b LIMIT 1", "SELECT NULL FROM c LIMIT 1"]
   end
 end
 
