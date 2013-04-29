@@ -27,6 +27,19 @@ module Sequel
     # Nested hook Proc; each new hook Proc just wraps the previous one.
     @initialize_hook = Proc.new {|db| }
 
+    # Register a hook that will be run when a new Database is instantiated. It is
+    # called with the new database handle.
+    def self.after_initialize(&block)
+      raise Error, "must provide block to after_initialize" unless block
+      Sequel.synchronize do
+        previous = @initialize_hook
+        @initialize_hook = Proc.new do |db|
+          previous.call(db)
+          block.call(db)
+        end
+      end
+    end
+
     # Register an extension callback for Database objects.  ext should be the
     # extension name symbol, and mod should either be a Module that the
     # database is extended with, or a callable object called with the database
@@ -44,6 +57,11 @@ module Sequel
       Sequel.synchronize{EXTENSIONS[ext] = block}
     end
 
+    # Run the after_initialize hook for the given +instance+.
+    def self.run_after_initialize(instance)
+      @initialize_hook.call(instance)
+    end
+
     # Converts a uri to an options hash. These options are then passed
     # to a newly created database object. 
     def self.uri_to_options(uri)
@@ -54,25 +72,6 @@ module Sequel
         :database => (m = /\/(.*)/.match(uri.path)) && (m[1]) }
     end
     private_class_method :uri_to_options
-
-
-    # Register a hook that will be run when a new Database is instantiated. It is
-    # called with the new database handle.
-    def self.after_initialize(&block)
-      raise Error, "must provide block to after_initialize" unless block
-      Sequel.synchronize do
-        previous = @initialize_hook
-        @initialize_hook = Proc.new do |db|
-          previous.call(db)
-          block.call(db)
-        end
-      end
-    end
-
-    # Run the after_initialize hook for the given +instance+.
-    def self.run_after_initialize(instance)
-      @initialize_hook.call(instance)
-    end
 
     # The options hash for this database
     attr_reader :opts
