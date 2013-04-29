@@ -360,6 +360,8 @@ The following additional options are supported:
                     if using the pg library).
 :sslmode :: Set to 'disable', 'allow', 'prefer', 'require' to choose how to treat SSL (only
             respected if using the pg library)
+:use_iso_date_format :: This can be set to false to not force the ISO date format.  Sequel forces
+                        it by default to allow for an optimization.
 
 === sqlite
 

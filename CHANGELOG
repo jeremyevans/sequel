@@ -1,5 +1,7 @@
 === HEAD
 
+* Support the :use_iso_date_format Database option in the postgres adapter, for per-Database specific behavior (jeremyevans)
+
 * Add Model.default_set_fields_options, for having a model-wide default setting (jeremyevans)
 
 * Database#table_exists? now assumes existence without a query if the table is in the cached schema (jeremyevans)

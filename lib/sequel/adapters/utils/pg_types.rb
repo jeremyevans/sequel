@@ -59,23 +59,10 @@ module Sequel
       [700, 701] => tt.method(:float),
       [1700] => ::BigDecimal.method(:new),
       [1083, 1266] => ::Sequel.method(:string_to_time),
+      [1082] => ::Sequel.method(:string_to_date),
       [1184, 1114] => ::Sequel.method(:database_to_application_timestamp),
     }.each do |k,v|
       k.each{|n| PG_TYPES[n] = v}
     end
-    
-    class << self
-      # As an optimization, Sequel sets the date style to ISO, so that PostgreSQL provides
-      # the date in a known format that Sequel can parse faster.  This can be turned off
-      # if you require a date style other than ISO.
-      attr_reader :use_iso_date_format
-    end
-
-    # Modify the type translator for the date type depending on the value given.
-    def self.use_iso_date_format=(v)
-      PG_TYPES[1082] = v ? TYPE_TRANSLATOR.method(:date) : Sequel.method(:string_to_date)
-      @use_iso_date_format = v
-    end
-    self.use_iso_date_format = true
   end
 end 

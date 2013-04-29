@@ -96,6 +96,15 @@ module Sequel
       def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
     end.new.method(:bytea)
 
+    @use_iso_date_format = true
+
+    class << self
+      # As an optimization, Sequel sets the date style to ISO, so that PostgreSQL provides
+      # the date in a known format that Sequel can parse faster.  This can be turned off
+      # if you require a date style other than ISO.
+      attr_accessor :use_iso_date_format
+    end
+
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
     class Adapter < ::PGconn
@@ -165,13 +174,15 @@ module Sequel
       # timestamp.  You can set this to :nil to convert to nil, :string to leave
       # as a string, or :float to convert to an infinite float.
       attr_reader :convert_infinite_timestamps
-      
+
       # Add the primary_keys and primary_key_sequences instance variables,
       # so we can get the correct return values for inserted rows.
       def initialize(*args)
         super
+        @use_iso_date_format = typecast_value_boolean(@opts.fetch(:use_iso_date_format, Postgres.use_iso_date_format))
         @convert_infinite_timestamps = false
         initialize_postgres_adapter
+        conversion_procs[1082] = TYPE_TRANSLATOR.method(:date) if @use_iso_date_format
       end
 
       # Convert given argument so that it can be used directly by pg.  Currently, pg doesn't
@@ -235,7 +246,7 @@ module Sequel
       
       def convert_infinite_timestamps=(v)
         @convert_infinite_timestamps = v
-        pr = old_pr = Postgres.use_iso_date_format ? TYPE_TRANSLATOR.method(:date) : Sequel.method(:string_to_date)
+        pr = old_pr = @use_iso_date_format ? TYPE_TRANSLATOR.method(:date) : Sequel.method(:string_to_date)
         if v
           pr = lambda do |val|
             case val
@@ -456,7 +467,7 @@ module Sequel
       # Set the DateStyle to ISO if configured, for faster date parsing.
       def connection_configuration_sqls
         sqls = super
-        sqls << "SET DateStyle = 'ISO'" if Postgres.use_iso_date_format
+        sqls << "SET DateStyle = 'ISO'" if @use_iso_date_format
         sqls
       end
 
