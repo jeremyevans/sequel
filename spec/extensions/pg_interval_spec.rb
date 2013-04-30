@@ -67,5 +67,10 @@ describe "pg_interval extension" do
     proc{@db.typecast_value(:interval, 'foo')}.should raise_error(Sequel::InvalidValue)
     proc{@db.typecast_value(:interval, Object.new)}.should raise_error(Sequel::InvalidValue)
   end
+
+  it "should return correct results for Database#schema_type_class" do
+    @db.schema_type_class(:interval).should == ActiveSupport::Duration
+    @db.schema_type_class(:integer).should == Integer
+  end
 end
 end

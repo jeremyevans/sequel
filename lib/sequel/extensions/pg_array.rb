@@ -222,6 +222,9 @@ module Sequel
           db.instance_eval do
             @pg_array_schema_types ||= {}
             copy_conversion_procs([1009, 1007, 1016, 1231, 1022, 1000, 1001, 1182, 1183, 1270, 1005, 1028, 1021, 1014, 1015])
+            [:string_array, :integer_array, :decimal_array, :float_array, :boolean_array, :blob_array, :date_array, :time_array, :datetime_array].each do |v|
+              @schema_type_classes[v] = PGArray
+            end
           end
 
           procs = db.conversion_procs
@@ -253,6 +256,7 @@ module Sequel
             opts[:oid] = array_oid unless opts.has_key?(:oid)
           end
           PGArray.register(db_type, opts, &block)
+          @schema_type_classes[:"#{opts[:typecast_method] || opts[:type_symbol] || db_type}_array"] = PGArray
         end
 
         # Make the column type detection handle registered array types.
@@ -262,6 +266,11 @@ module Sequel
           else
             super
           end
+        end
+
+        # Return PGArray if this type matches any supported array type.
+        def schema_type_class(type)
+          super || (ARRAY_TYPES.each_value{|v| return PGArray if type == v}; nil)
         end
 
         private

@@ -44,4 +44,9 @@ describe "pg_inet extension" do
     proc{@db.typecast_value(:ipaddr, '')}.should raise_error(Sequel::InvalidValue)
     proc{@db.typecast_value(:ipaddr, 1)}.should raise_error(Sequel::InvalidValue)
   end
+
+  it "should return correct results for Database#schema_type_class" do
+    @db.schema_type_class(:ipaddr).should == IPAddr
+    @db.schema_type_class(:integer).should == Integer
+  end
 end

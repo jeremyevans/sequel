@@ -119,8 +119,11 @@ module Sequel
       # Reset the conversion procs if using the native postgres adapter,
       # and extend the datasets to correctly literalize ActiveSupport::Duration values.
       def self.extended(db)
-        db.extend_datasets(IntervalDatasetMethods)
-        db.send(:copy_conversion_procs, [1186, 1187])
+        db.instance_eval do
+          extend_datasets(IntervalDatasetMethods)
+          copy_conversion_procs([1186, 1187])
+          @schema_type_classes[:interval] = ActiveSupport::Duration
+        end
       end
 
       # Handle ActiveSupport::Duration values in bound variables.

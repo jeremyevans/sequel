@@ -208,6 +208,8 @@ module Sequel
         end
       end
 
+      ROW_TYPE_CLASSES = [HashRow, ArrayRow]
+
       # This parser-like class splits the PostgreSQL
       # row-valued/composite type output string format
       # into an array of strings.  Note this class makes
@@ -485,6 +487,7 @@ module Sequel
 
           @row_types[db_type] = opts.merge(:parser=>parser)
           @row_schema_types[schema_type_string] = schema_type_symbol 
+          @schema_type_classes[schema_type_symbol] = ROW_TYPE_CLASSES
           @row_type_method_module.class_eval do
             meth = :"typecast_value_#{schema_type_symbol}"
             define_method(meth) do |v|

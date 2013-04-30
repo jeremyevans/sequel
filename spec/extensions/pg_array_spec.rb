@@ -362,4 +362,10 @@ describe "pg_array extension" do
     procs[1185].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
     procs[1115].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
   end
+
+  it "should return correct results for Database#schema_type_class" do
+    @db.register_array_type('banana', :oid=>7866, :scalar_typecast=>:integer){|s| s.to_i}
+    @db.schema_type_class(:banana_array).should == Sequel::Postgres::PGArray
+    @db.schema_type_class(:integer).should == Integer
+  end
 end

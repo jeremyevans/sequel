@@ -163,6 +163,11 @@ describe "pg_range extension" do
     Sequel::Postgres::PG_TYPES[331].call('[1,3)').should be_a_kind_of(@R)
   end
 
+  it "should return correct results for Database#schema_type_class" do
+    @db.schema_type_class(:int4range).should == Sequel::Postgres::PGRange
+    @db.schema_type_class(:integer).should == Integer
+  end
+
   describe "parser" do
     before do
       @p = Sequel::Postgres::PG_TYPES[3904]

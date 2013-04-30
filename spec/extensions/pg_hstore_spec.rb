@@ -197,4 +197,9 @@ describe "pg_hstore extension" do
     dump = Marshal.dump(v) 
     Marshal.load(dump).should == v    
   end 
+
+  it "should return correct results for Database#schema_type_class" do
+    @db.schema_type_class(:hstore).should == Sequel::Postgres::HStore
+    @db.schema_type_class(:integer).should == Integer
+  end
 end

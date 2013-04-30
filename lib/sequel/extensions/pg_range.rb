@@ -185,8 +185,13 @@ module Sequel
         # Reset the conversion procs if using the native postgres adapter,
         # and extend the datasets to correctly literalize ruby Range values.
         def self.extended(db)
-          db.extend_datasets(DatasetMethods)
-          db.send(:copy_conversion_procs, [3904, 3906, 3912, 3926, 3905, 3907, 3913, 3927])
+          db.instance_eval do
+            extend_datasets(DatasetMethods)
+            copy_conversion_procs([3904, 3906, 3912, 3926, 3905, 3907, 3913, 3927])
+            [:int4range, :numrange, :tsrange, :tstzrange, :daterange, :int8range].each do |v|
+              @schema_type_classes[v] = PGRange
+            end
+          end
 
           procs = db.conversion_procs
           procs[3908] = Parser.new("tsrange", procs[1114])

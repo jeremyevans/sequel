@@ -137,7 +137,10 @@ module Sequel
 
       module DatabaseMethods
         def self.extended(db)
-          db.send(:add_named_conversion_procs, db.conversion_procs, :hstore=>PG_NAMED_TYPES[:hstore])
+          db.instance_eval do
+            add_named_conversion_procs(conversion_procs, :hstore=>PG_NAMED_TYPES[:hstore])
+            @schema_type_classes[:hstore] = HStore
+          end
         end
 
         # Handle hstores in bound variables

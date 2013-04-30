@@ -348,4 +348,13 @@ describe "pg_row extension" do
     @db.fetch = []
     proc{@db.register_row_type(:foo)}.should raise_error(Sequel::Error)
   end
+
+  it "should return correct results for Database#schema_type_class" do
+    @db.conversion_procs[4] = proc{|s| s.to_i}
+    @db.conversion_procs[5] = proc{|s| s * 2}
+    @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
+    @db.register_row_type(:foo, :typecaster=>proc{|h| {:bar=>(h[:bar]||0).to_i, :baz=>(h[:baz] || 'a')*2}})
+    @db.schema_type_class(:pg_row_foo).should == [Sequel::Postgres::PGRow::HashRow, Sequel::Postgres::PGRow::ArrayRow]
+    @db.schema_type_class(:integer).should == Integer
+  end
 end
