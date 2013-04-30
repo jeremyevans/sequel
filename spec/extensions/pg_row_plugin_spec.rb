@@ -19,6 +19,11 @@ describe "Sequel::Plugins::PgRow" do
     @c.dataset.opts[:from] = [:address]
   end
 
+  it "should have schema_type_class include Sequel::Model" do
+    @c2.new.send(:schema_type_class, :address).should == @c
+    @db.conversion_procs[1098].call('(123 Foo St,Bar City)').should == @c.load(:street=>'123 Foo St', :city=>'Bar City')
+  end
+
   it "should set up a parser for the type that creates a model class" do
     @db.conversion_procs[1098].call('(123 Foo St,Bar City)').should == @c.load(:street=>'123 Foo St', :city=>'Bar City')
   end

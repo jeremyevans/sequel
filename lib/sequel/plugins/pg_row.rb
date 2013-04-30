@@ -100,7 +100,9 @@ module Sequel
       module ClassMethods
         # Register the model's row type with the database.
         def register_row_type
-          db.register_row_type(model.table_name, :converter=>self, :typecaster=>method(:new))
+          table = dataset.first_source_table
+          db.register_row_type(table, :converter=>self, :typecaster=>method(:new))
+          db.instance_variable_get(:@schema_type_classes)[:"pg_row_#{table}"] = self
         end
       end
 
