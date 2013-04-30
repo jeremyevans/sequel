@@ -49,8 +49,8 @@ module Sequel
         # object, and use it to convert the value.
         def set_values(values)
           model.pg_typecast_on_load_columns.each do |c|
-            if (v = values[c]).is_a?(String) && (oid = db_schema[c][:oid])
-              values[c] = db.conversion_procs[oid].call(v)
+            if (v = values[c]).is_a?(String) && (oid = db_schema[c][:oid]) && (pr = db.conversion_procs[oid])
+              values[c] = pr.call(v)
             end
           end
           super

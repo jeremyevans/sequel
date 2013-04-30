@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't fail for missing conversion proc in pg_typecast_on_load plugin (jeremyevans)
+
 * Rename PGRangeOp #starts_before and #ends_after to #ends_before and #starts_after (soupmatt) (#655)
 
 * Add Database#supports_schema_parsing? for checking for schema parsing support (jeremyevans)
