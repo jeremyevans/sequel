@@ -46,7 +46,7 @@
 #   DB.extension :pg_range
 #
 # If you are not using the native postgres adapter, you probably
-# also want to use the typecast_on_load plugin in the model, and
+# also want to use the pg_typecast_on_load plugin in the model, and
 # set it to typecast the range type column(s) on load.
 #
 # This extension integrates with the pg_array extension.  If you plan

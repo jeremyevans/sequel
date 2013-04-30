@@ -74,6 +74,10 @@
 #   DB.conversion_procs.select{|k,v| v.is_a?(Sequel::Postgres::PGRow::Parser) && \
 #     v.converter && (v.converter.name.nil? || v.converter.name == '') }.map{|k,v| v}
 # 
+# If you are not using the native postgres adapter, you probably
+# also want to use the pg_typecast_on_load plugin in the model, and
+# set it to typecast the composite type column(s) on load.
+#
 # This extension requires both the strscan and delegate libraries.
 
 require 'delegate'
