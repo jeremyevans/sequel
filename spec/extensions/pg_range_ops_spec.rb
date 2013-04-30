@@ -33,8 +33,8 @@ describe "Sequel::Postgres::RangeOp" do
     @ds.literal(@h.overlaps(@h)).should == "(h && h)"
     @ds.literal(@h.left_of(@h)).should == "(h << h)"
     @ds.literal(@h.right_of(@h)).should == "(h >> h)"
-    @ds.literal(@h.starts_before(@h)).should == "(h &< h)"
-    @ds.literal(@h.ends_after(@h)).should == "(h &> h)"
+    @ds.literal(@h.ends_before(@h)).should == "(h &< h)"
+    @ds.literal(@h.starts_after(@h)).should == "(h &> h)"
     @ds.literal(@h.adjacent_to(@h)).should == "(h -|- h)"
   end
 
