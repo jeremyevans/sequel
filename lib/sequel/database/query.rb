@@ -199,7 +199,7 @@ module Sequel
     end
 
     # Returns true if a table with the given name exists.  This requires a query
-    # to the database unless a matching entry exists in the schema cache.
+    # to the database.
     #
     #   DB.table_exists?(:foo) # => false
     #   # SELECT NULL FROM foo LIMIT 1
@@ -209,8 +209,7 @@ module Sequel
     def table_exists?(name)
       sch, table_name = schema_and_table(name)
       name = SQL::QualifiedIdentifier.new(sch, table_name) if sch
-      quoted_name = schema_utility_dataset.literal(name)
-      _table_exists?(from(name)) unless Sequel.synchronize{@schemas.has_key?(quoted_name)}
+      _table_exists?(from(name))
       true
     rescue DatabaseError
       false

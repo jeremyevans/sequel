@@ -623,15 +623,6 @@ describe "Database#table_exists?" do
     db.table_exists?(:b).should be_true
     db.table_exists?(:c).should be_true
   end
-
-  specify "should assume table exists without a query if in the database schema" do
-    db = Sequel.mock(:fetch=>[Sequel::Error, []])
-    db.instance_variable_get(:@schemas)['a'] = [[:id, {}]]
-    db.table_exists?(:a).should be_true
-    db.table_exists?(:b).should be_false
-    db.table_exists?(:c).should be_true
-    db.sqls.should == ["SELECT NULL FROM b LIMIT 1", "SELECT NULL FROM c LIMIT 1"]
-  end
 end
 
 shared_examples_for "Database#transaction" do  
