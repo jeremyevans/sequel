@@ -2558,9 +2558,12 @@ describe 'PostgreSQL range types' do
     @db.get(Sequel.pg_range(1..5, :int4range).op.starts_before(5..10)).should be_true
     @db.get(Sequel.pg_range(1..5, :int4range).op.starts_before(-1..0)).should be_false
     @db.get(Sequel.pg_range(1..5, :int4range).op.starts_before(-1..3)).should be_false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_before(-1..7)).should be_false
 
     @db.get(Sequel.pg_range(1..5, :int4range).op.ends_after(6..10)).should be_false
     @db.get(Sequel.pg_range(1..5, :int4range).op.ends_after(5..10)).should be_false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_after(3..10)).should be_false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_after(-1..10)).should be_false
     @db.get(Sequel.pg_range(1..5, :int4range).op.ends_after(-1..0)).should be_true
     @db.get(Sequel.pg_range(1..5, :int4range).op.ends_after(-1..3)).should be_true
 
