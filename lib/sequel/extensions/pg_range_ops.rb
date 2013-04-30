@@ -29,12 +29,12 @@
 # for easier querying:
 #
 #   r.contains(:other)      # range @> other
-#   r.contained_by(:other)  # range <@ other 
+#   r.contained_by(:other)  # range <@ other
 #   r.overlaps(:other)      # range && other
 #   r.left_of(:other)       # range << other
 #   r.right_of(:other)      # range >> other
-#   r.starts_before(:other) # range &< other
-#   r.ends_after(:other)    # range &> other
+#   r.starts_after(:other)  # range &> other
+#   r.ends_before(:other)   # range &< other
 #   r.adjacent_to(:other)   # range -|- other
 #
 #   r.lower            # lower(range)
@@ -66,8 +66,8 @@ module Sequel
         :contained_by => ["(".freeze, " <@ ".freeze, ")".freeze].freeze,
         :left_of => ["(".freeze, " << ".freeze, ")".freeze].freeze,
         :right_of => ["(".freeze, " >> ".freeze, ")".freeze].freeze,
-        :starts_before => ["(".freeze, " &< ".freeze, ")".freeze].freeze,
-        :ends_after => ["(".freeze, " &> ".freeze, ")".freeze].freeze,
+        :ends_before => ["(".freeze, " &< ".freeze, ")".freeze].freeze,
+        :starts_after => ["(".freeze, " &> ".freeze, ")".freeze].freeze,
         :adjacent_to => ["(".freeze, " -|- ".freeze, ")".freeze].freeze,
         :overlaps => ["(".freeze, " && ".freeze, ")".freeze].freeze,
       }
@@ -79,6 +79,8 @@ module Sequel
       OPERATORS.keys.each do |f|
         class_eval("def #{f}(v); operator(:#{f}, v) end", __FILE__, __LINE__)
       end
+      alias starts_before ends_before
+      alias ends_after starts_after
 
       # These operators are already supported by the wrapper, but for ranges they
       # return ranges, so wrap the results in another RangeOp.

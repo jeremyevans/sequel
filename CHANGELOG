@@ -1,5 +1,7 @@
 === HEAD
 
+* Rename PGRangeOp #starts_before and #ends_after to #ends_before and #starts_after (soupmatt) (#655)
+
 * Add Database#supports_schema_parsing? for checking for schema parsing support (jeremyevans)
 
 * Handle hstore[] types on PostgreSQL if using pg_array and pg_hstore extensions (jeremyevans)
