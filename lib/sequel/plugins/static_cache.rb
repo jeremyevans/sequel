@@ -36,8 +36,12 @@ module Sequel
         end
 
         # Get the number of records in the cache, without issuing a database query.
-        def count
-          @all.size
+        def count(*a, &block)
+          if a.empty? && !block
+            @all.size
+          else
+            super
+          end
         end
 
         # Return the frozen object with the given pk, or nil if no such object exists
