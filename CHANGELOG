@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't reset conversion procs when loading pg_* extensions (jeremyevans)
+
 * Handle domain types when parsing the schema on PostgreSQL (jeremyevans)
 
 * Handle domain types in composite types in the pg_row extension (jeremyevans)

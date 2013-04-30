@@ -93,6 +93,10 @@ module Sequel
 
     # Methods enabling Database object integration with the json type.
     module JSONDatabaseMethods
+      def self.extended(db)
+        db.send(:copy_conversion_procs, [114, 199])
+      end
+
       # Parse the given string as json, returning either a JSONArray
       # or JSONHash instance, and raising an error if the JSON
       # parsing does not yield an array or hash.

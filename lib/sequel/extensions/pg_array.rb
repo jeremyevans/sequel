@@ -221,7 +221,12 @@ module Sequel
         def self.extended(db)
           db.instance_eval do
             @pg_array_schema_types ||= {}
+            copy_conversion_procs([1009, 1007, 1016, 1231, 1022, 1000, 1001, 1182, 1183, 1270, 1005, 1028, 1021, 1014, 1015])
           end
+
+          procs = db.conversion_procs
+          procs[1115] = Creator.new("timestamp without time zone", procs[1114])
+          procs[1185] = Creator.new("timestamp with time zone", procs[1184])
         end
 
         # Handle arrays in bound variables

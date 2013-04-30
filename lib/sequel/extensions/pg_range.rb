@@ -186,6 +186,16 @@ module Sequel
         # and extend the datasets to correctly literalize ruby Range values.
         def self.extended(db)
           db.extend_datasets(DatasetMethods)
+          db.send(:copy_conversion_procs, [3904, 3906, 3912, 3926, 3905, 3907, 3913, 3927])
+
+          procs = db.conversion_procs
+          procs[3908] = Parser.new("tsrange", procs[1114])
+          procs[3910] = Parser.new("tstzrange", procs[1184])
+          if defined?(PGArray::Creator)
+            procs[3909] = PGArray::Creator.new("tsrange", procs[3908])
+            procs[3911] = PGArray::Creator.new("tstzrange", procs[3910])
+          end
+
         end
 
         # Define a private range typecasting method for the given type that uses

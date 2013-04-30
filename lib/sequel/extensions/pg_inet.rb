@@ -33,12 +33,12 @@ module Sequel
   module Postgres
     # Methods enabling Database object integration with the inet/cidr types.
     module InetDatabaseMethods
-
       # Reset the conversion procs when extending the Database object, so
       # it will pick up the inet/cidr converter.  Also, extend the datasets
       # with support for literalizing the IPAddr types.
       def self.extended(db)
         db.extend_datasets(InetDatasetMethods)
+        db.send(:copy_conversion_procs, [869, 650, 1041, 651, 1040])
       end
 
       # Convert an IPAddr arg to a string.  Probably not necessary, but done

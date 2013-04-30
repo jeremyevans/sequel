@@ -136,6 +136,10 @@ module Sequel
       end
 
       module DatabaseMethods
+        def self.extended(db)
+          db.send(:add_named_conversion_procs, db.conversion_procs, :hstore=>PG_NAMED_TYPES[:hstore])
+        end
+
         # Handle hstores in bound variables
         def bound_variable_arg(arg, conn)
           case arg

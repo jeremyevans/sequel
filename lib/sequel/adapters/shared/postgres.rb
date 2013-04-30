@@ -147,9 +147,6 @@ module Sequel
       end_sql
       ).strip.gsub(/\s+/, ' ').freeze
 
-      # The Sequel extensions that require reseting of the conversion procs.
-      RESET_PROCS_EXTENSIONS = [:pg_array, :pg_hstore, :pg_inet, :pg_interval, :pg_json, :pg_range].freeze
-
       # A hash of conversion procs, keyed by type integer (oid) and
       # having callable values for the conversion proc for that type.
       attr_reader :conversion_procs
@@ -266,17 +263,6 @@ module Sequel
       #   * :if_exists : Don't raise an error if the function doesn't exist.
       def drop_trigger(table, name, opts={})
         self << drop_trigger_sql(table, name, opts)
-      end
-
-      # If any of the extensions that require reseting the conversion procs
-      # is loaded, reset them.  This is done here so that if you load
-      # multiple pg_* extensions in the same call, the conversion procs are
-      # only reset once instead of once for every extension.
-      def extension(*exts)
-        super
-        unless (RESET_PROCS_EXTENSIONS & exts).empty?
-          reset_conversion_procs
-        end
       end
 
       # Return full foreign key information using the pg system tables, including
@@ -528,6 +514,16 @@ module Sequel
 
       private
 
+      # Do a type name-to-oid lookup using the database and update the procs
+      # with the related proc if the database supports the type.
+      def add_named_conversion_procs(procs, named_procs)
+        unless (named_procs).empty?
+          from(:pg_type).where(:typtype=>'b', :typname=>named_procs.keys.map{|t| t.to_s}).select_map([:oid, :typname]).each do |oid, name|
+            procs[oid.to_i] ||= named_procs[name.untaint.to_sym]
+          end
+        end
+      end
+
       # Use a PostgreSQL-specific alter table generator
       def alter_table_generator_class
         Postgres::AlterTableGenerator
@@ -634,6 +630,15 @@ module Sequel
           sql
         else
           super
+        end
+      end
+
+      # Copy the conversion procs related to the given oids from PG_TYPES into
+      # the conversion procs for this instance.
+      def copy_conversion_procs(oids)
+        procs = conversion_procs
+        oids.each do |oid|
+          procs[oid] = PG_TYPES[oid]
         end
       end
 
@@ -800,11 +805,7 @@ module Sequel
       def get_conversion_procs
         procs = PG_TYPES.dup
         procs[1184] = procs[1114] = method(:to_application_timestamp)
-        unless (pgnt = PG_NAMED_TYPES).empty?
-          from(:pg_type).where(:typtype=>'b', :typname=>pgnt.keys.map{|t| t.to_s}).select_map([:oid, :typname]).each do |oid, name|
-            procs[oid.to_i] ||= pgnt[name.untaint.to_sym]
-          end
-        end
+        add_named_conversion_procs(procs, PG_NAMED_TYPES)
         procs
       end
 

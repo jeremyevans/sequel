@@ -120,6 +120,7 @@ module Sequel
       # and extend the datasets to correctly literalize ActiveSupport::Duration values.
       def self.extended(db)
         db.extend_datasets(IntervalDatasetMethods)
+        db.send(:copy_conversion_procs, [1186, 1187])
       end
 
       # Handle ActiveSupport::Duration values in bound variables.

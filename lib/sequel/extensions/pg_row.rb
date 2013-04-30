@@ -385,6 +385,7 @@ module Sequel
             @row_types = {}
             @row_schema_types = {}
             extend(@row_type_method_module = Module.new)
+            copy_conversion_procs([2249, 2287])
           end
         end
 
