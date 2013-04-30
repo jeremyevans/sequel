@@ -119,6 +119,7 @@ end
 describe "A PostgreSQL database with domain types" do
   before(:all) do
     @db = POSTGRES_DB
+    @db << "DROP DOMAIN IF EXISTS positive_number CASCADE"
     @db << "CREATE DOMAIN positive_number AS numeric(10,2) CHECK (VALUE > 0)"
     @db.create_table!(:testfk){positive_number :id, :primary_key=>true}
   end
@@ -2771,6 +2772,7 @@ describe 'PostgreSQL row-valued/composite types' do
 
   specify 'insert and retrieve row types containing domains' do
     begin
+      @db << "DROP DOMAIN IF EXISTS positive_integer CASCADE"
       @db << "CREATE DOMAIN positive_integer AS integer CHECK (VALUE > 0)"
       @db.create_table!(:domain_check) do
         positive_integer :id
