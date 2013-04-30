@@ -116,6 +116,24 @@ describe "A PostgreSQL database" do
   end
 end
 
+describe "A PostgreSQL database with domain types" do
+  before(:all) do
+    @db = POSTGRES_DB
+    @db << "CREATE DOMAIN positive_number AS numeric(10,2) CHECK (VALUE > 0)"
+    @db.create_table!(:testfk){positive_number :id, :primary_key=>true}
+  end
+  after(:all) do
+    @db.drop_table?(:testfk)
+    @db << "DROP DOMAIN positive_number"
+  end
+
+  specify "should correctly parse the schema" do
+    sch = @db.schema(:testfk, :reload=>true)
+    sch.first.last.delete(:domain_oid).should be_a_kind_of(Integer)
+    sch.should == [[:id, {:type=>:decimal, :ruby_default=>nil, :db_type=>"numeric(10,2)", :default=>nil, :oid=>1700, :primary_key=>true, :allow_null=>false, :db_domain_type=>'positive_number'}]]
+  end
+end
+
 describe "A PostgreSQL dataset" do
   before(:all) do
     @db = POSTGRES_DB

@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle domain types when parsing the schema on PostgreSQL (jeremyevans)
+
 * Handle domain types in composite types in the pg_row extension (jeremyevans)
 
 * Add Database.extension, for loading an extension into all future databases (jeremyevans)
