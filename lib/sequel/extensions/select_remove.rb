@@ -36,4 +36,7 @@ module Sequel
       end
     end
   end
+
+  Database.register_extension(:select_remove){}
+  Dataset.register_extension(:select_remove){}
 end

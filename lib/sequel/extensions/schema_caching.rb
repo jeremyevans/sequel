@@ -73,4 +73,6 @@ module Sequel
       load_schema_cache(file) if File.exist?(file)
     end
   end
+
+  Database.register_extension(:schema_caching){}
 end

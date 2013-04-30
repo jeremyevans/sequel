@@ -147,18 +147,19 @@ begin
     exit
   end
   if dump_migration
-    Sequel.extension :schema_dumper
+    DB.extension :schema_dumper
     puts DB.dump_schema_migration(:same_db=>dump_migration==:same_db)
     exit
   end
   if dump_schema
-    Sequel.extension :schema_caching
+    DB.extension :schema_caching
     DB.tables.each{|t| DB.schema(Sequel::SQL::Identifier.new(t))}
     DB.dump_schema_cache(dump_schema)
     exit
   end
   if copy_databases
-    Sequel.extension :migration, :schema_dumper
+    Sequel.extension :migration
+    DB.extension :schema_dumper
 
     db2 = ARGV.shift
     error_proc["Error: Must specify database connection string or path to yaml file as second argument for database you want to copy to"] if db2.nil? || db2.empty?

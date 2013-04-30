@@ -24,4 +24,7 @@ module Sequel
       Sequel::PrettyTable.print(rows, cols.empty? ? ds.columns : cols)
     end
   end
+
+  Database.register_extension(:pretty_table){}
+  Dataset.register_extension(:pretty_table){}
 end

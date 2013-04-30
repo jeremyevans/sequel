@@ -51,4 +51,7 @@ module Sequel
       end
     end
   end
+
+  Dataset.register_extension(:query){}
+  Database.register_extension(:query){}
 end

@@ -103,4 +103,7 @@ module Sequel
       end
     end
   end
+
+  Database.register_extension(:pagination){}
+  Dataset.register_extension(:pagination){}
 end

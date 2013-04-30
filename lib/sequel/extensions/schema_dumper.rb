@@ -483,4 +483,6 @@ END_MIG
       end
     end
   end
+
+  Database.register_extension(:schema_dumper){}
 end
