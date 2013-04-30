@@ -130,16 +130,6 @@ module Sequel
         end
       end
 
-      # Make the column type detection recognize the json type.
-      def schema_column_type(db_type)
-        case db_type
-        when 'json'
-          :json
-        else
-          super
-        end
-      end
-
       private
 
       # Handle json[] types in bound variables.
@@ -147,6 +137,16 @@ module Sequel
         case a
         when JSONHash, JSONArray
           "\"#{a.to_json.gsub('"', '\\"')}\""
+        else
+          super
+        end
+      end
+
+      # Make the column type detection recognize the json type.
+      def schema_column_type(db_type)
+        case db_type
+        when 'json'
+          :json
         else
           super
         end

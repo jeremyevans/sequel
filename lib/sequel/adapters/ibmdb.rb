@@ -264,15 +264,6 @@ module Sequel
         end
       end
 
-      # Convert smallint type to boolean if convert_smallint_to_bool is true
-      def schema_column_type(db_type)
-        if Sequel::IBMDB.convert_smallint_to_bool && db_type =~ /smallint/i 
-          :boolean
-        else
-          super
-        end
-      end
-
       # On DB2, a table might need to be REORGed if you are testing existence
       # of it.  This REORGs automatically if the database raises a specific
       # error that indicates it should be REORGed.
@@ -363,6 +354,15 @@ module Sequel
       # connection and sets autocommit back on.
       def rollback_transaction(conn, opts={})
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
+      end
+
+      # Convert smallint type to boolean if convert_smallint_to_bool is true
+      def schema_column_type(db_type)
+        if Sequel::IBMDB.convert_smallint_to_bool && db_type =~ /smallint/i 
+          :boolean
+        else
+          super
+        end
       end
     end
     

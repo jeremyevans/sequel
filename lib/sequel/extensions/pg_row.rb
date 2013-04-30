@@ -540,15 +540,6 @@ module Sequel
           end
         end
 
-        # Make the column type detection handle registered row types.
-        def schema_column_type(db_type)
-          if type = @row_schema_types[db_type]
-            type
-          else
-            super
-          end
-        end
-
         private
 
         # Format composite types used in bound variable arrays.
@@ -559,6 +550,15 @@ module Sequel
           when HashRow
             arg.check_columns!
             "\"(#{arg.values_at(*arg.columns).map{|v| bound_variable_array(v) if v}.join(COMMA).gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)})\""
+          else
+            super
+          end
+        end
+
+        # Make the column type detection handle registered row types.
+        def schema_column_type(db_type)
+          if type = @row_schema_types[db_type]
+            type
           else
             super
           end

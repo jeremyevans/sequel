@@ -259,15 +259,6 @@ module Sequel
           @schema_type_classes[:"#{opts[:typecast_method] || opts[:type_symbol] || db_type}_array"] = PGArray
         end
 
-        # Make the column type detection handle registered array types.
-        def schema_column_type(db_type)
-          if (db_type =~ /\A([^(]+)(?:\([^(]+\))?\[\]\z/io) && (type = pg_array_schema_type($1))
-            type
-          else
-            super
-          end
-        end
-
         # Return PGArray if this type matches any supported array type.
         def schema_type_class(type)
           super || (ARRAY_TYPES.each_value{|v| return PGArray if type == v}; nil)
@@ -317,6 +308,15 @@ module Sequel
         # string.
         def pg_array_schema_type(type)
           @pg_array_schema_types[type] || ARRAY_TYPES[type]
+        end
+
+        # Make the column type detection handle registered array types.
+        def schema_column_type(db_type)
+          if (db_type =~ /\A([^(]+)(?:\([^(]+\))?\[\]\z/io) && (type = pg_array_schema_type($1))
+            type
+          else
+            super
+          end
         end
 
         # Given a value to typecast and the type of PGArray subclass:
