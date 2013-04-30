@@ -1359,6 +1359,7 @@ if POSTGRES_DB.adapter_scheme == :postgres
     before do
       @db = POSTGRES_DB
       Sequel::Postgres::PG_NAMED_TYPES[:interval] = lambda{|v| v.reverse}
+      @db.extension :pg_array
       @db.reset_conversion_procs
     end
     after do
@@ -1371,6 +1372,12 @@ if POSTGRES_DB.adapter_scheme == :postgres
       @db.create_table!(:foo){interval :bar}
       @db[:foo].insert(Sequel.cast('21 days', :interval))
       @db[:foo].get(:bar).should == 'syad 12'
+    end
+
+    specify "should handle array types of named types" do
+      @db.create_table!(:foo){column :bar, 'interval[]'}
+      @db[:foo].insert(Sequel.pg_array(['21 days'], :interval))
+      @db[:foo].get(:bar).should == ['syad 12']
     end
   end
 end
@@ -2001,7 +2008,7 @@ end
 describe 'PostgreSQL hstore handling' do
   before(:all) do
     @db = POSTGRES_DB
-    @db.extension :pg_hstore
+    @db.extension :pg_array, :pg_hstore
     @ds = @db[:items]
     @h = {'a'=>'b', 'c'=>nil, 'd'=>'NULL', 'e'=>'\\\\" \\\' ,=>'}
     @native = POSTGRES_DB.adapter_scheme == :postgres
@@ -2019,6 +2026,24 @@ describe 'PostgreSQL hstore handling' do
     if @native
       rs = @ds.all
       v = rs.first[:h]
+      v.should_not be_a_kind_of(Hash)
+      v.to_hash.should be_a_kind_of(Hash)
+      v.to_hash.should == @h
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+  end
+
+  specify 'insert and retrieve hstore[] values' do
+    @db.create_table!(:items) do
+      column :h, 'hstore[]'
+    end
+    @ds.insert(Sequel.pg_array([Sequel.hstore(@h)], :hstore))
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      v = rs.first[:h].first
       v.should_not be_a_kind_of(Hash)
       v.to_hash.should be_a_kind_of(Hash)
       v.to_hash.should == @h

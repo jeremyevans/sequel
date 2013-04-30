@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle hstore[] types on PostgreSQL if using pg_array and pg_hstore extensions (jeremyevans)
+
 * Don't reset conversion procs when loading pg_* extensions (jeremyevans)
 
 * Handle domain types when parsing the schema on PostgreSQL (jeremyevans)

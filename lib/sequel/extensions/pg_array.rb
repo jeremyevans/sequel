@@ -246,7 +246,7 @@ module Sequel
         # affect global state, unlike PGArray.register.  See PGArray.register for
         # possible options.
         def register_array_type(db_type, opts={}, &block)
-          opts = opts.merge(:type_procs=>conversion_procs, :typecast_method_map=>@pg_array_schema_types, :typecast_methods_module=>(class << self; self; end))
+          opts = {:type_procs=>conversion_procs, :typecast_method_map=>@pg_array_schema_types, :typecast_methods_module=>(class << self; self; end)}.merge(opts)
           unless (opts.has_key?(:scalar_oid) || block) && opts.has_key?(:oid)
             array_oid, scalar_oid = from(:pg_type).where(:typname=>db_type.to_s).get([:typarray, :oid])
             opts[:scalar_oid] = scalar_oid unless opts.has_key?(:scalar_oid) || block
@@ -280,6 +280,15 @@ module Sequel
           else
             literal(a)
           end
+        end
+
+        # Automatically handle array types for the given named types. 
+        def convert_named_procs_to_procs(named_procs)
+          h = super
+          from(:pg_type).where(:oid=>h.keys).select_map([:typname, :oid, :typarray]).each do |name, scalar_oid, array_oid|
+            register_array_type(name, :type_procs=>h, :oid=>array_oid.to_i, :scalar_oid=>scalar_oid.to_i)
+          end
+          h
         end
 
         # Manually override the typecasting for timestamp array types so that

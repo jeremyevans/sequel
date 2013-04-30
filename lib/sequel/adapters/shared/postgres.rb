@@ -518,8 +518,8 @@ module Sequel
       # with the related proc if the database supports the type.
       def add_named_conversion_procs(procs, named_procs)
         unless (named_procs).empty?
-          from(:pg_type).where(:typtype=>'b', :typname=>named_procs.keys.map{|t| t.to_s}).select_map([:oid, :typname]).each do |oid, name|
-            procs[oid.to_i] ||= named_procs[name.untaint.to_sym]
+          convert_named_procs_to_procs(named_procs).each do |oid, pr|
+            procs[oid] ||= pr
           end
         end
       end
@@ -631,6 +631,15 @@ module Sequel
         else
           super
         end
+      end
+
+      # Convert the hash of named conversion procs into a hash a oid conversion procs. 
+      def convert_named_procs_to_procs(named_procs)
+        h = {}
+        from(:pg_type).where(:typtype=>'b', :typname=>named_procs.keys.map{|t| t.to_s}).select_map([:oid, :typname]).each do |oid, name|
+          h[oid.to_i] = named_procs[name.untaint.to_sym]
+        end
+        h
       end
 
       # Copy the conversion procs related to the given oids from PG_TYPES into
