@@ -2112,6 +2112,18 @@ describe "Database#schema_autoincrementing_primary_key?" do
   end
 end
 
+describe "Database#supports_schema_parsing?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_schema_parsing?.should == false
+  end
+
+  specify "should be true if the database implements schema_parse_table" do
+    db = Sequel::Database.new
+    def db.schema_parse_table(*) end
+    db.supports_schema_parsing?.should == true
+  end
+end
+
 describe "Database#supports_deferrable_constraints?" do
   specify "should be false by default" do
     Sequel::Database.new.supports_deferrable_constraints?.should == false

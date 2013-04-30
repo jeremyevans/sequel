@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#supports_schema_parsing? for checking for schema parsing support (jeremyevans)
+
 * Handle hstore[] types on PostgreSQL if using pg_array and pg_hstore extensions (jeremyevans)
 
 * Don't reset conversion procs when loading pg_* extensions (jeremyevans)

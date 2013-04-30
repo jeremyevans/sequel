@@ -146,7 +146,7 @@ describe "Database schema parser" do
     INTEGRATION_DB.create_table!(:items){FalseClass :number}
     INTEGRATION_DB.schema(:items).first.last[:type].should == :boolean
   end
-end if INTEGRATION_DB.respond_to?(:schema_parse_table, true)
+end if INTEGRATION_DB.supports_schema_parsing?
 
 test_indexes = begin
   INTEGRATION_DB.drop_table?(:blah)

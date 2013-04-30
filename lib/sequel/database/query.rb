@@ -154,7 +154,7 @@ module Sequel
     #   #    :db_type=>"text",
     #   #    :allow_null=>false}]]
     def schema(table, opts={})
-      raise(Error, 'schema parsing is not implemented on this database') unless respond_to?(:schema_parse_table, true)
+      raise(Error, 'schema parsing is not implemented on this database') unless supports_schema_parsing?
 
       opts = opts.dup
       tab = if table.is_a?(Dataset)

@@ -53,6 +53,11 @@ module Sequel
       supports_prepared_transactions? && supports_savepoints?
     end
 
+    # Whether the database supports schema parsing via Database#schema.
+    def supports_schema_parsing?
+      respond_to?(:schema_parse_table, true)
+    end
+
     # Whether the database and adapter support transaction isolation levels, false by default.
     def supports_transaction_isolation_levels?
       false
