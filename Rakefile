@@ -197,11 +197,6 @@ rescue LoadError
   end
 end
 
-desc "check documentation coverage"
-task :dcov do
-  sh %{find lib -name '*.rb' | xargs dcov}
-end
-
 desc "Print Sequel version"
 task :version do
   puts VERS.call
