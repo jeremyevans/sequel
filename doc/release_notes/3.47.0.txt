@@ -1,0 +1,270 @@
+= New Plugins
+
+* An auto_validations plugin has been added, which automatically
+  adds not null, type, and unique validations based on information
+  obtained from parsing the database schema.  If you don't
+  require customization of the validation error message per
+  column, this can significantly DRY up validation code.  Currently
+  this plugin requires the database support index parsing; that
+  restriction will be removed in Sequel 4.
+
+* An input_transformer plugin has been added, for automatically
+  running a transformation proc on all model column setter
+  input before use.  This is a generalization of the
+  string_stripper plugin, allowing arbitrary modifications
+  to the input.
+
+* An error_splitter plugin has been added, for splitting validation
+  errors applying to multiple columns into a separate validation
+  error per column.  This is useful if you want to to include such
+  errors when using Errors#on to get all errors on the column. In
+  general, only uniqueness errors apply to multiple columns, so
+  those are the only errors likely to be affected.
+
+= Other New Features
+
+* Database.extension has been added, allowing you to load an
+  extension into all future databases.  This is similar to loading a
+  plugin into Sequel::Model itself.  For example, if you want all
+  Database instances to use the query_literals extension, run the
+  following before creating your Database instances:
+
+    Sequel::Database.extension :query_literals
+
+* Database.after_initialize has been added for running a hook
+  on all new databases created.
+
+* Model.default_set_fields_options has been added, allowing you
+  to set the default options for the #set_fields and #update_fields
+  methods.  This is useful if you want to make :missing=>:raise
+  or :missing=>:skip the default behavior.
+
+* The :setter, :adder, :remover, and :clearer association options
+  have been added.  These allow you to override the default
+  implementation used to modify the association.  :setter affects
+  the *_to_one setter method, :adder the *_to_many add_* method,
+  :remover the *_to_many remove_* method, and :clearer the
+  *_to_many remove_all_* method.
+
+  Previously, you had to override a private method to get the same
+  behavior, this just offers a nicer API for that.
+
+* A :keep_reference Database option has been added.  When set to
+  false, a reference to the Database instance is not kept in
+  Sequel::DATABASES.  This is designed for Database instances
+  created by libraries, so they don't accidentally get chosen as
+  the default Sequel::Model database.
+
+* Model#modified! now accepts a column and marks that column
+  as changed.  This is useful if you plan on mutating the column
+  value as opposed to reassigning it.
+
+* Model#modified? now accepts a column and returns whether the
+  column has been changed.
+
+* The migrators now support an :allow_missing_migration_files
+  option, which makes them silently ignore errors related to
+  missing migration files.
+
+* validates_schema_types has been added to validation_helpers,
+  which validates that the column values are instances of the
+  expected ruby type for the given database schema type.  This
+  is a more robust version of the validates_not_string
+  extension, and users of validates_not_string are encouraged
+  to switch soon, as validates_not_string is going away in
+  Sequel 4.
+
+  validates_schema_type has been added to validation_class_methods,
+  which preforms the same validation, but it requires the columns
+  be listed explicitly.
+
+  validates_type in validation_helpers has been expanded to
+  accept an array of allowable classes.
+
+  Related to this is the addition of Database#schema_type_class for
+  returning the type class(es) for the given schema type symbol.
+
+* validates_not_null has been added to the validation_helpers
+  plugin.  This is similar to the validates_presence validation,
+  but only checks for nil values, allowing empty/blank strings.
+
+* In the caching plugin, when the :ignore_exceptions option is true,
+  exceptions raised when deleting an object from the cache are now
+  ignored correctly.
+
+* On PostgreSQL, Sequel now supports a :search_path Database
+  option to automatically set the client connection search_path.
+  This allows you to control which schemas do no require
+  qualification, and in which order to check schemas when
+  referencing unqualified objects.  If you were using the
+  default_schema setting, it is recommended that you switch
+  to using :search_path instead.
+
+* The pg_array extension can now register array types on a
+  per-Database basis via Database#register_array_type. Previously,
+  only global registration of array types was allowed.  Additionally,
+  when registering array types on a per-Database basis, the oids can
+  be looked up automatically, making it possible to register array
+  types with just a type name:
+
+    DB.register_array_type(:interval)
+
+* The pg_array extension now automatically creates conversion
+  procs for array types of all named types used by the
+  database.  This means that if you use the pg_array and
+  pg_hstore extensions, the hstore[] type is now handled
+  correctly.
+
+* The postgres adapter now supports :use_iso_date_format and
+  :convert_infinite_timestamps Database options.  Previously,
+  use_iso_date_format was only a global setting, and
+  convert_infinite_timestamps could only be set after
+  initialization.
+
+* Database#supports_schema_parsing? has been added to check
+  if schema parsing via the Database#schema method is
+  supported.
+
+= Other Improvements
+
+* A race condition related to prepared_sql for newly prepared
+  statements has been fixed.
+
+* Dataset#get now works correctly if given an array with multiple
+  columns if there were no returned rows.
+
+* The plugins that ship with Sequel now handle frozen model instances
+  correctly.
+
+* Freezing of model instances now works correctly for models without
+  primary keys.
+
+* Database constraints added with the constraint_validations
+  plugin now handle NULL values correctly if the :allow_nil=>true
+  setting is used.
+
+* The  pagination, pretty_table, query, schema_caching,
+  schema_dumper, and select_remove extensions can now be
+  loaded by Database#extension.  If you are loading them
+  globally via Sequel.extension, switch to using
+  Database#extension, since that will be required starting
+  in Sequel 4.
+
+* The lazy_attributes plugin no longer uses the identity_map plugin
+  internally, and eager loading lazy attributes now works correctly
+  without an active identity map.
+
+* The many_to_one_pk_lookup plugin now handles many more corner
+  cases, and should be safe to enable by default.
+
+* The static_cache plugin now has optimized implementations of
+  Model.map, .to_hash, and .to_hash_groups which work without a
+  database query.  Model.count without arguments has also been
+  optimized to not require a database query.
+
+* Fetching new records has been made faster when using the
+  update_primary_key plugin, since it was changed to cache the primary
+  key values lazily.
+
+* When using the update_primary_key plugin, if the primary key
+  changes, clear the associations cache of all non-many_to_one
+  associations (since those will likely be based on the primary
+  key).
+
+* The pg_typecast_on_load plugin no longer errors if given a
+  column that doesn't have a matching oid conversion proc.
+
+* Handling of domain types on PostgreSQL has been significantly
+  improved.  Domain type columns now have correct model
+  typecasting, and the pg_row extension correctly sets up
+  conversion procs for domain types inside composite types.
+
+* Postgres::HStoreOp#- now automatically casts string input to
+  text, so that PostgreSQL doesn't assume the string is an
+  hstore.
+
+* Postgres::PGRangeOp#starts_before and #ends_after have been
+  renamed to #ends_before and #starts_after.  The previous
+  names were misleading.  The old names are still available
+  for backwards compatibility, but they will be removed in the
+  Sequel 4.
+
+* The pg_row plugin now handles aliased tables correctly.
+
+* Model#validate in the validation_class_methods plugin no
+  longer skips validate methods in superclasses or previously
+  loaded plugins.
+
+* Loading the touch plugin into a model subclass after it has
+  been loaded into a model superclass no longer ignores
+  inherited touched associations.
+
+* Sequel no longer resets the conversion procs for the
+  Database instance when using Databaset#extension to load a
+  pg_* extension that adds global conversion procs.  Instead,
+  the global conversion procs are added to the instance-specific
+  conversion procs.  The result of this is that manually added
+  conversion procs will not be lost if an extension is loaded
+  afterward.
+
+* The jdbc adapter now references the driver class before loading
+  subadapter specific code, which can fix issues if the database
+  tries to connect on initialization (such as the jdbc/postgres
+  adapter if the pg_hstore extension is loaded previously).
+
+* A guide describing Sequel's support for advanced PostgreSQL
+  features has been added.
+
+= Backwards Compatibility
+
+* If you have already used the constraint_validations plugin to
+  create validations with the :allow_nil=>true option, you should
+  drop and regenerate those constraints to ensure they handle NULL
+  values correctly.
+
+* The change to make PostgreSQL automatically handle domain
+  types can break previous code that set up special conversions
+  and typecasts per domain type.  In the schema parsing, if you
+  want to get the domain type information, it will be contained
+  in the :db_domain_type and :domain_oid schema entries.
+
+* Sequel::Postgres.use_iso_date_format is now only defined if
+  you are using the postgres adapter.  Previously, it could
+  be defined when using other adapters with a pg_* extension,
+  even though the setting had no effect in that case.
+
+* The validation_class_methods plugin now copies validations into
+  the subclass upon inheritance, instead of recursing into the
+  superclass on validation.  This makes it more similar to how
+  all the other Sequel plugins work.  However, it also means that
+  if you add validations to a superclass after creating a
+  subclass, the subclass won't have those validations.  Additionally
+  if you skip superclass validations in a child class after creating
+  a grandchild class, the grandchild class could still have the
+  parent class's validations.
+
+* The validates_unique validation in validation_helpers no longer
+  attempts to do the uniqueness query if the underlying columns
+  have validation errors.  The reasoning behind this is that if the
+  underlying columns are not valid, the uniqueness query can cause
+  a DatabaseError.
+
+* If you were passing strings in hstore format to
+  Postgres::HStoreOp#-, you should manually cast them to hstore:
+
+    hstore_op - Sequel.cast('a=>b', :hstore)
+
+* The default validation error message for validates_type has been
+  modified.
+
+* Database#schema_column_type was made public accidently by an
+  adapter and a few extensions.  That has been fixed, but if you
+  were calling it with an explicit receiver and it happened to
+  work by accident before, you'll need to update your code.
+
+= Sequel 4 Implementation Planning
+
+* Sequel 4 implementation work will begin shortly.  All Sequel users
+  are encouraged to read about the proposed changes and provide
+  feedback on the implementation plan. For details, see
+  https://github.com/jeremyevans/sequel-4-plans.  

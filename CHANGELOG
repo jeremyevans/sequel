@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.47.0 (2013-05-01)
 
 * Don't fail for missing conversion proc in pg_typecast_on_load plugin (jeremyevans)
 
