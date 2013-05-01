@@ -17,6 +17,7 @@ unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
   require 'sequel/no_core_ext'
 end
+Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
 
 begin
   # Attempt to load ActiveSupport blank extension and inflector first, so Sequel
@@ -40,6 +41,26 @@ Sequel::Dataset.introspect_all_columns if ENV['SEQUEL_COLUMNS_INTROSPECTION']
 
 def skip_warn(s)
   warn "Skipping test of #{s}" if ENV["SKIPPED_TEST_WARN"]
+end
+
+(defined?(RSpec) ? RSpec::Core::ExampleGroup : Spec::Example::ExampleGroup).class_eval do
+  if ENV['SEQUEL_DEPRECATION_WARNINGS']
+    class << self
+      alias qspecify specify
+    end
+  else
+    def self.qspecify(*a, &block)
+      specify(*a) do
+        begin
+          output = Sequel::Deprecation.output
+          Sequel::Deprecation.output = false
+          instance_exec(&block)
+        ensure
+          Sequel::Deprecation.output = output 
+        end
+      end
+    end
+  end
 end
 
 Sequel.quote_identifiers = false
