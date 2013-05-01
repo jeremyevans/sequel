@@ -433,7 +433,7 @@ module Sequel
 
   private_class_method :adapter_method, :def_adapter_method
   
-  require(%w"sql connection_pool exceptions dataset database timezones ast_transformer version")
+  require(%w"deprecated sql connection_pool exceptions dataset database timezones ast_transformer version")
   if !defined?(::SEQUEL_NO_CORE_EXTENSIONS) && !ENV.has_key?('SEQUEL_NO_CORE_EXTENSIONS')
   # :nocov:
     extension(:core_extensions)
