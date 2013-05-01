@@ -1225,6 +1225,10 @@ describe "Dataset#select" do
     @d.select(Sequel.as([[:b, :c]], :n)).sql.should == 'SELECT (b = c) AS n FROM test'
   end
 
+  specify "should handle hashes returned from virtual row blocks" do
+    @d.select{{:b=>:c}}.sql.should == 'SELECT b AS c FROM test'
+  end
+
   specify "should accept a hash for AS values" do
     @d.select(:name => 'n', :__ggh => 'age').sql.should =~ /SELECT ((name AS n, __ggh AS age)|(__ggh AS age, name AS n)) FROM test/
   end

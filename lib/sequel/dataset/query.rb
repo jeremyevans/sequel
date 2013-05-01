@@ -1157,7 +1157,14 @@ module Sequel
     # Treat the +block+ as a virtual_row block if not +nil+ and
     # add the resulting columns to the +columns+ array (modifies +columns+).
     def virtual_row_columns(columns, block)
-      columns.concat(Array(Sequel.virtual_row(&block))) if block
+      if block
+        v = Sequel.virtual_row(&block)
+        if v.is_a?(Array)
+          columns.concat(v)
+        else
+          columns << v
+        end
+      end
     end
   end
 end
