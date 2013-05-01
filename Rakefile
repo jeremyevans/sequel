@@ -202,15 +202,6 @@ task :dcov do
   sh %{find lib -name '*.rb' | xargs dcov}
 end
 
-### Statistics
-
-desc "Report code statistics (KLOCs, etc) from the application"
-task :stats do
-  STATS_DIRECTORIES = [%w(Code lib/), %w(Spec spec)].map{|name, dir| [ name, "./#{dir}" ] }.select { |name, dir| File.directory?(dir)}
-  require "./extra/stats"
-  CodeStatistics.new(*STATS_DIRECTORIES).to_s
-end
-
 desc "Print Sequel version"
 task :version do
   puts VERS.call
