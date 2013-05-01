@@ -263,7 +263,7 @@ module Sequel
 
       if column.is_a?(Array)
        if r = ds.single_record
-         r.values_at(*column.map{|c| hash_key_symbol(c)})
+         r.values_at(*hash_key_symbols(column))
        end
       else
         ds.single_value
@@ -824,17 +824,8 @@ module Sequel
     
     # Internals of +select_hash+ and +select_hash_groups+
     def _select_hash(meth, key_column, value_column)
-      if key_column.is_a?(Array)
-        if value_column.is_a?(Array)
-          select(*(key_column + value_column)).send(meth, key_column.map{|c| hash_key_symbol(c)}, value_column.map{|c| hash_key_symbol(c)})
-        else
-          select(*(key_column + [value_column])).send(meth, key_column.map{|c| hash_key_symbol(c)}, hash_key_symbol(value_column))
-        end
-      elsif value_column.is_a?(Array)
-        select(key_column, *value_column).send(meth, hash_key_symbol(key_column), value_column.map{|c| hash_key_symbol(c)})
-      else
-        select(key_column, value_column).send(meth, hash_key_symbol(key_column), hash_key_symbol(value_column))
-      end
+      select(*(key_column.is_a?(Array) ? key_column : [key_column]) + (value_column.is_a?(Array) ? value_column : [value_column])).
+        send(meth, hash_key_symbols(key_column), hash_key_symbols(value_column))
     end
     
     # Internals of +select_map+ and +select_order_map+
@@ -846,7 +837,7 @@ module Sequel
       ds = ds.select(*select_cols)
       ds = ds.order(*columns.map{|c| unaliased_identifier(c)}) if order
       if column.is_a?(Array) || (columns.length > 1)
-        ds._select_map_multiple(select_cols.map{|c| hash_key_symbol(c)})
+        ds._select_map_multiple(hash_key_symbols(select_cols))
       else
         ds._select_map_single
       end
@@ -881,27 +872,43 @@ module Sequel
     
     # Return a plain symbol given a potentially qualified or aliased symbol,
     # specifying the symbol that is likely to be used as the hash key
-    # for the column when records are returned.
-    def hash_key_symbol(s, recursing=false)
+    # for the column when records are returned.  Return nil if no hash key
+    # can be determined
+    def _hash_key_symbol(s, recursing=false)
       case s
       when Symbol
         _, c, a = split_symbol(s)
         (a || c).to_sym
       when SQL::Identifier, SQL::Wrapper
-        hash_key_symbol(s.value, true)
+        _hash_key_symbol(s.value, true)
       when SQL::QualifiedIdentifier
-        hash_key_symbol(s.column, true)
+        _hash_key_symbol(s.column, true)
       when SQL::AliasedExpression
-        hash_key_symbol(s.aliaz, true)
+        _hash_key_symbol(s.aliaz, true)
       when String
-        if recursing
-          s.to_sym
-        else
-          raise(Error, "#{s.inspect} is not supported, should be a Symbol, SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression") 
-        end
-      else
-        raise(Error, "#{s.inspect} is not supported, should be a Symbol, SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression") 
+        s.to_sym if recursing
       end
+    end
+
+    # Return a plain symbol given a potentially qualified or aliased symbol,
+    # specifying the symbol that is likely to be used as the hash key
+    # for the column when records are returned.  Raise Error if the hash key
+    # symbol cannot be returned.
+    def hash_key_symbol(s)
+      if v = _hash_key_symbol(s)
+        v
+      elsif block_given?
+        yield
+      else
+        raise(Error, "#{s.inspect} is not supported, should be a Symbol, SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression")
+      end
+    end
+
+    # If s is an array, return an array with the given hash key symbols.
+    # Otherwise, return a hash key symbol for the given expression 
+    # If a hash key symbol cannot be determined, raise an error.
+    def hash_key_symbols(s)
+      s.is_a?(Array) ? s.map{|c| hash_key_symbol(c)} : hash_key_symbol(s)
     end
     
     # Modify the identifier returned from the database based on the
