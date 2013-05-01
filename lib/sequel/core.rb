@@ -436,7 +436,7 @@ module Sequel
   require(%w"deprecated sql connection_pool exceptions dataset database timezones ast_transformer version")
   if !defined?(::SEQUEL_NO_CORE_EXTENSIONS) && !ENV.has_key?('SEQUEL_NO_CORE_EXTENSIONS')
   # :nocov:
-    extension(:core_extensions)
+    require(:deprecated_core_extensions)
   # :nocov:
   end
 

@@ -122,6 +122,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_rb.html">pg_row</a>: Adds support for PostgreSQL row-valued/composite types.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_ops_rb.html">pg_row_ops</a>: Adds DSL support for dealing with PostgreSQL row-valued/composite types.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_statement_cache_rb.html">pg_statement_cache</a>: Automatically uses prepared statements for most queries when using postgres adapter with the pg driver.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/ruby18_symbol_extensions_rb.html">ruby18_symbol_extensions</a>: Contains implementations of Symbol#{<,<=,>,>=,[]} that are only usable on ruby 1.8.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_caching_rb.html">schema_caching</a>: Speeds up loading a large number of models by caching database schema and loading it from a file.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/select_remove_rb.html">select_remove</a>: Adds Dataset#select_remove to remove selected columns from a dataset.</li>
