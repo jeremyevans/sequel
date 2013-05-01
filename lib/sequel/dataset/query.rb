@@ -74,7 +74,7 @@ module Sequel
         raise(InvalidOperation, "No existing filter found.")
       end
       if @opts[:having]
-        Sequel::Deprecation.deprecate('Dataset#and will no longer modify the HAVING clause starting in Sequel 4.  Switch to using Dataset#having.')
+        Sequel::Deprecation.deprecate('Dataset#and will no longer modify the HAVING clause starting in Sequel 4.  Switch to using Dataset#having or use the filter_having extension.')
         having(*cond, &block)
       else
         where(*cond, &block)
@@ -139,7 +139,7 @@ module Sequel
     #   DB[:items].exclude(:category => 'software', :id=>3)
     #   # SELECT * FROM items WHERE ((category != 'software') OR (id != 3))
     def exclude(*cond, &block)
-      Sequel::Deprecation.deprecate('Dataset#exclude will no longer modify the HAVING clause starting in Sequel 4.  Switch to using Dataset#exclude_having.') if @opts[:having]
+      Sequel::Deprecation.deprecate('Dataset#exclude will no longer modify the HAVING clause starting in Sequel 4.  Switch to using Dataset#exclude_having or use the filter_having extension.') if @opts[:having]
       _filter_or_exclude(true, @opts[:having] ? :having : :where, *cond, &block)
     end
 
@@ -223,7 +223,7 @@ module Sequel
     #
     # See the the {"Dataset Filtering" guide}[link:files/doc/dataset_filtering_rdoc.html] for more examples and details.
     def filter(*cond, &block)
-      Sequel::Deprecation.deprecate('Dataset#filter will no longer modify the HAVING clause starting in Sequel 4.  Switch to using Dataset#having.') if @opts[:having]
+      Sequel::Deprecation.deprecate('Dataset#filter will no longer modify the HAVING clause starting in Sequel 4.  Switch to using Dataset#having or use the filter_having extension.') if @opts[:having]
       _filter(@opts[:having] ? :having : :where, *cond, &block)
     end
     
@@ -649,7 +649,7 @@ module Sequel
         Sequel::Deprecation.deprecate('Dataset#or will no longer raise for an unfilered dataset starting in Sequel 4.')
         raise(InvalidOperation, "No existing filter found.")
       end
-      Sequel::Deprecation.deprecate('Dataset#or will no longer modify the HAVING clause starting in Sequel 4.  There is currently no replacement for this behavior, but one can be added if requested.') if clause == :having
+      Sequel::Deprecation.deprecate('Dataset#or will no longer modify the HAVING clause starting in Sequel 4.  You can use the filter_having extension to continue to use the current behavior.') if clause == :having
       cond = cond.first if cond.size == 1
       clone(clause => SQL::BooleanExpression.new(:OR, @opts[clause], filter_expr(cond, &block)))
     end

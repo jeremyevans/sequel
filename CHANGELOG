@@ -1,5 +1,7 @@
 === HEAD
 
+* Add filter_having extension for making Dataset#{and,filter,exclude,or} affect the HAVING clause if present (jeremyevans)
+
 * Deprecate Dataset#select_more meaning Dataset#select when called without an existing selection (jeremyevans)
 
 * Deprecate Dataset#and, #or, and #invert raising exceptions for no existing filter (jeremyevans)
