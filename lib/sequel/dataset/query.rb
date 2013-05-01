@@ -464,7 +464,8 @@ module Sequel
     #     the last joined or primary table is used.
     #   * :qualify - Can be set to false to not do any implicit qualification.  Can be set
     #     to :deep to use the Qualifier AST Transformer, which will attempt to qualify
-    #     subexpressions of the expression tree.
+    #     subexpressions of the expression tree.  Defaults to the value of
+    #     default_join_table_qualification.
     # * block - The block argument should only be given if a JOIN with an ON clause is used,
     #   in which case it yields the table alias/name for the table currently being joined,
     #   the table alias/name for the last joined (or first table), and an array of previous
@@ -532,6 +533,7 @@ module Sequel
         last_alias ||= @opts[:last_joined_table] || first_source_alias
         if Sequel.condition_specifier?(expr)
           expr = expr.collect do |k, v|
+            qualify_type = default_join_table_qualification if qualify_type.nil?
             case qualify_type
             when false
               nil # Do no qualification
@@ -1051,6 +1053,11 @@ module Sequel
       _filter_or_exclude(false, clause, *cond, &block)
     end
 
+    # The default :qualify option to use for join tables if one is not specified.
+    def default_join_table_qualification
+      :symbol
+    end
+    
     # SQL expression object based on the expr type.  See +filter+.
     def filter_expr(expr = nil, &block)
       expr = nil if expr == []
