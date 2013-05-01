@@ -844,7 +844,11 @@ module Sequel
     #   DB[:items].select(:a).select_more(:b) # SELECT a, b FROM items
     #   DB[:items].select_more(:b) # SELECT b FROM items
     def select_more(*columns, &block)
-      columns = @opts[:select] + columns if @opts[:select]
+      if @opts[:select]
+        columns = @opts[:select] + columns
+      else
+        Sequel::Deprecation.deprecate('Dataset#select_more will no longer remove the wildcard selection from the Dataset starting in Sequel 4.  Switch to using Dataset#select if you want that behavior.')
+      end
       select(*columns, &block)
     end
     
