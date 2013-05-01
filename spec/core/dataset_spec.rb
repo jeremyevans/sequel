@@ -622,7 +622,7 @@ describe "Dataset#or" do
     @d1 = @dataset.where(:x => 1)
   end
   
-  specify "should raise if no filter exists" do
+  qspecify "should raise if no filter exists" do
     proc {@dataset.or(:a => 1)}.should raise_error(Sequel::Error)
   end
   
@@ -659,7 +659,7 @@ describe "Dataset#and" do
     @d1 = @dataset.where(:x => 1)
   end
   
-  specify "should raise if no filter exists" do
+  qspecify "should raise if no filter exists" do
     proc {@dataset.and(:a => 1)}.should raise_error(Sequel::Error)
     proc {@dataset.where(:a => 1).group(:t).and(:b => 2)}.should_not raise_error(Sequel::Error)
     @dataset.where(:a => 1).group(:t).and(:b => 2).sql.should == "SELECT * FROM test WHERE ((a = 1) AND (b = 2)) GROUP BY t"
@@ -752,7 +752,7 @@ describe "Dataset#invert" do
     @d = Sequel::Dataset.new(nil).from(:test)
   end
 
-  specify "should raise error if the dataset is not filtered" do
+  qspecify "should raise error if the dataset is not filtered" do
     proc{@d.invert}.should raise_error(Sequel::Error)
   end
 

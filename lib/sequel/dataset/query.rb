@@ -69,7 +69,10 @@ module Sequel
     #
     #   DB[:table].filter(:a).and(:b) # SELECT * FROM table WHERE a AND b
     def and(*cond, &block)
-      raise(InvalidOperation, "No existing filter found.") unless @opts[:having] || @opts[:where]
+      unless @opts[:having] || @opts[:where]
+        Sequel::Deprecation.deprecate('Dataset#and will no longer raise for an unfilered dataset starting in Sequel 4.')
+        raise(InvalidOperation, "No existing filter found.")
+      end
       if @opts[:having]
         Sequel::Deprecation.deprecate('Dataset#and will no longer modify the HAVING clause starting in Sequel 4.  Switch to using Dataset#having.')
         having(*cond, &block)
@@ -428,7 +431,10 @@ module Sequel
     #   # SELECT * FROM items WHERE ((category != 'software') OR (id != 3))
     def invert
       having, where = @opts[:having], @opts[:where]
-      raise(Error, "No current filter") unless having || where
+      unless having || where
+        Sequel::Deprecation.deprecate('Dataset#invert will no longer raise for an unfilered dataset starting in Sequel 4.')
+        raise(Error, "No current filter")
+      end
       o = {}
       o[:having] = SQL::BooleanExpression.invert(having) if having
       o[:where] = SQL::BooleanExpression.invert(where) if where
@@ -639,7 +645,10 @@ module Sequel
     #   DB[:items].filter(:a).or(:b) # SELECT * FROM items WHERE a OR b
     def or(*cond, &block)
       clause = (@opts[:having] ? :having : :where)
-      raise(InvalidOperation, "No existing filter found.") unless @opts[clause]
+      unless @opts[clause]
+        Sequel::Deprecation.deprecate('Dataset#or will no longer raise for an unfilered dataset starting in Sequel 4.')
+        raise(InvalidOperation, "No existing filter found.")
+      end
       Sequel::Deprecation.deprecate('Dataset#or will no longer modify the HAVING clause starting in Sequel 4.  There is currently no replacement for this behavior, but one can be added if requested.') if clause == :having
       cond = cond.first if cond.size == 1
       clone(clause => SQL::BooleanExpression.new(:OR, @opts[clause], filter_expr(cond, &block)))

@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Dataset#and, #or, and #invert raising exceptions for no existing filter (jeremyevans)
+
 * Deprecate Dataset#{and,filter,exclude,or} affecting the HAVING clause (jeremyevans)
 
 * Deprecate passing explicit columns to update as separate arguments to Model#save (jeremyevans)
