@@ -1292,6 +1292,7 @@ module Sequel
       # Takes the following options:
       #
       # :changed :: save all changed columns, instead of all columns or the columns given
+      # :columns :: array of specific columns that should be saved.
       # :raise_on_failure :: set to true or false to override the current
       #                      +raise_on_save_failure+ setting
       # :server :: set the server/shard on the object before saving, and use that
@@ -1302,6 +1303,10 @@ module Sequel
       def save(*columns)
         raise Sequel::Error, "can't save frozen object" if frozen?
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
+
+        Sequel::Deprecation.deprecate('Passing columns as separate arguments to Model#save', 'Instead, provide a :columns option with the array of columns to save.') unless columns.empty?
+        columns.concat(Array(opts[:columns])) if opts[:columns]
+
         set_server(opts[:server]) if opts[:server] 
         if opts[:validate] != false
           unless checked_save_failure(opts){_valid?(true, opts)}

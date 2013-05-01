@@ -1060,7 +1060,7 @@ describe "UpdatePrimaryKey plugin" do
     @db[:t].all.should == [{:a=>1, :b=>4}]
     @c.first.set(:b=>5).save
     @db[:t].all.should == [{:a=>1, :b=>5}]
-    @c.first.set(:b=>6).save(:b)
+    @c.first.set(:b=>6).save(:columns=>:b)
     @db[:t].all.should == [{:a=>1, :b=>6}]
   end
 
@@ -1072,7 +1072,7 @@ describe "UpdatePrimaryKey plugin" do
   specify "should handle updating just the primary key field when saving changes" do
     @c.first.update(:a=>2)
     @db[:t].all.should == [{:a=>2, :b=>3}]
-    @c.first.set(:a=>3).save(:a)
+    @c.first.set(:a=>3).save(:columns=>:a)
     @db[:t].all.should == [{:a=>3, :b=>3}]
   end
 

@@ -139,10 +139,10 @@ describe "Sequel::Model basic support" do
     i = Item.create(:name=>'J', :num=>1)
     Item.all.should == [Item.load(:id=>1, :name=>'J', :num=>1)]
     i.set(:name=>'K', :num=>2)
-    i.save(:name)
+    i.save(:columns=>:name)
     Item.all.should == [Item.load(:id=>1, :name=>'K', :num=>1)]
     i.set(:name=>'L')
-    i.save(:num)
+    i.save(:columns=>:num)
     Item.all.should == [Item.load(:id=>1, :name=>'K', :num=>2)]
   end
   

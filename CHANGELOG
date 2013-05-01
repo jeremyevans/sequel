@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate passing explicit columns to update as separate arguments to Model#save (jeremyevans)
+
+* Allow specifying explicit columns to update in Model#save via the :columns option (jeremyevans)
+
 * Add ability set the default for join_table's :qualify option via Dataset#default_join_table_qualification (jeremyevans)
 
 * Deprecate core extension usage if the core_extensions have not been explicitly loaded (jeremyevans)

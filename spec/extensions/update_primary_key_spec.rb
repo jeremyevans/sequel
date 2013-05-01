@@ -19,7 +19,7 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
     @c.first.set(:b=>5).save
     @c.all.should == [@c.load(:a=>1, :b=>5)]
     MODEL_DB.sqls.should == ["SELECT * FROM a LIMIT 1", "UPDATE a SET b = 5 WHERE (a = 1)", "SELECT * FROM a"]
-    @c.first.set(:b=>6).save(:b)
+    @c.first.set(:b=>6).save(:columns=>:b)
     @c.all.should == [@c.load(:a=>1, :b=>6)]
     MODEL_DB.sqls.should == ["SELECT * FROM a LIMIT 1", "UPDATE a SET b = 6 WHERE (a = 1)", "SELECT * FROM a"]
   end
@@ -38,7 +38,7 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
     @c.first.update(:a=>2)
     @c.all.should == [@c.load(:a=>2, :b=>3)]
     MODEL_DB.sqls.should == ["SELECT * FROM a LIMIT 1", "UPDATE a SET a = 2 WHERE (a = 1)", "SELECT * FROM a"]
-    @c.first.set(:a=>3).save(:a)
+    @c.first.set(:a=>3).save(:columns=>:a)
     @c.all.should == [@c.load(:a=>3, :b=>3)]
     MODEL_DB.sqls.should == ["SELECT * FROM a LIMIT 1", "UPDATE a SET a = 3 WHERE (a = 2)", "SELECT * FROM a"]
   end

@@ -127,9 +127,15 @@ describe "Model#save" do
     proc{o.save}.should_not raise_error
   end
   
-  it "should update only the given columns if given" do
+  qspecify "should update only the given columns if given" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.save(:y)
+    MODEL_DB.sqls.first.should == "UPDATE items SET y = NULL WHERE (id = 3)"
+  end
+  
+  it "should respect the :columns option to specify the columns to save" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.save(:columns=>:y)
     MODEL_DB.sqls.first.should == "UPDATE items SET y = NULL WHERE (id = 3)"
   end
   
@@ -137,9 +143,9 @@ describe "Model#save" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o[:y] = 4
     o.changed_columns.should == [:y]
-    o.save(:x)
+    o.save(:columns=>:x)
     o.changed_columns.should == [:y]
-    o.save(:y)
+    o.save(:columns=>:y)
     o.changed_columns.should == []
   end
   
@@ -182,7 +188,7 @@ describe "Model#save" do
     o = @c.load(:id => 23,:x => 2, :y => nil)
     o[:x] = 2
     o[:y] = 22
-    o.save(:x)
+    o.save(:columns=>:x)
     res.should == [{:x=>2},nil]
     o.after_save
     res.should == [nil, nil]
@@ -190,19 +196,19 @@ describe "Model#save" do
   
   it "should use Model's use_transactions setting by default" do
     @c.use_transactions = true
-    @c.load(:id => 3, :x => 1, :y => nil).save(:y)
+    @c.load(:id => 3, :x => 1, :y => nil).save(:columns=>:y)
     MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
     @c.use_transactions = false
-    @c.load(:id => 3, :x => 1, :y => nil).save(:y)
+    @c.load(:id => 3, :x => 1, :y => nil).save(:columns=>:y)
     MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
   end
 
   it "should inherit Model's use_transactions setting" do
     @c.use_transactions = true
-    Class.new(@c).load(:id => 3, :x => 1, :y => nil).save(:y)
+    Class.new(@c).load(:id => 3, :x => 1, :y => nil).save(:columns=>:y)
     MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
     @c.use_transactions = false
-    Class.new(@c).load(:id => 3, :x => 1, :y => nil).save(:y)
+    Class.new(@c).load(:id => 3, :x => 1, :y => nil).save(:columns=>:y)
     MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
   end
 
@@ -210,23 +216,23 @@ describe "Model#save" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = false
     @c.use_transactions = true
-    o.save(:y)
+    o.save(:columns=>:y)
     MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
     @c.use_transactions = false 
-    o.save(:y)
+    o.save(:columns=>:y)
     MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
   end
 
   it "should use :transaction option if given" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
-    o.save(:y, :transaction=>false)
+    o.save(:columns=>:y, :transaction=>false)
     MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = false
-    o.save(:y, :transaction=>true)
+    o.save(:columns=>:y, :transaction=>true)
     MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
   end
 
@@ -237,7 +243,7 @@ describe "Model#save" do
     def o.before_save
       false
     end
-    proc { o.save(:y) }.should raise_error(Sequel::BeforeHookFailed)
+    proc { o.save(:columns=>:y) }.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == ["BEGIN", "ROLLBACK"]
   end
 
@@ -248,7 +254,7 @@ describe "Model#save" do
     def o.before_save
       false
     end
-    proc { o.save(:y, :raise_on_failure => true) }.should raise_error(Sequel::BeforeHookFailed)
+    proc { o.save(:columns=>:y, :raise_on_failure => true) }.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == ["BEGIN", "ROLLBACK"]
   end
 
@@ -260,7 +266,7 @@ describe "Model#save" do
       false
     end
     MODEL_DB.transaction do
-      o.save(:y).should == nil
+      o.save(:columns=>:y).should == nil
       MODEL_DB.run "BLAH"
     end
     MODEL_DB.sqls.should == ["BEGIN", "BLAH", "COMMIT"]
@@ -273,7 +279,7 @@ describe "Model#save" do
     def o.before_save
       false
     end
-    o.save(:y).should == nil
+    o.save(:columns=>:y).should == nil
     MODEL_DB.sqls.should == ["BEGIN", "ROLLBACK"]
   end
 
@@ -283,7 +289,7 @@ describe "Model#save" do
     def o.before_save
       raise Sequel::Rollback
     end
-    proc { o.save(:y) }.should raise_error(Sequel::Rollback)
+    proc { o.save(:columns=>:y) }.should raise_error(Sequel::Rollback)
     MODEL_DB.sqls.should == []
   end
 
