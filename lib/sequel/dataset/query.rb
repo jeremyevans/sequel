@@ -248,6 +248,7 @@ module Sequel
       source.each do |s|
         case s
         when Hash
+          Sequel::Deprecation.deprecate('Dataset#from will no longer treat an input hash as an alias specifier.  Switch to aliasing using Sequel.as or use the hash_aliases extension.')
           s.each{|k,v| sources << SQL::AliasedExpression.new(k,v)}
         when Dataset
           if hoist_cte?(s)
@@ -784,7 +785,12 @@ module Sequel
       virtual_row_columns(columns, block)
       m = []
       columns.each do |i|
-        i.is_a?(Hash) ? m.concat(i.map{|k, v| SQL::AliasedExpression.new(k,v)}) : m << i
+        if i.is_a?(Hash)
+          Sequel::Deprecation.deprecate('Dataset#select will no longer treat an input hash as an alias specifier.  Switch to aliasing using Sequel.as or use the hash_aliases extension.')
+          m.concat(i.map{|k, v| SQL::AliasedExpression.new(k,v)})
+        else
+          m << i
+        end
       end
       clone(:select => m)
     end

@@ -132,7 +132,7 @@ module Sequel
             end
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
-          model.from(t => table_alias).
+          model.from(SQL::AliasedExpression.new(t, table_alias)).
            with_recursive(t, col_aliases ? base_ds.select(*col_aliases) : base_ds.select_all,
             recursive_ds.select(*c_all),
             :args=>col_aliases)
@@ -181,7 +181,7 @@ module Sequel
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           elds = model.eager_loading_dataset(r,
-           model.from(t => table_alias).
+           model.from(SQL::AliasedExpression.new(t, table_alias)).
             with_recursive(t, base_case,
              recursive_case,
              :args=>(([ka] + col_aliases) if col_aliases)),
@@ -232,7 +232,7 @@ module Sequel
             end
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
-          model.from(t => table_alias).
+          model.from(SQL::AliasedExpression.new(t, table_alias)).
            with_recursive(t, col_aliases ? base_ds.select(*col_aliases) : base_ds.select_all,
             recursive_ds.select(*c_all),
             :args=>col_aliases)
@@ -287,7 +287,7 @@ module Sequel
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           elds = model.eager_loading_dataset(r,
-           model.from(t => table_alias).with_recursive(t, base_case, recursive_case,
+           model.from(SQL::AliasedExpression.new(t, table_alias)).with_recursive(t, base_case, recursive_case,
             :args=>(([ka] + col_aliases + (level ? [la] : [])) if col_aliases)),
            r.select,
            associations, eo)

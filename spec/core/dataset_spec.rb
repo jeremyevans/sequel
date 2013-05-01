@@ -1137,7 +1137,7 @@ describe "Dataset#from" do
     @dataset.from(d1, d2).sql.should == "SELECT * FROM (SELECT * FROM a GROUP BY b) AS t1, (SELECT * FROM c GROUP BY d) AS t2"
   end
   
-  specify "should accept a hash for aliasing" do
+  qspecify "should accept a hash for aliasing" do
     @dataset.from(:a => :b).sql.should == "SELECT * FROM a AS b"
     @dataset.from(:a => 'b').sql.should == "SELECT * FROM a AS b"
     @dataset.from(@dataset.from(:a).group(:b) => :c).sql.should == "SELECT * FROM (SELECT * FROM a GROUP BY b) AS c"
@@ -1225,11 +1225,11 @@ describe "Dataset#select" do
     @d.select(Sequel.as([[:b, :c]], :n)).sql.should == 'SELECT (b = c) AS n FROM test'
   end
 
-  specify "should handle hashes returned from virtual row blocks" do
+  qspecify "should handle hashes returned from virtual row blocks" do
     @d.select{{:b=>:c}}.sql.should == 'SELECT b AS c FROM test'
   end
 
-  specify "should accept a hash for AS values" do
+  qspecify "should accept a hash for AS values" do
     @d.select(:name => 'n', :__ggh => 'age').sql.should =~ /SELECT ((name AS n, __ggh AS age)|(__ggh AS age, name AS n)) FROM test/
   end
 
@@ -1241,7 +1241,7 @@ describe "Dataset#select" do
   specify "should accept arbitrary objects and literalize them correctly" do
     @d.select(1, :a, 't').sql.should == "SELECT 1, a, 't' FROM test"
     @d.select(nil, Sequel.function(:sum, :t), :x___y).sql.should == "SELECT NULL, sum(t), x AS y FROM test"
-    @d.select(nil, 1, :x => :y).sql.should == "SELECT NULL, 1, x AS y FROM test"
+    @d.select(nil, 1, Sequel.as(:x, :y)).sql.should == "SELECT NULL, 1, x AS y FROM test"
   end
 
   specify "should accept a block that yields a virtual row" do
@@ -2128,7 +2128,7 @@ describe "Dataset#join_table" do
   end
   
   specify "should support using an alias for the FROM when doing the first join with unqualified condition columns" do
-    @d.from(:foo=>:f).join_table(:inner, :bar, :id => :bar_id).sql.should == 'SELECT * FROM "foo" AS "f" INNER JOIN "bar" ON ("bar"."id" = "f"."bar_id")'
+    @d.from(Sequel.as(:foo, :f)).join_table(:inner, :bar, :id => :bar_id).sql.should == 'SELECT * FROM "foo" AS "f" INNER JOIN "bar" ON ("bar"."id" = "f"."bar_id")'
   end
   
   specify "should support implicit schemas in from table symbols" do
@@ -2241,7 +2241,7 @@ describe "Dataset#join_table" do
       joins.should == []
     end
 
-    @d.from(:items=>:i).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
+    @d.from(Sequel.as(:items, :i)).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
       join_alias.should == :c
       last_join_alias.should == :i
       joins.should == []
@@ -3629,7 +3629,7 @@ describe "Sequel::Dataset#qualify_to_first_source" do
     @ds.filter(:a=>1).order(:a).group(:a).having(:a).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a = 1) GROUP BY t.a HAVING t.a ORDER BY t.a'
   end
 
-  specify "should handle hashes in select option" do
+  qspecify "should handle hashes in select option" do
     @ds.select(:a=>:b).qualify_to_first_source.sql.should == 'SELECT t.a AS b FROM t'
   end
 
