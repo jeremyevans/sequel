@@ -647,6 +647,10 @@ describe "Dataset#or" do
   specify "should allow the use of blocks and arguments simultaneously" do
     @d1.or(Sequel.expr(:zz) < 3){yy > 3}.sql.should == 'SELECT * FROM test WHERE ((x = 1) OR ((zz < 3) AND (yy > 3)))'
   end
+
+  qspecify "should modify the having clause if there is already a having clause" do
+    @dataset.having(:x => 1).or(:y => 2).sql.should == 'SELECT * FROM test HAVING ((x = 1) OR (y = 2))'
+  end
 end
 
 describe "Dataset#and" do
@@ -689,7 +693,7 @@ describe "Dataset#exclude" do
     @dataset.exclude(:region=>'Asia').select_sql.should == "SELECT * FROM test WHERE (region != 'Asia')"
   end
 
-  specify "should affect the having clause if having clause is already used" do
+  qspecify "should affect the having clause if having clause is already used" do
     @dataset.group_and_count(:name).having{count > 2}.exclude{count > 5}.sql.should == "SELECT name, count(*) AS count FROM test GROUP BY name HAVING ((count > 2) AND (count <= 5))"
   end
 
@@ -781,8 +785,12 @@ describe "Dataset#having" do
     @grouped.having{Sequel.function(:sum, :population) > 10}.sql.should == "SELECT region, sum(population), avg(gdp) FROM test GROUP BY region HAVING (sum(population) > 10)"
   end
 
-  specify "should work with and on the having clause" do
+  qspecify "should work with and on the having clause" do
     @grouped.having(Sequel.expr(:a) > 1).and(Sequel.expr(:b) < 2).sql.should == "SELECT region, sum(population), avg(gdp) FROM test GROUP BY region HAVING ((a > 1) AND (b < 2))"
+  end
+
+  qspecify "should work with filter on the having clause" do
+    @grouped.having(Sequel.expr(:a) > 1).filter(Sequel.expr(:b) < 2).sql.should == "SELECT region, sum(population), avg(gdp) FROM test GROUP BY region HAVING ((a > 1) AND (b < 2))"
   end
 end
 
