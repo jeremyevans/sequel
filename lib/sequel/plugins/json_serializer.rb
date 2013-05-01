@@ -366,7 +366,10 @@ module Sequel
             opts.delete(:root)
             opts[:naked] = true unless opts.has_key?(:naked)
             true
+          when :both
+            true
           else
+            Sequel::Deprecation.deprecate('The to_json :root=>true option will mean :root=>:collection starting in Sequel 4.  Use :root=>:both if you want to wrap both the collection and each item in a wrapper.')
             true
           end
 
