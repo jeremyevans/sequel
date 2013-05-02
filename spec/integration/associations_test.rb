@@ -51,9 +51,6 @@ shared_examples_for "eager limit strategies" do
   end
   
   specify "should correctly handle limits and offsets when eager loading many_to_many associations" do
-    if @els == {:eager_limit_strategy=>:correlated_subquery} && Sequel.guarded?(:derby, :mssql)
-      pending("correlated subqueries on many_to_many associations not supported")
-    end
     Album.many_to_many :first_two_tags, {:clone=>:first_two_tags}.merge(@els) if @els
     Album.many_to_many :second_two_tags, {:clone=>:second_two_tags}.merge(@els) if @els
     Album.many_to_many :last_two_tags, {:clone=>:last_two_tags}.merge(@els) if @els
@@ -76,9 +73,6 @@ shared_examples_for "eager limit strategies" do
   end
   
   specify "should correctly handle limits and offsets when eager loading many_through_many associations" do
-    if @els == {:eager_limit_strategy=>:correlated_subquery} && Sequel.guarded?(:derby, :mssql)
-      pending("correlated subqueries on many_through_many associations not supported")
-    end
     Artist.many_through_many :first_two_tags, {:clone=>:first_two_tags}.merge(@els) if @els
     Artist.many_through_many :second_two_tags, {:clone=>:second_two_tags}.merge(@els) if @els
     Artist.many_through_many :last_two_tags, {:clone=>:last_two_tags}.merge(@els) if @els
@@ -603,13 +597,6 @@ describe "Sequel::Model Simple Associations" do
   
   it_should_behave_like "regular and composite key associations"
 
-  describe "with :eager_limit_strategy=>:correlated_subquery" do
-    before do
-      @els = {:eager_limit_strategy=>:correlated_subquery}
-    end
-    it_should_behave_like "eager limit strategies"
-  end unless Sequel.guarded?(:mysql, :db2, :oracle, :h2, :cubrid, :hsqldb)
-
   specify "should handle many_to_one associations with same name as :key" do
     Album.def_column_alias(:artist_id_id, :artist_id)
     Album.many_to_one :artist_id, :key_column =>:artist_id, :class=>Artist
@@ -815,13 +802,6 @@ describe "Sequel::Model Composite Key Associations" do
   end
 
   it_should_behave_like "regular and composite key associations"
-
-  describe "with :eager_limit_strategy=>:correlated_subquery" do
-    before do
-      @els = {:eager_limit_strategy=>:correlated_subquery}
-    end
-    it_should_behave_like "eager limit strategies"
-  end if INTEGRATION_DB.dataset.supports_multiple_column_in? && !Sequel.guarded?(:mysql, :db2, :oracle, :hsqldb)
 
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums

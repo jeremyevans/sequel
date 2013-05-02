@@ -317,14 +317,10 @@ describe Sequel::Model::Associations::AssociationReflection, "#eager_limit_strat
     def (c.dataset).supports_window_functions?() true end
     c.many_to_many :cs, :class=>c, :limit=>1
     c.association_reflection(:cs).eager_limit_strategy.should == :window_function
-
-    c.default_eager_limit_strategy = :correlated_subquery
-    c.many_to_many :cs, :class=>c, :limit=>1
-    c.association_reflection(:cs).eager_limit_strategy.should == :correlated_subquery
   end
 
   it "should ignore Model.default_eager_limit_strategy for one_to_one associations" do
-    @c.default_eager_limit_strategy = :correlated_subquery
+    @c.default_eager_limit_strategy = :window_function
     @c.one_to_one :c, :class=>@c
     @c.association_reflection(:c).eager_limit_strategy.should be_nil
   end

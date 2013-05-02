@@ -652,7 +652,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     MODEL_DB.sqls.length.should == 0
   end
 
-  it "should respect the :limit option on a many_through_many association using a :correlated_subquery strategy" do
+  qspecify "should respect the :limit option on a many_through_many association using a :correlated_subquery strategy" do
     @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :eager_limit_strategy=>:correlated_subquery, :order=>:name
     Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5},{:x_foreign_key_x=>1, :id=>6}]
     a = @c1.eager(:first_two_tags).all

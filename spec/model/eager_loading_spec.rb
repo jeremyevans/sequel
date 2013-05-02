@@ -169,7 +169,7 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.should == []
   end
   
-  it "should eagerly load a single one_to_one association using the :correlated_subquery strategy" do
+  qspecify "should eagerly load a single one_to_one association using the :correlated_subquery strategy" do
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>:correlated_subquery, :order=>:name
     a = EagerAlbum.eager(:track).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
@@ -178,7 +178,7 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.should == []
   end
   
-  it "should handle qualified order clauses when eagerly loading a single one_to_one association using the :correlated_subquery strategy" do
+  qspecify "should handle qualified order clauses when eagerly loading a single one_to_one association using the :correlated_subquery strategy" do
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>:correlated_subquery, :order=>[:tracks__name, Sequel.desc(:tracks__name), Sequel.qualify(:tracks, :name), Sequel.qualify(:t, :name), 1]
     a = EagerAlbum.eager(:track).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
@@ -187,7 +187,7 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.should == []
   end
   
-  it "should handle qualified composite keys when eagerly loading a single one_to_one association using the :correlated_subquery strategy" do
+  qspecify "should handle qualified composite keys when eagerly loading a single one_to_one association using the :correlated_subquery strategy" do
     c1 = Class.new(EagerAlbum)
     c2 = Class.new(EagerTrack)
     c1.set_primary_key [:id, :band_id]
@@ -581,7 +581,7 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.should == []
   end
   
-  it "should respect the :limit option on a one_to_many association using the :correlated_subquery strategy" do
+  qspecify "should respect the :limit option on a one_to_many association using the :correlated_subquery strategy" do
     EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>:correlated_subquery, :order=>:name, :limit=>2
     a = EagerAlbum.eager(:tracks).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
@@ -590,7 +590,7 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.should == []
   end
   
-  it "should respect the :limit option with an offset on a one_to_many association using the :correlated_subquery strategy" do
+  qspecify "should respect the :limit option with an offset on a one_to_many association using the :correlated_subquery strategy" do
     EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>:correlated_subquery, :order=>:name, :limit=>[2, 1]
     a = EagerAlbum.eager(:tracks).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
@@ -632,7 +632,7 @@ describe Sequel::Model, "#eager" do
     as.first.first_two_genres.should == [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
   end
 
-  it "should respect the limit option on a many_to_many association using the :correlated_subquery strategy" do
+  qspecify "should respect the limit option on a many_to_many association using the :correlated_subquery strategy" do
     EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :eager_limit_strategy=>:correlated_subquery, :limit=>2, :order=>:name
     EagerGenre.dataset._fetch = [{:x_foreign_key_x=>2, :id=>5}, {:x_foreign_key_x=>2, :id=>6}]
     as = EagerAlbum.eager(:first_two_genres).all

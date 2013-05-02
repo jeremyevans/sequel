@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate the correlated_subquery eager limit strategy (jeremyevans)
+
 * Add hash_aliases extension for making Dataset#select and #from treat hashes as alias specifiers (jeremyevans)
 
 * Deprecate having Dataset#select and #from treat hashes as alias specifiers (jeremyevans)

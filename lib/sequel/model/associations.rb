@@ -795,8 +795,8 @@ module Sequel
         #                          all records but slices the resulting array after the association is retrieved.  You
         #                          can pass a +true+ value for this option to have Sequel pick what it thinks is the best
         #                          choice for the database, or specify a specific symbol to manually select a strategy.
-        #                          one_to_one associations support :distinct_on, :window_function, and :correlated_subquery.
-        #                          *_many associations support :ruby, :window_function, and :correlated_subquery.
+        #                          one_to_one associations support :distinct_on and :window_function.
+        #                          *_many associations support :ruby, and :window_function.
         # :eager_loader :: A proc to use to implement eager loading, overriding the default.  Takes a single hash argument,
         #                  with at least the keys: :rows, which is an array of current model instances, :associations,
         #                  which is a hash of dependent associations, :self, which is the dataset doing the eager loading,
@@ -1023,6 +1023,7 @@ module Sequel
       
         # Use a correlated subquery to limit the results of the eager loading dataset.
         def apply_correlated_subquery_eager_limit_strategy(ds, opts)
+          Sequel::Deprecation.deprecate('The correlated_subquery eager limit strategy',  'Switch to another eager limit strategy.')
           klass = opts.associated_class
           kds = klass.dataset
           dsa = ds.send(:dataset_alias, 1)
