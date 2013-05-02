@@ -38,10 +38,14 @@ module Sequel
         
         par = opts.merge(opts.fetch(:parent, {}))
         parent = par.fetch(:name, :parent)
-        model.many_to_one parent, par
         
         chi = opts.merge(opts.fetch(:children, {}))
         children = chi.fetch(:name, :children)
+
+        par[:reciprocal] = children
+        chi[:recripocal] = parent
+
+        model.many_to_one parent, par
         model.one_to_many children, chi
 
         model.plugin SingleRoot if opts[:single_root]

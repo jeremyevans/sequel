@@ -36,7 +36,7 @@ describe "NestedAttributes plugin" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
     @Artist.one_to_many :concerts, :class=>@Concert, :key=>:artist_id
     @Artist.one_to_one :first_album, :class=>@Album, :key=>:artist_id
-    @Album.many_to_one :artist, :class=>@Artist
+    @Album.many_to_one :artist, :class=>@Artist, :reciprocal=>:albums
     @Album.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:at
     @Artist.nested_attributes :albums, :first_album, :destroy=>true, :remove=>true
     @Artist.nested_attributes :concerts, :destroy=>true, :remove=>true
@@ -419,7 +419,7 @@ describe "NestedAttributes plugin" do
   end
   
   it "should not attempt to validate nested attributes if the :validate=>false association option is used" do
-    @Album.many_to_one :artist, :class=>@Artist, :validate=>false
+    @Album.many_to_one :artist, :class=>@Artist, :validate=>false, :reciprocal=>nil
     @Album.nested_attributes :artist, :tags, :destroy=>true, :remove=>true
     @Artist.class_eval do
       def validate

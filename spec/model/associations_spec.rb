@@ -1682,7 +1682,7 @@ describe Sequel::Model, "one_to_many" do
   end
 
   it "should allow additional arguments given to the remove_ method and pass them onwards to the _remove_ method" do
-    @c2.one_to_many :attributes, :class => @c1
+    @c2.one_to_many :attributes, :class => @c1, :reciprocal=>nil
     p = @c2.load(:id=>10)
     c = @c1.load(:id=>123)
     def p._remove_attribute(x,*y)
@@ -3148,7 +3148,7 @@ describe "Sequel::Model Associations with non-column expression keys" do
     @Foo.one_to_one :bar, :primary_key=>:obj_id, :primary_key_column=>Sequel.subscript(:object_ids, 0), :key=>Sequel.subscript(:object_ids, 0), :key_method=>:obj_id, :class=>@Bar
     @Bar.many_to_one :foo, :key=>:obj_id, :key_column=>Sequel.subscript(:object_ids, 0), :primary_key=>Sequel.subscript(:object_ids, 0), :primary_key_method=>:obj_id, :class=>@Foo
     @Foo.many_to_many :mtmbars, :join_table=>:bars_foos, :left_primary_key=>:obj_id, :left_primary_key_column=>Sequel.subscript(:object_ids, 0), :right_primary_key=>Sequel.subscript(:object_ids, 0), :right_primary_key_method=>:obj_id, :left_key=>Sequel.subscript(:foo_ids, 0), :right_key=>Sequel.subscript(:bar_ids, 0), :class=>@Bar
-    @Bar.many_to_many :mtmfoos, :join_table=>:bars_foos, :left_primary_key=>:obj_id, :left_primary_key_column=>Sequel.subscript(:object_ids, 0), :right_primary_key=>Sequel.subscript(:object_ids, 0), :right_primary_key_method=>:obj_id, :left_key=>Sequel.subscript(:bar_ids, 0), :right_key=>Sequel.subscript(:foo_ids, 0), :class=>@Foo
+    @Bar.many_to_many :mtmfoos, :join_table=>:bars_foos, :left_primary_key=>:obj_id, :left_primary_key_column=>Sequel.subscript(:object_ids, 0), :right_primary_key=>Sequel.subscript(:object_ids, 0), :right_primary_key_method=>:obj_id, :left_key=>Sequel.subscript(:bar_ids, 0), :right_key=>Sequel.subscript(:foo_ids, 0), :class=>@Foo, :reciprocal=>nil
     @foo = @Foo.load(:id=>1, :object_ids=>[2])
     @bar = @Bar.load(:id=>1, :object_ids=>[2])
     @db.sqls

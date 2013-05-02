@@ -188,20 +188,37 @@ module Sequel
         # it sets album.artist to this_artist.
         def reciprocal
           cached_fetch(:reciprocal) do
-            r_types = Array(reciprocal_type)
-            keys = self[:keys]
-            recip = nil
+            possible_recips = []
+            fallback_recips = []
+
             associated_class.all_association_reflections.each do |assoc_reflect|
-              if r_types.include?(assoc_reflect[:type]) && assoc_reflect[:keys] == keys && assoc_reflect.associated_class == self[:model]
-                cached_set(:reciprocal_type, assoc_reflect[:type])
-                recip = assoc_reflect[:name]
-                break
+              if reciprocal_association?(assoc_reflect)
+                if deprecated_reciprocal_association?(assoc_reflect)
+                  fallback_recips << assoc_reflect
+                else
+                  possible_recips << assoc_reflect
+                end
               end
             end
-            recip
+
+            if self[:conditions] || self[:block]
+              fallback_recips.concat(possible_recips)
+              possible_recips = []
+            end
+
+            Sequel::Deprecation.deprecate("Multiple reciprocal association candidates found for #{self[:name]} association (#{possible_recips.map{|r| r[:name]}.join(', ')}).  Choosing the first candidate is", "Please explicitly specify the reciprocal option for the #{self[:name]} association") if possible_recips.size >= 2
+            if possible_recips.empty? && !fallback_recips.empty?
+              possible_recips = fallback_recips
+              Sequel::Deprecation.deprecate("All reciprocal association candidates found for #{self[:name]} association have conditions, blocks, or differing primary keys (#{possible_recips.map{|r| r[:name]}.join(', ')}).  Automatic choosing of an reciprocal association with conditions or blocks is", "Please explicitly specify the reciprocal option for the #{self[:name]} association")
+            end
+
+            unless possible_recips.empty?
+              cached_set(:reciprocal_type, possible_recips.first[:type]) if reciprocal_type.is_a?(Array)
+              possible_recips.first[:name]
+            end
           end
         end
-    
+
         # Whether the reciprocal of this association returns an array of objects instead of a single object,
         # true by default.
         def reciprocal_array?
@@ -288,6 +305,15 @@ module Sequel
           end
         end
 
+        def deprecated_reciprocal_association?(assoc_reflect)
+          assoc_reflect[:conditions] || assoc_reflect[:block]
+        end
+
+        def reciprocal_association?(assoc_reflect)
+          Array(reciprocal_type).include?(assoc_reflect[:type]) &&
+            assoc_reflect.associated_class == self[:model]
+        end
+    
         # If +s+ is an array, map +s+ over the block.  Otherwise, just call the
         # block with +s+.
         def transform(s)
@@ -378,6 +404,14 @@ module Sequel
     
         private
     
+        def deprecated_reciprocal_association?(assoc_reflect)
+          super || primary_key != assoc_reflect.primary_key
+        end
+
+        def reciprocal_association?(assoc_reflect)
+          super && self[:keys] == assoc_reflect[:keys]
+        end
+
         # The reciprocal type of a many_to_one association is either
         # a one_to_many or a one_to_one association.
         def reciprocal_type
@@ -444,6 +478,14 @@ module Sequel
     
         private
     
+        def deprecated_reciprocal_association?(assoc_reflect)
+          super || primary_key != assoc_reflect.primary_key
+        end
+
+        def reciprocal_association?(assoc_reflect)
+          super && self[:keys] == assoc_reflect[:keys]
+        end
+
         # The reciprocal type of a one_to_many association is a many_to_one association.
         def reciprocal_type
           :many_to_one
@@ -570,25 +612,6 @@ module Sequel
           true
         end
     
-        # Returns the reciprocal association symbol, if one exists.
-        def reciprocal
-          cached_fetch(:reciprocal) do
-            left_keys = self[:left_keys]
-            right_keys = self[:right_keys]
-            join_table = self[:join_table]
-            recip = nil
-            associated_class.all_association_reflections.each do |assoc_reflect|
-              if assoc_reflect[:type] == :many_to_many && assoc_reflect[:left_keys] == right_keys &&
-                 assoc_reflect[:right_keys] == left_keys && assoc_reflect[:join_table] == join_table &&
-                 assoc_reflect.associated_class == self[:model]
-                recip = assoc_reflect[:name]
-                break
-              end
-            end
-            recip
-          end
-        end
-
         # #right_primary_key qualified by the associated table
         def qualified_right_primary_key
           cached_fetch(:qualified_right_primary_key){qualify_assoc(right_primary_key)}
@@ -622,6 +645,20 @@ module Sequel
         end
 
         private
+
+        def deprecated_reciprocal_association?(assoc_reflect)
+          super || right_primary_keys != assoc_reflect[:left_primary_key_columns] || self[:left_primary_key_columns] != assoc_reflect.right_primary_keys
+        end
+
+        def reciprocal_association?(assoc_reflect)
+          super && assoc_reflect[:left_keys] == self[:right_keys] &&
+            assoc_reflect[:right_keys] == self[:left_keys] &&
+            assoc_reflect[:join_table] == self[:join_table]
+        end
+
+        def reciprocal_type
+          :many_to_many
+        end
 
         # Split the join table into source and alias parts.
         def split_join_table_alias

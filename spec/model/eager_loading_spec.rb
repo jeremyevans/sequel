@@ -7,7 +7,7 @@ describe Sequel::Model, "#eager" do
       many_to_one :band, :class=>'EagerBand', :key=>:band_id
       one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id
       many_to_many :genres, :class=>'EagerGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag
-      one_to_many :good_tracks, :class=>'EagerTrack', :key=>:album_id do |ds|
+      one_to_many :good_tracks, :class=>'EagerTrack', :reciprocal=>nil, :key=>:album_id do |ds|
         ds.filter(:name=>'Good')
       end
       many_to_one :band_name, :class=>'EagerBand', :key=>:band_id, :select=>[:id, :name]
@@ -21,11 +21,11 @@ describe Sequel::Model, "#eager" do
 
     class ::EagerBand < Sequel::Model(:bands)
       columns :id, :p_k
-      one_to_many :albums, :class=>'EagerAlbum', :key=>:band_id, :eager=>:tracks
-      one_to_many :graph_albums, :class=>'EagerAlbum', :key=>:band_id, :eager_graph=>:tracks
+      one_to_many :albums, :class=>'EagerAlbum', :key=>:band_id, :eager=>:tracks, :reciprocal=>:band
+      one_to_many :graph_albums, :class=>'EagerAlbum', :key=>:band_id, :eager_graph=>:tracks, :reciprocal=>nil
       many_to_many :members, :class=>'EagerBandMember', :left_key=>:band_id, :right_key=>:member_id, :join_table=>:bm
       many_to_many :graph_members, :clone=>:members, :eager_graph=>:bands
-      one_to_many :good_albums, :class=>'EagerAlbum', :key=>:band_id, :eager_block=>proc{|ds| ds.filter(:name=>'good')} do |ds|
+      one_to_many :good_albums, :class=>'EagerAlbum', :key=>:band_id, :reciprocal=>nil, :eager_block=>proc{|ds| ds.filter(:name=>'good')} do |ds|
         ds.filter(:name=>'Good')
       end
       one_to_many :self_titled_albums, :class=>'EagerAlbum', :key=>:band_id, :allow_eager=>false do |ds|
@@ -228,7 +228,7 @@ describe Sequel::Model, "#eager" do
   end
   
   it "should support using a custom :primary_key option when eager loading one_to_many associations" do
-    EagerBand.one_to_many :salbums, :clone=>:albums, :primary_key=>:id3, :eager=>nil
+    EagerBand.one_to_many :salbums, :clone=>:albums, :primary_key=>:id3, :eager=>nil, :reciprocal=>nil
     EagerBand.dataset._fetch = {:id=>6}
     a = EagerBand.eager(:salbums).all
     MODEL_DB.sqls.should == ['SELECT * FROM bands', 'SELECT * FROM albums WHERE (albums.band_id IN (2))']
@@ -258,7 +258,7 @@ describe Sequel::Model, "#eager" do
   end
   
   it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup, for one_to_many associations" do
-    EagerBand.one_to_many :salbums, :clone=>:albums, :eager_loading_predicate_key=>Sequel.*(:albums__band_id, 3), :key_method=>:band_id3, :eager=>nil
+    EagerBand.one_to_many :salbums, :clone=>:albums, :eager_loading_predicate_key=>Sequel.*(:albums__band_id, 3), :key_method=>:band_id3, :eager=>nil, :reciprocal=>nil
     EagerBand.dataset._fetch = {:id=>6}
     a = EagerBand.eager(:salbums).all
     MODEL_DB.sqls.should == ['SELECT * FROM bands', 'SELECT * FROM albums WHERE ((albums.band_id * 3) IN (6))']
@@ -501,7 +501,7 @@ describe Sequel::Model, "#eager" do
     as.length.should == 1
     as.first.special_band.should == EagerBand.load(:p_k=>2, :id=>1)
 
-    EagerAlbum.one_to_many :special_tracks, :class=>:EagerTrack, :primary_key=>:band_id, :key=>:album_id
+    EagerAlbum.one_to_many :special_tracks, :class=>:EagerTrack, :primary_key=>:band_id, :key=>:album_id, :reciprocal=>nil
     EagerTrack.dataset._fetch = {:album_id=>2, :id=>1}
     as = EagerAlbum.eager(:special_tracks).all
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM tracks WHERE (tracks.album_id IN (2))"]
@@ -1166,7 +1166,7 @@ describe Sequel::Model, "#eager_graph" do
     as.should == [GraphAlbum.load(:id=>3, :band_id=>2)]
     as.first.inner_band.should == GraphBand.load(:id=>5, :vocalist_id=>2)
 
-    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :primary_key=>:band_id
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :primary_key=>:band_id, :reciprocal=>nil
     ds = GraphAlbum.eager_graph(:right_tracks)
     ds.sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums LEFT OUTER JOIN tracks AS right_tracks ON (right_tracks.album_id = albums.band_id)'
     ds._fetch = [{:id=>3, :band_id=>2, :right_tracks_id=>5, :album_id=>2}, {:id=>3, :band_id=>2, :right_tracks_id=>6, :album_id=>2}]
@@ -1276,7 +1276,7 @@ describe Sequel::Model, "#eager_graph" do
     GraphAlbum.many_to_one :active_band, :class=>'GraphBand', :key=>:band_id, :conditions=>{:active=>true}
     GraphAlbum.eager_graph(:active_band).sql.should == "SELECT albums.id, albums.band_id, active_band.id AS active_band_id, active_band.vocalist_id FROM albums LEFT OUTER JOIN bands AS active_band ON ((active_band.id = albums.band_id) AND (active_band.active IS TRUE))"
 
-    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :conditions=>{:id=>(0..100)}
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :conditions=>{:id=>(0..100)}, :reciprocal=>nil
     GraphAlbum.eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums LEFT OUTER JOIN tracks AS right_tracks ON ((right_tracks.album_id = albums.id) AND (right_tracks.id >= 0) AND (right_tracks.id <= 100))'
 
     GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :conditions=>{true=>:active}
@@ -1380,7 +1380,7 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should add the association's :order for cascading associations" do
-    GraphBand.one_to_many :a_albums, :class=>'GraphAlbum', :key=>:band_id, :order=>:name
+    GraphBand.one_to_many :a_albums, :class=>'GraphAlbum', :key=>:band_id, :order=>:name, :reciprocal=>nil
     GraphAlbum.one_to_many :b_tracks, :class=>'GraphTrack', :key=>:album_id, :order=>[:id, :album_id]
     GraphBand.eager_graph(:a_albums=>:b_tracks).sql.should == 'SELECT bands.id, bands.vocalist_id, a_albums.id AS a_albums_id, a_albums.band_id, b_tracks.id AS b_tracks_id, b_tracks.album_id FROM bands LEFT OUTER JOIN albums AS a_albums ON (a_albums.band_id = bands.id) LEFT OUTER JOIN tracks AS b_tracks ON (b_tracks.album_id = a_albums.id) ORDER BY a_albums.name, b_tracks.id, b_tracks.album_id'
     GraphAlbum.one_to_many :albums, :class=>'GraphAlbum', :key=>:band_id, :order=>[:band_id, :id]

@@ -567,7 +567,7 @@ describe "Sequel::Model Simple Associations" do
     end
     class ::Album < Sequel::Model(@db)
       plugin :dataset_associations
-      many_to_one :artist
+      many_to_one :artist, :reciprocal=>nil
       many_to_many :tags, :right_key=>:tag_id
       many_to_many :alias_tags, :clone=>:tags, :join_table=>:albums_tags___at
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
@@ -619,7 +619,7 @@ describe "Sequel::Model Simple Associations" do
     Artist.set_dataset(:artists___ar)
     Album.set_dataset(:albums___a)
     Tag.set_dataset(:tags___t)
-    Artist.one_to_many :balbums, :class=>Album, :key=>:artist_id
+    Artist.one_to_many :balbums, :class=>Album, :key=>:artist_id, :reciprocal=>nil
     Album.many_to_many :btags, :class=>Tag, :join_table=>:albums_tags, :right_key=>:tag_id
     Album.many_to_one :bartist, :class=>Artist, :key=>:artist_id
     Tag.many_to_many :balbums, :class=>Album, :join_table=>:albums_tags, :right_key=>:album_id
@@ -771,7 +771,7 @@ describe "Sequel::Model Composite Key Associations" do
       plugin :dataset_associations
       set_primary_key :id1, :id2
       unrestrict_primary_key
-      many_to_one :artist, :key=>[:artist_id1, :artist_id2]
+      many_to_one :artist, :key=>[:artist_id1, :artist_id2], :reciprocal=>nil
       many_to_many :tags, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2]
       many_to_many :alias_tags, :clone=>:tags, :join_table=>:albums_tags___at
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
