@@ -1,5 +1,9 @@
 === HEAD
 
+* Add after_initialize plugin for the after_initialize hook (jeremyevans)
+
+* Deprecate Model after_initialize hook (jeremyevans)
+
 * Deprecate passing two arguments to Model.new (jeremyevans)
 
 * Deprecate choosing reciprocal associations with conditions, blocks, or differing primary keys (jeremyevans)

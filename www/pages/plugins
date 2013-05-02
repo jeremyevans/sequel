@@ -6,6 +6,7 @@
 
 <ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ActiveModel.html">active_model</a>: Makes Sequel::Model objects compliant to the ActiveModel::Lint specs, so they should work correctly in Rails 3.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/AfterInitialize.html">after_initialize</a>: Adds an after_initialize hook to model objects, called for both new objects and those loaded from the database.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationAutoreloading.html">association_autoreloading</a>: Automatically clears the association cache for many_to_one associations when the related foreign key value is modified.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationDependencies.html">association_dependencies</a>: Allows easy deleting, destroying, or nullifying associated objects when destroying a model object.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationPks.html">association_pks</a>: Adds the association_pks and association_pks= to *_to_many associations.</li>

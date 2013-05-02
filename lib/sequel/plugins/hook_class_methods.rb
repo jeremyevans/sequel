@@ -39,7 +39,13 @@ module Sequel
       end
 
       module ClassMethods
-        Model::HOOKS.each{|h| class_eval("def #{h}(method = nil, &block); add_hook(:#{h}, method, &block) end", __FILE__, __LINE__)}
+        (Model::HOOKS - [:after_initialize]).each{|h| class_eval("def #{h}(method = nil, &block); add_hook(:#{h}, method, &block) end", __FILE__, __LINE__)}
+
+        # REMOVE40
+        def after_initialize(method = nil, &block)
+          Sequel::Deprecation.deprecate('The Model after_initialize hook', 'The hook_class_methods plugin will no longer support the hook.  Please use the after_initialize plugin and define the after_initialize hook directly')
+          add_hook(:after_initialize, method, &block)
+        end
 
         # This adds a new hook type. It will define both a class
         # method that you can use to add hooks, as well as an instance method

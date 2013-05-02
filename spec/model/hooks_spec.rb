@@ -1,7 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Model#after_initialize" do
-  specify "should be called after initialization for both new object and objects retrieved from the database" do
+  qspecify "should be called after initialization for both new object and objects retrieved from the database" do
     
     a = Class.new(Sequel::Model) do
       self::Foo = []

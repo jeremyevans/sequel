@@ -342,9 +342,10 @@ module Sequel
       # may contain setter methods.
       def include(mod)
         clear_setter_methods_cache
+        check_deprecated_after_initialize(mod.instance_methods) unless allowed_after_initialize_implementation?(mod)
         super
       end
-  
+
       # If possible, set the dataset for the model subclass as soon as it
       # is created.  Also, make sure the inherited class instance variables
       # are copied into the subclass.
@@ -405,6 +406,7 @@ module Sequel
       # Clear the setter_methods cache when a setter method is added
       def method_added(meth)
         clear_setter_methods_cache if meth.to_s =~ SETTER_METHOD_REGEXP
+        check_deprecated_after_initialize(meth)
         super
       end
   
@@ -662,6 +664,18 @@ module Sequel
           raise
         rescue
           nil
+        end
+      end
+
+      # REMOVE40
+      def allowed_after_initialize_implementation?(mod)
+        mod == InstanceMethods || mod.to_s == 'Sequel::Plugins::HookClassMethods::InstanceMethods'
+      end
+  
+      # REMOVE40
+      def check_deprecated_after_initialize(meths)
+        Array(meths).each do |meth|
+          Sequel::Deprecation.deprecate('The Model after_initialize hook', 'Please use the after_initialize plugin to continue using the hook') if meth.to_s == 'after_initialize'
         end
       end
 

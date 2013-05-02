@@ -165,7 +165,7 @@ describe Sequel::Model, "hook_class_methods plugin" do
 end
 
 describe "Model#after_initialize" do
-  specify "should be called after initialization" do
+  qspecify "should be called after initialization" do
     values1 = nil
     reached_after_initialized = false
     
