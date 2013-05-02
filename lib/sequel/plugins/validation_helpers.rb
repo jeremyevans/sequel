@@ -95,7 +95,7 @@ module Sequel
       module InstanceMethods 
         # Check that the attribute values are the given exact length.
         def validates_exact_length(exact, atts, opts={})
-          validatable_attributes_for_type(:exact_length, atts, opts){|a,v,m| validation_error_message(m, exact) unless v && v.length == exact}
+          validatable_attributes_for_type(:exact_length, atts, opts){|a,v,m| validation_error_message(m, exact) if v.nil? || v.length != exact}
         end
 
         # Check the string representation of the attribute value(s) against the regular expression with.
@@ -122,7 +122,7 @@ module Sequel
 
         # Check that the attribute values length is in the specified range.
         def validates_length_range(range, atts, opts={})
-          validatable_attributes_for_type(:length_range, atts, opts){|a,v,m| validation_error_message(m, range) unless v && range.send(range.respond_to?(:cover?) ? :cover? : :include?, v.length)}
+          validatable_attributes_for_type(:length_range, atts, opts){|a,v,m| validation_error_message(m, range) if v.nil? || !range.send(range.respond_to?(:cover?) ? :cover? : :include?, v.length)}
         end
     
         # Check that the attribute values are not longer than the given max length.
@@ -130,12 +130,12 @@ module Sequel
         # Accepts a :nil_message option that is the error message to use when the
         # value is nil instead of being too long.
         def validates_max_length(max, atts, opts={})
-          validatable_attributes_for_type(:max_length, atts, opts){|a,v,m| v ? validation_error_message(m, max) : validation_error_message(opts[:nil_message] || DEFAULT_OPTIONS[:max_length][:nil_message]) unless v && v.length <= max}
+          validatable_attributes_for_type(:max_length, atts, opts){|a,v,m| v ? validation_error_message(m, max) : validation_error_message(opts[:nil_message] || DEFAULT_OPTIONS[:max_length][:nil_message]) if v.nil? || v.length > max}
         end
 
         # Check that the attribute values are not shorter than the given min length.
         def validates_min_length(min, atts, opts={})
-          validatable_attributes_for_type(:min_length, atts, opts){|a,v,m| validation_error_message(m, min) unless v && v.length >= min}
+          validatable_attributes_for_type(:min_length, atts, opts){|a,v,m| validation_error_message(m, min) if v.nil? || v.length < min}
         end
 
         # Check attribute value(s) are not NULL/nil.
@@ -170,8 +170,9 @@ module Sequel
         # the column's schema type.
         def validates_schema_types(atts=keys)
           Array(atts).each do |k|
-            next unless type = schema_type_class(k)
-            validates_type(type, k)
+            if type = schema_type_class(k)
+              validates_type(type, k, :allow_nil=>true)
+            end
           end
         end
 
@@ -180,7 +181,10 @@ module Sequel
         def validates_type(klass, atts, opts={})
           klass = klass.to_s.constantize if klass.is_a?(String) || klass.is_a?(Symbol)
           validatable_attributes_for_type(:type, atts, opts) do |a,v,m|
-            next if v.nil?
+            if v.nil?
+              Sequel::Deprecation.deprecate('validates_type will no longer allow nil values by default in Sequel 4.  Use the :allow_nil=>true option to allow nil values.')
+              next
+            end
             if klass.is_a?(Array) ? !klass.any?{|kls| v.is_a?(kls)} : !v.is_a?(klass)
               validation_error_message(m, klass)
             end
@@ -249,7 +253,7 @@ module Sequel
               where.call(model.dataset, self, arr)
             else
               vals = arr.map{|x| send(x)}
-              next unless vals.all?
+              next if vals.any?{|v| v.nil?}
               model.where(arr.zip(vals))
             end
             ds = yield(ds) if block_given?

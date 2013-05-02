@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate validates_type allowing nil values by default (jeremyevans)
+
 * Deprecate the correlated_subquery eager limit strategy (jeremyevans)
 
 * Add hash_aliases extension for making Dataset#select and #from treat hashes as alias specifiers (jeremyevans)

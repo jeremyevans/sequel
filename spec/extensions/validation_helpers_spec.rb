@@ -312,14 +312,12 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.errors.full_messages.should == ['value is not a valid integer']
     
     @c.set_validations{validates_type(Integer, :value)}
-    @m.value = nil
+    @m.value = 1
     @m.should be_valid
     @m.value = false
     @m.should_not be_valid
     
     @c.set_validations{validates_type([Integer, Float], :value)}
-    @m.value = nil
-    @m.should be_valid
     @m.value = 1
     @m.should be_valid
     @m.value = 1.0
@@ -327,6 +325,12 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = BigDecimal.new('1.0')
     @m.should_not be_valid
     @m.errors.full_messages.should == ['value is not a valid integer or float']
+  end
+
+  qspecify "should have validates_type skip nil values by default" do
+    @c.set_validations{validates_type([Integer, Float], :value)}
+    @m.value = nil
+    @m.should be_valid
   end
 
   specify "should support validates_not_null" do
