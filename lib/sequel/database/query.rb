@@ -234,7 +234,7 @@ module Sequel
     # Should raise an error if the table doesn't not exist,
     # and not raise an error if the table does exist.
     def _table_exists?(ds)
-      ds.get(Sequel::NULL)
+      ds.get(SQL::AliasedExpression.new(Sequel::NULL, :nil))
     end
     
     # Whether the type should be treated as a string type when parsing the

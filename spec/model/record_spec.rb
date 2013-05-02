@@ -1261,12 +1261,12 @@ describe Sequel::Model, "#exists?" do
 
   it "should do a query to check if the record exists" do
     @model.load(:id=>1).exists?.should be_true
-    MODEL_DB.sqls.should == ['SELECT 1 FROM items WHERE (id = 1) LIMIT 1']
+    MODEL_DB.sqls.should == ['SELECT 1 AS one FROM items WHERE (id = 1) LIMIT 1']
   end
 
   it "should return false when #this.count == 0" do
     @model.load(:id=>2).exists?.should be_false
-    MODEL_DB.sqls.should == ['SELECT 1 FROM items WHERE (id = 2) LIMIT 1']
+    MODEL_DB.sqls.should == ['SELECT 1 AS one FROM items WHERE (id = 2) LIMIT 1']
   end
 
   it "should return false without issuing a query if the model object is new" do

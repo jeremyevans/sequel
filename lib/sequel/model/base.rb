@@ -1088,7 +1088,7 @@ module Sequel
       #   Artist.new.exists?
       #   # => false
       def exists?
-        new? ? false : !this.get(1).nil?
+        new? ? false : !this.get(SQL::AliasedExpression.new(1, :one)).nil?
       end
       
       # Ignore the model's setter method cache when this instances extends a module, as the

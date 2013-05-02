@@ -2369,38 +2369,38 @@ describe "Dataset aggregate methods" do
   end
   
   specify "should include min" do
-    @d.min(:a).should == 'SELECT min(a) FROM test LIMIT 1'
+    @d.min(:a).should == 'SELECT min(a) AS min FROM test LIMIT 1'
   end
   
   specify "should include max" do
-    @d.max(:b).should == 'SELECT max(b) FROM test LIMIT 1'
+    @d.max(:b).should == 'SELECT max(b) AS max FROM test LIMIT 1'
   end
   
   specify "should include sum" do
-    @d.sum(:c).should == 'SELECT sum(c) FROM test LIMIT 1'
+    @d.sum(:c).should == 'SELECT sum(c) AS sum FROM test LIMIT 1'
   end
   
   specify "should include avg" do
-    @d.avg(:d).should == 'SELECT avg(d) FROM test LIMIT 1'
+    @d.avg(:d).should == 'SELECT avg(d) AS avg FROM test LIMIT 1'
   end
   
   specify "should accept qualified columns" do
-    @d.avg(:test__bc).should == 'SELECT avg(test.bc) FROM test LIMIT 1'
+    @d.avg(:test__bc).should == 'SELECT avg(test.bc) AS avg FROM test LIMIT 1'
   end
   
   specify "should use a subselect for the same conditions as count" do
     d = @d.order(:a).limit(5)
-    d.avg(:a).should == 'SELECT avg(a) FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
-    d.sum(:a).should == 'SELECT sum(a) FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
-    d.min(:a).should == 'SELECT min(a) FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
-    d.max(:a).should == 'SELECT max(a) FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+    d.avg(:a).should == 'SELECT avg(a) AS avg FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+    d.sum(:a).should == 'SELECT sum(a) AS sum FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+    d.min(:a).should == 'SELECT min(a) AS min FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+    d.max(:a).should == 'SELECT max(a) AS max FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
   end
   
   specify "should accept virtual row blocks" do
-    @d.avg{a(b)}.should == 'SELECT avg(a(b)) FROM test LIMIT 1'
-    @d.sum{a(b)}.should == 'SELECT sum(a(b)) FROM test LIMIT 1'
-    @d.min{a(b)}.should == 'SELECT min(a(b)) FROM test LIMIT 1'
-    @d.max{a(b)}.should == 'SELECT max(a(b)) FROM test LIMIT 1'
+    @d.avg{a(b)}.should == 'SELECT avg(a(b)) AS avg FROM test LIMIT 1'
+    @d.sum{a(b)}.should == 'SELECT sum(a(b)) AS sum FROM test LIMIT 1'
+    @d.min{a(b)}.should == 'SELECT min(a(b)) AS min FROM test LIMIT 1'
+    @d.max{a(b)}.should == 'SELECT max(a(b)) AS max FROM test LIMIT 1'
   end
 end
 
@@ -2441,20 +2441,20 @@ describe "Dataset#interval" do
   
   specify "should generate the correct SQL statement" do
     @ds.interval(:stamp)
-    @db.sqls.should == ["SELECT (max(stamp) - min(stamp)) FROM test LIMIT 1"]
+    @db.sqls.should == ["SELECT (max(stamp) - min(stamp)) AS interval FROM test LIMIT 1"]
 
     @ds.filter(Sequel.expr(:price) > 100).interval(:stamp)
-    @db.sqls.should == ["SELECT (max(stamp) - min(stamp)) FROM test WHERE (price > 100) LIMIT 1"]
+    @db.sqls.should == ["SELECT (max(stamp) - min(stamp)) AS interval FROM test WHERE (price > 100) LIMIT 1"]
   end
   
   specify "should use a subselect for the same conditions as count" do
     @ds.order(:stamp).limit(5).interval(:stamp).should == 1234
-    @db.sqls.should == ['SELECT (max(stamp) - min(stamp)) FROM (SELECT * FROM test ORDER BY stamp LIMIT 5) AS t1 LIMIT 1']
+    @db.sqls.should == ['SELECT (max(stamp) - min(stamp)) AS interval FROM (SELECT * FROM test ORDER BY stamp LIMIT 5) AS t1 LIMIT 1']
   end
 
   specify "should accept virtual row blocks" do
     @ds.interval{a(b)}
-    @db.sqls.should == ["SELECT (max(a(b)) - min(a(b))) FROM test LIMIT 1"]
+    @db.sqls.should == ["SELECT (max(a(b)) - min(a(b))) AS interval FROM test LIMIT 1"]
   end
 end
 
@@ -4090,9 +4090,14 @@ describe "Sequel::Dataset#select_map" do
     @ds.db.sqls.should == []
   end
   
-  specify "should accept a block" do
+  specify "should handle an expression without a determinable alias" do
     @ds.select_map{a(t__c)}.should == [1, 2]
     @ds.db.sqls.should == ['SELECT a(t.c) FROM t']
+  end
+
+  specify "should accept a block" do
+    @ds.select_map{a(t__c).as(b)}.should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a(t.c) AS b FROM t']
   end
 
   specify "should accept a block with an array of columns" do
@@ -4164,9 +4169,14 @@ describe "Sequel::Dataset#select_order_map" do
     @ds.db.sqls.should == ['SELECT a FROM t ORDER BY a DESC']
   end
   
-  specify "should accept a block" do
+  specify "should handle an expression without a determinable alias" do
     @ds.select_order_map{a(t__c)}.should == [1, 2]
     @ds.db.sqls.should == ['SELECT a(t.c) FROM t ORDER BY a(t.c)']
+  end
+
+  specify "should accept a block" do
+    @ds.select_order_map{a(t__c).as(b)}.should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a(t.c) AS b FROM t ORDER BY a(t.c)']
   end
 
   specify "should accept a block with an array of columns" do

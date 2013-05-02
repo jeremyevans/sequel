@@ -619,7 +619,7 @@ describe "Database#table_exists?" do
   specify "should test existence by selecting a row from the table's dataset" do
     db = Sequel.mock(:fetch=>[Sequel::Error, [], [{:a=>1}]])
     db.table_exists?(:a).should be_false
-    db.sqls.should == ["SELECT NULL FROM a LIMIT 1"]
+    db.sqls.should == ["SELECT NULL AS nil FROM a LIMIT 1"]
     db.table_exists?(:b).should be_true
     db.table_exists?(:c).should be_true
   end
@@ -1504,19 +1504,24 @@ describe "Database#get" do
   end
   
   specify "should use Dataset#get to get a single value" do
-    @db.get(1).should == 1
-    @db.sqls.should == ['SELECT 1 LIMIT 1']
+    @db.get(:a).should == 1
+    @db.sqls.should == ['SELECT a LIMIT 1']
     
-    @db.get(Sequel.function(:version))
-    @db.sqls.should == ['SELECT version() LIMIT 1']
+    @db.get(Sequel.function(:version).as(:version))
+    @db.sqls.should == ['SELECT version() AS version LIMIT 1']
   end
 
   specify "should accept a block" do
-    @db.get{1}
-    @db.sqls.should == ['SELECT 1 LIMIT 1']
+    @db.get{a}
+    @db.sqls.should == ['SELECT a LIMIT 1']
     
-    @db.get{version(1)}
-    @db.sqls.should == ['SELECT version(1) LIMIT 1']
+    @db.get{version(a).as(version)}
+    @db.sqls.should == ['SELECT version(a) AS version LIMIT 1']
+  end
+
+  qspecify "should work when an alias cannot be determined" do
+    @db.get(1).should == 1
+    @db.sqls.should == ['SELECT 1 LIMIT 1']
   end
 end
 
@@ -2360,15 +2365,15 @@ describe "Database specific exception classes" do
   specify "should use appropriate exception classes for given SQL states" do
     @db.fetch = ArgumentError
     @db.sql_state = '23502'
-    proc{@db.get(1)}.should raise_error(Sequel::NotNullConstraintViolation)
+    proc{@db.get(:a)}.should raise_error(Sequel::NotNullConstraintViolation)
     @db.sql_state = '23503'
-    proc{@db.get(1)}.should raise_error(Sequel::ForeignKeyConstraintViolation)
+    proc{@db.get(:a)}.should raise_error(Sequel::ForeignKeyConstraintViolation)
     @db.sql_state = '23505'
-    proc{@db.get(1)}.should raise_error(Sequel::UniqueConstraintViolation)
+    proc{@db.get(:a)}.should raise_error(Sequel::UniqueConstraintViolation)
     @db.sql_state = '23513'
-    proc{@db.get(1)}.should raise_error(Sequel::CheckConstraintViolation)
+    proc{@db.get(:a)}.should raise_error(Sequel::CheckConstraintViolation)
     @db.sql_state = '40001'
-    proc{@db.get(1)}.should raise_error(Sequel::SerializationFailure)
+    proc{@db.get(:a)}.should raise_error(Sequel::SerializationFailure)
   end
 end
 

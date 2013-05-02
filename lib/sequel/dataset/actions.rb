@@ -66,7 +66,7 @@ module Sequel
     #   DB[:table].avg{function(column)} # SELECT avg(function(column)) FROM table LIMIT 1
     #   # => 1
     def avg(column=Sequel.virtual_row(&Proc.new))
-      aggregate_dataset.get{avg(column)}
+      aggregate_dataset.get{avg(column).as(:avg)}
     end
   
     # Returns the columns in the result set in order as an array of symbols.
@@ -388,7 +388,7 @@ module Sequel
     #   DB[:table].interval{function(column)} # SELECT (max(function(column)) - min(function(column))) FROM table LIMIT 1
     #   # => 7
     def interval(column=Sequel.virtual_row(&Proc.new))
-      aggregate_dataset.get{max(column) - min(column)}
+      aggregate_dataset.get{(max(column) - min(column)).as(:interval)}
     end
 
     # Reverses the order and then runs #first with the given arguments and block.  Note that this
@@ -442,7 +442,7 @@ module Sequel
     #   DB[:table].max{function(column)} # SELECT max(function(column)) FROM table LIMIT 1
     #   # => 7
     def max(column=Sequel.virtual_row(&Proc.new))
-      aggregate_dataset.get{max(column)}
+      aggregate_dataset.get{max(column).as(:max)}
     end
 
     # Returns the minimum value for the given column/expression.
@@ -453,7 +453,7 @@ module Sequel
     #   DB[:table].min{function(column)} # SELECT min(function(column)) FROM table LIMIT 1
     #   # => 0
     def min(column=Sequel.virtual_row(&Proc.new))
-      aggregate_dataset.get{min(column)}
+      aggregate_dataset.get{min(column).as(:min)}
     end
 
     # This is a front end for import that allows you to submit an array of
@@ -649,7 +649,7 @@ module Sequel
     #   DB[:table].sum{function(column)} # SELECT sum(function(column)) FROM table LIMIT 1
     #   # => 10
     def sum(column=Sequel.virtual_row(&Proc.new))
-      aggregate_dataset.get{sum(column)}
+      aggregate_dataset.get{sum(column).as(:sum)}
     end
 
     # Returns a string in CSV format containing the dataset records. By 

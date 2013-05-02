@@ -91,12 +91,12 @@ describe Sequel::Model, "schema methods" do
 
   it "drop_table? should drop the table if it exists" do
     @model.drop_table?
-    MODEL_DB.sqls.should == ["SELECT NULL FROM items LIMIT 1", 'DROP TABLE items']
+    MODEL_DB.sqls.should == ["SELECT NULL AS nil FROM items LIMIT 1", 'DROP TABLE items']
   end
   
   it "create_table! should drop table if it exists and then create the table" do
     @model.create_table!
-    MODEL_DB.sqls.should == ["SELECT NULL FROM items LIMIT 1", 'DROP TABLE items', 'CREATE TABLE items ()']
+    MODEL_DB.sqls.should == ["SELECT NULL AS nil FROM items LIMIT 1", 'DROP TABLE items', 'CREATE TABLE items ()']
   end
   
   it "create_table? should not create the table if it already exists" do

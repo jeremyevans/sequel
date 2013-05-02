@@ -130,8 +130,8 @@ describe "Sequel Mock Adapter" do
   end
 
   specify "should raise Error if given an invalid object to fetch" do
-    proc{Sequel.mock(:fetch=>Class.new).get(1)}.should raise_error(Sequel::Error)
-    proc{Sequel.mock(:fetch=>Object.new).get(1)}.should raise_error(Sequel::Error)
+    proc{Sequel.mock(:fetch=>Class.new).get(:a)}.should raise_error(Sequel::Error)
+    proc{Sequel.mock(:fetch=>Object.new).get(:a)}.should raise_error(Sequel::Error)
   end
 
   specify "should be able to set the number of rows modified by update and delete using :numrows option as an integer" do
