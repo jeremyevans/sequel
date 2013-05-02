@@ -10,14 +10,19 @@ module Sequel
       # to add new error messages, and +on+ to check existing
       # error messages.
       def [](k)
-        has_key?(k) ? super : (self[k] = [])
+        if has_key?(k)
+          super
+        else
+          Sequel::Deprecation.deprecate('Model::Errors#[] autovivification', 'Please switch to Model::Errors#add to add errors, and Model::Errors#on to get errors')
+          self[k] = []
+        end
       end
 
       # Adds an error for the given attribute.
       #
       #   errors.add(:name, 'is not valid') if name == 'invalid'
       def add(att, msg)
-        self[att] << msg
+        fetch(att){self[att] = []} << msg
       end
 
       # Return the total number of error messages.

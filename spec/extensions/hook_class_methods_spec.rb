@@ -325,7 +325,7 @@ describe "Model#before_validation && Model#after_validation" do
       after_validation{MODEL_DB << "BLAH after"}
 
       def self.validate(o)
-        o.errors[:id] << 'not valid' unless o[:id] == 2233
+        o.errors.add(:id, 'not valid') unless o[:id] == 2233
       end
       columns :id
     end

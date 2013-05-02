@@ -11,7 +11,7 @@ describe Sequel::Model do
   before do
     @c = model_class.call Sequel::Model do
       def self.validates_coolness_of(attr)
-        validates_each(attr) {|o, a, v| o.errors[a] << 'is not cool' if v != :cool}
+        validates_each(attr) {|o, a, v| o.errors.add(a, 'is not cool') if v != :cool}
       end
     end
   end
@@ -41,7 +41,7 @@ describe Sequel::Model do
   end
 
   specify "should acccept validation definitions using validates_each" do
-    @c.validates_each(:xx, :yy) {|o, a, v| o.errors[a] << 'too low' if v < 50}
+    @c.validates_each(:xx, :yy) {|o, a, v| o.errors.add(a, 'too low') if v < 50}
     o = @c.new
     o.should_receive(:xx).once.and_return(40)
     o.should_receive(:yy).once.and_return(60)
@@ -105,8 +105,8 @@ describe Sequel::Model do
   end
   
   specify "should overwrite existing validation with the same tag and attribute" do
-    @c.validates_each(:xx, :xx, :tag=>:low) {|o, a, v| o.xxx; o.errors[a] << 'too low' if v < 50}
-    @c.validates_each(:yy, :yy) {|o, a, v| o.yyy; o.errors[a] << 'too low' if v < 50}
+    @c.validates_each(:xx, :xx, :tag=>:low) {|o, a, v| o.xxx; o.errors.add(a, 'too low') if v < 50}
+    @c.validates_each(:yy, :yy) {|o, a, v| o.yyy; o.errors.add(a, 'too low') if v < 50}
     @c.validates_presence_of(:zz, :zz)
     @c.validates_length_of(:aa, :aa, :tag=>:blah)
     o = @c.new
@@ -153,7 +153,7 @@ describe Sequel::Model do
     @c = model_class.call Sequel::Model do
       columns :score
       validates_each :score do |o, a, v|
-        o.errors[a] << 'too low' if v < 87
+        o.errors.add(a, 'too low') if v < 87
       end
     end
     
@@ -175,7 +175,7 @@ describe Sequel::Model do
     @o.score = 86
     @o.should_not be_valid
     @o.errors[:score].should == ['too low']
-    @o.errors[:blah].should be_empty
+    @o.errors.on(:blah).should be_nil
   end
 end
 
@@ -641,7 +641,7 @@ describe ".validates with block" do
       columns :vvv
       validates do
         each :vvv do |o, a, v|
-          o.errors[a] << "is less than zero" if v.to_i < 0
+          o.errors.add(a, "is less than zero") if v.to_i < 0
         end
       end
     end
@@ -1022,7 +1022,7 @@ describe "Model#save" do
       columns :id, :x
 
       validates_each :x do |o, a, v|
-        o.errors[a] << 'blah' unless v == 7
+        o.errors.add(a, 'blah') unless v == 7
       end
     end
     @m = @c.load(:id => 4, :x=>6)

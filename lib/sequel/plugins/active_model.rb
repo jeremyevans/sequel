@@ -16,6 +16,14 @@ module Sequel
     #   # Make the Album class active_model compliant
     #   Album.plugin :active_model
     module ActiveModel
+      # ActiveModel compliant error class
+      class Errors < Sequel::Model::Errors
+        # Add autovivification so that #[] always returns an array.
+        def [](k)
+          fetch(k){self[k] = []}
+        end
+      end
+
       module ClassMethods
         include ::ActiveModel::Naming
         
@@ -70,6 +78,11 @@ module Sequel
         end
         
         private
+
+        # Use ActiveModel compliant errors class.
+        def errors_class
+          Errors
+        end
         
         # The string to use to join composite primary key param strings.
         def to_param_joiner

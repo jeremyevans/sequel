@@ -14,16 +14,14 @@ describe Sequel::Model::Errors do
   
   specify "should be empty if there are no errors" do
     @errors.should be_empty
-    @errors[:blah]
-    @errors.should be_empty
   end
   
   specify "should not be empty if there are errors" do
-    @errors[:blah] << "blah"
+    @errors.add(:blah, "blah")
     @errors.should_not be_empty
   end
   
-  specify "should return errors for a specific attribute using #[]" do
+  qspecify "should return errors for a specific attribute using #[]" do
     @errors[:blah].should == []
     @errors[:blah] << 'blah'
     @errors[:blah].should == ['blah']
@@ -32,30 +30,30 @@ describe Sequel::Model::Errors do
   end
   
   specify "should return an array of errors for a specific attribute using #on if there are errors" do
-    @errors[:blah] << 'blah'
+    @errors.add(:blah, 'blah')
     @errors.on(:blah).should == ['blah']
   end
   
   specify "should return nil using #on if there are no errors for that attribute" do
     @errors.on(:blah).should == nil
-    @errors[:blah]
-    @errors.on(:blah).should == nil
   end
   
-  specify "should accept errors using #[] << or #add" do
+  qspecify "should accept errors using #[] <<" do
     @errors[:blah] << 'blah'
     @errors[:blah].should == ['blah']
+  end
     
+  specify "should accept errors using #add" do
     @errors.add :blah, 'zzzz'
-    @errors[:blah].should == ['blah', 'zzzz']
+    @errors[:blah].should == ['zzzz']
   end
   
   specify "should return full messages using #full_messages" do
     @errors.full_messages.should == []
     
-    @errors[:blow] << 'blieuh'
-    @errors[:blow] << 'blich'
-    @errors[:blay] << 'bliu'
+    @errors.add(:blow, 'blieuh')
+    @errors.add(:blow, 'blich')
+    @errors.add(:blay, 'bliu')
     msgs = @errors.full_messages
     msgs.size.should == 3
     msgs.should include('blow blieuh', 'blow blich', 'blay bliu')
@@ -64,9 +62,9 @@ describe Sequel::Model::Errors do
   specify "should not add column names for LiteralStrings" do
     @errors.full_messages.should == []
     
-    @errors[:blow] << 'blieuh'
-    @errors[:blow] << Sequel.lit('blich')
-    @errors[:blay] << 'bliu'
+    @errors.add(:blow, 'blieuh')
+    @errors.add(:blow, Sequel.lit('blich'))
+    @errors.add(:blay, 'bliu')
     msgs = @errors.full_messages
     msgs.size.should == 3
     msgs.should include('blow blieuh', 'blich', 'blay bliu')
@@ -103,7 +101,7 @@ describe Sequel::Model do
     @c = Class.new(Sequel::Model) do
       columns :score
       def validate
-        errors[:score] << 'too low' if score < 87
+        errors.add(:score, 'too low') if score < 87
       end
     end
     
@@ -125,7 +123,7 @@ describe Sequel::Model do
     @o.score = 86
     @o.should_not be_valid
     @o.errors[:score].should == ['too low']
-    @o.errors[:blah].should be_empty
+    @o.errors.on(:blah).should be_nil
   end
   
   specify "should allow raising of ValidationFailed with a Model instance with errors" do
