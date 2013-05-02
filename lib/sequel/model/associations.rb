@@ -305,6 +305,7 @@ module Sequel
           end
         end
 
+        # REMOVE40: merge into reciprocal_association?
         def deprecated_reciprocal_association?(assoc_reflect)
           assoc_reflect[:conditions] || assoc_reflect[:block]
         end
@@ -404,6 +405,7 @@ module Sequel
     
         private
     
+        # REMOVE40: merge into reciprocal_association?
         def deprecated_reciprocal_association?(assoc_reflect)
           super || primary_key != assoc_reflect.primary_key
         end
@@ -478,6 +480,7 @@ module Sequel
     
         private
     
+        # REMOVE40: merge into reciprocal_association?
         def deprecated_reciprocal_association?(assoc_reflect)
           super || primary_key != assoc_reflect.primary_key
         end
@@ -646,6 +649,7 @@ module Sequel
 
         private
 
+        # REMOVE40: merge into reciprocal_association?
         def deprecated_reciprocal_association?(assoc_reflect)
           super || right_primary_keys != assoc_reflect[:left_primary_key_columns] || self[:left_primary_key_columns] != assoc_reflect.right_primary_keys
         end
