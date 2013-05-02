@@ -1089,7 +1089,7 @@ module Sequel
       # Returns the validation errors associated with this object.
       # See +Errors+.
       def errors
-        @errors ||= Errors.new
+        @errors ||= errors_class.new
       end 
 
       # Returns true when current instance exists, false otherwise.
@@ -1807,6 +1807,11 @@ module Sequel
         cc = changed_columns
         cc << column unless cc.include?(column)
         @values[column] = value
+      end
+
+      # Default error class used for errors.
+      def errors_class
+        Errors
       end
 
       # Set the columns with the given hash.  By default, the same as +set+, but

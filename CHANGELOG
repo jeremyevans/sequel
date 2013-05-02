@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model#errors_class private method for choosing the errors class on a per-model basis (jeremyevans)
+
 * Add after_initialize plugin for the after_initialize hook (jeremyevans)
 
 * Deprecate Model after_initialize hook (jeremyevans)
