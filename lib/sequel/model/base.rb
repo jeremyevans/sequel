@@ -948,6 +948,7 @@ module Sequel
       #   end
       def initialize(values = {}, from_db = false)
         if from_db
+          Sequel::Deprecation.deprecate('Passing two arguments to Model.new', 'Please use Model.call instead')
           set_values(values)
         else
           @values = {}

@@ -329,7 +329,7 @@ describe Sequel::Model, "constructors" do
     o.new?.should be_false
   end
   
-  it "should have .new with a second true argument create an existing object" do
+  qspecify "should have .new with a second true argument create an existing object" do
     o = @m.new({:a=>1}, true)
     o.should be_a_kind_of(@m)
     o.values.should == {:a=>1}
