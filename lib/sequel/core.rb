@@ -28,7 +28,6 @@ module Sequel
   @convert_two_digit_years = true
   @datetime_class = Time
   @empty_array_handle_nulls = true
-  @virtual_row_instance_eval = true
   @require_thread = nil
   
   # Mutex used to protect file loading/requireing
@@ -81,8 +80,13 @@ module Sequel
     # some databases.
     attr_accessor :empty_array_handle_nulls
 
-    # For backwards compatibility, has no effect.
-    attr_accessor :virtual_row_instance_eval
+    # REMOVE40
+    def virtual_row_instance_eval
+        Sequel::Deprecation.deprecate('Sequel.virtual_row_instance_eval', 'It has no effect, so you can safely stop calling it.')
+    end
+    def virtual_row_instance_eval=(v)
+        Sequel::Deprecation.deprecate('Sequel.virtual_row_instance_eval=', 'It has no effect, so you can safely stop calling it.')
+    end
     
     # Alias to the standard version of require
     alias k_require require
