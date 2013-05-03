@@ -65,7 +65,10 @@ module Sequel
       def execute(sql, opts={}, &block)
         synchronize(opts[:server]){|conn| log_connection_execute(conn, sql, &block)}
       end
-      alias do execute
+      def do(*a, &block)
+        Sequel::Deprecation.deprecate('Database#do', 'Please use Database#execute')
+        execute(*a, &block)
+      end
 
       def execute_insert(sql, opts={})
         synchronize(opts[:server]) do |conn|

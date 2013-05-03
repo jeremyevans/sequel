@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate Database#query in the informix adapter (jeremyevans)
+
+* Deprecate Database#do as an alias to execute/execute_dui in some adapters (jeremyevans)
+
 * Deprecate modifying initial Dataset hash if the hash wasn't provided as an argument (jeremyevans)
 
 * Deprecate passing nil to Database#dataset or Dataset.new (jeremyevans)

@@ -17,12 +17,18 @@ module Sequel
       def execute_dui(sql, opts={})
         synchronize(opts[:server]){|c| log_yield(sql){c.immediate(sql)}}
       end
-      alias_method :do, :execute_dui
+      def do(*a, &block)
+        Sequel::Deprecation.deprecate('Database#do', 'Please use Database#execute_dui')
+        execute_dui(*a, &block)
+      end
       
       def execute(sql, opts={})
         synchronize(opts[:server]){|c| yield log_yield(sql){c.cursor(sql)}}
       end
-      alias_method :query, :execute
+      def query(*a, &block)
+        Sequel::Deprecation.deprecate('Database#query', 'Please use Database#execute')
+        execute(*a, &block)
+      end
     end
     
     class Dataset < Sequel::Dataset

@@ -75,10 +75,13 @@ module Sequel
         end
       end
       
-      def do(sql, opts={})
+      def execute_dui(sql, opts={})
         synchronize(opts[:server]){|conn| log_yield(sql){conn.do(sql)}}
       end
-      alias_method :execute_dui, :do
+      def do(*a, &block)
+        Sequel::Deprecation.deprecate('Database#do', 'Please use Database#execute_dui')
+        execute_dui(*a, &block)
+      end
     end
     
     class Dataset < Sequel::Dataset

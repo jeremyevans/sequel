@@ -26,7 +26,10 @@ module Sequel
           r
         end
       end
-      alias_method :do, :execute
+      def do(*a, &block)
+        Sequel::Deprecation.deprecate('Database#do', 'Please use Database#execute')
+        execute(*a, &block)
+      end
     end
     
     class Dataset < Sequel::Dataset
