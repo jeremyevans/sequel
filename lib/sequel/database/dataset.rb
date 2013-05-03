@@ -24,7 +24,7 @@ module Sequel
     #
     #   DB.dataset # SELECT *
     #   DB.dataset.from(:items) # SELECT * FROM items
-    def dataset(opts=nil)
+    def dataset(opts=Dataset::DEFAULT_OPTS.clone)
       @dataset_class.new(self, opts)
     end
 

@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate modifying initial Dataset hash if the hash wasn't provided as an argument (jeremyevans)
+
+* Deprecate passing nil to Database#dataset or Dataset.new (jeremyevans)
+
 * Make active_model plugin use an errors class with autovivification (jeremyevans)
 
 * Deprecate Model::Errors#[] autovivification (returning empty array when missing) (jeremyevans)

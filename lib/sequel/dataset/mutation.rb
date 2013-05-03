@@ -58,7 +58,7 @@ module Sequel
 
     # Avoid self-referential dataset by cloning.
     def from_self!(*args, &block)
-      @opts.merge!(clone.from_self(*args, &block).opts)
+      @opts = clone.from_self(*args, &block).opts
       self
     end
 
@@ -74,8 +74,7 @@ module Sequel
     # to the receiver and merging the options of the resulting dataset into
     # the receiver's options.
     def mutation_method(meth, *args, &block)
-      copy = send(meth, *args, &block)
-      @opts.merge!(copy.opts)
+      @opts = send(meth, *args, &block).opts
       self
     end
   end

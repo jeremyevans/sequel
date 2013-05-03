@@ -16,6 +16,17 @@ module Sequel
 
     # The hash of options for this dataset, keys are symbols.
     attr_accessor :opts
+
+    # Default options hash to use for datasets.
+    DEFAULT_OPTS = {}
+    %w'[]= merge! update clear delete delete_if keep_if reject! select! shift store'.each do |meth|
+      DEFAULT_OPTS.instance_eval(<<-END, __FILE__, __LINE__+1)
+        def #{meth}(*)
+          Sequel::Deprecation.deprecate('Modifying the initial dataset opts hash is deprecated. Please dup the hash.')
+          super
+        end
+      END
+    end
     
     # Constructs a new Dataset instance with an associated database and 
     # options. Datasets are usually constructed by invoking the Database#[] method:
@@ -25,9 +36,10 @@ module Sequel
     # Sequel::Dataset is an abstract class that is not useful by itself. Each
     # database adapter provides a subclass of Sequel::Dataset, and has
     # the Database#dataset method return an instance of that subclass.
-    def initialize(db, opts = nil)
+    def initialize(db, opts = DEFAULT_OPTS.clone)
       @db = db
-      @opts = opts || {}
+      Sequel::Deprecation.deprecate('Passing nil as the second argument to Dataset#initialize', 'Please pass a hash as the second argument or only one argument') unless opts
+      @opts = opts || DEFAULT_OPTS.clone
     end
 
     # Define a hash value such that datasets with the same DB, opts, and SQL
