@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate sequel_core.rb and sequel_model.rb (jeremyevans)
+
 * Add graph_each extension for Dataset#graph_each (jeremyevans)
 
 * Deprecate Dataset#graph_each (jeremyevans)
