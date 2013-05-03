@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#supports_{index_parsing,foreign_key_parsing,table_listing,view_listing}? (jeremyevans)
+
 * Deprecate Sequel.virtual_row_instance_eval accessor (jeremyevans)
 
 * Deprecate sequel_core.rb and sequel_model.rb (jeremyevans)

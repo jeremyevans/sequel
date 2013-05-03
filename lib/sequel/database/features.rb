@@ -36,6 +36,17 @@ module Sequel
       supports_create_table_if_not_exists?
     end
 
+    # Whether the database supports Database#foreign_key_list for
+    # parsing foreign keys.
+    def supports_foreign_key_parsing?
+      [:access, :mssql, :mysql, :postgres, :sqlite].include?(database_type)
+    end
+
+    # Whether the database supports Database#indexes for parsing indexes.
+    def supports_index_parsing?
+      [:access, :cubrid, :db2, :mssql, :mysql, :postgres, :sqlite].include?(database_type) || adapter_scheme == :jdbc
+    end
+
     # Whether the database and adapter support prepared transactions
     # (two-phase commit), false by default.
     def supports_prepared_transactions?
@@ -56,6 +67,16 @@ module Sequel
     # Whether the database supports schema parsing via Database#schema.
     def supports_schema_parsing?
       respond_to?(:schema_parse_table, true)
+    end
+
+    # Whether the database supports Database#tables for getting list of tables.
+    def supports_table_listing?
+      [:access, :cubrid, :db2, :firebird, :mssql, :mysql, :oracle, :postgres, :sqlite].include?(database_type) || adapter_scheme == :jdbc
+    end
+    #
+    # Whether the database supports Database#views for getting list of views.
+    def supports_view_listing?
+      supports_table_listing?
     end
 
     # Whether the database and adapter support transaction isolation levels, false by default.
