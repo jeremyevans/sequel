@@ -2371,13 +2371,13 @@ describe Sequel::Model, "many_to_many" do
   end
 
   it "add, remove, and remove_all methods should respect :join_table_block option" do
-    @c2.many_to_many :attributes, :class => @c1, :join_table_block=>proc{|ds| ds.filter(:x=>123).set_overrides(:x=>123)}
+    @c2.many_to_many :attributes, :class => @c1, :join_table_block=>proc{|ds| ds.filter(:x=>123)}
     o = @c2.load(:id => 1234)
     o.add_attribute(@c1.load(:id=>44))
     o.remove_attribute(@c1.load(:id=>45))
     o.remove_all_attributes
     sqls = MODEL_DB.sqls
-    sqls.shift =~ /INSERT INTO attributes_nodes \((node_id|attribute_id|x), (node_id|attribute_id|x), (node_id|attribute_id|x)\) VALUES \((1234|123|44), (1234|123|44), (1234|123|44)\)/
+    sqls.shift =~ /INSERT INTO attributes_nodes \((node_id|attribute_id), (node_id|attribute_id)\) VALUES \((1234|44), (1234|44)\)/
     sqls.should == ["DELETE FROM attributes_nodes WHERE ((x = 123) AND (node_id = 1234) AND (attribute_id = 45))",
       "DELETE FROM attributes_nodes WHERE ((x = 123) AND (node_id = 1234))"]
   end

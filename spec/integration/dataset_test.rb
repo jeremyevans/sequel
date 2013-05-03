@@ -1583,7 +1583,7 @@ describe "Dataset defaults and overrides" do
   before(:all) do
     @db = INTEGRATION_DB
     @db.create_table!(:a){Integer :a}
-    @ds = @db[:a].order(:a)
+    @ds = @db[:a].order(:a).extension(:set_overrides)
   end
   before do
     @ds.delete

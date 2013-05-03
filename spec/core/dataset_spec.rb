@@ -3552,10 +3552,11 @@ end
 
 describe "Sequel::Dataset #set_defaults" do
   before do
-    @ds = Sequel::Dataset.new(nil).from(:items).set_defaults(:x=>1)
+    @ds = Sequel::Dataset.new(nil).from(:items)
   end
 
-  specify "should set the default values for inserts" do
+  qspecify "should set the default values for inserts" do
+    @ds = @ds.set_defaults(:x=>1)
     @ds.insert_sql.should == "INSERT INTO items (x) VALUES (1)"
     @ds.insert_sql(:x=>2).should == "INSERT INTO items (x) VALUES (2)"
     @ds.insert_sql(:y=>2).should =~ /INSERT INTO items \([xy], [xy]\) VALUES \([21], [21]\)/
@@ -3563,7 +3564,8 @@ describe "Sequel::Dataset #set_defaults" do
     @ds.set_defaults(:x=>2).insert_sql.should == "INSERT INTO items (x) VALUES (2)"
   end
 
-  specify "should set the default values for updates" do
+  qspecify "should set the default values for updates" do
+    @ds = @ds.set_defaults(:x=>1)
     @ds.update_sql.should == "UPDATE items SET x = 1"
     @ds.update_sql(:x=>2).should == "UPDATE items SET x = 2"
     @ds.update_sql(:y=>2).should =~ /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
@@ -3574,10 +3576,11 @@ end
 
 describe "Sequel::Dataset #set_overrides" do
   before do
-    @ds = Sequel::Dataset.new(nil).from(:items).set_overrides(:x=>1)
+    @ds = Sequel::Dataset.new(nil).from(:items)
   end
 
-  specify "should override the given values for inserts" do
+  qspecify "should override the given values for inserts" do
+    @ds = @ds.set_overrides(:x=>1)
     @ds.insert_sql.should == "INSERT INTO items (x) VALUES (1)"
     @ds.insert_sql(:x=>2).should == "INSERT INTO items (x) VALUES (1)"
     @ds.insert_sql(:y=>2).should =~ /INSERT INTO items \([xy], [xy]\) VALUES \([21], [21]\)/
@@ -3585,7 +3588,8 @@ describe "Sequel::Dataset #set_overrides" do
     @ds.set_overrides(:x=>2).insert_sql.should == "INSERT INTO items (x) VALUES (1)"
   end
 
-  specify "should override the given values for updates" do
+  qspecify "should override the given values for updates" do
+    @ds = @ds.set_overrides(:x=>1)
     @ds.update_sql.should == "UPDATE items SET x = 1"
     @ds.update_sql(:x=>2).should == "UPDATE items SET x = 1"
     @ds.update_sql(:y=>2).should =~ /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/

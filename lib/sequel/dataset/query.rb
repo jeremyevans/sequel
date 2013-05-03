@@ -878,6 +878,7 @@ module Sequel
     #   DB[:items].set_defaults(:a=>'a', :c=>'c').insert(:a=>'d', :b=>'b')
     #   # INSERT INTO items (a, c, b) VALUES ('d', 'c', 'b')
     def set_defaults(hash)
+      Sequel::Deprecation.deprecate('Dataset#set_defaults', 'Please use the dataset_set_overrides extension if you want to continue using it')
       clone(:defaults=>(@opts[:defaults]||{}).merge(hash))
     end
 
@@ -888,6 +889,7 @@ module Sequel
     #   DB[:items].set_overrides(:a=>'a', :c=>'c').insert(:a=>'d', :b=>'b')
     #   # INSERT INTO items (a, c, b) VALUES ('a', 'c', 'b')
     def set_overrides(hash)
+      Sequel::Deprecation.deprecate('Dataset#set_overrides', 'Please use the dataset_set_overrides extension if you want to continue using it')
       clone(:overrides=>hash.merge(@opts[:overrides]||{}))
     end
     

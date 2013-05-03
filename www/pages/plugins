@@ -130,6 +130,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/select_remove_rb.html">select_remove</a>: Adds Dataset#select_remove to remove selected columns from a dataset.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/server_block_rb.html">server_block</a>: Adds Database#with_server method that makes access inside the passed block use the specified shard by default.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/set_overrides_rb.html">set_overrides</a>: Adds Dataset#set_defaults and #set_overrides for setting default values in some INSERT/UPDATE statements.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/split_array_nil_rb.html">split_array_nil</a>: Splits nils out of IN/NOT IN arrays into separate OR IS NULL or AND IS NOT NULL clauses.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_expr_rb.html">sql_expr</a>: Adds sql_expr method to all objects, allowing easy use of Sequel's DSL.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/string_date_time_rb.html">string_date_time</a>: Adds instance methods to String for converting the string into a Date/Time/DateTime.</li>
