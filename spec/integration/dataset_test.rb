@@ -65,11 +65,11 @@ describe "Simple Dataset operations" do
   end
 
   specify "should graph correctly" do
-    @ds.graph(:items, {:id=>:id}, :table_alias=>:b).all.should == [{:items=>{:id=>1, :number=>10}, :b=>{:id=>1, :number=>10}}]
+    @ds.graph(:items, {:id=>:id}, :table_alias=>:b).extension(:graph_each).all.should == [{:items=>{:id=>1, :number=>10}, :b=>{:id=>1, :number=>10}}]
   end
 
   specify "should graph correctly with a subselect" do
-    @ds.from_self(:alias=>:items).graph(@ds.from_self, {:id=>:id}, :table_alias=>:b).all.should == [{:items=>{:id=>1, :number=>10}, :b=>{:id=>1, :number=>10}}]
+    @ds.from_self(:alias=>:items).graph(@ds.from_self, {:id=>:id}, :table_alias=>:b).extension(:graph_each).all.should == [{:items=>{:id=>1, :number=>10}, :b=>{:id=>1, :number=>10}}]
   end
 
   cspecify "should have insert work correctly when inserting a row with all NULL values", :hsqldb do

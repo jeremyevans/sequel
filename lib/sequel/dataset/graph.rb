@@ -262,6 +262,7 @@ module Sequel
     # tranform and run the row_proc on each part (if applicable),
     # and yield a hash of the parts.
     def graph_each
+      Sequel::Deprecation.deprecate('Dataset#graph_each', 'Load the graph_each extension if you want to continue using it')
       # Reject tables with nil datasets, as they are excluded from
       # the result set
       datasets = @opts[:graph][:table_aliases].to_a.reject{|ta,ds| ds.nil?}

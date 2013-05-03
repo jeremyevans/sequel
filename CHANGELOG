@@ -1,5 +1,9 @@
 === HEAD
 
+* Add graph_each extension for Dataset#graph_each (jeremyevans)
+
+* Deprecate Dataset#graph_each (jeremyevans)
+
 * Add set_overrides extension for Dataset#set_overrides and #set_defaults (jeremyevans)
 
 * Deprecate Dataset#set_overrides and #set_defaults (jeremyevans)
