@@ -201,11 +201,6 @@ module Sequel
               end
             end
 
-            if self[:conditions] || self[:block]
-              fallback_recips.concat(possible_recips)
-              possible_recips = []
-            end
-
             Sequel::Deprecation.deprecate("Multiple reciprocal association candidates found for #{self[:name]} association (#{possible_recips.map{|r| r[:name]}.join(', ')}).  Choosing the first candidate is", "Please explicitly specify the reciprocal option for the #{self[:name]} association") if possible_recips.size >= 2
             if possible_recips.empty? && !fallback_recips.empty?
               possible_recips = fallback_recips

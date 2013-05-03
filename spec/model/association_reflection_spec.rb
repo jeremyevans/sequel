@@ -161,7 +161,7 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
     ParParentThree.association_reflection(:par_parents).reciprocal.should == :par_parent_threes
   end
 
-  qspecify "should handle reciprocals which have conditions/blocks" do
+  specify "should handle reciprocals where current association has conditions/block" do
     ParParent.many_to_one :par_parent_two, :conditions=>{:id=>:id}
     ParParentTwo.one_to_many :par_parents
     ParParent.many_to_many :par_parent_threes do |ds|
@@ -171,6 +171,16 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
 
     ParParent.association_reflection(:par_parent_two).reciprocal.should == :par_parents
     ParParent.association_reflection(:par_parent_threes).reciprocal.should == :par_parents
+  end
+
+  qspecify "should handle reciprocals where reciprocal association has conditions/block" do
+    ParParent.many_to_one :par_parent_two, :conditions=>{:id=>:id}
+    ParParentTwo.one_to_many :par_parents
+    ParParent.many_to_many :par_parent_threes do |ds|
+      ds
+    end
+    ParParentThree.many_to_many :par_parents
+
     ParParentTwo.association_reflection(:par_parents).reciprocal.should == :par_parent_two
     ParParentThree.association_reflection(:par_parents).reciprocal.should == :par_parent_threes
   end
