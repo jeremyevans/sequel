@@ -142,7 +142,7 @@ describe "date_arithmetic extension" do
     db.literal(Sequel.date_add(:a, @h2)).should == "(CAST(a AS timestamp) + 1 years + 1 months + 1 days + 1 hours + 1 minutes + 1 seconds)"
   end
 
-  it "should raise error if literalizing on an unsupported database" do
+  qspecify "should raise error if literalizing on an unsupported database" do
     db = Sequel.mock
     db.extension :date_arithmetic
     lambda{db.literal(Sequel.date_add(:a, @h0))}.should raise_error(Sequel::NotImplemented)

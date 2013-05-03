@@ -209,13 +209,11 @@ END_MIG
     # For the table given, get the list of foreign keys and return an alter_table
     # string that would add the foreign keys if run in a migration.
     def dump_table_foreign_keys(table, options={})
-      begin
+      if supports_foreign_key_parsing?
         fks = foreign_key_list(table, options).sort_by{|fk| fk[:columns].map{|c| c.to_s}}
-      rescue Sequel::NotImplemented
-        return ''
       end
 
-      if fks.empty?
+      if fks.nil? || fks.empty?
         ''
       else
         dump_add_fk_constraints(table, fks)
@@ -233,40 +231,32 @@ END_MIG
       m = method(:recreate_column)
       im = method(:index_to_generator_opts)
 
-      if options[:indexes] != false
-        begin
-          indexes = indexes(table).sort_by{|k,v| k.to_s}
-        rescue Sequel::NotImplemented
-          nil
-        end
+      if options[:indexes] != false && supports_index_parsing?
+        indexes = indexes(table).sort_by{|k,v| k.to_s}
       end
 
-      if options[:foreign_keys] != false
-        begin
-          fk_list = foreign_key_list(table)
-          
-          if (sfk = options[:skipped_foreign_keys]) && (sfkt = sfk[table])
-            fk_list.delete_if{|fk| sfkt.has_key?(fk[:columns])}
-          end
+      if options[:foreign_keys] != false && supports_foreign_key_parsing?
+        fk_list = foreign_key_list(table)
+        
+        if (sfk = options[:skipped_foreign_keys]) && (sfkt = sfk[table])
+          fk_list.delete_if{|fk| sfkt.has_key?(fk[:columns])}
+        end
 
-          composite_fks, single_fks = fk_list.partition{|h| h[:columns].length > 1}
-          fk_hash = {}
+        composite_fks, single_fks = fk_list.partition{|h| h[:columns].length > 1}
+        fk_hash = {}
 
-          single_fks.each do |fk|
-            column = fk.delete(:columns).first
-            fk.delete(:name)
-            fk_hash[column] = fk
-          end
+        single_fks.each do |fk|
+          column = fk.delete(:columns).first
+          fk.delete(:name)
+          fk_hash[column] = fk
+        end
 
-          s = s.map do |name, info|
-            if fk_info = fk_hash[name]
-              [name, fk_info.merge(info)]
-            else
-              [name, info]
-            end
+        s = s.map do |name, info|
+          if fk_info = fk_hash[name]
+            [name, fk_info.merge(info)]
+          else
+            [name, info]
           end
-        rescue Sequel::NotImplemented
-          nil
         end
       end
 
@@ -281,11 +271,12 @@ END_MIG
     # Return a string that containing add_index/drop_index method calls for
     # creating the index migration.
     def dump_table_indexes(table, meth, options={})
-      begin
+      if supports_index_parsing?
         indexes = indexes(table).sort_by{|k,v| k.to_s}
-      rescue Sequel::NotImplemented
+      else
         return ''
       end
+
       im = method(:index_to_generator_opts)
       gen = create_table_generator do
         indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts, options))}
@@ -311,18 +302,7 @@ END_MIG
     # Sort the tables so that referenced tables are created before tables that
     # reference them, and then by name.  If foreign keys are disabled, just sort by name.
     def sort_dumped_tables(tables, options={})
-      sort_topologically = if options[:foreign_keys] != false
-        begin
-          foreign_key_list(:some_table_that_does_not_exist)
-          true
-        rescue Sequel::NotImplemented
-          false
-        rescue
-          true
-        end
-      end
-
-      if sort_topologically
+      if options[:foreign_keys] != false && supports_foreign_key_parsing?
         table_fks = {}
         tables.each{|t| table_fks[t] = foreign_key_list(t)}
         # Remove self referential foreign keys, not important when sorting.

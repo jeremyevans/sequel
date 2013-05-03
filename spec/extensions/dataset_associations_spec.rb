@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::DatasetAssociations" do
   before do
-    @db = Sequel::Database.new
+    @db = Sequel.mock
     @Base = Class.new(Sequel::Model)
     @Base.plugin :dataset_associations
 
@@ -140,7 +140,7 @@ end
 
 describe "Sequel::Plugins::DatasetAssociations with composite keys" do
   before do
-    @db = Sequel::Database.new
+    @db = Sequel.mock
     @Base = Class.new(Sequel::Model)
     @Base.plugin :dataset_associations
 

@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::DefaultsSetter" do
   before do
-    @db = db = Sequel::Database.new
+    @db = db = Sequel.mock
     @c = c = Class.new(Sequel::Model(db[:foo]))
     @c.instance_variable_set(:@db_schema, {:a=>{}})
     @c.plugin :defaults_setter

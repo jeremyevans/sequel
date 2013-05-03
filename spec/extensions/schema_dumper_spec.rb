@@ -99,12 +99,14 @@ describe "Sequel::Database dump methods" do
 
   it "should handle foreign keys" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :allow_null=>true}]]}
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2]}]}
     @d.dump_table_schema(:t6).should == "create_table(:t6) do\n  foreign_key :c1, :t2, :key=>[:c2]\nend"
   end
 
   it "should handle primary keys that are also foreign keys" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true}]]}
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2]}]}
     s = @d.dump_table_schema(:t6)
     s.should =~ /create_table\(:t6\) do\n  primary_key :c1, /
@@ -114,6 +116,7 @@ describe "Sequel::Database dump methods" do
 
   it "should handle foreign key options" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :allow_null=>true}]]}
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:restrict, :on_update=>:set_null, :deferrable=>true}]}
     s = @d.dump_table_schema(:t6)
     s.should =~ /create_table\(:t6\) do\n  foreign_key :c1, :t2, /
@@ -125,6 +128,7 @@ describe "Sequel::Database dump methods" do
 
   it "should handle foreign key options in the primary key" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true}]]}
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:restrict, :on_update=>:set_null, :deferrable=>true}]}
     s = @d.dump_table_schema(:t6)
     s.should =~ /create_table\(:t6\) do\n  primary_key :c1, /
@@ -137,6 +141,7 @@ describe "Sequel::Database dump methods" do
 
   it "should omit foreign key options that are the same as defaults" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :allow_null=>true}]]}
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:no_action, :on_update=>:no_action, :deferrable=>false}]}
     s = @d.dump_table_schema(:t6)
     s.should =~ /create_table\(:t6\) do\n  foreign_key :c1, :t2, /
@@ -148,6 +153,7 @@ describe "Sequel::Database dump methods" do
 
   it "should omit foreign key options that are the same as defaults in the primary key" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true}]]}
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:no_action, :on_update=>:no_action, :deferrable=>false}]}
     s = @d.dump_table_schema(:t6)
     s.should =~ /create_table\(:t6\) do\n  primary_key :c1, /
@@ -169,11 +175,13 @@ describe "Sequel::Database dump methods" do
 
   it "should use a composite foreign_key calls if there is a composite foreign key" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer'}], [:c2, {:db_type=>'integer'}]]}
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1, :c2], :table=>:t2, :key=>[:c3, :c4]}]}
     @d.dump_table_schema(:t1).should == "create_table(:t1) do\n  Integer :c1\n  Integer :c2\n  \n  foreign_key [:c1, :c2], :t2, :key=>[:c3, :c4]\nend"
   end
 
   it "should include index information if available" do
+    @d.meta_def(:supports_index_parsing?){true}
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
@@ -227,6 +235,7 @@ END_MIG
     @d.meta_def(:schema) do |t|
       t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer', :primary_key=>true}]]
     end
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list) do |t|
       t == :t1 ? [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}] : []
     end
@@ -250,6 +259,7 @@ END_MIG
     @d.meta_def(:schema) do |t|
       t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer'}]]
     end
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list) do |t|
       t == :t1 ? [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}] : [{:columns=>[:c1], :table=>:t1, :key=>[:c2]}]
     end
@@ -277,6 +287,7 @@ END_MIG
     @d.meta_def(:schema) do |t|
       t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer', :primary_key=>true}]]
     end
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list) do |t|
       raise Sequel::DatabaseError unless [:t1, :t2].include?(t)
       t == :t1 ? [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}] : []
@@ -318,6 +329,7 @@ END_MIG
   end
 
   it "should honor the :index_names => false option to not include names of indexes" do
+    @d.meta_def(:supports_index_parsing?){true}
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
@@ -349,6 +361,7 @@ END_MIG
   end
   
   it "should make :index_names => :namespace option a noop if there is a  global index namespace" do
+    @d.meta_def(:supports_index_parsing?){true}
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>false}}
@@ -381,6 +394,7 @@ END_MIG
 
   it "should honor the :index_names => :namespace option to include names of indexes with prepended table name if there is no global index namespace" do
     @d.meta_def(:global_index_namespace?){false}
+    @d.meta_def(:supports_index_parsing?){true}
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>false}}
@@ -412,6 +426,7 @@ END_MIG
   end
 
   it "should honor the :indexes => false option to not include indexes" do
+    @d.meta_def(:supports_index_parsing?){true}
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
@@ -444,6 +459,7 @@ END_MIG
   end
 
   it "should have :foreign_keys option override :indexes => false disabling of foreign keys" do
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list) do |t|
       t == :t1 ? [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}] : []
     end
@@ -452,6 +468,7 @@ END_MIG
 
   it "should support dumping just indexes as a migration" do
     @d.meta_def(:tables){|o| [:t1]}
+    @d.meta_def(:supports_index_parsing?){true}
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
@@ -468,6 +485,7 @@ END_MIG
 
   it "should honor the :index_names => false option to not include names of indexes when dumping just indexes as a migration" do
     @d.meta_def(:tables){|o| [:t1]}
+    @d.meta_def(:supports_index_parsing?){true}
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
@@ -484,6 +502,7 @@ END_MIG
 
   it "should honor the :index_names => :namespace option be a noop if there is a global index namespace" do
     @d.meta_def(:tables){|o| [:t1, :t2]}
+    @d.meta_def(:supports_index_parsing?){true}
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>false}}
@@ -504,6 +523,7 @@ END_MIG
   it "should honor the :index_names => :namespace option to include names of indexes with prepended table name when dumping just indexes as a migration if there is no global index namespace" do
     @d.meta_def(:global_index_namespace?){false}
     @d.meta_def(:tables){|o| [:t1, :t2]}
+    @d.meta_def(:supports_index_parsing?){true}
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>false}}
@@ -548,6 +568,7 @@ END_MIG
     @d.meta_def(:schema) do |t|
       t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer'}]]
     end
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list) do |t, *a|
       case t
       when :t1
@@ -601,6 +622,8 @@ END_MIG
   
   it "should not use a literal string as a fallback if using MySQL with the :same_db option" do
     @d.meta_def(:database_type){:mysql}
+    @d.meta_def(:supports_index_parsing?){false}
+    @d.meta_def(:supports_foreign_key_parsing?){false}
     @d.meta_def(:schema) do |t, *os|
       s = [[:c10, {:db_type=>'foo', :default=>"'6 weeks'", :type=>nil, :allow_null=>true}]]
       s.each{|_, c| c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type])}
@@ -739,6 +762,7 @@ END_MIG
 
   it "should use explicit type for non integer foreign_key types" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'date', :primary_key=>true}]]}
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|t, *a| [{:columns=>[:c1], :table=>:t3, :key=>[:c1]}] if t == :t4}
     ["create_table(:t4) do\n  foreign_key :c1, :t3, :type=>Date, :key=>[:c1]\n  \n  primary_key [:c1]\nend",
      "create_table(:t4) do\n  foreign_key :c1, :t3, :key=>[:c1], :type=>Date\n  \n  primary_key [:c1]\nend"].should include(@d.dump_table_schema(:t4))
@@ -748,6 +772,7 @@ END_MIG
 
   it "should correctly handing autoincrementing primary keys that are also foreign keys" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true}]]}
+    @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|t, *a| [{:columns=>[:c1], :table=>:t3, :key=>[:c1]}] if t == :t4}
     ["create_table(:t4) do\n  primary_key :c1, :table=>:t3, :key=>[:c1]\nend",
      "create_table(:t4) do\n  primary_key :c1, :key=>[:c1], :table=>:t3\nend"].should include(@d.dump_table_schema(:t4))

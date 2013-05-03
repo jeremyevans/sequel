@@ -169,6 +169,7 @@ module Sequel
     # This method should probably should not be called by user code, use +each+
     # instead.
     def fetch_rows(sql)
+      Sequel::Deprecation.deprecate('Dataset#fetch_rows default implementation and Sequel::NotImplemented', 'All dataset instances can be assumed to implement fetch_rows')
       raise NotImplemented, NOTIMPL_MSG
     end
     

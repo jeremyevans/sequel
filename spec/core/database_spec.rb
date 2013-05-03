@@ -227,7 +227,7 @@ describe "Sequel.extension" do
 end
 
 describe "Database#connect" do
-  specify "should raise Sequel::NotImplemented" do
+  qspecify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.connect(:default)}.should raise_error(Sequel::NotImplemented)
   end
 end
@@ -505,31 +505,31 @@ describe "Database#valid_connection?" do
 end
 
 describe "Database#execute" do
-  specify "should raise Sequel::NotImplemented" do
+  qspecify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.execute('blah blah')}.should raise_error(Sequel::NotImplemented)
   end
 end
 
 describe "Database#tables" do
-  specify "should raise Sequel::NotImplemented" do
+  qspecify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.tables}.should raise_error(Sequel::NotImplemented)
   end
 end
 
 describe "Database#views" do
-  specify "should raise Sequel::NotImplemented" do
+  qspecify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.views}.should raise_error(Sequel::NotImplemented)
   end
 end
 
 describe "Database#indexes" do
-  specify "should raise Sequel::NotImplemented" do
+  qspecify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.indexes(:table)}.should raise_error(Sequel::NotImplemented)
   end
 end
 
 describe "Database#foreign_key_list" do
-  specify "should raise Sequel::NotImplemented" do
+  qspecify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.foreign_key_list(:table)}.should raise_error(Sequel::NotImplemented)
   end
 end
@@ -611,7 +611,8 @@ describe "Database#test_connection" do
   end
 
   specify "should raise an error if the attempting to connect raises an error" do
-    proc{Sequel::Database.new{raise Sequel::Error, 'blah'}.test_connection}.should raise_error(Sequel::Error)
+    def @db.connect(*) raise Sequel::Error end
+    proc{@db.test_connection}.should raise_error(Sequel::Error)
   end
 end
 
@@ -1145,7 +1146,7 @@ end
 
 describe "A Database adapter with a scheme" do
   before do
-    @ccc = Class.new(Sequel::Database)
+    @ccc = Class.new(Sequel::Mock::Database)
     @ccc.send(:set_adapter_scheme, :ccc)
   end
 
@@ -1266,6 +1267,7 @@ describe "A Database adapter with a scheme" do
   end
 
   specify "should test the connection if test parameter is truthy" do
+    @ccc.send(:define_method, :connect){}
     proc{Sequel.connect 'ccc:///d%5bb%5d?test=t'}.should raise_error(Sequel::DatabaseConnectionError)
     proc{Sequel.connect 'ccc:///d%5bb%5d?test=1'}.should raise_error(Sequel::DatabaseConnectionError)
     proc{Sequel.connect 'ccc:///d%5bb%5d', :test=>true}.should raise_error(Sequel::DatabaseConnectionError)
@@ -1365,12 +1367,14 @@ describe "A single threaded database" do
   end
   
   specify "should convert an Exception on connection into a DatabaseConnectionError" do
-    db = Sequel::Database.new(:single_threaded => true, :servers=>{}){raise Exception}
+    db = Sequel::Database.new(:single_threaded => true, :servers=>{})
+    def db.connect(*) raise Exception end
     proc {db.pool.hold {|c|}}.should raise_error(Sequel::DatabaseConnectionError)
   end
   
   specify "should raise a DatabaseConnectionError if the connection proc returns nil" do
-    db = Sequel::Database.new(:single_threaded => true, :servers=>{}){nil}
+    db = Sequel.mock(:single_threaded => true, :servers=>{})
+    def db.connect(*) end
     proc {db.pool.hold {|c|}}.should raise_error(Sequel::DatabaseConnectionError)
   end
 end

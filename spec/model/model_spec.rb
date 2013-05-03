@@ -55,7 +55,7 @@ describe "Sequel::Model()" do
   end
 
   it "should return a model subclass associated to the given database if given a database" do
-    db = Sequel::Database.new
+    db = Sequel.mock
     c = Sequel::Model(db)
     c.superclass.should == Sequel::Model
     c.db.should == db

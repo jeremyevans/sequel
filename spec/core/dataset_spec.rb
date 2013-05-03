@@ -3307,7 +3307,7 @@ describe "Dataset default #fetch_rows, #insert, #update, #delete, #with_sql_dele
     @ds = @db[:items]
   end
 
-  specify "#fetch_rows should raise a Sequel::NotImplemented" do
+  qspecify "#fetch_rows should raise a Sequel::NotImplemented" do
     proc{@ds.fetch_rows(''){}}.should raise_error(Sequel::NotImplemented)
   end
 
