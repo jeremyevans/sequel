@@ -441,12 +441,8 @@ module Sequel
       Sequel::Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
 
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
-      attr_accessor :mssql_unicode_strings
-
-      # Copy the mssql_unicode_strings option from the +db+ object.
-      def initialize(db, opts={})
-        super
-        @mssql_unicode_strings = db.mssql_unicode_strings
+      def mssql_unicode_strings
+        defined?(@mssql_unicode_strings) ? @mssql_unicode_strings : (@mssql_unicode_strings = db.mssql_unicode_strings)
       end
 
       # MSSQL uses + for string concatenation, and LIKE is case insensitive by default.
