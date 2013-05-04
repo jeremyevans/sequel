@@ -1180,8 +1180,12 @@ module Sequel
         else
           sql = 'LOCK TABLE '
           source_list_append(sql, @opts[:from])
+          mode = mode.to_s.upcase.strip
+          unless LOCK_MODES.include?(mode)
+            Sequel::Deprecation.deprecate("Calling Dataset#lock with an unsupported lock mode will raise an Error in Sequel 4.")
+          end
           sql << " IN #{mode} MODE"
-          @db.execute(sql, opts) # lock without a transaction
+          @db.execute(sql, opts)
         end
         nil
       end
