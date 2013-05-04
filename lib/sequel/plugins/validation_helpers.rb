@@ -150,6 +150,7 @@ module Sequel
         # be a string in an invalid format, and if typecasting succeeds, the value will
         # not be a string.
         def validates_not_string(atts, opts={})
+          Sequel::Deprecation.deprecate('validates_not_string', "Please switch to validates_schema_types")
           validatable_attributes_for_type(:not_string, atts, opts){|a,v,m| validation_error_message(m, (db_schema[a]||{})[:type]) if v.is_a?(String)}
         end
 

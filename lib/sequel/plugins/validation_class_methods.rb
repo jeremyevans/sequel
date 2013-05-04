@@ -274,6 +274,7 @@ module Sequel
         # Possible Options:
         # * :message - The message to use (default: 'is a string' or 'is not a valid (integer|datetime|etc.)' if the type is known)
         def validates_not_string(*atts)
+          Sequel::Deprecation.deprecate('validates_not_string', "Please switch to validates_schema_type")
           opts = {
             :tag => :not_string,
           }.merge!(extract_options!(atts))

@@ -235,7 +235,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should_not be_valid
   end
 
-  specify "should support validates_not_string" do
+  qspecify "should support validates_not_string" do
     @c.set_validations{validates_not_string(:value)}
     @m.value = 123
     @m.should be_valid
@@ -518,7 +518,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
   it "should not attempt a database query if the underlying columns have validation errors" do
     @c.columns(:id, :username, :password)
     @c.set_dataset MODEL_DB[:items]
-    @c.set_validations{validates_not_string(:username); validates_unique([:username, :password])}
+    @c.set_validations{errors.add(:username, 'foo'); validates_unique([:username, :password])}
     @c.dataset._fetch = {:v=>0}
     
     MODEL_DB.reset

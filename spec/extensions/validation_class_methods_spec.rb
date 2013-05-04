@@ -764,7 +764,7 @@ describe Sequel::Model, "Validations" do
     @person.should be_valid
   end
   
-  it "should validate that a column doesn't have a string value" do
+  qspecify "should validate that a column doesn't have a string value" do
     p = model_class.call Sequel::Model do
       columns :age, :price, :confirmed
       self.raise_on_typecast_failure = false

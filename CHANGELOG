@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate validates_not_string (jeremyevans)
+
 * Deprecate casting via __type suffix for prepared type placeholders in the postgres adapter (jeremyevans)
 
 * Deprecate json_serializer's Model.json_create (jeremyevans)
