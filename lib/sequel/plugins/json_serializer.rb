@@ -143,6 +143,9 @@ module Sequel
         # Attempt to parse a single instance from the given JSON string,
         # with options passed to InstanceMethods#from_json_node.
         def from_json(json, opts={})
+          if opts[:all_associations] || opts[:all_columns]
+            Sequel::Deprecation.deprecate("The from_json :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
+          end
           v = Sequel.parse_json(json)
           case v
           when self
@@ -157,6 +160,9 @@ module Sequel
         # Attempt to parse an array of instances from the given JSON string,
         # with options passed to InstanceMethods#from_json_node.
         def array_from_json(json, opts={})
+          if opts[:all_associations] || opts[:all_columns]
+            Sequel::Deprecation.deprecate("The from_json :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
+          end
           v = Sequel.parse_json(json)
           if v.is_a?(Array)
             raise(Error, 'parsed json returned an array containing non-hashes') unless v.all?{|ve| ve.is_a?(Hash) || ve.is_a?(self)}
@@ -172,6 +178,7 @@ module Sequel
         # :all_columns and :all_associations options.  Not recommended for usage
         # in new code, consider calling the from_json method directly with the JSON string.
         def json_create(hash, opts={})
+          Sequel::Deprecation.deprecate("Model.json_create", 'Switch to Model.from_json')
           new.from_json_node(hash, {:all_columns=>true, :all_associations=>true}.merge(opts))
         end
 
@@ -188,6 +195,9 @@ module Sequel
         # Parse the provided JSON, which should return a hash,
         # and process the hash with from_json_node.
         def from_json(json, opts={})
+          if opts[:all_associations] || opts[:all_columns]
+            Sequel::Deprecation.deprecate("The from_json :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
+          end
           from_json_node(Sequel.parse_json(json), opts)
         end
 

@@ -43,12 +43,12 @@ describe "Sequel::Plugins::JsonSerializer" do
     Artist.from_json(Artist.load(:name=>Date.today).to_json).should == Artist.load(:name=>Date.today)
   end
 
-  it "should have .json_create method for creating an instance from a hash parsed from JSON" do
+  qspecify "should have .json_create method for creating an instance from a hash parsed from JSON" do
     JSON.parse(@artist.to_json, :create_additions=>true).should == @artist
     JSON.parse(@artist.to_json(:include=>{:albums=>{:include=>{:artist=>{:include=>:albums}}}}), :create_additions=>true).albums.map{|a| a.artist.albums}.should == [[@album]]
   end
 
-  it "should have .json_create method raise error if not given a hash" do
+  qspecify "should have .json_create method raise error if not given a hash" do
     proc{Artist.json_create([])}.should raise_error(Sequel::Error)
   end
 
@@ -129,7 +129,7 @@ describe "Sequel::Plugins::JsonSerializer" do
     Album.from_json(@album.to_json(:include=>{:artist=>{:include=>{:albums=>{:only=>:name}}}}), :associations=>{:artist=>{:associations=>:albums}}).artist.albums.should == [Album.load(:name=>@album.name)]
   end
 
-  it "should automatically cascade parsing for all associations if :all_associations is used" do
+  qspecify "should automatically cascade parsing for all associations if :all_associations is used" do
     Artist.from_json(@artist.to_json(:include=>{:albums=>{:include=>:artist}}), :all_associations=>true).albums.map{|a| a.artist}.should == [@artist]
   end
 
@@ -260,26 +260,26 @@ describe "Sequel::Plugins::JsonSerializer" do
     Object.send(:remove_const, :Artist3)
   end
 
-  it "should have :associations option take precedence over :all_assocations" do
+  qspecify "should have :associations option take precedence over :all_assocations" do
     Artist.from_json(@artist.to_json(:include=>:albums), :associations=>[], :all_associations=>true, :fields=>[]).associations.should == {}
   end
 
-  it "should allow overriding of :all_columns options in associated objects" do
+  qspecify "should allow overriding of :all_columns options in associated objects" do
     Album.restrict_primary_key
     Artist.from_json(@artist.to_json(:include=>:albums), :associations=>{:albums=>{:fields=>[:id, :name, :artist_id], :missing=>:raise}}, :all_columns=>true).albums.should == [@album]
   end
 
-  it "should handle typecasting if setter columns exist when using :all_columns" do
+  qspecify "should handle typecasting if setter columns exist when using :all_columns" do
     Artist.restrict_primary_key
     Artist.from_json('{"id":"2","name":"YJM","json_class":"Artist"}', :all_columns=>true).should == @artist
   end
 
-  it "should allow setting columns that are restricted if :all_columns is used" do
+  qspecify "should allow setting columns that are restricted if :all_columns is used" do
     Artist.restrict_primary_key
     Artist.from_json(@artist.to_json, :all_columns=>true).should == @artist
   end
 
-  it "should raise an error if using :all_columns and non-column is in the JSON" do
+  qspecify "should raise an error if using :all_columns and non-column is in the JSON" do
     proc{Artist.from_json('{"foo":"bar"}', :all_columns=>true)}.should raise_error(Sequel::Error)
   end
 

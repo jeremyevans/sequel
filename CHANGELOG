@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate json_serializer's Model.json_create (jeremyevans)
+
+* Deprecate json_serializer from_json and xml_serializer from_xml :all_columns and :all_associations options (jeremyevans)
+
 * Deprecate passing an unsupported lock mode to Dataset#lock on PostgreSQL (jeremyevans)
 
 * Deprecate Model::InstanceMethods.class_attr_{overridable,reader} (jeremyevans)
