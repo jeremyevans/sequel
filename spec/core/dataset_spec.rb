@@ -2313,7 +2313,7 @@ describe "Dataset#join_table" do
 end
 
 describe "Dataset#[]=" do
-  specify "should perform an update on the specified filter" do
+  qspecify "should perform an update on the specified filter" do
     db = Sequel.mock
     ds = db[:items]
     ds[:a => 1] = {:x => 3}
@@ -2336,7 +2336,7 @@ describe "Dataset#insert_multiple" do
     @ds = @db[:items]
   end
   
-  specify "should insert all items in the supplied array" do
+  qspecify "should insert all items in the supplied array" do
     @ds.insert_multiple(['aa', 5, 3, {:a => 2}])
     @db.sqls.should == ["INSERT INTO items VALUES ('aa')",
       "INSERT INTO items VALUES (5)",
@@ -2344,18 +2344,18 @@ describe "Dataset#insert_multiple" do
       "INSERT INTO items (a) VALUES (2)"]
   end
   
-  specify "should pass array items through the supplied block if given" do
+  qspecify "should pass array items through the supplied block if given" do
     @ds.insert_multiple(["inevitable", "hello", "the ticking clock"]){|i| i.gsub('l', 'r')}
     @db.sqls.should == ["INSERT INTO items VALUES ('inevitabre')",
       "INSERT INTO items VALUES ('herro')",
       "INSERT INTO items VALUES ('the ticking crock')"]
   end
 
-  specify "should return array of inserted ids" do
+  qspecify "should return array of inserted ids" do
     @ds.insert_multiple(['aa', 5, 3, {:a => 2}]).should == [2, 3, 4, 5]
   end
 
-  specify "should work exactly like in metioned in the example" do
+  qspecify "should work exactly like in metioned in the example" do
     @ds.insert_multiple([{:x=>1}, {:x=>2}]){|row| row[:y] = row[:x] * 2 ; row }
     sqls = @db.sqls
     ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].should include(sqls[0])
@@ -3103,11 +3103,11 @@ describe "Dataset#to_csv" do
     @ds = Sequel.mock(:fetch=>[{:a=>1, :b=>2, :c=>3}, {:a=>4, :b=>5, :c=>6}, {:a=>7, :b=>8, :c=>9}])[:items].columns(:a, :b, :c)
   end
   
-  specify "should format a CSV representation of the records" do
+  qspecify "should format a CSV representation of the records" do
     @ds.to_csv.should == "a, b, c\r\n1, 2, 3\r\n4, 5, 6\r\n7, 8, 9\r\n"
   end
 
-  specify "should exclude column titles if so specified" do
+  qspecify "should exclude column titles if so specified" do
     @ds.to_csv(false).should == "1, 2, 3\r\n4, 5, 6\r\n7, 8, 9\r\n"
   end
 end

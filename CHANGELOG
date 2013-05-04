@@ -1,5 +1,9 @@
 === HEAD
 
+* Add sequel_3_dataset_methods extension for Dataset#[]=, #insert_multiple, #to_csv, #db=, and #opts= (jeremyevans)
+
+* Deprecate Dataset#[]=, #insert_multiple, #to_csv, #db=, and #opts= (jeremyevans)
+
 * Add blacklist_security plugin for Model.restricted_columns, Model.set_restricted_columns, Model#set_except, and Model#update_except (jeremyevans)
 
 * Deprecate Model.restricted_columns, Model.set_restricted_columns, Model#set_except, and Model#update_except (jeremyevans)

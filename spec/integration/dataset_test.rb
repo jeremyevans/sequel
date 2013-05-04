@@ -50,7 +50,7 @@ describe "Simple Dataset operations" do
   end
 
   specify "should have insert_multiple return primary key values" do
-    @ds.insert_multiple([{:number=>20}, {:number=>30}]).should == [2, 3]
+    @ds.extension(:sequel_3_dataset_methods).insert_multiple([{:number=>20}, {:number=>30}]).should == [2, 3]
     @ds.filter(:id=>2).get(:number).should == 20
     @ds.filter(:id=>3).get(:number).should == 30
   end
@@ -893,7 +893,7 @@ describe "Sequel::Dataset convenience methods" do
   
   it "#[]= should update matching rows" do
     @ds.insert(20, 10)
-    @ds[:a=>20] = {:b=>30}
+    @ds.extension(:sequel_3_dataset_methods)[:a=>20] = {:b=>30}
     @ds.all.should == [{:a=>20, :b=>30}]
   end
   

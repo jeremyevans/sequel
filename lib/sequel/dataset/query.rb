@@ -87,7 +87,7 @@ module Sequel
     # directly by user code.
     def clone(opts = {})
       c = super()
-      c.opts = @opts.merge(opts)
+      c.instance_variable_set(:@opts, @opts.merge(opts))
       c.instance_variable_set(:@columns, nil) if opts.keys.any?{|o| COLUMN_CHANGE_OPTS.include?(o)}
       c
     end

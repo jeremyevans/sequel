@@ -39,6 +39,7 @@ module Sequel
     #   DB[:table][:id=>1] = {:id=>2} # UPDATE table SET id = 2 WHERE id = 1
     #   # => 1 # number of rows affected
     def []=(conditions, values)
+      Sequel::Deprecation.deprecate('Dataset#[]=', 'Please load the sequel_3_dataset_methods extension to continue using it')
       filter(conditions).update(values)
     end
 
@@ -374,6 +375,7 @@ module Sequel
     #   # INSERT INTO table (x, y) VALUES (1, 2)
     #   # INSERT INTO table (x, y) VALUES (2, 4)
     def insert_multiple(array, &block)
+      Sequel::Deprecation.deprecate('Dataset#insert_multiple', 'Please load the sequel_3_dataset_methods extension to continue using it')
       if block
         array.map{|i| insert(block.call(i))}
       else
@@ -667,6 +669,7 @@ module Sequel
     #   # 1,Jim
     #   # 2,Bob
     def to_csv(include_column_titles = true)
+      Sequel::Deprecation.deprecate('Dataset#to_csv', 'Please load the sequel_3_dataset_methods extension to continue using it')
       n = naked
       cols = n.columns
       csv = ''

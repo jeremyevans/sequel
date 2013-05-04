@@ -12,10 +12,20 @@ module Sequel
     
     # The database related to this dataset.  This is the Database instance that
     # will execute all of this dataset's queries.
-    attr_accessor :db
+    attr_reader :db
 
     # The hash of options for this dataset, keys are symbols.
-    attr_accessor :opts
+    attr_reader :opts
+
+    # REMOVE40
+    def db=(v)
+      Sequel::Deprecation.deprecate('Dataset#db=', 'Please load the sequel_3_dataset_methods extension to continue using it')
+      @db = v
+    end
+    def opts=(v)
+      Sequel::Deprecation.deprecate('Dataset#opts=', 'Please load the sequel_3_dataset_methods extension to continue using it')
+      @opts = v
+    end
 
     # Default options hash to use for datasets.
     DEFAULT_OPTS = {}
