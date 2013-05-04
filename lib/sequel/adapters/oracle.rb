@@ -21,13 +21,6 @@ module Sequel
       # Hash of conversion procs for this database.
       attr_reader :conversion_procs
 
-      def initialize(opts={})
-        super
-        @autosequence = opts[:autosequence]
-        @primary_key_sequences = {}
-        @conversion_procs = ORACLE_TYPES.dup
-      end
-
       def connect(server)
         opts = server_opts(server)
         if opts[:database]
@@ -110,6 +103,12 @@ module Sequel
             raise_error(e)
           end
         end
+      end
+
+      def adapter_initialize
+        @autosequence = @opts[:autosequence]
+        @primary_key_sequences = {}
+        @conversion_procs = ORACLE_TYPES.dup
       end
 
       PS_TYPES = {'string'.freeze=>String, 'integer'.freeze=>Integer, 'float'.freeze=>Float,

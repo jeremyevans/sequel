@@ -59,13 +59,6 @@ module Sequel
       # it returns the strings as is.
       attr_reader :convert_invalid_date_time
       
-      def initialize(opts={})
-        super
-        @conversion_procs = MYSQL_TYPES.dup
-        self.convert_tinyint_to_bool = Sequel::MySQL.convert_tinyint_to_bool
-        self.convert_invalid_date_time = Sequel::MySQL.convert_invalid_date_time
-      end
-
       # Connect to the database.  In addition to the usual database options,
       # the following options have effect:
       #
@@ -221,6 +214,12 @@ module Sequel
         end
       end
       
+      def adapter_initialize
+        @conversion_procs = MYSQL_TYPES.dup
+        self.convert_tinyint_to_bool = Sequel::MySQL.convert_tinyint_to_bool
+        self.convert_invalid_date_time = Sequel::MySQL.convert_invalid_date_time
+      end
+
       # Try to get an accurate number of rows matched using the query
       # info.  Fall back to affected_rows if there was no match, but
       # that may be inaccurate.

@@ -7,12 +7,6 @@ module Sequel
       include Sequel::MSSQL::DatabaseMethods
       set_adapter_scheme :tinytds
 
-      # Choose whether to use unicode strings on initialization
-      def initialize(*)
-        super
-        set_mssql_unicode_strings
-      end
-      
       # Transfer the :user option to the :username option.
       def connect(server)
         opts = server_opts(server)
@@ -94,6 +88,11 @@ module Sequel
 
       private
 
+      # Choose whether to use unicode strings on initialization
+      def adapter_initialize
+        set_mssql_unicode_strings
+      end
+      
       # For some reason, unless you specify a column can be
       # NULL, it assumes NOT NULL, so turn NULL on by default unless
       # the column is a primary key column.

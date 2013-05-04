@@ -89,7 +89,7 @@ module Sequel
     #   # => 1
     #   DB.get{server_version{}} # SELECT server_version()
     def get(*args, &block)
-      dataset.get(*args, &block)
+      @default_dataset.get(*args, &block)
     end
     
     # Return a hash containing index information for the table. Hash keys are index name symbols.
@@ -317,11 +317,12 @@ module Sequel
     # for this database.  Used when parsing metadata so that column symbols are
     # returned as expected.
     def metadata_dataset
-      return @metadata_dataset if defined?(@metadata_dataset) && @metadata_dataset
-      ds = dataset
-      ds.identifier_input_method = identifier_input_method_default
-      ds.identifier_output_method = identifier_output_method_default
-      @metadata_dataset = ds
+      @metadata_dataset ||= (
+        ds = dataset;
+        ds.identifier_input_method = identifier_input_method_default;
+        ds.identifier_output_method = identifier_output_method_default;
+        ds
+      )
     end
 
     # Return a Method object for the dataset's output_identifier_method.

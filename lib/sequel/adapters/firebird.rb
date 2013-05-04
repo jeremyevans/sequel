@@ -12,13 +12,6 @@ module Sequel
 
       DISCONNECT_ERRORS = /Unsuccessful execution caused by a system error that precludes successful execution of subsequent statements/
 
-      # Add the primary_keys instance variables.
-      # so we can get the correct return values for inserted rows.
-      def initialize(*args)
-        super
-        @primary_keys = {}
-      end
-
       def connect(server)
         opts = server_opts(server)
 
@@ -53,6 +46,11 @@ module Sequel
       end
 
       private
+
+      # Add the primary_keys instance variable so we can get the correct return values for inserted rows.
+      def adapter_initialize
+        @primary_keys = {}
+      end
 
       def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN) do

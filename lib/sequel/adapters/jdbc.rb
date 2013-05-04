@@ -177,24 +177,6 @@ module Sequel
       # fetching rows.
       attr_accessor :convert_types
 
-      # Call the DATABASE_SETUP proc directly after initialization,
-      # so the object always uses sub adapter specific code.  Also,
-      # raise an error immediately if the connection doesn't have a
-      # uri, since JDBC requires one.
-      def initialize(opts)
-        super
-        @connection_prepared_statements = {}
-        @connection_prepared_statements_mutex = Mutex.new
-        @convert_types = typecast_value_boolean(@opts.fetch(:convert_types, true))
-        raise(Error, "No connection string specified") unless uri
-        
-        resolved_uri = jndi? ? get_uri_from_jndi : uri
-
-        if match = /\Ajdbc:([^:]+)/.match(resolved_uri) and prok = DATABASE_SETUP[match[1].to_sym]
-          @driver = prok.call(self)
-        end        
-      end
-      
       # Execute the given stored procedure with the give name. If a block is
       # given, the stored procedure should return rows.
       def call_sproc(name, opts = {})
@@ -350,6 +332,23 @@ module Sequel
 
       private
          
+      # Call the DATABASE_SETUP proc directly after initialization,
+      # so the object always uses sub adapter specific code.  Also,
+      # raise an error immediately if the connection doesn't have a
+      # uri, since JDBC requires one.
+      def adapter_initialize
+        @connection_prepared_statements = {}
+        @connection_prepared_statements_mutex = Mutex.new
+        @convert_types = typecast_value_boolean(@opts.fetch(:convert_types, true))
+        raise(Error, "No connection string specified") unless uri
+        
+        resolved_uri = jndi? ? get_uri_from_jndi : uri
+
+        if match = /\Ajdbc:([^:]+)/.match(resolved_uri) and prok = DATABASE_SETUP[match[1].to_sym]
+          @driver = prok.call(self)
+        end        
+      end
+      
       # Yield the native prepared statements hash for the given connection
       # to the block in a thread-safe manner.
       def cps_sync(conn, &block)

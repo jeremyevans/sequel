@@ -1,6 +1,8 @@
 module Sequel
   module Informix
     module DatabaseMethods
+      extend Sequel::Database::ResetIdentifierMangling
+
       TEMPORARY = 'TEMP '.freeze
 
       # Informix uses the :informix database type

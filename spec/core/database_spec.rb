@@ -81,7 +81,7 @@ describe "A new Database" do
 
   specify "should respect the :identifier_input_method option" do
     Sequel.identifier_input_method = nil
-    Sequel::Database.identifier_input_method.should == ""
+    Sequel::Database.identifier_input_method.should == false
     db = Sequel::Database.new(:identifier_input_method=>nil)
     db.identifier_input_method.should be_nil
     db.identifier_input_method = :downcase
@@ -104,7 +104,7 @@ describe "A new Database" do
   
   specify "should respect the :identifier_output_method option" do
     Sequel.identifier_output_method = nil
-    Sequel::Database.identifier_output_method.should == ""
+    Sequel::Database.identifier_output_method.should == false
     db = Sequel::Database.new(:identifier_output_method=>nil)
     db.identifier_output_method.should be_nil
     db.identifier_output_method = :downcase
@@ -169,7 +169,7 @@ describe "A new Database" do
   
   specify "should respect the identifier_input_method_default method" do
     class Sequel::Database
-      @@identifier_input_method = nil
+      @identifier_input_method = nil
     end
     x = Class.new(Sequel::Database){def identifier_input_method_default; :downcase end}
     x.new({}).identifier_input_method.should == :downcase
@@ -179,7 +179,7 @@ describe "A new Database" do
   
   specify "should respect the identifier_output_method_default method if Sequel.identifier_output_method is not called" do
     class Sequel::Database
-      @@identifier_output_method = nil
+      @identifier_output_method = nil
     end
     x = Class.new(Sequel::Database){def identifier_output_method_default; :upcase end}
     x.new({}).identifier_output_method.should == :upcase

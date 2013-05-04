@@ -91,13 +91,6 @@ module Sequel
       # The conversion procs to use for this database
       attr_reader :conversion_procs
 
-      def initialize(opts={})
-        super
-        @conversion_procs = SQLITE_TYPES.dup
-        @conversion_procs['datetime'] = @conversion_procs['timestamp'] = method(:to_application_timestamp)
-        set_integer_booleans
-      end
-      
       # Connect to the database.  Since SQLite is a file based database,
       # the only options available are :database (to specify the database
       # name), and :timeout, to specify how long to wait for the database to
@@ -165,6 +158,12 @@ module Sequel
       end
 
       private
+      
+      def adapter_initialize
+        @conversion_procs = SQLITE_TYPES.dup
+        @conversion_procs['datetime'] = @conversion_procs['timestamp'] = method(:to_application_timestamp)
+        set_integer_booleans
+      end
       
       # Yield an available connection.  Rescue
       # any SQLite3::Exceptions and turn them into DatabaseErrors.

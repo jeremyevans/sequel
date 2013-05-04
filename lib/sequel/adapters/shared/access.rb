@@ -1,6 +1,8 @@
 module Sequel
   module Access
     module DatabaseMethods
+      extend Sequel::Database::ResetIdentifierMangling
+
       # Access uses type :access as the database_type
       def database_type
         :access

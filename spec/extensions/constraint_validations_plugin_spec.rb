@@ -20,7 +20,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     set_fetch({})
     @ds = @db[:items]
     @ds.instance_variable_set(:@columns, [:name])
-    @ds2 = @db.dup[:items2]
+    @ds2 = Sequel.mock[:items2]
     @ds2.instance_variable_set(:@columns, [:name])
   end
 
@@ -69,7 +69,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
   it "should reparse constraint validations when changing the model's database" do
     c = Class.new(Sequel::Model(@ds2))
     c.plugin :constraint_validations
-    @db.sqls.should == ["SELECT * FROM sequel_constraint_validations"]
+    @ds2.db.sqls.should == ["SELECT * FROM sequel_constraint_validations"]
     sc = Class.new(c)
     sc.set_dataset @ds
     @db.sqls.should == ["SELECT * FROM sequel_constraint_validations"]
@@ -79,7 +79,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
   it "should reparse constraint validations when changing the model's database with a custom constraint validations table" do
     c = Class.new(Sequel::Model(@ds2))
     c.plugin :constraint_validations, :constraint_validations_table=>:foo
-    @db.sqls.should == ["SELECT * FROM foo"]
+    @ds2.db.sqls.should == ["SELECT * FROM foo"]
     sc = Class.new(c)
     sc.set_dataset @ds
     @db.sqls.should == ["SELECT * FROM foo"]

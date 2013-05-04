@@ -20,20 +20,6 @@ module Sequel
         :sqlrelay => "SQLRelay"
       }
       
-      def initialize(opts)
-        super
-        case @opts[:db_type]
-        when 'mssql'
-          Sequel.ts_require 'adapters/shared/mssql'
-          extend Sequel::MSSQL::DatabaseMethods
-          def self.dataset(*args)
-            ds = super
-            ds.extend Sequel::MSSQL::DatasetMethods
-            ds
-          end
-        end
-      end
-
       # Converts a uri to an options hash. These options are then passed
       # to a newly created database object.
       def self.uri_to_options(uri) # :nodoc:
@@ -81,6 +67,17 @@ module Sequel
       def do(*a, &block)
         Sequel::Deprecation.deprecate('Database#do', 'Please use Database#execute_dui')
         execute_dui(*a, &block)
+      end
+
+      private
+
+      def adapter_initialize
+        case @opts[:db_type]
+        when 'mssql'
+          Sequel.ts_require 'adapters/shared/mssql'
+          extend Sequel::MSSQL::DatabaseMethods
+          extend_datasets Sequel::MSSQL::DatasetMethods
+        end
       end
     end
     

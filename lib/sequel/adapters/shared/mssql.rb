@@ -4,6 +4,8 @@ module Sequel
   Dataset::NON_SQL_OPTIONS << :disable_insert_output
   module MSSQL
     module DatabaseMethods
+      extend Sequel::Database::ResetIdentifierMangling
+
       AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
       SERVER_VERSION_RE = /^(\d+)\.(\d+)\.(\d+)/.freeze
       SERVER_VERSION_SQL = "SELECT CAST(SERVERPROPERTY('ProductVersion') AS varchar)".freeze

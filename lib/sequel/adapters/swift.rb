@@ -37,24 +37,6 @@ module Sequel
       # in this database's connection pool will be instances of this class.
       attr_accessor :swift_class
       
-      # Call the DATABASE_SETUP proc directly after initialization,
-      # so the object always uses sub adapter specific code.  Also,
-      # raise an error immediately if the connection doesn't have a
-      # db_type specified, since one is required to include the correct
-      # subadapter.
-      def initialize(opts)
-        super
-        if db_type = opts[:db_type] and !db_type.to_s.empty? 
-          if prok = DATABASE_SETUP[db_type.to_s.to_sym]
-            prok.call(self)
-          else
-            raise(Error, "No :db_type option specified")
-          end
-        else
-          raise(Error, ":db_type option not valid, should be postgres, mysql, or sqlite")
-        end
-      end
-      
       # Create an instance of swift_class for the given options.
       def connect(server)
         opts = server_opts(server)
@@ -100,6 +82,23 @@ module Sequel
       end
       
       private
+      
+      # Call the DATABASE_SETUP proc directly after initialization,
+      # so the object always uses sub adapter specific code.  Also,
+      # raise an error immediately if the connection doesn't have a
+      # db_type specified, since one is required to include the correct
+      # subadapter.
+      def adapter_initialize
+        if db_type = @opts[:db_type] and !db_type.to_s.empty? 
+          if prok = DATABASE_SETUP[db_type.to_s.to_sym]
+            prok.call(self)
+          else
+            raise(Error, "No :db_type option specified")
+          end
+        else
+          raise(Error, ":db_type option not valid, should be postgres, mysql, or sqlite")
+        end
+      end
       
       # Method to call on a statement object to execute SQL that does
       # not return any rows.

@@ -8,8 +8,12 @@ module Sequel
     # Array of supported database adapters
     ADAPTERS = %w'ado amalgalite cubrid db2 dbi do firebird ibmdb informix jdbc mock mysql mysql2 odbc openbase oracle postgres sqlite swift tinytds'.collect{|x| x.to_sym}
 
-    # Whether to use the single threaded connection pool by default
-    @@single_threaded = false
+    @single_threaded = false
+
+    class << self
+      # Whether to use the single threaded connection pool by default
+      attr_accessor :single_threaded
+    end
 
     # The Database subclass for the given adapter scheme.
     # Raises Sequel::AdapterNotFound if the adapter
@@ -86,12 +90,6 @@ module Sequel
       db
     end
     
-    # Sets the default single_threaded mode for new databases.
-    # See Sequel.single_threaded=.
-    def self.single_threaded=(value)
-      @@single_threaded = value
-    end
-
     # Sets the adapter scheme for the Database class. Call this method in
     # descendants of Database to allow connection using a URL. For example the
     # following:

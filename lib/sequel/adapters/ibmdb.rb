@@ -176,12 +176,6 @@ module Sequel
       # Hash of connection procs for converting
       attr_reader :conversion_procs
 
-      def initialize(opts={})
-        super
-        @conversion_procs = DB2_TYPES.dup
-        @conversion_procs[:timestamp] = method(:to_application_timestamp)
-      end
-
       # REORG the related table whenever it is altered.  This is not always
       # required, but it is necessary for compatibilty with other Sequel
       # code in many cases.
@@ -297,6 +291,11 @@ module Sequel
         else  
           stmt.affected
         end
+      end
+
+      def adapter_initialize
+        @conversion_procs = DB2_TYPES.dup
+        @conversion_procs[:timestamp] = method(:to_application_timestamp)
       end
 
       # IBM_DB uses an autocommit setting instead of sending SQL queries.

@@ -1,6 +1,7 @@
 module Sequel
   module Progress
     module DatabaseMethods
+      extend Sequel::Database::ResetIdentifierMangling
 
       # Progress uses the :progress database type.
       def database_type

@@ -87,6 +87,8 @@ module Sequel
 
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
+      extend Sequel::Database::ResetIdentifierMangling
+
       EXCLUDE_SCHEMAS = /pg_*|information_schema/i
       PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze

@@ -14,12 +14,6 @@ module Sequel
       # Whether to convert tinyint columns to bool for this database
       attr_accessor :convert_tinyint_to_bool
 
-      # Set the convert_tinyint_to_bool setting based on the default value.
-      def initialize(opts={})
-        super
-        self.convert_tinyint_to_bool = Sequel::MySQL.convert_tinyint_to_bool
-      end
-
       # Connect to the database.  In addition to the usual database options,
       # the following options have effect:
       #
@@ -87,6 +81,11 @@ module Sequel
         rescue ::Mysql2::Error => e
           raise_error(e)
         end
+      end
+
+      # Set the convert_tinyint_to_bool setting based on the default value.
+      def adapter_initialize
+        self.convert_tinyint_to_bool = Sequel::MySQL.convert_tinyint_to_bool
       end
 
       # MySQL connections use the query method to execute SQL without a result

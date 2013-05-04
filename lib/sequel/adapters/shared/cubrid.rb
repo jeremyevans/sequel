@@ -3,6 +3,8 @@ Sequel.require 'adapters/utils/split_alter_table'
 module Sequel
   module Cubrid
     module DatabaseMethods
+      extend Sequel::Database::ResetIdentifierMangling
+
       include Sequel::Database::SplitAlterTable
 
       AUTOINCREMENT = 'AUTO_INCREMENT'.freeze

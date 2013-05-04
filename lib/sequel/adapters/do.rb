@@ -44,18 +44,6 @@ module Sequel
 
       set_adapter_scheme :do
       
-      # Call the DATABASE_SETUP proc directly after initialization,
-      # so the object always uses sub adapter specific code.  Also,
-      # raise an error immediately if the connection doesn't have a
-      # uri, since DataObjects requires one.
-      def initialize(opts)
-        super
-        raise(Error, "No connection string specified") unless uri
-        if prok = DATABASE_SETUP[subadapter.to_sym]
-          prok.call(self)
-        end
-      end
-      
       # Setup a DataObjects::Connection to the database.
       def connect(server)
         setup_connection(::DataObjects::Connection.new(uri(server_opts(server))))
@@ -118,6 +106,17 @@ module Sequel
       end
 
       private
+      
+      # Call the DATABASE_SETUP proc directly after initialization,
+      # so the object always uses sub adapter specific code.  Also,
+      # raise an error immediately if the connection doesn't have a
+      # uri, since DataObjects requires one.
+      def adapter_initialize
+        raise(Error, "No connection string specified") unless uri
+        if prok = DATABASE_SETUP[subadapter.to_sym]
+          prok.call(self)
+        end
+      end
       
       # Method to call on a statement object to execute SQL that does
       # not return any rows.

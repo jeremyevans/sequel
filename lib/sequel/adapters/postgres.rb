@@ -175,16 +175,6 @@ module Sequel
       # as a string, or :float to convert to an infinite float.
       attr_reader :convert_infinite_timestamps
 
-      # Add the primary_keys and primary_key_sequences instance variables,
-      # so we can get the correct return values for inserted rows.
-      def initialize(*args)
-        super
-        @use_iso_date_format = typecast_value_boolean(@opts.fetch(:use_iso_date_format, Postgres.use_iso_date_format))
-        initialize_postgres_adapter
-        conversion_procs[1082] = TYPE_TRANSLATOR.method(:date) if @use_iso_date_format
-        self.convert_infinite_timestamps = @opts[:convert_infinite_timestamps]
-      end
-
       # Convert given argument so that it can be used directly by pg.  Currently, pg doesn't
       # handle fractional seconds in Time/DateTime or blobs with "\0", and it won't ever
       # handle Sequel::SQLTime values correctly.  Only public for use by the adapter, shouldn't
@@ -469,6 +459,15 @@ module Sequel
       # Execute the prepared statement name with the given arguments on the connection.
       def _execute_prepared_statement(conn, ps_name, args, opts)
         conn.exec_prepared(ps_name, args)
+      end
+
+      # Add the primary_keys and primary_key_sequences instance variables,
+      # so we can get the correct return values for inserted rows.
+      def adapter_initialize
+        @use_iso_date_format = typecast_value_boolean(@opts.fetch(:use_iso_date_format, Postgres.use_iso_date_format))
+        initialize_postgres_adapter
+        conversion_procs[1082] = TYPE_TRANSLATOR.method(:date) if @use_iso_date_format
+        self.convert_infinite_timestamps = @opts[:convert_infinite_timestamps]
       end
 
       # Convert exceptions raised from the block into DatabaseErrors.

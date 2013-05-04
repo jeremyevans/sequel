@@ -3,6 +3,8 @@ Sequel.require 'adapters/utils/emulate_offset_with_row_number'
 module Sequel
   module Oracle
     module DatabaseMethods
+      extend Sequel::Database::ResetIdentifierMangling
+
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
       AUTOINCREMENT = ''.freeze
 

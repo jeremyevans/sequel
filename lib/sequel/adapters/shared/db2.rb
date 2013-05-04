@@ -10,6 +10,8 @@ module Sequel
     end
 
     module DatabaseMethods
+      extend Sequel::Database::ResetIdentifierMangling
+
       AUTOINCREMENT = 'GENERATED ALWAYS AS IDENTITY'.freeze
       NOT_NULL      = ' NOT NULL'.freeze
       NULL          = ''.freeze

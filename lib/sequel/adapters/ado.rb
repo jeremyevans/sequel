@@ -8,25 +8,6 @@ module Sequel
 
       set_adapter_scheme :ado
 
-      def initialize(opts)
-        super
-        case @opts[:conn_string]
-        when /Microsoft\.(Jet|ACE)\.OLEDB/io
-          Sequel.ts_require 'adapters/ado/access'
-          extend Sequel::ADO::Access::DatabaseMethods
-          @dataset_class = ADO::Access::Dataset
-        else
-          @opts[:driver] ||= 'SQL Server'
-          case @opts[:driver]
-          when 'SQL Server'
-            Sequel.ts_require 'adapters/ado/mssql'
-            extend Sequel::ADO::MSSQL::DatabaseMethods
-            @dataset_class = ADO::MSSQL::Dataset
-            set_mssql_unicode_strings
-          end
-        end
-      end
-
       # In addition to the usual database options,
       # the following options have an effect:
       #
@@ -105,6 +86,25 @@ module Sequel
 
       private
       
+      def adapter_initialize
+        case @opts[:conn_string]
+        when /Microsoft\.(Jet|ACE)\.OLEDB/io
+          Sequel.ts_require 'adapters/ado/access'
+          extend Sequel::ADO::Access::DatabaseMethods
+          @dataset_class = ADO::Access::Dataset
+        else
+          @opts[:driver] ||= 'SQL Server'
+          case @opts[:driver]
+          when 'SQL Server'
+            Sequel.ts_require 'adapters/ado/mssql'
+            extend Sequel::ADO::MSSQL::DatabaseMethods
+            @dataset_class = ADO::MSSQL::Dataset
+            set_mssql_unicode_strings
+          end
+        end
+        super
+      end
+
       # The ADO adapter's default provider doesn't support transactions, since it 
       # creates a new native connection for each query.  So Sequel only attempts
       # to use transactions if an explicit :provider is given.

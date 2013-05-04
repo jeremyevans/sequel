@@ -47,7 +47,7 @@ module Sequel
     #
     #   DB.fetch('SELECT * FROM items WHERE name = ?', my_name).all
     def fetch(sql, *args, &block)
-      ds = dataset.with_sql(sql, *args)
+      ds = @default_dataset.with_sql(sql, *args)
       ds.each(&block) if block
       ds
     end
@@ -58,7 +58,7 @@ module Sequel
     #   DB.from(:items) # SELECT * FROM items
     #   DB.from(:items){id > 2} # SELECT * FROM items WHERE (id > 2)
     def from(*args, &block)
-      ds = dataset.from(*args)
+      ds = @default_dataset.from(*args)
       block ? ds.filter(&block) : ds
     end
     
@@ -68,7 +68,7 @@ module Sequel
     #   DB.select{server_version{}} # SELECT server_version()
     #   DB.select(:id).from(:items) # SELECT id FROM items
     def select(*args, &block)
-      dataset.select(*args, &block)
+      @default_dataset.select(*args, &block)
     end
   end
 end

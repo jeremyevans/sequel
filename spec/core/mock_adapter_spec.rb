@@ -417,12 +417,12 @@ describe "Sequel Mock Adapter" do
 
   specify "should be able to load dialects based on the database name" do
     begin
-      qi = class Sequel::Database; @@quote_identifiers; end
-      ii = class Sequel::Database; @@identifier_input_method; end
-      io = class Sequel::Database; @@identifier_output_method; end
+      qi = class Sequel::Database; @quote_identifiers; end
+      ii = class Sequel::Database; @identifier_input_method; end
+      io = class Sequel::Database; @identifier_output_method; end
       Sequel.quote_identifiers = nil
-      class Sequel::Database; @@identifier_input_method=nil; end
-      class Sequel::Database; @@identifier_output_method=nil; end
+      class Sequel::Database; @identifier_input_method=nil; end
+      class Sequel::Database; @identifier_output_method=nil; end
       Sequel.mock(:host=>'access').select(Date.new(2011, 12, 13)).sql.should == 'SELECT #2011-12-13#'
       Sequel.mock(:host=>'db2').select(1).sql.should == 'SELECT 1 FROM "SYSIBM"."SYSDUMMY1"'
       Sequel.mock(:host=>'firebird')[:a].distinct.limit(1, 2).sql.should == 'SELECT DISTINCT FIRST 1 SKIP 2 * FROM "A"'
@@ -434,8 +434,8 @@ describe "Sequel Mock Adapter" do
       Sequel.mock(:host=>'sqlite')[:a___b].sql.should == "SELECT * FROM `a` AS 'b'"
     ensure
       Sequel.quote_identifiers = qi
-      Sequel::Database.send(:class_variable_set, :@@identifier_input_method, ii)
-      Sequel::Database.send(:class_variable_set, :@@identifier_output_method, io)
+      Sequel::Database.send(:instance_variable_set, :@identifier_input_method, ii)
+      Sequel::Database.send(:instance_variable_set, :@identifier_output_method, io)
     end
   end
 

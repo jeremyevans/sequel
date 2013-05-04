@@ -1,5 +1,15 @@
 === HEAD
 
+* Deprecate Database#reset_schema_utility_dataset private method (jeremyevans)
+
+* Speed up Database#fetch, #from, #select, and #get by using a cached dataset (jeremyevans)
+
+* Make sure adapters with subadapters have fully initialized database instances before calling Database.after_initialize (jeremyevans)
+
+* Set identifier mangling methods on Database initialization (jeremyevans)
+
+* Switch internal use of class variables to instance variables (jeremyevans)
+
 * Deprecate passing an options hash to Database#dataset or Dataset.new (jeremyevans)
 
 * Speed up Dataset#clone (jeremyevans)

@@ -131,37 +131,6 @@ module Sequel
       # Mock the server version, useful when using the shared adapters
       attr_accessor :server_version
 
-      # Additional options supported:
-      #
-      # :autoid :: Call #autoid= with the value
-      # :columns :: Call #columns= with the value
-      # :fetch ::  Call #fetch= with the value
-      # :numrows :: Call #numrows= with the value
-      # :extend :: A module the object is extended with.
-      # :sqls :: The array to store the SQL queries in.
-      def initialize(opts={})
-        super
-        opts = @opts
-        @sqls = opts[:sqls] || []
-        if mod_name = SHARED_ADAPTERS[opts[:host]]
-          @shared_adapter = true
-          require "sequel/adapters/shared/#{opts[:host]}"
-          extend Sequel.const_get(mod_name)::DatabaseMethods
-          extend_datasets Sequel.const_get(mod_name)::DatasetMethods
-          if pr = SHARED_ADAPTER_SETUP[opts[:host]]
-            pr.call(self)
-          end
-        else
-          @shared_adapter = false
-        end
-        self.autoid = opts[:autoid]
-        self.columns = opts[:columns]
-        self.fetch = opts[:fetch]
-        self.numrows = opts[:numrows]
-        extend(opts[:extend]) if opts[:extend]
-        sqls
-      end
-
       # Return a related Connection option connecting to the given shard.
       def connect(server)
         Connection.new(self, server, server_opts(server))
@@ -295,6 +264,36 @@ module Sequel
 
       def _numrows(sql, v)
         _nextres(v, sql, 0)
+      end
+
+      # Additional options supported:
+      #
+      # :autoid :: Call #autoid= with the value
+      # :columns :: Call #columns= with the value
+      # :fetch ::  Call #fetch= with the value
+      # :numrows :: Call #numrows= with the value
+      # :extend :: A module the object is extended with.
+      # :sqls :: The array to store the SQL queries in.
+      def adapter_initialize
+        opts = @opts
+        @sqls = opts[:sqls] || []
+        if mod_name = SHARED_ADAPTERS[opts[:host]]
+          @shared_adapter = true
+          require "sequel/adapters/shared/#{opts[:host]}"
+          extend Sequel.const_get(mod_name)::DatabaseMethods
+          extend_datasets Sequel.const_get(mod_name)::DatasetMethods
+          if pr = SHARED_ADAPTER_SETUP[opts[:host]]
+            pr.call(self)
+          end
+        else
+          @shared_adapter = false
+        end
+        self.autoid = opts[:autoid]
+        self.columns = opts[:columns]
+        self.fetch = opts[:fetch]
+        self.numrows = opts[:numrows]
+        extend(opts[:extend]) if opts[:extend]
+        sqls
       end
 
       def columns(ds, sql, cs=@columns)
