@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model.print and Model.each_page (jeremyevans)
+
 * Deprecate Dataset checking that the Database implements the identifier mangling methods (jeremyevans)
 
 * Deprecate Database#reset_schema_utility_dataset private method (jeremyevans)

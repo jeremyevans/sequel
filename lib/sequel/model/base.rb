@@ -659,6 +659,19 @@ module Sequel
         @restrict_primary_key = false
       end
   
+      # Add model methods that call dataset methods
+      Plugins.def_dataset_methods(self, DATASET_METHODS)
+
+      # REMOVE40
+      def print(*args, &block)
+        Sequel::Deprecation.deprecate('Model.print', 'Please use Model.dataset.print instead')
+        dataset.print(*args, &block)
+      end
+      def each_page(*args, &block)
+        Sequel::Deprecation.deprecate('Model.each_page', 'Please use Model.dataset.each_page instead')
+        dataset.each_page(*args, &block)
+      end
+  
       private
       
       # Yield to the passed block and swallow all errors other than DatabaseConnectionErrors.
@@ -889,9 +902,6 @@ module Sequel
         reset_fast_pk_lookup_sql
       end
 
-      # Add model methods that call dataset methods
-      Plugins.def_dataset_methods(self, DATASET_METHODS)
-  
       # Returns a copy of the model's dataset with custom SQL
       #
       #   Artist.fetch("SELECT * FROM artists WHERE name LIKE 'A%'")
