@@ -57,6 +57,8 @@ module Sequel
           def_dataset_method(meth){associated(name)}
           ret
         end
+
+        Plugins.def_dataset_methods(self, :associated)
       end
 
       module DatasetMethods

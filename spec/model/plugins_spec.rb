@@ -168,26 +168,22 @@ describe Sequel::Model, ".plugin" do
   it "should extend the class's dataset with a DatasetMethods module if the plugin includes it" do
     @c.plugin @t
     @c.dataset.ghi.should == 345
-    @c.ghi.should == 345
   end
 
   it "should save the DatasetMethods module and apply it later if the class doesn't have a dataset" do
     c = Class.new(Sequel::Model)
     c.plugin @t
-    proc{c.ghi}.should raise_error(Sequel::Error)
     c.dataset = MODEL_DB[:i]
     c.dataset.ghi.should == 345
-    c.ghi.should == 345
   end
   
   it "should save the DatasetMethods module and apply it later if the class has a dataset" do
     @c.plugin @t
     @c.dataset = MODEL_DB[:i]
     @c.dataset.ghi.should == 345
-    @c.ghi.should == 345
   end
 
-  it "should define class methods for all public instance methods in DatasetMethod" do
+  qspecify "should define class methods for all public instance methods in DatasetMethod" do
     m = Module.new do
       self::DatasetMethods = Module.new do
         def a; 1; end
@@ -213,7 +209,6 @@ describe Sequel::Model, ".plugin" do
     @c.dataset.b.should == 2
     lambda{@c.dataset.a}.should raise_error(NoMethodError)
     @c.dataset.send(:a).should == 1
-    @c.b.should == 2
     lambda{@c.a}.should raise_error(NoMethodError)
     lambda{@c.send(:a)}.should raise_error(NoMethodError)
   end

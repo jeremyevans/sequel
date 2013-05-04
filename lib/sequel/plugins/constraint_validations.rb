@@ -86,7 +86,7 @@ module Sequel
           if @dataset
             ds = @dataset.clone
             ds.quote_identifiers = false
-            table_name = ds.literal(model.table_name)
+            table_name = ds.literal(ds.first_source_table)
             @constraint_validations = Sequel.synchronize{hash[table_name]} || []
           end
         end

@@ -57,6 +57,6 @@ describe "Sequel::Plugins::PgRow" do
   end
 
   it "should allow inserting just this model value" do
-    @c2.insert_sql(@c.load(:street=>'123', :city=>'Bar')).should == "INSERT INTO company VALUES (ROW('123', 'Bar')::address)"
+    @c2.dataset.insert_sql(@c.load(:street=>'123', :city=>'Bar')).should == "INSERT INTO company VALUES (ROW('123', 'Bar')::address)"
   end
 end

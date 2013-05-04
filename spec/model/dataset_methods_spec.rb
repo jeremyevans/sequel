@@ -92,7 +92,7 @@ describe Sequel::Model::DatasetMethods  do
   end
 
   specify "#insert_sql should handle a single model instance as an argument" do
-    @c.insert_sql(@c.load(:id=>1)).should == 'INSERT INTO items (id) VALUES (1)'
+    @c.dataset.insert_sql(@c.load(:id=>1)).should == 'INSERT INTO items (id) VALUES (1)'
   end
 
   specify "#first should handle no primary key" do

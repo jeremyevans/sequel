@@ -45,9 +45,9 @@ describe "List plugin" do
 
   it "should modify the order when using the plugin" do
     c = Class.new(Sequel::Model(:items))
-    c.model.dataset.sql.should == 'SELECT * FROM items'
+    c.dataset.sql.should == 'SELECT * FROM items'
     c.plugin :list
-    c.model.dataset.sql.should == 'SELECT * FROM items ORDER BY position'
+    c.dataset.sql.should == 'SELECT * FROM items ORDER BY position'
   end
 
   it "should be able to access the position field as a class attribute" do

@@ -444,7 +444,18 @@ module Sequel
           m.apply(self, *args, &block) if m.respond_to?(:apply)
           include(m::InstanceMethods) if plugin_module_defined?(m, :InstanceMethods)
           extend(m::ClassMethods)if plugin_module_defined?(m, :ClassMethods)
-          dataset_extend(m::DatasetMethods) if plugin_module_defined?(m, :DatasetMethods)
+          if plugin_module_defined?(m, :DatasetMethods)
+            dataset_extend(m::DatasetMethods, :create_class_methods=>false)
+            # REMOVE40
+            m::DatasetMethods.public_instance_methods.each do |meth|
+              unless respond_to?(meth, true)
+                (class << self; self; end).send(:define_method, meth) do |*args, &block|
+                  Sequel::Deprecation.deprecate('Automatically defining Model class methods for plugin public dataset methods', "Please modify the plugin to use Plugins.def_dataset_method for #{meth}")
+                  dataset.send(meth, *args, &block)
+                end
+              end
+            end
+          end
         end
         m.configure(self, *args, &block) if m.respond_to?(:configure)
       end
@@ -707,11 +718,13 @@ module Sequel
       # Add the module to the class's dataset_method_modules.  Extend the dataset with the
       # module if the model has a dataset.  Add dataset methods to the class for all
       # public dataset methods.
-      def dataset_extend(mod)
+      def dataset_extend(mod, opts={})
         @dataset.extend(mod) if defined?(@dataset) && @dataset
         reset_instance_dataset
         dataset_method_modules << mod
-        mod.public_instance_methods.each{|meth| def_model_dataset_method(meth)}
+        unless opts[:create_class_methods] == false
+          mod.public_instance_methods.each{|meth| def_model_dataset_method(meth)}
+        end
       end
 
       # Create a column accessor for a column with a method name that is hard to use in ruby code.
