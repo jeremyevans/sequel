@@ -336,6 +336,7 @@ module Sequel
     # Do not call this method with untrusted input, as that can result in
     # arbitrary code execution.
     def self.def_append_methods(meths)
+      Sequel::Deprecation.deprecate('Dataset.def_append_methods', "There is no replacement planned")
       meths.each do |meth|
         class_eval(<<-END, __FILE__, __LINE__ + 1)
           def #{meth}(*args, &block)
@@ -346,8 +347,27 @@ module Sequel
         END
       end
     end
-    def_append_methods(PUBLIC_APPEND_METHODS + PRIVATE_APPEND_METHODS)
+    (PUBLIC_APPEND_METHODS + PRIVATE_APPEND_METHODS - [:literal, :quote_identifier, :quote_schema_table]).each do |meth|
+      class_eval(<<-END, __FILE__, __LINE__ + 1)
+        def #{meth}(*args, &block)
+          Sequel::Deprecation.deprecate('Dataset##{meth}', "Please switch to Dataset##{meth}_append")
+          s = ''
+          #{meth}_append(s, *args, &block)
+          s
+        end
+      END
+    end
     private(*PRIVATE_APPEND_METHODS)
+
+    [:literal, :quote_identifier, :quote_schema_table].each do |meth|
+      class_eval(<<-END, __FILE__, __LINE__ + 1)
+        def #{meth}(*args, &block)
+          s = ''
+          #{meth}_append(s, *args, &block)
+          s
+        end
+      END
+    end
 
     # SQL fragment for AliasedExpression
     def aliased_expression_sql_append(sql, ae)

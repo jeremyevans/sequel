@@ -1,5 +1,11 @@
 === HEAD
 
+* Deprecate all methods in Dataset::PUBLIC_APPEND_METHODS except for literal, quote_identifier, quote_schema_table (jeremyevans)
+
+* Deprecate all methods in Dataset::PRIVATE_APPEND_METHODS (jeremyevans)
+
+* Deprecate Dataset.def_append_methods (jeremyevans)
+
 * Deprecate Dataset#table_ref_append (jeremyevans)
 
 * Deprecate SQL::Expression#to_s taking an argument and returning a literal SQL string (jeremyevans)
