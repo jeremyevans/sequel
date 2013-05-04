@@ -220,10 +220,9 @@ describe "Blockless Ruby Filters" do
     y.lit.should == y
   end
 
-  it "should return have .sql_literal operate like .to_s" do
+  it "should return have .sql_literal return the literal SQL for the expression" do
     y = Sequel.expr(:x) + 1
     y.sql_literal(@d).should == '(x + 1)'
-    y.sql_literal(@d).should == y.to_s(@d)
     y.sql_literal(@d).should == @d.literal(y)
   end
 
