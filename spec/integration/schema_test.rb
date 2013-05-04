@@ -4,13 +4,11 @@ describe "Database schema parser" do
   before do
     @iom = INTEGRATION_DB.identifier_output_method
     @iim = INTEGRATION_DB.identifier_input_method
-    @defsch = INTEGRATION_DB.default_schema
     @qi = INTEGRATION_DB.quote_identifiers?
   end
   after do
     INTEGRATION_DB.identifier_output_method = @iom
     INTEGRATION_DB.identifier_input_method = @iim
-    INTEGRATION_DB.default_schema = @defsch
     INTEGRATION_DB.quote_identifiers = @qi
     INTEGRATION_DB.drop_table?(:items)
   end
@@ -19,7 +17,6 @@ describe "Database schema parser" do
     INTEGRATION_DB.identifier_output_method = :reverse
     INTEGRATION_DB.identifier_input_method = :reverse
     INTEGRATION_DB.quote_identifiers = true
-    INTEGRATION_DB.default_schema = nil if INTEGRATION_DB.default_schema
     INTEGRATION_DB.create_table!(:items){Integer :number}
     begin
       INTEGRATION_DB.schema(:items, :reload=>true).should be_a_kind_of(Array)
@@ -33,7 +30,6 @@ describe "Database schema parser" do
     INTEGRATION_DB.identifier_output_method = :reverse
     INTEGRATION_DB.identifier_input_method = :reverse
     INTEGRATION_DB.quote_identifiers = true
-    INTEGRATION_DB.default_schema = nil if INTEGRATION_DB.default_schema
     INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.identifier_output_method = @iom
     INTEGRATION_DB.identifier_input_method = @iim

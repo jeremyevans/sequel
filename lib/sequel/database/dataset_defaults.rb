@@ -50,10 +50,18 @@ module Sequel
     # an optional options hash.
     attr_reader :dataset_class
 
-    # The default schema to use, generally should be nil.  This sets
-    # the default schema used for some schema modification and
-    # introspection queries, but does not effect most dataset code.
-    attr_accessor :default_schema
+    # REMOVE40
+    def _default_schema
+      @default_schema
+    end
+    def default_schema
+      Sequel::Deprecation.deprecate('Sequel.default_schema', 'Use qualified tables instead')
+      @default_schema
+    end
+    def default_schema=(v)
+      Sequel::Deprecation.deprecate('Sequel.default_schema=', 'Use qualified tables instead') if v
+      @default_schema = v
+    end
 
     # If the database has any dataset modules associated with it,
     # use a subclass of the given class that includes the modules
@@ -170,7 +178,7 @@ module Sequel
       self.class.const_get(:DatasetClass)
     end
     
-    # The default value for default_schema.
+    # REMOVE40
     def default_schema_default
       nil
     end

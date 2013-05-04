@@ -665,7 +665,7 @@ module Sequel
     # Note that this function does not handle tables with more than one
     # level of qualification (e.g. database.schema.table on Microsoft
     # SQL Server).
-    def schema_and_table(table_name, sch=(db.default_schema if db))
+    def schema_and_table(table_name, sch=(db._default_schema if db))
       sch = sch.to_s if sch
       case table_name
       when Symbol

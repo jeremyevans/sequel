@@ -281,7 +281,7 @@ module Sequel
         m = output_identifier_meth
         metadata_dataset.from(:information_schema__tables___t).
           select(:table_name).
-          filter(:table_type=>type, :table_schema=>(opts[:schema]||default_schema||'dbo').to_s).
+          filter(:table_type=>type, :table_schema=>(opts[:schema]||_default_schema||'dbo').to_s).
           map{|x| m.call(x[:table_name])}
       end
 
@@ -343,7 +343,7 @@ module Sequel
               :table_schema => :table_schema, :table_name => :table_name).
          select(:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, :column_default___default, :is_nullable___allow_null, :numeric_precision___column_size, :numeric_scale___scale).
          filter(:c__table_name=>tn)
-        if schema = opts[:schema] || default_schema
+        if schema = opts[:schema] || _default_schema
           ds.filter!(:c__table_schema=>schema)
         end
         ds.map do |row|

@@ -643,25 +643,6 @@ describe "A PostgreSQL database" do
     @db[:posts].order(:a).map(:a).should == [1, 2, 10, 20, 21]
   end
     
-  specify "should support resetting the primary key sequence with default_schema" do
-    begin
-      @db.run("DROP SCHEMA p") rescue nil
-      @db.run("CREATE SCHEMA p")
-      @db.default_schema = :p
-      @db.create_table(:posts){primary_key :a}
-      @db[:p__posts].insert(:a=>20).should == 20
-      @db[:p__posts].insert.should == 1
-      @db[:p__posts].insert.should == 2
-      @db[:p__posts].insert(:a=>10).should == 10
-      @db.reset_primary_key_sequence(:posts).should == 21
-      @db[:p__posts].insert.should == 21
-      @db[:p__posts].order(:a).map(:a).should == [1, 2, 10, 20, 21]
-    ensure
-      @db.default_schema = nil
-      @db.run("DROP SCHEMA p CASCADE")
-    end
-  end
-
   specify "should support specifying Integer/Bignum/Fixnum types in primary keys and have them be auto incrementing" do
     @db.create_table(:posts){primary_key :a, :type=>Integer}
     @db[:posts].insert.should == 1
@@ -957,15 +938,6 @@ describe "Postgres::Database schema qualified tables" do
     @db << "CREATE SEQUENCE schema_test.\"ks eq\""
     @db.create_table(:"schema_test__schema test"){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.\"ks eq\"'::regclass)")}
     @db.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."ks eq"'
-  end
-
-  specify "#default_schema= should change the default schema used from public" do
-    @db.create_table(:schema_test__schema_test){primary_key :i}
-    @db.default_schema = :schema_test
-    @db.table_exists?(:schema_test).should == true
-    @db.tables.should == [:schema_test]
-    @db.primary_key(:schema_test__schema_test).should == 'i'
-    @db.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
   end
 
   specify "should handle schema introspection cases with tables with same name in multiple schemas" do

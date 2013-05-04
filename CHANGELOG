@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Database#default_schema (jeremyevans)
+
 * Deprecate Sequel::NotImplemented and defining methods that raise it (jeremyevans)
 
 * Add Database#supports_{index_parsing,foreign_key_parsing,table_listing,view_listing}? (jeremyevans)

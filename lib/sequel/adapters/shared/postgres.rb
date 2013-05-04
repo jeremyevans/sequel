@@ -488,7 +488,7 @@ module Sequel
       # Options:
       # :qualify :: Return the tables as Sequel::SQL::QualifiedIdentifier instances,
       #             using the schema the table is located in as the qualifier.
-      # :schema :: The schema to search (default_schema by default)
+      # :schema :: The schema to search
       # :server :: The server to use
       def tables(opts={}, &block)
         pg_class_relname('r', opts, &block)
@@ -506,7 +506,7 @@ module Sequel
       # Options:
       # :qualify :: Return the views as Sequel::SQL::QualifiedIdentifier instances,
       #             using the schema the view is located in as the qualifier.
-      # :schema :: The schema to search (default_schema by default)
+      # :schema :: The schema to search
       # :server :: The server to use
       def views(opts={})
         pg_class_relname('v', opts)
@@ -803,7 +803,7 @@ module Sequel
       # If opts includes a :schema option, or a default schema is used, restrict the dataset to
       # that schema.  Otherwise, just exclude the default PostgreSQL schemas except for public.
       def filter_schema(ds, opts)
-        if schema = opts[:schema] || default_schema
+        if schema = opts[:schema] || _default_schema
           ds.filter(:pg_namespace__nspname=>schema.to_s)
         else
           ds.exclude(:pg_namespace__nspname=>EXCLUDE_SCHEMAS)

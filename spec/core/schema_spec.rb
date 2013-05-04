@@ -1125,7 +1125,7 @@ describe "Database#create_table" do
       'CREATE UNIQUE INDEX test_tmp_name_index ON test_tmp (name)']
   end
 
-  specify "should not use default schema when creating a temporary table" do
+  qspecify "should not use default schema when creating a temporary table" do
     @db.default_schema = :foo
     @db.create_table :test_tmp, :temp => true do
       column :name, :text

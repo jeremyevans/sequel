@@ -91,7 +91,6 @@ module Sequel
     # options hash.
     #
     # Accepts the following options:
-    # :default_schema :: The default schema to use, see #default_schema.
     # :default_string_column_size :: The default size of string columns, 255 by default.
     # :identifier_input_method :: A string method symbol to call on identifiers going into the database
     # :identifier_output_method :: A string method symbol to call on identifiers coming from the database
