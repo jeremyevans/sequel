@@ -182,3 +182,4 @@ module Sequel
 
   Database.register_extension(:pg_auto_parameterize, Postgres::AutoParameterize::DatabaseMethods)
 end
+Sequel::Deprecation.deprecate('The pg_auto_parameterize extension', 'Please stop loading it') unless defined?(SEQUEL_EXTENSIONS_NO_DEPRECATION_WARNING)

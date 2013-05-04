@@ -18,6 +18,7 @@ unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   require 'sequel/no_core_ext'
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
+SEQUEL_EXTENSIONS_NO_DEPRECATION_WARNING = true
 
 begin
   # Attempt to load ActiveSupport blank extension and inflector first, so Sequel

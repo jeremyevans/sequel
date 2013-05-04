@@ -315,3 +315,4 @@ module Sequel
 
   Database.register_extension(:pg_statement_cache, Postgres::StatementCache::DatabaseMethods)
 end
+Sequel::Deprecation.deprecate('The pg_statement_cache extension', 'Please stop loading it') unless defined?(SEQUEL_EXTENSIONS_NO_DEPRECATION_WARNING)
