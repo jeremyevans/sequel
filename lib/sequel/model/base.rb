@@ -258,7 +258,7 @@ module Sequel
       # sharding support.
       def db=(db)
         @db = db
-        set_dataset(db.dataset(@dataset.opts)) if @dataset
+        set_dataset(db.dataset.clone(@dataset.opts)) if @dataset
       end
       
       # Returns the cached schema information if available or gets it

@@ -5,13 +5,16 @@ describe "Dataset" do
     @dataset = Sequel::Dataset.new("db")
   end
   
-  specify "should accept database and opts in initialize" do
+  qspecify "should accept database and opts in initialize" do
     db = "db"
     opts = {:from => :test}
     d = Sequel::Dataset.new(db, opts)
     d.db.should be(db)
     d.opts.should be(opts)
+  end
     
+  specify "should accept database in initialize" do
+    db = "db"
     d = Sequel::Dataset.new(db)
     d.db.should be(db)
     d.opts.should be_a_kind_of(Hash)

@@ -24,8 +24,13 @@ module Sequel
     #
     #   DB.dataset # SELECT *
     #   DB.dataset.from(:items) # SELECT * FROM items
-    def dataset(opts=Dataset::DEFAULT_OPTS.clone)
-      @dataset_class.new(self, opts)
+    def dataset(opts=(no_arg_given=true; nil))
+      # REMOVE40
+      if no_arg_given
+        @dataset_class.new(self)
+      else
+        @dataset_class.new(self, opts)
+      end
     end
 
     # Fetches records for an arbitrary SQL statement. If a block is given,

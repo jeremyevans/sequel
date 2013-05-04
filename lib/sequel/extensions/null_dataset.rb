@@ -33,7 +33,7 @@ module Sequel
       # Create a new dataset from the dataset (which won't
       # be nulled) to get the columns if they aren't already cached.
       def columns
-        @columns ||= db.dataset(@opts).columns
+        @columns ||= db.dataset.clone(@opts).columns
       end
 
       # Return 0 without sending a database query.

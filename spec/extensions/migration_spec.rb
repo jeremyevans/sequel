@@ -231,7 +231,7 @@ describe "Sequel::IntegerMigrator" do
         @tables_created << name.to_sym
       end
       
-      def dataset(opts={})
+      def dataset
         ds = super
         ds.extend(Module.new do
           def count; 1; end

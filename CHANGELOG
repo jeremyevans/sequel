@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate passing an options hash to Database#dataset or Dataset.new (jeremyevans)
+
 * Speed up Dataset#clone (jeremyevans)
 
 * Add sequel_3_dataset_methods extension for Dataset#[]=, #insert_multiple, #to_csv, #db=, and #opts= (jeremyevans)
@@ -33,8 +35,6 @@
 * Deprecate Database#do as an alias to execute/execute_dui in some adapters (jeremyevans)
 
 * Deprecate modifying initial Dataset hash if the hash wasn't provided as an argument (jeremyevans)
-
-* Deprecate passing nil to Database#dataset or Dataset.new (jeremyevans)
 
 * Make active_model plugin use an errors class with autovivification (jeremyevans)
 
