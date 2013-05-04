@@ -1,5 +1,9 @@
 === HEAD
 
+* Add blacklist_security plugin for Model.restricted_columns, Model.set_restricted_columns, Model#set_except, and Model#update_except (jeremyevans)
+
+* Deprecate Model.restricted_columns, Model.set_restricted_columns, Model#set_except, and Model#update_except (jeremyevans)
+
 * Deprecate Database#default_schema (jeremyevans)
 
 * Deprecate Sequel::NotImplemented and defining methods that raise it (jeremyevans)

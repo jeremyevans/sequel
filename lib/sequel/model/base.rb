@@ -63,10 +63,14 @@ module Sequel
       # Sequel will not check the number of rows modified (default: true).
       attr_accessor :require_modification
   
-      # Which columns are specifically restricted in a call to set/update/new/etc.
-      # (default: not set).  Some columns are restricted regardless of
-      # this setting, such as the primary key column and columns in Model::RESTRICTED_SETTER_METHODS.
-      attr_reader :restricted_columns
+      # REMOVE40
+      def restricted_columns
+        Sequel::Deprecation.deprecate('Model.restricted_columns', 'Please load the blacklist_security plugin to continue using it')
+        @restricted_columns
+      end
+      def _restricted_columns
+        @restricted_columns
+      end
   
       # Should be the literal primary key column name if this Model's table has a simple primary key, or
       # nil if the model has a compound primary key or no primary key.
@@ -592,6 +596,7 @@ module Sequel
       #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
       def set_restricted_columns(*cols)
         clear_setter_methods_cache
+        Sequel::Deprecation.deprecate('Model.set_restricted_columns', 'Please switch to Model.set_allowed_columns or use the blacklist_security plugin')
         @restricted_columns = cols
       end
 
@@ -602,7 +607,7 @@ module Sequel
         else
           meths = instance_methods.collect{|x| x.to_s}.grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
           meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
-          meths -= restricted_columns.map{|x| "#{x}="} if restricted_columns
+          meths -= _restricted_columns.map{|x| "#{x}="} if _restricted_columns
           meths
         end
       end
@@ -1357,9 +1362,9 @@ module Sequel
       end
   
       # Set all values using the entries in the hash, ignoring any setting of
-      # allowed_columns or restricted columns in the model.
+      # allowed_columns in the model.
       #
-      #   Artist.set_restricted_columns(:name)
+      #   Artist.set_allowed_columns(:num_albums)
       #   artist.set_all(:name=>'Jim')
       #   artist.name # => 'Jim'
       def set_all(hash)
@@ -1373,6 +1378,7 @@ module Sequel
       #   artist.set_except({:name=>'Jim'}, :hometown)
       #   artist.name # => 'Jim'
       def set_except(hash, *except)
+        Sequel::Deprecation.deprecate('Model#set_except', 'Please switch to Model#set_only or use the blacklist_security plugin')
         set_restricted(hash, false, except.flatten)
       end
   
@@ -1482,9 +1488,9 @@ module Sequel
       end
   
       # Update all values using the entries in the hash, ignoring any setting of
-      # +allowed_columns+ or +restricted_columns+ in the model.
+      # +allowed_columns+ in the model.
       #
-      #   Artist.set_restricted_columns(:name)
+      #   Artist.set_allowed_columns(:num_albums)
       #   artist.update_all(:name=>'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update_all(hash)
         update_restricted(hash, false, false)
@@ -1496,6 +1502,7 @@ module Sequel
       #
       #   artist.update_except({:name=>'Jim'}, :hometown) # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update_except(hash, *except)
+        Sequel::Deprecation.deprecate('Model#update_except', 'Please switch to Model#update_only or use the blacklist_security plugin')
         update_restricted(hash, false, except.flatten)
       end
   
@@ -1894,7 +1901,7 @@ module Sequel
       # well, see Model.unrestrict_primary_key to change this.
       def setter_methods(only, except)
         only = only.nil? ? model.allowed_columns : only
-        except = except.nil? ? model.restricted_columns : except
+        except = except.nil? ? model._restricted_columns : except
         if only
           only.map{|x| "#{x}="}
         else

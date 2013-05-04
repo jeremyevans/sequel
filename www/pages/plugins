@@ -12,6 +12,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationPks.html">association_pks</a>: Adds the association_pks and association_pks= to *_to_many associations.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationProxies.html">association_proxies</a>: Changes the *_to_many association method to return a proxy instead of an array of objects.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AutoValidations.html">auto_validations</a>: Automatically add presence, not_string, and unique validations.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/BlacklistSecurity.html">blacklist_security</a>: Adds blacklist-based model mass-assignment protection.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/BooleanReaders.html">boolean_readers</a>: Adds attribute? methods for all boolean columns.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Caching.html">caching</a>: Supports caching primary key lookups of model objects to any object that supports the Ruby-Memcache API.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ClassTableInheritance.html">class_table_inheritance</a>: Supports inheritance in the database by using a single database table for each class in a class hierarchy.</li>

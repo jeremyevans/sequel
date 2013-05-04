@@ -864,7 +864,7 @@ describe Sequel::Model, "#set" do
 
   it "should raise error if strict_param_setting is true and column is restricted" do
     @o1.strict_param_setting = true
-    @c.set_restricted_columns :x
+    @c.set_allowed_columns
     proc{@o1.set('x' => 1)}.should raise_error(Sequel::Error)
   end
 
@@ -1093,7 +1093,6 @@ describe Sequel::Model, "#(set|update)_(all|except|only)" do
       set_primary_key :id
       columns :x, :y, :z, :id
       set_allowed_columns :x
-      set_restricted_columns :y
     end
     @c.strict_param_setting = false
     @o1 = @c.new
@@ -1111,7 +1110,10 @@ describe Sequel::Model, "#(set|update)_(all|except|only)" do
     proc{@c.new.set_only({:x => 1, :y => 2, :z=>3}, :x, :y)}.should raise_error(Sequel::Error)
     (o = @c.new).set_only({:x => 1, :y => 2}, :x, :y)
     o.values.should == {:x => 1, :y => 2}
+  end
 
+  qspecify "should raise errors for set_except if not all hash fields can be set and strict_param_setting is true" do
+    @c.strict_param_setting = true
     proc{@c.new.set_except({:x => 1, :y => 2, :z=>3, :id=>4}, :x, :y)}.should raise_error(Sequel::Error)
     proc{@c.new.set_except({:x => 1, :y => 2, :z=>3}, :x, :y)}.should raise_error(Sequel::Error)
     (o = @c.new).set_except({:z => 3}, :x, :y)
@@ -1132,7 +1134,7 @@ describe Sequel::Model, "#(set|update)_(all|except|only)" do
     @o1.values.should == {:x => 9, :y => 8, :id=>7}
   end
 
-  it "#set_except should not set given attributes or the primary key" do
+  qspecify "#set_except should not set given attributes or the primary key" do
     @o1.set_except({:x => 1, :y => 2, :z=>3, :id=>4}, [:y, :z])
     @o1.values.should == {:x => 1}
     @o1.set_except({:x => 4, :y => 2, :z=>3, :id=>4}, :y, :z)
@@ -1155,7 +1157,7 @@ describe Sequel::Model, "#(set|update)_(all|except|only)" do
     MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
-  it "#update_except should not update given attributes" do
+  qspecify "#update_except should not update given attributes" do
     @o1.update_except({:x => 1, :y => 2, :z=>3, :id=>4}, [:y, :z])
     MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     @c.new.update_except({:x => 1, :y => 2, :z=>3, :id=>4}, :y, :z)
