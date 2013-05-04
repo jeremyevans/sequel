@@ -649,6 +649,9 @@ module Sequel
               prepared_args << y
               i = prepared_args.length
             end
+            if type
+              Sequel::Deprecation.deprecate('Specifying prepared statement argument types via the __type suffix', "If a manual cast is really need, surround the prepared statement argument in Sequel.cast")
+            end
             LiteralString.new("#{prepared_arg_placeholder}#{i}#{"::#{type}" if type}")
           end
 

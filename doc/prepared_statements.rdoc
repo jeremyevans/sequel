@@ -87,16 +87,13 @@ to create prepared statements dynamically at runtime.
 === PostgreSQL
 
 If you are using the ruby-postgres or postgres-pr driver, PostgreSQL uses the
-default emulated support.  If you are using ruby-pg, there is native support,
-but it may require type specifiers on some old versions (generally not anymore).
-You can add a __* suffix to the placeholder symbol to specify a type, which
-casts to that type in the SQL (e.g.  :$name__text, which will be compiled to
-"$1::text" in the SQL).  Prepared statements are always server side.
+default emulated support.  If you are using ruby-pg, there is native support
+for both prepared statements and bound variables.  Prepared statements are
+always server side.
 
 === SQLite
 
-SQLite supports both prepared statements and bound variables.  Prepared
-statements are cached per connection.
+SQLite supports both prepared statements and bound variables.
 
 === MySQL/Mysql2
 
@@ -119,8 +116,7 @@ Microsoft SQL Server doesn't support true prepared statements.
 
 === IBM_DB
 
-DB2 supports both prepared statements and bound variables.  Prepared
-statement objects are cached per connection.
+DB2 supports both prepared statements and bound variables.
 
 === Oracle
 
