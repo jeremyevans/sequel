@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Dataset checking that the Database implements the identifier mangling methods (jeremyevans)
+
 * Deprecate Database#reset_schema_utility_dataset private method (jeremyevans)
 
 * Speed up Database#fetch, #from, #select, and #get by using a cached dataset (jeremyevans)

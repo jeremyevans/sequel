@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "filter_having extension" do
   before do
-    @ds = Sequel::Dataset.new(nil).from(:t).extension(:filter_having)
+    @ds = Sequel.mock[:t].extension(:filter_having)
     @dsh = @ds.having(:a)
   end
 

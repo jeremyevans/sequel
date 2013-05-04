@@ -150,6 +150,7 @@ module Sequel
       elsif db.respond_to?(:identifier_input_method)
         @identifier_input_method = db.identifier_input_method
       else
+        Sequel::Deprecation.deprecate('Calling Dataset#identifier_input_method for a dataset where the database doesn\'t implement identifier_input_method will raise a NoMethodError in Sequel 4.')
         @identifier_input_method = nil
       end
     end
@@ -162,6 +163,7 @@ module Sequel
       elsif db.respond_to?(:identifier_output_method)
         @identifier_output_method = db.identifier_output_method
       else
+        Sequel::Deprecation.deprecate('Calling Dataset#identifier_output_method for a dataset where the database doesn\'t implement identifier_output_method will raise a NoMethodError in Sequel 4.')
         @identifier_output_method = nil
       end
     end

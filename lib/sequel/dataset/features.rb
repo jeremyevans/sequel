@@ -13,6 +13,7 @@ module Sequel
       elsif db.respond_to?(:quote_identifiers?)
         @quote_identifiers = db.quote_identifiers?
       else
+        Sequel::Deprecation.deprecate('Calling Dataset#quote_identifiers? for a dataset where the database doesn\'t implement quote_identifiers? will raise a NoMethodError in Sequel 4.')
         @quote_identifiers = false
       end
     end

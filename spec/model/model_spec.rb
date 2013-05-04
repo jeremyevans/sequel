@@ -308,7 +308,7 @@ describe Sequel::Model, "constructors" do
   end
   
   it "should have dataset row_proc create an existing object" do
-    @m.dataset = Sequel::Dataset.new(nil)
+    @m.dataset = Sequel.mock.dataset
     o = @m.dataset.row_proc.call(:a=>1)
     o.should be_a_kind_of(@m)
     o.values.should == {:a=>1}

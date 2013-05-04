@@ -134,7 +134,7 @@ end
 
 describe "Array#case and Hash#case" do
   before do
-    @d = Sequel::Dataset.new(nil)
+    @d = Sequel.mock.dataset
   end
 
   specify "should return SQL CASE expression" do
@@ -166,7 +166,7 @@ end
 
 describe "Array#sql_value_list and #sql_array" do
   before do
-    @d = Sequel::Dataset.new(nil)
+    @d = Sequel.mock.dataset
   end
 
   specify "should treat the array as an SQL value list instead of conditions when used as a placeholder value" do
@@ -231,7 +231,7 @@ end
 
 describe "#desc" do
   before do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = Sequel.mock.dataset
   end
   
   specify "should format a DESC clause for a column ref" do
@@ -247,7 +247,7 @@ end
 
 describe "#asc" do
   before do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = Sequel.mock.dataset
   end
   
   specify "should format a ASC clause for a column ref" do
@@ -263,7 +263,7 @@ end
 
 describe "#as" do
   before do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = Sequel.mock.dataset
   end
   
   specify "should format a AS clause for a column ref" do
@@ -327,7 +327,7 @@ end
 
 describe "Symbol#*" do
   before do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = Sequel.mock.dataset
   end
   
   specify "should format a qualified wildcard if no argument" do
@@ -347,7 +347,7 @@ end
 
 describe "Symbol" do
   before do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = Sequel.mock.dataset
     @ds.quote_identifiers = true
     @ds.identifier_input_method = :upcase
   end
