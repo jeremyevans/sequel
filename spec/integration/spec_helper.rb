@@ -22,7 +22,7 @@ if ENV['SEQUEL_COLUMNS_INTROSPECTION']
 end
 
 Sequel::Model.use_transactions = false
-Sequel::Model.cache_anonymous_models = false
+Sequel.cache_anonymous_models = false
 
 unless defined?(RSpec)
   module Spec::Matchers

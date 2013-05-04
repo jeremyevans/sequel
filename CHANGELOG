@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Sequel.cache_anonymous_models accessor (jeremyevans)
+
+* Deprecate Sequel::Model.cache_anonymous_models accessor (jeremyevans)
+
 * Deprecate identity_map plugin (jeremyevans)
 
 * Deprecate Model#set_values (jeremyevans)
