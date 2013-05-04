@@ -493,38 +493,6 @@ describe "Tactical Eager Loading Plugin" do
   end
 end
 
-describe "Identity Map plugin" do 
-  before do
-    @db = INTEGRATION_DB
-    @db.create_table!(:items) do
-      primary_key :id
-      String :name
-      Integer :num
-    end
-    class ::Item < Sequel::Model(@db)
-      plugin :identity_map
-    end
-    Item.create(:name=>'J', :num=>3)
-  end
-  after do
-    @db.drop_table?(:items)
-    Object.send(:remove_const, :Item)
-  end
-
-  specify "should return the same instance if retrieved more than once" do
-    Item.with_identity_map{Item.first.object_id.should == Item.first.object_id}
-  end
-  
-  specify "should merge attributes that don't exist in the model" do
-    Item.with_identity_map do 
-      i = Item.select(:id, :name).first
-      i.values.should == {:id=>1, :name=>'J'}
-      Item.first
-      i.values.should == {:id=>1, :name=>'J', :num=>3}
-    end
-  end
-end
-
 describe "Touch plugin" do
   before(:all) do
     @db = INTEGRATION_DB

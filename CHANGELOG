@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate identity_map plugin (jeremyevans)
+
 * Deprecate Model#set_values (jeremyevans)
 
 * Deprecate pg_auto_parameterize and pg_statement_cache extensions (jeremyevans)

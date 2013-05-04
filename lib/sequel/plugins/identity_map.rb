@@ -33,6 +33,10 @@ module Sequel
     #   Album.plugin :identity_map
     #   # would need to do Album.with_identity_map{} to use the identity map
     module IdentityMap
+      def self.apply(mod)
+        Sequel::Deprecation.deprecate('The identity_map plugin', 'Please stop loading it') unless defined?(SEQUEL_EXTENSIONS_NO_DEPRECATION_WARNING)
+      end
+
       module ClassMethods
         # Override the default :eager_loader option for many_*_many associations to work
         # with an identity_map.  If the :eager_graph association option is used, you'll probably have to use

@@ -228,6 +228,7 @@ module Sequel
         # Set the statement_cache for the connection, using the database's
         # :statement_cache_opts option.
         def self.extended(c)
+          Sequel::Deprecation.deprecate('The pg_statement_cache extension', 'Please stop loading it') unless defined?(SEQUEL_EXTENSIONS_NO_DEPRECATION_WARNING)
           c.instance_variable_set(:@statement_cache, StatementCache.new(c.sequel_db.opts[:statement_cache_opts] || {}){|name| c.deallocate(name)})
         end
 
@@ -315,4 +316,3 @@ module Sequel
 
   Database.register_extension(:pg_statement_cache, Postgres::StatementCache::DatabaseMethods)
 end
-Sequel::Deprecation.deprecate('The pg_statement_cache extension', 'Please stop loading it') unless defined?(SEQUEL_EXTENSIONS_NO_DEPRECATION_WARNING)

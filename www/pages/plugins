@@ -25,7 +25,6 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ErrorSplitter.html">error_splitter</a>: Splits multi-column errors entries into separate errors, one per column.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ForceEncoding.html">force_encoding</a>: Forces the all model column string values to a given encoding.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/HookClassMethods.html">hook_class_methods</a>: Adds backwards compatiblity for the legacy class-level hook methods (e.g. before_save :do_something).</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/IdentityMap.html">identity_map</a>: Allows you to create temporary identity maps which ensure a 1-1 correspondence of model objects to database rows.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/InputTransformer.html">input_transformer</a>: Automatically transform input to model column setters.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/InstanceFilters.html">instance_filters</a>: Allows you to add per instance filters that are used when updating or destroying the instance.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/InstanceHooks.html">instance_hooks</a>: Allows you to add hooks to specific model instances.</li>
@@ -111,12 +110,8 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/named_timezones_rb.html">named_timezones</a>: Allows you to use named timezones instead of just :local and :utc (requires <a href="http://tzinfo.rubyforge.org/">TZInfo</a>).</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/null_dataset_rb.html">null_dataset</a>: Adds Dataset#nullify to get a dataset that will never issue a query.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pagination_rb.html">pagination</a>: Adds Dataset#paginate for easier pagination of datasets.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pretty_table_rb.html">pretty_table</a>: Adds Dataset#print for printing a dataset as a simple plain-text table.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/query_rb.html">query</a>: Adds Dataset#query for a different interface to creating queries that doesn't use method chaining.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/query_literals_rb.html">query_literals</a>: Automatically uses literal strings for regular strings in select, group, and order methods (similar to filter methods).</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_rb.html">pg_array</a>: Adds support for string and numeric PostgreSQL arrays.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_ops_rb.html">pg_array_ops</a>: Adds DSL support for calling PostgreSQL array operators and functions.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_auto_parameterize_rb.html">pg_auto_parameterize</a>: Automatically parameterizes queries when using the postgres adapter with the pg driver.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html">pg_hstore</a>: Adds support for the PostgreSQL hstore type.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_ops_rb.html">pg_hstore_ops</a>: Adds DSL support for calling PostgreSQL hstore operators and functions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_inet_rb.html">pg_inet</a>: Adds support for the PostgreSQL inet and cidr types.</li>
@@ -126,7 +121,9 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_ops_rb.html">pg_range_ops</a>: Adds DSL support for calling PostgreSQL range operators and functions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_rb.html">pg_row</a>: Adds support for PostgreSQL row-valued/composite types.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_ops_rb.html">pg_row_ops</a>: Adds DSL support for dealing with PostgreSQL row-valued/composite types.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_statement_cache_rb.html">pg_statement_cache</a>: Automatically uses prepared statements for most queries when using postgres adapter with the pg driver.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pretty_table_rb.html">pretty_table</a>: Adds Dataset#print for printing a dataset as a simple plain-text table.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/query_rb.html">query</a>: Adds Dataset#query for a different interface to creating queries that doesn't use method chaining.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/query_literals_rb.html">query_literals</a>: Automatically uses literal strings for regular strings in select, group, and order methods (similar to filter methods).</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/ruby18_symbol_extensions_rb.html">ruby18_symbol_extensions</a>: Contains implementations of Symbol#{<,<=,>,>=,[]} that are only usable on ruby 1.8.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_caching_rb.html">schema_caching</a>: Speeds up loading a large number of models by caching database schema and loading it from a file.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
