@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model::InstanceMethods.class_attr_{overridable,reader} (jeremyevans)
+
 * Deprecate all methods in Dataset::PUBLIC_APPEND_METHODS except for literal, quote_identifier, quote_schema_table (jeremyevans)
 
 * Deprecate all methods in Dataset::PRIVATE_APPEND_METHODS (jeremyevans)

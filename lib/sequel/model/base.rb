@@ -945,32 +945,29 @@ module Sequel
       HOOKS.each{|h| class_eval("def #{h}; end", __FILE__, __LINE__)}
       AROUND_HOOKS.each{|h| class_eval("def #{h}; yield end", __FILE__, __LINE__)}
 
-      # Define instance method(s) that calls class method(s) of the
-      # same name, caching the result in an instance variable.  Define
-      # standard attr_writer method for modifying that instance variable.
-      #
-      # Do not call this method with untrusted input, as that can result in
-      # arbitrary code execution.
+      # REMOVE40
       def self.class_attr_overridable(*meths) # :nodoc:
+        Sequel::Deprecation.deprecate('Model::InstanceMethods.class_attr_overridable', "There is no replacement planned")
         meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (frozen? ? self.class.#{meth} : (@#{meth} = self.class.#{meth})) : @#{meth} end", __FILE__, __LINE__)}
         attr_writer(*meths) 
       end 
-    
+      def self.class_attr_reader(*meths) # :nodoc:
+        Sequel::Deprecation.deprecate('Model::InstanceMethods.class_attr_reader', "There is no replacement planned")
+        meths.each{|meth| class_eval("def #{meth}; self.class.#{meth} end", __FILE__, __LINE__)}
+      end
+      private_class_method :class_attr_overridable, :class_attr_reader
+
       # Define instance method(s) that calls class method(s) of the
       # same name. Replaces the construct:
       #   
       #   define_method(meth){self.class.send(meth)}
-      #
-      # Do not call this method with untrusted input, as that can result in
-      # arbitrary code execution.
-      def self.class_attr_reader(*meths) # :nodoc:
-        meths.each{|meth| class_eval("def #{meth}; self.class.#{meth} end", __FILE__, __LINE__)}
-      end
+      [:columns, :db, :primary_key, :db_schema].each{|meth| class_eval("def #{meth}; self.class.#{meth} end", __FILE__, __LINE__)}
 
-      private_class_method :class_attr_overridable, :class_attr_reader
-
-      class_attr_reader :columns, :db, :primary_key, :db_schema
-      class_attr_overridable(*BOOLEAN_SETTINGS)
+      # Define instance method(s) that calls class method(s) of the
+      # same name, caching the result in an instance variable.  Define
+      # standard attr_writer method for modifying that instance variable.
+      BOOLEAN_SETTINGS.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (frozen? ? self.class.#{meth} : (@#{meth} = self.class.#{meth})) : @#{meth} end", __FILE__, __LINE__)}
+      attr_writer(*BOOLEAN_SETTINGS)
 
       # The hash of attribute values.  Keys are symbols with the names of the
       # underlying database columns.
