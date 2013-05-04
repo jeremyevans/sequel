@@ -1497,6 +1497,7 @@ module Sequel
         # Formally used internally by the associations code, like pk but doesn't raise
         # an Error if the model has no primary key.  Not used any longer, deprecated.
         def pk_or_nil
+          Sequel::Deprecation.deprecate('Model#pk_or_nil', 'There is no replacement')
           key = primary_key
           key.is_a?(Array) ? key.map{|k| @values[k]} : @values[key]
         end
