@@ -347,6 +347,7 @@ module Sequel
       def include(mod)
         clear_setter_methods_cache
         check_deprecated_after_initialize(mod.instance_methods) unless allowed_after_initialize_implementation?(mod)
+        Sequel::Deprecation.deprecate('Model#set_values', 'Please override Model.call, Model#_refresh_set_values, and/or Model#_create_set_values depending on the type of behavior you want to change') if mod.public_instance_methods.map{|x| x.to_s}.include?('set_values') && mod.name.to_s !~ /\ASequel::(Model|Model::Associations|Plugins::(ForceEncoding|Serialization|TypecastOnLoad|Composition|PreparedStatementsSafe|Dirty|PgTypecastOnLoad))::InstanceMethods\z/
         super
       end
 
@@ -411,6 +412,7 @@ module Sequel
       def method_added(meth)
         clear_setter_methods_cache if meth.to_s =~ SETTER_METHOD_REGEXP
         check_deprecated_after_initialize(meth)
+        Sequel::Deprecation.deprecate('Model#set_values', 'Please override Model.call, Model#_refresh_set_values, and/or Model#_create_set_values depending on the type of behavior you want to change') if meth.to_s == 'set_values'
         super
       end
   

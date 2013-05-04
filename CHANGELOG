@@ -1,8 +1,10 @@
 === HEAD
 
+* Deprecate Model#set_values (jeremyevans)
+
 * Deprecate pg_auto_parameterize and pg_statement_cache extensions (jeremyevans)
 
-* Deprecate Model.pk_or_nil (jeremyevans)
+* Deprecate Model#pk_or_nil (jeremyevans)
 
 * Deprecate Model.print and Model.each_page (jeremyevans)
 
