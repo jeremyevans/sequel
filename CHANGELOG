@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Dataset#table_ref_append (jeremyevans)
+
 * Deprecate SQL::Expression#to_s taking an argument and returning a literal SQL string (jeremyevans)
 
 * Deprecate creating Model class methods automatically from plugin public dataset methods (jeremyevans)

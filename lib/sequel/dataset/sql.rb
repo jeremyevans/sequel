@@ -978,7 +978,12 @@ module Sequel
         literal_append(sql, v)
       end
     end
-    alias table_ref_append identifier_append 
+
+    # REMOVE40
+    def table_ref_append(sql, v)
+      Sequel::Deprecation.deprecate('Dataset#table_ref_append', "Please switch to Dataset#identifier_append")
+      identifier_append(sql, v)
+    end
     
     # Append all identifiers in args interspersed by commas.
     def identifier_list_append(sql, args)
