@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up Dataset#clone when called without an argument (jeremyevans)
+
 * Deprecate Postgres::PGRangeOp#{starts_before,ends_after} (jeremyevans)
 
 * Deprecate global use of pagination, pretty_table, query, select_remove, schema_caching, and schema_dumper extensions (jeremyevans)

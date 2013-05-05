@@ -85,10 +85,14 @@ module Sequel
     # If the options changed include options in COLUMN_CHANGE_OPTS, the cached
     # columns are deleted.  This method should generally not be called
     # directly by user code.
-    def clone(opts = {})
+    def clone(opts = nil)
       c = super()
-      c.instance_variable_set(:@opts, @opts.merge(opts))
-      c.instance_variable_set(:@columns, nil) if @columns && !opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
+      if opts
+        c.instance_variable_set(:@opts, @opts.merge(opts))
+        c.instance_variable_set(:@columns, nil) if @columns && !opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
+      else
+        c.instance_variable_set(:@opts, @opts.dup)
+      end
       c
     end
 
