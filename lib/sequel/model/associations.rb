@@ -956,7 +956,10 @@ module Sequel
         #                              Defaults to :right_primary_key option.
         # :uniq :: Adds a after_load callback that makes the array of objects unique.
         def associate(type, name, opts = {}, &block)
-          raise(Error, 'one_to_many association type with :one_to_one option removed, used one_to_one association type') if opts[:one_to_one] && type == :one_to_many
+          if opts[:one_to_one] && type == :one_to_many
+            Sequel::Deprecation.deprecate('Raising an Error when the one_to_many type uses the :one_to_one option', "Use the one_to_one associationtype")
+            raise(Error, 'one_to_many association type with :one_to_one option removed, used one_to_one association type')
+          end
           raise(Error, 'invalid association type') unless assoc_class = ASSOCIATION_TYPES[type]
           raise(Error, 'Model.associate name argument must be a symbol') unless Symbol === name
           raise(Error, ':eager_loader option must have an arity of 1 or 3') if opts[:eager_loader] && ![1, 3].include?(opts[:eager_loader].arity)

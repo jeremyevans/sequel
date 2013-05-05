@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate one_to_many with :one_to_one option raising an error (jeremyevans)
+
 * Automatically typecast hash and array to string for string columns in the looser_typecasting extension (jeremyevans)
 
 * Deprecate automatic typecasting of hash and array to string for string columns (jeremyevans)

@@ -1801,7 +1801,7 @@ describe Sequel::Model, "one_to_many" do
     p.attributes.should == [c]
   end
   
-  it "should raise an error if trying to use the :one_to_one option" do
+  qspecify "should raise an error if trying to use the :one_to_one option" do
     proc{@c2.one_to_many :attribute, :class => @c1, :one_to_one=>true}.should raise_error(Sequel::Error)
     proc{@c2.associate :one_to_many, :attribute, :class => @c1, :one_to_one=>true}.should raise_error(Sequel::Error)
   end
