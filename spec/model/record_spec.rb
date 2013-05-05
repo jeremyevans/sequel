@@ -680,7 +680,7 @@ describe Sequel::Model, "with a primary key" do
     model_a.primary_key.should == :a
   end
 
-  it "should support multi argument composite keys" do
+  qspecify "should support multi argument composite keys" do
     model_a = Class.new(Sequel::Model){ set_primary_key :a, :b }
     model_a.primary_key.should == [:a, :b]
   end
@@ -721,7 +721,7 @@ describe Sequel::Model, "#this" do
   end
 
   it "should support composite primary keys" do
-    @example.set_primary_key :x, :y
+    @example.set_primary_key [:x, :y]
     instance = @example.load(:x => 4, :y => 5)
     instance.this.sql.should =~ /SELECT \* FROM examples WHERE \(\([xy] = [45]\) AND \([xy] = [45]\)\) LIMIT 1/
   end
@@ -1390,10 +1390,10 @@ describe Sequel::Model, "#hash" do
   specify "should be the same only for objects with the same class and pk if pk is composite and all values are non-NULL" do
     z = Class.new(Sequel::Model)
     z.columns :id, :id2, :x
-    z.set_primary_key(:id, :id2)
+    z.set_primary_key([:id, :id2])
     y = Class.new(Sequel::Model)
     y.columns :id, :id2, :x
-    y.set_primary_key(:id, :id2)
+    y.set_primary_key([:id, :id2])
     a = z.load(:id => 1, :id2=>2, :x => 3)
     
     a.hash.should == z.load(:id => 1, :id2=>2, :x => 4).hash
@@ -1404,10 +1404,10 @@ describe Sequel::Model, "#hash" do
   specify "should be the same only for objects with the same class and value if pk is composite and one values is NULL" do
     z = Class.new(Sequel::Model)
     z.columns :id, :id2, :x
-    z.set_primary_key(:id, :id2)
+    z.set_primary_key([:id, :id2])
     y = Class.new(Sequel::Model)
     y.columns :id, :id2, :x
-    y.set_primary_key(:id, :id2)
+    y.set_primary_key([:id, :id2])
 
     a = z.load(:id => 1, :id2 => nil, :x => 3)
     a.hash.should == z.load(:id => 1, :id2=>nil, :x => 3).hash

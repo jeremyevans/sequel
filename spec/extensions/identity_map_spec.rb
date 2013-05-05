@@ -282,8 +282,8 @@ describe "Sequel::Plugins::IdentityMap" do
   it "should work correctly when eagerly loading many_to_many associations with composite keys" do
     @c1.columns :id, :id2
     @c2.columns :id, :id2
-    @c1.set_primary_key :id, :id2
-    @c2.set_primary_key :id, :id2
+    @c1.set_primary_key [:id, :id2]
+    @c2.set_primary_key [:id, :id2]
     @c1.many_to_many :artists, :class=>@c2, :left_key=>[:album_id1, :album_id2], :right_key=>[:artist_id1, :artist_id2], :join_table=>:aa
     @c1.dataset._fetch = [{:id=>1, :id2=>4}, {:id=>2, :id2=>5}, {:id=>3, :id2=>6}]
     @c2.dataset._fetch = [ {:id=>1, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}, {:id=>1, :x_foreign_key_0_x=>2, :x_foreign_key_1_x=>5}, {:id=>2, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}, {:id=>2, :x_foreign_key_0_x=>2, :x_foreign_key_1_x=>5}, {:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}, {:id=>3, :x_foreign_key_0_x=>1, :x_foreign_key_1_x=>4}]
@@ -319,7 +319,7 @@ describe "Sequel::Plugins::IdentityMap" do
   it "should work correctly when eagerly loading many_to_many associations with composite keys" do
     @c1.columns :id, :id2
     @c2.columns :id
-    @c1.set_primary_key :id, :id2
+    @c1.set_primary_key [:id, :id2]
     @c1.plugin :many_through_many
     @c1.many_through_many :artists, [[:aa, [:album_id1, :album_id2], :artist_id]], :class=>@c2
     @c1.dataset._fetch = [{:id=>1, :id2=>4}, {:id=>2, :id2=>5}, {:id=>3, :id2=>6}]

@@ -1301,7 +1301,7 @@ describe Sequel::Model, "one_to_many" do
   end
 
   it "should have add_ method accept a composite key" do
-    @c1.set_primary_key :id, :z
+    @c1.set_primary_key [:id, :z]
     @c2.one_to_many :attributes, :class => @c1, :key =>[:node_id, :y], :primary_key=>[:id, :x]
     @c1.dataset._fetch = {:id => 2345, :z => 8, :node_id => 1234, :y=>5}
     
@@ -1326,7 +1326,7 @@ describe Sequel::Model, "one_to_many" do
   end
   
   it "should accept a array of composite primary key values for the remove_ method and remove an existing record" do
-    @c1.set_primary_key :id, :y
+    @c1.set_primary_key [:id, :y]
     @c2.one_to_many :attributes, :class => @c1, :key=>:node_id, :primary_key=>:id
     n = @c2.new(:id => 123)
     @c1.dataset._fetch = {:id=>234, :node_id=>123, :y=>5}

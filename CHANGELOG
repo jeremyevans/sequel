@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model.set_primary_key taking multiple arguments (jeremyevans)
+
 * Make auto_validations plugin work with databases that don't support index parsing (jeremyevans)
 
 * Model classes will no longer call Database#schema if it isn't supported (jeremyevans)

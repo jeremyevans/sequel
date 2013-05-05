@@ -635,8 +635,6 @@ describe Sequel::Model, ".[] optimization" do
   it "should have simple_pk be blank if compound or no primary key" do
     @c.no_primary_key
     @c.simple_pk.should == nil
-    @c.set_primary_key :b, :a
-    @c.simple_pk.should == nil
     @c.set_primary_key [:b, :a]
     @c.simple_pk.should == nil
   end
@@ -734,7 +732,7 @@ describe "Model datasets #with_pk with #with_pk!" do
   end
 
   it "should handle an array for composite primary keys" do
-    @c.set_primary_key :id1, :id2
+    @c.set_primary_key [:id1, :id2]
     @ds.with_pk([1, 2])
     sqls = MODEL_DB.sqls
     ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1",

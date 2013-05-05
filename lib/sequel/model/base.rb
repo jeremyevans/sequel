@@ -589,6 +589,9 @@ module Sequel
       #     set_primary_key [:taggable_id, :tag_id]
       #   end
       def set_primary_key(*key)
+        Sequel::Deprecation.deprecate('Calling set_primary_key without arguments is deprecated and will raise an exception in Sequel 4. Please use no_primary_key to mark the model as not having a primary key.') if key.length == 0
+        Sequel::Deprecation.deprecate('Calling set_primary_key with multiple arguments is deprecated and will raise an exception in Sequel 4. Please pass an array of keys to setup a composite primary key.') if key.length > 1
+        
         clear_setter_methods_cache
         key = key.flatten
         self.simple_pk = if key.length == 1
@@ -801,7 +804,7 @@ module Sequel
             # if the schema information includes primary key information
             if schema_array.all?{|k,v| v.has_key?(:primary_key)}
               pks = schema_array.collect{|k,v| k if v[:primary_key]}.compact
-              pks.length > 0 ? set_primary_key(*pks) : no_primary_key
+              pks.length > 0 ? set_primary_key(pks) : no_primary_key
             end
             # Also set the columns for the dataset, so the dataset
             # doesn't have to do a query to get them.
