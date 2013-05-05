@@ -175,6 +175,15 @@ module Sequel
         def table_name
           self == cti_base_model ? super : cti_tables.last
         end
+
+        private
+
+        # If calling set_dataset manually, make sure to set the dataset
+        # row proc to one that handles inheritance correctly.
+        def set_dataset_row_proc(ds)
+          ds.row_proc = @dataset.row_proc if @dataset
+        end
+
       end
 
       module InstanceMethods

@@ -545,10 +545,10 @@ module Sequel
       # sharding support.
       def set_dataset(ds, opts={})
         inherited = opts[:inherited]
-        @dataset = case ds
+        case ds
         when Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, LiteralString
           self.simple_table = db.literal(ds)
-          db.from(ds)
+          ds = db.from(ds)
         when Dataset
           self.simple_table = if ds.send(:simple_select_all?)
             ds.literal(ds.first_source_table)
@@ -556,11 +556,11 @@ module Sequel
             nil
           end
           @db = ds.db
-          ds
         else
           raise(Error, "Model.set_dataset takes one of the following classes as an argument: Symbol, LiteralString, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, Dataset")
         end
-        @dataset.row_proc = self
+        set_dataset_row_proc(ds)
+        @dataset = ds
         @require_modification = Sequel::Model.require_modification.nil? ? @dataset.provides_accurate_rows_matched? : Sequel::Model.require_modification
         if inherited
           self.simple_table = superclass.simple_table
@@ -921,6 +921,11 @@ module Sequel
         @columns = new_columns
         def_column_accessor(*new_columns) if new_columns
         @columns
+      end
+
+      # Set the dataset's row_proc to the current model.
+      def set_dataset_row_proc(ds)
+        ds.row_proc = self
       end
 
       # Reset the fast primary key lookup SQL when the simple_pk value changes.

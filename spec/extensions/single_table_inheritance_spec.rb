@@ -121,6 +121,16 @@ describe Sequel::Model, "single table inheritance plugin" do
       Object.send(:remove_const, :StiTest4)
     end
 
+    specify "should have working row_proc if using set_dataset in subclass to remove columns" do
+      StiTest2.plugin :single_table_inheritance, :kind
+      class ::StiTest3 < ::StiTest2
+        set_dataset(dataset.select(*(columns - [:blah])))
+      end
+      class ::StiTest4 < ::StiTest3; end
+      StiTest3.dataset._fetch = {:id=>1, :kind=>'StiTest4'}
+      StiTest3[1].should == StiTest4.load(:id=>1, :kind=>'StiTest4')
+    end
+
     it "should work with custom procs with strings" do
       StiTest2.plugin :single_table_inheritance, :kind, :model_map=>proc{|v| v == 1 ? 'StiTest3' : 'StiTest4'}, :key_map=>proc{|klass| klass.name == 'StiTest3' ? 1 : 2}
       class ::StiTest3 < ::StiTest2; end

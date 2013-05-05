@@ -181,6 +181,12 @@ module Sequel
 
         private
 
+        # If calling set_dataset manually, make sure to set the dataset
+        # row proc to one that handles inheritance correctly.
+        def set_dataset_row_proc(ds)
+          ds.row_proc = @dataset.row_proc if @dataset
+        end
+
         # Return a class object.  If a class is given, return it directly.
         # Treat strings and symbols as class names.  If nil is given or
         # an invalid class name string or symbol is used, return self.
