@@ -74,7 +74,12 @@ module Sequel
     # 
     # This may not handle NULLs correctly, but can be much faster on
     # some databases.
-    attr_accessor :empty_array_handle_nulls
+    attr_reader :empty_array_handle_nulls
+
+    def empty_array_handle_nulls=(v)
+      Sequel::Deprecation.deprecate('Sequel.empty_array_handle_nulls=', 'Please switch to loading the empty_array_ignore_nulls plugin if you wish empty array handling to ignore nulls')
+      @empty_array_handle_nulls = v
+    end
 
     # REMOVE40
     def virtual_row_instance_eval

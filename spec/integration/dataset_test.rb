@@ -1335,25 +1335,21 @@ describe "Sequel::Dataset DSL support" do
     end
   end
   
-  specify "should work empty arrays with nulls and Sequel.empty_array_null_handling = true" do
-    begin
-      Sequel.empty_array_handle_nulls = false
-      @ds.insert(nil, nil)
-      @ds.filter(:a=>[]).all.should == []
-      @ds.exclude(:a=>[]).all.should == [{:a=>nil, :b=>nil}]
-      @ds.filter([:a, :b]=>[]).all.should == []
-      @ds.exclude([:a, :b]=>[]).all.should == [{:a=>nil, :b=>nil}]
+  specify "should work empty arrays with nulls and the empty_array_ignore_nulls extension" do
+    ds = @ds.extension(:empty_array_ignore_nulls)
+    ds.insert(nil, nil)
+    ds.filter(:a=>[]).all.should == []
+    ds.exclude(:a=>[]).all.should == [{:a=>nil, :b=>nil}]
+    ds.filter([:a, :b]=>[]).all.should == []
+    ds.exclude([:a, :b]=>[]).all.should == [{:a=>nil, :b=>nil}]
 
-      unless Sequel.guarded?(:mssql, :oracle, :db2)
-        # Some databases don't like boolean results in the select list
-        pr = proc{|r| r.is_a?(Integer) ? (r != 0) : r}
-        pr[@ds.get(Sequel.expr(:a=>[]))].should == false
-        pr[@ds.get(~Sequel.expr(:a=>[]))].should == true
-        pr[@ds.get(Sequel.expr([:a, :b]=>[]))].should == false
-        pr[@ds.get(~Sequel.expr([:a, :b]=>[]))].should == true
-      end
-    ensure
-      Sequel.empty_array_handle_nulls = true
+    unless Sequel.guarded?(:mssql, :oracle, :db2)
+      # Some databases don't like boolean results in the select list
+      pr = proc{|r| r.is_a?(Integer) ? (r != 0) : r}
+      pr[ds.get(Sequel.expr(:a=>[]))].should == false
+      pr[ds.get(~Sequel.expr(:a=>[]))].should == true
+      pr[ds.get(Sequel.expr([:a, :b]=>[]))].should == false
+      pr[ds.get(~Sequel.expr([:a, :b]=>[]))].should == true
     end
   end
 

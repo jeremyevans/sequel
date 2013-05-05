@@ -470,7 +470,7 @@ describe "Dataset#where" do
     @dataset.exclude([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
   end
 
-  specify "should handle all types of IN/NOT IN queries with empty arrays when empty_array_handle_nulls is false" do
+  qspecify "should handle all types of IN/NOT IN queries with empty arrays when empty_array_handle_nulls is false" do
     begin
       Sequel.empty_array_handle_nulls = false
       @dataset.filter(:id => []).sql.should == "SELECT * FROM test WHERE (1 = 0)"
@@ -524,7 +524,7 @@ describe "Dataset#where" do
     db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
   end
   
-  specify "should handle IN/NOT IN queries with multiple columns and an empty dataset where the database doesn't support it when empty_array_handle nulls is true" do
+  qspecify "should handle IN/NOT IN queries with multiple columns and an empty dataset where the database doesn't support it when empty_array_handle nulls is true" do
     begin
       Sequel.empty_array_handle_nulls = false
       meta_def(@dataset, :supports_multiple_column_in?){false}

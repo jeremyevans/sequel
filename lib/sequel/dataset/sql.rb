@@ -941,6 +941,7 @@ module Sequel
       end
     end
 
+    # An expression for how to handle an empty array lookup
     def empty_array_value(op, cols)
       if Sequel.empty_array_handle_nulls
         c = Array(cols)

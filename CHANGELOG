@@ -1,5 +1,9 @@
 === HEAD
 
+* Add empty_array_ignore_nulls extension for ignoring null handling for IN/NOT with an empty array (jeremyevans)
+
+* Deprecate Sequel.empty_array_handle_nulls accessor (jeremyevans)
+
 * Deprecate Sequel.{k,ts,tsk}_require and Sequel.check_requiring_thread (jeremyevans)
 
 * Discontinue use of manual thread-safe requiring (jeremyevans)

@@ -99,6 +99,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/core_extensions_rb.html">core_extensions</a>: Extends the Array, Hash, String, and Symbol classes with methods that return Sequel expression objects (loaded by default).</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/core_refinements_rb.html">core_refinements</a>: Adds refinement versions of Sequel's core extensions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/date_arithmetic_rb.html">date_arithmetic</a>: Allows for database-independent date calculations (adding/subtracting an interval to/from a date/timestamp).</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/empty_array_ignore_nulls_rb.html">empty_array_ignore_nulls</a>: Makes Sequel's handling of IN/NOT IN with an empty ignore correct NULL handling.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/eval_inspect_rb.html">eval_inspect</a>: Makes inspect on Sequel's expression objects attempt to return a string suitable for eval.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/filter_having_rb.html">filter_having</a>: Makes Dataset#filter, #and, #or, and #having operate on HAVING clause if HAVING clause is already present.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/graph_each_rb.html">graph_each</a>: Makes Dataset#each split returned results by table when using Dataset#graph.</li>
