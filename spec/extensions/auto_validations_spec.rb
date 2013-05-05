@@ -12,6 +12,7 @@ describe "Sequel::Plugins::AutoValidations" do
        [:num, {:primary_key=>false, :type=>:integer, :allow_null=>true}],
        [:d, {:primary_key=>false, :type=>:date, :allow_null=>false}]]
     end
+    def db.supports_index_parsing?() true end
     def db.indexes(t, *)
       return [] if t != :test
       {:a=>{:columns=>[:name, :num], :unique=>true}, :b=>{:columns=>[:num], :unique=>false}}

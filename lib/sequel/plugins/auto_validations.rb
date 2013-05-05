@@ -84,7 +84,7 @@ module Sequel
         # Parse the database schema and indexes and record the columns to automatically validate.
         def setup_auto_validations
           @auto_validate_presence_columns = db_schema.select{|col, sch| sch[:allow_null] == false && sch[:ruby_default].nil?}.map{|col, sch| col} - Array(primary_key)
-          @auto_validate_unique_columns = if db.respond_to?(:indexes) 
+          @auto_validate_unique_columns = if db.supports_index_parsing?
             db.indexes(dataset.first_source_table).select{|name, idx| idx[:unique] == true}.map{|name, idx| idx[:columns]}
           else
             []
