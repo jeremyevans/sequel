@@ -42,7 +42,7 @@ class Sequel::ConnectionPool
       when Class
         v.new(db, opts)
       when Symbol
-        Sequel.tsk_require("sequel/connection_pool/#{v}")
+        require("sequel/connection_pool/#{v}")
         connection_pool_class(opts).new(db, opts) || raise(Sequel::Error, "No connection pool class found")
       end
     end

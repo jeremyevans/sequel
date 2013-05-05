@@ -14,20 +14,20 @@ module Sequel
     # Contains procs keyed on sub adapter type that extend the
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {:postgres=>proc do |db|
-        Sequel.tsk_require 'do_postgres'
-        Sequel.ts_require 'adapters/do/postgres'
+        require 'do_postgres'
+        Sequel.require 'adapters/do/postgres'
         db.extend(Sequel::DataObjects::Postgres::DatabaseMethods)
         db.extend_datasets Sequel::Postgres::DatasetMethods
       end,
       :mysql=>proc do |db|
-        Sequel.tsk_require 'do_mysql'
-        Sequel.ts_require 'adapters/do/mysql'
+        require 'do_mysql'
+        Sequel.require 'adapters/do/mysql'
         db.extend(Sequel::DataObjects::MySQL::DatabaseMethods)
         db.dataset_class = Sequel::DataObjects::MySQL::Dataset
       end,
       :sqlite3=>proc do |db|
-        Sequel.tsk_require 'do_sqlite3'
-        Sequel.ts_require 'adapters/do/sqlite'
+        require 'do_sqlite3'
+        Sequel.require 'adapters/do/sqlite'
         db.extend(Sequel::DataObjects::SQLite::DatabaseMethods)
         db.extend_datasets Sequel::SQLite::DatasetMethods
         db.set_integer_booleans

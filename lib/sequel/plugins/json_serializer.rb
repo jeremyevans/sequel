@@ -1,6 +1,6 @@
-module Sequel
-  tsk_require 'json'
+require 'json'
 
+module Sequel
   module Plugins
     # The json_serializer plugin handles serializing entire Sequel::Model
     # objects to JSON, as well as support for deserializing JSON directly

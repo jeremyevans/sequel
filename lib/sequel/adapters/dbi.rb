@@ -74,7 +74,7 @@ module Sequel
       def adapter_initialize
         case @opts[:db_type]
         when 'mssql'
-          Sequel.ts_require 'adapters/shared/mssql'
+          Sequel.require 'adapters/shared/mssql'
           extend Sequel::MSSQL::DatabaseMethods
           extend_datasets Sequel::MSSQL::DatasetMethods
         end

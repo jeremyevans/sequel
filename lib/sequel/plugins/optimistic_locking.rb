@@ -1,5 +1,5 @@
 module Sequel
-  tsk_require 'sequel/plugins/instance_filters'
+  require 'plugins/instance_filters'
   
   module Plugins
     # This plugin implements a simple database-independent locking mechanism

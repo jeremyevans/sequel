@@ -26,7 +26,7 @@ module Sequel
       unless klass = ADAPTER_MAP[scheme]
         # attempt to load the adapter file
         begin
-          Sequel.tsk_require "sequel/adapters/#{scheme}"
+          require "sequel/adapters/#{scheme}"
         rescue LoadError => e
           raise Sequel.convert_exception_class(e, AdapterNotFound)
         end

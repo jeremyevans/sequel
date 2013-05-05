@@ -10,19 +10,19 @@ module Sequel
     # Contains procs keyed on sub adapter type that extend the
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {:postgres=>proc do |db|
-        Sequel.ts_require 'adapters/swift/postgres'
+        Sequel.require 'adapters/swift/postgres'
         db.extend(Sequel::Swift::Postgres::DatabaseMethods)
         db.extend_datasets Sequel::Postgres::DatasetMethods
         db.swift_class = ::Swift::DB::Postgres
       end,
       :mysql=>proc do |db|
-        Sequel.ts_require 'adapters/swift/mysql'
+        Sequel.require 'adapters/swift/mysql'
         db.extend(Sequel::Swift::MySQL::DatabaseMethods)
         db.dataset_class = Sequel::Swift::MySQL::Dataset
         db.swift_class = ::Swift::DB::Mysql
       end,
       :sqlite=>proc do |db|
-        Sequel.ts_require 'adapters/swift/sqlite'
+        Sequel.require 'adapters/swift/sqlite'
         db.extend(Sequel::Swift::SQLite::DatabaseMethods)
         db.dataset_class = Sequel::Swift::SQLite::Dataset
         db.swift_class = ::Swift::DB::Sqlite3

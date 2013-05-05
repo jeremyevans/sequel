@@ -28,10 +28,6 @@ module Sequel
   @convert_two_digit_years = true
   @datetime_class = Time
   @empty_array_handle_nulls = true
-  @require_thread = nil
-  
-  # Mutex used to protect file loading/requireing
-  @require_mutex = Mutex.new
   
   # Whether Sequel is being run in single threaded mode
   @single_threaded = false
@@ -82,30 +78,21 @@ module Sequel
 
     # REMOVE40
     def virtual_row_instance_eval
-        Sequel::Deprecation.deprecate('Sequel.virtual_row_instance_eval', 'It has no effect, so you can safely stop calling it.')
+      Sequel::Deprecation.deprecate('Sequel.virtual_row_instance_eval', 'It has no effect, so you can safely stop calling it.')
     end
     def virtual_row_instance_eval=(v)
-        Sequel::Deprecation.deprecate('Sequel.virtual_row_instance_eval=', 'It has no effect, so you can safely stop calling it.')
+      Sequel::Deprecation.deprecate('Sequel.virtual_row_instance_eval=', 'It has no effect, so you can safely stop calling it.')
     end
-    
-    # Alias to the standard version of require
-    alias k_require require
+    def k_require(*a)
+      Sequel::Deprecation.deprecate('Sequel.k_require', 'Please switch to Kernel.require')
+      Kernel.require(*a)
+    end
 
     private
 
     # Make thread safe requiring reentrant to prevent deadlocks.
     def check_requiring_thread
-      return yield if @single_threaded
-      t = Thread.current
-      return(yield) if @require_thread == t
-      @require_mutex.synchronize do
-        begin
-          @require_thread = t 
-          yield
-        ensure
-          @require_thread = nil
-        end
-      end
+      Sequel::Deprecation.deprecate('Sequel.check_requiring_thread', 'It has no effect, so you can safely stop calling it.')
     end
   end
 
@@ -179,7 +166,7 @@ module Sequel
   #   Sequel.extension(:schema_dumper)
   #   Sequel.extension(:pagination, :query)
   def self.extension(*extensions)
-    extensions.each{|e| tsk_require "sequel/extensions/#{e}"}
+    extensions.each{|e| Kernel.require "sequel/extensions/#{e}"}
   end
   
   # Set the method to call on identifiers going into the database.  This affects
@@ -381,14 +368,14 @@ module Sequel
     end
   end
 
-  # Same as Sequel.require, but wrapped in a mutex in order to be thread safe.
+  # REMOVE40
   def self.ts_require(*args)
-    check_requiring_thread{require(*args)}
+    Sequel::Deprecation.deprecate('Sequel.ts_require', 'Please switch to Sequel.require')
+    require(*args)
   end
-  
-  # Same as Kernel.require, but wrapped in a mutex in order to be thread safe.
   def self.tsk_require(*args)
-    check_requiring_thread{k_require(*args)}
+    Sequel::Deprecation.deprecate('Sequel.tsk_require', 'Please switch to Kernel.require')
+    Kernel.require(*args)
   end
 
   # If the supplied block takes a single argument,

@@ -844,10 +844,10 @@ module Sequel
            (Sequel.const_defined?(module_name) &&
             Sequel::Plugins.const_get(module_name) == Sequel.const_get(module_name))
           begin
-            Sequel.tsk_require "sequel/plugins/#{plugin}"
+            require "sequel/plugins/#{plugin}"
           rescue LoadError => e
             begin
-              Sequel.tsk_require "sequel_#{plugin}"
+              require "sequel_#{plugin}"
             rescue LoadError => e2
               e.message << "; #{e2.message}"
               raise e

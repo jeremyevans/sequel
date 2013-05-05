@@ -1,6 +1,6 @@
-module Sequel
-  tsk_require 'nokogiri'
+require 'nokogiri'
 
+module Sequel
   module Plugins
     # The xml_serializer plugin handles serializing entire Sequel::Model
     # objects to XML, and deserializing XML into a single Sequel::Model

@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate Sequel.{k,ts,tsk}_require and Sequel.check_requiring_thread (jeremyevans)
+
+* Discontinue use of manual thread-safe requiring (jeremyevans)
+
 * Deprecate using an unsupported client_min_messages setting on PostgreSQL (jeremyevans)
 
 * Deprecate passing non-hash 4th argument to Dataset#join_table (jeremyevans)

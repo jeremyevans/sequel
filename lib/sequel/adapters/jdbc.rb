@@ -32,7 +32,7 @@ module Sequel
     DATABASE_SETUP = {:postgresql=>proc do |db|
         JDBC.load_gem(:Postgres)
         org.postgresql.Driver
-        Sequel.ts_require 'adapters/jdbc/postgresql'
+        Sequel.require 'adapters/jdbc/postgresql'
         db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::Postgres::Dataset
         org.postgresql.Driver
@@ -40,7 +40,7 @@ module Sequel
       :mysql=>proc do |db|
         JDBC.load_gem(:MySQL)
         com.mysql.jdbc.Driver
-        Sequel.ts_require 'adapters/jdbc/mysql'
+        Sequel.require 'adapters/jdbc/mysql'
         db.extend(Sequel::JDBC::MySQL::DatabaseMethods)
         db.extend_datasets Sequel::MySQL::DatasetMethods
         com.mysql.jdbc.Driver
@@ -48,7 +48,7 @@ module Sequel
       :sqlite=>proc do |db|
         JDBC.load_gem(:SQLite3)
         org.sqlite.JDBC
-        Sequel.ts_require 'adapters/jdbc/sqlite'
+        Sequel.require 'adapters/jdbc/sqlite'
         db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
         db.extend_datasets Sequel::SQLite::DatasetMethods
         db.set_integer_booleans
@@ -56,14 +56,14 @@ module Sequel
       end,
       :oracle=>proc do |db|
         Java::oracle.jdbc.driver.OracleDriver
-        Sequel.ts_require 'adapters/jdbc/oracle'
+        Sequel.require 'adapters/jdbc/oracle'
         db.extend(Sequel::JDBC::Oracle::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::Oracle::Dataset
         Java::oracle.jdbc.driver.OracleDriver
       end,
       :sqlserver=>proc do |db|
         com.microsoft.sqlserver.jdbc.SQLServerDriver
-        Sequel.ts_require 'adapters/jdbc/sqlserver'
+        Sequel.require 'adapters/jdbc/sqlserver'
         db.extend(Sequel::JDBC::SQLServer::DatabaseMethods)
         db.extend_datasets Sequel::MSSQL::DatasetMethods
         db.send(:set_mssql_unicode_strings)
@@ -72,7 +72,7 @@ module Sequel
       :jtds=>proc do |db|
         JDBC.load_gem(:JTDS)
         Java::net.sourceforge.jtds.jdbc.Driver
-        Sequel.ts_require 'adapters/jdbc/jtds'
+        Sequel.require 'adapters/jdbc/jtds'
         db.extend(Sequel::JDBC::JTDS::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::JTDS::Dataset
         db.send(:set_mssql_unicode_strings)
@@ -81,7 +81,7 @@ module Sequel
       :h2=>proc do |db|
         JDBC.load_gem(:H2)
         org.h2.Driver
-        Sequel.ts_require 'adapters/jdbc/h2'
+        Sequel.require 'adapters/jdbc/h2'
         db.extend(Sequel::JDBC::H2::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::H2::Dataset
         org.h2.Driver
@@ -89,7 +89,7 @@ module Sequel
       :hsqldb=>proc do |db|
         JDBC.load_gem(:HSQLDB)
         org.hsqldb.jdbcDriver
-        Sequel.ts_require 'adapters/jdbc/hsqldb'
+        Sequel.require 'adapters/jdbc/hsqldb'
         db.extend(Sequel::JDBC::HSQLDB::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::HSQLDB::Dataset
         org.hsqldb.jdbcDriver
@@ -97,49 +97,49 @@ module Sequel
       :derby=>proc do |db|
         JDBC.load_gem(:Derby)
         org.apache.derby.jdbc.EmbeddedDriver
-        Sequel.ts_require 'adapters/jdbc/derby'
+        Sequel.require 'adapters/jdbc/derby'
         db.extend(Sequel::JDBC::Derby::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::Derby::Dataset
         org.apache.derby.jdbc.EmbeddedDriver
       end,
       :as400=>proc do |db|
         com.ibm.as400.access.AS400JDBCDriver
-        Sequel.ts_require 'adapters/jdbc/as400'
+        Sequel.require 'adapters/jdbc/as400'
         db.extend(Sequel::JDBC::AS400::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::AS400::Dataset
         com.ibm.as400.access.AS400JDBCDriver
       end,
       :"informix-sqli"=>proc do |db|
         com.informix.jdbc.IfxDriver
-        Sequel.ts_require 'adapters/jdbc/informix'
+        Sequel.require 'adapters/jdbc/informix'
         db.extend(Sequel::JDBC::Informix::DatabaseMethods)
         db.extend_datasets Sequel::Informix::DatasetMethods
         com.informix.jdbc.IfxDriver
       end,
       :db2=>proc do |db|
         com.ibm.db2.jcc.DB2Driver
-        Sequel.ts_require 'adapters/jdbc/db2'
+        Sequel.require 'adapters/jdbc/db2'
         db.extend(Sequel::JDBC::DB2::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::DB2::Dataset
         com.ibm.db2.jcc.DB2Driver
       end,
       :firebirdsql=>proc do |db|
         org.firebirdsql.jdbc.FBDriver
-        Sequel.ts_require 'adapters/jdbc/firebird'
+        Sequel.require 'adapters/jdbc/firebird'
         db.extend(Sequel::JDBC::Firebird::DatabaseMethods)
         db.extend_datasets Sequel::Firebird::DatasetMethods
         org.firebirdsql.jdbc.FBDriver
       end,
       :jdbcprogress=>proc do |db|
         com.progress.sql.jdbc.JdbcProgressDriver
-        Sequel.ts_require 'adapters/jdbc/progress'
+        Sequel.require 'adapters/jdbc/progress'
         db.extend(Sequel::JDBC::Progress::DatabaseMethods)
         db.extend_datasets Sequel::Progress::DatasetMethods
         com.progress.sql.jdbc.JdbcProgressDriver
       end,
       :cubrid=>proc do |db|
         Java::cubrid.jdbc.driver.CUBRIDDriver
-        Sequel.ts_require 'adapters/jdbc/cubrid'
+        Sequel.require 'adapters/jdbc/cubrid'
         db.extend(Sequel::JDBC::Cubrid::DatabaseMethods)
         db.extend_datasets Sequel::Cubrid::DatasetMethods
         Java::cubrid.jdbc.driver.CUBRIDDriver
@@ -150,7 +150,7 @@ module Sequel
     # works for PostgreSQL, MySQL, and SQLite.
     def self.load_gem(name)
       begin
-        Sequel.tsk_require "jdbc/#{name.to_s.downcase}"
+        require "jdbc/#{name.to_s.downcase}"
       rescue LoadError
         # jdbc gem not used, hopefully the user has the .jar in their CLASSPATH
       else
