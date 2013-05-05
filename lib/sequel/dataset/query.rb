@@ -526,6 +526,7 @@ module Sequel
         last_alias = options[:implicit_qualifier]
         qualify_type = options[:qualify]
       when Symbol, String, SQL::Identifier
+        Sequel::Deprecation.deprecate('Passing a non-hash as the options hash to Dataset#join_table', "Please switch to an options hash with the :table_alias option.")
         table_alias = options
         last_alias = nil 
       else

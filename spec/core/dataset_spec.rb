@@ -2118,7 +2118,7 @@ describe "Dataset#join_table" do
     @d.join(:categories, :category_id=>:id).sql.should == 'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
   
-  specify "should support aliased tables using the deprecated argument" do
+  qspecify "should support aliased tables using the deprecated argument" do
     @d.from('stats').join('players', {:id => :player_id}, 'p').sql.should == 'SELECT * FROM "stats" INNER JOIN "players" AS "p" ON ("p"."id" = "stats"."player_id")'
   end
 
@@ -2185,7 +2185,7 @@ describe "Dataset#join_table" do
   
   specify "should support joining datasets and aliasing the join" do
     ds = Sequel.mock.dataset.from(:categories)
-    @d.join_table(:left_outer, ds, {:ds__item_id => :id}, :ds).sql.should == 'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) AS "ds" ON ("ds"."item_id" = "items"."id")'      
+    @d.join_table(:left_outer, ds, {:ds__item_id => :id}, :table_alias=>:ds).sql.should == 'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) AS "ds" ON ("ds"."item_id" = "items"."id")'      
   end
   
   specify "should support joining multiple datasets" do
@@ -2200,7 +2200,7 @@ describe "Dataset#join_table" do
   end
 
   specify "should support using an SQL String as the join condition" do
-    @d.join(:categories, "c.item_id = items.id", :c).sql.should == 'SELECT * FROM "items" INNER JOIN "categories" AS "c" ON (c.item_id = items.id)'
+    @d.join(:categories, "c.item_id = items.id", :table_alias=>:c).sql.should == 'SELECT * FROM "items" INNER JOIN "categories" AS "c" ON (c.item_id = items.id)'
   end
   
   specify "should support using a boolean column as the join condition" do
@@ -2214,7 +2214,7 @@ describe "Dataset#join_table" do
   specify "should support natural and cross joins" do
     @d.join_table(:natural, :categories).sql.should == 'SELECT * FROM "items" NATURAL JOIN "categories"'
     @d.join_table(:cross, :categories, nil).sql.should == 'SELECT * FROM "items" CROSS JOIN "categories"'
-    @d.join_table(:natural, :categories, nil, :c).sql.should == 'SELECT * FROM "items" NATURAL JOIN "categories" AS "c"'
+    @d.join_table(:natural, :categories, nil, :table_alias=>:c).sql.should == 'SELECT * FROM "items" NATURAL JOIN "categories" AS "c"'
   end
 
   specify "should support joins with a USING clause if an array of symbols is used" do
@@ -2244,19 +2244,19 @@ describe "Dataset#join_table" do
       joins.should == []
     end
 
-    @d.from(Sequel.as(:items, :i)).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
+    @d.from(Sequel.as(:items, :i)).join(:categories, nil, :table_alias=>:c) do |join_alias, last_join_alias, joins| 
       join_alias.should == :c
       last_join_alias.should == :i
       joins.should == []
     end
 
-    @d.from(:items___i).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
+    @d.from(:items___i).join(:categories, nil, :table_alias=>:c) do |join_alias, last_join_alias, joins| 
       join_alias.should == :c
       last_join_alias.should == :i
       joins.should == []
     end
 
-    @d.join(:blah).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
+    @d.join(:blah).join(:categories, nil, :table_alias=>:c) do |join_alias, last_join_alias, joins| 
       join_alias.should == :c
       last_join_alias.should == :blah
       joins.should be_a_kind_of(Array)
@@ -2265,7 +2265,7 @@ describe "Dataset#join_table" do
       joins.first.join_type.should == :inner
     end
 
-    @d.join_table(:natural, :blah, nil, :b).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
+    @d.join_table(:natural, :blah, nil, :table_alias=>:b).join(:categories, nil, :table_alias=>:c) do |join_alias, last_join_alias, joins| 
       join_alias.should == :c
       last_join_alias.should == :b
       joins.should be_a_kind_of(Array)

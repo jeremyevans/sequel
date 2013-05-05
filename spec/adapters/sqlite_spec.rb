@@ -317,7 +317,7 @@ describe "An SQLite dataset AS clause" do
   end
 
   specify "should use a string literal in the JOIN clause" do
-    SQLITE_DB[:t].join_table(:natural, :j, nil, :a).sql.should == "SELECT * FROM `t` NATURAL JOIN `j` AS 'a'"
+    SQLITE_DB[:t].join_table(:natural, :j, nil, :table_alias=>:a).sql.should == "SELECT * FROM `t` NATURAL JOIN `j` AS 'a'"
   end
 end
 

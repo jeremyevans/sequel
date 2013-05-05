@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate passing non-hash 4th argument to Dataset#join_table (jeremyevans)
+
 * Deprecate passing non-hash 2nd argument to Dataset#union/intersect/except (jeremyevans)
 
 * Deprecate one_to_many with :one_to_one option raising an error (jeremyevans)
