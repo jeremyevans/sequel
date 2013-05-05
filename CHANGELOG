@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate :eager_loader and :eager_grapher association options getting passed 3 separate arguments (jeremyevans)
+
 * Deprecate validates_not_string (jeremyevans)
 
 * Deprecate casting via __type suffix for prepared type placeholders in the postgres adapter (jeremyevans)

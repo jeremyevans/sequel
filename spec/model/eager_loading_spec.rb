@@ -649,17 +649,17 @@ describe Sequel::Model, "#eager" do
   end
 
   it "should use the :eager_loader association option when eager loading" do
-    EagerAlbum.many_to_one :special_band, :key=>:band_id, :eager_loader=>(proc do |key_hash, records, assocs| 
-      item = EagerBand.filter(:album_id=>records.collect{|r| [r.pk, r.pk*2]}.flatten).order(:name).first
-      records.each{|r| r.associations[:special_band] = item}
+    EagerAlbum.many_to_one :special_band, :key=>:band_id, :eager_loader=>(proc do |eo| 
+      item = EagerBand.filter(:album_id=>eo[:rows].collect{|r| [r.pk, r.pk*2]}.flatten).order(:name).first
+      eo[:rows].each{|r| r.associations[:special_band] = item}
     end)
     EagerAlbum.one_to_many :special_tracks, :eager_loader=>(proc do |eo|
       items = EagerTrack.filter(:album_id=>eo[:rows].collect{|r| [r.pk, r.pk*2]}.flatten).all
       eo[:rows].each{|r| r.associations[:special_tracks] = items}
     end)
-    EagerAlbum.many_to_many :special_genres, :class=>:EagerGenre, :eager_loader=>(proc do |key_hash, records, assocs| 
-      items = EagerGenre.inner_join(:ag, [:genre_id]).filter(:album_id=>records.collect{|r| r.pk}).all
-      records.each{|r| r.associations[:special_genres] = items}
+    EagerAlbum.many_to_many :special_genres, :class=>:EagerGenre, :eager_loader=>(proc do |eo| 
+      items = EagerGenre.inner_join(:ag, [:genre_id]).filter(:album_id=>eo[:rows].collect{|r| r.pk}).all
+      eo[:rows].each{|r| r.associations[:special_genres] = items}
     end)
     a = EagerAlbum.eager(:special_genres, :special_tracks, :special_band).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
@@ -1322,13 +1322,13 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should respect the association's :eager_grapher option" do 
-    GraphAlbum.many_to_one :active_band, :class=>'GraphBand', :key=>:band_id, :eager_grapher=>proc{|ds, aa, ta| ds.graph(GraphBand, {:active=>true}, :table_alias=>aa, :join_type=>:inner)}
+    GraphAlbum.many_to_one :active_band, :class=>'GraphBand', :key=>:band_id, :eager_grapher=>proc{|eo| eo[:self].graph(GraphBand, {:active=>true}, :table_alias=>eo[:table_alias], :join_type=>:inner)}
     GraphAlbum.eager_graph(:active_band).sql.should == "SELECT albums.id, albums.band_id, active_band.id AS active_band_id, active_band.vocalist_id FROM albums INNER JOIN bands AS active_band ON (active_band.active IS TRUE)"
 
     GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :eager_grapher=>proc{|eo| eo[:self].graph(GraphTrack, nil, :join_type=>:natural, :table_alias=>eo[:table_alias])}
     GraphAlbum.eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums NATURAL JOIN tracks AS right_tracks'
 
-    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :eager_grapher=>proc{|ds, aa, ta| ds.graph(:ag, {:album_id=>:id}, :table_alias=>:a123, :implicit_qualifier=>ta).graph(GraphGenre, [:album_id], :table_alias=>aa)}
+    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :eager_grapher=>proc{|eo| eo[:self].graph(:ag, {:album_id=>:id}, :table_alias=>:a123, :implicit_qualifier=>eo[:implicit_qualifier]).graph(GraphGenre, [:album_id], :table_alias=>eo[:table_alias])}
     GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag AS a123 ON (a123.album_id = albums.id) LEFT OUTER JOIN genres AS active_genres USING (album_id)"
   end
 

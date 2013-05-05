@@ -818,12 +818,10 @@ module Sequel
         # :eager_graph :: The associations to eagerly load via +eager_graph+ when loading the associated object(s).
         #                 many_to_many associations with this option cannot be eagerly loaded via +eager+.
         # :eager_grapher :: A proc to use to implement eager loading via +eager_graph+, overriding the default.
-        #                   Takes one or three arguments. If three arguments, they are a dataset, an alias to use for
-        #                   the table to graph for this association, and the alias that was used for the current table
-        #                   (since you can cascade associations). If one argument, is passed a hash with keys :self,
-        #                   :table_alias, and :implicit_qualifier, corresponding to the three arguments, and an optional
-        #                   additional key :eager_block, a callback accepting one argument, the associated dataset. This
-        #                   is used to customize the association at query time.
+        #                   Takes an options hash with the entries :self (the receiver of the eager_graph call),
+        #                   :table_alias (the alias to use for table to graph into the association), :implicit_qualifier
+        #                   (the alias that was used for the current table), and possibly :eager_block (a callback
+        #                   proc accepting the associated dataset, for per-call customization).
         #                   Should return a copy of the dataset with the association graphed into it.
         # :eager_limit_strategy :: Determines the strategy used for enforcing limits when eager loading associations via
         #                          the +eager+ method.  For one_to_one associations, no strategy is used by default, and
@@ -963,6 +961,9 @@ module Sequel
           raise(Error, 'Model.associate name argument must be a symbol') unless Symbol === name
           raise(Error, ':eager_loader option must have an arity of 1 or 3') if opts[:eager_loader] && ![1, 3].include?(opts[:eager_loader].arity)
           raise(Error, ':eager_grapher option must have an arity of 1 or 3') if opts[:eager_grapher] && ![1, 3].include?(opts[:eager_grapher].arity)
+
+          Sequel::Deprecation.deprecate('The :eager_loader association option accepting 3 arguments', "Please switch to accepting a single options hash") if opts[:eager_loader] && opts[:eager_loader].arity == 3
+          Sequel::Deprecation.deprecate('The :eager_grapher association option accepting 3 arguments', "Please switch to accepting a single options hash") if opts[:eager_grapher] && opts[:eager_grapher].arity == 3
 
           # dup early so we don't modify opts
           orig_opts = opts.dup
