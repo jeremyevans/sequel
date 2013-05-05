@@ -261,6 +261,11 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.meta_def(:db_schema){{:value=>{:type=>:integer}}}
     @m.should_not be_valid
     @m.errors.full_messages.should == ['value is not a valid integer']
+
+    @c.set_validations{validates_schema_types(:value, :message=>'is bad')}
+    @m.meta_def(:db_schema){{:value=>{:type=>:integer}}}
+    @m.should_not be_valid
+    @m.errors.full_messages.should == ['value is bad']
   end
 
   specify "should support validates_numeric" do
