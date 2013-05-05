@@ -4,6 +4,7 @@ require 'yaml'
 describe "Sequel::Plugins::LazyAttributes" do
   before do
     @db = Sequel.mock
+    def @db.supports_schema_parsing?() true end
     @db.meta_def(:schema){|*a| [[:id, {:type=>:integer}], [:name,{:type=>:string}]]}
     class ::LazyAttributesModel < Sequel::Model(@db[:la])
       plugin :lazy_attributes

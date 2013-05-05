@@ -88,4 +88,5 @@ Sequel.cache_anonymous_models = false
 db = Sequel.mock(:fetch=>{:id => 1, :x => 1}, :numrows=>1, :autoid=>proc{|sql| 10})
 def db.schema(*) [[:id, {:primary_key=>true}]] end
 def db.reset() sqls end
+def db.supports_schema_parsing?() true end
 Sequel::Model.db = MODEL_DB = db

@@ -2,7 +2,8 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "LooserTypecasting Extension" do
   before do
-    @db = Sequel::Database.new({})
+    @db = Sequel::Database.new
+    def @db.supports_schema_parsing?() true end
     def @db.schema(*args)
       [[:id, {}], [:z, {:type=>:float}], [:b, {:type=>:integer}], [:d, {:type=>:decimal}], [:s, {:type=>:string}]]
     end 

@@ -781,7 +781,7 @@ module Sequel
         schema_hash = {}
         ds_opts = dataset.opts
         get_columns = proc{check_non_connection_error{columns} || []}
-        schema_array = check_non_connection_error{db.schema(dataset, :reload=>reload)}
+        schema_array = check_non_connection_error{db.schema(dataset, :reload=>reload)} if db.supports_schema_parsing?
         if schema_array
           schema_array.each{|k,v| schema_hash[k] = v}
           if ds_opts.include?(:select)

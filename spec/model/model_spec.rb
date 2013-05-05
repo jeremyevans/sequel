@@ -520,6 +520,7 @@ end
 describe Sequel::Model, "attribute accessors" do
   before do
     db = Sequel.mock
+    def db.supports_schema_parsing?() true end
     def db.schema(*)
       [[:x, {:type=>:integer}], [:z, {:type=>:integer}]]
     end
@@ -637,9 +638,23 @@ describe "Model.db_schema" do
       def self.columns; orig_columns; end
     end
     @db = Sequel.mock
+    def @db.supports_schema_parsing?() true end
     @dataset = @db[:items]
   end
   
+  specify "should not call database's schema if it isn't supported" do
+    def @db.supports_schema_parsing?() false end
+    def @db.schema(table, opts = {})
+      raise Sequel::Error
+    end
+    @dataset.instance_variable_set(:@columns, [:x, :y])
+
+    @c.dataset = @dataset
+    @c.db_schema.should == {:x=>{}, :y=>{}}
+    @c.columns.should == [:x, :y]
+    @c.dataset.instance_variable_get(:@columns).should == [:x, :y]
+  end
+
   specify "should use the database's schema and set the columns and dataset columns" do
     def @db.schema(table, opts = {})
       [[:x, {:type=>:integer}], [:y, {:type=>:string}]]

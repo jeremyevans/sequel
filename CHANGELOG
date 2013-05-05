@@ -1,5 +1,7 @@
 === HEAD
 
+* Model classes will no longer call Database#schema if it isn't supported (jeremyevans)
+
 * Speed up Model.with_pk and with_pk! class methods (jeremyevans)
 
 * Speed up Dataset#clone when called without an argument (jeremyevans)

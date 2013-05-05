@@ -2,7 +2,8 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe Sequel::Model, "BooleanReaders plugin" do
   before do
-    @db = Sequel::Database.new({})
+    @db = Sequel::Database.new
+    def @db.supports_schema_parsing?() true end
     def @db.schema(*args)
       [[:id, {}], [:z, {:type=>:integer, :db_type=>'tinyint(1)'}], [:b, {:type=>:boolean, :db_type=>'boolean'}]]
     end

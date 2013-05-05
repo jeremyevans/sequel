@@ -3,6 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "class_table_inheritance plugin" do
   before do
     @db = Sequel.mock(:autoid=>proc{|sql| 1})
+    def @db.supports_schema_parsing?() true end
     def @db.schema(table, opts={})
       {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}], [:kind, {:type=>:string}]],
        :managers=>[[:id, {:type=>:integer}], [:num_staff, {:type=>:integer}]],

@@ -3,6 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe Sequel::Model, "TypecastOnLoad plugin" do
   before do
     @db = Sequel.mock(:fetch=>{:id=>1, :b=>"1", :y=>"0"}, :columns=>[:id, :b, :y], :numrows=>1)
+    def @db.supports_schema_parsing?() true end
     def @db.schema(*args)
       [[:id, {}], [:y, {:type=>:boolean, :db_type=>'tinyint(1)'}], [:b, {:type=>:integer, :db_type=>'integer'}]]
     end
