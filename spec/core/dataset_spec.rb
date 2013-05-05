@@ -2565,21 +2565,24 @@ describe "Dataset compound operations" do
     @b = Sequel.mock.dataset.from(:b).filter(:z => 2)
   end
   
+  qspecify "should support ALL with deprecated 2nd argument" do
+    @b.union(@a, true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) UNION ALL SELECT * FROM a WHERE (z = 1)) AS t1"
+    @b.intersect(@a, true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) INTERSECT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
+    @b.except(@a, true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
+  end
+
   specify "should support UNION and UNION ALL" do
     @a.union(@b).sql.should == "SELECT * FROM (SELECT * FROM a WHERE (z = 1) UNION SELECT * FROM b WHERE (z = 2)) AS t1"
-    @b.union(@a, true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) UNION ALL SELECT * FROM a WHERE (z = 1)) AS t1"
     @b.union(@a, :all=>true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) UNION ALL SELECT * FROM a WHERE (z = 1)) AS t1"
   end
 
   specify "should support INTERSECT and INTERSECT ALL" do
     @a.intersect(@b).sql.should == "SELECT * FROM (SELECT * FROM a WHERE (z = 1) INTERSECT SELECT * FROM b WHERE (z = 2)) AS t1"
-    @b.intersect(@a, true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) INTERSECT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
     @b.intersect(@a, :all=>true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) INTERSECT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
   end
 
   specify "should support EXCEPT and EXCEPT ALL" do
     @a.except(@b).sql.should == "SELECT * FROM (SELECT * FROM a WHERE (z = 1) EXCEPT SELECT * FROM b WHERE (z = 2)) AS t1"
-    @b.except(@a, true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
     @b.except(@a, :all=>true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
   end
     
@@ -2602,29 +2605,29 @@ describe "Dataset compound operations" do
   specify "should raise an InvalidOperation if INTERSECT or EXCEPT is used and they are not supported" do
     meta_def(@a, :supports_intersect_except?){false}
     proc{@a.intersect(@b)}.should raise_error(Sequel::InvalidOperation)
-    proc{@a.intersect(@b, true)}.should raise_error(Sequel::InvalidOperation)
+    proc{@a.intersect(@b,:all=> true)}.should raise_error(Sequel::InvalidOperation)
     proc{@a.except(@b)}.should raise_error(Sequel::InvalidOperation)
-    proc{@a.except(@b, true)}.should raise_error(Sequel::InvalidOperation)
+    proc{@a.except(@b, :all=>true)}.should raise_error(Sequel::InvalidOperation)
   end
     
   specify "should raise an InvalidOperation if INTERSECT ALL or EXCEPT ALL is used and they are not supported" do
     meta_def(@a, :supports_intersect_except_all?){false}
     proc{@a.intersect(@b)}.should_not raise_error
-    proc{@a.intersect(@b, true)}.should raise_error(Sequel::InvalidOperation)
+    proc{@a.intersect(@b, :all=>true)}.should raise_error(Sequel::InvalidOperation)
     proc{@a.except(@b)}.should_not raise_error
-    proc{@a.except(@b, true)}.should raise_error(Sequel::InvalidOperation)
+    proc{@a.except(@b, :all=>true)}.should raise_error(Sequel::InvalidOperation)
   end
     
   specify "should handle chained compound operations" do
-    @a.union(@b).union(@a, true).sql.should == "SELECT * FROM (SELECT * FROM (SELECT * FROM a WHERE (z = 1) UNION SELECT * FROM b WHERE (z = 2)) AS t1 UNION ALL SELECT * FROM a WHERE (z = 1)) AS t1"
-    @a.intersect(@b, true).intersect(@a).sql.should == "SELECT * FROM (SELECT * FROM (SELECT * FROM a WHERE (z = 1) INTERSECT ALL SELECT * FROM b WHERE (z = 2)) AS t1 INTERSECT SELECT * FROM a WHERE (z = 1)) AS t1"
-    @a.except(@b).except(@a, true).sql.should == "SELECT * FROM (SELECT * FROM (SELECT * FROM a WHERE (z = 1) EXCEPT SELECT * FROM b WHERE (z = 2)) AS t1 EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
+    @a.union(@b).union(@a, :all=>true).sql.should == "SELECT * FROM (SELECT * FROM (SELECT * FROM a WHERE (z = 1) UNION SELECT * FROM b WHERE (z = 2)) AS t1 UNION ALL SELECT * FROM a WHERE (z = 1)) AS t1"
+    @a.intersect(@b, :all=>true).intersect(@a).sql.should == "SELECT * FROM (SELECT * FROM (SELECT * FROM a WHERE (z = 1) INTERSECT ALL SELECT * FROM b WHERE (z = 2)) AS t1 INTERSECT SELECT * FROM a WHERE (z = 1)) AS t1"
+    @a.except(@b).except(@a, :all=>true).sql.should == "SELECT * FROM (SELECT * FROM (SELECT * FROM a WHERE (z = 1) EXCEPT SELECT * FROM b WHERE (z = 2)) AS t1 EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
   end
   
   specify "should use a subselect when using a compound operation with a dataset that already has a compound operation" do
-    @a.union(@b.union(@a, true)).sql.should == "SELECT * FROM (SELECT * FROM a WHERE (z = 1) UNION SELECT * FROM (SELECT * FROM b WHERE (z = 2) UNION ALL SELECT * FROM a WHERE (z = 1)) AS t1) AS t1"
-    @a.intersect(@b.intersect(@a), true).sql.should == "SELECT * FROM (SELECT * FROM a WHERE (z = 1) INTERSECT ALL SELECT * FROM (SELECT * FROM b WHERE (z = 2) INTERSECT SELECT * FROM a WHERE (z = 1)) AS t1) AS t1"
-    @a.except(@b.except(@a, true)).sql.should == "SELECT * FROM (SELECT * FROM a WHERE (z = 1) EXCEPT SELECT * FROM (SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1) AS t1"
+    @a.union(@b.union(@a, :all=>true)).sql.should == "SELECT * FROM (SELECT * FROM a WHERE (z = 1) UNION SELECT * FROM (SELECT * FROM b WHERE (z = 2) UNION ALL SELECT * FROM a WHERE (z = 1)) AS t1) AS t1"
+    @a.intersect(@b.intersect(@a), :all=>true).sql.should == "SELECT * FROM (SELECT * FROM a WHERE (z = 1) INTERSECT ALL SELECT * FROM (SELECT * FROM b WHERE (z = 2) INTERSECT SELECT * FROM a WHERE (z = 1)) AS t1) AS t1"
+    @a.except(@b.except(@a, :all=>true)).sql.should == "SELECT * FROM (SELECT * FROM a WHERE (z = 1) EXCEPT SELECT * FROM (SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1) AS t1"
   end
 
   specify "should order and limit properly when using UNION, INTERSECT, or EXCEPT" do
