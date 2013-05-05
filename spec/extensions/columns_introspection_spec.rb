@@ -8,8 +8,6 @@ describe "Sequel::Dataset.introspect_all_columns" do
       # Handle case where introspect_all_columns has already been called
       alias columns columns_without_introspection unless instance_methods(false).map{|x| x.to_s}.include?('columns')
     end
-    Sequel::Dataset.introspect_all_columns
-    @db.reset
   end
   after do
     class Sequel::Dataset
@@ -17,7 +15,9 @@ describe "Sequel::Dataset.introspect_all_columns" do
     end
   end
 
-  specify "should turn on column introspection by default" do
+  qspecify "should turn on column introspection by default" do
+    Sequel::Dataset.introspect_all_columns
+    @db.reset
     @ds.select(:x).columns.should == [:x]
     @db.sqls.length.should == 0
   end

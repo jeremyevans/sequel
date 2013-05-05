@@ -14,11 +14,6 @@
 # To attempt to introspect columns for all datasets on a single database:
 #
 #   DB.extension(:columns_introspection)
-#
-# To attempt to introspect columns for all datasets on all databases:
-#
-#   Sequel.extension :columns_introspection
-#   Sequel::Dataset.introspect_all_columns
 
 module Sequel
   module ColumnsIntrospection
@@ -87,6 +82,7 @@ module Sequel
 
     # Enable column introspection for every dataset.
     def self.introspect_all_columns
+      Sequel::Deprecation.deprecate('Sequel::Dataset.introspect_all_columns', "Please use Database.extension :columns_introspection to load the extension into all databases")
       include ColumnsIntrospection
       remove_method(:columns) if instance_methods(false).map{|x| x.to_s}.include?('columns')
     end
