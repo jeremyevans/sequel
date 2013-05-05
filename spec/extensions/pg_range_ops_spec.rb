@@ -27,7 +27,7 @@ describe "Sequel::Postgres::RangeOp" do
     @ds.literal(Sequel.pg_range(1..2, :numrange).op.lower).should == "lower('[1,2]'::numrange)"
   end
 
-  it "should define methods for all of the the PostgreSQL range operators" do
+  it "should define methods for all of the PostgreSQL range operators" do
     @ds.literal(@h.contains(@h)).should == "(h @> h)"
     @ds.literal(@h.contained_by(@h)).should == "(h <@ h)"
     @ds.literal(@h.overlaps(@h)).should == "(h && h)"
@@ -36,12 +36,14 @@ describe "Sequel::Postgres::RangeOp" do
     @ds.literal(@h.ends_before(@h)).should == "(h &< h)"
     @ds.literal(@h.starts_after(@h)).should == "(h &> h)"
     @ds.literal(@h.adjacent_to(@h)).should == "(h -|- h)"
+  end
 
+  qspecify "should define methods for the deprecated PostgreSQL range operators" do
     @ds.literal(@h.starts_before(@h)).should == "(h &< h)"
     @ds.literal(@h.ends_after(@h)).should == "(h &> h)"
   end
 
-  it "should define methods for all of the the PostgreSQL range functions" do
+  it "should define methods for all of the PostgreSQL range functions" do
     @ds.literal(@h.lower).should == "lower(h)"
     @ds.literal(@h.upper).should == "upper(h)"
     @ds.literal(@h.isempty).should == "isempty(h)"
