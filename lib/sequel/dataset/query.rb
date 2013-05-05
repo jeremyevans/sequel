@@ -125,7 +125,7 @@ module Sequel
     #   # SELECT * FROM (SELECT * FROM items EXCEPT SELECT * FROM other_items) AS i
     def except(dataset, opts={})
       unless opts.is_a?(Hash)
-        Sequel::Deprecation.deprecate('Passing a non-hash as the second argument to Dataset#except', "Please switch to an options hash with the :all option.")
+        Sequel::Deprecation.deprecate('Passing a non-hash as the second argument to Dataset#except', "Please switch to an options hash with the :all option")
         opts = {:all=>opts}
       end
       raise(InvalidOperation, "EXCEPT not supported") unless supports_intersect_except?
@@ -421,7 +421,7 @@ module Sequel
     #   # SELECT * FROM (SELECT * FROM items INTERSECT SELECT * FROM other_items) AS i
     def intersect(dataset, opts={})
       unless opts.is_a?(Hash)
-        Sequel::Deprecation.deprecate('Passing a non-hash as the second argument to Dataset#intersect', "Please switch to an options hash with the :all option.")
+        Sequel::Deprecation.deprecate('Passing a non-hash as the second argument to Dataset#intersect', "Please switch to an options hash with the :all option")
         opts = {:all=>opts}
       end
       raise(InvalidOperation, "INTERSECT not supported") unless supports_intersect_except?
@@ -526,7 +526,7 @@ module Sequel
         last_alias = options[:implicit_qualifier]
         qualify_type = options[:qualify]
       when Symbol, String, SQL::Identifier
-        Sequel::Deprecation.deprecate('Passing a non-hash as the options hash to Dataset#join_table', "Please switch to an options hash with the :table_alias option.")
+        Sequel::Deprecation.deprecate('Passing a non-hash as the options hash to Dataset#join_table', "Please switch to an options hash with the :table_alias option")
         table_alias = options
         last_alias = nil 
       else
@@ -950,7 +950,7 @@ module Sequel
     #   # SELECT * FROM (SELECT * FROM items UNION SELECT * FROM other_items) AS i
     def union(dataset, opts={})
       unless opts.is_a?(Hash)
-        Sequel::Deprecation.deprecate('Passing a non-hash as the second argument to Dataset#union', "Please switch to an options hash with the :all option.")
+        Sequel::Deprecation.deprecate('Passing a non-hash as the second argument to Dataset#union', "Please switch to an options hash with the :all option")
         opts = {:all=>opts}
       end
       compound_clone(:union, dataset, opts)
