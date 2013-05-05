@@ -181,11 +181,11 @@ end
 
 describe "Sequel::Plugins::ValidationClassMethods::ClassMethods::Generator" do
   before do
-    $testit = nil
+    @testit = testit = []
     
     @c = model_class.call Sequel::Model do
-      def self.validates_blah
-        $testit = 1324
+      (class << self; self end).send(:define_method, :validates_blah) do
+        testit << 1324
       end
     end
   end
@@ -194,7 +194,7 @@ describe "Sequel::Plugins::ValidationClassMethods::ClassMethods::Generator" do
     @c.validates do
       blah
     end
-    $testit.should == 1324
+    @testit.should == [1324]
   end
 end
 
