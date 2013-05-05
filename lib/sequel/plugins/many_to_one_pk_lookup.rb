@@ -39,7 +39,7 @@ module Sequel
         # If the current association is a simple many_to_one association, use
         # a simple primary key lookup on the associated model, which can benefit from
         # caching if the associated model is using caching.
-        def _load_associated_objects(opts, dynamic_opts={})
+        def _load_associated_objects(opts, dynamic_opts=OPTS)
           return super unless opts.can_have_associated_objects?(self) && opts[:type] == :many_to_one
           klass = opts.associated_class
           if !dynamic_opts[:callback] &&

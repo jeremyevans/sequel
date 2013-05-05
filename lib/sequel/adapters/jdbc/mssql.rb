@@ -22,7 +22,7 @@ module Sequel
         private
         
         # Get the last inserted id using SCOPE_IDENTITY().
-        def last_insert_id(conn, opts={})
+        def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
             sql = opts[:prepared] ? ATAT_IDENTITY : SCOPE_IDENTITY
             rs = log_yield(sql){stmt.executeQuery(sql)}
@@ -33,7 +33,7 @@ module Sequel
         
         # Call the generic JDBC version instead of MSSQL version,
         # since the JDBC version handles primary keys.
-        def schema_parse_table(table, opts={})
+        def schema_parse_table(table, opts=OPTS)
           jdbc_schema_parse_table(table, opts)
         end
         

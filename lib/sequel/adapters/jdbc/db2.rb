@@ -38,7 +38,7 @@ module Sequel
           end
         end
         
-        def last_insert_id(conn, opts={})
+        def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
             sql = IDENTITY_VAL_LOCAL
             rs = log_yield(sql){stmt.executeQuery(sql)}

@@ -65,7 +65,7 @@ module Sequel
         end
 
         # Use IDENTITY() to get the last inserted id.
-        def last_insert_id(conn, opts={})
+        def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
             sql = 'CALL IDENTITY()'
             rs = log_yield(sql){stmt.executeQuery(sql)}

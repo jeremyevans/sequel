@@ -69,7 +69,7 @@ module Sequel
     # as keys.
     module SingleTableInheritance
       # Setup the necessary STI variables, see the module RDoc for SingleTableInheritance
-      def self.configure(model, key, opts={})
+      def self.configure(model, key, opts=OPTS)
         model.instance_eval do
           @sti_key_array = nil
           @sti_key = key 

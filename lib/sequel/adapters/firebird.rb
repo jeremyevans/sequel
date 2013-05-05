@@ -29,7 +29,7 @@ module Sequel
         end
       end
 
-      def execute(sql, opts={})
+      def execute(sql, opts=OPTS)
         begin
           synchronize(opts[:server]) do |conn|
             if conn.transaction_started && !_trans(conn)
@@ -52,7 +52,7 @@ module Sequel
         @primary_keys = {}
       end
 
-      def begin_transaction(conn, opts={})
+      def begin_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_BEGIN) do
           begin
             conn.transaction
@@ -63,7 +63,7 @@ module Sequel
         end
       end
 
-      def commit_transaction(conn, opts={})
+      def commit_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
       
@@ -71,7 +71,7 @@ module Sequel
         [Fb::Error]
       end
 
-      def rollback_transaction(conn, opts={})
+      def rollback_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
     end

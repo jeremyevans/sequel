@@ -13,7 +13,7 @@ module Sequel
         private
         
         # TODO: implement
-        def last_insert_id(conn, opts={})
+        def last_insert_id(conn, opts=OPTS)
           nil
         end
       end

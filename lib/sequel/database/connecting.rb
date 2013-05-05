@@ -45,7 +45,7 @@ module Sequel
     end
     
     # Connects to a database.  See Sequel.connect.
-    def self.connect(conn_string, opts = {})
+    def self.connect(conn_string, opts = OPTS)
       case conn_string
       when String
         if match = /\A(jdbc|do):/o.match(conn_string)
@@ -161,7 +161,7 @@ module Sequel
     #   DB.disconnect # All servers
     #   DB.disconnect(:servers=>:server1) # Single server
     #   DB.disconnect(:servers=>[:server1, :server2]) # Multiple servers
-    def disconnect(opts = {})
+    def disconnect(opts = OPTS)
       pool.disconnect(opts)
     end
 

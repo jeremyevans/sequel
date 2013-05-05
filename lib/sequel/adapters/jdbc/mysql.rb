@@ -27,7 +27,7 @@ module Sequel
         end
 
         # Get the last inserted id using LAST_INSERT_ID().
-        def last_insert_id(conn, opts={})
+        def last_insert_id(conn, opts=OPTS)
           if stmt = opts[:stmt]
             rs = stmt.getGeneratedKeys
             begin

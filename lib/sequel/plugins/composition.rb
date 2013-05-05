@@ -90,7 +90,7 @@ module Sequel
         #     # for example y in the composition object represents year
         #     # in the model object.
         #     :mapping=>[[:year, :y], [:month, :m], [:day, :d]]
-        def composition(name, opts={})
+        def composition(name, opts=OPTS)
           opts = opts.dup
           compositions[name] = opts
           if mapping = opts[:mapping]
@@ -127,7 +127,7 @@ module Sequel
         Plugins.inherited_instance_variables(self, :@compositions=>:dup)
         
         # Define getter and setter methods for the composition object.
-        def define_composition_accessor(name, opts={})
+        def define_composition_accessor(name, opts=OPTS)
           include(@composition_module ||= Module.new) unless composition_module
           composer = opts[:composer]
           composition_module.class_eval do

@@ -44,7 +44,7 @@ module Sequel
       end
 
       # Use JDBC connection's setAutoCommit to false to start transactions
-      def begin_transaction(conn, opts={})
+      def begin_transaction(conn, opts=OPTS)
         if supports_savepoints?
           th = _trans(conn)
           if sps = th[:savepoints]
@@ -62,7 +62,7 @@ module Sequel
       end
       
       # Use JDBC connection's commit method to commit transactions
-      def commit_transaction(conn, opts={})
+      def commit_transaction(conn, opts=OPTS)
         if supports_savepoints?
           sps = _trans(conn)[:savepoints]
           if sps.empty?
@@ -92,7 +92,7 @@ module Sequel
       end
       
       # Use JDBC connection's rollback method to rollback transactions
-      def rollback_transaction(conn, opts={})
+      def rollback_transaction(conn, opts=OPTS)
         if supports_savepoints?
           sps = _trans(conn)[:savepoints]
           if sps.empty?

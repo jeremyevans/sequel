@@ -11,7 +11,7 @@ module Sequel
         LAST_INSERT_ID_SQL='SELECT SCOPE_IDENTITY()'.freeze
         
         # Return the last inserted identity value.
-        def execute_insert(sql, opts={})
+        def execute_insert(sql, opts=OPTS)
           synchronize(opts[:server]) do |conn|
             begin
               log_yield(sql){conn.do(sql)}

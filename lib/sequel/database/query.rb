@@ -39,21 +39,21 @@ module Sequel
     # Method that should be used when submitting any DDL (Data Definition
     # Language) SQL, such as +create_table+.  By default, calls +execute_dui+.
     # This method should not be called directly by user code.
-    def execute_ddl(sql, opts={}, &block)
+    def execute_ddl(sql, opts=OPTS, &block)
       execute_dui(sql, opts, &block)
     end
 
     # Method that should be used when issuing a DELETE, UPDATE, or INSERT
     # statement.  By default, calls execute.
     # This method should not be called directly by user code.
-    def execute_dui(sql, opts={}, &block)
+    def execute_dui(sql, opts=OPTS, &block)
       execute(sql, opts, &block)
     end
 
     # Method that should be used when issuing a INSERT
     # statement.  By default, calls execute_dui.
     # This method should not be called directly by user code.
-    def execute_insert(sql, opts={}, &block)
+    def execute_insert(sql, opts=OPTS, &block)
       execute_dui(sql, opts, &block)
     end
 
@@ -71,7 +71,7 @@ module Sequel
     # :server :: The server to run the SQL on.
     #
     #   DB.run("SET some_server_variable = 42")
-    def run(sql, opts={})
+    def run(sql, opts=OPTS)
       execute_ddl(sql, opts)
       nil
     end
@@ -116,7 +116,7 @@ module Sequel
     #   #    :ruby_default=>nil,
     #   #    :db_type=>"text",
     #   #    :allow_null=>false}]]
-    def schema(table, opts={})
+    def schema(table, opts=OPTS)
       raise(Error, 'schema parsing is not implemented on this database') unless supports_schema_parsing?
 
       opts = opts.dup

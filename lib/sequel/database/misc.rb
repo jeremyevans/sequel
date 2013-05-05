@@ -110,7 +110,7 @@ module Sequel
     # :sql_log_level :: Method to use to log SQL to a logger, :info by default.
     #
     # All options given are also passed to the connection pool.
-    def initialize(opts = {}, &block)
+    def initialize(opts = OPTS, &block)
       @opts ||= opts
       @opts = connection_pool_default_options.merge(@opts)
       @loggers = Array(@opts[:logger]) + Array(@opts[:loggers])
@@ -149,7 +149,7 @@ module Sequel
     # in progress transaction commits (and only if it commits).
     # Options:
     # :server :: The server/shard to use.
-    def after_commit(opts={}, &block)
+    def after_commit(opts=OPTS, &block)
       raise Error, "must provide block to after_commit" unless block
       synchronize(opts[:server]) do |conn|
         if h = _trans(conn)
@@ -166,7 +166,7 @@ module Sequel
     # in progress transaction rolls back (and only if it rolls back).
     # Options:
     # :server :: The server/shard to use.
-    def after_rollback(opts={}, &block)
+    def after_rollback(opts=OPTS, &block)
       raise Error, "must provide block to after_rollback" unless block
       synchronize(opts[:server]) do |conn|
         if h = _trans(conn)
@@ -211,7 +211,7 @@ module Sequel
     # Return true if already in a transaction given the options,
     # false otherwise.  Respects the :server option for selecting
     # a shard.
-    def in_transaction?(opts={})
+    def in_transaction?(opts=OPTS)
       synchronize(opts[:server]){|conn| !!_trans(conn)}
     end
 
@@ -397,7 +397,7 @@ module Sequel
     
     # Convert the given exception to an appropriate Sequel::DatabaseError
     # subclass, keeping message and traceback.
-    def raise_error(exception, opts={})
+    def raise_error(exception, opts=OPTS)
       if !opts[:classes] || Array(opts[:classes]).any?{|c| exception.is_a?(c)}
         raise Sequel.convert_exception_class(exception, database_error_class(exception, opts))
       else

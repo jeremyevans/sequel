@@ -32,7 +32,7 @@ module Sequel
       DEFAULT_CONSTRAINT_VALIDATIONS_TABLE = :sequel_constraint_validations
 
       # Automatically load the validation_helpers plugin to run the actual validations.
-      def self.apply(model, opts={})
+      def self.apply(model, opts=OPTS)
         model.instance_eval do
           plugin :validation_helpers
           @constraint_validations_table = DEFAULT_CONSTRAINT_VALIDATIONS_TABLE
@@ -49,7 +49,7 @@ module Sequel
       #                        given options.  Keys should be validation type symbols (e.g.
       #                        :presence) and values should be hashes of options specific
       #                        to that validation type.
-      def self.configure(model, opts={})
+      def self.configure(model, opts=OPTS)
         model.instance_eval do
           if table = opts[:constraint_validations_table]
             @constraint_validations_table = table

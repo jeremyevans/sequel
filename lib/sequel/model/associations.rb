@@ -955,7 +955,7 @@ module Sequel
         #                              object to get the foreign key values for the join table.
         #                              Defaults to :right_primary_key option.
         # :uniq :: Adds a after_load callback that makes the array of objects unique.
-        def associate(type, name, opts = {}, &block)
+        def associate(type, name, opts = OPTS, &block)
           if opts[:one_to_one] && type == :one_to_many
             Sequel::Deprecation.deprecate('Raising an Error when the one_to_many type uses the :one_to_one option', "Use the one_to_one associationtype")
             raise(Error, 'one_to_many association type with :one_to_one option removed, used one_to_one association type')
@@ -1017,7 +1017,7 @@ module Sequel
         end
 
         # Modify and return eager loading dataset based on association options.
-        def eager_loading_dataset(opts, ds, select, associations, eager_options={})
+        def eager_loading_dataset(opts, ds, select, associations, eager_options=OPTS)
           ds = apply_association_dataset_opts(opts, ds)
           ds = ds.select(*select) if select
           if opts[:eager_graph]
@@ -1037,22 +1037,22 @@ module Sequel
         end
 
         # Shortcut for adding a many_to_many association, see #associate
-        def many_to_many(name, opts={}, &block)
+        def many_to_many(name, opts=OPTS, &block)
           associate(:many_to_many, name, opts, &block)
         end
         
         # Shortcut for adding a many_to_one association, see #associate
-        def many_to_one(name, opts={}, &block)
+        def many_to_one(name, opts=OPTS, &block)
           associate(:many_to_one, name, opts, &block)
         end
         
         # Shortcut for adding a one_to_many association, see #associate
-        def one_to_many(name, opts={}, &block)
+        def one_to_many(name, opts=OPTS, &block)
           associate(:one_to_many, name, opts, &block)
         end
 
         # Shortcut for adding a one_to_one association, see #associate.
-        def one_to_one(name, opts={}, &block)
+        def one_to_one(name, opts=OPTS, &block)
           associate(:one_to_one, name, opts, &block)
         end
 
@@ -1131,19 +1131,19 @@ module Sequel
 
         # The module to use for the association's methods.  Defaults to
         # the overridable_methods_module.
-        def association_module(opts={})
+        def association_module(opts=OPTS)
           opts.fetch(:methods_module, overridable_methods_module)
         end
 
         # Add a method to the module included in the class, so the method
         # can be easily overridden in the class itself while allowing for
         # super to be called.
-        def association_module_def(name, opts={}, &block)
+        def association_module_def(name, opts=OPTS, &block)
           association_module(opts).module_eval{define_method(name, &block)}
         end
       
         # Add a private method to the module included in the class.
-        def association_module_private_def(name, opts={}, &block)
+        def association_module_private_def(name, opts=OPTS, &block)
           association_module_def(name, opts, &block)
           association_module(opts).send(:private, name)
         end
@@ -1559,7 +1559,7 @@ module Sequel
 
         # Return the associated objects from the dataset, without association callbacks, reciprocals, and caching.
         # Still apply the dynamic callback if present.
-        def _load_associated_objects(opts, dynamic_opts={})
+        def _load_associated_objects(opts, dynamic_opts=OPTS)
           if opts.can_have_associated_objects?(self)
             if opts.returns_array?
               _load_associated_object_array(opts, dynamic_opts)

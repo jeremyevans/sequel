@@ -45,12 +45,12 @@ module Sequel
       end
 
       # Just execute so it doesn't attempt to return the number of rows modified.
-      def execute_ddl(sql, opts={})
+      def execute_ddl(sql, opts=OPTS)
         execute(sql, opts)
       end
 
       # Just execute so it doesn't attempt to return the number of rows modified.
-      def execute_insert(sql, opts={})
+      def execute_insert(sql, opts=OPTS)
         execute(sql, opts)
       end
       
@@ -58,7 +58,7 @@ module Sequel
       # unless is a provider is in use (since some providers don't seem to
       # return the number of affected rows, but the default provider appears
       # to).
-      def execute_dui(sql, opts={})
+      def execute_dui(sql, opts=OPTS)
         return super if opts[:provider]
         synchronize(opts[:server]) do |conn|
           begin
@@ -70,7 +70,7 @@ module Sequel
         end
       end
 
-      def execute(sql, opts={})
+      def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
             r = log_yield(sql){conn.Execute(sql)}
@@ -106,11 +106,11 @@ module Sequel
       # The ADO adapter's default provider doesn't support transactions, since it 
       # creates a new native connection for each query.  So Sequel only attempts
       # to use transactions if an explicit :provider is given.
-      def begin_transaction(conn, opts={})
+      def begin_transaction(conn, opts=OPTS)
         super if @opts[:provider]
       end
 
-      def commit_transaction(conn, opts={})
+      def commit_transaction(conn, opts=OPTS)
         super if @opts[:provider]
       end
 
@@ -122,7 +122,7 @@ module Sequel
         super || (e.is_a?(::WIN32OLERuntimeError) && e.message =~ DISCONNECT_ERROR_RE)
       end
 
-      def rollback_transaction(conn, opts={})
+      def rollback_transaction(conn, opts=OPTS)
         super if @opts[:provider]
       end
     end

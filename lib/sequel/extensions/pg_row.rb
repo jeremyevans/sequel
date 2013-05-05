@@ -290,7 +290,7 @@ module Sequel
 
         # Sets each of the parser's attributes, using options with
         # the same name (e.g. :columns sets the columns attribute).
-        def initialize(h={})
+        def initialize(h=OPTS)
           @columns = h[:columns]
           @column_converters = h[:column_converters]
           @column_oids = h[:column_oids]
@@ -417,7 +417,7 @@ module Sequel
         #
         # :converter :: Use a custom converter for the parser.
         # :typecaster :: Use a custom typecaster for the parser.
-        def register_row_type(db_type, opts={})
+        def register_row_type(db_type, opts=OPTS)
           procs = @conversion_procs
           rel_oid = nil
           array_oid = nil

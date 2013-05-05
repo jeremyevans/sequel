@@ -179,7 +179,7 @@ module Sequel
 
       # Execute the given stored procedure with the give name. If a block is
       # given, the stored procedure should return rows.
-      def call_sproc(name, opts = {})
+      def call_sproc(name, opts = OPTS)
         args = opts[:args] || []
         sql = "{call #{name}(#{args.map{'?'}.join(',')})}"
         synchronize(opts[:server]) do |conn|
@@ -252,7 +252,7 @@ module Sequel
       
       # Execute the given SQL.  If a block is given, if should be a SELECT
       # statement or something else that returns rows.
-      def execute(sql, opts={}, &block)
+      def execute(sql, opts=OPTS, &block)
         return call_sproc(sql, opts, &block) if opts[:sproc]
         return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
         synchronize(opts[:server]) do |conn|
@@ -277,18 +277,18 @@ module Sequel
 
       # Execute the given DDL SQL, which should not return any
       # values or rows.
-      def execute_ddl(sql, opts={})
+      def execute_ddl(sql, opts=OPTS)
         execute(sql, {:type=>:ddl}.merge(opts))
       end
       
       # Execute the given INSERT SQL, returning the last inserted
       # row id.
-      def execute_insert(sql, opts={})
+      def execute_insert(sql, opts=OPTS)
         execute(sql, {:type=>:insert}.merge(opts))
       end
       
       # Use the JDBC metadata to get the index information for the table.
-      def indexes(table, opts={})
+      def indexes(table, opts=OPTS)
         m = output_identifier_meth
         im = input_identifier_meth
         schema, table = schema_and_table(table)
@@ -311,7 +311,7 @@ module Sequel
       end
       
       # All tables in this database
-      def tables(opts={})
+      def tables(opts=OPTS)
         get_tables('TABLE', opts)
       end
       
@@ -319,14 +319,14 @@ module Sequel
       # using the :uri, :url, or :database options.  You don't
       # need to worry about this if you use Sequel.connect
       # with the JDBC connectrion strings.
-      def uri(opts={})
+      def uri(opts=OPTS)
         opts = @opts.merge(opts)
         ur = opts[:uri] || opts[:url] || opts[:database]
         ur =~ /^\Ajdbc:/ ? ur : "jdbc:#{ur}"
       end
 
       # All views in this database
-      def views(opts={})
+      def views(opts=OPTS)
         get_tables('VIEW', opts)
       end
 
@@ -387,7 +387,7 @@ module Sequel
       # statement, use that statement instead of creating another.
       # Otherwise, prepare a new statement for the connection, bind the
       # variables, and execute it.
-      def execute_prepared_statement(name, opts={})
+      def execute_prepared_statement(name, opts=OPTS)
         args = opts[:arguments]
         if name.is_a?(Dataset)
           ps = name
@@ -561,7 +561,7 @@ module Sequel
       end
       
       # Parse the table schema for the given table.
-      def schema_parse_table(table, opts={})
+      def schema_parse_table(table, opts=OPTS)
         m = output_identifier_meth(opts[:dataset])
         im = input_identifier_meth(opts[:dataset])
         ds = dataset
@@ -623,17 +623,17 @@ module Sequel
         
         # Execute the prepared SQL using the stored type and
         # arguments derived from the hash passed to call.
-        def execute(sql, opts={}, &block)
+        def execute(sql, opts=OPTS, &block)
           super(self, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_dui(sql, opts={}, &block)
+        def execute_dui(sql, opts=OPTS, &block)
           super(self, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_insert(sql, opts={}, &block)
+        def execute_insert(sql, opts=OPTS, &block)
           super(self, {:arguments=>bind_arguments, :type=>:insert}.merge(opts), &block)
         end
       end
@@ -646,17 +646,17 @@ module Sequel
         private
         
         # Execute the database stored procedure with the stored arguments.
-        def execute(sql, opts={}, &block)
+        def execute(sql, opts=OPTS, &block)
           super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_dui(sql, opts={}, &block)
+        def execute_dui(sql, opts=OPTS, &block)
           super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_insert(sql, opts={}, &block)
+        def execute_insert(sql, opts=OPTS, &block)
           super(@sproc_name, {:args=>@sproc_args, :sproc=>true, :type=>:insert}.merge(opts), &block)
         end
       end

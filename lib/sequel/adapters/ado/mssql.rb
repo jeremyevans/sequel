@@ -15,7 +15,7 @@ module Sequel
         # Issue a separate query to get the rows modified.  ADO appears to
         # use pass by reference with an integer variable, which is obviously
         # not supported directly in ruby, and I'm not aware of a workaround.
-        def execute_dui(sql, opts={})
+        def execute_dui(sql, opts=OPTS)
           return super unless @opts[:provider]
           synchronize(opts[:server]) do |conn|
             begin
@@ -33,15 +33,15 @@ module Sequel
         # The ADO adapter's default provider doesn't support transactions, since it 
         # creates a new native connection for each query.  So Sequel only attempts
         # to use transactions if an explicit :provider is given.
-        def begin_transaction(conn, opts={})
+        def begin_transaction(conn, opts=OPTS)
           super if @opts[:provider]
         end
 
-        def commit_transaction(conn, opts={})
+        def commit_transaction(conn, opts=OPTS)
           super if @opts[:provider]
         end
 
-        def rollback_transaction(conn, opts={})
+        def rollback_transaction(conn, opts=OPTS)
           super if @opts[:provider]
         end
       end

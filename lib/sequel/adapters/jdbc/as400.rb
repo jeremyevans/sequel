@@ -20,7 +20,7 @@ module Sequel
         end
 
         # TODO: Fix for AS400
-        def last_insert_id(conn, opts={})
+        def last_insert_id(conn, opts=OPTS)
           nil
         end
 
@@ -32,7 +32,7 @@ module Sequel
         private
 
         # Use JDBC connection's setAutoCommit to false to start transactions
-        def begin_transaction(conn, opts={})
+        def begin_transaction(conn, opts=OPTS)
           set_transaction_isolation(conn, opts)
           super
         end

@@ -115,7 +115,7 @@ module Sequel
     #
     #   DB[:items].except(DB[:other_items], :alias=>:i)
     #   # SELECT * FROM (SELECT * FROM items EXCEPT SELECT * FROM other_items) AS i
-    def except(dataset, opts={})
+    def except(dataset, opts=OPTS)
       raise(InvalidOperation, "EXCEPT not supported") unless supports_intersect_except?
       raise(InvalidOperation, "EXCEPT ALL not supported") if opts[:all] && !supports_intersect_except_all?
       compound_clone(:except, dataset, opts)
@@ -211,7 +211,7 @@ module Sequel
     #
     #   ds.from_self(:alias=>:foo)
     #   # SELECT * FROM (SELECT id, name FROM items ORDER BY name) AS foo
-    def from_self(opts={})
+    def from_self(opts=OPTS)
       fs = {}
       @opts.keys.each{|k| fs[k] = nil unless NON_SQL_OPTIONS.include?(k)}
       clone(fs).from(opts[:alias] ? as(opts[:alias]) : self)
@@ -248,7 +248,7 @@ module Sequel
     #
     #   dataset.grep([:a, :b], %w'%foo% %bar%', :all_patterns=>true, :all_columns=>true)
     #   # SELECT * FROM a WHERE ((a LIKE '%foo%') AND (b LIKE '%foo%') AND (a LIKE '%bar%') AND (b LIKE '%bar%'))
-    def grep(columns, patterns, opts={})
+    def grep(columns, patterns, opts=OPTS)
       if opts[:all_patterns]
         conds = Array(patterns).map do |pat|
           SQL::BooleanExpression.new(opts[:all_columns] ? :AND : :OR, *Array(columns).map{|c| SQL::StringExpression.like(c, pat, opts)})
@@ -341,7 +341,7 @@ module Sequel
     #
     #   DB[:items].intersect(DB[:other_items], :alias=>:i)
     #   # SELECT * FROM (SELECT * FROM items INTERSECT SELECT * FROM other_items) AS i
-    def intersect(dataset, opts={})
+    def intersect(dataset, opts=OPTS)
       raise(InvalidOperation, "INTERSECT not supported") unless supports_intersect_except?
       raise(InvalidOperation, "INTERSECT ALL not supported") if opts[:all] && !supports_intersect_except_all?
       compound_clone(:intersect, dataset, opts)
@@ -426,7 +426,7 @@ module Sequel
     #   end
     #   # SELECT * FROM a NATURAL JOIN b INNER JOIN c
     #   #   ON ((c.d > b.e) AND (c.f IN (SELECT g FROM b)))
-    def join_table(type, table, expr=nil, options={}, &block)
+    def join_table(type, table, expr=nil, options=OPTS, &block)
       if hoist_cte?(table)
         s, ds = hoist_cte(table)
         return s.join_table(type, ds, expr, options, &block)
@@ -792,7 +792,7 @@ module Sequel
     #
     #   DB[:items].union(DB[:other_items], :alias=>:i)
     #   # SELECT * FROM (SELECT * FROM items UNION SELECT * FROM other_items) AS i
-    def union(dataset, opts={})
+    def union(dataset, opts=OPTS)
       compound_clone(:union, dataset, opts)
     end
     
@@ -872,7 +872,7 @@ module Sequel
     #
     #   DB[:items].with(:items, DB[:syx].filter(:name.like('A%')))
     #   # WITH items AS (SELECT * FROM syx WHERE (name LIKE 'A%')) SELECT * FROM items
-    def with(name, dataset, opts={})
+    def with(name, dataset, opts=OPTS)
       raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
       if hoist_cte?(dataset)
         s, ds = hoist_cte(dataset)
@@ -898,7 +898,7 @@ module Sequel
     #   #   UNION ALL
     #   #   SELECT "i1"."id", "i1"."parent_id" FROM "i1" INNER JOIN "t" ON ("t"."id" = "i1"."parent_id")
     #   # ) SELECT * FROM "t"
-    def with_recursive(name, nonrecursive, recursive, opts={})
+    def with_recursive(name, nonrecursive, recursive, opts=OPTS)
       raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
       if hoist_cte?(nonrecursive)
         s, ds = hoist_cte(nonrecursive)

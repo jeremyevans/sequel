@@ -61,17 +61,17 @@ module Sequel
         nil
       end
 
-      def execute(sql, opts={}, &block)
+      def execute(sql, opts=OPTS, &block)
         _execute(nil, sql, opts, &block)
       end
 
-      def execute_insert(sql, opts={})
+      def execute_insert(sql, opts=OPTS)
         _execute(:insert, sql, opts)
       end
 
       private
 
-      def _execute(type, sql, opts={}, &block)
+      def _execute(type, sql, opts=OPTS, &block)
         synchronize(opts[:server]) do |conn|
           begin
             return execute_prepared_statement(conn, type, sql, opts, &block) if sql.is_a?(Symbol)
@@ -210,12 +210,12 @@ module Sequel
         end
       end
 
-      def begin_transaction(conn, opts={})
+      def begin_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
         set_transaction_isolation(conn, opts)
       end
       
-      def commit_transaction(conn, opts={})
+      def commit_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
 
@@ -247,11 +247,11 @@ module Sequel
         super
       end
       
-      def rollback_transaction(conn, opts={})
+      def rollback_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
 
-      def schema_parse_table(table, opts={})
+      def schema_parse_table(table, opts=OPTS)
         schema, table = schema_and_table(table)
         schema ||= opts[:schema]
         schema_and_table = if ds = opts[:dataset]
@@ -355,17 +355,17 @@ module Sequel
         
         # Run execute_select on the database with the given SQL and the stored
         # bind arguments.
-        def execute(sql, opts={}, &block)
+        def execute(sql, opts=OPTS, &block)
           super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_dui(sql, opts={}, &block)
+        def execute_dui(sql, opts=OPTS, &block)
           super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_insert(sql, opts={}, &block)
+        def execute_insert(sql, opts=OPTS, &block)
           super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
       end
@@ -377,17 +377,17 @@ module Sequel
           
         # Execute the stored prepared statement name and the stored bind
         # arguments instead of the SQL given.
-        def execute(sql, opts={}, &block)
+        def execute(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
          
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_dui(sql, opts={}, &block)
+        def execute_dui(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
           
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_insert(sql, opts={}, &block)
+        def execute_insert(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
       end

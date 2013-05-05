@@ -164,7 +164,7 @@ module Sequel
       #                             to DatabaseMethods.
       #
       # If a block is given, it is treated as the :converter option.
-      def self.register(db_type, opts={}, &block)
+      def self.register(db_type, opts=OPTS, &block)
         db_type = db_type.to_s
         typecast_method = opts[:typecast_method]
         type = (typecast_method || opts[:type_symbol] || db_type).to_sym
@@ -248,7 +248,7 @@ module Sequel
         # different array types per Database.  Use of this method does not
         # affect global state, unlike PGArray.register.  See PGArray.register for
         # possible options.
-        def register_array_type(db_type, opts={}, &block)
+        def register_array_type(db_type, opts=OPTS, &block)
           opts = {:type_procs=>conversion_procs, :typecast_method_map=>@pg_array_schema_types, :typecast_methods_module=>(class << self; self; end)}.merge(opts)
           unless (opts.has_key?(:scalar_oid) || block) && opts.has_key?(:oid)
             array_oid, scalar_oid = from(:pg_type).where(:typname=>db_type.to_s).get([:typarray, :oid])

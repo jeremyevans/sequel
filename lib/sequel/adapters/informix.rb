@@ -14,11 +14,11 @@ module Sequel
       end
     
       # Returns number of rows affected
-      def execute_dui(sql, opts={})
+      def execute_dui(sql, opts=OPTS)
         synchronize(opts[:server]){|c| log_yield(sql){c.immediate(sql)}}
       end
       
-      def execute(sql, opts={})
+      def execute(sql, opts=OPTS)
         synchronize(opts[:server]){|c| yield log_yield(sql){c.cursor(sql)}}
       end
     end

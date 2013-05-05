@@ -33,7 +33,7 @@ module Sequel
         c.disconnect
       end
 
-      def execute(sql, opts={})
+      def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
             r = log_yield(sql){conn.run(sql)}
@@ -47,7 +47,7 @@ module Sequel
         end
       end
       
-      def execute_dui(sql, opts={})
+      def execute_dui(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
             log_yield(sql){conn.do(sql)}

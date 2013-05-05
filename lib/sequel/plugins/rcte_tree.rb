@@ -92,7 +92,7 @@ module Sequel
     module RcteTree
       # Create the appropriate parent, children, ancestors, and descendants
       # associations for the model.
-      def self.apply(model, opts={})
+      def self.apply(model, opts=OPTS)
         model.plugin :tree, opts
 
         opts = opts.dup

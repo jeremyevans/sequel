@@ -18,14 +18,14 @@ module Sequel
         MYSQL_DATABASE_DISCONNECT_ERRORS = /\A#{Regexp.union(disconnect_errors)}/o
        
         # Support stored procedures on MySQL
-        def call_sproc(name, opts={}, &block)
+        def call_sproc(name, opts=OPTS, &block)
           args = opts[:args] || [] 
           execute("CALL #{name}#{args.empty? ? '()' : literal(args)}", opts.merge(:sproc=>false), &block)
         end
         
         # Executes the given SQL using an available connection, yielding the
         # connection if the block is given.
-        def execute(sql, opts={}, &block)
+        def execute(sql, opts=OPTS, &block)
           if opts[:sproc]
             call_sproc(sql, opts, &block)
           elsif sql.is_a?(Symbol)
@@ -114,17 +114,17 @@ module Sequel
           
           # Execute the prepared statement with the bind arguments instead of
           # the given SQL.
-          def execute(sql, opts={}, &block)
+          def execute(sql, opts=OPTS, &block)
             super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
           end
           
           # Same as execute, explicit due to intricacies of alias and super.
-          def execute_dui(sql, opts={}, &block)
+          def execute_dui(sql, opts=OPTS, &block)
             super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
           end
           
           # Same as execute, explicit due to intricacies of alias and super.
-          def execute_insert(sql, opts={}, &block)
+          def execute_insert(sql, opts=OPTS, &block)
             super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
           end
         end
@@ -136,12 +136,12 @@ module Sequel
           private
           
           # Execute the database stored procedure with the stored arguments.
-          def execute(sql, opts={}, &block)
+          def execute(sql, opts=OPTS, &block)
             super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
           end
           
           # Same as execute, explicit due to intricacies of alias and super.
-          def execute_dui(sql, opts={}, &block)
+          def execute_dui(sql, opts=OPTS, &block)
             super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
           end
         end

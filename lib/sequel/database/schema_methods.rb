@@ -46,7 +46,7 @@ module Sequel
     # :ignore_errors :: Ignore any DatabaseErrors that are raised
     #
     # See <tt>alter_table</tt>.
-    def add_index(table, columns, options={})
+    def add_index(table, columns, options=OPTS)
       e = options[:ignore_errors]
       begin
         alter_table(table){add_index(columns, options)}
@@ -117,7 +117,7 @@ module Sequel
     # :name :: The name of the table to create
     # :no_index :: Set to true not to create the second index.
     # :no_primary_key :: Set to true to not create the primary key.
-    def create_join_table(hash, options={})
+    def create_join_table(hash, options=OPTS)
       keys = hash.keys.sort_by{|k| k.to_s}
       create_table(join_table_name(hash, options), options) do
         keys.each do |key|
@@ -158,7 +158,7 @@ module Sequel
     # :unlogged :: Create the table as an unlogged table.
     #
     # See <tt>Schema::Generator</tt> and the {"Schema Modification" guide}[link:files/doc/schema_modification_rdoc.html].
-    def create_table(name, options={}, &block)
+    def create_table(name, options=OPTS, &block)
       remove_cached_schema(name)
       options = {:generator=>options} if options.is_a?(Schema::CreateTableGenerator)
       if sql = options[:as]
@@ -178,7 +178,7 @@ module Sequel
     #   # SELECT NULL FROM a LIMIT 1 -- check existence
     #   # DROP TABLE a -- drop table if already exists
     #   # CREATE TABLE a (a integer)
-    def create_table!(name, options={}, &block)
+    def create_table!(name, options=OPTS, &block)
       drop_table?(name)
       create_table(name, options, &block)
     end
@@ -188,7 +188,7 @@ module Sequel
     #   DB.create_table?(:a){Integer :a} 
     #   # SELECT NULL FROM a LIMIT 1 -- check existence
     #   # CREATE TABLE a (a integer) -- if it doesn't already exist
-    def create_table?(name, options={}, &block)
+    def create_table?(name, options=OPTS, &block)
       if supports_create_table_if_not_exists?
         create_table(name, options.merge(:if_not_exists=>true), &block)
       elsif !table_exists?(name)
@@ -209,7 +209,7 @@ module Sequel
     #
     # For databases where replacing a view is not natively supported, support
     # is emulated by dropping a view with the same name before creating the view.
-    def create_or_replace_view(name, source, options = {})
+    def create_or_replace_view(name, source, options = OPTS)
       if supports_create_or_replace_view?
         options = options.merge(:replace=>true)
       else
@@ -226,7 +226,7 @@ module Sequel
     #
     # PostgreSQL/SQLite specific option:
     # :temp :: Create a temporary view, automatically dropped on disconnect.
-    def create_view(name, source, options = {})
+    def create_view(name, source, options = OPTS)
       execute_ddl(create_view_sql(name, source, options))
       remove_cached_schema(name)
       nil
@@ -247,7 +247,7 @@ module Sequel
     #   DB.drop_index :posts, [:author, :title]
     #
     # See <tt>alter_table</tt>.
-    def drop_index(table, columns, options={})
+    def drop_index(table, columns, options=OPTS)
       alter_table(table){drop_index(columns, options)}
     end
 
@@ -256,7 +256,7 @@ module Sequel
     #
     #   drop_join_table(:cat_id=>:cats, :dog_id=>:dogs)
     #   # DROP TABLE cats_dogs
-    def drop_join_table(hash, options={})
+    def drop_join_table(hash, options=OPTS)
       drop_table(join_table_name(hash, options), options)
     end
     

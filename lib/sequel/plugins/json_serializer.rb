@@ -142,7 +142,7 @@ module Sequel
 
         # Attempt to parse a single instance from the given JSON string,
         # with options passed to InstanceMethods#from_json_node.
-        def from_json(json, opts={})
+        def from_json(json, opts=OPTS)
           if opts[:all_associations] || opts[:all_columns]
             Sequel::Deprecation.deprecate("The from_json :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
           end
@@ -159,7 +159,7 @@ module Sequel
 
         # Attempt to parse an array of instances from the given JSON string,
         # with options passed to InstanceMethods#from_json_node.
-        def array_from_json(json, opts={})
+        def array_from_json(json, opts=OPTS)
           if opts[:all_associations] || opts[:all_columns]
             Sequel::Deprecation.deprecate("The from_json :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
           end
@@ -194,7 +194,7 @@ module Sequel
       module InstanceMethods
         # Parse the provided JSON, which should return a hash,
         # and process the hash with from_json_node.
-        def from_json(json, opts={})
+        def from_json(json, opts=OPTS)
           if opts[:all_associations] || opts[:all_columns]
             Sequel::Deprecation.deprecate("The from_json :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
           end
@@ -220,7 +220,7 @@ module Sequel
         #                  for a single association, an array of symbols for multiple associations,
         #                  or a hash with symbol keys and dependent association option hash values.
         # :fields :: Changes the behavior to call set_fields using the provided fields, instead of calling set.
-        def from_json_node(hash, opts={})
+        def from_json_node(hash, opts=OPTS)
           unless hash.is_a?(Hash)
             raise Error, "parsed json doesn't return a hash"
           end

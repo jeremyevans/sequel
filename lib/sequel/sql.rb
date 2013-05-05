@@ -322,7 +322,7 @@ module Sequel
       #
       #   Sequel.asc(:a) # a ASC
       #   Sequel.asc(:b, :nulls=>:last) # b ASC NULLS LAST
-      def asc(arg, opts={})
+      def asc(arg, opts=OPTS)
         SQL::OrderedExpression.new(arg, false, opts)
       end
 
@@ -413,7 +413,7 @@ module Sequel
       #
       #   Sequel.desc(:a) # b DESC
       #   Sequel.desc(:b, :nulls=>:first) # b DESC NULLS FIRST
-      def desc(arg, opts={})
+      def desc(arg, opts=OPTS)
         SQL::OrderedExpression.new(arg, true, opts)
       end
 
@@ -815,7 +815,7 @@ module Sequel
       # :nulls :: Set to :first to use NULLS FIRST (so NULL values are ordered
       #           before other values), or :last to use NULLS LAST (so NULL values
       #           are ordered after other values).
-      def asc(opts={})
+      def asc(opts=OPTS)
         OrderedExpression.new(self, false, opts)
       end
       
@@ -825,7 +825,7 @@ module Sequel
       # :nulls :: Set to :first to use NULLS FIRST (so NULL values are ordered
       #           before other values), or :last to use NULLS LAST (so NULL values
       #           are ordered after other values).
-      def desc(opts={})
+      def desc(opts=OPTS)
         OrderedExpression.new(self, true, opts)
       end
     end
@@ -1348,7 +1348,7 @@ module Sequel
       # Options:
       #
       # :nulls :: Can be :first/:last for NULLS FIRST/LAST.
-      def initialize(expression, descending = true, opts={})
+      def initialize(expression, descending = true, opts=OPTS)
         @expression, @descending, @nulls = expression, descending, opts[:nulls]
       end
 
@@ -1638,7 +1638,7 @@ module Sequel
       attr_reader :opts
 
       # Set the options to the options given
-      def initialize(opts={})
+      def initialize(opts=OPTS)
         @opts = opts
       end
 

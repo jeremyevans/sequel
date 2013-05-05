@@ -30,7 +30,7 @@ module Sequel
       # The default column to update when touching
       TOUCH_COLUMN_DEFAULT = :updated_at
 
-      def self.apply(model, opts={})
+      def self.apply(model, opts=OPTS)
         model.instance_variable_set(:@touched_associations, {})
       end
 
@@ -43,7 +43,7 @@ module Sequel
       #   when updating the associated objects is the model's touch_column.
       #   If a hash is used, the value is used as the column to update.
       # * :column - The column to modify when touching a model instance.
-      def self.configure(model, opts={})
+      def self.configure(model, opts=OPTS)
         model.touch_column = opts[:column] || TOUCH_COLUMN_DEFAULT if opts[:column] || !model.touch_column
         model.touch_associations(opts[:associations]) if opts[:associations]
       end

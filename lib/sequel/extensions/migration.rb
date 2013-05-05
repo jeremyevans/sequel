@@ -369,7 +369,7 @@ module Sequel
 
     # Return whether the migrator is current (i.e. it does not need to make
     # any changes).  Takes the same arguments as #run.
-    def self.is_current?(db, directory, opts={})
+    def self.is_current?(db, directory, opts=OPTS)
       migrator_class(directory).new(db, directory, opts).is_current?
     end
 
@@ -386,7 +386,7 @@ module Sequel
     #   Sequel::Migrator.run(DB, "migrations", :target=>15, :current=>10)
     #   Sequel::Migrator.run(DB, "app1/migrations", :column=> :app2_version)
     #   Sequel::Migrator.run(DB, "app2/migrations", :column => :app2_version, :table=>:schema_info2)
-    def self.run(db, directory, opts={})
+    def self.run(db, directory, opts=OPTS)
       migrator_class(directory).new(db, directory, opts).run
     end
 
@@ -432,7 +432,7 @@ module Sequel
     attr_reader :target
 
     # Setup the state for the migrator
-    def initialize(db, directory, opts={})
+    def initialize(db, directory, opts=OPTS)
       raise(Error, "Must supply a valid migration path") unless File.directory?(directory)
       @db = db
       @directory = directory
@@ -502,7 +502,7 @@ module Sequel
     attr_reader :migrations
 
     # Set up all state for the migrator instance
-    def initialize(db, directory, opts={})
+    def initialize(db, directory, opts=OPTS)
       super
       @target = opts[:target] || latest_migration_version
       @current = opts[:current] || current_migration_version
@@ -628,7 +628,7 @@ module Sequel
     attr_reader :migration_tuples
 
     # Set up all state for the migrator instance
-    def initialize(db, directory, opts={})
+    def initialize(db, directory, opts=OPTS)
       super
       @target = opts[:target]
       @applied_migrations = get_applied_migrations

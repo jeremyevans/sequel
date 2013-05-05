@@ -72,6 +72,8 @@ module Sequel
   # You can set the +SEQUEL_NO_ASSOCIATIONS+ constant or environment variable to
   # make Sequel not load the associations plugin by default.
   class Model
+    OPTS = Sequel::OPTS
+
     # Map that stores model classes created with <tt>Sequel::Model()</tt>, to allow the reopening
     # of classes when dealing with code reloading.
     ANONYMOUS_MODEL_CLASSES = {}

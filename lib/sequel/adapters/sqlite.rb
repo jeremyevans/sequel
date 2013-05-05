@@ -118,19 +118,19 @@ module Sequel
       end
       
       # Run the given SQL with the given arguments and yield each row.
-      def execute(sql, opts={}, &block)
+      def execute(sql, opts=OPTS, &block)
         _execute(:select, sql, opts, &block)
       end
 
       # Run the given SQL with the given arguments and return the number of changed rows.
-      def execute_dui(sql, opts={})
+      def execute_dui(sql, opts=OPTS)
         _execute(:update, sql, opts)
       end
       
       # Drop any prepared statements on the connection when executing DDL.  This is because
       # prepared statements lock the table in such a way that you can't drop or alter the
       # table while a prepared statement that references it still exists.
-      def execute_ddl(sql, opts={})
+      def execute_ddl(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           conn.prepared_statements.values.each{|cps, s| cps.close}
           conn.prepared_statements.clear
@@ -139,7 +139,7 @@ module Sequel
       end
       
       # Run the given SQL with the given arguments and return the last inserted row id.
-      def execute_insert(sql, opts={})
+      def execute_insert(sql, opts=OPTS)
         _execute(:insert, sql, opts)
       end
       
@@ -307,17 +307,17 @@ module Sequel
         
         # Run execute_select on the database with the given SQL and the stored
         # bind arguments.
-        def execute(sql, opts={}, &block)
+        def execute(sql, opts=OPTS, &block)
           super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_dui(sql, opts={}, &block)
+        def execute_dui(sql, opts=OPTS, &block)
           super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_insert(sql, opts={}, &block)
+        def execute_insert(sql, opts=OPTS, &block)
           super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
       end
@@ -329,17 +329,17 @@ module Sequel
           
         # Execute the stored prepared statement name and the stored bind
         # arguments instead of the SQL given.
-        def execute(sql, opts={}, &block)
+        def execute(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
          
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_dui(sql, opts={}, &block)
+        def execute_dui(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
           
         # Same as execute, explicit due to intricacies of alias and super.
-        def execute_insert(sql, opts={}, &block)
+        def execute_insert(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
       end

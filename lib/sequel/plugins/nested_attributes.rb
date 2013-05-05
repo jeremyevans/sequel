@@ -196,7 +196,7 @@ module Sequel
         # :destroy option is given, destroy the object after disassociating it
         # (unless destroying the object would automatically disassociate it).
         # Returns the object removed.
-        def nested_attributes_remove(reflection, obj, opts={})
+        def nested_attributes_remove(reflection, obj, opts=OPTS)
           if !opts[:destroy] || reflection.remove_before_destroy?
             before_save_hook do
               if reflection.returns_array?

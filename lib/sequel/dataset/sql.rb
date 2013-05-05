@@ -161,7 +161,7 @@ module Sequel
     #
     # Raises an +Error+ if the dataset is grouped or includes more
     # than one table.
-    def update_sql(values = {})
+    def update_sql(values = OPTS)
       return static_sql(opts[:sql]) if opts[:sql]
       check_modification_allowed!
       clone(:values=>values)._update_sql

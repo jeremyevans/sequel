@@ -30,7 +30,7 @@ module Sequel
       alias_method :server_version, :db2_version
 
       # Use SYSIBM.SYSCOLUMNS to get the information on the tables.
-      def schema_parse_table(table, opts = {})
+      def schema_parse_table(table, opts = OPTS)
         m = output_identifier_meth(opts[:dataset])
         im = input_identifier_meth(opts[:dataset])
         metadata_dataset.with_sql("SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = #{literal(im.call(table))} ORDER BY COLNO").
@@ -61,7 +61,7 @@ module Sequel
       end
 
       # Use SYSCAT.INDEXES to get the indexes for the table
-      def indexes(table, opts = {})
+      def indexes(table, opts = OPTS)
         m = output_identifier_meth
         indexes = {}
         metadata_dataset.

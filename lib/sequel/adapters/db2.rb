@@ -56,11 +56,11 @@ module Sequel
         DB2CLI.SQLFreeHandle(DB2CLI::SQL_HANDLE_DBC, conn)
       end
 
-      def execute(sql, opts={}, &block)
+      def execute(sql, opts=OPTS, &block)
         synchronize(opts[:server]){|conn| log_connection_execute(conn, sql, &block)}
       end
 
-      def execute_insert(sql, opts={})
+      def execute_insert(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           log_connection_execute(conn, sql)
           sql = "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1"
@@ -118,7 +118,7 @@ module Sequel
         [DB2Error]
       end
 
-      def begin_transaction(conn, opts={})
+      def begin_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_BEGIN){DB2CLI.SQLSetConnectAttr(conn, DB2CLI::SQL_ATTR_AUTOCOMMIT, DB2CLI::SQL_AUTOCOMMIT_OFF)}
         set_transaction_isolation(conn, opts)
       end
@@ -129,11 +129,11 @@ module Sequel
         super
       end
 
-      def rollback_transaction(conn, opts={})
+      def rollback_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_ROLLBACK){DB2CLI.SQLEndTran(DB2CLI::SQL_HANDLE_DBC, conn, DB2CLI::SQL_ROLLBACK)}
       end
 
-      def commit_transaction(conn, opts={})
+      def commit_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_COMMIT){DB2CLI.SQLEndTran(DB2CLI::SQL_HANDLE_DBC, conn, DB2CLI::SQL_COMMIT)}
       end
     

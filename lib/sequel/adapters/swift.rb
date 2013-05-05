@@ -45,7 +45,7 @@ module Sequel
       end
       
       # Execute the given SQL, yielding a Swift::Result if a block is given.
-      def execute(sql, opts={})
+      def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
             res = log_yield(sql){conn.execute(sql)}
@@ -59,7 +59,7 @@ module Sequel
       
       # Execute the SQL on the this database, returning the number of affected
       # rows.
-      def execute_dui(sql, opts={})
+      def execute_dui(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
             log_yield(sql){conn.execute(sql).affected_rows}
@@ -71,7 +71,7 @@ module Sequel
       
       # Execute the SQL on this database, returning the primary key of the
       # table being inserted to.
-      def execute_insert(sql, opts={})
+      def execute_insert(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
             log_yield(sql){conn.execute(sql).insert_id}

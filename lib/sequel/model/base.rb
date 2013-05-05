@@ -543,7 +543,7 @@ module Sequel
       # Note that you should not use this to change the model's dataset
       # at runtime.  If you have that need, you should look into Sequel's
       # sharding support.
-      def set_dataset(ds, opts={})
+      def set_dataset(ds, opts=OPTS)
         inherited = opts[:inherited]
         case ds
         when Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, LiteralString
@@ -739,7 +739,7 @@ module Sequel
       # Add the module to the class's dataset_method_modules.  Extend the dataset with the
       # module if the model has a dataset.  Add dataset methods to the class for all
       # public dataset methods.
-      def dataset_extend(mod, opts={})
+      def dataset_extend(mod, opts=OPTS)
         @dataset.extend(mod) if @dataset
         reset_instance_dataset
         dataset_method_modules << mod
@@ -1121,7 +1121,7 @@ module Sequel
       #
       #   Artist[1].destroy # BEGIN; DELETE FROM artists WHERE (id = 1); COMMIT;
       #   # => #<Artist {:id=>1, ...}>
-      def destroy(opts = {})
+      def destroy(opts = OPTS)
         raise Sequel::Error, "can't destroy frozen object" if frozen?
         checked_save_failure(opts){checked_transaction(opts){_destroy(opts)}}
       end
@@ -1399,7 +1399,7 @@ module Sequel
       #   a.name = 'Jim'
       #   a.save_changes # UPDATE artists SET name = 'Bob' WHERE (id = 1)
       #   # => #<Artist {:id=>1, :name=>'Jim', ...}
-      def save_changes(opts={})
+      def save_changes(opts=OPTS)
         save(opts.merge(:changed=>true)) || false if modified? 
       end
   
@@ -1598,7 +1598,7 @@ module Sequel
       #   artist(:name=>'Valid').valid? # => true
       #   artist(:name=>'Invalid').valid? # => false
       #   artist.errors.full_messages # => ['name cannot be Invalid']
-      def valid?(opts = {})
+      def valid?(opts = OPTS)
         _valid?(false, opts)
       end
 
@@ -1858,7 +1858,7 @@ module Sequel
       end
       
       # If transactions should be used, wrap the yield in a transaction block.
-      def checked_transaction(opts={})
+      def checked_transaction(opts=OPTS)
         use_transaction?(opts) ? db.transaction({:server=>this_server}.merge(opts)){yield} : yield
       end
 
@@ -2005,7 +2005,7 @@ module Sequel
       # Whether to use a transaction for this action.  If the :transaction
       # option is present in the hash, use that, otherwise, fallback to the
       # object's default (if set), or class's default (if not).
-      def use_transaction?(opts = {})
+      def use_transaction?(opts = OPTS)
         opts.fetch(:transaction, use_transactions)
       end
     end

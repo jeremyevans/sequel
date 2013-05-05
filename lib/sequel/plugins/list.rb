@@ -53,7 +53,7 @@ module Sequel
       # The <tt>:scope</tt> option can be a symbol, array of symbols, or a proc that
       # accepts a model instance and returns a dataset representing the list.
       # Also, modify the model dataset's order to order by the position and scope fields.
-      def self.configure(model, opts = {})
+      def self.configure(model, opts = OPTS)
         model.position_field = opts[:field] || :position
         model.dataset = model.dataset.order_prepend(model.position_field)
         

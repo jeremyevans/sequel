@@ -65,7 +65,7 @@ module Sequel
       end
 
       # Return 0 without sending a database query.
-      def update(v={})
+      def update(v=OPTS)
         0
       end
 
@@ -82,7 +82,7 @@ module Sequel
       # make them noops.  There's nothing we can do if the db
       # is accessed directly to make a change, though.
       (%w'_ddl _dui _insert' << '').each do |m|
-        class_eval("private; def execute#{m}(sql, opts={}) end", __FILE__, __LINE__)
+        class_eval("private; def execute#{m}(sql, opts=OPTS) end", __FILE__, __LINE__)
       end
     end
 

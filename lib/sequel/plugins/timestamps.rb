@@ -26,7 +26,7 @@ module Sequel
       # * :force - Whether to overwrite an existing create timestamp (default: false)
       # * :update - The field to hold the update timestamp (default: :updated_at)
       # * :update_on_create - Whether to set the update timestamp to the create timestamp when creating (default: false)
-      def self.configure(model, opts={})
+      def self.configure(model, opts=OPTS)
         model.instance_eval do
           @create_timestamp_field = opts[:create]||:created_at
           @update_timestamp_field = opts[:update]||:updated_at

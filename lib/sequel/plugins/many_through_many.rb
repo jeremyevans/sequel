@@ -157,7 +157,7 @@ module Sequel
         #   :join_type :: The join type to use for the join, defaults to :left_outer.
         #   :only_conditions :: Conditions to use for the join instead of the ones specified by the keys.
         # * opts - The options for the associaion.  Takes the same options as many_to_many.
-        def many_through_many(name, through, opts={}, &block)
+        def many_through_many(name, through, opts=OPTS, &block)
           associate(:many_through_many, name, opts.merge(through.is_a?(Hash) ? through : {:through=>through}), &block)
         end
 

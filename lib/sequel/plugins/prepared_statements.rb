@@ -42,7 +42,7 @@ module Sequel
 
         # Create a prepared statement based on the given dataset with a unique name for the given
         # type of query and values.
-        def prepare_statement(ds, type, vals={})
+        def prepare_statement(ds, type, vals=OPTS)
           ps = ds.prepare(type, :"smpsp_#{NEXT.call}", vals)
           ps.log_sql = true
           ps

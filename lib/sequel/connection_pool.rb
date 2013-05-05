@@ -21,6 +21,8 @@
 # remove_servers(Array of Symbols) :: no longer recognize all shards/servers
 #                                     specified by the array of symbols.
 class Sequel::ConnectionPool
+  OPTS = Sequel::OPTS
+
   # The default server to use
   DEFAULT_SERVER = :default
   
@@ -37,7 +39,7 @@ class Sequel::ConnectionPool
     # option is provided is provided, use that pool class, otherwise
     # use a new instance of an appropriate pool subclass based on the
     # <tt>:single_threaded</tt> and <tt>:servers</tt> options.
-    def get_pool(db, opts = {})
+    def get_pool(db, opts = OPTS)
       case v = connection_pool_class(opts)
       when Class
         v.new(db, opts)
@@ -70,7 +72,7 @@ class Sequel::ConnectionPool
   # :after_connect :: The proc called after each new connection is made, with the
   #                   connection object, useful for customizations that you want to apply to all
   #                   connections.
-  def initialize(db, opts={})
+  def initialize(db, opts=OPTS)
     @db = db
     @after_connect = opts[:after_connect]
   end

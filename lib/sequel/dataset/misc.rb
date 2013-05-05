@@ -17,17 +17,6 @@ module Sequel
     # The hash of options for this dataset, keys are symbols.
     attr_reader :opts
 
-    module DeprecateModifyHash
-      %w'[]= merge! update clear delete delete_if keep_if reject! select! shift store'.each do |meth|
-        class_eval(<<-END, __FILE__, __LINE__+1)
-          def #{meth}(*)
-            Sequel::Deprecation.deprecate('Modifying the initial dataset opts hash is deprecated. Please dup the hash.')
-           super
-          end   
-        END
-      end
-    end
-
     # Constructs a new Dataset instance with an associated database and 
     # options. Datasets are usually constructed by invoking the Database#[] method:
     #
@@ -38,7 +27,7 @@ module Sequel
     # the Database#dataset method return an instance of that subclass.
     def initialize(db)
       @db = db
-      @opts = {}.extend(DeprecateModifyHash)
+      @opts = OPTS
     end
 
     # Define a hash value such that datasets with the same DB, opts, and SQL

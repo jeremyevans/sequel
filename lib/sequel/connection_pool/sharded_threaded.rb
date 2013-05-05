@@ -13,7 +13,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   #   Sequel uses Hash.new(:default).  You can use a hash with a default proc
   #   that raises an error if you want to catch all cases where a nonexistent
   #   server is used.
-  def initialize(db, opts = {})
+  def initialize(db, opts = OPTS)
     super
     @available_connections = {}
     @connections_to_remove = []
@@ -86,7 +86,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # creates new connections to the database. Options:
   # * :server - Should be a symbol specifing the server to disconnect from,
   #   or an array of symbols to specify multiple servers.
-  def disconnect(opts={})
+  def disconnect(opts=OPTS)
     sync do
       (opts[:server] ? Array(opts[:server]) : @servers.keys).each do |s|
         disconnect_server(s)

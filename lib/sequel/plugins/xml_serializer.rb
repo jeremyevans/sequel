@@ -130,7 +130,7 @@ module Sequel
 
         # Return an array of instances of this class based on
         # the provided XML.
-        def array_from_xml(xml, opts={})
+        def array_from_xml(xml, opts=OPTS)
           if opts[:all_associations] || opts[:all_columns]
             Sequel::Deprecation.deprecate("The array_from_xml :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
           end
@@ -143,7 +143,7 @@ module Sequel
 
         # Return an instance of this class based on the provided
         # XML.
-        def from_xml(xml, opts={})
+        def from_xml(xml, opts=OPTS)
           if opts[:all_associations] || opts[:all_columns]
             Sequel::Deprecation.deprecate("The from_xml :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
           end
@@ -153,14 +153,14 @@ module Sequel
         # Return an instance of this class based on the given
         # XML node, which should be Nokogiri::XML::Node instance.
         # This should probably not be used directly by user code.
-        def from_xml_node(parent, opts={})
+        def from_xml_node(parent, opts=OPTS)
           new.from_xml_node(parent, opts)
         end
 
         # Return an appropriate Nokogiri::XML::Builder instance
         # used to create the XML.  This should probably not be used
         # directly by user code.
-        def xml_builder(opts={})
+        def xml_builder(opts=OPTS)
           if opts[:builder]
             opts[:builder]
           else
@@ -177,7 +177,7 @@ module Sequel
         # Return a proc (or any other object that responds to []),
         # used for formatting XML tag names when serializing to XML.
         # This should probably not be used directly by user code.
-        def xml_deserialize_name_proc(opts={})
+        def xml_deserialize_name_proc(opts=OPTS)
           if opts[:name_proc]
             opts[:name_proc]
           elsif opts[:underscore]
@@ -190,7 +190,7 @@ module Sequel
         # Return a proc (or any other object that responds to []),
         # used for formatting XML tag names when serializing to XML.
         # This should probably not be used directly by user code.
-        def xml_serialize_name_proc(opts={})
+        def xml_serialize_name_proc(opts=OPTS)
           pr = if opts[:name_proc]
             opts[:name_proc]
           elsif opts[:dasherize]
@@ -216,7 +216,7 @@ module Sequel
         # :underscore :: Sets the :name_proc option to one that calls +underscore+
         #                on the input string.  Requires that you load the inflector
         #                extension or another library that adds String#underscore.
-        def from_xml(xml, opts={})
+        def from_xml(xml, opts=OPTS)
           if opts[:all_associations] || opts[:all_columns]
             Sequel::Deprecation.deprecate("The from_xml :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
           end
@@ -243,7 +243,7 @@ module Sequel
         #                  for a single association, an array of symbols for multiple associations,
         #                  or a hash with symbol keys and dependent association option hash values.
         # :fields :: Changes the behavior to call set_fields using the provided fields, instead of calling set.
-        def from_xml_node(parent, opts={})
+        def from_xml_node(parent, opts=OPTS)
           unless parent
             raise Error, "Malformed XML used"
           end
@@ -367,7 +367,7 @@ module Sequel
         #               an array of objects using Model.to_xml or Dataset#to_xml.
         # :types :: Set to true to include type information for
         #           all of the columns, pulled from the db_schema.
-        def to_xml(opts={})
+        def to_xml(opts=OPTS)
           vals = values
           types = opts[:types]
           inc = opts[:include]
@@ -406,7 +406,7 @@ module Sequel
 
         # Handle associated objects and virtual attributes when creating
         # the xml.
-        def to_xml_include(node, i, opts={})
+        def to_xml_include(node, i, opts=OPTS)
           name_proc = model.xml_serialize_name_proc(opts)
           objs = send(i)
           if objs.is_a?(Array) && objs.all?{|x| x.is_a?(Sequel::Model)}
@@ -426,7 +426,7 @@ module Sequel
         # this dataset.  Takes all of the options available to Model#to_xml,
         # as well as the :array_root_name option for specifying the name of
         # the root node that contains the nodes for all of the instances.
-        def to_xml(opts={})
+        def to_xml(opts=OPTS)
           raise(Sequel::Error, "Dataset#to_xml") unless row_proc
           x = model.xml_builder(opts)
           name_proc = model.xml_serialize_name_proc(opts)

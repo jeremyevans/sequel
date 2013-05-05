@@ -23,6 +23,8 @@ module Sequel
   #
   # For more information, see the {"Dataset Basics" guide}[link:files/doc/dataset_basics_rdoc.html].
   class Dataset
+    OPTS = Sequel::OPTS
+
     include Enumerable
     include SQL::AliasMethods
     include SQL::BooleanMethods

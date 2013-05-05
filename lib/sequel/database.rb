@@ -13,6 +13,7 @@ module Sequel
   # The Database class is meant to be subclassed by database adapters in order
   # to provide the functionality needed for executing queries.
   class Database
+    OPTS = Sequel::OPTS
   end
 
   require(%w"connecting dataset dataset_defaults logging features misc query transactions schema_generator schema_methods", 'database')

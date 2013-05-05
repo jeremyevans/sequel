@@ -210,7 +210,7 @@ module Sequel
       end
 
       # Execute the given SQL on the database.
-      def execute(sql, opts={}, &block)
+      def execute(sql, opts=OPTS, &block)
         if sql.is_a?(Symbol)
           execute_prepared_statement(sql, opts, &block)
         else
@@ -222,7 +222,7 @@ module Sequel
 
       # Execute the given SQL on the database, returning the last inserted
       # identity value.
-      def execute_insert(sql, opts={})
+      def execute_insert(sql, opts=OPTS)
         synchronize(opts[:server]) do |c|
           if sql.is_a?(Symbol)
             execute_prepared_statement(sql, opts)
@@ -304,14 +304,14 @@ module Sequel
 
       # IBM_DB uses an autocommit setting instead of sending SQL queries.
       # So starting a transaction just turns autocommit off.
-      def begin_transaction(conn, opts={})
+      def begin_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
         set_transaction_isolation(conn, opts)
       end
 
       # This commits transaction in progress on the
       # connection and sets autocommit back on.
-      def commit_transaction(conn, opts={})
+      def commit_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
     
@@ -355,7 +355,7 @@ module Sequel
 
       # This rolls back the transaction in progress on the
       # connection and sets autocommit back on.
-      def rollback_transaction(conn, opts={})
+      def rollback_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
 
@@ -392,17 +392,17 @@ module Sequel
         
         private
         # Execute the prepared statement with arguments instead of the given SQL.
-        def execute(sql, opts={}, &block)
+        def execute(sql, opts=OPTS, &block)
           super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
         # Execute the prepared statment with arguments instead of the given SQL.
-        def execute_dui(sql, opts={}, &block)
+        def execute_dui(sql, opts=OPTS, &block)
           super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
         end
 
         # Execute the prepared statement with arguments instead of the given SQL.
-        def execute_insert(sql, opts={}, &block)
+        def execute_insert(sql, opts=OPTS, &block)
           super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
         end
 

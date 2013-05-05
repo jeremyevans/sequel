@@ -275,7 +275,7 @@ module Sequel
     # :server :: Set the server/shard to use for the transaction and insert
     #            queries.
     # :slice :: Same as :commit_every, :commit_every takes precedence.
-    def import(columns, values, opts={})
+    def import(columns, values, opts=OPTS)
       return @db.transaction{insert(columns, values)} if values.is_a?(Dataset)
 
       return if values.empty?
@@ -427,7 +427,7 @@ module Sequel
     # values.
     #
     # This respects the same options as #import.
-    def multi_insert(hashes, opts={})
+    def multi_insert(hashes, opts=OPTS)
       return if hashes.empty?
       columns = hashes.first.keys
       import(columns, hashes.map{|h| columns.map{|c| h[c]}}, opts)
@@ -446,7 +446,7 @@ module Sequel
     #
     # Options:
     # :rows_per_fetch :: The number of rows to fetch per query.  Defaults to 1000.
-    def paged_each(opts={})
+    def paged_each(opts=OPTS)
       unless @opts[:order]
         raise Sequel::Error, "Dataset#paged_each requires the dataset be ordered"
       end
@@ -710,7 +710,7 @@ module Sequel
     #
     #   DB[:table].update(:x=>:x+1, :y=>0) # UPDATE table SET x = (x + 1), y = 0
     #   # => 10
-    def update(values={}, &block)
+    def update(values=OPTS, &block)
       sql = update_sql(values)
       if uses_returning?(:update)
         returning_fetch_rows(sql, &block)
@@ -790,23 +790,23 @@ module Sequel
 
     # Execute the given select SQL on the database using execute. Use the
     # :read_only server unless a specific server is set.
-    def execute(sql, opts={}, &block)
+    def execute(sql, opts=OPTS, &block)
       @db.execute(sql, {:server=>@opts[:server] || :read_only}.merge(opts), &block)
     end
     
     # Execute the given SQL on the database using execute_ddl.
-    def execute_ddl(sql, opts={}, &block)
+    def execute_ddl(sql, opts=OPTS, &block)
       @db.execute_ddl(sql, default_server_opts(opts), &block)
       nil
     end
     
     # Execute the given SQL on the database using execute_dui.
-    def execute_dui(sql, opts={}, &block)
+    def execute_dui(sql, opts=OPTS, &block)
       @db.execute_dui(sql, default_server_opts(opts), &block)
     end
     
     # Execute the given SQL on the database using execute_insert.
-    def execute_insert(sql, opts={}, &block)
+    def execute_insert(sql, opts=OPTS, &block)
       @db.execute_insert(sql, default_server_opts(opts), &block)
     end
     

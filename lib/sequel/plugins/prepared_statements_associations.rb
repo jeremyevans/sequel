@@ -25,7 +25,7 @@ module Sequel
       module ClassMethods
         # Disable prepared statement use if a block is given, or the :dataset or :conditions
         # options are used, or you are cloning an association.
-        def associate(type, name, opts = {}, &block)
+        def associate(type, name, opts = OPTS, &block)
           if block || opts[:dataset] || opts[:conditions] || (opts[:clone] && association_reflection(opts[:clone])[:prepared_statement] == false)
             opts = opts.merge(:prepared_statement=>false)
           end
@@ -70,7 +70,7 @@ module Sequel
 
         # If a prepared statement can be used to load the associated objects, execute it to retrieve them.  Otherwise,
         # fall back to the default implementation.
-        def _load_associated_objects(opts, dynamic_opts={})
+        def _load_associated_objects(opts, dynamic_opts=OPTS)
           if !opts.can_have_associated_objects?(self) || dynamic_opts[:callback] || (ps = opts[:prepared_statement]) == false
             super
           else 

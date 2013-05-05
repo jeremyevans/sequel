@@ -48,7 +48,7 @@ module Sequel
         
         # If the :prepare option is given and we aren't in a savepoint,
         # prepare the transaction for a two-phase commit.
-        def commit_transaction(conn, opts={})
+        def commit_transaction(conn, opts=OPTS)
           if (s = opts[:prepare]) && _trans(conn)[:savepoint_level] <= 1
             log_connection_execute(conn, "PREPARE COMMIT #{s}")
           else
@@ -115,7 +115,7 @@ module Sequel
         end
 
         # Use IDENTITY() to get the last inserted id.
-        def last_insert_id(conn, opts={})
+        def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
             sql = 'SELECT IDENTITY();'
             rs = log_yield(sql){stmt.executeQuery(sql)}

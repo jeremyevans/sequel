@@ -19,7 +19,7 @@ module Sequel
         c.disconnect
       end
       
-      def execute(sql, opts={})
+      def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           r = log_yield(sql){conn.execute(sql)}
           yield(r) if block_given?

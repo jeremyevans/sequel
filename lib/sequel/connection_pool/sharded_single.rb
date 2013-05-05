@@ -9,7 +9,7 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   #   Sequel uses Hash.new(:default).  You can use a hash with a default proc
   #   that raises an error if you want to catch all cases where a nonexistent
   #   server is used.
-  def initialize(db, opts={})
+  def initialize(db, opts=OPTS)
     super
     @conns = {}
     @servers = opts.fetch(:servers_hash, Hash.new(:default))
@@ -38,7 +38,7 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   # #hold, the connection is reestablished. Options:
   # * :server - Should be a symbol specifing the server to disconnect from,
   #   or an array of symbols to specify multiple servers.
-  def disconnect(opts={})
+  def disconnect(opts=OPTS)
     (opts[:server] ? Array(opts[:server]) : servers).each{|s| disconnect_server(s)}
   end
   

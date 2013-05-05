@@ -64,7 +64,7 @@ module Sequel
 
         # Always do a full save of all columns to reduce the number of prepared
         # statements that can be used.
-        def save_changes(opts={})
+        def save_changes(opts=OPTS)
           save(opts) || false if modified?
         end
       end

@@ -144,7 +144,7 @@ module Sequel
       # Create constraint validation methods that don't take an argument 
       %w'presence unique'.each do |v|
         class_eval(<<-END, __FILE__, __LINE__+1)
-          def #{v}(columns, opts={})
+          def #{v}(columns, opts=OPTS)
             @generator.validation({:type=>:#{v}, :columns=>Array(columns)}.merge(opts))
           end
         END
@@ -153,7 +153,7 @@ module Sequel
       # Create constraint validation methods that take an argument 
       %w'exact_length min_length max_length length_range format like ilike includes'.each do |v|
         class_eval(<<-END, __FILE__, __LINE__+1)
-          def #{v}(arg, columns, opts={})
+          def #{v}(arg, columns, opts=OPTS)
             @generator.validation({:type=>:#{v}, :columns=>Array(columns), :arg=>arg}.merge(opts))
           end
         END
@@ -244,7 +244,7 @@ module Sequel
     # the related metadata, it could make it impossible to save
     # rows, since a validation for a nonexistent column will be
     # created.
-    def drop_constraint_validations_for(opts={})
+    def drop_constraint_validations_for(opts=OPTS)
       ds = from(constraint_validations_table)
       if table = opts[:table]
         ds = ds.where(:table=>constraint_validations_literal_table(table))

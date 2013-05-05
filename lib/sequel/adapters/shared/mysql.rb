@@ -61,7 +61,7 @@ module Sequel
       # Use the Information Schema's KEY_COLUMN_USAGE table to get
       # basic information on foreign key columns, but include the
       # constraint name.
-      def foreign_key_list(table, opts={})
+      def foreign_key_list(table, opts=OPTS)
         m = output_identifier_meth
         im = input_identifier_meth
         ds = metadata_dataset.
@@ -93,7 +93,7 @@ module Sequel
       #
       # By default partial indexes are not included, you can use the
       # option :partial to override this.
-      def indexes(table, opts={})
+      def indexes(table, opts=OPTS)
         indexes = {}
         remove_indexes = []
         m = output_identifier_meth
@@ -153,7 +153,7 @@ module Sequel
       #
       # Options:
       # * :server - Set the server to use
-      def tables(opts={})
+      def tables(opts=OPTS)
         full_tables('BASE TABLE', opts)
       end
       
@@ -170,7 +170,7 @@ module Sequel
       #
       # Options:
       # * :server - Set the server to use
-      def views(opts={})
+      def views(opts=OPTS)
         full_tables('VIEW', opts)
       end
       
@@ -290,7 +290,7 @@ module Sequel
 
       # Use XA START to start a new prepared transaction if the :prepare
       # option is given.
-      def begin_transaction(conn, opts={})
+      def begin_transaction(conn, opts=OPTS)
         if (s = opts[:prepare]) && (th = _trans(conn))[:savepoint_level] == 0
           log_connection_execute(conn, "XA START #{literal(s)}")
           th[:savepoint_level] += 1
@@ -313,7 +313,7 @@ module Sequel
       
       # Prepare the XA transaction for a two-phase commit if the
       # :prepare option is given.
-      def commit_transaction(conn, opts={})
+      def commit_transaction(conn, opts=OPTS)
         if (s = opts[:prepare]) && _trans(conn)[:savepoint_level] <= 1
           log_connection_execute(conn, "XA END #{literal(s)}")
           log_connection_execute(conn, "XA PREPARE #{literal(s)}")
@@ -323,7 +323,7 @@ module Sequel
       end
 
       # Use MySQL specific syntax for engine type and character encoding
-      def create_table_sql(name, generator, options = {})
+      def create_table_sql(name, generator, options = OPTS)
         engine = options.fetch(:engine, Sequel::MySQL.default_engine)
         charset = options.fetch(:charset, Sequel::MySQL.default_charset)
         collate = options.fetch(:collate, Sequel::MySQL.default_collate)
@@ -418,7 +418,7 @@ module Sequel
       end
 
       # Rollback the currently open XA transaction
-      def rollback_transaction(conn, opts={})
+      def rollback_transaction(conn, opts=OPTS)
         if (s = opts[:prepare]) && _trans(conn)[:savepoint_level] <= 1
           log_connection_execute(conn, "XA END #{literal(s)}")
           log_connection_execute(conn, "XA PREPARE #{literal(s)}")
@@ -620,7 +620,7 @@ module Sequel
       
       # Return the results of an EXPLAIN query as a string. Options:
       # :extended :: Use EXPLAIN EXPTENDED instead of EXPLAIN if true.
-      def explain(opts={})
+      def explain(opts=OPTS)
         # Load the PrettyTable class, needed for explain output
         Sequel.extension(:_pretty_table) unless defined?(Sequel::PrettyTable)
 
@@ -635,12 +635,12 @@ module Sequel
       end
 
       # Adds full text filter
-      def full_text_search(cols, terms, opts = {})
+      def full_text_search(cols, terms, opts = OPTS)
         filter(full_text_sql(cols, terms, opts))
       end
       
       # MySQL specific full text search syntax.
-      def full_text_sql(cols, terms, opts = {})
+      def full_text_sql(cols, terms, opts = OPTS)
         terms = terms.join(' ') if terms.is_a?(Array)
         SQL::PlaceholderLiteralString.new((opts[:boolean] ? MATCH_AGAINST_BOOLEAN : MATCH_AGAINST), [Array(cols), terms])
       end
@@ -652,10 +652,10 @@ module Sequel
       
       # Transforms an CROSS JOIN to an INNER JOIN if the expr is not nil.
       # Raises an error on use of :full_outer type, since MySQL doesn't support it.
-      def join_table(type, table, expr=nil, table_alias={}, &block)
+      def join_table(type, table, expr=nil, opts=OPTS, &block)
         type = :inner if (type == :cross) && !expr.nil?
         raise(Sequel::Error, "MySQL doesn't support FULL OUTER JOIN") if type == :full_outer
-        super(type, table, expr, table_alias, &block)
+        super(type, table, expr, opts, &block)
       end
       
       # Transforms :natural_inner to NATURAL LEFT JOIN and straight to

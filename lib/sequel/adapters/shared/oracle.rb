@@ -10,7 +10,7 @@ module Sequel
 
       attr_accessor :autosequence
 
-      def create_sequence(name, opts={})
+      def create_sequence(name, opts=OPTS)
         self << create_sequence_sql(name, opts)
       end
 
@@ -36,12 +36,12 @@ module Sequel
         false
       end
 
-      def tables(opts={})
+      def tables(opts=OPTS)
         m = output_identifier_meth
         metadata_dataset.from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'TABLE').map{|r| m.call(r[:tname])}
       end
 
-      def views(opts={}) 
+      def views(opts=OPTS) 
         m = output_identifier_meth
         metadata_dataset.from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'VIEW').map{|r| m.call(r[:tname])}
       end 
@@ -96,7 +96,7 @@ module Sequel
         AUTOINCREMENT
       end
 
-      def create_sequence_sql(name, opts={})
+      def create_sequence_sql(name, opts=OPTS)
         "CREATE SEQUENCE #{quote_identifier(name)} start with #{opts [:start_with]||1} increment by #{opts[:increment_by]||1} nomaxvalue"
       end
 
@@ -106,7 +106,7 @@ module Sequel
         create_statements.each{|sql| execute_ddl(sql)}
       end
 
-      def create_table_sql_list(name, generator, options={})
+      def create_table_sql_list(name, generator, options=OPTS)
         statements = [create_table_sql(name, generator, options)]
         drop_seq_statement = nil
         generator.columns.each do |c|
@@ -132,7 +132,7 @@ module Sequel
         [drop_seq_statement, statements]
       end
 
-      def create_trigger_sql(table, name, definition, opts={})
+      def create_trigger_sql(table, name, definition, opts=OPTS)
         events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
         sql = <<-end_sql
           CREATE#{' OR REPLACE' if opts[:replace]} TRIGGER #{quote_identifier(name)}
@@ -291,7 +291,7 @@ module Sequel
       end
       
       # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
-      def except(dataset, opts={})
+      def except(dataset, opts=OPTS)
         raise(Sequel::Error, "EXCEPT ALL not supported") if opts[:all]
         compound_clone(:minus, dataset, opts)
       end
@@ -390,7 +390,7 @@ module Sequel
 
       # If this dataset is associated with a sequence, return the most recently
       # inserted sequence value.
-      def execute_insert(sql, opts={})
+      def execute_insert(sql, opts=OPTS)
         f = @opts[:from]
         super(sql, {:table=>(f.first if f), :sequence=>@opts[:sequence]}.merge(opts))
       end

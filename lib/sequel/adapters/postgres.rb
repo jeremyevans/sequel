@@ -275,7 +275,7 @@ module Sequel
       end
       
       # Execute the given SQL with the given args on an available connection.
-      def execute(sql, opts={}, &block)
+      def execute(sql, opts=OPTS, &block)
         synchronize(opts[:server]){|conn| check_database_errors{_execute(conn, sql, opts, &block)}}
       end
 
@@ -304,7 +304,7 @@ module Sequel
         # If a block is provided, the method continually yields to the block, one yield
         # per row.  If a block is not provided, a single string is returned with all
         # of the data.
-        def copy_table(table, opts={})
+        def copy_table(table, opts=OPTS)
           synchronize(opts[:server]) do |conn|
             conn.execute(copy_table_sql(table, opts))
             begin
@@ -344,7 +344,7 @@ module Sequel
         #
         # If a block is provided and :data option is not, this will yield to the block repeatedly.
         # The block should return a string, or nil to signal that it is finished.
-        def copy_into(table, opts={})
+        def copy_into(table, opts=OPTS)
           data = opts[:data]
           data = Array(data) if data.is_a?(String)
 
@@ -397,7 +397,7 @@ module Sequel
         # * the channel the notification was sent to (as a string)
         # * the backend pid of the notifier (as an integer),
         # * and the payload of the notification (as a string or nil).
-        def listen(channels, opts={}, &block)
+        def listen(channels, opts=OPTS, &block)
           check_database_errors do
             synchronize(opts[:server]) do |conn|
               begin
@@ -503,7 +503,7 @@ module Sequel
       # deallocate that statement first and then prepare this statement.
       # If a block is given, yield the result, otherwise, return the number
       # of rows changed.
-      def execute_prepared_statement(conn, name, opts={}, &block)
+      def execute_prepared_statement(conn, name, opts=OPTS, &block)
         ps = prepared_statement(name)
         sql = ps.prepared_sql
         ps_name = name.to_s
@@ -613,7 +613,7 @@ module Sequel
       #
       # This is untested with the prepared statement/bound variable support,
       # and unlikely to work with either.
-      def use_cursor(opts={})
+      def use_cursor(opts=OPTS)
         clone(:cursor=>{:rows_per_fetch=>1000}.merge(opts))
       end
 
@@ -661,12 +661,12 @@ module Sequel
           private
           
           # Execute the given SQL with the stored bind arguments.
-          def execute(sql, opts={}, &block)
+          def execute(sql, opts=OPTS, &block)
             super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
           end
           
           # Same as execute, explicit due to intricacies of alias and super.
-          def execute_dui(sql, opts={}, &block)
+          def execute_dui(sql, opts=OPTS, &block)
             super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
           end
         end
@@ -686,18 +686,18 @@ module Sequel
           
           # Execute the stored prepared statement name and the stored bind
           # arguments instead of the SQL given.
-          def execute(sql, opts={}, &block)
+          def execute(sql, opts=OPTS, &block)
             super(prepared_statement_name, opts, &block)
           end
           
           # Same as execute, explicit due to intricacies of alias and super.
-          def execute_dui(sql, opts={}, &block)
+          def execute_dui(sql, opts=OPTS, &block)
             super(prepared_statement_name, opts, &block)
           end
         end
         
         # Execute the given type of statement with the hash of values.
-        def call(type, bind_vars={}, *values, &block)
+        def call(type, bind_vars=OPTS, *values, &block)
           ps = to_prepared_statement(type, values)
           ps.extend(BindArgumentMethods)
           ps.call(bind_vars, &block)

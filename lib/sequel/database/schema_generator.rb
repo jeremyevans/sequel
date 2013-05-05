@@ -108,7 +108,7 @@ module Sequel
       # :unique :: Mark the column as unique, generally has the same effect as
       #            creating a unique index on the column.
       # :unique_constraint_name :: The name to give the unique key constraint
-      def column(name, type, opts = {})
+      def column(name, type, opts = OPTS)
         columns << {:name => name, :type => type}.merge(opts)
         if index_opts = opts[:index]
           index(name, index_opts.is_a?(Hash) ? index_opts : {})
@@ -142,7 +142,7 @@ module Sequel
       #
       #   foreign_key([:artist_name, :artist_location], :artists, :name=>:artist_fk)
       #   # ADD CONSTRAINT artist_fk FOREIGN KEY (artist_name, artist_location) REFERENCES artists
-      def foreign_key(name, table=nil, opts = {})
+      def foreign_key(name, table=nil, opts = OPTS)
         opts = case table
         when Hash
           table.merge(opts)
@@ -164,7 +164,7 @@ module Sequel
       #
       # Microsoft SQL Server specific options:
       # :key_index :: The KEY INDEX to use for the full text index.
-      def full_text_index(columns, opts = {})
+      def full_text_index(columns, opts = OPTS)
         index(columns, opts.merge(:type => :full_text))
       end
       
@@ -199,13 +199,13 @@ module Sequel
       #
       #   index [:artist_id, :name]
       #   # CREATE INDEX table_artist_id_name_index ON table (artist_id, name)
-      def index(columns, opts = {})
+      def index(columns, opts = OPTS)
         indexes << {:columns => Array(columns)}.merge(opts)
       end
       
       # Add a column with the given type, name, and opts to the DDL.  See +column+ for available
       # options.
-      def method_missing(type, name = nil, opts = {})
+      def method_missing(type, name = nil, opts = OPTS)
         name ? column(name, type, opts) : super
       end
 
@@ -250,7 +250,7 @@ module Sequel
       end
       
       # Add a spatial index on the given columns to the DDL.
-      def spatial_index(columns, opts = {})
+      def spatial_index(columns, opts = OPTS)
         index(columns, opts.merge(:type => :spatial))
       end
 
@@ -260,7 +260,7 @@ module Sequel
       #
       # Supports the same :deferrable option as #column. The :name option can be used
       # to name the constraint.
-      def unique(columns, opts = {})
+      def unique(columns, opts = OPTS)
         constraints << {:type => :unique, :columns => Array(columns)}.merge(opts)
       end
 
@@ -308,7 +308,7 @@ module Sequel
       # See CreateTableGenerator#column for the available options.
       #
       #   add_column(:name, String) # ADD COLUMN name varchar(255)
-      def add_column(name, type, opts = {})
+      def add_column(name, type, opts = OPTS)
         @operations << {:op => :add_column, :name => name, :type => type}.merge(opts)
       end
       
@@ -327,7 +327,7 @@ module Sequel
       #   add_unique_constraint(:name, :name=>:unique_name) # ADD CONSTRAINT unique_name UNIQUE (name)
       #
       # Supports the same :deferrable option as CreateTableGenerator#column.
-      def add_unique_constraint(columns, opts = {})
+      def add_unique_constraint(columns, opts = OPTS)
         @operations << {:op => :add_constraint, :type => :unique, :columns => Array(columns)}.merge(opts)
       end
 
@@ -353,14 +353,14 @@ module Sequel
       #               existing data has been cleaned up, validate_constraint can be used
       #               to mark the constraint as valid.  Note that this option only makes
       #               sense when using an array of columns.
-      def add_foreign_key(name, table, opts = {})
+      def add_foreign_key(name, table, opts = OPTS)
         return add_composite_foreign_key(name, table, opts) if name.is_a?(Array)
         add_column(name, Integer, {:table=>table}.merge(opts))
       end
       
       # Add a full text index on the given columns to the DDL for the table.
       # See CreateTableGenerator#index for available options.
-      def add_full_text_index(columns, opts = {})
+      def add_full_text_index(columns, opts = OPTS)
         add_index(columns, {:type=>:full_text}.merge(opts))
       end
       
@@ -368,7 +368,7 @@ module Sequel
       # CreateTableGenerator#index for available options.
       #
       #   add_index(:artist_id) # CREATE INDEX table_artist_id_index ON table (artist_id)
-      def add_index(columns, opts = {})
+      def add_index(columns, opts = OPTS)
         @operations << {:op => :add_index, :columns => Array(columns)}.merge(opts)
       end
       
@@ -378,7 +378,7 @@ module Sequel
       #
       #   add_primary_key(:id) # ADD COLUMN id serial PRIMARY KEY
       #   add_primary_key([:artist_id, :name]) # ADD PRIMARY KEY (artist_id, name)
-      def add_primary_key(name, opts = {})
+      def add_primary_key(name, opts = OPTS)
         return add_composite_primary_key(name, opts) if name.is_a?(Array)
         opts = @db.serial_primary_key_options.merge(opts)
         add_column(name, opts.delete(:type), opts)
@@ -386,7 +386,7 @@ module Sequel
       
       # Add a spatial index on the given columns to the DDL for the table.
       # See CreateTableGenerator#index for available options.
-      def add_spatial_index(columns, opts = {})
+      def add_spatial_index(columns, opts = OPTS)
         add_index(columns, {:type=>:spatial}.merge(opts))
       end
       
@@ -394,7 +394,7 @@ module Sequel
       #
       #   drop_column(:artist_id) # DROP COLUMN artist_id
       #   drop_column(:artist_id, :cascade=>true) # DROP COLUMN artist_id CASCADE
-      def drop_column(name, opts={})
+      def drop_column(name, opts=OPTS)
         @operations << {:op => :drop_column, :name => name}.merge(opts)
       end
       
@@ -405,7 +405,7 @@ module Sequel
       #
       #   drop_constraint(:unique_name) # DROP CONSTRAINT unique_name
       #   drop_constraint(:unique_name, :cascade=>true) # DROP CONSTRAINT unique_name CASCADE
-      def drop_constraint(name, opts={})
+      def drop_constraint(name, opts=OPTS)
         @operations << {:op => :drop_constraint, :name => name}.merge(opts)
       end
       
@@ -419,7 +419,7 @@ module Sequel
       #
       #   drop_foreign_key(:artist_id) # DROP CONSTRAINT table_artist_id_fkey, DROP COLUMN artist_id
       #   drop_foreign_key([:name]) # DROP CONSTRAINT table_name_fkey
-      def drop_foreign_key(name, opts={})
+      def drop_foreign_key(name, opts=OPTS)
         drop_composite_foreign_key(Array(name), opts)
         drop_column(name) unless name.is_a?(Array)
       end
@@ -439,14 +439,14 @@ module Sequel
       #   drop_index(:artist_id) # DROP INDEX table_artist_id_index
       #   drop_index([:a, :b]) # DROP INDEX table_a_b_index
       #   drop_index([:a, :b], :name=>:foo) # DROP INDEX foo
-      def drop_index(columns, options={})
+      def drop_index(columns, options=OPTS)
         @operations << {:op => :drop_index, :columns => Array(columns)}.merge(options)
       end
 
       # Modify a column's name in the DDL for the table.
       #
       #   rename_column(:name, :artist_name) # RENAME COLUMN name TO artist_name
-      def rename_column(name, new_name, opts = {})
+      def rename_column(name, new_name, opts = OPTS)
         @operations << {:op => :rename_column, :name => name, :new_name => new_name}.merge(opts)
       end
       
@@ -464,7 +464,7 @@ module Sequel
       # PostgreSQL specific options:
       #
       # :using :: Add a USING clause that specifies how to convert existing values to new values.
-      def set_column_type(name, type, opts={})
+      def set_column_type(name, type, opts=OPTS)
         @operations << {:op => :set_column_type, :name => name, :type => type}.merge(opts)
       end
       

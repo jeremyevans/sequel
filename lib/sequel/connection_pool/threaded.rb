@@ -22,7 +22,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   #   a connection again (default 0.001)
   # * :pool_timeout - The amount of seconds to wait to acquire a connection
   #   before raising a PoolTimeoutError (default 5)
-  def initialize(db, opts = {})
+  def initialize(db, opts = OPTS)
     super
     @max_size = Integer(opts[:max_connections] || 4)
     raise(Sequel::Error, ':max_connections must be positive') if @max_size < 1
@@ -64,7 +64,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # 
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database.
-  def disconnect(opts={})
+  def disconnect(opts=OPTS)
     sync do
       @available_connections.each{|conn| db.disconnect_connection(conn)}
       @available_connections.clear

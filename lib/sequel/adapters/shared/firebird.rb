@@ -35,16 +35,16 @@ module Sequel
         self << restart_sequence_sql(*args)
       end
 
-      def sequences(opts={})
+      def sequences(opts=OPTS)
         ds = self[:"rdb$generators"].server(opts[:server]).filter(:"rdb$system_flag" => 0).select(:"rdb$generator_name")
         block_given? ? yield(ds) : ds.map{|r| ds.send(:output_identifier, r[:"rdb$generator_name"])}
       end
 
-      def tables(opts={})
+      def tables(opts=OPTS)
         tables_or_views(0, opts)
       end
 
-      def views(opts={})
+      def views(opts=OPTS)
         tables_or_views(1, opts)
       end
 
@@ -70,7 +70,7 @@ module Sequel
         AUTO_INCREMENT
       end
       
-      def create_sequence_sql(name, opts={})
+      def create_sequence_sql(name, opts=OPTS)
         "CREATE SEQUENCE #{quote_identifier(name)}"
       end
 
@@ -82,7 +82,7 @@ module Sequel
         create_statements.each{|sql| execute_ddl(sql)}
       end
 
-      def create_table_sql_list(name, generator, options={})
+      def create_table_sql_list(name, generator, options=OPTS)
         statements = [create_table_sql(name, generator, options)]
         drop_seq_statement = nil
         generator.columns.each do |c|
@@ -111,7 +111,7 @@ module Sequel
         [drop_seq_statement, statements]
       end
 
-      def create_trigger_sql(table, name, definition, opts={})
+      def create_trigger_sql(table, name, definition, opts=OPTS)
         events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
         whence = opts[:after] ? 'AFTER' : 'BEFORE'
         inactive = opts[:inactive] ? 'INACTIVE' : 'ACTIVE'
@@ -133,7 +133,7 @@ module Sequel
         super
       end
 
-      def restart_sequence_sql(name, opts={})
+      def restart_sequence_sql(name, opts=OPTS)
         seq_name = quote_identifier(name)
         "ALTER SEQUENCE #{seq_name} RESTART WITH #{opts[:restart_position]}"
       end

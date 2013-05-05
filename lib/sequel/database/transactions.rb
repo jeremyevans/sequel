@@ -68,7 +68,7 @@ module Sequel
     # :synchronous :: if non-nil, set synchronous_commit
     #                 appropriately.  Valid values true, :on, false, :off, :local (9.1+),
     #                 and :remote_write (9.2+).
-    def transaction(opts={}, &block)
+    def transaction(opts=OPTS, &block)
       if retry_on = opts[:retry_on]
         num_retries = opts.fetch(:num_retries, 5)
         begin
@@ -101,7 +101,7 @@ module Sequel
     # block will cause the transaction to be rolled back.  If the exception is
     # not a Sequel::Rollback, the error will be reraised. If no exception occurs
     # inside the block, the transaction is commited.
-    def _transaction(conn, opts={})
+    def _transaction(conn, opts=OPTS)
       rollback = opts[:rollback]
       begin
         add_transaction(conn, opts)
@@ -197,7 +197,7 @@ module Sequel
     end
 
     # Start a new database transaction or a new savepoint on the given connection.
-    def begin_transaction(conn, opts={})
+    def begin_transaction(conn, opts=OPTS)
       if supports_savepoints?
         th = _trans(conn)
         if (depth = th[:savepoint_level]) > 0
@@ -256,7 +256,7 @@ module Sequel
     end
 
     # Commit the active transaction on the connection
-    def commit_transaction(conn, opts={})
+    def commit_transaction(conn, opts=OPTS)
       if supports_savepoints?
         depth = _trans(conn)[:savepoint_level]
         log_connection_execute(conn, depth > 1 ? commit_savepoint_sql(depth-1) : commit_transaction_sql)
@@ -297,7 +297,7 @@ module Sequel
     end
 
     # Rollback the active transaction on the connection
-    def rollback_transaction(conn, opts={})
+    def rollback_transaction(conn, opts=OPTS)
       if supports_savepoints?
         depth = _trans(conn)[:savepoint_level]
         log_connection_execute(conn, depth > 1 ? rollback_savepoint_sql(depth-1) : rollback_transaction_sql)
@@ -324,7 +324,7 @@ module Sequel
     end
 
     # Raise a database error unless the exception is an Rollback.
-    def transaction_error(e, opts={})
+    def transaction_error(e, opts=OPTS)
       if e.is_a?(Rollback)
         raise e if opts[:rollback] == :reraise
       else

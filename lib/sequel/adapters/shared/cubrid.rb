@@ -14,7 +14,7 @@ module Sequel
         :cubrid
       end
 
-      def indexes(table, opts={})
+      def indexes(table, opts=OPTS)
         m = output_identifier_meth
         m2 = input_identifier_meth
         indexes = {}
@@ -61,11 +61,11 @@ module Sequel
           end
       end
 
-      def tables(opts={})
+      def tables(opts=OPTS)
         _tables('CLASS')
       end
 
-      def views(opts={})
+      def views(opts=OPTS)
         _tables('VCLASS')
       end
 

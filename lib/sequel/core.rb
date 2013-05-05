@@ -70,6 +70,9 @@ module Sequel
     end
   end
 
+  # Frozen hash used as the default options hash for most options.
+  OPTS = {}.freeze
+
   # Creates a new database object based on the supplied connection string
   # and optional arguments.  The specified scheme determines the database
   # class used, and the rest of the string specifies the connection options.
@@ -317,7 +320,7 @@ module Sequel
   # to uncommit the changes on DB3.  For that kind of support, you need to
   # have two-phase commit/prepared transactions (which Sequel supports on
   # some databases).
-  def self.transaction(dbs, opts={}, &block)
+  def self.transaction(dbs, opts=OPTS, &block)
     unless opts[:rollback]
       rescue_rollback = true
       opts = opts.merge(:rollback=>:reraise)

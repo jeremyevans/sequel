@@ -92,7 +92,7 @@ module Sequel
       #                proc.
       #
       # If a block is given, it is treated as the :converter option.
-      def self.register(db_type, opts={}, &block)
+      def self.register(db_type, opts=OPTS, &block)
         db_type = db_type.to_s.dup.freeze
 
         if converter = opts[:converter]
@@ -328,7 +328,7 @@ module Sequel
       # :empty :: Whether the range is empty (has no points)
       # :exclude_begin :: Whether the beginning element is excluded from the range.
       # :exclude_end :: Whether the ending element is excluded from the range.
-      def initialize(beg, en, opts={})
+      def initialize(beg, en, opts=OPTS)
         @begin = beg
         @end = en
         @empty = !!opts[:empty]

@@ -27,7 +27,7 @@ module Sequel
       # specify options to use for the parent association
       # using a :parent option, and options to use for the
       # children association using a :children option.
-      def self.apply(model, opts={})
+      def self.apply(model, opts=OPTS)
         opts = opts.dup
         opts[:class] = model
 

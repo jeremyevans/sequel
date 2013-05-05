@@ -21,7 +21,7 @@ module Sequel
         end
 
         # See Sequel::Postgres::Adapter#copy_into
-        def copy_into(table, opts={})
+        def copy_into(table, opts=OPTS)
           data = opts[:data]
           data = Array(data) if data.is_a?(String)
 
@@ -58,7 +58,7 @@ module Sequel
         end
         
         # See Sequel::Postgres::Adapter#copy_table
-        def copy_table(table, opts={})
+        def copy_table(table, opts=OPTS)
           synchronize(opts[:server]) do |conn|
             copy_manager = org.postgresql.copy.CopyManager.new(conn)
             copier = copy_manager.copy_out(copy_table_sql(table, opts))

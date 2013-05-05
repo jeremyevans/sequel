@@ -68,7 +68,7 @@ module Sequel
       # The class_table_inheritance plugin requires the lazy_attributes plugin
       # to handle lazily-loaded attributes for subclass instances returned
       # by superclass methods.
-      def self.apply(model, opts={})
+      def self.apply(model, opts=OPTS)
         model.plugin :lazy_attributes
       end
       
@@ -81,7 +81,7 @@ module Sequel
       # * :table_map - Hash with class name symbol keys and table name symbol
       #   values.  Necessary if the implicit table name for the model class
       #   does not match the database table name
-      def self.configure(model, opts={})
+      def self.configure(model, opts=OPTS)
         model.instance_eval do
           m = method(:constantize)
           @cti_base_model = self

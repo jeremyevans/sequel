@@ -43,7 +43,7 @@ module Sequel
     #   # Make the Album class use auto validations
     #   Album.plugin :auto_validations
     module AutoValidations
-      def self.apply(model, opts={})
+      def self.apply(model, opts=OPTS)
         model.instance_eval do
           plugin :validation_helpers
           @auto_validate_presence = false
@@ -55,7 +55,7 @@ module Sequel
       end
 
       # Setup auto validations for the model if it has a dataset.
-      def self.configure(model, opts={})
+      def self.configure(model, opts=OPTS)
         model.instance_eval do
           setup_auto_validations if @dataset
           if opts[:not_null] == :presence

@@ -58,7 +58,7 @@ module Sequel
       # a SELECT statement is being used (or something else that returns rows).
       # Otherwise, the return value is the insert id if opts[:type] is :insert,
       # or the number of affected rows, otherwise.
-      def execute(sql, opts={})
+      def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
             command = conn.create_command(sql)
@@ -82,13 +82,13 @@ module Sequel
       
       # Execute the SQL on the this database, returning the number of affected
       # rows.
-      def execute_dui(sql, opts={})
+      def execute_dui(sql, opts=OPTS)
         execute(sql, opts)
       end
       
       # Execute the SQL on this database, returning the primary key of the
       # table being inserted to.
-      def execute_insert(sql, opts={})
+      def execute_insert(sql, opts=OPTS)
         execute(sql, opts.merge(:type=>:insert))
       end
       
@@ -100,7 +100,7 @@ module Sequel
       
       # Return the DataObjects URI for the Sequel URI, removing the do:
       # prefix.
-      def uri(opts={})
+      def uri(opts=OPTS)
         opts = @opts.merge(opts)
         (opts[:uri] || opts[:url]).sub(/\Ado:/, '')
       end

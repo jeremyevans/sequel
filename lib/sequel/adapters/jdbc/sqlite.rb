@@ -13,7 +13,7 @@ module Sequel
         
         # Swallow pointless exceptions when the foreign key list pragma
         # doesn't return any rows.
-        def foreign_key_list(table, opts={})
+        def foreign_key_list(table, opts=OPTS)
           super
         rescue Sequel::DatabaseError => e
           raise unless e.message =~ FOREIGN_KEY_ERROR_RE
@@ -22,7 +22,7 @@ module Sequel
 
         # Swallow pointless exceptions when the index list pragma
         # doesn't return any rows.
-        def indexes(table, opts={})
+        def indexes(table, opts=OPTS)
           super
         rescue Sequel::DatabaseError => e
           raise unless e.message =~ FOREIGN_KEY_ERROR_RE
@@ -37,7 +37,7 @@ module Sequel
         end
 
         # Use last_insert_rowid() to get the last inserted id.
-        def last_insert_id(conn, opts={})
+        def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
             rs = stmt.executeQuery(LAST_INSERT_ROWID)
             rs.next

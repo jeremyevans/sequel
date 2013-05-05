@@ -24,13 +24,13 @@ module Sequel
       Error = InstanceFilters::Error
       
       # Load the instance_filters plugin into the model.
-      def self.apply(model, opts={})
+      def self.apply(model, opts=OPTS)
         model.plugin :instance_filters
       end
 
       # Set the lock_column to the :lock_column option, or :lock_version if
       # that option is not given.
-      def self.configure(model, opts={})
+      def self.configure(model, opts=OPTS)
         model.lock_column = opts[:lock_column] || :lock_version
       end
       

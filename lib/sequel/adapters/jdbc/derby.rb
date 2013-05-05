@@ -117,7 +117,7 @@ module Sequel
         end
 
         # Use IDENTITY_VAL_LOCAL() to get the last inserted id.
-        def last_insert_id(conn, opts={})
+        def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
             sql = 'SELECT IDENTITY_VAL_LOCAL() FROM sysibm.sysdummy1'
             rs = log_yield(sql){stmt.executeQuery(sql)}

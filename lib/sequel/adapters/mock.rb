@@ -142,18 +142,18 @@ module Sequel
       # Store the sql used for later retrieval with #sqls, and return
       # the appropriate value using either the #autoid, #fetch, or
       # #numrows methods.
-      def execute(sql, opts={}, &block)
+      def execute(sql, opts=OPTS, &block)
         synchronize(opts[:server]){|c| _execute(c, sql, opts, &block)} 
       end
       alias execute_ddl execute
 
       # Store the sql used, and return the value of the #numrows method.
-      def execute_dui(sql, opts={})
+      def execute_dui(sql, opts=OPTS)
         execute(sql, opts.merge(:meth=>:numrows))
       end
 
       # Store the sql used, and return the value of the #autoid method.
-      def execute_insert(sql, opts={})
+      def execute_insert(sql, opts=OPTS)
         execute(sql, opts.merge(:meth=>:autoid))
       end
 
@@ -186,7 +186,7 @@ module Sequel
         end
       end
 
-      def _execute(c, sql, opts={}, &block)
+      def _execute(c, sql, opts=OPTS, &block)
         sql += " -- args: #{opts[:arguments].inspect}" if opts[:arguments]
         sql += " -- #{@opts[:append]}" if @opts[:append]
         sql += " -- #{c.server.is_a?(Symbol) ? c.server : c.server.inspect}" if c.server != :default
@@ -362,15 +362,15 @@ module Sequel
 
       private
 
-      def execute(sql, opts={}, &block)
+      def execute(sql, opts=OPTS, &block)
         super(sql, opts.merge(:dataset=>self), &block)
       end
 
-      def execute_dui(sql, opts={}, &block)
+      def execute_dui(sql, opts=OPTS, &block)
         super(sql, opts.merge(:dataset=>self), &block)
       end
 
-      def execute_insert(sql, opts={}, &block)
+      def execute_insert(sql, opts=OPTS, &block)
         super(sql, opts.merge(:dataset=>self), &block)
       end
     end

@@ -63,7 +63,7 @@ module Sequel
       # :using :: Override the index_method for the exclusion constraint (defaults to gist).
       # :where :: Create a partial exclusion constraint, which only affects
       #           a subset of table rows, value should be a filter expression.
-      def exclude(elements, opts={})
+      def exclude(elements, opts=OPTS)
         constraints << {:type => :exclude, :elements => elements}.merge(opts)
       end
     end
@@ -71,7 +71,7 @@ module Sequel
     class AlterTableGenerator < Sequel::Schema::AlterTableGenerator
       # Adds an exclusion constraint to an existing table, see
       # CreateTableGenerator#exclude.
-      def add_exclusion_constraint(elements, opts={})
+      def add_exclusion_constraint(elements, opts=OPTS)
         @operations << {:op => :add_constraint, :type => :exclude, :elements => elements}.merge(opts)
       end
 
@@ -177,7 +177,7 @@ module Sequel
       #   * :set : Configuration variables to set while the function is being run, can be a hash or an array of two pairs.  search_path is
       #     often used here if :security_definer is used.
       #   * :strict : Makes the function return NULL when any argument is NULL.
-      def create_function(name, definition, opts={})
+      def create_function(name, definition, opts=OPTS)
         self << create_function_sql(name, definition, opts)
       end
 
@@ -188,7 +188,7 @@ module Sequel
       #   * :replace: Replace the installed language if it already exists (on PostgreSQL 9.0+).
       #   * :trusted : Marks the language being created as trusted, allowing unprivileged users to create functions using this language.
       #   * :validator : The name of previously registered function used as a validator of functions defined in this language.
-      def create_language(name, opts={})
+      def create_language(name, opts=OPTS)
         self << create_language_sql(name, opts)
       end
 
@@ -208,7 +208,7 @@ module Sequel
       #   * :each_row : Calls the trigger for each row instead of for each statement.
       #   * :events : Can be :insert, :update, :delete, or an array of any of those. Calls the trigger whenever that type of statement is used.  By default,
       #     the trigger is called for insert, update, or delete.
-      def create_trigger(table, name, function, opts={})
+      def create_trigger(table, name, function, opts=OPTS)
         self << create_trigger_sql(table, name, function, opts)
       end
 
@@ -222,7 +222,7 @@ module Sequel
       #
       # :language :: The procedural language the code is written in.  The PostgreSQL
       #              default is plpgsql.  Can be specified as a string or a symbol.
-      def do(code, opts={})
+      def do(code, opts=OPTS)
         language = opts[:language]
         run "DO #{"LANGUAGE #{literal(language.to_s)} " if language}#{literal(code)}"
       end
@@ -233,7 +233,7 @@ module Sequel
       #   * :args : The arguments for the function.  See create_function_sql.
       #   * :cascade : Drop other objects depending on this function.
       #   * :if_exists : Don't raise an error if the function doesn't exist.
-      def drop_function(name, opts={})
+      def drop_function(name, opts=OPTS)
         self << drop_function_sql(name, opts)
       end
 
@@ -242,7 +242,7 @@ module Sequel
       # * opts : options hash:
       #   * :cascade : Drop other objects depending on this function.
       #   * :if_exists : Don't raise an error if the function doesn't exist.
-      def drop_language(name, opts={})
+      def drop_language(name, opts=OPTS)
         self << drop_language_sql(name, opts)
       end
 
@@ -251,7 +251,7 @@ module Sequel
       # * opts : options hash:
       #   * :cascade : Drop all objects in this schema.
       #   * :if_exists : Don't raise an error if the schema doesn't exist.
-      def drop_schema(name, opts={})
+      def drop_schema(name, opts=OPTS)
         self << drop_schema_sql(name, opts)
       end
 
@@ -261,13 +261,13 @@ module Sequel
       # * opts : options hash:
       #   * :cascade : Drop other objects depending on this function.
       #   * :if_exists : Don't raise an error if the function doesn't exist.
-      def drop_trigger(table, name, opts={})
+      def drop_trigger(table, name, opts=OPTS)
         self << drop_trigger_sql(table, name, opts)
       end
 
       # Return full foreign key information using the pg system tables, including
       # :name, :on_delete, :on_update, and :deferrable entries in the hashes.
-      def foreign_key_list(table, opts={})
+      def foreign_key_list(table, opts=OPTS)
         m = output_identifier_meth
         schema, _ = opts.fetch(:schema, schema_and_table(table))
         range = 0...32
@@ -321,7 +321,7 @@ module Sequel
       end
 
       # Use the pg_* system tables to determine indexes on a table
-      def indexes(table, opts={})
+      def indexes(table, opts=OPTS)
         m = output_identifier_meth
         range = 0...32
         attnums = server_version >= 80100 ? SQL::Function.new(:ANY, :ind__indkey) : range.map{|x| SQL::Subscript.new(:ind__indkey, [x])}
@@ -356,7 +356,7 @@ module Sequel
       #             in PostgreSQL 9.0+.
       # :server :: The server to which to send the NOTIFY statement, if the sharding support
       #            is being used.
-      def notify(channel, opts={})
+      def notify(channel, opts=OPTS)
         sql = "NOTIFY "
         dataset.send(:identifier_append, sql, channel)
         if payload = opts[:payload]
@@ -367,7 +367,7 @@ module Sequel
       end
 
       # Return primary key for the given table.
-      def primary_key(table, opts={})
+      def primary_key(table, opts=OPTS)
         quoted_table = quote_schema_table(table)
         Sequel.synchronize{return @primary_keys[quoted_table] if @primary_keys.has_key?(quoted_table)}
         sql = "#{SELECT_PK_SQL} AND pg_class.oid = #{literal(regclass_oid(table, opts))}"
@@ -376,7 +376,7 @@ module Sequel
       end
 
       # Return the sequence providing the default for the primary key for the given table.
-      def primary_key_sequence(table, opts={})
+      def primary_key_sequence(table, opts=OPTS)
         quoted_table = quote_schema_table(table)
         Sequel.synchronize{return @primary_key_sequences[quoted_table] if @primary_key_sequences.has_key?(quoted_table)}
         sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND t.oid = #{literal(regclass_oid(table, opts))}"
@@ -490,7 +490,7 @@ module Sequel
       #             using the schema the table is located in as the qualifier.
       # :schema :: The schema to search
       # :server :: The server to use
-      def tables(opts={}, &block)
+      def tables(opts=OPTS, &block)
         pg_class_relname('r', opts, &block)
       end
 
@@ -508,7 +508,7 @@ module Sequel
       #             using the schema the view is located in as the qualifier.
       # :schema :: The schema to search
       # :server :: The server to use
-      def views(opts={})
+      def views(opts=OPTS)
         pg_class_relname('v', opts)
       end
 
@@ -576,7 +576,7 @@ module Sequel
 
       # If the :prepare option is given and we aren't in a savepoint,
       # prepare the transaction for a two-phase commit.
-      def commit_transaction(conn, opts={})
+      def commit_transaction(conn, opts=OPTS)
         if (s = opts[:prepare]) && _trans(conn)[:savepoint_level] <= 1
           log_connection_execute(conn, "PREPARE TRANSACTION #{literal(s)}")
         else
@@ -716,7 +716,7 @@ module Sequel
       end
 
       # SQL statement to create database function.
-      def create_function_sql(name, definition, opts={})
+      def create_function_sql(name, definition, opts=OPTS)
         args = opts[:args]
         if !opts[:args].is_a?(Array) || !opts[:args].any?{|a| Array(a).length == 3 and %w'OUT INOUT'.include?(a[2].to_s)}
           returns = opts[:returns] || 'void'
@@ -737,7 +737,7 @@ module Sequel
       end
 
       # SQL for creating a procedural language.
-      def create_language_sql(name, opts={})
+      def create_language_sql(name, opts=OPTS)
         "CREATE#{' OR REPLACE' if opts[:replace] && server_version >= 90000}#{' TRUSTED' if opts[:trusted]} LANGUAGE #{name}#{" HANDLER #{opts[:handler]}" if opts[:handler]}#{" VALIDATOR #{opts[:validator]}" if opts[:validator]}"
       end
 
@@ -763,7 +763,7 @@ module Sequel
       end
     
       # SQL for creating a database trigger.
-      def create_trigger_sql(table, name, function, opts={})
+      def create_trigger_sql(table, name, function, opts=OPTS)
         events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
         whence = opts[:after] ? 'AFTER' : 'BEFORE'
         "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
@@ -780,7 +780,7 @@ module Sequel
       end
 
       # SQL for dropping a function from the database.
-      def drop_function_sql(name, opts={})
+      def drop_function_sql(name, opts=OPTS)
         "DROP FUNCTION#{' IF EXISTS' if opts[:if_exists]} #{name}#{sql_function_args(opts[:args])}#{' CASCADE' if opts[:cascade]}"
       end
       
@@ -790,17 +790,17 @@ module Sequel
       end
 
       # SQL for dropping a procedural language from the database.
-      def drop_language_sql(name, opts={})
+      def drop_language_sql(name, opts=OPTS)
         "DROP LANGUAGE#{' IF EXISTS' if opts[:if_exists]} #{name}#{' CASCADE' if opts[:cascade]}"
       end
 
       # SQL for dropping a schema from the database.
-      def drop_schema_sql(name, opts={})
+      def drop_schema_sql(name, opts=OPTS)
         "DROP SCHEMA#{' IF EXISTS' if opts[:if_exists]} #{quote_identifier(name)}#{' CASCADE' if opts[:cascade]}"
       end
 
       # SQL for dropping a trigger from the database.
-      def drop_trigger_sql(table, name, opts={})
+      def drop_trigger_sql(table, name, opts=OPTS)
         "DROP TRIGGER#{' IF EXISTS' if opts[:if_exists]} #{name} ON #{quote_schema_table(table)}#{' CASCADE' if opts[:cascade]}"
       end
 
@@ -886,7 +886,7 @@ module Sequel
 
       # Return an expression the oid for the table expr.  Used by the metadata parsing
       # code to disambiguate unqualified tables.
-      def regclass_oid(expr, opts={})
+      def regclass_oid(expr, opts=OPTS)
         if expr.is_a?(String) && !expr.is_a?(LiteralString)
           expr = Sequel.identifier(expr)
         end
@@ -1132,7 +1132,7 @@ module Sequel
       end
 
       # Return the results of an EXPLAIN query as a string
-      def explain(opts={})
+      def explain(opts=OPTS)
         with_sql((opts[:analyze] ? EXPLAIN_ANALYZE : EXPLAIN) + select_sql).map(QUERY_PLAN).join(CRLF)
       end
 
@@ -1143,7 +1143,7 @@ module Sequel
 
       # PostgreSQL specific full text search syntax, using tsearch2 (included
       # in 8.3 by default, and available for earlier versions as an add-on).
-      def full_text_search(cols, terms, opts = {})
+      def full_text_search(cols, terms, opts = OPTS)
         lang = opts[:language] || 'simple'
         terms = terms.join(' | ') if terms.is_a?(Array)
         filter("to_tsvector(?::regconfig, ?) @@ to_tsquery(?::regconfig, ?)", lang, full_text_string_join(cols), lang, terms)
@@ -1177,7 +1177,7 @@ module Sequel
       # a new transaction, locks the table, and yields.  If a block is not given
       # just locks the tables.  Note that PostgreSQL will probably raise an error
       # if you lock the table outside of an existing transaction.  Returns nil.
-      def lock(mode, opts={})
+      def lock(mode, opts=OPTS)
         if block_given? # perform locking inside a transaction and yield to block
           @db.transaction(opts){lock(mode, opts); yield}
         else
@@ -1251,7 +1251,7 @@ module Sequel
       #   # => nil
       #   DB[:table].truncate(:cascade => true, :only=>true, :restart=>true) # TRUNCATE TABLE ONLY "table" RESTART IDENTITY CASCADE
       #   # => nil
-      def truncate(opts = {})
+      def truncate(opts = OPTS)
         if opts.empty?
           super()
         else
@@ -1270,7 +1270,7 @@ module Sequel
       # dataset.  If RETURNING is already set, use existing returning values.  If RETURNING
       # is only set to return a single columns, return an array of just that column.
       # Otherwise, return an array of hashes.
-      def _import(columns, values, opts={})
+      def _import(columns, values, opts=OPTS)
         if @opts[:returning]
           statements = multi_insert_sql(columns, values)
           @db.transaction(opts.merge(:server=>@opts[:server])) do

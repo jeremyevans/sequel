@@ -53,7 +53,7 @@ module Sequel
         c.disconnect
       end
       
-      def execute(sql, opts={})
+      def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           r = log_yield(sql){conn.execute(sql)}
           yield(r) if block_given?
@@ -61,7 +61,7 @@ module Sequel
         end
       end
       
-      def execute_dui(sql, opts={})
+      def execute_dui(sql, opts=OPTS)
         synchronize(opts[:server]){|conn| log_yield(sql){conn.do(sql)}}
       end
 
