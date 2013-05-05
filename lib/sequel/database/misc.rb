@@ -493,7 +493,13 @@ module Sequel
 
     # Typecast the value to a String
     def typecast_value_string(value)
-      value.to_s
+      case value
+      when Hash, Array
+        Sequel::Deprecation.deprecate('Automatically typecasting a hash or array to string for a string column', 'Either typecast the input manually or use the looser_typecasting extension')
+        value.to_s
+      else
+        value.to_s
+      end
     end
 
     # Typecast the value to a Time

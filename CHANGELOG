@@ -1,5 +1,9 @@
 === HEAD
 
+* Automatically typecast hash and array to string for string columns in the looser_typecasting extension (jeremyevans)
+
+* Deprecate automatic typecasting of hash and array to string for string columns (jeremyevans)
+
 * Deprecate :eager_loader and :eager_grapher association options getting passed 3 separate arguments (jeremyevans)
 
 * Deprecate validates_not_string (jeremyevans)

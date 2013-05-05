@@ -1,6 +1,12 @@
-# The LooserTypecasting extension changes the float and integer typecasting to
-# use the looser .to_f and .to_i instead of the more strict Kernel.Float and
-# Kernel.Integer.  To load the extension into the database:
+# The LooserTypecasting extension loosens the default database typecasting
+# for the following types:
+#
+# :float :: use to_f instead of Float()
+# :integer :: use to_i instead of Integer()
+# :decimal :: don't check string conversion with Float()
+# :string :: silently allow hash and array conversion to string
+#
+# To load the extension into the database:
 #
 #   DB.extension :looser_typecasting
 
@@ -14,6 +20,11 @@ module Sequel
     # Typecast the value to an Integer using to_i instead of Kernel.Integer
     def typecast_value_integer(value)
       value.to_i
+    end
+
+    # Typecast the value to an Integer using to_i instead of Kernel.Integer
+    def typecast_value_string(value)
+      value.to_s
     end
 
     # Typecast the value to a BigDecimal, without checking if strings
