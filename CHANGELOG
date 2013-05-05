@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up Model.with_pk and with_pk! class methods (jeremyevans)
+
 * Speed up Dataset#clone when called without an argument (jeremyevans)
 
 * Deprecate Postgres::PGRangeOp#{starts_before,ends_after} (jeremyevans)

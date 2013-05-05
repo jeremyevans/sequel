@@ -705,6 +705,13 @@ describe "Model datasets #with_pk with #with_pk!" do
     MODEL_DB.reset
   end
 
+  it "should be callable on the model class with optimized SQL" do
+    @c.with_pk(1).should == @c.load(:id=>1)
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE id = 1"]
+    @c.with_pk!(1).should == @c.load(:id=>1)
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE id = 1"]
+  end
+
   it "should return the first record where the primary key matches" do
     @ds.with_pk(1).should == @c.load(:id=>1)
     MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
@@ -747,6 +754,14 @@ describe "Model datasets #with_pk with #with_pk!" do
     MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
     proc{@ds.with_pk!(1)}.should raise_error(Sequel::NoMatchingRow)
     MODEL_DB.sqls.should == ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
+  end
+
+  it "should have with_pk return nil and with_pk! raise if no rows match when calling the class method" do
+    @ds._fetch = []
+    @c.with_pk(1).should == nil
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE id = 1"]
+    proc{@c.with_pk!(1)}.should raise_error(Sequel::NoMatchingRow)
+    MODEL_DB.sqls.should == ["SELECT * FROM a WHERE id = 1"]
   end
 
   it "should have #[] consider an integer as a primary key lookup" do

@@ -676,6 +676,16 @@ module Sequel
         clear_setter_methods_cache
         @restrict_primary_key = false
       end
+
+      # Return the model instance with the primary key, or nil if there is no matching record.
+      def with_pk(pk)
+        primary_key_lookup(pk)
+      end
+
+      # Return the model instance with the primary key, or raise NoMatchingRow if there is no matching record.
+      def with_pk!(pk)
+        with_pk(pk) || raise(NoMatchingRow)
+      end
   
       # Add model methods that call dataset methods
       Plugins.def_dataset_methods(self, DATASET_METHODS)
