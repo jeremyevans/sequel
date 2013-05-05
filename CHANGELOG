@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate using an unsupported client_min_messages setting on PostgreSQL (jeremyevans)
+
 * Deprecate passing non-hash 4th argument to Dataset#join_table (jeremyevans)
 
 * Deprecate passing non-hash 2nd argument to Dataset#union/intersect/except (jeremyevans)

@@ -600,6 +600,10 @@ module Sequel
         sqls << "SET standard_conforming_strings = ON" if typecast_value_boolean(@opts.fetch(:force_standard_strings, Postgres.force_standard_strings))
 
         if (cmm = @opts.fetch(:client_min_messages, Postgres.client_min_messages)) && !cmm.to_s.empty?
+          cmm = cmm.to_s.upcase.strip
+          unless VALID_CLIENT_MIN_MESSAGES.include?(cmm)
+            Sequel::Deprecation.deprecate("Using an unsupported client_min_messages setting will raise an Error in Sequel 4.")
+          end
           sqls << "SET client_min_messages = '#{cmm.to_s.upcase}'"
         end
 
