@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "A paginated dataset" do
   before do
-    @d = Sequel.mock.dataset
+    @d = Sequel.mock.dataset.extension(:pagination)
     @d.meta_def(:count) {153}
     
     @paginated = @d.paginate(1, 20)
@@ -78,7 +78,7 @@ end
 
 describe "Dataset#each_page" do
   before do
-    @d = Sequel.mock.dataset.from(:items)
+    @d = Sequel.mock.dataset.from(:items).extension(:pagination)
     @d.meta_def(:count) {153}
   end
   

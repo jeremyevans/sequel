@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
 describe "Sequel::Schema::Generator dump methods" do
   before do
-    @d = Sequel::Database.new
+    @d = Sequel::Database.new.extension(:schema_dumper)
     @g = Sequel::Schema::Generator
   end
 
@@ -64,7 +64,7 @@ end
 
 describe "Sequel::Database dump methods" do
   before do
-    @d = Sequel::Database.new
+    @d = Sequel::Database.new.extension(:schema_dumper)
     @d.meta_def(:tables){|o| [:t1, :t2]}
     @d.meta_def(:schema) do |t, *o|
       case t

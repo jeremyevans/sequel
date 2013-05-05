@@ -2,11 +2,20 @@
 # columns from a dataset.  It's not part of Sequel core as it is rarely needed and has
 # some corner cases where it can't work correctly.
 #
-# To load the extension:
+# You can load this extension into specific datasets:
 #
-#   Sequel.extension :select_remove
+#   ds = DB[:table]
+#   ds.extension(:select_remove)
+#
+# Or you can load it into all of a database's datasets, which
+# is probably the desired behavior if you are using this extension:
+#
+#   DB.extension(:select_remove)
 
 module Sequel
+  module SelectRemove
+  end
+
   class Dataset
     # Remove columns from the list of selected columns.  If any of the currently selected
     # columns use expressions/aliases, this will remove selected columns with the given
@@ -29,6 +38,7 @@ module Sequel
     #
     # There may be other cases where this method does not work correctly, use it with caution.
     def select_remove(*cols)
+      Sequel::Deprecation.deprecate('Loading the select_remove extension globally', "Please use Database/Dataset#extension to load the extension into this dataset") unless is_a?(SelectRemove)
       if (sel = @opts[:select]) && !sel.empty?
         select(*(columns.zip(sel).reject{|c, s| cols.include?(c)}.map{|c, s| s} - cols))
       else
@@ -37,6 +47,5 @@ module Sequel
     end
   end
 
-  Database.register_extension(:select_remove){}
-  Dataset.register_extension(:select_remove){}
+  Dataset.register_extension(:select_remove, SelectRemove)
 end

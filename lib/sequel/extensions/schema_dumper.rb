@@ -6,11 +6,14 @@
 #
 # To load the extension:
 #
-#   Sequel.extension :schema_dumper
+#   DB.extension :schema_dumper
 
 Sequel.extension :eval_inspect
 
 module Sequel
+  module SchemaDumper
+  end
+
   class Database
     # Dump foreign key constraints for all tables as a migration. This complements
     # the :foreign_keys=>false option to dump_schema_migration. This only dumps
@@ -20,6 +23,7 @@ module Sequel
     # Note that the migration this produces does not have a down
     # block, so you cannot reverse it.
     def dump_foreign_key_migration(options={})
+      Sequel::Deprecation.deprecate('Loading the schema_dumper extension globally', "Please use Database#extension to load the extension into this database") unless is_a?(SchemaDumper)
       ts = tables(options)
       <<END_MIG
 Sequel.migration do
@@ -38,6 +42,7 @@ END_MIG
     #                 set to :namespace, prepend the table name to the index name if the
     #                 database does not use a global index namespace.
     def dump_indexes_migration(options={})
+      Sequel::Deprecation.deprecate('Loading the schema_dumper extension globally', "Please use Database#extension to load the extension into this database") unless is_a?(SchemaDumper)
       ts = tables(options)
       <<END_MIG
 Sequel.migration do
@@ -62,6 +67,7 @@ END_MIG
     # :index_names :: If set to false, don't record names of indexes. If
     #                 set to :namespace, prepend the table name to the index name.
     def dump_schema_migration(options={})
+      Sequel::Deprecation.deprecate('Loading the schema_dumper extension globally', "Please use Database#extension to load the extension into this database") unless is_a?(SchemaDumper)
       options = options.dup
       if options[:indexes] == false && !options.has_key?(:foreign_keys)
         # Unless foreign_keys option is specifically set, disable if indexes
@@ -91,6 +97,7 @@ END_MIG
     # Return a string with a create table block that will recreate the given
     # table's schema.  Takes the same options as dump_schema_migration.
     def dump_table_schema(table, options={})
+      Sequel::Deprecation.deprecate('Loading the schema_dumper extension globally', "Please use Database#extension to load the extension into this database") unless is_a?(SchemaDumper)
       table = table.value.to_s if table.is_a?(SQL::Identifier)
       gen = dump_table_generator(table, options)
       commands = [gen.dump_columns, gen.dump_constraints, gen.dump_indexes].reject{|x| x == ''}.join("\n\n")
@@ -464,5 +471,5 @@ END_MIG
     end
   end
 
-  Database.register_extension(:schema_dumper){}
+  Database.register_extension(:schema_dumper, SchemaDumper)
 end

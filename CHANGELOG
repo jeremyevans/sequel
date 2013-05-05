@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate global use of pagination, pretty_table, query, select_remove, schema_caching, and schema_dumper extensions (jeremyevans)
+
 * Deprecate Dataset.introspect_all_columns in the columns_introspection extension (jeremyevans)
 
 * Add empty_array_ignore_nulls extension for ignoring null handling for IN/NOT with an empty array (jeremyevans)

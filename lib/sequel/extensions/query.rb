@@ -2,16 +2,32 @@
 # a different way to construct queries instead of the usual
 # method chaining.  See Sequel::Dataset#query for details.
 #
-# To load the extension, do:
+# You can load this extension into specific datasets:
 #
-#   Sequel.extension :query
+#   ds = DB[:table]
+#   ds.extension(:query)
+#
+# Or you can load it into all of a database's datasets, which
+# is probably the desired behavior if you are using this extension:
+#
+#   DB.extension(:query)
 
 module Sequel
+  module DatabaseQuery
+    def self.extended(db)
+      db.extend_datasets(DatasetQuery)
+    end
+  end
+
   class Database
     # Return a dataset modified by the query block
     def query(&block)
+      Sequel::Deprecation.deprecate('Loading the query extension globally', "Please use Database#extension to load the extension into this database") unless is_a?(DatabaseQuery)
       dataset.query(&block)
     end
+  end
+
+  module DatasetQuery
   end
 
   class Dataset
@@ -29,6 +45,7 @@ module Sequel
     #
     #  dataset = DB[:items].select(:x, :y, :z).filter{(x > 1) & (y > 2)}.reverse(:z)
     def query(&block)
+      Sequel::Deprecation.deprecate('Loading the query extension globally', "Please use Database/Dataset#extension to load the extension into this dataset") unless is_a?(DatasetQuery)
       query = Query.new(self)
       query.instance_eval(&block)
       query.dataset
@@ -52,6 +69,6 @@ module Sequel
     end
   end
 
-  Dataset.register_extension(:query){}
-  Database.register_extension(:query){}
+  Dataset.register_extension(:query, DatasetQuery)
+  Database.register_extension(:query, DatabaseQuery)
 end

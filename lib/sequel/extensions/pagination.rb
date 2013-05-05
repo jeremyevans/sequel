@@ -2,19 +2,29 @@
 # which return paginated (limited and offset) datasets with some helpful methods
 # that make creating a paginated display easier.
 #
-# To load the extension:
-#
-#   Sequel.extension :pagination
-#
 # This extension uses Object#extend at runtime, which can hurt performance.
+#
+# You can load this extension into specific datasets:
+#
+#   ds = DB[:table]
+#   ds.extension(:pagination)
+#
+# Or you can load it into all of a database's datasets, which
+# is probably the desired behavior if you are using this extension:
+#
+#   DB.extension(:pagination)
 
 module Sequel
+  module DatasetPagination
+  end
+
   class Dataset
     # Returns a paginated dataset. The returned dataset is limited to
     # the page size at the correct offset, and extended with the Pagination
     # module.  If a record count is not provided, does a count of total
     # number of records for this dataset.
     def paginate(page_no, page_size, record_count=nil)
+      Sequel::Deprecation.deprecate('Loading the pagination extension globally', "Please use Database/Dataset#extension to load the extension into this dataset") unless is_a?(DatasetPagination)
       raise(Error, "You cannot paginate a dataset that already has a limit") if @opts[:limit]
       paginated = limit(page_size, (page_no - 1) * page_size)
       paginated.extend(Pagination)
@@ -24,6 +34,7 @@ module Sequel
     # Yields a paginated dataset for each page and returns the receiver. Does
     # a count to find the total number of records for this dataset.
     def each_page(page_size)
+      Sequel::Deprecation.deprecate('Loading the pagination extension globally', "Please use Database/Dataset#extension to load the extension into this dataset") unless is_a?(DatasetPagination)
       raise(Error, "You cannot paginate a dataset that already has a limit") if @opts[:limit]
       record_count = count
       total_pages = (record_count / page_size.to_f).ceil
@@ -104,6 +115,5 @@ module Sequel
     end
   end
 
-  Database.register_extension(:pagination){}
-  Dataset.register_extension(:pagination){}
+  Dataset.register_extension(:pagination, DatasetPagination)
 end

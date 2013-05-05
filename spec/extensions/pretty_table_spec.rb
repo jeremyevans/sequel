@@ -7,7 +7,7 @@ describe "Dataset#print" do
     @output = StringIO.new
     @orig_stdout = $stdout
     $stdout = @output
-    @dataset = Sequel.mock(:fetch=>[{:a=>1, :b=>2}, {:a=>3, :b=>4}, {:a=>5, :b=>6}])[:items]
+    @dataset = Sequel.mock(:fetch=>[{:a=>1, :b=>2}, {:a=>3, :b=>4}, {:a=>5, :b=>6}])[:items].extension(:pretty_table)
   end
 
   after do

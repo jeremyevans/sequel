@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Dataset#select_remove" do
   before do
-    @d = Sequel.mock.from(:test)
+    @d = Sequel.mock.from(:test).extension(:select_remove)
     @d.columns :a, :b, :c
   end
   

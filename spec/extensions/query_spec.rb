@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Database#query" do
   before do
-    @db = Sequel.mock
+    @db = Sequel.mock.extension(:query)
   end
 
   specify "should delegate to Dataset#query if block is provided" do
@@ -14,7 +14,7 @@ end
 
 describe "Dataset#query" do
   before do
-    @d = Sequel.mock.dataset
+    @d = Sequel.mock.dataset.extension(:query)
   end
   
   specify "should allow cloning without arguments" do
