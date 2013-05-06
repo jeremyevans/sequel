@@ -91,7 +91,7 @@ module Sequel
         when /Microsoft\.(Jet|ACE)\.OLEDB/io
           Sequel.require 'adapters/ado/access'
           extend Sequel::ADO::Access::DatabaseMethods
-          self. dataset_class = ADO::Access::Dataset
+          self.dataset_class = ADO::Access::Dataset
         else
           @opts[:driver] ||= 'SQL Server'
           case @opts[:driver]
