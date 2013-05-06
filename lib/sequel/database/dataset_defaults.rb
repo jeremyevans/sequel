@@ -66,6 +66,7 @@ module Sequel
         @dataset_modules.each{|m| c.send(:include, m)}
       end
       @dataset_class = c
+      reset_default_dataset
     end
 
     # Equivalent to extending all datasets produced by the database with a
