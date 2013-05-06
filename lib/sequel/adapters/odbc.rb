@@ -68,7 +68,7 @@ module Sequel
         when 'mssql'
           Sequel.require 'adapters/odbc/mssql'
           extend Sequel::ODBC::MSSQL::DatabaseMethods
-          @dataset_class = Sequel::ODBC::MSSQL::Dataset
+          self.dataset_class = Sequel::ODBC::MSSQL::Dataset
           set_mssql_unicode_strings
         when 'progress'
           Sequel.require 'adapters/shared/progress'

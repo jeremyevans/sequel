@@ -91,14 +91,14 @@ module Sequel
         when /Microsoft\.(Jet|ACE)\.OLEDB/io
           Sequel.require 'adapters/ado/access'
           extend Sequel::ADO::Access::DatabaseMethods
-          @dataset_class = ADO::Access::Dataset
+          self. dataset_class = ADO::Access::Dataset
         else
           @opts[:driver] ||= 'SQL Server'
           case @opts[:driver]
           when 'SQL Server'
             Sequel.require 'adapters/ado/mssql'
             extend Sequel::ADO::MSSQL::DatabaseMethods
-            @dataset_class = ADO::MSSQL::Dataset
+            self.dataset_class = ADO::MSSQL::Dataset
             set_mssql_unicode_strings
           end
         end
