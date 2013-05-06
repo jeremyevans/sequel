@@ -23,7 +23,12 @@ module Sequel
       # strings.  True by default for compatibility, can be set to false for a possible
       # performance increase.  This sets the default for all datasets created from this
       # Database object.
-      attr_accessor :mssql_unicode_strings
+      attr_reader :mssql_unicode_strings
+
+      def mssql_unicode_strings=(v)
+        @mssql_unicode_strings = v
+        reset_default_dataset
+      end
 
       # The types to check for 0 scale to transform :decimal types
       # to :integer.
@@ -443,6 +448,9 @@ module Sequel
       Sequel::Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
 
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
+      attr_writer :mssql_unicode_strings
+
+      # Use the database's mssql_unicode_strings setting if the dataset hasn't overridden it.
       def mssql_unicode_strings
         defined?(@mssql_unicode_strings) ? @mssql_unicode_strings : (@mssql_unicode_strings = db.mssql_unicode_strings)
       end
