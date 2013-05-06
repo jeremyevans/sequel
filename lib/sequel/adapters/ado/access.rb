@@ -84,6 +84,7 @@ module Sequel
       end      
 
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::Access::DatabaseMethods
         include Sequel::Database::SplitAlterTable
     

@@ -7,6 +7,7 @@ module Sequel
     module Informix
       # Database instance methods for Informix databases accessed via JDBC.
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::Informix::DatabaseMethods
         
         private

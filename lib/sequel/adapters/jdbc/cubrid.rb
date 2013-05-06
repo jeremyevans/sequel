@@ -5,6 +5,7 @@ module Sequel
   module JDBC
     module Cubrid
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::Cubrid::DatabaseMethods
         include Sequel::JDBC::Transactions
 

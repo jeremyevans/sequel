@@ -6,6 +6,7 @@ module Sequel
     # support via ADO.
     module MSSQL
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::MSSQL::DatabaseMethods
         # Query to use to get the number of rows affected by an update or
         # delete query.

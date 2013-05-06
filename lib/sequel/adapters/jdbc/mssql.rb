@@ -12,6 +12,7 @@ module Sequel
     module MSSQL
       # Database instance methods for MSSQL databases accessed via JDBC.
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         PRIMARY_KEY_INDEX_RE = /\Apk__/i.freeze
         ATAT_IDENTITY = 'SELECT @@IDENTITY'.freeze
         SCOPE_IDENTITY = 'SELECT SCOPE_IDENTITY()'.freeze

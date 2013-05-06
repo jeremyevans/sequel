@@ -6,6 +6,7 @@ module Sequel
     module SQLite
       # Instance methods for SQLite Database objects accessed via JDBC.
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::SQLite::DatabaseMethods
         LAST_INSERT_ROWID = 'SELECT last_insert_rowid()'.freeze
         FOREIGN_KEY_ERROR_RE = /query does not return ResultSet/.freeze

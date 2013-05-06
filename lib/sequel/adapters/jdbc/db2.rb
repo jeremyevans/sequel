@@ -16,6 +16,7 @@ module Sequel
     module DB2
       # Database instance methods for DB2 databases accessed via JDBC.
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         PRIMARY_KEY_INDEX_RE = /\Asql\d+\z/i.freeze
 
         include Sequel::DB2::DatabaseMethods

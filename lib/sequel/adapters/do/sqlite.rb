@@ -6,6 +6,7 @@ module Sequel
     module SQLite
       # Instance methods for SQLite Database objects accessed via DataObjects.
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::SQLite::DatabaseMethods
         
         private

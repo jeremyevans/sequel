@@ -4,6 +4,7 @@ module Sequel
     module H2
       # Instance methods for H2 Database objects accessed via JDBC.
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         PRIMARY_KEY_INDEX_RE = /\Aprimary_key/i.freeze
       
         # Commit an existing prepared transaction with the given transaction

@@ -7,6 +7,7 @@ module Sequel
     module Oracle
       # Instance methods for Oracle Database objects accessed via JDBC.
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         PRIMARY_KEY_INDEX_RE = /\Asys_/i.freeze
 
         include Sequel::Oracle::DatabaseMethods

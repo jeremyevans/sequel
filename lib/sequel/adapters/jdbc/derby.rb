@@ -6,6 +6,7 @@ module Sequel
     module Derby
       # Instance methods for Derby Database objects accessed via JDBC.
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         PRIMARY_KEY_INDEX_RE = /\Asql\d+\z/i.freeze
 
         include ::Sequel::JDBC::Transactions

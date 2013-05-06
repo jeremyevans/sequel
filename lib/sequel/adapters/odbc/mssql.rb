@@ -6,6 +6,7 @@ module Sequel
     # support via ODBC.
     module MSSQL
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::MSSQL::DatabaseMethods
         LAST_INSERT_ID_SQL='SELECT SCOPE_IDENTITY()'.freeze
         

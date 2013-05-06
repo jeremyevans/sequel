@@ -6,6 +6,7 @@ module Sequel
     module HSQLDB
       # Instance methods for HSQLDB Database objects accessed via JDBC.
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         PRIMARY_KEY_INDEX_RE = /\Asys_idx_sys_pk_/i.freeze
 
         include ::Sequel::JDBC::Transactions

@@ -8,6 +8,7 @@ module Sequel
     module Firebird
       # Database instance methods for Firebird databases accessed via JDBC.
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::Firebird::DatabaseMethods
         include Sequel::JDBC::Transactions
         
