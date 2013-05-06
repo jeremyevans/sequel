@@ -149,7 +149,7 @@ module Sequel
     def each
       if @opts[:graph]
         graph_each{|r| yield r}
-      elsif defined?(@row_proc) && (row_proc = @row_proc)
+      elsif row_proc = @row_proc
         fetch_rows(select_sql){|r| yield row_proc.call(r)}
       else
         fetch_rows(select_sql){|r| yield r}

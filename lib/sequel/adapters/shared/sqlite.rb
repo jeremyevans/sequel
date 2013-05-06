@@ -44,10 +44,9 @@ module Sequel
       end
 
       # A symbol signifying the value of the default transaction mode
-      def transaction_mode
-        defined?(@transaction_mode) ? @transaction_mode : (@transaction_mode = nil)
-      end
+      attr_reader :transaction_mode
 
+      # Set the default transaction mode.
       def transaction_mode=(value)
         if TRANSACTION_MODE.include?(value)
           @transaction_mode = value

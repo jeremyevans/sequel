@@ -732,7 +732,7 @@ module Sequel
       # module if the model has a dataset.  Add dataset methods to the class for all
       # public dataset methods.
       def dataset_extend(mod, opts={})
-        @dataset.extend(mod) if defined?(@dataset) && @dataset
+        @dataset.extend(mod) if @dataset
         reset_instance_dataset
         dataset_method_modules << mod
         unless opts[:create_class_methods] == false
@@ -845,7 +845,7 @@ module Sequel
       # Module that the class includes that holds methods the class adds for column accessors and
       # associations so that the methods can be overridden with +super+.
       def overridable_methods_module
-        include(@overridable_methods_module = Module.new) unless defined?(@overridable_methods_module) && @overridable_methods_module
+        include(@overridable_methods_module = Module.new) unless @overridable_methods_module
         @overridable_methods_module
       end
       
@@ -913,7 +913,7 @@ module Sequel
       # Reset the instance dataset to a modified copy of the current dataset,
       # should be used whenever the model's dataset is modified.
       def reset_instance_dataset
-        @instance_dataset = @dataset.limit(1).naked if defined?(@dataset) && @dataset
+        @instance_dataset = @dataset.limit(1).naked if @dataset
       end
   
       # Set the columns for this model and create accessor methods for each column.

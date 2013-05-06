@@ -76,7 +76,7 @@ module Sequel
         
         # Instructs the model to skip validations defined in superclasses
         def skip_superclass_validations?
-          defined?(@skip_superclass_validations) && @skip_superclass_validations
+          @skip_superclass_validations
         end
 
         # Defines validations by converting a longhand block into a series of 

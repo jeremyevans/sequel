@@ -29,7 +29,7 @@ module Sequel
       # Override the given *_sql method based on the type, and
       # cache the result of the sql.
       def prepared_sql
-        return @prepared_sql if defined?(@prepared_sql) && @prepared_sql
+        return @prepared_sql if @prepared_sql
         @prepared_args ||= []
         @prepared_sql = super
         @opts[:sql] = @prepared_sql

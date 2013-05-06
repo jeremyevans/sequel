@@ -41,7 +41,7 @@ module Sequel
         
     # Returns the scheme symbol for the Database class.
     def self.adapter_scheme
-      @scheme if defined?(@scheme)
+      @scheme
     end
     
     # Connects to a database.  See Sequel.connect.
