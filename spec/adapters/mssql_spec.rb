@@ -195,78 +195,38 @@ describe "MSSQL Dataset#output" do
   end
 end
 
-describe "MSSQL dataset" do
+describe "MSSQL dataset using #with and #with_recursive" do
   before do
     @db = MSSQL_DB
     @ds = MSSQL_DB[:t]
-  end
-
-  describe "using #with and #with_recursive" do
-    before do
       @ds1 = @ds.with(:t, @db[:x])
       @ds2 = @ds.with_recursive(:t, @db[:x], @db[:t])
-    end
+  end
 
-    specify "should prepend UPDATE statements with WITH clause" do
-      @ds1.update_sql(:x => :y).should == 'WITH [T] AS (SELECT * FROM [X]) UPDATE [T] SET [X] = [Y]'
-      @ds2.update_sql(:x => :y).should == 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) UPDATE [T] SET [X] = [Y]'
-    end
+  specify "should prepend UPDATE statements with WITH clause" do
+    @ds1.update_sql(:x => :y).should == 'WITH [T] AS (SELECT * FROM [X]) UPDATE [T] SET [X] = [Y]'
+    @ds2.update_sql(:x => :y).should == 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) UPDATE [T] SET [X] = [Y]'
+  end
 
-    specify "should prepend DELETE statements with WITH clause" do
-      @ds1.filter(:y => 1).delete_sql.should == 'WITH [T] AS (SELECT * FROM [X]) DELETE FROM [T] WHERE ([Y] = 1)'
-      @ds2.filter(:y => 1).delete_sql.should == 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) DELETE FROM [T] WHERE ([Y] = 1)'
-    end
+  specify "should prepend DELETE statements with WITH clause" do
+    @ds1.filter(:y => 1).delete_sql.should == 'WITH [T] AS (SELECT * FROM [X]) DELETE FROM [T] WHERE ([Y] = 1)'
+    @ds2.filter(:y => 1).delete_sql.should == 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) DELETE FROM [T] WHERE ([Y] = 1)'
+  end
 
-    specify "should prepend INSERT statements with WITH clause" do
-      @ds1.insert_sql(@db[:t]).should == 'WITH [T] AS (SELECT * FROM [X]) INSERT INTO [T] SELECT * FROM [T]'
-      @ds2.insert_sql(@db[:t]).should == 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) INSERT INTO [T] SELECT * FROM [T]'
-    end
+  specify "should prepend INSERT statements with WITH clause" do
+    @ds1.insert_sql(@db[:t]).should == 'WITH [T] AS (SELECT * FROM [X]) INSERT INTO [T] SELECT * FROM [T]'
+    @ds2.insert_sql(@db[:t]).should == 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) INSERT INTO [T] SELECT * FROM [T]'
+  end
 
-    specify "should move WITH clause on joined dataset to top level" do
-      @db[:s].inner_join(@ds1).sql.should == "WITH [T] AS (SELECT * FROM [X]) SELECT * FROM [S] INNER JOIN (SELECT * FROM [T]) AS [T1]"
-      @ds1.inner_join(@db[:s].with(:s, @db[:y])).sql.should == "WITH [T] AS (SELECT * FROM [X]), [S] AS (SELECT * FROM [Y]) SELECT * FROM [T] INNER JOIN (SELECT * FROM [S]) AS [T1]"
-    end
-
-    describe "on #import" do
-      before do
-        @db = @db.clone
-        class << @db
-          attr_reader :import_sqls
-
-          def execute(sql, opts={})
-            @import_sqls ||= []
-            @import_sqls << sql
-          end
-          alias execute_dui execute
-
-          def transaction(opts={})
-            @import_sqls ||= []
-            @import_sqls << 'BEGIN'
-            yield
-            @import_sqls << 'COMMIT'
-          end
-        end
-      end
-
-      specify "should prepend INSERT statements with WITH clause" do
-        @db[:items].with(:items, @db[:inventory].group(:type)).import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
-        @db.import_sqls.should == [
-          'BEGIN',
-          "WITH [ITEMS] AS (SELECT * FROM [INVENTORY] GROUP BY [TYPE]) INSERT INTO [ITEMS] ([X], [Y]) SELECT 1, 2 UNION ALL SELECT 3, 4",
-          'COMMIT',
-          'BEGIN',
-          "WITH [ITEMS] AS (SELECT * FROM [INVENTORY] GROUP BY [TYPE]) INSERT INTO [ITEMS] ([X], [Y]) SELECT 5, 6",
-          'COMMIT'
-        ]
-      end
-    end
+  specify "should move WITH clause on joined dataset to top level" do
+    @db[:s].inner_join(@ds1).sql.should == "WITH [T] AS (SELECT * FROM [X]) SELECT * FROM [S] INNER JOIN (SELECT * FROM [T]) AS [T1]"
+    @ds1.inner_join(@db[:s].with(:s, @db[:y])).sql.should == "WITH [T] AS (SELECT * FROM [X]), [S] AS (SELECT * FROM [Y]) SELECT * FROM [T] INNER JOIN (SELECT * FROM [S]) AS [T1]"
   end
 end
 
 describe "MSSQL::Dataset#import" do
   before do
     @db = MSSQL_DB
-    @db.create_table!(:test){primary_key :x; Integer :y}
     @db.sqls.clear
     @ds = @db[:test]
   end
@@ -275,8 +235,15 @@ describe "MSSQL::Dataset#import" do
   end
   
   specify "#import should work correctly with an arbitrary output value" do
+    @db.create_table!(:test){primary_key :x; Integer :y}
     @ds.output(nil, [:inserted__y, :inserted__x]).import([:y], [[3], [4]]).should == [{:y=>3, :x=>1}, {:y=>4, :x=>2}]
     @ds.all.should == [{:x=>1, :y=>3}, {:x=>2, :y=>4}]
+  end
+
+  specify "should handle WITH statements" do
+    @db.create_table!(:test){Integer :x; Integer :y}
+    @db[:testx].with(:testx, @db[:test]).import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
+    @ds.select_order_map([:x, :y]).should == [[1, 2], [3, 4], [5, 6]]
   end
 end
 
