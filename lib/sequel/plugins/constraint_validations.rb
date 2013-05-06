@@ -42,8 +42,14 @@ module Sequel
       #                                  name was overridden when creating the constraint
       #                                  validations.
       def self.configure(model, opts={})
-        model.instance_variable_set(:@constraint_validations_table, opts[:constraint_validations_table] || DEFAULT_CONSTRAINT_VALIDATIONS_TABLE)
-        model.send(:parse_constraint_validations)
+        model.instance_eval do
+          if table = opts[:constraint_validations_table]
+            @constraint_validations_table = table
+          else
+            @constraint_validations_table ||= DEFAULT_CONSTRAINT_VALIDATIONS_TABLE
+          end
+          parse_constraint_validations
+        end
       end
 
       module DatabaseMethods

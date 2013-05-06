@@ -54,6 +54,18 @@ describe "Sequel::Plugins::ConstraintValidations" do
     sc.constraint_validations.should == [[:validates_presence, :name]]
   end
 
+  it "should handle plugin being loaded in subclass when superclass uses a custom constraint validations table" do
+    c = Class.new(Sequel::Model(@db))
+    c.plugin :constraint_validations, :constraint_validations_table=>:foo
+    @db.sqls.should == ["SELECT * FROM foo"]
+    sc = Class.new(c)
+    sc.plugin :constraint_validations
+    sc.constraint_validations_table.should == :foo
+    sc.set_dataset @ds
+    @db.sqls.should == []
+    sc.constraint_validations.should == [[:validates_presence, :name]]
+  end
+
   it "should populate constraint_validations when changing the model's dataset" do
     c = Class.new(Sequel::Model(@db[:foo]))
     c.columns :name
