@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow for per-model/per-validation type customization of validation options in constraint_validations plugin (jeremyevans)
+
+* Make Database#constraint_validations in the constraint_validations plugin have raw row values (jeremyevans)
+
 * Fix statement freeing in the ibmdb adapter (jeremyevans)
 
 * Make single and class table inheritance plugins handle usage of set_dataset in a subclass (jeremyevans)

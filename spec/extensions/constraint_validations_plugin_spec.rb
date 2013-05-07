@@ -31,7 +31,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
   it "should parse constraint validations when loading plugin" do
     @c = model_class
     @db.sqls.should == ["SELECT * FROM sequel_constraint_validations"]
-    @db.constraint_validations.should == {'items'=>[[:validates_presence, :name]]}
+    @db.constraint_validations.should == {"items"=>[{:allow_nil=>nil, :constraint_name=>nil, :message=>nil, :validation_type=>"presence", :column=>"name", :argument=>nil, :table=>"items"}]}
     @c.constraint_validations.should == [[:validates_presence, :name]]
   end
 
@@ -40,7 +40,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     @db.sqls
     c.plugin :constraint_validations, :constraint_validations_table=>:foo
     @db.sqls.should == ["SELECT * FROM foo"]
-    @db.constraint_validations.should == {'items'=>[[:validates_presence, :name]]}
+    @db.constraint_validations.should == {"items"=>[{:allow_nil=>nil, :constraint_name=>nil, :message=>nil, :validation_type=>"presence", :column=>"name", :argument=>nil, :table=>"items"}]}
     c.constraint_validations.should == [[:validates_presence, :name]]
   end
 
@@ -184,6 +184,38 @@ describe "Sequel::Plugins::ConstraintValidations" do
 
   it "should handle unique validation with multiple columns" do
     model_class(:validation_type=>'unique', :column=>'name,id').constraint_validations.should == [[:validates_unique, [:name, :id]]]
+  end
+
+  it "should handle :validation_options" do
+    c = model_class(:validation_type=>'unique', :column=>'name')
+    c.plugin :constraint_validations, :validation_options=>{:unique=>{:message=>'is bad'}}
+    c.constraint_validations.should == [[:validates_unique, [:name], {:message=>'is bad'}]]
+    c.dataset._fetch = {:count=>1}
+    o = c.new(:name=>'a')
+    o.valid?.should == false
+    o.errors.full_messages.should == ['name is bad']
+  end
+
+  it "should handle :validation_options merging with constraint validation options" do
+    c = model_class(:validation_type=>'unique', :column=>'name', :allow_nil=>true)
+    c.plugin :constraint_validations, :validation_options=>{:unique=>{:message=>'is bad'}}
+    c.constraint_validations.should == [[:validates_unique, [:name], {:message=>'is bad', :allow_nil=>true}]]
+    c.dataset._fetch = {:count=>1}
+    o = c.new(:name=>'a')
+    o.valid?.should == false
+    o.errors.full_messages.should == ['name is bad']
+  end
+
+  it "should handle :validation_options merging with subclasses" do
+    c = model_class(:validation_type=>'unique', :column=>'name')
+    c.plugin :constraint_validations, :validation_options=>{:unique=>{:message=>'is bad', :allow_nil=>true}}
+    sc = Class.new(c)
+    sc.plugin :constraint_validations, :validation_options=>{:unique=>{:allow_missing=>true, :allow_nil=>false}}
+    sc.constraint_validations.should == [[:validates_unique, [:name], {:message=>'is bad', :allow_missing=>true, :allow_nil=>false}]]
+    sc.dataset._fetch = {:count=>1}
+    o = sc.new(:name=>'a')
+    o.valid?.should == false
+    o.errors.full_messages.should == ['name is bad']
   end
 
   it "should used parsed constraint validations when validating" do

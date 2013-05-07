@@ -33,7 +33,11 @@ module Sequel
 
       # Automatically load the validation_helpers plugin to run the actual validations.
       def self.apply(model, opts={})
-        model.plugin :validation_helpers
+        model.instance_eval do
+          plugin :validation_helpers
+          @constraint_validations_table = DEFAULT_CONSTRAINT_VALIDATIONS_TABLE
+          @constraint_validation_options = {}
+        end
       end
 
       # Parse the constraint validations metadata from the database. Options:
@@ -41,12 +45,22 @@ module Sequel
       #                                  metadata table.  Should only be used if the table
       #                                  name was overridden when creating the constraint
       #                                  validations.
+      # :validation_options :: Override/augment the options stored in the database with the
+      #                        given options.  Keys should be validation type symbols (e.g.
+      #                        :presence) and values should be hashes of options specific
+      #                        to that validation type.
       def self.configure(model, opts={})
         model.instance_eval do
           if table = opts[:constraint_validations_table]
             @constraint_validations_table = table
-          else
-            @constraint_validations_table ||= DEFAULT_CONSTRAINT_VALIDATIONS_TABLE
+          end
+          if vos = opts[:validation_options]
+            vos.each do |k, v|
+              if existing_options = @constraint_validation_options[k]       
+                v = existing_options.merge(v)
+              end
+              @constraint_validation_options[k] = v
+            end
           end
           parse_constraint_validations
         end
@@ -67,7 +81,7 @@ module Sequel
         # The name of the table containing the constraint validations metadata.
         attr_reader :constraint_validations_table
 
-        Plugins.inherited_instance_variables(self, :@constraint_validations_table=>nil)
+        Plugins.inherited_instance_variables(self, :@constraint_validations_table=>nil, :@constraint_validation_options=>:hash_dup)
         Plugins.after_set_dataset(self, :parse_constraint_validations)
 
         private
@@ -84,7 +98,7 @@ module Sequel
           unless hash = Sequel.synchronize{db.constraint_validations}
             hash = {}
             db.from(constraint_validations_table).each do |r|
-              (hash[r[:table]] ||= []) << constraint_validation_array(r)
+              (hash[r[:table]] ||= []) << r
             end
             Sequel.synchronize{db.constraint_validations = hash}
           end
@@ -93,7 +107,7 @@ module Sequel
             ds = @dataset.clone
             ds.quote_identifiers = false
             table_name = ds.literal(ds.first_source_table)
-            @constraint_validations = Sequel.synchronize{hash[table_name]} || []
+            @constraint_validations = (Sequel.synchronize{hash[table_name]} || []).map{|r| constraint_validation_array(r)}
           end
         end
 
@@ -135,6 +149,10 @@ module Sequel
             column.split(',').map{|c| c.to_sym}
           else
             column.to_sym
+          end
+
+          if type_opts = @constraint_validation_options[type]
+            opts = opts.merge(type_opts)
           end
 
           a = [:"validates_#{type}"]
