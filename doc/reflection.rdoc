@@ -108,3 +108,14 @@ You can get an array of all association reflections via Model.all_association_re
 Finally, you can get a hash of association reflections via Model.association_reflections:
 
   Model.association_reflections # {:association1=>{:name=>:association1, :type=>:many_to_one, :model=>Model, ...}, ...}
+
+== Validations Defined
+
+When using the validation_class_methods plugin, you can use the validation_reflections class method to get a hash with validation reflection information.  This returns a hash keyed on the column name symbol:
+
+  Model.validation_reflections[:column] # => [[:presence, {}], [:length, {:maximum=>255, :message=>'is just too long'}]]
+
+Similarly, when using the constraint_validations plugin, you can use the constraint_validation_reflections class method:
+
+  Model.constraint_validation_reflections[:column] # => [[:presence, {}], [:max_length, {:argument=>255, :message=>'is just too long'}]]
+

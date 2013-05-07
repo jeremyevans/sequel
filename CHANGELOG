@@ -1,5 +1,7 @@
 === HEAD
 
+* Make constraint_validations plugin reflect validations by column (jeremyevans)
+
 * Allow for per-model/per-validation type customization of validation options in constraint_validations plugin (jeremyevans)
 
 * Make Database#constraint_validations in the constraint_validations plugin have raw row values (jeremyevans)

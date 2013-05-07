@@ -78,6 +78,13 @@ module Sequel
         # is splatted to send to perform a validation via validation_helpers.
         attr_reader :constraint_validations
 
+        # A hash of reflections of constraint validations.  Keys are type name
+        # symbols.  Each value is an array of pairs, with the first element being
+        # the validation type symbol (e.g. :presence) and the second element being
+        # options for the validation.  If the validation takes an argument, it appears
+        # as the :argument entry in the validation option hash.
+        attr_reader :constraint_validation_reflections
+
         # The name of the table containing the constraint validations metadata.
         attr_reader :constraint_validations_table
 
@@ -107,13 +114,15 @@ module Sequel
             ds = @dataset.clone
             ds.quote_identifiers = false
             table_name = ds.literal(ds.first_source_table)
-            @constraint_validations = (Sequel.synchronize{hash[table_name]} || []).map{|r| constraint_validation_array(r)}
+            reflections = {}
+            @constraint_validations = (Sequel.synchronize{hash[table_name]} || []).map{|r| constraint_validation_array(r, reflections)}
+            @constraint_validation_reflections = reflections
           end
         end
 
         # Given a specific database constraint validation metadata row hash, transform
         # it in an validation method call array suitable for splatting to send.
-        def constraint_validation_array(r)
+        def constraint_validation_array(r, reflections)
           opts = {}
           opts[:message] = r[:message] if r[:message]
           opts[:allow_nil] = true if db.typecast_value(:boolean, r[:allow_nil])
@@ -155,14 +164,23 @@ module Sequel
             opts = opts.merge(type_opts)
           end
 
+          reflection_opts = opts
           a = [:"validates_#{type}"]
+
           if arg
             a << arg
+            reflection_opts = reflection_opts.merge(:argument=>arg)
           end 
           a << column
           unless opts.empty?
             a << opts
           end
+
+          if column.is_a?(Array) && column.length == 1
+            column = column.first
+          end
+          (reflections[column] ||= []) << [type, reflection_opts]
+
           a
         end
 
