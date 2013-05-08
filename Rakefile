@@ -162,6 +162,7 @@ begin
 
   task :default => [:spec]
   spec_with_cov.call("spec", Dir["spec/{core,model}/*_spec.rb"], "Run core and model specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/(adapters/([a-ln-z]|m[a-np-z])|extensions/core_extensions)"')}
+  spec.call("spec_bin", ["spec/bin_spec.rb"], "Run bin/sequel specs")
   spec.call("spec_core", Dir["spec/core/*_spec.rb"], "Run core specs")
   spec.call("spec_model", Dir["spec/model/*_spec.rb"], "Run model specs")
   spec.call("_spec_model_no_assoc", Dir["spec/model/*_spec.rb"].delete_if{|f| f =~ /association|eager_loading/}, '')
