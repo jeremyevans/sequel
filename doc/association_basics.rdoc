@@ -1575,7 +1575,7 @@ you also wanted to handle the Artist#remove_all_albums method:
 
 The symbol name of the reciprocal association, if it exists.  By default,
 Sequel will try to determine it by looking at the associated model's
-assocations for a association that matches the current association's key(s).
+associations for a association that matches the current association's key(s).
 Set to nil to not use a reciprocal.
 
 Reciprocals are used in Sequel to modify the matching cached associations
