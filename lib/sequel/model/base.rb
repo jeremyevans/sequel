@@ -694,13 +694,13 @@ module Sequel
       Plugins.def_dataset_methods(self, DATASET_METHODS)
 
       # REMOVE40
-      def print(*args, &block)
-        Sequel::Deprecation.deprecate('Model.print', 'Please use Model.dataset.print instead')
-        dataset.print(*args, &block)
-      end
-      def each_page(*args, &block)
-        Sequel::Deprecation.deprecate('Model.each_page', 'Please use Model.dataset.each_page instead')
-        dataset.each_page(*args, &block)
+      %w'print each_page destroy delete update set'.each do |meth|
+        class_eval(<<-END, __FILE__, __LINE__+1)
+          def #{meth}(*args, &block)
+            Sequel::Deprecation.deprecate('Model.#{meth}', 'Please use Model.dataset.#{meth} instead')
+            dataset.#{meth}(*args, &block)
+          end
+        END
       end
   
       private

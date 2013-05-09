@@ -637,13 +637,13 @@ describe "Sequel::Model Simple Associations" do
   
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums
-    Album.delete
+    Album.dataset.delete
     @album = @artist.add_album(:name=>'Al2')
     Album.first[:name].should == 'Al2'
     @artist.albums_dataset.first[:name].should == 'Al2'
     
     @album.remove_all_tags
-    Tag.delete
+    Tag.dataset.delete
     @album.add_tag(:name=>'T2')
     Tag.first[:name].should == 'T2'
     @album.tags_dataset.first[:name].should == 'T2'
@@ -805,13 +805,13 @@ describe "Sequel::Model Composite Key Associations" do
 
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums
-    Album.delete
+    Album.dataset.delete
     @artist.add_album(:id1=>1, :id2=>2, :name=>'Al2')
     Album.first[:name].should == 'Al2'
     @artist.albums_dataset.first[:name].should == 'Al2'
     
     @album.remove_all_tags
-    Tag.delete
+    Tag.dataset.delete
     @album.add_tag(:id1=>1, :id2=>2, :name=>'T2')
     Tag.first[:name].should == 'T2'
     @album.tags_dataset.first[:name].should == 'T2'

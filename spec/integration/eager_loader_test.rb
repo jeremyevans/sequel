@@ -496,8 +496,8 @@ describe "many_to_one/one_to_many not referencing primary key" do
     end
   end
   before do
-    Client.delete
-    Invoice.delete
+    Client.dataset.delete
+    Invoice.dataset.delete
     @client1 = Client.create(:name=>'X')
     @client2 = Client.create(:name=>'Y')
     @invoice1 = Invoice.create(:client_name=>'X')

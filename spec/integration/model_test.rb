@@ -125,7 +125,7 @@ describe "Sequel::Model basic support" do
   specify "#exists? should return whether the item is still in the database" do
     i = Item.create(:name=>'J')
     i.exists?.should == true
-    Item.delete
+    Item.dataset.delete
     i.exists?.should == false
   end
 

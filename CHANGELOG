@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model.set, .update, .delete, and .destroy (jeremyevans)
+
 * Deprecate Dataset#set (jeremyevans)
 
 * Add specs for bin/sequel (jeremyevans)

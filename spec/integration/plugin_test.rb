@@ -1398,7 +1398,7 @@ describe "List plugin without a scope" do
     @c.plugin :list
   end
   before do
-    @c.delete
+    @c.dataset.delete
     @c.create :name => "abc"
     @c.create :name => "def"
     @c.create :name => "hig"
@@ -1473,7 +1473,7 @@ describe "List plugin with a scope" do
     @c.plugin :list, :field => :pos, :scope => :parent_id
   end
   before do
-    @c.delete
+    @c.dataset.delete
     p1 = @c.create :name => "Hm", :parent_id => 0
     p2 = @c.create :name => "Ps", :parent_id => p1.id
     @c.create :name => "P1", :parent_id => p2.id
@@ -1714,7 +1714,7 @@ describe "Sequel::Plugins::PreparedStatements" do
     @c.plugin :prepared_statements_with_pk
   end
   before do
-    @c.delete
+    @c.dataset.delete
     @foo = @c.create(:name=>'foo', :i=>10)
     @bar = @c.create(:name=>'bar', :i=>20)
   end
@@ -1910,13 +1910,13 @@ describe "Sequel::Plugins::ConstraintValidations" do
     it "should set up automatic validations inside the model" do 
       c = Class.new(Sequel::Model(@ds))
       c.plugin :constraint_validations
-      c.delete
+      c.dataset.delete
       proc{c.create(@valid_row)}.should_not raise_error
 
       # Test for unique validation 
       c.new(@valid_row).should_not be_valid
 
-      c.delete
+      c.dataset.delete
       @violations.each do |col, vals|
         try = @valid_row.dup
         vals.each do |val|
