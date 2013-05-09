@@ -138,6 +138,10 @@ The +spec+ rake task (which is also the default rake task) runs Sequel's core an
 
 The +spec_plugin+ rake task runs the specs for the plugins and extensions that ship with Sequel.  These also use a mocked database connection, and operate very similarly to the general Sequel core and model specs.
 
+== rake spec_bin
+
+The +spec_bin+ rake task runs the specs for bin/sequel.  These use an SQLite3 database, and require either the sqlite3 (non-JRuby) or jdbc-sqlite3 (JRuby) gem.
+
 == rake spec_<i>adapter</i> (e.g. rake spec_postgres)
 
 The <tt>spec_<i>adapter</i></tt> specs run against a real database connection with nothing mocked, and test for correct results.  They are slower than the standard specs, but they will catch errors that are mocked out by the default specs, as well as show issues that only occur on a certain database, adapter, or a combination of the two.
@@ -147,6 +151,8 @@ These specs are broken down into two parts.  For each database, there are specif
 == Environment variables
 
 Sequel often uses environment variables when testing to specify either the database to be tested or specify how testing should be done.  You can also specify the databases to test by copying spec/spec_config.rb.example to spec/spec_config.rb and modifying it.  See that file for details.  It may be necessary to use spec_config.rb as opposed to an environment variable if your database connection cannot be specified by a connection string.
+
+Sequel does not create test databases automatically, except for file-based databases such as SQLite/H2/HSQLDB/Derby.  It's up to the user to create the test databases manually and give Sequel a valid connection string in an environment variable (or setup the connection object in spec_config.rb).
 
 === Connection Strings
 
