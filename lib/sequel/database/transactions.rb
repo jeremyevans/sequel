@@ -74,6 +74,7 @@ module Sequel
     #                 and :remote_write (9.2+).
     def transaction(opts={}, &block)
       if opts[:disconnect] == :retry
+        Sequel::Deprecation.deprecate('Database#transaction :disconnect=>:retry option', 'Please switch to :retry_on=>Sequel::DatabaseDisconnectError.')
         raise(Error, 'cannot specify both :disconnect=>:retry and :retry_on') if opts[:retry_on]
         return transaction(opts.merge(:retry_on=>Sequel::DatabaseDisconnectError, :disconnect=>nil), &block)
       end

@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Database#transaction :disconnect=>:retry option (jeremyevans)
+
 * Deprecate Model.set, .update, .delete, and .destroy (jeremyevans)
 
 * Deprecate Dataset#set (jeremyevans)
