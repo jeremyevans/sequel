@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Dataset#set (jeremyevans)
+
 * Add specs for bin/sequel (jeremyevans)
 
 * Make constraint_validations plugin reflect validations by column (jeremyevans)

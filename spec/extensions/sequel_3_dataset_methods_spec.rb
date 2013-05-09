@@ -78,3 +78,13 @@ describe "Dataset#opts=" do
     ds.opts.should == {}
   end
 end
+
+describe "Dataset#set" do
+  specify "should act as alias to #update" do
+    db = Sequel.mock
+    ds = db[:items].extension(:sequel_3_dataset_methods)
+    ds.set({:x => 3})
+    db.sqls.should == ['UPDATE items SET x = 3']
+  end
+end
+

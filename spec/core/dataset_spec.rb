@@ -2325,7 +2325,7 @@ describe "Dataset#[]=" do
 end
 
 describe "Dataset#set" do
-  specify "should act as alias to #update" do
+  qspecify "should act as alias to #update" do
     db = Sequel.mock
     ds = db[:items]
     ds.set({:x => 3})

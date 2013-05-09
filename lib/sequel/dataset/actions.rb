@@ -624,6 +624,7 @@ module Sequel
     # Alias for update, but not aliased directly so subclasses
     # don't have to override both methods.
     def set(*args)
+      Sequel::Deprecation.deprecate('Dataset#set', 'Please switch to Dataset#update or load the sequel_3_dataset_methods extension to continue using it')
       update(*args)
     end
     

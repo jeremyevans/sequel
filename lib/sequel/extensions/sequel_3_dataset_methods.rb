@@ -2,6 +2,7 @@
 #
 # []= :: filter with the first argument, update with the second
 # insert_multiple :: insert multiple rows at once
+# set :: alias for update
 # to_csv :: return string in csv format for the dataset
 # db= :: change the dataset's database
 # opts= :: change the dataset's opts
@@ -58,6 +59,12 @@ module Sequel
       else
         array.map{|i| insert(i)}
       end
+    end
+    
+    # Alias for update, but not aliased directly so subclasses
+    # don't have to override both methods.
+    def set(*args)
+      update(*args)
     end
     
     # Returns a string in CSV format containing the dataset records. By 
