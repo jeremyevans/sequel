@@ -114,7 +114,7 @@
 
 * Speed up Dataset#clone (jeremyevans)
 
-* Add sequel_3_dataset_methods extension for Dataset#[]=, #insert_multiple, #to_csv, #db=, and #opts= (jeremyevans)
+* Add sequel_3_dataset_methods extension for Dataset#[]=, #insert_multiple, #set, #to_csv, #db=, and #opts= (jeremyevans)
 
 * Deprecate Dataset#[]=, #insert_multiple, #to_csv, #db=, and #opts= (jeremyevans)
 
