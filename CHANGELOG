@@ -1,5 +1,7 @@
 === HEAD
 
+* Add guide for ordering code with Sequel (jeremyevans)
+
 * Deprecate Database#transaction :disconnect=>:retry option (jeremyevans)
 
 * Deprecate Model.set, .update, .delete, and .destroy (jeremyevans)
