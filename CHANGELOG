@@ -34,7 +34,7 @@
 
 * Deprecate Postgres::PGRangeOp#{starts_before,ends_after} (jeremyevans)
 
-* Deprecate global use of pagination, pretty_table, query, select_remove, schema_caching, schema_dumper, and to_dot extensions (jeremyevans)
+* Deprecate global use of null_dataset, pagination, pretty_table, query, select_remove, schema_caching, schema_dumper, and to_dot extensions (jeremyevans)
 
 * Deprecate Dataset.introspect_all_columns in the columns_introspection extension (jeremyevans)
 

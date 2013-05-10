@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "null_dataset extension" do
   before do
-    @db = Sequel::mock(:fetch=>{:id=>1}, :autoid=>1, :numrows=>1, :columns=>[:id])
+    @db = Sequel::mock(:fetch=>{:id=>1}, :autoid=>1, :numrows=>1, :columns=>[:id]).extension(:null_dataset)
     @ds = @db[:table].nullify
     @i = 0
     @pr = proc{|*a| @i += 1}
