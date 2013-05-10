@@ -9,6 +9,9 @@
 
 module Sequel
   class ToDot
+    module DatasetMethods
+    end
+
     # The option keys that should be included in the dot output.
     TO_DOT_OPTIONS = [:with, :distinct, :select, :from, :join, :where, :group, :having, :compounds, :order, :limit, :offset, :lock].freeze
 
@@ -147,7 +150,10 @@ module Sequel
     # with graphviz) in order to see a visualization of the dataset's
     # abstract syntax tree.
     def to_dot
+      Sequel::Deprecation.deprecate('Loading the to_dot extension globally', "Please use Database/Dataset#extension to load the extension into this dataset") unless is_a?(ToDot::DatasetMethods)
       ToDot.output(self)
     end
   end
+
+  Dataset.register_extension(:to_dot, ToDot::DatasetMethods)
 end
