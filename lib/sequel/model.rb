@@ -78,7 +78,7 @@ module Sequel
 
     # Class methods added to model that call the method of the same name on the dataset
     DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS +
-      [:each_server]) - [:and, :or, :[], :[]=, :columns, :columns!, :delete, :update, :set]
+      [:each_server]) - [:and, :or, :[], :[]=, :columns, :columns!, :delete, :update, :add_graph_aliases]
     
     # Class instance variables to set to nil when a subclass is created, for -w compliance
     EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@db]

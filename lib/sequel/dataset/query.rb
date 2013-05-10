@@ -41,6 +41,7 @@ module Sequel
       set_defaults set_graph_aliases set_overrides unfiltered ungraphed ungrouped union
       unlimited unordered where with with_recursive with_sql
     METHS
+    # REMOVE40: query paginate set_defaults set_overrides
 
     # Register an extension callback for Dataset objects.  ext should be the
     # extension name symbol, and mod should either be a Module that the

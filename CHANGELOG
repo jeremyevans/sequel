@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model.add_graph_aliases, .insert_multiple, .query, .set_overrides, .set_defaults, .to_csv, and .paginate (jeremyevans)
+
 * Add guide for ordering code with Sequel (jeremyevans)
 
 * Deprecate Database#transaction :disconnect=>:retry option (jeremyevans)
