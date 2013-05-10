@@ -86,57 +86,73 @@
 
 <h2>Sequel Extensions</h2>
 
-<p>Extensions are modifications or additions to Sequel that affect core Sequel, not just Sequel::Model.</p>
+<p>Extensions are modifications or additions to Sequel that affect either Sequel::Database objects (database extensions), Sequel::Dataset objects (dataset extensions), or the general ruby environment (global extensions).</p>
 
-<h3>Extensions that ship with Sequel</h3>
+<h3>Database extensions that ship with Sequel</h3>
+
+<p>Database extensions can be loaded into a single Sequel::Database object via Sequel::Database#extension, or to all databases by using Sequel::Database.extension.</p>
 
 <ul>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/arbitrary_servers_rb.html">arbitrary_servers</a>: Adds ability to connection to arbitrary servers (instead of just preconfigured ones) in the sharding support.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/blank_rb.html">blank</a>: Adds blank? instance methods to all objects.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/columns_introspection_rb.html">columns_introspection</a>: Attemps to skip database queries by introspecting the selected columns if possible.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/connection_validator_rb.html">connection_validator</a>: Automatically validates connections on pool checkout and handles disconnections transparently.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations</a>: Creates database constraints when creating/altering tables, with metadata for <a href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">automatic model validations via the constraint_validations plugin</a>.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/core_extensions_rb.html">core_extensions</a>: Extends the Array, Hash, String, and Symbol classes with methods that return Sequel expression objects (loaded by default).</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/core_refinements_rb.html">core_refinements</a>: Adds refinement versions of Sequel's core extensions.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/date_arithmetic_rb.html">date_arithmetic</a>: Allows for database-independent date calculations (adding/subtracting an interval to/from a date/timestamp).</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/empty_array_ignore_nulls_rb.html">empty_array_ignore_nulls</a>: Makes Sequel's handling of IN/NOT IN with an empty ignore correct NULL handling.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/eval_inspect_rb.html">eval_inspect</a>: Makes inspect on Sequel's expression objects attempt to return a string suitable for eval.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/filter_having_rb.html">filter_having</a>: Makes Dataset#filter, #and, #or, and #having operate on HAVING clause if HAVING clause is already present.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/graph_each_rb.html">graph_each</a>: Makes Dataset#each split returned results by table when using Dataset#graph.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/hash_aliases_rb.html">hash_aliases</a>: Makes Dataset#select and #from treat hashes and alias specifications.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/inflector_rb.html">inflector</a>: Adds instance-level inflection methods to String.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/looser_typecasting_rb.html">looser_typecasting</a>: Uses .to_f and .to_i instead of Kernel.Float and Kernel.Integer when typecasting floats and integers.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/meta_def_rb.html">meta_def</a>: Adds meta_def method for defining methods to Database, Dataset, and Model classes and instances.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/migration_rb.html">migration</a>: Adds Migration and Migrator classes for easily migrating the database schema forward or reverting to a previous version.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/named_timezones_rb.html">named_timezones</a>: Allows you to use named timezones instead of just :local and :utc (requires <a href="http://tzinfo.rubyforge.org/">TZInfo</a>).</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/null_dataset_rb.html">null_dataset</a>: Adds Dataset#nullify to get a dataset that will never issue a query.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pagination_rb.html">pagination</a>: Adds Dataset#paginate for easier pagination of datasets.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_rb.html">pg_array</a>: Adds support for string and numeric PostgreSQL arrays.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_ops_rb.html">pg_array_ops</a>: Adds DSL support for calling PostgreSQL array operators and functions.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_rb.html">pg_array</a>: Adds support for PostgreSQL arrays.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html">pg_hstore</a>: Adds support for the PostgreSQL hstore type.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_ops_rb.html">pg_hstore_ops</a>: Adds DSL support for calling PostgreSQL hstore operators and functions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_inet_rb.html">pg_inet</a>: Adds support for the PostgreSQL inet and cidr types.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_interval_rb.html">pg_interval</a>: Adds support for the PostgreSQL interval type.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_json_rb.html">pg_json</a>: Adds support for the PostgreSQL json type.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_rb.html">pg_range</a>: Adds support for PostgreSQL range types.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_ops_rb.html">pg_range_ops</a>: Adds DSL support for calling PostgreSQL range operators and functions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_rb.html">pg_row</a>: Adds support for PostgreSQL row-valued/composite types.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_ops_rb.html">pg_row_ops</a>: Adds DSL support for dealing with PostgreSQL row-valued/composite types.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_caching_rb.html">schema_caching</a>: Speeds up loading a large number of models by caching database schema and loading it from a file.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/server_block_rb.html">server_block</a>: Adds Database#with_server method that makes access inside the passed block use the specified shard by default.</li>
+</ul>
+
+<h3>Dataset extensions that ship with Sequel</h3>
+
+<p>Dataset extensions can be loaded into a single Sequel::Database object via Sequel::Dataset#extension, or to all datasets for a given database via Sequel::Database.extension, or all datasets for all databases by using Sequel::Database.extension.</p>
+
+<ul>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/columns_introspection_rb.html">columns_introspection</a>: Attemps to skip database queries by introspecting the selected columns if possible.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/date_arithmetic_rb.html">date_arithmetic</a>: Allows for database-independent date calculations (adding/subtracting an interval to/from a date/timestamp).</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/empty_array_ignore_nulls_rb.html">empty_array_ignore_nulls</a>: Makes Sequel's handling of IN/NOT IN with an empty ignore correct NULL handling.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/filter_having_rb.html">filter_having</a>: Makes Dataset#filter, #and, #or, and #having operate on HAVING clause if HAVING clause is already present.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/graph_each_rb.html">graph_each</a>: Makes Dataset#each split returned results by table when using Dataset#graph.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/hash_aliases_rb.html">hash_aliases</a>: Makes Dataset#select and #from treat hashes and alias specifications.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/null_dataset_rb.html">null_dataset</a>: Adds Dataset#nullify to get a dataset that will never issue a query.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pagination_rb.html">pagination</a>: Adds Dataset#paginate for easier pagination of datasets.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pretty_table_rb.html">pretty_table</a>: Adds Dataset#print for printing a dataset as a simple plain-text table.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/query_rb.html">query</a>: Adds Dataset#query for a different interface to creating queries that doesn't use method chaining.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/query_literals_rb.html">query_literals</a>: Automatically uses literal strings for regular strings in select, group, and order methods (similar to filter methods).</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/ruby18_symbol_extensions_rb.html">ruby18_symbol_extensions</a>: Contains implementations of Symbol#{<,<=,>,>=,[]} that are only usable on ruby 1.8.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_caching_rb.html">schema_caching</a>: Speeds up loading a large number of models by caching database schema and loading it from a file.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/select_remove_rb.html">select_remove</a>: Adds Dataset#select_remove to remove selected columns from a dataset.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sequel_3_dataset_methods_rb.html">sequel_3_dataset_methods</a>: Adds Dataset#[]=, #insert_multiple, #to_csv, #db=, and #opts= methods.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/server_block_rb.html">server_block</a>: Adds Database#with_server method that makes access inside the passed block use the specified shard by default.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/set_overrides_rb.html">set_overrides</a>: Adds Dataset#set_defaults and #set_overrides for setting default values in some INSERT/UPDATE statements.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/split_array_nil_rb.html">split_array_nil</a>: Splits nils out of IN/NOT IN arrays into separate OR IS NULL or AND IS NOT NULL clauses.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/to_dot_rb.html">to_dot</a>: Adds Dataset#to_dot method, which returns a string suitable for processing by graphviz's dot program to get a visualization of the dataset's abstract syntax tree.</li>
+</ul>
+
+<h3>Global extensions that ship with Sequel</h3>
+
+<p>Global extensions can affect other parts of Sequel or the general ruby environment, and are loaded with Sequel.extension.</p>
+
+<ul>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/blank_rb.html">blank</a>: Adds blank? instance methods to all objects.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/core_extensions_rb.html">core_extensions</a>: Extends the Array, Hash, String, and Symbol classes with methods that return Sequel expression objects.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/core_refinements_rb.html">core_refinements</a>: Adds refinement versions of Sequel's core extensions.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/eval_inspect_rb.html">eval_inspect</a>: Makes inspect on Sequel's expression objects attempt to return a string suitable for eval.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/inflector_rb.html">inflector</a>: Adds instance-level inflection methods to String.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/meta_def_rb.html">meta_def</a>: Adds meta_def method for defining methods to Database, Dataset, and Model classes and instances.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/migration_rb.html">migration</a>: Adds Migration and Migrator classes for easily migrating the database schema forward or reverting to a previous version.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/named_timezones_rb.html">named_timezones</a>: Allows you to use named timezones instead of just :local and :utc (requires <a href="http://tzinfo.rubyforge.org/">TZInfo</a>).</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_ops_rb.html">pg_array_ops</a>: Adds DSL support for calling PostgreSQL array operators and functions.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_ops_rb.html">pg_hstore_ops</a>: Adds DSL support for calling PostgreSQL hstore operators and functions.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_ops_rb.html">pg_range_ops</a>: Adds DSL support for calling PostgreSQL range operators and functions.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_ops_rb.html">pg_row_ops</a>: Adds DSL support for dealing with PostgreSQL row-valued/composite types.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/ruby18_symbol_extensions_rb.html">ruby18_symbol_extensions</a>: Contains implementations of Symbol#{<,<=,>,>=,[]} that are only usable on ruby 1.8.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_expr_rb.html">sql_expr</a>: Adds sql_expr method to all objects, allowing easy use of Sequel's DSL.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/string_date_time_rb.html">string_date_time</a>: Adds instance methods to String for converting the string into a Date/Time/DateTime.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/thread_local_timezones_rb.html">thread_local_timezones</a>: Allows for per-thread overrides of the global timezone settings.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/to_dot_rb.html">to_dot</a>: Adds Dataset#to_dot method, which returns a string suitable for processing by graphviz's dot program to get a visualization of the dataset's abstract syntax tree.</li>
 </ul>
 
 <h3>External Extensions</h3>
