@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate calling Dataset#add_graph_aliases before #graph or #set_graph_aliases (jeremyevans)
+
 * Deprecate Model.add_graph_aliases, .insert_multiple, .query, .set_overrides, .set_defaults, .to_csv, and .paginate (jeremyevans)
 
 * Add guide for ordering code with Sequel (jeremyevans)

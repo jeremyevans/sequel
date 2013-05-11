@@ -15,10 +15,13 @@ module Sequel
     #   # SELECT ..., table.column AS some_alias
     #   # => {:table=>{:column=>some_alias_value, ...}, ...}
     def add_graph_aliases(graph_aliases)
+      unless ga = opts[:graph_aliases]
+        unless opts[:graph] && (ga = opts[:graph][:column_aliases])
+          Sequel::Deprecation.deprecate('Calling Dataset#add_graph_aliases before #graph or #set_graph_aliases', 'Please call it after #graph or #set_graph_aliases')
+        end
+      end
       columns, graph_aliases = graph_alias_columns(graph_aliases)
-      ds = select_more(*columns)
-      ds.opts[:graph_aliases] = (ds.opts[:graph_aliases] || (ds.opts[:graph][:column_aliases] rescue {}) || {}).merge(graph_aliases)
-      ds
+      select_more(*columns).clone(:graph_aliases => ga.merge(graph_aliases))
     end
 
     # Allows you to join multiple datasets/tables and have the result set
