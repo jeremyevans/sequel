@@ -861,11 +861,11 @@ describe Sequel::Model, "Validations" do
     end
     User.dataset._fetch = proc do |sql|
       case sql
-      when /COUNT.*username = '0records'/
+      when /count.*username = '0records'/
         {:v => 0}
-      when /COUNT.*username = '2records'/
+      when /count.*username = '2records'/
         {:v => 2}
-      when /COUNT.*username = '1record'/
+      when /count.*username = '1record'/
         {:v => 1}
       when /username = '1record'/
         {:id => 3, :username => "1record", :password => "test"}
@@ -908,11 +908,11 @@ describe Sequel::Model, "Validations" do
     end
     User.dataset._fetch = proc do |sql|
       case sql
-      when /COUNT.*username = '0records'/
+      when /count.*username = '0records'/
         {:v => 0}
-      when /COUNT.*username = '2records'/
+      when /count.*username = '2records'/
         {:v => 2}
-      when /COUNT.*username = '1record'/
+      when /count.*username = '1record'/
         {:v => 1}
       when /username = '1record'/
         if sql =~ /password = 'anothertest'/

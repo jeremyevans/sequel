@@ -826,7 +826,7 @@ describe "a grouped dataset" do
   specify "should format the right statement for counting (as a subquery)" do
     db = Sequel.mock
     db[:test].select(:name).group(:name).count
-    db.sqls.should == ["SELECT COUNT(*) AS count FROM (SELECT name FROM test GROUP BY name) AS t1 LIMIT 1"]
+    db.sqls.should == ["SELECT count(*) AS count FROM (SELECT name FROM test GROUP BY name) AS t1 LIMIT 1"]
   end
 end
 
@@ -1827,7 +1827,7 @@ describe "Dataset#distinct" do
 
   specify "should do a subselect for count" do
     @dataset.distinct.count
-    @db.sqls.should == ['SELECT COUNT(*) AS count FROM (SELECT DISTINCT name FROM test) AS t1 LIMIT 1']
+    @db.sqls.should == ['SELECT count(*) AS count FROM (SELECT DISTINCT name FROM test) AS t1 LIMIT 1']
   end
 end
 
@@ -1839,22 +1839,22 @@ describe "Dataset#count" do
   
   specify "should format SQL properly" do
     @dataset.count.should == 1
-    @db.sqls.should == ['SELECT COUNT(*) AS count FROM test LIMIT 1']
+    @db.sqls.should == ['SELECT count(*) AS count FROM test LIMIT 1']
   end
   
   specify "should accept an argument" do
     @dataset.count(:foo).should == 1
-    @db.sqls.should == ['SELECT COUNT(foo) AS count FROM test LIMIT 1']
+    @db.sqls.should == ['SELECT count(foo) AS count FROM test LIMIT 1']
   end
   
   specify "should work with a nil argument" do
     @dataset.count(nil).should == 1
-    @db.sqls.should == ['SELECT COUNT(NULL) AS count FROM test LIMIT 1']
+    @db.sqls.should == ['SELECT count(NULL) AS count FROM test LIMIT 1']
   end
   
   specify "should accept a virtual row block" do
     @dataset.count{foo(bar)}.should == 1
-    @db.sqls.should == ['SELECT COUNT(foo(bar)) AS count FROM test LIMIT 1']
+    @db.sqls.should == ['SELECT count(foo(bar)) AS count FROM test LIMIT 1']
   end
   
   specify "should raise an Error if given an argument and a block" do
@@ -1863,45 +1863,45 @@ describe "Dataset#count" do
   
   specify "should include the where clause if it's there" do
     @dataset.filter(Sequel.expr(:abc) < 30).count.should == 1
-    @db.sqls.should == ['SELECT COUNT(*) AS count FROM test WHERE (abc < 30) LIMIT 1']
+    @db.sqls.should == ['SELECT count(*) AS count FROM test WHERE (abc < 30) LIMIT 1']
   end
   
   specify "should count properly for datasets with fixed sql" do
     @dataset.opts[:sql] = "select abc from xyz"
     @dataset.count.should == 1
-    @db.sqls.should == ["SELECT COUNT(*) AS count FROM (select abc from xyz) AS t1 LIMIT 1"]
+    @db.sqls.should == ["SELECT count(*) AS count FROM (select abc from xyz) AS t1 LIMIT 1"]
   end
 
   specify "should count properly when using UNION, INTERSECT, or EXCEPT" do
     @dataset.union(@dataset).count.should == 1
-    @db.sqls.should == ["SELECT COUNT(*) AS count FROM (SELECT * FROM test UNION SELECT * FROM test) AS t1 LIMIT 1"]
+    @db.sqls.should == ["SELECT count(*) AS count FROM (SELECT * FROM test UNION SELECT * FROM test) AS t1 LIMIT 1"]
     @dataset.intersect(@dataset).count.should == 1
-    @db.sqls.should == ["SELECT COUNT(*) AS count FROM (SELECT * FROM test INTERSECT SELECT * FROM test) AS t1 LIMIT 1"]
+    @db.sqls.should == ["SELECT count(*) AS count FROM (SELECT * FROM test INTERSECT SELECT * FROM test) AS t1 LIMIT 1"]
     @dataset.except(@dataset).count.should == 1
-    @db.sqls.should == ["SELECT COUNT(*) AS count FROM (SELECT * FROM test EXCEPT SELECT * FROM test) AS t1 LIMIT 1"]
+    @db.sqls.should == ["SELECT count(*) AS count FROM (SELECT * FROM test EXCEPT SELECT * FROM test) AS t1 LIMIT 1"]
   end
 
   specify "should return limit if count is greater than it" do
     @dataset.limit(5).count.should == 1
-    @db.sqls.should == ["SELECT COUNT(*) AS count FROM (SELECT * FROM test LIMIT 5) AS t1 LIMIT 1"]
+    @db.sqls.should == ["SELECT count(*) AS count FROM (SELECT * FROM test LIMIT 5) AS t1 LIMIT 1"]
   end
   
   specify "should work correctly with offsets" do
     @dataset.limit(nil, 5).count.should == 1
-    @db.sqls.should == ["SELECT COUNT(*) AS count FROM (SELECT * FROM test OFFSET 5) AS t1 LIMIT 1"]
+    @db.sqls.should == ["SELECT count(*) AS count FROM (SELECT * FROM test OFFSET 5) AS t1 LIMIT 1"]
   end
   
   it "should work on a graphed_dataset" do
     @dataset.should_receive(:columns).twice.and_return([:a])
     @dataset.graph(@dataset, [:a], :table_alias=>:test2).count.should == 1
-    @db.sqls.should == ['SELECT COUNT(*) AS count FROM test LEFT OUTER JOIN test AS test2 USING (a) LIMIT 1']
+    @db.sqls.should == ['SELECT count(*) AS count FROM test LEFT OUTER JOIN test AS test2 USING (a) LIMIT 1']
   end
 
   specify "should not cache the columns value" do
     ds = @dataset.from(:blah).columns(:a)
     ds.columns.should == [:a]
     ds.count.should == 1
-    @db.sqls.should == ['SELECT COUNT(*) AS count FROM blah LIMIT 1']
+    @db.sqls.should == ['SELECT count(*) AS count FROM blah LIMIT 1']
     ds.columns.should == [:a]
   end
 end

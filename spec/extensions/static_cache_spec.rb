@@ -76,7 +76,7 @@ describe "Sequel::Plugins::StaticCache" do
     @db.fetch = [[{:count=>1}], [{:count=>2}]]
     @c.count(:a).should == 1
     @c.count{b}.should == 2
-    @db.sqls.should == ["SELECT COUNT(a) AS count FROM t LIMIT 1", "SELECT COUNT(b) AS count FROM t LIMIT 1"]
+    @db.sqls.should == ["SELECT count(a) AS count FROM t LIMIT 1", "SELECT count(b) AS count FROM t LIMIT 1"]
   end
 
   it "should have map not send a query if given an argument" do

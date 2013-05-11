@@ -19,7 +19,7 @@ describe Sequel::Model, "class dataset methods"  do
     @c.avg(:id).should == 1
     @db.sqls.should == ["SELECT avg(id) AS avg FROM items LIMIT 1"]
     @c.count.should == 1
-    @db.sqls.should == ["SELECT COUNT(*) AS count FROM items LIMIT 1"]
+    @db.sqls.should == ["SELECT count(*) AS count FROM items LIMIT 1"]
     @c.cross_join(@c).sql.should == "SELECT * FROM items CROSS JOIN items"
     @c.distinct.sql.should == "SELECT DISTINCT * FROM items"
     @c.each{|r| r.should == @c.load(:id=>1)}.should == @d

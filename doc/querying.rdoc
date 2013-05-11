@@ -650,7 +650,7 @@ A common use of grouping is to count based on the number of grouped rows,
 and Sequel provides a +group_and_count+ method to make this easier:
 
   Album.group_and_count(:artist_id)
-  # SELECT artist_id, COUNT(*) AS count FROM albums GROUP BY artist_id
+  # SELECT artist_id, count(*) AS count FROM albums GROUP BY artist_id
 
 This will return the number of albums for each artist_id.
 
@@ -673,7 +673,7 @@ before.  One possible use is if you only wanted to return artists
 who had at least 10 albums:
 
   Album.group_and_count(:artist_id).having{count >= 10}
-  # SELECT artist_id, COUNT(*) AS count FROM albums
+  # SELECT artist_id, count(*) AS count FROM albums
   # GROUP BY artist_id HAVING count >= 10
 
 If you have an existing HAVING clause on your dataset, then +filter+
@@ -681,7 +681,7 @@ will add to the HAVING clause instead of the WHERE clause:
 
   Album.group_and_count(:artist_id).
    having{count >= 10}.filter{count < 15}
-  # SELECT artist_id, COUNT(*) AS count FROM albums
+  # SELECT artist_id, count(*) AS count FROM albums
   # GROUP BY artist_id HAVING count >= 10 AND count < 15
 
 This can be confusing, so it is recommended that you always use
@@ -692,7 +692,7 @@ Both the WHERE clause and the HAVING clause are removed by +unfiltered+:
 
   Album.group_and_count(:artist_id).having{count >= 10}.
    where(:name.like('A%')).unfiltered
-  # SELECT artist_id, COUNT(*) AS count FROM albums GROUP BY artist_id
+  # SELECT artist_id, count(*) AS count FROM albums GROUP BY artist_id
 
 == Joins
 
@@ -994,7 +994,7 @@ for each of these aggregate functions.
 +count+ just returns the number of records in the dataset.
 
   Album.count
-  # SELECT COUNT(*) AS count FROM albums LIMIT 1
+  # SELECT count(*) AS count FROM albums LIMIT 1
   => 2
   
 The other methods take a column argument and call the aggregate function with
