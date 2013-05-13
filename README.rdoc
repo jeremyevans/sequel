@@ -483,7 +483,7 @@ You can use the <tt>Sequel.as</tt> method to alias arbitrary expressions, not ju
 
 == Sequel Models
 
-A model class wraps a dataset, and an instance of that class wraps a single record in the dataset.
+A model class wraps a dataset, and an instance of that class wraps a single record in the dataset. Unlike many other ORM systems, you do not define fields in your class definitions. Instead, Sequel obtains the field definitions from the database schema.
 
 Model classes are defined as regular Ruby classes inheriting from <tt>Sequel::Model</tt>:
 
