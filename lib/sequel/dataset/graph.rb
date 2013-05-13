@@ -13,7 +13,6 @@ module Sequel
     #
     #   DB[:table].add_graph_aliases(:some_alias=>[:table, :column])
     #   # SELECT ..., table.column AS some_alias
-    #   # => {:table=>{:column=>some_alias_value, ...}, ...}
     def add_graph_aliases(graph_aliases)
       unless ga = opts[:graph_aliases]
         unless opts[:graph] && (ga = opts[:graph][:column_aliases])
@@ -24,34 +23,8 @@ module Sequel
       select_more(*columns).clone(:graph_aliases => ga.merge(graph_aliases))
     end
 
-    # Allows you to join multiple datasets/tables and have the result set
-    # split into component tables.
-    #
-    # This differs from the usual usage of join, which returns the result set
-    # as a single hash.  For example:
-    #
-    #   # CREATE TABLE artists (id INTEGER, name TEXT);
-    #   # CREATE TABLE albums (id INTEGER, name TEXT, artist_id INTEGER);
-    #
-    #   DB[:artists].left_outer_join(:albums, :artist_id=>:id).first
-    #   #=> {:id=>albums.id, :name=>albums.name, :artist_id=>albums.artist_id}
-    #
-    #   DB[:artists].graph(:albums, :artist_id=>:id).first
-    #   #=> {:artists=>{:id=>artists.id, :name=>artists.name}, :albums=>{:id=>albums.id, :name=>albums.name, :artist_id=>albums.artist_id}}
-    #
-    # Using a join such as left_outer_join, the attribute names that are shared between
-    # the tables are combined in the single return hash.  You can get around that by
-    # using +select+ with correct aliases for all of the columns, but it is simpler to
-    # use +graph+ and have the result set split for you.  In addition, +graph+ respects
-    # any +row_proc+ of the current dataset and the datasets you use with +graph+.
-    #
-    # If you are graphing a table and all columns for that table are nil, this
-    # indicates that no matching rows existed in the table, so graph will return nil
-    # instead of a hash with all nil values:
-    #
-    #   # If the artist doesn't have any albums
-    #   DB[:artists].graph(:albums, :artist_id=>:id).first
-    #   => {:artists=>{:id=>artists.id, :name=>artists.name}, :albums=>nil}
+    # Similar to Dataset#join_table, but uses unambiguous aliases for selected
+    # columns and keeps metadata about the aliases for use in other methods.
     #
     # Arguments:
     # dataset :: Can be a symbol (specifying a table), another dataset,
@@ -229,7 +202,6 @@ module Sequel
     #                       :album_name=>[:albums, :name],
     #                       :forty_two=>[:albums, :fourtwo, 42]).first
     #   # SELECT artists.name, albums.name AS album_name, 42 AS forty_two ...
-    #   # => {:artists=>{:name=>artists.name}, :albums=>{:name=>albums.name, :fourtwo=>42}}
     def set_graph_aliases(graph_aliases)
       columns, graph_aliases = graph_alias_columns(graph_aliases)
       ds = select(*columns)
