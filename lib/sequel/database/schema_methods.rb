@@ -196,6 +196,25 @@ module Sequel
       end
     end
 
+    # Upgrades the table if it exists, or passes to create_table.
+    #
+    #   DB.upgrade_table?(:accounts){column :title, String, :default => 'foobar'}
+    #   # SELECT NULL AS `nil` FROM `accounts` LIMIT 1 -- check existence
+    #   # DESCRIBE `accounts`                          -- or similar to get database schema
+    #   # ALTER TABLE `accounts` ADD COLUMN `title` varchar(255) DEFAULT 'foobar'
+    def upgrade_table?( name, options={}, &block )
+      return create_table(name, options, &block)  unless table_exists?(name)
+      current_schema = Hash[schema name]
+      create_table_generator(&block).columns.each do |column|
+        if current_schema[column[:name]]
+          # TODO: maybe add some logic for altering column type, might be DESTRUCTIVE
+          next
+        else
+          add_column name, column.delete(:name), column.delete(:type), column
+        end
+      end
+    end
+
     # Return a new Schema::CreateTableGenerator instance with the receiver as
     # the database and the given block.
     def create_table_generator(&block)
