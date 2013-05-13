@@ -491,6 +491,10 @@ Model classes are defined as regular Ruby classes inheriting from <tt>Sequel::Mo
   class Post < Sequel::Model
   end
 
+When a model class is created, it parses the schema in the table from the database, and
+automatically sets up accessor methods for all of the columns in the table (Sequel::Model
+implements the active record pattern).
+
 Sequel model classes assume that the table name is an underscored plural of the class name:
 
   Post.table_name #=> :posts
