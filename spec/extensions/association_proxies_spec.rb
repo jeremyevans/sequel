@@ -29,6 +29,17 @@ describe "Sequel::Plugins::AssociationProxies" do
     @i.associations.has_key?(:tags).should == false
   end
   
+  it "should accept block to plugin to specify which methods to proxy to dataset" do
+    Item.plugin :association_proxies do |meth, args, &block|
+      meth == :where || args.length == 2 || block
+    end
+    @i.associations.has_key?(:tags).should == false
+    @t.where(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
+    proc{@t.filter(:a=>1)}.should raise_error(NoMethodError)
+    @t.filter('a = ?', 1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
+    @t.filter{{:a=>1}}.sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
+  end
+  
   it "should reload the cached association if sent an array method and the reload flag was given" do
     @t.select{|x| false}.should == []
     Item.db.sqls.length.should == 1
@@ -47,4 +58,13 @@ describe "Sequel::Plugins::AssociationProxies" do
     Tag.one_to_one :item
     proc{Tag.load(:id=>1, :item_id=>2).item.filter(:a=>1)}.should raise_error(NoMethodError)
   end
+
+  it "should work correctly in subclasses" do
+    i = Class.new(Item).load(:id=>1)
+    i.associations.has_key?(:tags).should == false
+    i.tags.select{|x| false}.should == []
+    i.associations.has_key?(:tags).should == true
+    i.tags.filter(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
+  end
+  
 end

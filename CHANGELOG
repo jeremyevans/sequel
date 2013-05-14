@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow association_proxies plugin to accept a block to give user control over which methods are proxied to the dataset (jeremyevans) (#660)
+
 * Deprecate calling Dataset#add_graph_aliases before #graph or #set_graph_aliases (jeremyevans)
 
 * Deprecate Model.add_graph_aliases, .insert_multiple, .query, .set_overrides, .set_defaults, .to_csv, and .paginate (jeremyevans)
