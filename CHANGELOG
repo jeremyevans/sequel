@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate parsing columns for the same table name in multiple schemas on jdbc (jeremyevans)
+
 * Allow association_proxies plugin to accept a block to give user control over which methods are proxied to the dataset (jeremyevans) (#660)
 
 * Deprecate calling Dataset#add_graph_aliases before #graph or #set_graph_aliases (jeremyevans)

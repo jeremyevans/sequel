@@ -574,13 +574,18 @@ module Sequel
           next if schema_parse_table_skip?(h, schema)
           pks << h[:column_name]
         end
+        schemas = []
         metadata(:getColumns, nil, schema, table, nil) do |h|
           next if schema_parse_table_skip?(h, schema)
           s = {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name]), :column_size=>h[:column_size], :scale=>h[:decimal_digits]}
           if s[:db_type] =~ DECIMAL_TYPE_RE && s[:scale] == 0
             s[:type] = :integer
           end
+          schemas << h[:table_schem] unless schemas.include?(h[:table_schem])
           ts << [m.call(h[:column_name]), s]
+        end
+        if schemas.length > 1
+          Sequel::Deprecation.deprecate('Schema parsing in the jdbc adapter resulted in columns being returned for a table with the same name in multiple schemas.  This will raise an Error starting in Sequel 4.  Please explicitly qualify your table with a schema.')
         end
         ts
       end
