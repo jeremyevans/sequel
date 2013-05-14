@@ -32,7 +32,7 @@ vulnerable to code execution.
 == SQL Injection
 
 The primary security concern in SQL database libraries is SQL injection.
-Because Sequel mostly promotes using ruby objects for SQL concepts instead
+Because Sequel promotes using ruby objects for SQL concepts instead
 of raw SQL, it is less likely to be vulnerable to SQL injection.
 However, because Sequel still makes it easy to use raw SQL, misuse of the
 library can result in SQL injection in your application.
@@ -153,7 +153,7 @@ class methods also call down to the filter methods.
 
 ==== SQL Fragment passed to Dataset#update
 
-Similar to the filter methods, Sequel::Dataset#update (and alias Sequel::Dataset#set) also treat a
+Similar to the filter methods, Sequel::Dataset#update also treats a
 string argument as raw SQL:
 
   DB[:table].update("column = 1")

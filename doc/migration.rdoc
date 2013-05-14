@@ -100,7 +100,7 @@ from Sacramento, CA, USA, but now you want to branch out and include artists in 
   Sequel.migration do
     up do
       add_column :artists, :location, String
-      self[:artists].update(:location=>'Sacramento')
+      from(:artists).update(:location=>'Sacramento')
     end
 
     down do
@@ -114,10 +114,10 @@ because future artists should not be assumed to come from Sacramento.  In the +d
 just drops the +location+ column from the +artists+ table, reversing the actions of the up
 block.
 
-Note that when updating the +artists+ table in the update, a plain dataset is used, <tt>self[:artists]</tt>.
+Note that when updating the +artists+ table in the update, a plain dataset is used, <tt>from(:artists)</tt>.
 This looks a little weird, but you need to be aware that inside an up or +down+ block in a migration,
 self always refers to the <tt>Sequel::Database</tt> object that the migration is being applied to.
-Since <tt>Database#[]</tt> creates datasets, using <tt>self[:artists]</tt> inside the +up+ block creates
+Since <tt>Database#from</tt> creates datasets, using <tt>from(:artists)</tt> inside the +up+ block creates
 a dataset on the database representing all columns in the +artists+ table, and updates it to set the
 +location+ column to <tt>'Sacramento'</tt>.  You should avoid referencing the <tt>Sequel::Database</tt>
 object directly in your migration, and always use self to reference it, otherwise you may run into problems.
@@ -130,7 +130,7 @@ to create their development database.
 == The +migration+ extension
 
 The migration code is not technically part of the core of Sequel.  It's not loaded by default as it
-is only useful in specific cases.  It is one of the built-in extensions, which receive the same
+is only useful in specific cases.  It is one of the extensions that ship with Sequel, which receive the same
 level of support as Sequel's core.
 
 If you want to play with Sequel's migration tools without using the <tt>bin/sequel</tt> tool, you
@@ -240,7 +240,7 @@ the +TimestampMigrator+.  They both have plusses and minuses:
 
 * Simpler, uses migration versions starting with 1
 * Doesn't allow duplicate migrations
-* Doesn't allow missing migrations
+* Doesn't allow missing migrations by default
 * Just stores the version of the last migration run
 * Good for single developer or small teams with close
   communication
@@ -255,7 +255,7 @@ the +TimestampMigrator+.  They both have plusses and minuses:
 * Allows missing migrations (since you obviously don't have one every second)
 * Stores the file names of all applied migrations
 * Good for large teams without close communication
-* Higher risk of undected conflicting migrations
+* Higher risk of undetected conflicting migrations
 * Does not require manual merging of simultaneous migrations
 
 === Filenames
@@ -293,7 +293,7 @@ to worry about that issue until the 1000th migration:
   009_do_something.rb
   010_do_something_else.rb
 
-It should be fairly obvious, but migrations start at 1, not 0.  The migration version number 0
+Migrations start at 1, not 0.  The migration version number 0
 is important though, as it is used to mean that all migrations should be unapplied (i.e. all
 +down+ blocks run).  In Sequel, you can do that with:
 

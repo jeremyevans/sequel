@@ -140,10 +140,15 @@ Or against SQL functions:
 
 == String search functions
 
-You can search SQL strings using the Sequel.like method:
+You can search SQL strings in a case sensitive manner using the Sequel.like method:
 
   items.where(Sequel.like(:name, 'Acme%')).sql
   #=> "SELECT * FROM items WHERE (name LIKE 'Acme%')"
+
+You can search SQL strings in a case insensitive manner using the Sequel.ilike method:
+
+  items.where(Sequel.ilike(:name, 'Acme%')).sql
+  #=> "SELECT * FROM items WHERE (name ILIKE 'Acme%')"
 
 You can specify a Regexp as a like argument, but this will probably only work
 on PostgreSQL and MySQL:
@@ -163,7 +168,7 @@ You can concatenate SQL strings using Sequel.join:
   items.where(Sequel.join([:name, :comment]).like('%acme%')).sql
   #=> "SELECT * FROM items WHERE ((name || comment) LIKE 'Acme%')"
 
-Array#sql_string_join also takes a join argument:
+Sequel.join also takes a join argument:
 
   items.filter(Sequel.join([:name, :comment], ' ').like('%acme%')).sql
   #=> "SELECT * FROM items WHERE ((name || ' ' || comment) LIKE 'Acme%')"

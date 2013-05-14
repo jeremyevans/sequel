@@ -9,7 +9,7 @@ many Sequel::Dataset methods that take virtual row blocks.
 
 Virtual Rows were created to work around the issue that some parts of
 Sequel's standard DSL could not be used on ruby 1.9.  For example, the
-following Sequel code works on ruby 1.8, but not ruby 1.9:
+following Sequel code historically worked on ruby 1.8, but not ruby 1.9:
 
   dataset.where(:a > :b[:c])
   # WHERE a > b(c)
@@ -243,7 +243,7 @@ doesn't look as nice:
 == Returning multiple values
 
 It's common when using select and order virtual row blocks to want to
-return multiple values.  If you want to do that, you just need to return a single
+return multiple values.  If you want to do that, you just need to return an 
 array:
 
   ds.select{|o| [o.column1, o.sum(o.column2).as(o.sum)]}

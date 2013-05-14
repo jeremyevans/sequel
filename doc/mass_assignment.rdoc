@@ -36,7 +36,7 @@ By default, if an invalid setter method call is attempted, Sequel raises a <tt>S
   # Instance level
   post.strict_param_setting = false
 
-These mass assignment methods have been around a long time, but starting in Sequel 3.12.0, the +set_fields+ and +update_fields+ methods were added, and these may be a better mass assignment choice for most users.
+In addition to +set_only+ and +update_only+, Sequel also has +set_fields+ and +update_fields+ methods, and these may be a better mass assignment choice for most users.
 These methods take two arguments, the attributes hash as the first argument, and a single array of valid field names as the second argument:
 
   post.set_fields(params[:post], [:title, :body])
@@ -50,7 +50,6 @@ They work great for things like HTML forms where the form fields are static.
 +set_only+ and +update_only+ are designed for cases where you are not sure what fields are going to be present in the input, but still want to make sure only certain setter methods can be called.
 They work great for flexible APIs.
 
-Starting in Sequel 3.34.0, +set_fields+ and +update_fields+ take an optional argument hash, and currently handles the :missing option.  With <tt>:missing=>:skip</tt>, +set_fields+ and +update_fields+ will just skip missing entries in the hash, allowing them to be used in flexible APIs.  With <tt>:missing=>:raise</tt>, +set_fields+ and +update_fields+ will raise an error if one of the entries in the hash is missing, instead of just assigning the value to nil or whatever the hash's default value is.  That allows stricter checks, similar to the :strict_param_checking setting for the default mass assignment methods.
++set_fields+ and +update_fields+ take an optional argument hash, and currently handles the :missing option.  With <tt>:missing=>:skip</tt>, +set_fields+ and +update_fields+ will just skip missing entries in the hash, allowing them to be used in flexible APIs.  With <tt>:missing=>:raise</tt>, +set_fields+ and +update_fields+ will raise an error if one of the entries in the hash is missing, instead of just assigning the value to nil or whatever the hash's default value is.  That allows stricter checks, similar to the :strict_param_checking setting for the default mass assignment methods.  You can use the <tt>Model.default_set_fields_options=</tt> method to set the default options to use for +set_fields+ and +update_fields+ on a global or per-model basis.
 
 In all of the mass assignment cases, methods starting with +set+ will set the attributes without saving the object, while methods starting with +update+ will set the attributes and then save the changes to the object.
-

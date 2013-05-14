@@ -3,7 +3,7 @@
 Sequel's dataset layer is mostly structured as an DSL, so it often obscures
 what actual objects are being used.  For example, you don't usually create
 Sequel objects by calling #new on the object's class (other than Sequel::Model
-subclasses).  However, just as almost everything in ruby is an object, all 
+instances).  However, just as almost everything in ruby is an object, all 
 the methods you call in Sequel deal with objects behind the scenes.
 
 There are five main types of Sequel-specific objects that you deal with in
@@ -377,7 +377,7 @@ take arguments.  Still, it's possible they are still useful in some code:
 
   Sequel::SQL::ColumnAll.new(:table) # "table".*
 
-The following shortcut exists for creating Sequel::SQL::Cast objects:
+The following shortcut exists for creating Sequel::SQL::ColumnAll objects:
 
   Sequel.expr(:table).*
   :table.* # core_extensions extension

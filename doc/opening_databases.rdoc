@@ -12,7 +12,7 @@ The connection options needed depend on the adapter being used, though most adap
 share the same basic connection options.
 
 If you are only connecting to a single database, it is recommended that you store the
-database object in a constant named DB.  This should never be required, but it is the
+database object in a constant named DB.  This is not required, but it is the
 convention that most Sequel code uses.
 
 == Using the Sequel.connect method
@@ -68,9 +68,7 @@ These options are shared by all adapters unless otherwise noted.
 
 :adapter :: The adapter to use
 :database :: The name of the database to which to connect
-:default_schema :: The database schema to use in schema_modification and introspection.
 :host :: The hostname of the database server to which to connect
-:logger :: An array of SQL loggers to log to
 :loggers :: An array of SQL loggers to log to
 :password :: The password for the user account
 :servers :: A hash with symbol keys and hash or proc values, used with master/slave/partitioned database configurations
@@ -98,7 +96,7 @@ Requires: win32ole
 
 The ADO adapter provides connectivity to ADO databases in Windows. It relies
 on WIN32OLE library, so it isn't usable on other operating systems (except
-possibly through WINE, but that's fairly unlikely).
+possibly through WINE, but that's unlikely).
 
 The following options are supported:
 
@@ -239,7 +237,7 @@ Requires: java
 Houses Sequel's JDBC support when running on JRuby.
 Support for individual database types is done using sub adapters.
 There are currently subadapters for PostgreSQL, MySQL, SQLite, H2, HSQLDB, Derby,
-Oracle, MSSQL, JTDS, AS400, Progress, Firebird, Informix, and DB2.  For PostgreSQL, MySQL, SQLite, H2, Derby,
+Oracle, MSSQL, JTDS, AS400, Progress, Firebird, Informix, and DB2.  For PostgreSQL, MySQL, SQLite, H2, HSQLDB, Derby,
 and JTDS, this can use the jdbc-* gem, for the others you need to have the .jar in your CLASSPATH
 or load the Java class manually before calling Sequel.connect.
 
@@ -396,7 +394,7 @@ The following additional options are supported:
 
 === swift
 
-swift is a ruby 1.9 only library, so you'll need to be running ruby 1.9.  It
+swift is a ruby 1.9+ library, so you'll need to be running ruby 1.9+.  It
 can connect to SQLite, MySQL, and PostgreSQL, and you must specify which
 database using the db_type option.
 
@@ -416,8 +414,7 @@ Examples:
 
 Requires: tiny_tds
 
-Because the underscore is not a valid character in a URI schema, the adapter
-is named tinytds instead of tiny_tds.  The connection options are passed directly
+The connection options are passed directly
 to tiny_tds, except that the tiny_tds :username option is set to
 the Sequel :user option.  If you want to use an entry in the freetds.conf file, you
 should specify the :dataserver option with that name as the value.  Some other
@@ -431,12 +428,6 @@ Other Sequel specific options:
              This should be specified as an integer.  If you plan on setting large
              text or blob values via tinytds, you should use this option or modify
              your freetds.conf file.
-
-For highest performance, you should disable any identifier output method when
-using the tinytds adapter, which probably means disabling any identifier input method
-as well.  The default for Microsoft SQL Server is to :downcase identifiers on output
-and :upcase them on input, so the highest performance will require changing the setting
-from the default.
 
 The Sequel tinytds adapter requires tiny_tds >= 0.4.5, and if you are using FreeTDS
 0.91, you must at least be using 0.91rc2 (0.91rc1 does not work).

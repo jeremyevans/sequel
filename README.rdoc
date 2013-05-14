@@ -39,7 +39,6 @@ If you have any comments or suggestions please post to the Google group.
   
 == A Short Example
 
-  require 'rubygems'
   require 'sequel'
   
   DB = Sequel.sqlite # memory database
@@ -363,7 +362,7 @@ Updating records in the table is done with +update+:
 
 You can reference table columns when choosing what values to set:
 
-  posts.where{|o| o.stamp < Date.today - 7}.update(:backup_number => :backup_number + 1)
+  posts.where{|o| o.stamp < Date.today - 7}.update(:backup_number => Sequel.+(:backup_number, 1))
   # UPDATE posts SET backup_number = backup_number + 1 WHERE stamp < '2010-07-07'
 
 As with +delete+, +update+ affects all rows in the dataset, so +where+ first,
@@ -417,18 +416,6 @@ You can then do anything you like with the dataset:
   # ON order_items.item_id = items.id
   # WHERE order_items.order_id = 1234
   
-=== Graphing Datasets
-
-When retrieving records from joined datasets, you get the results in a single hash, which is subject to clobbering if you have columns with the same name in multiple tables:
-
-  DB[:items].join(:order_items, :item_id => :id).first
-  => {:id=>order_items.id, :item_id=>order_items.item_id}
-
-Using +graph+, you can split the result hashes into subhashes, one per join:
-
-  DB[:items].graph(:order_items, :item_id => :id).first
-  => {:items=>{:id=>items.id}, :order_items=>{:id=>order_items.id, :item_id=>order_items.item_id}}
-
 == Column references in Sequel
 
 Sequel expects column names to be specified using symbols. In addition, returned hashes always use symbols as their keys. This allows you to freely mix literal values and column references in many cases. For example, the two following lines produce equivalent SQL:
@@ -539,9 +526,9 @@ A single model instance can also be fetched by specifying a condition:
   post = Post[:title => 'hello world']
   post = Post.first{num_comments < 10}
 
-=== Iterating over records
+=== Acts like a dataset
 
-A model class lets you iterate over subsets of records by proxying many methods to the underlying dataset. This means that you can use most of the +Dataset+ API to create customized queries that return model instances, e.g.:
+A model class forwards many methods to the underlying dataset. This means that you can use most of the +Dataset+ API to create customized queries that return model instances, e.g.:
 
   Post.where(:category => 'ruby').each{|post| p post}
 
@@ -566,21 +553,25 @@ If the record's attributes names are not valid columns in the model's dataset (m
   post[:id] #=> 123
   post[:title] #=> 'hello world'
 
-You can also modify record values using attribute setters, the <tt>[]=</tt> method, or the +set+ method:
+You can also modify record values using attribute setters or the <tt>[]=</tt> method.
+
 
   post.title = 'hey there'
-  # or 
   post[:title] = 'hey there'
-  # or 
-  post.set(:title=>'hey there')
 
 That will just change the value for the object, it will not update the row in the database.  To update the database row, call the +save+ method:
 
   post.save
 
-You can modify record values and save the changes to the object in a single method call using the +update+ method:
+=== Mass assignment
 
-  post.update(:title => 'hey there')
+You can also set the values for multiple columns in a single method call, using one of the mass-assignment methods.  See the {mass assignment guide}[link:files/doc/mass_assignment_rdoc.html] for details.  For example +set+ updates the model's column values without saving:
+
+  post.set(:title=>'hey there', :updated_by=>'foo')
+
+and +update+ updates the model's column values and then saves the changes to the database:
+
+  post.update(:title => 'hey there', :updated_by=>'foo')
 
 === Creating new records
 
@@ -629,13 +620,13 @@ You can delete individual records by calling +delete+ or +destroy+. The only dif
   post.delete # => bypasses hooks
   post.destroy # => runs hooks
 
-Records can also be deleted en-masse by calling <tt>Model.delete</tt> and <tt>Model.destroy</tt>. As stated above, you can specify filters for the deleted records:
+Records can also be deleted en-masse by calling <tt>delete</tt> and <tt>destroy</tt> on the model's dataset. As stated above, you can specify filters for the deleted records:
 
   Post.where(:category => 32).delete # => bypasses hooks
   Post.where(:category => 32).destroy # => runs hooks
 
-Please note that if <tt>Model.destroy</tt> is called, each record is deleted 
-separately, but <tt>Model.delete</tt> deletes all matching records with a single 
+Please note that if <tt>destroy</tt> is called, each record is deleted 
+separately, but <tt>delete</tt> deletes all matching records with a single 
 SQL query.
 
 === Associations
@@ -748,19 +739,7 @@ You can dynamically customize eager loads for both +eager+ and +eager_graph+ whi
 
 === Extending the underlying dataset
 
-The obvious way to add table-wide logic is to define class methods to the model class definition. That way you can define subsets of the underlying dataset, change the ordering, or perform actions on multiple records:
-
-  class Post < Sequel::Model
-    def self.posts_with_few_comments
-      where{num_comments < 30}
-    end
-
-    def self.clean_posts_with_few_comments
-      posts_with_few_comments.delete
-    end
-  end
-
-You can also implement table-wide logic by defining methods on the dataset using +dataset_module+:
+The recommended way to implement table-wide logic by defining methods on the dataset using +dataset_module+:
 
   class Post < Sequel::Model
     dataset_module do
@@ -774,7 +753,7 @@ You can also implement table-wide logic by defining methods on the dataset using
     end
   end
 
-This is the recommended way of implementing table-wide operations, and allows you to have access to your model API from filtered datasets as well:
+This allows you to have access to your model API from filtered datasets as well:
 
   Post.where(:category => 'ruby').clean_posts_with_few_comments
 
@@ -802,4 +781,3 @@ raise an error or return false depending on how it is configured
       errors.add(:written_on, "should be in the past") if written_on >= Time.now
     end
   end
-

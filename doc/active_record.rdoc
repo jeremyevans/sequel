@@ -1,7 +1,6 @@
 = Sequel for ActiveRecord Users
 
-This guide is aimed at helping ActiveRecord users transition to Sequel.  It assumes the user is familiar with ActiveRecord 2, but if you are familiar with ActiveRecord 3, the transition should be even easier.
-
+This guide is aimed at helping ActiveRecord users transition to Sequel.  It assumes the user is familiar with ActiveRecord 2, but if you are familiar with a newer ActiveRecord version, the transition should be even easier.
 
 == Introduction
 
@@ -164,7 +163,7 @@ By now, you should have the idea that Sequel supports most things that ActiveRec
 
 === Method Chaining
 
-Unlike ActiveRecord 2, Sequel uses method chains on datasets for retrieving objects, so instead of:
+Unlike ActiveRecord 2 (and similar to ActiveRecord 3+), Sequel uses method chains on datasets for retrieving objects, so instead of:
 
   Album.find(:all, :conditions=>['name > ? AND artist_id = ?', 'RF', 1],
     :order=>'copies_sold', :select=>'id, name')
@@ -423,8 +422,8 @@ ActiveRecord option :: Sequel option
 <tt>:foreign_key</tt> :: <tt>:left_key</tt>
 <tt>:association_foreign_key</tt> :: <tt>:right_key</tt>
 <tt>:join_table</tt> :: <tt>:join_table</tt>
-<tt>:delete_sql</tt> :: Override the _remove_association method for the association
-<tt>:insert_sql</tt> :: Override the _add_association method for the association
+<tt>:delete_sql</tt> :: <tt>:remover</tt>
+<tt>:insert_sql</tt> :: <tt>:adder</tt>
 
 == Validation Errors
 
@@ -499,15 +498,7 @@ Sequel only uses connections for the minimum amount of time necessary, checking 
     ...
   end
 
-Note that the connection is yielded to the block, and the block ensures it is returned to the pool.  Sequel doesn't have a method that returns a connection, since that would check it out with no ability to ensure it is returned to the pool
-
-==== +count+
-
-Without arguments, +count+ works the same in Sequel as in ActiveRecord.  For a single column:
-
-  Album.get{count(column)}
-
-For options, you should use method chaining to build your query and execute it.
+Note that the connection is yielded to the block, and the block ensures it is returned to the pool.  Sequel doesn't have a method that returns a connection, since that would check it out with no ability to ensure it is returned to the pool.
 
 ==== +count_by_sql+
 
@@ -517,10 +508,14 @@ You can call +with_sql+ to set the SQL to use, and the +single_value+ to retriev
 
 ==== +delete+, +delete_all+
 
-Calling +delete+ directly on the class will probably delete all rows in the table.  You want to filter first, then call +delete+:
+You probably want to filter first, then call +delete+:
 
   Album.where(:id=>id).delete
   Album.where("artist_id = ?", 5).delete
+
+If you really want to delete all rows in the table,call +delete+ on the Model's dataset:
+
+  Album.dataset.delete
 
 ==== +destroy+, +destroy_all+
 
@@ -528,6 +523,10 @@ Similar to +delete+, you filter first, then +destroy+:
 
   Album.where(:id=>id).destroy
   Album.where("artist_id = ?", 5).destroy
+
+If you really want to destroy all rows in the table,call +destroy+ on the Model's dataset:
+
+  Album.dataset.destroy
 
 ==== +establish_connection+
 
@@ -553,7 +552,10 @@ ActiveRecord's +find+ can be used for a lot of different things.  If you are try
 
   Album[1]
 
-Note that Sequel returns nil if no record is found, it doesn't raise an exception.
+Note that Sequel returns nil if no record is found, it doesn't raise an exception.  To raise an exception if no record
+is found:
+
+  Album.with_pk!(1)
 
 If you want to find multiple objects using an array of primary keys:
 
@@ -578,8 +580,8 @@ Here's a mapping of ActiveRecord +find+ options to <tt>Sequel::Dataset</tt> meth
 :conditions :: filter, where
 :order :: order
 :group :: group
-:limit :: limit # first argument
-:offset :: limit # second argument
+:limit :: limit
+:offset :: limit # second entry in limit array
 :joins :: join, left_join, etc. # many other join methods
 :include :: eager, eager_graph # eager does preloading, eager_graph does JOINs
 :select :: select
@@ -628,6 +630,7 @@ For anything more complex, you can use +dataset_module+:
 
 If you want to completely reload the schema for the table:
 
+  Album.instance_variable_set(:@db_schema, nil)
   Album.send(:get_db_schema, true)
 
 ==== +serialize+, +seralized_attributes+
@@ -679,6 +682,10 @@ Just like +delete+ and +destroy+, you filter first, then +update+:
   Album.where(:id=>id).update(:name=>'RF')
   Album.where("artist_id = ?", 5).update(:copies_sold=>0)
 
+Likewise, to update all rows in the model:
+
+  Album.dataset.update(:name=>'RF')
+
 Note that +update+ in that case will operate on a dataset, so it won't run model validations or hooks.  If you want those run:
 
   Album[id].update(:name=>'RF')
@@ -698,6 +705,7 @@ ActiveRecord Method :: Sequel Method
 +average+ :: +avg+
 +belongs_to+ :: +many_to_one+
 +columns_hash+ :: +db_schema+
++count+ :: +count+
 +changed+ :: +changed_columns+
 +create+ :: +create+
 +has_and_belongs_to_many+ :: +many_to_many+
@@ -772,14 +780,6 @@ If it is a new record:
   album = Album.new
   album.send(:set_values, gold_album.values)
 
-==== +clone+
-
-You probably have to use +set_values+, a private method:
-
-  album = Album[1]
-  cloned_album = Album.new
-  cloned_album.send(:set_values, album.values.dup)
-
 ==== +column_for_attribute+
 
 You can access this through the +db_schema+ hash:
@@ -806,7 +806,7 @@ Assuming you want the full behavior of saving just one column without validating
 
   album.values[:column] ||= 0
   album.values[:column] -= 1 # or += 1 for increment!
-  album.save(:column, :validate=>false)
+  album.save(:columns=>[:column], :validate=>false)
 
 ==== <tt>has_attribute?</tt>
 
@@ -837,7 +837,7 @@ No equivalent, but very easy to add:
 
 If you want to save just that column:
 
-  album.save(:column, :validate=>false)
+  album.save(:columns=>[:column], :validate=>false)
 
 ==== +transaction+
 
@@ -850,7 +850,7 @@ Just like in the class, you can access the transaction method through the +db+:
 To only set and save a specific column:
 
   album.set(:column => value)
-  album.save(:column, :validate=>false)
+  album.save(:columns=>[:column], :validate=>false)
 
 ==== +update_attributes+, <tt>update_attributes!</tt>
 

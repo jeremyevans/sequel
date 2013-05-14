@@ -32,7 +32,7 @@ to ensure that all values have at least two characters.
 Unfortunately, sometimes there are situations where that is not possible.  For
 example, if you are using MySQL and don't have control over the database configuration,
 it's possible that if you attempt to insert a string with 300 characters into a
-varchar(255) field, that MySQL will just silently truncate it for you, instead of
+varchar(255) field, then MySQL may just silently truncate it for you, instead of
 raising an error.  In that case, it may be necessary to use a model validation
 to enforce the database integrity.
 
@@ -172,9 +172,14 @@ This is probably the most commonly used helper method, which checks if the speci
 
   class Album < Sequel::Model
     def validate
+      super
       validates_presence [:name, :website, :debut_album]
     end
   end
+
+=== +validates_not_null+
+
+This is similar to +validates_presence+, but only checks for NULL/nil values, allowing other blank objects such as empty strings or strings with just whitespace.
 
 === +validates_format+
 
@@ -182,6 +187,7 @@ This is probably the most commonly used helper method, which checks if the speci
 
   class Album < Sequel::Model
     def validate
+      super
       validates_format /\A\d\d\d-\d-\d{7}-\d-\d\z/, :isbn
       validates_format /\a[0-9a-zA-Z:' ]+\z/, :name
     end
@@ -194,6 +200,7 @@ These methods all deal with ensuring that the length of the specified attribute 
 
   class Album < Sequel::Model
     def validate
+      super
       validates_exact_length 17, :isbn
       validates_min_length 3, :name
       validates_max_length 100, :name
@@ -207,6 +214,7 @@ These methods check that the specified attributes can be valid integers or valid
 
   class Album < Sequel::Model
     def validate
+      super
       validates_integer :copies_sold
       validates_numeric :replaygain
     end
@@ -224,35 +232,33 @@ These methods check that the specified attributes can be valid integers or valid
 
 === +validates_type+
 
-+validates_type+ checks that the specified attributes are instances of the class specified in the first argument.  The class can be specified as the class itself, or as a string or symbol with the class name:
++validates_type+ checks that the specified attributes are instances of the class specified in the first argument.  The class can be specified as the class itself, or as a string or symbol with the class name, or as a an array of classes.
 
   class Album < Sequel::Model
     def validate
+      super
       validates_type String, [:name, :website]
       validates_type :Artist, :artist
+      validates_type [String, Integer], :foo
     end
   end
 
-=== +validates_not_string+
+=== +validates_schema_types+
 
-+validates_not_string+ is a special validation designed to be used with the <tt>raise_on_typecast_failure = false</tt> setting.  By default, Sequel raises errors when typecasting fails, immediately when you try to set the value on the object:
-
-  album = Album.new
-  album.copies_sold = 'banana' # raises Sequel::InvalidValue
-
-The <tt>raise_on_typecast_failure = false</tt> setting tells Sequel to attempt to typecast values, but to silently ignore any errors raised:
++validates_schema_types+ uses the database metadata for the model's table to determine which ruby type(s) should be used for the given database type, and calls +validates_type+ with that ruby type.  It's designed to be used with the <tt>raise_on_typecast_failure = false</tt> setting (the default starting in Sequel 4).  <tt>raise_on_typecast_failure = false</tt, Sequel attempts to typecast values, but silently ignores any errors raised:
 
   Album.raise_on_typecast_failure = false
   album = Album.new
   album.copies_sold = 'banana'
   album.copies_sold # => 'banana'
 
-+validates_not_string+ is designed to be used in web applications where all user input comes in as strings.  When the <tt>raise_on_typecast_failure = false</tt> setting is used in such an application, you can call +validates_not_string+ with all non-string columns.  If any of those columns has a string value, it's because the column was set and Sequel was not able to typecast it correctly, which means it probably isn't valid.  For example, let's say that you want to check that a couple of columns contain valid dates:
+When <tt>raise_on_typecast_failure = false</tt>, you can call +validates_schema_types+ with all columns.  If any of those columns has a value that doesn't match the type that Sequel expects, it's probably because the column was set and Sequel was not able to typecast it correctly, which means it probably isn't valid.  For example, let's say that you want to check that a couple of columns contain valid dates:
 
   class Album < Sequel::Model
     self.raise_on_typecast_failure = false
     def validate
-      validates_not_string [:release_date, :record_date]
+      super
+      validates_schema_types [:release_date, :record_date]
     end
   end
 
@@ -264,7 +270,7 @@ The <tt>raise_on_typecast_failure = false</tt> setting tells Sequel to attempt t
   album.valid? # => false
   album.errors # => {:release_date=>["is not a valid date"]}
 
-For web applications, you usually want the <tt>raise_on_typecast_failure = false</tt> setting, so that you can accept all of the input without raising an error, and then present the user with all error messages.  Without the setting, if the user submits any invalid data, Sequel will immediately raise an error.  +validates_not_string+ is helpful because it allows you to check for typecasting errors on non-string columns, and provides a good default error message stating that the attribute is not of the expected type.
+For web applications, you usually want the <tt>raise_on_typecast_failure = false</tt> setting, so that you can accept all of the input without raising an error, and then present the user with all error messages.  Without the setting, if the user submits any invalid data, Sequel will immediately raise an error.  +validates_schema_types+ is helpful because it allows you to check for typecasting errors on columns, and provides a good default error message stating that the attribute is not of the expected type.
 
 === +validates_unique+
 
@@ -301,10 +307,11 @@ All +validation_helpers+ methods except +validates_unique+ accept the following 
 
 === <tt>:message</tt>
 
-The most commonly used option, used to override the default validation message.  Can be either a string or a proc.  If a string, it is used directly.  If a proc, the proc is called and should return a string.  If the validation method takes an argument before the array of attributes, that argument is passed as an argument to the proc. The exception is the +validates_not_string+ method, which doesn't take an argument, but passes the schema type symbol as the argument to the proc. 
+The most commonly used option, used to override the default validation message.  Can be either a string or a proc.  If a string, it is used directly.  If a proc, the proc is called and should return a string.  If the validation method takes an argument before the array of attributes, that argument is passed as an argument to the proc. The exception is the +validates_not_string+ method, which doesn't take an argument, but passes the schema type symbol as the argument to the proc.
 
   class Album < Sequel::Model
     def validate
+      super
       validates_presence :copies_sold, :message=>'was not given'
       validates_min_length 3, :name, :message=>proc{|s| "should be more than #{s} characters"}
     end
@@ -316,6 +323,7 @@ The <tt>:allow_nil</tt> option skips the validation if the attribute value is ni
 
   class Album < Sequel::Model
     def validate
+      super
       validates_presence :copies_sold
       validates_integer :copies_sold, :allow_nil=>true
     end
@@ -329,6 +337,7 @@ The <tt>:allow_blank</tt> is similar to the <tt>:allow_nil</tt> option, but inst
 
   class Album < Sequel::Model
     def validate
+      super
       validates_format /\Ahttps?:\/\//, :website, :allow_blank=>true
     end
   end
@@ -386,8 +395,9 @@ These are the default error messages for all of the helper methods in +validatio
 :length_range :: is too short or too long
 :max_length :: is longer than #{arg} characters
 :min_length :: is shorter than #{arg} characters
-:not_string :: is not a valid #{schema_type}
+:not_null :: is not present
 :numeric :: is not a number
+:schema_types :: is not a valid #{schema_type}
 :type :: is not a #{arg}
 :presence :: is not present
 :unique :: is already taken
@@ -403,6 +413,8 @@ It's easy to modify the default options used by +validation_helpers+.  All of th
    :format=>{:message=>'contains invalid characters', :allow_nil=>true})
 
 This updates the default messages that will be used for the presence, includes, max_length, and format validations, and sets the default value of the <tt>:allow_nil</tt> option to true for the includes, max_length, and format validations.
+
+You can also override <tt>Sequel::Model#default_validation_helpers_options</tt> private method to override these settings on a per-model or even per-instance basis.
 
 == Custom Validations
 
@@ -442,7 +454,7 @@ Let's say you want to add some default validations that apply to all of your mod
 
     def validate
       super
-      validates_format(/\A[^\x00-\x08\x0e-\x1f\x7f\x81\x8d\x8f\x90\x9d]*\z/,
+      validates_format(/\A[^\x00-\x08\x0e-\x1f\x7f\x81\x8d\x8f\x90\x9d]*\z/n,
        model.string_columns,
        :message=>"contains invalid characters")
     end
@@ -496,6 +508,17 @@ Here, you don't care about validating the release date if there were validation 
 
   album.errors.count # => 1
 
-== +validation_class_methods+
+== Other Validation Plugins
 
-Sequel actually ships with two validation plugins.  The recommended one that this guide focused on is the +validation_helpers+ plugin.  However, Sequel also ships with the +validation_class_methods+ plugin, which uses class methods instead of instance methods to define validations.  It exists mostly for legacy compatibility, but it is still supported.
+=== +constraint_validations+
+
+Sequel ships with a +constraint_validations+ plugin and extension, that allows you to setup constraints when creating your database tables, and have Model validations automatically created that mirror those constraints.
+
+=== +auto_validations+
+
+Autovalidations uses the not null and type information obtained from parsing the database schema, and the unique index information from parsing the database's index information, and automatically setting up not_null, schema_types, and unique validations.  If you don't require customizing validation messages on a per-column basis, it can DRY up a lot of validation code.
+
+=== +validation_class_methods+
+
+Sequel ships with the +validation_class_methods+ plugin, which uses class methods instead of instance methods to define validations.  It exists mostly for legacy compatibility, but it is still supported.
+

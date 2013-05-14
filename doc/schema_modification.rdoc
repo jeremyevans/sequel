@@ -5,7 +5,7 @@ Here's a brief description of the most common schema modification methods:
 == +create_table+
 
 +create_table+ is the most common schema modification method, and it's used for adding new tables
-to the schema.  You provide it with the name of the table as a symbol, as well a block:
+to the database.  You provide it with the name of the table as a symbol, as well a block:
 
   create_table(:artists) do
     primary_key :id
@@ -521,11 +521,18 @@ ruby class, in which case it gets converted to an appropriate database type.
 
 === +set_column_allow_null+
 
-This changes the NULL or NOT NULL setting of a column:
+This allows you to set the column as allowing NULL values:
 
   alter_table(:albums) do
-    set_column_allow_null :artist_id, true    # NULL
-    set_column_allow_null :copies_sold, false # NOT NULL
+    set_column_allow_null :artist_id
+  end
+
+=== +set_column_not_null+
+
+This allows you to set the column as not allowing NULL values:
+
+  alter_table(:albums) do
+    set_column_not_null :artist_id
   end
 
 == Other +Database+ schema modification methods

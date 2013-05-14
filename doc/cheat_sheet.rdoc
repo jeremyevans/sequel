@@ -2,7 +2,6 @@
 
 == Open a database
 
-  require 'rubygems'
   require 'sequel'
 
   DB = Sequel.sqlite('my_blog.db')
@@ -62,7 +61,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   dataset.map(:name) # same as above
 
   dataset.inject(0){|sum, r| sum + r[:value]}
-  dataset.sum(:value) # same as above
+  dataset.sum(:value) # better
 
 == Filtering (see also {Dataset Filtering}[link:files/doc/dataset_filtering_rdoc.html])
 
@@ -101,7 +100,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   DB[:items].where{(x > 5) & (y > 10)}.sql 
   # SELECT * FROM items WHERE ((x > 5) AND (y > 10))
 
-  DB[:items].where({:x => 1, :y => 2}.sql_or & Sequel.~(:z => 3)).sql 
+  DB[:items].where(Sequel.or(:x => 1, :y => 2)) & Sequel.~(:z => 3)).sql 
   # SELECT * FROM items WHERE (((x = 1) OR (y = 2)) AND (z != 3))
 
 === Mathematical operators
@@ -126,10 +125,13 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 == Joins
 
   DB[:items].left_outer_join(:categories, :id => :category_id).sql 
-  # SELECT * FROM items LEFT OUTER JOIN categories ON categories.id = items.category_id
+  # SELECT * FROM items
+  # LEFT OUTER JOIN categories ON categories.id = items.category_id
 
   DB[:items].join(:categories, :id => :category_id).join(:groups, :id => :items__group_id) 
-  # SELECT * FROM items INNER JOIN categories ON categories.id = items.category_id INNER JOIN groups ON groups.id = items.group_id
+  # SELECT * FROM items
+  # INNER JOIN categories ON categories.id = items.category_id
+  # INNER JOIN groups ON groups.id = items.group_id
 	
 == Aggregate functions methods
 
@@ -140,7 +142,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   dataset.sum(:stock)
 
   dataset.group_and_count(:category)
-  dataset.group(:category).select(:category, Sequel.function(:AVG, :price))
+  dataset.select_group(:category).select_append{avg(:price)}
 
 == SQL Functions / Literals
 

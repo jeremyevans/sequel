@@ -86,13 +86,13 @@ So you can use Sequel's DSL everywhere you find it helpful, and fallback to lite
 
 == Translating SQL Expressions into Sequel
 
-The rest of this guide assumes you want to use Sequel's DSL to represent your query, that you know how to write the query in SQL, but you aren't sure how to write it in Sequel.
+The rest of this guide assumes you want to use Sequel's DSL to represent your query, that you know how to write the query in SQL, but you aren't sure how to write it in Sequel's DSL.
 
 This section will describe how specific SQL expressions are handled in Sequel.  The next section will discuss how to create queries by using method chaining on datasets.
 
 === <tt>Database#literal</tt>
 
-Before we get started, I think it's important to get familiar with the <tt>Database#literal</tt> method, which will return the SQL that will be used for a given expression:
+It's important to get familiar with the <tt>Database#literal</tt> method, which will return the SQL that will be used for a given expression:
 
   DB.literal(1)
   # => "1"
@@ -101,7 +101,7 @@ Before we get started, I think it's important to get familiar with the <tt>Datab
   DB.literal('string')
   # => "'string'"
 
-I encourage you to just play around to see how different objects get literalized into SQL
+Try playing around to see how different objects get literalized into SQL
 
 === Database Loggers
 
@@ -346,17 +346,14 @@ Sequel defines the & and | methods on most Sequel-specific expression objects to
   Sequel.expr(:column1=>1) | {:column2=>2} # (("column1" = 1) OR ("column2" = 2))
   (Sequel.function(:func) > 1) & :column3 # ((func() > 1) AND "column3")
 
-Note the use of parentheses in the last statement.  If you omit them, you won't get what you expect:
+Note the use of parentheses in the last statement.  If you omit them, you won't get what you expect.
+Because & has higher precedence than >
 
-  Sequel.function(:func) > 1 & :column3 # (func() > 1)
+  Sequel.function(:func) > 1 & :column3
 
-This is because & has higher precedence than >, so it is parsed as:
+is parsed as:
 
   Sequel.function(:func) > (1 & :column3)
-
-In this case, <tt>:column3.to_int</tt> returns an odd integer, so:
-
-  1 & :column3 # => 1
 
 You and also use the <tt>Sequel.&</tt> and <tt>Sequel.|</tt> methods:
 
@@ -505,7 +502,7 @@ If the hash or array has multiple arguments, multiple WHEN clauses are used:
   Sequel.case({:c=>1, :d=>2}, 0) # (CASE WHEN "c" THEN 1 WHEN "d" THEN 2 ELSE 0 END)
   Sequel.case([[:c, 1], [:d, 2]], 0) # (CASE WHEN "c" THEN 1 WHEN "d" THEN 2 ELSE 0 END)
 
-If you provide a 2nd argument to CASE, it goes between CASE and WHEN:
+If you provide a 3rd argument to <tt>Sequel.case</tt>, it goes between CASE and WHEN:
 
   Sequel.case({2=>1, 3=>5}, 0, :column) # (CASE column WHEN 2 THEN 1 WHEN 3 THEN 5 ELSE 0 END)
 
@@ -538,9 +535,9 @@ If you want to select from multiple FROM tables, use multiple arguments:
 
   DB[:albums, :artists] # SELECT * FROM albums, artists
 
-If you don't want to select from any FROM tables, use no arguments:
+If you don't want to select from any FROM tables, just call dataset:
 
-  DB[] # SELECT *
+  DB.dataset # SELECT *
 
 === Chaining Methods
 

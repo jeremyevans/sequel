@@ -42,7 +42,10 @@ by its primary key value:
   # SELECT * FROM artists WHERE id = 1
   => #<Artist @values={:name=>"YJM", :id=>1}>
 
-If there is no record with the given primary key, nil will be returned.
+If there is no record with the given primary key, nil will be returned. If you want
+to raise an exception if no record is found, you can use <tt>Sequel::Model.with_pk!</tt>:
+
+  artist = Artist.with_pk!(1)
 
 ==== Using +first+
 
@@ -63,6 +66,9 @@ Any options you pass to +first+ will be used as a filter:
   # SELECT * FROM artists WHERE (name LIKE 'Y%') LIMIT 1
   => #<Artist @values={:name=>"YJM", :id=>1}>
   
+If there is no matching row, +first+ will return nil.  If you want to
+raise an exception instead, use <tt>first!</tt>.
+
 <tt>Sequel::Dataset#[]</tt> is basically an alias for +first+, except it
 requires an argument:
 
@@ -77,16 +83,17 @@ Dataset#[] does not (unless it is a model dataset).
 
 If you want the last record in the dataset,
 <tt>Sequel::Dataset#last</tt> is an obvious method to use.  Note
-that last requires that the dataset be ordered.  Without an order, any
-object can be considered the first as well as the last.
+that last requires that the dataset be ordered, unless the
+dataset is a model dataset.  For a model dataset, +last+ will do a
+reverse order by the primary key field:
 
-  artist = Artist.order(:name).last
-  # SELECT * FROM artists ORDER BY name DESC LIMIT 1
+  artist = Artist.last
+  # SELECT * FROM artists ORDER BY id DESC LIMIT 1
   => #<Artist @values={:name=>"YJM", :id=>1}>
 
-Note that all +last+ does is reverse the order of the dataset and then
+Note that what +last+ does is reverse the order of the dataset and then
 call +first+.  This is why +last+ raises a Sequel::Error if there is no
-order on the dataset, because otherwise it would provide the same record
+order on a plain dataset, because otherwise it would provide the same record
 as +first+, and most users would find that confusing.
 
 Note that +last+ is not necessarily going to give you the last record
@@ -302,8 +309,7 @@ any part of the query at any time.
 
 Filtering is probably the most common dataset modifying action done in Sequel.
 Both the +where+ and +filter+ methods filter the dataset by modifying the
-dataset's WHERE clause.  While not quite aliases of each other, they operate
-the same in most cases.  Both accept a wide variety of input formats, discussed
+dataset's WHERE clause.  Both accept a wide variety of input formats, discussed
 below.
 
 === Hashes
@@ -454,7 +460,7 @@ sure of what you are doing.
 
   Artist.where("id = #{params[:id]}") # Don't do this!
   Artist.where("id = ?", params[:id]) # Do this instead
-  Artist.where(:id=>params[:id]) # Even better
+  Artist.where(:id=>params[:id].to_i) # Even better
 
 === Inverting
 
@@ -676,18 +682,6 @@ who had at least 10 albums:
   # SELECT artist_id, count(*) AS count FROM albums
   # GROUP BY artist_id HAVING count >= 10
 
-If you have an existing HAVING clause on your dataset, then +filter+
-will add to the HAVING clause instead of the WHERE clause:
-
-  Album.group_and_count(:artist_id).
-   having{count >= 10}.filter{count < 15}
-  # SELECT artist_id, count(*) AS count FROM albums
-  # GROUP BY artist_id HAVING count >= 10 AND count < 15
-
-This can be confusing, so it is recommended that you always use
-either +having+ or +where+ instead of +filter+, indicating which
-clause that would want affected.
-
 Both the WHERE clause and the HAVING clause are removed by +unfiltered+:
 
   Album.group_and_count(:artist_id).having{count >= 10}.
@@ -806,7 +800,8 @@ a JOIN using case insensitive string comparison:
   # SELECT * FROM albums INNER JOIN artists
   #  ON (lower(artists.name) = lower(albums.artist_name))
 
-Note how the arguments to lower were qualified correctly in both cases.
+Note how the arguments to lower were qualified correctly in both cases. Starting in Sequel 4,
+the <tt>:qualify=>:deep</tt> option is going to become the default.
 
 ==== USING Joins
 
@@ -922,7 +917,7 @@ it and when the transaction ends.
 
 === Optimistic Locking
 
-One of Sequel's built-in model plugins is an optimistic locking plugin, which provides
+One of the model plugins that ships with Sequel is an optimistic locking plugin, which provides
 a database independent way to detect and raise an error if two different connections
 modify the same row.  It's useful for things like web forms where you cannot keep a
 transaction open while the user is looking at the form, because of the web's

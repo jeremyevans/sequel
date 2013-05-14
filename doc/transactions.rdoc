@@ -27,7 +27,6 @@ If the block raises a Sequel::Rollback exception, the transaction is rolled back
 
 If any other exception is raised, the transaction is rolled back, and the exception is raised outside the block:
 
-  # ArgumentError raised
   DB.transaction do # BEGIN
     raise ArgumentError
   end # ROLLBACK
@@ -45,6 +44,7 @@ If you always want to rollback (useful for testing), use the <tt>:rollback => :a
   DB.transaction(:rollback => :always) do # BEGIN
     DB[:foo].insert(1) # INSERT
   end # ROLLBACK
+  # no exception raised
 
 If you want to check whether you are currently in a transaction, use the Database#in_transaction? method:
 
@@ -129,7 +129,7 @@ or roll the prepared transaction back:
 
 == Transaction Isolation Levels
 
-The SQL standard supports 4 isolation levels: READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, and SERIALIZABLE.  Not all databases implement the levels as specified in the standard (or implement the levels at all), but on PostgreSQL, MySQL, and Microsoft SQL Server, you can specify which transaction isolation level you want to use via the :isolation option to <tt>Database#transaction</tt>.  The isolation level is specified as one of the following symbols: :uncommitted, :committed, :repeatable, and :serializable.  Using this option make Sequel use the correct transaction isolation syntax for your database:
+The SQL standard supports 4 isolation levels: READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, and SERIALIZABLE.  Not all databases implement the levels as specified in the standard (or implement the levels at all), but on most databases, you can specify which transaction isolation level you want to use via the :isolation option to <tt>Database#transaction</tt>.  The isolation level is specified as one of the following symbols: :uncommitted, :committed, :repeatable, and :serializable.  Using this option make Sequel use the correct transaction isolation syntax for your database:
 
   DB.transaction(:isolation => :serializable) do # BEGIN
     # SET TRANSACTION ISOLATION LEVEL SERIALIZABLE

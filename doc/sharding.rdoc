@@ -15,8 +15,7 @@ support is to use the empty hash:
 
   DB=Sequel.connect('postgres://master_server/database', :servers=>{})
 
-In most cases, you are probably not going to want to use an empty hash,
-so you'll want to have entries in the hash.  Keys in the server hash are
+In most cases, you are probably not going to want to use an empty hash.  Keys in the server hash are
 not restricted to type, but the general recommendation is to use a symbol
 unless you have special requirements. Values in the server hash should be
 either hashes or procs that return hashes. These hashes are merged into
