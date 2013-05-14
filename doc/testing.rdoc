@@ -6,8 +6,6 @@ Whether or not you use Sequel in your application, you are usually going to want
 
 These run each test in its own transaction, the recommended way to test.
 
-Make sure you are using Sequel 3.29.0 or above when using these examples, as older versions don't support the <tt>:rollback=>:always</tt> option.
-
 === RSpec 1
 
   class Spec::Example::ExampleGroup
@@ -103,7 +101,7 @@ Use Sequel.transaction with an array of databases:
 
 In some cases, it is not possible to use transactions.  For example, if you are testing a web application that is running in a separate process, you don't have access to that process's database connections, so you can't run your examples in transactions.  In that case, the best way to handle things is to cleanup after each test by deleting or truncating the database tables used in the test.
 
-The order in which you delete/truncate the tables is important if you are using referential integrity in your database (which you probably should be doing).  If you are using referential integrity, you need to make sure to delete in tables referencing other tables before the tables that are being referenced.  For example, if you have an +albums+ table with an +artist_id+ field referencing the +artists+ table, you want to delete/truncate the +albums+ table before the +artists+ table.  Note that if you have cyclic references in your database, you will probably need to write your own custom cleaning code.
+The order in which you delete/truncate the tables is important if you are using referential integrity in your database (which you should be doing).  If you are using referential integrity, you need to make sure to delete in tables referencing other tables before the tables that are being referenced.  For example, if you have an +albums+ table with an +artist_id+ field referencing the +artists+ table, you want to delete/truncate the +albums+ table before the +artists+ table.  Note that if you have cyclic references in your database, you will probably need to write your own custom cleaning code.
 
 === RSpec
 
@@ -146,7 +144,7 @@ The +spec_bin+ rake task runs the specs for bin/sequel.  These use an SQLite3 da
 
 The <tt>spec_<i>adapter</i></tt> specs run against a real database connection with nothing mocked, and test for correct results.  They are slower than the standard specs, but they will catch errors that are mocked out by the default specs, as well as show issues that only occur on a certain database, adapter, or a combination of the two.
 
-These specs are broken down into two parts.  For each database, there are specific specs that only apply to that database, and these are called the adapter specs.  There are also shared specs that apply to all (or almost all) databases, these are called the integration specs.
+These specs are broken down into two parts.  For each database, there are specific specs that only apply to that database, and these are called the adapter specs.  There are also shared specs that apply to all (or almost all) databases, these are called the integration specs. For database types that don't have specific adapter tests, you can use rake spec_integration to just run the shared integration tests.
 
 == Environment variables
 

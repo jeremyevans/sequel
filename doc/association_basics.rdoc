@@ -1080,11 +1080,11 @@ Can use an array of symbols for a composite key association.
 A proc that can be used to modify the dataset used in the add/remove/remove_all
 methods.  It's separate from the association block, as that is called on a
 join of the join table and the associated table, whereas this option just
-applies to the join table.  It can be used to make sure additional columns are
-used when inserting, or that filters are used when deleting.
+applies to the join table.  It can be used to make sure that filters are used
+when deleting.
 
   Artist.many_to_many :lead_guitar_albums, :join_table_block=>proc do |ds|
-    ds.where(:instrument_id=>5).set_overrides(:instrument_id=>5)
+    ds.where(:instrument_id=>5)
   end
 
 === Callback Options
@@ -1704,15 +1704,6 @@ strategies are:
 :window_function :: Uses window functions if the database supports it.
                     This is used by default on databases that support window
                     functions.
-:correlated_subquery :: Uses a correlated subquery to get the information.
-                        This is never used by default as if you aren't careful,
-                        it can result in pathologically long running times.
-                        This will not work correctly for associations where
-                        the associated table has a composite primary key if
-                        the database doesn't support using IN
-                        with multiple columns.  This will also not work on MySQL
-                        because MySQL has problems using IN with a correlated
-                        subquery that contains a limit.
 :ruby :: Uses ruby array slicing to emulate database limiting (*_many
          associations only).  This is the default if the database doesn't
          support window functions.

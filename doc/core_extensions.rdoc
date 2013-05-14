@@ -8,7 +8,7 @@ Historically, Sequel added methods to many of the core classes, and usage of tho
     where(:column.like('A%')).              # Symbol#like
     order({1=>2}.case(0, :a))               # Hash#case
 
-While Sequel never override any methods defined by ruby, it is possible that other libraries could define the same methods that Sequel defines, which could cause problems.  Also, some rubyists do not like using libraries that add methods to the core classes.
+While Sequel never overrode any methods defined by ruby, it is possible that other libraries could define the same methods that Sequel defines, which could cause problems.  Also, some rubyists do not like using libraries that add methods to the core classes.
 
 Alternatives for the core extension methods where added to Sequel, so the query above could be written as:
 
@@ -22,7 +22,7 @@ Almost all of the core extension methods have a replacement on the Sequel module
 
 There is no recommendation on whether the core_extensions should be used or not.  It is very rare that any of the methods added by core_extensions actually causes a problem, but some of them can make it more difficult to find other problems.  For example, if you type:
 
-  do_somehting if value | other_value
+  do_something if value | other_value
 
 while meaning to type:
 
@@ -236,7 +236,7 @@ Symbol#sql_function returns an SQL function call expression object:
 
 Alternative: Sequel.function:
 
-  Sequel.function(:now, :a)
+  Sequel.function(:sum, :a)
 
 === String
 

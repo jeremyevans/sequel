@@ -17,7 +17,7 @@ Model hooks, also known as model callbacks, are used to specify actions that occ
     end
   end
 
-The one important thing to note here is the call to +super+ inside the hook.  Whenever you override one of Sequel::Model's methods, you should be calling +super+ to get the default behavior.  Many of Sequel's built in plugins work by overriding the hook methods and calling +super+.  If you use these plugins and override the hook methods but do not call +super+, it's likely the plugins will not work correctly.
+The one important thing to note here is the call to +super+ inside the hook.  Whenever you override one of Sequel::Model's methods, you should be calling +super+ to get the default behavior.  Many of the plugins that ship with Sequel work by overriding the hook methods and calling +super+.  If you use these plugins and override the hook methods but do not call +super+, it's likely the plugins will not work correctly.
 
 == Available Hooks
 
@@ -67,8 +67,6 @@ Sequel calls hooks in the following order when destroying an existing object:
 
 Note that these hooks are only called when using <tt>Model#destroy</tt>, they are not called if you use <tt>Model#delete</tt>.
 
-<tt>Sequel::Model</tt> does support a few additional hooks. One is +after_intialize+, which is called after the model object has been initalized.  It can be used to set default attribute values for new objects, since by default new <tt>Sequel::Model</tt> objects have no attributes, and the attributes are not filled in until the model object is saved.  You should be careful when you are using +after_initialize+, since it is called for every created record.  So if you run a query that returns 1000 model objects, it will be called 1000 times.  If you only want to change the behavior for new records, you can override the +initialize_set+ private method, which is called with the hash passed to +initialize+.
-
 == Special Hook-Related Instance Variables
 
 For after_save hooks, a @was_new instance variable is present that indicates whether the record was a new record that was just inserted, or an existing record that was updated.  Sequel marks a record as existing as soon as it inserts the record, so in an after_save or after_create hook, the instance is no longer considered new.  You have to check @was_new to see if the record was inserted.  This exists so that you don't have to have separate after_create and after_update hooks that are mostly the same and only differ slightly depending on whether the record was a new record.
@@ -114,7 +112,7 @@ However, skipping hooks is a bad idea in general and should be avoided.  As ment
 
 The +this+ dataset works just like any other dataset, so you can call +update+ on it to modify it:
 
-  album.this.update(:copies_sold=>:copies_sold + 1)
+  album.this.update(:copies_sold=>album.copies_sold + 1))
 
 If you want to insert a row into the model's table without running the creation hooks, you can use <tt>Model.insert</tt> instead of <tt>Model.create</tt>:
 
@@ -240,10 +238,16 @@ Likewise, let's say that upon retrieval, you associate an object with a file des
     end
   end
 
-== +hook_class_methods+
+== Hook related plugins
+
+=== +instance_hooks+
+
+Sequel also ships with an +instance_hooks+ plugin that allows you to define before and after hooks on a per instance basis.  It's very useful as it allows you to delay action on an instance until before or after saving.  This can be important if you want to modify a group of related objects together (which is how the +nested_attributes+ plugin uses +instance_hooks+).
+
+=== +hook_class_methods+
 
 While it's recommended to write your hooks as instance methods, Sequel ships with a +hook_class_methods+ plugin that allows you to define hooks via class methods. It exists mostly for legacy compatibility, but is still supported.  However, it does not implement around hooks.
 
-== +instance_hooks+
+=== +after_initialize+
 
-Sequel also ships with an +instance_hooks+ plugin that allows you to define before and after hooks on a per instance basis.  It's very useful as it allows you to delay action on an instance until before or after saving.  This can be important if you want to modify a group of related objects together (which is how the +nested_attributes+ plugin uses +instance_hooks+).
+The after_initialize plugin adds an after_initialize hook, that is called for all model instances on creation (both new instances and instances retrieved from the database).  It exists mostly for legacy compatibility, but it is still supported.
