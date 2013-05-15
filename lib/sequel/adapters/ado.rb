@@ -40,6 +40,8 @@ module Sequel
       
       def disconnect_connection(conn)
         conn.Close
+      rescue WIN32OLERuntimeError
+        nil
       end
 
       # Just execute so it doesn't attempt to return the number of rows modified.
