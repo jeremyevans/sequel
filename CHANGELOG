@@ -1,5 +1,7 @@
 === HEAD
 
+* Emulate offsets on Microsoft Access using reverse orders and total counts (jeremyevans) (#661)
+
 * Make ado adapter handle disconnecting an already disconnected connection (jeremyevans)
 
 * Deprecate parsing columns for the same table name in multiple schemas on jdbc (jeremyevans)

@@ -1,4 +1,6 @@
 module Sequel
+  require 'adapters/utils/emulate_offset_with_reverse_and_count'
+
   module Access
     module DatabaseMethods
       extend Sequel::Database::ResetIdentifierMangling
@@ -86,6 +88,8 @@ module Sequel
     end
   
     module DatasetMethods
+      include EmulateOffsetWithReverseAndCount
+
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct limit columns into from join where group order having compounds')
       DATE_FORMAT = '#%Y-%m-%d#'.freeze
       TIMESTAMP_FORMAT = '#%Y-%m-%d %H:%M:%S#'.freeze
