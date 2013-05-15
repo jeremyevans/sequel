@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel.object_to_json to allow the use of alternative JSON implementations (jeremyevans) (#662)
+
 * Deprecate JSON.create_id usage in the json_serializer plugin (jeremyevans)
 
 * Emulate offsets on Microsoft Access using reverse orders and total counts (jeremyevans) (#661)

@@ -66,11 +66,11 @@ module Sequel
     class JSONArray < DelegateClass(Array)
       include Sequel::SQL::AliasMethods
 
-      # Convert the array to a string using to_json, append a
+      # Convert the array to a json string, append a
       # literalized version of the string to the sql, and explicitly
       # cast the string to json.
       def sql_literal_append(ds, sql)
-        ds.literal_append(sql, to_json)
+        ds.literal_append(sql, Sequel.object_to_json(self))
         sql << CAST_JSON
       end
     end
@@ -79,11 +79,11 @@ module Sequel
     class JSONHash < DelegateClass(Hash)
       include Sequel::SQL::AliasMethods
 
-      # Convert the array to a string using to_json, append a
+      # Convert the hash to a json string, append a
       # literalized version of the string to the sql, and explicitly
       # cast the string to json.
       def sql_literal_append(ds, sql)
-        ds.literal_append(sql, to_json)
+        ds.literal_append(sql, Sequel.object_to_json(self))
         sql << CAST_JSON
       end
 
@@ -124,7 +124,7 @@ module Sequel
       def bound_variable_arg(arg, conn)
         case arg
         when JSONArray, JSONHash
-          arg.to_json
+          Sequel.object_to_json(arg)
         else
           super
         end
@@ -136,7 +136,7 @@ module Sequel
       def bound_variable_array(a)
         case a
         when JSONHash, JSONArray
-          "\"#{a.to_json.gsub('"', '\\"')}\""
+          "\"#{Sequel.object_to_json(a).gsub('"', '\\"')}\""
         else
           super
         end

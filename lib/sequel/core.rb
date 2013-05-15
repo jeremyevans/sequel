@@ -205,9 +205,15 @@ module Sequel
     Database.identifier_output_method = value
   end
 
+  # Convert given object to json and return the result.
+  # This can be overridden to use an alternative json implementation.
+  def self.object_to_json(obj, *args)
+    obj.to_json(*args)
+  end
+
   # Parse the string as JSON and return the result.
-  # This is solely for internal use, it should not be used externally.
-  def self.parse_json(json) # :nodoc:
+  # This can be overridden to use an alternative json implementation.
+  def self.parse_json(json)
     JSON.parse(json, :create_additions=>false)
   end
   

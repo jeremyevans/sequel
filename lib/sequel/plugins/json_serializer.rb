@@ -334,9 +334,9 @@ module Sequel
                 v = v.empty? ? [] : [v]
                 h[k.to_s] = case objs = send(k)
                 when Array
-                  objs.map{|obj| Literal.new(obj.to_json(*v))}
+                  objs.map{|obj| Literal.new(Sequel.object_to_json(obj, *v))}
                 else
-                  Literal.new(objs.to_json(*v))
+                  Literal.new(Sequel.object_to_json(objs, *v))
                 end
               end
             else
@@ -344,7 +344,7 @@ module Sequel
             end
           end
           h = {model.send(:underscore, model.to_s) => h} if opts[:root]
-          h.to_json(*a)
+          Sequel.object_to_json(h, *a)
         end
       end
 
@@ -396,15 +396,15 @@ module Sequel
             else
               all
             end
-            array.map{|obj| Literal.new(obj.to_json(opts))}
+            array.map{|obj| Literal.new(Sequel.object_to_json(obj, opts))}
            else
             all
           end
 
           if collection_root
-            {model.send(:pluralize, model.send(:underscore, model.to_s)) => res}.to_json(*a)
+            Sequel.object_to_json({model.send(:pluralize, model.send(:underscore, model.to_s)) => res}, *a)
           else
-            res.to_json(*a)
+            Sequel.object_to_json(res, *a)
           end
         end
       end
