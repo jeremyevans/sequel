@@ -45,7 +45,7 @@ module Sequel
     # You can use a hash value with <tt>:include</tt> to pass options
     # to associations:
     #
-    #   album.to_json(:include=>{:artist=>{:only=>:name}})
+    #   album.to_xml(:include=>{:artist=>{:only=>:name}})
     #   # Output:
     #   <?xml version="1.0"?>
     #   <album>
