@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate JSON.create_id usage in the json_serializer plugin (jeremyevans)
+
 * Emulate offsets on Microsoft Access using reverse orders and total counts (jeremyevans) (#661)
 
 * Make ado adapter handle disconnecting an already disconnected connection (jeremyevans)

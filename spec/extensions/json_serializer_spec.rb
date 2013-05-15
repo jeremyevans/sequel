@@ -4,7 +4,7 @@ describe "Sequel::Plugins::JsonSerializer" do
   before do
     class ::Artist < Sequel::Model
       unrestrict_primary_key
-      plugin :json_serializer
+      plugin :json_serializer, :naked=>true
       columns :id, :name
       def_column_accessor :id, :name
       @db_schema = {:id=>{:type=>:integer}}
@@ -13,7 +13,7 @@ describe "Sequel::Plugins::JsonSerializer" do
     class ::Album < Sequel::Model
       unrestrict_primary_key
       attr_accessor :blah
-      plugin :json_serializer
+      plugin :json_serializer, :naked=>true
       columns :id, :name, :artist_id
       def_column_accessor :id, :name, :artist_id
       many_to_one :artist
@@ -44,8 +44,8 @@ describe "Sequel::Plugins::JsonSerializer" do
   end
 
   qspecify "should have .json_create method for creating an instance from a hash parsed from JSON" do
-    JSON.parse(@artist.to_json, :create_additions=>true).should == @artist
-    JSON.parse(@artist.to_json(:include=>{:albums=>{:include=>{:artist=>{:include=>:albums}}}}), :create_additions=>true).albums.map{|a| a.artist.albums}.should == [[@album]]
+    JSON.parse(@artist.to_json(:naked=>false), :create_additions=>true).should == @artist
+    JSON.parse(@artist.to_json(:naked=>false, :include=>{:albums=>{:include=>{:artist=>{:include=>:albums}}}}), :create_additions=>true).albums.map{|a| a.artist.albums}.should == [[@album]]
   end
 
   qspecify "should have .json_create method raise error if not given a hash" do
@@ -68,8 +68,8 @@ describe "Sequel::Plugins::JsonSerializer" do
   end
 
   it "should raise an error if attempting to parse json when providing array to non-array association or vice-versa" do
-    proc{Artist.from_json('{"albums":{"id":1,"name":"RF","artist_id":2,"json_class":"Album"},"id":2,"name":"YJM","json_class":"Artist"}', :associations=>:albums)}.should raise_error(Sequel::Error)
-    proc{Album.from_json('{"artist":[{"id":2,"name":"YJM","json_class":"Artist"}],"id":1,"name":"RF","json_class":"Album","artist_id":2}', :associations=>:artist)}.should raise_error(Sequel::Error)
+    proc{Artist.from_json('{"albums":{"id":1,"name":"RF","artist_id":2,"json_class":"Album"},"id":2,"name":"YJM"}', :associations=>:albums)}.should raise_error(Sequel::Error)
+    proc{Album.from_json('{"artist":[{"id":2,"name":"YJM","json_class":"Artist"}],"id":1,"name":"RF","artist_id":2}', :associations=>:artist)}.should raise_error(Sequel::Error)
   end
 
   it "should raise an error if attempting to parse an array containing non-hashes" do
@@ -241,10 +241,10 @@ describe "Sequel::Plugins::JsonSerializer" do
   end
 
   it "should store the default options in json_serializer_opts" do
-    Album.json_serializer_opts.should == {}
+    Album.json_serializer_opts.should == {:naked=>true}
     c = Class.new(Album)
-    c.plugin :json_serializer, :naked=>true
-    c.json_serializer_opts.should == {:naked=>true}
+    c.plugin :json_serializer, :naked=>false
+    c.json_serializer_opts.should == {:naked=>false}
   end
 
   it "should work correctly when subclassing" do

@@ -224,7 +224,10 @@ module Sequel
           unless hash.is_a?(Hash)
             raise Error, "parsed json doesn't return a hash"
           end
-          hash.delete(JSON.create_id)
+          if hash.has_key?(JSON.create_id)
+            Sequel::Deprecation.deprecate('Attempting to use Model#from_json with a hash value that includes JSON.create_id is deprecated.  Starting in Sequel 4.0, the create_id will not be removed automatically.')
+            hash.delete(JSON.create_id)
+          end
 
           unless assocs = opts[:associations]
             if opts[:all_associations]
@@ -299,9 +302,6 @@ module Sequel
         #             to include in the JSON output.  Using a nested
         #             hash, you can pass options to associations
         #             to affect the JSON used for associated objects.
-        # :naked :: Not to add the JSON.create_id (json_class) key to the JSON
-        #           output hash, so when the JSON is parsed, it
-        #           will yield a hash instead of a model object.
         # :only :: Symbol or Array of Symbols of columns to only
         #          include in the JSON output, ignoring all other
         #          columns.
@@ -320,7 +320,13 @@ module Sequel
           else
             vals.keys - Array(opts[:except])
           end
-          h = (JSON.create_id && !opts[:naked] && !opts[:root]) ? {JSON.create_id=>model.name} : {}
+
+          h = {}
+          if  JSON.create_id && !opts[:naked] && !opts[:root]
+            Sequel::Deprecation.deprecate('The :naked and :root options have not been used, so adding JSON.create_id to the to_json output.  This is deprecated, starting in Sequel 4, the JSON.create_id will never be added.')
+            h[JSON.create_id] = model.name
+          end
+
           cols.each{|c| h[c.to_s] = send(c)}
           if inc = opts[:include]
             if inc.is_a?(Hash)
