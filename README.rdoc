@@ -121,6 +121,15 @@ You can specify a block to connect, which will disconnect from the database afte
 
   Sequel.connect('postgres://user:password@host:port/database_name'){|db| db[:posts].delete}
 
+=== The DB convention
+
+Throughout Sequel's documentation, you will see the +DB+ constant used to refer to the Sequel::Database instance you create.
+This reflects the recommendation that for an app with a single Sequel::Database instance, the Sequel convention is to store
+the instance in the +DB+ constant.  This is just a convention, it's not required, but it is recommended.
+
+Note that some frameworks that use Sequel may create the Sequel::Database instance for you, and you might not know
+how to access it.  In most cases, you can access the Sequel::Database instance through <tt>Sequel::Model.db</tt>.
+
 === Arbitrary SQL queries
 
 You can execute arbitrary SQL code using <tt>Database#run</tt>:
