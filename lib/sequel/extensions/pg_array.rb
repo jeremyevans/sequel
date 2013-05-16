@@ -36,6 +36,11 @@
 #
 #   DB.extension :pg_array
 #
+# To use this extension with model, load it to Sequel::Model class before
+# defining your model classes.
+#
+#   Sequel::Model.db.extension :pg_array
+#
 # If you are not using the native postgres adapter and are using array
 # types as model column values you probably should use the
 # pg_typecast_on_load plugin in the model, and set it to typecast the
