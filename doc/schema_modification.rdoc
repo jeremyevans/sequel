@@ -12,7 +12,7 @@ to the database.  You provide it with the name of the table as a symbol, as well
     String :name
   end
 
-Not that if you want a primary key for the table, you need to specify it, Sequel does not create one
+Note that if you want a primary key for the table, you need to specify it, Sequel does not create one
 by default.
 
 === Column types
