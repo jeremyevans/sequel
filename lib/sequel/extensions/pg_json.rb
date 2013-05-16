@@ -106,7 +106,7 @@ module Sequel
       def self.parse_json(s)
         begin
           value = Sequel.parse_json(s)
-        rescue JSON::ParserError=>e
+        rescue Sequel.json_parser_error_class => e
           raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
         end
 

@@ -205,6 +205,12 @@ module Sequel
     Database.identifier_output_method = value
   end
 
+  # The exception classed raised if there is an error parsing JSON.
+  # This can be overridden to use an alternative json implementation.
+  def self.json_parser_error_class
+    JSON::ParserError
+  end
+
   # Convert given object to json and return the result.
   # This can be overridden to use an alternative json implementation.
   def self.object_to_json(obj, *args)
