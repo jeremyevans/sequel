@@ -74,7 +74,7 @@ global model configration and global plugins, you can load your model
 classes.  It's recommended to have a separate file for each model class,
 unless the model classes are very simple.  Example:
 
-  dir['./models/*.rb'].each{|f| require f}
+  Dir['./models/*.rb'].each{|f| require f}
 
 == Disconnect If Using Forking Webserver with Code Preloading
 
