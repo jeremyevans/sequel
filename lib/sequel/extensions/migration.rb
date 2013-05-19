@@ -583,9 +583,8 @@ module Sequel
     def schema_dataset
       c = column
       ds = db.from(table)
-      if !db.table_exists?(table)
-        db.create_table(table){Integer c, :default=>0, :null=>false}
-      elsif !ds.columns.include?(c)
+      db.create_table?(table){Integer c, :default=>0, :null=>false}
+      unless ds.columns.include?(c)
         db.alter_table(table){add_column c, Integer, :default=>0, :null=>false}
       end
       ds.insert(c=>0) if ds.empty?
