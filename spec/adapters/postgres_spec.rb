@@ -2152,18 +2152,18 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(h1['a']).should == 'b'
     @ds.get(h1['d']).should == nil
 
-    @ds.get(h2.concat(h3).keys.pg_array.length).should == 2
-    @ds.get(h1.concat(h3).keys.pg_array.length).should == 3
-    @ds.get(h2.merge(h3).keys.pg_array.length).should == 2
-    @ds.get(h1.merge(h3).keys.pg_array.length).should == 3
+    @ds.get(h2.concat(h3).keys.length).should == 2
+    @ds.get(h1.concat(h3).keys.length).should == 3
+    @ds.get(h2.merge(h3).keys.length).should == 2
+    @ds.get(h1.merge(h3).keys.length).should == 3
 
     unless [:do].include?(@db.adapter_scheme)
       # Broken DataObjects thinks operators with ? represent placeholders
-      @ds.get(h1.contain_all(Sequel.pg_array(%w'a c'))).should == true
-      @ds.get(h1.contain_all(Sequel.pg_array(%w'a d'))).should == false
+      @ds.get(h1.contain_all(%w'a c')).should == true
+      @ds.get(h1.contain_all(%w'a d')).should == false
 
-      @ds.get(h1.contain_any(Sequel.pg_array(%w'a d'))).should == true
-      @ds.get(h1.contain_any(Sequel.pg_array(%w'e d'))).should == false
+      @ds.get(h1.contain_any(%w'a d')).should == true
+      @ds.get(h1.contain_any(%w'e d')).should == false
     end
 
     @ds.get(h1.contains(h2)).should == true
@@ -2177,7 +2177,7 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(h1.defined('d')).should == false
 
     @ds.get(h1.delete('a')['c']).should == nil
-    @ds.get(h1.delete(Sequel.pg_array(%w'a d'))['c']).should == nil
+    @ds.get(h1.delete(%w'a d')['c']).should == nil
     @ds.get(h1.delete(h2)['c']).should == nil
 
     @ds.from(Sequel.hstore('a'=>'b', 'c'=>nil).op.each).order(:key).all.should == [{:key=>'a', :value=>'b'}, {:key=>'c', :value=>nil}]
@@ -2195,11 +2195,11 @@ describe 'PostgreSQL hstore handling' do
       @ds.get(h1.exist?('d')).should == false
     end
 
-    @ds.get(h1.hstore.hstore.hstore.keys.pg_array.length).should == 2
-    @ds.get(h1.keys.pg_array.length).should == 2
-    @ds.get(h2.keys.pg_array.length).should == 1
-    @ds.get(h1.akeys.pg_array.length).should == 2
-    @ds.get(h2.akeys.pg_array.length).should == 1
+    @ds.get(h1.hstore.hstore.hstore.keys.length).should == 2
+    @ds.get(h1.keys.length).should == 2
+    @ds.get(h2.keys.length).should == 1
+    @ds.get(h1.akeys.length).should == 2
+    @ds.get(h2.akeys.length).should == 1
 
     @ds.from(Sequel.hstore('t'=>'s').op.populate(Sequel::SQL::Cast.new(nil, :items))).select_map(:t).should == ['s']
     @ds.from(:items___i).select(Sequel.hstore('t'=>'s').op.record_set(:i).as(:r)).from_self(:alias=>:s).select(Sequel.lit('(r).*')).from_self.select_map(:t).should == ['s']
@@ -2207,22 +2207,22 @@ describe 'PostgreSQL hstore handling' do
     @ds.from(Sequel.hstore('t'=>'s', 'a'=>'b').op.skeys.as(:s)).select_order_map(:s).should == %w'a t'
     @ds.from((Sequel.hstore('t'=>'s', 'a'=>'b').op - 'a').skeys.as(:s)).select_order_map(:s).should == %w't'
 
-    @ds.get(h1.slice(Sequel.pg_array(%w'a c')).keys.pg_array.length).should == 2
-    @ds.get(h1.slice(Sequel.pg_array(%w'd c')).keys.pg_array.length).should == 1
-    @ds.get(h1.slice(Sequel.pg_array(%w'd e')).keys.pg_array.length).should == nil
+    @ds.get(h1.slice(%w'a c').keys.length).should == 2
+    @ds.get(h1.slice(%w'd c').keys.length).should == 1
+    @ds.get(h1.slice(%w'd e').keys.length).should == nil
 
     @ds.from(Sequel.hstore('t'=>'s', 'a'=>'b').op.svals.as(:s)).select_order_map(:s).should == %w'b s'
 
-    @ds.get(h1.to_array.pg_array.length).should == 4
-    @ds.get(h2.to_array.pg_array.length).should == 2
+    @ds.get(h1.to_array.length).should == 4
+    @ds.get(h2.to_array.length).should == 2
 
-    @ds.get(h1.to_matrix.pg_array.length).should == 2
-    @ds.get(h2.to_matrix.pg_array.length).should == 1
+    @ds.get(h1.to_matrix.length).should == 2
+    @ds.get(h2.to_matrix.length).should == 1
 
-    @ds.get(h1.values.pg_array.length).should == 2
-    @ds.get(h2.values.pg_array.length).should == 1
-    @ds.get(h1.avals.pg_array.length).should == 2
-    @ds.get(h2.avals.pg_array.length).should == 1
+    @ds.get(h1.values.length).should == 2
+    @ds.get(h2.values.length).should == 1
+    @ds.get(h1.avals.length).should == 2
+    @ds.get(h2.avals.length).should == 1
   end
 end if POSTGRES_DB.type_supported?(:hstore)
 
