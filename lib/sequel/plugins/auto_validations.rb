@@ -39,7 +39,7 @@ module Sequel
       def self.apply(model)
         model.instance_eval do
           plugin :validation_helpers
-          @auto_validate_presence_columns = []
+          @auto_validate_not_null_columns = []
           @auto_validate_unique_columns = []
           @auto_validate_types = true
         end
@@ -54,13 +54,19 @@ module Sequel
 
       module ClassMethods
         # The columns with automatic presence validations
-        attr_reader :auto_validate_presence_columns
+        attr_reader :auto_validate_not_null_columns
 
         # The columns or sets of columns with automatic unique validations
         attr_reader :auto_validate_unique_columns
 
-        Plugins.inherited_instance_variables(self, :@auto_validate_types=>nil, :@auto_validate_presence_columns=>:dup, :@auto_validate_unique_columns=>:dup)
+        Plugins.inherited_instance_variables(self, :@auto_validate_types=>nil, :@auto_validate_not_null_columns=>:dup, :@auto_validate_unique_columns=>:dup)
         Plugins.after_set_dataset(self, :setup_auto_validations)
+
+        # REMOVE40
+        def auto_validate_presence_columns
+          Sequel::Deprecation.deprecate('Model.auto_validate_presence_columns', 'Please switch to auto_validate_not_null_columns')
+          auto_validate_not_null_columns
+        end
 
         # Whether to automatically validate schema types for all columns
         def auto_validate_types?
@@ -71,7 +77,7 @@ module Sequel
         # If :all is given as the type, skip all auto validations.
         def skip_auto_validations(type)
           if type == :all
-            [:presence, :types, :unique].each{|v| skip_auto_validations(v)}
+            [:not_null, :types, :unique].each{|v| skip_auto_validations(v)}
           elsif type == :types
             @auto_validate_types = false
           else
@@ -83,7 +89,7 @@ module Sequel
 
         # Parse the database schema and indexes and record the columns to automatically validate.
         def setup_auto_validations
-          @auto_validate_presence_columns = db_schema.select{|col, sch| sch[:allow_null] == false && sch[:ruby_default].nil?}.map{|col, sch| col} - Array(primary_key)
+          @auto_validate_not_null_columns = db_schema.select{|col, sch| sch[:allow_null] == false && sch[:ruby_default].nil?}.map{|col, sch| col} - Array(primary_key)
           @auto_validate_unique_columns = if db.supports_index_parsing?
             db.indexes(dataset.first_source_table).select{|name, idx| idx[:unique] == true}.map{|name, idx| idx[:columns]}
           else
@@ -96,8 +102,8 @@ module Sequel
         # Validate the model's auto validations columns
         def validate
           super
-          if presence_columns = model.auto_validate_presence_columns
-            validates_not_null(presence_columns)
+          if not_null_columns = model.auto_validate_not_null_columns
+            validates_not_null(not_null_columns)
           end
 
           validates_schema_types if model.auto_validate_types?

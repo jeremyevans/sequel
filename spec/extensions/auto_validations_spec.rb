@@ -45,7 +45,7 @@ describe "Sequel::Plugins::AutoValidations" do
   it "should allow skipping validations by type" do
     @c = Class.new(@c)
     @m = @c.new
-    @c.skip_auto_validations(:presence)
+    @c.skip_auto_validations(:not_null)
     @m.valid?.should be_true
 
     @m.set(:d=>'/', :num=>'a', :name=>'1')
