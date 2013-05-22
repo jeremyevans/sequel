@@ -7,7 +7,7 @@ module Sequel
     # 2. not_null validations on NOT NULL columns (optionally, presence validations)
     # 3. unique validations on columns or sets of columns with unique indexes
     #
-    # To determine the columns to use for the presence validations and the types for the type validations,
+    # To determine the columns to use for the not_null validations and the types for the type validations,
     # the plugin looks at the database schema for the model's table.  To determine
     # the unique validations, Sequel looks at the indexes on the table.  In order
     # for this plugin to be fully functional, the underlying database adapter needs
@@ -32,6 +32,9 @@ module Sequel
     #
     #   Model.plugin :auto_validations, :not_null=>:presence
     #
+    # This is useful if you want to enforce that NOT NULL string columns do not
+    # allow empty values.
+    #
     # Usage:
     #
     #   # Make all model subclass use auto validations (called before loading subclasses)
@@ -45,6 +48,7 @@ module Sequel
           plugin :validation_helpers
           @auto_validate_presence = false
           @auto_validate_not_null_columns = []
+          @auto_validate_explicit_not_null_columns = []
           @auto_validate_unique_columns = []
           @auto_validate_types = true
         end
@@ -61,13 +65,16 @@ module Sequel
       end
 
       module ClassMethods
-        # The columns with automatic presence validations
+        # The columns with automatic not_null validations
         attr_reader :auto_validate_not_null_columns
+
+        # The columns with automatic not_null validations for columns present in the values.
+        attr_reader :auto_validate_explicit_not_null_columns
 
         # The columns or sets of columns with automatic unique validations
         attr_reader :auto_validate_unique_columns
 
-        Plugins.inherited_instance_variables(self, :@auto_validate_presence=>nil, :@auto_validate_types=>nil, :@auto_validate_not_null_columns=>:dup, :@auto_validate_unique_columns=>:dup)
+        Plugins.inherited_instance_variables(self, :@auto_validate_presence=>nil, :@auto_validate_types=>nil, :@auto_validate_not_null_columns=>:dup, :@auto_validate_explicit_not_null_columns=>:dup, :@auto_validate_unique_columns=>:dup)
         Plugins.after_set_dataset(self, :setup_auto_validations)
 
         # REMOVE40
@@ -86,7 +93,7 @@ module Sequel
           @auto_validate_types
         end
 
-        # Skip automatic validations for the given validation type (:presence, :types, :unique).
+        # Skip automatic validations for the given validation type (:not_null, :types, :unique).
         # If :all is given as the type, skip all auto validations.
         def skip_auto_validations(type)
           if type == :all
@@ -102,7 +109,10 @@ module Sequel
 
         # Parse the database schema and indexes and record the columns to automatically validate.
         def setup_auto_validations
-          @auto_validate_not_null_columns = db_schema.select{|col, sch| sch[:allow_null] == false && sch[:ruby_default].nil?}.map{|col, sch| col} - Array(primary_key)
+          not_null_cols, explicit_not_null_cols = db_schema.select{|col, sch| sch[:allow_null] == false}.partition{|col, sch| sch[:ruby_default].nil?}.map{|cs| cs.map{|col, sch| col}}
+          @auto_validate_not_null_columns = not_null_cols - Array(primary_key)
+          explicit_not_null_cols += Array(primary_key)
+          @auto_validate_explicit_not_null_columns = explicit_not_null_cols.uniq
           @auto_validate_unique_columns = if db.supports_index_parsing?
             db.indexes(dataset.first_source_table).select{|name, idx| idx[:unique] == true}.map{|name, idx| idx[:columns]}
           else
@@ -120,6 +130,13 @@ module Sequel
               validates_presence(not_null_columns)
             else
               validates_not_null(not_null_columns)
+            end
+          end
+          unless (not_null_columns = model.auto_validate_explicit_not_null_columns).empty?
+            if model.auto_validate_presence?
+              validates_presence(not_null_columns, :allow_missing=>true)
+            else
+              validates_not_null(not_null_columns, :allow_missing=>true)
             end
           end
 

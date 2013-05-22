@@ -1,5 +1,7 @@
 === HEAD
 
+* Validate against explicit nil values in NOT NULL columns with default values in the auto_validations plugin (jeremyevans)
+
 * Support :not_null=>:presence option for auto_validations plugin, for using presence validation for not null columns (jeremyevans)
 
 * Rename auto_validate_presence_columns to auto_validate_not_null_columns (jeremyevans)
