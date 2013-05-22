@@ -694,10 +694,18 @@ module Sequel
       Plugins.def_dataset_methods(self, DATASET_METHODS)
 
       # REMOVE40
-      %w'print each_page destroy delete update set add_graph_aliases insert_multiple query set_overrides set_defaults to_csv paginate'.each do |meth|
+      %w'print each_page set add_graph_aliases insert_multiple query set_overrides set_defaults to_csv paginate'.each do |meth|
         class_eval(<<-END, __FILE__, __LINE__+1)
           def #{meth}(*args, &block)
             Sequel::Deprecation.deprecate('Model.#{meth}', 'Please use Model.dataset.#{meth} instead')
+            dataset.#{meth}(*args, &block)
+          end
+        END
+      end
+      %w'destroy delete update'.each do |meth|
+        class_eval(<<-END, __FILE__, __LINE__+1)
+          def #{meth}(*args, &block)
+            Sequel::Deprecation.deprecate('Model.#{meth}', 'Please use the scissors plugin or Model.dataset.#{meth} instead')
             dataset.#{meth}(*args, &block)
           end
         END
