@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe "filter_having extension" do
+describe "hash_aliases extension" do
   before do
     @ds = Sequel.mock.dataset.extension(:hash_aliases)
   end
