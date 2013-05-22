@@ -42,6 +42,13 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.errors.should == {[:name, :num]=>["is already taken"]}
   end
 
+  it "should support :not_null=>:presence option" do
+    @c.plugin :auto_validations, :not_null=>:presence
+    @m.set(:d=>Date.today, :num=>'')
+    @m.valid?.should be_false
+    @m.errors.should == {:name=>["is not present"]}
+  end
+
   it "should allow skipping validations by type" do
     @c = Class.new(@c)
     @m = @c.new

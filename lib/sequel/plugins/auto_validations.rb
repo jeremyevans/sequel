@@ -4,7 +4,7 @@ module Sequel
     # for your model columns:
     #
     # 1. type validations for all columns
-    # 2. presence validations on NOT NULL columns
+    # 2. not_null validations on NOT NULL columns (optionally, presence validations)
     # 3. unique validations on columns or sets of columns with unique indexes
     #
     # To determine the columns to use for the presence validations and the types for the type validations,
@@ -20,12 +20,17 @@ module Sequel
     #
     # You can skip certain types of validations from being automatically added via:
     #
-    #   Model.skip_auto_validations(:presence)
+    #   Model.skip_auto_validations(:not_null)
     #
     # If you want to skip all auto validations (only useful if loading the plugin
     # in a superclass):
     #
     #   Model.skip_auto_validations(:all)
+    #
+    # By default, the plugin uses a not_null validation for NOT NULL columns, but that
+    # can be changed to a presence validation using an option:
+    #
+    #   Model.plugin :auto_validations, :not_null=>:presence
     #
     # Usage:
     #
@@ -35,10 +40,10 @@ module Sequel
     #   # Make the Album class use auto validations
     #   Album.plugin :auto_validations
     module AutoValidations
-      # Load the validation_helpers plugin and setup data structures.
-      def self.apply(model)
+      def self.apply(model, opts={})
         model.instance_eval do
           plugin :validation_helpers
+          @auto_validate_presence = false
           @auto_validate_not_null_columns = []
           @auto_validate_unique_columns = []
           @auto_validate_types = true
@@ -46,9 +51,12 @@ module Sequel
       end
 
       # Setup auto validations for the model if it has a dataset.
-      def self.configure(model)
+      def self.configure(model, opts={})
         model.instance_eval do
           setup_auto_validations if @dataset
+          if opts[:not_null] == :presence
+            @auto_validate_presence = true
+          end
         end
       end
 
@@ -59,13 +67,18 @@ module Sequel
         # The columns or sets of columns with automatic unique validations
         attr_reader :auto_validate_unique_columns
 
-        Plugins.inherited_instance_variables(self, :@auto_validate_types=>nil, :@auto_validate_not_null_columns=>:dup, :@auto_validate_unique_columns=>:dup)
+        Plugins.inherited_instance_variables(self, :@auto_validate_presence=>nil, :@auto_validate_types=>nil, :@auto_validate_not_null_columns=>:dup, :@auto_validate_unique_columns=>:dup)
         Plugins.after_set_dataset(self, :setup_auto_validations)
 
         # REMOVE40
         def auto_validate_presence_columns
           Sequel::Deprecation.deprecate('Model.auto_validate_presence_columns', 'Please switch to auto_validate_not_null_columns')
           auto_validate_not_null_columns
+        end
+
+        # Whether to use a presence validation for not null columns
+        def auto_validate_presence?
+          @auto_validate_presence
         end
 
         # Whether to automatically validate schema types for all columns
@@ -102,8 +115,12 @@ module Sequel
         # Validate the model's auto validations columns
         def validate
           super
-          if not_null_columns = model.auto_validate_not_null_columns
-            validates_not_null(not_null_columns)
+          unless (not_null_columns = model.auto_validate_not_null_columns).empty?
+            if model.auto_validate_presence?
+              validates_presence(not_null_columns)
+            else
+              validates_not_null(not_null_columns)
+            end
           end
 
           validates_schema_types if model.auto_validate_types?

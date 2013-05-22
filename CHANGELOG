@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :not_null=>:presence option for auto_validations plugin, for using presence validation for not null columns (jeremyevans)
+
 * Rename auto_validate_presence_columns to auto_validate_not_null_columns (jeremyevans)
 
 * Make pg_hstore_ops extension integrate with pg_array, pg_hstore, and pg_array_ops extensions (jeremyevans)
