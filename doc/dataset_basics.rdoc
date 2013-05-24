@@ -85,8 +85,7 @@ LIMIT:: limit, unlimited
 compounds:: union, intersect, except
 locking:: for_update, lock_style
 common table expressions:: with, with_recursive
-qualification:: qualify, qualify_to, qualify_to_first_source
-other:: clone, distinct, naked, server, with_sql
+other:: clone, distinct, naked, qualify, server, with_sql
 
 === Methods that execute code on the database
 

@@ -88,3 +88,15 @@ describe "Dataset#set" do
   end
 end
 
+describe "Sequel::Dataset#qualify_to_first_source" do
+  specify "should qualify to the first source" do
+    Sequel.mock.dataset.extension(:sequel_3_dataset_methods).from(:t).filter{a<b}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a < t.b)'
+  end
+end
+
+describe "Sequel::Dataset#qualify_to" do
+  specify "should qualify to the given table" do
+    Sequel.mock.dataset.extension(:sequel_3_dataset_methods).from(:t).filter{a<b}.qualify_to(:e).sql.should == 'SELECT e.* FROM t WHERE (e.a < e.b)'
+  end
+end
+

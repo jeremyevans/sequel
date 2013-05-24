@@ -3604,112 +3604,106 @@ describe "Sequel::Dataset #set_overrides" do
   end
 end
 
-describe "Sequel::Dataset#qualify" do
-  specify "should qualify to the given table" do
-    Sequel.mock.dataset.from(:t).filter{a<b}.qualify(:e).sql.should == 'SELECT e.* FROM t WHERE (e.a < e.b)'
-  end
-
-  specify "should qualify to the first source if no table if given" do
-    Sequel.mock.dataset.from(:t).filter{a<b}.qualify.sql.should == 'SELECT t.* FROM t WHERE (t.a < t.b)'
+describe "Sequel::Dataset#qualify_to_first_source" do
+  qspecify "should qualify to the first source" do
+    Sequel.mock.dataset.from(:t).filter{a<b}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a < t.b)'
   end
 end
 
 describe "Sequel::Dataset#qualify_to" do
-  specify "should qualify to the given table" do
+  qspecify "should qualify to the given table" do
     Sequel.mock.dataset.from(:t).filter{a<b}.qualify_to(:e).sql.should == 'SELECT e.* FROM t WHERE (e.a < e.b)'
   end
 end
 
-describe "Sequel::Dataset#qualify_to_first_source" do
+describe "Sequel::Dataset#qualify" do
   before do
     @ds = Sequel::Database.new[:t]
   end
 
-  specify "should qualify_to the first source" do
-    @ds.qualify_to_first_source.sql.should == 'SELECT t.* FROM t'
-    @ds.should_receive(:qualify_to).with(:t).once
-    @ds.qualify_to_first_source
+  specify "should qualify to the table if one is given" do
+    @ds.filter{a<b}.qualify(:e).sql.should == 'SELECT e.* FROM t WHERE (e.a < e.b)'
   end
 
   specify "should handle the select, order, where, having, and group options/clauses" do
-    @ds.select(:a).filter(:a=>1).order(:a).group(:a).having(:a).qualify_to_first_source.sql.should == 'SELECT t.a FROM t WHERE (t.a = 1) GROUP BY t.a HAVING t.a ORDER BY t.a'
+    @ds.select(:a).filter(:a=>1).order(:a).group(:a).having(:a).qualify.sql.should == 'SELECT t.a FROM t WHERE (t.a = 1) GROUP BY t.a HAVING t.a ORDER BY t.a'
   end
 
   specify "should handle the select using a table.* if all columns are currently selected" do
-    @ds.filter(:a=>1).order(:a).group(:a).having(:a).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a = 1) GROUP BY t.a HAVING t.a ORDER BY t.a'
+    @ds.filter(:a=>1).order(:a).group(:a).having(:a).qualify.sql.should == 'SELECT t.* FROM t WHERE (t.a = 1) GROUP BY t.a HAVING t.a ORDER BY t.a'
   end
 
   qspecify "should handle hashes in select option" do
-    @ds.select(:a=>:b).qualify_to_first_source.sql.should == 'SELECT t.a AS b FROM t'
+    @ds.select(:a=>:b).qualify.sql.should == 'SELECT t.a AS b FROM t'
   end
 
   specify "should handle symbols" do
-    @ds.select(:a, :b__c, :d___e, :f__g___h).qualify_to_first_source.sql.should == 'SELECT t.a, b.c, t.d AS e, f.g AS h FROM t'
+    @ds.select(:a, :b__c, :d___e, :f__g___h).qualify.sql.should == 'SELECT t.a, b.c, t.d AS e, f.g AS h FROM t'
   end
 
   specify "should handle arrays" do
-    @ds.filter(:a=>[:b, :c]).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
+    @ds.filter(:a=>[:b, :c]).qualify.sql.should == 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
   end
 
   specify "should handle hashes" do
-    @ds.select(Sequel.case({:b=>{:c=>1}}, false)).qualify_to_first_source.sql.should == "SELECT (CASE WHEN t.b THEN (t.c = 1) ELSE 'f' END) FROM t"
+    @ds.select(Sequel.case({:b=>{:c=>1}}, false)).qualify.sql.should == "SELECT (CASE WHEN t.b THEN (t.c = 1) ELSE 'f' END) FROM t"
   end
 
   specify "should handle SQL::Identifiers" do
-    @ds.select{a}.qualify_to_first_source.sql.should == 'SELECT t.a FROM t'
+    @ds.select{a}.qualify.sql.should == 'SELECT t.a FROM t'
   end
 
   specify "should handle SQL::OrderedExpressions" do
-    @ds.order(Sequel.desc(:a), Sequel.asc(:b)).qualify_to_first_source.sql.should == 'SELECT t.* FROM t ORDER BY t.a DESC, t.b ASC'
+    @ds.order(Sequel.desc(:a), Sequel.asc(:b)).qualify.sql.should == 'SELECT t.* FROM t ORDER BY t.a DESC, t.b ASC'
   end
 
   specify "should handle SQL::AliasedExpressions" do
-    @ds.select(Sequel.expr(:a).as(:b)).qualify_to_first_source.sql.should == 'SELECT t.a AS b FROM t'
+    @ds.select(Sequel.expr(:a).as(:b)).qualify.sql.should == 'SELECT t.a AS b FROM t'
   end
 
   specify "should handle SQL::CaseExpressions" do
-    @ds.filter{Sequel.case({a=>b}, c, d)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (CASE t.d WHEN t.a THEN t.b ELSE t.c END)'
+    @ds.filter{Sequel.case({a=>b}, c, d)}.qualify.sql.should == 'SELECT t.* FROM t WHERE (CASE t.d WHEN t.a THEN t.b ELSE t.c END)'
   end
 
   specify "should handle SQL:Casts" do
-    @ds.filter{a.cast(:boolean)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE CAST(t.a AS boolean)'
+    @ds.filter{a.cast(:boolean)}.qualify.sql.should == 'SELECT t.* FROM t WHERE CAST(t.a AS boolean)'
   end
 
   specify "should handle SQL::Functions" do
-    @ds.filter{a(b, 1)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE a(t.b, 1)'
+    @ds.filter{a(b, 1)}.qualify.sql.should == 'SELECT t.* FROM t WHERE a(t.b, 1)'
   end
 
   specify "should handle SQL::ComplexExpressions" do
-    @ds.filter{(a+b)<(c-3)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE ((t.a + t.b) < (t.c - 3))'
+    @ds.filter{(a+b)<(c-3)}.qualify.sql.should == 'SELECT t.* FROM t WHERE ((t.a + t.b) < (t.c - 3))'
   end
 
   specify "should handle SQL::ValueLists" do
-    @ds.filter(:a=>Sequel.value_list([:b, :c])).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
+    @ds.filter(:a=>Sequel.value_list([:b, :c])).qualify.sql.should == 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
   end
 
   specify "should handle SQL::Subscripts" do
-    @ds.filter{a.sql_subscript(b,3)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE t.a[t.b, 3]'
+    @ds.filter{a.sql_subscript(b,3)}.qualify.sql.should == 'SELECT t.* FROM t WHERE t.a[t.b, 3]'
   end
 
   specify "should handle SQL::PlaceholderLiteralStrings" do
-    @ds.filter('? > ?', :a, 1).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a > 1)'
+    @ds.filter('? > ?', :a, 1).qualify.sql.should == 'SELECT t.* FROM t WHERE (t.a > 1)'
   end
 
   specify "should handle SQL::PlaceholderLiteralStrings with named placeholders" do
-    @ds.filter(':a > :b', :a=>:c, :b=>1).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.c > 1)'
+    @ds.filter(':a > :b', :a=>:c, :b=>1).qualify.sql.should == 'SELECT t.* FROM t WHERE (t.c > 1)'
   end
 
   specify "should handle SQL::Wrappers" do
-    @ds.filter(Sequel::SQL::Wrapper.new(:a)).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE t.a'
+    @ds.filter(Sequel::SQL::Wrapper.new(:a)).qualify.sql.should == 'SELECT t.* FROM t WHERE t.a'
   end
 
   specify "should handle SQL::WindowFunctions" do
     meta_def(@ds, :supports_window_functions?){true}
-    @ds.select{sum(:over, :args=>:a, :partition=>:b, :order=>:c){}}.qualify_to_first_source.sql.should == 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
+    @ds.select{sum(:over, :args=>:a, :partition=>:b, :order=>:c){}}.qualify.sql.should == 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
   end
 
   specify "should handle all other objects by returning them unchanged" do
-    @ds.select("a").filter{a(3)}.filter('blah').order(Sequel.lit('true')).group(Sequel.lit('a > ?', 1)).having(false).qualify_to_first_source.sql.should == "SELECT 'a' FROM t WHERE (a(3) AND (blah)) GROUP BY a > 1 HAVING 'f' ORDER BY true"
+    @ds.select("a").filter{a(3)}.filter('blah').order(Sequel.lit('true')).group(Sequel.lit('a > ?', 1)).having(false).qualify.sql.should == "SELECT 'a' FROM t WHERE (a(3) AND (blah)) GROUP BY a > 1 HAVING 'f' ORDER BY true"
   end
 end
 

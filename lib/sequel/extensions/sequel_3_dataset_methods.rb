@@ -61,6 +61,29 @@ module Sequel
       end
     end
     
+    # Return a copy of the dataset with unqualified identifiers in the
+    # SELECT, WHERE, GROUP, HAVING, and ORDER clauses qualified by the
+    # given table. If no columns are currently selected, select all
+    # columns of the given table.
+    #
+    #   DB[:items].filter(:id=>1).qualify_to(:i)
+    #   # SELECT i.* FROM items WHERE (i.id = 1)
+    def qualify_to(table)
+      qualify(table)
+    end
+    
+    # Qualify the dataset to its current first source.  This is useful
+    # if you have unqualified identifiers in the query that all refer to
+    # the first source, and you want to join to another table which
+    # has columns with the same name as columns in the current dataset.
+    # See +qualify_to+.
+    #
+    #   DB[:items].filter(:id=>1).qualify_to_first_source
+    #   # SELECT items.* FROM items WHERE (items.id = 1)
+    def qualify_to_first_source
+      qualify
+    end
+    
     # Alias for update, but not aliased directly so subclasses
     # don't have to override both methods.
     def set(*args)

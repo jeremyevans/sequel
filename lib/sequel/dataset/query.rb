@@ -724,7 +724,14 @@ module Sequel
     #   DB[:items].filter(:id=>1).qualify(:i)
     #   # SELECT i.* FROM items WHERE (i.id = 1)
     def qualify(table=first_source)
-      qualify_to(table)
+      o = @opts
+      return clone if o[:sql]
+      h = {}
+      (o.keys & QUALIFY_KEYS).each do |k|
+        h[k] = qualified_expression(o[k], table)
+      end
+      h[:select] = [SQL::ColumnAll.new(table)] if !o[:select] || o[:select].empty?
+      clone(h)
     end
 
     # Return a copy of the dataset with unqualified identifiers in the
@@ -735,14 +742,8 @@ module Sequel
     #   DB[:items].filter(:id=>1).qualify_to(:i)
     #   # SELECT i.* FROM items WHERE (i.id = 1)
     def qualify_to(table)
-      o = @opts
-      return clone if o[:sql]
-      h = {}
-      (o.keys & QUALIFY_KEYS).each do |k|
-        h[k] = qualified_expression(o[k], table)
-      end
-      h[:select] = [SQL::ColumnAll.new(table)] if !o[:select] || o[:select].empty?
-      clone(h)
+      Sequel::Deprecation.deprecate('Dataset#qualify_to', 'Switch to Dataset#qualify or use the sequel_3_dataset_methods extension')
+      qualify(table)
     end
     
     # Qualify the dataset to its current first source.  This is useful
@@ -754,7 +755,8 @@ module Sequel
     #   DB[:items].filter(:id=>1).qualify_to_first_source
     #   # SELECT items.* FROM items WHERE (items.id = 1)
     def qualify_to_first_source
-      qualify_to(first_source)
+      Sequel::Deprecation.deprecate('Dataset#qualify_to_first_source', 'Switch to Dataset#qualify or use the sequel_3_dataset_methods extension')
+      qualify
     end
     
     # Modify the RETURNING clause, only supported on a few databases.  If returning
