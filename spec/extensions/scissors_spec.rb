@@ -5,6 +5,7 @@ describe "scissors plugin" do
     @m = Class.new(Sequel::Model(:items))
     @m.use_transactions = true
     @m.plugin :scissors
+    @m.db.sqls
   end
 
   it "Model.delete should delete from the dataset" do
