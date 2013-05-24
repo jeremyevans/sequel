@@ -621,13 +621,21 @@ module Sequel
           sql << s
           literal_append(sql, args[i]) unless i == len
         end
+        unless str.length == args.length || str.length == args.length + 1
+          Sequel::Deprecation.deprecate("Using a mismatched number of placeholders (#{str.length}) and placeholder arguments (#{args.length}) is deprecated and will raise an Error in Sequel 4.")
+        end
       else
         i = -1
         loop do
           previous, q, str = str.partition(QUESTION_MARK)
           sql << previous
-           literal_append(sql, args.at(i+=1)) unless q.empty?
-          break if str.empty?
+          literal_append(sql, args.at(i+=1)) unless q.empty?
+          if str.empty?
+            unless i + 1 == args.length
+              Sequel::Deprecation.deprecate("Using a mismatched number of placeholders (#{i+1}) and placeholder arguments (#{args.length}) is deprecated and will raise an Error in Sequel 4.")
+            end
+            break
+          end
         end
       end
       sql << PAREN_CLOSE if pls.parens
