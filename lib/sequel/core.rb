@@ -420,7 +420,8 @@ module Sequel
     raise(::Sequel::Error, "Wrong number of arguments, 0-2 arguments valid") if args.length > 2
     opts = {:adapter=>adapter.to_sym}
     opts[:database] = args.shift if args.length >= 1 && !(args[0].is_a?(Hash))
-    if Hash === (arg = args[0])
+    arg = args[0]
+    if arg.is_a?(Hash)
       opts.merge!(arg)
     elsif !arg.nil?
       raise ::Sequel::Error, "Wrong format of arguments, either use (), (String), (Hash), or (String, Hash)"
