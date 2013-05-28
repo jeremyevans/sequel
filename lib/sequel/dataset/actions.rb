@@ -217,7 +217,7 @@ module Sequel
         ds.single_record
       else
         args = (args.size == 1) ? args.first : args
-        if Integer === args
+        if args.is_a?(Integer)
           ds.limit(args).all
         else
           ds.filter(args).single_record

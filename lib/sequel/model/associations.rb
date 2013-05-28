@@ -961,7 +961,7 @@ module Sequel
             raise(Error, 'one_to_many association type with :one_to_one option removed, used one_to_one association type')
           end
           raise(Error, 'invalid association type') unless assoc_class = ASSOCIATION_TYPES[type]
-          raise(Error, 'Model.associate name argument must be a symbol') unless Symbol === name
+          raise(Error, 'Model.associate name argument must be a symbol') unless name.is_a?(Symbol)
           raise(Error, ':eager_loader option must have an arity of 1 or 3') if opts[:eager_loader] && ![1, 3].include?(opts[:eager_loader].arity)
           raise(Error, ':eager_grapher option must have an arity of 1 or 3') if opts[:eager_grapher] && ![1, 3].include?(opts[:eager_grapher].arity)
 
