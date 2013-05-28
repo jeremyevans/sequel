@@ -538,7 +538,7 @@ module Sequel
         raise Error, "invalid options format for join_table: #{options.inspect}"
       end
 
-      if Dataset === table
+      if table.is_a?(Dataset)
         if table_alias.nil?
           table_alias_num = (@opts[:num_dataset_sources] || 0) + 1
           table_alias = dataset_alias(table_alias_num)
@@ -606,7 +606,7 @@ module Sequel
     def limit(l, o = (no_offset = true; nil))
       return from_self.limit(l, o) if @opts[:sql]
 
-      if Range === l
+      if l.is_a?(Range)
         o = l.first
         l = l.last - l.first + (l.exclude_end? ? 0 : 1)
       end

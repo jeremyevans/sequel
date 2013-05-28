@@ -1230,7 +1230,7 @@ module Sequel
     # Returns a qualified column name (including a table name) if the column
     # name isn't already qualified.
     def qualified_column_name(column, table)
-      if Symbol === column 
+      if column.is_a?(Symbol)
         c_table, column, _ = split_symbol(column)
         unless c_table
           case table

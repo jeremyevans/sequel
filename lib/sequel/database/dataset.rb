@@ -17,7 +17,7 @@ module Sequel
     #
     #   DB[:items].sql #=> "SELECT * FROM items"
     def [](*args)
-      (String === args.first) ? fetch(*args) : from(*args)
+      args.first.is_a?(String) ? fetch(*args) : from(*args)
     end
     
     # Returns a blank dataset for this database.

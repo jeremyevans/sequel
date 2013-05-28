@@ -389,7 +389,7 @@ module Sequel
       # variables, and execute it.
       def execute_prepared_statement(name, opts={})
         args = opts[:arguments]
-        if Dataset === name
+        if name.is_a?(Dataset)
           ps = name
           name = ps.prepared_statement_name
         else
