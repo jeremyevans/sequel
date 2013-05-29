@@ -8,13 +8,38 @@ module Sequel
     # 
     # You can override which methods to forward to the dataset by passing a block to the plugin:
     #
-    #   plugin :association_proxies do |meth, args, &block|
-    #     [:find, :where, :create].include?(meth)
+    #   plugin :association_proxies do |opts|
+    #     [:find, :where, :create].include?(opts[:method])
     #   end
     #
     # If the block returns false or nil, the method is sent to the array of associated
-    # objects.  Otherwise, the method is sent to the association dataset.
+    # objects.  Otherwise, the method is sent to the association dataset.  Here are the entries
+    # in the hash passed to the block:
+    #
+    # :method :: The name of the method
+    # :arguments :: The arguments to the method
+    # :block :: The block given to the method
+    # :instance :: The model instance related to the call
+    # :reflection :: The reflection for the association related to the call
+    # :proxy_argument :: The argument given to the association method call
+    # :proxy_block :: The block given to the association method call
     # 
+    # For example, in a call like:
+    #
+    #   artist.albums(1){|ds| ds}.foo(2){|x| 3}
+    #
+    # The opts passed to the block would be:
+    #
+    #   {
+    #     :method => :foo,
+    #     :arguments => [2],
+    #     :block => {|x| 3},
+    #     :instance => artist,
+    #     :reflection => {:name=>:albums, ...},
+    #     :proxy_argument => 1,
+    #     :proxy_block => {|ds| ds}
+    #   }
+    #
     # Usage:
     #
     #   # Use association proxies in all model subclasses (called before loading subclasses)
@@ -38,20 +63,26 @@ module Sequel
 
         # Default proc used to determine whether to sent the method to the dataset.
         # If the array would respond to it, sends it to the array instead of the dataset.
-        DEFAULT_PROXY_TO_DATASET = proc{|meth, args, &block| !array.respond_to?(meth)}
+        DEFAULT_PROXY_TO_DATASET = proc{|opts| !array.respond_to?(opts[:method])}
 
         # Set the association reflection to use, and whether the association should be
         # reloaded if an array method is called.
-        def initialize(instance, reflection, reload=nil)
+        def initialize(instance, reflection, proxy_argument, &proxy_block)
           @instance = instance
           @reflection = reflection
-          @reload = reload
+          @proxy_argument = proxy_argument
+          @proxy_block = proxy_block
         end
 
         # Call the method given on the array of associated objects if the method
         # is an array method, otherwise call the method on the association's dataset.
         def method_missing(meth, *args, &block)
-          (@instance.model.association_proxy_to_dataset.call(meth, args, &block) ? @instance.send(@reflection.dataset_method) : @instance.send(:load_associated_objects, @reflection, @reload)).send(meth, *args, &block)
+          v = if @instance.model.association_proxy_to_dataset.call(:method=>meth, :arguments=>args, :block=>block, :instance=>@instance, :reflection=>@reflection, :proxy_argument=>@proxy_argument, :proxy_block=>@proxy_block)
+            @instance.send(@reflection.dataset_method)
+          else
+            @instance.send(:load_associated_objects, @reflection, @proxy_argument, &@proxy_block)
+          end
+          v.send(meth, *args, &block)
         end
       end
 
@@ -66,7 +97,7 @@ module Sequel
         # Changes the association method to return a proxy instead of the associated objects
         # directly.
         def def_association_method(opts)
-          opts.returns_array? ? association_module_def(opts.association_method, opts){|*r| AssociationProxy.new(self, opts, r[0])} : super
+          opts.returns_array? ? association_module_def(opts.association_method, opts){|*r, &block| AssociationProxy.new(self, opts, r[0], &block)} : super
         end
       end
     end

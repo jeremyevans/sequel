@@ -6,7 +6,7 @@ describe "Sequel::Plugins::AssociationProxies" do
     end
     class ::Item < Sequel::Model
       plugin :association_proxies
-      many_to_many :tags
+      many_to_many :tags, :extend=>Module.new{def size; count end}
     end
     @i = Item.load(:id=>1)
     @t = @i.tags
@@ -30,14 +30,30 @@ describe "Sequel::Plugins::AssociationProxies" do
   end
   
   it "should accept block to plugin to specify which methods to proxy to dataset" do
-    Item.plugin :association_proxies do |meth, args, &block|
-      meth == :where || args.length == 2 || block
+    Item.plugin :association_proxies do |opts|
+      opts[:method] == :where || opts[:arguments].length == 2 || opts[:block]
     end
     @i.associations.has_key?(:tags).should == false
     @t.where(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
-    proc{@t.filter(:a=>1)}.should raise_error(NoMethodError)
     @t.filter('a = ?', 1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
     @t.filter{{:a=>1}}.sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
+
+    @i.associations.has_key?(:tags).should == false
+    Item.plugin :association_proxies do |opts|
+      proxy_arg = opts[:proxy_argument]
+      proxy_block = opts[:proxy_block]
+      cached = opts[:instance].associations[opts[:reflection][:name]]
+      is_size = opts[:method] == :size
+      is_size && !cached && !proxy_arg && !proxy_block
+    end
+    @t.size.should == 1
+    Item.db.sqls.should == ["SELECT count(*) AS count FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) LIMIT 1"]
+    @i.tags{|ds| ds}.size.should == 1
+    Item.db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1))"]
+    @i.tags(true).size.should == 1
+    Item.db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1))"]
+    @t.size.should == 1
+    Item.db.sqls.should == []
   end
   
   it "should reload the cached association if sent an array method and the reload flag was given" do
