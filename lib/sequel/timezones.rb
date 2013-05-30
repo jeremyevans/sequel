@@ -82,7 +82,7 @@ module Sequel
     end
     
     # Convert the given object into an object of <tt>Sequel.datetime_class</tt> in the
-    # +application_timezone+.  Used when coverting datetime/timestamp columns
+    # +application_timezone+.  Used when converting datetime/timestamp columns
     # returned by the database.
     def database_to_application_timestamp(v)
       convert_timestamp(v, Sequel.database_timezone)
