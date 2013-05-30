@@ -1481,5 +1481,6 @@ describe "Schema Parser" do
     @db.extend(sm)
     @db.schema(:set).first.last[:type].should == :set
     @db.schema(:mediumint).first.last[:type].should == :integer
+    @db.schema(:mediumtext).first.last[:type].should == :string
   end
 end
