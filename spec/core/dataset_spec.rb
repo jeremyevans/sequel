@@ -644,6 +644,12 @@ describe "Dataset#or" do
     proc {@dataset.or(:a => 1)}.should raise_error(Sequel::Error)
   end
   
+  specify "should just clone if given an empty argument" do
+    @d1.or({}).sql.should == @d1.sql
+    @d1.or([]).sql.should == @d1.sql
+    @d1.or('').sql.should == @d1.sql
+  end
+  
   specify "should add an alternative expression to the where clause" do
     @d1.or(:y => 2).sql.should == 'SELECT * FROM test WHERE ((x = 1) OR (y = 2))'
   end

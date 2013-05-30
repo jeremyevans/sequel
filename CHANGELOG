@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#or just clone if given an empty argument (jeremyevans)
+
 * Deprecated using a mismatched number of placeholders and arguments in a placeholder literal string (jeremyevans)
 
 * Add Dataset#qualify_to and #qualify_to_first_source to sequel_3_dataset_methods extension (jeremyevans)

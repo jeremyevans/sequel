@@ -664,7 +664,11 @@ module Sequel
       end
       Sequel::Deprecation.deprecate('Dataset#or will no longer modify the HAVING clause starting in Sequel 4.  You can use the filter_having extension to continue to use the current behavior.') if clause == :having
       cond = cond.first if cond.size == 1
-      clone(clause => SQL::BooleanExpression.new(:OR, @opts[clause], filter_expr(cond, &block)))
+      if cond.respond_to?(:empty?) && cond.empty? && !block
+        clone
+      else
+        clone(clause => SQL::BooleanExpression.new(:OR, @opts[clause], filter_expr(cond, &block)))
+      end
     end
 
     # Returns a copy of the dataset with the order changed. If the dataset has an
