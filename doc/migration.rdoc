@@ -349,7 +349,7 @@ So for unrelated migrations, the +TimestampMigrator+ works fine.  However, let's
 migrations are related, in such a way that if Bob's is run first, Alice's will fail.  In this
 case, the +TimestampMigrator+ would not raise an error when Bob merges Alice's changes, since
 Bob ran his migration first.  However, it would raise an error when Alice runs Bob's migration,
-and could leave the database in an inconsistant state if the database doesn't support transactional
+and could leave the database in an inconsistent state if the database doesn't support transactional
 schema changes.
 
 With the +TimestampMigrator+, you are trading reliability for convenience.  That's possibly a valid
