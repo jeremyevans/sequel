@@ -1480,5 +1480,6 @@ describe "Schema Parser" do
     @db = Sequel.mock(:host=>'mysql')
     @db.extend(sm)
     @db.schema(:set).first.last[:type].should == :set
+    @db.schema(:mediumint).first.last[:type].should == :integer
   end
 end
