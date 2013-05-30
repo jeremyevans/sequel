@@ -435,6 +435,8 @@ module Sequel
           :set
         when /\Amediumint/io
           :integer
+        when /\Amediumtext/io
+          :string
         else
           super
         end
