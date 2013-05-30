@@ -433,6 +433,8 @@ module Sequel
         case db_type
         when /\Aset/io
           :set
+        when /\Amediumint/io
+          :integer
         else
           super
         end
