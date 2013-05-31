@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.48.0 (2013-06-01)
 
 * Make named_timezones extension usable by databases allowing timezone strings to be given to Database#timezone= (jeremyevans)
 
