@@ -1209,6 +1209,7 @@ describe "A Database adapter with a scheme" do
 
     # invalid parameters
     proc {Sequel.ccc('abc', 'def')}.should raise_error(Sequel::Error)
+    proc {Sequel.ccc(1)}.should raise_error(Sequel::Error)
     
     c = Sequel.ccc('mydb')
     c.should be_a_kind_of(@ccc)
