@@ -28,10 +28,10 @@ module Sequel
   @convert_two_digit_years = true
   @datetime_class = Time
   @empty_array_handle_nulls = true
-  
+
   # Whether Sequel is being run in single threaded mode
   @single_threaded = false
-  
+
   class << self
     # Sequel converts two digit years in <tt>Date</tt>s and <tt>DateTime</tt>s by default,
     # so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted
@@ -148,7 +148,7 @@ module Sequel
   def self.core_extensions?
     false
   end
-  
+
   # Convert the +exception+ to the given class.  The given class should be
   # <tt>Sequel::Error</tt> or a subclass.  Returns an instance of +klass+ with
   # the message and backtrace of +exception+.
@@ -188,7 +188,7 @@ module Sequel
   def self.identifier_input_method=(value)
     Database.identifier_input_method = value
   end
-  
+
   # Set the method to call on identifiers coming out of the database.  This affects
   # the literalization of identifiers by calling this method on them when they are
   # retrieved from the database.  Sequel downcases identifiers retrieved for most
@@ -222,7 +222,7 @@ module Sequel
   def self.parse_json(json)
     JSON.parse(json, :create_additions=>false)
   end
-  
+
   # Set whether to quote identifiers for all databases by default. By default,
   # Sequel quotes identifiers in all SQL strings, so to turn that off:
   #
@@ -243,7 +243,7 @@ module Sequel
       end
     end
   end
-  
+
   # Require all given +files+ which should be in the same or a subdirectory of
   # this file.  If a +subdir+ is given, assume all +files+ are in that subdir.
   # This is used to ensure that the files loaded are from the same version of
@@ -251,7 +251,7 @@ module Sequel
   def self.require(files, subdir=nil)
     Array(files).each{|f| super("#{File.dirname(__FILE__).untaint}/#{"#{subdir}/" if subdir}#{f}")}
   end
-  
+
   # Set whether Sequel is being used in single threaded mode. By default,
   # Sequel uses a thread-safe connection pool, which isn't as fast as the
   # single threaded connection pool, and also has some additional thread
@@ -411,22 +411,20 @@ module Sequel
       block.call(vr)
     end  
   end
-  
+
   ### Private Class Methods ###
 
   # Helper method that the database adapter class methods that are added to Sequel via
   # metaprogramming use to parse arguments.
-  def self.adapter_method(adapter, *args, &block) # :nodoc:
-    raise(::Sequel::Error, "Wrong number of arguments, 0-2 arguments valid") if args.length > 2
-    opts = {:adapter=>adapter.to_sym}
-    opts[:database] = args.shift if args.length >= 1 && !(args[0].is_a?(Hash))
-    arg = args[0]
-    if arg.is_a?(Hash)
-      opts.merge!(arg)
-    elsif !arg.nil?
+  def self.adapter_method(adapter, *args, &block)
+    options = args.last.is_a?(Hash) ? args.pop : {}
+    opts = {:adapter => adapter.to_sym}
+    opts[:database] = args.shift if args.first.is_a?(String)
+    if args.any?
       raise ::Sequel::Error, "Wrong format of arguments, either use (), (String), (Hash), or (String, Hash)"
     end
-    connect(opts, &block)
+
+    connect(opts.merge(options), &block)
   end
 
   # Method that adds a database adapter class method to Sequel that calls
@@ -441,7 +439,7 @@ module Sequel
   end
 
   private_class_method :adapter_method, :def_adapter_method
-  
+
   require(%w"deprecated sql connection_pool exceptions dataset database timezones ast_transformer version")
   if !defined?(::SEQUEL_NO_CORE_EXTENSIONS) && !ENV.has_key?('SEQUEL_NO_CORE_EXTENSIONS')
   # :nocov:
