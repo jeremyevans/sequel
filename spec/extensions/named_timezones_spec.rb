@@ -29,6 +29,12 @@ describe "Sequel named_timezones extension" do
     Sequel.database_timezone.should == @tz_out
   end
     
+  it "should convert string arguments for Database#timezone= to TZInfo::Timezone instances for database-specific timezones" do
+    @db.extension :named_timezones
+    @db.timezone = 'America/Los_Angeles'
+    @db.timezone.should == @tz_in
+  end
+    
   it "should accept TZInfo::Timezone instances in *_timezone=" do
     Sequel.application_timezone = @tz_in
     Sequel.database_timezone = @tz_out

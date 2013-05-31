@@ -1,5 +1,7 @@
 === HEAD
 
+* Make named_timezones extension usable by databases allowing timezone strings to be given to Database#timezone= (jeremyevans)
+
 * Make Dataset#or just clone if given an empty argument (jeremyevans)
 
 * Deprecated using a mismatched number of placeholders and arguments in a placeholder literal string (jeremyevans)
