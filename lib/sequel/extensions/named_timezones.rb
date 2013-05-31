@@ -47,7 +47,7 @@ module Sequel
     private 
     
     # Assume the given DateTime has a correct time but a wrong timezone.  It is
-    # currently in UTC timezone, but it should be converted to the input_timzone.
+    # currently in UTC timezone, but it should be converted to the input_timezone.
     # Keep the time the same but convert the timezone to the input_timezone.
     # Expects the input_timezone to be a TZInfo::Timezone instance.
     def convert_input_datetime_other(v, input_timezone)
