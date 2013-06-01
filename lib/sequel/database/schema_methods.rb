@@ -752,12 +752,6 @@ module Sequel
       "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_schema_table(new_name)}"
     end
 
-    # REMOVE40
-    def reset_schema_utility_dataset
-      Sequel::Deprecation.deprecate('Database#reset_schema_utility_dataset', 'Switch to Database#reset_default_dataset')
-      reset_default_dataset
-    end
-
     # Split the schema information from the table
     def schema_and_table(table_name)
       schema_utility_dataset.schema_and_table(table_name)
