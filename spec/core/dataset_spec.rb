@@ -476,18 +476,6 @@ describe "Dataset#where" do
     @dataset.exclude([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
   end
 
-  qspecify "should handle all types of IN/NOT IN queries with empty arrays when empty_array_handle_nulls is false" do
-    begin
-      Sequel.empty_array_handle_nulls = false
-      @dataset.filter(:id => []).sql.should == "SELECT * FROM test WHERE (1 = 0)"
-      @dataset.filter([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE (1 = 0)"
-      @dataset.exclude(:id => []).sql.should == "SELECT * FROM test WHERE (1 = 1)"
-      @dataset.exclude([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE (1 = 1)"
-    ensure
-      Sequel.empty_array_handle_nulls = true
-    end
-  end
-
   specify "should handle all types of IN/NOT IN queries" do
     @dataset.filter(:id => @d1.select(:id)).sql.should == "SELECT * FROM test WHERE (id IN (SELECT id FROM test WHERE (region = 'Asia')))"
     @dataset.filter(:id => [1, 2]).sql.should == "SELECT * FROM test WHERE (id IN (1, 2))"
@@ -528,21 +516,6 @@ describe "Dataset#where" do
     db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
     @dataset.exclude([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
     db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
-  end
-  
-  qspecify "should handle IN/NOT IN queries with multiple columns and an empty dataset where the database doesn't support it when empty_array_handle nulls is true" do
-    begin
-      Sequel.empty_array_handle_nulls = false
-      meta_def(@dataset, :supports_multiple_column_in?){false}
-      db = Sequel.mock
-      d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
-      @dataset.filter([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (1 = 0)"
-      db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
-      @dataset.exclude([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (1 = 1)"
-      db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
-    ensure
-      Sequel.empty_array_handle_nulls = true
-    end
   end
   
   specify "should handle IN/NOT IN queries for datasets with row_procs" do

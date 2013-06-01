@@ -22,7 +22,6 @@
 module Sequel
   @convert_two_digit_years = true
   @datetime_class = Time
-  @empty_array_handle_nulls = true
 
   # Whether Sequel is being run in single threaded mode
   @single_threaded = false
@@ -49,32 +48,6 @@ module Sequel
     # they often implement them differently (e.g. + using seconds on +Time+ and
     # days on +DateTime+).
     attr_accessor :datetime_class
-
-    # Sets whether or not to attempt to handle NULL values correctly when given
-    # an empty array.  By default:
-    #
-    #   DB[:a].filter(:b=>[])
-    #   # SELECT * FROM a WHERE (b != b)
-    #   DB[:a].exclude(:b=>[])
-    #   # SELECT * FROM a WHERE (b = b)
-    #
-    # However, some databases (e.g. MySQL) will perform very poorly
-    # with this type of query.  You can set this to false to get the
-    # following behavior:
-    #
-    #   DB[:a].filter(:b=>[])
-    #   # SELECT * FROM a WHERE 1 = 0
-    #   DB[:a].exclude(:b=>[])
-    #   # SELECT * FROM a WHERE 1 = 1
-    # 
-    # This may not handle NULLs correctly, but can be much faster on
-    # some databases.
-    attr_reader :empty_array_handle_nulls
-
-    def empty_array_handle_nulls=(v)
-      Sequel::Deprecation.deprecate('Sequel.empty_array_handle_nulls=', 'Please switch to loading the empty_array_ignore_nulls plugin if you wish empty array handling to ignore nulls')
-      @empty_array_handle_nulls = v
-    end
 
     # REMOVE40
     def virtual_row_instance_eval

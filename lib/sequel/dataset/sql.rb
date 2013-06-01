@@ -947,14 +947,10 @@ module Sequel
       end
     end
 
-    # An expression for how to handle an empty array lookup
+    # An expression for how to handle an empty array lookup.
     def empty_array_value(op, cols)
-      if Sequel.empty_array_handle_nulls
-        c = Array(cols)
-        SQL::BooleanExpression.from_value_pairs(c.zip(c), :AND, op == :IN)
-      else
-        {1 => ((op == :IN) ? 0 : 1)}
-      end
+      c = Array(cols)
+      SQL::BooleanExpression.from_value_pairs(c.zip(c), :AND, op == :IN)
     end
     
     # Format the timestamp based on the default_timestamp_format, with a couple
