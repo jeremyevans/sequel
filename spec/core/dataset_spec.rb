@@ -2075,10 +2075,6 @@ describe "Dataset#join_table" do
     @d.join(:categories, :category_id=>:id).sql.should == 'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
   
-  qspecify "should support aliased tables using the deprecated argument" do
-    @d.from('stats').join('players', {:id => :player_id}, 'p').sql.should == 'SELECT * FROM "stats" INNER JOIN "players" AS "p" ON ("p"."id" = "stats"."player_id")'
-  end
-
   specify "should support aliased tables using the :table_alias option" do
     @d.from('stats').join('players', {:id => :player_id}, :table_alias=>:p).sql.should == 'SELECT * FROM "stats" INNER JOIN "players" AS "p" ON ("p"."id" = "stats"."player_id")'
   end
@@ -2268,11 +2264,6 @@ describe "Dataset#join_table" do
     proc{@d.join(:categories, :a=>:d).update_sql(:a=>1)}.should raise_error(Sequel::InvalidOperation)
     proc{@d.join(:categories, :a=>:d).delete_sql}.should raise_error(Sequel::InvalidOperation)
     proc{@d.join(:categories, :a=>:d).truncate_sql}.should raise_error(Sequel::InvalidOperation)
-  end
-
-  specify "should raise an error if an invalid option is passed" do
-    proc{@d.join(:c, [:id], nil)}.should raise_error(Sequel::Error)
-    proc{@d.join(:c, [:id], Sequel.qualify(:d, :c))}.should raise_error(Sequel::Error)
   end
 end
 

@@ -439,18 +439,9 @@ module Sequel
         return join_table(type, table, h, options)
       end
 
-      case options
-      when Hash
-        table_alias = options[:table_alias]
-        last_alias = options[:implicit_qualifier]
-        qualify_type = options[:qualify]
-      when Symbol, String, SQL::Identifier
-        Sequel::Deprecation.deprecate('Passing a non-hash as the options hash to Dataset#join_table', "Please switch to an options hash with the :table_alias option")
-        table_alias = options
-        last_alias = nil 
-      else
-        raise Error, "invalid options format for join_table: #{options.inspect}"
-      end
+      table_alias = options[:table_alias]
+      last_alias = options[:implicit_qualifier]
+      qualify_type = options[:qualify]
 
       if table.is_a?(Dataset)
         if table_alias.nil?
