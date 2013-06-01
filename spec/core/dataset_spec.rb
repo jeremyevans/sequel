@@ -2475,12 +2475,6 @@ describe "Dataset compound operations" do
     @b = Sequel.mock.dataset.from(:b).filter(:z => 2)
   end
   
-  qspecify "should support ALL with deprecated 2nd argument" do
-    @b.union(@a, true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) UNION ALL SELECT * FROM a WHERE (z = 1)) AS t1"
-    @b.intersect(@a, true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) INTERSECT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
-    @b.except(@a, true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
-  end
-
   specify "should support UNION and UNION ALL" do
     @a.union(@b).sql.should == "SELECT * FROM (SELECT * FROM a WHERE (z = 1) UNION SELECT * FROM b WHERE (z = 2)) AS t1"
     @b.union(@a, :all=>true).sql.should == "SELECT * FROM (SELECT * FROM b WHERE (z = 2) UNION ALL SELECT * FROM a WHERE (z = 1)) AS t1"

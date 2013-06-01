@@ -116,10 +116,6 @@ module Sequel
     #   DB[:items].except(DB[:other_items], :alias=>:i)
     #   # SELECT * FROM (SELECT * FROM items EXCEPT SELECT * FROM other_items) AS i
     def except(dataset, opts={})
-      unless opts.is_a?(Hash)
-        Sequel::Deprecation.deprecate('Passing a non-hash as the second argument to Dataset#except', "Please switch to an options hash with the :all option")
-        opts = {:all=>opts}
-      end
       raise(InvalidOperation, "EXCEPT not supported") unless supports_intersect_except?
       raise(InvalidOperation, "EXCEPT ALL not supported") if opts[:all] && !supports_intersect_except_all?
       compound_clone(:except, dataset, opts)
@@ -346,10 +342,6 @@ module Sequel
     #   DB[:items].intersect(DB[:other_items], :alias=>:i)
     #   # SELECT * FROM (SELECT * FROM items INTERSECT SELECT * FROM other_items) AS i
     def intersect(dataset, opts={})
-      unless opts.is_a?(Hash)
-        Sequel::Deprecation.deprecate('Passing a non-hash as the second argument to Dataset#intersect', "Please switch to an options hash with the :all option")
-        opts = {:all=>opts}
-      end
       raise(InvalidOperation, "INTERSECT not supported") unless supports_intersect_except?
       raise(InvalidOperation, "INTERSECT ALL not supported") if opts[:all] && !supports_intersect_except_all?
       compound_clone(:intersect, dataset, opts)
@@ -810,10 +802,6 @@ module Sequel
     #   DB[:items].union(DB[:other_items], :alias=>:i)
     #   # SELECT * FROM (SELECT * FROM items UNION SELECT * FROM other_items) AS i
     def union(dataset, opts={})
-      unless opts.is_a?(Hash)
-        Sequel::Deprecation.deprecate('Passing a non-hash as the second argument to Dataset#union', "Please switch to an options hash with the :all option")
-        opts = {:all=>opts}
-      end
       compound_clone(:union, dataset, opts)
     end
     

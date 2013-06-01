@@ -292,7 +292,6 @@ module Sequel
       
       # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
       def except(dataset, opts={})
-        opts = {:all=>opts} unless opts.is_a?(Hash)
         raise(Sequel::Error, "EXCEPT ALL not supported") if opts[:all]
         compound_clone(:minus, dataset, opts)
       end
