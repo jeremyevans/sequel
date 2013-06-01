@@ -1,5 +1,7 @@
 === HEAD
 
+* Default to deep qualification when joining (jeremyevans)
+
 * Use a connection queue instead of stack by default for threaded connection pools (jeremyevans)
 
 * Remove SQL::SQLArray alias for SQL::ValueList (jeremyevans)

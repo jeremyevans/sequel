@@ -2185,6 +2185,10 @@ describe "Dataset#join_table" do
     @d.from('stats').join(:players, {Sequel.function(:f, :id) => Sequel.subscript(:player_id, 0)}, :qualify=>:deep).sql.should == 'SELECT * FROM "stats" INNER JOIN "players" ON (f("players"."id") = "stats"."player_id"[0])'
   end
   
+  specify "should do only qualification if :qualify=>:symbol option is given" do
+    @d.from('stats').join(:players, {Sequel.function(:f, :id) => :player_id}, :qualify=>:symbol).sql.should == 'SELECT * FROM "stats" INNER JOIN "players" ON (f("id") = "stats"."player_id")'
+  end
+  
   specify "should allow for arbitrary conditions in the JOIN clause" do
     @d.join_table(:left_outer, :categories, :status => 0).sql.should == 'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."status" = 0)'
     @d.join_table(:left_outer, :categories, :categorizable_type => "Post").sql.should == 'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."categorizable_type" = \'Post\')'

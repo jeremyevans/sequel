@@ -132,7 +132,7 @@ END
   end
 
   it "should handle JOIN ON" do
-    dot(@ds.from(:a).join(:d, :b=>:c)).should == ["1 -> 2 [label=\"from\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\":a\"];", "1 -> 4 [label=\"join\"];", "4 [label=\"Array\"];", "4 -> 5 [label=\"0\"];", "5 [label=\"INNER JOIN ON\"];", "5 -> 6 [label=\"table\"];", "6 [label=\":d\"];", "5 -> 7 [label=\"on\"];", "7 [label=\"ComplexExpression: =\"];", "7 -> 8 [label=\"0\"];", "8 [label=\"QualifiedIdentifier\"];", "8 -> 9 [label=\"table\"];", "9 [label=\"\\\"d\\\"\"];", "8 -> 10 [label=\"column\"];", "10 [label=\"\\\"b\\\"\"];", "7 -> 11 [label=\"1\"];", "11 [label=\"QualifiedIdentifier\"];", "11 -> 12 [label=\"table\"];", "12 [label=\"\\\"a\\\"\"];", "11 -> 13 [label=\"column\"];", "13 [label=\"\\\"c\\\"\"];"]
+    dot(@ds.from(:a).join(:d, :b=>:c)).should == ["1 -> 2 [label=\"from\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\":a\"];", "1 -> 4 [label=\"join\"];", "4 [label=\"Array\"];", "4 -> 5 [label=\"0\"];", "5 [label=\"INNER JOIN ON\"];", "5 -> 6 [label=\"table\"];", "6 [label=\":d\"];", "5 -> 7 [label=\"on\"];", "7 [label=\"ComplexExpression: =\"];", "7 -> 8 [label=\"0\"];", "8 [label=\"QualifiedIdentifier\"];", "8 -> 9 [label=\"table\"];", "9 [label=\":d\"];", "8 -> 10 [label=\"column\"];", "10 [label=\":b\"];", "7 -> 11 [label=\"1\"];", "11 [label=\"QualifiedIdentifier\"];", "11 -> 12 [label=\"table\"];", "12 [label=\":a\"];", "11 -> 13 [label=\"column\"];", "13 [label=\":c\"];"]
   end
 
   it "should handle JOIN USING" do
