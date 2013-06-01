@@ -14,10 +14,8 @@ module Sequel
     #   DB[:table].add_graph_aliases(:some_alias=>[:table, :column])
     #   # SELECT ..., table.column AS some_alias
     def add_graph_aliases(graph_aliases)
-      unless ga = opts[:graph_aliases]
-        unless opts[:graph] && (ga = opts[:graph][:column_aliases])
-          Sequel::Deprecation.deprecate('Calling Dataset#add_graph_aliases before #graph or #set_graph_aliases', 'Please call it after #graph or #set_graph_aliases')
-        end
+      unless (ga = opts[:graph_aliases]) || (opts[:graph] && (ga = opts[:graph][:column_aliases]))
+        raise Error, "cannot call add_graph_aliases on a dataset that has not been called with graph or set_graph_aliases"
       end
       columns, graph_aliases = graph_alias_columns(graph_aliases)
       select_more(*columns).clone(:graph_aliases => ga.merge(graph_aliases))
