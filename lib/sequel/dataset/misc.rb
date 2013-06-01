@@ -17,16 +17,6 @@ module Sequel
     # The hash of options for this dataset, keys are symbols.
     attr_reader :opts
 
-    # REMOVE40
-    def db=(v)
-      Sequel::Deprecation.deprecate('Dataset#db=', 'Please load the sequel_3_dataset_methods extension to continue using it')
-      @db = v
-    end
-    def opts=(v)
-      Sequel::Deprecation.deprecate('Dataset#opts=', 'Please load the sequel_3_dataset_methods extension to continue using it')
-      @opts = v
-    end
-
     module DeprecateModifyHash
       %w'[]= merge! update clear delete delete_if keep_if reject! select! shift store'.each do |meth|
         class_eval(<<-END, __FILE__, __LINE__+1)

@@ -34,16 +34,6 @@ module Sequel
       first(*conditions)
     end
 
-    # Update all records matching the conditions with the values specified.
-    # Returns the number of rows affected.
-    #
-    #   DB[:table][:id=>1] = {:id=>2} # UPDATE table SET id = 2 WHERE id = 1
-    #   # => 1 # number of rows affected
-    def []=(conditions, values)
-      Sequel::Deprecation.deprecate('Dataset#[]=', 'Please load the sequel_3_dataset_methods extension to continue using it')
-      filter(conditions).update(values)
-    end
-
     # Returns an array with all records in the dataset. If a block is given,
     # the array is iterated over after all items have been loaded.
     #
@@ -360,30 +350,6 @@ module Sequel
       end
     end
     
-    # Inserts multiple values. If a block is given it is invoked for each
-    # item in the given array before inserting it.  See +multi_insert+ as
-    # a possibly faster version that may be able to insert multiple
-    # records in one SQL statement (if supported by the database).
-    # Returns an array of primary keys of inserted rows.
-    #
-    #   DB[:table].insert_multiple([{:x=>1}, {:x=>2}])
-    #   # => [4, 5]
-    #   # INSERT INTO table (x) VALUES (1)
-    #   # INSERT INTO table (x) VALUES (2)
-    #
-    #   DB[:table].insert_multiple([{:x=>1}, {:x=>2}]){|row| row[:y] = row[:x] * 2; row }
-    #   # => [6, 7]
-    #   # INSERT INTO table (x, y) VALUES (1, 2)
-    #   # INSERT INTO table (x, y) VALUES (2, 4)
-    def insert_multiple(array, &block)
-      Sequel::Deprecation.deprecate('Dataset#insert_multiple', 'Please load the sequel_3_dataset_methods extension to continue using it')
-      if block
-        array.map{|i| insert(block.call(i))}
-      else
-        array.map{|i| insert(i)}
-      end
-    end
-    
     # Returns the interval between minimum and maximum values for the given 
     # column/expression. Uses a virtual row block if no argument is given.
     #
@@ -622,13 +588,6 @@ module Sequel
       _select_map(column, true, &block)
     end
 
-    # Alias for update, but not aliased directly so subclasses
-    # don't have to override both methods.
-    def set(*args)
-      Sequel::Deprecation.deprecate('Dataset#set', 'Please switch to Dataset#update or load the sequel_3_dataset_methods extension to continue using it')
-      update(*args)
-    end
-    
     # Returns the first record in the dataset, or nil if the dataset
     # has no records. Users should probably use +first+ instead of
     # this method.
@@ -657,29 +616,6 @@ module Sequel
       aggregate_dataset.get{sum(column).as(:sum)}
     end
 
-    # Returns a string in CSV format containing the dataset records. By 
-    # default the CSV representation includes the column titles in the
-    # first line. You can turn that off by passing false as the 
-    # include_column_titles argument.
-    #
-    # This does not use a CSV library or handle quoting of values in
-    # any way.  If any values in any of the rows could include commas or line
-    # endings, you shouldn't use this.
-    #
-    #   puts DB[:table].to_csv # SELECT * FROM table
-    #   # id,name
-    #   # 1,Jim
-    #   # 2,Bob
-    def to_csv(include_column_titles = true)
-      Sequel::Deprecation.deprecate('Dataset#to_csv', 'Please load the sequel_3_dataset_methods extension to continue using it')
-      n = naked
-      cols = n.columns
-      csv = ''
-      csv << "#{cols.join(COMMA_SEPARATOR)}\r\n" if include_column_titles
-      n.each{|r| csv << "#{cols.collect{|c| r[c]}.join(COMMA_SEPARATOR)}\r\n"}
-      csv
-    end
-    
     # Returns a hash with one column used as key and another used as value.
     # If rows have duplicate values for the key column, the latter row(s)
     # will overwrite the value of the previous row(s). If the value_column
