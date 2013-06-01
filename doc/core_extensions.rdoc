@@ -36,16 +36,6 @@ All of Sequel's extensions to the core classes are stored in Sequel's core_exten
 
   Sequel.extension :core_extensions
 
-For backwards compatibility, the core_extensions are loaded by default in Sequel 3.  Starting in Sequel 4, the core extensions will no longer be loaded by default, so you will have to load the core_extensions extension manually using the above code.  If you plan to use the core extensions, it's recommended that you manually load the extension, even in Sequel 3.  If you do not plan to use the core extensions, you can change from:
-
-  require 'sequel'
-
-to:
-
-  require 'sequel/no_core_ext'
-
-which will load Sequel without the core extensions.
-
 == No Internal Dependency
 
 Sequel has no internal dependency on the core extensions.  This includes Sequel's core, Sequel::Model, and all plugins and extensions that ship with Sequel.  However, it is possible that external plugins and extensions will depend on the core extensions.  Such plugins and extensions should be updated so that they no longer depend on the core extensions.

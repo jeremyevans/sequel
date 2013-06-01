@@ -208,9 +208,6 @@ class Symbol
   include Sequel::SQL::StringMethods
   include Sequel::SQL::SubscriptMethods
   include Sequel::SQL::ComplexExpressionMethods
-  if RUBY_VERSION < '1.9.0'
-    include Sequel::Deprecation.deprecated_module(Sequel::SQL::InequalityMethods){|meth| ["Symbol##{meth}", "Please use Sequel.expr(symbol).#{meth} instead, or Sequel.extension(:ruby18_symbol_extensions) to continue using it"]}
-  end
 
   # Returns receiver wrapped in an <tt>Sequel::SQL::Identifier</tt>.  Usually used to
   # prevent splitting the symbol.
@@ -231,11 +228,5 @@ class Symbol
   #   :concat.sql_function(:a, :b) # SQL: concat(a, b)
   def sql_function(*args)
     Sequel::SQL::Function.new(self, *args)
-  end
-  if RUBY_VERSION < '1.9.0'
-    def [](*args)
-      Sequel::Deprecation.deprecate('Symbol#[]', 'Please use Sequel.function instead, or Sequel.extension(:ruby18_symbol_extensions) to continue using it')
-      Sequel::SQL::Function.new(self, *args)
-    end
   end
 end

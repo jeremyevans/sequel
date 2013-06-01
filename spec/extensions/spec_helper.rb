@@ -15,7 +15,7 @@ end
 
 unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require 'sequel/no_core_ext'
+  require 'sequel'
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
 SEQUEL_EXTENSIONS_NO_DEPRECATION_WARNING = true

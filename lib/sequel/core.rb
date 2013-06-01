@@ -17,11 +17,6 @@
 #
 #   Sequel.sqlite('blog.db'){|db| puts db[:users].count} 
 #
-# Sequel currently adds methods to the Array, Hash, String and Symbol classes by
-# default.  You can either require 'sequel/no_core_ext' or set the
-# +SEQUEL_NO_CORE_EXTENSIONS+ constant or environment variable before requiring
-# sequel to have Sequel not add methods to those classes.
-#
 # For a more expanded introduction, see the {README}[link:files/README_rdoc.html].
 # For a quicker introduction, see the {cheat sheet}[link:files/doc/cheat_sheet_rdoc.html].
 module Sequel
@@ -441,11 +436,6 @@ module Sequel
   private_class_method :adapter_method, :def_adapter_method
 
   require(%w"deprecated sql connection_pool exceptions dataset database timezones ast_transformer version")
-  if !defined?(::SEQUEL_NO_CORE_EXTENSIONS) && !ENV.has_key?('SEQUEL_NO_CORE_EXTENSIONS')
-  # :nocov:
-    require(:deprecated_core_extensions)
-  # :nocov:
-  end
 
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)

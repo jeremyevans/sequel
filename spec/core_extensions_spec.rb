@@ -7,12 +7,8 @@ end
 
 unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  if dep_core_extensions = ENV['SEQUEL_DEPRECATED_CORE_EXTENSIONS']
-    require 'sequel'
-  else
-    require 'sequel/no_core_ext'
-  end
-  Sequel::Deprecation.backtrace_filter = false
+  require 'sequel'
+  Sequel::Deprecation.backtrace_filter = true
 end
 
 Sequel.quote_identifiers = false
@@ -21,10 +17,8 @@ Sequel.identifier_output_method = nil
 
 Regexp.send(:include, Sequel::SQL::StringMethods)
 String.send(:include, Sequel::SQL::StringMethods)
-if dep_core_extensions.nil? || dep_core_extensions =~ /OVERRIDDEN/
-  Sequel.extension :core_extensions
-end
-if RUBY_VERSION < '1.9.0' && (dep_core_extensions.nil? || dep_core_extensions =~ /SYMBOL18/)
+Sequel.extension :core_extensions
+if RUBY_VERSION < '1.9.0'
   Sequel.extension :ruby18_symbol_extensions
 end
 
@@ -264,7 +258,7 @@ end
 
 describe "Array#case and Hash#case" do
   before do
-    @d = Sequel::Dataset.new(nil)
+    @d = Sequel.mock.dataset
   end
 
   specify "should return SQL CASE expression" do
@@ -296,7 +290,7 @@ end
 
 describe "Array#sql_value_list and #sql_array" do
   before do
-    @d = Sequel::Dataset.new(nil)
+    @d = Sequel.mock.dataset
   end
 
   specify "should treat the array as an SQL value list instead of conditions when used as a placeholder value" do
@@ -391,7 +385,7 @@ end
   
 describe "#desc" do
   before do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = Sequel.mock.dataset
   end
   
   specify "should format a DESC clause for a column ref" do
@@ -407,7 +401,7 @@ end
 
 describe "#asc" do
   before do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = Sequel.mock.dataset
   end
   
   specify "should format a ASC clause for a column ref" do
@@ -423,7 +417,7 @@ end
 
 describe "#as" do
   before do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = Sequel.mock.dataset
   end
   
   specify "should format a AS clause for a column ref" do
@@ -488,7 +482,7 @@ end
 if RUBY_VERSION < '1.9.0'
   describe "Symbol#[]" do
     specify "should format an SQL Function" do
-      ds = Sequel::Dataset.new(nil)
+      ds = Sequel.mock.dataset
       ds.literal(:xyz[]).should == 'xyz()'
       ds.literal(:xyz[1]).should == 'xyz(1)'
       ds.literal(:xyz[1, 2, :abc[3]]).should == 'xyz(1, 2, abc(3))'
@@ -498,7 +492,7 @@ end
 
 describe "Symbol#*" do
   before do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = Sequel.mock.dataset
   end
   
   specify "should format a qualified wildcard if no argument" do
@@ -518,7 +512,7 @@ end
 
 describe "Symbol" do
   before do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = Sequel.mock.dataset
     @ds.quote_identifiers = true
     @ds.identifier_input_method = :upcase
   end
