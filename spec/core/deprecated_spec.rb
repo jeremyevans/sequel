@@ -67,12 +67,4 @@ describe "Sequel::Deprecated" do
     @output.first.should == 'foo'
     @output.count.should == 4
   end
-
-  specify "should have deprecated_module return a module where all instance methods are marked deprecated" do
-    m = Module.new{def foo; 1 end}
-    dm = @d.deprecated_module(m){|meth| ["Module##{meth}", "Load the bar extension"]}
-    dm.should_not == m
-    c = Class.new{include dm}.new.foo.should == 1
-    @output.should == ['Module#foo is deprecated and will be removed in Sequel 4.0.  Load the bar extension.']
-  end
 end

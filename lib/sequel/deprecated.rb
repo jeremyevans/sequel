@@ -54,21 +54,5 @@ module Sequel
       end
       nil
     end
-
-    # Return a module that includes deprecation warnings for all public
-    # instance methods in the given module, such that including the returned
-    # module will not result in the given module being included.
-    def self.deprecated_module(mod, &block)
-      Module.new do
-        include mod.dup
-        mod.public_instance_methods.each do |meth|
-          msg = block.call(meth)
-          define_method(meth) do |*a, &blk|
-            Sequel::Deprecation.deprecate(*msg)
-            super(*a, &blk)
-          end
-        end
-      end
-    end
   end
 end
