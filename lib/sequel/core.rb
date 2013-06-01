@@ -48,18 +48,6 @@ module Sequel
     # they often implement them differently (e.g. + using seconds on +Time+ and
     # days on +DateTime+).
     attr_accessor :datetime_class
-
-    def k_require(*a)
-      Sequel::Deprecation.deprecate('Sequel.k_require', 'Please switch to Kernel.require')
-      Kernel.require(*a)
-    end
-
-    private
-
-    # Make thread safe requiring reentrant to prevent deadlocks.
-    def check_requiring_thread
-      Sequel::Deprecation.deprecate('Sequel.check_requiring_thread', 'It has no effect, so you can safely stop calling it.')
-    end
   end
 
   # Returns true if the passed object could be a specifier of conditions, false otherwise.
@@ -344,16 +332,6 @@ module Sequel
     else
       pr.call
     end
-  end
-
-  # REMOVE40
-  def self.ts_require(*args)
-    Sequel::Deprecation.deprecate('Sequel.ts_require', 'Please switch to Sequel.require')
-    require(*args)
-  end
-  def self.tsk_require(*args)
-    Sequel::Deprecation.deprecate('Sequel.tsk_require', 'Please switch to Kernel.require')
-    Kernel.require(*args)
   end
 
   # If the supplied block takes a single argument,
