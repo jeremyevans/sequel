@@ -1,3 +1,11 @@
+=== HEAD
+
+* Use a connection queue instead of stack by default for threaded connection pools (jeremyevans)
+
+* Remove SQL::SQLArray alias for SQL::ValueList (jeremyevans)
+
+* Remove SQL::NoBooleanInputMethods empty module (jeremyevans)
+
 === 3.48.0 (2013-06-01)
 
 * Make named_timezones extension usable by databases allowing timezone strings to be given to Database#timezone= (jeremyevans)

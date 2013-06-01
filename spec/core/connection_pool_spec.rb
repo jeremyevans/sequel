@@ -367,7 +367,8 @@ shared_examples_for "A threaded connection pool" do
     @pool.allocated.should be_empty
   end
 
-  specify "should store connections in a stack by default" do
+  specify "should store connections in a stack if :connection_handling=>:stack" do
+    @pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:connection_handling=>:stack))
     c2 = nil
     c = @pool.hold{|cc| Thread.new{@pool.hold{|cc2| c2 = cc2}}.join; cc}
     @pool.size.should == 2

@@ -217,10 +217,10 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # The calling code should already have the mutex before calling this.
   def next_available(server)
     case @connection_handling
-    when :queue
-      available_connections(server).shift
-    else
+    when :stack
       available_connections(server).pop
+    else
+      available_connections(server).shift
     end
   end
   

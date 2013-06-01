@@ -14,8 +14,8 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
 
   # The following additional options are respected:
   # * :connection_handling - Set how to handle available connections.  By default,
-  #   uses a a stack for performance.  Can be set to :queue to use a queue, which reduces
-  #   the chances of connections becoming stale.
+  #   uses a a queue for fairness.  Can be set to :stack to use a stack, which may
+  #   offer better performance.
   # * :max_connections - The maximum number of connections the connection pool
   #   will open (default 4)
   # * :pool_sleep_time - The amount of time to sleep before attempting to acquire
@@ -163,10 +163,10 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # have the mutex before calling this.
   def next_available
     case @connection_handling
-    when :queue
-      @available_connections.shift
-    else
+    when :stack
       @available_connections.pop
+    else
+      @available_connections.shift
     end
   end
 
