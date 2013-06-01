@@ -1339,10 +1339,10 @@ describe "Dataset#select_more" do
     @d = Sequel.mock.dataset.from(:test)
   end
   
-  qspecify "should act like #select for datasets with no selection" do
-    @d.select_more(:a, :b).sql.should == 'SELECT a, b FROM test'
-    @d.select_all.select_more(:a, :b).sql.should == 'SELECT a, b FROM test'
-    @d.select(:blah).select_all.select_more(:a, :b).sql.should == 'SELECT a, b FROM test'
+  specify "should act like #select_append for datasets with no selection" do
+    @d.select_more(:a, :b).sql.should == 'SELECT *, a, b FROM test'
+    @d.select_all.select_more(:a, :b).sql.should == 'SELECT *, a, b FROM test'
+    @d.select(:blah).select_all.select_more(:a, :b).sql.should == 'SELECT *, a, b FROM test'
   end
 
   specify "should add to the currently selected columns" do

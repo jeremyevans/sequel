@@ -781,20 +781,9 @@ module Sequel
       select(*columns).group(*columns.map{|c| unaliased_identifier(c)})
     end
 
-    # Returns a copy of the dataset with the given columns added
-    # to the existing selected columns. If no columns are currently selected
-    # it will just select the columns given. 
-    #
-    #   DB[:items].select(:a).select(:b) # SELECT b FROM items
-    #   DB[:items].select(:a).select_more(:b) # SELECT a, b FROM items
-    #   DB[:items].select_more(:b) # SELECT b FROM items
+    # Alias for select_append. 
     def select_more(*columns, &block)
-      if @opts[:select]
-        columns = @opts[:select] + columns
-      else
-        Sequel::Deprecation.deprecate('Dataset#select_more will no longer remove the wildcard selection from the Dataset starting in Sequel 4.  Switch to using Dataset#select if you want that behavior.')
-      end
-      select(*columns, &block)
+      select_append(*columns, &block)
     end
     
     # Set the server for this dataset to use.  Used to pick a specific database
