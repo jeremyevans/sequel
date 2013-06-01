@@ -1,5 +1,7 @@
 === HEAD
 
+* Make boolean prepared statement arguments work on sqlite adapter when integer_booleans is true (jeremyevans)
+
 * Remove Sequel::NotImplemented exception (jeremyevans)
 
 * Automatically alias single expressions in Dataset#get, #select_map, and #select_order_map, to work around possible DoS issues (jeremyevans)

@@ -203,10 +203,16 @@ module Sequel
       
       def prepared_statement_argument(arg)
         case arg
-        when Date, DateTime, Time, TrueClass, FalseClass
+        when Date, DateTime, Time
           literal(arg)[1...-1]
         when SQL::Blob
           arg.to_blob
+        when true, false
+          if integer_booleans
+            arg ? 1 : 0
+          else
+            literal(arg)[1...-1]
+          end
         else
           arg
         end

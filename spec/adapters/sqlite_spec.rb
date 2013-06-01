@@ -21,6 +21,7 @@ describe "An SQLite database" do
     @db.drop_table?(:fk)
     @db.foreign_keys = @fk
     @db.case_sensitive_like = true
+    @db.use_timestamp_timezones = false
     Sequel.datetime_class = Time
   end
 
@@ -92,6 +93,7 @@ describe "An SQLite database" do
   end
   
   specify "should support a use_timestamp_timezones setting" do
+    @db.use_timestamp_timezones = true
     @db.create_table!(:fk){Time :time}
     @db[:fk].insert(Time.now)
     @db[:fk].get(Sequel.cast(:time, String)).should =~ /[-+]\d\d\d\d\z/
@@ -99,7 +101,6 @@ describe "An SQLite database" do
     @db[:fk].delete
     @db[:fk].insert(Time.now)
     @db[:fk].get(Sequel.cast(:time, String)).should_not =~ /[-+]\d\d\d\d\z/
-    @db.use_timestamp_timezones = true
   end
   
   specify "should provide a list of existing tables" do
@@ -134,6 +135,7 @@ describe "An SQLite database" do
   
   cspecify "should support timestamps and datetimes and respect datetime_class", :do, :jdbc, :amalgalite, :swift do
     @db.create_table!(:fk){timestamp :t; datetime :d}
+    @db.use_timestamp_timezones = true
     t1 = Time.at(1)
     @db[:fk] << {:t => t1, :d => t1}
     @db[:fk].map(:t).should == [t1]

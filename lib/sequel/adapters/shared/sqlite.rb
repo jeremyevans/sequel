@@ -121,7 +121,7 @@ module Sequel
 
       # Set the integer_booleans option using the passed in :integer_boolean option.
       def set_integer_booleans
-        @integer_booleans = typecast_value_boolean(@opts[:integer_booleans])
+        @integer_booleans = @opts.has_key?(:integer_booleans) ? typecast_value_boolean(@opts[:integer_booleans]) : true
       end
       
       # The version of the server as an integer, where 3.6.19 = 30619.
@@ -161,7 +161,7 @@ module Sequel
       # SQLite supports timezones in timestamps, since it just stores them as strings,
       # but it breaks the usage of SQLite's datetime functions.
       def use_timestamp_timezones?
-        defined?(@use_timestamp_timezones) ? @use_timestamp_timezones : (@use_timestamp_timezones = true)
+        defined?(@use_timestamp_timezones) ? @use_timestamp_timezones : (@use_timestamp_timezones = false)
       end
 
       # A symbol signifying the value of the synchronous PRAGMA.
