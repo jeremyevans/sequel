@@ -1124,14 +1124,6 @@ describe "Database#create_table" do
     @db.sqls.should == ['CREATE TEMPORARY TABLE test_tmp (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
       'CREATE UNIQUE INDEX test_tmp_name_index ON test_tmp (name)']
   end
-
-  qspecify "should not use default schema when creating a temporary table" do
-    @db.default_schema = :foo
-    @db.create_table :test_tmp, :temp => true do
-      column :name, :text
-    end
-    @db.sqls.should == ['CREATE TEMPORARY TABLE test_tmp (name text)']
-  end
 end
 
 describe "Database#alter_table" do

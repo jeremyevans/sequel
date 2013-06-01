@@ -646,7 +646,7 @@ module Sequel
     # for certain databases.
     def default_index_name(table_name, columns)
       schema, table = schema_and_table(table_name)
-      "#{"#{schema}_" if schema and schema != _default_schema}#{table}_#{columns.map{|c| [String, Symbol].any?{|cl| c.is_a?(cl)} ? c : literal(c).gsub(/\W/, '_')}.join(UNDERSCORE)}_index"
+      "#{"#{schema}_" if schema}#{table}_#{columns.map{|c| [String, Symbol].any?{|cl| c.is_a?(cl)} ? c : literal(c).gsub(/\W/, '_')}.join(UNDERSCORE)}_index"
     end
   
     # Get foreign key name for given table and columns.

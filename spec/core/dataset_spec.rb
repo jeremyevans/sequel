@@ -4361,12 +4361,6 @@ describe "Dataset#schema_and_table" do
   it "should correctly handle qualified identifiers" do
     @ds.schema_and_table(Sequel.qualify(:t, :s)).should == ['t', 's']
   end
-
-  qspecify "should respect default_schema" do
-    @ds.db.default_schema = :foo
-    @ds.schema_and_table(:s).should == ['foo', 's']
-    @ds.schema_and_table(:s, nil).should == [nil, 's']
-  end
 end
 
 describe "Dataset#split_qualifiers" do
@@ -4400,13 +4394,6 @@ describe "Dataset#split_qualifiers" do
     @ds.split_qualifiers(Sequel.qualify(:d, Sequel.qualify(:t, :s))).should == ['d', 't', 's']
     @ds.split_qualifiers(Sequel.qualify(:d__t, :s__s2)).should == ['d', 't', 's', 's2']
     @ds.split_qualifiers(Sequel.qualify(Sequel.qualify(:d, :t), Sequel.qualify(:s, :s2))).should == ['d', 't', 's', 's2']
-  end
-
-  qspecify "should respect default_schema" do
-    @ds.db.default_schema = :foo
-    @ds.split_qualifiers(:s).should == ['foo', 's']
-    @ds.split_qualifiers(:s, nil).should == ['s']
-    @ds.split_qualifiers(Sequel.qualify(:d__t, :s)).should == ['d', 't', 's']
   end
 end
 

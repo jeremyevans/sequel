@@ -121,7 +121,6 @@ module Sequel
       
       @opts[:single_threaded] = @single_threaded = typecast_value_boolean(@opts.fetch(:single_threaded, Database.single_threaded))
       @schemas = {}
-      @default_schema = @opts.fetch(:default_schema, default_schema_default)
       @default_string_column_size = @opts[:default_string_column_size] || DEFAULT_STRING_COLUMN_SIZE
       @prepared_statements = {}
       @transactions = {}

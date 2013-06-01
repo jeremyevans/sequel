@@ -851,7 +851,6 @@ describe "Postgres::Database schema qualified tables" do
   end
   after do
     @db << "DROP SCHEMA schema_test CASCADE"
-    @db.default_schema = nil
   end
 
   specify "should be able to create, drop, select and insert into tables in a given schema" do

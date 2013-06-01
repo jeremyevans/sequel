@@ -44,19 +44,6 @@ module Sequel
     # The identifier output method to use by default for this database (default: adapter default)
     attr_reader :identifier_output_method
 
-    # REMOVE40
-    def _default_schema
-      @default_schema
-    end
-    def default_schema
-      Sequel::Deprecation.deprecate('Database#default_schema', 'Use qualified tables instead')
-      @default_schema
-    end
-    def default_schema=(v)
-      Sequel::Deprecation.deprecate('Database#default_schema=', 'Use qualified tables instead') if v
-      @default_schema = v
-    end
-
     # If the database has any dataset modules associated with it,
     # use a subclass of the given class that includes the modules
     # as the dataset class.
@@ -144,11 +131,6 @@ module Sequel
     # The default dataset class to use for the database
     def dataset_class_default
       self.class.const_get(:DatasetClass)
-    end
-
-    # REMOVE40
-    def default_schema_default
-      nil
     end
 
     # Reset the default dataset used by most Database methods that

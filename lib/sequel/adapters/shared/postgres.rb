@@ -809,7 +809,7 @@ module Sequel
       # If opts includes a :schema option, or a default schema is used, restrict the dataset to
       # that schema.  Otherwise, just exclude the default PostgreSQL schemas except for public.
       def filter_schema(ds, opts)
-        if schema = opts[:schema] || _default_schema
+        if schema = opts[:schema]
           ds.filter(:pg_namespace__nspname=>schema.to_s)
         else
           ds.exclude(:pg_namespace__nspname=>EXCLUDE_SCHEMAS)
