@@ -226,12 +226,6 @@ describe "Sequel.extension" do
   end
 end
 
-describe "Database#connect" do
-  qspecify "should raise Sequel::NotImplemented" do
-    proc {Sequel::Database.new.connect(:default)}.should raise_error(Sequel::NotImplemented)
-  end
-end
-
 describe "Database#log_info" do
   before do
     @o = Object.new
@@ -501,36 +495,6 @@ describe "Database#valid_connection?" do
       def c.execute(*) raise Sequel::DatabaseError, "error" end
       db.valid_connection?(c)
     end.should be_false
-  end
-end
-
-describe "Database#execute" do
-  qspecify "should raise Sequel::NotImplemented" do
-    proc {Sequel::Database.new.execute('blah blah')}.should raise_error(Sequel::NotImplemented)
-  end
-end
-
-describe "Database#tables" do
-  qspecify "should raise Sequel::NotImplemented" do
-    proc {Sequel::Database.new.tables}.should raise_error(Sequel::NotImplemented)
-  end
-end
-
-describe "Database#views" do
-  qspecify "should raise Sequel::NotImplemented" do
-    proc {Sequel::Database.new.views}.should raise_error(Sequel::NotImplemented)
-  end
-end
-
-describe "Database#indexes" do
-  qspecify "should raise Sequel::NotImplemented" do
-    proc {Sequel::Database.new.indexes(:table)}.should raise_error(Sequel::NotImplemented)
-  end
-end
-
-describe "Database#foreign_key_list" do
-  qspecify "should raise Sequel::NotImplemented" do
-    proc {Sequel::Database.new.foreign_key_list(:table)}.should raise_error(Sequel::NotImplemented)
   end
 end
 

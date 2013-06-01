@@ -138,12 +138,6 @@ module Sequel
       end
     end
 
-    # Connects to the database. This method should be overridden by descendants.
-    def connect(server)
-      Sequel::Deprecation.deprecate('Database#connect default implementation and Sequel::NotImplemented', 'All database instance can be assumed to implement connect.')
-      raise NotImplemented, "#connect should be overridden by adapters"
-    end
-    
     # The database type for this database object, the same as the adapter scheme
     # by default.  Should be overridden in adapters (especially shared adapters)
     # to be the correct type, so that even if two separate Database objects are

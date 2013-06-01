@@ -145,6 +145,6 @@ describe "date_arithmetic extension" do
   qspecify "should raise error if literalizing on an unsupported database" do
     db = Sequel.mock
     db.extension :date_arithmetic
-    lambda{db.literal(Sequel.date_add(:a, @h0))}.should raise_error(Sequel::NotImplemented)
+    lambda{db.literal(Sequel.date_add(:a, @h0))}.should raise_error(Sequel::Error)
   end
 end

@@ -156,15 +156,6 @@ module Sequel
       get(Sequel::SQL::AliasedExpression.new(1, :one)).nil?
     end
 
-    # Executes a select query and fetches records, yielding each record to the
-    # supplied block.  The yielded records should be hashes with symbol keys.
-    # This method should probably should not be called by user code, use +each+
-    # instead.
-    def fetch_rows(sql)
-      Sequel::Deprecation.deprecate('Dataset#fetch_rows default implementation and Sequel::NotImplemented', 'All dataset instances can be assumed to implement fetch_rows')
-      raise NotImplemented, NOTIMPL_MSG
-    end
-    
     # If a integer argument is given, it is interpreted as a limit, and then returns all 
     # matching records up to that limit.  If no argument is passed,
     # it returns the first matching record.  If any other type of

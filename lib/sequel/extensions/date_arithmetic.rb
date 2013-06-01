@@ -122,8 +122,7 @@ module Sequel
             end
             false
           else
-            Sequel::Deprecation.deprecate('Sequel::NotImplemented', 'Sequel 4 will just raise Error if date_arithmetic is not supported on the database')
-            raise NotImplemented, "date arithmetic is not implemented on #{db.database_type}"
+            raise Error, "date arithmetic is not implemented on #{db.database_type}"
           end
 
           if cast

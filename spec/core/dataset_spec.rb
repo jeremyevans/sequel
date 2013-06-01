@@ -3245,10 +3245,6 @@ describe "Dataset default #fetch_rows, #insert, #update, #delete, #with_sql_dele
     @ds = @db[:items]
   end
 
-  qspecify "#fetch_rows should raise a Sequel::NotImplemented" do
-    proc{@ds.fetch_rows(''){}}.should raise_error(Sequel::NotImplemented)
-  end
-
   specify "#delete should execute delete SQL" do
     @db.should_receive(:execute).once.with('DELETE FROM items', :server=>:default)
     @ds.delete
