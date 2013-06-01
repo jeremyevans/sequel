@@ -176,33 +176,29 @@ module Sequel
     #   DB[:items].from(:blah, :foo) # SQL: SELECT * FROM blah, foo
     def from(*source)
       table_alias_num = 0
-      sources = []
       ctes = nil
-      source.each do |s|
+      source.map! do |s|
         case s
-        when Hash
-          Sequel::Deprecation.deprecate('Dataset#from will no longer treat an input hash as an alias specifier.  Switch to aliasing using Sequel.as or use the hash_aliases extension.')
-          s.each{|k,v| sources << SQL::AliasedExpression.new(k,v)}
         when Dataset
           if hoist_cte?(s)
             ctes ||= []
             ctes += s.opts[:with]
             s = s.clone(:with=>nil)
           end
-          sources << SQL::AliasedExpression.new(s, dataset_alias(table_alias_num+=1))
+          SQL::AliasedExpression.new(s, dataset_alias(table_alias_num+=1))
         when Symbol
           sch, table, aliaz = split_symbol(s)
           if aliaz
             s = sch ? SQL::QualifiedIdentifier.new(sch, table) : SQL::Identifier.new(table)
-            sources << SQL::AliasedExpression.new(s, aliaz.to_sym)
+            SQL::AliasedExpression.new(s, aliaz.to_sym)
           else
-            sources << s
+            s
           end
         else
-          sources << s
+          s
         end
       end
-      o = {:from=>sources.empty? ? nil : sources}
+      o = {:from=>source.empty? ? nil : source}
       o[:with] = (opts[:with] || []) + ctes if ctes
       o[:num_dataset_sources] = table_alias_num if table_alias_num > 0
       clone(o)
@@ -722,16 +718,7 @@ module Sequel
     #   DB[:items].select{[a, sum(b)]} # SELECT a, sum(b) FROM items
     def select(*columns, &block)
       virtual_row_columns(columns, block)
-      m = []
-      columns.each do |i|
-        if i.is_a?(Hash)
-          Sequel::Deprecation.deprecate('Dataset#select will no longer treat an input hash as an alias specifier.  Switch to aliasing using Sequel.as or use the hash_aliases extension.')
-          m.concat(i.map{|k, v| SQL::AliasedExpression.new(k,v)})
-        else
-          m << i
-        end
-      end
-      clone(:select => m)
+      clone(:select => columns)
     end
     
     # Returns a copy of the dataset selecting the wildcard if no arguments

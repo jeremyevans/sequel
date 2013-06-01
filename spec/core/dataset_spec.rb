@@ -1143,12 +1143,6 @@ describe "Dataset#from" do
     @dataset.from(d1, d2).sql.should == "SELECT * FROM (SELECT * FROM a GROUP BY b) AS t1, (SELECT * FROM c GROUP BY d) AS t2"
   end
   
-  qspecify "should accept a hash for aliasing" do
-    @dataset.from(:a => :b).sql.should == "SELECT * FROM a AS b"
-    @dataset.from(:a => 'b').sql.should == "SELECT * FROM a AS b"
-    @dataset.from(@dataset.from(:a).group(:b) => :c).sql.should == "SELECT * FROM (SELECT * FROM a GROUP BY b) AS c"
-  end
-
   specify "should always use a subquery if given a dataset" do
     @dataset.from(@dataset.from(:a)).select_sql.should == "SELECT * FROM (SELECT * FROM a) AS t1"
   end
@@ -1232,11 +1226,7 @@ describe "Dataset#select" do
   end
 
   qspecify "should handle hashes returned from virtual row blocks" do
-    @d.select{{:b=>:c}}.sql.should == 'SELECT b AS c FROM test'
-  end
-
-  qspecify "should accept a hash for AS values" do
-    @d.select(:name => 'n', :__ggh => 'age').sql.should =~ /SELECT ((name AS n, __ggh AS age)|(__ggh AS age, name AS n)) FROM test/
+    @d.select{{:b=>:c}}.sql.should == 'SELECT (b = c) FROM test'
   end
 
   specify "should override the previous select option" do
@@ -3641,7 +3631,7 @@ describe "Sequel::Dataset#qualify" do
   end
 
   qspecify "should handle hashes in select option" do
-    @ds.select(:a=>:b).qualify.sql.should == 'SELECT t.a AS b FROM t'
+    @ds.select(:a=>:b).qualify.sql.should == 'SELECT (t.a = t.b) FROM t'
   end
 
   specify "should handle symbols" do
