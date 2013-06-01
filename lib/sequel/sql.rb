@@ -743,10 +743,6 @@ module Sequel
       end
     end
 
-    # Only exists for backwards compatibility, ignore it.
-    module NoBooleanInputMethods
-    end
-
     # This module includes the standard mathematical methods (+, -, *, and /)
     # that are defined on objects that can be used in a numeric context in SQL
     # (+Symbol+, +LiteralString+, and +SQL::GenericExpression+).
@@ -1501,9 +1497,6 @@ module Sequel
     # hash-like conditions specifier.
     class ValueList < ::Array
     end
-
-    # Deprecated name for +ValueList+, used for backwards compatibility
-    SQLArray = ValueList
 
     # The purpose of the +VirtualRow+ class is to allow the easy creation of SQL identifiers and functions
     # without relying on methods defined on +Symbol+.  This is useful if another library defines
