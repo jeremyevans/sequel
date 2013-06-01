@@ -17,6 +17,17 @@
 
 module Sequel
   module GraphEach
+    # Call graph_each for graphed datasets that are not being eager graphed.
+    def each
+      if @opts[:graph] && !@opts[:eager_graph]
+        graph_each{|r| yield r}
+      else
+        super
+      end
+    end
+
+    private
+
     # Fetch the rows, split them into component table parts,
     # tranform and run the row_proc on each part (if applicable),
     # and yield a hash of the parts.

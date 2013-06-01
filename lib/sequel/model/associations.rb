@@ -1858,6 +1858,11 @@ module Sequel
           end
         end
 
+        # Return plain hashes instead of calling the row_proc if eager_graph is being used.
+        def each(&block)
+          @opts[:eager_graph] ? fetch_rows(select_sql, &block) : super
+        end
+
         # The preferred eager loading method.  Loads all associated records using one
         # query for each association.
         #
@@ -2141,11 +2146,6 @@ module Sequel
             end
             a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])} unless r[:after_load].empty?
           end 
-        end
-
-        # Return plain hashes instead of calling the row_proc if eager_graph is being used.
-        def graph_each(&block)
-          @opts[:eager_graph] ? fetch_rows(select_sql, &block) : super
         end
 
         # Return a subquery expression for filering by a many_to_many association
