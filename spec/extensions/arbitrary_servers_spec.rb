@@ -65,7 +65,7 @@ describe "arbtirary servers" do
   end
 
   specify "should work correctly with server_block plugin" do
-    @db.extend Sequel::ServerBlock
+    @db.extension :server_block
     @db.with_server(:host=>'host1', :database=>'db1') do
       @db.synchronize do |c|
         c.opts[:host].should == 'host1'
@@ -77,9 +77,8 @@ describe "arbtirary servers" do
     end
   end
 
-
   specify "should respect multithreaded access with server block plugin" do
-    @db.extend Sequel::ServerBlock
+    @db.extension :server_block
     q, q1 = Queue.new, Queue.new
     
     t = nil

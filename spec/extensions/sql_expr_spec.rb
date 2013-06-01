@@ -1,5 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
+Sequel.extension :sql_expr
+
 describe "Sequel sql_expr extension" do
   before do
     @ds = Sequel.mock.dataset

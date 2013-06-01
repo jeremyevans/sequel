@@ -1,5 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
+Sequel.extension :pg_json
+
 describe "pg_json extension" do
   before(:all) do
     m = Sequel::Postgres

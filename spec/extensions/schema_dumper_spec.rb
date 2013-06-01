@@ -1,6 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
-
 describe "Sequel::Schema::Generator dump methods" do
   before do
     @d = Sequel::Database.new.extension(:schema_dumper)

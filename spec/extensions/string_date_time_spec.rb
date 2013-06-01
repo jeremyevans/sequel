@@ -1,5 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
+Sequel.extension :string_date_time
+
 describe "String#to_time" do
   specify "should convert the string into a Time object" do
     "2007-07-11".to_time.should == Time.parse("2007-07-11")

@@ -1,5 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
+Sequel.extension :pg_array, :pg_row, :pg_row_ops
+
 describe "Sequel::Postgres::PGRowOp" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)

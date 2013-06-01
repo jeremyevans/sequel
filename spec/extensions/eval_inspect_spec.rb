@@ -1,5 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
+Sequel.extension :eval_inspect
+
 describe "eval_inspect extension" do
   before do
     @ds = Sequel.mock.dataset

@@ -1,5 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
+Sequel.extension :columns_introspection
+
 describe "Sequel::Dataset.introspect_all_columns" do
   before do
     @db = MODEL_DB

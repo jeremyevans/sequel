@@ -1,5 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
+Sequel.extension :inflector
+
 describe String do
   it "#camelize and #camelcase should transform the word to CamelCase" do
     "egg_and_hams".camelize.should == "EggAndHams"

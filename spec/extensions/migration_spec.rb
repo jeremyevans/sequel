@@ -1,5 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
+Sequel.extension :migration
+
 describe "Migration.descendants" do
   before do
     Sequel::Migration.descendants.clear

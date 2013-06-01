@@ -1,5 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
+Sequel.extension :blank
+
 describe "Object#blank?" do
   specify "it should be true if the object responds true to empty?" do
     [].blank?.should == true

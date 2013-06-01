@@ -167,7 +167,7 @@ begin
   spec.call("spec_model", Dir["spec/model/*_spec.rb"], "Run model specs")
   spec.call("_spec_model_no_assoc", Dir["spec/model/*_spec.rb"].delete_if{|f| f =~ /association|eager_loading/}, '')
   spec_with_cov.call("spec_core_ext", ["spec/core_extensions_spec.rb"], "Run core extensions specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|adapters|connection_pool|database|dataset|model)"')}
-  spec_with_cov.call("spec_plugin", Dir["spec/extensions/*_spec.rb"], "Run extension/plugin specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|adapters|connection_pool|database|dataset|model)"')}
+  spec_with_cov.call("spec_plugin", Dir["spec/extensions/*_spec.rb"].sort_by{rand}, "Run extension/plugin specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|adapters|connection_pool|database|dataset|model)"')}
   spec_with_cov.call("spec_integration", Dir["spec/integration/*_test.rb"], "Run integration tests")
 
   %w'postgres sqlite mysql informix oracle firebird mssql db2'.each do |adapter|

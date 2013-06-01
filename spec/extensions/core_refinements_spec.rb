@@ -1,6 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 if RUBY_VERSION >= '2.0.0'
+Sequel.extension :core_refinements, :pg_array, :pg_hstore, :pg_row, :pg_range, :pg_row_ops, :pg_range_ops, :pg_array_ops, :pg_hstore_ops
 using Sequel::CoreRefinements
 
 describe "Core refinements" do

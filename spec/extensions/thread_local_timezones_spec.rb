@@ -1,5 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
+Sequel.extension :thread_local_timezones
+
 describe "Sequel thread_local_timezones extension" do
   after do
     Sequel.default_timezone = nil
