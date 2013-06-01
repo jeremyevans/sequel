@@ -1524,7 +1524,7 @@ describe "Database#get" do
 
   qspecify "should work when an alias cannot be determined" do
     @db.get(1).should == 1
-    @db.sqls.should == ['SELECT 1 LIMIT 1']
+    @db.sqls.should == ['SELECT 1 AS v LIMIT 1']
   end
 end
 

@@ -250,31 +250,6 @@ Then you have a denial of service vulnerability.  In general, such a vulnerabili
 is unlikely, because you are probably indexing into the returned hash(es) by name,
 and if an alias was used and you didn't expect it, your application wouldn't work.
 
-The more insidious cases are those where an explicit alias is not used at all, but
-an unaliased expression is used and the database chooses which alias to use.  For
-example, on SQLite, the following types of queries are vulnerable to denial of service:
-
-  DB[:table].get(params[:a].to_s)
-  DB[:table].select_map(params[:b].to_s)
-  DB[:table].select_order_map(params[:c].to_s)
-
-In these cases, the queries will work correctly, but an unused symbol will be created.
-To protect against the denial of service, use an explicit alias:
-
-  DB[:table].get(Sequel.as(params[:a].to_s, :a))
-  DB[:table].select_map(Sequel.as(params[:b].to_s, :a))
-  DB[:table].select_order_map(Sequel.as(params[:c].to_s, :a))
-
-While the above code is unlikely to be used in practice, variants that use expressions
-could be.  For example, if you want to select all values in a specific column, with
-a suffix provided by the user:
-
-  DB[:table].select_map(Sequel.join(:column, params[:suffix].to_s))
-
-As above, you should use an explicit alias to protect against denial of service:
-
-  DB[:table].select_map(Sequel.join(:column, params[:suffix].to_s).as(:a))
-
 === Database Connection Options
 
 All database connection options are converted to symbols.  For a

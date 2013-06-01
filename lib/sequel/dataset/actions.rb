@@ -227,7 +227,7 @@ module Sequel
     #   DB[:table].get(:id) # SELECT id FROM table LIMIT 1
     #   # => 3
     #
-    #   ds.get{sum(id)} # SELECT sum(id) FROM table LIMIT 1
+    #   ds.get{sum(id)} # SELECT sum(id) AS v FROM table LIMIT 1
     #   # => 6
     #
     # You can pass an array of arguments to return multiple arguments,
@@ -250,7 +250,7 @@ module Sequel
         ds = if column.is_a?(Array)
           ds.select(*column)
         else
-          ds.select(column)
+          ds.select(auto_alias_expression(column))
         end
       end
 
@@ -776,12 +776,21 @@ module Sequel
       columns = Array(column)
       virtual_row_columns(columns, block)
       select_cols = order ? columns.map{|c| c.is_a?(SQL::OrderedExpression) ? c.expression : c} : columns
-      ds = ds.select(*select_cols)
       ds = ds.order(*columns.map{|c| unaliased_identifier(c)}) if order
       if column.is_a?(Array) || (columns.length > 1)
-        ds._select_map_multiple(hash_key_symbols(select_cols))
+        ds.select(*select_cols)._select_map_multiple(hash_key_symbols(select_cols))
       else
-        ds._select_map_single
+        ds.select(auto_alias_expression(select_cols.first))._select_map_single
+      end
+    end
+
+    # Automatically alias the given expression if it does not have an identifiable alias.
+    def auto_alias_expression(v)
+      case v
+      when LiteralString, Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression
+        v
+      else
+        SQL::AliasedExpression.new(v, :v)
       end
     end
 

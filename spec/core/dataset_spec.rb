@@ -2684,8 +2684,8 @@ describe "Dataset#get" do
   end
   
   specify "should support false and nil values" do
-    @d.get(false).should == "SELECT 'f' FROM test LIMIT 1"
-    @d.get(nil).should == "SELECT NULL FROM test LIMIT 1"
+    @d.get(false).should == "SELECT 'f' AS v FROM test LIMIT 1"
+    @d.get(nil).should == "SELECT NULL AS v FROM test LIMIT 1"
   end
 
   specify "should support an array of expressions to get an array of results" do
@@ -4016,7 +4016,7 @@ describe "Sequel::Dataset#select_map" do
   
   specify "should handle an expression without a determinable alias" do
     @ds.select_map{a(t__c)}.should == [1, 2]
-    @ds.db.sqls.should == ['SELECT a(t.c) FROM t']
+    @ds.db.sqls.should == ['SELECT a(t.c) AS v FROM t']
   end
 
   specify "should accept a block" do
@@ -4095,7 +4095,7 @@ describe "Sequel::Dataset#select_order_map" do
   
   specify "should handle an expression without a determinable alias" do
     @ds.select_order_map{a(t__c)}.should == [1, 2]
-    @ds.db.sqls.should == ['SELECT a(t.c) FROM t ORDER BY a(t.c)']
+    @ds.db.sqls.should == ['SELECT a(t.c) AS v FROM t ORDER BY a(t.c)']
   end
 
   specify "should accept a block" do
