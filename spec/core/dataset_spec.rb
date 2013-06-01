@@ -403,19 +403,9 @@ describe "Dataset#where" do
     @dataset.where('price < :price AND id in :ids', :price=>100).select_sql.should == "SELECT * FROM test WHERE (price < 100 AND id in :ids)"
   end
     
-  qspecify "should handle a mismatched number of placeholders" do
-    @dataset.where('price < ? AND id in ?', 100).select_sql.should == "SELECT * FROM test WHERE (price < 100 AND id in NULL)"
-    @dataset.where('price < ? AND id in ?', 100, [1, 2, 3], 4).select_sql.should == "SELECT * FROM test WHERE (price < 100 AND id in (1, 2, 3))"
-  end
-  
   specify "should handle placeholders when using an array" do
     @dataset.where(Sequel.lit(['price < ', ' AND id in '], 100, [1, 2, 3])).select_sql.should == "SELECT * FROM test WHERE price < 100 AND id in (1, 2, 3)"
     @dataset.where(Sequel.lit(['price < ', ' AND id in '], 100)).select_sql.should == "SELECT * FROM test WHERE price < 100 AND id in "
-  end
-  
-  qspecify "should handle a mismatched number of placeholders when using an array" do
-    @dataset.where(Sequel.lit(['a = ', ' AND price < ', ' AND id in '], 100)).select_sql.should == "SELECT * FROM test WHERE a = 100 AND price <  AND id in NULL"
-    @dataset.where(Sequel.lit(['price < ', ' AND id in '], 100, [1, 2, 3], 4)).select_sql.should == "SELECT * FROM test WHERE price < 100 AND id in (1, 2, 3)"
   end
   
   specify "should handle partial names" do
