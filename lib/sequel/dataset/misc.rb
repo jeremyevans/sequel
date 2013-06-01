@@ -36,11 +36,9 @@ module Sequel
     # Sequel::Dataset is an abstract class that is not useful by itself. Each
     # database adapter provides a subclass of Sequel::Dataset, and has
     # the Database#dataset method return an instance of that subclass.
-    def initialize(db, opts = (no_arg_given=true; nil))
+    def initialize(db)
       @db = db
-      # REMOVE40
-      Sequel::Deprecation.deprecate('Passing the opts argument to Database#dataset or Dataset#initialize', 'Clone the dataset afterward to change the opts') unless no_arg_given
-      @opts = opts || {}.extend(DeprecateModifyHash)
+      @opts = {}.extend(DeprecateModifyHash)
     end
 
     # Define a hash value such that datasets with the same DB, opts, and SQL
