@@ -93,15 +93,6 @@ module Sequel
         # Do not call this method with untrusted input, as that can result in
         # arbitrary code execution.
         def to_s_method(meth, args=:self) # :nodoc:
-          # REMOVE40
-          class_eval(<<-END, __FILE__, __LINE__+1)
-            def to_s(ds)
-              Sequel::Deprecation.deprecate('SQL::Expression#to_s', "Please switch to using Dataset#literal to literalize expressions")
-              s = ''
-              to_s_append(ds, s)
-              s
-            end
-          END
           class_eval("def to_s_append(ds, sql) ds.#{meth}_append(sql, #{args}) end", __FILE__, __LINE__)
         end
       end
