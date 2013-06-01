@@ -640,8 +640,8 @@ describe "Dataset#or" do
     @d1 = @dataset.where(:x => 1)
   end
   
-  qspecify "should raise if no filter exists" do
-    proc {@dataset.or(:a => 1)}.should raise_error(Sequel::Error)
+  specify "should just clone if no where clause exists" do
+    @dataset.or(:a => 1).sql.should == 'SELECT * FROM test'
   end
   
   specify "should just clone if given an empty argument" do
@@ -671,10 +671,6 @@ describe "Dataset#or" do
   specify "should allow the use of blocks and arguments simultaneously" do
     @d1.or(Sequel.expr(:zz) < 3){yy > 3}.sql.should == 'SELECT * FROM test WHERE ((x = 1) OR ((zz < 3) AND (yy > 3)))'
   end
-
-  qspecify "should modify the having clause if there is already a having clause" do
-    @dataset.having(:x => 1).or(:y => 2).sql.should == 'SELECT * FROM test HAVING ((x = 1) OR (y = 2))'
-  end
 end
 
 describe "Dataset#and" do
@@ -683,13 +679,11 @@ describe "Dataset#and" do
     @d1 = @dataset.where(:x => 1)
   end
   
-  qspecify "should raise if no filter exists" do
-    proc {@dataset.and(:a => 1)}.should raise_error(Sequel::Error)
-    proc {@dataset.where(:a => 1).group(:t).and(:b => 2)}.should_not raise_error(Sequel::Error)
-    @dataset.where(:a => 1).group(:t).and(:b => 2).sql.should == "SELECT * FROM test WHERE ((a = 1) AND (b = 2)) GROUP BY t"
+  specify "should add a WHERE filter if none exists" do
+    @dataset.and(:a => 1).sql.should == 'SELECT * FROM test WHERE (a = 1)'
   end
   
-  specify "should add an alternative expression to the where clause" do
+  specify "should add an expression to the where clause" do
     @d1.and(:y => 2).sql.should == 'SELECT * FROM test WHERE ((x = 1) AND (y = 2))'
   end
   
@@ -715,10 +709,6 @@ describe "Dataset#exclude" do
 
   specify "should correctly negate the expression when one condition is given" do
     @dataset.exclude(:region=>'Asia').select_sql.should == "SELECT * FROM test WHERE (region != 'Asia')"
-  end
-
-  qspecify "should affect the having clause if having clause is already used" do
-    @dataset.group_and_count(:name).having{count > 2}.exclude{count > 5}.sql.should == "SELECT name, count(*) AS count FROM test GROUP BY name HAVING ((count > 2) AND (count <= 5))"
   end
 
   specify "should take multiple conditions as a hash and express the logic correctly in SQL" do
@@ -776,8 +766,8 @@ describe "Dataset#invert" do
     @d = Sequel.mock.dataset.from(:test)
   end
 
-  qspecify "should raise error if the dataset is not filtered" do
-    proc{@d.invert}.should raise_error(Sequel::Error)
+  specify "should return a dataset that selects no rows if dataset is not filtered" do
+    @d.invert.sql.should == "SELECT * FROM test WHERE 'f'"
   end
 
   specify "should invert current filter if dataset is filtered" do
@@ -807,14 +797,6 @@ describe "Dataset#having" do
 
   specify "should support proc expressions" do
     @grouped.having{Sequel.function(:sum, :population) > 10}.sql.should == "SELECT region, sum(population), avg(gdp) FROM test GROUP BY region HAVING (sum(population) > 10)"
-  end
-
-  qspecify "should work with and on the having clause" do
-    @grouped.having(Sequel.expr(:a) > 1).and(Sequel.expr(:b) < 2).sql.should == "SELECT region, sum(population), avg(gdp) FROM test GROUP BY region HAVING ((a > 1) AND (b < 2))"
-  end
-
-  qspecify "should work with filter on the having clause" do
-    @grouped.having(Sequel.expr(:a) > 1).filter(Sequel.expr(:b) < 2).sql.should == "SELECT region, sum(population), avg(gdp) FROM test GROUP BY region HAVING ((a > 1) AND (b < 2))"
   end
 end
 

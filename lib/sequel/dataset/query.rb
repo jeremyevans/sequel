@@ -64,22 +64,9 @@ module Sequel
       Sequel.synchronize{EXTENSIONS[ext] = block}
     end
 
-    # Adds an further filter to an existing filter using AND. If no filter 
-    # exists an error is raised. This method is identical to #filter except
-    # it expects an existing filter.
-    #
-    #   DB[:table].filter(:a).and(:b) # SELECT * FROM table WHERE a AND b
+    # Alias for where.
     def and(*cond, &block)
-      unless @opts[:having] || @opts[:where]
-        Sequel::Deprecation.deprecate('Dataset#and will no longer raise for an unfilered dataset starting in Sequel 4.')
-        raise(InvalidOperation, "No existing filter found.")
-      end
-      if @opts[:having]
-        Sequel::Deprecation.deprecate('Dataset#and will no longer modify the HAVING clause starting in Sequel 4.  Switch to using Dataset#having or use the filter_having extension.')
-        having(*cond, &block)
-      else
-        where(*cond, &block)
-      end
+      where(*cond, &block)
     end
     
     # Returns a new clone of the dataset with with the given options merged.
@@ -138,7 +125,7 @@ module Sequel
       compound_clone(:except, dataset, opts)
     end
 
-    # Performs the inverse of Dataset#filter.  Note that if you have multiple filter
+    # Performs the inverse of Dataset#where.  Note that if you have multiple filter
     # conditions, this is not the same as a negation of all conditions.
     #
     #   DB[:items].exclude(:category => 'software')
@@ -147,8 +134,7 @@ module Sequel
     #   DB[:items].exclude(:category => 'software', :id=>3)
     #   # SELECT * FROM items WHERE ((category != 'software') OR (id != 3))
     def exclude(*cond, &block)
-      Sequel::Deprecation.deprecate('Dataset#exclude will no longer modify the HAVING clause starting in Sequel 4.  Switch to using Dataset#exclude_having or use the filter_having extension.') if @opts[:having]
-      _filter_or_exclude(true, @opts[:having] ? :having : :where, *cond, &block)
+      _filter_or_exclude(true, :where, *cond, &block)
     end
 
     # Inverts the given conditions and adds them to the HAVING clause.
@@ -159,18 +145,9 @@ module Sequel
       _filter_or_exclude(true, :having, *cond, &block)
     end
 
-    # Inverts the given conditions and adds them to the WHERE clause.
-    #
-    #   DB[:items].select_group(:name).exclude_where(:category => 'software')
-    #   # SELECT * FROM items WHERE (category != 'software')
-    #
-    #   DB[:items].select_group(:name).
-    #     exclude_having{count(name) < 2}.
-    #     exclude_where(:category => 'software')
-    #   # SELECT name FROM items WHERE (category != 'software')
-    #   # GROUP BY name HAVING (count(name) >= 2)
+    # Alias for exclude.
     def exclude_where(*cond, &block)
-      _filter_or_exclude(true, :where, *cond, &block)
+      exclude(*cond, &block)
     end
 
     # Return a clone of the dataset loaded with the extensions, see #extension!.
@@ -178,61 +155,9 @@ module Sequel
       clone.extension!(*exts)
     end
 
-    # Returns a copy of the dataset with the given conditions imposed upon it.  
-    # If the query already has a HAVING clause, then the conditions are imposed in the 
-    # HAVING clause. If not, then they are imposed in the WHERE clause.
-    # 
-    # filter accepts the following argument types:
-    #
-    # * Hash - list of equality/inclusion expressions
-    # * Array - depends:
-    #   * If first member is a string, assumes the rest of the arguments
-    #     are parameters and interpolates them into the string.
-    #   * If all members are arrays of length two, treats the same way
-    #     as a hash, except it allows for duplicate keys to be
-    #     specified.
-    #   * Otherwise, treats each argument as a separate condition.
-    # * String - taken literally
-    # * Symbol - taken as a boolean column argument (e.g. WHERE active)
-    # * Sequel::SQL::BooleanExpression - an existing condition expression,
-    #   probably created using the Sequel expression filter DSL.
-    #
-    # filter also takes a block, which should return one of the above argument
-    # types, and is treated the same way.  This block yields a virtual row object,
-    # which is easy to use to create identifiers and functions.  For more details
-    # on the virtual row support, see the {"Virtual Rows" guide}[link:files/doc/virtual_rows_rdoc.html]
-    #
-    # If both a block and regular argument are provided, they get ANDed together.
-    #
-    # Examples:
-    #
-    #   DB[:items].filter(:id => 3)
-    #   # SELECT * FROM items WHERE (id = 3)
-    #
-    #   DB[:items].filter('price < ?', 100)
-    #   # SELECT * FROM items WHERE price < 100
-    #
-    #   DB[:items].filter([[:id, [1,2,3]], [:id, 0..10]])
-    #   # SELECT * FROM items WHERE ((id IN (1, 2, 3)) AND ((id >= 0) AND (id <= 10)))
-    #
-    #   DB[:items].filter('price < 100')
-    #   # SELECT * FROM items WHERE price < 100
-    #
-    #   DB[:items].filter(:active)
-    #   # SELECT * FROM items WHERE :active
-    #
-    #   DB[:items].filter{price < 100}
-    #   # SELECT * FROM items WHERE (price < 100)
-    # 
-    # Multiple filter calls can be chained for scoping:
-    #
-    #   software = dataset.filter(:category => 'software').filter{price < 100}
-    #   # SELECT * FROM items WHERE ((category = 'software') AND (price < 100))
-    #
-    # See the the {"Dataset Filtering" guide}[link:files/doc/dataset_filtering_rdoc.html] for more examples and details.
+    # Alias for where.
     def filter(*cond, &block)
-      Sequel::Deprecation.deprecate('Dataset#filter will no longer modify the HAVING clause starting in Sequel 4.  Switch to using Dataset#having or use the filter_having extension.') if @opts[:having]
-      _filter(@opts[:having] ? :having : :where, *cond, &block)
+      where(*cond, &block)
     end
     
     # Returns a cloned dataset with a :update lock style.
@@ -399,7 +324,7 @@ module Sequel
       clone(:group_options=>:rollup)
     end
 
-    # Returns a copy of the dataset with the HAVING conditions changed. See #filter for argument types.
+    # Returns a copy of the dataset with the HAVING conditions changed. See #where for argument types.
     #
     #   DB[:items].group(:sum).having(:sum=>10)
     #   # SELECT * FROM items GROUP BY sum HAVING (sum = 10)
@@ -434,7 +359,8 @@ module Sequel
       compound_clone(:intersect, dataset, opts)
     end
 
-    # Inverts the current filter.
+    # Inverts the current WHERE and HAVING clauses.  If there is neither a
+    # WHERE or HAVING clause, adds a WHERE clause that is always false.
     #
     #   DB[:items].filter(:category => 'software').invert
     #   # SELECT * FROM items WHERE (category != 'software')
@@ -442,15 +368,15 @@ module Sequel
     #   DB[:items].filter(:category => 'software', :id=>3).invert
     #   # SELECT * FROM items WHERE ((category != 'software') OR (id != 3))
     def invert
-      having, where = @opts[:having], @opts[:where]
-      unless having || where
-        Sequel::Deprecation.deprecate('Dataset#invert will no longer raise for an unfilered dataset starting in Sequel 4.')
-        raise(Error, "No current filter")
+      having, where = @opts.values_at(:having, :where)
+      if having.nil? && where.nil?
+        where(false)
+      else
+        o = {}
+        o[:having] = SQL::BooleanExpression.invert(having) if having
+        o[:where] = SQL::BooleanExpression.invert(where) if where
+        clone(o)
       end
-      o = {}
-      o[:having] = SQL::BooleanExpression.invert(having) if having
-      o[:where] = SQL::BooleanExpression.invert(where) if where
-      clone(o)
     end
 
     # Alias of +inner_join+
@@ -657,17 +583,12 @@ module Sequel
     #
     #   DB[:items].filter(:a).or(:b) # SELECT * FROM items WHERE a OR b
     def or(*cond, &block)
-      clause = (@opts[:having] ? :having : :where)
-      unless @opts[clause]
-        Sequel::Deprecation.deprecate('Dataset#or will no longer raise for an unfilered dataset starting in Sequel 4.')
-        raise(InvalidOperation, "No existing filter found.")
-      end
-      Sequel::Deprecation.deprecate('Dataset#or will no longer modify the HAVING clause starting in Sequel 4.  You can use the filter_having extension to continue to use the current behavior.') if clause == :having
       cond = cond.first if cond.size == 1
-      if cond.respond_to?(:empty?) && cond.empty? && !block
+      v = @opts[:where]
+      if v.nil? || (cond.respond_to?(:empty?) && cond.empty? && !block)
         clone
       else
-        clone(clause => SQL::BooleanExpression.new(:OR, @opts[clause], filter_expr(cond, &block)))
+        clone(:where => SQL::BooleanExpression.new(:OR, v, filter_expr(cond, &block)))
       end
     end
 
@@ -981,13 +902,56 @@ module Sequel
       order(nil)
     end
     
-    # Add a condition to the WHERE clause.  See +filter+ for argument types.
+    # Returns a copy of the dataset with the given WHERE conditions imposed upon it.  
+    # 
+    # Accepts the following argument types:
     #
-    #   DB[:items].group(:a).having(:a).filter(:b)
-    #   # SELECT * FROM items GROUP BY a HAVING a AND b
+    # * Hash - list of equality/inclusion expressions
+    # * Array - depends:
+    #   * If first member is a string, assumes the rest of the arguments
+    #     are parameters and interpolates them into the string.
+    #   * If all members are arrays of length two, treats the same way
+    #     as a hash, except it allows for duplicate keys to be
+    #     specified.
+    #   * Otherwise, treats each argument as a separate condition.
+    # * String - taken literally
+    # * Symbol - taken as a boolean column argument (e.g. WHERE active)
+    # * Sequel::SQL::BooleanExpression - an existing condition expression,
+    #   probably created using the Sequel expression filter DSL.
     #
-    #   DB[:items].group(:a).having(:a).where(:b)
-    #   # SELECT * FROM items WHERE b GROUP BY a HAVING a
+    # where also accepts a block, which should return one of the above argument
+    # types, and is treated the same way.  This block yields a virtual row object,
+    # which is easy to use to create identifiers and functions.  For more details
+    # on the virtual row support, see the {"Virtual Rows" guide}[link:files/doc/virtual_rows_rdoc.html]
+    #
+    # If both a block and regular argument are provided, they get ANDed together.
+    #
+    # Examples:
+    #
+    #   DB[:items].filter(:id => 3)
+    #   # SELECT * FROM items WHERE (id = 3)
+    #
+    #   DB[:items].filter('price < ?', 100)
+    #   # SELECT * FROM items WHERE price < 100
+    #
+    #   DB[:items].filter([[:id, [1,2,3]], [:id, 0..10]])
+    #   # SELECT * FROM items WHERE ((id IN (1, 2, 3)) AND ((id >= 0) AND (id <= 10)))
+    #
+    #   DB[:items].filter('price < 100')
+    #   # SELECT * FROM items WHERE price < 100
+    #
+    #   DB[:items].filter(:active)
+    #   # SELECT * FROM items WHERE :active
+    #
+    #   DB[:items].filter{price < 100}
+    #   # SELECT * FROM items WHERE (price < 100)
+    # 
+    # Multiple filter calls can be chained for scoping:
+    #
+    #   software = dataset.filter(:category => 'software').filter{price < 100}
+    #   # SELECT * FROM items WHERE ((category = 'software') AND (price < 100))
+    #
+    # See the the {"Dataset Filtering" guide}[link:files/doc/dataset_filtering_rdoc.html] for more examples and details.
     def where(*cond, &block)
       _filter(:where, *cond, &block)
     end
@@ -1085,7 +1049,8 @@ module Sequel
 
     private
 
-    # Internal filter/exclude method so it works on either the having or where clauses.
+    # Internal filtering method so it works on either the WHERE or HAVING clauses, with or
+    # without inversion.
     def _filter_or_exclude(invert, clause, *cond, &block)
       cond = cond.first if cond.size == 1
       if cond.respond_to?(:empty?) && cond.empty? && !block
