@@ -40,8 +40,6 @@ module Sequel
       when 1
         case vals = values.at(0)
         when Hash
-          vals = @opts[:defaults].merge(vals) if @opts[:defaults]
-          vals = vals.merge(@opts[:overrides]) if @opts[:overrides]
           values = []
           vals.each do |k,v| 
             columns << k
@@ -1467,8 +1465,6 @@ module Sequel
       values = opts[:values]
       sql << SET
       if values.is_a?(Hash)
-        values = opts[:defaults].merge(values) if opts[:defaults]
-        values = values.merge(opts[:overrides]) if opts[:overrides]
         c = false
         eq = EQUAL
         values.each do |k, v|

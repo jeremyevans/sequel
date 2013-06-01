@@ -16,7 +16,17 @@
 
 module Sequel
   module SetOverrides
+    Dataset::NON_SQL_OPTIONS.concat([:defaults, :overrides])
     Dataset.def_mutation_method(:set_defaults, :set_overrides, :module=>self)
+
+    # Set overrides/defaults for insert hashes
+    def insert_sql(*values)
+      if values.size == 1 && (vals = values.first).is_a?(Hash)
+        super(merge_defaults_overrides(vals))
+      else
+        super
+      end
+    end
 
     # Set the default values for insert and update statements.  The values hash passed
     # to insert or update are merged into this hash, so any values in the hash passed
@@ -36,6 +46,24 @@ module Sequel
     #   # INSERT INTO items (a, c, b) VALUES ('a', 'c', 'b')
     def set_overrides(hash)
       clone(:overrides=>hash.merge(@opts[:overrides]||{}))
+    end
+
+    # Set overrides/defaults for update hashes
+    def update_sql(values = {})
+      if values.is_a?(Hash)
+        super(merge_defaults_overrides(values))
+      else
+        super
+      end
+    end
+
+    private
+
+    # Return new hashe with merged defaults and overrides.
+    def merge_defaults_overrides(vals)
+      vals = @opts[:defaults].merge(vals) if @opts[:defaults]
+      vals = vals.merge(@opts[:overrides]) if @opts[:overrides]
+      vals
     end
   end
 

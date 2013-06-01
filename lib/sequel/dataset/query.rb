@@ -761,28 +761,6 @@ module Sequel
       clone(:server=>servr)
     end
 
-    # Set the default values for insert and update statements.  The values hash passed
-    # to insert or update are merged into this hash, so any values in the hash passed
-    # to insert or update will override values passed to this method.  
-    #
-    #   DB[:items].set_defaults(:a=>'a', :c=>'c').insert(:a=>'d', :b=>'b')
-    #   # INSERT INTO items (a, c, b) VALUES ('d', 'c', 'b')
-    def set_defaults(hash)
-      Sequel::Deprecation.deprecate('Dataset#set_defaults', 'Please use the dataset_set_overrides extension if you want to continue using it')
-      clone(:defaults=>(@opts[:defaults]||{}).merge(hash))
-    end
-
-    # Set values that override hash arguments given to insert and update statements.
-    # This hash is merged into the hash provided to insert or update, so values
-    # will override any values given in the insert/update hashes.
-    #
-    #   DB[:items].set_overrides(:a=>'a', :c=>'c').insert(:a=>'d', :b=>'b')
-    #   # INSERT INTO items (a, c, b) VALUES ('a', 'c', 'b')
-    def set_overrides(hash)
-      Sequel::Deprecation.deprecate('Dataset#set_overrides', 'Please use the dataset_set_overrides extension if you want to continue using it')
-      clone(:overrides=>hash.merge(@opts[:overrides]||{}))
-    end
-    
     # Unbind bound variables from this dataset's filter and return an array of two
     # objects.  The first object is a modified dataset where the filter has been
     # replaced with one that uses bound variable placeholders.  The second object
