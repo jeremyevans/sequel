@@ -36,7 +36,7 @@ Sequel.extension :meta_def
 Sequel.extension :core_refinements if RUBY_VERSION >= '2.0.0'
 
 # Load most extensions by default, so that any conflicts are easily detectable.
-Sequel.extension(*%w'string_date_time inflector pagination query pretty_table blank migration schema_dumper looser_typecasting sql_expr thread_local_timezones to_dot columns_introspection server_block arbitrary_servers pg_auto_parameterize pg_statement_cache pg_array pg_array_ops pg_hstore pg_hstore_ops pg_range pg_range_ops pg_json pg_inet pg_row pg_row_ops schema_caching null_dataset select_remove query_literals eval_inspect')
+Sequel.extension(*%w'string_date_time inflector pagination query pretty_table blank migration schema_dumper looser_typecasting sql_expr thread_local_timezones to_dot columns_introspection server_block arbitrary_servers pg_array pg_array_ops pg_hstore pg_hstore_ops pg_range pg_range_ops pg_json pg_inet pg_row pg_row_ops schema_caching null_dataset select_remove query_literals eval_inspect')
 
 Sequel::Dataset.introspect_all_columns if ENV['SEQUEL_COLUMNS_INTROSPECTION']
 
