@@ -64,10 +64,6 @@ module Sequel
       def execute_dui(sql, opts={})
         synchronize(opts[:server]){|conn| log_yield(sql){conn.do(sql)}}
       end
-      def do(*a, &block)
-        Sequel::Deprecation.deprecate('Database#do', 'Please use Database#execute_dui')
-        execute_dui(*a, &block)
-      end
 
       private
 

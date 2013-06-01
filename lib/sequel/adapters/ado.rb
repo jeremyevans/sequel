@@ -81,10 +81,6 @@ module Sequel
         end
         nil
       end
-      def do(*a, &block)
-        Sequel::Deprecation.deprecate('Database#do', 'Please use Database#execute')
-        execute(*a, &block)
-      end
 
       private
       

@@ -26,10 +26,6 @@ module Sequel
           r
         end
       end
-      def do(*a, &block)
-        Sequel::Deprecation.deprecate('Database#do', 'Please use Database#execute')
-        execute(*a, &block)
-      end
     end
     
     class Dataset < Sequel::Dataset

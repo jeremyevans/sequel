@@ -64,10 +64,6 @@ module Sequel
       def execute(sql, opts={}, &block)
         _execute(nil, sql, opts, &block)
       end
-      def do(*a, &block)
-        Sequel::Deprecation.deprecate('Database#do', 'Please use Database#execute')
-        execute_dui(*a, &block)
-      end
 
       def execute_insert(sql, opts={})
         _execute(:insert, sql, opts)

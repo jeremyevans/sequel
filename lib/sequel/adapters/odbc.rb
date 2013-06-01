@@ -56,10 +56,6 @@ module Sequel
           end
         end
       end
-      def do(*a, &block)
-        Sequel::Deprecation.deprecate('Database#do', 'Please use Database#execute_dui')
-        execute_dui(*a, &block)
-      end
 
       private
       
