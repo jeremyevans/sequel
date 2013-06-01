@@ -36,10 +36,6 @@ module Sequel
     #
     # The following general options are respected:
     #
-    # :disconnect :: If set to :retry, automatically sets the :retry_on option
-    #                with a Sequel::DatabaseDisconnectError.  This option is only
-    #                present for backwards compatibility, please use the :retry_on
-    #                option instead.
     # :isolation :: The transaction isolation level to use for this transaction,
     #               should be :uncommitted, :committed, :repeatable, or :serializable,
     #               used if given and the database/adapter supports customizable
@@ -73,12 +69,6 @@ module Sequel
     #                 appropriately.  Valid values true, :on, false, :off, :local (9.1+),
     #                 and :remote_write (9.2+).
     def transaction(opts={}, &block)
-      if opts[:disconnect] == :retry
-        Sequel::Deprecation.deprecate('Database#transaction :disconnect=>:retry option', 'Please switch to :retry_on=>Sequel::DatabaseDisconnectError.')
-        raise(Error, 'cannot specify both :disconnect=>:retry and :retry_on') if opts[:retry_on]
-        return transaction(opts.merge(:retry_on=>Sequel::DatabaseDisconnectError, :disconnect=>nil), &block)
-      end
-
       if retry_on = opts[:retry_on]
         num_retries = opts.fetch(:num_retries, 5)
         begin
@@ -96,7 +86,7 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           if already_in_transaction?(conn, opts)
             if opts[:retrying]
-              raise Sequel::Error, "cannot set :disconnect=>:retry or :retry_on options if you are already inside a transaction"
+              raise Sequel::Error, "cannot set :retry_on options if you are already inside a transaction"
             end
             return yield(conn)
           end

@@ -619,13 +619,6 @@ shared_examples_for "Database#transaction" do
                        'BEGIN', 'SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', 'DROP TABLE serializable', 'COMMIT']
   end
   
-  qspecify "should support :disconnect=>:retry option for automatically retrying on disconnect" do
-    a = []
-    @db.transaction(:disconnect=>:retry){a << 1; raise Sequel::DatabaseDisconnectError if a.length < 2}
-    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'BEGIN', 'COMMIT']
-    a.should == [1, 1]
-  end
-  
   specify "should support :retry_on option for automatically retrying transactions" do
     a = []
     @db.transaction(:retry_on=>Sequel::DatabaseDisconnectError){a << 1; raise Sequel::DatabaseDisconnectError if a.length < 2}
@@ -668,12 +661,7 @@ shared_examples_for "Database#transaction" do
     a.should == [1] * 100
   end
   
-  qspecify "should raise an error if using :disconnect=>:retry and :retry_on together" do
-    proc{@db.transaction(:disconnect=>:retry, :retry_on=>Sequel::ConstraintViolation){}}.should raise_error(Sequel::Error)
-    @db.sqls.should == []
-  end
-  
-  specify "should raise an error if attempting to use :disconnect=>:retry or :retry_on inside another transaction" do
+  specify "should raise an error if attempting to use :retry_on inside another transaction" do
     proc{@db.transaction{@db.transaction(:retry_on=>Sequel::ConstraintViolation){}}}.should raise_error(Sequel::Error)
     @db.sqls.should == ['BEGIN', 'ROLLBACK']
   end
