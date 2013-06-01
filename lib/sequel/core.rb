@@ -49,13 +49,6 @@ module Sequel
     # days on +DateTime+).
     attr_accessor :datetime_class
 
-    # REMOVE40
-    def virtual_row_instance_eval
-      Sequel::Deprecation.deprecate('Sequel.virtual_row_instance_eval', 'It has no effect, so you can safely stop calling it.')
-    end
-    def virtual_row_instance_eval=(v)
-      Sequel::Deprecation.deprecate('Sequel.virtual_row_instance_eval=', 'It has no effect, so you can safely stop calling it.')
-    end
     def k_require(*a)
       Sequel::Deprecation.deprecate('Sequel.k_require', 'Please switch to Kernel.require')
       Kernel.require(*a)
