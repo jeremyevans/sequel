@@ -636,23 +636,15 @@ module Sequel
 
           private
           
-          # PostgreSQL most of the time requires type information for each of
-          # arguments to a prepared statement.  Handle this by allowing the
-          # named argument to have a __* suffix, with the * being the type.
-          # In the generated SQL, cast the bound argument to that type to
-          # elminate ambiguity (and PostgreSQL from raising an exception).
           def prepared_arg(k)
-            y, type = k.to_s.split("__")
+            y = k
             if i = prepared_args.index(y)
               i += 1
             else
               prepared_args << y
               i = prepared_args.length
             end
-            if type
-              Sequel::Deprecation.deprecate('Specifying prepared statement argument types via the __type suffix', "If a manual cast is really need, surround the prepared statement argument in Sequel.cast")
-            end
-            LiteralString.new("#{prepared_arg_placeholder}#{i}#{"::#{type}" if type}")
+            LiteralString.new("#{prepared_arg_placeholder}#{i}")
           end
 
           # Always assume a prepared argument.
