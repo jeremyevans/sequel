@@ -1018,18 +1018,13 @@ module Sequel
       #   Artist.new do |a|
       #     a.name = 'Bob'
       #   end
-      def initialize(values = {}, from_db = false)
-        if from_db
-          Sequel::Deprecation.deprecate('Passing two arguments to Model.new', 'Please use Model.call instead')
-          set_values(values)
-        else
-          @values = {}
-          @new = true
-          @modified = true
-          initialize_set(values)
-          changed_columns.clear 
-          yield self if block_given?
-        end
+      def initialize(values = {})
+        @values = {}
+        @new = true
+        @modified = true
+        initialize_set(values)
+        changed_columns.clear 
+        yield self if block_given?
         after_initialize
       end
       
