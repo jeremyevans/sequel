@@ -5,10 +5,6 @@ unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
 
-if ENV['SEQUEL_COLUMNS_INTROSPECTION']
-  Sequel.extension :columns_introspection
-  Sequel::Dataset.introspect_all_columns
-end
 
 (defined?(RSpec) ? RSpec::Core::ExampleGroup : Spec::Example::ExampleGroup).class_eval do
   if ENV['SEQUEL_DEPRECATION_WARNINGS']
@@ -56,3 +52,9 @@ def db.schema(*) [[:id, {:primary_key=>true}]] end
 def db.reset() sqls end
 def db.supports_schema_parsing?() true end
 Sequel::Model.db = MODEL_DB = db
+
+if ENV['SEQUEL_COLUMNS_INTROSPECTION']
+  Sequel.extension :columns_introspection
+  Sequel::Database.extension :columns_introspection
+  Sequel::Mock::Dataset.send(:include, Sequel::ColumnsIntrospection)
+end

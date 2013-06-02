@@ -410,9 +410,9 @@ describe "Database#dataset_class" do
   end
 
   specify "should have getter return the class to use to create datasets" do
-    @db.dataset_class.should == Sequel::Dataset
+    [@db.dataset_class, @db.dataset_class.superclass].should include(Sequel::Dataset)
     @db.dataset_class = @dsc
-    @db.dataset_class.should == @dsc
+    [@db.dataset_class, @db.dataset_class.superclass].should include(@dsc)
   end
 end
   

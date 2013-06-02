@@ -37,7 +37,9 @@ end
 
 if ENV['SEQUEL_COLUMNS_INTROSPECTION']
   Sequel.extension :columns_introspection
-  Sequel::Dataset.introspect_all_columns
+  Sequel::Database.extension :columns_introspection
+  Sequel.require 'adapters/mock'
+  Sequel::Mock::Dataset.send(:include, Sequel::ColumnsIntrospection)
 end
 
 Sequel.quote_identifiers = false

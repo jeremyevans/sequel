@@ -16,11 +16,7 @@ rescue LoadError
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_(spec|test)\.rb/}
 
-if ENV['SEQUEL_COLUMNS_INTROSPECTION']
-  Sequel.extension :columns_introspection
-  Sequel::Dataset.introspect_all_columns
-end
-
+Sequel::Database.extension :columns_introspection if ENV['SEQUEL_COLUMNS_INTROSPECTION']
 Sequel::Model.use_transactions = false
 Sequel.cache_anonymous_models = false
 

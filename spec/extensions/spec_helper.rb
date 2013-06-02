@@ -33,8 +33,6 @@ end
 Sequel.extension :meta_def
 Sequel.extension :core_refinements if RUBY_VERSION >= '2.0.0'
 
-Sequel::Dataset.introspect_all_columns if ENV['SEQUEL_COLUMNS_INTROSPECTION']
-
 def skip_warn(s)
   warn "Skipping test of #{s}" if ENV["SKIPPED_TEST_WARN"]
 end
@@ -85,3 +83,9 @@ def db.schema(*) [[:id, {:primary_key=>true}]] end
 def db.reset() sqls end
 def db.supports_schema_parsing?() true end
 Sequel::Model.db = MODEL_DB = db
+
+if ENV['SEQUEL_COLUMNS_INTROSPECTION']
+  Sequel.extension :columns_introspection
+  Sequel::Database.extension :columns_introspection
+  Sequel::Mock::Dataset.send(:include, Sequel::ColumnsIntrospection)
+end

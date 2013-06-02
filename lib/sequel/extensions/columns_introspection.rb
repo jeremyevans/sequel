@@ -27,7 +27,7 @@ module Sequel
       if (pcs = probable_columns) && pcs.all?
         @columns = pcs
       else
-        columns_without_introspection
+        super
       end
     end
 
@@ -74,17 +74,6 @@ module Sequel
         a = c.aliaz
         a.is_a?(SQL::Identifier) ? a.value.to_sym : a.to_sym
       end
-    end
-  end
-
-  class Dataset
-    alias columns_without_introspection columns
-
-    # Enable column introspection for every dataset.
-    def self.introspect_all_columns
-      Sequel::Deprecation.deprecate('Sequel::Dataset.introspect_all_columns', "Please use Database.extension :columns_introspection to load the extension into all databases")
-      include ColumnsIntrospection
-      remove_method(:columns) if instance_methods(false).map{|x| x.to_s}.include?('columns')
     end
   end
 

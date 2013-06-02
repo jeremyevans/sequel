@@ -2,29 +2,6 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
 Sequel.extension :columns_introspection
 
-describe "Sequel::Dataset.introspect_all_columns" do
-  before do
-    @db = MODEL_DB
-    @ds = @db[:a]
-    class Sequel::Dataset
-      # Handle case where introspect_all_columns has already been called
-      alias columns columns_without_introspection unless instance_methods(false).map{|x| x.to_s}.include?('columns')
-    end
-  end
-  after do
-    class Sequel::Dataset
-      alias columns columns_without_introspection
-    end
-  end
-
-  qspecify "should turn on column introspection by default" do
-    Sequel::Dataset.introspect_all_columns
-    @db.reset
-    @ds.select(:x).columns.should == [:x]
-    @db.sqls.length.should == 0
-  end
-end
-
 describe "columns_introspection extension" do
   before do
     @db = Sequel.mock
@@ -109,11 +86,6 @@ describe "columns_introspection extension" do
 
   specify "should issue a database query if an unsupported type is used" do
     @ds.select(1).columns
-    @db.sqls.length.should == 1
-  end
-
-  specify "should not have column introspection on by default" do
-    @db[:a].select(:x).columns
     @db.sqls.length.should == 1
   end
 end
