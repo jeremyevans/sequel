@@ -494,8 +494,7 @@ module Sequel
     def typecast_value_string(value)
       case value
       when Hash, Array
-        Sequel::Deprecation.deprecate('Automatically typecasting a hash or array to string for a string column', 'Either typecast the input manually or use the looser_typecasting extension')
-        value.to_s
+        raise Sequel::InvalidValue, "invalid value for String: #{value.inspect}"
       else
         value.to_s
       end
