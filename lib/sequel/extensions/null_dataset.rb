@@ -30,6 +30,15 @@
 module Sequel
   class Dataset
     module Nullifiable
+      # Return a cloned nullified dataset.
+      def nullify
+        clone.nullify!
+      end
+
+      # Nullify the current dataset
+      def nullify!
+        extend NullDataset
+      end
     end
 
     module NullDataset
@@ -84,17 +93,6 @@ module Sequel
       (%w'_ddl _dui _insert' << '').each do |m|
         class_eval("private; def execute#{m}(sql, opts=OPTS) end", __FILE__, __LINE__)
       end
-    end
-
-    # Return a cloned nullified dataset.
-    def nullify
-      clone.nullify!
-    end
-
-    # Nullify the current dataset
-    def nullify!
-      Sequel::Deprecation.deprecate('Loading the null_dataset extension globally', "Please use Database/Dataset#extension to load the extension into this dataset") unless is_a?(Nullifiable)
-      extend NullDataset
     end
   end
 

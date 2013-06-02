@@ -14,9 +14,6 @@
 
 module Sequel
   module SelectRemove
-  end
-
-  class Dataset
     # Remove columns from the list of selected columns.  If any of the currently selected
     # columns use expressions/aliases, this will remove selected columns with the given
     # aliases.  It will also remove entries from the selection that match exactly:
@@ -38,7 +35,6 @@ module Sequel
     #
     # There may be other cases where this method does not work correctly, use it with caution.
     def select_remove(*cols)
-      Sequel::Deprecation.deprecate('Loading the select_remove extension globally', "Please use Database/Dataset#extension to load the extension into this dataset") unless is_a?(SelectRemove)
       if (sel = @opts[:select]) && !sel.empty?
         select(*(columns.zip(sel).reject{|c, s| cols.include?(c)}.map{|c, s| s} - cols))
       else

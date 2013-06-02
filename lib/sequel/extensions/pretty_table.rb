@@ -23,12 +23,8 @@ module Sequel
   extension :_pretty_table
 
   module DatasetPrinter
-  end
-
-  class Dataset
     # Pretty prints the records in the dataset as plain-text table.
     def print(*cols)
-      Sequel::Deprecation.deprecate('Loading the pretty_table extension globally', "Please use Database/Dataset#extension to load the extension into this dataset") unless is_a?(DatasetPrinter)
       ds = naked
       rows = ds.all
       Sequel::PrettyTable.print(rows, cols.empty? ? ds.columns : cols)

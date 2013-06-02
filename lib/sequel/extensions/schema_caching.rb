@@ -44,12 +44,8 @@
 
 module Sequel
   module SchemaCaching
-  end
-
-  class Database
     # Dump the cached schema to the filename given in Marshal format.
     def dump_schema_cache(file)
-      Sequel::Deprecation.deprecate('Loading the schema_caching extension globally', "Please use Database#extension to load the extension into this database") unless is_a?(SchemaCaching)
       File.open(file, 'wb'){|f| f.write(Marshal.dump(@schemas))}
       nil
     end
@@ -57,14 +53,12 @@ module Sequel
     # Dump the cached schema to the filename given unless the file
     # already exists.
     def dump_schema_cache?(file)
-      Sequel::Deprecation.deprecate('Loading the schema_caching extension globally', "Please use Database#extension to load the extension into this database") unless is_a?(SchemaCaching)
       dump_schema_cache(file) unless File.exist?(file)
     end
 
     # Replace the schema cache with the data from the given file, which
     # should be in Marshal format.
     def load_schema_cache(file)
-      Sequel::Deprecation.deprecate('Loading the schema_caching extension globally', "Please use Database#extension to load the extension into this database") unless is_a?(SchemaCaching)
       @schemas = Marshal.load(File.read(file))
       nil
     end
@@ -72,7 +66,6 @@ module Sequel
     # Replace the schema cache with the data from the given file if the
     # file exists.
     def load_schema_cache?(file)
-      Sequel::Deprecation.deprecate('Loading the schema_caching extension globally', "Please use Database#extension to load the extension into this database") unless is_a?(SchemaCaching)
       load_schema_cache(file) if File.exist?(file)
     end
   end

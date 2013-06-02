@@ -10,6 +10,12 @@
 module Sequel
   class ToDot
     module DatasetMethods
+      # Return a string that can be processed by the +dot+ program (included
+      # with graphviz) in order to see a visualization of the dataset's
+      # abstract syntax tree.
+      def to_dot
+        ToDot.output(self)
+      end
     end
 
     # The option keys that should be included in the dot output.
@@ -142,16 +148,6 @@ module Sequel
         dot "Unhandled: #{e.inspect}"
       end
       @stack.pop
-    end
-  end
-
-  class Dataset
-    # Return a string that can be processed by the +dot+ program (included
-    # with graphviz) in order to see a visualization of the dataset's
-    # abstract syntax tree.
-    def to_dot
-      Sequel::Deprecation.deprecate('Loading the to_dot extension globally', "Please use Database/Dataset#extension to load the extension into this dataset") unless is_a?(ToDot::DatasetMethods)
-      ToDot.output(self)
     end
   end
 

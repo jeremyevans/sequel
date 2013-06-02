@@ -17,20 +17,14 @@ module Sequel
     def self.extended(db)
       db.extend_datasets(DatasetQuery)
     end
-  end
 
-  class Database
     # Return a dataset modified by the query block
     def query(&block)
-      Sequel::Deprecation.deprecate('Loading the query extension globally', "Please use Database#extension to load the extension into this database") unless is_a?(DatabaseQuery)
       dataset.query(&block)
     end
   end
 
   module DatasetQuery
-  end
-
-  class Dataset
     # Translates a query block into a dataset. Query blocks are an
     # alternative to Sequel's usual method chaining, by using
     # instance_eval with a proxy object:
@@ -45,12 +39,13 @@ module Sequel
     #
     #  dataset = DB[:items].select(:x, :y, :z).filter{(x > 1) & (y > 2)}.reverse(:z)
     def query(&block)
-      Sequel::Deprecation.deprecate('Loading the query extension globally', "Please use Database/Dataset#extension to load the extension into this dataset") unless is_a?(DatasetQuery)
-      query = Query.new(self)
+      query = Dataset::Query.new(self)
       query.instance_eval(&block)
       query.dataset
     end
+  end
 
+  class Dataset
     # Proxy object used by Dataset#query.
     class Query < Sequel::BasicObject
       # The current dataset in the query.  This changes on each method call.
