@@ -21,14 +21,6 @@ describe Sequel::Model::Errors do
     @errors.should_not be_empty
   end
   
-  qspecify "should return errors for a specific attribute using #[]" do
-    @errors[:blah].should == []
-    @errors[:blah] << 'blah'
-    @errors[:blah].should == ['blah']
-
-    @errors[:bleu].should == []
-  end
-  
   specify "should return an array of errors for a specific attribute using #on if there are errors" do
     @errors.add(:blah, 'blah')
     @errors.on(:blah).should == ['blah']
@@ -38,11 +30,6 @@ describe Sequel::Model::Errors do
     @errors.on(:blah).should == nil
   end
   
-  qspecify "should accept errors using #[] <<" do
-    @errors[:blah] << 'blah'
-    @errors[:blah].should == ['blah']
-  end
-    
   specify "should accept errors using #add" do
     @errors.add :blah, 'zzzz'
     @errors[:blah].should == ['zzzz']
