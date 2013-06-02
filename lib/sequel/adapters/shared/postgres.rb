@@ -89,10 +89,8 @@ module Sequel
     module DatabaseMethods
       extend Sequel::Database::ResetIdentifierMangling
 
-      EXCLUDE_SCHEMAS = /pg_*|information_schema/i
       PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
-      SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
       FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'.freeze=>:no_action, 'r'.freeze=>:restrict, 'c'.freeze=>:cascade, 'n'.freeze=>:set_null, 'd'.freeze=>:set_default}.freeze
       POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/
       UNLOGGED = 'UNLOGGED '.freeze
@@ -809,11 +807,12 @@ module Sequel
       # If opts includes a :schema option, or a default schema is used, restrict the dataset to
       # that schema.  Otherwise, just exclude the default PostgreSQL schemas except for public.
       def filter_schema(ds, opts)
-        if schema = opts[:schema]
-          ds.filter(:pg_namespace__nspname=>schema.to_s)
+        expr = if schema = opts[:schema]
+          schema.to_s
         else
-          ds.exclude(:pg_namespace__nspname=>EXCLUDE_SCHEMAS)
+          Sequel.function(:any, Sequel.function(:current_schemas, false))
         end
+        ds.where(:pg_namespace__nspname=>expr)
       end
 
       # Return a hash with oid keys and callable values, used for converting types.
@@ -867,7 +866,7 @@ module Sequel
 
       # Backbone of the tables and views support.
       def pg_class_relname(type, opts)
-        ds = metadata_dataset.from(:pg_class).filter(:relkind=>type).select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace)
+        ds = metadata_dataset.from(:pg_class).filter(:relkind=>type).select(:relname).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace)
         ds = filter_schema(ds, opts)
         m = output_identifier_meth
         if block_given?
