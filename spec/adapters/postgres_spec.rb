@@ -868,7 +868,7 @@ describe "Postgres::Database schema qualified tables" do
 
   specify "#tables should not include tables in a default non-public schema" do
     @db.create_table(:schema_test__schema_test){integer :i}
-    @db.tables.should include(:schema_test)
+    @db.tables(:schema=>:schema_test).should include(:schema_test)
     @db.tables.should_not include(:pg_am)
     @db.tables.should_not include(:domain_udt_usage)
   end
