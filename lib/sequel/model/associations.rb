@@ -189,25 +189,14 @@ module Sequel
         def reciprocal
           cached_fetch(:reciprocal) do
             possible_recips = []
-            fallback_recips = []
 
             associated_class.all_association_reflections.each do |assoc_reflect|
               if reciprocal_association?(assoc_reflect)
-                if deprecated_reciprocal_association?(assoc_reflect)
-                  fallback_recips << assoc_reflect
-                else
-                  possible_recips << assoc_reflect
-                end
+                possible_recips << assoc_reflect
               end
             end
 
-            Sequel::Deprecation.deprecate("Multiple reciprocal association candidates found for #{self[:name]} association (#{possible_recips.map{|r| r[:name]}.join(', ')}).  Choosing the first candidate is", "Please explicitly specify the reciprocal option for the #{self[:name]} association") if possible_recips.size >= 2
-            if possible_recips.empty? && !fallback_recips.empty?
-              possible_recips = fallback_recips
-              Sequel::Deprecation.deprecate("All reciprocal association candidates found for #{self[:name]} association have conditions, blocks, or differing primary keys (#{possible_recips.map{|r| r[:name]}.join(', ')}).  Automatic choosing of an reciprocal association with conditions or blocks is", "Please explicitly specify the reciprocal option for the #{self[:name]} association")
-            end
-
-            unless possible_recips.empty?
+            if possible_recips.length == 1
               cached_set(:reciprocal_type, possible_recips.first[:type]) if reciprocal_type.is_a?(Array)
               possible_recips.first[:name]
             end
@@ -300,14 +289,11 @@ module Sequel
           end
         end
 
-        # REMOVE40: merge into reciprocal_association?
-        def deprecated_reciprocal_association?(assoc_reflect)
-          assoc_reflect[:conditions] || assoc_reflect[:block]
-        end
-
         def reciprocal_association?(assoc_reflect)
           Array(reciprocal_type).include?(assoc_reflect[:type]) &&
-            assoc_reflect.associated_class == self[:model]
+            assoc_reflect.associated_class == self[:model] &&
+            assoc_reflect[:conditions].nil? &&
+            assoc_reflect[:block].nil?
         end
     
         # If +s+ is an array, map +s+ over the block.  Otherwise, just call the
@@ -400,13 +386,8 @@ module Sequel
     
         private
     
-        # REMOVE40: merge into reciprocal_association?
-        def deprecated_reciprocal_association?(assoc_reflect)
-          super || primary_key != assoc_reflect.primary_key
-        end
-
         def reciprocal_association?(assoc_reflect)
-          super && self[:keys] == assoc_reflect[:keys]
+          super && self[:keys] == assoc_reflect[:keys] && primary_key == assoc_reflect.primary_key
         end
 
         # The reciprocal type of a many_to_one association is either
@@ -475,13 +456,8 @@ module Sequel
     
         private
     
-        # REMOVE40: merge into reciprocal_association?
-        def deprecated_reciprocal_association?(assoc_reflect)
-          super || primary_key != assoc_reflect.primary_key
-        end
-
         def reciprocal_association?(assoc_reflect)
-          super && self[:keys] == assoc_reflect[:keys]
+          super && self[:keys] == assoc_reflect[:keys] && primary_key == assoc_reflect.primary_key
         end
 
         # The reciprocal type of a one_to_many association is a many_to_one association.
@@ -644,15 +620,12 @@ module Sequel
 
         private
 
-        # REMOVE40: merge into reciprocal_association?
-        def deprecated_reciprocal_association?(assoc_reflect)
-          super || right_primary_keys != assoc_reflect[:left_primary_key_columns] || self[:left_primary_key_columns] != assoc_reflect.right_primary_keys
-        end
-
         def reciprocal_association?(assoc_reflect)
           super && assoc_reflect[:left_keys] == self[:right_keys] &&
             assoc_reflect[:right_keys] == self[:left_keys] &&
-            assoc_reflect[:join_table] == self[:join_table]
+            assoc_reflect[:join_table] == self[:join_table] &&
+            right_primary_keys == assoc_reflect[:left_primary_key_columns] &&
+            self[:left_primary_key_columns] == assoc_reflect.right_primary_keys
         end
 
         def reciprocal_type

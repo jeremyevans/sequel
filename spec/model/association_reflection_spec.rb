@@ -116,20 +116,6 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
     ParParentThree.association_reflection(:par_parents).reciprocal.should == :par_parent_threes
   end
 
-  qspecify "should handle ambiguous reciprocals" do
-    ParParent.many_to_one :par_parent_two, :class=>ParParentTwo, :key=>:par_parent_two_id
-    ParParent.many_to_one :par_parent_two2, :clone=>:par_parent_two
-    ParParentTwo.one_to_many :par_parents, :class=>ParParent, :key=>:par_parent_two_id
-    ParParentTwo.one_to_many :par_parents2, :clone=>:par_parents
-    ParParent.many_to_many :par_parent_threes, :class=>ParParentThree, :right_key=>:par_parent_three_id
-    ParParent.many_to_many :par_parent_threes2, :clone=>:par_parent_threes
-    ParParentThree.many_to_many :par_parents
-
-    [:par_parent_two, :par_parent_two2].should include(ParParentTwo.association_reflection(:par_parents).reciprocal)
-    [:par_parents, :par_parents2].should include(ParParent.association_reflection(:par_parent_two).reciprocal)
-    [:par_parent_threes, :par_parent_threes2].should include(ParParentThree.association_reflection(:par_parents).reciprocal)
-  end
-
   it "should handle ambiguous reciprocals where only one doesn't have conditions/blocks" do
     ParParent.many_to_one :par_parent_two, :class=>ParParentTwo, :key=>:par_parent_two_id
     ParParent.many_to_one :par_parent_two2, :clone=>:par_parent_two, :conditions=>{:id=>:id}
@@ -171,18 +157,6 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
 
     ParParent.association_reflection(:par_parent_two).reciprocal.should == :par_parents
     ParParent.association_reflection(:par_parent_threes).reciprocal.should == :par_parents
-  end
-
-  qspecify "should handle reciprocals where reciprocal association has conditions/block" do
-    ParParent.many_to_one :par_parent_two, :conditions=>{:id=>:id}
-    ParParentTwo.one_to_many :par_parents
-    ParParent.many_to_many :par_parent_threes do |ds|
-      ds
-    end
-    ParParentThree.many_to_many :par_parents
-
-    ParParentTwo.association_reflection(:par_parents).reciprocal.should == :par_parent_two
-    ParParentThree.association_reflection(:par_parents).reciprocal.should == :par_parent_threes
   end
 end
 
