@@ -965,9 +965,6 @@ module Sequel
           raise(Error, ':eager_loader option must have an arity of 1 or 3') if opts[:eager_loader] && ![1, 3].include?(opts[:eager_loader].arity)
           raise(Error, ':eager_grapher option must have an arity of 1 or 3') if opts[:eager_grapher] && ![1, 3].include?(opts[:eager_grapher].arity)
 
-          Sequel::Deprecation.deprecate('The :eager_loader association option accepting 3 arguments', "Please switch to accepting a single options hash") if opts[:eager_loader] && opts[:eager_loader].arity == 3
-          Sequel::Deprecation.deprecate('The :eager_grapher association option accepting 3 arguments', "Please switch to accepting a single options hash") if opts[:eager_grapher] && opts[:eager_grapher].arity == 3
-
           # dup early so we don't modify opts
           orig_opts = opts.dup
           if opts[:clone]
@@ -1982,11 +1979,7 @@ module Sequel
               associations = assoc.is_a?(Array) ? assoc : [assoc]
             end
           end
-          ds = if loader.arity == 1
-            loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>ta, :callback=>callback)
-          else
-            loader.call(ds, assoc_table_alias, ta)
-          end
+          ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>ta, :callback=>callback)
           ds = ds.order_more(*qualified_expression(r[:order], assoc_table_alias)) if r[:order] and r[:order_eager_graph]
           eager_graph = ds.opts[:eager_graph]
           eager_graph[:requirements][assoc_table_alias] = requirements.dup
@@ -2139,11 +2132,7 @@ module Sequel
             elsif associations.is_a?(Hash) && associations.length == 1 && (pr_assoc = associations.to_a.first) && pr_assoc.first.respond_to?(:call)
               eager_block, associations = pr_assoc
             end
-            if loader.arity == 1
-              loader.call(:key_hash=>key_hash, :rows=>a, :associations=>associations, :self=>self, :eager_block=>eager_block, :id_map=>id_map)
-            else
-              loader.call(key_hash, a, associations)
-            end
+            loader.call(:key_hash=>key_hash, :rows=>a, :associations=>associations, :self=>self, :eager_block=>eager_block, :id_map=>id_map)
             a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])} unless r[:after_load].empty?
           end 
         end
