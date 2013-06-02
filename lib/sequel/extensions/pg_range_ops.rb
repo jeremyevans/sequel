@@ -79,14 +79,6 @@ module Sequel
       OPERATORS.keys.each do |f|
         class_eval("def #{f}(v); operator(:#{f}, v) end", __FILE__, __LINE__)
       end
-      def starts_before(v)
-        Sequel::Deprecation.deprecate('Postgres::PGRangeOp#starts_before', "Please switch to Postgres::PGRangeOp#ends_before")
-        ends_before(v)
-      end
-      def ends_after(v)
-        Sequel::Deprecation.deprecate('Postgres::PGRangeOp#ends_after', "Please switch to Postgres::PGRangeOp#starts_after")
-        starts_after(v)
-      end
 
       # These operators are already supported by the wrapper, but for ranges they
       # return ranges, so wrap the results in another RangeOp.

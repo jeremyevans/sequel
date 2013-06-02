@@ -40,11 +40,6 @@ describe "Sequel::Postgres::RangeOp" do
     @ds.literal(@h.adjacent_to(@h)).should == "(h -|- h)"
   end
 
-  qspecify "should define methods for the deprecated PostgreSQL range operators" do
-    @ds.literal(@h.starts_before(@h)).should == "(h &< h)"
-    @ds.literal(@h.ends_after(@h)).should == "(h &> h)"
-  end
-
   it "should define methods for all of the PostgreSQL range functions" do
     @ds.literal(@h.lower).should == "lower(h)"
     @ds.literal(@h.upper).should == "upper(h)"
