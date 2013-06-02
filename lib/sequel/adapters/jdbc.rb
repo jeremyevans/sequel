@@ -585,7 +585,7 @@ module Sequel
           ts << [m.call(h[:column_name]), s]
         end
         if schemas.length > 1
-          Sequel::Deprecation.deprecate('Schema parsing in the jdbc adapter resulted in columns being returned for a table with the same name in multiple schemas.  This will raise an Error starting in Sequel 4.  Please explicitly qualify your table with a schema.')
+          raise Error, 'Schema parsing in the jdbc adapter resulted in columns being returned for a table with the same name in multiple schemas.  Please explicitly qualify your table with a schema.'
         end
         ts
       end
