@@ -1,5 +1,7 @@
 === HEAD
 
+* Model#_save private method now only takes a single argument (jeremyevans)
+
 * Remove Dataset#columns_without_introspection from columns_introspection extension (jeremyevans)
 
 * Make boolean prepared statement arguments work on sqlite adapter when integer_booleans is true (jeremyevans)

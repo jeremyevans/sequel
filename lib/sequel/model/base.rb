@@ -1321,13 +1321,8 @@ module Sequel
       # :transaction :: set to true or false to override the current
       #                 +use_transactions+ setting
       # :validate :: set to false to skip validation
-      def save(*columns)
+      def save(opts=OPTS)
         raise Sequel::Error, "can't save frozen object" if frozen?
-        opts = columns.last.is_a?(Hash) ? columns.pop : {}
-
-        Sequel::Deprecation.deprecate('Passing columns as separate arguments to Model#save', 'Instead, provide a :columns option with the array of columns to save.') unless columns.empty?
-        columns.concat(Array(opts[:columns])) if opts[:columns]
-
         set_server(opts[:server]) if opts[:server] 
         if opts[:validate] != false
           unless checked_save_failure(opts){_valid?(true, opts)}
@@ -1335,7 +1330,7 @@ module Sequel
             return
           end
         end
-        checked_save_failure(opts){checked_transaction(opts){_save(columns, opts)}}
+        checked_save_failure(opts){checked_transaction(opts){_save(opts)}}
       end
 
       # Saves only changed columns if the object has been modified.
@@ -1630,7 +1625,7 @@ module Sequel
       
       # Internal version of save, split from save to allow running inside
       # it's own transaction.
-      def _save(columns, opts)
+      def _save(opts)
         sh = {:server=>this_server}
         db.after_rollback(sh){after_rollback} if uacr = use_after_commit_rollback
         was_new = false
@@ -1657,7 +1652,8 @@ module Sequel
             around_update do
               called_cu = true
               raise_hook_failure(:before_update) if before_update == false
-              if columns.empty?
+              columns = opts[:columns]
+              if columns.nil?
                 @columns_updated = if opts[:changed]
                   @values.reject{|k,v| !changed_columns.include?(k)}
                 else
@@ -1665,6 +1661,7 @@ module Sequel
                 end
                 changed_columns.clear
               else # update only the specified columns
+                columns = Array(columns)
                 @columns_updated = @values.reject{|k, v| !columns.include?(k)}
                 changed_columns.reject!{|c| columns.include?(c)}
               end

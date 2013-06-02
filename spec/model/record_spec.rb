@@ -127,12 +127,6 @@ describe "Model#save" do
     proc{o.save}.should_not raise_error
   end
   
-  qspecify "should update only the given columns if given" do
-    o = @c.load(:id => 3, :x => 1, :y => nil)
-    o.save(:y)
-    MODEL_DB.sqls.first.should == "UPDATE items SET y = NULL WHERE (id = 3)"
-  end
-  
   it "should respect the :columns option to specify the columns to save" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.save(:columns=>:y)
