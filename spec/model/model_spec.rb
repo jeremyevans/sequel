@@ -609,14 +609,6 @@ describe Sequel::Model, ".[]" do
     sqls.length.should == 1
     sqls.first.should =~ /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
   end
-  
-  qspecify "should work correctly for composite primary key specified as separate arguments" do
-    @c.set_primary_key :node_id, :kind
-    @c[3921, 201].should be_a_kind_of(@c)
-    sqls = MODEL_DB.sqls
-    sqls.length.should == 1
-    sqls.first.should =~ /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
-  end
 end
 
 describe "Model#inspect" do

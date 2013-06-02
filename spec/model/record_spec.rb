@@ -674,11 +674,6 @@ describe Sequel::Model, "with a primary key" do
     model_a.primary_key.should == :a
   end
 
-  qspecify "should support multi argument composite keys" do
-    model_a = Class.new(Sequel::Model){ set_primary_key :a, :b }
-    model_a.primary_key.should == [:a, :b]
-  end
-
   it "should accept single argument composite keys" do
     model_a = Class.new(Sequel::Model){ set_primary_key [:a, :b] }
     model_a.primary_key.should == [:a, :b]

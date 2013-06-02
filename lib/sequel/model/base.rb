@@ -576,18 +576,15 @@ module Sequel
       #     # composite key
       #     set_primary_key [:taggable_id, :tag_id]
       #   end
-      def set_primary_key(*key)
-        Sequel::Deprecation.deprecate('Calling set_primary_key without arguments is deprecated and will raise an exception in Sequel 4. Please use no_primary_key to mark the model as not having a primary key.') if key.length == 0
-        Sequel::Deprecation.deprecate('Calling set_primary_key with multiple arguments is deprecated and will raise an exception in Sequel 4. Please pass an array of keys to setup a composite primary key.') if key.length > 1
-        
+      def set_primary_key(key)
         clear_setter_methods_cache
-        key = key.flatten
-        self.simple_pk = if key.length == 1
-          (@dataset || db).literal(key.first)
-        else 
-          nil 
+        if key.is_a?(Array) && key.length < 2
+          key = key.first
         end
-        @primary_key = (key.length == 1) ? key[0] : key
+        self.simple_pk = if key && !key.is_a?(Array)
+          (@dataset || db).literal(key)
+        end
+        @primary_key = key
       end
   
       # Cache of setter methods to allow by default, in order to speed up new/set/update instance methods.
