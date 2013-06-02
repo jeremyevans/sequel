@@ -1565,6 +1565,7 @@ describe Sequel::Model, "typecasting" do
       columns :x
     end
     @c.db_schema = {:x=>{:type=>:integer}}
+    @c.raise_on_typecast_failure = true
     MODEL_DB.reset
   end
 
