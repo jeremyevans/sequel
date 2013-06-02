@@ -13,30 +13,24 @@ module Sequel
     module AfterInitialize
       module ClassMethods
         # Call after_initialize for model objects loaded from the database.
-        #def call
-        #  v = super
-        #  v.after_initialize
-        #  v
-        #end
-
-        private
-
-        # REMOVE40
-        def check_deprecated_after_initialize(meths)
+        def call(h={})
+          v = super
+          v.after_initialize
+          v
         end
       end
 
       module InstanceMethods
         # Call after_initialize for new model objects.
-        #def initialize(h={})
-        #  super
-        #  after_initialize
-        #end
-        
+        def initialize(h={})
+          super
+          after_initialize
+        end
+       
         # An empty after_initialize hook, so that plugins that use this
         # can always call super to get the default behavior.
-        #def after_initialize
-        #end
+        def after_initialize
+        end
       end
     end
   end

@@ -96,7 +96,7 @@ module Sequel
 
     # Hooks that are called after an action.  When overriding these, it is recommended to call
     # +super+ on the first line of your method, so later hooks are called after earlier hooks.
-    AFTER_HOOKS = [:after_initialize, :after_create, :after_update, :after_save, :after_destroy,
+    AFTER_HOOKS = [:after_create, :after_update, :after_save, :after_destroy,
       :after_validation, :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback]
 
     # Hooks that are called around an action.  If overridden, these methods must call super

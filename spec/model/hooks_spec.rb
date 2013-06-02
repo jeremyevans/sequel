@@ -1,22 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe "Model#after_initialize" do
-  qspecify "should be called after initialization for both new object and objects retrieved from the database" do
-    
-    a = Class.new(Sequel::Model) do
-      self::Foo = []
-      columns :x, :y
-      def after_initialize
-        model::Foo << @values.clone
-      end
-    end
-    
-    a.new(:x => 1, :y => 2)
-    a.call(:x => 1, :y => 3)
-    a::Foo.should == [{:x => 1, :y => 2}, {:x => 1, :y => 3}]
-  end
-end
-
 describe "Model#before_create && Model#after_create" do
   before do
     @c = Class.new(Sequel::Model(:items)) do

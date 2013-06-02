@@ -136,7 +136,6 @@ module Sequel
       def call(values)
         o = allocate
         o.set_values(values)
-        o.after_initialize
         o
       end
       
@@ -351,7 +350,6 @@ module Sequel
       # may contain setter methods.
       def include(mod)
         clear_setter_methods_cache
-        check_deprecated_after_initialize(mod.instance_methods) unless allowed_after_initialize_implementation?(mod)
         Sequel::Deprecation.deprecate('Model#set_values', 'Please override Model.call, Model#_refresh_set_values, and/or Model#_create_set_values depending on the type of behavior you want to change') if mod.public_instance_methods.map{|x| x.to_s}.include?('set_values') && mod.name.to_s !~ /\ASequel::(Model|Model::Associations|Plugins::(ForceEncoding|Serialization|TypecastOnLoad|Composition|PreparedStatementsSafe|Dirty|PgTypecastOnLoad))::InstanceMethods\z/
         super
       end
@@ -416,7 +414,6 @@ module Sequel
       # Clear the setter_methods cache when a setter method is added
       def method_added(meth)
         clear_setter_methods_cache if meth.to_s =~ SETTER_METHOD_REGEXP
-        check_deprecated_after_initialize(meth)
         Sequel::Deprecation.deprecate('Model#set_values', 'Please override Model.call, Model#_refresh_set_values, and/or Model#_create_set_values depending on the type of behavior you want to change') if meth.to_s == 'set_values'
         super
       end
@@ -724,18 +721,6 @@ module Sequel
         end
       end
 
-      # REMOVE40
-      def allowed_after_initialize_implementation?(mod)
-        mod == InstanceMethods || mod.to_s == 'Sequel::Plugins::HookClassMethods::InstanceMethods'
-      end
-  
-      # REMOVE40
-      def check_deprecated_after_initialize(meths)
-        Array(meths).each do |meth|
-          Sequel::Deprecation.deprecate('The Model after_initialize hook', 'Please use the after_initialize plugin to continue using the hook') if meth.to_s == 'after_initialize'
-        end
-      end
-
       # Add the module to the class's dataset_method_modules.  Extend the dataset with the
       # module if the model has a dataset.  Add dataset methods to the class for all
       # public dataset methods.
@@ -1006,8 +991,6 @@ module Sequel
       # Creates new instance and passes the given values to set.
       # If a block is given, yield the instance to the block unless
       # from_db is true.
-      # This method runs the after_initialize hook after
-      # it has optionally yielded itself to the block.
       #
       # Arguments:
       # values :: should be a hash to pass to set. 
@@ -1025,7 +1008,6 @@ module Sequel
         initialize_set(values)
         changed_columns.clear 
         yield self if block_given?
-        after_initialize
       end
       
       # Returns value of the column's attribute.

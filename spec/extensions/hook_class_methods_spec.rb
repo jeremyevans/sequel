@@ -164,25 +164,6 @@ describe Sequel::Model, "hook_class_methods plugin" do
   end
 end
 
-describe "Model#after_initialize" do
-  qspecify "should be called after initialization" do
-    values1 = nil
-    reached_after_initialized = false
-    
-    a = model_class.call Sequel::Model do
-      columns :x, :y
-      after_initialize do
-        values1 = @values.clone
-        reached_after_initialized = true
-      end
-    end
-    
-    a.new(:x => 1, :y => 2)
-    values1.should == {:x => 1, :y => 2}
-    reached_after_initialized.should == true
-  end
-end
-
 describe "Model#before_create && Model#after_create" do
   before do
     MODEL_DB.reset
