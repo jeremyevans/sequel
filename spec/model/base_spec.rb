@@ -462,14 +462,6 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     @c.allowed_columns.should == [:x, :y]
   end
 
-  qspecify "should set the restricted columns correctly" do
-    @c.restricted_columns.should == nil
-    @c.set_restricted_columns :x
-    @c.restricted_columns.should == [:x]
-    @c.set_restricted_columns :x, :y
-    @c.restricted_columns.should == [:x, :y]
-  end
-
   it "should only set allowed columns by default" do
     @c.set_allowed_columns :x, :y
     i = @c.new(:x => 1, :y => 2, :z => 3)
@@ -482,35 +474,6 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     i.update(:x => 7, :z => 9)
     i.values.should == {:x => 7}
     MODEL_DB.sqls.should == ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
-  end
-
-  qspecify "should not set restricted columns by default" do
-    @c.set_restricted_columns :z
-    i = @c.new(:x => 1, :y => 2, :z => 3)
-    i.values.should == {:x => 1, :y => 2}
-    i.set(:x => 4, :y => 5, :z => 6)
-    i.values.should == {:x => 4, :y => 5}
-
-    @c.instance_dataset._fetch = @c.dataset._fetch = {:x => 7}
-    i = @c.new
-    i.update(:x => 7, :z => 9)
-    i.values.should == {:x => 7}
-    MODEL_DB.sqls.should == ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
-  end
-
-  qspecify "should have allowed take precedence over restricted" do
-    @c.set_allowed_columns :x, :y
-    @c.set_restricted_columns :y, :z
-    i = @c.new(:x => 1, :y => 2, :z => 3)
-    i.values.should == {:x => 1, :y => 2}
-    i.set(:x => 4, :y => 5, :z => 6)
-    i.values.should == {:x => 4, :y => 5}
-
-    @c.instance_dataset._fetch = @c.dataset._fetch = {:y => 7}
-    i = @c.new
-    i.update(:y => 7, :z => 9)
-    i.values.should == {:y => 7}
-    MODEL_DB.sqls.should == ["INSERT INTO blahblah (y) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
   end
 end
 
@@ -574,12 +537,6 @@ describe Sequel::Model, ".strict_param_setting" do
     proc{c.update(:z=>1)}.should raise_error(Sequel::Error)
     proc{c.update_all(:id=>1)}.should raise_error(Sequel::Error)
     proc{c.update_only({:x=>1}, :y)}.should raise_error(Sequel::Error)
-  end
-
-  qspecify "should raise an error if a missing/restricted column/method is accessed by *_except" do
-    c = @c.new
-    proc{c.set_except({:x=>1}, :x)}.should raise_error(Sequel::Error)
-    proc{c.update_except({:x=>1}, :x)}.should raise_error(Sequel::Error)
   end
 
   it "should be disabled by strict_param_setting = false" do

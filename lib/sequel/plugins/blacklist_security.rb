@@ -36,6 +36,18 @@ module Sequel
           clear_setter_methods_cache
           @restricted_columns = cols
         end
+
+        # Cache of setter methods to allow by default, in order to speed up new/set/update instance methods.
+        def setter_methods
+          @setter_methods ||= if allowed_columns
+            super
+          else
+            meths = instance_methods.collect{|x| x.to_s}.grep(Model::SETTER_METHOD_REGEXP) - Model::RESTRICTED_SETTER_METHODS
+            meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
+            meths -= restricted_columns.map{|x| "#{x}="} if restricted_columns
+            meths
+          end
+        end
       end
 
       module InstanceMethods
@@ -56,6 +68,19 @@ module Sequel
         #   artist.update_except({:name=>'Jim'}, :hometown) # UPDATE artists SET name = 'Jim' WHERE (id = 1)
         def update_except(hash, *except)
           update_restricted(hash, false, except.flatten)
+        end
+
+        private
+
+        def setter_methods(only, except)
+          if only || except == false
+            super
+          else
+            meths = methods.collect{|x| x.to_s}.grep(Model::SETTER_METHOD_REGEXP) - Model::RESTRICTED_SETTER_METHODS
+            meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && model.restrict_primary_key?
+            meths -= (except || model.restricted_columns).map{|x| "#{x}="}
+            meths
+          end
         end
       end
     end

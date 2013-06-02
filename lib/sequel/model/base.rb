@@ -68,15 +68,6 @@ module Sequel
       # Sequel will not check the number of rows modified (default: true).
       attr_accessor :require_modification
   
-      # REMOVE40
-      def restricted_columns
-        Sequel::Deprecation.deprecate('Model.restricted_columns', 'Please load the blacklist_security plugin to continue using it')
-        @restricted_columns
-      end
-      def _restricted_columns
-        @restricted_columns
-      end
-  
       # Should be the literal primary key column name if this Model's table has a simple primary key, or
       # nil if the model has a compound primary key or no primary key.
       attr_reader :simple_pk
@@ -599,25 +590,6 @@ module Sequel
         @primary_key = (key.length == 1) ? key[0] : key
       end
   
-      # Set the columns to restrict when using mass assignment (e.g. +set+).  Using this means that
-      # attempts to call setter methods for the columns listed here will cause an
-      # exception or be silently skipped (based on the +strict_param_setting+ setting).
-      # If you have any virtual setter methods (methods that end in =) that you
-      # want not to be used during mass assignment, they need to be listed here as well (without the =).
-      #
-      # It's generally a bad idea to rely on a blacklist approach for security.  Using a whitelist
-      # approach such as set_allowed_columns or the instance level set_only or set_fields methods
-      # is usually a better choice.  So use of this method is generally a bad idea.
-      #
-      #   Artist.set_restricted_columns(:records_sold)
-      #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
-      #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
-      def set_restricted_columns(*cols)
-        clear_setter_methods_cache
-        Sequel::Deprecation.deprecate('Model.set_restricted_columns', 'Please switch to Model.set_allowed_columns or use the blacklist_security plugin')
-        @restricted_columns = cols
-      end
-
       # Cache of setter methods to allow by default, in order to speed up new/set/update instance methods.
       def setter_methods
         @setter_methods ||= if allowed_columns
@@ -625,7 +597,6 @@ module Sequel
         else
           meths = instance_methods.collect{|x| x.to_s}.grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
           meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
-          meths -= _restricted_columns.map{|x| "#{x}="} if _restricted_columns
           meths
         end
       end
@@ -1401,17 +1372,6 @@ module Sequel
         set_restricted(hash, false, false)
       end
   
-      # Set all values using the entries in the hash, except for the keys
-      # given in except.  You should probably use +set_fields+ or +set_only+
-      # instead of this method, as blacklist approaches to security are a bad idea.
-      #
-      #   artist.set_except({:name=>'Jim'}, :hometown)
-      #   artist.name # => 'Jim'
-      def set_except(hash, *except)
-        Sequel::Deprecation.deprecate('Model#set_except', 'Please switch to Model#set_only or use the blacklist_security plugin')
-        set_restricted(hash, false, except.flatten)
-      end
-  
       # For each of the fields in the given array +fields+, call the setter
       # method with the value of that +hash+ entry for the field. Returns self.
       #
@@ -1524,16 +1484,6 @@ module Sequel
       #   artist.update_all(:name=>'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update_all(hash)
         update_restricted(hash, false, false)
-      end
-  
-      # Update all values using the entries in the hash, except for the keys
-      # given in except.  You should probably use +update_fields+ or +update_only+
-      # instead of this method, as blacklist approaches to security are a bad idea.
-      #
-      #   artist.update_except({:name=>'Jim'}, :hometown) # UPDATE artists SET name = 'Jim' WHERE (id = 1)
-      def update_except(hash, *except)
-        Sequel::Deprecation.deprecate('Model#update_except', 'Please switch to Model#update_only or use the blacklist_security plugin')
-        update_restricted(hash, false, except.flatten)
       end
   
       # Update the instances values by calling +set_fields+ with the arguments, then
@@ -1931,13 +1881,11 @@ module Sequel
       # well, see Model.unrestrict_primary_key to change this.
       def setter_methods(only, except)
         only = only.nil? ? model.allowed_columns : only
-        except = except.nil? ? model._restricted_columns : except
         if only
           only.map{|x| "#{x}="}
         else
           meths = methods.collect{|x| x.to_s}.grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
           meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && model.restrict_primary_key?
-          meths -= except.map{|x| "#{x}="} if except
           meths
         end
       end
