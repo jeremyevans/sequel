@@ -36,12 +36,6 @@ module Sequel
       end
     
       module InstanceMethods
-        # Allow the force encoding plugin to work with the identity_map
-        # plugin by typecasting new values.
-        def merge_db_update(row)
-          super(force_hash_encoding(row))
-        end
-        
         # Force the encoding of all string values when setting the instance's values.
         def set_values(row)
           super(force_hash_encoding(row))

@@ -108,22 +108,6 @@ describe "force_encoding plugin" do
     o.x.should == 'blah'
     o.x.encoding.should == @e1
   end
-  
-  specify "should work when used with the identity_map plugin if the identity_map plugin is setup first" do
-    @c = Class.new(Sequel::Model) do
-    end
-    @c.columns :id, :x
-    @c.plugin :identity_map
-    @c.plugin :force_encoding, 'UTF-8'
-    @c.with_identity_map do
-      o = @c.load(:id=>1)
-      s = 'blah'
-      s.force_encoding('US-ASCII')
-      @c.load(:id=>1, :x=>s)
-      o.x.should == 'blah'
-      o.x.encoding.should == @e1
-    end
-  end
 end 
 else
   skip_warn "force_encoding plugin: only works on ruby 1.9+"

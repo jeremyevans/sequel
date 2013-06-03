@@ -11,10 +11,8 @@ module Sequel
     # get the reviews for all of those albums:
     #
     #   Album.plugin :lazy_attributes, :review
-    #   Sequel::Model.with_identity_map do
-    #     Album.filter{id<100}.all do |a|
-    #       a.review
-    #     end
+    #   Album.filter{id<100}.all do |a|
+    #     a.review
     #   end
     #
     #   # You can specify multiple columns to lazily load:
