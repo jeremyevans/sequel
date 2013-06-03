@@ -183,20 +183,6 @@ describe Sequel::Model, ".plugin" do
     @c.dataset.ghi.should == 345
   end
 
-  qspecify "should define class methods for all public instance methods in DatasetMethod" do
-    m = Module.new do
-      self::DatasetMethods = Module.new do
-        def a; 1; end
-        def b; 2; end
-      end
-    end
-    @c.plugin m
-    @c.dataset.a.should == 1
-    @c.dataset.b.should == 2
-    @c.a.should == 1
-    @c.b.should == 2
-  end
-  
   it "should not define class methods for private instance methods in DatasetMethod" do
     m = Module.new do
       self::DatasetMethods = Module.new do

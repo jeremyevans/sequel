@@ -421,18 +421,9 @@ module Sequel
           @plugins << m
           m.apply(self, *args, &block) if m.respond_to?(:apply)
           include(m::InstanceMethods) if plugin_module_defined?(m, :InstanceMethods)
-          extend(m::ClassMethods)if plugin_module_defined?(m, :ClassMethods)
+          extend(m::ClassMethods) if plugin_module_defined?(m, :ClassMethods)
           if plugin_module_defined?(m, :DatasetMethods)
             dataset_extend(m::DatasetMethods, :create_class_methods=>false)
-            # REMOVE40
-            m::DatasetMethods.public_instance_methods.each do |meth|
-              unless respond_to?(meth, true)
-                (class << self; self; end).send(:define_method, meth) do |*args, &block|
-                  Sequel::Deprecation.deprecate('Automatically defining Model class methods for plugin public dataset methods', "Please modify the plugin to use Plugins.def_dataset_method for #{meth}")
-                  dataset.send(meth, *args, &block)
-                end
-              end
-            end
           end
         end
         m.configure(self, *args, &block) if m.respond_to?(:configure)
