@@ -77,7 +77,7 @@ describe "Sequel::Plugins::Timestamps" do
       columns :id, :x
       plugin :timestamps
       db.reset
-      def _refresh(ds); self end
+      def _save_refresh; self end
     end
     c.create(:x=>2)
     c.load(:id=>1, :x=>2).save

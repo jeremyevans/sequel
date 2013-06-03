@@ -217,17 +217,6 @@ describe "Serialization plugin" do
       "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
-  it "should clear the deserialized columns when using set_values" do
-    @c.set_primary_key :id
-    @c.plugin :serialization, :yaml, :abc, :def
-    o = @c.load(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
-    o.abc = 23
-    o.deserialized_values.length.should == 1
-    o.abc.should == 23
-    o.set_values(:id=>1)
-    o.deserialized_values.length.should == 0
-  end
-  
   it "should clear the deserialized columns when refreshing" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
@@ -239,16 +228,16 @@ describe "Serialization plugin" do
     o.deserialized_values.length.should == 0
   end
   
-  it "should clear the deserialized columns when refreshing after saving a new object" do
+  it "should not clear the deserialized columns when refreshing after saving a new object" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
     o = @c.new(:abc => "--- 1\n", :def => "--- hello\n")
     o.deserialized_values.length.should == 2
     o.save
-    o.deserialized_values.length.should == 0
+    o.deserialized_values.length.should == 2
   end
   
-  it "should clear the deserialized columns when refreshing after saving a new object with insert_select" do
+  it "should not clear the deserialized columns when refreshing after saving a new object with insert_select" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
     def (@c.instance_dataset).supports_insert_select?() true end
@@ -256,7 +245,7 @@ describe "Serialization plugin" do
     o = @c.new(:abc => "--- 1\n", :def => "--- hello\n")
     o.deserialized_values.length.should == 2
     o.save
-    o.deserialized_values.length.should == 0
+    o.deserialized_values.length.should == 2
   end
   
   it "should raise an error if calling internal serialization methods with bad columns" do

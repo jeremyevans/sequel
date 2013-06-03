@@ -149,12 +149,6 @@ module Sequel
       end
 
       module InstanceMethods
-        # Clear the cached compositions when setting values.
-        def set_values(hash)
-          @compositions.clear if @compositions
-          super
-        end
-
         # For each composition, set the columns in the model class based
         # on the composition object.
         def before_save
@@ -170,6 +164,14 @@ module Sequel
         # Freeze compositions hash when freezing model instance.
         def freeze
           compositions.freeze
+          super
+        end
+
+        private
+
+        # Clear the cached compositions when manually refreshing.
+        def _refresh_set_values(hash)
+          @compositions.clear if @compositions
           super
         end
       end

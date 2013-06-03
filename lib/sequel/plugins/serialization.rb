@@ -172,18 +172,19 @@ module Sequel
           @deserialized_values ||= {}
         end
 
+        # Freeze the deserialized values
         def freeze
           deserialized_values.freeze
           super
         end
 
-        # Initialization the deserialized values for objects retrieved from the database.
-        def set_values(hash)
+        private
+
+        # Clear any cached deserialized values when doing a manual refresh.
+        def _refresh_set_values(hash)
           @deserialized_values.clear if @deserialized_values
           super
         end
-
-        private
 
         # Deserialize the column value.  Called when the model column accessor is called to
         # return a deserialized value.

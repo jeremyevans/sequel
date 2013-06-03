@@ -5,7 +5,7 @@ module Sequel
     # typecast correctly (with correct being defined as how the model object
     # would typecast the same column values).
     #
-    # This plugin modifies Model#set_values to call the setter methods (which typecast
+    # This plugin makes model loading call the setter methods (which typecast
     # by default) for all columns given.  You can either specify the columns to
     # typecast on load in the plugin call itself, or afterwards using 
     # add_typecast_on_load_columns:
@@ -36,6 +36,12 @@ module Sequel
           @typecast_on_load_columns.concat(columns)
         end
 
+        # Typecast values using #load_typecast when the values are retrieved
+        # from the database.
+        def call(values)
+          super.load_typecast
+        end
+
         Plugins.inherited_instance_variables(self, :@typecast_on_load_columns=>:dup)
       end
 
@@ -52,9 +58,18 @@ module Sequel
           self
         end
 
-        # Typecast values using #load_typecast when the values are retrieved from
-        # the database.
-        def set_values(values)
+        private
+
+        # Typecast values using #load_typecast when the values are refreshed manually.
+        def _refresh_set_values(values)
+          ret = super
+          load_typecast
+          ret
+        end
+
+        # Typecast values using #load_typecast when the values are refreshed
+        # automatically after a save.
+        def save_set_values(values)
           ret = super
           load_typecast
           ret

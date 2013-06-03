@@ -1410,12 +1410,6 @@ module Sequel
           super
         end
       
-        # Clear the associations cache when refreshing
-        def set_values(hash)
-          @associations.clear if @associations
-          super
-        end
-
         private
         
         # Apply the association options such as :order and :limit to the given dataset, returning a modified dataset.
@@ -1481,6 +1475,12 @@ module Sequel
           elsif opts.returns_array?
             []
           end
+        end
+
+        # Clear the associations cache when refreshing
+        def _refresh_set_values(hash)
+          @associations.clear if @associations
+          super
         end
 
         # Add the given associated object to the given association

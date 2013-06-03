@@ -1,5 +1,9 @@
 === HEAD
 
+* Model#save no longer calls #_refresh internally (jeremyevans)
+
+* Deprecated Model#set_values (jeremyevans)
+
 * Model#set_all and #update_all can now update the primary key (jeremyevans)
 
 * Integrate many_to_one_pk_lookup and association_autoreloading plugins into main associations plugin (jeremyevans)

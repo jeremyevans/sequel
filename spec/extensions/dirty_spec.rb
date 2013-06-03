@@ -88,11 +88,6 @@ describe "Sequel::Plugins::Dirty" do
       @o.values.has_key?(:missing_changed).should == false
     end
     
-    it "set_values should clear the cached initial values" do
-      @o.set_values(:id=>1)
-      @o.column_changes.should == {}
-    end
-    
     it "refresh should clear the cached initial values" do
       @o.refresh
       @o.column_changes.should == {}

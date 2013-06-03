@@ -24,7 +24,7 @@ describe "class_table_inheritance plugin" do
       end
     end
     class ::Employee < Sequel::Model(@db)
-      def _refresh(x); @values[:id] = 1 end
+      def _save_refresh; @values[:id] = 1 end
       def self.columns
         dataset.columns
       end

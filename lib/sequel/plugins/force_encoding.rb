@@ -33,15 +33,26 @@ module Sequel
         attr_accessor :forced_encoding
         
         Plugins.inherited_instance_variables(self, :@forced_encoding=>nil)
+
+        def call(values)
+          o = super
+          o.send(:force_hash_encoding, o.values)
+          o
+        end
       end
     
       module InstanceMethods
+        private
+        
         # Force the encoding of all string values when setting the instance's values.
-        def set_values(row)
-          super(force_hash_encoding(row))
+        def _refresh_set_values(values)
+          super(force_hash_encoding(values))
         end
         
-        private
+        # Force the encoding of all string values when setting the instance's values.
+        def _save_set_values(values)
+          super(force_hash_encoding(values))
+        end
         
         # Force the encoding for all string values in the given row hash.
         def force_hash_encoding(row)

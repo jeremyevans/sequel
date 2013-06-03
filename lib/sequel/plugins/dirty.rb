@@ -123,12 +123,6 @@ module Sequel
           end
         end
 
-        # Reset the initial values when setting values.
-        def set_values(hash)
-          reset_initial_values
-          super
-        end
-
         # Manually specify that a column will change.  This should only be used
         # if you plan to modify a column value in place, which is not recommended.
         #
@@ -157,6 +151,12 @@ module Sequel
         end
 
         private
+
+        # Reset the initial values when setting values.
+        def _refresh_set_values(hash)
+          reset_initial_values
+          super
+        end
 
         # Reset the initial values after saving.
         def after_save

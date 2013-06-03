@@ -138,15 +138,6 @@ describe Sequel::Model, "associate" do
     proc{c.one_to_one :c2, :clone=>:cs}.should_not raise_error(Sequel::Error)
   end
 
-  it "should clear associations cache when using set_values" do
-    c = Class.new(Sequel::Model(:c))
-    c.many_to_one :c
-    o = c.new
-    o.associations[:c] = 1
-    o.set_values(:id=>1)
-    o.associations.should == {}
-  end
-
   it "should clear associations cache when refreshing object manually" do
     c = Class.new(Sequel::Model(:c))
     c.many_to_one :c
@@ -156,16 +147,16 @@ describe Sequel::Model, "associate" do
     o.associations.should == {}
   end
 
-  it "should clear associations cache when refreshing object after save" do
+  it "should not clear associations cache when refreshing object after save" do
     c = Class.new(Sequel::Model(:c))
     c.many_to_one :c
     o = c.new
     o.associations[:c] = 1
     o.save
-    o.associations.should == {}
+    o.associations.should == {:c=>1}
   end
 
-  it "should clear associations cache when saving with insert_select" do
+  it "should not clear associations cache when saving with insert_select" do
     ds = Sequel::Model.db[:c]
     def ds.supports_insert_select?() true end
     def ds.insert_select(*) {:id=>1} end
@@ -174,7 +165,7 @@ describe Sequel::Model, "associate" do
     o = c.new
     o.associations[:c] = 1
     o.save
-    o.associations.should == {}
+    o.associations.should == {:c=>1}
   end
 
 end

@@ -34,7 +34,7 @@ module Sequel
         # show the column is modified after saving.
         def after_save
           super
-          @original_deserialized_values = {}
+          @original_deserialized_values = @deserialized_values
         end
 
         # Detect which serialized columns have changed.

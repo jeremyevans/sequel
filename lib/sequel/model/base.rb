@@ -116,7 +116,7 @@ module Sequel
       # probably should not be used by external code.
       def call(values)
         o = allocate
-        o.set_values(values)
+        o.instance_variable_set(:@values, values)
         o
       end
       
@@ -331,7 +331,6 @@ module Sequel
       # may contain setter methods.
       def include(mod)
         clear_setter_methods_cache
-        Sequel::Deprecation.deprecate('Model#set_values', 'Please override Model.call, Model#_refresh_set_values, and/or Model#_create_set_values depending on the type of behavior you want to change') if mod.public_instance_methods.map{|x| x.to_s}.include?('set_values') && mod.name.to_s !~ /\ASequel::(Model|Model::Associations|Plugins::(ForceEncoding|Serialization|TypecastOnLoad|Composition|PreparedStatementsSafe|Dirty|PgTypecastOnLoad))::InstanceMethods\z/
         super
       end
 
@@ -395,7 +394,6 @@ module Sequel
       # Clear the setter_methods cache when a setter method is added
       def method_added(meth)
         clear_setter_methods_cache if meth.to_s =~ SETTER_METHOD_REGEXP
-        Sequel::Deprecation.deprecate('Model#set_values', 'Please override Model.call, Model#_refresh_set_values, and/or Model#_create_set_values depending on the type of behavior you want to change') if meth.to_s == 'set_values'
         super
       end
   
@@ -1392,10 +1390,9 @@ module Sequel
         self
       end
 
-      # Replace the current values with hash.  Should definitely not be
-      # used with untrusted input, and should probably not be called
-      # directly by user code.
+      # REMOVE41
       def set_values(hash)
+        Sequel::Deprecation.deprecate('Model#set_values is deprecreated and will be removed in Sequel 4.1.  Please use _refresh_set_values or _save_set_values or set the values directly.')
         @values = hash
       end
       
@@ -1530,7 +1527,7 @@ module Sequel
       def _insert
         ds = _insert_dataset
         if !ds.opts[:select] and ds.supports_insert_select? and h = _insert_select_raw(ds)
-          set_values(h)
+          _save_set_values(h)
           nil
         else
           iid = _insert_raw(ds)
@@ -1562,7 +1559,7 @@ module Sequel
       # Refresh using a particular dataset, used inside save to make sure the same server
       # is used for reading newly inserted values from the database
       def _refresh(dataset)
-        set_values(_refresh_get(dataset) || raise(Error, "Record not found"))
+        _refresh_set_values(_refresh_get(dataset) || raise(Error, "Record not found"))
         changed_columns.clear
       end
 
@@ -1571,6 +1568,11 @@ module Sequel
         dataset.first
       end
       
+      # Set the refreshed values after 
+      def _refresh_set_values(h)
+        @values = h
+      end
+
       # Internal version of save, split from save to allow running inside
       # it's own transaction.
       def _save(opts)
@@ -1639,7 +1641,14 @@ module Sequel
       # default values of all columns.  Separated from _save so it
       # can be overridden to avoid the refresh.
       def _save_refresh
-        _refresh(this.opts[:server] ? this : this.server(:default))
+        _save_set_values(_refresh_get(this.opts[:server] ? this : this.server(:default)) || raise(Error, "Record not found"))
+        changed_columns.clear
+      end
+
+      # Set values to the provided hash.  Called after a create,
+      # to set the full values from the database in the model instance.
+      def _save_set_values(h)
+        @values = h
       end
 
       # Return a hash of values used when saving all columns of an
