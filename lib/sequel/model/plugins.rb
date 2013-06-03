@@ -9,10 +9,10 @@ module Sequel
   #   already loaded by an ancestor class), before including/extending
   #   any modules, with the arguments
   #   and block provided to the call to Model.plugin.
-  # * A module inside the plugin module named InstanceMethods,
-  #   which will be included in the model class.
   # * A module inside the plugin module named ClassMethods,
   #   which will extend the model class.
+  # * A module inside the plugin module named InstanceMethods,
+  #   which will be included in the model class.
   # * A module inside the plugin module named DatasetMethods,
   #   which will extend the model's dataset.
   # * A singleton method named configure, which takes a model, 

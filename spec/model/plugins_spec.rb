@@ -115,7 +115,7 @@ describe Sequel::Model, ".plugin" do
     m.args.should == [[b, 123, {1=>2}], [b2, 234, {2=>3}]]
   end
   
-  it "should call things in the following order: apply, InstanceMethods, ClassMethods, DatasetMethods, configure" do
+  it "should call things in the following order: apply, ClassMethods, InstanceMethods, DatasetMethods, configure" do
     m = Module.new do
       @args = []
       def self.args; @args; end
@@ -144,9 +144,9 @@ describe Sequel::Model, ".plugin" do
     
     b = lambda{44}
     @c.plugin(m, 123, 1=>2, &b)
-    m.args.should == [:apply, :im, :cm, :dm, :configure]
+    m.args.should == [:apply, :cm, :im, :dm, :configure]
     @c.plugin(m, 234, 2=>3, &b)
-    m.args.should == [:apply, :im, :cm, :dm, :configure, :configure]
+    m.args.should == [:apply, :cm, :im, :dm, :configure, :configure]
   end
 
   it "should include an InstanceMethods module in the class if the plugin includes it" do

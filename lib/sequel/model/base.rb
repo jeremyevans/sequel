@@ -420,8 +420,8 @@ module Sequel
         unless @plugins.include?(m)
           @plugins << m
           m.apply(self, *args, &block) if m.respond_to?(:apply)
-          include(m::InstanceMethods) if plugin_module_defined?(m, :InstanceMethods)
           extend(m::ClassMethods) if plugin_module_defined?(m, :ClassMethods)
+          include(m::InstanceMethods) if plugin_module_defined?(m, :InstanceMethods)
           if plugin_module_defined?(m, :DatasetMethods)
             dataset_extend(m::DatasetMethods, :create_class_methods=>false)
           end
