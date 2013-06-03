@@ -1,20 +1,10 @@
-require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
+SEQUEL_ADAPTER_TEST = :sqlite
 
-unless defined?(SQLITE_DB)
-  unless defined? SQLITE_URL
-    if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
-      SQLITE_URL = 'jdbc:sqlite::memory:'
-    else
-      SQLITE_URL = 'sqlite:/'
-    end
-  end
-  SQLITE_DB = Sequel.connect(ENV['SEQUEL_SQLITE_SPEC_DB']||SQLITE_URL)
-end
-INTEGRATION_DB = SQLITE_DB unless defined?(INTEGRATION_DB)
+require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "An SQLite database" do
   before do
-    @db = SQLITE_DB
+    @db = INTEGRATION_DB
     @fk = @db.foreign_keys
   end
   after do
@@ -25,7 +15,7 @@ describe "An SQLite database" do
     Sequel.datetime_class = Time
   end
 
-  if SQLITE_DB.auto_vacuum == :none
+  if INTEGRATION_DB.auto_vacuum == :none
     specify "should support getting pragma values" do
       @db.pragma_get(:auto_vacuum).to_s.should == '0'
     end
@@ -83,7 +73,7 @@ describe "An SQLite database" do
     @db[:fk].insert(2, 1)
     @db[:fk].insert(3, 3)
     proc{@db[:fk].insert(4, 5)}.should raise_error(Sequel::Error)
-  end if SQLITE_DB.sqlite_version >= 30619
+  end if INTEGRATION_DB.sqlite_version >= 30619
   
   specify "should not enforce foreign key integrity if foreign_keys pragma is unset" do
     @db.foreign_keys = false
@@ -164,8 +154,8 @@ describe "An SQLite database" do
   end
 
   specify "should handle and return BigDecimal values for numeric columns" do
-    SQLITE_DB.create_table!(:fk){numeric :d}
-    d = SQLITE_DB[:fk]
+    INTEGRATION_DB.create_table!(:fk){numeric :d}
+    d = INTEGRATION_DB[:fk]
     d.insert(:d=>BigDecimal.new('80.0'))
     d.insert(:d=>BigDecimal.new('NaN'))
     d.insert(:d=>BigDecimal.new('Infinity'))
@@ -173,13 +163,13 @@ describe "An SQLite database" do
     ds = d.all
     ds.shift.should == {:d=>BigDecimal.new('80.0')}
     ds.map{|x| x[:d].to_s}.should == %w'NaN Infinity -Infinity'
-    SQLITE_DB
+    INTEGRATION_DB
   end
 end
 
 describe "SQLite temporary views" do
   before do
-    @db = SQLITE_DB
+    @db = INTEGRATION_DB
     @db.drop_view(:items) rescue nil
     @db.create_table!(:items){Integer :number}
     @db[:items].insert(10)
@@ -199,7 +189,7 @@ end
     
 describe "SQLite type conversion" do
   before do
-    @db = SQLITE_DB
+    @db = INTEGRATION_DB
     @integer_booleans = @db.integer_booleans
     @db.integer_booleans = true
     @ds = @db[:items]
@@ -282,11 +272,11 @@ describe "SQLite type conversion" do
     @db[:items].update(:a=>'1.1')
     @db[:items].first.should == {:a=>Sequel::SQL::Blob.new(1.1.to_s)}
   end
-end if SQLITE_DB.adapter_scheme == :sqlite
+end if INTEGRATION_DB.adapter_scheme == :sqlite
 
 describe "An SQLite dataset" do
   before do
-    @d = SQLITE_DB[:items]
+    @d = INTEGRATION_DB[:items]
   end
   
   specify "should raise errors if given a regexp pattern match" do
@@ -299,38 +289,38 @@ end
 
 describe "An SQLite dataset AS clause" do
   specify "should use a string literal for :col___alias" do
-    SQLITE_DB.literal(:c___a).should == "`c` AS 'a'"
+    INTEGRATION_DB.literal(:c___a).should == "`c` AS 'a'"
   end
 
   specify "should use a string literal for :table__col___alias" do
-    SQLITE_DB.literal(:t__c___a).should == "`t`.`c` AS 'a'"
+    INTEGRATION_DB.literal(:t__c___a).should == "`t`.`c` AS 'a'"
   end
 
   specify "should use a string literal for :column.as(:alias)" do
-    SQLITE_DB.literal(Sequel.as(:c, :a)).should == "`c` AS 'a'"
+    INTEGRATION_DB.literal(Sequel.as(:c, :a)).should == "`c` AS 'a'"
   end
 
   specify "should use a string literal in the SELECT clause" do
-    SQLITE_DB[:t].select(:c___a).sql.should == "SELECT `c` AS 'a' FROM `t`"
+    INTEGRATION_DB[:t].select(:c___a).sql.should == "SELECT `c` AS 'a' FROM `t`"
   end
 
   specify "should use a string literal in the FROM clause" do
-    SQLITE_DB[:t___a].sql.should == "SELECT * FROM `t` AS 'a'"
+    INTEGRATION_DB[:t___a].sql.should == "SELECT * FROM `t` AS 'a'"
   end
 
   specify "should use a string literal in the JOIN clause" do
-    SQLITE_DB[:t].join_table(:natural, :j, nil, :table_alias=>:a).sql.should == "SELECT * FROM `t` NATURAL JOIN `j` AS 'a'"
+    INTEGRATION_DB[:t].join_table(:natural, :j, nil, :table_alias=>:a).sql.should == "SELECT * FROM `t` NATURAL JOIN `j` AS 'a'"
   end
 end
 
 describe "SQLite::Dataset#delete" do
   before do
-    SQLITE_DB.create_table! :items do
+    INTEGRATION_DB.create_table! :items do
       primary_key :id
       String :name
       Float :value
     end
-    @d = SQLITE_DB[:items]
+    @d = INTEGRATION_DB[:items]
     @d.delete # remove all records
     @d << {:name => 'abc', :value => 1.23}
     @d << {:name => 'def', :value => 4.56}
@@ -357,12 +347,12 @@ end
 
 describe "SQLite::Dataset#update" do
   before do
-    SQLITE_DB.create_table! :items do
+    INTEGRATION_DB.create_table! :items do
       primary_key :id
       String :name
       Float :value
     end
-    @d = SQLITE_DB[:items]
+    @d = INTEGRATION_DB[:items]
     @d.delete # remove all records
     @d << {:name => 'abc', :value => 1.23}
     @d << {:name => 'def', :value => 4.56}
@@ -380,38 +370,38 @@ end
 
 describe "SQLite dataset" do
   before do
-    SQLITE_DB.create_table! :test do
+    INTEGRATION_DB.create_table! :test do
       primary_key :id
       String :name
       Float :value
     end
-    SQLITE_DB.create_table! :items do
+    INTEGRATION_DB.create_table! :items do
       primary_key :id
       String :name
       Float :value
     end
-    @d = SQLITE_DB[:items]
+    @d = INTEGRATION_DB[:items]
     @d << {:name => 'abc', :value => 1.23}
     @d << {:name => 'def', :value => 4.56}
     @d << {:name => 'ghi', :value => 7.89}
   end
   after do
-    SQLITE_DB.drop_table?(:test, :items)
+    INTEGRATION_DB.drop_table?(:test, :items)
   end
   
   specify "should be able to insert from a subquery" do
-    SQLITE_DB[:test] << @d
-    SQLITE_DB[:test].count.should == 3
-    SQLITE_DB[:test].select(:name, :value).order(:value).to_a.should == \
+    INTEGRATION_DB[:test] << @d
+    INTEGRATION_DB[:test].count.should == 3
+    INTEGRATION_DB[:test].select(:name, :value).order(:value).to_a.should == \
       @d.select(:name, :value).order(:value).to_a
   end
     
   specify "should support #explain" do
-    SQLITE_DB[:test].explain.should be_a_kind_of(String)
+    INTEGRATION_DB[:test].explain.should be_a_kind_of(String)
   end
   
   specify "should have #explain work when identifier_output_method is modified" do
-    ds = SQLITE_DB[:test]
+    ds = INTEGRATION_DB[:test]
     ds.identifier_output_method = :upcase
     ds.explain.should be_a_kind_of(String)
   end
@@ -419,7 +409,7 @@ end
 
 describe "A SQLite database" do
   before do
-    @db = SQLITE_DB
+    @db = INTEGRATION_DB
     @db.create_table! :test2 do
       text :name
       integer :value
@@ -480,7 +470,7 @@ describe "A SQLite database" do
     @db[:test3].select(:id).all.should == [{:id => 1}, {:id => 3}]
   end
 
-  if SQLITE_DB.foreign_keys
+  if INTEGRATION_DB.foreign_keys
     specify "should keep foreign keys when dropping a column" do
       @db.create_table! :test do
         primary_key :id

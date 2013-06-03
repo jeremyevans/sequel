@@ -1,25 +1,19 @@
+SEQUEL_ADAPTER_TEST = :mssql
+
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-require ENV['SEQUEL_MSSQL_SPEC_REQUIRE'] if ENV['SEQUEL_MSSQL_SPEC_REQUIRE']
-
-unless defined?(MSSQL_DB)
-  MSSQL_URL = 'jdbc:sqlserver://localhost;integratedSecurity=true;database=sandbox' unless defined? MSSQL_URL
-  MSSQL_DB = Sequel.connect(ENV['SEQUEL_MSSQL_SPEC_DB']||MSSQL_URL)
-end
-INTEGRATION_DB = MSSQL_DB unless defined?(INTEGRATION_DB)
-
-def MSSQL_DB.sqls
+def INTEGRATION_DB.sqls
   (@sqls ||= [])
 end
 logger = Object.new
 def logger.method_missing(m, msg)
-  MSSQL_DB.sqls << msg
+  INTEGRATION_DB.sqls << msg
 end
-MSSQL_DB.loggers = [logger]
+INTEGRATION_DB.loggers = [logger]
 
 describe "A MSSQL database" do
   before do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
   end
 
   cspecify "should be able to read fractional part of timestamp", :odbc do
@@ -40,7 +34,7 @@ end
   
 describe "A MSSQL database" do
   before do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
     @db.create_table! :test3 do
       Integer :value
       Time :time
@@ -57,7 +51,7 @@ end
 
 describe "MSSQL" do
   before(:all) do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
     @db.create_table!(:test3){Integer :v3}
     @db.create_table!(:test4){Integer :v4}
     @db[:test3].import([:v3], [[1], [2]])
@@ -82,7 +76,7 @@ end
 #   CREATE FULLTEXT CATALOG ftscd AS DEFAULT
 describe "MSSQL full_text_search" do
   before do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
     @db.drop_table?(:posts)
   end
   after do
@@ -107,19 +101,19 @@ end if false
 
 describe "MSSQL Dataset#join_table" do
   specify "should emulate the USING clause with ON" do
-    MSSQL_DB[:items].join(:categories, [:id]).sql.should ==
+    INTEGRATION_DB[:items].join(:categories, [:id]).sql.should ==
       'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON ([CATEGORIES].[ID] = [ITEMS].[ID])'
     ['SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID1] = [ITEMS].[ID1]) AND ([CATEGORIES].[ID2] = [ITEMS].[ID2]))',
       'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID2] = [ITEMS].[ID2]) AND ([CATEGORIES].[ID1] = [ITEMS].[ID1]))'].
-      should include(MSSQL_DB[:items].join(:categories, [:id1, :id2]).sql)
-    MSSQL_DB[:items___i].join(:categories___c, [:id]).sql.should ==
+      should include(INTEGRATION_DB[:items].join(:categories, [:id1, :id2]).sql)
+    INTEGRATION_DB[:items___i].join(:categories___c, [:id]).sql.should ==
       'SELECT * FROM [ITEMS] AS [I] INNER JOIN [CATEGORIES] AS [C] ON ([C].[ID] = [I].[ID])'
   end
 end
 
 describe "MSSQL Dataset#output" do
   before do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
     @db.create_table!(:items){String :name; Integer :value}
     @db.create_table!(:out){String :name; Integer :value}
     @ds = @db[:items]
@@ -197,8 +191,8 @@ end
 
 describe "MSSQL dataset using #with and #with_recursive" do
   before do
-    @db = MSSQL_DB
-    @ds = MSSQL_DB[:t]
+    @db = INTEGRATION_DB
+    @ds = INTEGRATION_DB[:t]
       @ds1 = @ds.with(:t, @db[:x])
       @ds2 = @ds.with_recursive(:t, @db[:x], @db[:t])
   end
@@ -226,7 +220,7 @@ end
 
 describe "MSSQL::Dataset#import" do
   before do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
     @db.sqls.clear
     @ds = @db[:test]
   end
@@ -249,7 +243,7 @@ end
 
 describe "MSSQL joined datasets" do
   before do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
   end
 
   specify "should format DELETE statements" do
@@ -265,7 +259,7 @@ end
 
 describe "Offset support" do
   before do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
     @db.create_table!(:i){Integer :id; Integer :parent_id}
     @ds = @db[:i].order(:id)
     @hs = []
@@ -288,7 +282,7 @@ end
 
 describe "Common Table Expressions" do
   before do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
     @db.create_table!(:i1){Integer :id; Integer :parent_id}
     @db.create_table!(:i2){Integer :id; Integer :parent_id}
     @ds = @db[:i1]
@@ -360,7 +354,7 @@ end
 
 describe "MSSSQL::Dataset#insert" do
   before do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
     @db.create_table!(:test5){primary_key :xid; Integer :value}
     @db.create_table! :test4 do
       String :name, :size => 20
@@ -397,13 +391,13 @@ describe "MSSSQL::Dataset#insert" do
   end
 
   specify "should play nicely with simple_select_all?" do
-    MSSQL_DB[:test4].disable_insert_output.send(:simple_select_all?).should == true
+    INTEGRATION_DB[:test4].disable_insert_output.send(:simple_select_all?).should == true
   end
 end
 
 describe "MSSSQL::Dataset#into" do
   before do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
   end
 
   specify "should format SELECT statement" do
@@ -421,7 +415,7 @@ end
 
 describe "A MSSQL database" do
   before do
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
   end
   after do
     @db.drop_table?(:a)
@@ -447,68 +441,68 @@ end
 
 describe "MSSQL::Database#rename_table" do
   after do
-    MSSQL_DB.drop_table?(:foo)
+    INTEGRATION_DB.drop_table?(:foo)
   end
 
   specify "should work on non-schema bound tables which need escaping" do
-    MSSQL_DB.quote_identifiers = true
-    MSSQL_DB.create_table! :'foo bar' do
+    INTEGRATION_DB.quote_identifiers = true
+    INTEGRATION_DB.create_table! :'foo bar' do
       text :name
     end
-    MSSQL_DB.drop_table? :foo
-    proc { MSSQL_DB.rename_table 'foo bar', 'foo' }.should_not raise_error
+    INTEGRATION_DB.drop_table? :foo
+    proc { INTEGRATION_DB.rename_table 'foo bar', 'foo' }.should_not raise_error
   end
   
   specify "should work on schema bound tables" do
-    MSSQL_DB.execute(<<-SQL)
+    INTEGRATION_DB.execute(<<-SQL)
       IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'MY')
         EXECUTE sp_executesql N'create schema MY'
     SQL
-    MSSQL_DB.create_table! :MY__foo do
+    INTEGRATION_DB.create_table! :MY__foo do
       text :name
     end
-    proc { MSSQL_DB.rename_table :MY__foo, :MY__bar }.should_not raise_error
-    proc { MSSQL_DB.rename_table :MY__bar, :foo }.should_not raise_error
+    proc { INTEGRATION_DB.rename_table :MY__foo, :MY__bar }.should_not raise_error
+    proc { INTEGRATION_DB.rename_table :MY__bar, :foo }.should_not raise_error
   end
 end
 
 describe "MSSQL::Dataset#count" do
   specify "should work with a distinct query with an order clause" do
-    MSSQL_DB.create_table!(:items){String :name; Integer :value}
-    MSSQL_DB[:items].insert(:name => "name", :value => 1)
-    MSSQL_DB[:items].insert(:name => "name", :value => 1)
-    MSSQL_DB[:items].select(:name, :value).distinct.order(:name).count.should == 1
-    MSSQL_DB[:items].select(:name, :value).group(:name, :value).order(:name).count.should == 1
+    INTEGRATION_DB.create_table!(:items){String :name; Integer :value}
+    INTEGRATION_DB[:items].insert(:name => "name", :value => 1)
+    INTEGRATION_DB[:items].insert(:name => "name", :value => 1)
+    INTEGRATION_DB[:items].select(:name, :value).distinct.order(:name).count.should == 1
+    INTEGRATION_DB[:items].select(:name, :value).group(:name, :value).order(:name).count.should == 1
   end
 end
 
 describe "MSSQL::Database#create_table" do
   specify "should support collate with various other column options" do
-    MSSQL_DB.create_table!(:items){ String :name, :size => 128, :collate => :sql_latin1_general_cp1_ci_as, :default => 'foo', :null => false, :unique => true}
-    MSSQL_DB[:items].insert
-    MSSQL_DB[:items].select_map(:name).should == ["foo"]
+    INTEGRATION_DB.create_table!(:items){ String :name, :size => 128, :collate => :sql_latin1_general_cp1_ci_as, :default => 'foo', :null => false, :unique => true}
+    INTEGRATION_DB[:items].insert
+    INTEGRATION_DB[:items].select_map(:name).should == ["foo"]
   end
 end
 
 describe "MSSQL::Database#mssql_unicode_strings = false" do
   before do
-    MSSQL_DB.mssql_unicode_strings = false
+    INTEGRATION_DB.mssql_unicode_strings = false
   end
   after do
-    MSSQL_DB.drop_table?(:items)
-    MSSQL_DB.mssql_unicode_strings = true
+    INTEGRATION_DB.drop_table?(:items)
+    INTEGRATION_DB.mssql_unicode_strings = true
   end
 
   specify "should work correctly" do
-    MSSQL_DB.create_table!(:items){String :name}
-    MSSQL_DB[:items].mssql_unicode_strings.should == false
-    MSSQL_DB[:items].insert(:name=>'foo')
-    MSSQL_DB[:items].select_map(:name).should == ['foo']
+    INTEGRATION_DB.create_table!(:items){String :name}
+    INTEGRATION_DB[:items].mssql_unicode_strings.should == false
+    INTEGRATION_DB[:items].insert(:name=>'foo')
+    INTEGRATION_DB[:items].select_map(:name).should == ['foo']
   end
 
   specify "should be overridable at the dataset level" do
-    MSSQL_DB.create_table!(:items){String :name}
-    ds = MSSQL_DB[:items]
+    INTEGRATION_DB.create_table!(:items){String :name}
+    ds = INTEGRATION_DB[:items]
     ds.mssql_unicode_strings.should == false
     ds.mssql_unicode_strings = true
     ds.mssql_unicode_strings.should == true
@@ -520,7 +514,7 @@ end
 describe "A MSSQL database adds index with include" do
   before :all do
     @table_name = :test_index_include
-    @db = MSSQL_DB
+    @db = INTEGRATION_DB
     @db.create_table! @table_name do
       integer :col1
       integer :col2
@@ -542,34 +536,34 @@ end
 
 describe "MSSQL::Database#drop_column with a schema" do
   before do
-    MSSQL_DB.run "create schema test" rescue nil
+    INTEGRATION_DB.run "create schema test" rescue nil
   end
   after do
-    MSSQL_DB.drop_table(:test__items)
-    MSSQL_DB.run "drop schema test" rescue nil
+    INTEGRATION_DB.drop_table(:test__items)
+    INTEGRATION_DB.run "drop schema test" rescue nil
   end
 
   specify "drops columns with a default value" do
-    MSSQL_DB.create_table!(:test__items){ Integer :id; String :name, :default => 'widget' }
-    MSSQL_DB.drop_column(:test__items, :name)
-    MSSQL_DB[:test__items].columns.should == [:id]
+    INTEGRATION_DB.create_table!(:test__items){ Integer :id; String :name, :default => 'widget' }
+    INTEGRATION_DB.drop_column(:test__items, :name)
+    INTEGRATION_DB[:test__items].columns.should == [:id]
   end
 end
 
 describe "Database#foreign_key_list" do
   before(:all) do
-    MSSQL_DB.create_table! :items do
+    INTEGRATION_DB.create_table! :items do
       primary_key :id
       integer     :sku
     end
-    MSSQL_DB.create_table! :prices do
+    INTEGRATION_DB.create_table! :prices do
       integer     :item_id
       datetime    :valid_from
       float       :price
       primary_key [:item_id, :valid_from]
       foreign_key [:item_id], :items, :key => :id, :name => :fk_prices_items
     end
-    MSSQL_DB.create_table! :sales do
+    INTEGRATION_DB.create_table! :sales do
       integer  :id
       integer  :price_item_id
       datetime :price_valid_from
@@ -577,12 +571,12 @@ describe "Database#foreign_key_list" do
     end
   end
   after(:all) do
-    MSSQL_DB.drop_table :sales
-    MSSQL_DB.drop_table :prices
-    MSSQL_DB.drop_table :items
+    INTEGRATION_DB.drop_table :sales
+    INTEGRATION_DB.drop_table :prices
+    INTEGRATION_DB.drop_table :items
   end
   it "should support typical foreign keys" do
-    MSSQL_DB.foreign_key_list(:prices).should == [{:name      => :fk_prices_items, 
+    INTEGRATION_DB.foreign_key_list(:prices).should == [{:name      => :fk_prices_items, 
                                                    :table     => :items, 
                                                    :columns   => [:item_id], 
                                                    :key       => [:id], 
@@ -590,7 +584,7 @@ describe "Database#foreign_key_list" do
                                                    :on_delete => :no_action }]
   end
   it "should support a foreign key with multiple columns" do
-    MSSQL_DB.foreign_key_list(:sales).should == [{:name      => :fk_sales_prices, 
+    INTEGRATION_DB.foreign_key_list(:sales).should == [{:name      => :fk_sales_prices, 
                                                   :table     => :prices, 
                                                   :columns   => [:price_item_id, :price_valid_from], 
                                                   :key       => [:item_id, :valid_from], 
@@ -600,12 +594,12 @@ describe "Database#foreign_key_list" do
 
   context "with multiple schemas" do
     before(:all) do
-      MSSQL_DB.execute_ddl "create schema vendor"
-      MSSQL_DB.create_table! :vendor__vendors do
+      INTEGRATION_DB.execute_ddl "create schema vendor"
+      INTEGRATION_DB.create_table! :vendor__vendors do
         primary_key :id
         varchar     :name
       end
-      MSSQL_DB.create_table! :vendor__mapping do
+      INTEGRATION_DB.create_table! :vendor__mapping do
         integer :vendor_id
         integer :item_id
         foreign_key [:vendor_id], :vendor__vendors, :name => :fk_mapping_vendor
@@ -613,12 +607,12 @@ describe "Database#foreign_key_list" do
       end
     end
     after(:all) do
-      MSSQL_DB.drop_table :vendor__mapping
-      MSSQL_DB.drop_table :vendor__vendors
-      MSSQL_DB.execute_ddl "drop schema vendor"
+      INTEGRATION_DB.drop_table :vendor__mapping
+      INTEGRATION_DB.drop_table :vendor__vendors
+      INTEGRATION_DB.execute_ddl "drop schema vendor"
     end
     it "should support mixed schema bound tables" do
- MSSQL_DB.foreign_key_list(:vendor__mapping).sort_by{|h| h[:name].to_s}.should == [{:name => :fk_mapping_item, :table => :items, :columns => [:item_id], :key => [:id], :on_update => :no_action, :on_delete => :no_action }, {:name => :fk_mapping_vendor, :table => :vendor__vendors, :columns => [:vendor_id], :key => [:id], :on_update => :no_action, :on_delete => :no_action }]
+ INTEGRATION_DB.foreign_key_list(:vendor__mapping).sort_by{|h| h[:name].to_s}.should == [{:name => :fk_mapping_item, :table => :items, :columns => [:item_id], :key => [:id], :on_update => :no_action, :on_delete => :no_action }, {:name => :fk_mapping_vendor, :table => :vendor__vendors, :columns => [:vendor_id], :key => [:id], :on_update => :no_action, :on_delete => :no_action }]
     end
   end
 end

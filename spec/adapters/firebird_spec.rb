@@ -1,41 +1,37 @@
+SEQUEL_ADAPTER_TEST = :firebird
+
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-unless defined?(FIREBIRD_DB)
-  FIREBIRD_URL = 'firebird://sysdba:masterkey@localhost/reality_spec' unless defined? FIREBIRD_URL
-  FIREBIRD_DB = Sequel.connect(ENV['SEQUEL_FB_SPEC_DB']||FIREBIRD_URL)
-end
-INTEGRATION_DB = FIREBIRD_DB unless defined?(INTEGRATION_DB)
-
-def FIREBIRD_DB.sqls
+def INTEGRATION_DB.sqls
   (@sqls ||= [])
 end
 logger = Object.new
 def logger.method_missing(m, msg)
-  FIREBIRD_DB.sqls.push(msg)
+  INTEGRATION_DB.sqls.push(msg)
 end
-FIREBIRD_DB.loggers = [logger]
+INTEGRATION_DB.loggers = [logger]
 
-FIREBIRD_DB.create_table! :test do
+INTEGRATION_DB.create_table! :test do
   varchar :name,  :size => 50
   integer :val,   :index => true
 end
 
-FIREBIRD_DB.create_table! :test2 do
+INTEGRATION_DB.create_table! :test2 do
   integer :val
   timestamp :time_stamp
 end
 
-FIREBIRD_DB.create_table! :test3 do
+INTEGRATION_DB.create_table! :test3 do
   integer :val
   timestamp :time_stamp
 end
 
-FIREBIRD_DB.create_table! :test5 do
+INTEGRATION_DB.create_table! :test5 do
   primary_key :xid
   integer :val
 end
 
-FIREBIRD_DB.create_table! :test6 do
+INTEGRATION_DB.create_table! :test6 do
   primary_key :xid
   blob :val
   String :val2
@@ -45,7 +41,7 @@ end
 
 describe "A Firebird database" do
   before do
-    @db = FIREBIRD_DB
+    @db = INTEGRATION_DB
   end
 
   specify "should provide disconnect functionality" do
@@ -62,7 +58,7 @@ end
 
 describe "A Firebird dataset" do
   before do
-    @d = FIREBIRD_DB[:test]
+    @d = INTEGRATION_DB[:test]
     @d.delete # remove all records
     @d.quote_identifiers = true
   end
@@ -176,7 +172,7 @@ describe "A Firebird dataset" do
   end
 
   specify "should support transactions" do
-    FIREBIRD_DB.transaction do
+    INTEGRATION_DB.transaction do
       @d << {:name => 'abc', :val => 1}
     end
 
@@ -184,14 +180,14 @@ describe "A Firebird dataset" do
   end
 
   specify "should have #transaction yield the connection" do
-    FIREBIRD_DB.transaction do |conn|
+    INTEGRATION_DB.transaction do |conn|
       conn.should_not == nil
     end
   end
 
   specify "should correctly rollback transactions" do
     proc do
-      FIREBIRD_DB.transaction do
+      INTEGRATION_DB.transaction do
         @d << {:name => 'abc', :val => 1}
         raise RuntimeError, 'asdf'
       end
@@ -201,7 +197,7 @@ describe "A Firebird dataset" do
   end
 
   specify "should handle returning inside of the block by committing" do
-    def FIREBIRD_DB.ret_commit
+    def INTEGRATION_DB.ret_commit
       transaction do
         self[:test] << {:name => 'abc'}
         return
@@ -209,12 +205,12 @@ describe "A Firebird dataset" do
       end
     end
     @d.count.should == 0
-    FIREBIRD_DB.ret_commit
+    INTEGRATION_DB.ret_commit
     @d.count.should == 1
-    FIREBIRD_DB.ret_commit
+    INTEGRATION_DB.ret_commit
     @d.count.should == 2
     proc do
-      FIREBIRD_DB.transaction do
+      INTEGRATION_DB.transaction do
         raise RuntimeError, 'asdf'
       end
     end.should raise_error(RuntimeError)
@@ -223,7 +219,7 @@ describe "A Firebird dataset" do
   end
 
   specify "should quote and upcase reserved keywords" do
-    @d = FIREBIRD_DB[:testing]
+    @d = INTEGRATION_DB[:testing]
     @d.quote_identifiers = true
     @d.select(:select).sql.should == \
       'SELECT "SELECT" FROM "TESTING"'
@@ -232,7 +228,7 @@ end
 
 describe "A Firebird dataset with a timestamp field" do
   before do
-    @d = FIREBIRD_DB[:test3]
+    @d = INTEGRATION_DB[:test3]
     @d.delete
   end
 
@@ -246,7 +242,7 @@ end
 
 describe "A Firebird database" do
   before do
-    @db = FIREBIRD_DB
+    @db = INTEGRATION_DB
     @db.drop_table?(:posts)
     @db.sqls.clear
   end
@@ -369,7 +365,7 @@ end
 
 describe "Postgres::Dataset#insert" do
   before do
-    @ds = FIREBIRD_DB[:test5]
+    @ds = INTEGRATION_DB[:test5]
     @ds.delete
   end
 
@@ -395,7 +391,7 @@ describe "Postgres::Dataset#insert" do
   end
 
   specify "should return nil if the table has no primary key" do
-    ds = FIREBIRD_DB[:test]
+    ds = INTEGRATION_DB[:test]
     ds.delete
     ds.insert(:name=>'a').should == nil
   end
@@ -403,7 +399,7 @@ end
 
 describe "Postgres::Dataset#insert" do
   before do
-    @ds = FIREBIRD_DB[:test6]
+    @ds = INTEGRATION_DB[:test6]
     @ds.delete
   end
 

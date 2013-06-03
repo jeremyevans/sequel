@@ -1,26 +1,20 @@
+SEQUEL_ADAPTER_TEST = :postgres
+
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-unless defined?(POSTGRES_DB)
-  POSTGRES_URL = 'postgres://postgres:postgres@localhost:5432/reality_spec' unless defined? POSTGRES_URL
-  POSTGRES_DB = Sequel.connect(ENV['SEQUEL_PG_SPEC_DB']||POSTGRES_URL)
-end
-INTEGRATION_DB = POSTGRES_DB unless defined?(INTEGRATION_DB)
-
-def POSTGRES_DB.sqls
+def INTEGRATION_DB.sqls
   (@sqls ||= [])
 end
 logger = Object.new
 def logger.method_missing(m, msg)
-  POSTGRES_DB.sqls << msg
+  INTEGRATION_DB.sqls << msg
 end
-POSTGRES_DB.loggers << logger
-
-#POSTGRES_DB.instance_variable_set(:@server_version, 80200)
+INTEGRATION_DB.loggers << logger
 
 describe "PostgreSQL", '#create_table' do
   before do
-    @db = POSTGRES_DB
-    POSTGRES_DB.sqls.clear
+    @db = INTEGRATION_DB
+    INTEGRATION_DB.sqls.clear
   end
   after do
     @db.drop_table?(:tmp_dolls)
@@ -50,7 +44,7 @@ end
 
 describe "PostgreSQL temporary views" do
   before do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.drop_view(:items_view) rescue nil
     @db.create_table!(:items){Integer :number}
     @db[:items].insert(10)
@@ -68,11 +62,11 @@ describe "PostgreSQL temporary views" do
     @db.disconnect
     lambda{@db[:items_view].map(:number)}.should raise_error(Sequel::DatabaseError)
   end
-end unless POSTGRES_DB.adapter_scheme == :do # Causes freezing later
+end unless INTEGRATION_DB.adapter_scheme == :do # Causes freezing later
     
 describe "A PostgreSQL database" do
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.create_table!(:public__testfk){primary_key :id; foreign_key :i, :public__testfk}
   end
   after(:all) do
@@ -118,7 +112,7 @@ end
 
 describe "A PostgreSQL database with domain types" do
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db << "DROP DOMAIN IF EXISTS positive_number CASCADE"
     @db << "CREATE DOMAIN positive_number AS numeric(10,2) CHECK (VALUE > 0)"
     @db.create_table!(:testfk){positive_number :id, :primary_key=>true}
@@ -137,7 +131,7 @@ end
 
 describe "A PostgreSQL dataset" do
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @d = @db[:test]
     @db.create_table! :test do
       text :name
@@ -216,7 +210,7 @@ describe "A PostgreSQL dataset" do
     @db[:atest].insert(2)
     proc{@db[:atest].insert(2)}.should raise_error(Sequel::Postgres::ExclusionConstraintViolation)
     @db.alter_table(:atest){drop_constraint 'atest_ex'}
-  end if POSTGRES_DB.server_version >= 90000
+  end if INTEGRATION_DB.server_version >= 90000
 
   specify "should support Database#do for executing anonymous code blocks" do
     @db.drop_table?(:btest)
@@ -225,7 +219,7 @@ describe "A PostgreSQL dataset" do
 
     @db.do "BEGIN EXECUTE 'DROP TABLE btest; CREATE TABLE atest (a INTEGER)'; EXECUTE 'INSERT INTO atest VALUES (1)'; END", :language=>:plpgsql
     @db[:atest].select_map(:a).should == [1]
-  end if POSTGRES_DB.server_version >= 90000
+  end if INTEGRATION_DB.server_version >= 90000
 
   specify "should support adding foreign key constarints that are not yet valid, and validating them later" do
     @db.create_table!(:atest){primary_key :id; Integer :fk}
@@ -238,7 +232,7 @@ describe "A PostgreSQL dataset" do
     @db[:atest].where(:id=>1).update(:fk=>2)
     @db.alter_table(:atest){validate_constraint :atest_fk}
     proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.should_not raise_error
-  end if POSTGRES_DB.server_version >= 90200
+  end if INTEGRATION_DB.server_version >= 90200
 
   specify "should support :using when altering a column's type" do
     @db.create_table!(:atest){Integer :t}
@@ -305,7 +299,7 @@ describe "A PostgreSQL dataset" do
     @db.transaction(:isolation=>:serializable, :deferrable=>true, :read_only=>true){}
     @db.transaction(:isolation=>:serializable, :deferrable=>false, :read_only=>false){}
     @db.sqls.grep(/DEF/).should == ["SET TRANSACTION DEFERRABLE", "SET TRANSACTION NOT DEFERRABLE", "SET TRANSACTION READ ONLY DEFERRABLE", "SET TRANSACTION READ WRITE NOT DEFERRABLE",  "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE NOT DEFERRABLE"]
-  end if POSTGRES_DB.server_version >= 90100
+  end if INTEGRATION_DB.server_version >= 90100
 
   specify "should support creating indexes concurrently" do
     @db.add_index :test, [:name, :value], :concurrently=>true
@@ -339,7 +333,7 @@ describe "A PostgreSQL dataset" do
     check_sqls do
       @db.sqls.should == ['DROP INDEX CONCURRENTLY "tnv2"']
     end
-  end if POSTGRES_DB.server_version >= 90200
+  end if INTEGRATION_DB.server_version >= 90200
 
   specify "#lock should lock table if inside a transaction" do
     @db.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}
@@ -376,7 +370,7 @@ end
 
 describe "Dataset#distinct" do
   before do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.create_table!(:a) do
       Integer :a
       Integer :b
@@ -397,29 +391,29 @@ describe "Dataset#distinct" do
   end
 end
 
-if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
+if INTEGRATION_DB.pool.respond_to?(:max_size) and INTEGRATION_DB.pool.max_size > 1
   describe "Dataset#for_update support" do
     before do
-      @db = POSTGRES_DB.create_table!(:items) do
+      @db = INTEGRATION_DB.create_table!(:items) do
         primary_key :id
         Integer :number
         String :name
       end
-      @ds = POSTGRES_DB[:items]
+      @ds = INTEGRATION_DB[:items]
     end
     after do
-      POSTGRES_DB.drop_table?(:items)
-      POSTGRES_DB.disconnect
+      INTEGRATION_DB.drop_table?(:items)
+      INTEGRATION_DB.disconnect
     end
 
     specify "should handle FOR UPDATE" do
       @ds.insert(:number=>20)
       c, t = nil, nil
       q = Queue.new
-      POSTGRES_DB.transaction do
+      INTEGRATION_DB.transaction do
         @ds.for_update.first(:id=>1)
         t = Thread.new do
-          POSTGRES_DB.transaction do
+          INTEGRATION_DB.transaction do
             q.push nil
             @ds.filter(:id=>1).update(:name=>'Jim')
             c = @ds.first(:id=>1)
@@ -438,10 +432,10 @@ if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
       @ds.insert(:number=>20)
       c, t = nil
       q = Queue.new
-      POSTGRES_DB.transaction do
+      INTEGRATION_DB.transaction do
         @ds.for_share.first(:id=>1)
         t = Thread.new do
-          POSTGRES_DB.transaction do
+          INTEGRATION_DB.transaction do
             c = @ds.for_share.filter(:id=>1).first
             q.push nil
           end
@@ -457,7 +451,7 @@ end
 
 describe "A PostgreSQL dataset with a timestamp field" do
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.create_table! :test3 do
       Date :date
       DateTime :time
@@ -492,7 +486,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     (t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000).should == t.strftime('%N').to_i/1000
   end
 
-  if POSTGRES_DB.adapter_scheme == :postgres
+  if INTEGRATION_DB.adapter_scheme == :postgres
     specify "should handle infinite timestamps if convert_infinite_timestamps is set" do
       @d << {:time=>Sequel.cast('infinity', DateTime)}
       @db.convert_infinite_timestamps = :nil
@@ -566,7 +560,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
   end
 
   specify "explain and analyze should not raise errors" do
-    @d = POSTGRES_DB[:test3]
+    @d = INTEGRATION_DB[:test3]
     proc{@d.explain}.should_not raise_error
     proc{@d.analyze}.should_not raise_error
   end
@@ -579,7 +573,7 @@ end
 
 describe "A PostgreSQL database" do
   before do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.create_table! :test2 do
       text :name
       integer :value
@@ -624,7 +618,7 @@ end
 
 describe "A PostgreSQL database" do
   before do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.drop_table?(:posts)
     @db.sqls.clear
   end
@@ -757,7 +751,7 @@ end
 
 describe "Postgres::Dataset#import" do
   before do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.create_table!(:test){primary_key :x; Integer :y}
     @db.sqls.clear
     @ds = @db[:test]
@@ -793,7 +787,7 @@ end
 
 describe "Postgres::Dataset#insert" do
   before do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.create_table!(:test5){primary_key :xid; Integer :value}
     @db.sqls.clear
     @ds = @db[:test5]
@@ -844,7 +838,7 @@ end
 
 describe "Postgres::Database schema qualified tables" do
   before do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db << "CREATE SCHEMA schema_test"
     @db.instance_variable_set(:@primary_keys, {})
     @db.instance_variable_set(:@primary_key_sequences, {})
@@ -964,7 +958,7 @@ end
 
 describe "Postgres::Database schema qualified tables and eager graphing" do
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.run "DROP SCHEMA s CASCADE" rescue nil
     @db.run "CREATE SCHEMA s"
 
@@ -1140,21 +1134,21 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
 
 end
 
-if POSTGRES_DB.server_version >= 80300
+if INTEGRATION_DB.server_version >= 80300
   describe "PostgreSQL tsearch2" do
     before(:all) do
-      POSTGRES_DB.create_table! :test6 do
+      INTEGRATION_DB.create_table! :test6 do
         text :title
         text :body
         full_text_index [:title, :body]
       end
-      @ds = POSTGRES_DB[:test6]
+      @ds = INTEGRATION_DB[:test6]
     end
     after do
-      POSTGRES_DB[:test6].delete
+      INTEGRATION_DB[:test6].delete
     end
     after(:all) do
-      POSTGRES_DB.drop_table?(:test6)
+      INTEGRATION_DB.drop_table?(:test6)
     end
 
     specify "should search by indexed column" do
@@ -1177,10 +1171,10 @@ if POSTGRES_DB.server_version >= 80300
   end
 end
 
-if POSTGRES_DB.dataset.supports_window_functions?
+if INTEGRATION_DB.dataset.supports_window_functions?
   describe "Postgres::Dataset named windows" do
     before do
-      @db = POSTGRES_DB
+      @db = INTEGRATION_DB
       @db.create_table!(:i1){Integer :id; Integer :group_id; Integer :amount}
       @ds = @db[:i1].order(:id)
       @ds.insert(:id=>1, :group_id=>1, :amount=>1)
@@ -1209,7 +1203,7 @@ end
 
 describe "Postgres::Database functions, languages, schemas, and triggers" do
   before do
-    @d = POSTGRES_DB
+    @d = INTEGRATION_DB
   end
   after do
     @d.drop_function('tf', :if_exists=>true, :cascade=>true)
@@ -1287,10 +1281,10 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
   end
 end
 
-if POSTGRES_DB.adapter_scheme == :postgres
+if INTEGRATION_DB.adapter_scheme == :postgres
   describe "Postgres::Dataset #use_cursor" do
     before(:all) do
-      @db = POSTGRES_DB
+      @db = INTEGRATION_DB
       @db.create_table!(:test_cursor){Integer :x}
       @db.sqls.clear
       @ds = @db[:test_cursor]
@@ -1328,7 +1322,7 @@ if POSTGRES_DB.adapter_scheme == :postgres
 
   describe "Postgres::PG_NAMED_TYPES" do
     before do
-      @db = POSTGRES_DB
+      @db = INTEGRATION_DB
       Sequel::Postgres::PG_NAMED_TYPES[:interval] = lambda{|v| v.reverse}
       @db.extension :pg_array
       @db.reset_conversion_procs
@@ -1353,10 +1347,10 @@ if POSTGRES_DB.adapter_scheme == :postgres
   end
 end
 
-if ((POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || POSTGRES_DB.adapter_scheme == :jdbc) && POSTGRES_DB.server_version >= 90000
+if ((INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || INTEGRATION_DB.adapter_scheme == :jdbc) && INTEGRATION_DB.server_version >= 90000
   describe "Postgres::Database#copy_into" do
     before(:all) do
-      @db = POSTGRES_DB
+      @db = INTEGRATION_DB
       @db.create_table!(:test_copy){Integer :x; Integer :y}
       @ds = @db[:test_copy].order(:x, :y)
     end
@@ -1435,7 +1429,7 @@ if ((POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || POST
 
   describe "Postgres::Database#copy_table" do
     before(:all) do
-      @db = POSTGRES_DB
+      @db = INTEGRATION_DB
       @db.create_table!(:test_copy){Integer :x; Integer :y}
       ds = @db[:test_copy]
       ds.insert(1, 2)
@@ -1505,10 +1499,10 @@ if ((POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || POST
   end
 end
 
-if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && POSTGRES_DB.server_version >= 90000
+if INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && INTEGRATION_DB.server_version >= 90000
   describe "Postgres::Database LISTEN/NOTIFY" do
     before(:all) do
-      @db = POSTGRES_DB
+      @db = INTEGRATION_DB
     end
 
     specify "should support listen and notify" do
@@ -1590,7 +1584,7 @@ end
 
 describe 'PostgreSQL special float handling' do
   before do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.create_table!(:test5){Float :value}
     @db.sqls.clear
     @ds = @db[:test5]
@@ -1616,7 +1610,7 @@ describe 'PostgreSQL special float handling' do
     end
   end
 
-  if POSTGRES_DB.adapter_scheme == :postgres
+  if INTEGRATION_DB.adapter_scheme == :postgres
     specify 'inserts NaN' do
       nan = 0.0/0.0
       @ds.insert(:value=>nan)
@@ -1639,11 +1633,11 @@ end
 
 describe 'PostgreSQL array handling' do
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.extension :pg_array
     @ds = @db[:items]
-    @native = POSTGRES_DB.adapter_scheme == :postgres
-    @jdbc = POSTGRES_DB.adapter_scheme == :jdbc
+    @native = INTEGRATION_DB.adapter_scheme == :postgres
+    @jdbc = INTEGRATION_DB.adapter_scheme == :jdbc
     @tp = lambda{@db.schema(:items).map{|a| a.last[:type]}}
   end
   after do
@@ -1840,7 +1834,7 @@ describe 'PostgreSQL array handling' do
       @ds.insert(rs.first)
       @ds.all.should == rs
     end
-  end unless POSTGRES_DB.adapter_scheme == :jdbc
+  end unless INTEGRATION_DB.adapter_scheme == :jdbc
 
   specify 'use arrays in bound variables' do
     @db.create_table!(:items) do
@@ -1900,7 +1894,7 @@ describe 'PostgreSQL array handling' do
     @ds.get(:i).should == a
     @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
     @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Sequel.blob("b\0")], 'bytea')).should == nil
-  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models' do
     @db.create_table!(:items) do
@@ -1978,11 +1972,11 @@ end
 
 describe 'PostgreSQL hstore handling' do
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.extension :pg_array, :pg_hstore
     @ds = @db[:items]
     @h = {'a'=>'b', 'c'=>nil, 'd'=>'NULL', 'e'=>'\\\\" \\\' ,=>'}
-    @native = POSTGRES_DB.adapter_scheme == :postgres
+    @native = INTEGRATION_DB.adapter_scheme == :postgres
   end
   after do
     @db.drop_table?(:items)
@@ -2042,7 +2036,7 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(:i).should == @h
     @ds.filter(:i=>:$i).call(:first, :i=>@h).should == {:i=>@h}
     @ds.filter(:i=>:$i).call(:first, :i=>{}).should == nil
-  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models and associations' do
     @db.create_table!(:items) do
@@ -2223,16 +2217,16 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(h1.avals.length).should == 2
     @ds.get(h2.avals.length).should == 1
   end
-end if POSTGRES_DB.type_supported?(:hstore)
+end if INTEGRATION_DB.type_supported?(:hstore)
 
 describe 'PostgreSQL json type' do
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.extension :pg_array, :pg_json
     @ds = @db[:items]
     @a = [1, 2, {'a'=>'b'}, 3.0]
     @h = {'a'=>'b', '1'=>[3, 4, 5]}
-    @native = POSTGRES_DB.adapter_scheme == :postgres
+    @native = INTEGRATION_DB.adapter_scheme == :postgres
   end
   after do
     @db.drop_table?(:items)
@@ -2311,7 +2305,7 @@ describe 'PostgreSQL json type' do
     @ds.get(:i).should == j
     @ds.filter(Sequel.cast(:i, 'text[]')=>:$i).call(:first, :i=>j).should == {:i=>j}
     @ds.filter(Sequel.cast(:i, 'text[]')=>:$i).call(:first, :i=>Sequel.pg_array([])).should == nil
-  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models' do
     @db.create_table!(:items) do
@@ -2323,13 +2317,13 @@ describe 'PostgreSQL json type' do
     c.create(:h=>Sequel.pg_json(@h)).h.should == @h
     c.create(:h=>Sequel.pg_json(@a)).h.should == @a
   end
-end if POSTGRES_DB.server_version >= 90200
+end if INTEGRATION_DB.server_version >= 90200
 
 describe 'PostgreSQL inet/cidr types' do
   ipv6_broken = (IPAddr.new('::1'); false) rescue true
 
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.extension :pg_array, :pg_inet
     @ds = @db[:items]
     @v4 = '127.0.0.1'
@@ -2342,7 +2336,7 @@ describe 'PostgreSQL inet/cidr types' do
       @ipv6 = IPAddr.new(@v6)
       @ipv6nm = IPAddr.new(@v6nm)
     end
-    @native = POSTGRES_DB.adapter_scheme == :postgres
+    @native = INTEGRATION_DB.adapter_scheme == :postgres
   end
   after do
     @db.drop_table?(:items)
@@ -2423,7 +2417,7 @@ describe 'PostgreSQL inet/cidr types' do
     @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).should == {:i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']}
     @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[], :c=>[], :m=>[]).should == nil
     @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:delete, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).should == 1
-  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models' do
     @db.create_table!(:items) do
@@ -2442,7 +2436,7 @@ end
 
 describe 'PostgreSQL range types' do
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.extension :pg_array, :pg_range
     @ds = @db[:items]
     @map = {:i4=>'int4range', :i8=>'int8range', :n=>'numrange', :d=>'daterange', :t=>'tsrange', :tz=>'tstzrange'}
@@ -2453,7 +2447,7 @@ describe 'PostgreSQL range types' do
     @r.each{|k, v| @ra[k] = Sequel.pg_array([v], @map[k])}
     @r.each{|k, v| @pgr[k] = Sequel.pg_range(v)}
     @r.each{|k, v| @pgra[k] = Sequel.pg_array([Sequel.pg_range(v)], @map[k])}
-    @native = POSTGRES_DB.adapter_scheme == :postgres
+    @native = INTEGRATION_DB.adapter_scheme == :postgres
   end
   after do
     @db.drop_table?(:items)
@@ -2525,7 +2519,7 @@ describe 'PostgreSQL range types' do
     @ds.filter(h).call(:first, @pgra).each{|k, v| v.should == @ra[k].to_a}
     @ds.filter(h).call(:first, r2).should == nil
     @ds.filter(h).call(:delete, @ra).should == 1
-  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models' do
     @db.create_table!(:items){primary_key :id; int4range :i4; int8range :i8; numrange :n; daterange :d; tsrange :t; tstzrange :tz}
@@ -2613,14 +2607,14 @@ describe 'PostgreSQL range types' do
     @db.get(Sequel::Postgres::PGRange.new(1, 5, :db_type=>:int4range).op.upper_inf).should be_false
     @db.get(Sequel::Postgres::PGRange.new(1, nil, :db_type=>:int4range).op.upper_inf).should be_true
   end
-end if POSTGRES_DB.server_version >= 90200
+end if INTEGRATION_DB.server_version >= 90200
 
 describe 'PostgreSQL interval types' do
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     @db.extension :pg_array, :pg_interval
     @ds = @db[:items]
-    @native = POSTGRES_DB.adapter_scheme == :postgres
+    @native = INTEGRATION_DB.adapter_scheme == :postgres
   end
   after(:all) do
     Sequel::Postgres::PG_TYPES.delete(1186)
@@ -2698,7 +2692,7 @@ describe 'PostgreSQL interval types' do
     @ds.filter(:i=>:$i).call(:first, :i=>[d]).should == {:i=>[d]}
     @ds.filter(:i=>:$i).call(:first, :i=>[]).should == nil
     @ds.filter(:i=>:$i).call(:delete, :i=>[d]).should == 1
-  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'with models' do
     @db.create_table!(:items) do
@@ -2716,7 +2710,7 @@ end if (begin require 'active_support/duration'; require 'active_support/inflect
 
 describe 'PostgreSQL row-valued/composite types' do
   before(:all) do
-    @db = POSTGRES_DB
+    @db = INTEGRATION_DB
     Sequel.extension :pg_array_ops, :pg_row_ops
     @db.extension :pg_array, :pg_row
     @ds = @db[:person]
@@ -2738,7 +2732,7 @@ describe 'PostgreSQL row-valued/composite types' do
     @db.register_row_type(Sequel.qualify(:public, :person))
     @db.register_row_type(:public__company)
 
-    @native = POSTGRES_DB.adapter_scheme == :postgres
+    @native = INTEGRATION_DB.adapter_scheme == :postgres
   end
   after(:all) do
     @db.drop_table?(:company, :person, :address)
@@ -2783,7 +2777,7 @@ describe 'PostgreSQL row-valued/composite types' do
       @db.drop_table(:domain_check)
       @db << "DROP DOMAIN positive_integer"
     end
-  end if POSTGRES_DB.adapter_scheme == :postgres
+  end if INTEGRATION_DB.adapter_scheme == :postgres
 
   specify 'insert and retrieve arrays of row types' do
     @ds = @db[:company]
@@ -2813,7 +2807,7 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds.delete
     @ds.call(:insert, {:address=>Sequel.pg_row([nil, nil, nil])}, {:address=>:$address, :id=>1})
     @ds.get(:address).should == {:street=>nil, :city=>nil, :zip=>nil}
-  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'use arrays of row types in bound variables' do
     @ds = @db[:company]
@@ -2825,7 +2819,7 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds.delete
     @ds.call(:insert, {:employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row([nil, nil, nil])])])}, {:employees=>:$employees, :id=>1})
     @ds.get(:employees).should == [{:address=>{:city=>nil, :zip=>nil, :street=>nil}, :id=>1}]
-  end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'operations/functions with pg_row_ops' do
     @ds.insert(:id=>1, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))
@@ -2951,7 +2945,7 @@ describe 'PostgreSQL row-valued/composite types' do
       @ds.get(:address).should == @a
       @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>@a)[:id].should == 1
       @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12356')).should == nil
-    end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+    end if INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
     specify 'use arrays of model objects in bound variables' do
       @ds = @db[:company]
@@ -2959,7 +2953,7 @@ describe 'PostgreSQL row-valued/composite types' do
       @ds.get(:company).should == Company.new(:id=>1, :employees=>@es)
       @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>@es)[:id].should == 1
       @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).should == nil
-    end if POSTGRES_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+    end if INTEGRATION_DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
     specify 'model typecasting' do
       Person.plugin :pg_typecast_on_load, :address unless @native

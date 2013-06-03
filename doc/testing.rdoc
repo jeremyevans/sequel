@@ -136,6 +136,10 @@ The +spec+ rake task (which is also the default rake task) runs Sequel's core an
 
 The +spec_plugin+ rake task runs the specs for the plugins and extensions that ship with Sequel.  These also use a mocked database connection, and operate very similarly to the general Sequel core and model specs.
 
+== rake spec_core_ext
+
+The +spec_core_ext+ rake task runs the specs for the core_extensions extension.  These are run separately from the other extension tests to make sure none of the other extensions require the core_extensions.
+
 == rake spec_bin
 
 The +spec_bin+ rake task runs the specs for bin/sequel.  These use an SQLite3 database, and require either the sqlite3 (non-JRuby) or jdbc-sqlite3 (JRuby) gem.
@@ -154,20 +158,10 @@ Sequel does not create test databases automatically, except for file-based datab
 
 === Connection Strings
 
-The following environment variables specify Database connection URL strings:
-
-* SEQUEL_INTEGRATION_URL: integration specs
-* SEQUEL_FB_SPEC_DB: firebird adapter specs
-* SEQUEL_MSSQL_SPEC_DB: mssql adapter specs
-* SEQUEL_PG_SPEC_DB: postgres adapter specs
-* SEQUEL_SQLITE_SPEC_DB: sqlite adapter specs
-* SEQUEL_MY_SPEC_DB: mysql adapter specs
-* SEQUEL_DB2_SPEC_DB: db2 adapter specs
+The SEQUEL_INTEGRATION_URL environment variable specifies the Database connection URL to use for the adapter and integration specs.  Additionally, when running the adapter specs, you can also use the SEQUEL_<i>ADAPTER</i>_URL environment variable (e.g. SEQUEL_POSTGRES_URL for spec_postgres).
 
 === Other
 
-* SEQUEL_MSSQL_SPEC_REQUIRE: Separate file to require when running mssql adapter specs
-* SEQUEL_DB2_SPEC_REQUIRE: Separate file to require when running db2 adapter specs
-* SEQUEL_COLUMNS_INTROSPECTION: Whether to run the specs with the columns_introspection extension loaded by default
-* SEQUEL_NO_PENDING: Don't mark any specs as pending, try running all specs
-* SKIPPED_TEST_WARN: Warn when skipping any tests because libraries aren't available
+SEQUEL_COLUMNS_INTROSPECTION :: Whether to run the specs with the columns_introspection extension loaded by default
+SEQUEL_NO_PENDING :: Don't mark any specs as pending, try running all specs
+SKIPPED_TEST_WARN :: Warn when skipping any tests because libraries aren't available

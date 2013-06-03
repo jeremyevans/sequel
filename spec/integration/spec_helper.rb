@@ -79,14 +79,8 @@ end
   end
 end
 
-if defined?(INTEGRATION_DB) || defined?(INTEGRATION_URL) || ENV['SEQUEL_INTEGRATION_URL']
-  unless defined?(INTEGRATION_DB)
-    url = defined?(INTEGRATION_URL) ? INTEGRATION_URL : ENV['SEQUEL_INTEGRATION_URL']
-    INTEGRATION_DB = Sequel.connect(url)
-    #INTEGRATION_DB.instance_variable_set(:@server_version, 80100)
-  end
-else
-  INTEGRATION_DB = Sequel.sqlite
+unless defined?(INTEGRATION_DB)
+  INTEGRATION_DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL'])
 end
 
 if INTEGRATION_DB.adapter_scheme == :ibmdb || (INTEGRATION_DB.adapter_scheme == :ado && INTEGRATION_DB.database_type == :access)

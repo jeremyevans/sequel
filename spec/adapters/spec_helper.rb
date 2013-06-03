@@ -61,3 +61,9 @@ end
     yield unless ENV['SEQUEL_NO_CHECK_SQLS']
   end
 end
+
+unless defined?(INTEGRATION_DB)
+  env_var = "SEQUEL_#{SEQUEL_ADAPTER_TEST.to_s.upcase}_URL"
+  env_var = ENV.has_key?(env_var) ? env_var : 'SEQUEL_INTEGRATION_URL'
+  INTEGRATION_DB = Sequel.connect(ENV[env_var])
+end
