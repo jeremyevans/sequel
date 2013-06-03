@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove Model::EMPTY_INSTANCE_VARIABLES (jeremyevans)
+
 * Model.raise_on_typecast_failure now defaults to false (jeremyevans)
 
 * Model#_save private method now only takes a single argument (jeremyevans)

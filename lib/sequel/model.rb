@@ -82,9 +82,6 @@ module Sequel
     DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS +
       [:each_server]) - [:and, :or, :[], :[]=, :columns, :columns!, :delete, :update, :add_graph_aliases]
     
-    # Class instance variables to set to nil when a subclass is created, for -w compliance
-    EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@db]
-
     # Boolean settings that can be modified at the global, class, or instance level.
     BOOLEAN_SETTINGS = [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, \
       :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_after_commit_rollback, :use_transactions]
