@@ -1800,11 +1800,6 @@ describe Sequel::Model, "one_to_many" do
     p.remove_attribute(c).should == nil
     p.attributes.should == [c]
   end
-  
-  qspecify "should raise an error if trying to use the :one_to_one option" do
-    proc{@c2.one_to_many :attribute, :class => @c1, :one_to_one=>true}.should raise_error(Sequel::Error)
-    proc{@c2.associate :one_to_many, :attribute, :class => @c1, :one_to_one=>true}.should raise_error(Sequel::Error)
-  end
 end
 
 describe Sequel::Model, "many_to_many" do

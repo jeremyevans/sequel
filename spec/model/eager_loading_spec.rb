@@ -609,10 +609,6 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.should == []
   end
 
-  it "should raise an error if you use an :eager_loader proc with the wrong arity" do
-    proc{EagerAlbum.many_to_one :special_band, :eager_loader=>proc{|a, b|}}.should raise_error(Sequel::Error)
-  end
-  
   it "should respect :after_load callbacks on associations when eager loading" do
     EagerAlbum.many_to_one :al_band, :class=>'EagerBand', :key=>:band_id, :after_load=>proc{|o, a| a.id *=2}
     EagerAlbum.one_to_many :al_tracks, :class=>'EagerTrack', :key=>:album_id, :after_load=>proc{|o, os| os.each{|a| a.id *=2}}
@@ -1264,10 +1260,6 @@ describe Sequel::Model, "#eager_graph" do
 
     GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :eager_grapher=>proc{|eo| eo[:self].graph(:ag, {:album_id=>:id}, :table_alias=>:a123, :implicit_qualifier=>eo[:implicit_qualifier]).graph(GraphGenre, [:album_id], :table_alias=>eo[:table_alias])}
     GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag AS a123 ON (a123.album_id = albums.id) LEFT OUTER JOIN genres AS active_genres USING (album_id)"
-  end
-
-  it "should raise an error if you use an :eager_grapher proc with the wrong arity" do
-    proc{GraphAlbum.many_to_one :special_band, :eager_grapher=>proc{|a, b|}}.should raise_error(Sequel::Error)
   end
 
   it "should respect the association's :graph_only_conditions option" do 
