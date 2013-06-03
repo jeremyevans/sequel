@@ -532,10 +532,10 @@ describe Sequel::Model, ".strict_param_setting" do
     proc{@c.create(:z=>1)}.should raise_error(Sequel::Error)
     c = @c.new
     proc{c.set(:z=>1)}.should raise_error(Sequel::Error)
-    proc{c.set_all(:id=>1)}.should raise_error(Sequel::Error)
+    proc{c.set_all(:use_after_commit_rollback => false)}.should raise_error(Sequel::Error)
     proc{c.set_only({:x=>1}, :y)}.should raise_error(Sequel::Error)
     proc{c.update(:z=>1)}.should raise_error(Sequel::Error)
-    proc{c.update_all(:id=>1)}.should raise_error(Sequel::Error)
+    proc{c.update_all(:use_after_commit_rollback=>false)}.should raise_error(Sequel::Error)
     proc{c.update_only({:x=>1}, :y)}.should raise_error(Sequel::Error)
   end
 

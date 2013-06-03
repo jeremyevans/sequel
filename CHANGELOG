@@ -1,5 +1,7 @@
 === HEAD
 
+* Model#set_all and #update_all can now update the primary key (jeremyevans)
+
 * Integrate many_to_one_pk_lookup and association_autoreloading plugins into main associations plugin (jeremyevans)
 
 * Make defaults_setter plugin operate in a lazy manner (jeremyevans)

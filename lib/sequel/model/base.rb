@@ -1830,7 +1830,7 @@ module Sequel
           only.map{|x| "#{x}="}
         else
           meths = methods.collect{|x| x.to_s}.grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
-          meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && model.restrict_primary_key?
+          meths -= Array(primary_key).map{|x| "#{x}="} if except != false && primary_key && model.restrict_primary_key?
           meths
         end
       end

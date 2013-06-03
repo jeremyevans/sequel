@@ -1091,7 +1091,7 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
   it "should raise errors if not all hash fields can be set and strict_param_setting is true" do
     @c.strict_param_setting = true
 
-    proc{@c.new.set_all(:x => 1, :y => 2, :z=>3, :id=>4)}.should raise_error(Sequel::Error)
+    proc{@c.new.set_all(:x => 1, :y => 2, :z=>3, :use_after_commit_rollback => false)}.should raise_error(Sequel::Error)
     (o = @c.new).set_all(:x => 1, :y => 2, :z=>3)
     o.values.should == {:x => 1, :y => 2, :z=>3}
 
@@ -1101,9 +1101,15 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
     o.values.should == {:x => 1, :y => 2}
   end
 
-  it "#set_all should set all attributes except the primary key" do
+  it "#set_all should set all attributes including the primary key" do
     @o1.set_all(:x => 1, :y => 2, :z=>3, :id=>4)
-    @o1.values.should == {:x => 1, :y => 2, :z=>3}
+    @o1.values.should == {:id =>4, :x => 1, :y => 2, :z=>3}
+  end
+
+  it "#set_all should set not set restricted fields" do
+    @o1.set_all(:x => 1, :use_after_commit_rollback => false)
+    @o1.use_after_commit_rollback.should be_true
+    @o1.values.should == {:x => 1}
   end
 
   it "#set_only should only set given attributes" do
@@ -1116,11 +1122,11 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
   end
 
   it "#update_all should update all attributes" do
-    @c.new.update_all(:x => 1, :id=>4)
+    @c.new.update_all(:x => 1)
     MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
-    @c.new.update_all(:y => 1, :id=>4)
+    @c.new.update_all(:y => 1)
     MODEL_DB.sqls.should == ["INSERT INTO items (y) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
-    @c.new.update_all(:z => 1, :id=>4)
+    @c.new.update_all(:z => 1)
     MODEL_DB.sqls.should == ["INSERT INTO items (z) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
