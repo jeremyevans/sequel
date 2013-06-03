@@ -1,5 +1,7 @@
 === HEAD
 
+* Make defaults_setter plugin operate in a lazy manner (jeremyevans)
+
 * Plugins now extend the model class with ClassMethods before including InstanceMethods (jeremyevans)
 
 * Remove Model::EMPTY_INSTANCE_VARIABLES (jeremyevans)

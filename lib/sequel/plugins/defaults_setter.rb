@@ -54,12 +54,14 @@ module Sequel
       end
 
       module InstanceMethods
-        private
-
-        # Set default values if they are not already set by the hash provided to initialize.
-        def initialize_set(h)
-          super
-          model.default_values.each{|k,v| self[k] = (v.respond_to?(:call) ? v.call : v) unless values.has_key?(k)}
+        # Use default value for a new record if values doesn't already contain an entry for it.
+        def [](k)
+          if new? && !values.has_key?(k)
+            v = model.default_values[k]
+            v.respond_to?(:call) ? v.call : v
+          else
+            super
+          end
         end
       end
     end
