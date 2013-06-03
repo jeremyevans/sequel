@@ -1,8 +1,12 @@
 === HEAD
 
-* Model#save no longer calls #_refresh internally (jeremyevans)
+* All behavior deprecated in Sequel 3.48.0 has been removed (jeremyevans)
 
-* Deprecated Model#set_values (jeremyevans)
+* Make adapter/integration spec environment variables more consistent (jeremyevans)
+
+* Sequel no longer provides default databases for adapter/integration specs (jeremyevans)
+
+* Model#save no longer calls #_refresh internally (jeremyevans)
 
 * Model#set_all and #update_all can now update the primary key (jeremyevans)
 
@@ -22,7 +26,11 @@
 
 * Make boolean prepared statement arguments work on sqlite adapter when integer_booleans is true (jeremyevans)
 
+* Make Database#tables and #views reflect search_path on PostgreSQL (jeremyevans)
+
 * SQLite now defaults to true for integer_booleans and false for use_timestamp_timezones (jeremyevans)
+
+* Make the default value for most option hashes a shared frozen hash (jeremyevans)
 
 * Remove Sequel::NotImplemented exception (jeremyevans)
 
