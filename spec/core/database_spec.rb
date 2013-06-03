@@ -1993,9 +1993,9 @@ describe "Database#typecast_value" do
     end
   end
 
-  qspecify "should typecast hash and array values to String" do
+  specify "should raise errors when typecasting hash and array values to String" do
     [[], {}].each do |i|
-      @db.typecast_value(:string, i).should be_an_instance_of(String)
+      proc{@db.typecast_value(:string, i)}.should raise_error(Sequel::InvalidValue)
     end
   end
 
