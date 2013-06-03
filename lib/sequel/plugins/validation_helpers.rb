@@ -167,10 +167,6 @@ module Sequel
         def validates_type(klass, atts, opts=OPTS)
           klass = klass.to_s.constantize if klass.is_a?(String) || klass.is_a?(Symbol)
           validatable_attributes_for_type(:type, atts, opts) do |a,v,m|
-            if v.nil?
-              Sequel::Deprecation.deprecate('validates_type will no longer allow nil values by default in Sequel 4.  Use the :allow_nil=>true option to allow nil values.')
-              next
-            end
             if klass.is_a?(Array) ? !klass.any?{|kls| v.is_a?(kls)} : !v.is_a?(klass)
               validation_error_message(m, klass)
             end

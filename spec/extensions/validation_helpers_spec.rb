@@ -320,12 +320,6 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.errors.full_messages.should == ['value is not a valid integer or float']
   end
 
-  qspecify "should have validates_type skip nil values by default" do
-    @c.set_validations{validates_type([Integer, Float], :value)}
-    @m.value = nil
-    @m.should be_valid
-  end
-
   specify "should support validates_not_null" do
     @c.set_validations{validates_not_null(:value)}
     @m.should_not be_valid
