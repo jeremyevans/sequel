@@ -1,6 +1,4 @@
 module Sequel
-  require 'plugins/instance_filters'
-  
   module Plugins
     # This plugin implements a simple database-independent locking mechanism
     # to ensure that concurrent updates do not override changes. This is
@@ -21,7 +19,7 @@ module Sequel
     # This plugin relies on the instance_filters plugin.
     module OptimisticLocking
       # Exception class raised when trying to update or destroy a stale object.
-      Error = InstanceFilters::Error
+      Error = Sequel::NoExistingObject
       
       # Load the instance_filters plugin into the model.
       def self.apply(model, opts=OPTS)
