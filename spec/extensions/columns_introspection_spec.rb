@@ -4,9 +4,8 @@ Sequel.extension :columns_introspection
 
 describe "columns_introspection extension" do
   before do
-    @db = Sequel.mock
+    @db = Sequel.mock.extension(:columns_introspection)
     @ds = @db[:a]
-    @ds.extend(Sequel::ColumnsIntrospection.dup) # dup to allow multiple places in class hierarchy
     @db.sqls
   end
 
