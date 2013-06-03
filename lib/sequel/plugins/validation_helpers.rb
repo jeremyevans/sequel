@@ -32,9 +32,7 @@ module Sequel
     # :allow_nil :: Whether to skip the validation if the value is nil.
     # :message :: The message to use.  Can be a string which is used directly, or a
     #             proc which is called.  If the validation method takes a argument before the array of attributes,
-    #             that argument is passed as an argument to the proc.  The exception is the
-    #             validates_not_string method, which doesn't take an argument, but passes
-    #             the schema type symbol as the argument to the proc.
+    #             that argument is passed as an argument to the proc.
     #
     # The default validation options for all models can be modified by
     # changing the values of the Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS hash.  You
@@ -84,7 +82,6 @@ module Sequel
         :max_length=>{:message=>lambda{|max| "is longer than #{max} characters"}, :nil_message=>lambda{"is not present"}},
         :min_length=>{:message=>lambda{|min| "is shorter than #{min} characters"}},
         :not_null=>{:message=>lambda{"is not present"}},
-        :not_string=>{:message=>lambda{|type| type ? "is not a valid #{type}" : "is a string"}},
         :numeric=>{:message=>lambda{"is not a number"}},
         :type=>{:message=>lambda{|klass| klass.is_a?(Array) ? "is not a valid #{klass.join(" or ").downcase}" : "is not a valid #{klass.to_s.downcase}"}},
         :presence=>{:message=>lambda{"is not present"}},
@@ -142,17 +139,6 @@ module Sequel
           validatable_attributes_for_type(:not_null, atts, opts){|a,v,m| validation_error_message(m) if v.nil?}
         end
         
-        # Check that the attribute value(s) is not a string.  This is generally useful
-        # in conjunction with raise_on_typecast_failure = false, where you are
-        # passing in string values for non-string attributes (such as numbers and dates).
-        # If typecasting fails (invalid number or date), the value of the attribute will
-        # be a string in an invalid format, and if typecasting succeeds, the value will
-        # not be a string.
-        def validates_not_string(atts, opts=OPTS)
-          Sequel::Deprecation.deprecate('validates_not_string', "Please switch to validates_schema_types")
-          validatable_attributes_for_type(:not_string, atts, opts){|a,v,m| validation_error_message(m, (db_schema[a]||{})[:type]) if v.is_a?(String)}
-        end
-
         # Check attribute value(s) string representation is a valid float.
         def validates_numeric(atts, opts=OPTS)
           validatable_attributes_for_type(:numeric, atts, opts) do |a,v,m|

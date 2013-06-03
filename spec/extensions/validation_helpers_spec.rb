@@ -235,18 +235,6 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should_not be_valid
   end
 
-  qspecify "should support validates_not_string" do
-    @c.set_validations{validates_not_string(:value)}
-    @m.value = 123
-    @m.should be_valid
-    @m.value = '123'
-    @m.should_not be_valid
-    @m.errors.full_messages.should == ['value is a string']
-    @m.meta_def(:db_schema){{:value=>{:type=>:integer}}}
-    @m.should_not be_valid
-    @m.errors.full_messages.should == ['value is not a valid integer']
-  end
-
   specify "should support validates_schema_types" do
     @c.set_validations{validates_schema_types}
     @m.value = 123
