@@ -208,17 +208,10 @@ module Sequel
             ft = opts.final_reverse_edge
             ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.predicate_key, h.keys]], :table_alias=>ft[:alias], :qualify=>:deep)
             ds = model.eager_loading_dataset(opts, ds, nil, eo[:associations], eo)
-            case opts.eager_limit_strategy
-            when :window_function
+            if opts.eager_limit_strategy == :window_function
               delete_rn = true
               rn = ds.row_number_column
               ds = apply_window_function_eager_limit_strategy(ds, opts)
-            when :correlated_subquery
-              ds = apply_correlated_subquery_eager_limit_strategy(ds, opts) do |xds|
-                dsa = ds.send(:dataset_alias, 2)
-                opts.reverse_edges.each{|t| xds = xds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
-                xds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + left_keys.map{|k| [k, SQL::QualifiedIdentifier.new(ft[:table], k)]}, :table_alias=>dsa, :qualify=>:deep)
-              end
             end
             ds.all do |assoc_record|
               assoc_record.values.delete(rn) if delete_rn

@@ -1031,59 +1031,6 @@ module Sequel
         
         private
       
-        # Use a correlated subquery to limit the results of the eager loading dataset.
-        def apply_correlated_subquery_eager_limit_strategy(ds, opts)
-          Sequel::Deprecation.deprecate('The correlated_subquery eager limit strategy',  'Switch to another eager limit strategy.')
-          klass = opts.associated_class
-          kds = klass.dataset
-          dsa = ds.send(:dataset_alias, 1)
-          raise Error, "can't use a correlated subquery if the associated class (#{opts.associated_class.inspect}) does not have a primary key" unless pk = klass.primary_key
-          pka = Array(pk)
-          raise Error, "can't use a correlated subquery if the associated class (#{opts.associated_class.inspect}) has a composite primary key and the database does not support multiple column IN" if pka.length > 1 && !ds.supports_multiple_column_in?
-          table = kds.opts[:from]
-          raise Error, "can't use a correlated subquery unless the associated class (#{opts.associated_class.inspect}) uses a single FROM table" unless table && table.length == 1
-          table = table.first
-          if order = ds.opts[:order]
-            oproc = lambda do |x|
-              case x
-              when Symbol
-                t, c, _ = ds.send(:split_symbol, x)
-                if t && t.to_sym == table
-                  SQL::QualifiedIdentifier.new(dsa, c)
-                else
-                  x
-                end
-              when SQL::QualifiedIdentifier
-                if x.table == table
-                  SQL::QualifiedIdentifier.new(dsa, x.column)
-                else
-                  x
-                end
-              when SQL::OrderedExpression
-                SQL::OrderedExpression.new(oproc.call(x.expression), x.descending, :nulls=>x.nulls)
-              else
-                x
-              end
-            end
-            order = order.map(&oproc) 
-          end
-          limit, offset = opts.limit_and_offset
-
-          subquery = yield kds.
-            unlimited.
-            from(SQL::AliasedExpression.new(table, dsa)).
-            select(*pka.map{|k| SQL::QualifiedIdentifier.new(dsa, k)}).
-            order(*order).
-            limit(limit, offset)
-
-          pk = if pk.is_a?(Array)
-            pk.map{|k| SQL::QualifiedIdentifier.new(table, k)}
-          else
-            SQL::QualifiedIdentifier.new(table, pk)
-          end
-          ds.where(pk=>subquery)
-        end
-
         # Use a window function to limit the results of the eager loading dataset.
         def apply_window_function_eager_limit_strategy(ds, opts)
           rn = ds.row_number_column 
@@ -1169,16 +1116,10 @@ module Sequel
             r = rcks.zip(opts.right_primary_keys)
             l = [[opts.predicate_key, h.keys]]
             ds = model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l, :qualify=>:deep), nil, eo[:associations], eo)
-            case opts.eager_limit_strategy
-            when :window_function
+            if opts.eager_limit_strategy == :window_function
               delete_rn = true
               rn = ds.row_number_column
               ds = apply_window_function_eager_limit_strategy(ds, opts)
-            when :correlated_subquery
-              ds = apply_correlated_subquery_eager_limit_strategy(ds, opts) do |xds|
-                dsa = ds.send(:dataset_alias, 2)
-                xds.inner_join(join_table, r + lcks.map{|k| [k, SQL::QualifiedIdentifier.new(opts.join_table_alias, k)]}, :table_alias=>dsa, :qualify=>:deep)
-              end
             end
             ds.all do |assoc_record|
               assoc_record.values.delete(rn) if delete_rn
@@ -1334,10 +1275,6 @@ module Sequel
               delete_rn = true
               rn = ds.row_number_column
               ds = apply_window_function_eager_limit_strategy(ds, opts)
-            when :correlated_subquery
-              ds = apply_correlated_subquery_eager_limit_strategy(ds, opts) do |xds|
-                xds.where(opts.associated_object_keys.map{|k| [SQL::QualifiedIdentifier.new(xds.first_source_alias, k), SQL::QualifiedIdentifier.new(xds.first_source_table, k)]})
-              end
             end
             ds.all do |assoc_record|
               assoc_record.values.delete(rn) if delete_rn
