@@ -77,12 +77,6 @@ module Sequel
         Plugins.inherited_instance_variables(self, :@auto_validate_presence=>nil, :@auto_validate_types=>nil, :@auto_validate_not_null_columns=>:dup, :@auto_validate_explicit_not_null_columns=>:dup, :@auto_validate_unique_columns=>:dup)
         Plugins.after_set_dataset(self, :setup_auto_validations)
 
-        # REMOVE40
-        def auto_validate_presence_columns
-          Sequel::Deprecation.deprecate('Model.auto_validate_presence_columns', 'Please switch to auto_validate_not_null_columns')
-          auto_validate_not_null_columns
-        end
-
         # Whether to use a presence validation for not null columns
         def auto_validate_presence?
           @auto_validate_presence
