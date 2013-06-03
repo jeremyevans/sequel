@@ -1,5 +1,7 @@
 === HEAD
 
+* Integrate many_to_one_pk_lookup and association_autoreloading plugins into main associations plugin (jeremyevans)
+
 * Make defaults_setter plugin operate in a lazy manner (jeremyevans)
 
 * Plugins now extend the model class with ClassMethods before including InstanceMethods (jeremyevans)

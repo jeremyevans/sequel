@@ -1,11 +1,10 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe "Sequel::Plugins::ManyToOnePkLookup" do
+describe "Shared caching behavior" do
   before do
     @db = Sequel.mock
 
     class ::LookupModel < ::Sequel::Model(@db)
-      plugin :many_to_one_pk_lookup
       columns :id, :caching_model_id, :caching_model_id2
       many_to_one :caching_model
       many_to_one :caching_model2, :key=>[:caching_model_id, :caching_model_id2], :class=>:CachingModel
@@ -99,7 +98,6 @@ describe "Sequel::Plugins::ManyToOnePkLookup" do
       c = Class.new(Sequel::Model(@db[:lookup_model]))
       c.class_eval do
         plugin :prepared_statements_associations
-        plugin :many_to_one_pk_lookup
         columns :id, :caching_model_id
         many_to_one :caching_model, :class=>c2
       end
@@ -111,7 +109,6 @@ describe "Sequel::Plugins::ManyToOnePkLookup" do
       c = Class.new(Sequel::Model(:lookup_model))
       c.class_eval do
         plugin :prepared_statements_associations
-        plugin :many_to_one_pk_lookup
         columns :id, :caching_model_id
         many_to_one :caching_model
       end

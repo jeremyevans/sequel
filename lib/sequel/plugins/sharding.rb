@@ -82,6 +82,12 @@ module Sequel
           o.set_server?(@server) if o.respond_to?(:set_server?)
           super
         end
+
+        # Don't use primary key lookup to load associated objects, since that will not
+        # respect the current object's server.
+        def load_with_primary_key_lookup?(opts, dynamic_opts)
+          false
+        end
       end
 
       module DatasetMethods

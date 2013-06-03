@@ -197,7 +197,7 @@ describe Sequel::Model, "many_to_one" do
     p.class.should == @c2
     p.values.should == {:x => 1, :id => 1}
 
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE id = 234"]
   end
   
   it "should allow association with the same name as the key if :key_column is given" do
@@ -208,7 +208,7 @@ describe Sequel::Model, "many_to_one" do
     d.parent_id.should == @c2.load(:x => 1, :id => 1)
     d.parent_id_id.should == 234
     d[:parent_id].should == 234
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE id = 234"]
 
     d.parent_id_id = 3
     d.parent_id_id.should == 3
@@ -220,7 +220,7 @@ describe Sequel::Model, "many_to_one" do
       class ::ParParent < Sequel::Model; end
       @c2.many_to_one :par_parent
       @c2.new(:id => 1, :par_parent_id => 234).par_parent.class.should == ParParent
-      MODEL_DB.sqls.should == ["SELECT * FROM par_parents WHERE (par_parents.id = 234) LIMIT 1"]
+      MODEL_DB.sqls.should == ["SELECT * FROM par_parents WHERE id = 234"]
     ensure
       Object.send(:remove_const, :ParParent)
     end
@@ -233,7 +233,7 @@ describe Sequel::Model, "many_to_one" do
       end
       @c2.many_to_one :par_parent, :class=>"Par::Parent"
       @c2.new(:id => 1, :par_parent_id => 234).par_parent.class.should == Par::Parent
-      MODEL_DB.sqls.should == ["SELECT * FROM parents WHERE (parents.id = 234) LIMIT 1"]
+      MODEL_DB.sqls.should == ["SELECT * FROM parents WHERE id = 234"]
     ensure
       Object.send(:remove_const, :Par)
     end
@@ -247,13 +247,13 @@ describe Sequel::Model, "many_to_one" do
     p.class.should == @c2
     p.values.should == {:x => 1, :id => 1}
 
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 567) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE id = 567"]
   end
 
   it "should respect :qualify => false option" do
     @c2.many_to_one :parent, :class => @c2, :key => :blah, :qualify=>false
     @c2.new(:id => 1, :blah => 567).parent
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (id = 567) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE id = 567"]
   end
   
   it "should use :primary_key option if given" do
@@ -317,7 +317,7 @@ describe Sequel::Model, "many_to_one" do
     d = @c2.new(:id => 1, :parent_id=>555)
     MODEL_DB.sqls.should == []
     d.parent.should == nil
-    MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (nodes.id = 555) LIMIT 1']
+    MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE id = 555']
     d.parent.should == nil
     MODEL_DB.sqls.should == []
   end
@@ -386,7 +386,7 @@ describe Sequel::Model, "many_to_one" do
     d.associations[:parent].should == nil
     @c2.dataset._fetch = {:id=>234}
     e = d.parent 
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE id = 234"]
     d.associations[:parent].should == e
   end
 
@@ -420,7 +420,7 @@ describe Sequel::Model, "many_to_one" do
     d.parent_id = 234
     d.associations[:parent] = 42
     d.parent(true).should_not == 42 
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE id = 234"]
   end
   
   it "should use a callback if given one as the argument" do
@@ -3271,5 +3271,104 @@ describe "Model#freeze" do
     b = Album::B.load(:id=>2, :album_id=>nil)
     b.album = @o
     @o.associations[:b].should be_nil
+  end
+end
+
+describe "association autoreloading" do
+  before do
+    @c = Class.new(Sequel::Model)
+    @Artist = Class.new(@c).set_dataset(:artists)
+    @Artist.dataset._fetch = {:id=>2, :name=>'Ar'}
+    @Album = Class.new(@c).set_dataset(:albums)
+    @Artist.columns :id, :name
+    @Album.columns :id, :name, :artist_id
+    @Album.db_schema[:artist_id][:type] = :integer
+    @Album.many_to_one :artist, :class=>@Artist
+    MODEL_DB.reset
+  end
+
+  specify "should reload many_to_one association when foreign key is modified" do
+    album = @Album.load(:id => 1, :name=>'Al', :artist_id=>2)
+    album.artist
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE id = 2']
+
+    album.artist_id = 1
+    album.artist
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE id = 1']
+  end
+
+  specify "should handle multiple many_to_one association with the same foreign key" do
+    @Album.many_to_one :artist2, :key=>:artist_id, :class=>@Artist
+    album = @Album.load(:id => 1, :name=>'Al', :artist_id=>2)
+    album.artist
+    album.artist2
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE id = 2'] * 2
+
+    album.artist
+    album.artist2
+    MODEL_DB.sqls.should == []
+
+    album.artist_id = 1
+    album.artist
+    album.artist2
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE id = 1'] * 2
+  end
+
+  specify "should not reload when value has not changed" do
+    album = @Album.load(:id => 1, :name=>'Al', :artist_id=>2)
+    album.artist
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE id = 2']
+
+    album.artist_id = 2
+    album.artist
+    MODEL_DB.sqls.should == []
+
+    album.artist_id = "2"
+    album.artist
+    MODEL_DB.sqls.should == []
+  end
+
+  specify "should reload all associations which use the foreign key" do
+    @Album.many_to_one :other_artist, :key => :artist_id, :foreign_key => :id, :class => @Artist
+    album = @Album.load(:id => 1, :name=>'Al', :artist_id=>2)
+    album.artist
+    album.other_artist
+    MODEL_DB.reset
+
+    album.artist_id = 1
+    album.artist
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE id = 1']
+
+    album.other_artist
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE id = 1']
+  end
+
+  specify "should work with composite keys" do
+    @Album.many_to_one :composite_artist, :key => [:artist_id, :name], :primary_key => [:id, :name], :class => @Artist
+    album = @Album.load(:id => 1, :name=>'Al', :artist_id=>2)
+    album.composite_artist
+    MODEL_DB.reset
+
+    album.artist_id = 1
+    album.composite_artist
+    MODEL_DB.sqls.should == ["SELECT * FROM artists WHERE ((artists.id = 1) AND (artists.name = 'Al')) LIMIT 1"]
+
+    album.name = 'Al2'
+    album.composite_artist
+    MODEL_DB.sqls.should == ["SELECT * FROM artists WHERE ((artists.id = 1) AND (artists.name = 'Al2')) LIMIT 1"]
+  end
+
+  specify "should work with subclasses" do
+    salbum = Class.new(@Album)
+    oartist = Class.new(@c).set_dataset(:oartist)
+    oartist.columns :id, :name
+    salbum.many_to_one :artist2, :class=>oartist, :key=>:artist_id
+    album = salbum.load(:id => 1, :name=>'Al', :artist_id=>2)
+    album.artist
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE id = 2']
+
+    album.artist_id = 1
+    album.artist
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE id = 1']
   end
 end

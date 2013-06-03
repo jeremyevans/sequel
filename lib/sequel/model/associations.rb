@@ -9,6 +9,7 @@ module Sequel
       # Set an empty association reflection hash in the model
       def self.apply(model)
         model.instance_variable_set(:@association_reflections, {})
+        model.instance_variable_set(:@autoreloading_associations, {})
       end
 
       # AssociationReflection is a Hash subclass that keeps information on Sequel::Model associations. It
@@ -700,6 +701,11 @@ module Sequel
         # All association reflections defined for this model (default: {}).
         attr_reader :association_reflections
 
+        # Hash with column symbol keys and arrays of many_to_one
+        # association symbols that should be cleared when the column
+        # value changes.
+        attr_reader :autoreloading_associations
+
         # The default :eager_limit_strategy option to use for *_many associations (default: nil)
         attr_accessor :default_eager_limit_strategy
 
@@ -1020,7 +1026,7 @@ module Sequel
           associate(:one_to_one, name, opts, &block)
         end
 
-        Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@default_eager_limit_strategy=>nil)
+        Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@autoreloading_associations=>:hash_dup, :@default_eager_limit_strategy=>nil)
         Plugins.def_dataset_methods(self, [:eager, :eager_graph])
         
         private
@@ -1190,6 +1196,17 @@ module Sequel
           end
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
           opts[:cartesian_product_number] ||= 0
+
+          if !opts.has_key?(:many_to_one_pk_lookup) &&
+             (opts[:dataset] || opts[:conditions] || opts[:block] || opts[:select] ||
+              (opts.has_key?(:key) && opts[:key] == nil))
+            opts[:many_to_one_pk_lookup] = false
+          end
+          auto_assocs = @autoreloading_associations
+          cks.each do |k|
+            (auto_assocs[k] ||= []) << name
+          end
+
           opts[:dataset] ||= proc do
             opts.associated_dataset.where(opts.predicate_keys.zip(cks.map{|k| send(k)}))
           end
@@ -1456,6 +1473,8 @@ module Sequel
           if opts.can_have_associated_objects?(self)
             if opts.returns_array?
               _load_associated_object_array(opts, dynamic_opts)
+            elsif load_with_primary_key_lookup?(opts, dynamic_opts)
+              opts.associated_class.send(:primary_key_lookup, ((fk = opts[:key]).is_a?(Array) ? fk.map{|c| send(c)} : send(fk)))
             else
               _load_associated_object(opts, dynamic_opts)
             end
@@ -1463,7 +1482,7 @@ module Sequel
             []
           end
         end
-        
+
         # Add the given associated object to the given association
         def add_associated_object(opts, o, *args)
           klass = opts.associated_class
@@ -1503,6 +1522,15 @@ module Sequel
         # and is an actual method for memory reasons.
         def array_uniq!(a)
           a.uniq!
+        end
+
+        # If a foreign key column value changes, clear the related
+        # cached associations.
+        def change_column_value(column, value)
+          if assocs = model.autoreloading_associations[column]
+            assocs.each{|a| associations.delete(a)}
+          end
+          super
         end
 
         # Save the associated object if the associated object needs a primary key
@@ -1548,6 +1576,13 @@ module Sequel
           end
         end
 
+        # Whether to use a simple primary key lookup on the associated class when loading.
+        def load_with_primary_key_lookup?(opts, dynamic_opts)
+          opts[:type] == :many_to_one &&
+            !dynamic_opts[:callback] && 
+            opts.send(:cached_fetch, :many_to_one_pk_lookup){opts.primary_key == opts.associated_class.primary_key}
+        end
+        
         # Remove all associated objects from the given association
         def remove_all_associated_objects(opts, *args)
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") unless pk

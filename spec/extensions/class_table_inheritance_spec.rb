@@ -204,7 +204,7 @@ describe "class_table_inheritance plugin" do
   it "should handle many_to_one relationships correctly" do
     Manager.dataset._fetch = {:id=>3, :name=>'E', :kind=>'Executive', :num_managers=>3}
     Staff.load(:manager_id=>3).manager.should == Executive.load(:id=>3, :name=>'E', :kind=>'Executive', :num_managers=>3)
-    @db.sqls.should == ['SELECT * FROM employees INNER JOIN managers USING (id) WHERE (managers.id = 3) LIMIT 1']
+    @db.sqls.should == ['SELECT * FROM employees INNER JOIN managers USING (id) WHERE (id = 3) LIMIT 1']
   end
   
   it "should handle one_to_many relationships correctly" do

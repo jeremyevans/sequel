@@ -68,8 +68,8 @@ describe Sequel::Model, "tree plugin" do
   it "should have ancestors return the ancestors of the current node" do
     @ds._fetch = [[{:id=>1, :parent_id=>5, :name=>'r'}], [{:id=>5, :parent_id=>nil, :name=>'r2'}]]
     @o.ancestors.should == [@c.load(:id=>1, :parent_id=>5, :name=>'r'), @c.load(:id=>5, :parent_id=>nil, :name=>'r2')]
-    @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1",
-      "SELECT * FROM nodes WHERE (nodes.id = 5) LIMIT 1"]
+    @db.sqls.should == ["SELECT * FROM nodes WHERE id = 1",
+      "SELECT * FROM nodes WHERE id = 5"]
   end
 
   it "should have descendants return the descendants of the current node" do
@@ -84,8 +84,8 @@ describe Sequel::Model, "tree plugin" do
   it "should have root return the root of the current node" do
     @ds._fetch = [[{:id=>1, :parent_id=>5, :name=>'r'}], [{:id=>5, :parent_id=>nil, :name=>'r2'}]]
     @o.root.should == @c.load(:id=>5, :parent_id=>nil, :name=>'r2')
-    @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1",
-      "SELECT * FROM nodes WHERE (nodes.id = 5) LIMIT 1"]
+    @db.sqls.should == ["SELECT * FROM nodes WHERE id = 1",
+      "SELECT * FROM nodes WHERE id = 5"]
   end
 
   it "should have root? return true for a root node and false for a child node" do
@@ -100,14 +100,14 @@ describe Sequel::Model, "tree plugin" do
   it "should have self_and_siblings return the children of the current node's parent" do
     @ds._fetch = [[{:id=>1, :parent_id=>3, :name=>'r'}], [{:id=>7, :parent_id=>1, :name=>'r2'}, @o.values.dup]]
     @o.self_and_siblings.should == [@c.load(:id=>7, :parent_id=>1, :name=>'r2'), @o] 
-    @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1",
+    @db.sqls.should == ["SELECT * FROM nodes WHERE id = 1",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 1)"]
   end
 
   it "should have siblings return the children of the current node's parent, except for the current node" do
     @ds._fetch = [[{:id=>1, :parent_id=>3, :name=>'r'}], [{:id=>7, :parent_id=>1, :name=>'r2'}, @o.values.dup]]
     @o.siblings.should == [@c.load(:id=>7, :parent_id=>1, :name=>'r2')] 
-    @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1",
+    @db.sqls.should == ["SELECT * FROM nodes WHERE id = 1",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 1)"]
   end
 
