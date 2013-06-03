@@ -249,6 +249,7 @@ module Sequel
           end
 
           hash = {}
+          populate_associations = {}
           name_proc = model.xml_deserialize_name_proc(opts)
           parent.children.each do |node|
             next if node.is_a?(Nokogiri::XML::Text)
@@ -268,7 +269,7 @@ module Sequel
                 raise Error, "Association #{assoc} is not defined for #{model}"
               end
 
-              associations[assoc] = if r.returns_array?
+              populate_associations[assoc] = if r.returns_array?
                 node.children.reject{|c| c.is_a?(Nokogiri::XML::Text)}.map{|c| r.associated_class.from_xml_node(c, assoc_opts)}
               else
                 r.associated_class.from_xml_node(node, assoc_opts)
@@ -280,6 +281,10 @@ module Sequel
             set_fields(hash, fields, opts)
           else
             set(hash)
+          end
+
+          populate_associations.each do |assoc, values|
+            associations[assoc] = values
           end
 
           self

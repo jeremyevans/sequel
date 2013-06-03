@@ -193,6 +193,8 @@ module Sequel
             raise Error, "parsed json doesn't return a hash"
           end
 
+          populate_associations = {}
+
           if assocs = opts[:associations]
             assocs = case assocs
             when Symbol
@@ -213,7 +215,7 @@ module Sequel
                   raise Error, "Association #{assoc} is not defined for #{model}"
                 end
 
-                associations[assoc] = if r.returns_array?
+                populate_associations[assoc] = if r.returns_array?
                   raise Error, "Attempt to populate array association with a non-array" unless assoc_values.is_a?(Array)
                   assoc_values.map{|v| v.is_a?(r.associated_class) ? v : r.associated_class.new.from_json_node(v, assoc_opts)}
                 else
@@ -228,6 +230,10 @@ module Sequel
             set_fields(hash, fields, opts)
           else
             set(hash)
+          end
+
+          populate_associations.each do |assoc, values|
+            associations[assoc] = values
           end
 
           self
