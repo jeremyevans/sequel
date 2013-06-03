@@ -82,9 +82,6 @@ module Sequel
     #
     #   album.from_json(json, :associations=>{:artist=>{:fields=>%w'id name', :associations=>:tags}})
     #
-    # If the json is trusted and should be allowed to set all column and association
-    # values, you can use the :all_columns and :all_associations options.
-    #
     # Note that active_support/json makes incompatible changes to the to_json API,
     # and breaks some aspects of the json_serializer plugin.  You can undo the damage
     # done by active_support/json by doing:
@@ -143,9 +140,6 @@ module Sequel
         # Attempt to parse a single instance from the given JSON string,
         # with options passed to InstanceMethods#from_json_node.
         def from_json(json, opts=OPTS)
-          if opts[:all_associations] || opts[:all_columns]
-            Sequel::Deprecation.deprecate("The from_json :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
-          end
           v = Sequel.parse_json(json)
           case v
           when self
@@ -160,9 +154,6 @@ module Sequel
         # Attempt to parse an array of instances from the given JSON string,
         # with options passed to InstanceMethods#from_json_node.
         def array_from_json(json, opts=OPTS)
-          if opts[:all_associations] || opts[:all_columns]
-            Sequel::Deprecation.deprecate("The from_json :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
-          end
           v = Sequel.parse_json(json)
           if v.is_a?(Array)
             raise(Error, 'parsed json returned an array containing non-hashes') unless v.all?{|ve| ve.is_a?(Hash) || ve.is_a?(self)}
@@ -170,16 +161,6 @@ module Sequel
           else
             raise(Error, 'parsed json did not return an array')
           end
-        end
-
-        # Exists for compatibility with old json library which allows creation
-        # of arbitrary ruby objects by JSON.parse.  Creates a new instance
-        # and populates it using InstanceMethods#from_json_node with the
-        # :all_columns and :all_associations options.  Not recommended for usage
-        # in new code, consider calling the from_json method directly with the JSON string.
-        def json_create(hash, opts={})
-          Sequel::Deprecation.deprecate("Model.json_create", 'Switch to Model.from_json')
-          new.from_json_node(hash, {:all_columns=>true, :all_associations=>true}.merge(opts))
         end
 
         Plugins.inherited_instance_variables(self, :@json_serializer_opts=>lambda do |json_serializer_opts|
@@ -195,9 +176,6 @@ module Sequel
         # Parse the provided JSON, which should return a hash,
         # and process the hash with from_json_node.
         def from_json(json, opts=OPTS)
-          if opts[:all_associations] || opts[:all_columns]
-            Sequel::Deprecation.deprecate("The from_json :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
-          end
           from_json_node(Sequel.parse_json(json), opts)
         end
 
@@ -205,16 +183,6 @@ module Sequel
         # calls set with the hash values.
         # 
         # Options:
-        # :all_associations :: Indicates that all associations supported by the model should be tried.
-        #                      This option also cascades to associations if used. It is better to use the
-        #                      :associations option instead of this option. This option only exists for
-        #                      backwards compatibility.
-        # :all_columns :: Overrides the setting logic allowing all setter methods be used,
-        #                 even if access to the setter method is restricted.
-        #                 This option cascades to associations if used, and can be reset in those associations
-        #                 using the :all_columns=>false or :fields options.  This option is considered a
-        #                 security risk, and only exists for backwards compatibility.  It is better to use
-        #                 the :fields option appropriately instead of this option, or no option at all.
         # :associations :: Indicates that the associations cache should be updated by creating
         #                  a new associated object using data from the hash.  Should be a Symbol
         #                  for a single association, an array of symbols for multiple associations,
@@ -224,19 +192,8 @@ module Sequel
           unless hash.is_a?(Hash)
             raise Error, "parsed json doesn't return a hash"
           end
-          if hash.has_key?(JSON.create_id)
-            Sequel::Deprecation.deprecate('Attempting to use Model#from_json with a hash value that includes JSON.create_id is deprecated.  Starting in Sequel 4.0, the create_id will not be removed automatically.')
-            hash.delete(JSON.create_id)
-          end
 
-          unless assocs = opts[:associations]
-            if opts[:all_associations]
-              assocs = {}
-              model.associations.each{|v| assocs[v] = {:all_associations=>true}}
-            end
-          end
-
-          if assocs
+          if assocs = opts[:associations]
             assocs = case assocs
             when Symbol
               {assocs=>{}}
@@ -248,12 +205,6 @@ module Sequel
               assocs
             else
               raise Error, ":associations should be Symbol, Array, or Hash if present"
-            end
-
-            if opts[:all_columns]
-              assocs.each_value do |assoc_opts|
-                assoc_opts[:all_columns] = true unless assoc_opts.has_key?(:fields) || assoc_opts.has_key?(:all_columns)
-              end
             end
 
             assocs.each do |assoc, assoc_opts|
@@ -275,15 +226,6 @@ module Sequel
 
           if fields = opts[:fields]
             set_fields(hash, fields, opts)
-          elsif opts[:all_columns]
-            meths = methods.collect{|x| x.to_s}.grep(Model::SETTER_METHOD_REGEXP) - Model::RESTRICTED_SETTER_METHODS
-            hash.each do |k, v|
-              if meths.include?(setter_meth = "#{k}=")
-                send(setter_meth, v)
-              else
-                raise Error, "Entry in JSON does not have a matching setter method: #{k}"
-              end
-            end
           else
             set(hash)
           end
@@ -322,10 +264,6 @@ module Sequel
           end
 
           h = {}
-          if  JSON.create_id && !opts[:naked] && !opts[:root]
-            Sequel::Deprecation.deprecate('The :naked and :root options have not been used, so adding JSON.create_id to the to_json output.  This is deprecated, starting in Sequel 4, the JSON.create_id will never be added.')
-            h[JSON.create_id] = model.name
-          end
 
           cols.each{|c| h[c.to_s] = send(c)}
           if inc = opts[:include]
@@ -385,8 +323,7 @@ module Sequel
           when :both
             true
           else
-            Sequel::Deprecation.deprecate('The to_json :root=>true option will mean :root=>:collection starting in Sequel 4.  Use :root=>:both if you want to wrap both the collection and each item in a wrapper.')
-            true
+            false
           end
 
           res = if row_proc 

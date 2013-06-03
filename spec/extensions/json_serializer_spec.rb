@@ -43,15 +43,6 @@ describe "Sequel::Plugins::JsonSerializer" do
     Artist.from_json(Artist.load(:name=>Date.today).to_json).should == Artist.load(:name=>Date.today)
   end
 
-  qspecify "should have .json_create method for creating an instance from a hash parsed from JSON" do
-    JSON.parse(@artist.to_json(:naked=>false), :create_additions=>true).should == @artist
-    JSON.parse(@artist.to_json(:naked=>false, :include=>{:albums=>{:include=>{:artist=>{:include=>:albums}}}}), :create_additions=>true).albums.map{|a| a.artist.albums}.should == [[@album]]
-  end
-
-  qspecify "should have .json_create method raise error if not given a hash" do
-    proc{Artist.json_create([])}.should raise_error(Sequel::Error)
-  end
-
   it "should handle the :only option" do
     Artist.from_json(@artist.to_json(:only=>:name)).should == Artist.load(:name=>@artist.name)
     Album.from_json(@album.to_json(:only=>[:id, :name])).should == Album.load(:id=>@album.id, :name=>@album.name)
@@ -127,10 +118,6 @@ describe "Sequel::Plugins::JsonSerializer" do
 
     Artist.from_json(@artist.to_json(:include=>{:albums=>{:include=>{:artist=>{:include=>:albums}}}}), :associations=>{:albums=>{:associations=>{:artist=>{:associations=>:albums}}}}).albums.map{|a| a.artist.albums}.should == [[@album]]
     Album.from_json(@album.to_json(:include=>{:artist=>{:include=>{:albums=>{:only=>:name}}}}), :associations=>{:artist=>{:associations=>:albums}}).artist.albums.should == [Album.load(:name=>@album.name)]
-  end
-
-  qspecify "should automatically cascade parsing for all associations if :all_associations is used" do
-    Artist.from_json(@artist.to_json(:include=>{:albums=>{:include=>:artist}}), :all_associations=>true).albums.map{|a| a.artist}.should == [@artist]
   end
 
   it "should handle the :include option cascading with an empty hash" do
@@ -235,11 +222,6 @@ describe "Sequel::Plugins::JsonSerializer" do
     Album.dataset.to_json(:root=>:instance, :only => :id).to_s.should == '[{"album":{"id":1}},{"album":{"id":1}}]'
   end
 
-  qspecify "should handle the :root=>true option be the same as :root=>:both for backwards compatibility" do
-    Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
-    Album.dataset.to_json(:root=>true, :only => :id).to_s.should == '{"albums":[{"album":{"id":1}},{"album":{"id":1}}]}'
-  end
-
   it "should store the default options in json_serializer_opts" do
     Album.json_serializer_opts.should == {:naked=>true}
     c = Class.new(Album)
@@ -258,29 +240,6 @@ describe "Sequel::Plugins::JsonSerializer" do
     Sequel.parse_json(Artist3.load(:id=>2, :name=>'YYY').to_json).should == {"name"=>'YYY'}
     Object.send(:remove_const, :Artist2)
     Object.send(:remove_const, :Artist3)
-  end
-
-  qspecify "should have :associations option take precedence over :all_assocations" do
-    Artist.from_json(@artist.to_json(:include=>:albums), :associations=>[], :all_associations=>true, :fields=>[]).associations.should == {}
-  end
-
-  qspecify "should allow overriding of :all_columns options in associated objects" do
-    Album.restrict_primary_key
-    Artist.from_json(@artist.to_json(:include=>:albums), :associations=>{:albums=>{:fields=>[:id, :name, :artist_id], :missing=>:raise}}, :all_columns=>true).albums.should == [@album]
-  end
-
-  qspecify "should handle typecasting if setter columns exist when using :all_columns" do
-    Artist.restrict_primary_key
-    Artist.from_json('{"id":"2","name":"YJM","json_class":"Artist"}', :all_columns=>true).should == @artist
-  end
-
-  qspecify "should allow setting columns that are restricted if :all_columns is used" do
-    Artist.restrict_primary_key
-    Artist.from_json(@artist.to_json, :all_columns=>true).should == @artist
-  end
-
-  qspecify "should raise an error if using :all_columns and non-column is in the JSON" do
-    proc{Artist.from_json('{"foo":"bar"}', :all_columns=>true)}.should raise_error(Sequel::Error)
   end
 
   it "should raise an error if attempting to set a restricted column and :all_columns is not used" do

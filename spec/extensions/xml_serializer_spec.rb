@@ -97,10 +97,6 @@ describe "Sequel::Plugins::XmlSerializer" do
     Album.from_xml(@album.to_xml(:include=>{:artist=>{:include=>{:albums=>{:only=>:name}}}}), :associations=>{:artist=>{:associations=>{:albums=>{:fields=>%w'name'}}}}).artist.albums.should == [Album.load(:name=>@album.name)]
   end
 
-  qspecify "should automatically cascade parsing for all associations if :all_associations is used" do
-    Artist.from_xml(@artist.to_xml(:include=>{:albums=>{:include=>:artist}}), :all_associations=>true).albums.map{|a| a.artist}.should == [@artist]
-   end
-  
   it "should handle the :include option cascading with an empty hash" do
     Album.from_xml(@album.to_xml(:include=>{:artist=>{}}), :associations=>:artist).artist.should == @artist
     Album.from_xml(@album.to_xml(:include=>{:blah=>{}})).blah.should == @album.blah
@@ -181,27 +177,9 @@ describe "Sequel::Plugins::XmlSerializer" do
     proc{Album.dataset.naked.to_xml}.should raise_error(Sequel::Error)
   end
 
-  qspecify "should have :associations option take precedence over :all_assocations" do
-    Artist.from_xml(@artist.to_xml(:include=>:albums), :associations=>[], :all_associations=>true, :fields=>[]).associations.should == {}
-  end
-
-  qspecify "should allow overriding of :all_columns options in associated objects" do
-    Album.restrict_primary_key
-    Artist.from_xml(@artist.to_xml(:include=>:albums), :associations=>{:albums=>{:fields=>[:id, :name, :artist_id], :missing=>:raise}}, :all_columns=>true).albums
-  end
-
-  qspecify "should allow setting columns that are restricted if :all_columns is used" do
-    Artist.restrict_primary_key
-    Artist.from_xml(@artist.to_xml, :all_columns=>true).should == @artist
-  end
-
   it "should raise an error if using parsing empty xml" do
     proc{Artist.from_xml("<?xml version=\"1.0\"?>\n")}.should raise_error(Sequel::Error)
     proc{Artist.array_from_xml("<?xml version=\"1.0\"?>\n")}.should raise_error(Sequel::Error)
-  end
-
-  qspecify "should raise an error if using :all_columns and non-column is in the XML" do
-    proc{Artist.from_xml("<?xml version=\"1.0\"?>\n<artist>\n  <foo>bar</foo>\n  <id>2</id>\n</artist>\n", :all_columns=>true)}.should raise_error(Sequel::Error)
   end
 
   it "should raise an error if attempting to set a restricted column and :all_columns is not used" do

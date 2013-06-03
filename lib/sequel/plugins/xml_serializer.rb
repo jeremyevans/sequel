@@ -103,9 +103,6 @@ module Sequel
     #
     #   album.from_xml(xml, :associations=>{:artist=>{:fields=>%w'id name', :associations=>:tags}})
     #
-    # If the xml is trusted and should be allowed to set all column and association
-    # values, you can use the :all_columns and :all_associations options.
-    #
     # Usage:
     #
     #   # Add XML output capability to all model subclass instances (called before loading subclasses)
@@ -131,9 +128,6 @@ module Sequel
         # Return an array of instances of this class based on
         # the provided XML.
         def array_from_xml(xml, opts=OPTS)
-          if opts[:all_associations] || opts[:all_columns]
-            Sequel::Deprecation.deprecate("The array_from_xml :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
-          end
           node = Nokogiri::XML(xml).children.first
           unless node 
             raise Error, "Malformed XML used"
@@ -144,9 +138,6 @@ module Sequel
         # Return an instance of this class based on the provided
         # XML.
         def from_xml(xml, opts=OPTS)
-          if opts[:all_associations] || opts[:all_columns]
-            Sequel::Deprecation.deprecate("The from_xml :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
-          end
           from_xml_node(Nokogiri::XML(xml).children.first, opts)
         end
 
@@ -217,9 +208,6 @@ module Sequel
         #                on the input string.  Requires that you load the inflector
         #                extension or another library that adds String#underscore.
         def from_xml(xml, opts=OPTS)
-          if opts[:all_associations] || opts[:all_columns]
-            Sequel::Deprecation.deprecate("The from_xml :all_associations and :all_columns", 'You need to explicitly specify the associations and columns via the :associations and :fields options')
-          end
           from_xml_node(Nokogiri::XML(xml).children.first, opts)
         end
 
@@ -228,16 +216,6 @@ module Sequel
         # By default, just calls set with a hash created from the content of the node.
         # 
         # Options:
-        # :all_associations :: Indicates that all associations supported by the model should be tried.
-        #                      This option also cascades to associations if used. It is better to use the
-        #                      :associations option instead of this option. This option only exists for
-        #                      backwards compatibility.
-        # :all_columns :: Overrides the setting logic allowing all setter methods be used,
-        #                 even if access to the setter method is restricted.
-        #                 This option cascades to associations if used, and can be reset in those associations
-        #                 using the :all_columns=>false or :fields options.  This option is considered a
-        #                 security risk, and only exists for backwards compatibility.  It is better to use
-        #                 the :fields option appropriately instead of this option, or no option at all.
         # :associations :: Indicates that the associations cache should be updated by creating
         #                  a new associated object using data from the hash.  Should be a Symbol
         #                  for a single association, an array of symbols for multiple associations,
@@ -251,14 +229,7 @@ module Sequel
             raise Error, "XML consisting of just text nodes used"
           end
 
-          unless assocs = opts[:associations]
-            if opts[:all_associations]
-              assocs = {}
-              model.associations.each{|v| assocs[v] = {:all_associations=>true}}
-            end
-          end
-
-          if assocs
+          if assocs = opts[:associations]
             assocs = case assocs
             when Symbol
               {assocs=>{}}
@@ -270,12 +241,6 @@ module Sequel
               assocs
             else
               raise Error, ":associations should be Symbol, Array, or Hash if present"
-            end
-
-            if opts[:all_columns]
-              assocs.each_value do |assoc_opts|
-                assoc_opts[:all_columns] = true unless assoc_opts.has_key?(:fields) || assoc_opts.has_key?(:all_columns)
-              end
             end
 
             assocs_hash = {}
@@ -313,15 +278,6 @@ module Sequel
 
           if fields = opts[:fields]
             set_fields(hash, fields, opts)
-          elsif opts[:all_columns]
-            meths = methods.collect{|x| x.to_s}.grep(Model::SETTER_METHOD_REGEXP) - Model::RESTRICTED_SETTER_METHODS
-            hash.each do |k, v|
-              if meths.include?(setter_meth = "#{k}=")
-                send(setter_meth, v)
-              else
-                raise Error, "Entry in XML does not have a matching setter method: #{k}"
-              end
-            end
           else
             set(hash)
           end
