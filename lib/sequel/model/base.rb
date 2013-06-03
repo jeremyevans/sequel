@@ -896,18 +896,6 @@ module Sequel
       HOOKS.each{|h| class_eval("def #{h}; end", __FILE__, __LINE__)}
       AROUND_HOOKS.each{|h| class_eval("def #{h}; yield end", __FILE__, __LINE__)}
 
-      # REMOVE40
-      def self.class_attr_overridable(*meths) # :nodoc:
-        Sequel::Deprecation.deprecate('Model::InstanceMethods.class_attr_overridable', "There is no replacement planned")
-        meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (frozen? ? self.class.#{meth} : (@#{meth} = self.class.#{meth})) : @#{meth} end", __FILE__, __LINE__)}
-        attr_writer(*meths) 
-      end 
-      def self.class_attr_reader(*meths) # :nodoc:
-        Sequel::Deprecation.deprecate('Model::InstanceMethods.class_attr_reader', "There is no replacement planned")
-        meths.each{|meth| class_eval("def #{meth}; self.class.#{meth} end", __FILE__, __LINE__)}
-      end
-      private_class_method :class_attr_overridable, :class_attr_reader
-
       # Define instance method(s) that calls class method(s) of the
       # same name. Replaces the construct:
       #   
