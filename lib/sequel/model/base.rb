@@ -12,16 +12,6 @@ module Sequel
       # (default: not set, so all columns not otherwise restricted are allowed).
       attr_reader :allowed_columns
 
-      # REMOVE40
-      def cache_anonymous_models
-        Sequel::Deprecation.deprecate('Model.cache_anonymous_models', 'Please switch to Sequel.cache_anonymous_models')
-        Sequel.cache_anonymous_models
-      end
-      def cache_anonymous_models=(v)
-        Sequel::Deprecation.deprecate('Model.cache_anonymous_models=', 'Please switch to Sequel.cache_anonymous_models=')
-        Sequel.cache_anonymous_models = v
-      end
-  
       # Array of modules that extend this model's dataset.  Stored
       # so that if the model's dataset is changed, it will be extended
       # with all of these modules.
