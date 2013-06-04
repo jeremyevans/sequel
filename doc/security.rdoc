@@ -20,8 +20,6 @@ could conceivably be abused to do so:
 * Sequel::Dataset.def_mutation_method
 * Sequel::Model::Plugins.def_dataset_methods
 * Sequel.def_adapter_method (private)
-* Sequel::Model::InstanceMethods.class_attr_overridable (private)
-* Sequel::Model::InstanceMethods.class_attr_reader (private)
 * Sequel::SQL::Expression.to_s_method (private)
 * Sequel::Plugins::HookClassMethods::ClassMethods#add_hook_type
 
