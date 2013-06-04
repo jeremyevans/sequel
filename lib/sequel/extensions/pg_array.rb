@@ -285,8 +285,10 @@ module Sequel
         # Automatically handle array types for the given named types. 
         def convert_named_procs_to_procs(named_procs)
           h = super
-          from(:pg_type).where(:oid=>h.keys).select_map([:typname, :oid, :typarray]).each do |name, scalar_oid, array_oid|
-            register_array_type(name, :type_procs=>h, :oid=>array_oid.to_i, :scalar_oid=>scalar_oid.to_i)
+          unless h.empty?
+            from(:pg_type).where(:oid=>h.keys).select_map([:typname, :oid, :typarray]).each do |name, scalar_oid, array_oid|
+              register_array_type(name, :type_procs=>h, :oid=>array_oid.to_i, :scalar_oid=>scalar_oid.to_i)
+            end
           end
           h
         end

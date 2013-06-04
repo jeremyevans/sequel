@@ -2,10 +2,13 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "pg_array extension" do
   before(:all) do
+    Sequel.extension :pg_array
     @pg_types = Sequel::Postgres::PG_TYPES.dup
+    @pg_named_types = Sequel::Postgres::PG_NAMED_TYPES.dup
   end
   after(:all) do
     Sequel::Postgres::PG_TYPES.replace(@pg_types)
+    Sequel::Postgres::PG_NAMED_TYPES.replace(@pg_named_types)
   end
 
   before do
@@ -357,10 +360,15 @@ describe "pg_array extension" do
     @db.typecast_value(:banana_array, %w'1 2').should == [1,2]
   end
 
-  it "should set appropriate timestamp conversion procs when getting conversion procs" do
+  it "should set appropriate timestamp conversion procs when resetting conversion procs" do
+    Sequel::Postgres::PG_NAMED_TYPES[:foo] = proc{|v| v*2}
+    @db.fetch = [[{:oid=>2222, :typname=>'foo'}], [{:oid=>2222, :typarray=>2223, :typname=>'foo'}]]
+    @db.reset_conversion_procs
     procs = @db.conversion_procs
     procs[1185].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
     procs[1115].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
+    procs[2222].call('1').should == '11'
+    procs[2223].call('{"2"}').should == ['22']
   end
 
   it "should return correct results for Database#schema_type_class" do
