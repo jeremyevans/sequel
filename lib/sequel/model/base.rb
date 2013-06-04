@@ -568,15 +568,9 @@ module Sequel
   
       # Cache of setter methods to allow by default, in order to speed up new/set/update instance methods.
       def setter_methods
-        @setter_methods ||= if allowed_columns
-          allowed_columns.map{|x| "#{x}="}
-        else
-          meths = instance_methods.collect{|x| x.to_s}.grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
-          meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
-          meths
-        end
+        @setter_methods ||= get_setter_methods
       end
-  
+
       # Sets up a dataset method that returns a filtered dataset.
       # Sometimes thought of as a scope, and like most dataset methods,
       # they can be chained.
@@ -741,6 +735,18 @@ module Sequel
         schema_hash
       end
       
+      # Uncached version of setter_methods, to be overridden by plugins
+      # that want to modify the methods used.
+      def get_setter_methods
+        if allowed_columns
+          allowed_columns.map{|x| "#{x}="}
+        else
+          meths = instance_methods.collect{|x| x.to_s}.grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
+          meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
+          meths
+        end
+      end
+  
       # A hash of instance variables to automatically set up in subclasses.
       # See Sequel::Model::INHERITED_INSTANCE_VARIABLES.  It is safe to modify
       # the hash returned by this method, though it may not be safe to modify
@@ -1300,7 +1306,7 @@ module Sequel
       #   artist.set(:name=>'Jim')
       #   artist.name # => 'Jim'
       def set(hash)
-        set_restricted(hash, nil, nil)
+        set_restricted(hash, :default)
       end
   
       # Set all values using the entries in the hash, ignoring any setting of
@@ -1310,7 +1316,7 @@ module Sequel
       #   artist.set_all(:name=>'Jim')
       #   artist.name # => 'Jim'
       def set_all(hash)
-        set_restricted(hash, false, false)
+        set_restricted(hash, :all)
       end
   
       # For each of the fields in the given array +fields+, call the setter
@@ -1380,7 +1386,7 @@ module Sequel
       #
       #   artist.set_only({:hometown=>'LA'}, :name) # Raise Error
       def set_only(hash, *only)
-        set_restricted(hash, only.flatten, false)
+        set_restricted(hash, only.flatten)
       end
   
       # Set the shard that this object is tied to.  Returns self.
@@ -1414,7 +1420,7 @@ module Sequel
       #
       #   artist.update(:name=>'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update(hash)
-        update_restricted(hash, nil, nil)
+        update_restricted(hash, :default)
       end
   
       # Update all values using the entries in the hash, ignoring any setting of
@@ -1423,7 +1429,7 @@ module Sequel
       #   Artist.set_allowed_columns(:num_albums)
       #   artist.update_all(:name=>'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update_all(hash)
-        update_restricted(hash, false, false)
+        update_restricted(hash, :all)
       end
   
       # Update the instances values by calling +set_fields+ with the arguments, then
@@ -1448,7 +1454,7 @@ module Sequel
       #
       #   artist.update_only({:hometown=>'LA'}, :name) # Raise Error
       def update_only(hash, *only)
-        update_restricted(hash, only.flatten, false)
+        update_restricted(hash, only.flatten)
       end
       
       # Validates the object.  If the object is invalid, errors should be added
@@ -1788,14 +1794,11 @@ module Sequel
         end
       end
 
-      # Set the columns, filtered by the only and except arrays.
-      def set_restricted(hash, only, except)
+      # Call setter methods based on keys in hash, with the appropriate values.
+      # Restrict which methods can be called based on the provided type.
+      def set_restricted(hash, type)
         return self if hash.empty?
-        meths = if only.nil? && except.nil? && !@singleton_setter_added
-          model.setter_methods
-        else
-          setter_methods(only, except)
-        end
+        meths = setter_methods(type)
         strict = strict_param_setting
         hash.each do |k,v|
           m = "#{k}="
@@ -1817,29 +1820,24 @@ module Sequel
         self
       end
       
-      # Returns all methods that can be used for attribute
-      # assignment (those that end with =), modified by the only
-      # and except arguments:
+      # Returns all methods that can be used for attribute assignment (those that end with =),
+      # depending on the type:
       #
-      # * only
-      #   * false - Don't modify the results
-      #   * nil - if the model has allowed_columns, use only these, otherwise, don't modify
-      #   * Array - allow only the given methods to be used
-      # * except
-      #   * false - Don't modify the results
-      #   * nil - if the model has restricted_columns, remove these, otherwise, don't modify
-      #   * Array - remove the given methods
-      #
-      # only takes precedence over except, and if only is not used, certain methods are always
-      # restricted (RESTRICTED_SETTER_METHODS).  The primary key is restricted by default as
-      # well, see Model.unrestrict_primary_key to change this.
-      def setter_methods(only, except)
-        only = only.nil? ? model.allowed_columns : only
-        if only
-          only.map{|x| "#{x}="}
+      # :default :: Use the default methods allowed in th model class. 
+      # :all :: Allow setting all setters, except those specifically restricted (such as ==).
+      # Array :: Only allow setting of columns in the given array.
+      def setter_methods(type)
+        if type == :default
+          if !@singleton_setter_added || model.allowed_columns
+            return model.setter_methods
+          end
+        end
+
+        if type.is_a?(Array)
+          type.map{|x| "#{x}="}
         else
           meths = methods.collect{|x| x.to_s}.grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
-          meths -= Array(primary_key).map{|x| "#{x}="} if except != false && primary_key && model.restrict_primary_key?
+          meths -= Array(primary_key).map{|x| "#{x}="} if type != :all && primary_key && model.restrict_primary_key?
           meths
         end
       end
@@ -1871,8 +1869,8 @@ module Sequel
       end
   
       # Set the columns, filtered by the only and except arrays.
-      def update_restricted(hash, only, except)
-        set_restricted(hash, only, except)
+      def update_restricted(hash, type)
+        set_restricted(hash, type)
         save_changes
       end
 

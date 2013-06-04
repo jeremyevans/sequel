@@ -37,20 +37,24 @@ module Sequel
           @restricted_columns = cols
         end
 
-        # Cache of setter methods to allow by default, in order to speed up new/set/update instance methods.
-        def setter_methods
-          @setter_methods ||= if allowed_columns
-            super
-          else
-            meths = instance_methods.collect{|x| x.to_s}.grep(Model::SETTER_METHOD_REGEXP) - Model::RESTRICTED_SETTER_METHODS
-            meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
-            meths -= restricted_columns.map{|x| "#{x}="} if restricted_columns
-            meths
+        private
+
+        # If allowed_columns is not set but restricted_columns is, remove the
+        # restricted_columns.
+        def get_setter_methods
+          meths = super
+          if !allowed_columns && restricted_columns
+            meths -= restricted_columns.map{|x| "#{x}="}
           end
+          meths
         end
       end
 
       module InstanceMethods
+        # Special array subclass used for marking methods to be removed.
+        class ExceptionList < Array
+        end
+
         # Set all values using the entries in the hash, except for the keys
         # given in except.  You should probably use +set_fields+ or +set_only+
         # instead of this method, as blacklist approaches to security are a bad idea.
@@ -58,7 +62,7 @@ module Sequel
         #   artist.set_except({:name=>'Jim'}, :hometown)
         #   artist.name # => 'Jim'
         def set_except(hash, *except)
-          set_restricted(hash, false, except.flatten)
+          set_restricted(hash, ExceptionList.new(except.flatten))
         end
     
         # Update all values using the entries in the hash, except for the keys
@@ -67,19 +71,20 @@ module Sequel
         #
         #   artist.update_except({:name=>'Jim'}, :hometown) # UPDATE artists SET name = 'Jim' WHERE (id = 1)
         def update_except(hash, *except)
-          update_restricted(hash, false, except.flatten)
+          update_restricted(hash, ExceptionList.new(except.flatten))
         end
 
         private
 
-        def setter_methods(only, except)
-          if only || except == false
-            super
-          else
-            meths = methods.collect{|x| x.to_s}.grep(Model::SETTER_METHOD_REGEXP) - Model::RESTRICTED_SETTER_METHODS
+        # If set_except or update_except was used, remove the related methods from the list.
+        def setter_methods(type)
+          if type.is_a?(ExceptionList)
+            meths = super(:all)
             meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && model.restrict_primary_key?
-            meths -= (except || model.restricted_columns).map{|x| "#{x}="}
+            meths -= type.map{|x| "#{x}="}
             meths
+          else
+            super
           end
         end
       end
