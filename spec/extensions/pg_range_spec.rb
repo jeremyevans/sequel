@@ -1,8 +1,9 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
+
 describe "pg_range extension" do
   before(:all) do
-    Sequel.extension :pg_array
+    Sequel.extension :pg_array, :pg_range
     @pg_types = Sequel::Postgres::PG_TYPES.dup
   end
   after(:all) do
