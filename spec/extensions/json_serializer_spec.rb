@@ -215,6 +215,7 @@ describe "Sequel::Plugins::JsonSerializer" do
   it "should handle the :root=>:collection option to qualify just the collection" do
     Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
     Album.dataset.to_json(:root=>:collection, :only => :id).to_s.should == '{"albums":[{"id":1},{"id":1}]}'
+    Album.dataset.to_json(:root=>true, :only => :id).to_s.should == '{"albums":[{"id":1},{"id":1}]}'
   end
 
   it "should handle the :root=>:instance option to qualify just the instances" do

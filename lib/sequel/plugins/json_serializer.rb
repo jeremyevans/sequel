@@ -254,7 +254,6 @@ module Sequel
         #          include in the JSON output, ignoring all other
         #          columns.
         # :root :: Qualify the JSON with the name of the object.
-        #          Implies :naked since the object name is explicit.
         def to_json(*a)
           if opts = a.first.is_a?(Hash)
             opts = model.json_serializer_opts.merge(a.first)
@@ -321,15 +320,12 @@ module Sequel
           collection_root = case opts[:root]
           when nil, false, :instance
             false
-          when :collection
-            opts = opts.dup
-            opts.delete(:root)
-            opts[:naked] = true unless opts.has_key?(:naked)
-            true
           when :both
             true
           else
-            false
+            opts = opts.dup
+            opts.delete(:root)
+            true
           end
 
           res = if row_proc 
