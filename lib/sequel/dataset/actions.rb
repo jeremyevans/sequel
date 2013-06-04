@@ -837,8 +837,6 @@ module Sequel
     def hash_key_symbol(s)
       if v = _hash_key_symbol(s)
         v
-      elsif block_given?
-        yield
       else
         raise(Error, "#{s.inspect} is not supported, should be a Symbol, SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression")
       end
