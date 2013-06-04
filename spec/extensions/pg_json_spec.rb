@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-Sequel.extension :pg_json
+Sequel.extension :pg_array, :pg_json
 
 describe "pg_json extension" do
   before(:all) do

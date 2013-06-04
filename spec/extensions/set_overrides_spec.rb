@@ -20,6 +20,10 @@ describe "Sequel::Dataset #set_defaults" do
     @ds.set_defaults(:y=>2).update_sql.should =~ /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
     @ds.set_defaults(:x=>2).update_sql.should == "UPDATE items SET x = 2"
   end
+
+  specify "should not affect String update arguments" do
+    @ds.update_sql('y = 2').should == "UPDATE items SET y = 2"
+  end
 end
 
 describe "Sequel::Dataset #set_overrides" do

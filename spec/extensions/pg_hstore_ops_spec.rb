@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-Sequel.extension :pg_array, :pg_hstore, :pg_hstore_ops
+Sequel.extension :pg_array, :pg_array_ops, :pg_hstore, :pg_hstore_ops
 
 describe "Sequel::Postgres::HStoreOp" do
   before do
@@ -42,6 +42,17 @@ describe "Sequel::Postgres::HStoreOp" do
 
   it "#[] should return a PGArrayOp if given an array" do
     @ds.literal(@h[%w'a'][0]).should == "(h -> ARRAY['a'])[0]"
+  end
+
+  it "#[] should not return a PGArrayOp if given an array but pg_array_op is not supported" do
+    begin
+      module Sequel::Postgres::HStoreOp::Sequel
+        SQL = ::Sequel::SQL
+      end
+      @ds.literal(@h[%w'a']).should_not be_a_kind_of(Sequel::Postgres::ArrayOp)
+    ensure
+      Sequel::Postgres::HStoreOp.send(:remove_const, :Sequel)
+    end
   end
 
   it "#[] should return a PGArrayOp if given a PGArray" do

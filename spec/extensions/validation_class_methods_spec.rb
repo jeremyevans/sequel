@@ -619,6 +619,12 @@ describe "Superclass validations" do
     o.valid?.should be_true
   end
   
+  specify "should have skip_superclass_validations? return whether superclass validations were skipped" do
+    @c2.skip_superclass_validations?.should == nil
+    @c2.skip_superclass_validations
+    @c2.skip_superclass_validations?.should == true
+  end
+
   specify "should be skipped if skip_superclass_validations is called" do
     @c2.skip_superclass_validations
 

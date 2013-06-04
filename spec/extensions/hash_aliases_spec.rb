@@ -9,8 +9,16 @@ describe "hash_aliases extension" do
     @ds.from(:a=>:b).sql.should == "SELECT * FROM a AS b"
   end
 
+  it "should not affect other arguments to from" do
+    @ds.from(:a, :b).sql.should == "SELECT * FROM a, b"
+  end
+
   it "should make select treat hash arguments as alias specifiers" do
     @ds.select(:a=>:b).sql.should == "SELECT a AS b"
     @ds.select{{:a=>:b}}.sql.should == "SELECT a AS b"
+  end
+
+  it "should not affect other arguments to select" do
+    @ds.select(:a, :b).sql.should == "SELECT a, b"
   end
 end

@@ -35,7 +35,9 @@ describe "Sequel::Plugins::StringStripper" do
   end
 
   it "should allow skipping of columns using Model.skip_string_stripping" do
+    @c.skip_string_stripping?(:name).should == false
     @c.skip_string_stripping :name
+    @c.skip_string_stripping?(:name).should == true
     v = ' name '
     @o.name = v
     @o.name.should equal(v)

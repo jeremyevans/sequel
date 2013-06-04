@@ -43,6 +43,13 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.errors.should == {[:name, :num]=>["is already taken"]}
   end
 
+  it "should handle databases that don't support index parsing" do
+    def (@m.db).supports_index_parsing?() false end
+    @m.model.send(:setup_auto_validations)
+    @m.set(:d=>Date.today, :num=>1, :name=>'1')
+    @m.valid?.should be_true
+  end
+
   it "should support :not_null=>:presence option" do
     @c.plugin :auto_validations, :not_null=>:presence
     @m.set(:d=>Date.today, :num=>'')

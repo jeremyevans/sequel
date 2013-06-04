@@ -168,7 +168,7 @@ describe "Sequel::Plugins::XmlSerializer" do
     Album.array_from_xml(Album.to_xml(:array=>[a], :include=>:artist), :associations=>:artist).first.artist.should == artist
 
     artist.associations[:albums] = [a]
-    x = Artist.array_from_xml(Artist.to_xml(:array=>[artist], :include=>:albums), :associations=>:albums)
+    x = Artist.array_from_xml(Artist.to_xml(:array=>[artist], :include=>:albums), :associations=>[:albums])
     x.should == [artist]
     x.first.albums.should == [a]
   end
