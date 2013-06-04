@@ -69,7 +69,7 @@ module Sequel
 
         # Typecast values using #load_typecast when the values are refreshed
         # automatically after a save.
-        def save_set_values(values)
+        def _save_set_values(values)
           ret = super
           load_typecast
           ret

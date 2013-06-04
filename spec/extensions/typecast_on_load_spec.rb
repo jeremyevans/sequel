@@ -31,10 +31,17 @@ describe Sequel::Model, "TypecastOnLoad plugin" do
     o.bset.should == true
   end
 
+  specify "should call setter method with value when automatically reloading the object on creation" do
+    @c.plugin :typecast_on_load, :b
+    o = @c.new(:b=>"1", :y=>"0")
+    o.save.values.should == {:id=>1, :b=>1, :y=>"0"}
+    o.bset.should == true
+  end
+
   specify "should call setter method with value when automatically reloading the object on creation via insert_select" do
     @c.plugin :typecast_on_load, :b
     @c.dataset.meta_def(:insert_select){|h| insert(h); first}
-    o = @c.load(:id=>1, :b=>"1", :y=>"0")
+    o = @c.new(:b=>"1", :y=>"0")
     o.save.values.should == {:id=>1, :b=>1, :y=>"0"}
     o.bset.should == true
   end
