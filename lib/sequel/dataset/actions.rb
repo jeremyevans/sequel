@@ -71,7 +71,7 @@ module Sequel
     #   DB[:table].columns
     #   # => [:id, :name]
     def columns
-      return @columns if @columns
+      return @columns if defined?(@columns) && @columns
       ds = unfiltered.unordered.naked.clone(:distinct => nil, :limit => 1, :offset=>nil)
       ds.each{break}
       @columns = ds.instance_variable_get(:@columns)
@@ -138,7 +138,7 @@ module Sequel
     # running queries inside the block, you should use +all+ instead of +each+
     # for the outer queries, or use a separate thread or shard inside +each+.
     def each
-      if row_proc = @row_proc
+      if defined?(@row_proc) && row_proc = @row_proc
         fetch_rows(select_sql){|r| yield row_proc.call(r)}
       else
         fetch_rows(select_sql){|r| yield r}

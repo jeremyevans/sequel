@@ -77,7 +77,7 @@ module Sequel
       c = super()
       if opts
         c.instance_variable_set(:@opts, @opts.merge(opts))
-        c.instance_variable_set(:@columns, nil) if @columns && !opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
+        c.instance_variable_set(:@columns, nil) if defined?(@columns) && @columns && !opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
       else
         c.instance_variable_set(:@opts, @opts.dup)
       end
