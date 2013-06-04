@@ -1474,7 +1474,7 @@ describe "Database#get" do
     @db.sqls.should == ['SELECT version(a) AS version LIMIT 1']
   end
 
-  qspecify "should work when an alias cannot be determined" do
+  specify "should work when an alias cannot be determined" do
     @db.get(1).should == 1
     @db.sqls.should == ['SELECT 1 AS v LIMIT 1']
   end

@@ -412,6 +412,8 @@ describe "Model.db" do
       class ModelTest2 < Sequel::Model(@db[:foo])
         db.should == @db
       end
+      ModelTest.instance_variable_set(:@db, nil)
+      ModelTest.db.should == @db
     ensure
       Object.send(:remove_const, :ModelTest)
       Object.send(:remove_const, :ModelTest2)

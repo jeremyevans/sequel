@@ -402,10 +402,20 @@ describe "Dataset#where" do
   specify "should not replace named placeholders that don't exist in the hash" do
     @dataset.where('price < :price AND id in :ids', :price=>100).select_sql.should == "SELECT * FROM test WHERE (price < 100 AND id in :ids)"
   end
-    
+  
+  specify "should raise an error for a mismatched number of placeholders" do
+    proc{@dataset.where('price < ? AND id in ?', 100).select_sql}.should raise_error(Sequel::Error)
+    proc{@dataset.where('price < ? AND id in ?', 100, [1, 2, 3], 4).select_sql}.should raise_error(Sequel::Error)
+  end
+
   specify "should handle placeholders when using an array" do
     @dataset.where(Sequel.lit(['price < ', ' AND id in '], 100, [1, 2, 3])).select_sql.should == "SELECT * FROM test WHERE price < 100 AND id in (1, 2, 3)"
     @dataset.where(Sequel.lit(['price < ', ' AND id in '], 100)).select_sql.should == "SELECT * FROM test WHERE price < 100 AND id in "
+  end
+
+  specify "should handle a mismatched number of placeholders when using an array" do
+    proc{@dataset.where(Sequel.lit(['a = ', ' AND price < ', ' AND id in '], 100)).select_sql}.should raise_error(Sequel::Error)
+    proc{@dataset.where(Sequel.lit(['price < ', ' AND id in '], 100, [1, 2, 3], 4)).select_sql}.should raise_error(Sequel::Error)
   end
   
   specify "should handle partial names" do
@@ -1179,7 +1189,7 @@ describe "Dataset#select" do
     @d.select(Sequel.as([[:b, :c]], :n)).sql.should == 'SELECT (b = c) AS n FROM test'
   end
 
-  qspecify "should handle hashes returned from virtual row blocks" do
+  specify "should handle hashes returned from virtual row blocks" do
     @d.select{{:b=>:c}}.sql.should == 'SELECT (b = c) FROM test'
   end
 
@@ -3440,7 +3450,7 @@ describe "Sequel::Dataset#qualify" do
     @ds.filter(:a=>1).order(:a).group(:a).having(:a).qualify.sql.should == 'SELECT t.* FROM t WHERE (t.a = 1) GROUP BY t.a HAVING t.a ORDER BY t.a'
   end
 
-  qspecify "should handle hashes in select option" do
+  specify "should handle hashes in select option" do
     @ds.select(:a=>:b).qualify.sql.should == 'SELECT (t.a = t.b) FROM t'
   end
 

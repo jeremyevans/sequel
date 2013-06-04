@@ -172,6 +172,10 @@ describe Sequel::Dataset, " graphing" do
     @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :q]).add_graph_aliases(:y=>[:lines, :r]).sql.should == 'SELECT points.q AS x, lines.r AS y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
   end
 
+  it "#add_graph_aliases should raise an error if called without existing graph aliases" do
+    proc{@ds1.add_graph_aliases(:y=>[:lines, :r])}.should raise_error(Sequel::Error)
+  end
+
   it "#set_graph_aliases should allow a third entry to specify an expression to use other than the default" do
     ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x, 1], :y=>[:lines, :y, Sequel.function(:random)])
     ['SELECT 1 AS x, random() AS y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',

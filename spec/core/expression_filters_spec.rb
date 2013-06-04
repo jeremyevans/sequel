@@ -1010,19 +1010,31 @@ describe "Sequel.delay" do
   end
 end
 
-describe "Sequel.parse_json" do
+describe Sequel do
   before do
-    Sequel::JSON = Object.new
-    def (Sequel::JSON).parse(json, opts={})
-      [json, opts]
+    Sequel::JSON = Class.new do
+      self::ParserError = Sequel
+      def self.parse(json, opts={})
+        [json, opts]
+      end
     end
   end
   after do
     Sequel.send(:remove_const, :JSON)
   end
 
-  specify "should parse json correctly" do
+  specify ".parse_json should parse json correctly" do
     Sequel.parse_json('[]').should == ['[]', {:create_additions=>false}]
+  end
+
+  specify ".json_parser_error_class should return the related parser error class" do
+    Sequel.json_parser_error_class.should == Sequel
+  end
+
+  specify ".object_to_json should return a json version of the object" do
+    o = Object.new
+    def o.to_json(*args); [1, args]; end
+    Sequel.object_to_json(o, :foo).should == [1, [:foo]]
   end
 end
 
