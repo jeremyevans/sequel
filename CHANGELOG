@@ -1,5 +1,9 @@
 === HEAD
 
+* ungraphed on an eager_graph dataset now resets the original row_proc (jeremyevans)
+
+* eager_graph now returns a naked dataset (jeremyevans)
+
 * All behavior deprecated in Sequel 3.48.0 has been removed (jeremyevans)
 
 * Make adapter/integration spec environment variables more consistent (jeremyevans)

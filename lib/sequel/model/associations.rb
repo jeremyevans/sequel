@@ -1786,11 +1786,6 @@ module Sequel
           end
         end
 
-        # Return plain hashes instead of calling the row_proc if eager_graph is being used.
-        def each(&block)
-          @opts[:eager_graph] ? fetch_rows(select_sql, &block) : super
-        end
-
         # The preferred eager loading method.  Loads all associated records using one
         # query for each association.
         #
@@ -1855,18 +1850,20 @@ module Sequel
         # Like +eager+, you need to call +all+ on the dataset for the eager loading to work.  If you just
         # call +each+, it will yield plain hashes, each containing all columns from all the tables.
         def eager_graph(*associations)
-          ds = if eg = @opts[:eager_graph]
+          if eg = @opts[:eager_graph]
             eg = eg.dup
             [:requirements, :reflections, :reciprocals].each{|k| eg[k] = eg[k].dup}
-            clone(:eager_graph=>eg)
+            ds = clone(:eager_graph=>eg)
+            ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations)
           else
             # Each of the following have a symbol key for the table alias, with the following values: 
             # :reciprocals - the reciprocal instance variable to use for this association
             # :reflections - AssociationReflection instance related to this association
             # :requirements - array of requirements for this association
-            clone(:eager_graph=>{:requirements=>{}, :master=>alias_symbol(first_source), :reflections=>{}, :reciprocals=>{}, :cartesian_product_number=>0})
+            ds = clone(:eager_graph=>{:requirements=>{}, :master=>alias_symbol(first_source), :reflections=>{}, :reciprocals=>{}, :cartesian_product_number=>0, :row_proc=>row_proc})
+            ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations).
+              naked
           end
-          ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations)
         end
         
         # Do not attempt to split the result set into associations,
@@ -1874,7 +1871,11 @@ module Sequel
         # want to use eager_graph as a shortcut to have all of the joins
         # and aliasing set up, but want to do something else with the dataset.
         def ungraphed
-          super.clone(:eager_graph=>nil)
+          ds = super.clone(:eager_graph=>nil)
+          if (eg = @opts[:eager_graph]) && (rp = eg[:row_proc])
+            ds.row_proc = rp
+          end
+          ds
         end
       
         protected
