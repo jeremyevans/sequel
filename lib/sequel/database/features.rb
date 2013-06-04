@@ -39,12 +39,12 @@ module Sequel
     # Whether the database supports Database#foreign_key_list for
     # parsing foreign keys.
     def supports_foreign_key_parsing?
-      [:access, :mssql, :mysql, :postgres, :sqlite].include?(database_type)
+      respond_to?(:foreign_key_list)
     end
 
     # Whether the database supports Database#indexes for parsing indexes.
     def supports_index_parsing?
-      [:access, :cubrid, :db2, :mssql, :mysql, :postgres, :sqlite].include?(database_type) || adapter_scheme == :jdbc
+      respond_to?(:indexes)
     end
 
     # Whether the database and adapter support prepared transactions
@@ -71,12 +71,12 @@ module Sequel
 
     # Whether the database supports Database#tables for getting list of tables.
     def supports_table_listing?
-      [:access, :cubrid, :db2, :firebird, :mssql, :mysql, :oracle, :postgres, :sqlite].include?(database_type) || adapter_scheme == :jdbc
+      respond_to?(:tables)
     end
     #
     # Whether the database supports Database#views for getting list of views.
     def supports_view_listing?
-      supports_table_listing?
+      respond_to?(:views)
     end
 
     # Whether the database and adapter support transaction isolation levels, false by default.

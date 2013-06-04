@@ -2081,6 +2081,54 @@ describe "Database#supports_schema_parsing?" do
   end
 end
 
+describe "Database#supports_foreign_key_parsing?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_foreign_key_parsing?.should == false
+  end
+
+  specify "should be true if the database implements foreign_key_list" do
+    db = Sequel::Database.new
+    def db.foreign_key_list(*) end
+    db.supports_foreign_key_parsing?.should == true
+  end
+end
+
+describe "Database#supports_index_parsing?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_index_parsing?.should == false
+  end
+
+  specify "should be true if the database implements indexes" do
+    db = Sequel::Database.new
+    def db.indexes(*) end
+    db.supports_index_parsing?.should == true
+  end
+end
+
+describe "Database#supports_table_listing?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_table_listing?.should == false
+  end
+
+  specify "should be true if the database implements tables" do
+    db = Sequel::Database.new
+    def db.tables(*) end
+    db.supports_table_listing?.should == true
+  end
+end
+
+describe "Database#supports_view_listing?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_view_listing?.should == false
+  end
+
+  specify "should be true if the database implements views" do
+    db = Sequel::Database.new
+    def db.views(*) end
+    db.supports_view_listing?.should == true
+  end
+end
+
 describe "Database#supports_deferrable_constraints?" do
   specify "should be false by default" do
     Sequel::Database.new.supports_deferrable_constraints?.should == false
