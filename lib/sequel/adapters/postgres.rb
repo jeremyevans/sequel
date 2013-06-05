@@ -133,6 +133,9 @@ module Sequel
           disconnect ||= !status_ok
           disconnect ||= e.message =~ DISCONNECT_ERROR_RE
           disconnect ? raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError)) : raise
+        rescue IOError, Errno::EPIPE, Errno::ECONNRESET => e
+          disconnect = true
+          raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError))
         ensure
           block if status_ok && !disconnect
         end
@@ -270,7 +273,7 @@ module Sequel
       def disconnect_connection(conn)
         begin
           conn.finish
-        rescue PGError
+        rescue PGError, IOError
         end
       end
       

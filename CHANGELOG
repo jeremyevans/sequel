@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle more disconnect errors when using the postgres adapter with the postgres-pr driver (jeremyevans)
+
 * Model#setter_methods private method now accepts 1 argument instead of 2 (jeremyevans)
 
 * Model#set_restricted and #update_restricted private methods now accept 2 arguments instead of 3 (jeremyevans)
