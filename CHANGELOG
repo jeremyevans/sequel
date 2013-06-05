@@ -1,5 +1,7 @@
 === HEAD
 
+* Hex escape blob input on MySQL (jeremyevans)
+
 * Handle more disconnect errors when using the postgres adapter with the postgres-pr driver (jeremyevans)
 
 * Model#setter_methods private method now accepts 1 argument instead of 2 (jeremyevans)

@@ -563,6 +563,8 @@ module Sequel
       EXPLAIN_EXTENDED = 'EXPLAIN EXTENDED '.freeze
       BACKSLASH_RE = /\\/.freeze
       QUAD_BACKSLASH = "\\\\\\\\".freeze
+      BLOB_START = "0x".freeze
+      HSTAR = "H*".freeze
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
@@ -892,6 +894,11 @@ module Sequel
       end
       alias delete_limit_sql limit_sql
       alias update_limit_sql limit_sql
+
+      # MySQL uses a preceding X for hex escaping strings
+      def literal_blob_append(sql, v)
+        sql << BLOB_START << v.unpack(HSTAR).first
+      end
 
       # Use 0 for false on MySQL
       def literal_false
