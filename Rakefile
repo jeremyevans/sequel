@@ -148,7 +148,7 @@ begin
     if RUBY_VERSION < '1.9'
       t = spec.call("#{name}_cov", files, "#{d} with coverage")
       t.rcov = true
-      t.rcov_opts = File.read("spec/rcov.opts").split("\n")
+      t.rcov_opts = File.file?("spec/rcov.opts") ? File.read("spec/rcov.opts").split("\n") : []
       b.call(t) if b
     else
       desc "#{d} with coverage"
