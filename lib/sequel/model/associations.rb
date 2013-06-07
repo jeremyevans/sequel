@@ -426,7 +426,7 @@ module Sequel
     
         # The column in the current table that the key in the associated table references.
         def primary_key
-         self[:primary_key]
+          self[:primary_key]
         end
 
         # #primary_key qualified by the current table
