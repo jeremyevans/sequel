@@ -19,6 +19,7 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
     @Artist.plugin :prepared_statements_associations
     @Album.plugin :prepared_statements_associations
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
+    @Artist.one_to_one :album, :class=>@Album, :key=>:artist_id
     @Album.many_to_one :artist, :class=>@Artist
     @Album.many_to_many :tags, :class=>@Tag, :join_table=>:albums_tags, :left_key=>:album_id
     @Artist.plugin :many_through_many
@@ -29,6 +30,9 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
   specify "should run correct SQL for associations" do
     @Artist.load(:id=>1).albums
     @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1) -- prepared"]
+
+    @Artist.load(:id=>1).album
+    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1) LIMIT 1 -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2).artist
     @db.sqls.should == ["SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1 -- prepared"]
@@ -42,12 +46,16 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
 
   specify "should run correct SQL for composite key associations" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>[:artist_id, :artist_id2], :primary_key=>[:id, :id2]
+    @Artist.one_to_one :album, :class=>@Album, :key=>[:artist_id, :artist_id2], :primary_key=>[:id, :id2]
     @Album.many_to_one :artist, :class=>@Artist, :key=>[:artist_id, :artist_id2], :primary_key=>[:id, :id2]
     @Album.many_to_many :tags, :class=>@Tag, :join_table=>:albums_tags, :left_key=>[:album_id, :album_id2], :right_key=>[:tag_id, :tag_id2], :right_primary_key=>[:id, :id2], :left_primary_key=>[:id, :id2]
     @Artist.many_through_many :tags, [[:albums, [:artist_id, :artist_id2], [:id, :id2]], [:albums_tags, [:album_id, :album_id2], [:tag_id, :tag_id2]]], :class=>@Tag, :right_primary_key=>[:id, :id2], :left_primary_key=>[:id, :id2]
 
     @Artist.load(:id=>1, :id2=>2).albums
     @db.sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) -- prepared"]
+
+    @Artist.load(:id=>1, :id2=>2).album
+    @db.sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) LIMIT 1 -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2, :artist_id2=>3).artist
     @db.sqls.should == ["SELECT * FROM artists WHERE ((artists.id = 2) AND (artists.id2 = 3)) LIMIT 1 -- prepared"]

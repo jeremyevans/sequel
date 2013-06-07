@@ -48,7 +48,7 @@ module Sequel
           case opts[:type]
           when :many_to_one
             association_bound_variable_hash(opts.associated_class.table_name, opts.primary_keys, opts[:keys])
-          when :one_to_many
+          when :one_to_many, :one_to_one
             association_bound_variable_hash(opts.associated_class.table_name, opts[:keys], opts[:primary_keys])
           when :many_to_many
             association_bound_variable_hash(opts.join_table_alias, opts[:left_keys], opts[:left_primary_keys])
