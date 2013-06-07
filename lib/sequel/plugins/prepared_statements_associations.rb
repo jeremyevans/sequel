@@ -26,7 +26,7 @@ module Sequel
         # Disable prepared statement use if a block is given, or the :dataset or :conditions
         # options are used, or you are cloning an association.
         def associate(type, name, opts = OPTS, &block)
-          if block || opts[:dataset] || opts[:conditions] || (opts[:clone] && association_reflection(opts[:clone])[:prepared_statement] == false)
+          if block || opts[:dataset] || (opts[:clone] && association_reflection(opts[:clone])[:prepared_statement] == false)
             opts = opts.merge(:prepared_statement=>false)
           end
           super(type, name, opts, &block)
@@ -60,16 +60,19 @@ module Sequel
         # Given an association reflection, return and cache a prepared statement for this association such
         # that, given appropriate bound variables, the prepared statement will work correctly for any
         # instance.  Return false if such a prepared statement cannot be created.
-        def association_prepared_statement(opts, num_variables)
+        def association_prepared_statement(opts, assoc_bv)
           opts.send(:cached_fetch, :prepared_statement) do
             ds, bv = _associated_dataset(opts, {}).unbind
-            if bv.length == num_variables
-              ps = ds.prepare(opts.returns_array? ? :select : :first, :"smpsap_#{NEXT.call}")
-              ps.log_sql = true
-              ps
-            else
-              false
+            if bv.length != assoc_bv.length
+              h = {}
+              bv.each do |k,v|
+                h[k] = v unless assoc_bv.has_key?(k)
+              end
+              ds = ds.bind(h)
             end
+            ps = ds.prepare(opts.returns_array? ? :select : :first, :"smpsap_#{NEXT.call}")
+            ps.log_sql = true
+            ps
           end
         end
 
@@ -78,7 +81,7 @@ module Sequel
         def _load_associated_objects(opts, dynamic_opts=OPTS)
           if !opts.can_have_associated_objects?(self) || dynamic_opts[:callback] || (load_with_primary_key_lookup?(opts, dynamic_opts) && opts.associated_class.respond_to?(:cache_get_pk))
             super
-          elsif (bv = association_bound_variables(opts)) && (ps ||= association_prepared_statement(opts, bv.length))
+          elsif (bv = association_bound_variables(opts)) && (ps ||= association_prepared_statement(opts, bv))
             ps.call(bv)
           else
             super

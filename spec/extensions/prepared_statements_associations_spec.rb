@@ -89,17 +89,17 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
     @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
   end
 
-  specify "should run a regular query if the associated dataset has conditions" do
-    @Album.dataset = @Album.dataset.where(:a=>1)
+  specify "should use a prepared statement if the associated dataset has conditions" do
+    @Album.dataset = @Album.dataset.where(:a=>2)
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 1) AND (albums.artist_id = 1))"]
+    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
   end
 
-  specify "should run a regular query if :conditions option is used when defining the association" do
-    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>1} 
+  specify "should use a prepared statement if the :conditions association option" do
+    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>2} 
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 1) AND (albums.artist_id = 1))"]
+    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
   end
 
   specify "should run a regular query if :dataset option is used when defining the association" do
@@ -110,9 +110,9 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
   end
 
   specify "should run a regular query if :cloning an association that doesn't used prepared statements" do
-    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>1} 
+    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id do |ds| ds end
     @Artist.one_to_many :oalbums, :clone=>:albums
     @Artist.load(:id=>1).oalbums
-    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 1) AND (albums.artist_id = 1))"]
+    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
   end
 end

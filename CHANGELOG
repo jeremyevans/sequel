@@ -1,6 +1,8 @@
 === HEAD
 
-* Skip prepared statement usage in some additional cases in the prepared_statements_associations plugin (jeremyevans)
+* Use prepared statements when the association has :conditions in the prepared_statements_associations plugin (jeremyevans)
+
+* Fix prepared statement usage in some additional cases in the prepared_statements_associations plugin (jeremyevans)
 
 * Hex escape blob input on MySQL (jeremyevans)
 
