@@ -18,6 +18,13 @@ be executed unless the library has been required first. Example:
 Global extensions are loaded with Sequel.extension, and affect
 other parts of Sequel or the general ruby environment.  It's not
 necessary to load them first, but it is a recommended practice.
+
+The exception to this is global extensions that integrate with
+Database-specific extensions, where the Database-specific
+extension should be loaded first (such as some of the pg_*
+extensions).  In those cases, the global extensions should be
+loaded after the Database-specific extensions.
+
 Example:
 
   Sequel.extension :blank
