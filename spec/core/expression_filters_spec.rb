@@ -798,6 +798,8 @@ describe "Sequel core extension replacements" do
     l(Sequel.subscript(:a, 1), 'a[1]')
     l(Sequel.subscript(:a, 1, 2), 'a[1, 2]')
     l(Sequel.subscript(:a, [1, 2]), 'a[1, 2]')
+    l(Sequel.subscript(:a, 1..2), 'a[1:2]')
+    l(Sequel.subscript(:a, 1...3), 'a[1:2]')
   end
 
   it "Sequel.function should return an SQL function" do

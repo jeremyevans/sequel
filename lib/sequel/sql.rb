@@ -615,6 +615,8 @@ module Sequel
       #   Sequel.subscript(:array, 1) # array[1]
       #   Sequel.subscript(:array, 1, 2) # array[1, 2]
       #   Sequel.subscript(:array, [1, 2]) # array[1, 2]
+      #   Sequel.subscript(:array, 1..2) # array[1:2]
+      #   Sequel.subscript(:array, 1...3) # array[1:2]
       def subscript(exp, *subs)
         SQL::Subscript.new(exp, subs.flatten)
       end
@@ -895,6 +897,8 @@ module Sequel
       #   :array.sql_subscript(1) # array[1]
       #   :array.sql_subscript(1, 2) # array[1, 2]
       #   :array.sql_subscript([1, 2]) # array[1, 2]
+      #   :array.sql_subscript(:array, 1..2) # array[1:2]
+      #   :array.sql_subscript(:array, 1...3) # array[1:2]
       def sql_subscript(*sub)
         Subscript.new(self, sub.flatten)
       end

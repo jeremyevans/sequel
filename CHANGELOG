@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow providing ranges as subscripts for array[start:end] (jeremyevans)
+
 * Prepare one_to_one associations in the prepared_statements_associations plugin (jeremyevans)
 
 * Use prepared statements when the association has :conditions in the prepared_statements_associations plugin (jeremyevans)

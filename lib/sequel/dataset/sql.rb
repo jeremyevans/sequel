@@ -200,6 +200,7 @@ module Sequel
     CASE_THEN = " THEN ".freeze
     CASE_WHEN = " WHEN ".freeze
     CAST_OPEN = 'CAST('.freeze
+    COLON = ':'.freeze
     COLUMN_REF_RE1 = Sequel::COLUMN_REF_RE1
     COLUMN_REF_RE2 = Sequel::COLUMN_REF_RE2
     COLUMN_REF_RE3 = Sequel::COLUMN_REF_RE3
@@ -655,7 +656,15 @@ module Sequel
     def subscript_sql_append(sql, s)
       literal_append(sql, s.f)
       sql << BRACKET_OPEN
-      expression_list_append(sql, s.sub)
+      if s.sub.length == 1 && (range = s.sub.first).is_a?(Range)
+        literal_append(sql, range.begin)
+        sql << COLON
+        e = range.end
+        e -= 1 if range.exclude_end? && e.is_a?(Integer)
+        literal_append(sql, e)
+      else
+        expression_list_append(sql, s.sub)
+      end
       sql << BRACKET_CLOSE
     end
 

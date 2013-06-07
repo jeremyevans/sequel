@@ -504,18 +504,21 @@ The following shortcuts exist for creating Sequel::SQL::OrderedExpression object
 === Sequel::SQL::Subscript
 
 Sequel::SQL::Subscript objects represent SQL database array access.  They take an
-expression and an array of indexes:
+expression and an array of indexes (or a range for an SQL array slice):
 
   Sequel::SQL::Subscript.new(:a, [1]) # "a"[1]
   Sequel::SQL::Subscript.new(:a, [1, 2]) # "a"[1, 2]
+  Sequel::SQL::Subscript.new(:a, [1..2]) # "a"[1:2]
 
 The following shortcuts exist for creating Sequel::SQL::Subscript objects:
 
   Sequel.subscript(:a, 1)
   Sequel.subscript(:a, 1, 2)
+  Sequel.subscript(:a, 1..2)
 
   :a.sql_subscript(1) # core_extensions extension
   :a.sql_subscript(1, 2) # core_extensions extension
+  :a.sql_subscript(1..2) # core_extensions extension
   
 === Sequel::SQL::VirtualRow
 
