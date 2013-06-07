@@ -59,26 +59,29 @@ module Sequel
 
         # Given an association reflection, return and cache a prepared statement for this association such
         # that, given appropriate bound variables, the prepared statement will work correctly for any
-        # instance.
-        def association_prepared_statement(opts)
+        # instance.  Return false if such a prepared statement cannot be created.
+        def association_prepared_statement(opts, num_variables)
           opts.send(:cached_fetch, :prepared_statement) do
-            ps = _associated_dataset(opts, {}).unbind.first.prepare(opts.returns_array? ? :select : :first, :"smpsap_#{NEXT.call}")
-            ps.log_sql = true
-            ps
+            ds, bv = _associated_dataset(opts, {}).unbind
+            if bv.length == num_variables
+              ps = ds.prepare(opts.returns_array? ? :select : :first, :"smpsap_#{NEXT.call}")
+              ps.log_sql = true
+              ps
+            else
+              false
+            end
           end
         end
 
         # If a prepared statement can be used to load the associated objects, execute it to retrieve them.  Otherwise,
         # fall back to the default implementation.
         def _load_associated_objects(opts, dynamic_opts=OPTS)
-          if !opts.can_have_associated_objects?(self) || dynamic_opts[:callback] || (ps = opts[:prepared_statement]) == false || (load_with_primary_key_lookup?(opts, dynamic_opts) && opts.associated_class.respond_to?(:cache_get_pk))
+          if !opts.can_have_associated_objects?(self) || dynamic_opts[:callback] || (load_with_primary_key_lookup?(opts, dynamic_opts) && opts.associated_class.respond_to?(:cache_get_pk))
             super
-          else 
-            if bv = association_bound_variables(opts)
-              (ps || association_prepared_statement(opts)).call(bv)
-            else
-              super
-            end
+          elsif (bv = association_bound_variables(opts)) && (ps ||= association_prepared_statement(opts, bv.length))
+            ps.call(bv)
+          else
+            super
           end
         end
       end

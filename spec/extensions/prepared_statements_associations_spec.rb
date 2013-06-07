@@ -89,6 +89,13 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
     @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
   end
 
+  specify "should run a regular query if the associated dataset has conditions" do
+    @Album.dataset = @Album.dataset.where(:a=>1)
+    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
+    @Artist.load(:id=>1).albums
+    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 1) AND (albums.artist_id = 1))"]
+  end
+
   specify "should run a regular query if :conditions option is used when defining the association" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>1} 
     @Artist.load(:id=>1).albums
