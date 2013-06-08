@@ -479,7 +479,7 @@ module Sequel
               s
             when true
               ds = associated_class.dataset
-              if ds.supports_ordered_distinct_on?
+              if ds.supports_ordered_distinct_on? && limit_and_offset.last.nil?
                 :distinct_on
               elsif ds.supports_window_functions?
                 :window_function
@@ -492,7 +492,11 @@ module Sequel
 
         # The limit and offset for this association (returned as a two element array).
         def limit_and_offset
-          [1, nil]
+          if (v = self[:limit]).is_a?(Array)
+            v
+          else
+            [v, nil]
+          end
         end
 
         # one_to_one associations return a single object, not an array
@@ -1037,10 +1041,14 @@ module Sequel
           limit, offset = opts.limit_and_offset
           ds = ds.unordered.select_append{row_number(:over, :partition=>opts.predicate_key, :order=>ds.opts[:order]){}.as(rn)}.from_self
           ds = if opts[:type] == :one_to_one
-            ds.where(rn => 1)
+            ds.where(rn => offset ? offset+1 : 1)
           elsif offset
             offset += 1
-            ds.where(rn => (offset...(offset+limit))) 
+            if limit
+              ds.where(rn => (offset...(offset+limit))) 
+            else
+              ds.where{SQL::Identifier.new(rn) >= offset} 
+            end
           else
             ds.where{SQL::Identifier.new(rn) <= limit} 
           end
@@ -1133,7 +1141,8 @@ module Sequel
             end
             if opts.eager_limit_strategy == :ruby
               limit, offset = opts.limit_and_offset
-              rows.each{|o| o.associations[name] = o.associations[name].slice(offset||0, limit) || []}
+              offset ||= 0
+              rows.each{|o| o.associations[name] = o.associations[name][offset..(limit ? offset+limit-1 : -1)] || []}
             end
           end
           
@@ -1307,7 +1316,8 @@ module Sequel
             end
             if opts.eager_limit_strategy == :ruby
               limit, offset = opts.limit_and_offset
-              rows.each{|o| o.associations[name] = o.associations[name].slice(offset||0, limit) || []}
+              offset ||= 0
+              rows.each{|o| o.associations[name] = o.associations[name][offset..(limit ? offset+limit-1 : -1)] || []}
             end
           end
           

@@ -1,5 +1,7 @@
 === HEAD
 
+* Make sure an offset without a limit is handled correctly when eager loading (jeremyevans)
+
 * Allow providing ranges as subscripts for array[start:end] (jeremyevans)
 
 * Prepare one_to_one associations in the prepared_statements_associations plugin (jeremyevans)

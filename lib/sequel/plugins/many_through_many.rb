@@ -225,7 +225,8 @@ module Sequel
             end
             if opts.eager_limit_strategy == :ruby
               limit, offset = opts.limit_and_offset
-              rows.each{|o| o.associations[name] = o.associations[name].slice(offset||0, limit) || []}
+              offset ||= 0
+              rows.each{|o| o.associations[name] = o.associations[name][offset..(limit ? offset+limit-1 : -1)] || []}
             end
           end
 
