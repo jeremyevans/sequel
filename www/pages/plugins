@@ -33,6 +33,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ManyThroughMany.html">many_through_many</a>: Allows you to create an association to multiple objects through multiple join tables.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/NestedAttributes.html">nested_attributes</a>: Allows you to modified associated objects directly through a model object, similar to ActiveRecord's Nested Attributes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking</a>: Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/PgArrayAssociations.html">pg_array_associations</a>: Adds associations types to handle the case where foreign keys are stored in a PostgreSQL array in one of the tables.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PgRow.html">pg_row</a>: Allows Sequel::Model classes to implement PostgreSQL row-valued/composite types.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/PgTypecastOnLoad.html'>pg_typecast_on_load</a>: Handles typecasting of PostgreSQL array/hstore/composite types when loading model objects via jdbc, do, or swift adapters.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatements.html">prepared_statements</a>: Makes models use prepared statements for deletes, inserts, updates, and lookups by primary key.</li>

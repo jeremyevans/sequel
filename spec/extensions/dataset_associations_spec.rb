@@ -23,11 +23,15 @@ describe "Sequel::Plugins::DatasetAssociations" do
     @Tag.columns :id, :name
 
     @Artist.plugin :many_through_many
+    @Artist.plugin :pg_array_associations
+    @Tag.plugin :pg_array_associations
     @Artist.one_to_many :albums, :class=>@Album
     @Artist.one_to_one :first_album, :class=>@Album
     @Album.many_to_one :artist, :class=>@Artist
     @Album.many_to_many :tags, :class=>@Tag
     @Tag.many_to_many :albums, :class=>@Album
+    @Artist.pg_array_to_many :artist_tags, :class=>@Tag, :key=>:tag_ids
+    @Tag.many_to_pg_array :artists, :class=>@Artist
     @Artist.many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :class=>@Tag
   end
 
@@ -64,6 +68,20 @@ describe "Sequel::Plugins::DatasetAssociations" do
     ds.should be_a_kind_of(Sequel::Dataset)
     ds.model.should == @Tag
     ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id)))"
+  end
+
+  it "should work for pg_array_to_many associations" do
+    ds = @Artist.artist_tags
+    ds.should be_a_kind_of(Sequel::Dataset)
+    ds.model.should == @Tag
+    ds.sql.should == "SELECT * FROM tags WHERE (id IN (SELECT unnest(artists.tag_ids) FROM artists))"
+  end
+
+  it "should work for many_to_pg_array associations" do
+    ds = @Tag.artists
+    ds.should be_a_kind_of(Sequel::Dataset)
+    ds.model.should == @Artist
+    ds.sql.should == "SELECT * FROM artists WHERE coalesce((tag_ids && (SELECT array_agg(tags.id) FROM tags)), 'f')"
   end
 
   it "should have an associated method that takes an association symbol" do
