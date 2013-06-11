@@ -307,7 +307,7 @@ describe "Database schema modifiers" do
   end
 
   specify "should create temporary tables without raising an exception" do
-    @db.create_table!(:items, :temp=>true){Integer :number}
+    @db.create_table!(:items_temp, :temp=>true){Integer :number}
   end
 
   specify "should have create_table? only create the table if it doesn't already exist" do
