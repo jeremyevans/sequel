@@ -771,12 +771,12 @@ module Sequel
       
       # Use the driver's escape_bytea
       def literal_blob_append(sql, v)
-        sql << APOS << db.synchronize{|c| c.escape_bytea(v)} << APOS
+        sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_bytea(v)} << APOS
       end
       
       # Use the driver's escape_string
       def literal_string_append(sql, v)
-        sql << APOS << db.synchronize{|c| c.escape_string(v)} << APOS
+        sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS
       end
       
       # For each row in the result set, yield a hash with column name symbol

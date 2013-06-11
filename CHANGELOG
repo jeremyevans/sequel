@@ -1,5 +1,7 @@
 === HEAD
 
+* Make dataset string literalization that requires databaset connection use dataset's chosen server (jeremyevans)
+
 * Make sure an offset without a limit is handled correctly when eager loading (jeremyevans)
 
 * Allow providing ranges as subscripts for array[start:end] (jeremyevans)

@@ -39,7 +39,7 @@ module Sequel
         
         # Use Swift's escape method for quoting.
         def literal_string_append(sql, s)
-          sql << APOS << db.synchronize{|c| c.escape(s)} << APOS
+          sql << APOS << db.synchronize(@opts[:server]){|c| c.escape(s)} << APOS
         end
       end
     end

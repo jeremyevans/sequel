@@ -181,7 +181,7 @@ module Sequel
         
         # Literalize strings similar to the native postgres adapter
         def literal_string_append(sql, v)
-          sql << APOS << db.synchronize{|c| c.escape_string(v)} << APOS
+          sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS
         end
       end
     end

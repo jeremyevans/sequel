@@ -172,7 +172,7 @@ module Sequel
       
       # Quote the string using the adapter instance method.
       def literal_string_append(sql, v)
-        db.synchronize{|c| sql << c.quote(v)}
+        db.synchronize(@opts[:server]){|c| sql << c.quote(v)}
       end
     end
   end
