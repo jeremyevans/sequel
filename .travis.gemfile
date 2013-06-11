@@ -8,7 +8,7 @@ gem 'rspec', '<2.10.0'
 # Plugin/Extension Dependencies
 gem 'tzinfo'
 gem 'activemodel'
-gem 'nokogiri'
+gem 'nokogiri', '<1.6.0'
 gem 'json'
 
 # MRI/Rubinius Adapter Dependencies
