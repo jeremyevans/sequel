@@ -905,6 +905,15 @@ module Sequel
         BOOL_FALSE
       end
 
+      # Raise error for infinitate and NaN values
+      def literal_float(v)
+        if v.infinite? || v.nan?
+          raise InvalidValue, "Infinite floats and NaN values are not valid on MySQL"
+        else
+          super
+        end
+      end
+
       # SQL fragment for String.  Doubles \ and ' by default.
       def literal_string_append(sql, v)
         sql << APOS << v.gsub(BACKSLASH_RE, QUAD_BACKSLASH).gsub(APOS_RE, DOUBLE_APOS) << APOS
