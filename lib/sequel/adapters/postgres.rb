@@ -795,7 +795,7 @@ module Sequel
   end
 end
 
-if SEQUEL_POSTGRES_USES_PG
+if SEQUEL_POSTGRES_USES_PG && !ENV['NO_SEQUEL_PG']
   begin
     require 'sequel_pg'
   rescue LoadError
