@@ -1,5 +1,7 @@
 === HEAD
 
+* Enable use of window functions for limited eager loading by default (jeremyevans)
+
 * Handle offsets correctly when eager loading one_to_one associations (jeremyevans)
 
 * Raise exception for infinite and NaN floats on MySQL (jeremyevans) (#677)

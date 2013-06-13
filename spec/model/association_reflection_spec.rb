@@ -287,7 +287,7 @@ describe Sequel::Model::Associations::AssociationReflection, "#eager_limit_strat
     @c = Class.new(Sequel::Model(:a))
   end
   after do
-    Sequel::Model.default_eager_limit_strategy = nil
+    Sequel::Model.default_eager_limit_strategy = true
   end
 
   it "should be nil by default for *_one associations" do

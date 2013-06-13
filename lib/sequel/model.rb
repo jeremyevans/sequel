@@ -136,7 +136,7 @@ module Sequel
     @db_schema = nil
     @dataset = nil
     @dataset_method_modules = []
-    @default_eager_limit_strategy = nil
+    @default_eager_limit_strategy = true
     @default_set_fields_options = {}
     @overridable_methods_module = nil
     @fast_pk_lookup_sql = nil
