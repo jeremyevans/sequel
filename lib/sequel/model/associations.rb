@@ -721,7 +721,8 @@ module Sequel
         # value changes.
         attr_reader :autoreloading_associations
 
-        # The default :eager_limit_strategy option to use for *_many associations (default: nil)
+        # The default :eager_limit_strategy option to use for limited or offset associations (default: true, causing Sequel
+        # to use what it considers the most appropriate strategy).
         attr_accessor :default_eager_limit_strategy
 
         # Array of all association reflections for this model class
@@ -817,14 +818,8 @@ module Sequel
         #                   (the alias that was used for the current table), and possibly :eager_block (a callback
         #                   proc accepting the associated dataset, for per-call customization).
         #                   Should return a copy of the dataset with the association graphed into it.
-        # :eager_limit_strategy :: Determines the strategy used for enforcing limits when eager loading associations via
-        #                          the +eager+ method.  For one_to_one associations, no strategy is used by default, and
-        #                          for *_many associations, the :ruby strategy is used by default, which still retrieves
-        #                          all records but slices the resulting array after the association is retrieved.  You
-        #                          can pass a +true+ value for this option to have Sequel pick what it thinks is the best
-        #                          choice for the database, or specify a specific symbol to manually select a strategy.
-        #                          one_to_one associations support :distinct_on and :window_function.
-        #                          *_many associations support :ruby, and :window_function.
+        # :eager_limit_strategy :: Determines the strategy used for enforcing limits and offsets when eager loading
+        #                          associations via the +eager+ method.  
         # :eager_loader :: A proc to use to implement eager loading, overriding the default.  Takes a single hash argument,
         #                  with at least the keys: :rows, which is an array of current model instances, :associations,
         #                  which is a hash of dependent associations, :self, which is the dataset doing the eager loading,

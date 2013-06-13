@@ -1673,18 +1673,19 @@ plugin.
 
 This setting determines what strategy to use for loading the associations
 that use the :limit setting to limit the number of returned records. You
-can't use LIMIT directly, since you want a limit for each associated
-record, not a LIMIT on the number of records returned by the dataset.
+can't use LIMIT directly, since you want a limit for each group of
+associated records, not a LIMIT on the total number of records returned
+by the dataset.
 
-By default, no strategy is used for one_to_one associations, and
-the :ruby strategy is used for *_many associations, which does a simple
-array slice after loading the associated records.  That doesn't provide
-a performance advantage, since all records are still loaded from the
-database, but it at least makes sure the cached records are accurately
-limited as they would be in the lazy load case.
+By default, if a *_to_many association uses a limit or offset, or a
+one_to_one association uses an offset, Sequel will choose to use an
+eager limit strategy.  The default strategy depends on the database
+being used.  For databases which support window functions, a window
+function will be used.  Other databases will just have an ruby array
+slice done on the entire record set.
 
-The reason no strategy is used by default for one_to_one associations
-is that none is needed for a true one_to_one association (since there
+For one_to_one associations without offsets, no strategy is used by default
+because none is needed for a true one_to_one association (since there
 is only one associated record per current record).  However, if you are
 using a one_to_one association where the relationship is really one_to_many,
 and using an order to pick the first matching row, then if you don't
@@ -1693,17 +1694,18 @@ rows just to have Sequel ignore all rows after the first.  By using a
 strategy to change the query to only return one associated record per
 current record, you can get much better database performance.
 
-You can set a value of +true+ for this option to have Sequel select what
-it thinks is the best way of limiting the records for your database.  You
-can also specify a symbol to manually choose a strategy.  The available
+In general, Sequel picks an appropriate strategy, so it is not usually
+necessary to specify a specific strategy.  The exception is for one_to_one
+associations where there is more than one associated record per current
+record.  For those, you should probably specify true to this option to have
+Sequel pick an appropriate strategy.
+
+You can also specify a symbol to manually choose a strategy.  The available
 strategies are:
 
 :distinct_on :: Uses DISTINCT ON to ensure only the first matching record
-                is loaded (one_to_one associations only). This is used by
-                default on PostgreSQL.
-:window_function :: Uses window functions if the database supports it.
-                    This is used by default on databases that support window
-                    functions.
-:ruby :: Uses ruby array slicing to emulate database limiting (*_many
-         associations only).  This is the default if the database doesn't
-         support window functions.
+                is loaded (only used for one_to_one associations without
+                offsets on PostgreSQL).
+:window_function :: Uses a ROW_NUMBER window functions to ensure the
+                    correctly limited/offset records are returned.
+:ruby :: Uses ruby array slicing to emulate database limiting/offsetting.
