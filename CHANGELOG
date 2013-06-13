@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle offsets correctly when eager loading one_to_one associations (jeremyevans)
+
 * Raise exception for infinite and NaN floats on MySQL (jeremyevans) (#677)
 
 * Make dataset string literalization that requires database connection use dataset's chosen server (jeremyevans)

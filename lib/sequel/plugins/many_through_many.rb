@@ -198,6 +198,7 @@ module Sequel
             ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])) + opts.predicate_keys.zip(left_pks.map{|k| send(k)}), :table_alias=>ft[:alias], :qualify=>:deep)
           end
 
+          slice_range = opts.slice_range
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
           opts[:eager_loader] ||= lambda do |eo|
             h = eo[:id_map]
@@ -224,9 +225,7 @@ module Sequel
               objects.each{|object| object.associations[name].push(assoc_record)}
             end
             if opts.eager_limit_strategy == :ruby
-              limit, offset = opts.limit_and_offset
-              offset ||= 0
-              rows.each{|o| o.associations[name] = o.associations[name][offset..(limit ? offset+limit-1 : -1)] || []}
+              rows.each{|o| o.associations[name] = o.associations[name][slice_range] || []}
             end
           end
 

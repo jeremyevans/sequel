@@ -253,6 +253,14 @@ module Sequel
           :"#{self[:name]}="
         end
         
+        # The range used for slicing when using the :ruby eager limit strategy.
+        def slice_range
+          limit, offset = limit_and_offset
+          if limit || offset
+            (offset||0)..(limit ? (offset||0)+limit-1 : -1)
+          end
+        end
+        
         private
 
         if defined?(RUBY_ENGINE) && RUBY_ENGINE != 'ruby'
@@ -474,15 +482,18 @@ module Sequel
         # support both DISTINCT ON and window functions as strategies.
         def eager_limit_strategy
           cached_fetch(:_eager_limit_strategy) do
-            case s = self[:eager_limit_strategy]
+            offset = limit_and_offset.last
+            case s = self.fetch(:eager_limit_strategy){(self[:model].default_eager_limit_strategy || :ruby) if offset}
             when Symbol
               s
             when true
               ds = associated_class.dataset
-              if ds.supports_ordered_distinct_on? && limit_and_offset.last.nil?
+              if ds.supports_ordered_distinct_on? && offset.nil?
                 :distinct_on
               elsif ds.supports_window_functions?
                 :window_function
+              else
+                :ruby
               end
             else
               nil
@@ -1115,6 +1126,7 @@ module Sequel
           graph_jt_conds = opts[:graph_join_table_conditions] = opts.fetch(:graph_join_table_conditions, []).to_a
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
+          slice_range = opts.slice_range
           opts[:dataset] ||= proc{opts.associated_dataset.inner_join(join_table, rcks.zip(opts.right_primary_keys) + opts.predicate_keys.zip(lcpks.map{|k| send(k)}), :qualify=>:deep)}
 
           opts[:eager_loader] ||= proc do |eo|
@@ -1140,9 +1152,7 @@ module Sequel
               objects.each{|object| object.associations[name].push(assoc_record)}
             end
             if opts.eager_limit_strategy == :ruby
-              limit, offset = opts.limit_and_offset
-              offset ||= 0
-              rows.each{|o| o.associations[name] = o.associations[name][offset..(limit ? offset+limit-1 : -1)] || []}
+              rows.each{|o| o.associations[name] = o.associations[name][slice_range] || []}
             end
           end
           
@@ -1273,21 +1283,18 @@ module Sequel
           pkcs = opts[:primary_key_columns] ||= Array(pkc)
           raise(Error, "mismatched number of keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
+          slice_range = opts.slice_range
           opts[:dataset] ||= proc do
             opts.associated_dataset.where(opts.predicate_keys.zip(cpks.map{|k| send(k)}))
           end
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:id_map]
             rows = eo[:rows]
-            if one_to_one
-              rows.each{|object| object.associations[name] = nil}
-            else
-              rows.each{|object| object.associations[name] = []}
-            end
             reciprocal = opts.reciprocal
             klass = opts.associated_class
             filter_keys = opts.predicate_key
             ds = model.eager_loading_dataset(opts, klass.where(filter_keys=>h.keys), nil, eo[:associations], eo)
+            assign_singular = true if one_to_one 
             case opts.eager_limit_strategy
             when :distinct_on
               ds = ds.distinct(*filter_keys).order_prepend(*filter_keys)
@@ -1295,12 +1302,19 @@ module Sequel
               delete_rn = true
               rn = ds.row_number_column
               ds = apply_window_function_eager_limit_strategy(ds, opts)
+            when :ruby
+              assign_singular = false if one_to_one && slice_range
+            end
+            if assign_singular
+              rows.each{|object| object.associations[name] = nil}
+            else
+              rows.each{|object| object.associations[name] = []}
             end
             ds.all do |assoc_record|
               assoc_record.values.delete(rn) if delete_rn
               hash_key = uses_cks ? km.map{|k| assoc_record.send(k)} : assoc_record.send(km)
               next unless objects = h[hash_key]
-              if one_to_one
+              if assign_singular
                 objects.each do |object| 
                   unless object.associations[name]
                     object.associations[name] = assoc_record
@@ -1315,9 +1329,13 @@ module Sequel
               end
             end
             if opts.eager_limit_strategy == :ruby
-              limit, offset = opts.limit_and_offset
-              offset ||= 0
-              rows.each{|o| o.associations[name] = o.associations[name][offset..(limit ? offset+limit-1 : -1)] || []}
+              if one_to_one
+                if slice_range
+                  rows.each{|o| o.associations[name] = o.associations[name][slice_range.begin]}
+                end
+              else
+                rows.each{|o| o.associations[name] = o.associations[name][slice_range] || []}
+              end
             end
           end
           
