@@ -149,6 +149,16 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.should == []
   end
   
+  it "should use first matching entry when eager loading one_to_one association" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id
+    EagerTrack.dataset._fetch = [{:id => 3, :album_id=>1}, {:id => 4, :album_id=>1}]
+    a = EagerAlbum.eager(:track).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
+    a.first.track.should == EagerTrack.load(:id => 3, :album_id=>1)
+    MODEL_DB.sqls.should == []
+  end
+  
   it "should eagerly load a single one_to_one association using the :distinct_on strategy" do
     def (EagerTrack.dataset).supports_distinct_on?() true end
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>true
