@@ -529,7 +529,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     MODEL_DB.sqls.length.should == 0
   end
   
-  it "should cascade eagerly loading when the :eager_graph association option is used" do
+  it "should raise error if attempting to eagerly load an association using :eager_graph option" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_graph=>:tracks
     proc{@c1.eager(:tags).all}.should raise_error(Sequel::Error)
   end
