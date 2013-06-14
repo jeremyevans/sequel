@@ -383,6 +383,16 @@ module Sequel
         SQL::EmulatedFunction.new(:char_length, arg)
       end
 
+      # Do a deep qualification of the argument using the qualifier.  This recurses into
+      # nested structures.
+      #
+      #   Sequel.deep_qualify(:table, :column) # "table"."column"
+      #   Sequel.deep_qualify(:table, Sequel.+(:column, 1)) # "table"."column" + 1
+      #   Sequel.deep_qualify(:table, Sequel.like(:a, 'b')) # "table"."a" LIKE 'b' ESCAPE '\'
+      def deep_qualify(qualifier, expr)
+        Sequel::Qualifier.new(Sequel, qualifier).transform(expr)
+      end
+
       # Return a delayed evaluation that uses the passed block. This is used
       # to delay evaluations of the code to runtime.  For example, with
       # the following code:

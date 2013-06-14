@@ -748,6 +748,10 @@ describe "Sequel core extension replacements" do
     Sequel.blob(o).should equal(o)
   end
 
+  it "Sequel.deep_qualify should do a deep qualification into nested structors" do
+    l(Sequel.deep_qualify(:t, Sequel.+(:c, 1)), "(t.c + 1)")
+  end
+
   it "Sequel.qualify should return a qualified identifier" do
     l(Sequel.qualify(:t, :c), "t.c")
   end

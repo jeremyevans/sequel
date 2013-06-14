@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel.deep_qualify, for easily doing a deep qualification (jeremyevans)
+
 * Enable use of window functions for limited eager loading by default (jeremyevans)
 
 * Handle offsets correctly when eager loading one_to_one associations (jeremyevans)
