@@ -3544,6 +3544,11 @@ describe "Sequel::Dataset#unbind" do
     @ds.exclude(:foo=>1).unbind.last.should == {:foo=>1}
   end
 
+  specify "should return variables as symbols" do
+    @ds.filter(Sequel.expr(:foo)=>1).unbind.last.should == {:foo=>1}
+    @ds.exclude(Sequel.expr(:foo__bar)=>1).unbind.last.should == {:"foo.bar"=>1}
+  end
+
   specify "should handle numerics, strings, dates, times, and datetimes" do
     @u[@ds.filter(:foo=>1)].should == ["SELECT * FROM t WHERE (foo = $foo)", {:foo=>1}]
     @u[@ds.filter(:foo=>1.0)].should == ["SELECT * FROM t WHERE (foo = $foo)", {:foo=>1.0}]

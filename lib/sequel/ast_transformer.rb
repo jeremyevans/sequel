@@ -157,8 +157,10 @@ module Sequel
     # an instance of one of the +UNBIND_KEY_CLASSES+.
     def bind_key(obj)
       case obj
-      when Symbol, String
+      when Symbol
         obj
+      when String
+        obj.to_sym
       when SQL::Identifier
         bind_key(obj.value)
       when SQL::QualifiedIdentifier

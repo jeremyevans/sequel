@@ -110,6 +110,12 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
     @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
   end
 
+  specify "should not use a prepared statement if :conditions association option uses an identifier" do
+    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{Sequel.identifier('a')=>2}
+    @Artist.load(:id=>1).albums
+    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
+  end
+
   specify "should run a regular query if :dataset option is used when defining the association" do
     album = @Album
     @Artist.one_to_many :albums, :class=>@Album, :dataset=>proc{album.filter(:artist_id=>id)} 
