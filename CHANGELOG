@@ -1,5 +1,7 @@
 === HEAD
 
+* Ensure that CHECK constraints are surrounded with parentheses (jeremyevans)
+
 * Ensure Dataset#unbind returned variable hash uses symbol keys (jeremyevans)
 
 * Add pg_array_associations plugin, for associations based on PostgreSQL arrays containing foreign keys (jeremyevans)

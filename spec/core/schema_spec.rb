@@ -502,9 +502,17 @@ describe "DB#create_table" do
   specify "should accept unnamed constraint definitions with blocks" do
     @db.create_table(:cats) do
       integer :score
-      check{(x.sql_number > 0) & (y.sql_number < 1)}
+      check{(x > 0) & (y < 1)}
     end
     @db.sqls.should == ["CREATE TABLE cats (score integer, CHECK ((x > 0) AND (y < 1)))"]
+  end
+
+  specify "should accept unnamed constraint definitions with function calls" do
+    @db.create_table(:cats) do
+      integer :score
+      check{f(x)}
+    end
+    @db.sqls.should == ["CREATE TABLE cats (score integer, CHECK (f(x)))"]
   end
 
   specify "should accept unnamed constraint definitions" do
@@ -514,11 +522,25 @@ describe "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (CHECK (price < 100))"]
   end
 
+  specify "should accept arrays of pairs constraints" do
+    @db.create_table(:cats) do
+      check [[:price, 100]]
+    end
+    @db.sqls.should == ["CREATE TABLE cats (CHECK (price = 100))"]
+  end
+
   specify "should accept hash constraints" do
     @db.create_table(:cats) do
       check :price=>100
     end
     @db.sqls.should == ["CREATE TABLE cats (CHECK (price = 100))"]
+  end
+
+  specify "should accept array constraints" do
+    @db.create_table(:cats) do
+      check [Sequel.expr(:x) > 0, Sequel.expr(:y) < 1]
+    end
+    @db.sqls.should == ["CREATE TABLE cats (CHECK ((x > 0) AND (y < 1)))"]
   end
 
   specify "should accept named constraint definitions" do

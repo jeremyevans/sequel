@@ -542,7 +542,10 @@ module Sequel
       case constraint[:type]
       when :check
         check = constraint[:check]
-        sql << "CHECK #{filter_expr((check.is_a?(Array) && check.length == 1) ? check.first : check)}"
+        check = check.first if check.is_a?(Array) && check.length == 1
+        check = filter_expr(check)
+        check = "(#{check})" unless check[0..0] == '(' && check[-1..-1] == ')'
+        sql << "CHECK #{check}"
       when :primary_key
         sql << "PRIMARY KEY #{literal(constraint[:columns])}"
       when :foreign_key
