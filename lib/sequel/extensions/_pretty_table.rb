@@ -60,7 +60,7 @@ module Sequel
       case v
       when Bignum, Fixnum
         "%#{size}d" % v
-      when Float
+      when Float, BigDecimal
         "%#{size}g" % v
       else
         "%-#{size}s" % v.to_s
