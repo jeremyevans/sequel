@@ -1253,9 +1253,11 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
 
   specify "#create_schema and #drop_schema should create and drop schemas" do
     @d.send(:create_schema_sql, :sequel).should == 'CREATE SCHEMA "sequel"'
+    @d.send(:create_schema_sql, :sequel, :if_not_exists=>true, :owner=>:foo).should == 'CREATE SCHEMA IF NOT EXISTS "sequel" AUTHORIZATION "foo"'
     @d.send(:drop_schema_sql, :sequel).should == 'DROP SCHEMA "sequel"'
     @d.send(:drop_schema_sql, :sequel, :if_exists=>true, :cascade=>true).should == 'DROP SCHEMA IF EXISTS "sequel" CASCADE'
     @d.create_schema(:sequel)
+    @d.create_schema(:sequel, :if_not_exists=>true) if @d.server_version >= 90300
     @d.create_table(:sequel__test){Integer :a}
     @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true)
   end

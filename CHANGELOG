@@ -1,5 +1,7 @@
 === HEAD
 
+* Support the Database#create_schema :owner and :if_not_exists options on PostgreSQL (jeremyevans)
+
 * Support :index_type=>:gist option to create GIST full text indexes on PostgreSQL (jeremyevans)
 
 * Add Postgres::ArrayOp#replace for the array_replace function added in PostgreSQL 9.3 (jeremyevans)

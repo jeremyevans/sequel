@@ -185,7 +185,7 @@ module Sequel
       # * name : Name of the procedural language (e.g. plpgsql)
       # * opts : options hash:
       #   * :handler : The name of a previously registered function used as a call handler for this language.
-      #   * :replace: Replace the installed language if it already exists (on PostgreSQL 9.0+).
+      #   * :replace : Replace the installed language if it already exists (on PostgreSQL 9.0+).
       #   * :trusted : Marks the language being created as trusted, allowing unprivileged users to create functions using this language.
       #   * :validator : The name of previously registered function used as a validator of functions defined in this language.
       def create_language(name, opts=OPTS)
@@ -194,8 +194,11 @@ module Sequel
 
       # Create a schema in the database. Arguments:
       # * name : Name of the schema (e.g. admin)
-      def create_schema(name)
-        self << create_schema_sql(name)
+      # * opts : options hash:
+      #   * :if_not_exists : Don't raise an error if the schema already exists (PostgreSQL 9.3+)
+      #   * :owner : The owner to set for the schema (defaults to current user if not specified)
+      def create_schema(name, opts=OPTS)
+        self << create_schema_sql(name, opts)
       end
 
       # Create a trigger in the database.  Arguments:
@@ -742,8 +745,8 @@ module Sequel
       end
 
       # SQL for creating a schema.
-      def create_schema_sql(name)
-        "CREATE SCHEMA #{quote_identifier(name)}"
+      def create_schema_sql(name, opts=OPTS)
+        "CREATE SCHEMA #{'IF NOT EXISTS ' if opts[:if_not_exists]}#{quote_identifier(name)}#{" AUTHORIZATION #{literal(opts[:owner])}" if opts[:owner]}"
       end
 
       # DDL statement for creating a table with the given name, columns, and options
