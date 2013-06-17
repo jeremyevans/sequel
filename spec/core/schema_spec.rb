@@ -1301,11 +1301,20 @@ describe "Database#create_view" do
   specify "should construct proper SQL with dataset" do
     @db.create_view :test, @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
-    @db.create_or_replace_view :sch__test, "SELECT * FROM xyz"
-    @db.sqls.should == ['DROP VIEW sch.test', 'CREATE VIEW sch.test AS SELECT * FROM xyz']
   end
 
-  specify "should construct proper SQL with dataset" do
+  specify "should handle :columns option" do
+    @db.create_view :test, @db[:items].select(:a, :b).order(:c), :columns=>[:d, :e]
+    @db.sqls.should == ['CREATE VIEW test (d, e) AS SELECT a, b FROM items ORDER BY c']
+    @db.create_view :test, @db[:items].select(:a, :b).order(:c), :columns=>%w'd e'
+    @db.sqls.should == ['CREATE VIEW test (d, e) AS SELECT a, b FROM items ORDER BY c']
+    @db.create_view :test, @db[:items].select(:a, :b).order(:c), :columns=>[Sequel.identifier('d'), Sequel.lit('e')]
+    @db.sqls.should == ['CREATE VIEW test (d, e) AS SELECT a, b FROM items ORDER BY c']
+  end
+
+  specify "should handle create_or_replace_view" do
+    @db.create_or_replace_view :sch__test, "SELECT * FROM xyz"
+    @db.sqls.should == ['DROP VIEW sch.test', 'CREATE VIEW sch.test AS SELECT * FROM xyz']
     @db.create_or_replace_view :test, @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['DROP VIEW test', 'CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
     @db.create_or_replace_view Sequel.identifier(:test), @db[:items].select(:a, :b).order(:c)

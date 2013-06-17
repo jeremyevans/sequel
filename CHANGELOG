@@ -1,12 +1,16 @@
 === HEAD
 
+* Support the Database#create_view :recursive option for defining recursive views in PostgreSQL 9.3+ (jeremyevans)
+
+* Support the Database#create_view :columns option for using explicit columns (jeremyevans)
+
 * Support the Database#create_schema :owner and :if_not_exists options on PostgreSQL (jeremyevans)
 
 * Support :index_type=>:gist option to create GIST full text indexes on PostgreSQL (jeremyevans)
 
-* Add Postgres::ArrayOp#replace for the array_replace function added in PostgreSQL 9.3 (jeremyevans)
+* Add Postgres::ArrayOp#replace for the array_replace function in PostgreSQL 9.3+ (jeremyevans)
 
-* Add Postgres::ArrayOp#remove for the array_remove function added in PostgreSQL 9.3 (jeremyevans)
+* Add Postgres::ArrayOp#remove for the array_remove function in PostgreSQL 9.3+ (jeremyevans)
 
 * Add Postgres::ArrayOp#hstore for creating hstores from arrays (jeremyevans)
 

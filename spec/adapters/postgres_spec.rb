@@ -42,27 +42,32 @@ describe "PostgreSQL", '#create_table' do
   end
 end
 
-describe "PostgreSQL temporary views" do
+describe "PostgreSQL views" do
   before do
     @db = INTEGRATION_DB
-    @db.drop_view(:items_view) rescue nil
     @db.create_table!(:items){Integer :number}
     @db[:items].insert(10)
     @db[:items].insert(20)
   end
   after do
+    @db.drop_view(:items_view) rescue nil
     @db.drop_table?(:items)
   end
 
-  specify "should be supported" do
+  specify "should support temporary views" do
     @db.create_view(:items_view, @db[:items].where(:number=>10), :temp=>true)
     @db[:items_view].map(:number).should == [10]
     @db.create_or_replace_view(:items_view, @db[:items].where(:number=>20),  :temp=>true)
     @db[:items_view].map(:number).should == [20]
-    @db.disconnect
-    lambda{@db[:items_view].map(:number)}.should raise_error(Sequel::DatabaseError)
   end
-end unless INTEGRATION_DB.adapter_scheme == :do # Causes freezing later
+
+  specify "should support recursive views" do
+    @db.create_view(:items_view, @db[:items].where(:number=>10).union(@db[:items, :items_view].where(Sequel.-(:number, 5)=>:n).select(:number), :all=>true, :from_self=>false), :recursive=>[:n])
+    @db[:items_view].select_order_map(:n).should == [10]
+    @db[:items].insert(15)
+    @db[:items_view].select_order_map(:n).should == [10, 15, 20]
+  end
+end 
     
 describe "A PostgreSQL database" do
   before(:all) do

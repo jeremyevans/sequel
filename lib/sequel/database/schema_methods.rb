@@ -224,8 +224,20 @@ module Sequel
     #   DB.create_view(:cheap_items, "SELECT * FROM items WHERE price < 100")
     #   DB.create_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
     #
+    # Options:
+    # :columns :: The column names to use for the view.  If not given,
+    #             automatically determined based on the input dataset.
+    #
     # PostgreSQL/SQLite specific option:
     # :temp :: Create a temporary view, automatically dropped on disconnect.
+    #
+    # PostgreSQL specific option:
+    # :recursive :: Defines a recursive view.  As columns must be specified for
+    #               recursive views, you can also set them as the value of this
+    #               option.  Since a recursive view requires a union that isn't
+    #               in a subquery, if you are providing a Dataset as the source
+    #               argument, if should probably call the union method with the
+    #               :all=>true and :from_self=>false options.
     def create_view(name, source, options = OPTS)
       execute_ddl(create_view_sql(name, source, options))
       remove_cached_schema(name)
@@ -634,15 +646,25 @@ module Sequel
       "CREATE #{temporary_table_sql if options[:temp]}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"
     end
 
+    # DDL fragment for initial part of CREATE VIEW statement
+    def create_view_prefix_sql(name, options)
+      create_view_sql_append_columns("CREATE #{'OR REPLACE 'if options[:replace]}VIEW #{quote_schema_table(name)}", options[:columns])
+    end
+
     # DDL statement for creating a view.
     def create_view_sql(name, source, options)
       source = source.sql if source.is_a?(Dataset)
       "#{create_view_prefix_sql(name, options)} AS #{source}"
     end
 
-    # DDL fragment for initial part of CREATE VIEW statement
-    def create_view_prefix_sql(name, options)
-      "CREATE #{'OR REPLACE 'if options[:replace]}VIEW #{quote_schema_table(name)}"
+    # Append the column list to the SQL, if a column list is given.
+    def create_view_sql_append_columns(sql, columns)
+      if columns
+        sql << ' ('
+        schema_utility_dataset.send(:identifier_list_append, sql, columns)
+        sql << ')'
+      end
+      sql
     end
 
     # Default index name for the table and columns, may be too long

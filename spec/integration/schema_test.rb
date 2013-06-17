@@ -269,12 +269,17 @@ describe "Database schema modifiers" do
       @ds.insert(:number=>2)
     end
     after do
-      @db.drop_view(:items_view)
+      @db.drop_view(:items_view) rescue nil
     end
 
     specify "should create views correctly" do
       @db.create_view(:items_view, @ds.where(:number=>1))
       @db[:items_view].map(:number).should == [1]
+    end
+
+    cspecify "should create views with explicit columns correctly", :sqlite do
+      @db.create_view(:items_view, @ds.where(:number=>1), :columns=>[:n])
+      @db[:items_view].map(:n).should == [1]
     end
 
     specify "should create or replace views correctly" do
