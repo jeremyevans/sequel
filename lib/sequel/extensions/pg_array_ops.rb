@@ -180,6 +180,21 @@ module Sequel
         self
       end
 
+      # Remove the given element from the array:
+      #
+      #   array_op.remove(1) # array_remove(array, 1)
+      def remove(element)
+        ArrayOp.new(function(:array_remove, element))
+      end
+
+      # Replace the given element in the array with another
+      # element:
+      #
+      #   array_op.replace(1, 2) # array_replace(array, 1, 2)
+      def replace(element, replacement)
+        ArrayOp.new(function(:array_replace, element, replacement))
+      end
+
       # Call the array_to_string method:
       #
       #   array_op.join           # array_to_string(array, '', NULL)

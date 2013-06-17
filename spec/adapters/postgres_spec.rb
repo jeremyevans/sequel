@@ -1959,12 +1959,19 @@ describe 'PostgreSQL array handling' do
     @ds.get(Sequel.pg_array(:i).length).should == 3
     @ds.get(Sequel.pg_array(:i).lower).should == 1
 
+    if @db.server_version >= 80400
+      @ds.select(Sequel.pg_array(:i).unnest).from_self.count.should == 3
+    end
     if @db.server_version >= 90000
       @ds.get(Sequel.pg_array(:i5).join).should == '15'
       @ds.get(Sequel.pg_array(:i5).join(':')).should == '1:5'
       @ds.get(Sequel.pg_array(:i5).join(':', '*')).should == '1:*:5'
     end
-    @ds.select(Sequel.pg_array(:i).unnest).from_self.count.should == 3 if @db.server_version >= 80400
+    if @db.server_version >= 90300
+      @ds.get(Sequel.pg_array(:i5).remove(1).length).should == 2
+      @ds.get(Sequel.pg_array(:i5).replace(1, 4).contains([1])).should be_false
+      @ds.get(Sequel.pg_array(:i5).replace(1, 4).contains([4])).should be_true
+    end
 
     if @native
       @ds.get(Sequel.pg_array(:i).push(4)).should == [1, 2, 3, 4]

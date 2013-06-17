@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Postgres::ArrayOp#replace for the array_replace function added in PostgreSQL 9.3 (jeremyevans)
+
+* Add Postgres::ArrayOp#remove for the array_remove function added in PostgreSQL 9.3 (jeremyevans)
+
 * Add Postgres::ArrayOp#hstore for creating hstores from arrays (jeremyevans)
 
 * Make Postgres::ArrayOp#[] return ArrayOp if given a range (jeremyevans)

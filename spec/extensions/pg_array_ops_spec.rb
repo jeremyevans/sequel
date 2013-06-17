@@ -49,6 +49,16 @@ describe "Sequel::Postgres::ArrayOp" do
     @db.literal(@a.concat(:b)).should == "(a || b)"
   end
 
+  it "#remove should remove the element from the array" do
+    @db.literal(@a.remove(1)).should == "array_remove(a, 1)"
+    @db.literal(@a.remove(1)[2]).should == "array_remove(a, 1)[2]"
+  end
+
+  it "#remove should replace the element in the array with another" do
+    @db.literal(@a.replace(1, 2)).should == "array_replace(a, 1, 2)"
+    @db.literal(@a.replace(1, 2)[3]).should == "array_replace(a, 1, 2)[3]"
+  end
+
   it "#unshift should use the || operator in prepend mode" do
     @db.literal(@a.unshift(:b)).should == "(b || a)"
   end
