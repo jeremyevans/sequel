@@ -170,7 +170,8 @@ module Sequel
     #   DB[:items].from # SQL: SELECT *
     #   DB[:items].from(:blah) # SQL: SELECT * FROM blah
     #   DB[:items].from(:blah, :foo) # SQL: SELECT * FROM blah, foo
-    def from(*source)
+    def from(*source, &block)
+      virtual_row_columns(source, block)
       table_alias_num = 0
       ctes = nil
       source.map! do |s|

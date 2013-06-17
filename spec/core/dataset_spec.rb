@@ -1131,6 +1131,14 @@ describe "Dataset#from" do
     @dataset.from(Sequel.function(:a, :i)).select_sql.should == "SELECT * FROM a(i)"
   end
 
+  specify "should accept virtual row blocks" do
+    @dataset.from{abc(de)}.select_sql.should == "SELECT * FROM abc(de)"
+    @dataset.from{[i, abc(de)]}.select_sql.should == "SELECT * FROM i, abc(de)"
+    @dataset.from(:a){i}.select_sql.should == "SELECT * FROM a, i"
+    @dataset.from(:a, :b){i}.select_sql.should == "SELECT * FROM a, b, i"
+    @dataset.from(:a, :b){[i, abc(de)]}.select_sql.should == "SELECT * FROM a, b, i, abc(de)"
+  end
+
   specify "should accept :schema__table___alias symbol format" do
     @dataset.from(:abc__def).select_sql.should == "SELECT * FROM abc.def"
     @dataset.from(:a_b__c).select_sql.should == "SELECT * FROM a_b.c"

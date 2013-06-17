@@ -1,5 +1,7 @@
 === HEAD
 
+* Dataset#from now accepts virtual row blocks (jeremyevans)
+
 * Add Database#refresh_view on PostgreSQL to support refreshing materialized views (jeremyevans)
 
 * Support the Database#drop_view :if_exists option on PostgreSQL (jeremyevans)
