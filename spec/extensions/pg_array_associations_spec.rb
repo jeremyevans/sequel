@@ -321,14 +321,18 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :limit=>[1, 1]
     a = @c1.eager(:tags).all
     a.should == [@o1]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists', "SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))"]
+    sqls = MODEL_DB.sqls
+    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
+    sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@c2.load(:id=>2)]
     MODEL_DB.sqls.should == []
 
     @c1.pg_array_to_many :tags, :clone=>:tags, :limit=>[nil, 1]
     a = @c1.eager(:tags).all
     a.should == [@o1]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists', "SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))"]
+    sqls = MODEL_DB.sqls
+    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
+    sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@c2.load(:id=>2), @c2.load(:id=>3)]
     MODEL_DB.sqls.length.should == 0
 
