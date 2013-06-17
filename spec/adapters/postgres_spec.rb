@@ -1936,6 +1936,10 @@ describe 'PostgreSQL array handling' do
     @ds.get(Sequel.expr(1=>Sequel.pg_array(:i3).all)).should be_false
     @ds.get(Sequel.expr(4=>Sequel.pg_array(:i3).all)).should be_true
 
+    @ds.get(Sequel.expr(1=>Sequel.pg_array(:i)[1..1].any)).should be_true
+    @ds.get(Sequel.expr(2=>Sequel.pg_array(:i)[1..1].any)).should be_false
+
+    @ds.get(Sequel.pg_array(:i2)[1]).should == 2
     @ds.get(Sequel.pg_array(:i2)[1]).should == 2
     @ds.get(Sequel.pg_array(:i2)[2]).should == 1
 

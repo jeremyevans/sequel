@@ -20,6 +20,10 @@ describe "Sequel::Postgres::ArrayOp" do
     @db.literal(@a[1][2]).should == "a[1][2]"
   end
 
+  it "#[] with a range should return an ArrayOp" do
+    @db.literal(@a[1..2].any).should == "ANY(a[1:2])"
+  end
+
   it "#any should use the ANY method" do
     @db.literal(1=>@a.any).should == "(1 = ANY(a))"
   end

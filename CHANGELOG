@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Postgres::ArrayOp#[] return ArrayOp if given a range (jeremyevans)
+
 * Ensure that CHECK constraints are surrounded with parentheses (jeremyevans)
 
 * Ensure Dataset#unbind returned variable hash uses symbol keys (jeremyevans)

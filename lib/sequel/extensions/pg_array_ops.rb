@@ -76,7 +76,9 @@ module Sequel
       #
       #   array_op[1] # array[1]
       def [](key)
-        Sequel::SQL::Subscript.new(self, [key])
+        s = Sequel::SQL::Subscript.new(self, [key])
+        s = ArrayOp.new(s) if key.is_a?(Range)
+        s
       end
 
       # Call the ALL function:
