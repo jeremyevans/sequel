@@ -1,6 +1,12 @@
 === HEAD
 
-* Support the Database#create_view :recursive option for defining recursive views in PostgreSQL 9.3+ (jeremyevans)
+* Add Database#refresh_view on PostgreSQL to support refreshing materialized views (jeremyevans)
+
+* Support the Database#drop_view :if_exists option on PostgreSQL (jeremyevans)
+
+* Support the Database#{create,drop}_view :materialized option for creating materialized views in PostgreSQL 9.3+ (jeremyevans)
+
+* Support the Database#create_view :recursive option for creating recursive views in PostgreSQL 9.3+ (jeremyevans)
 
 * Support the Database#create_view :columns option for using explicit columns (jeremyevans)
 

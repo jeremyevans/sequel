@@ -394,6 +394,14 @@ module Sequel
           end
         end
       end
+
+      # Refresh the materialized view with the given name.
+      # 
+      #   DB.refresh_view(:items_view)
+      #   # REFRESH MATERIALIZED VIEW items_view
+      def refresh_view(name)
+        run "REFRESH MATERIALIZED VIEW #{quote_schema_table(name)}"
+      end
       
       # Reset the database's conversion procs, requires a server query if there
       # any named types.
@@ -774,7 +782,7 @@ module Sequel
 
       # DDL fragment for initial part of CREATE VIEW statement
       def create_view_prefix_sql(name, options)
-        create_view_sql_append_columns("CREATE #{'OR REPLACE 'if options[:replace]}#{'TEMPORARY 'if options[:temp]}#{'RECURSIVE ' if options[:recursive]}VIEW #{quote_schema_table(name)}", options[:columns] || options[:recursive])
+        create_view_sql_append_columns("CREATE #{'OR REPLACE 'if options[:replace]}#{'TEMPORARY 'if options[:temp]}#{'RECURSIVE ' if options[:recursive]}#{'MATERIALIZED ' if options[:materialized]}VIEW #{quote_schema_table(name)}", options[:columns] || options[:recursive])
       end
 
       # The errors that the main adapters can raise, depends on the adapter being used
@@ -805,6 +813,11 @@ module Sequel
       # SQL for dropping a trigger from the database.
       def drop_trigger_sql(table, name, opts=OPTS)
         "DROP TRIGGER#{' IF EXISTS' if opts[:if_exists]} #{name} ON #{quote_schema_table(table)}#{' CASCADE' if opts[:cascade]}"
+      end
+
+      # SQL for dropping a view from the database.
+      def drop_view_sql(name, opts=OPTS)
+        "DROP #{'MATERIALIZED ' if opts[:materialized]}VIEW#{' IF EXISTS' if opts[:if_exists]} #{quote_schema_table(name)}#{' CASCADE' if opts[:cascade]}"
       end
 
       # If opts includes a :schema option, or a default schema is used, restrict the dataset to

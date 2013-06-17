@@ -232,7 +232,9 @@ module Sequel
     # :temp :: Create a temporary view, automatically dropped on disconnect.
     #
     # PostgreSQL specific option:
-    # :recursive :: Defines a recursive view.  As columns must be specified for
+    # :materialized :: Creates a materialized view, similar to a regular view,
+    #                  but backed by a physical table.
+    # :recursive :: Creates a recursive view.  As columns must be specified for
     #               recursive views, you can also set them as the value of this
     #               option.  Since a recursive view requires a union that isn't
     #               in a subquery, if you are providing a Dataset as the source
@@ -311,6 +313,13 @@ module Sequel
     #   DB.drop_view(:cheap_items)
     #   DB.drop_view(:cheap_items, :pricey_items)
     #   DB.drop_view(:cheap_items, :pricey_items, :cascade=>true)
+    #
+    # Options:
+    # :cascade :: Also drop objects depending on this view.
+    #
+    # PostgreSQL specific options:
+    # :if_exists :: Do not raise an error if the view does not exist.
+    # :materialized :: Drop a materialized view.
     def drop_view(*names)
       options = names.last.is_a?(Hash) ? names.pop : {}
       names.each do |n|

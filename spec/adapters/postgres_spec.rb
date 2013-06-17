@@ -45,12 +45,14 @@ end
 describe "PostgreSQL views" do
   before do
     @db = INTEGRATION_DB
+    @db.drop_view(:items_view, :cascade=>true, :if_exists=>true)
     @db.create_table!(:items){Integer :number}
     @db[:items].insert(10)
     @db[:items].insert(20)
   end
   after do
-    @db.drop_view(:items_view) rescue nil
+    @opts ||={}
+    @db.drop_view(:items_view, @opts.merge(:if_exists=>true, :cascade=>true)) rescue nil
     @db.drop_table?(:items)
   end
 
@@ -66,6 +68,20 @@ describe "PostgreSQL views" do
     @db[:items_view].select_order_map(:n).should == [10]
     @db[:items].insert(15)
     @db[:items_view].select_order_map(:n).should == [10, 15, 20]
+  end if INTEGRATION_DB.server_version >= 90300
+
+  specify "should support materialized views" do
+    @opts = {:materialized=>true}
+    @db.create_view(:items_view, @db[:items].where{number >= 10}, @opts)
+    @db[:items_view].select_order_map(:number).should == [10, 20]
+    @db[:items].insert(15)
+    @db[:items_view].select_order_map(:number).should == [10, 20]
+    @db.refresh_view(:items_view)
+    @db[:items_view].select_order_map(:number).should == [10, 15, 20]
+  end if INTEGRATION_DB.server_version >= 90300
+
+  specify "should support :if_exists=>true for not raising an error if the view does not exist" do
+    proc{@db.drop_view(:items_view, :if_exists=>true)}.should_not raise_error
   end
 end 
     
