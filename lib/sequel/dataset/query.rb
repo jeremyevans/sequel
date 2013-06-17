@@ -166,10 +166,12 @@ module Sequel
     # Returns a copy of the dataset with the source changed. If no
     # source is given, removes all tables.  If multiple sources
     # are given, it is the same as using a CROSS JOIN (cartesian product) between all tables.
+    # If a block is given, it is treated as a virtual row block, similar to +where+.
     #
     #   DB[:items].from # SQL: SELECT *
     #   DB[:items].from(:blah) # SQL: SELECT * FROM blah
     #   DB[:items].from(:blah, :foo) # SQL: SELECT * FROM blah, foo
+    #   DB[:items].from{fun(arg)} # SQL: SELECT * FROM fun(arg)
     def from(*source, &block)
       virtual_row_columns(source, block)
       table_alias_num = 0
@@ -254,18 +256,18 @@ module Sequel
         conds = Array(patterns).map do |pat|
           SQL::BooleanExpression.new(opts[:all_columns] ? :AND : :OR, *Array(columns).map{|c| SQL::StringExpression.like(c, pat, opts)})
         end
-        filter(SQL::BooleanExpression.new(opts[:all_patterns] ? :AND : :OR, *conds))
+        where(SQL::BooleanExpression.new(opts[:all_patterns] ? :AND : :OR, *conds))
       else
         conds = Array(columns).map do |c|
           SQL::BooleanExpression.new(:OR, *Array(patterns).map{|pat| SQL::StringExpression.like(c, pat, opts)})
         end
-        filter(SQL::BooleanExpression.new(opts[:all_columns] ? :AND : :OR, *conds))
+        where(SQL::BooleanExpression.new(opts[:all_columns] ? :AND : :OR, *conds))
       end
     end
 
     # Returns a copy of the dataset with the results grouped by the value of 
     # the given columns.  If a block is given, it is treated
-    # as a virtual row block, similar to +filter+.
+    # as a virtual row block, similar to +where+.
     #
     #   DB[:items].group(:id) # SELECT * FROM items GROUP BY id
     #   DB[:items].group(:id, :name) # SELECT * FROM items GROUP BY id, name
@@ -282,7 +284,7 @@ module Sequel
     
     # Returns a dataset grouped by the given column with count by group.
     # Column aliases may be supplied, and will be included in the select clause.
-    # If a block is given, it is treated as a virtual row block, similar to +filter+.
+    # If a block is given, it is treated as a virtual row block, similar to +where+.
     #
     # Examples:
     #
@@ -351,10 +353,10 @@ module Sequel
     # Inverts the current WHERE and HAVING clauses.  If there is neither a
     # WHERE or HAVING clause, adds a WHERE clause that is always false.
     #
-    #   DB[:items].filter(:category => 'software').invert
+    #   DB[:items].where(:category => 'software').invert
     #   # SELECT * FROM items WHERE (category != 'software')
     #
-    #   DB[:items].filter(:category => 'software', :id=>3).invert
+    #   DB[:items].where(:category => 'software', :id=>3).invert
     #   # SELECT * FROM items WHERE ((category != 'software') OR (id != 3))
     def invert
       having, where = @opts.values_at(:having, :where)
@@ -394,7 +396,7 @@ module Sequel
     #     the result set if this is used.
     #   * nil - If a block is not given, doesn't use ON or USING, so the JOIN should be a NATURAL
     #     or CROSS join. If a block is given, uses an ON clause based on the block, see below.
-    #   * Everything else - pretty much the same as a using the argument in a call to filter,
+    #   * Everything else - pretty much the same as a using the argument in a call to where,
     #     so strings are considered literal, symbols specify boolean columns, and Sequel
     #     expressions can be used. Uses a JOIN with an ON clause.
     # * options - a hash of options, with any of the following keys:
@@ -409,7 +411,7 @@ module Sequel
     # * block - The block argument should only be given if a JOIN with an ON clause is used,
     #   in which case it yields the table alias/name for the table currently being joined,
     #   the table alias/name for the last joined (or first table), and an array of previous
-    #   SQL::JoinClause. Unlike +filter+, this block is not treated as a virtual row block.
+    #   SQL::JoinClause. Unlike +where+, this block is not treated as a virtual row block.
     #
     # Examples:
     #
@@ -561,7 +563,7 @@ module Sequel
     # Adds an alternate filter to an existing filter using OR. If no filter 
     # exists an +Error+ is raised.
     #
-    #   DB[:items].filter(:a).or(:b) # SELECT * FROM items WHERE a OR b
+    #   DB[:items].where(:a).or(:b) # SELECT * FROM items WHERE a OR b
     def or(*cond, &block)
       cond = cond.first if cond.size == 1
       v = @opts[:where]
@@ -576,7 +578,7 @@ module Sequel
     # existing order, it is ignored and overwritten with this order. If a nil is given
     # the returned dataset has no order. This can accept multiple arguments
     # of varying kinds, such as SQL functions.  If a block is given, it is treated
-    # as a virtual row block, similar to +filter+.
+    # as a virtual row block, similar to +where+.
     #
     #   DB[:items].order(:name) # SELECT * FROM items ORDER BY name
     #   DB[:items].order(:a, :b) # SELECT * FROM items ORDER BY a, b
@@ -623,10 +625,10 @@ module Sequel
     
     # Qualify to the given table, or first source if no table is given.
     #
-    #   DB[:items].filter(:id=>1).qualify
+    #   DB[:items].where(:id=>1).qualify
     #   # SELECT items.* FROM items WHERE (items.id = 1)
     #
-    #   DB[:items].filter(:id=>1).qualify(:i)
+    #   DB[:items].where(:id=>1).qualify(:i)
     #   # SELECT i.* FROM items WHERE (i.id = 1)
     def qualify(table=first_source)
       o = @opts
@@ -670,7 +672,7 @@ module Sequel
 
     # Returns a copy of the dataset with the columns selected changed
     # to the given columns. This also takes a virtual row block,
-    # similar to +filter+.
+    # similar to +where+.
     #
     #   DB[:items].select(:a) # SELECT a FROM items
     #   DB[:items].select(:a, :b) # SELECT a, b FROM items
@@ -715,7 +717,7 @@ module Sequel
 
     # Set both the select and group clauses with the given +columns+.
     # Column aliases may be supplied, and will be included in the select clause.
-    # This also takes a virtual row block similar to +filter+.
+    # This also takes a virtual row block similar to +where+.
     #
     #   DB[:items].select_group(:a, :b)
     #   # SELECT a, b FROM items GROUP BY a, b
@@ -751,7 +753,7 @@ module Sequel
     # is the hash of unbound variables.  You can then prepare and execute (or just
     # call) the dataset with the bound variables to get results.
     #
-    #   ds, bv = DB[:items].filter(:a=>1).unbind
+    #   ds, bv = DB[:items].where(:a=>1).unbind
     #   ds # SELECT * FROM items WHERE (a = $a)
     #   bv #  {:a => 1}
     #   ds.call(:select, bv)
@@ -837,27 +839,27 @@ module Sequel
     #
     # Examples:
     #
-    #   DB[:items].filter(:id => 3)
+    #   DB[:items].where(:id => 3)
     #   # SELECT * FROM items WHERE (id = 3)
     #
-    #   DB[:items].filter('price < ?', 100)
+    #   DB[:items].where('price < ?', 100)
     #   # SELECT * FROM items WHERE price < 100
     #
-    #   DB[:items].filter([[:id, [1,2,3]], [:id, 0..10]])
+    #   DB[:items].where([[:id, [1,2,3]], [:id, 0..10]])
     #   # SELECT * FROM items WHERE ((id IN (1, 2, 3)) AND ((id >= 0) AND (id <= 10)))
     #
-    #   DB[:items].filter('price < 100')
+    #   DB[:items].where('price < 100')
     #   # SELECT * FROM items WHERE price < 100
     #
-    #   DB[:items].filter(:active)
+    #   DB[:items].where(:active)
     #   # SELECT * FROM items WHERE :active
     #
-    #   DB[:items].filter{price < 100}
+    #   DB[:items].where{price < 100}
     #   # SELECT * FROM items WHERE (price < 100)
     # 
-    # Multiple filter calls can be chained for scoping:
+    # Multiple where calls can be chained for scoping:
     #
-    #   software = dataset.filter(:category => 'software').filter{price < 100}
+    #   software = dataset.where(:category => 'software').where{price < 100}
     #   # SELECT * FROM items WHERE ((category = 'software') AND (price < 100))
     #
     # See the the {"Dataset Filtering" guide}[link:files/doc/dataset_filtering_rdoc.html] for more examples and details.
@@ -871,7 +873,7 @@ module Sequel
     # :args :: Specify the arguments/columns for the CTE, should be an array of symbols.
     # :recursive :: Specify that this is a recursive CTE
     #
-    #   DB[:items].with(:items, DB[:syx].filter(:name.like('A%')))
+    #   DB[:items].with(:items, DB[:syx].where(:name.like('A%')))
     #   # WITH items AS (SELECT * FROM syx WHERE (name LIKE 'A%')) SELECT * FROM items
     def with(name, dataset, opts=OPTS)
       raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
@@ -890,7 +892,7 @@ module Sequel
     # :union_all :: Set to false to use UNION instead of UNION ALL combining the nonrecursive and recursive parts.
     #
     #   DB[:t].with_recursive(:t,
-    #     DB[:i1].select(:id, :parent_id).filter(:parent_id=>nil),
+    #     DB[:i1].select(:id, :parent_id).where(:parent_id=>nil),
     #     DB[:i1].join(:t, :id=>:parent_id).select(:i1__id, :i1__parent_id),
     #     :args=>[:id, :parent_id])
     #   
@@ -982,7 +984,7 @@ module Sequel
       :deep
     end
     
-    # SQL expression object based on the expr type.  See +filter+.
+    # SQL expression object based on the expr type.  See +where+.
     def filter_expr(expr = nil, &block)
       expr = nil if expr == []
       if expr && block
