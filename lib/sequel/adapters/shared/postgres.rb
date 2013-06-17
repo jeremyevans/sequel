@@ -849,7 +849,7 @@ module Sequel
         case index_type
         when :full_text
           expr = "(to_tsvector(#{literal(index[:language] || 'simple')}::regconfig, #{literal(dataset.send(:full_text_string_join, cols))}))"
-          index_type = :gin
+          index_type = index[:index_type] || :gin
         when :spatial
           index_type = :gist
         end

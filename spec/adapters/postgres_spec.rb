@@ -665,12 +665,12 @@ describe "A PostgreSQL database" do
   end
 
   specify "should support fulltext indexes and searching" do
-    @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french'}
+    @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french', :index_type=>:gist}
     check_sqls do
       @db.sqls.should == [
         %{CREATE TABLE "posts" ("title" text, "body" text)},
         %{CREATE INDEX "posts_title_body_index" ON "posts" USING gin (to_tsvector('simple'::regconfig, (COALESCE("title", '') || ' ' || COALESCE("body", ''))))},
-        %{CREATE INDEX "posts_title_index" ON "posts" USING gin (to_tsvector('french'::regconfig, (COALESCE("title", ''))))}
+        %{CREATE INDEX "posts_title_index" ON "posts" USING gist (to_tsvector('french'::regconfig, (COALESCE("title", ''))))}
       ]
     end
 

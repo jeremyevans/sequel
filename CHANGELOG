@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :index_type=>:gist option to create GIST full text indexes on PostgreSQL (jeremyevans)
+
 * Add Postgres::ArrayOp#replace for the array_replace function added in PostgreSQL 9.3 (jeremyevans)
 
 * Add Postgres::ArrayOp#remove for the array_remove function added in PostgreSQL 9.3 (jeremyevans)

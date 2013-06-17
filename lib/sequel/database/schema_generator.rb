@@ -160,6 +160,8 @@ module Sequel
       # Add a full text index on the given columns to the DDL.
       #
       # PostgreSQL specific options:
+      # :index_type :: Can be set to :gist to use a GIST index instead of the
+      #                default GIN index.
       # :language :: Set a language to use for the index (default: simple).
       #
       # Microsoft SQL Server specific options:
