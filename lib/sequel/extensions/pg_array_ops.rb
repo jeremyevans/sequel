@@ -126,6 +126,23 @@ module Sequel
         function(:array_dims)
       end
 
+      # Convert the array into an hstore using the hstore function.
+      # If given an argument, use the two array form:
+      #
+      #   array_op.hstore          # hstore(array)
+      #   array_op.hstore(:array2) # hstore(array, array2)
+      def hstore(arg=(no_arg_given=true; nil))
+        v = if no_arg_given
+          Sequel.function(:hstore, self)
+        else
+          Sequel.function(:hstore, self, wrap_array(arg))
+        end
+        if Sequel.respond_to?(:hstore_op)
+          v = Sequel.hstore_op(v)
+        end
+        v
+      end
+
       # Call the array_length method:
       #
       #   array_op.length    # array_length(array, 1)

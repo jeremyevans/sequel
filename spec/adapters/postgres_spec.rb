@@ -1971,6 +1971,12 @@ describe 'PostgreSQL array handling' do
       @ds.get(Sequel.pg_array(:i).unshift(4)).should == [4, 1, 2, 3]
       @ds.get(Sequel.pg_array(:i).concat(:i2)).should == [1, 2, 3, 2, 1]
     end
+
+    if @db.type_supported?(:hstore)
+      Sequel.extension :pg_hstore, :pg_hstore_ops
+      @db.get(Sequel.pg_array(['a', 'b']).op.hstore['a']).should == 'b'
+      @db.get(Sequel.pg_array(['a', 'b']).op.hstore(['c', 'd'])['a']).should == 'c'
+    end
   end
 end
 

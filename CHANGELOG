@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Postgres::ArrayOp#hstore for creating hstores from arrays (jeremyevans)
+
 * Make Postgres::ArrayOp#[] return ArrayOp if given a range (jeremyevans)
 
 * Ensure that CHECK constraints are surrounded with parentheses (jeremyevans)

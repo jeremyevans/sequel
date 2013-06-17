@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-Sequel.extension :pg_array, :pg_array_ops
+Sequel.extension :pg_array, :pg_array_ops, :pg_hstore, :pg_hstore_ops
 
 describe "Sequel::Postgres::ArrayOp" do
   before do
@@ -72,6 +72,15 @@ describe "Sequel::Postgres::ArrayOp" do
     @db.literal(@a.join).should == "array_to_string(a, '', NULL)"
     @db.literal(@a.join(':')).should == "array_to_string(a, ':', NULL)"
     @db.literal(@a.join(':', '*')).should == "array_to_string(a, ':', '*')"
+  end
+
+  it "#hstore should convert the item to an hstore using the hstore function" do
+    @db.literal(@a.hstore).should == "hstore(a)"
+    @db.literal(@a.hstore['a']).should == "(hstore(a) -> 'a')"
+    @db.literal(@a.hstore(:b)).should == "hstore(a, b)"
+    @db.literal(@a.hstore(:b)['a']).should == "(hstore(a, b) -> 'a')"
+    @db.literal(@a.hstore(%w'1')).should == "hstore(a, ARRAY['1'])"
+    @db.literal(@a.hstore(%w'1')['a']).should == "(hstore(a, ARRAY['1']) -> 'a')"
   end
 
   it "#unnest should use the unnest function" do
