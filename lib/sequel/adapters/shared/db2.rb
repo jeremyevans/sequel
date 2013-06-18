@@ -293,6 +293,11 @@ module Sequel
         false
       end
 
+      # DB2 supports lateral subqueries
+      def supports_lateral_subqueries?
+        true
+      end
+      
       # DB2 does not support multiple columns in IN.
       def supports_multiple_column_in?
         false

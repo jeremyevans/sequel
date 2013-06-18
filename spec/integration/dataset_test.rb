@@ -59,6 +59,16 @@ describe "Simple Dataset operations" do
     @ds.join(:items___b, :id=>:id).select_all(:items).all.should == [{:id=>1, :number=>10}]
   end
 
+  specify "should handle LATERAL subqueries correctly" do
+    @ds << {:number=>20}
+    @ds.from(:items___i, @ds.where(:items__number=>:i__number).lateral).select_order_map([:i__number___n, :t1__number]).should == [[10, 10], [20, 20]]
+    @ds.from(:items___i).cross_join(@ds.where(:items__number=>:i__number).lateral).select_order_map([:i__number___n, :t1__number]).should == [[10, 10], [20, 20]]
+    @ds.from(:items___i).join(@ds.where(:items__number=>:i__number).lateral, 1=>1).select_order_map([:i__number___n, :t1__number]).should == [[10, 10], [20, 20]]
+    @ds.from(:items___i).join(@ds.where(:items__number=>:i__number).lateral, 1=>0).select_order_map([:i__number___n, :t1__number]).should == []
+    @ds.from(:items___i).left_join(@ds.from(:items___i2).where(:i2__number=>:i__number).lateral, 1=>1).select_order_map([:i__number___n, :t1__number]).should == [[10, 10], [20, 20]]
+    @ds.from(:items___i).left_join(@ds.from(:items___i2).where(:i2__number=>:i__number).lateral, 1=>0).select_order_map([:i__number___n, :t1__number]).should == [[10, nil], [20, nil]]
+  end if DB.dataset.supports_lateral_subqueries?
+
   specify "should correctly deal with qualified columns and subselects" do
     @ds.from_self(:alias=>:a).select(:a__id, Sequel.qualify(:a, :number)).all.should == [{:id=>1, :number=>10}]
     @ds.join(@ds.as(:a), :id=>:id).select(:a__id, Sequel.qualify(:a, :number)).all.should == [{:id=>1, :number=>10}]

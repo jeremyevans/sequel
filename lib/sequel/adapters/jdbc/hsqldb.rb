@@ -160,6 +160,11 @@ module Sequel
           false
         end
 
+        # HSQLDB supports lateral subqueries.
+        def supports_lateral_subqueries?
+          true
+        end
+
         private
 
         # Use string in hex format for blob data.

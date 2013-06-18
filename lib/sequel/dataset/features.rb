@@ -95,6 +95,11 @@ module Sequel
       true
     end
     
+    # Whether the dataset supports LATERAL for subqueries in the FROM or JOIN clauses.
+    def supports_lateral_subqueries?
+      false
+    end
+    
     # Whether modifying joined datasets is supported.
     def supports_modifying_joins?
       false

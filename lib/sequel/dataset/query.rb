@@ -501,6 +501,16 @@ module Sequel
       class_eval("def #{jtype}_join(table); raise(Sequel::Error, '#{jtype}_join does not accept join table blocks') if block_given?; join_table(:#{jtype}, table) end", __FILE__, __LINE__)
     end
 
+    # Marks this dataset as a lateral dataset.  If used in another dataset's FROM
+    # or JOIN clauses, it will surround the subquery with LATERAL to enable it
+    # to deal with previous tables in the query:
+    #
+    #   DB.from(:a, DB[:b].where(:a__c=>:b__d).lateral)
+    #   # SELECT * FROM a, LATERAL (SELECT * FROM b WHERE (a.c = b.d))
+    def lateral
+      clone(:lateral=>true)
+    end
+
     # If given an integer, the dataset will contain only the first l results.
     # If given a range, it will contain only those at offsets within that
     # range. If a second argument is given, it is used as an offset. To use

@@ -1,5 +1,9 @@
 === HEAD
 
+* Add mssql_emulate_lateral_with_apply extension for emulating LATERAL queries using CROSS/OUTER APPLY (jeremyevans)
+
+* Support LATERAL queries via Dataset#lateral (jeremyevans)
+
 * Add pg_loose_count Database extension, for fast approximate counts of PostgreSQL tables (jeremyevans)
 
 * Add from_block Database extension, for having Database#from block affect FROM instead of WHERE (jeremyevans)

@@ -242,6 +242,7 @@ module Sequel
     INTO = " INTO ".freeze
     IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze
     IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
+    LATERAL = 'LATERAL '.freeze
     LIKE_OPERATORS = ::Sequel::SQL::ComplexExpression::LIKE_OPERATORS
     LIMIT = " LIMIT ".freeze
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
@@ -1047,6 +1048,7 @@ module Sequel
 
     # SQL fragment for Dataset.  Does a subselect inside parantheses.
     def literal_dataset_append(sql, v)
+      sql << LATERAL if v.opts[:lateral]
       sql << PAREN_OPEN
       subselect_sql_append(sql, v)
       sql << PAREN_CLOSE

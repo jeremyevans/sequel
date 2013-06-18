@@ -1238,6 +1238,11 @@ module Sequel
         true
       end
 
+      # PostgreSQL supports lateral subqueries
+      def supports_lateral_subqueries?
+        true
+      end
+      
       # PostgreSQL supports modifying joined datasets
       def supports_modifying_joins?
         true

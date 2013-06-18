@@ -1144,6 +1144,10 @@ describe "Dataset#from" do
     @dataset.from(:a, :b){[i, abc(de)]}.select_sql.should == "SELECT * FROM a, b, i, abc(de)"
   end
 
+  specify "should handle LATERAL subqueries" do
+    @dataset.from(:a, @dataset.from(:b).lateral).select_sql.should == "SELECT * FROM a, LATERAL (SELECT * FROM b) AS t1"
+  end
+
   specify "should accept :schema__table___alias symbol format" do
     @dataset.from(:abc__def).select_sql.should == "SELECT * FROM abc.def"
     @dataset.from(:a_b__c).select_sql.should == "SELECT * FROM a_b.c"
@@ -2043,6 +2047,12 @@ describe "Dataset#join_table" do
   
   specify "should support multiple joins" do
     @d.join_table(:inner, :b, :items_id=>:id).join_table(:left_outer, :c, :b_id => :b__id).sql.should == 'SELECT * FROM "items" INNER JOIN "b" ON ("b"."items_id" = "items"."id") LEFT OUTER JOIN "c" ON ("c"."b_id" = "b"."id")'
+  end
+
+  specify "should handle LATERAL subqueries" do
+    @d.join(@d.lateral, :a=>:b).select_sql.should == 'SELECT * FROM "items" INNER JOIN LATERAL (SELECT * FROM "items") AS "t1" ON ("t1"."a" = "items"."b")'
+    @d.left_join(@d.lateral, :a=>:b).select_sql.should == 'SELECT * FROM "items" LEFT JOIN LATERAL (SELECT * FROM "items") AS "t1" ON ("t1"."a" = "items"."b")'
+    @d.cross_join(@d.lateral).select_sql.should == 'SELECT * FROM "items" CROSS JOIN LATERAL (SELECT * FROM "items") AS "t1"'
   end
   
   specify "should support arbitrary join types" do

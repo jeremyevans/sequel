@@ -144,6 +144,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/graph_each_rb.html">graph_each</a>: Makes Dataset#each split returned results by table when using Dataset#graph.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/hash_aliases_rb.html">hash_aliases</a>: Makes Dataset#select and #from treat hashes and alias specifications.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/null_dataset_rb.html">null_dataset</a>: Adds Dataset#nullify to get a dataset that will never issue a query.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/mssql_emulate_lateral_with_apply_rb.html">mssql_emulate_lateral_with_apply</a>: Emulates LATERAL queries using CROSS/OUTER APPLY on Microsoft SQL Server.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pagination_rb.html">pagination</a>: Adds Dataset#paginate for easier pagination of datasets.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pretty_table_rb.html">pretty_table</a>: Adds Dataset#print for printing a dataset as a simple plain-text table.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/query_rb.html">query</a>: Adds Dataset#query for a different interface to creating queries that doesn't use method chaining.</li>
