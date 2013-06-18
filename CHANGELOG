@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle non-JSON plain strings, integers, and floats in PostgreSQL JSON columns in pg_json extension (jeremyevans)
+
 * Dataset#from now accepts virtual row blocks (jeremyevans)
 
 * Add Database#refresh_view on PostgreSQL to support refreshing materialized views (jeremyevans)

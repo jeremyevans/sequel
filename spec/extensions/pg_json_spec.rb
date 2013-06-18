@@ -38,6 +38,14 @@ describe "pg_json extension" do
     @m.parse_json('{"a": "b", "c": {"d": "e"}}').to_hash.should == {'a'=>'b', 'c'=>{'d'=>'e'}}
   end
 
+  it "should parse json and non-json plain strings, integers, and floats correctly in db_parse_json" do
+    @m.db_parse_json('{"a": "b", "c": {"d": "e"}}').to_hash.should == {'a'=>'b', 'c'=>{'d'=>'e'}}
+    @m.db_parse_json('[1, [2], {"a": "b"}]').to_a.should == [1, [2], {'a'=>'b'}]
+    @m.db_parse_json('1').should == 1
+    @m.db_parse_json('"b"').should == 'b'
+    @m.db_parse_json('1.1').should == 1.1
+  end
+
   it "should raise an error when attempting to parse invalid json" do
     proc{@m.parse_json('')}.should raise_error(Sequel::InvalidValue)
     proc{@m.parse_json('1')}.should raise_error(Sequel::InvalidValue)

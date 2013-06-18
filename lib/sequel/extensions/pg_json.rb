@@ -100,6 +100,16 @@ module Sequel
         end
       end
 
+      # Parse JSON data coming from the database.  Since PostgreSQL allows
+      # non JSON data in JSON fields (such as plain numbers and strings),
+      # we don't want to raise an exception for that.
+      def self.db_parse_json(s)
+        parse_json(s)
+      rescue Sequel::InvalidValue
+        raise unless s.is_a?(String)
+        parse_json("[#{s}]").first
+      end
+
       # Parse the given string as json, returning either a JSONArray
       # or JSONHash instance, and raising an error if the JSON
       # parsing does not yield an array or hash.
@@ -174,7 +184,7 @@ module Sequel
       end
     end
 
-    PG_TYPES[114] = JSONDatabaseMethods.method(:parse_json)
+    PG_TYPES[114] = JSONDatabaseMethods.method(:db_parse_json)
     if defined?(PGArray) && PGArray.respond_to?(:register)
       PGArray.register('json', :oid=>199, :scalar_oid=>114)
     end
