@@ -1,5 +1,7 @@
 === HEAD
 
+* Add pg_json_ops extension for calling JSON functions and operators in PostgreSQL 9.3+ (jeremyevans)
+
 * Handle non-JSON plain strings, integers, and floats in PostgreSQL JSON columns in pg_json extension (jeremyevans)
 
 * Dataset#from now accepts virtual row blocks (jeremyevans)

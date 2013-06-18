@@ -2357,6 +2357,48 @@ describe 'PostgreSQL json type' do
     c.create(:h=>Sequel.pg_json(@h)).h.should == @h
     c.create(:h=>Sequel.pg_json(@a)).h.should == @a
   end
+
+  specify 'operations/functions with pg_json_ops' do
+    Sequel.extension :pg_json_ops
+    jo = Sequel.pg_json('a'=>1, 'b'=>{'c'=>2, 'd'=>{'e'=>3}}).op
+    ja = Sequel.pg_json([2, 3, %w'a b']).op
+
+    @db.get(jo['a']).should == 1
+    @db.get(jo['b']['c']).should == 2
+    @db.get(jo[%w'b c']).should == 2
+    @db.get(jo['b'].get_text(%w'd e')).should == "3"
+    @db.get(jo[%w'b d'].get_text('e')).should == "3"
+    @db.get(ja[1]).should == 3
+    @db.get(ja[%w'2 1']).should == 'b'
+
+    @db.get(jo.extract('a')).should == 1
+    @db.get(jo.extract('b').extract('c')).should == 2
+    @db.get(jo.extract('b', 'c')).should == 2
+    @db.get(jo.extract('b', 'd', 'e')).should == 3
+    @db.get(jo.extract_text('b', 'd')).should == '{"e":3}'
+    @db.get(jo.extract_text('b', 'd', 'e')).should == '3'
+
+    @db.get(ja.array_length).should == 3
+    @db.from(ja.array_elements.as(:v)).select_map(:v).should == [2, 3, %w'a b']
+
+    @db.from(jo.keys.as(:k)).select_order_map(:k).should == %w'a b'
+    @db.from(jo.each).select_order_map(:key).should == %w'a b'
+    @db.from(jo.each).order(:key).select_map(:value).should == [1, {'c'=>2, 'd'=>{'e'=>3}}]
+    @db.from(jo.each_text).select_order_map(:key).should == %w'a b'
+    @db.from(jo.each_text).order(:key).where(:key=>'b').get(:value).should =~ /\{"d":\{"e":3\},"c":2\}|\{"c":2,"d":\{"e":3\}\}/
+
+    Sequel.extension :pg_row_ops
+    @db.create_table!(:items) do
+      Integer :a
+      String :b
+    end
+    j = Sequel.pg_json('a'=>1, 'b'=>'c').op
+    @db.get(j.populate(Sequel.cast(nil, :items)).pg_row[:a]).should == 1
+    @db.get(j.populate(Sequel.cast(nil, :items)).pg_row[:b]).should == 'c'
+    j = Sequel.pg_json([{'a'=>1, 'b'=>'c'}, {'a'=>2, 'b'=>'d'}]).op
+    @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:a).should == [1, 2]
+    @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:b).should == %w'c d'
+  end if INTEGRATION_DB.server_version >= 90300 && INTEGRATION_DB.adapter_scheme == :postgres
 end if INTEGRATION_DB.server_version >= 90200
 
 describe 'PostgreSQL inet/cidr types' do

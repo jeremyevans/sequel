@@ -79,10 +79,6 @@ describe "pg_json extension" do
     Sequel.pg_json(a).should equal(a)
   end
 
-  it "should have Sequel.pg_json raise an Error if called with a non-hash or array" do
-    proc{Sequel.pg_json(:a)}.should raise_error(Sequel::Error)
-  end
-
   it "should have JSONHash#to_hash method for getting underlying hash" do
     Sequel.pg_json({}).to_hash.should be_a_kind_of(Hash)
   end

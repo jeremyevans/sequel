@@ -201,7 +201,7 @@ module Sequel
       when Hash
         Postgres::JSONHash.new(v)
       else
-        raise Error, "Sequel.pg_json requires a hash or array argument"
+        Sequel.pg_json_op(v)
       end
     end
   end
