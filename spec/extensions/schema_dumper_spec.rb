@@ -25,6 +25,7 @@ describe "Sequel::Schema::Generator dump methods" do
       index [:d], :unique=>true
       spatial_index :a
       full_text_index [:b, :c]
+      column :f, :interval
     end
     g2 = @g.new(@d) do
       instance_eval(g.dump_columns, __FILE__, __LINE__)
