@@ -189,6 +189,8 @@ END_MIG
         {:type=>File, :size=>($1.to_i if $1)}
       when /\A(?:year|(?:int )?identity)\z/o
         {:type=>Integer}
+      when /\Ainterval\z/io
+        {:type=>:interval}
       else
         {:type=>String}
       end
