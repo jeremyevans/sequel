@@ -27,6 +27,10 @@ module Sequel
           false
         end
 
+        def disconnect_error?(exception, opts)
+          super || exception.message =~ /\AClosed Connection/
+        end
+
         def last_insert_id(conn, opts)
           unless sequence = opts[:sequence]
             if t = opts[:table]
