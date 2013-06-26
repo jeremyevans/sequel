@@ -981,7 +981,7 @@ module Sequel
 
     # The default :qualify option to use for join tables if one is not specified.
     def default_join_table_qualification
-      :deep
+      :symbol
     end
     
     # SQL expression object based on the expr type.  See +where+.
