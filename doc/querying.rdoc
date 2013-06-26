@@ -678,13 +678,13 @@ filters the results after the grouping has been applied, instead of
 before.  One possible use is if you only wanted to return artists
 who had at least 10 albums:
 
-  Album.group_and_count(:artist_id).having{count >= 10}
+  Album.group_and_count(:artist_id).having{count(:*){} >= 10}
   # SELECT artist_id, count(*) AS count FROM albums
-  # GROUP BY artist_id HAVING count >= 10
+  # GROUP BY artist_id HAVING count(*) >= 10
 
 Both the WHERE clause and the HAVING clause are removed by +unfiltered+:
 
-  Album.group_and_count(:artist_id).having{count >= 10}.
+  Album.group_and_count(:artist_id).having{count(:*){} >= 10}.
    where(:name.like('A%')).unfiltered
   # SELECT artist_id, count(*) AS count FROM albums GROUP BY artist_id
 
