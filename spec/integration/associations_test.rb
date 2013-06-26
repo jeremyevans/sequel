@@ -522,14 +522,14 @@ shared_examples_for "regular and composite key associations" do
       @els = {:eager_limit_strategy=>true}
     end
     it_should_behave_like "one_to_one eager limit strategies"
-  end if INTEGRATION_DB.dataset.supports_ordered_distinct_on?
+  end if DB.dataset.supports_ordered_distinct_on?
 
   describe "with :eager_limit_strategy=>:window_function" do
     before do
       @els = {:eager_limit_strategy=>:window_function}
     end
     it_should_behave_like "eager limit strategies"
-  end if INTEGRATION_DB.dataset.supports_window_functions?
+  end if DB.dataset.supports_window_functions?
 
   specify "should work with a many_through_many association" do
     @album.update(:artist => @artist)
@@ -563,7 +563,7 @@ end
 
 describe "Sequel::Model Simple Associations" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.drop_table?(:albums_tags, :tags, :albums, :artists)
     @db.create_table(:artists) do
       primary_key :id
@@ -755,7 +755,7 @@ end
 
 describe "Sequel::Model Composite Key Associations" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.drop_table?(:albums_tags, :tags, :albums, :artists)
     @db.create_table(:artists) do
       Integer :id1
@@ -887,7 +887,7 @@ end
 
 describe "Sequel::Model pg_array_to_many" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.extension :pg_array
     Sequel.extension :pg_array_ops
     @db.drop_table?(:tags, :albums, :artists)
@@ -958,11 +958,11 @@ describe "Sequel::Model pg_array_to_many" do
     a.remove_tag(@tag)
     a.save
   end
-end if INTEGRATION_DB.database_type == :postgres && INTEGRATION_DB.adapter_scheme == :postgres && INTEGRATION_DB.server_version >= 90300
+end if DB.database_type == :postgres && DB.adapter_scheme == :postgres && DB.server_version >= 90300
 
 describe "Sequel::Model many_to_pg_array" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.extension :pg_array
     Sequel.extension :pg_array_ops
     @db.drop_table?(:tags, :albums, :artists)
@@ -1032,11 +1032,11 @@ describe "Sequel::Model many_to_pg_array" do
     a.add_tag(@tag)
     a.remove_tag(@tag)
   end
-end if INTEGRATION_DB.database_type == :postgres && INTEGRATION_DB.adapter_scheme == :postgres && INTEGRATION_DB.server_version >= 90300
+end if DB.database_type == :postgres && DB.adapter_scheme == :postgres && DB.server_version >= 90300
 
 describe "Sequel::Model Associations with clashing column names" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.drop_table?(:bars_foos, :bars, :foos)
     @db.create_table(:foos) do
       primary_key :id

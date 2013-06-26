@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Sequel::Model basic support" do 
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:items, :engine=>:InnoDB) do
       primary_key :id
       String :name
@@ -201,7 +201,7 @@ end
 
 describe "Sequel::Model with no existing table" do 
   specify "should not raise an error when setting the dataset" do
-    db = INTEGRATION_DB
+    db = DB
     db.drop_table?(:items)
     proc{class ::Item < Sequel::Model(db); end; Object.send(:remove_const, :Item)}.should_not raise_error
     proc{c = Class.new(Sequel::Model); c.set_dataset(db[:items])}.should_not raise_error

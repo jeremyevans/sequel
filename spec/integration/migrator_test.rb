@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 Sequel.extension :migration
 describe Sequel::Migrator do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @m = Sequel::Migrator
   end
   after do

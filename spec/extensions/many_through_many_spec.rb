@@ -14,7 +14,7 @@ describe Sequel::Model, "many_through_many" do
     @c2 = Tag
     @dataset = @c2.dataset
     @dataset._fetch = {:id=>1}
-    MODEL_DB.reset
+    DB.reset
   end
   after do
     Object.send(:remove_const, :Artist)
@@ -41,9 +41,9 @@ describe Sequel::Model, "many_through_many" do
     @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :left_primary_key=>:id3
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id => 1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists', "SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (3)))"]
+    DB.sqls.should == ['SELECT * FROM artists', "SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (3)))"]
     a.first.tags.should == [@c2.load(:id=>4)]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup" do
@@ -52,7 +52,7 @@ describe Sequel::Model, "many_through_many" do
     @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_loading_predicate_key=>Sequel./(:albums_artists__artist_id, 3)
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id => 1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists', "SELECT tags.*, (albums_artists.artist_id / 3) AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND ((albums_artists.artist_id / 3) IN (1)))"]
+    DB.sqls.should == ['SELECT * FROM artists', "SELECT tags.*, (albums_artists.artist_id / 3) AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND ((albums_artists.artist_id / 3) IN (1)))"]
     a.first.tags.should == [@c2.load(:id=>4)]
   end
   
@@ -294,18 +294,18 @@ describe Sequel::Model, "many_through_many" do
   it "should provide an array with all members of the association" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     @c1.load(:id => 1234).tags.should == [@c2.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))']
+    DB.sqls.should == ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))']
   end
 
   it "should populate cache when accessed" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)
     n.associations[:tags].should == nil
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     n.tags.should == [@c2.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))']
+    DB.sqls.should == ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))']
     n.associations[:tags].should == n.tags
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should use cache if available" do
@@ -313,18 +313,18 @@ describe Sequel::Model, "many_through_many" do
     n = @c1.load(:id => 1234)
     n.associations[:tags] = []
     n.tags.should == []
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   it "should not use cache if asked to reload" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)
     n.associations[:tags] = []
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     n.tags(true).should == [@c2.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))']
+    DB.sqls.should == ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))']
     n.associations[:tags].should == n.tags
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should not add associations methods directly to class" do
@@ -368,7 +368,7 @@ describe 'Sequel::Plugins::ManyThroughMany::ManyThroughManyAssociationReflection
     end
     class ::Tag < Sequel::Model
     end
-    MODEL_DB.reset
+    DB.reset
     @ar = Artist.association_reflection(:tags)
   end
   after do
@@ -452,7 +452,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     end
 
     @c1 = Artist
-    MODEL_DB.reset
+    DB.reset
   end
   after do
     [:Artist, :Tag, :Album, :Track].each{|x| Object.send(:remove_const, x)}
@@ -461,15 +461,15 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   it "should eagerly load a single many_through_many association" do
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists', 'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
+    DB.sqls.should == ['SELECT * FROM artists', 'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
     a.first.tags.should == [Tag.load(:id=>2)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "should eagerly load multiple associations in a single call" do
     a = @c1.eager(:tags, :albums).all
     a.should == [@c1.load(:id=>1)]
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.length.should == 3
     sqls[0].should == 'SELECT * FROM artists'
     sqls[1..-1].should(include('SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))'))
@@ -477,13 +477,13 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     a = a.first
     a.tags.should == [Tag.load(:id=>2)]
     a.albums.should == [Album.load(:id=>3)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "should eagerly load multiple associations in separate" do
     a = @c1.eager(:tags).eager(:albums).all
     a.should == [@c1.load(:id=>1)]
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.length.should == 3
     sqls[0].should == 'SELECT * FROM artists'
     sqls[1..-1].should(include('SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))'))
@@ -491,42 +491,42 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     a = a.first
     a.tags.should == [Tag.load(:id=>2)]
     a.albums.should == [Album.load(:id=>3)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "should allow cascading of eager loading for associations of associated models" do
     a = @c1.eager(:tags=>:tracks).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))',
       'SELECT tracks.*, albums_tags.tag_id AS x_foreign_key_x FROM tracks INNER JOIN albums ON (albums.id = tracks.album_id) INNER JOIN albums_tags ON ((albums_tags.album_id = albums.id) AND (albums_tags.tag_id IN (2)))']
     a = a.first
     a.tags.should == [Tag.load(:id=>2)]
     a.tags.first.tracks.should == [Track.load(:id=>4)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "should cascade eagerly loading when the :eager association option is used" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager=>:tracks
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))',
       'SELECT tracks.*, albums_tags.tag_id AS x_foreign_key_x FROM tracks INNER JOIN albums ON (albums.id = tracks.album_id) INNER JOIN albums_tags ON ((albums_tags.album_id = albums.id) AND (albums_tags.tag_id IN (2)))']
     a = a.first
     a.tags.should == [Tag.load(:id=>2)]
     a.tags.first.tracks.should == [Track.load(:id=>4)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "should respect :eager when lazily loading an association" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager=>:tracks
     a = @c1.load(:id=>1)
     a.tags.should == [Tag.load(:id=>2)]
-    MODEL_DB.sqls.should == ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1))',
+    DB.sqls.should == ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1))',
       'SELECT tracks.*, albums_tags.tag_id AS x_foreign_key_x FROM tracks INNER JOIN albums ON (albums.id = tracks.album_id) INNER JOIN albums_tags ON ((albums_tags.album_id = albums.id) AND (albums_tags.tag_id IN (2)))']
     a.tags.first.tracks.should == [Track.load(:id=>4)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "should raise error if attempting to eagerly load an association using :eager_graph option" do
@@ -544,50 +544,50 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_graph=>:tracks
     a = @c1.load(:id=>1)
     a.tags
-    MODEL_DB.sqls.should == [ 'SELECT tags.id, tracks.id AS tracks_id FROM (SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1))) AS tags LEFT OUTER JOIN albums_tags AS albums_tags_0 ON (albums_tags_0.tag_id = tags.id) LEFT OUTER JOIN albums ON (albums.id = albums_tags_0.album_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)']
+    DB.sqls.should == [ 'SELECT tags.id, tracks.id AS tracks_id FROM (SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1))) AS tags LEFT OUTER JOIN albums_tags AS albums_tags_0 ON (albums_tags_0.tag_id = tags.id) LEFT OUTER JOIN albums ON (albums.id = albums_tags_0.album_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)']
     a.tags.should == [Tag.load(:id=>2)]
     a.tags.first.tracks.should == [Track.load(:id=>4)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "should respect :conditions when eagerly loading" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :conditions=>{:a=>32}
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1))) WHERE (a = 32)']
     a.first.tags.should == [Tag.load(:id=>2)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "should respect :order when eagerly loading" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :order=>:blah
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1))) ORDER BY blah']
     a.first.tags.should == [Tag.load(:id=>2)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "should use the association's block when eager loading by default" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]] do |ds| ds.filter(:a) end
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1))) WHERE a']
     a.first.tags.should == [Tag.load(:id=>2)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should use the :eager_block option when eager loading if given" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_block=>proc{|ds| ds.filter(:b)} do |ds| ds.filter(:a) end
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1))) WHERE b']
     a.first.tags.should == [Tag.load(:id=>2)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should respect the :limit option on a many_through_many association" do
@@ -595,26 +595,26 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5},{:x_foreign_key_x=>1, :id=>6}, {:x_foreign_key_x=>1, :id=>7}]
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
     a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
 
     @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[1,1]
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
     a.first.first_two_tags.should == [Tag.load(:id=>6)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
 
     @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1]
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
     a.first.first_two_tags.should == [Tag.load(:id=>6), Tag.load(:id=>7)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should respect the :limit option on a many_through_many association using a :window_function strategy" do
@@ -623,26 +623,26 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5},{:x_foreign_key_x=>1, :id=>6}]
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT * FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x, row_number() OVER (PARTITION BY albums_artists.artist_id ORDER BY name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))) AS t1 WHERE (x_sequel_row_number_x <= 2)']
     a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
 
     @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[2,1], :order=>:name
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT * FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x, row_number() OVER (PARTITION BY albums_artists.artist_id ORDER BY name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))) AS t1 WHERE ((x_sequel_row_number_x >= 2) AND (x_sequel_row_number_x < 4))']
     a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
 
     @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1], :order=>:name
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT * FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x, row_number() OVER (PARTITION BY albums_artists.artist_id ORDER BY name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))) AS t1 WHERE (x_sequel_row_number_x >= 2)']
     a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should respect the :limit option on a many_through_many association with composite primary keys on the main table using a :window_function strategy" do
@@ -654,18 +654,18 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     Tag.dataset._fetch = [{:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>5}, {:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>6}]
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id1=>1, :id2=>2)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT * FROM (SELECT tags.*, albums_artists.artist_id1 AS x_foreign_key_0_x, albums_artists.artist_id2 AS x_foreign_key_1_x, row_number() OVER (PARTITION BY albums_artists.artist_id1, albums_artists.artist_id2 ORDER BY name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND ((albums_artists.artist_id1, albums_artists.artist_id2) IN ((1, 2))))) AS t1 WHERE (x_sequel_row_number_x <= 2)']
     a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
 
     @c1.many_through_many :first_two_tags, [[:albums_artists, [:artist_id1, :artist_id2], :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[2,1], :order=>:name
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id1=>1, :id2=>2)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT * FROM (SELECT tags.*, albums_artists.artist_id1 AS x_foreign_key_0_x, albums_artists.artist_id2 AS x_foreign_key_1_x, row_number() OVER (PARTITION BY albums_artists.artist_id1, albums_artists.artist_id2 ORDER BY name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND ((albums_artists.artist_id1, albums_artists.artist_id2) IN ((1, 2))))) AS t1 WHERE ((x_sequel_row_number_x >= 2) AND (x_sequel_row_number_x < 4))']
     a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should raise an error when attempting to eagerly load an association with the :allow_eager option set to false" do
@@ -678,10 +678,10 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>:tags__name
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.name, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
     a.first.tags.should == [Tag.load(:id=>2)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should respect many_through_many association's :left_primary_key and :right_primary_key options" do
@@ -691,10 +691,10 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :left_primary_key=>:yyy, :right_primary_key=>:tag_id
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>1, :yyy=>8)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.tag_id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (8)))']
     a.first.tags.should == [Tag.load(:tag_id=>2)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "should handle composite keys" do
@@ -704,20 +704,20 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     @c1.many_through_many :tags, [[:albums_artists, [:b1, :b2], [:c1, :c2]], [:albums, [:d1, :d2], [:e1, :e2]], [:albums_tags, [:f1, :f2], [:g1, :g2]]], :right_primary_key=>[:h1, :h2], :left_primary_key=>[:id, :yyy]
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>1, :yyy=>8)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.b1 AS x_foreign_key_0_x, albums_artists.b2 AS x_foreign_key_1_x FROM tags INNER JOIN albums_tags ON ((albums_tags.g1 = tags.h1) AND (albums_tags.g2 = tags.h2)) INNER JOIN albums ON ((albums.e1 = albums_tags.f1) AND (albums.e2 = albums_tags.f2)) INNER JOIN albums_artists ON ((albums_artists.c1 = albums.d1) AND (albums_artists.c2 = albums.d2) AND ((albums_artists.b1, albums_artists.b2) IN ((1, 8))))']
     a.first.tags.should == [Tag.load(:id=>2)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should respect :after_load callbacks on associations when eager loading" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :after_load=>lambda{|o, as| o[:id] *= 2; as.each{|a| a[:id] *= 3}}
     a = @c1.eager(:tags).all
     a.should == [@c1.load(:id=>2)]
-    MODEL_DB.sqls.should == ['SELECT * FROM artists',
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
     a.first.tags.should == [Tag.load(:id=>6)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
     
   it "should raise an error if called without a symbol or hash" do
@@ -727,39 +727,39 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   it "should eagerly graph a single many_through_many association" do
     a = @c1.eager_graph(:tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)']
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)']
     a.first.tags.should == [Tag.load(:id=>2)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should eagerly graph multiple associations in a single call" do 
     a = @c1.eager_graph(:tags, :albums).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, albums_0.id AS albums_0_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id)']
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, albums_0.id AS albums_0_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id)']
     a = a.first
     a.tags.should == [Tag.load(:id=>2)]
     a.albums.should == [Album.load(:id=>3)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should eagerly graph multiple associations in separate calls" do 
     a = @c1.eager_graph(:tags).eager_graph(:albums).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, albums_0.id AS albums_0_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id)']
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, albums_0.id AS albums_0_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id)']
     a = a.first
     a.tags.should == [Tag.load(:id=>2)]
     a.albums.should == [Album.load(:id=>3)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should allow cascading of eager graphing for associations of associated models" do
     a = @c1.eager_graph(:tags=>:tracks).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, tracks.id AS tracks_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_tags AS albums_tags_0 ON (albums_tags_0.tag_id = tags.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_tags_0.album_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums_0.id)']
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, tracks.id AS tracks_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_tags AS albums_tags_0 ON (albums_tags_0.tag_id = tags.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_tags_0.album_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums_0.id)']
     a = a.first
     a.tags.should == [Tag.load(:id=>2)]
     a.tags.first.tracks.should == [Track.load(:id=>4)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "eager graphing should eliminate duplicates caused by cartesian products" do
@@ -768,29 +768,29 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     ds._fetch = [{:id=>1, :tags_id=>2}, {:id=>1, :tags_id=>3}, {:id=>1, :tags_id=>2}, {:id=>1, :tags_id=>3}]
     a = ds.all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)']
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)']
     a.first.tags.should == [Tag.load(:id=>2), Tag.load(:id=>3)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "should eager graph multiple associations from the same table" do
     a = @c1.eager_graph(:tags, :other_tags).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, other_tags.id AS other_tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id) LEFT OUTER JOIN albums_tags AS albums_tags_0 ON (albums_tags_0.album_id = albums_0.id) LEFT OUTER JOIN tags AS other_tags ON (other_tags.id = albums_tags_0.tag_id)']
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, other_tags.id AS other_tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id) LEFT OUTER JOIN albums_tags AS albums_tags_0 ON (albums_tags_0.album_id = albums_0.id) LEFT OUTER JOIN tags AS other_tags ON (other_tags.id = albums_tags_0.tag_id)']
     a = a.first
     a.tags.should == [Tag.load(:id=>2)]
     a.other_tags.should == [Tag.load(:id=>9)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should eager graph a self_referential association" do
     a = @c1.eager_graph(:tags, :artists).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, artists_0.id AS artists_0_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id) LEFT OUTER JOIN albums_artists AS albums_artists_1 ON (albums_artists_1.album_id = albums_0.id) LEFT OUTER JOIN artists AS artists_0 ON (artists_0.id = albums_artists_1.artist_id)']
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, artists_0.id AS artists_0_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id) LEFT OUTER JOIN albums_artists AS albums_artists_1 ON (albums_artists_1.album_id = albums_0.id) LEFT OUTER JOIN artists AS artists_0 ON (artists_0.id = albums_artists_1.artist_id)']
     a = a.first
     a.tags.should == [Tag.load(:id=>2)]
     a.artists.should == [@c1.load(:id=>10)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "eager graphing should give you a plain hash when called without .all" do 
@@ -800,12 +800,12 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
   it "should be able to use eager and eager_graph together" do
     a = @c1.eager_graph(:tags).eager(:albums).all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)',
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)',
       'SELECT albums.*, albums_artists.artist_id AS x_foreign_key_x FROM albums INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1)))']
     a = a.first
     a.tags.should == [Tag.load(:id=>2)]
     a.albums.should == [Album.load(:id=>3)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should handle no associated records when eagerly graphing a single many_through_many association" do
@@ -813,9 +813,9 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     ds._fetch = {:id=>1, :tags_id=>nil}
     a = ds.all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)']
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)']
     a.first.tags.should == []
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should handle no associated records when eagerly graphing multiple many_through_many associations" do
@@ -823,12 +823,12 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     ds._fetch = [{:id=>1, :tags_id=>nil, :albums_0_id=>3}, {:id=>1, :tags_id=>2, :albums_0_id=>nil}, {:id=>1, :tags_id=>5, :albums_0_id=>6}, {:id=>7, :tags_id=>nil, :albums_0_id=>nil}]
     a = ds.all
     a.should == [@c1.load(:id=>1), @c1.load(:id=>7)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, albums_0.id AS albums_0_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id)']
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, albums_0.id AS albums_0_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id)']
     a.first.tags.should == [Tag.load(:id=>2), Tag.load(:id=>5)]
     a.first.albums.should == [Album.load(:id=>3), Album.load(:id=>6)]
     a.last.tags.should == []
     a.last.albums.should == []
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should handle missing associated records when cascading eager graphing for associations of associated models" do
@@ -836,13 +836,13 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     ds._fetch = [{:id=>1, :tags_id=>2, :tracks_id=>4}, {:id=>1, :tags_id=>3, :tracks_id=>nil}, {:id=>2, :tags_id=>nil, :tracks_id=>nil}]
     a = ds.all
     a.should == [@c1.load(:id=>1), @c1.load(:id=>2)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, tracks.id AS tracks_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_tags AS albums_tags_0 ON (albums_tags_0.tag_id = tags.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_tags_0.album_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums_0.id)']
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id, tracks.id AS tracks_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) LEFT OUTER JOIN albums_tags AS albums_tags_0 ON (albums_tags_0.tag_id = tags.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_tags_0.album_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums_0.id)']
     a.last.tags.should == []
     a = a.first
     a.tags.should == [Tag.load(:id=>2), Tag.load(:id=>3)]
     a.tags.first.tracks.should == [Track.load(:id=>4)]
     a.tags.last.tracks.should == []
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "eager graphing should respect :left_primary_key and :right_primary_key options" do 
@@ -853,9 +853,9 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     ds._fetch = {:id=>1, :yyy=>8, :tags_id=>2, :tag_id=>4}
     a = ds.all
     a.should == [@c1.load(:id=>1, :yyy=>8)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, artists.yyy, tags.id AS tags_id, tags.tag_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.yyy) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.tag_id = albums_tags.tag_id)']
+    DB.sqls.should == ['SELECT artists.id, artists.yyy, tags.id AS tags_id, tags.tag_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.yyy) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.tag_id = albums_tags.tag_id)']
     a.first.tags.should == [Tag.load(:id=>2, :tag_id=>4)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
   
   it "eager graphing should respect composite keys" do 
@@ -866,9 +866,9 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     ds._fetch = {:id=>1, :yyy=>8, :tags_id=>2, :tag_id=>4}
     a = ds.all
     a.should == [@c1.load(:id=>1, :yyy=>8)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, artists.yyy, tags.id AS tags_id, tags.tag_id FROM artists LEFT OUTER JOIN albums_artists ON ((albums_artists.b1 = artists.id) AND (albums_artists.b2 = artists.yyy)) LEFT OUTER JOIN albums ON ((albums.d1 = albums_artists.c1) AND (albums.d2 = albums_artists.c2)) LEFT OUTER JOIN albums_tags ON ((albums_tags.f1 = albums.e1) AND (albums_tags.f2 = albums.e2)) LEFT OUTER JOIN tags ON ((tags.id = albums_tags.g1) AND (tags.tag_id = albums_tags.g2))']
+    DB.sqls.should == ['SELECT artists.id, artists.yyy, tags.id AS tags_id, tags.tag_id FROM artists LEFT OUTER JOIN albums_artists ON ((albums_artists.b1 = artists.id) AND (albums_artists.b2 = artists.yyy)) LEFT OUTER JOIN albums ON ((albums.d1 = albums_artists.c1) AND (albums.d2 = albums_artists.c2)) LEFT OUTER JOIN albums_tags ON ((albums_tags.f1 = albums.e1) AND (albums_tags.f2 = albums.e2)) LEFT OUTER JOIN tags ON ((tags.id = albums_tags.g1) AND (tags.tag_id = albums_tags.g2))']
     a.first.tags.should == [Tag.load(:id=>2, :tag_id=>4)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should respect the association's :graph_select option" do 
@@ -877,9 +877,9 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     ds._fetch = {:id=>1, :b=>2}
     a = ds.all
     a.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == ['SELECT artists.id, tags.b FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)']
+    DB.sqls.should == ['SELECT artists.id, tags.b FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)']
     a.first.tags.should == [Tag.load(:b=>2)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
   end
 
   it "should respect the association's :graph_join_type option" do 

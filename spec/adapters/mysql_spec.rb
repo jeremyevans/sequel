@@ -5,17 +5,17 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 unless defined?(MYSQL_SOCKET_FILE)
   MYSQL_SOCKET_FILE = '/tmp/mysql.sock'
 end
-MYSQL_URI = URI.parse(INTEGRATION_DB.uri)
+MYSQL_URI = URI.parse(DB.uri)
 
-def INTEGRATION_DB.sqls
+def DB.sqls
   (@sqls ||= [])
 end
 logger = Object.new
 def logger.method_missing(m, msg)
-  INTEGRATION_DB.sqls << msg
+  DB.sqls << msg
 end
-INTEGRATION_DB.loggers = [logger]
-INTEGRATION_DB.drop_table?(:items, :dolls, :booltest)
+DB.loggers = [logger]
+DB.drop_table?(:items, :dolls, :booltest)
 
 SQL_BEGIN = 'BEGIN'
 SQL_ROLLBACK = 'ROLLBACK'
@@ -23,8 +23,8 @@ SQL_COMMIT = 'COMMIT'
 
 describe "MySQL", '#create_table' do
   before do
-    @db = INTEGRATION_DB
-    INTEGRATION_DB.sqls.clear
+    @db = DB
+    DB.sqls.clear
   end
   after do
     @db.drop_table?(:dolls)
@@ -92,10 +92,10 @@ describe "MySQL", '#create_table' do
   end
 end
 
-if [:mysql, :mysql2].include?(INTEGRATION_DB.adapter_scheme)
+if [:mysql, :mysql2].include?(DB.adapter_scheme)
   describe "Sequel::MySQL::Database#convert_tinyint_to_bool" do
     before do
-      @db = INTEGRATION_DB
+      @db = DB
       @db.create_table(:booltest){column :b, 'tinyint(1)'; column :i, 'tinyint(4)'}
       @ds = @db[:booltest]
     end
@@ -155,12 +155,12 @@ end
 
 describe "A MySQL dataset" do
   before do
-    INTEGRATION_DB.create_table(:items){String :name; Integer :value}
-    @d = INTEGRATION_DB[:items]
-    INTEGRATION_DB.sqls.clear
+    DB.create_table(:items){String :name; Integer :value}
+    @d = DB[:items]
+    DB.sqls.clear
   end
   after do
-    INTEGRATION_DB.drop_table?(:items)
+    DB.drop_table?(:items)
   end
 
   specify "should quote columns and tables using back-ticks if quoting identifiers" do
@@ -230,7 +230,7 @@ end
 
 describe "MySQL datasets" do
   before do
-    @d = INTEGRATION_DB[:orders]
+    @d = DB[:orders]
   end
 
   specify "should correctly quote column references" do
@@ -246,7 +246,7 @@ end
 
 describe "Dataset#distinct" do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:a) do
       Integer :a
       Integer :b
@@ -269,7 +269,7 @@ end
 
 describe "MySQL join expressions" do
   before do
-    @ds = INTEGRATION_DB[:nodes]
+    @ds = DB[:nodes]
   end
 
   specify "should raise error for :full_outer join requests." do
@@ -319,7 +319,7 @@ end
 
 describe "Joined MySQL dataset" do
   before do
-    @ds = INTEGRATION_DB[:nodes]
+    @ds = DB[:nodes]
   end
 
   specify "should quote fields correctly" do
@@ -343,17 +343,17 @@ end
 
 describe "A MySQL database" do
   after do
-    INTEGRATION_DB.drop_table?(:test_innodb)
+    DB.drop_table?(:test_innodb)
   end
 
   specify "should handle the creation and dropping of an InnoDB table with foreign keys" do
-    proc{INTEGRATION_DB.create_table!(:test_innodb, :engine=>:InnoDB){primary_key :id; foreign_key :fk, :test_innodb, :key=>:id}}.should_not raise_error
+    proc{DB.create_table!(:test_innodb, :engine=>:InnoDB){primary_key :id; foreign_key :fk, :test_innodb, :key=>:id}}.should_not raise_error
   end
 end
 
 describe "A MySQL database" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table! :test2 do
       text :name
       integer :value
@@ -450,10 +450,10 @@ describe "A MySQL database with table options" do
     Sequel::MySQL.default_charset = 'utf8'
     Sequel::MySQL.default_collate = 'utf8_general_ci'
 
-    @db = INTEGRATION_DB
+    @db = DB
     @db.drop_table?(:items)
 
-    INTEGRATION_DB.sqls.clear
+    DB.sqls.clear
   end
   after do
     @db.drop_table?(:items)
@@ -487,9 +487,9 @@ end
 
 describe "A MySQL database" do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.drop_table?(:items)
-    INTEGRATION_DB.sqls.clear
+    DB.sqls.clear
   end
   after do
     @db.drop_table?(:items, :users)
@@ -589,20 +589,20 @@ describe "A MySQL database" do
 end  
 
 # Socket tests should only be run if the MySQL server is on localhost
-if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and INTEGRATION_DB.adapter_scheme == :mysql
+if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and DB.adapter_scheme == :mysql
   describe "A MySQL database" do
     specify "should accept a socket option" do
-      db = Sequel.mysql(INTEGRATION_DB.opts[:database], :host => 'localhost', :user => INTEGRATION_DB.opts[:user], :password => INTEGRATION_DB.opts[:password], :socket => MYSQL_SOCKET_FILE)
+      db = Sequel.mysql(DB.opts[:database], :host => 'localhost', :user => DB.opts[:user], :password => DB.opts[:password], :socket => MYSQL_SOCKET_FILE)
       proc {db.test_connection}.should_not raise_error
     end
 
     specify "should accept a socket option without host option" do
-      db = Sequel.mysql(INTEGRATION_DB.opts[:database], :user => INTEGRATION_DB.opts[:user], :password => INTEGRATION_DB.opts[:password], :socket => MYSQL_SOCKET_FILE)
+      db = Sequel.mysql(DB.opts[:database], :user => DB.opts[:user], :password => DB.opts[:password], :socket => MYSQL_SOCKET_FILE)
       proc {db.test_connection}.should_not raise_error
     end
 
     specify "should fail to connect with invalid socket" do
-      db = Sequel.mysql(INTEGRATION_DB.opts[:database], :user => INTEGRATION_DB.opts[:user], :password => INTEGRATION_DB.opts[:password], :socket =>'blah')
+      db = Sequel.mysql(DB.opts[:database], :user => DB.opts[:user], :password => DB.opts[:password], :socket =>'blah')
       proc {db.test_connection}.should raise_error
     end
   end
@@ -610,93 +610,93 @@ end
 
 describe "A MySQL database" do
   specify "should accept a read_timeout option when connecting" do
-    db = Sequel.connect(INTEGRATION_DB.opts.merge(:read_timeout=>22342))
+    db = Sequel.connect(DB.opts.merge(:read_timeout=>22342))
     proc {db.test_connection}.should_not raise_error
   end
 
   specify "should accept a connect_timeout option when connecting" do
-    db = Sequel.connect(INTEGRATION_DB.opts.merge(:connect_timeout=>22342))
+    db = Sequel.connect(DB.opts.merge(:connect_timeout=>22342))
     proc {db.test_connection}.should_not raise_error
   end
 end
 
 describe "MySQL foreign key support" do
   after do
-    INTEGRATION_DB.drop_table?(:testfk, :testpk)
+    DB.drop_table?(:testfk, :testpk)
   end
 
   specify "should create table without :key" do
-    INTEGRATION_DB.create_table!(:testpk){primary_key :id}
-    INTEGRATION_DB.create_table!(:testfk){foreign_key :fk, :testpk}
+    DB.create_table!(:testpk){primary_key :id}
+    DB.create_table!(:testfk){foreign_key :fk, :testpk}
   end
 
   specify "should create table with composite keys without :key" do
-    INTEGRATION_DB.create_table!(:testpk){Integer :id; Integer :id2; primary_key([:id, :id2])}
-    INTEGRATION_DB.create_table!(:testfk){Integer :fk; Integer :fk2; foreign_key([:fk, :fk2], :testpk)}
+    DB.create_table!(:testpk){Integer :id; Integer :id2; primary_key([:id, :id2])}
+    DB.create_table!(:testfk){Integer :fk; Integer :fk2; foreign_key([:fk, :fk2], :testpk)}
   end
 
   specify "should create table with self referential without :key" do
-    INTEGRATION_DB.create_table!(:testfk){primary_key :id; foreign_key :fk, :testfk}
+    DB.create_table!(:testfk){primary_key :id; foreign_key :fk, :testfk}
   end
 
   specify "should create table with self referential with composite keys without :key" do
-    INTEGRATION_DB.create_table!(:testfk){Integer :id; Integer :id2; Integer :fk; Integer :fk2; primary_key([:id, :id2]); foreign_key([:fk, :fk2], :testfk)}
+    DB.create_table!(:testfk){Integer :id; Integer :id2; Integer :fk; Integer :fk2; primary_key([:id, :id2]); foreign_key([:fk, :fk2], :testfk)}
   end
 
   specify "should alter table without :key" do
-    INTEGRATION_DB.create_table!(:testpk){primary_key :id}
-    INTEGRATION_DB.create_table!(:testfk){Integer :id}
-    INTEGRATION_DB.alter_table(:testfk){add_foreign_key :fk, :testpk}
+    DB.create_table!(:testpk){primary_key :id}
+    DB.create_table!(:testfk){Integer :id}
+    DB.alter_table(:testfk){add_foreign_key :fk, :testpk}
   end
 
   specify "should alter table with composite keys without :key" do
-    INTEGRATION_DB.create_table!(:testpk){Integer :id; Integer :id2; primary_key([:id, :id2])}
-    INTEGRATION_DB.create_table!(:testfk){Integer :fk; Integer :fk2}
-    INTEGRATION_DB.alter_table(:testfk){add_foreign_key([:fk, :fk2], :testpk)}
+    DB.create_table!(:testpk){Integer :id; Integer :id2; primary_key([:id, :id2])}
+    DB.create_table!(:testfk){Integer :fk; Integer :fk2}
+    DB.alter_table(:testfk){add_foreign_key([:fk, :fk2], :testpk)}
   end
 
   specify "should alter table with self referential without :key" do
-    INTEGRATION_DB.create_table!(:testfk){primary_key :id}
-    INTEGRATION_DB.alter_table(:testfk){add_foreign_key :fk, :testfk}
+    DB.create_table!(:testfk){primary_key :id}
+    DB.alter_table(:testfk){add_foreign_key :fk, :testfk}
   end
 
   specify "should alter table with self referential with composite keys without :key" do
-    INTEGRATION_DB.create_table!(:testfk){Integer :id; Integer :id2; Integer :fk; Integer :fk2; primary_key([:id, :id2])}
-    INTEGRATION_DB.alter_table(:testfk){add_foreign_key [:fk, :fk2], :testfk}
+    DB.create_table!(:testfk){Integer :id; Integer :id2; Integer :fk; Integer :fk2; primary_key([:id, :id2])}
+    DB.alter_table(:testfk){add_foreign_key [:fk, :fk2], :testfk}
   end
 end
 
 describe "A grouped MySQL dataset" do
   before do
-    INTEGRATION_DB.create_table! :test2 do
+    DB.create_table! :test2 do
       text :name
       integer :value
     end
-    INTEGRATION_DB[:test2] << {:name => '11', :value => 10}
-    INTEGRATION_DB[:test2] << {:name => '11', :value => 20}
-    INTEGRATION_DB[:test2] << {:name => '11', :value => 30}
-    INTEGRATION_DB[:test2] << {:name => '12', :value => 10}
-    INTEGRATION_DB[:test2] << {:name => '12', :value => 20}
-    INTEGRATION_DB[:test2] << {:name => '13', :value => 10}
+    DB[:test2] << {:name => '11', :value => 10}
+    DB[:test2] << {:name => '11', :value => 20}
+    DB[:test2] << {:name => '11', :value => 30}
+    DB[:test2] << {:name => '12', :value => 10}
+    DB[:test2] << {:name => '12', :value => 20}
+    DB[:test2] << {:name => '13', :value => 10}
   end
   after do
-    INTEGRATION_DB.drop_table?(:test2)
+    DB.drop_table?(:test2)
   end
 
   specify "should return the correct count for raw sql query" do
-    ds = INTEGRATION_DB["select name FROM test2 WHERE name = '11' GROUP BY name"]
+    ds = DB["select name FROM test2 WHERE name = '11' GROUP BY name"]
     ds.count.should == 1
   end
 
   specify "should return the correct count for a normal dataset" do
-    ds = INTEGRATION_DB[:test2].select(:name).where(:name => '11').group(:name)
+    ds = DB[:test2].select(:name).where(:name => '11').group(:name)
     ds.count.should == 1
   end
 end
 
 describe "A MySQL database" do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.drop_table?(:posts)
     @db.sqls.clear
   end
@@ -778,18 +778,18 @@ end
 
 describe "MySQL::Dataset#insert and related methods" do
   before do
-    INTEGRATION_DB.create_table(:items){String :name; Integer :value}
-    @d = INTEGRATION_DB[:items]
-    INTEGRATION_DB.sqls.clear
+    DB.create_table(:items){String :name; Integer :value}
+    @d = DB[:items]
+    DB.sqls.clear
   end
   after do
-    INTEGRATION_DB.drop_table?(:items)
+    DB.drop_table?(:items)
   end
 
   specify "#insert should insert record with default values when no arguments given" do
     @d.insert
     check_sqls do
-      INTEGRATION_DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
+      DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
     end
     @d.all.should == [{:name => nil, :value => nil}]
   end
@@ -797,7 +797,7 @@ describe "MySQL::Dataset#insert and related methods" do
   specify "#insert  should insert record with default values when empty hash given" do
     @d.insert({})
     check_sqls do
-      INTEGRATION_DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
+      DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
     end
     @d.all.should == [{:name => nil, :value => nil}]
   end
@@ -805,23 +805,23 @@ describe "MySQL::Dataset#insert and related methods" do
   specify "#insert should insert record with default values when empty array given" do
     @d.insert []
     check_sqls do
-      INTEGRATION_DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
+      DB.sqls.should == ["INSERT INTO `items` () VALUES ()"]
     end
     @d.all.should == [{:name => nil, :value => nil}]
   end
 
   specify "#on_duplicate_key_update should work with regular inserts" do
-    INTEGRATION_DB.add_index :items, :name, :unique=>true
-    INTEGRATION_DB.sqls.clear
+    DB.add_index :items, :name, :unique=>true
+    DB.sqls.clear
     @d.insert(:name => 'abc', :value => 1)
     @d.on_duplicate_key_update(:name, :value => 6).insert(:name => 'abc', :value => 1)
     @d.on_duplicate_key_update(:name, :value => 6).insert(:name => 'def', :value => 2)
 
     check_sqls do
-      INTEGRATION_DB.sqls.length.should == 3
-      INTEGRATION_DB.sqls[0].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\)\z/
-      INTEGRATION_DB.sqls[1].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/
-      INTEGRATION_DB.sqls[2].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('def'|2), (2|'def')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/
+      DB.sqls.length.should == 3
+      DB.sqls[0].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\)\z/
+      DB.sqls[1].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/
+      DB.sqls[2].should =~ /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('def'|2), (2|'def')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/
     end
 
     @d.all.should == [{:name => 'abc', :value => 6}, {:name => 'def', :value => 2}]
@@ -831,7 +831,7 @@ describe "MySQL::Dataset#insert and related methods" do
     @d.multi_replace([{:name => 'abc'}, {:name => 'def'}])
 
     check_sqls do
-      INTEGRATION_DB.sqls.should == [
+      DB.sqls.should == [
         SQL_BEGIN,
         "REPLACE INTO `items` (`name`) VALUES ('abc'), ('def')",
         SQL_COMMIT
@@ -848,7 +848,7 @@ describe "MySQL::Dataset#insert and related methods" do
       :commit_every => 2)
 
     check_sqls do
-      INTEGRATION_DB.sqls.should == [
+      DB.sqls.should == [
         SQL_BEGIN,
         "REPLACE INTO `items` (`value`) VALUES (1), (2)",
         SQL_COMMIT,
@@ -871,7 +871,7 @@ describe "MySQL::Dataset#insert and related methods" do
       :slice => 2)
 
     check_sqls do
-      INTEGRATION_DB.sqls.should == [
+      DB.sqls.should == [
         SQL_BEGIN,
         "REPLACE INTO `items` (`value`) VALUES (1), (2)",
         SQL_COMMIT,
@@ -893,7 +893,7 @@ describe "MySQL::Dataset#insert and related methods" do
     @d.multi_insert([{:name => 'abc'}, {:name => 'def'}])
 
     check_sqls do
-      INTEGRATION_DB.sqls.should == [
+      DB.sqls.should == [
         SQL_BEGIN,
         "INSERT INTO `items` (`name`) VALUES ('abc'), ('def')",
         SQL_COMMIT
@@ -910,7 +910,7 @@ describe "MySQL::Dataset#insert and related methods" do
       :commit_every => 2)
 
     check_sqls do
-      INTEGRATION_DB.sqls.should == [
+      DB.sqls.should == [
         SQL_BEGIN,
         "INSERT INTO `items` (`value`) VALUES (1), (2)",
         SQL_COMMIT,
@@ -933,7 +933,7 @@ describe "MySQL::Dataset#insert and related methods" do
       :slice => 2)
 
     check_sqls do
-      INTEGRATION_DB.sqls.should == [
+      DB.sqls.should == [
         SQL_BEGIN,
         "INSERT INTO `items` (`value`) VALUES (1), (2)",
         SQL_COMMIT,
@@ -955,7 +955,7 @@ describe "MySQL::Dataset#insert and related methods" do
     @d.import([:name, :value], [['abc', 1], ['def', 2]])
 
     check_sqls do
-      INTEGRATION_DB.sqls.should == [
+      DB.sqls.should == [
         SQL_BEGIN,
         "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2)",
         SQL_COMMIT
@@ -972,7 +972,7 @@ describe "MySQL::Dataset#insert and related methods" do
     @d.insert_ignore.multi_insert([{:name => 'abc'}, {:name => 'def'}])
 
     check_sqls do
-      INTEGRATION_DB.sqls.should == [
+      DB.sqls.should == [
         SQL_BEGIN,
         "INSERT IGNORE INTO `items` (`name`) VALUES ('abc'), ('def')",
         SQL_COMMIT
@@ -987,7 +987,7 @@ describe "MySQL::Dataset#insert and related methods" do
   specify "#insert_ignore should add the IGNORE keyword for single inserts" do
     @d.insert_ignore.insert(:name => 'ghi')
     check_sqls do
-      INTEGRATION_DB.sqls.should == ["INSERT IGNORE INTO `items` (`name`) VALUES ('ghi')"]
+      DB.sqls.should == ["INSERT IGNORE INTO `items` (`name`) VALUES ('ghi')"]
     end
     @d.all.should == [{:name => 'ghi', :value => nil}]
   end
@@ -996,7 +996,7 @@ describe "MySQL::Dataset#insert and related methods" do
     @d.on_duplicate_key_update.import([:name,:value], [['abc', 1], ['def',2]])
 
     check_sqls do
-      INTEGRATION_DB.sqls.should == [
+      DB.sqls.should == [
         "SELECT * FROM `items` LIMIT 1",
         SQL_BEGIN,
         "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `value`=VALUES(`value`)",
@@ -1015,7 +1015,7 @@ describe "MySQL::Dataset#insert and related methods" do
     )
 
     check_sqls do
-      INTEGRATION_DB.sqls.should == [
+      DB.sqls.should == [
         SQL_BEGIN,
         "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE `value`=VALUES(`value`)",
         SQL_COMMIT
@@ -1031,21 +1031,21 @@ end
 
 describe "MySQL::Dataset#update and related methods" do
   before do
-    INTEGRATION_DB.create_table(:items){String :name; Integer :value; index :name, :unique=>true}
-    @d = INTEGRATION_DB[:items]
+    DB.create_table(:items){String :name; Integer :value; index :name, :unique=>true}
+    @d = DB[:items]
   end
   after do
-    INTEGRATION_DB.drop_table?(:items)
+    DB.drop_table?(:items)
   end
 
   specify "#update_ignore should not raise error where normal update would fail" do
     @d.insert(:name => 'cow', :value => 0)
     @d.insert(:name => 'cat', :value => 1)
     proc{@d.where(:value => 1).update(:name => 'cow')}.should raise_error(Sequel::DatabaseError)
-    INTEGRATION_DB.sqls.clear
+    DB.sqls.clear
     @d.update_ignore.where(:value => 1).update(:name => 'cow')
     check_sqls do
-      INTEGRATION_DB.sqls.should == ["UPDATE IGNORE `items` SET `name` = 'cow' WHERE (`value` = 1)"]
+      DB.sqls.should == ["UPDATE IGNORE `items` SET `name` = 'cow' WHERE (`value` = 1)"]
     end
     @d.order(:name).all.should == [{:name => 'cat', :value => 1}, {:name => 'cow', :value => 0}]
   end
@@ -1053,16 +1053,16 @@ end
 
 describe "MySQL::Dataset#replace" do
   before do
-    INTEGRATION_DB.create_table(:items){Integer :id, :unique=>true; Integer :value}
-    @d = INTEGRATION_DB[:items]
-    INTEGRATION_DB.sqls.clear
+    DB.create_table(:items){Integer :id, :unique=>true; Integer :value}
+    @d = DB[:items]
+    DB.sqls.clear
   end
   after do
-    INTEGRATION_DB.drop_table?(:items)
+    DB.drop_table?(:items)
   end
 
   specify "should use default values if they exist" do
-    INTEGRATION_DB.alter_table(:items){set_column_default :id, 1; set_column_default :value, 2}
+    DB.alter_table(:items){set_column_default :id, 1; set_column_default :value, 2}
     @d.replace
     @d.all.should == [{:id=>1, :value=>2}]
     @d.replace([])
@@ -1095,7 +1095,7 @@ end
 
 describe "MySQL::Dataset#complex_expression_sql" do
   before do
-    @d = INTEGRATION_DB.dataset
+    @d = DB.dataset
   end
 
   specify "should handle string concatenation with CONCAT if more than one record" do
@@ -1112,28 +1112,28 @@ end
 
 describe "MySQL::Dataset#calc_found_rows" do
   before do
-    INTEGRATION_DB.create_table!(:items){Integer :a}
+    DB.create_table!(:items){Integer :a}
   end
   after do
-    INTEGRATION_DB.drop_table?(:items)
+    DB.drop_table?(:items)
   end
 
   specify "should add the SQL_CALC_FOUND_ROWS keyword when selecting" do
-    INTEGRATION_DB[:items].select(:a).calc_found_rows.limit(1).sql.should == \
+    DB[:items].select(:a).calc_found_rows.limit(1).sql.should == \
       'SELECT SQL_CALC_FOUND_ROWS `a` FROM `items` LIMIT 1'
   end
 
   specify "should count matching rows disregarding LIMIT clause" do
-    INTEGRATION_DB[:items].multi_insert([{:a => 1}, {:a => 1}, {:a => 2}])
-    INTEGRATION_DB.sqls.clear
+    DB[:items].multi_insert([{:a => 1}, {:a => 1}, {:a => 2}])
+    DB.sqls.clear
 
-    INTEGRATION_DB.synchronize do
-      INTEGRATION_DB[:items].calc_found_rows.filter(:a => 1).limit(1).all.should == [{:a => 1}]
-      INTEGRATION_DB.dataset.select(Sequel.function(:FOUND_ROWS).as(:rows)).all.should == [{:rows => 2 }]
+    DB.synchronize do
+      DB[:items].calc_found_rows.filter(:a => 1).limit(1).all.should == [{:a => 1}]
+      DB.dataset.select(Sequel.function(:FOUND_ROWS).as(:rows)).all.should == [{:rows => 2 }]
     end
 
     check_sqls do
-      INTEGRATION_DB.sqls.should == [
+      DB.sqls.should == [
         'SELECT SQL_CALC_FOUND_ROWS * FROM `items` WHERE (`a` = 1) LIMIT 1',
         'SELECT FOUND_ROWS() AS `rows`',
       ]
@@ -1141,34 +1141,34 @@ describe "MySQL::Dataset#calc_found_rows" do
   end
 end
 
-if INTEGRATION_DB.adapter_scheme == :mysql or INTEGRATION_DB.adapter_scheme == :jdbc or INTEGRATION_DB.adapter_scheme == :mysql2
+if DB.adapter_scheme == :mysql or DB.adapter_scheme == :jdbc or DB.adapter_scheme == :mysql2
   describe "MySQL Stored Procedures" do
     before do
-      INTEGRATION_DB.create_table(:items){Integer :id; Integer :value}
-      @d = INTEGRATION_DB[:items]
-      INTEGRATION_DB.sqls.clear
+      DB.create_table(:items){Integer :id; Integer :value}
+      @d = DB[:items]
+      DB.sqls.clear
     end
     after do
-      INTEGRATION_DB.drop_table?(:items)
-      INTEGRATION_DB.execute('DROP PROCEDURE test_sproc')
+      DB.drop_table?(:items)
+      DB.execute('DROP PROCEDURE test_sproc')
     end
 
     specify "should be callable on the database object" do
-      INTEGRATION_DB.execute_ddl('CREATE PROCEDURE test_sproc() BEGIN DELETE FROM items; END')
-      INTEGRATION_DB[:items].delete
-      INTEGRATION_DB[:items].insert(:value=>1)
-      INTEGRATION_DB[:items].count.should == 1
-      INTEGRATION_DB.call_sproc(:test_sproc)
-      INTEGRATION_DB[:items].count.should == 0
+      DB.execute_ddl('CREATE PROCEDURE test_sproc() BEGIN DELETE FROM items; END')
+      DB[:items].delete
+      DB[:items].insert(:value=>1)
+      DB[:items].count.should == 1
+      DB.call_sproc(:test_sproc)
+      DB[:items].count.should == 0
     end
 
     # Mysql2 doesn't support stored procedures that return result sets, probably because
     # CLIENT_MULTI_RESULTS is not set.
-    unless INTEGRATION_DB.adapter_scheme == :mysql2
+    unless DB.adapter_scheme == :mysql2
       specify "should be callable on the dataset object" do
-        INTEGRATION_DB.execute_ddl('CREATE PROCEDURE test_sproc(a INTEGER) BEGIN SELECT *, a AS b FROM items; END')
-        INTEGRATION_DB[:items].delete
-        @d = INTEGRATION_DB[:items]
+        DB.execute_ddl('CREATE PROCEDURE test_sproc(a INTEGER) BEGIN SELECT *, a AS b FROM items; END')
+        DB[:items].delete
+        @d = DB[:items]
         @d.call_sproc(:select, :test_sproc, 3).should == []
         @d.insert(:value=>1)
         @d.call_sproc(:select, :test_sproc, 4).should == [{:id=>nil, :value=>1, :b=>4}]
@@ -1177,9 +1177,9 @@ if INTEGRATION_DB.adapter_scheme == :mysql or INTEGRATION_DB.adapter_scheme == :
       end
 
       specify "should be callable on the dataset object with multiple arguments" do
-        INTEGRATION_DB.execute_ddl('CREATE PROCEDURE test_sproc(a INTEGER, c INTEGER) BEGIN SELECT *, a AS b, c AS d FROM items; END')
-        INTEGRATION_DB[:items].delete
-        @d = INTEGRATION_DB[:items]
+        DB.execute_ddl('CREATE PROCEDURE test_sproc(a INTEGER, c INTEGER) BEGIN SELECT *, a AS b, c AS d FROM items; END')
+        DB[:items].delete
+        @d = DB[:items]
         @d.call_sproc(:select, :test_sproc, 3, 4).should == []
         @d.insert(:value=>1)
         @d.call_sproc(:select, :test_sproc, 4, 5).should == [{:id=>nil, :value=>1, :b=>4, :d=>5}]
@@ -1189,58 +1189,58 @@ if INTEGRATION_DB.adapter_scheme == :mysql or INTEGRATION_DB.adapter_scheme == :
     end
 
     specify "should deal with nil values" do
-      INTEGRATION_DB.execute_ddl('CREATE PROCEDURE test_sproc(i INTEGER, v INTEGER) BEGIN INSERT INTO items VALUES (i, v); END')
-      INTEGRATION_DB[:items].delete
-      INTEGRATION_DB.call_sproc(:test_sproc, :args=>[1, nil])
-      INTEGRATION_DB[:items].all.should == [{:id=>1, :value=>nil}]
+      DB.execute_ddl('CREATE PROCEDURE test_sproc(i INTEGER, v INTEGER) BEGIN INSERT INTO items VALUES (i, v); END')
+      DB[:items].delete
+      DB.call_sproc(:test_sproc, :args=>[1, nil])
+      DB[:items].all.should == [{:id=>1, :value=>nil}]
     end
   end
 end
 
-if INTEGRATION_DB.adapter_scheme == :mysql
+if DB.adapter_scheme == :mysql
   describe "MySQL bad date/time conversions" do
     after do
-      INTEGRATION_DB.convert_invalid_date_time = false
+      DB.convert_invalid_date_time = false
     end
 
     specify "should raise an exception when a bad date/time is used and convert_invalid_date_time is false" do
-      INTEGRATION_DB.convert_invalid_date_time = false
-      proc{INTEGRATION_DB["SELECT CAST('0000-00-00' AS date)"].single_value}.should raise_error(Sequel::InvalidValue)
-      proc{INTEGRATION_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value}.should raise_error(Sequel::InvalidValue)
-      proc{INTEGRATION_DB["SELECT CAST('25:00:00' AS time)"].single_value}.should raise_error(Sequel::InvalidValue)
+      DB.convert_invalid_date_time = false
+      proc{DB["SELECT CAST('0000-00-00' AS date)"].single_value}.should raise_error(Sequel::InvalidValue)
+      proc{DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value}.should raise_error(Sequel::InvalidValue)
+      proc{DB["SELECT CAST('25:00:00' AS time)"].single_value}.should raise_error(Sequel::InvalidValue)
     end
 
     specify "should not use a nil value bad date/time is used and convert_invalid_date_time is nil or :nil" do
-      INTEGRATION_DB.convert_invalid_date_time = nil
-      INTEGRATION_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == nil
-      INTEGRATION_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == nil
-      INTEGRATION_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == nil
-      INTEGRATION_DB.convert_invalid_date_time = :nil
-      INTEGRATION_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == nil
-      INTEGRATION_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == nil
-      INTEGRATION_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == nil
+      DB.convert_invalid_date_time = nil
+      DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == nil
+      DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == nil
+      DB["SELECT CAST('25:00:00' AS time)"].single_value.should == nil
+      DB.convert_invalid_date_time = :nil
+      DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == nil
+      DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == nil
+      DB["SELECT CAST('25:00:00' AS time)"].single_value.should == nil
     end
 
     specify "should not use a nil value bad date/time is used and convert_invalid_date_time is :string" do
-      INTEGRATION_DB.convert_invalid_date_time = :string
-      INTEGRATION_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == '0000-00-00'
-      INTEGRATION_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == '0000-00-00 00:00:00'
-      INTEGRATION_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == '25:00:00'
+      DB.convert_invalid_date_time = :string
+      DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == '0000-00-00'
+      DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == '0000-00-00 00:00:00'
+      DB["SELECT CAST('25:00:00' AS time)"].single_value.should == '25:00:00'
     end
   end
 
   describe "MySQL multiple result sets" do
     before do
-      INTEGRATION_DB.create_table!(:a){Integer :a}
-      INTEGRATION_DB.create_table!(:b){Integer :b}
-      @ds = INTEGRATION_DB['SELECT * FROM a; SELECT * FROM b']
-      INTEGRATION_DB[:a].insert(10)
-      INTEGRATION_DB[:a].insert(15)
-      INTEGRATION_DB[:b].insert(20)
-      INTEGRATION_DB[:b].insert(25)
+      DB.create_table!(:a){Integer :a}
+      DB.create_table!(:b){Integer :b}
+      @ds = DB['SELECT * FROM a; SELECT * FROM b']
+      DB[:a].insert(10)
+      DB[:a].insert(15)
+      DB[:b].insert(20)
+      DB[:b].insert(25)
     end
     after do
-      INTEGRATION_DB.drop_table?(:a, :b)
+      DB.drop_table?(:a, :b)
     end
 
     specify "should combine all results by default" do
@@ -1248,14 +1248,14 @@ if INTEGRATION_DB.adapter_scheme == :mysql
     end
 
     specify "should work with Database#run" do
-      proc{INTEGRATION_DB.run('SELECT * FROM a; SELECT * FROM b')}.should_not raise_error
-      proc{INTEGRATION_DB.run('SELECT * FROM a; SELECT * FROM b')}.should_not raise_error
+      proc{DB.run('SELECT * FROM a; SELECT * FROM b')}.should_not raise_error
+      proc{DB.run('SELECT * FROM a; SELECT * FROM b')}.should_not raise_error
     end
 
     specify "should work with Database#run and other statements" do
-      proc{INTEGRATION_DB.run('UPDATE a SET a = 1; SELECT * FROM a; DELETE FROM b')}.should_not raise_error
-      INTEGRATION_DB[:a].select_order_map(:a).should == [1, 1]
-      INTEGRATION_DB[:b].all.should == []
+      proc{DB.run('UPDATE a SET a = 1; SELECT * FROM a; DELETE FROM b')}.should_not raise_error
+      DB[:a].select_order_map(:a).should == [1, 1]
+      DB[:b].all.should == []
     end
 
     specify "should split results returned into arrays if split_multiple_result_sets is used" do
@@ -1276,24 +1276,24 @@ if INTEGRATION_DB.adapter_scheme == :mysql
     end
 
     specify "should not allow splitting a graphed dataset" do
-      proc{INTEGRATION_DB[:a].graph(:b, :b=>:a).split_multiple_result_sets}.should raise_error(Sequel::Error)
+      proc{DB[:a].graph(:b, :b=>:a).split_multiple_result_sets}.should raise_error(Sequel::Error)
     end
   end
 end
 
-if INTEGRATION_DB.adapter_scheme == :mysql2
+if DB.adapter_scheme == :mysql2
   describe "Mysql2 streaming" do
     before(:all) do
-      INTEGRATION_DB.create_table!(:a){Integer :a}
-      INTEGRATION_DB.transaction do
+      DB.create_table!(:a){Integer :a}
+      DB.transaction do
         1000.times do |i|
-          INTEGRATION_DB[:a].insert(i)
+          DB[:a].insert(i)
         end
       end
-      @ds = INTEGRATION_DB[:a].stream.order(:a)
+      @ds = DB[:a].stream.order(:a)
     end
     after(:all) do
-      INTEGRATION_DB.drop_table?(:a)
+      DB.drop_table?(:a)
     end
 
     specify "should correctly stream results" do

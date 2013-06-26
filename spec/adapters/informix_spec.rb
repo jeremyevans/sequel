@@ -2,10 +2,10 @@ SEQUEL_ADAPTER_TEST = :informix
 
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-if INTEGRATION_DB.table_exists?(:test)
-  INTEGRATION_DB.drop_table :test
+if DB.table_exists?(:test)
+  DB.drop_table :test
 end
-INTEGRATION_DB.create_table :test do
+DB.create_table :test do
   text :name
   integer :value
   
@@ -14,16 +14,16 @@ end
 
 describe "A Informix database" do
   specify "should provide disconnect functionality" do
-    INTEGRATION_DB.execute("select user from dual")
-    INTEGRATION_DB.pool.size.should == 1
-    INTEGRATION_DB.disconnect
-    INTEGRATION_DB.pool.size.should == 0
+    DB.execute("select user from dual")
+    DB.pool.size.should == 1
+    DB.disconnect
+    DB.pool.size.should == 0
   end
 end
 
 describe "A Informix dataset" do
   before do
-    @d = INTEGRATION_DB[:test]
+    @d = DB[:test]
     @d.delete # remove all records
   end
   
@@ -76,7 +76,7 @@ describe "A Informix dataset" do
   end
   
   specify "should support transactions" do
-    INTEGRATION_DB.transaction do
+    DB.transaction do
       @d << {:name => 'abc', :value => 1}
     end
 

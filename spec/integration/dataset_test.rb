@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Simple Dataset operations" do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:items) do
       primary_key :id
       Integer :number
@@ -232,7 +232,7 @@ end
 
 describe "Simple dataset operations with nasty table names" do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @table = :"i`t' [e]\"m\\s" 
     @qi = @db.quote_identifiers?
     @db.quote_identifiers = true
@@ -259,14 +259,14 @@ end
 
 describe Sequel::Dataset do
   before do
-    INTEGRATION_DB.create_table!(:test) do
+    DB.create_table!(:test) do
       String :name
       Integer :value
     end
-    @d = INTEGRATION_DB[:test]
+    @d = DB[:test]
   end
   after do
-    INTEGRATION_DB.drop_table?(:test)
+    DB.drop_table?(:test)
   end
 
   specify "should return the correct record count" do
@@ -349,49 +349,49 @@ describe Sequel::Database do
      "\\'dingo",
      "\\\\''dingo",
     ].each do |str|
-      INTEGRATION_DB.get(Sequel.cast(str, String)).should == str
+      DB.get(Sequel.cast(str, String)).should == str
       str = "1#{str}1"
-      INTEGRATION_DB.get(Sequel.cast(str, String)).should == str
+      DB.get(Sequel.cast(str, String)).should == str
       str = "#{str}#{str}"
-      INTEGRATION_DB.get(Sequel.cast(str, String)).should == str
+      DB.get(Sequel.cast(str, String)).should == str
     end
   end
 
   cspecify "should properly escape binary data", [:odbc], [:jdbc, :hsqldb], :oracle do
-    INTEGRATION_DB.get(Sequel.cast(Sequel.blob("\1\2\3"), File).as(:a)).should == "\1\2\3"
+    DB.get(Sequel.cast(Sequel.blob("\1\2\3"), File).as(:a)).should == "\1\2\3"
   end
 
   cspecify "should properly escape identifiers", :db2, :oracle do
-    INTEGRATION_DB.create_table(:"\\'\"[]"){Integer :id}
-    INTEGRATION_DB.drop_table(:"\\'\"[]")
+    DB.create_table(:"\\'\"[]"){Integer :id}
+    DB.drop_table(:"\\'\"[]")
   end
 
   specify "should have a working table_exists?" do
     t = :basdfdsafsaddsaf
-    INTEGRATION_DB.drop_table?(t)
-    INTEGRATION_DB.table_exists?(t).should == false
-    INTEGRATION_DB.create_table(t){Integer :a}
+    DB.drop_table?(t)
+    DB.table_exists?(t).should == false
+    DB.create_table(t){Integer :a}
     begin
-      INTEGRATION_DB.table_exists?(t).should == true
+      DB.table_exists?(t).should == true
     ensure
-      INTEGRATION_DB.drop_table(t)
+      DB.drop_table(t)
     end
   end
 end
 
 describe Sequel::Dataset do
   before do
-    INTEGRATION_DB.create_table! :items do
+    DB.create_table! :items do
       primary_key :id 
       Integer :value
     end 
-    @d = INTEGRATION_DB[:items]
+    @d = DB[:items]
     @d << {:value => 123}
     @d << {:value => 456}
     @d << {:value => 789}
   end 
   after do
-    INTEGRATION_DB.drop_table?(:items)
+    DB.drop_table?(:items)
   end 
   
   specify "should correctly return avg" do
@@ -413,14 +413,14 @@ end
 
 describe "Simple Dataset operations" do
   before do
-    INTEGRATION_DB.create_table!(:items) do
+    DB.create_table!(:items) do
       Integer :number
       TrueClass :flag
     end
-    @ds = INTEGRATION_DB[:items]
+    @ds = DB[:items]
   end
   after do
-    INTEGRATION_DB.drop_table?(:items)
+    DB.drop_table?(:items)
   end
 
   specify "should deal with boolean conditions correctly" do
@@ -439,18 +439,18 @@ end
 
 describe "Simple Dataset operations in transactions" do
   before do
-    INTEGRATION_DB.create_table!(:items) do
+    DB.create_table!(:items) do
       primary_key :id
       integer :number
     end
-    @ds = INTEGRATION_DB[:items]
+    @ds = DB[:items]
   end
   after do
-    INTEGRATION_DB.drop_table?(:items)
+    DB.drop_table?(:items)
   end
 
   cspecify "should insert correctly with a primary key specified inside a transaction", :db2, :mssql do
-    INTEGRATION_DB.transaction do
+    DB.transaction do
       @ds.insert(:id=>100, :number=>20)
       @ds.count.should == 1
       @ds.order(:id).all.should == [{:id=>100, :number=>20}]
@@ -458,7 +458,7 @@ describe "Simple Dataset operations in transactions" do
   end
   
   specify "should have insert return primary key value inside a transaction" do
-    INTEGRATION_DB.transaction do
+    DB.transaction do
       @ds.insert(:number=>20).should == 1
       @ds.count.should == 1
       @ds.order(:id).all.should == [{:id=>1, :number=>20}]
@@ -466,23 +466,23 @@ describe "Simple Dataset operations in transactions" do
   end
   
   specify "should support for_update" do
-    INTEGRATION_DB.transaction{@ds.for_update.all.should == []}
+    DB.transaction{@ds.for_update.all.should == []}
   end
 end
 
 describe "Dataset UNION, EXCEPT, and INTERSECT" do
   before do
-    INTEGRATION_DB.create_table!(:i1){integer :number}
-    INTEGRATION_DB.create_table!(:i2){integer :number}
-    @ds1 = INTEGRATION_DB[:i1]
+    DB.create_table!(:i1){integer :number}
+    DB.create_table!(:i2){integer :number}
+    @ds1 = DB[:i1]
     @ds1.insert(:number=>10)
     @ds1.insert(:number=>20)
-    @ds2 = INTEGRATION_DB[:i2]
+    @ds2 = DB[:i2]
     @ds2.insert(:number=>10)
     @ds2.insert(:number=>30)
   end
   after do
-    INTEGRATION_DB.drop_table?(:i1, :i2, :i3)
+    DB.drop_table?(:i1, :i2, :i3)
   end
   
   specify "should give the correct results for simple UNION, EXCEPT, and INTERSECT" do
@@ -516,8 +516,8 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
   end
 
   specify "should give the correct results for compound UNION, EXCEPT, and INTERSECT" do
-    INTEGRATION_DB.create_table!(:i3){integer :number}
-    @ds3 = INTEGRATION_DB[:i3]
+    DB.create_table!(:i3){integer :number}
+    @ds3 = DB[:i3]
     @ds3.insert(:number=>10)
     @ds3.insert(:number=>40)
 
@@ -546,10 +546,10 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
   end
 end
 
-if INTEGRATION_DB.dataset.supports_cte?
+if DB.dataset.supports_cte?
   describe "Common Table Expressions" do
     before(:all) do
-      @db = INTEGRATION_DB
+      @db = DB
       @db.create_table!(:i1){Integer :id; Integer :parent_id}
       @ds = @db[:i1]
       @ds.insert(:id=>1)
@@ -601,10 +601,10 @@ if INTEGRATION_DB.dataset.supports_cte?
   end
 end
 
-if INTEGRATION_DB.dataset.supports_cte?(:update) # Assume INSERT and DELETE support as well
+if DB.dataset.supports_cte?(:update) # Assume INSERT and DELETE support as well
   describe "Common Table Expressions in INSERT/UPDATE/DELETE" do
     before do
-      @db = INTEGRATION_DB
+      @db = DB
       @db.create_table!(:i1){Integer :id}
       @ds = @db[:i1]
       @ds2 = @ds.with(:t, @ds)
@@ -626,10 +626,10 @@ if INTEGRATION_DB.dataset.supports_cte?(:update) # Assume INSERT and DELETE supp
   end
 end
 
-if INTEGRATION_DB.dataset.supports_returning?(:insert)
+if DB.dataset.supports_returning?(:insert)
   describe "RETURNING clauses in INSERT" do
     before do
-      @db = INTEGRATION_DB
+      @db = DB
       @db.create_table!(:i1){Integer :id; Integer :foo}
       @ds = @db[:i1]
     end
@@ -651,10 +651,10 @@ if INTEGRATION_DB.dataset.supports_returning?(:insert)
   end
 end
 
-if INTEGRATION_DB.dataset.supports_returning?(:update) # Assume DELETE support as well
+if DB.dataset.supports_returning?(:update) # Assume DELETE support as well
   describe "RETURNING clauses in UPDATE/DELETE" do
     before do
-      @db = INTEGRATION_DB
+      @db = DB
       @db.create_table!(:i1){Integer :id; Integer :foo}
       @ds = @db[:i1]
       @ds.insert(1, 2)
@@ -687,10 +687,10 @@ if INTEGRATION_DB.dataset.supports_returning?(:update) # Assume DELETE support a
   end
 end
 
-if INTEGRATION_DB.dataset.supports_window_functions?
+if DB.dataset.supports_window_functions?
   describe "Window Functions" do
     before(:all) do
-      @db = INTEGRATION_DB
+      @db = DB
       @db.create_table!(:i1){Integer :id; Integer :group_id; Integer :amount}
       @ds = @db[:i1].order(:id)
       @ds.insert(:id=>1, :group_id=>1, :amount=>1)
@@ -741,7 +741,7 @@ end
 
 describe Sequel::SQL::Constants do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @ds = @db[:constants]
     @c = proc do |v|
       case v
@@ -788,7 +788,7 @@ end
 
 describe "Sequel::Dataset#import and #multi_insert" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:imp){Integer :i}
     @ids = @db[:imp].order(:i)
   end
@@ -831,7 +831,7 @@ end
 
 describe "Sequel::Dataset#import and #multi_insert :return=>:primary_key " do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:imp){primary_key :id; Integer :i}
     @ds = @db[:imp]
   end
@@ -854,7 +854,7 @@ end
 
 describe "Sequel::Dataset convenience methods" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:a){Integer :a; Integer :b; Integer :c}
     @ds = @db[:a]
     @ds.insert(1, 3, 5)
@@ -870,17 +870,17 @@ describe "Sequel::Dataset convenience methods" do
   it "#group_rollup should include hierarchy of groupings" do
     @ds.group_by(:a).group_rollup.select_map([:a, Sequel.function(:sum, :b).cast(Integer).as(:b), Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 10, 16], [2, 7, 11], [nil, 17, 27]]
     @ds.group_by(:a, :b).group_rollup.select_map([:a, :b, Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 3, 11], [1, 4, 5], [1, nil, 16], [2, 3, 5], [2, 4, 6], [2, nil, 11], [nil, nil, 27]]
-  end if INTEGRATION_DB.dataset.supports_group_rollup?
+  end if DB.dataset.supports_group_rollup?
 
   it "#group_cube should include all combinations of groupings" do
     @ds.group_by(:a).group_cube.select_map([:a, Sequel.function(:sum, :b).cast(Integer).as(:b), Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 10, 16], [2, 7, 11], [nil, 17, 27]]
     @ds.group_by(:a, :b).group_cube.select_map([:a, :b, Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.should == [[1, 3, 11], [1, 4, 5], [1, nil, 16], [2, 3, 5], [2, 4, 6], [2, nil, 11], [nil, 3, 16], [nil, 4, 11], [nil, nil, 27]]
-  end if INTEGRATION_DB.dataset.supports_group_cube?
+  end if DB.dataset.supports_group_cube?
 end
 
 describe "Sequel::Dataset convenience methods" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:a){Integer :a; Integer :b}
     @ds = @db[:a].order(:a)
   end
@@ -958,7 +958,7 @@ end
   
 describe "Sequel::Dataset main SQL methods" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:d){Integer :a; Integer :b}
     @ds = @db[:d].order(:a)
   end
@@ -1029,7 +1029,7 @@ end
 
 describe "Sequel::Dataset convenience methods" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:a){Integer :a; Integer :b; Integer :c; Integer :d}
     @ds = @db[:a].order(:a)
   end
@@ -1131,7 +1131,7 @@ end
 
 describe "Sequel::Dataset DSL support" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:a){Integer :a; Integer :b}
     @ds = @db[:a].order(:a)
   end
@@ -1365,7 +1365,7 @@ end
 
 describe "SQL Extract Function" do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:a){DateTime :a}
     @ds = @db[:a].order(:a)
   end
@@ -1388,7 +1388,7 @@ end
 
 describe "Dataset string methods" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     csc = {}
     cic = {}
     csc[:collate] = @db.dataset_class::CASE_SENSITIVE_COLLATION if defined? @db.dataset_class::CASE_SENSITIVE_COLLATION
@@ -1493,7 +1493,7 @@ describe "Dataset string methods" do
     @ds.filter(Sequel.expr(:b).ilike("#{@ds.escape_like('Bar%')}%")).select_order_map(:b).should == ['bar%', 'bar%.', 'bar%..']
   end
   
-  if INTEGRATION_DB.dataset.supports_regexp?
+  if DB.dataset.supports_regexp?
     it "#like with regexp return matching rows" do
       @ds.insert('foo', 'bar')
       @ds.filter(Sequel.expr(:a).like(/fo/)).all.should == [{:a=>'foo', :b=>'bar'}]
@@ -1546,7 +1546,7 @@ describe "Dataset identifier methods" do
         upcase.reverse
       end
     end
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:a){Integer :ab}
     @db[:a].insert(1)
   end
@@ -1577,7 +1577,7 @@ end
 
 describe "Dataset defaults and overrides" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:a){Integer :a}
     @ds = @db[:a].order(:a).extension(:set_overrides)
   end
@@ -1603,10 +1603,10 @@ describe "Dataset defaults and overrides" do
   end
 end
 
-if INTEGRATION_DB.dataset.supports_modifying_joins?
+if DB.dataset.supports_modifying_joins?
   describe "Modifying joined datasets" do
     before do
-      @db = INTEGRATION_DB
+      @db = DB
       @db.create_table!(:a){Integer :a; Integer :d}
       @db.create_table!(:b){Integer :b; Integer :e}
       @db.create_table!(:c){Integer :c; Integer :f}
@@ -1642,7 +1642,7 @@ end
 
 describe "Emulated functions" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:a){String :a}
     @ds = @db[:a]
   end

@@ -997,26 +997,26 @@ describe "Model#save" do
       end
     end
     @m = @c.load(:id => 4, :x=>6)
-    MODEL_DB.reset
+    DB.reset
   end
 
   specify "should save only if validations pass" do
     @m.raise_on_save_failure = false
     @m.should_not be_valid
     @m.save
-    MODEL_DB.sqls.should be_empty
+    DB.sqls.should be_empty
     
     @m.x = 7
     @m.should be_valid
     @m.save.should_not be_false
-    MODEL_DB.sqls.should == ['UPDATE people SET x = 7 WHERE (id = 4)']
+    DB.sqls.should == ['UPDATE people SET x = 7 WHERE (id = 4)']
   end
   
   specify "should skip validations if the :validate=>false option is used" do
     @m.raise_on_save_failure = false
     @m.should_not be_valid
     @m.save(:validate=>false)
-    MODEL_DB.sqls.should == ['UPDATE people SET x = 6 WHERE (id = 4)']
+    DB.sqls.should == ['UPDATE people SET x = 6 WHERE (id = 4)']
   end
     
   specify "should raise error if validations fail and raise_on_save_faiure is true" do

@@ -2,10 +2,10 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 # DB2 does not seem to support USING joins in every version; it seems to be
 # valid expression in DB2 iSeries UDB though.
-unless !INTEGRATION_DB.dataset.supports_join_using? || Sequel.guarded?(:db2)
+unless !DB.dataset.supports_join_using? || Sequel.guarded?(:db2)
 describe "Class Table Inheritance Plugin" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.instance_variable_set(:@schemas, {})
     @db.drop_table?(:staff, :executives, :managers, :employees)
     @db.create_table(:employees) do
@@ -148,7 +148,7 @@ end
 
 describe "Many Through Many Plugin" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.instance_variable_set(:@schemas, {})
     @db.drop_table?(:albums_artists, :albums, :artists)
     @db.create_table(:albums) do
@@ -396,7 +396,7 @@ end
 
 describe "Lazy Attributes plugin" do 
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:items) do
       primary_key :id
       String :name
@@ -440,7 +440,7 @@ end
 
 describe "Tactical Eager Loading Plugin" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.instance_variable_set(:@schemas, {})
     @db.create_table!(:artists) do
       primary_key :id
@@ -495,7 +495,7 @@ end
 
 describe "Touch plugin" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.drop_table? :albums_artists, :albums, :artists
     @db.create_table(:artists) do
       primary_key :id
@@ -585,7 +585,7 @@ end
 
 describe "Serialization plugin" do 
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:items) do
       primary_key :id
       String :stuff
@@ -612,7 +612,7 @@ end
 
 describe "OptimisticLocking plugin" do 
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:people) do
       primary_key :id
       String :name
@@ -654,7 +654,7 @@ end
 
 describe "Composition plugin" do 
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:events) do
       primary_key :id
       Integer :year
@@ -706,10 +706,10 @@ describe "Composition plugin" do
 end
 
 # DB2's implemention of CTE is too limited to use this plugin
-if INTEGRATION_DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
+if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
   describe "RcteTree Plugin" do
     before(:all) do
-      @db = INTEGRATION_DB
+      @db = DB
       @db.create_table!(:nodes) do
         primary_key :id
         Integer :parent_id
@@ -941,7 +941,7 @@ end
 
 describe "Instance Filters plugin" do 
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:items) do
       primary_key :id
       String :name
@@ -1004,7 +1004,7 @@ end
 
 describe "UpdatePrimaryKey plugin" do 
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:t) do
       Integer :a, :primary_key=>true
       Integer :b
@@ -1062,7 +1062,7 @@ end
 
 describe "AssociationPks plugin" do 
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.drop_table?(:albums_tags, :albums_vocalists, :vocalists_instruments, :vocalists_hits, :hits, :instruments, :vocalists, :tags, :albums, :artists)
     @db.create_table(:artists) do
       primary_key :id
@@ -1387,7 +1387,7 @@ end
 
 describe "List plugin without a scope" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:sites) do
       primary_key :id
       String :name
@@ -1461,7 +1461,7 @@ end
 
 describe "List plugin with a scope" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:pages) do
       primary_key :id
       String :name
@@ -1539,7 +1539,7 @@ end
 
 describe "Sequel::Plugins::Tree" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
   end
 
   describe "with natural database order" do
@@ -1704,7 +1704,7 @@ end
 
 describe "Sequel::Plugins::PreparedStatements" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:ps_test) do
       primary_key :id
       String :name
@@ -1777,7 +1777,7 @@ end
 
 describe "Caching plugins" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.drop_table?(:albums, :artists)
     @db.create_table(:artists) do
       primary_key :id
@@ -1840,7 +1840,7 @@ end
 
 describe "Sequel::Plugins::ConstraintValidations" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.extension(:constraint_validations)
     @db.create_constraint_validations_table
     @ds = @db[:cv_test]
@@ -2029,7 +2029,7 @@ describe "date_arithmetic extension" do
   end
 
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.extension(:date_arithmetic)
     if @db.database_type == :sqlite
       @db.use_timestamp_timezones = false

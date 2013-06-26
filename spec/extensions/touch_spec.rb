@@ -15,7 +15,7 @@ describe "Touch plugin" do
     @Album.many_to_one :artist, :class=>@Artist
 
     @a = @Artist.load(:id=>1)
-    MODEL_DB.reset
+    DB.reset
   end
 
   specify "should default to using Time.now when setting the column values for model instances" do
@@ -23,45 +23,45 @@ describe "Touch plugin" do
     c.plugin :touch
     c.columns :id, :updated_at
     c.load(:id=>1).touch
-    MODEL_DB.sqls.first.should =~ /UPDATE a SET updated_at = '[-0-9 :.]+' WHERE \(id = 1\)/
+    DB.sqls.first.should =~ /UPDATE a SET updated_at = '[-0-9 :.]+' WHERE \(id = 1\)/
   end
 
   specify "should allow #touch instance method for updating the updated_at column" do
     @Artist.plugin :touch
     @a.touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
   end
 
   specify "should have #touch take an argument for the column to touch" do
     @Artist.plugin :touch
     @a.touch(:modified_on)
-    MODEL_DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 1)"]
   end
 
   specify "should be able to specify the default column to touch in the plugin call using the :column option" do
     @Artist.plugin :touch, :column=>:modified_on
     @a.touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 1)"]
   end
 
   specify "should be able to specify the default column to touch using the touch_column model accessor" do
     @Artist.plugin :touch
     @Artist.touch_column = :modified_on
     @a.touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 1)"]
   end
 
   specify "should be able to specify the associations to touch in the plugin call using the :associations option" do
     @Artist.plugin :touch, :associations=>:albums
     @a.touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
+    DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
       "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (albums.artist_id = 1)"]
   end
 
   specify "should be able to give an array to the :associations option specifying multiple associations" do
     @Album.plugin :touch, :associations=>[:artist, :followup_albums]
     @Album.load(:id=>4, :artist_id=>1).touch
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.shift.should == "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"
     sqls.sort.should == ["UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
       "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 1)"]
@@ -70,21 +70,21 @@ describe "Touch plugin" do
   specify "should be able to give a hash to the :associations option specifying the column to use for each association" do
     @Artist.plugin :touch, :associations=>{:albums=>:modified_on}
     @a.touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
+    DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
       "UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.artist_id = 1)"]
   end
 
   specify "should default to using the touch_column as the default touch column for associations" do
     @Artist.plugin :touch, :column=>:modified_on, :associations=>:albums
     @a.touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 1)",
+    DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 1)",
       "UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.artist_id = 1)"]
   end
 
   specify "should allow the mixed use of symbols and hashes inside an array for the :associations option" do
     @Album.plugin :touch, :associations=>[:artist, {:followup_albums=>:modified_on}]
     @Album.load(:id=>4, :artist_id=>1).touch
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.shift.should == "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"
     sqls.sort.should == ["UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
       "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 1)"]
@@ -94,7 +94,7 @@ describe "Touch plugin" do
     @Album.plugin :touch
     @Album.touch_associations(:artist, {:followup_albums=>:modified_on})
     @Album.load(:id=>4, :artist_id=>1).touch
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.shift.should == "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"
     sqls.sort.should == ["UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
       "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 1)"]
@@ -104,7 +104,7 @@ describe "Touch plugin" do
     @Album.plugin :touch
     @Album.touch_associations(:artist, {:followup_albums=>:modified_on})
     @Album.load(:id=>4, :artist_id=>1).destroy
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.shift.should == "DELETE FROM albums WHERE id = 4"
     sqls.sort.should == ["UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.original_album_id = 4)",
       "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 1)"]
@@ -113,7 +113,7 @@ describe "Touch plugin" do
   specify "should be able to touch many_to_one associations" do
     @Album.plugin :touch, :associations=>:artist
     @Album.load(:id=>3, :artist_id=>4).touch
-    MODEL_DB.sqls.should == ["UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 3)",
+    DB.sqls.should == ["UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 3)",
       "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 4)"]
   end
 
@@ -121,7 +121,7 @@ describe "Touch plugin" do
     @Artist.one_to_one :album, :class=>@Album, :key=>:artist_id
     @Artist.plugin :touch, :associations=>:album
     @a.touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
+    DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
       "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (albums.artist_id = 1)"]
   end
 
@@ -129,7 +129,7 @@ describe "Touch plugin" do
     @Artist.many_to_many :albums, :class=>@Album, :left_key=>:artist_id, :join_table=>:aa
     @Artist.plugin :touch, :associations=>:albums
     @a.touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
+    DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
       "SELECT albums.* FROM albums INNER JOIN aa ON ((aa.album_id = albums.id) AND (aa.artist_id = 1))",
       "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
   end
@@ -139,7 +139,7 @@ describe "Touch plugin" do
     @Artist.many_through_many :albums, [[:aa, :artist_id, :album_id]], :class=>@Album
     @Artist.plugin :touch, :associations=>:albums
     @a.touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
+    DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
       "SELECT albums.* FROM albums INNER JOIN aa ON ((aa.album_id = albums.id) AND (aa.artist_id = 1))",
       "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
   end
@@ -147,17 +147,17 @@ describe "Touch plugin" do
   specify "should handle touching many_to_one associations with no associated object" do
     @Album.plugin :touch, :associations=>:artist
     @Album.load(:id=>3, :artist_id=>nil).touch
-    MODEL_DB.sqls.should == ["UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 3)"]
+    DB.sqls.should == ["UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 3)"]
   end
 
   specify "should not update a column that doesn't exist" do
     @Album.plugin :touch, :column=>:x
     a = @Album.load(:id=>1)
     a.touch
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     a.artist_id = 1
     a.touch
-    MODEL_DB.sqls.should == ['UPDATE albums SET artist_id = 1 WHERE (id = 1)']
+    DB.sqls.should == ['UPDATE albums SET artist_id = 1 WHERE (id = 1)']
   end
 
   specify "should raise an error if given a column argument in touch that doesn't exist" do
@@ -174,21 +174,21 @@ describe "Touch plugin" do
     @Artist.plugin :touch
     c1 = Class.new(@Artist)
     c1.load(:id=>4).touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"]
+    DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 4)"]
 
     c1.touch_column = :modified_on
     c1.touch_associations :albums
     c1.load(:id=>1).touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 1)",
+    DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 1)",
       "UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.artist_id = 1)"]
 
     @a.touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
 
     @Artist.plugin :touch, :column=>:modified_on, :associations=>:albums
     c2 = Class.new(@Artist)
     c2.load(:id=>4).touch
-    MODEL_DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 4)",
+    DB.sqls.should == ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 4)",
       "UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.artist_id = 4)"]
   end
 end

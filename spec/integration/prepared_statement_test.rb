@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Prepared Statements and Bound Arguments" do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:items) do
       primary_key :id
       integer :numb
@@ -258,7 +258,7 @@ end
 
 describe "Bound Argument Types" do
   before(:all) do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:items) do
       primary_key :id
       Date :d
@@ -343,9 +343,9 @@ end
 
 describe "Dataset#unbind" do
   before do
-    @ds = ds = INTEGRATION_DB[:items]
+    @ds = ds = DB[:items]
     @ct = proc do |t, v|
-      INTEGRATION_DB.create_table!(:items) do
+      DB.create_table!(:items) do
         column :c, t
       end
       ds.insert(:c=>v)
@@ -353,7 +353,7 @@ describe "Dataset#unbind" do
     @u = proc{|ds1| ds2, bv = ds1.unbind; ds2.call(:first, bv)}
   end
   after do
-    INTEGRATION_DB.drop_table?(:items)
+    DB.drop_table?(:items)
   end
   
   specify "should unbind values assigned to equality and inequality statements" do
@@ -374,7 +374,7 @@ describe "Dataset#unbind" do
     @ct[String, 'foo']
     @u[@ds.filter(:c=>'foo')].should == {:c=>'foo'}
 
-    INTEGRATION_DB.create_table!(:items) do
+    DB.create_table!(:items) do
       BigDecimal :c, :size=>[15,2]
     end
     @ds.insert(:c=>BigDecimal.new('1.1'))
@@ -395,7 +395,7 @@ describe "Dataset#unbind" do
   end
 
   specify "should handle deep nesting" do
-    INTEGRATION_DB.create_table!(:items) do
+    DB.create_table!(:items) do
       Integer :a
       Integer :b
       Integer :c

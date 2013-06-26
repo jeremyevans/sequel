@@ -4,63 +4,63 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "An Oracle database" do
   before(:all) do
-    INTEGRATION_DB.create_table!(:items) do
+    DB.create_table!(:items) do
       String :name, :size => 50
       Integer :value
       Date :date_created
       index :value
     end
 
-    INTEGRATION_DB.create_table!(:books) do
+    DB.create_table!(:books) do
       Integer :id
       String :title, :size => 50
       Integer :category_id
     end
 
-    INTEGRATION_DB.create_table!(:categories) do
+    DB.create_table!(:categories) do
       Integer :id
       String :cat_name, :size => 50
     end
-    @d = INTEGRATION_DB[:items]
+    @d = DB[:items]
   end
   after do
     @d.delete
   end
   after(:all) do
-    INTEGRATION_DB.drop_table?(:items, :books, :categories)
+    DB.drop_table?(:items, :books, :categories)
   end
 
   specify "should provide disconnect functionality" do
-    INTEGRATION_DB.execute("select user from dual")
-    INTEGRATION_DB.pool.size.should == 1
-    INTEGRATION_DB.disconnect
-    INTEGRATION_DB.pool.size.should == 0
+    DB.execute("select user from dual")
+    DB.pool.size.should == 1
+    DB.disconnect
+    DB.pool.size.should == 0
   end
 
   specify "should have working view_exists?" do
     begin
-      INTEGRATION_DB.view_exists?(:cats).should be_false
-      INTEGRATION_DB.create_view(:cats, INTEGRATION_DB[:categories])
-      INTEGRATION_DB.view_exists?(:cats).should be_true
-      om = INTEGRATION_DB.identifier_output_method
-      im = INTEGRATION_DB.identifier_input_method
-      INTEGRATION_DB.identifier_output_method = :reverse
-      INTEGRATION_DB.identifier_input_method = :reverse
-      INTEGRATION_DB.view_exists?(:STAC).should be_true
-      INTEGRATION_DB.view_exists?(:cats).should be_false
+      DB.view_exists?(:cats).should be_false
+      DB.create_view(:cats, DB[:categories])
+      DB.view_exists?(:cats).should be_true
+      om = DB.identifier_output_method
+      im = DB.identifier_input_method
+      DB.identifier_output_method = :reverse
+      DB.identifier_input_method = :reverse
+      DB.view_exists?(:STAC).should be_true
+      DB.view_exists?(:cats).should be_false
     ensure
-      INTEGRATION_DB.identifier_output_method = om
-      INTEGRATION_DB.identifier_input_method = im
-      INTEGRATION_DB.drop_view(:cats)
+      DB.identifier_output_method = om
+      DB.identifier_input_method = im
+      DB.drop_view(:cats)
     end
   end
 
   specify "should be able to get current sequence value with SQL" do
     begin
-      INTEGRATION_DB.create_table!(:foo){primary_key :id}
-      INTEGRATION_DB.fetch('SELECT seq_foo_id.nextval FROM DUAL').single_value.should == 1
+      DB.create_table!(:foo){primary_key :id}
+      DB.fetch('SELECT seq_foo_id.nextval FROM DUAL').single_value.should == 1
     ensure
-      INTEGRATION_DB.drop_table(:foo)
+      DB.drop_table(:foo)
     end
   end
   
@@ -75,19 +75,19 @@ describe "An Oracle database" do
       [:date_created, [:datetime, false, true, nil]]]
      
     {:books => books_schema, :categories => categories_schema, :items => items_schema}.each_pair do |table, expected_schema|
-      schema = INTEGRATION_DB.schema(table)
+      schema = DB.schema(table)
       schema.should_not be_nil
       schema.map{|c, s| [c, s.values_at(:type, :primary_key, :allow_null, :ruby_default)]}.should == expected_schema
     end
   end
   
   specify "should create a temporary table" do
-    INTEGRATION_DB.create_table! :test_tmp, :temp => true do
+    DB.create_table! :test_tmp, :temp => true do
       varchar2 :name, :size => 50
       primary_key :id, :integer, :null => false
       index :name, :unique => true
     end
-    INTEGRATION_DB.drop_table?(:test_tmp)
+    DB.drop_table?(:test_tmp)
   end
 
   specify "should return the correct record count" do
@@ -222,7 +222,7 @@ describe "An Oracle database" do
   end
   
   specify "should support transactions" do
-    INTEGRATION_DB.transaction do
+    DB.transaction do
       @d << {:name => 'abc', :value => 1}
     end
 
@@ -230,14 +230,14 @@ describe "An Oracle database" do
   end
 
   specify "should return correct result" do
-    @d1 = INTEGRATION_DB[:books]
+    @d1 = DB[:books]
     @d1.delete
     @d1 << {:id => 1, :title => 'aaa', :category_id => 100}
     @d1 << {:id => 2, :title => 'bbb', :category_id => 100}
     @d1 << {:id => 3, :title => 'ccc', :category_id => 101}
     @d1 << {:id => 4, :title => 'ddd', :category_id => 102}
     
-    @d2 = INTEGRATION_DB[:categories]
+    @d2 = DB[:categories]
     @d2.delete
     @d2 << {:id => 100, :cat_name => 'ruby'}
     @d2 << {:id => 101, :cat_name => 'rails'}
@@ -267,7 +267,7 @@ describe "An Oracle database" do
   end  
 
   specify "should allow columns to be renamed" do
-    @d1 = INTEGRATION_DB[:books]
+    @d1 = DB[:books]
     @d1.delete
     @d1 << {:id => 1, :title => 'aaa', :category_id => 100}
     @d1 << {:id => 2, :title => 'bbb', :category_id => 100}
@@ -281,14 +281,14 @@ describe "An Oracle database" do
   end
 
   specify "nested queries should work" do
-    INTEGRATION_DB[:books].select(:title).group_by(:title).count.should == 2
+    DB[:books].select(:title).group_by(:title).count.should == 2
   end
 
   specify "#for_update should use FOR UPDATE" do
-    INTEGRATION_DB[:books].for_update.sql.should == 'SELECT * FROM "BOOKS" FOR UPDATE'
+    DB[:books].for_update.sql.should == 'SELECT * FROM "BOOKS" FOR UPDATE'
   end
 
   specify "#lock_style should accept symbols" do
-    INTEGRATION_DB[:books].lock_style(:update).sql.should == 'SELECT * FROM "BOOKS" FOR UPDATE'
+    DB[:books].lock_style(:update).sql.should == 'SELECT * FROM "BOOKS" FOR UPDATE'
   end
 end

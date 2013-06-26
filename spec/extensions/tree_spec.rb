@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe Sequel::Model, "tree plugin" do
   def klass(opts={})
-    @db = MODEL_DB
+    @db = DB
     c = Class.new(Sequel::Model(@db[:nodes]))
     c.class_eval do
       def self.name; 'Node'; end

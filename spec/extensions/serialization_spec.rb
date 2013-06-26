@@ -9,21 +9,21 @@ describe "Serialization plugin" do
       no_primary_key
       columns :id, :abc, :def, :ghi
     end
-    MODEL_DB.reset
+    DB.reset
   end
   
   it "should allow setting additional serializable attributes via plugin :serialization call" do
     @c.plugin :serialization, :yaml, :abc
     @c.create(:abc => 1, :def=> 2)
-    MODEL_DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n(\.\.\.\n)?', 2|2, '--- 1\n(\.\.\.\n)?')\)/
+    DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n(\.\.\.\n)?', 2|2, '--- 1\n(\.\.\.\n)?')\)/
 
     @c.plugin :serialization, :marshal, :def
     @c.create(:abc => 1, :def=> 1)
-    MODEL_DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n(\.\.\.\n)?', 'BAhpBg==\n'|'BAhpBg==\n', '--- 1\n(\.\.\.\n)?')\)/
+    DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n(\.\.\.\n)?', 'BAhpBg==\n'|'BAhpBg==\n', '--- 1\n(\.\.\.\n)?')\)/
     
     @c.plugin :serialization, :json, :ghi
     @c.create(:ghi => [123])
-    MODEL_DB.sqls.last.should =~ /INSERT INTO items \((ghi)\) VALUES \('\[123\]'\)/
+    DB.sqls.last.should =~ /INSERT INTO items \((ghi)\) VALUES \('\[123\]'\)/
   end
 
   it "should allow serializing attributes to yaml" do
@@ -31,7 +31,7 @@ describe "Serialization plugin" do
     @c.create(:abc => 1)
     @c.create(:abc => "hello")
 
-    MODEL_DB.sqls.map{|s| s.sub("...\n", '')}.should == ["INSERT INTO items (abc) VALUES ('--- 1\n')", "INSERT INTO items (abc) VALUES ('--- hello\n')"]
+    DB.sqls.map{|s| s.sub("...\n", '')}.should == ["INSERT INTO items (abc) VALUES ('--- 1\n')", "INSERT INTO items (abc) VALUES ('--- hello\n')"]
   end
 
   it "serialized_columns should be the columns serialized" do
@@ -45,7 +45,7 @@ describe "Serialization plugin" do
     @c.create(:abc => "hello")
     x = [Marshal.dump("hello")].pack('m')
 
-    MODEL_DB.sqls.should == [ \
+    DB.sqls.should == [ \
       "INSERT INTO items (abc) VALUES ('BAhpBg==\n')", \
       "INSERT INTO items (abc) VALUES ('#{x}')", \
     ]
@@ -57,7 +57,7 @@ describe "Serialization plugin" do
     @c.create(:ghi => ["hello"])
     
     x = ["hello"].to_json
-    MODEL_DB.sqls.should == [ \
+    DB.sqls.should == [ \
       "INSERT INTO items (ghi) VALUES ('[1]')", \
       "INSERT INTO items (ghi) VALUES ('#{x}')", \
     ]
@@ -66,7 +66,7 @@ describe "Serialization plugin" do
   it "should allow serializing attributes using arbitrary callable" do
     @c.plugin :serialization, [proc{|s| s.reverse}, proc{}], :abc
     @c.create(:abc => "hello")
-    MODEL_DB.sqls.should == ["INSERT INTO items (abc) VALUES ('olleh')"]
+    DB.sqls.should == ["INSERT INTO items (abc) VALUES ('olleh')"]
   end
   
   it "should raise an error if specificing serializer as an unregistered symbol" do
@@ -87,7 +87,7 @@ describe "Serialization plugin" do
 
     o.update(:abc => 23)
     @c.create(:abc => [1, 2, 3])
-    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+    DB.sqls.should == ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')",
       "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
@@ -107,7 +107,7 @@ describe "Serialization plugin" do
 
     o.update(:abc => 23)
     @c.create(:abc => [1, 2, 3])
-    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+    DB.sqls.should == ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = '#{[Marshal.dump(23)].pack('m')}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[Marshal.dump([1, 2, 3])].pack('m')}')",
       "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
@@ -148,7 +148,7 @@ describe "Serialization plugin" do
     o.update(:abc => [23])
     @c.create(:abc => [1,2,3])
     
-    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+    DB.sqls.should == ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = '#{[23].to_json}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[1,2,3].to_json}')",
       "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
@@ -169,7 +169,7 @@ describe "Serialization plugin" do
     o.update(:abc => 'foo')
     @c.create(:abc => 'bar')
     
-    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+    DB.sqls.should == ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = 'oof' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('rab')",
       "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
@@ -191,7 +191,7 @@ describe "Serialization plugin" do
     o.update(:abc => 'foo')
     @c.create(:abc => 'bar')
     
-    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+    DB.sqls.should == ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = 'oof' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('rab')",
       "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
@@ -211,7 +211,7 @@ describe "Serialization plugin" do
 
     o.update(:abc => 23)
     Class.new(@c).create(:abc => [1, 2, 3])
-    MODEL_DB.sqls.should == ["SELECT * FROM items LIMIT 1",
+    DB.sqls.should == ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')",
       "SELECT * FROM items WHERE (id = 10) LIMIT 1"]

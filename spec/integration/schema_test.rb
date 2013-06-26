@@ -2,71 +2,71 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Database schema parser" do
   before do
-    @iom = INTEGRATION_DB.identifier_output_method
-    @iim = INTEGRATION_DB.identifier_input_method
-    @qi = INTEGRATION_DB.quote_identifiers?
+    @iom = DB.identifier_output_method
+    @iim = DB.identifier_input_method
+    @qi = DB.quote_identifiers?
   end
   after do
-    INTEGRATION_DB.identifier_output_method = @iom
-    INTEGRATION_DB.identifier_input_method = @iim
-    INTEGRATION_DB.quote_identifiers = @qi
-    INTEGRATION_DB.drop_table?(:items)
+    DB.identifier_output_method = @iom
+    DB.identifier_input_method = @iim
+    DB.quote_identifiers = @qi
+    DB.drop_table?(:items)
   end
 
   specify "should handle a database with a identifier methods" do
-    INTEGRATION_DB.identifier_output_method = :reverse
-    INTEGRATION_DB.identifier_input_method = :reverse
-    INTEGRATION_DB.quote_identifiers = true
-    INTEGRATION_DB.create_table!(:items){Integer :number}
+    DB.identifier_output_method = :reverse
+    DB.identifier_input_method = :reverse
+    DB.quote_identifiers = true
+    DB.create_table!(:items){Integer :number}
     begin
-      INTEGRATION_DB.schema(:items, :reload=>true).should be_a_kind_of(Array)
-      INTEGRATION_DB.schema(:items, :reload=>true).first.first.should == :number
+      DB.schema(:items, :reload=>true).should be_a_kind_of(Array)
+      DB.schema(:items, :reload=>true).first.first.should == :number
     ensure 
-      INTEGRATION_DB.drop_table(:items)
+      DB.drop_table(:items)
     end
   end
 
   specify "should handle a dataset with identifier methods different than the database's" do
-    INTEGRATION_DB.identifier_output_method = :reverse
-    INTEGRATION_DB.identifier_input_method = :reverse
-    INTEGRATION_DB.quote_identifiers = true
-    INTEGRATION_DB.create_table!(:items){Integer :number}
-    INTEGRATION_DB.identifier_output_method = @iom
-    INTEGRATION_DB.identifier_input_method = @iim
-    ds = INTEGRATION_DB[:items]
+    DB.identifier_output_method = :reverse
+    DB.identifier_input_method = :reverse
+    DB.quote_identifiers = true
+    DB.create_table!(:items){Integer :number}
+    DB.identifier_output_method = @iom
+    DB.identifier_input_method = @iim
+    ds = DB[:items]
     ds.identifier_output_method = :reverse
     ds.identifier_input_method = :reverse
     begin
-      INTEGRATION_DB.schema(ds, :reload=>true).should be_a_kind_of(Array)
-      INTEGRATION_DB.schema(ds, :reload=>true).first.first.should == :number
+      DB.schema(ds, :reload=>true).should be_a_kind_of(Array)
+      DB.schema(ds, :reload=>true).first.first.should == :number
     ensure 
-      INTEGRATION_DB.identifier_output_method = :reverse
-      INTEGRATION_DB.identifier_input_method = :reverse
-      INTEGRATION_DB.drop_table(:items)
+      DB.identifier_output_method = :reverse
+      DB.identifier_input_method = :reverse
+      DB.drop_table(:items)
     end
   end
 
   specify "should not issue an sql query if the schema has been loaded unless :reload is true" do
-    INTEGRATION_DB.create_table!(:items){Integer :number}
-    INTEGRATION_DB.schema(:items, :reload=>true)
-    INTEGRATION_DB.schema(:items)
-    INTEGRATION_DB.schema(:items, :reload=>true)
+    DB.create_table!(:items){Integer :number}
+    DB.schema(:items, :reload=>true)
+    DB.schema(:items)
+    DB.schema(:items, :reload=>true)
   end
 
   specify "Model schema should include columns in the table, even if they aren't selected" do
-    INTEGRATION_DB.create_table!(:items){String :a; Integer :number}
-    m = Sequel::Model(INTEGRATION_DB[:items].select(:a))
+    DB.create_table!(:items){String :a; Integer :number}
+    m = Sequel::Model(DB[:items].select(:a))
     m.columns.should == [:a]
     m.db_schema[:number][:type].should == :integer
   end
 
   specify "should raise an error when the table doesn't exist" do
-    proc{INTEGRATION_DB.schema(:no_table)}.should raise_error(Sequel::Error)
+    proc{DB.schema(:no_table)}.should raise_error(Sequel::Error)
   end
 
   specify "should return the schema correctly" do
-    INTEGRATION_DB.create_table!(:items){Integer :number}
-    schema = INTEGRATION_DB.schema(:items, :reload=>true)
+    DB.create_table!(:items){Integer :number}
+    schema = DB.schema(:items, :reload=>true)
     schema.should be_a_kind_of(Array)
     schema.length.should == 1
     col = schema.first
@@ -76,110 +76,110 @@ describe "Database schema parser" do
     col_info = col.last
     col_info.should be_a_kind_of(Hash)
     col_info[:type].should == :integer
-    INTEGRATION_DB.schema(:items)
+    DB.schema(:items)
   end
 
   specify "should parse primary keys from the schema properly" do
-    INTEGRATION_DB.create_table!(:items){Integer :number}
-    INTEGRATION_DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == []
-    INTEGRATION_DB.create_table!(:items){primary_key :number}
-    INTEGRATION_DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == [:number]
-    INTEGRATION_DB.create_table!(:items){Integer :number1; Integer :number2; primary_key [:number1, :number2]}
-    INTEGRATION_DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == [:number1, :number2]
+    DB.create_table!(:items){Integer :number}
+    DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == []
+    DB.create_table!(:items){primary_key :number}
+    DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == [:number]
+    DB.create_table!(:items){Integer :number1; Integer :number2; primary_key [:number1, :number2]}
+    DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == [:number1, :number2]
   end
 
   specify "should parse NULL/NOT NULL from the schema properly" do
-    INTEGRATION_DB.create_table!(:items){Integer :number, :null=>true}
-    INTEGRATION_DB.schema(:items).first.last[:allow_null].should == true
-    INTEGRATION_DB.create_table!(:items){Integer :number, :null=>false}
-    INTEGRATION_DB.schema(:items).first.last[:allow_null].should == false
+    DB.create_table!(:items){Integer :number, :null=>true}
+    DB.schema(:items).first.last[:allow_null].should == true
+    DB.create_table!(:items){Integer :number, :null=>false}
+    DB.schema(:items).first.last[:allow_null].should == false
   end
 
   specify "should parse defaults from the schema properly" do
-    INTEGRATION_DB.create_table!(:items){Integer :number}
-    INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == nil
-    INTEGRATION_DB.create_table!(:items){Integer :number, :default=>0}
-    INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == 0
-    INTEGRATION_DB.create_table!(:items){String :a, :default=>"blah"}
-    INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == 'blah'
+    DB.create_table!(:items){Integer :number}
+    DB.schema(:items).first.last[:ruby_default].should == nil
+    DB.create_table!(:items){Integer :number, :default=>0}
+    DB.schema(:items).first.last[:ruby_default].should == 0
+    DB.create_table!(:items){String :a, :default=>"blah"}
+    DB.schema(:items).first.last[:ruby_default].should == 'blah'
   end
 
   specify "should parse current timestamp defaults from the schema properly" do
-    INTEGRATION_DB.create_table!(:items){Time :a, :default=>Sequel::CURRENT_TIMESTAMP}
-    INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == Sequel::CURRENT_TIMESTAMP
+    DB.create_table!(:items){Time :a, :default=>Sequel::CURRENT_TIMESTAMP}
+    DB.schema(:items).first.last[:ruby_default].should == Sequel::CURRENT_TIMESTAMP
   end
 
   cspecify "should parse current date defaults from the schema properly", :mysql, :oracle do
-    INTEGRATION_DB.create_table!(:items){Date :a, :default=>Sequel::CURRENT_DATE}
-    INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == Sequel::CURRENT_DATE
+    DB.create_table!(:items){Date :a, :default=>Sequel::CURRENT_DATE}
+    DB.schema(:items).first.last[:ruby_default].should == Sequel::CURRENT_DATE
   end
 
   cspecify "should parse types from the schema properly", [:jdbc, :db2], :oracle do
-    INTEGRATION_DB.create_table!(:items){Integer :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
-    INTEGRATION_DB.create_table!(:items){Fixnum :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
-    INTEGRATION_DB.create_table!(:items){Bignum :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
-    INTEGRATION_DB.create_table!(:items){Float :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :float
-    INTEGRATION_DB.create_table!(:items){BigDecimal :number, :size=>[11, 2]}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :decimal
-    INTEGRATION_DB.create_table!(:items){Numeric :number, :size=>[12, 0]}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
-    INTEGRATION_DB.create_table!(:items){String :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :string
-    INTEGRATION_DB.create_table!(:items){Date :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :date
-    INTEGRATION_DB.create_table!(:items){Time :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :datetime
-    INTEGRATION_DB.create_table!(:items){DateTime :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :datetime
-    INTEGRATION_DB.create_table!(:items){File :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :blob
-    INTEGRATION_DB.create_table!(:items){TrueClass :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :boolean
-    INTEGRATION_DB.create_table!(:items){FalseClass :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :boolean
+    DB.create_table!(:items){Integer :number}
+    DB.schema(:items).first.last[:type].should == :integer
+    DB.create_table!(:items){Fixnum :number}
+    DB.schema(:items).first.last[:type].should == :integer
+    DB.create_table!(:items){Bignum :number}
+    DB.schema(:items).first.last[:type].should == :integer
+    DB.create_table!(:items){Float :number}
+    DB.schema(:items).first.last[:type].should == :float
+    DB.create_table!(:items){BigDecimal :number, :size=>[11, 2]}
+    DB.schema(:items).first.last[:type].should == :decimal
+    DB.create_table!(:items){Numeric :number, :size=>[12, 0]}
+    DB.schema(:items).first.last[:type].should == :integer
+    DB.create_table!(:items){String :number}
+    DB.schema(:items).first.last[:type].should == :string
+    DB.create_table!(:items){Date :number}
+    DB.schema(:items).first.last[:type].should == :date
+    DB.create_table!(:items){Time :number}
+    DB.schema(:items).first.last[:type].should == :datetime
+    DB.create_table!(:items){DateTime :number}
+    DB.schema(:items).first.last[:type].should == :datetime
+    DB.create_table!(:items){File :number}
+    DB.schema(:items).first.last[:type].should == :blob
+    DB.create_table!(:items){TrueClass :number}
+    DB.schema(:items).first.last[:type].should == :boolean
+    DB.create_table!(:items){FalseClass :number}
+    DB.schema(:items).first.last[:type].should == :boolean
   end
-end if INTEGRATION_DB.supports_schema_parsing?
+end if DB.supports_schema_parsing?
 
 describe "Database index parsing" do
   after do
-    INTEGRATION_DB.drop_table?(:items)
+    DB.drop_table?(:items)
   end
 
   specify "should parse indexes into a hash" do
     # Delete :deferrable entry, since not all adapters implement it
-    f = lambda{h = INTEGRATION_DB.indexes(:items); h.values.each{|h2| h2.delete(:deferrable)}; h}
+    f = lambda{h = DB.indexes(:items); h.values.each{|h2| h2.delete(:deferrable)}; h}
 
-    INTEGRATION_DB.create_table!(:items){Integer :n; Integer :a}
+    DB.create_table!(:items){Integer :n; Integer :a}
     f.call.should == {}
-    INTEGRATION_DB.add_index(:items, :n)
+    DB.add_index(:items, :n)
     f.call.should == {:items_n_index=>{:columns=>[:n], :unique=>false}}
-    INTEGRATION_DB.drop_index(:items, :n)
+    DB.drop_index(:items, :n)
     f.call.should == {}
-    INTEGRATION_DB.add_index(:items, :n, :unique=>true, :name=>:blah_blah_index)
+    DB.add_index(:items, :n, :unique=>true, :name=>:blah_blah_index)
     f.call.should == {:blah_blah_index=>{:columns=>[:n], :unique=>true}}
-    INTEGRATION_DB.add_index(:items, [:n, :a])
+    DB.add_index(:items, [:n, :a])
     f.call.should == {:blah_blah_index=>{:columns=>[:n], :unique=>true}, :items_n_a_index=>{:columns=>[:n, :a], :unique=>false}}
-    INTEGRATION_DB.drop_index(:items, :n, :name=>:blah_blah_index)
+    DB.drop_index(:items, :n, :name=>:blah_blah_index)
     f.call.should == {:items_n_a_index=>{:columns=>[:n, :a], :unique=>false}}
-    INTEGRATION_DB.drop_index(:items, [:n, :a])
+    DB.drop_index(:items, [:n, :a])
     f.call.should == {}
   end
   
   specify "should not include a primary key index" do
-    INTEGRATION_DB.create_table!(:items){primary_key :n}
-    INTEGRATION_DB.indexes(:items).should == {}
-    INTEGRATION_DB.create_table!(:items){Integer :n; Integer :a; primary_key [:n, :a]}
-    INTEGRATION_DB.indexes(:items).should == {}
+    DB.create_table!(:items){primary_key :n}
+    DB.indexes(:items).should == {}
+    DB.create_table!(:items){Integer :n; Integer :a; primary_key [:n, :a]}
+    DB.indexes(:items).should == {}
   end
-end if INTEGRATION_DB.supports_index_parsing?
+end if DB.supports_index_parsing?
 
 describe "Database foreign key parsing" do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @pr = lambda do |table, *expected|
       actual = @db.foreign_key_list(table).sort_by{|c| c[:columns].map{|s| s.to_s}.join << (c[:key]||[]).map{|s| s.to_s}.join}.map{|v| v.values_at(:columns, :table, :key)}
       actual.zip(expected).each do |a, e|
@@ -231,11 +231,11 @@ describe "Database foreign key parsing" do
     @db.create_table!(:b, :engine=>:InnoDB){Integer :e; Integer :f; foreign_key [:e, :f], :a; foreign_key [:f, :e], :a, :key=>[:c, :b]}
     @pr[:b, [[:e, :f], :a, [:pk, :b, :c]], [[:f, :e], :a, [:c, :b]]]
   end
-end if INTEGRATION_DB.supports_foreign_key_parsing?
+end if DB.supports_foreign_key_parsing?
 
 describe "Database schema modifiers" do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @ds = @db[:items]
   end
   after do
@@ -294,7 +294,7 @@ describe "Database schema modifiers" do
     @db.drop_table?(:items)
     @db.transaction(:rollback=>:always){@db.create_table(:items){Integer :number}}
     @db.table_exists?(:items).should be_false
-  end if INTEGRATION_DB.supports_transactional_ddl?
+  end if DB.supports_transactional_ddl?
   
   describe "join tables" do
     after do
@@ -651,7 +651,7 @@ describe "Database schema modifiers" do
     @db.create_table!(:items){foreign_key :id, :items2, :deferrable=>true}
     proc{@db[:items].insert(1)}.should raise_error(Sequel::DatabaseError)
     proc{@db.transaction{proc{@db[:items].insert(1)}.should_not raise_error}}.should raise_error(Sequel::DatabaseError)
-  end if INTEGRATION_DB.supports_deferrable_foreign_key_constraints?
+  end if DB.supports_deferrable_foreign_key_constraints?
 
   specify "should support deferrable unique constraints when creating or altering tables" do
     @db.create_table!(:items){Integer :t; unique [:t], :name=>:atest_def, :deferrable=>true, :using=>:btree}
@@ -666,7 +666,7 @@ describe "Database schema modifiers" do
     @db[:items].insert(2)
     proc{@db[:items].insert(2)}.should raise_error(Sequel::DatabaseError)
     proc{@db.transaction{proc{@db[:items].insert(2)}.should_not raise_error}}.should raise_error(Sequel::DatabaseError)
-  end if INTEGRATION_DB.supports_deferrable_constraints?
+  end if DB.supports_deferrable_constraints?
 end
 
 describe "Database#tables" do
@@ -677,7 +677,7 @@ describe "Database#tables" do
         "xxxxx#{@@xxxxx += 1}"
       end
     end
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table(:sequel_test_table){Integer :a}
     @db.create_view :sequel_test_view, @db[:sequel_test_table]
     @iom = @db.identifier_output_method
@@ -703,7 +703,7 @@ describe "Database#tables" do
     @db.identifier_input_method = :xxxxx
     @db.tables.each{|t| t.to_s.should =~ /\Ax{5}\d+\z/}
   end
-end if INTEGRATION_DB.supports_table_listing?
+end if DB.supports_table_listing?
 
 describe "Database#views" do
   before do
@@ -713,7 +713,7 @@ describe "Database#views" do
         "xxxxx#{@@xxxxx += 1}"
       end
     end
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table(:sequel_test_table){Integer :a}
     @db.create_view :sequel_test_view, @db[:sequel_test_table]
     @iom = @db.identifier_output_method
@@ -739,4 +739,4 @@ describe "Database#views" do
     @db.identifier_input_method = :xxxxx
     @db.views.each{|t| t.to_s.should =~ /\Ax{5}\d+\z/}
   end
-end if INTEGRATION_DB.supports_view_listing?
+end if DB.supports_view_listing?

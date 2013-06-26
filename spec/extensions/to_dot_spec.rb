@@ -6,7 +6,7 @@ describe Sequel::Model, "to_dot extension" do
   end
 
   before do
-    @db = MODEL_DB
+    @db = DB
     @ds = @db.dataset
   end
 

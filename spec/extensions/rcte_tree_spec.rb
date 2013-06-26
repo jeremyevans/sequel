@@ -2,14 +2,14 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe Sequel::Model, "rcte_tree" do
   before do
-    @c = Class.new(Sequel::Model(MODEL_DB[:nodes]))
+    @c = Class.new(Sequel::Model(DB[:nodes]))
     @c.class_eval do
       def self.name; 'Node'; end
       columns :id, :name, :parent_id, :i, :pi
     end
     @ds = @c.dataset
     @o = @c.load(:id=>2, :parent_id=>1, :name=>'AA', :i=>3, :pi=>4)
-    MODEL_DB.reset
+    DB.reset
   end
 
   it "should define the correct associations" do
@@ -102,7 +102,7 @@ describe Sequel::Model, "rcte_tree" do
        {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>1}, {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>2},
        {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>2}, {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>1}]]
     os = @ds.eager(:ancestors).all
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.first.should == "SELECT * FROM nodes"
     sqls.last.should =~ /WITH t AS \(SELECT id AS x_root_x, nodes\.\* FROM nodes WHERE \(id IN \([12], [12]\)\) UNION ALL SELECT t\.x_root_x, nodes\.\* FROM nodes INNER JOIN t ON \(t\.parent_id = nodes\.id\)\) SELECT \* FROM t AS nodes/
     os.should == [@c.load(:id=>2, :parent_id=>1, :name=>'AA'), @c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>7, :parent_id=>1, :name=>'D'), @c.load(:id=>9, :parent_id=>nil, :name=>'E')]
@@ -114,7 +114,7 @@ describe Sequel::Model, "rcte_tree" do
     os.map{|o| o.parent.parent if o.parent}.should == [@c.load(:id=>8, :name=>'?', :parent_id=>nil), @c.load(:id=>1, :name=>'00', :parent_id=>8), @c.load(:id=>8, :name=>'?', :parent_id=>nil), nil]
     os.map{|o| o.parent.parent.parent if o.parent and o.parent.parent}.should == [nil, @c.load(:id=>8, :name=>'?', :parent_id=>nil), nil, nil]
     os.map{|o| o.parent.parent.parent.parent if o.parent and o.parent.parent and o.parent.parent.parent}.should == [nil, nil, nil, nil]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   it "should eagerly load ancestors when giving options" do
@@ -124,7 +124,7 @@ describe Sequel::Model, "rcte_tree" do
        {:i=>1, :name=>'00', :pi=>8, :kal=>1}, {:i=>1, :name=>'00', :pi=>8, :kal=>2},
        {:i=>8, :name=>'?', :pi=>nil, :kal=>2}, {:i=>8, :name=>'?', :pi=>nil, :kal=>1}]]
     os = @ds.eager(:as).all
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.first.should == "SELECT * FROM nodes"
     sqls.last.should =~ /WITH cte AS \(SELECT i AS kal, nodes\.\* FROM nodes WHERE \(i IN \([12], [12]\)\) UNION ALL SELECT cte\.kal, nodes\.\* FROM nodes INNER JOIN cte ON \(cte\.pi = nodes\.i\)\) SELECT \* FROM cte/
     os.should == [@c.load(:i=>2, :pi=>1, :name=>'AA'), @c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>7, :pi=>1, :name=>'D'), @c.load(:i=>9, :pi=>nil, :name=>'E')]
@@ -145,7 +145,7 @@ describe Sequel::Model, "rcte_tree" do
        {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>1}, {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>2},
        {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>2}, {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>1}]]
     @ds.eager(:ancestors).all
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.first.should == "SELECT * FROM nodes"
     sqls.last.should =~ /WITH t AS \(SELECT id AS x_root_x, nodes\.\* FROM nodes WHERE \(\(id IN \([12], [12]\)\) AND \(i = 1\)\) UNION ALL SELECT t\.x_root_x, nodes\.\* FROM nodes INNER JOIN t ON \(t\.parent_id = nodes\.id\) WHERE \(i = 1\)\) SELECT \* FROM t AS nodes WHERE \(i = 1\)/
   end
@@ -157,7 +157,7 @@ describe Sequel::Model, "rcte_tree" do
        {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>6}, {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>2},
        {:id=>4, :name=>'?', :parent_id=>7, :x_root_x=>7}, {:id=>5, :name=>'?', :parent_id=>4, :x_root_x=>7}]]
     os = @ds.eager(:descendants).all
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.first.should == "SELECT * FROM nodes"
     sqls.last.should =~ /WITH t AS \(SELECT parent_id AS x_root_x, nodes\.\* FROM nodes WHERE \(parent_id IN \([267], [267], [267]\)\) UNION ALL SELECT t\.x_root_x, nodes\.\* FROM nodes INNER JOIN t ON \(t\.id = nodes\.parent_id\)\) SELECT \* FROM t AS nodes/
     os.should == [@c.load(:id=>2, :parent_id=>1, :name=>'AA'), @c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>7, :parent_id=>1, :name=>'D')]
@@ -167,7 +167,7 @@ describe Sequel::Model, "rcte_tree" do
     os.map{|o| o.children}.should == [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E')], [@c.load(:id=>3, :name=>'00', :parent_id=>6)], [@c.load(:id=>4, :name=>'?', :parent_id=>7)]]
     os.map{|o1| o1.children.map{|o2| o2.children}}.should == [[[@c.load(:id=>3, :name=>'00', :parent_id=>6)], []], [[]], [[@c.load(:id=>5, :name=>'?', :parent_id=>4)]]]
     os.map{|o1| o1.children.map{|o2| o2.children.map{|o3| o3.children}}}.should == [[[[]], []], [[]], [[[]]]]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   it "should eagerly load descendants when giving options" do
@@ -177,7 +177,7 @@ describe Sequel::Model, "rcte_tree" do
        {:i=>3, :name=>'00', :pi=>6, :kal=>6}, {:i=>3, :name=>'00', :pi=>6, :kal=>2},
        {:i=>4, :name=>'?', :pi=>7, :kal=>7}, {:i=>5, :name=>'?', :pi=>4, :kal=>7}]]
     os = @ds.eager(:ds).all
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.first.should == "SELECT * FROM nodes"
     sqls.last.should =~ /WITH cte AS \(SELECT pi AS kal, nodes\.\* FROM nodes WHERE \(pi IN \([267], [267], [267]\)\) UNION ALL SELECT cte\.kal, nodes\.\* FROM nodes INNER JOIN cte ON \(cte\.i = nodes\.pi\)\) SELECT \* FROM cte/
     os.should == [@c.load(:i=>2, :pi=>1, :name=>'AA'), @c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>7, :pi=>1, :name=>'D')]
@@ -187,7 +187,7 @@ describe Sequel::Model, "rcte_tree" do
     os.map{|o| o.cs}.should == [[@c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>9, :pi=>2, :name=>'E')], [@c.load(:i=>3, :name=>'00', :pi=>6)], [@c.load(:i=>4, :name=>'?', :pi=>7)]]
     os.map{|o1| o1.cs.map{|o2| o2.cs}}.should == [[[@c.load(:i=>3, :name=>'00', :pi=>6)], []], [[]], [[@c.load(:i=>5, :name=>'?', :pi=>4)]]]
     os.map{|o1| o1.cs.map{|o2| o2.cs.map{|o3| o3.cs}}}.should == [[[[]], []], [[]], [[[]]]]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   it "should eagerly load descendants to a given level" do
@@ -197,7 +197,7 @@ describe Sequel::Model, "rcte_tree" do
        {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>6, :x_level_x=>0}, {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>2, :x_level_x=>1},
        {:id=>4, :name=>'?', :parent_id=>7, :x_root_x=>7, :x_level_x=>0}, {:id=>5, :name=>'?', :parent_id=>4, :x_root_x=>7, :x_level_x=>1}]]
     os = @ds.eager(:descendants=>2).all
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.first.should == "SELECT * FROM nodes"
     sqls.last.should =~ /WITH t AS \(SELECT parent_id AS x_root_x, nodes\.\*, 0 AS x_level_x FROM nodes WHERE \(parent_id IN \([267], [267], [267]\)\) UNION ALL SELECT t\.x_root_x, nodes\.\*, \(t\.x_level_x \+ 1\) AS x_level_x FROM nodes INNER JOIN t ON \(t\.id = nodes\.parent_id\) WHERE \(t\.x_level_x < 1\)\) SELECT \* FROM t AS nodes/
     os.should == [@c.load(:id=>2, :parent_id=>1, :name=>'AA'), @c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>7, :parent_id=>1, :name=>'D')]
@@ -207,7 +207,7 @@ describe Sequel::Model, "rcte_tree" do
     os.map{|o| o.associations[:children]}.should == [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E')], [@c.load(:id=>3, :name=>'00', :parent_id=>6)], [@c.load(:id=>4, :name=>'?', :parent_id=>7)]]
     os.map{|o1| o1.associations[:children].map{|o2| o2.associations[:children]}}.should == [[[@c.load(:id=>3, :name=>'00', :parent_id=>6)], []], [[]], [[@c.load(:id=>5, :name=>'?', :parent_id=>4)]]]
     os.map{|o1| o1.associations[:children].map{|o2| o2.associations[:children].map{|o3| o3.associations[:children]}}}.should == [[[[]], []], [[]], [[nil]]]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   it "should eagerly load descendants to a given level when giving options" do
@@ -217,7 +217,7 @@ describe Sequel::Model, "rcte_tree" do
        {:i=>3, :name=>'00', :pi=>6, :kal=>6, :lal=>0}, {:i=>3, :name=>'00', :pi=>6, :kal=>2, :lal=>1},
        {:i=>4, :name=>'?', :pi=>7, :kal=>7, :lal=>0}, {:i=>5, :name=>'?', :pi=>4, :kal=>7, :lal=>1}]]
     os = @ds.eager(:ds=>2).all
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.first.should == "SELECT * FROM nodes"
     sqls.last.should =~ /WITH cte AS \(SELECT pi AS kal, nodes\.\*, 0 AS lal FROM nodes WHERE \(pi IN \([267], [267], [267]\)\) UNION ALL SELECT cte\.kal, nodes\.\*, \(cte\.lal \+ 1\) AS lal FROM nodes INNER JOIN cte ON \(cte\.i = nodes\.pi\) WHERE \(cte\.lal < 1\)\) SELECT \* FROM cte/
     os.should == [@c.load(:i=>2, :pi=>1, :name=>'AA'), @c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>7, :pi=>1, :name=>'D')]
@@ -227,7 +227,7 @@ describe Sequel::Model, "rcte_tree" do
     os.map{|o| o.associations[:cs]}.should == [[@c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>9, :pi=>2, :name=>'E')], [@c.load(:i=>3, :name=>'00', :pi=>6)], [@c.load(:i=>4, :name=>'?', :pi=>7)]]
     os.map{|o1| o1.associations[:cs].map{|o2| o2.associations[:cs]}}.should == [[[@c.load(:i=>3, :name=>'00', :pi=>6)], []], [[]], [[@c.load(:i=>5, :name=>'?', :pi=>4)]]]
     os.map{|o1| o1.associations[:cs].map{|o2| o2.associations[:cs].map{|o3| o3.associations[:cs]}}}.should == [[[[]], []], [[]], [[nil]]]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   it "should eagerly load descendants respecting association option :conditions" do
@@ -237,7 +237,7 @@ describe Sequel::Model, "rcte_tree" do
        {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>6}, {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>2},
        {:id=>4, :name=>'?', :parent_id=>7, :x_root_x=>7}, {:id=>5, :name=>'?', :parent_id=>4, :x_root_x=>7}]]
     @ds.eager(:descendants).all
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.first.should == "SELECT * FROM nodes"
     sqls.last.should =~ /WITH t AS \(SELECT parent_id AS x_root_x, nodes\.\* FROM nodes WHERE \(\(parent_id IN \([267], [267], [267]\)\) AND \(i = 1\)\) UNION ALL SELECT t\.x_root_x, nodes\.\* FROM nodes INNER JOIN t ON \(t\.id = nodes\.parent_id\) WHERE \(i = 1\)\) SELECT \* FROM t AS nodes WHERE \(i = 1\)/
   end

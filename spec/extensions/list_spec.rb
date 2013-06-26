@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
 describe "List plugin" do
   def klass(opts={})
-    @db = MODEL_DB
+    @db = DB
     c = Class.new(Sequel::Model(@db[:items]))
     c.class_eval do
       columns :id, :position, :scope_id, :pos

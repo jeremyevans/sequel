@@ -11,7 +11,7 @@ describe Sequel::Model, "#(set|update)_except" do
     end
     @c.strict_param_setting = false
     @o1 = @c.new
-    MODEL_DB.reset
+    DB.reset
   end
 
   it "should raise errors if not all hash fields can be set and strict_param_setting is true" do
@@ -31,9 +31,9 @@ describe Sequel::Model, "#(set|update)_except" do
 
   it "#update_except should not update given attributes" do
     @o1.update_except({:x => 1, :y => 2, :z=>3, :id=>4}, [:y, :z])
-    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     @c.new.update_except({:x => 1, :y => 2, :z=>3, :id=>4}, :y, :z)
-    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 end
 
@@ -67,7 +67,7 @@ describe Sequel::Model, ".restricted_columns " do
     i = @c.new
     i.update(:x => 7, :z => 9)
     i.values.should == {:x => 7}
-    MODEL_DB.sqls.should == ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
+    DB.sqls.should == ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
   end
 
   it "should have allowed take precedence over restricted" do
@@ -82,6 +82,6 @@ describe Sequel::Model, ".restricted_columns " do
     i = @c.new
     i.update(:y => 7, :z => 9)
     i.values.should == {:y => 7}
-    MODEL_DB.sqls.should == ["INSERT INTO blahblah (y) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
+    DB.sqls.should == ["INSERT INTO blahblah (y) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
   end
 end

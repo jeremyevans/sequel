@@ -8,22 +8,22 @@ describe "Model#before_create && Model#after_create" do
       unrestrict_primary_key
       
       def after_create
-        MODEL_DB << "BLAH after"
+        DB << "BLAH after"
       end
     end
-    MODEL_DB.reset
+    DB.reset
   end
   
   specify "should be called around new record creation" do
-    @c.send(:define_method, :before_create){MODEL_DB << "BLAH before"}
+    @c.send(:define_method, :before_create){DB << "BLAH before"}
     @c.create(:x => 2)
-    MODEL_DB.sqls.should == ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after', 'SELECT * FROM items WHERE (x = 2) LIMIT 1']
+    DB.sqls.should == ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after', 'SELECT * FROM items WHERE (x = 2) LIMIT 1']
   end
 
   specify ".create should cancel the save and raise an error if before_create returns false and raise_on_save_failure is true" do
     @c.send(:define_method, :before_create){false}
     proc{@c.create(:x => 2)}.should raise_error(Sequel::BeforeHookFailed)
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
   end
 
@@ -31,7 +31,7 @@ describe "Model#before_create && Model#after_create" do
     @c.send(:define_method, :before_create){false}
     @c.raise_on_save_failure = false
     @c.create(:x => 2).should == nil
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 end
 
@@ -40,24 +40,24 @@ describe "Model#before_update && Model#after_update" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :id, :x
       def after_update
-        MODEL_DB << "BLAH after"
+        DB << "BLAH after"
       end
     end
-    MODEL_DB.reset
+    DB.reset
   end
   
   specify "should be called around record update" do
-    @c.send(:define_method, :before_update){MODEL_DB << "BLAH before"}
+    @c.send(:define_method, :before_update){DB << "BLAH before"}
     m = @c.load(:id => 2233, :x=>123)
     m.save
-    MODEL_DB.sqls.should == ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
+    DB.sqls.should == ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
   end
 
   specify "#save should cancel the save and raise an error if before_update returns false and raise_on_save_failure is true" do
     @c.send(:define_method, :before_update){false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save}.should raise_error(Sequel::BeforeHookFailed)
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   specify "#save should cancel the save and raise an error if before_update returns false and raise_on_failure option is true" do
@@ -65,14 +65,14 @@ describe "Model#before_update && Model#after_update" do
     @c.raise_on_save_failure = false
     proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.should raise_error(Sequel::BeforeHookFailed)
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   specify "#save should cancel the save and return nil if before_update returns false and raise_on_save_failure is false" do
     @c.send(:define_method, :before_update){false}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).save.should == nil
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 end
 
@@ -81,32 +81,32 @@ describe "Model#before_save && Model#after_save" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :x
       def after_save
-        MODEL_DB << "BLAH after"
+        DB << "BLAH after"
       end
     end
-    MODEL_DB.reset
+    DB.reset
   end
   
   specify "should be called around record update" do
-    @c.send(:define_method, :before_save){MODEL_DB << "BLAH before"}
+    @c.send(:define_method, :before_save){DB << "BLAH before"}
     m = @c.load(:id => 2233, :x=>123)
     m.save
-    MODEL_DB.sqls.should == ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
+    DB.sqls.should == ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
   end
   
   specify "should be called around record creation" do
-    @c.send(:define_method, :before_save){MODEL_DB << "BLAH before"}
+    @c.send(:define_method, :before_save){DB << "BLAH before"}
     @c.set_primary_key :x
     @c.unrestrict_primary_key
     @c.create(:x => 2)
-    MODEL_DB.sqls.should == ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after', 'SELECT * FROM items WHERE (x = 2) LIMIT 1']
+    DB.sqls.should == ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after', 'SELECT * FROM items WHERE (x = 2) LIMIT 1']
   end
 
   specify "#save should cancel the save and raise an error if before_save returns false and raise_on_save_failure is true" do
     @c.send(:define_method, :before_save){false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save}.should raise_error(Sequel::BeforeHookFailed)
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   specify "#save should cancel the save and raise an error if before_save returns false and raise_on_failure option is true" do
@@ -114,20 +114,20 @@ describe "Model#before_save && Model#after_save" do
     @c.raise_on_save_failure = false
     proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.should raise_error(Sequel::BeforeHookFailed)
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   specify "#save should cancel the save and return nil if before_save returns false and raise_on_save_failure is false" do
     @c.send(:define_method, :before_save){false}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).save.should == nil
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   specify "#save should have a raised exception reference the model instance" do
     @c.send(:define_method, :before_save){false}
     proc{@c.create(:x => 2233)}.should raise_error(Sequel::HookFailed){|e| e.model.should == @c.load(:x=>2233)}
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 end
 
@@ -135,37 +135,37 @@ describe "Model#before_destroy && Model#after_destroy" do
   before do
     @c = Class.new(Sequel::Model(:items)) do
       def after_destroy
-        MODEL_DB << "BLAH after"
+        DB << "BLAH after"
       end
     end
-    MODEL_DB.reset
+    DB.reset
   end
   
   specify "should be called around record destruction" do
-    @c.send(:define_method, :before_destroy){MODEL_DB << "BLAH before"}
+    @c.send(:define_method, :before_destroy){DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.destroy
-    MODEL_DB.sqls.should == ['BLAH before', 'DELETE FROM items WHERE id = 2233', 'BLAH after']
+    DB.sqls.should == ['BLAH before', 'DELETE FROM items WHERE id = 2233', 'BLAH after']
   end
 
   specify "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_save_failure is true" do
     @c.send(:define_method, :before_destroy){false}
     proc{@c.load(:id => 2233).destroy}.should raise_error(Sequel::BeforeHookFailed)
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   specify "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_failure option is true" do
     @c.send(:define_method, :before_destroy){false}
     @c.raise_on_save_failure = false
     proc{@c.load(:id => 2233).destroy(:raise_on_failure => true)}.should raise_error(Sequel::BeforeHookFailed)
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   specify "#destroy should cancel the destroy and return nil if before_destroy returns false and raise_on_save_failure is false" do
     @c.send(:define_method, :before_destroy){false}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).destroy.should == nil
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 end
 
@@ -174,7 +174,7 @@ describe "Model#before_validation && Model#after_validation" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :id
       def after_validation
-        MODEL_DB << "BLAH after"
+        DB << "BLAH after"
       end
 
       def validate
@@ -184,33 +184,33 @@ describe "Model#before_validation && Model#after_validation" do
   end
   
   specify "should be called around validation" do
-    @c.send(:define_method, :before_validation){MODEL_DB << "BLAH before"}
+    @c.send(:define_method, :before_validation){DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.should be_valid
-    MODEL_DB.sqls.should == ['BLAH before', 'BLAH after']
+    DB.sqls.should == ['BLAH before', 'BLAH after']
 
     m = @c.load(:id => 22)
     m.should_not be_valid
-    MODEL_DB.sqls.should == ['BLAH before', 'BLAH after']
+    DB.sqls.should == ['BLAH before', 'BLAH after']
   end
 
   specify "should be called when calling save" do
-    @c.send(:define_method, :before_validation){MODEL_DB << "BLAH before"}
+    @c.send(:define_method, :before_validation){DB << "BLAH before"}
     m = @c.load(:id => 2233, :x=>123)
     m.save.should == m
-    MODEL_DB.sqls.should == ['BLAH before', 'BLAH after', 'UPDATE items SET x = 123 WHERE (id = 2233)']
+    DB.sqls.should == ['BLAH before', 'BLAH after', 'UPDATE items SET x = 123 WHERE (id = 2233)']
 
     m = @c.load(:id => 22)
     m.raise_on_save_failure = false
     m.save.should == nil
-    MODEL_DB.sqls.should == ['BLAH before', 'BLAH after']
+    DB.sqls.should == ['BLAH before', 'BLAH after']
   end
 
   specify "#save should cancel the save and raise an error if before_validation returns false and raise_on_save_failure is true" do
     @c.send(:define_method, :before_validation){false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save}.should raise_error(Sequel::BeforeHookFailed)
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   specify "#save should cancel the save and raise an error if before_validation returns false and raise_on_failure option is true" do
@@ -218,14 +218,14 @@ describe "Model#before_validation && Model#after_validation" do
     @c.raise_on_save_failure = false
     proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.should raise_error(Sequel::BeforeHookFailed)
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   specify "#save should cancel the save and return nil if before_validation returns false and raise_on_save_failure is false" do
     @c.send(:define_method, :before_validation){false}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).save.should == nil
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   specify "#valid? should return false if before_validation returns false" do
@@ -239,82 +239,82 @@ describe "Model around filters" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :id, :x
     end
-    MODEL_DB.reset
+    DB.reset
   end
   
   specify "around_create should be called around new record creation" do
     @c.class_eval do
       def around_create
-        MODEL_DB << 'ac_before'
+        DB << 'ac_before'
         super
-        MODEL_DB << 'ac_after'
+        DB << 'ac_after'
       end
     end
     @c.create(:x => 2)
-    MODEL_DB.sqls.should == ['ac_before', 'INSERT INTO items (x) VALUES (2)', 'ac_after', "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.should == ['ac_before', 'INSERT INTO items (x) VALUES (2)', 'ac_after', "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   specify "around_delete should be called around record destruction" do
     @c.class_eval do
       def around_destroy
-        MODEL_DB << 'ad_before'
+        DB << 'ad_before'
         super
-        MODEL_DB << 'ad_after'
+        DB << 'ad_after'
       end
     end
     @c.load(:id=>1, :x => 2).destroy
-    MODEL_DB.sqls.should == ['ad_before', 'DELETE FROM items WHERE id = 1', 'ad_after']
+    DB.sqls.should == ['ad_before', 'DELETE FROM items WHERE id = 1', 'ad_after']
   end
   
   specify "around_update should be called around updating existing records" do
     @c.class_eval do
       def around_update
-        MODEL_DB << 'au_before'
+        DB << 'au_before'
         super
-        MODEL_DB << 'au_after'
+        DB << 'au_after'
       end
     end
     @c.load(:id=>1, :x => 2).save
-    MODEL_DB.sqls.should == ['au_before', 'UPDATE items SET x = 2 WHERE (id = 1)', 'au_after']
+    DB.sqls.should == ['au_before', 'UPDATE items SET x = 2 WHERE (id = 1)', 'au_after']
   end
 
   specify "around_save should be called around saving both new and existing records, around either after_create and after_update" do
     @c.class_eval do
       def around_update
-        MODEL_DB << 'au_before'
+        DB << 'au_before'
         super
-        MODEL_DB << 'au_after'
+        DB << 'au_after'
       end
       def around_create
-        MODEL_DB << 'ac_before'
+        DB << 'ac_before'
         super
-        MODEL_DB << 'ac_after'
+        DB << 'ac_after'
       end
       def around_save
-        MODEL_DB << 'as_before'
+        DB << 'as_before'
         super
-        MODEL_DB << 'as_after'
+        DB << 'as_after'
       end
     end
     @c.create(:x => 2)
-    MODEL_DB.sqls.should == ['as_before', 'ac_before', 'INSERT INTO items (x) VALUES (2)', 'ac_after', 'as_after', "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.should == ['as_before', 'ac_before', 'INSERT INTO items (x) VALUES (2)', 'ac_after', 'as_after', "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     @c.load(:id=>1, :x => 2).save
-    MODEL_DB.sqls.should == ['as_before', 'au_before', 'UPDATE items SET x = 2 WHERE (id = 1)', 'au_after', 'as_after']
+    DB.sqls.should == ['as_before', 'au_before', 'UPDATE items SET x = 2 WHERE (id = 1)', 'au_after', 'as_after']
   end
 
   specify "around_validation should be called around validating records" do
     @c.class_eval do
       def around_validation
-        MODEL_DB << 'av_before'
+        DB << 'av_before'
         super
-        MODEL_DB << 'av_after'
+        DB << 'av_after'
       end
       def validate
-        MODEL_DB << 'validate'
+        DB << 'validate'
       end
     end
     @c.new(:x => 2).valid?.should == true
-    MODEL_DB.sqls.should == [ 'av_before', 'validate', 'av_after' ]
+    DB.sqls.should == [ 'av_before', 'validate', 'av_after' ]
   end
 
   specify "around_validation should be able to catch validation errors and modify them" do

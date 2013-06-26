@@ -24,7 +24,7 @@ describe Sequel::Model, "pg_array_associations" do
     @o2 = @c2.first
     @n1 = @c1.new
     @n2 = @c2.new
-    MODEL_DB.reset
+    DB.reset
   end
   after do
     Object.send(:remove_const, :Artist)
@@ -45,13 +45,13 @@ describe Sequel::Model, "pg_array_associations" do
     @n1.tags.should == []
     @c1.load(:tag_ids=>[]).tags.should == []
     @n2.artists.should == []
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   it "should use correct SQL when loading associations lazily" do
     @o1.tags.should == [@o2]
     @o2.artists.should == [@o1]
-    MODEL_DB.sqls.should == ["SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))", "SELECT * FROM artists WHERE (artists.tag_ids @> ARRAY[2])"]
+    DB.sqls.should == ["SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))", "SELECT * FROM artists WHERE (artists.tag_ids @> ARRAY[2])"]
   end
 
   it "should accept :primary_key option for primary keys to use in current and associated table" do
@@ -205,17 +205,17 @@ describe Sequel::Model, "pg_array_associations" do
   it "should eagerly load correctly" do
     a = @c1.eager(:tags).all
     a.should == [@o1]
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
     sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@o2]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     a = @c2.eager(:artists).all
     a.should == [@o2]
-    MODEL_DB.sqls.should == ['SELECT * FROM tags', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
+    DB.sqls.should == ['SELECT * FROM tags', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
     a.first.artists.should == [@o1]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   it "should support using custom key options when eager loading associations" do
@@ -225,28 +225,28 @@ describe Sequel::Model, "pg_array_associations" do
 
     a = @c1.eager(:tags).all
     a.should == [@o1]
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.pop.should =~ /SELECT \* FROM tags WHERE \(\(tags\.id \* 3\) IN \([369], [369], [369]\)\)/ 
     sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@o2]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     a = @c2.eager(:artists).all
     a.should == [@o2]
-    MODEL_DB.sqls.should == ["SELECT * FROM tags", "SELECT * FROM artists WHERE (artists.tag_ids[1:2] && ARRAY[6])"]
+    DB.sqls.should == ["SELECT * FROM tags", "SELECT * FROM artists WHERE (artists.tag_ids[1:2] && ARRAY[6])"]
     a.first.artists.should == [@o1]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   it "should allow cascading of eager loading for associations of associated models" do
     a = @c1.eager(:tags=>:artists).all
     a.should == [@o1]
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.slice!(1).should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
     sqls.should == ['SELECT * FROM artists', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
     a.first.tags.should == [@o2]
     a.first.tags.first.artists.should == [@o1]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   it "should respect :eager when lazily loading an association" do
@@ -254,16 +254,16 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.many_to_pg_array :artists2, :clone=>:artists, :eager=>:tags
 
     @o1.tags2.should == [@o2]
-    MODEL_DB.sqls.should == ["SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))", "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
+    DB.sqls.should == ["SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))", "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
     @o1.tags2.first.artists.should == [@o1]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     @o2.artists2.should == [@o1]
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
     sqls.should == ["SELECT * FROM artists WHERE (artists.tag_ids @> ARRAY[2])"]
     @o2.artists2.first.tags.should == [@o2]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   it "should cascade eagerly loading when the :eager_graph association option is used" do
@@ -274,36 +274,36 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.dataset._fetch = {:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])}
 
     @o1.tags2.should == [@o2]
-    MODEL_DB.sqls.first.should =~ /SELECT tags\.id, artists\.id AS artists_id, artists\.tag_ids FROM tags LEFT OUTER JOIN artists ON \(artists.tag_ids @> ARRAY\[tags.id\]\) WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
+    DB.sqls.first.should =~ /SELECT tags\.id, artists\.id AS artists_id, artists\.tag_ids FROM tags LEFT OUTER JOIN artists ON \(artists.tag_ids @> ARRAY\[tags.id\]\) WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
     @o1.tags2.first.artists.should == [@o1]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     @o2.artists2.should == [@o1]
-    MODEL_DB.sqls.should == ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id]) WHERE (artists.tag_ids @> ARRAY[2])"]
+    DB.sqls.should == ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id]) WHERE (artists.tag_ids @> ARRAY[2])"]
     @o2.artists2.first.tags.should == [@o2]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     @c2.dataset._fetch = {:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3])}
     @c1.dataset._fetch = {:id=>1, :tag_ids=>Sequel.pg_array([1,2,3])}
 
     a = @c1.eager(:tags2).all
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.pop.should =~ /SELECT tags\.id, artists\.id AS artists_id, artists\.tag_ids FROM tags LEFT OUTER JOIN artists ON \(artists.tag_ids @> ARRAY\[tags.id\]\) WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
     sqls.should == ["SELECT * FROM artists"]
     a.should == [@o1]
     a.first.tags2.should == [@o2]
     a.first.tags2.first.artists.should == [@o1]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     @c2.dataset._fetch = {:id=>2}
     @c1.dataset._fetch = {:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])}
 
     a = @c2.eager(:artists2).all
-    MODEL_DB.sqls.should == ["SELECT * FROM tags", "SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id]) WHERE (artists.tag_ids && ARRAY[2])"]
+    DB.sqls.should == ["SELECT * FROM tags", "SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id]) WHERE (artists.tag_ids && ARRAY[2])"]
     a.should == [@o2]
     a.first.artists2.should == [@o1]
     a.first.artists2.first.tags.should == [@o2]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   it "should respect the :limit option when eager loading" do
@@ -312,29 +312,29 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :limit=>2
     a = @c1.eager(:tags).all
     a.should == [@o1]
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
     sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@c2.load(:id=>1), @c2.load(:id=>2)]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     @c1.pg_array_to_many :tags, :clone=>:tags, :limit=>[1, 1]
     a = @c1.eager(:tags).all
     a.should == [@o1]
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
     sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@c2.load(:id=>2)]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     @c1.pg_array_to_many :tags, :clone=>:tags, :limit=>[nil, 1]
     a = @c1.eager(:tags).all
     a.should == [@o1]
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
     sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@c2.load(:id=>2), @c2.load(:id=>3)]
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
 
     @c2.dataset._fetch = [{:id=>2}]
     @c1.dataset._fetch = [{:id=>5, :tag_ids=>Sequel.pg_array([1,2,3])},{:id=>6, :tag_ids=>Sequel.pg_array([2,3])}, {:id=>7, :tag_ids=>Sequel.pg_array([1,2])}]
@@ -342,23 +342,23 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.many_to_pg_array :artists, :clone=>:artists, :limit=>2
     a = @c2.eager(:artists).all
     a.should == [@o2]
-    MODEL_DB.sqls.should == ['SELECT * FROM tags', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
+    DB.sqls.should == ['SELECT * FROM tags', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
     a.first.artists.should == [@c1.load(:id=>5, :tag_ids=>Sequel.pg_array([1,2,3])), @c1.load(:id=>6, :tag_ids=>Sequel.pg_array([2,3]))]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     @c2.many_to_pg_array :artists, :clone=>:artists, :limit=>[1, 1]
     a = @c2.eager(:artists).all
     a.should == [@o2]
-    MODEL_DB.sqls.should == ['SELECT * FROM tags', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
+    DB.sqls.should == ['SELECT * FROM tags', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
     a.first.artists.should == [@c1.load(:id=>6, :tag_ids=>Sequel.pg_array([2,3]))]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     @c2.many_to_pg_array :artists, :clone=>:artists, :limit=>[nil, 1]
     a = @c2.eager(:artists).all
     a.should == [@o2]
-    MODEL_DB.sqls.should == ['SELECT * FROM tags', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
+    DB.sqls.should == ['SELECT * FROM tags', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
     a.first.artists.should == [@c1.load(:id=>6, :tag_ids=>Sequel.pg_array([2,3])), @c1.load(:id=>7, :tag_ids=>Sequel.pg_array([1,2]))]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   it "should eagerly graph associations" do
@@ -366,16 +366,16 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.dataset._fetch = {:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])}
 
     a = @c1.eager_graph(:tags).all
-    MODEL_DB.sqls.should == ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id])"]
+    DB.sqls.should == ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id])"]
     a.should == [@o1]
     a.first.tags.should == [@o2]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     a = @c2.eager_graph(:artists).all
-    MODEL_DB.sqls.should == ["SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id])"]
+    DB.sqls.should == ["SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id])"]
     a.should == [@o2]
     a.first.artists.should == [@o1]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   it "should allow cascading of eager graphing for associations of associated models" do
@@ -383,18 +383,18 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.dataset._fetch = {:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3]), :artists_0_id=>1, :artists_0_tag_ids=>Sequel.pg_array([1,2,3])}
 
     a = @c1.eager_graph(:tags=>:artists).all
-    MODEL_DB.sqls.should == ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id, artists_0.id AS artists_0_id, artists_0.tag_ids AS artists_0_tag_ids FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id]) LEFT OUTER JOIN artists AS artists_0 ON (artists_0.tag_ids @> ARRAY[tags.id])"]
+    DB.sqls.should == ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id, artists_0.id AS artists_0_id, artists_0.tag_ids AS artists_0_tag_ids FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id]) LEFT OUTER JOIN artists AS artists_0 ON (artists_0.tag_ids @> ARRAY[tags.id])"]
     a.should == [@o1]
     a.first.tags.should == [@o2]
     a.first.tags.first.artists.should == [@o1]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     a = @c2.eager_graph(:artists=>:tags).all
-    MODEL_DB.sqls.should == ["SELECT tags.id, artists.id AS artists_id, artists.tag_ids, tags_0.id AS tags_0_id FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id]) LEFT OUTER JOIN tags AS tags_0 ON (artists.tag_ids @> ARRAY[tags_0.id])"]
+    DB.sqls.should == ["SELECT tags.id, artists.id AS artists_id, artists.tag_ids, tags_0.id AS tags_0_id FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id]) LEFT OUTER JOIN tags AS tags_0 ON (artists.tag_ids @> ARRAY[tags_0.id])"]
     a.should == [@o2]
     a.first.artists.should == [@o1]
     a.first.artists.first.tags.should == [@o2]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   it "eager graphing should respect key options" do 
@@ -407,15 +407,15 @@ describe Sequel::Model, "pg_array_associations" do
 
     a = @c1.eager_graph(:tags).all
     a.should == [@o1]
-    MODEL_DB.sqls.should == ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids[1:2] @> ARRAY[(tags.id * 3)])"]
+    DB.sqls.should == ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids[1:2] @> ARRAY[(tags.id * 3)])"]
     a.first.tags.should == [@o2]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     a = @c2.eager_graph(:artists).all
     a.should == [@o2]
-    MODEL_DB.sqls.should == ["SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids[1:2] @> ARRAY[tags.id3])"]
+    DB.sqls.should == ["SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids[1:2] @> ARRAY[tags.id3])"]
     a.first.artists.should == [@o1]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
   
   it "should respect the association's :graph_select option" do 
@@ -426,16 +426,16 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.dataset._fetch = {:id=>1, :id2=>2, :tag_ids=>Sequel.pg_array([1,2,3])}
 
     a = @c1.eager_graph(:tags).all
-    MODEL_DB.sqls.should == ["SELECT artists.id, artists.tag_ids, tags.id2 FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id])"]
+    DB.sqls.should == ["SELECT artists.id, artists.tag_ids, tags.id2 FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id])"]
     a.should == [@o1]
     a.first.tags.should == [@c2.load(:id2=>2)]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     a = @c2.eager_graph(:artists).all
-    MODEL_DB.sqls.should == ["SELECT tags.id, artists.id AS artists_id FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id])"]
+    DB.sqls.should == ["SELECT tags.id, artists.id AS artists_id FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id])"]
     a.should == [@o2]
     a.first.artists.should == [@c1.load(:id=>1)]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   it "should respect the association's :graph_join_type option" do 
@@ -483,34 +483,34 @@ describe Sequel::Model, "pg_array_associations" do
   it "should define an add_ method for adding associated objects" do
     @o1.add_tag(@c2.load(:id=>4))
     @o1.tag_ids.should == [1,2,3,4]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     @o1.save_changes
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[1,2,3,4] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[1,2,3,4] WHERE (id = 1)"]
 
     @o2.add_artist(@c1.load(:id=>1, :tag_ids=>Sequel.pg_array([4])))
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[4,2] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[4,2] WHERE (id = 1)"]
   end
 
   it "should define a remove_ method for removing associated objects" do
     @o1.remove_tag(@o2)
     @o1.tag_ids.should == [1,3]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     @o1.save_changes
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[1,3] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[1,3] WHERE (id = 1)"]
 
     @o2.remove_artist(@c1.load(:id=>1, :tag_ids=>Sequel.pg_array([1,2,3,4])))
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[1,3,4] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[1,3,4] WHERE (id = 1)"]
   end
 
   it "should define a remove_all_ method for removing all associated objects" do
     @o1.remove_all_tags
     @o1.tag_ids.should == []
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     @o1.save_changes
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[] WHERE (id = 1)"]
 
     @o2.remove_all_artists
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = array_remove(tag_ids, 2) WHERE (tag_ids @> ARRAY[2])"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = array_remove(tag_ids, 2) WHERE (tag_ids @> ARRAY[2])"]
   end
 
   it "should have pg_array_to_many association modification methods save if :save_after_modify option is used" do
@@ -518,73 +518,73 @@ describe Sequel::Model, "pg_array_associations" do
 
     @o1.add_tag(@c2.load(:id=>4))
     @o1.tag_ids.should == [1,2,3,4]
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[1,2,3,4] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[1,2,3,4] WHERE (id = 1)"]
 
     @o1.remove_tag(@o2)
     @o1.tag_ids.should == [1,3,4]
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[1,3,4] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[1,3,4] WHERE (id = 1)"]
 
     @o1.remove_all_tags
     @o1.tag_ids.should == []
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[] WHERE (id = 1)"]
   end
 
   it "should have association modification methods deal with nil values" do
     v = @c1.load(:id=>1)
     v.add_tag(@c2.load(:id=>4))
     v.tag_ids.should == [4]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     v.save_changes
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[4]::integer[] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[4]::integer[] WHERE (id = 1)"]
 
     @o2.add_artist(@c1.load(:id=>1))
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[2]::integer[] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[2]::integer[] WHERE (id = 1)"]
 
     v = @c1.load(:id=>1)
     v.remove_tag(@c2.load(:id=>4))
     v.tag_ids.should == nil
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     v.save_changes
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     @o2.remove_artist(@c1.load(:id=>1))
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     v = @c1.load(:id=>1)
     v.remove_all_tags
     v.tag_ids.should == nil
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     v.save_changes
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   it "should have association modification methods deal with empty arrays values" do
     v = @c1.load(:id=>1, :tag_ids=>Sequel.pg_array([]))
     v.add_tag(@c2.load(:id=>4))
     v.tag_ids.should == [4]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     v.save_changes
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[4] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[4] WHERE (id = 1)"]
 
     @o2.add_artist(@c1.load(:id=>1, :tag_ids=>Sequel.pg_array([])))
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[2] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[2] WHERE (id = 1)"]
 
     v = @c1.load(:id=>1, :tag_ids=>Sequel.pg_array([]))
     v.remove_tag(@c2.load(:id=>4))
     v.tag_ids.should == []
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     v.save_changes
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     @o2.remove_artist(@c1.load(:id=>1, :tag_ids=>Sequel.pg_array([])))
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
 
     v = @c1.load(:id=>1, :tag_ids=>Sequel.pg_array([]))
     v.remove_all_tags
     v.tag_ids.should == []
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     v.save_changes
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
   end
 
   it "should respect the :array_type option when manually creating arrays" do
@@ -593,11 +593,11 @@ describe Sequel::Model, "pg_array_associations" do
     v = @c1.load(:id=>1)
     v.add_tag(@c2.load(:id=>4))
     v.tag_ids.should == [4]
-    MODEL_DB.sqls.should == []
+    DB.sqls.should == []
     v.save_changes
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[4]::int8[] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[4]::int8[] WHERE (id = 1)"]
 
     @o2.add_artist(@c1.load(:id=>1))
-    MODEL_DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[2]::int8[] WHERE (id = 1)"]
+    DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[2]::int8[] WHERE (id = 1)"]
   end
 end

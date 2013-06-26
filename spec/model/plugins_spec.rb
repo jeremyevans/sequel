@@ -173,13 +173,13 @@ describe Sequel::Model, ".plugin" do
   it "should save the DatasetMethods module and apply it later if the class doesn't have a dataset" do
     c = Class.new(Sequel::Model)
     c.plugin @t
-    c.dataset = MODEL_DB[:i]
+    c.dataset = DB[:i]
     c.dataset.ghi.should == 345
   end
   
   it "should save the DatasetMethods module and apply it later if the class has a dataset" do
     @c.plugin @t
-    @c.dataset = MODEL_DB[:i]
+    @c.dataset = DB[:i]
     @c.dataset.ghi.should == 345
   end
 

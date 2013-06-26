@@ -375,7 +375,7 @@ describe Sequel::Model, " association reflection methods" do
       def self.name; 'Node'; end
       def self.to_s; 'Node'; end
     end
-    MODEL_DB.reset
+    DB.reset
   end
   
   it "#all_association_reflections should include all association reflection hashes" do

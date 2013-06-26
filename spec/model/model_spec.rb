@@ -150,12 +150,12 @@ describe Sequel::Model do
   end
 
   it "should be associated with a dataset" do
-    model_a = Class.new(Sequel::Model) { set_dataset MODEL_DB[:as] }
+    model_a = Class.new(Sequel::Model) { set_dataset DB[:as] }
 
     model_a.dataset.should be_a_kind_of(Sequel::Mock::Dataset)
     model_a.dataset.opts[:from].should == [:as]
 
-    model_b = Class.new(Sequel::Model) { set_dataset MODEL_DB[:bs] }
+    model_b = Class.new(Sequel::Model) { set_dataset DB[:bs] }
 
     model_b.dataset.should be_a_kind_of(Sequel::Mock::Dataset)
     model_b.dataset.opts[:from].should == [:bs]
@@ -183,36 +183,36 @@ describe Sequel::Model do
   end
 
   it "allows dataset change" do
-    @model.set_dataset(MODEL_DB[:foo])
+    @model.set_dataset(DB[:foo])
     @model.table_name.should == :foo
   end
 
   it "allows set_dataset to accept a Symbol" do
-    @model.db = MODEL_DB
+    @model.db = DB
     @model.set_dataset(:foo)
     @model.table_name.should == :foo
   end
 
   it "allows set_dataset to accept a LiteralString" do
-    @model.db = MODEL_DB
+    @model.db = DB
     @model.set_dataset(Sequel.lit('foo'))
     @model.table_name.should == Sequel.lit('foo')
   end
 
   it "allows set_dataset to acceptan SQL::Identifier" do
-    @model.db = MODEL_DB
+    @model.db = DB
     @model.set_dataset(Sequel.identifier(:foo))
     @model.table_name.should == Sequel.identifier(:foo)
   end
 
   it "allows set_dataset to acceptan SQL::QualifiedIdentifier" do
-    @model.db = MODEL_DB
+    @model.db = DB
     @model.set_dataset(Sequel.qualify(:bar, :foo))
     @model.table_name.should == Sequel.qualify(:bar, :foo)
   end
 
   it "allows set_dataset to acceptan SQL::AliasedExpression" do
-    @model.db = MODEL_DB
+    @model.db = DB
     @model.set_dataset(Sequel.as(:foo, :bar))
     @model.table_name.should == :bar
   end
@@ -227,14 +227,14 @@ describe Sequel::Model do
   end
 
   it "set_dataset should add the destroy method to the dataset that destroys each object" do
-    ds = MODEL_DB[:foo]
+    ds = DB[:foo]
     ds.should_not respond_to(:destroy)
     @model.set_dataset(ds)
     ds.should respond_to(:destroy)
-    MODEL_DB.sqls
+    DB.sqls
     ds._fetch = [{:id=>1}, {:id=>2}]
     ds.destroy.should == 2
-    MODEL_DB.sqls.should == ["SELECT * FROM foo", "DELETE FROM foo WHERE id = 1", "DELETE FROM foo WHERE id = 2"]
+    DB.sqls.should == ["SELECT * FROM foo", "DELETE FROM foo WHERE id = 1", "DELETE FROM foo WHERE id = 2"]
   end
 
   it "set_dataset should add the destroy method that respects sharding with transactions" do
@@ -254,12 +254,12 @@ describe Sequel::Model do
 
   it "should not raise an error if there is a problem getting the columns for a dataset" do
     def @model.columns() raise Sequel::Error end
-    proc{@model.set_dataset(MODEL_DB[:foo].join(:blah))}.should_not raise_error
+    proc{@model.set_dataset(DB[:foo].join(:blah))}.should_not raise_error
   end
 
   it "doesn't raise an error on set_dataset if there is an error raised getting the schema" do
     def @model.get_db_schema(*) raise Sequel::Error end
-    proc{@model.set_dataset(MODEL_DB[:foo])}.should_not raise_error
+    proc{@model.set_dataset(DB[:foo])}.should_not raise_error
   end
 
   it "doesn't raise an error on inherited if there is an error setting the dataset" do
@@ -333,7 +333,7 @@ end
 describe Sequel::Model, "new" do
   before do
     @m = Class.new(Sequel::Model) do
-      set_dataset MODEL_DB[:items]
+      set_dataset DB[:items]
       columns :x, :id
     end
   end
@@ -367,7 +367,7 @@ end
 describe Sequel::Model, ".subset" do
   before do
     @c = Class.new(Sequel::Model(:items))
-    MODEL_DB.reset
+    DB.reset
   end
 
   specify "should create a filter on the underlying dataset" do
@@ -398,29 +398,29 @@ describe Sequel::Model, ".find" do
   before do
     @c = Class.new(Sequel::Model(:items))
     @c.dataset._fetch = {:name => 'sharon', :id => 1}
-    MODEL_DB.reset
+    DB.reset
   end
   
   it "should return the first record matching the given filter" do
     @c.find(:name => 'sharon').should be_a_kind_of(@c)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"]
+    DB.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"]
 
     @c.find(Sequel.expr(:name).like('abc%')).should be_a_kind_of(@c)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (name LIKE 'abc%' ESCAPE '\\') LIMIT 1"]
+    DB.sqls.should == ["SELECT * FROM items WHERE (name LIKE 'abc%' ESCAPE '\\') LIMIT 1"]
   end
   
   specify "should accept filter blocks" do
     @c.find{id > 1}.should be_a_kind_of(@c)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id > 1) LIMIT 1"]
+    DB.sqls.should == ["SELECT * FROM items WHERE (id > 1) LIMIT 1"]
 
     @c.find{(x > 1) & (y < 2)}.should be_a_kind_of(@c)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE ((x > 1) AND (y < 2)) LIMIT 1"]
+    DB.sqls.should == ["SELECT * FROM items WHERE ((x > 1) AND (y < 2)) LIMIT 1"]
   end
 end
 
 describe Sequel::Model, ".fetch" do
   before do
-    MODEL_DB.reset
+    DB.reset
     @c = Class.new(Sequel::Model(:items))
   end
   
@@ -441,19 +441,19 @@ describe Sequel::Model, ".find_or_create" do
       set_primary_key :id
       columns :x
     end
-    MODEL_DB.reset
+    DB.reset
   end
 
   it "should find the record" do
     @c.find_or_create(:x => 1).should == @c.load(:x=>1, :id=>1)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1"]
+    DB.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1"]
   end
   
   it "should create the record if not found" do
     @c.instance_dataset._fetch = @c.dataset._fetch = [[], {:x=>1, :id=>1}]
     @c.instance_dataset.autoid = @c.dataset.autoid = 1
     @c.find_or_create(:x => 1).should == @c.load(:x=>1, :id=>1)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1",
+    DB.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1",
       "INSERT INTO items (x) VALUES (1)",
       "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
   end
@@ -462,7 +462,7 @@ describe Sequel::Model, ".find_or_create" do
     @c.instance_dataset._fetch = @c.dataset._fetch = [[], {:x=>1, :id=>1}]
     @c.instance_dataset.autoid = @c.dataset.autoid = 1
     @c.find_or_create(:x => 1){|x| x[:y] = 2}.should == @c.load(:x=>1, :id=>1)
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.first.should == "SELECT * FROM items WHERE (x = 1) LIMIT 1"
     ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].should include(sqls[1])
     sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
@@ -482,7 +482,7 @@ describe Sequel::Model, "A model class without a primary key" do
       columns :x
       no_primary_key
     end
-    MODEL_DB.reset
+    DB.reset
   end
 
   it "should be able to insert records without selecting them back" do
@@ -491,7 +491,7 @@ describe Sequel::Model, "A model class without a primary key" do
     i.class.should be(@c)
     i.values.to_hash.should == {:x => 1}
 
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)']
+    DB.sqls.should == ['INSERT INTO items (x) VALUES (1)']
   end
 
   it "should raise when deleting" do
@@ -506,7 +506,7 @@ describe Sequel::Model, "A model class without a primary key" do
     o = @c.new(:x => 2)
     o.should be_new
     o.save
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (2)']
+    DB.sqls.should == ['INSERT INTO items (x) VALUES (2)']
   end
 end
 
@@ -519,7 +519,7 @@ describe Sequel::Model, "attribute accessors" do
     end
     @dataset = db[:items].columns(:x, :z)
     @c = Class.new(Sequel::Model)
-    MODEL_DB.reset
+    DB.reset
   end
 
   it "should be created on set_dataset" do
@@ -574,38 +574,38 @@ describe Sequel::Model, ".[]" do
   before do
     @c = Class.new(Sequel::Model(:items))
     @c.dataset._fetch = {:name => 'sharon', :id => 1}
-    MODEL_DB.reset
+    DB.reset
   end
 
   it "should return the first record for the given pk" do
     @c[1].should == @c.load(:name => 'sharon', :id => 1)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE id = 1"]
+    DB.sqls.should == ["SELECT * FROM items WHERE id = 1"]
     @c[9999].should == @c.load(:name => 'sharon', :id => 1)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE id = 9999"]
+    DB.sqls.should == ["SELECT * FROM items WHERE id = 9999"]
   end
 
   it "should have #[] return nil if no rows match" do
     @c.dataset._fetch = []
     @c[1].should == nil
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE id = 1"]
+    DB.sqls.should == ["SELECT * FROM items WHERE id = 1"]
   end
 
   it "should work correctly for custom primary key" do
     @c.set_primary_key :name
     @c['sharon'].should == @c.load(:name => 'sharon', :id => 1)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE name = 'sharon'"]
+    DB.sqls.should == ["SELECT * FROM items WHERE name = 'sharon'"]
   end
 
   it "should return the first record for the given pk for a filtered dataset" do
     @c.dataset = @c.dataset.filter(:active=>true)
     @c[1].should == @c.load(:name => 'sharon', :id => 1)
-    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE ((active IS TRUE) AND (id = 1)) LIMIT 1"]
+    DB.sqls.should == ["SELECT * FROM items WHERE ((active IS TRUE) AND (id = 1)) LIMIT 1"]
   end
 
   it "should work correctly for composite primary key specified as array" do
     @c.set_primary_key [:node_id, :kind]
     @c[3921, 201].should be_a_kind_of(@c)
-    sqls = MODEL_DB.sqls
+    sqls = DB.sqls
     sqls.length.should == 1
     sqls.first.should =~ /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
   end

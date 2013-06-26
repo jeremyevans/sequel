@@ -11,7 +11,7 @@ describe Sequel::Model, "single table inheritance plugin" do
     class ::StiTestSub2 < StiTest
     end 
     @ds = StiTest.dataset
-    MODEL_DB.reset
+    DB.reset
   end
   after do
     Object.send(:remove_const, :StiTestSub1)
@@ -74,19 +74,19 @@ describe Sequel::Model, "single table inheritance plugin" do
     StiTest.new.save
     StiTestSub1.new.save
     StiTestSub2.new.save
-    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 10)) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub2')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub2')) AND (id = 10)) LIMIT 1"]
+    DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 10)) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub2')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub2')) AND (id = 10)) LIMIT 1"]
   end
 
   it "should have the before_create hook not override an existing value" do
     StiTest.create(:kind=>'StiTestSub1')
-    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]
+    DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]
   end
 
   it "should have the before_create hook handle columns with the same name as existing method names" do
     StiTest.plugin :single_table_inheritance, :type
     StiTest.columns :id, :type
     StiTest.create
-    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (type) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]
+    DB.sqls.should == ["INSERT INTO sti_tests (type) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]
   end
 
   it "should add a filter to model datasets inside subclasses hook to only retreive objects with the matching key" do

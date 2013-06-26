@@ -10,7 +10,7 @@ describe Sequel::Model::DatasetMethods, "#destroy"  do
     end
     @d = @c.dataset
     @d._fetch = [{:id=>1}, {:id=>2}]
-    MODEL_DB.reset
+    DB.reset
   end
 
   it "should instantiate objects in the dataset and call destroy on each" do
@@ -28,13 +28,13 @@ describe Sequel::Model::DatasetMethods, "#destroy"  do
   it "should use a transaction if use_transactions is true for the model" do
     @c.use_transactions = true
     @d.destroy
-    MODEL_DB.sqls.should == ["BEGIN", "SELECT * FROM items", "COMMIT"]
+    DB.sqls.should == ["BEGIN", "SELECT * FROM items", "COMMIT"]
   end
 
   it "should not use a transaction if use_transactions is false for the model" do
     @c.use_transactions = false
     @d.destroy
-    MODEL_DB.sqls.should == ["SELECT * FROM items"]
+    DB.sqls.should == ["SELECT * FROM items"]
   end
 end
 
@@ -82,7 +82,7 @@ describe Sequel::Model::DatasetMethods  do
   end
 
   specify "#join_table should handle model classes that aren't simple selects using a subselect" do
-    @c.join(Class.new(Sequel::Model(MODEL_DB[:categories].where(:foo=>1))), :item_id => :id).sql.should == 'SELECT * FROM items INNER JOIN (SELECT * FROM categories WHERE (foo = 1)) AS t1 ON (t1.item_id = items.id)'
+    @c.join(Class.new(Sequel::Model(DB[:categories].where(:foo=>1))), :item_id => :id).sql.should == 'SELECT * FROM items INNER JOIN (SELECT * FROM categories WHERE (foo = 1)) AS t1 ON (t1.item_id = items.id)'
   end
 
   specify "#graph should allow use to use a model class when joining" do

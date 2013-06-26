@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe Sequel::Database do
   before do
-    @db = INTEGRATION_DB
+    @db = DB
   end
 
   specify "should provide disconnect functionality" do

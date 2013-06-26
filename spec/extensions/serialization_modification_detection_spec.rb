@@ -13,7 +13,7 @@ describe "serialization_modification_detection plugin" do
     @o2 = @c.load(:id=>1, :h=>"--- {}\n\n")
     @o3 = @c.new
     @o4 = @c.load(:id=>1, :h=>nil)
-    MODEL_DB.reset
+    DB.reset
   end
   
   it "should not detect columns that haven't been changed" do

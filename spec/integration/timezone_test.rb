@@ -29,7 +29,7 @@ describe "Sequel timezone support" do
   end
 
   before do
-    @db = INTEGRATION_DB
+    @db = DB
     @db.create_table!(:t){DateTime :t}
   end
   after do

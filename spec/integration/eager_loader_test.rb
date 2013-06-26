@@ -2,8 +2,8 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Eagerly loading a tree structure" do
   before(:all) do
-    INTEGRATION_DB.instance_variable_set(:@schemas, {})
-    INTEGRATION_DB.create_table!(:nodes) do
+    DB.instance_variable_set(:@schemas, {})
+    DB.create_table!(:nodes) do
       primary_key :id
       foreign_key :parent_id, :nodes
     end
@@ -68,7 +68,7 @@ describe "Eagerly loading a tree structure" do
     Node.insert(:parent_id=>6)
   end
   after(:all) do
-    INTEGRATION_DB.drop_table :nodes
+    DB.drop_table :nodes
     Object.send(:remove_const, :Node)
   end
 
@@ -128,14 +128,14 @@ describe "Association Extensions" do
         first(:name=>name) || model.create(:name=>name, :author_id=>model_object.pk)
       end
     end
-    INTEGRATION_DB.instance_variable_set(:@schemas, {})
-    INTEGRATION_DB.create_table!(:authors) do
+    DB.instance_variable_set(:@schemas, {})
+    DB.create_table!(:authors) do
       primary_key :id
     end
     class ::Author < Sequel::Model
       one_to_many :authorships, :extend=>FindOrCreate
     end
-    INTEGRATION_DB.create_table!(:authorships) do
+    DB.create_table!(:authorships) do
       primary_key :id
       foreign_key :author_id, :authors
       String :name
@@ -146,7 +146,7 @@ describe "Association Extensions" do
     @author = Author.create
   end
   after do
-    INTEGRATION_DB.drop_table :authorships, :authors
+    DB.drop_table :authorships, :authors
     Object.send(:remove_const, :Author)
     Object.send(:remove_const, :Authorship)
   end
@@ -171,8 +171,8 @@ end
 
 describe "has_many :through has_many and has_one :through belongs_to" do
   before(:all) do
-    INTEGRATION_DB.instance_variable_set(:@schemas, {})
-    INTEGRATION_DB.create_table!(:firms) do
+    DB.instance_variable_set(:@schemas, {})
+    DB.create_table!(:firms) do
       primary_key :id
     end
     class ::Firm < Sequel::Model
@@ -195,7 +195,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
         end)
     end
 
-    INTEGRATION_DB.create_table!(:clients) do
+    DB.create_table!(:clients) do
       primary_key :id
       foreign_key :firm_id, :firms
     end
@@ -204,7 +204,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
       one_to_many :invoices
     end
 
-    INTEGRATION_DB.create_table!(:invoices) do
+    DB.create_table!(:invoices) do
       primary_key :id
       foreign_key :client_id, :clients
     end
@@ -251,7 +251,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
     @invoice5 = Invoice.create(:client => @client3)
   end
   after(:all) do
-    INTEGRATION_DB.drop_table :invoices, :clients, :firms
+    DB.drop_table :invoices, :clients, :firms
     Object.send(:remove_const, :Firm)
     Object.send(:remove_const, :Client)
     Object.send(:remove_const, :Invoice)
@@ -322,8 +322,8 @@ end
 
 describe "Polymorphic Associations" do
   before(:all) do
-    INTEGRATION_DB.instance_variable_set(:@schemas, {})
-    INTEGRATION_DB.create_table!(:assets) do
+    DB.instance_variable_set(:@schemas, {})
+    DB.create_table!(:assets) do
       primary_key :id
       Integer :attachable_id
       String :attachable_type
@@ -356,7 +356,7 @@ describe "Polymorphic Associations" do
         end)
     end 
   
-    INTEGRATION_DB.create_table!(:posts) do
+    DB.create_table!(:posts) do
       primary_key :id
     end
     class ::Post < Sequel::Model
@@ -366,7 +366,7 @@ describe "Polymorphic Associations" do
         :clearer=>proc{assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)}
     end 
   
-    INTEGRATION_DB.create_table!(:notes) do
+    DB.create_table!(:notes) do
       primary_key :id
     end
     class ::Note < Sequel::Model
@@ -377,7 +377,7 @@ describe "Polymorphic Associations" do
     end
   end
   before do
-    [:assets, :posts, :notes].each{|t| INTEGRATION_DB[t].delete}
+    [:assets, :posts, :notes].each{|t| DB[t].delete}
     @post = Post.create
     Note.create
     @note = Note.create
@@ -387,7 +387,7 @@ describe "Polymorphic Associations" do
     @asset2.associations.clear
   end
   after(:all) do
-    INTEGRATION_DB.drop_table :assets, :posts, :notes
+    DB.drop_table :assets, :posts, :notes
     Object.send(:remove_const, :Asset)
     Object.send(:remove_const, :Post)
     Object.send(:remove_const, :Note)
@@ -448,8 +448,8 @@ end
 
 describe "many_to_one/one_to_many not referencing primary key" do
   before(:all) do
-    INTEGRATION_DB.instance_variable_set(:@schemas, {})
-    INTEGRATION_DB.create_table!(:clients) do
+    DB.instance_variable_set(:@schemas, {})
+    DB.create_table!(:clients) do
       primary_key :id
       String :name
     end
@@ -478,7 +478,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
         end)
     end 
   
-    INTEGRATION_DB.create_table!(:invoices) do
+    DB.create_table!(:invoices) do
       primary_key :id
       String :client_name
     end
@@ -504,7 +504,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
     @invoice2 = Invoice.create(:client_name=>'X')
   end
   after(:all) do
-    INTEGRATION_DB.drop_table :invoices, :clients
+    DB.drop_table :invoices, :clients
     Object.send(:remove_const, :Client)
     Object.send(:remove_const, :Invoice)
   end
@@ -575,7 +575,7 @@ end
 
 describe "statistics associations" do
   before(:all) do
-    INTEGRATION_DB.create_table!(:projects) do
+    DB.create_table!(:projects) do
       primary_key :id
       String :name
     end
@@ -599,7 +599,7 @@ describe "statistics associations" do
       end 
     end 
 
-    INTEGRATION_DB.create_table!(:tickets) do
+    DB.create_table!(:tickets) do
       primary_key :id
       foreign_key :project_id, :projects
       Integer :hours
@@ -616,7 +616,7 @@ describe "statistics associations" do
     @ticket4 = Ticket.create(:project=>@project2, :hours=>20)
   end
   after(:all) do
-    INTEGRATION_DB.drop_table :tickets, :projects
+    DB.drop_table :tickets, :projects
     Object.send(:remove_const, :Project)
     Object.send(:remove_const, :Ticket)
   end
@@ -635,7 +635,7 @@ end
 
 describe "one to one associations" do
   before(:all) do
-    INTEGRATION_DB.create_table!(:books) do
+    DB.create_table!(:books) do
       primary_key :id
     end
     class ::Book < Sequel::Model
@@ -643,7 +643,7 @@ describe "one to one associations" do
       one_to_one :second_page, :class=>:Page, :conditions=>{:page_number=>2}, :reciprocal=>nil
     end
 
-    INTEGRATION_DB.create_table!(:pages) do
+    DB.create_table!(:pages) do
       primary_key :id
       foreign_key :book_id, :books
       Integer :page_number
@@ -660,7 +660,7 @@ describe "one to one associations" do
     @page4 = Page.create(:book=>@book2, :page_number=>2)
   end
   after(:all) do
-    INTEGRATION_DB.drop_table :pages, :books
+    DB.drop_table :pages, :books
     Object.send(:remove_const, :Book)
     Object.send(:remove_const, :Page)
   end

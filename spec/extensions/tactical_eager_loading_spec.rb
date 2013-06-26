@@ -21,7 +21,7 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
     end
     @c = ::TacticalEagerLoadingModel
     @ds = TacticalEagerLoadingModel.dataset
-    MODEL_DB.reset
+    DB.reset
   end
   after do
     Object.send(:remove_const, :TacticalEagerLoadingModel)
@@ -37,19 +37,19 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
   end
 
   it "association getter methods should eagerly load the association if the association isn't cached" do
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
     ts = @c.all
-    MODEL_DB.sqls.length.should == 1
+    DB.sqls.length.should == 1
     ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
-    MODEL_DB.sqls.length.should == 1
+    DB.sqls.length.should == 1
     ts.map{|x| x.children}.should == [[], [], [ts[0]], [ts[1]]]
-    MODEL_DB.sqls.length.should == 1
+    DB.sqls.length.should == 1
   end
 
   it "association getter methods should not eagerly load the association if the association is cached" do
-    MODEL_DB.sqls.length.should == 0
+    DB.sqls.length.should == 0
     ts = @c.all
-    MODEL_DB.sqls.length.should == 1
+    DB.sqls.length.should == 1
     ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
     @ds.should_not_receive(:eager_load)
     ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
@@ -65,14 +65,14 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
   it "association getter methods should not eagerly load the association if an instance is frozen" do
     ts = @c.all
     ts.first.freeze
-    MODEL_DB.sqls.length.should == 1
+    DB.sqls.length.should == 1
     ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
-    MODEL_DB.sqls.length.should == 2
+    DB.sqls.length.should == 2
     ts.map{|x| x.children}.should == [[], [], [ts[0]], [ts[1]]]
-    MODEL_DB.sqls.length.should == 2
+    DB.sqls.length.should == 2
     ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
-    MODEL_DB.sqls.length.should == 1
+    DB.sqls.length.should == 1
     ts.map{|x| x.children}.should == [[], [], [ts[0]], [ts[1]]]
-    MODEL_DB.sqls.length.should == 1
+    DB.sqls.length.should == 1
   end
 end
