@@ -7,7 +7,7 @@ gem 'rspec', '<2.10.0'
 
 # Plugin/Extension Dependencies
 gem 'tzinfo'
-gem 'activemodel'
+gem 'activemodel', '<4.0.0'
 gem 'nokogiri', '<1.6.0'
 gem 'json'
 
