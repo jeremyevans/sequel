@@ -1,5 +1,7 @@
 === HEAD
 
+* Correctly parse composite primary keys on SQLite 3.7.16+ (jeremyevans)
+
 * Recognize another disconnect error in the jdbc/oracle adapter (jeremyevans)
 
 * Add pg_json_ops extension for calling JSON functions and operators in PostgreSQL 9.3+ (jeremyevans)
