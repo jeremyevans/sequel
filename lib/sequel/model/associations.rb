@@ -2418,7 +2418,8 @@ module Sequel
                 list.uniq!
                 if lo = limit_map[ta]
                   limit, offset = lo
-                  list.replace(list[offset||0, limit])
+                  offset ||= 0
+                  list.replace(list[(offset)..(limit ? (offset)+limit-1 : -1)])
                 end
                 list
               elsif list
