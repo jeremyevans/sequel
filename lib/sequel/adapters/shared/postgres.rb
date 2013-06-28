@@ -399,7 +399,7 @@ module Sequel
       # 
       #   DB.refresh_view(:items_view)
       #   # REFRESH MATERIALIZED VIEW items_view
-      def refresh_view(name)
+      def refresh_view(name, opts=OPTS)
         run "REFRESH MATERIALIZED VIEW #{quote_schema_table(name)}"
       end
       
