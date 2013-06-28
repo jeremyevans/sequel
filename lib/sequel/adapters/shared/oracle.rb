@@ -247,17 +247,27 @@ module Sequel
         when :&
           sql << complex_expression_arg_pairs(args){|a, b| "CAST(BITAND(#{literal(a)}, #{literal(b)}) AS INTEGER)"}
         when :|
-          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} - #{complex_expression_sql(:&, [a, b])} + #{literal(b)})"}
+          sql << complex_expression_arg_pairs(args) do |a, b|
+            s1 = ''
+            complex_expression_sql_append(s1, :&, [a, b])
+            "(#{literal(a)} - #{s1} + #{literal(b)})"
+          end
         when :^
-          sql << complex_expression_arg_pairs(args){|*x| "(#{complex_expression_sql(:|, x)} - #{complex_expression_sql(:&, x)})"}
+          sql << complex_expression_arg_pairs(args) do |*x|
+            s1 = ''
+            s2 = ''
+            complex_expression_sql_append(s1, :|, x)
+            complex_expression_sql_append(s2, :&, x)
+            "(#{s1} - #{s2})"
+          end
         when :'B~'
           sql << BITCOMP_OPEN
           literal_append(sql, args.at(0))
           sql << BITCOMP_CLOSE
         when :<<
-          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * power(2, #{literal b}))"}
+          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * power(2, #{literal(b)}))"}
         when :>>
-          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / power(2, #{literal b}))"}
+          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / power(2, #{literal(b)}))"}
         when :%
           sql << complex_expression_arg_pairs(args){|a, b| "MOD(#{literal(a)}, #{literal(b)})"}
         else
