@@ -61,9 +61,10 @@ module Sequel
     #
     # Note that until PostgreSQL gains the ability to enforce foreign key
     # constraints in array columns, this plugin is not recommended for
-    # production use.
+    # production use unless you plan on emulating referential integrity
+    # constraints via triggers.
     #
-    # This plugin should work on all supported PostgreSQL versions, except that
+    # This plugin should work on all supported PostgreSQL versions, except
     # the remove_all modification method for many_to_pg_array associations, which
     # requires the array_remove method added in PostgreSQL 9.3.
     module PgArrayAssociations
