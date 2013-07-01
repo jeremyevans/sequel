@@ -1,3 +1,5 @@
+Sequel.require 'adapters/utils/replace'
+
 module Sequel
   module SQLite
     # No matter how you connect to SQLite, the following Database options
@@ -473,6 +475,8 @@ module Sequel
     
     # Instance methods for datasets that connect to an SQLite database
     module DatasetMethods
+      include Dataset::Replace
+
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
       EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}

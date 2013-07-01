@@ -1671,3 +1671,39 @@ describe "Emulated functions" do
     @ds.get(Sequel.trim(:a)).should == 'foo22'
   end
 end
+
+describe "Dataset replace" do
+  before do
+    DB.create_table(:items){Integer :id, :unique=>true; Integer :value}
+    sqls = []
+    DB.loggers << Class.new{%w'info error'.each{|m| define_method(m){|sql| sqls << sql}}}.new
+
+    @d = DB[:items]
+    sqls.clear
+  end
+
+  after do
+    DB.drop_table?(:items)
+  end
+
+  specify "should use support arrays, datasets, and multiple values" do
+    @d.replace([1, 2])
+    @d.all.should == [{:id=>1, :value=>2}]
+    @d.replace(1, 2)
+    @d.all.should == [{:id=>1, :value=>2}]
+    @d.replace(@d)
+    @d.all.should == [{:id=>1, :value=>2}]
+  end
+
+  specify "should create a record if the condition is not met" do
+    @d.replace(:id => 111, :value => 333)
+    @d.all.should == [{:id => 111, :value => 333}]
+  end
+
+  specify "should update a record if the condition is met" do
+    @d << {:id => 111}
+    @d.all.should == [{:id => 111, :value => nil}]
+    @d.replace(:id => 111, :value => 333)
+    @d.all.should == [{:id => 111, :value => 333}]
+  end
+end if DB.dataset.supports_replace?
