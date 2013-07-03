@@ -1,3 +1,7 @@
+=== HEAD
+
+* Correctly raise error when using an invalid virtual row block function call (jeremyevans)
+
 === 4.0.0 (2013-07-01)
 
 * Correctly parse composite primary keys on SQLite 3.7.16+ (jeremyevans)

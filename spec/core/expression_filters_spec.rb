@@ -429,7 +429,7 @@ describe Sequel::SQL::VirtualRow do
   end
 
   it "should raise an error if an unsupported argument is used with a block" do
-    proc{@d.l{count(:blah){}}}.should raise_error(Sequel::Error)
+    proc{@d.where{count(:blah){}}}.should raise_error(Sequel::Error)
   end
 
   it "should treat methods with a block and a leading argument :over as a window function call" do

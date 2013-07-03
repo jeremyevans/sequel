@@ -1624,7 +1624,7 @@ module Sequel
               fun_args = ::Kernel.Array(opts[:*] ? WILDCARD : opts[:args])
               WindowFunction.new(Function.new(m, *fun_args), Window.new(opts))
             else
-              raise Error, 'unsupported VirtualRow method argument used with block'
+              Kernel.raise(Error, 'unsupported VirtualRow method argument used with block')
             end
           end
         elsif args.empty?
