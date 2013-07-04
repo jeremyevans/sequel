@@ -1,4 +1,5 @@
 Sequel.require 'adapters/utils/split_alter_table'
+Sequel.require 'adapters/utils/replace'
 
 module Sequel
   Dataset::NON_SQL_OPTIONS << :insert_ignore
@@ -532,7 +533,6 @@ module Sequel
       PAREN_CLOSE = Dataset::PAREN_CLOSE
       NOT_SPACE = Dataset::NOT_SPACE
       FROM = Dataset::FROM
-      INSERT = Dataset::INSERT
       COMMA = Dataset::COMMA
       LIMIT = Dataset::LIMIT
       GROUP_BY = Dataset::GROUP_BY
@@ -552,7 +552,6 @@ module Sequel
       EMPTY_COLUMNS = " ()".freeze
       EMPTY_VALUES = " VALUES ()".freeze
       IGNORE = " IGNORE".freeze
-      REPLACE = 'REPLACE'.freeze
       ON_DUPLICATE_KEY_UPDATE = " ON DUPLICATE KEY UPDATE ".freeze
       EQ_VALUES = '=VALUES('.freeze
       EQ = '='.freeze
@@ -565,7 +564,9 @@ module Sequel
       QUAD_BACKSLASH = "\\\\\\\\".freeze
       BLOB_START = "0x".freeze
       HSTAR = "H*".freeze
-      
+
+      include Sequel::Dataset::Replace
+
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
       def complex_expression_sql_append(sql, op, args)
@@ -719,23 +720,7 @@ module Sequel
       def quoted_identifier_append(sql, c)
         sql << BACKTICK << c.to_s.gsub(BACKTICK_RE, DOUBLE_BACKTICK) << BACKTICK
       end
-      
-      # Execute a REPLACE statement on the database.
-      def replace(*values)
-        execute_insert(replace_sql(*values))
-      end
 
-      # MySQL specific syntax for REPLACE (aka UPSERT, or update if exists,
-      # insert if it doesn't).
-      def replace_sql(*values)
-        clone(:replace=>true).insert_sql(*values)
-      end
-
-      # Replace multiple rows in a single query.
-      def multi_replace(*values)
-        clone(:replace=>true).multi_insert(*values)
-      end
-      
       # MySQL can emulate DISTINCT ON with its non-standard GROUP BY implementation,
       # though the rows returned cannot be made deterministic through ordering.
       def supports_distinct_on?
@@ -830,11 +815,6 @@ module Sequel
       # MySQL supports UPDATE IGNORE
       def update_ignore_sql(sql)
         sql << IGNORE if opts[:update_ignore]
-      end
-
-      # If this is an replace instead of an insert, use replace instead
-      def insert_insert_sql(sql)
-        sql << (@opts[:replace] ? REPLACE : INSERT)
       end
 
       # MySQL supports INSERT ... ON DUPLICATE KEY UPDATE

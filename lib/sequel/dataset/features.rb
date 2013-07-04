@@ -149,6 +149,11 @@ module Sequel
       true
     end
 
+    # Whether the dataset supports REPLACE syntax
+    def supports_replace?
+      false
+    end
+
     private
 
     # Whether insert(nil) or insert({}) must be emulated by
