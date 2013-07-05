@@ -255,6 +255,19 @@ describe "A PostgreSQL dataset" do
     proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.should_not raise_error
   end if DB.server_version >= 90200
 
+  specify "should support adding check constarints that are not yet valid, and validating them later" do
+    @db.create_table!(:atest){Integer :a}
+    @db[:atest].insert(5)
+    @db.alter_table(:atest){add_constraint({:name=>:atest_check, :not_valid=>true}){a >= 10}}
+    @db[:atest].insert(10)
+    proc{@db[:atest].insert(6)}.should raise_error(Sequel::DatabaseError)
+
+    proc{@db.alter_table(:atest){validate_constraint :atest_check}}.should raise_error(Sequel::DatabaseError)
+    @db[:atest].where{a < 10}.update(:a=>Sequel.+(:a, 10))
+    @db.alter_table(:atest){validate_constraint :atest_check}
+    proc{@db.alter_table(:atest){validate_constraint :atest_check}}.should_not raise_error
+  end if DB.server_version >= 90200
+
   specify "should support :using when altering a column's type" do
     @db.create_table!(:atest){Integer :t}
     @db[:atest].insert(1262304000)

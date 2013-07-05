@@ -551,6 +551,14 @@ describe "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (score integer, CONSTRAINT valid_score CHECK (score <= 100))"]
   end
 
+  specify "should accept named constraint definitions with options" do
+    @db.create_table(:cats) do
+      integer :score
+      constraint({:name=>:valid_score, :deferrable=>true}, 'score <= 100')
+    end
+    @db.sqls.should == ["CREATE TABLE cats (score integer, CONSTRAINT valid_score CHECK (score <= 100) DEFERRABLE INITIALLY DEFERRED)"]
+  end
+
   specify "should accept named constraint definitions with block" do
     @db.create_table(:cats) do
       constraint(:blah_blah){(x.sql_number > 0) & (y.sql_number < 1)}
@@ -890,6 +898,13 @@ describe "DB#alter_table" do
       add_constraint :valid_score, 'score <= 100'
     end
     @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT valid_score CHECK (score <= 100)"]
+  end
+
+  specify "should support add_constraint with options" do
+    @db.alter_table(:cats) do
+      add_constraint({:name=>:valid_score, :deferrable=>true}, 'score <= 100')
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT valid_score CHECK (score <= 100) DEFERRABLE INITIALLY DEFERRED"]
   end
 
   specify "should support add_constraint with block" do

@@ -116,12 +116,16 @@ module Sequel
       end
       
       # Adds a named constraint (or unnamed if name is nil) to the DDL,
-      # with the given block or args.
+      # with the given block or args. To provide options for the constraint, pass
+      # a hash as the first argument.
       #
-      #   constraint(:blah, :num=>1..5) # CONSTRAINT blah CHECK num >= 1 AND num <= 5
-      #   check(:foo){num > 5} # CONSTRAINT foo CHECK num > 5
+      #   constraint(:blah, :num=>1..5)
+      #   # CONSTRAINT blah CHECK num >= 1 AND num <= 5
+      #   constraint({:name=>:blah, :deferrable=>true}, :num=>1..5)
+      #   # CONSTRAINT blah CHECK num >= 1 AND num <= 5 DEFERRABLE INITIALLY DEFERRED
       def constraint(name, *args, &block)
-        constraints << {:name => name, :type => :check, :check => block || args}
+        opts = name.is_a?(Hash) ? name : {:name=>name}
+        constraints << opts.merge(:type=>:check, :check=>block || args)
       end
       
       # Add a foreign key in the table that references another table to the DDL. See column
@@ -319,8 +323,11 @@ module Sequel
       #
       #   add_constraint(:valid_name, Sequel.like(:name, 'A%'))
       #   # ADD CONSTRAINT valid_name CHECK (name LIKE 'A%')
+      #   add_constraint({:name=>:valid_name, :deferrable=>true}, :num=>1..5)
+      #   # CONSTRAINT valid_name CHECK (name LIKE 'A%') DEFERRABLE INITIALLY DEFERRED
       def add_constraint(name, *args, &block)
-        @operations << {:op => :add_constraint, :name => name, :type => :check, :check => block || args}
+        opts = name.is_a?(Hash) ? name : {:name=>name}
+        @operations << opts.merge(:op=>:add_constraint, :type=>:check, :check=>block || args)
       end
 
       # Add a unique constraint to the given column(s)

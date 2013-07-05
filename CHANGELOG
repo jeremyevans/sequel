@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow PostgreSQL add_constraint to support :not_valid option (jeremyevans)
+
+* Allow CHECK constraints to have options by using an options hash as the constraint name (jeremyevans)
+
 * Correctly raise error when using an invalid virtual row block function call (jeremyevans)
 
 * Support REPLACE on SQLite via Dataset#replace and #multi_replace (etehtsea) (#681)

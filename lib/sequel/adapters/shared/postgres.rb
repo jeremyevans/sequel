@@ -637,7 +637,7 @@ module Sequel
         when :exclude
           elements = constraint[:elements].map{|c, op| "#{literal(c)} WITH #{op}"}.join(', ')
           "#{"CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name]}EXCLUDE USING #{constraint[:using]||'gist'} (#{elements})#{" WHERE #{filter_expr(constraint[:where])}" if constraint[:where]}"
-        when :foreign_key
+        when :foreign_key, :check
           sql = super
           if constraint[:not_valid]
             sql << " NOT VALID"
