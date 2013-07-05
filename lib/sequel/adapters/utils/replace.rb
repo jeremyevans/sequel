@@ -4,13 +4,13 @@ module Sequel
       INSERT = Dataset::INSERT
       REPLACE = 'REPLACE'.freeze
 
-      # Execute a REPLACE statement on the database.
+      # Execute a REPLACE statement on the database (deletes any duplicate
+      # rows before inserting).
       def replace(*values)
         execute_insert(replace_sql(*values))
       end
 
-      # SQLite specific syntax for REPLACE (aka UPSERT, or update if exists,
-      # insert if it doesn't).
+      # SQL statement for REPLACE
       def replace_sql(*values)
         clone(:replace=>true).insert_sql(*values)
       end
@@ -20,7 +20,7 @@ module Sequel
         clone(:replace=>true).multi_insert(*values)
       end
 
-      # Whether the database supports REPLACE syntax
+      # Databases using this module support REPLACE.
       def supports_replace?
         true
       end

@@ -117,6 +117,11 @@ module Sequel
       false
     end
 
+    # Whether the dataset supports REPLACE syntax, false by default.
+    def supports_replace?
+      false
+    end
+
     # Whether the RETURNING clause is supported for the given type of query.
     # +type+ can be :insert, :update, or :delete.
     def supports_returning?(type)
@@ -147,11 +152,6 @@ module Sequel
     # that use 1 for true).
     def supports_where_true?
       true
-    end
-
-    # Whether the dataset supports REPLACE syntax
-    def supports_replace?
-      false
     end
 
     private

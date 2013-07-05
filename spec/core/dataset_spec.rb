@@ -4508,3 +4508,8 @@ describe "Dataset#escape_like" do
   end
 end
 
+describe "Dataset#supports_replace?" do
+  it "should be false by default" do
+    Sequel::Dataset.new(nil).supports_replace?.should be_false
+  end
+end
