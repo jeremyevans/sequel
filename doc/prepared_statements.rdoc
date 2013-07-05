@@ -31,6 +31,12 @@ placeholders, e.g.:
 
   ds = DB[:items].where(:name=>:$n)
 
+You can use these placeholders in most places where you can use the value
+directly.  For example, if you want to use placeholders while also using
+raw SQL, you can do:
+
+  ds = DB["SELECT * FROM items WHERE name = ?", :$n]
+
 == Bound Variables
 
 Using bound variables for this query is simple:
