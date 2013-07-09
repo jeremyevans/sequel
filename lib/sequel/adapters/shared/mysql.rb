@@ -648,11 +648,6 @@ module Sequel
         SQL::PlaceholderLiteralString.new((opts[:boolean] ? MATCH_AGAINST_BOOLEAN : MATCH_AGAINST), [Array(cols), terms])
       end
 
-      # MySQL allows HAVING clause on ungrouped datasets.
-      def having(*cond, &block)
-        _filter(:having, *cond, &block)
-      end
-      
       # Transforms an CROSS JOIN to an INNER JOIN if the expr is not nil.
       # Raises an error on use of :full_outer type, since MySQL doesn't support it.
       def join_table(type, table, expr=nil, opts=OPTS, &block)
