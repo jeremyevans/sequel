@@ -1239,6 +1239,14 @@ describe Sequel::Model, "one_to_many" do
     DB.sqls.should == ["SELECT * FROM attributes WHERE id = 234", "UPDATE attributes SET node_id = 1234 WHERE (id = 234)"]
   end
 
+  it "should raise an error if the primary key passed to the add_ method does not match an existing record" do
+    @c2.one_to_many :attributes, :class => @c1
+    n = @c2.new(:id => 1234)
+    @c1.dataset._fetch = []
+    proc{n.add_attribute(234)}.should raise_error(Sequel::NoMatchingRow)
+    DB.sqls.should == ["SELECT * FROM attributes WHERE id = 234"]
+  end
+
   it "should raise an error in the add_ method if the passed associated object is not of the correct type" do
     @c2.one_to_many :attributes, :class => @c1
     proc{@c2.new(:id => 1234).add_attribute(@c2.new)}.should raise_error(Sequel::Error)
@@ -2011,6 +2019,16 @@ describe Sequel::Model, "many_to_many" do
     ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 2345)',
      'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (2345, 1234)'].should(include(sqls.pop))
     sqls.should == ["SELECT * FROM attributes WHERE id = 2345"]
+  end
+
+  it "should raise an error if the primary key passed to the add_ method does not match an existing record" do
+    @c2.many_to_many :attributes, :class => @c1
+    
+    n = @c2.load(:id => 1234)
+    a = @c1.load(:id => 2345)
+    @c1.dataset._fetch = []
+    proc{n.add_attribute(2345)}.should raise_error(Sequel::NoMatchingRow)
+    DB.sqls.should == ["SELECT * FROM attributes WHERE id = 2345"]
   end
 
   it "should allow passing a hash to the add_ method which creates a new record" do

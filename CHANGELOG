@@ -1,5 +1,7 @@
 === HEAD
 
+* Raise NoMatchingRow if calling add_association with a primary key value that doesn't match an existing row (jeremyevans)
+
 * Allow PostgreSQL add_constraint to support :not_valid option (jeremyevans)
 
 * Allow CHECK constraints to have options by using an options hash as the constraint name (jeremyevans)

@@ -1512,7 +1512,7 @@ module Sequel
           if o.is_a?(Hash)
             o = klass.new(o)
           elsif o.is_a?(Integer) || o.is_a?(String) || o.is_a?(Array)
-            o = klass[o]
+            o = klass.with_pk!(o)
           elsif !o.is_a?(klass)
             raise(Sequel::Error, "associated object #{o.inspect} not of correct type #{klass}")
           end
