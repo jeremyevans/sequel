@@ -1,5 +1,7 @@
 === HEAD
 
+* Convert Java::JavaUtil::HashMap to ruby Hash in jdbc adapter, for better handling of PostgreSQL hstore type (jeremyevans) (#686)
+
 * Raise NoMatchingRow if calling add_association with a primary key value that doesn't match an existing row (jeremyevans)
 
 * Allow PostgreSQL add_constraint to support :not_valid option (jeremyevans)
