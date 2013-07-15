@@ -21,8 +21,9 @@ module Sequel
     #   Album.add_pg_typecast_on_load_columns :aliases, :config
     #
     # This plugin only handles values that the adapter returns as strings.  If
-    # the adapter returns a value other than a string for a column, that value
-    # will be used directly without typecasting.
+    # the adapter returns a value other than a string, this plugin will have no
+    # effect.  You may be able to use the regular typecast_on_load plugin to
+    # handle those cases.
     module PgTypecastOnLoad
       # Call add_pg_typecast_on_load_columns on the passed column arguments.
       def self.configure(model, *columns)
