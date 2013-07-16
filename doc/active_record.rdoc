@@ -742,12 +742,12 @@ ActiveRecord Method :: Notes, Workarounds
 <tt>clear_active_connections!</tt> :: Sequel doesn't leak connections like ActiveRecord, so you don't need to worry about this
 <tt>clear_reloadable_connections!</tt> :: Sequel doesn't leak connections like ActiveRecord, so you don't need to worry about this
 +content_columns+ :: Not needed internally, you can probably do <tt>Album.columns.map{|x| x.to_s}.delete_if{|x| x == Album.primary_key || x =~ /_(id|count)\z/}</tt>
-+decrement_counter+ :: <tt>Album.where(:id=>:id).update(:counter_name=>:counter_name - 1)</tt>
++decrement_counter+ :: <tt>Album.where(:id=>:id).update(:counter_name=>Sequel.-(:counter_name, 1))</tt>
 +define_attribute_methods+, +define_read_methods+ :: <tt>def_column_accessor(*columns)</tt>, a private method
 <tt>descends_from_active_record?</tt> :: Not needed internally, if using single table inheritance, <tt>Album.sti_dataset.model == Album</tt>
 +find_each+, +find_in_batches+ :: Use the +pagination+ extension
 <tt>generated_methods?</tt> :: No equivalent
-+increment_counter+ :: <tt>Album.where(:id=>:id).update(:counter_name=>:counter_name + 1)</tt>
++increment_counter+ :: <tt>Album.where(:id=>:id).update(:counter_name=>Sequel.+(:counter_name, 1))</tt>
 <tt>instance_method_already_implemented?</tt> :: No equivalent, Sequel does not create column accessors that override other methods, it just skips them.
 <tt>match_attribute_method?</tt> :: No equivalent
 +readonly_attributes+ :: No equivalent
