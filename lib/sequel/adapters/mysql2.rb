@@ -72,9 +72,23 @@ module Sequel
       # yield the connection if a block is given.
       def _execute(conn, sql, opts)
         begin
-          r = log_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql){conn.query(sql, :database_timezone => timezone, :application_timezone => Sequel.application_timezone)}
+          stream = opts[:stream]
+          r = log_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql){conn.query(sql, :database_timezone => timezone, :application_timezone => Sequel.application_timezone, :stream=>stream)}
           if opts[:type] == :select
-            yield r if r
+            if r
+              if stream
+                begin
+                  r2 = yield r
+                ensure
+                  # If r2 is nil, it means the block did not exit normally,
+                  # so the rest of the results must be drained to prevent
+                  # "commands out of sync" errors.
+                  r.each{} unless r2
+                end
+              else
+                yield r
+              end
+            end
           elsif block_given?
             yield conn
           end
@@ -145,6 +159,13 @@ module Sequel
         self
       end
 
+      # Return a clone of the dataset that will stream rows when iterating
+      # over the result set, so it can handle large datasets that
+      # won't fit in memory (Requires mysql 0.3.12 to have an effect).
+      def stream
+        clone(:stream=>true)
+      end
+
       private
 
       # Whether to cast tinyint(1) columns to integer instead of boolean.
@@ -156,7 +177,7 @@ module Sequel
 
       # Set the :type option to :select if it hasn't been set.
       def execute(sql, opts=OPTS, &block)
-        super(sql, {:type=>:select}.merge(opts), &block)
+        super(sql, {:type=>:select, :stream=>@opts[:stream]}.merge(opts), &block)
       end
 
       # Handle correct quoting of strings using ::Mysql2::Client#escape.

@@ -1282,5 +1282,5 @@ if DB.adapter_scheme == :mysql2
     specify "should correctly handle early returning when streaming results" do
       3.times{@ds.each{|r| break r[:a]}.should == 0}
     end
-  end if false
+  end
 end
