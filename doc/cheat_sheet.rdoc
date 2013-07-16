@@ -166,11 +166,6 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
   DB.drop_table :items
 
-  DB.create_table :test do
-    String :zipcode
-    enum :system, :elements => ['mac', 'linux', 'windows']
-  end
-
 == Aliasing
 
   DB[:items].select(Sequel.as(:name, :item_name))
