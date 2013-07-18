@@ -321,8 +321,9 @@ The :database option given ODBC database should be the DSN (Descriptive Service 
 
 The :host and :port options are not respected. The following additional options are supported:
 
-:db_type :: Can be specified as 'mssql' or 'progress' to use SQL syntax specific to those databases.
-:driver :: The name of the ODBC driver to utilize.
+:db_type :: Can be specified as 'mssql', 'progress', or 'db2' to use SQL syntax specific to those databases.
+:drvconnect :: Can be given an ODBC connection string, and will use ODBC::Database#drvconnect to
+               do the connection.  Typical usage would be: <tt>Sequel.odbc(:drvconnect=>'driver={...};...')</tt>
 
 === openbase 
 

@@ -11,7 +11,10 @@ module Sequel
 
       def connect(server)
         opts = server_opts(server)
-        if opts.include? :driver
+        conn = if opts.include?(:drvconnect)
+          ::ODBC::Database.new.drvconnect(opts[:drvconnect])
+        elsif opts.include?(:driver)
+          Deprecation.deprecate("The odbc driver's handling of the :driver option is thought to be broken and will probably be removed in the future. If you are successfully using it, please contact the developers.")
           drv = ::ODBC::Driver.new
           drv.name = 'Sequel ODBC Driver130'
           opts.each do |param, value|
@@ -20,10 +23,9 @@ module Sequel
             end
             drv.attrs[param.to_s.upcase] = value.to_s
           end
-          db = ::ODBC::Database.new
-          conn = db.drvconnect(drv)
+          ::ODBC::Database.new.drvconnect(drv)
         else
-          conn = ::ODBC::connect(opts[:database], opts[:user], opts[:password])
+          ::ODBC::connect(opts[:database], opts[:user], opts[:password])
         end
         conn.autocommit = true
         conn

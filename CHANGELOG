@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate :driver option in odbc adapter since it appears to be broken (jeremyevans)
+
+* Support :drvconnect option in odbc adapter for supplying the ODBC connection string directly (jeremyevans)
+
 * Support mysql2 0.3.12+ result streaming via Dataset#stream (jeremyevans)
 
 * Convert Java::JavaUtil::HashMap to ruby Hash in jdbc adapter, for better handling of PostgreSQL hstore type (jeremyevans) (#686)
