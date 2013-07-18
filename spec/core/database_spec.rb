@@ -508,6 +508,11 @@ describe "Database#run" do
     @db.sqls.should == ["DELETE FROM items"]
   end
   
+  specify "should handle placeholder literal strings" do
+    @db.run(Sequel.lit("DELETE FROM ?", :items))
+    @db.sqls.should == ["DELETE FROM items"]
+  end
+  
   specify "should return nil" do
     @db.run("DELETE FROM items").should be_nil
   end
@@ -525,6 +530,11 @@ describe "Database#<<" do
 
   specify "should execute the code on the database" do
     @db << "DELETE FROM items"
+    @db.sqls.should == ["DELETE FROM items"]
+  end
+  
+  specify "should handle placeholder literal strings" do
+    @db << Sequel.lit("DELETE FROM ?", :items)
     @db.sqls.should == ["DELETE FROM items"]
   end
   

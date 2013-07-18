@@ -72,6 +72,7 @@ module Sequel
     #
     #   DB.run("SET some_server_variable = 42")
     def run(sql, opts=OPTS)
+      sql = literal(sql) if sql.is_a?(SQL::PlaceholderLiteralString)
       execute_ddl(sql, opts)
       nil
     end

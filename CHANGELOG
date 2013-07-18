@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#run and #<< accept SQL::PlaceholderLiteralString values (jeremyevans)
+
 * Deprecate :driver option in odbc adapter since it appears to be broken (jeremyevans)
 
 * Support :drvconnect option in odbc adapter for supplying the ODBC connection string directly (jeremyevans)
