@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow prepared_statements plugin to work with instance_filters and update_primary_key plugins (jeremyevans)
+
 * Support deferrable exclusion constraints on PostgreSQL using the :deferrable option (mfoody) (#687)
 
 * Make Database#run and #<< accept SQL::PlaceholderLiteralString values (jeremyevans)

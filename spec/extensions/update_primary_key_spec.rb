@@ -68,6 +68,19 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
     DB.sqls.should == ["SELECT * FROM a LIMIT 1", "UPDATE a SET a = 2 WHERE (a = 1)", "UPDATE a SET b = 4 WHERE (a = 2)", "UPDATE a SET b = 5 WHERE (a = 2)", "SELECT * FROM a"]
   end
 
+  specify "should work correctly when using the prepared_statements plugin" do
+    @c.plugin :prepared_statements
+    @ds._fetch = [[{:a=>1, :b=>3}], [{:a=>2, :b=>4}]]
+    o = @c.first
+    o.update(:a=>2, :b=>4)
+    @c.all.should == [@c.load(:a=>2, :b=>4)]
+    sqls = DB.sqls
+    ["UPDATE a SET a = 2, b = 4 WHERE (a = 1)", "UPDATE a SET b = 4, a = 2 WHERE (a = 1)"].should include(sqls.slice!(1))
+    sqls.should == ["SELECT * FROM a LIMIT 1", "SELECT * FROM a"]
+
+    o.delete
+  end
+
   specify "should clear the associations cache of non-many_to_one associations when changing the primary key" do
     @c.one_to_many :cs, :class=>@c
     @c.many_to_one :c, :class=>@c

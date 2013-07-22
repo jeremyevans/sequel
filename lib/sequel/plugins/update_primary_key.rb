@@ -54,6 +54,16 @@ module Sequel
             associations.delete(k) if model.association_reflection(k)[:type] != :many_to_one
           end
         end
+
+        # Do not use prepared statements for update queries, since they don't work
+        # in the case where the primary key has changed.
+        def use_prepared_statements_for?(type)
+          if type == :update
+            false
+          else
+            super
+          end
+        end
       end
     end
   end

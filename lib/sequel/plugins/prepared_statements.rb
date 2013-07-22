@@ -1,4 +1,16 @@
 module Sequel
+  class Model
+    module InstanceMethods
+      # Whether prepared statements should be used for the given type of query
+      # (:insert, :insert_select, :refresh, :update, or :delete).  True by default,
+      # can be overridden in other plugins to disallow prepared statements for
+      # specific types of queries.
+      def use_prepared_statements_for?(type)
+        true
+      end
+    end
+  end
+
   module Plugins
     # The prepared_statements plugin modifies the model to use prepared statements for
     # instance level deletes and saves, as well as class level lookups by
@@ -10,9 +22,6 @@ module Sequel
     # +prepared_statements_safe+ plugin in addition to this plugin to reduce the number
     # of prepared statements that can be created, unless you tightly control how your
     # model instances are saved.
-    # 
-    # This plugin does not work correctly with the instance filters plugin
-    # or the update_primary_key plugin.
     # 
     # Usage:
     #
@@ -133,30 +142,50 @@ module Sequel
 
         # Use a prepared statement to delete the row.
         def _delete_without_checking
-          model.send(:prepared_delete).call(pk_hash)
+          if use_prepared_statements_for?(:delete)
+            model.send(:prepared_delete).call(pk_hash)
+          else
+            super
+          end
         end
 
         # Use a prepared statement to insert the values into the model's dataset.
         def _insert_raw(ds)
-          model.send(:prepared_insert, @values.keys).call(@values)
+          if use_prepared_statements_for?(:insert)
+            model.send(:prepared_insert, @values.keys).call(@values)
+          else
+            super
+          end
         end
 
         # Use a prepared statement to insert the values into the model's dataset
         # and return the new column values.
         def _insert_select_raw(ds)
-          if ps = model.send(:prepared_insert_select, @values.keys)
-            ps.call(@values)
+          if use_prepared_statements_for?(:insert_select)
+            if ps = model.send(:prepared_insert_select, @values.keys)
+              ps.call(@values)
+            end
+          else
+            super
           end
         end
 
         # Use a prepared statement to refresh this model's column values.
         def _refresh_get(ds)
-          model.send(:prepared_refresh).call(pk_hash)
+          if use_prepared_statements_for?(:refresh)
+            model.send(:prepared_refresh).call(pk_hash)
+          else
+            super
+          end
         end
 
         # Use a prepared statement to update this model's columns in the database.
         def _update_without_checking(columns)
-          model.send(:prepared_update, columns.keys).call(columns.merge(pk_hash))
+          if use_prepared_statements_for?(:update)
+            model.send(:prepared_update, columns.keys).call(columns.merge(pk_hash))
+          else
+            super
+          end
         end
       end
     end

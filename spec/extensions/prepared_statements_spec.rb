@@ -16,37 +16,48 @@ describe "prepared_statements plugin" do
     @db.sqls.should == ["SELECT * FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
   end 
 
-  specify "should correctly delete instance" do
-    @p.destroy.should == @p
-    @db.sqls.should == ["DELETE FROM people WHERE (id = 1)"]
+  shared_examples_for "prepared_statements plugin" do
+    specify "should correctly delete instance" do
+      @p.destroy.should == @p
+      @db.sqls.should == ["DELETE FROM people WHERE (id = 1)"]
+    end
+
+    specify "should correctly update instance" do
+      @p.update(:name=>'bar').should == @c.load(:id=>1, :name=>'bar', :i => 2)
+      @db.sqls.should == ["UPDATE people SET name = 'bar' WHERE (id = 1)"]
+    end
+
+    specify "should correctly create instance" do
+      @c.create(:name=>'foo').should == @c.load(:id=>1, :name=>'foo', :i => 2)
+      @db.sqls.should == ["INSERT INTO people (name) VALUES ('foo')", "SELECT * FROM people WHERE (id = 1) LIMIT 1"]
+    end
+
+    specify "should correctly create instance if dataset supports insert_select" do
+      @c.dataset_module do
+        def supports_insert_select?
+          true
+        end
+        def insert_select(h)
+          self._fetch = {:id=>1, :name=>'foo', :i => 2}
+          returning.server(:default).with_sql(:insert_sql, h).first
+        end
+        def insert_sql(*)
+          "#{super}#{' RETURNING *' if opts.has_key?(:returning)}"
+        end
+      end
+      @c.create(:name=>'foo').should == @c.load(:id=>1, :name=>'foo', :i => 2)
+      @db.sqls.should == ["INSERT INTO people (name) VALUES ('foo') RETURNING *"]
+    end
   end
 
-  specify "should correctly update instance" do
-    @p.update(:name=>'bar').should == @c.load(:id=>1, :name=>'bar', :i => 2)
-    @db.sqls.should == ["UPDATE people SET name = 'bar' WHERE (id = 1)"]
-  end
+  it_should_behave_like "prepared_statements plugin"
 
-  specify "should correctly create instance" do
-    @c.create(:name=>'foo').should == @c.load(:id=>1, :name=>'foo', :i => 2)
-    @db.sqls.should == ["INSERT INTO people (name) VALUES ('foo')", "SELECT * FROM people WHERE (id = 1) LIMIT 1"]
-  end
+  describe "when #use_prepared_statements_for? returns false" do
+    before do
+      @c.class_eval{def use_prepared_statements_for?(type) false end}
+    end
 
-  specify "should correctly create instance if dataset supports insert_select" do
-    ds = @c.instance_dataset 
-    def ds.supports_insert_select?
-      true
-    end
-    def @ds.supports_insert_select?
-      true
-    end
-    def @ds.insert_select(h)
-      {:id=>1, :name=>'foo', :i => 2}
-    end
-    def @ds.insert_sql(*)
-      "#{super}#{' RETURNING *' if opts.has_key?(:returning)}"
-    end
-    @c.create(:name=>'foo').should == @c.load(:id=>1, :name=>'foo', :i => 2)
-    @db.sqls.should == ["INSERT INTO people (name) VALUES ('foo') RETURNING *"]
+    it_should_behave_like "prepared_statements plugin"
   end
 
   specify "should work correctly when subclassing" do
