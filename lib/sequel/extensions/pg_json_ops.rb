@@ -184,12 +184,6 @@ module Sequel
         a.is_a?(Array) || (defined?(PGArray) && a.is_a?(PGArray)) || (defined?(ArrayOp) && a.is_a?(ArrayOp))
       end
 
-      # Return a placeholder literal with the given str and args, wrapped
-      # in an SQL::StringExpression, used by operators that return text.
-      def text_op(str, args)
-        Sequel::SQL::StringExpression.new(:NOOP, Sequel::SQL::PlaceholderLiteralString.new(str, [self, args]))
-      end
-
       # Automatically wrap argument in a PGArray if it is a plain Array.
       # Requires that the pg_array extension has been loaded to work.
       def wrap_array(arg)
