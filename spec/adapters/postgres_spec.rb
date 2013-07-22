@@ -235,10 +235,13 @@ describe "A PostgreSQL dataset" do
   
   specify "should support deferrable exclusion constraints" do
     @db.create_table!(:atest){Integer :t; exclude [[Sequel.desc(:t, :nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}, :deferrable => true}
-    check_sqls do
-      @db.sqls.should == ["DROP TABLE IF EXISTS \"atest\"", "CREATE TABLE \"atest\" (\"t\" integer, EXCLUDE USING btree (\"t\" DESC NULLS LAST WITH =) WHERE (\"t\" > 0) DEFERRABLE INITIALLY DEFERRED)"]
-    end
-  end
+    proc do 
+      @db.transaction do
+        @db[:atest].insert(2)
+        proc{@db[:atest].insert(2)}.should_not raise_error
+      end
+    end.should raise_error(Sequel::Postgres::ExclusionConstraintViolation)
+  end if DB.server_version >= 90000
 
   specify "should support Database#do for executing anonymous code blocks" do
     @db.drop_table?(:btest)
