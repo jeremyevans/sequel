@@ -160,7 +160,14 @@ begin
     t
   end
 
-  task :default => [:spec]
+  task :default do
+    STDERR.puts """
+      Running core, model, bin, plugin and core_ext specs.
+      Run other specs manually with rake {spec_integration,spec_sqlite,spec_postgres,spec_mysql}.
+    """
+    [:spec, :spec_bin, :spec_plugin, :spec_core_ext].each {|t| Rake::Task[t].invoke }
+  end
+
   spec_with_cov.call("spec", Dir["spec/{core,model}/*_spec.rb"], "Run core and model specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/(adapters/([a-ln-z]|m[a-np-z])|extensions/core_extensions)"')}
   spec.call("spec_bin", ["spec/bin_spec.rb"], "Run bin/sequel specs")
   spec.call("spec_core", Dir["spec/core/*_spec.rb"], "Run core specs")
