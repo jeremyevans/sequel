@@ -125,12 +125,12 @@ describe Sequel::Model, "caching" do
     m = @c.new
     proc {m.cache_key}.should raise_error(Sequel::Error)
     m.values[:id] = 1
-    proc {m.cache_key}.should_not raise_error(Sequel::Error)
+    proc {m.cache_key}.should_not raise_error
 
     m = @c2.new
     proc {m.cache_key}.should raise_error(Sequel::Error)
     m.values[:id] = 1
-    proc {m.cache_key}.should_not raise_error(Sequel::Error)
+    proc {m.cache_key}.should_not raise_error
   end
   
   it "should not raise error if trying to save a new record" do

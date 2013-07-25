@@ -1609,10 +1609,10 @@ describe "Dataset#limit" do
   specify "should raise an error if an invalid limit or offset is used" do
     proc{@dataset.limit(-1)}.should raise_error(Sequel::Error)
     proc{@dataset.limit(0)}.should raise_error(Sequel::Error)
-    proc{@dataset.limit(1)}.should_not raise_error(Sequel::Error)
+    proc{@dataset.limit(1)}.should_not raise_error
     proc{@dataset.limit(1, -1)}.should raise_error(Sequel::Error)
-    proc{@dataset.limit(1, 0)}.should_not raise_error(Sequel::Error)
-    proc{@dataset.limit(1, 1)}.should_not raise_error(Sequel::Error)
+    proc{@dataset.limit(1, 0)}.should_not raise_error
+    proc{@dataset.limit(1, 1)}.should_not raise_error
   end
 end
 

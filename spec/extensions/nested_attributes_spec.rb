@@ -340,7 +340,7 @@ describe "NestedAttributes plugin" do
     @Album.nested_attributes :artist
     proc{a.set(:artist_attributes=>{:id=>'20', :_delete=>'1'})}.should raise_error(Sequel::Error)
     @Album.nested_attributes :artist, :destroy=>true
-    proc{a.set(:artist_attributes=>{:id=>'20', :_delete=>'1'})}.should_not raise_error(Sequel::Error)
+    proc{a.set(:artist_attributes=>{:id=>'20', :_delete=>'1'})}.should_not raise_error
   end
   
   it "should only allow removing associated objects if :remove option is used in the nested_attributes call" do
@@ -350,7 +350,7 @@ describe "NestedAttributes plugin" do
     @Album.nested_attributes :artist
     proc{a.set(:artist_attributes=>{:id=>'20', :_remove=>'1'})}.should raise_error(Sequel::Error)
     @Album.nested_attributes :artist, :remove=>true
-    proc{a.set(:artist_attributes=>{:id=>'20', :_remove=>'1'})}.should_not raise_error(Sequel::Error)
+    proc{a.set(:artist_attributes=>{:id=>'20', :_remove=>'1'})}.should_not raise_error
   end
   
   it "should raise an Error if a primary key is given in a nested attribute hash, but no matching associated object exists" do
@@ -358,7 +358,7 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     ar.associations[:albums] = [al]
     proc{ar.set(:albums_attributes=>[{:id=>30, :_delete=>'t'}])}.should raise_error(Sequel::Error)
-    proc{ar.set(:albums_attributes=>[{:id=>10, :_delete=>'t'}])}.should_not raise_error(Sequel::Error)
+    proc{ar.set(:albums_attributes=>[{:id=>10, :_delete=>'t'}])}.should_not raise_error
   end
   
   it "should not raise an Error if an unmatched primary key is given, if the :strict=>false option is used" do
@@ -388,7 +388,7 @@ describe "NestedAttributes plugin" do
     co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
     ar.associations[:concerts] = [co]
     proc{ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-04', :_delete=>'t'}])}.should raise_error(Sequel::Error)
-    proc{ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :_delete=>'t'}])}.should_not raise_error(Sequel::Error)
+    proc{ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :_delete=>'t'}])}.should_not raise_error
   end
 
   it "should not raise an Error if an unmatched composite primary key is given, if the :strict=>false option is used" do

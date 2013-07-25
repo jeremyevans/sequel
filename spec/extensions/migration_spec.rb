@@ -194,19 +194,19 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
   
   specify "should raise in the down direction if migration uses unsupported method" do
     m = Sequel.migration{change{run 'SQL'}}
-    proc{m.apply(@db, :up)}.should_not raise_error(Sequel::Error)
+    proc{m.apply(@db, :up)}.should_not raise_error
     proc{m.apply(@db, :down)}.should raise_error(Sequel::Error)
   end
   
   specify "should raise in the down direction if migration uses add_primary_key with an array" do
     m = Sequel.migration{change{alter_table(:a){add_primary_key [:b]}}}
-    proc{m.apply(@db, :up)}.should_not raise_error(Sequel::Error)
+    proc{m.apply(@db, :up)}.should_not raise_error
     proc{m.apply(@db, :down)}.should raise_error(Sequel::Error)
   end
   
   specify "should raise in the down direction if migration uses add_foreign_key with an array" do
     m = Sequel.migration{change{alter_table(:a){add_foreign_key [:b]}}}
-    proc{m.apply(@db, :up)}.should_not raise_error(Sequel::Error)
+    proc{m.apply(@db, :up)}.should_not raise_error
     proc{m.apply(@db, :down)}.should raise_error(Sequel::Error)
   end
 end
@@ -263,7 +263,7 @@ describe "Sequel::IntegerMigrator" do
   end
   
   specify "should not raise and error if there is a missing integer migration version and allow_missing_migration_files is true" do
-    Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true).should_not raise_error(Sequel::Migrator::Error)
+    Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true).should_not raise_error
   end
 
   specify "should raise and error if there is a duplicate integer migration version" do
@@ -622,7 +622,7 @@ describe "Sequel::TimestampMigrator" do
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
 
     @dir = 'spec/files/missing_timestamped_migrations'
-    proc{@m.run(@db, @dir, :allow_missing_migration_files => true)}.should_not raise_error(Sequel::Migrator::Error)
+    proc{@m.run(@db, @dir, :allow_missing_migration_files => true)}.should_not raise_error
     [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
   end
