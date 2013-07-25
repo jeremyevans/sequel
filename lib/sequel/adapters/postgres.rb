@@ -276,6 +276,31 @@ module Sequel
         rescue PGError, IOError
         end
       end
+
+      if SEQUEL_POSTGRES_USES_PG && Object.const_defined?(:PG) && ::PG.const_defined?(:Constants) && ::PG::Constants.const_defined?(:PG_DIAG_SCHEMA_NAME)
+        # Return a hash of information about the related PGError (or Sequel::DatabaseError that
+        # wraps a PGError), with the following entries:
+        #
+        # :schema :: The schema name related to the error
+        # :table :: The table name related to the error
+        # :column :: the column name related to the error
+        # :constraint :: The constraint name related to the error
+        # :type :: The datatype name related to the error
+        #
+        # This requires a PostgreSQL 9.3+ server and 9.3+ client library,
+        # and ruby-pg 0.16.0+ to be supported.
+        def error_info(e)
+          e = e.wrapped_exception if e.is_a?(DatabaseError)
+          r = e.result
+          h = {}
+          h[:schema] = r.error_field(::PG::PG_DIAG_SCHEMA_NAME)
+          h[:table] = r.error_field(::PG::PG_DIAG_TABLE_NAME)
+          h[:column] = r.error_field(::PG::PG_DIAG_COLUMN_NAME)
+          h[:constraint] = r.error_field(::PG::PG_DIAG_CONSTRAINT_NAME)
+          h[:type] = r.error_field(::PG::PG_DIAG_DATATYPE_NAME)
+          h
+        end
+      end
       
       # Execute the given SQL with the given args on an available connection.
       def execute(sql, opts=OPTS, &block)

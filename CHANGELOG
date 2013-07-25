@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#error_info on PostgreSQL 9.3+ if pg-0.16.0+ is used, to get a hash of metadata for a given database exception (jeremyevans)
+
 * Allow prepared_statements plugin to work with instance_filters and update_primary_key plugins (jeremyevans)
 
 * Support deferrable exclusion constraints on PostgreSQL using the :deferrable option (mfoody) (#687)

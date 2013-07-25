@@ -243,6 +243,33 @@ describe "A PostgreSQL dataset" do
     end.should raise_error(Sequel::Postgres::ExclusionConstraintViolation)
   end if DB.server_version >= 90000
 
+  specify "should support Database#error_info for getting info hash on the given error" do
+    @db.create_table!(:atest){Integer :t; Integer :t2, :null=>false, :default=>1; constraint :f, :t=>0}
+    begin
+      @db[:atest].insert(1)
+    rescue => e
+    end
+    e.should_not be_nil
+    info = @db.error_info(e)
+    info[:schema].should == 'public'
+    info[:table].should == 'atest'
+    info[:constraint].should == 'f'
+    info[:column].should be_nil
+    info[:type].should be_nil
+
+    begin
+      @db[:atest].insert(0, nil)
+    rescue => e
+    end
+    e.should_not be_nil
+    info = @db.error_info(e.wrapped_exception)
+    info[:schema].should == 'public'
+    info[:table].should == 'atest'
+    info[:constraint].should be_nil
+    info[:column].should == 't2'
+    info[:type].should be_nil
+  end if DB.server_version >= 90300 && DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && Object.const_defined?(:PG) && ::PG.const_defined?(:Constants) && ::PG::Constants.const_defined?(:PG_DIAG_SCHEMA_NAME)
+
   specify "should support Database#do for executing anonymous code blocks" do
     @db.drop_table?(:btest)
     @db.do "BEGIN EXECUTE 'CREATE TABLE btest (a INTEGER)'; EXECUTE 'INSERT INTO btest VALUES (1)'; END"
