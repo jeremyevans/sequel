@@ -88,6 +88,9 @@ method, the fourth argument is the options hash.  The following options are supp
 :primary_key :: Mark this column as the primary key.  This is used instead of the
                 primary key method if you want a non-autoincrementing primary key.
 :primary_key_constraint_name :: The name to give the primary key constraint.
+:type :: Overrides the type given as the method name or a separate argument.
+         Not usually used by +column+ itself, but often by other methods such
+         as +primary_key+ or +foreign_key+.
 :unique :: Mark the column as unique, generally has the same effect as
            creating a unique index on the column.
 :unique_constraint_name :: The name to give the unique key constraint.
@@ -137,12 +140,16 @@ as it's third argument.  A simple example is:
     String :name
   end
 
-+foreign_key+ accepts some specific options:
++foreign_key+ accepts the same options as +column+.  For example, to have a unique foreign key with varchar(16) type:
+
+  foreign_key :column_name, :unique=>true, :type=>'varchar(16)'
+
++foreign_key+ also accepts some specific options:
 
 :deferrable :: Makes the foreign key constraint checks deferrable, so they aren't checked
                until the end of the transaction.
 :foreign_key_constraint_name :: The name to give the foreign key constraint.
-:key :: For foreign key columns, the column in the associated table
+:key :: The column in the associated table
         that this column references.  Unnecessary if this column
         references the primary key of the associated table, at least
         on most databases.
