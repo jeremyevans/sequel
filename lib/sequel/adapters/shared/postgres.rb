@@ -799,7 +799,8 @@ module Sequel
       
       # Support :if_exists, :cascade, and :concurrently options.
       def drop_index_sql(table, op)
-        "DROP INDEX#{' CONCURRENTLY' if op[:concurrently]}#{' IF EXISTS' if op[:if_exists]} #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))}#{' CASCADE' if op[:cascade]}"
+        sch, _ = schema_and_table(table)
+        "DROP INDEX#{' CONCURRENTLY' if op[:concurrently]}#{' IF EXISTS' if op[:if_exists]} #{"#{quote_identifier(sch)}." if sch}#{quote_identifier(op[:name] || default_index_name(table, op[:columns]))}#{' CASCADE' if op[:cascade]}"
       end
 
       # SQL for dropping a procedural language from the database.

@@ -977,6 +977,13 @@ describe "Postgres::Database schema qualified tables" do
     @db.table_exists?(:schema_test__schema_test).should == true
   end
 
+  specify "should be able to add and drop indexes in a schema" do
+    @db.create_table(:schema_test__schema_test){Integer :i, :index=>true}
+    @db.indexes(:schema_test__schema_test).keys.should == [:schema_test_schema_test_i_index]
+    @db.drop_index :schema_test__schema_test, :i
+    @db.indexes(:schema_test__schema_test).keys.should == []
+  end
+
   specify "should be able to get primary keys for tables in a given schema" do
     @db.create_table(:schema_test__schema_test){primary_key :i}
     @db.primary_key(:schema_test__schema_test).should == 'i'
