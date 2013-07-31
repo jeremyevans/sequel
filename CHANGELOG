@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :inherits option in Database#create_table on PostgreSQL, for table inheritance (jeremyevans)
+
 * Handle dropping indexes for schema qualified tables on PostgreSQL (jeremyevans)
 
 * Add Database#error_info on PostgreSQL 9.3+ if pg-0.16.0+ is used, to get a hash of metadata for a given database exception (jeremyevans)

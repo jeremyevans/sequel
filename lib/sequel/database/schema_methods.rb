@@ -156,6 +156,8 @@ module Sequel
     #
     # PostgreSQL specific options:
     # :unlogged :: Create the table as an unlogged table.
+    # :inherits :: Inherit from a different tables.  An array can be
+    #              specified to inherit from multiple tables.
     #
     # See <tt>Schema::Generator</tt> and the {"Schema Modification" guide}[link:files/doc/schema_modification_rdoc.html].
     def create_table(name, options=OPTS, &block)

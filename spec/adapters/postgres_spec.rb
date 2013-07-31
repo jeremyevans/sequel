@@ -17,8 +17,7 @@ describe "PostgreSQL", '#create_table' do
     DB.sqls.clear
   end
   after do
-    @db.drop_table?(:tmp_dolls)
-    @db.drop_table?(:unlogged_dolls)
+    @db.drop_table?(:tmp_dolls, :unlogged_dolls)
   end
 
   specify "should create a temporary table" do
@@ -32,6 +31,27 @@ describe "PostgreSQL", '#create_table' do
     @db.create_table(:unlogged_dolls, :unlogged => true){text :name}
     check_sqls do
       @db.sqls.should == ['CREATE UNLOGGED TABLE "unlogged_dolls" ("name" text)']
+    end
+  end
+
+  specify "should create a table inheriting from another table" do
+    @db.create_table(:unlogged_dolls){text :name}
+    @db.create_table(:tmp_dolls, :inherits=>:unlogged_dolls){}
+    @db[:tmp_dolls].insert('a')
+    @db[:unlogged_dolls].all.should == [{:name=>'a'}]
+  end
+
+  specify "should create a table inheriting from multiple tables" do
+    begin
+      @db.create_table(:unlogged_dolls){text :name}
+      @db.create_table(:tmp_dolls){text :bar}
+      @db.create_table!(:items, :inherits=>[:unlogged_dolls, :tmp_dolls]){text :foo}
+      @db[:items].insert(:name=>'a', :bar=>'b', :foo=>'c')
+      @db[:unlogged_dolls].all.should == [{:name=>'a'}]
+      @db[:tmp_dolls].all.should == [{:bar=>'b'}]
+      @db[:items].all.should == [{:name=>'a', :bar=>'b', :foo=>'c'}]
+    ensure
+      @db.drop_table?(:items)
     end
   end
 

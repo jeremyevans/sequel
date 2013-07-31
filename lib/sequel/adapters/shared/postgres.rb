@@ -770,6 +770,14 @@ module Sequel
         "CREATE #{temp_or_unlogged_sql}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"
       end
 
+      def create_table_sql(name, generator, options)
+        sql = super
+        if inherits = options[:inherits]
+          sql << " INHERITS (#{Array(inherits).map{|t| quote_schema_table(t)}.join(', ')})"
+        end
+        sql
+      end
+
       # Use a PostgreSQL-specific create table generator
       def create_table_generator_class
         Postgres::CreateTableGenerator
