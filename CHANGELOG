@@ -1,3 +1,7 @@
+=== HEAD
+
+* Fix select_map, select_order_map, and single_value methods on eager_graphed datasets (jeremyevans)
+
 === 4.1.0 (2013-08-01)
 
 * Support :inherits option in Database#create_table on PostgreSQL, for table inheritance (jeremyevans)

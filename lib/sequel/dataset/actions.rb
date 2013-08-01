@@ -589,7 +589,7 @@ module Sequel
     # Returns nil if dataset is empty.  Users should generally use
     # +get+ instead of this method.
     def single_value
-      if r = naked.ungraphed.single_record
+      if r = ungraphed.naked.single_record
         r.values.first
       end
     end
@@ -761,7 +761,7 @@ module Sequel
     
     # Internals of +select_map+ and +select_order_map+
     def _select_map(column, order, &block)
-      ds = naked.ungraphed
+      ds = ungraphed.naked
       columns = Array(column)
       virtual_row_columns(columns, block)
       select_cols = order ? columns.map{|c| c.is_a?(SQL::OrderedExpression) ? c.expression : c} : columns

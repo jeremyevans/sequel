@@ -839,6 +839,23 @@ describe Sequel::Model, "#eager_graph" do
     proc{GraphAlbum.eager_graph(Object.new)}.should raise_error(Sequel::Error)
   end
 
+  it "should work correctly with select_map" do
+    ds = GraphAlbum.eager_graph(:band)
+    ds._fetch = [{:id=>1}, {:id=>2}]
+    ds.select_map(:albums__id).should == [1, 2]
+    DB.sqls.should == ['SELECT albums.id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)']
+    ds._fetch = [{:id=>1}, {:id=>2}]
+    ds.select_map([:albums__id, :albums__id]).should == [[1, 1], [2, 2]]
+    DB.sqls.should == ['SELECT albums.id, albums.id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)']
+  end
+
+  it "should work correctly with single_value" do
+    ds = GraphAlbum.eager_graph(:band).select(:albums__id)
+    ds._fetch = [{:id=>1}]
+    ds.single_value.should == 1
+    DB.sqls.should == ['SELECT albums.id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) LIMIT 1']
+  end
+
   it "should not split results and assign associations if ungraphed is called" do
     ds = GraphAlbum.eager_graph(:band).ungraphed
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
