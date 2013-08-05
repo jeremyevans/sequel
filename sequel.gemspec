@@ -12,6 +12,7 @@ SEQUEL_GEMSPEC = Gem::Specification.new do |s|
   s.author = "Jeremy Evans"
   s.email = "code@jeremyevans.net"
   s.homepage = "http://sequel.rubyforge.org"
+  s.license = 'MIT'
   s.required_ruby_version = ">= 1.8.7"
   s.files = %w(MIT-LICENSE CHANGELOG README.rdoc Rakefile bin/sequel) + Dir["doc/**/*.{rdoc,txt}"] + Dir["{spec,lib}/**/*.{rb,RB}"]
   s.require_path = "lib"
