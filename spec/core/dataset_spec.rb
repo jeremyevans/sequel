@@ -426,6 +426,10 @@ describe "Dataset#where" do
     @dataset.where('price::float = 10', {}).select_sql.should == "SELECT * FROM test WHERE (price::float = 10)"
   end
 
+  specify "should not replace ::cast syntax, even with matching placeholders" do
+    @dataset.where('created_at::date = :date', { :date => '2013-01-01' }).select_sql.should == "SELECT * FROM test WHERE (created_at::date = '2013-01-01')"
+  end
+
   specify "should affect select, delete and update statements" do
     @d1.select_sql.should == "SELECT * FROM test WHERE (region = 'Asia')"
     @d1.delete_sql.should == "DELETE FROM test WHERE (region = 'Asia')"
