@@ -1412,12 +1412,18 @@ if DB.adapter_scheme == :postgres
     end
 
     specify "should respect the :cursor_name option" do
-      @db.sqls.clear
-      @ds.use_cursor(:cursor_name => 'cursor_one').all
-      check_sqls do
-        @db.sqls[1].include?('cursor_one').should == true
-        @db.sqls.clear
+      one_rows = []
+      two_rows = []
+      @ds.order(:x).use_cursor(:cursor_name => 'cursor_one').each do |one|
+        one_rows << one
+        if one[:x] % 1000 == 500 
+          two_rows = []
+          @ds.order(:x).use_cursor(:cursor_name => 'cursor_two').each do |two|
+            two_rows << two
+          end
+        end
       end
+      one_rows.should == two_rows
     end
 
     specify "should handle returning inside block" do

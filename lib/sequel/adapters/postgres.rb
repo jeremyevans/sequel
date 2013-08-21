@@ -760,7 +760,7 @@ module Sequel
       # Use a cursor to fetch groups of records at a time, yielding them to the block.
       def cursor_fetch_rows(sql)
         server_opts = {:server=>@opts[:server] || :read_only}
-        cursor_name = @opts[:cursor][:cursor_name]
+        cursor_name = quote_identifier(@opts[:cursor][:cursor_name])
         db.transaction(server_opts) do 
           begin
             execute_ddl("DECLARE #{cursor_name} NO SCROLL CURSOR WITHOUT HOLD FOR #{sql}", server_opts)
