@@ -533,10 +533,14 @@ module Sequel
       str = pls.str
       sql << PAREN_OPEN if pls.parens
       if args.is_a?(Hash)
-        re = /:(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join('|')})\b/
+        re = /:+(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join('|')})\b/
         loop do
           previous, q, str = str.partition(re)
           sql << previous
+          if q.count(":") > 1
+            sql << q
+            next
+          end
           literal_append(sql, args[($1||q[1..-1].to_s).to_sym]) unless q.empty?
           break if str.empty?
         end
