@@ -421,7 +421,11 @@ describe "Dataset#where" do
   specify "should handle partial names" do
     @dataset.where('price < :price AND id = :p', :p=>2, :price=>100).select_sql.should == "SELECT * FROM test WHERE (price < 100 AND id = 2)"
   end
-  
+
+  specify "should handle ::cast syntax when no parameters are supplied" do
+    @dataset.where('price::float = 10', {}).select_sql.should == "SELECT * FROM test WHERE (price::float = 10)"
+  end
+
   specify "should affect select, delete and update statements" do
     @d1.select_sql.should == "SELECT * FROM test WHERE (region = 'Asia')"
     @d1.delete_sql.should == "DELETE FROM test WHERE (region = 'Asia')"

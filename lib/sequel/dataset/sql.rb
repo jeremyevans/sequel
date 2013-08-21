@@ -532,7 +532,7 @@ module Sequel
       args = pls.args
       str = pls.str
       sql << PAREN_OPEN if pls.parens
-      if args.is_a?(Hash)
+      if args.is_a?(Hash) and !args.empty?
         re = /:(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join('|')})\b/
         loop do
           previous, q, str = str.partition(re)
