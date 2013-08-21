@@ -1411,6 +1411,15 @@ if DB.adapter_scheme == :postgres
       end
     end
 
+    specify "should respect the :cursor_name option" do
+      @db.sqls.clear
+      @ds.use_cursor(:cursor_name => 'cursor_one').all
+      check_sqls do
+        @db.sqls[1].include?('cursor_one').should == true
+        @db.sqls.clear
+      end
+    end
+
     specify "should handle returning inside block" do
       def @ds.check_return
         use_cursor.each{|r| return}

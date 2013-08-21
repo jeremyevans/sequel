@@ -633,16 +633,19 @@ module Sequel
       #
       # * :rows_per_fetch - the number of rows per fetch (default 1000).  Higher
       #   numbers result in fewer queries but greater memory use.
+      # * :cursor_name - the name assigned to the cursor (default 'sequel_cursor').
+      #   Nested cursors require different names.
       #
       # Usage:
       #
       #   DB[:huge_table].use_cursor.each{|row| p row}
       #   DB[:huge_table].use_cursor(:rows_per_fetch=>10000).each{|row| p row}
+      #   DB[:huge_table].use_cursor(:cursor_name=>'my_cursor').each{|row| p row}      
       #
       # This is untested with the prepared statement/bound variable support,
       # and unlikely to work with either.
       def use_cursor(opts=OPTS)
-        clone(:cursor=>{:rows_per_fetch=>1000}.merge(opts))
+        clone(:cursor=>{:rows_per_fetch=>1000, :cursor_name => 'sequel_cursor'}.merge(opts))
       end
 
       if SEQUEL_POSTGRES_USES_PG
@@ -757,12 +760,13 @@ module Sequel
       # Use a cursor to fetch groups of records at a time, yielding them to the block.
       def cursor_fetch_rows(sql)
         server_opts = {:server=>@opts[:server] || :read_only}
+        cursor_name = @opts[:cursor][:cursor_name]
         db.transaction(server_opts) do 
           begin
-            execute_ddl("DECLARE sequel_cursor NO SCROLL CURSOR WITHOUT HOLD FOR #{sql}", server_opts)
+            execute_ddl("DECLARE #{cursor_name} NO SCROLL CURSOR WITHOUT HOLD FOR #{sql}", server_opts)
             rows_per_fetch = @opts[:cursor][:rows_per_fetch].to_i
             rows_per_fetch = 1000 if rows_per_fetch <= 0
-            fetch_sql = "FETCH FORWARD #{rows_per_fetch} FROM sequel_cursor"
+            fetch_sql = "FETCH FORWARD #{rows_per_fetch} FROM #{cursor_name}"
             cols = nil
             # Load columns only in the first fetch, so subsequent fetches are faster
             execute(fetch_sql) do |res|
@@ -777,7 +781,7 @@ module Sequel
               end
             end
           ensure
-            execute_ddl("CLOSE sequel_cursor", server_opts)
+            execute_ddl("CLOSE #{cursor_name}", server_opts)
           end
         end
       end
