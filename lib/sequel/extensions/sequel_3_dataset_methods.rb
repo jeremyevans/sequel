@@ -12,7 +12,7 @@
 # You can load this extension into specific datasets:
 #
 #   ds = DB[:table]
-#   ds.extension(:sequel_3_dataset_methods)
+#   ds = ds.extension(:sequel_3_dataset_methods)
 #
 # Or you can load it into all of a database's datasets, which
 # is probably the desired behavior if you are using this extension:

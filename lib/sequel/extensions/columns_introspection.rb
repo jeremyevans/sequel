@@ -9,7 +9,7 @@
 #
 # To attempt to introspect columns for a single dataset:
 #
-#   ds.extension(:columns_introspection)
+#   ds = ds.extension(:columns_introspection)
 #
 # To attempt to introspect columns for all datasets on a single database:
 #

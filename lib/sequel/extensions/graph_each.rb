@@ -8,7 +8,7 @@
 # You can load this extension into specific datasets:
 #
 #   ds = DB[:table]
-#   ds.extension(:graph_each)
+#   ds = ds.extension(:graph_each)
 #
 # Or you can load it into all of a database's datasets, which
 # is probably the desired behavior if you are using this extension:
