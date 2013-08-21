@@ -1,3 +1,7 @@
+=== HEAD
+
+* Fix placeholder literal strings when used with an empty placeholder hash (trydionel, jeremyevans) (#695)
+
 === 4.1.1 (2013-08-01)
 
 * Fix select_map, select_order_map, and single_value methods on eager_graphed datasets (jeremyevans)

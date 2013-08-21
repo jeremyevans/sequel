@@ -424,6 +424,7 @@ describe "Dataset#where" do
 
   specify "should handle ::cast syntax when no parameters are supplied" do
     @dataset.where('price::float = 10', {}).select_sql.should == "SELECT * FROM test WHERE (price::float = 10)"
+    @dataset.where('price::float ? 10', {}).select_sql.should == "SELECT * FROM test WHERE (price::float ? 10)"
   end
 
   specify "should affect select, delete and update statements" do

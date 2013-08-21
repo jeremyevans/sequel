@@ -532,13 +532,17 @@ module Sequel
       args = pls.args
       str = pls.str
       sql << PAREN_OPEN if pls.parens
-      if args.is_a?(Hash) and !args.empty?
-        re = /:(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join('|')})\b/
-        loop do
-          previous, q, str = str.partition(re)
-          sql << previous
-          literal_append(sql, args[($1||q[1..-1].to_s).to_sym]) unless q.empty?
-          break if str.empty?
+      if args.is_a?(Hash)
+        if args.empty?
+          sql << str
+        else
+          re = /:(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join('|')})\b/
+          loop do
+            previous, q, str = str.partition(re)
+            sql << previous
+            literal_append(sql, args[($1||q[1..-1].to_s).to_sym]) unless q.empty?
+            break if str.empty?
+          end
         end
       elsif str.is_a?(Array)
         len = args.length
