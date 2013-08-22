@@ -60,6 +60,17 @@ describe "PostgreSQL", '#create_table' do
       @db.create_table(:temp_unlogged_dolls, :temp => true, :unlogged => true){text :name}
     end.should raise_error(Sequel::Error, "can't provide both :temp and :unlogged to create_table")
   end
+
+  specify "should support pg_loose_count extension" do
+    @db.extension :pg_loose_count
+    @db.create_table(:tmp_dolls){text :name}
+    @db.loose_count(:tmp_dolls).should == 0
+    @db.loose_count(:public__tmp_dolls).should == 0
+    @db[:tmp_dolls].insert('a')
+    @db << 'VACUUM ANALYZE tmp_dolls'
+    @db.loose_count(:tmp_dolls).should == 1
+    @db.loose_count(:public__tmp_dolls).should == 1
+  end
 end
 
 describe "PostgreSQL views" do
