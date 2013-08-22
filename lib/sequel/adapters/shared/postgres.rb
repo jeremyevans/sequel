@@ -1238,9 +1238,9 @@ module Sequel
         true
       end
 
-      # PostgreSQL supports lateral subqueries
+      # PostgreSQL 9.3rc1+ supports lateral subqueries
       def supports_lateral_subqueries?
-        true
+        server_version >= 90300
       end
       
       # PostgreSQL supports modifying joined datasets
