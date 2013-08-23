@@ -64,6 +64,7 @@ describe "PostgreSQL", '#create_table' do
   specify "should support pg_loose_count extension" do
     @db.extension :pg_loose_count
     @db.create_table(:tmp_dolls){text :name}
+    @db.loose_count(:tmp_dolls).should be_a_kind_of(Integer)
     @db.loose_count(:tmp_dolls).should == 0
     @db.loose_count(:public__tmp_dolls).should == 0
     @db[:tmp_dolls].insert('a')

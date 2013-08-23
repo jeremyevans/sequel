@@ -22,7 +22,7 @@ module Sequel
       # Look at the table statistics for the given table to get
       # an approximate count of the number of rows.
       def loose_count(table)
-        from(:pg_class).where(:oid=>regclass_oid(table)).get(:reltuples)
+        from(:pg_class).where(:oid=>regclass_oid(table)).get(Sequel.cast(:reltuples, Integer))
       end
     end
   end
