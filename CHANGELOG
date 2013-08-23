@@ -1,5 +1,9 @@
 === HEAD
 
+* The static_cache plugin now disallows saving/destroying if the :frozen=>false option is not used (jeremyevans)
+
+* Support :frozen=>false option in static_cache plugin, for having new instances returned instead of frozen cached instances (jeremyevans)
+
 * Add pg_static_cache_updater Database extension for listening for changes to tables and updating static_cache caches automatically (jeremyevans)
 
 * Add mssql_emulate_lateral_with_apply extension for emulating LATERAL queries using CROSS/OUTER APPLY (jeremyevans)
