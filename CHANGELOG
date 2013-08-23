@@ -1,5 +1,7 @@
 === HEAD
 
+* Add pg_static_cache_updater Database extension for listening for changes to tables and updating static_cache caches automatically (jeremyevans)
+
 * Add mssql_emulate_lateral_with_apply extension for emulating LATERAL queries using CROSS/OUTER APPLY (jeremyevans)
 
 * Support LATERAL queries via Dataset#lateral (jeremyevans)

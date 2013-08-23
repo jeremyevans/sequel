@@ -127,6 +127,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_loose_count_rb.html">pg_loose_count</a>: Adds Database#loose_count for fast approximate counts of whole tables on PostgreSQL.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_rb.html">pg_range</a>: Adds support for PostgreSQL range types.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_rb.html">pg_row</a>: Adds support for PostgreSQL row-valued/composite types.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_static_cache_updater_rb.html">pg_static_cache_updater</a>: Listens for changes to underlying tables in order to automatically update models using the static_cache plugin.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_caching_rb.html">schema_caching</a>: Speeds up loading a large number of models by caching database schema and loading it from a file.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/server_block_rb.html">server_block</a>: Adds Database#with_server method that makes access inside the passed block use the specified shard by default.</li>

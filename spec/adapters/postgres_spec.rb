@@ -3161,3 +3161,46 @@ describe 'PostgreSQL row-valued/composite types' do
     end
   end
 end
+
+describe 'pg_static_cache_updater extension' do
+  before(:all) do
+    @db = DB
+    @db.extension :pg_static_cache_updater
+    @db.drop_function(@db.default_static_cache_update_name, :cascade=>true, :if_exists=>true)
+    @db.create_static_cache_update_function
+
+    @db.create_table!(:things) do
+      primary_key :id
+      String :name
+    end
+    @Thing = Class.new(Sequel::Model(:things))
+    @Thing.plugin :static_cache
+    @db.create_static_cache_update_trigger(:things)
+  end
+  after(:all) do
+    @db.drop_table(:things)
+    @db.drop_function(@db.default_static_cache_update_name)
+  end
+
+  specify "should reload model static cache when underlying table changes" do
+    @Thing.all.should == []
+    q = Queue.new
+    q1 = Queue.new
+
+    @db.listen_for_static_cache_updates(@Thing, :timeout=>0, :loop=>proc{q.push(nil); q1.pop.call})
+    q.pop
+    q1.push(proc{@db[:things].insert(1, 'A')})
+    q.pop
+    @Thing.all.should == [@Thing.load(:id=>1, :name=>'A')]
+
+    q1.push(proc{@db[:things].update(:name=>'B')})
+    q.pop
+    @Thing.all.should == [@Thing.load(:id=>1, :name=>'B')]
+
+    q1.push(proc{@db[:things].delete})
+    q.pop
+    @Thing.all.should == []
+
+    q1.push(proc{throw :stop})
+  end
+end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_version >= 90000
