@@ -11,10 +11,8 @@ module Sequel
     # You can use the :frozen=>false option to have this plugin return unfrozen
     # instances.  This is slower as it requires creating new objects, but it allows
     # you to make changes to the object and save them.  If you set the option to false,
-    # the cache will automatically be reloaded when you create, update, or destroy a
-    # model object.  If you make any changes to the underlying table without going
-    # through the model API, you are responsible for making sure the caches are kept
-    # updated (the pg_static_cache_updater extension can do this automatically).
+    # you are responsible for updating the cache manually (the pg_static_cache_updater
+    # extension can handle this automatically).
     #
     # The caches this plugin creates are used for the following things:
     #
@@ -31,25 +29,17 @@ module Sequel
     #   # Cache the AlbumType class statically, disallowing any changes.
     #   AlbumType.plugin :static_cache
     #
-    #   # Cache the AlbumType class statically, reloading the
-    #   # cache when changes are made.
+    #   # Cache the AlbumType class statically, but return unfrozen instances
+    #   # that can be modified.
     #   AlbumType.plugin :static_cache, :frozen=>false
     module StaticCache
       # Populate the static caches when loading the plugin. Options:
       # :frozen :: Whether retrieved model objects are frozen.  The default is true,
       #            for better performance as the shared frozen objects can be used
       #            directly.  If set to false, new instances are created.
-      # :reload_hooks :: If frozen is set to false, this defaults to true, and sets
-      #                  up hooks so that if model instances are created, updated, or
-      #                  destroyed, the cache is reloaded.  This should be set to
-      #                  false if you are using some external method to update the
-      #                  cache (such as the pg_static_cache_updater), and want to
-      #                  avoid reloading the cache twice during model updates.
       def self.configure(model, opts=OPTS)
         model.instance_eval do
-          unless @static_cache_frozen = opts.fetch(:frozen, true)
-            @static_cache_reload_hooks = opts.fetch(:reload_hooks, true)
-          end
+          @static_cache_frozen = opts.fetch(:frozen, true)
           load_cache
         end
       end
@@ -172,12 +162,6 @@ module Sequel
           h
         end
 
-        # Notify the class that one of the instances was updated, which may
-        # cause the cache to be reloaded.
-        def static_cache_instance_modified!
-          load_cache if @static_cache_reload_hooks
-        end
-
         # Ask whether modifications to this class are allowed.
         def static_cache_allow_modifications?
           !@static_cache_frozen
@@ -214,18 +198,6 @@ module Sequel
       end
 
       module InstanceMethods
-        # Notify model class that an instance was modified when destroying.
-        def after_destroy
-          super
-          model.static_cache_instance_modified!
-        end
-
-        # Notify model class that an instance was modified when saving.
-        def after_save
-          super
-          model.static_cache_instance_modified!
-        end
-
         # Disallowing destroying the object unless the :frozen=>false option was used.
         def before_destroy
           return false unless model.static_cache_allow_modifications?
