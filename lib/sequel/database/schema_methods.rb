@@ -36,9 +36,9 @@ module Sequel
     def add_column(table, *args)
       alter_table(table) {add_column(*args)}
     end
-    
+
     # Adds an index to a table for the given columns:
-    # 
+    #
     #   DB.add_index :posts, :title
     #   DB.add_index :posts, [:author, :title], :unique => true
     #
@@ -54,7 +54,7 @@ module Sequel
         raise unless e
       end
     end
-    
+
     # Alters the given table with the specified block. Example:
     #
     #   DB.alter_table :items do
@@ -106,7 +106,7 @@ module Sequel
     # entry giving the table referenced:
     #
     #   create_join_table(:cat_id=>{:table=>:cats, :type=>Bignum}, :dog_id=>:dogs)
-    #   
+    #
     # You can provide a second argument which is a table options hash:
     #
     #   create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :temp=>true)
@@ -175,8 +175,8 @@ module Sequel
     end
 
     # Forcibly create a table, attempting to drop it if it already exists, then creating it.
-    # 
-    #   DB.create_table!(:a){Integer :a} 
+    #
+    #   DB.create_table!(:a){Integer :a}
     #   # SELECT NULL FROM a LIMIT 1 -- check existence
     #   # DROP TABLE a -- drop table if already exists
     #   # CREATE TABLE a (a integer)
@@ -184,10 +184,10 @@ module Sequel
       drop_table?(name)
       create_table(name, options, &block)
     end
-    
+
     # Creates the table unless the table already exists.
-    # 
-    #   DB.create_table?(:a){Integer :a} 
+    #
+    #   DB.create_table?(:a){Integer :a}
     #   # SELECT NULL FROM a LIMIT 1 -- check existence
     #   # CREATE TABLE a (a integer) -- if it doesn't already exist
     def create_table?(name, options=OPTS, &block)
@@ -203,7 +203,7 @@ module Sequel
     def create_table_generator(&block)
       create_table_generator_class.new(self, &block)
     end
-    
+
     # Creates a view, replacing a view with the same name if one already exists.
     #
     #   DB.create_or_replace_view(:some_items, "SELECT * FROM items WHERE price < 100")
@@ -220,7 +220,7 @@ module Sequel
 
       create_view(name, source, options)
     end
-    
+
     # Creates a view based on a dataset or an SQL string:
     #
     #   DB.create_view(:cheap_items, "SELECT * FROM items WHERE price < 100")
@@ -247,7 +247,7 @@ module Sequel
       remove_cached_schema(name)
       nil
     end
-    
+
     # Removes a column from the specified table:
     #
     #   DB.drop_column :items, :category
@@ -256,7 +256,7 @@ module Sequel
     def drop_column(table, *args)
       alter_table(table) {drop_column(*args)}
     end
-    
+
     # Removes an index for the given table and column/s:
     #
     #   DB.drop_index :posts, :title
@@ -275,7 +275,7 @@ module Sequel
     def drop_join_table(hash, options=OPTS)
       drop_table(join_table_name(hash, options), options)
     end
-    
+
     # Drops one or more tables corresponding to the given names:
     #
     #   DB.drop_table(:posts) # DROP TABLE posts
@@ -289,10 +289,10 @@ module Sequel
       end
       nil
     end
-    
+
     # Drops the table if it already exists.  If it doesn't exist,
     # does nothing.
-    # 
+    #
     #   DB.drop_table?(:a)
     #   # SELECT NULL FROM a LIMIT 1 -- check existence
     #   # DROP TABLE a -- if it already exists
@@ -309,7 +309,7 @@ module Sequel
         end
       end
     end
-    
+
     # Drops one or more views corresponding to the given names:
     #
     #   DB.drop_view(:cheap_items)
@@ -341,7 +341,7 @@ module Sequel
       remove_cached_schema(name)
       nil
     end
-    
+
     # Renames a column in the specified table. This method expects the current
     # column name and the new column name:
     #
@@ -351,7 +351,7 @@ module Sequel
     def rename_column(table, *args)
       alter_table(table) {rename_column(*args)}
     end
-    
+
     # Sets the default value for the given column in the given table:
     #
     #   DB.set_column_default :items, :category, 'perl!'
@@ -360,7 +360,7 @@ module Sequel
     def set_column_default(table, *args)
       alter_table(table) {set_column_default(*args)}
     end
-    
+
     # Set the data type for the given column in the given table:
     #
     #   DB.set_column_type :items, :price, :float
@@ -376,7 +376,7 @@ module Sequel
     def apply_alter_table(name, ops)
       alter_table_sql_list(name, ops).each{|sql| execute_ddl(sql)}
     end
-    
+
     # Apply the operations in the given generator to the table given by name.
     def apply_alter_table_generator(name, generator)
       apply_alter_table(name, generator.operations)
@@ -386,7 +386,7 @@ module Sequel
     def alter_table_generator_class
       Schema::AlterTableGenerator
     end
-    
+
     # SQL fragment for given alter table operation.
     def alter_table_op_sql(table, op)
       quoted_name = quote_identifier(op[:name]) if op[:name]
@@ -457,13 +457,13 @@ module Sequel
         operations.map{|op| alter_table_sql(table, op)}.flatten.compact
       end
     end
-    
+
     # The SQL string specify the autoincrement property, generally used by
     # primary keys.
     def auto_increment_sql
       AUTOINCREMENT
     end
-    
+
     # The order of the column definition, as an array of symbols.
     def column_definition_order
       self.class.const_get(:COLUMN_DEFINITION_ORDER)
@@ -490,14 +490,14 @@ module Sequel
     def column_definition_default_sql(sql, column)
       sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)
     end
-    
+
     # Add null/not null SQL fragment to column creation SQL.
     def column_definition_null_sql(sql, column)
       null = column.fetch(:null, column[:allow_null])
       sql << NOT_NULL if null == false
       sql << NULL if null == true
     end
-    
+
     # Add primary key SQL fragment to column creation SQL.
     def column_definition_primary_key_sql(sql, column)
       if column[:primary_key]
@@ -507,7 +507,7 @@ module Sequel
         sql << PRIMARY_KEY
       end
     end
-    
+
     # Add foreign key reference SQL fragment to column creation SQL.
     def column_definition_references_sql(sql, column)
       if column[:table]
@@ -517,7 +517,7 @@ module Sequel
         sql << column_references_column_constraint_sql(column)
       end
     end
-    
+
     # Add unique constraint SQL fragment to column creation SQL.
     def column_definition_unique_sql(sql, column)
       if column[:unique]
@@ -527,7 +527,7 @@ module Sequel
         sql << UNIQUE
       end
     end
-    
+
     # SQL for all given columns, used inside a CREATE TABLE block.
     def column_list_sql(generator)
       (generator.columns.map{|c| column_definition_sql(c)} + generator.constraints.map{|c| constraint_definition_sql(c)}).join(COMMA_SEPARATOR)
@@ -547,7 +547,7 @@ module Sequel
       constraint_deferrable_sql_append(sql, column[:deferrable])
       sql
     end
-  
+
     # SQL DDL fragment for table foreign key references (table constraints)
     def column_references_table_constraint_sql(constraint)
       "FOREIGN KEY #{literal(constraint[:columns])}#{column_references_sql(constraint)}"
@@ -604,7 +604,7 @@ module Sequel
     def create_table_generator_class
       Schema::CreateTableGenerator
     end
-    
+
     # Execute the create index statements using the generator.
     def create_table_indexes_from_generator(name, generator, options)
       e = options[:ignore_index_errors] || options[:if_not_exists]
@@ -645,7 +645,7 @@ module Sequel
       sql = sql.sql if sql.is_a?(Sequel::Dataset)
       run(create_table_as_sql(name, sql, options))
     end
-    
+
     # DDL statement for creating a table from the result of a SELECT statement.
     # +sql+ should be a string representing a SELECT query.
     def create_table_as_sql(name, sql, options)
@@ -684,14 +684,14 @@ module Sequel
       schema, table = schema_and_table(table_name)
       "#{"#{schema}_" if schema}#{table}_#{columns.map{|c| [String, Symbol].any?{|cl| c.is_a?(cl)} ? c : literal(c).gsub(/\W/, '_')}.join(UNDERSCORE)}_index"
     end
-  
+
     # Get foreign key name for given table and columns.
     def foreign_key_name(table_name, columns)
       keys = foreign_key_list(table_name).select{|key| key[:columns] == columns}
       raise(Error, "#{keys.empty? ? 'Missing' : 'Ambiguous'} foreign key for #{columns.inspect}") unless keys.size == 1
       keys.first[:name]
     end
-    
+
     # The SQL to drop an index for the table.
     def drop_index_sql(table, op)
       "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))}"
@@ -701,7 +701,7 @@ module Sequel
     def drop_table_sql(name, options)
       "DROP TABLE#{' IF EXISTS' if options[:if_exists]} #{quote_schema_table(name)}#{' CASCADE' if options[:cascade]}"
     end
-    
+
     # SQL DDL statement to drop a view with the given name.
     def drop_view_sql(name, options)
       "DROP VIEW #{quote_schema_table(name)}#{' CASCADE' if options[:cascade]}"
@@ -718,13 +718,13 @@ module Sequel
       index_name = index[:name] || default_index_name(table_name, index[:columns])
       if index[:type]
         raise Error, "Index types are not supported for this database"
-      elsif index[:where]
+      elsif index[:where] && !supports_index_conditions?
         raise Error, "Partial indexes are not supported for this database"
       else
         "CREATE #{'UNIQUE ' if index[:unique]}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
       end
     end
-  
+
     # Array of SQL DDL statements, one for each index specification,
     # for the given table.
     def index_sql_list(table_name, indexes)
@@ -756,10 +756,10 @@ module Sequel
         raise Error, "can't extract table name from #{entry.inspect}"
       end
     end
-    
+
     # SQL DDL ON DELETE fragment to use, based on the given action.
     # The following actions are recognized:
-    # 
+    #
     # * :cascade - Delete rows referencing this row.
     # * :no_action (default) - Raise an error if other rows reference this
     #   row, allow deferring of the integrity check.
@@ -777,12 +777,12 @@ module Sequel
     def on_update_clause(action)
       on_delete_clause(action)
     end
-    
+
     # Proxy the quote_schema_table method to the dataset
     def quote_schema_table(table)
       schema_utility_dataset.quote_schema_table(table)
     end
-    
+
     # SQL DDL statement for renaming a table.
     def rename_table_sql(name, new_name)
       "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_schema_table(new_name)}"
@@ -817,7 +817,7 @@ module Sequel
     def type_literal(column)
       column[:type].is_a?(Class) ? type_literal_generic(column) : type_literal_specific(column)
     end
-    
+
     # SQL fragment specifying the full type of a column,
     # consider the type with possible modifiers.
     def type_literal_generic(column)
@@ -894,7 +894,7 @@ module Sequel
         "varchar(#{column[:size]||default_string_column_size})"
       end
     end
-    
+
     # Sequel uses the timestamp type by default for Time values.
     # If the :only_time option is used, the time type is used.
     def type_literal_generic_time(column)
