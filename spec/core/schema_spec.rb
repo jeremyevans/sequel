@@ -397,6 +397,24 @@ describe "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (name text, UNIQUE (name))"]
   end
 
+  specify "should accept partial index definitions" do
+    def @db.supports_partial_indexes?() true end
+    @db.create_table(:cats) do
+      integer :id
+      index :id, :where=>proc{id > 1}
+    end
+    @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_id_index ON cats (id) WHERE (id > 1)"]
+  end
+
+  specify "should raise an error if partial indexes are not supported" do
+    proc do 
+      @db.create_table(:cats) do
+        integer :id
+        index :id, :where=>proc{id > 1}
+      end
+    end.should raise_error(Sequel::Error)
+  end
+
   specify "should not raise on index error for unsupported index definitions if ignore_index_errors is used" do
     proc {
       @db.create_table(:cats, :ignore_index_errors=>true) do

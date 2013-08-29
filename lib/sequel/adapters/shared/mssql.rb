@@ -90,15 +90,20 @@ module Sequel
         m = output_identifier_meth
         im = input_identifier_meth
         indexes = {}
-        metadata_dataset.from(:sys__tables___t).
+        ds = metadata_dataset.from(:sys__tables___t).
          join(:sys__indexes___i, :object_id=>:object_id).
          join(:sys__index_columns___ic, :object_id=>:object_id, :index_id=>:index_id).
          join(:sys__columns___c, :object_id=>:object_id, :column_id=>:column_id).
          select(:i__name, :i__is_unique, :c__name___column).
          where{{t__name=>im.call(table)}}.
          where(:i__is_primary_key=>0, :i__is_disabled=>0).
-         order(:i__name, :ic__index_column_id).
-         each do |r|
+         order(:i__name, :ic__index_column_id)
+
+        if supports_partial_indexes?
+          ds = ds.where(:i__has_filter=>0)
+        end
+
+        ds.each do |r|
           index = indexes[m.call(r[:name])] ||= {:columns=>[], :unique=>(r[:is_unique] && r[:is_unique]!=0)}
           index[:columns] << m.call(r[:column])
         end
@@ -119,6 +124,11 @@ module Sequel
         @server_version
       end
         
+      # MSSQL 2008+ supports partial indexes.
+      def supports_partial_indexes?
+        dataset.send(:is_2008_or_later?)
+      end
+
       # MSSQL supports savepoints, though it doesn't support committing/releasing them savepoint
       def supports_savepoints?
         true
@@ -276,6 +286,7 @@ module Sequel
       # support for clustered index type
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
+        raise Error, "Partial indexes are not supported for this database" if index[:where] && !supports_partial_indexes?
         if index[:type] == :full_text
           "CREATE FULLTEXT INDEX ON #{quote_schema_table(table_name)} #{literal(index[:columns])} KEY INDEX #{literal(index[:key_index])}"
         else

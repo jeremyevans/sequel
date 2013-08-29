@@ -47,6 +47,11 @@ module Sequel
       respond_to?(:indexes)
     end
 
+    # Whether the database supports partial indexes (indexes on a subset of a table).
+    def supports_partial_indexes?
+      false
+    end
+
     # Whether the database and adapter support prepared transactions
     # (two-phase commit), false by default.
     def supports_prepared_transactions?
@@ -90,7 +95,7 @@ module Sequel
     end
 
     private
-    
+
     # Whether the database supports combining multiple alter table
     # operations into a single query, false by default.
     def supports_combining_alter_table_ops?

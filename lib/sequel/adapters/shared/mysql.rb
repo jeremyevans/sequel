@@ -401,6 +401,7 @@ module Sequel
       # Handle MySQL specific index SQL syntax
       def index_definition_sql(table_name, index)
         index_name = quote_identifier(index[:name] || default_index_name(table_name, index[:columns]))
+        raise Error, "Partial indexes are not supported for this database" if index[:where] && !supports_partial_indexes?
         index_type = case index[:type]
         when :full_text
           "FULLTEXT "

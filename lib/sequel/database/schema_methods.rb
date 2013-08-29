@@ -716,13 +716,9 @@ module Sequel
     # and index specifications.
     def index_definition_sql(table_name, index)
       index_name = index[:name] || default_index_name(table_name, index[:columns])
-      if index[:type]
-        raise Error, "Index types are not supported for this database"
-      elsif index[:where]
-        raise Error, "Partial indexes are not supported for this database"
-      else
-        "CREATE #{'UNIQUE ' if index[:unique]}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
-      end
+      raise Error, "Index types are not supported for this database" if index[:type]
+      raise Error, "Partial indexes are not supported for this database" if index[:where] && !supports_partial_indexes?
+      "CREATE #{'UNIQUE ' if index[:unique]}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}#{" WHERE #{filter_expr(index[:where])}" if index[:where]}"
     end
   
     # Array of SQL DDL statements, one for each index specification,

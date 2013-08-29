@@ -148,6 +148,11 @@ module Sequel
         sqlite_version >= 30619
       end
 
+      # SQLite 3.8.0+ supports partial indexes.
+      def supports_partial_indexes?
+        sqlite_version >= 30800
+      end
+
       # SQLite 3.6.8+ supports savepoints. 
       def supports_savepoints?
         sqlite_version >= 30608

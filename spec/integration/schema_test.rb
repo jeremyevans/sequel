@@ -175,6 +175,11 @@ describe "Database index parsing" do
     DB.create_table!(:items){Integer :n; Integer :a; primary_key [:n, :a]}
     DB.indexes(:items).should == {}
   end
+
+  cspecify "should not include partial indexes", :sqlite do
+    DB.create_table!(:items){Integer :n; Integer :a; index :n, :where=>proc{n > 10}}
+    DB.indexes(:items).should == {}
+  end if DB.supports_partial_indexes?
 end if DB.supports_index_parsing?
 
 describe "Database foreign key parsing" do
@@ -351,6 +356,14 @@ describe "Database schema modifiers" do
     @ds.insert([10])
     @ds.columns!.should == [:number]
   end
+
+  specify "should allow creating partial indexes with tables" do
+    @db.create_table!(:items){Integer :number; index :number, :where=>proc{number > 10}}
+    @db.table_exists?(:items).should == true
+    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:number]
+    @ds.insert([10])
+    @ds.columns!.should == [:number]
+  end if DB.supports_partial_indexes?
 
   specify "should handle combination of default, unique, and not null" do
     @db.create_table!(:items){Integer :number, :default=>0, :null=>false, :unique=>true}

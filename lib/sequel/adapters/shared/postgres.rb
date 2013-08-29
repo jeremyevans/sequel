@@ -470,6 +470,11 @@ module Sequel
         true
       end
 
+      # PostgreSQL supports partial indexes.
+      def supports_partial_indexes?
+        true
+      end
+
       # PostgreSQL supports prepared transactions (two-phase commit) if
       # max_prepared_transactions is greater than 0.
       def supports_prepared_transactions?
