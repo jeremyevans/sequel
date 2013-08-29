@@ -75,7 +75,7 @@ module Sequel
             referenced_schema = m.call(row[:schema])
             referenced_table = m.call(row[:table])
             h[row[:name]] = { :name      => m.call(row[:name]), 
-                              :table     => (referenced_schema == current_schema) ? referenced_table : :"#{referenced_schema}__#{referenced_table}",
+                              :table     => (referenced_schema == current_schema) ? referenced_table : Sequel.qualify(referenced_schema, referenced_table),
                               :columns   => [m.call(row[:column])], 
                               :key       => [m.call(row[:referenced_column])], 
                               :on_update => fk_action_map[row[:update_referential_action]], 
