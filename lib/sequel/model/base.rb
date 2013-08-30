@@ -1416,12 +1416,6 @@ module Sequel
         self
       end
 
-      # REMOVE41
-      def set_values(hash)
-        Sequel::Deprecation.deprecate('Model#set_values is deprecreated and will be removed in Sequel 4.1.  Please use _refresh_set_values or _save_set_values or set the values directly.')
-        @values = hash
-      end
-      
       # Clear the setter_methods cache when a method is added
       def singleton_method_added(meth)
         @singleton_setter_added = true if meth.to_s =~ SETTER_METHOD_REGEXP
