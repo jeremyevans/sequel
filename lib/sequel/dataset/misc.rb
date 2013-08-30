@@ -142,9 +142,7 @@ module Sequel
     # Returns a string representation of the dataset including the class name 
     # and the corresponding SQL select statement.
     def inspect
-      c = self.class
-      c = c.superclass while c.name.nil? || c.name == ''
-      "#<#{c.name}: #{sql.inspect}>"
+      "#<#{visible_class_name}: #{sql.inspect}>"
     end
     
     # The alias to use for the row_number column, used when emulating OFFSET
@@ -206,6 +204,15 @@ module Sequel
       else
         table_alias
       end
+    end
+
+    private
+
+    # Return the class name for this dataset, but skip anonymous classes
+    def visible_class_name
+      c = self.class
+      c = c.superclass while c.name.nil? || c.name == ''
+      c.name
     end
   end
 end

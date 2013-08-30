@@ -118,9 +118,7 @@ module Sequel
       # with the prepared SQL it represents (which in general won't have
       # substituted variables).
       def inspect
-        c = self.class
-        c = c.superclass while c.name.nil? || c.name == ''
-        "<#{c.name}/PreparedStatement #{prepared_sql.inspect}>"
+        "<#{visible_class_name}/PreparedStatement #{prepared_sql.inspect}>"
       end
       
       protected
