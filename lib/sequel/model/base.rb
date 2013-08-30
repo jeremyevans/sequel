@@ -1041,7 +1041,7 @@ module Sequel
           @values = s.values.dup
           @changed_columns = s.changed_columns.dup
           @errors = s.errors.dup
-          @this = nil
+          @this = s.this.dup if !new? && model.primary_key
           self
         end
       end

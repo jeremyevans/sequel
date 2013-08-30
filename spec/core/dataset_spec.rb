@@ -4528,3 +4528,45 @@ describe "Dataset#supports_replace?" do
     Sequel::Dataset.new(nil).supports_replace?.should be_false
   end
 end
+
+describe "Frozen Datasets" do
+  before do
+    @ds = Sequel.mock[:test].freeze
+  end
+
+  it "should be returned by Dataset#freeze" do
+    @ds.should be_frozen
+  end
+
+  it "should have Dataset#freeze return receiver" do
+    @ds = Sequel.mock[:test]
+    @ds.freeze.should equal(@ds)
+  end
+
+  it "should have Dataset#freeze be a no-op" do
+    @ds.freeze.should equal(@ds)
+  end
+
+  it "should have clones be frozen" do
+    @ds.clone.should be_frozen
+  end
+
+  it "should have dups not be frozen" do
+    @ds.dup.should_not be_frozen
+  end
+
+  it "should raise an error when calling mutation methods" do
+    proc{@ds.select!(:a)}.should raise_error
+    proc{@ds.identifier_input_method = :a}.should raise_error
+    proc{@ds.identifier_output_method = :a}.should raise_error
+    proc{@ds.quote_identifiers = false}.should raise_error
+    proc{@ds.row_proc = proc{}}.should raise_error
+    proc{@ds.extension! :query}.should raise_error
+    proc{@ds.naked!}.should raise_error
+    proc{@ds.from_self!}.should raise_error
+  end
+
+  it "should not raise an error when calling query methods" do
+    @ds.select(:a).sql.should == 'SELECT a FROM test'
+  end
+end

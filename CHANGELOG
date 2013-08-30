@@ -1,5 +1,7 @@
 === HEAD
 
+* Add implementations of Dataset#freeze and Dataset#dup (jeremyevans)
+
 * Add implementations of Model#dup and Model#clone (jeremyevans)
 
 * Don't have partial_indexes returned by Database#indexes on MSSQL 2008+ (jeremyevans)
