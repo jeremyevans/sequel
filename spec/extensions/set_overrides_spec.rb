@@ -24,6 +24,12 @@ describe "Sequel::Dataset #set_defaults" do
   specify "should not affect String update arguments" do
     @ds.update_sql('y = 2').should == "UPDATE items SET y = 2"
   end
+
+  specify "should have working mutation method" do
+    @ds = Sequel.mock.dataset.from(:items).extension(:set_overrides)
+    @ds.set_defaults!(:x=>1)
+    @ds.insert_sql.should == "INSERT INTO items (x) VALUES (1)"
+  end
 end
 
 describe "Sequel::Dataset #set_overrides" do
@@ -45,5 +51,11 @@ describe "Sequel::Dataset #set_overrides" do
     @ds.update_sql(:y=>2).should =~ /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
     @ds.set_overrides(:y=>2).update_sql.should =~ /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
     @ds.set_overrides(:x=>2).update_sql.should == "UPDATE items SET x = 1"
+  end
+
+  specify "should have working mutation method" do
+    @ds = Sequel.mock.dataset.from(:items).extension(:set_overrides)
+    @ds.set_overrides!(:x=>1)
+    @ds.insert_sql.should == "INSERT INTO items (x) VALUES (1)"
   end
 end

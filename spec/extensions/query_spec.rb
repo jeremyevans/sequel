@@ -87,6 +87,14 @@ describe "Dataset#query" do
     q.sql.should == "SELECT * FROM xyz"
   end
   
+  specify "should have an appropriate mutation method" do
+    @d.query! do
+      select :a, :b___mongo
+      from :yyy
+    end
+    @d.sql.should == "SELECT a, b AS mongo FROM yyy"
+  end
+
   specify "should raise on non-chainable method calls" do
     proc {@d.query {row_proc}}.should raise_error(Sequel::Error)
     proc {@d.query {all}}.should raise_error(Sequel::Error)
