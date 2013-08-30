@@ -1,5 +1,7 @@
 === HEAD
 
+* Support custom :flags option in mysql2 adapter (jeremyevans) (#700)
+
 * Add implementations of Dataset#freeze and Dataset#dup (jeremyevans)
 
 * Add implementations of Model#dup and Model#clone (jeremyevans)

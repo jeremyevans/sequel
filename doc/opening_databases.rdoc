@@ -312,6 +312,10 @@ This is a newer MySQL adapter that does typecasting in C, so it is often faster 
 mysql adapter.  Supports the same additional options as the mysql adapter, except for :compress, and uses
 :timeout instead of :read_timeout and :connect_timeout.
 
+The following additional options are supported:
+
+:flags :: Override the flags to use for the connection (e.g. ::Mysql2::Client::MULTI_STATEMENTS)
+
 === odbc 
 
 The ODBC adapter allows you to connect to any database with the appropriate ODBC drivers installed.  
