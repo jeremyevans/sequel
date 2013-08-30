@@ -9,12 +9,11 @@ module Sequel
     
     # Action methods defined by Sequel that execute code on the database.
     ACTION_METHODS = (<<-METHS).split.map{|x| x.to_sym}
-      << [] []= all avg count columns columns! delete each
-      empty? fetch_rows first first! get import insert insert_multiple interval last
+      << [] all avg count columns columns! delete each
+      empty? fetch_rows first first! get import insert interval last
       map max min multi_insert paged_each range select_hash select_hash_groups select_map select_order_map
-      set single_record single_value sum to_csv to_hash to_hash_groups truncate update
+      single_record single_value sum to_hash to_hash_groups truncate update
     METHS
-    # REMOVE40 []= insert_multiple set to_csv
 
     # Inserts the given argument into the database.  Returns self so it
     # can be used safely when chaining:
