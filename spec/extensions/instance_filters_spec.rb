@@ -70,4 +70,10 @@ describe "instance_filters plugin" do
     @p.freeze
     proc{@p.instance_filter(:name=>'Jim')}.should raise_error
   end 
+
+  specify "should have dup duplicate internal structures" do
+    @p.instance_filter(:name=>'Joe')
+    @p.dup.send(:instance_filters).should == @p.send(:instance_filters)
+    @p.dup.send(:instance_filters).should_not equal(@p.send(:instance_filters))
+  end 
 end

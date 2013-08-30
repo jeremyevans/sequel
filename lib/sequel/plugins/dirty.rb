@@ -85,6 +85,25 @@ module Sequel
           initial_values.has_key?(column)
         end
 
+        # Duplicate internal data structures
+        def dup 
+          s = self
+          super.instance_eval do
+            @initial_values = s.initial_values.dup
+            @missing_initial_values = s.send(:missing_initial_values).dup
+            @previous_changes = s.previous_changes.dup if s.previous_changes
+            self
+          end
+        end
+
+        # Freeze internal data structures
+        def freeze
+          initial_values.freeze
+          missing_initial_values.freeze
+          @previous_changes.freeze if @previous_changes
+          super
+        end
+
         # The initial value of the given column.  If the column value has
         # not changed, this will be the same as the current value of the
         # column.
@@ -99,14 +118,6 @@ module Sequel
         #   initial_values # {:name => 'Initial'}
         def initial_values
           @initial_values ||= {}
-        end
-
-        # Freeze internal data structures
-        def freeze
-          initial_values.freeze
-          missing_initial_values.freeze
-          @previous_changes.freeze if @previous_changes
-          super
         end
 
         # Reset the column to its initial value.  If the column was not set

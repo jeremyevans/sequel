@@ -122,6 +122,15 @@ describe "Sequel::Plugins::Dirty" do
       @o.initial_value(:initial).should == 'i'
       proc{@o.initial = 'b'}.should raise_error
     end
+
+    it "should have #dup duplicate structures" do
+      @o.dup.initial_values.should == @o.initial_values
+      @o.dup.initial_values.should_not equal(@o.initial_values)
+      @o.dup.instance_variable_get(:@missing_initial_values).should == @o.instance_variable_get(:@missing_initial_values)
+      @o.dup.instance_variable_get(:@missing_initial_values).should_not equal(@o.instance_variable_get(:@missing_initial_values))
+      @o.dup.previous_changes.should == @o.previous_changes
+      @o.dup.previous_changes.should_not equal(@o.previous_changes) if @o.previous_changes
+    end
   end
 
   describe "with new instance" do

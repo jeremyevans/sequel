@@ -293,4 +293,11 @@ describe "Serialization plugin" do
     proc{o.abc = 2}.should raise_error
     proc{o.def = 'h'}.should raise_error
   end
+
+  it "should have dup duplicate internal structures" do
+    @c.plugin :serialization, :yaml, :abc, :def
+    o = @c.new
+    o.dup.deserialized_values.should == o.deserialized_values
+    o.dup.deserialized_values.should_not equal(o.deserialized_values)
+  end
 end

@@ -406,6 +406,80 @@ describe "Model#freeze" do
   end
 end
 
+describe "Model#dup" do
+  before do
+    @Album = Class.new(Sequel::Model(:albums))
+    @o = @Album.load(:id=>1)
+    DB.sqls
+  end
+
+  it "should be equal to existing object" do
+    @o.dup.should == @o
+    @o.dup.values.should == @o.values
+    @o.dup.changed_columns.should == @o.changed_columns
+    @o.dup.errors.should == @o.errors
+    @o.dup.this.should == @o.this
+  end
+
+  it "should not use identical structures" do
+    @o.dup.should_not equal(@o)
+    @o.dup.values.should_not equal(@o.values)
+    @o.dup.changed_columns.should_not equal(@o.changed_columns)
+    @o.dup.errors.should_not equal(@o.errors)
+    @o.dup.this.should_not equal(@o.this)
+  end
+
+  it "should keep new status" do
+    @o.dup.new?.should be_false
+    @Album.new.dup.new?.should be_true
+  end
+
+  it "should not copy frozen status" do
+    @o.freeze.dup.should_not be_frozen
+    @o.freeze.dup.values.should_not be_frozen
+    @o.freeze.dup.changed_columns.should_not be_frozen
+    @o.freeze.dup.errors.should_not be_frozen
+    @o.freeze.dup.this.should_not be_frozen
+  end
+end
+
+describe "Model#clone" do
+  before do
+    @Album = Class.new(Sequel::Model(:albums))
+    @o = @Album.load(:id=>1)
+    DB.sqls
+  end
+
+  it "should be equal to existing object" do
+    @o.clone.should == @o
+    @o.clone.values.should == @o.values
+    @o.clone.changed_columns.should == @o.changed_columns
+    @o.clone.errors.should == @o.errors
+    @o.clone.this.should == @o.this
+  end
+
+  it "should not use identical structures" do
+    @o.clone.should_not equal(@o)
+    @o.clone.values.should_not equal(@o.values)
+    @o.clone.changed_columns.should_not equal(@o.changed_columns)
+    @o.clone.errors.should_not equal(@o.errors)
+    @o.clone.this.should_not equal(@o.this)
+  end
+
+  it "should keep new status" do
+    @o.clone.new?.should be_false
+    @Album.new.clone.new?.should be_true
+  end
+
+  it "should copy frozen status" do
+    @o.freeze.clone.should be_frozen
+    @o.freeze.clone.values.should be_frozen
+    @o.freeze.clone.changed_columns.should be_frozen
+    @o.freeze.clone.errors.should be_frozen
+    @o.freeze.clone.this.should be_frozen
+  end
+end
+
 describe "Model#marshallable" do
   before do
     class ::Album < Sequel::Model

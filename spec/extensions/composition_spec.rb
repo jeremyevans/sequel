@@ -201,6 +201,13 @@ describe "Composition plugin" do
     proc{@o.date = Date.today}.should raise_error
   end
 
+  it "should have #dup duplicate compositions" do
+    @c.composition :date, :mapping=>[:year, :month, :day]
+    @o.date.should == Date.new(1, 2, 3)
+    @o.dup.compositions.should == @o.compositions
+    @o.dup.compositions.should_not equal(@o.compositions)
+  end
+
   it "should work correctly with subclasses" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     c = Class.new(@c)

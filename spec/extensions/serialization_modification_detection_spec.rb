@@ -77,4 +77,13 @@ describe "serialization_modification_detection plugin" do
     @o1.h[1] = 2
     @o1.changed_columns.should == [:h]
   end
+
+  it "should work with frozen objects" do
+    @o2.changed_columns.should == []
+    o = @o2.dup
+    @o2.h.should == {}
+    @o2.h[1] = 2
+    @o2.changed_columns.should == [:h]
+    o.changed_columns.should == []
+  end
 end

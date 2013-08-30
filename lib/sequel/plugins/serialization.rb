@@ -173,6 +173,15 @@ module Sequel
         end
 
         # Freeze the deserialized values
+        def dup
+          dv = deserialized_values.dup
+          super.instance_eval do
+            @deserialized_values = dv
+            self
+          end
+        end
+
+        # Freeze the deserialized values
         def freeze
           deserialized_values.freeze
           super

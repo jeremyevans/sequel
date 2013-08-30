@@ -1001,6 +1001,14 @@ module Sequel
         @changed_columns ||= []
       end
   
+      # Similar to Model#dup, but copies frozen status to returned object
+      # if current object is frozen.
+      def clone
+        o = dup
+        o.freeze if frozen?
+        o
+      end
+
       # Deletes and returns +self+.  Does not run destroy hooks.
       # Look into using +destroy+ instead.
       #
@@ -1026,6 +1034,18 @@ module Sequel
         checked_save_failure(opts){checked_transaction(opts){_destroy(opts)}}
       end
 
+      # Produce a shallow copy of the object, similar to Object#dup.
+      def dup
+        s = self
+        super.instance_eval do
+          @values = s.values.dup
+          @changed_columns = s.changed_columns.dup
+          @errors = s.errors.dup
+          @this = nil
+          self
+        end
+      end
+  
       # Iterates through all of the current values using each.
       #
       #  Album[1].each{|k, v| puts "#{k} => #{v}"}

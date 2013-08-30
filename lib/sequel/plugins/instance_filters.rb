@@ -59,6 +59,15 @@ module Sequel
           clear_instance_filters
         end
 
+        # Duplicate internal structures when duplicating model instance.
+        def dup
+          ifs = instance_filters.dup
+          super.instance_eval do
+            @instance_filters = ifs
+            self
+          end
+        end
+      
         # Freeze the instance filters when freezing the object
         def freeze
           instance_filters.freeze

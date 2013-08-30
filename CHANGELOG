@@ -1,5 +1,7 @@
 === HEAD
 
+* Add implementations of Model#dup and Model#clone (jeremyevans)
+
 * Don't have partial_indexes returned by Database#indexes on MSSQL 2008+ (jeremyevans)
 
 * Support partial indexes on SQLite 3.8.0+ (jeremyevans)
