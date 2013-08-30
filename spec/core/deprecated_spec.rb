@@ -27,7 +27,7 @@ describe "Sequel::Deprecated" do
 
   specify "should consider two arguments to be a method name and additional text" do
     @d.deprecate("foo", "Use bar instead")
-    @output.should == ['foo is deprecated and will be removed in Sequel 4.0.  Use bar instead.']
+    @output.should == ['foo is deprecated and will be removed in a future version of Sequel.  Use bar instead.']
   end
 
   specify "should include a prefix if set" do
