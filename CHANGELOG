@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.2.0 (2013-09-01)
 
 * Support custom :flags option in mysql2 adapter (jeremyevans) (#700)
 
