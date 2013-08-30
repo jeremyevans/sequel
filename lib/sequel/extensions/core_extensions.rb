@@ -48,8 +48,6 @@ class Array
   def sql_value_list
     ::Sequel::SQL::ValueList.new(self)
   end
-  
-  # Deprecated alias for sql_value_list
   alias sql_array sql_value_list
 
   # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this array, matching all of the

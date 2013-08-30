@@ -11,7 +11,7 @@ module Sequel
     end
   end
 
-  # Deprecated alias for HookFailed, kept for backwards compatibility
+  # Alias for HookFailed, kept for backwards compatibility
   BeforeHookFailed = HookFailed
   
   # Exception class raised when +require_modification+ is set and an UPDATE or DELETE statement to modify the dataset doesn't
