@@ -24,6 +24,11 @@ describe Sequel::Database do
     proc{@db << "SELECT"}.should raise_error(Sequel::DatabaseError)
   end
 
+  specify "should have Sequel::DatabaseError#sql give the SQL causing the error" do
+    (@db << "SELECT") rescue (e = $!)
+    e.sql.should == "SELECT"
+  end if ENV['SEQUEL_ERROR_SQL']
+
   describe "constraint violations" do
     before do
       @db.drop_table?(:test2, :test)

@@ -92,6 +92,10 @@ if DB.adapter_scheme == :ibmdb || (DB.adapter_scheme == :ado && DB.database_type
   end
 end
 
+if ENV['SEQUEL_ERROR_SQL']
+  DB.extension :error_sql
+end
+
 if ENV['SEQUEL_CONNECTION_VALIDATOR']
   ENV['SEQUEL_NO_CHECK_SQLS'] = '1'
   DB.extension(:connection_validator)

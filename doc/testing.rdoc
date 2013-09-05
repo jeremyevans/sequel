@@ -163,5 +163,8 @@ The SEQUEL_INTEGRATION_URL environment variable specifies the Database connectio
 === Other
 
 SEQUEL_COLUMNS_INTROSPECTION :: Whether to run the specs with the columns_introspection extension loaded by default
+SEQUEL_CONNECTION_VALIDATOR :: Use the connection validator extension when running the specs
+SEQUEL_ERROR_SQL :: Use the error_sql extension when running the specs
+SEQUEL_NO_CHECK_SQLS :: Don't check for specific SQL syntax when running the specs
 SEQUEL_NO_PENDING :: Don't mark any specs as pending, try running all specs
 SKIPPED_TEST_WARN :: Warn when skipping any tests because libraries aren't available
