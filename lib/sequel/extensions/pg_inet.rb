@@ -10,9 +10,9 @@
 #
 #   DB.extension :pg_inet
 #
-# If you are not using the native postgres adapter, you probably
-# also want to use the pg_typecast_on_load plugin in the model, and
-# set it to typecast the inet/cidr column(s) on load.
+# If you are not using the native postgres adapter and are using inet/cidr
+# types as model column values you probably should use the
+# pg_typecast_on_load plugin if the column values are returned as a string.
 #
 # This extension integrates with the pg_array extension.  If you plan
 # to use the inet[] or cidr[] types, load the pg_array extension before

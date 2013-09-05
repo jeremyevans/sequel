@@ -38,8 +38,9 @@
 #
 # If you are not using the native postgres adapter and are using array
 # types as model column values you probably should use the
-# pg_typecast_on_load plugin in the model, and set it to typecast the
-# array column(s) on load.
+# typecast_on_load plugin if the column values are returned as a
+# regular array, and the pg_typecast_on_load plugin if the column
+# values are returned as a string.
 #
 # This extension by default includes handlers for array types for
 # all scalar types that the native postgres adapter handles. It

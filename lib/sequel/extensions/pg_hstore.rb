@@ -75,9 +75,11 @@
 #
 #   DB.extension :pg_hstore
 #
-# If you are not using the native postgres adapter, you probably
-# also want to use the pg_typecast_on_load plugin in the model, and
-# set it to typecast the hstore column(s) on load.
+# If you are not using the native postgres adapter and are using hstore
+# types as model column values you probably should use the
+# typecast_on_load plugin if the column values are returned as a
+# hash, and the pg_typecast_on_load plugin if the column
+# values are returned as a string.
 #
 # This extension requires the delegate and strscan libraries.
 
