@@ -96,4 +96,14 @@ describe "Dataset#each_page" do
       'SELECT * FROM items LIMIT 50 OFFSET 150',
     ]
   end
+
+  specify "should return an enumerator if no block is given" do
+    enum = @d.each_page(50)
+    enum.map {|p| p.sql}.should == [
+      'SELECT * FROM items LIMIT 50 OFFSET 0',
+      'SELECT * FROM items LIMIT 50 OFFSET 50',
+      'SELECT * FROM items LIMIT 50 OFFSET 100',
+      'SELECT * FROM items LIMIT 50 OFFSET 150',
+    ]
+  end
 end
