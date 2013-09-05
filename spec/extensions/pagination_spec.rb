@@ -11,6 +11,8 @@ describe "A paginated dataset" do
   specify "should raise an error if the dataset already has a limit" do
     proc{@d.limit(10).paginate(1,10)}.should raise_error(Sequel::Error)
     proc{@paginated.paginate(2,20)}.should raise_error(Sequel::Error)
+    proc{@d.limit(10).each_page(10){|ds|}}.should raise_error(Sequel::Error)
+    proc{@d.limit(10).each_page(10)}.should raise_error(Sequel::Error)
   end
   
   specify "should set the limit and offset options correctly" do

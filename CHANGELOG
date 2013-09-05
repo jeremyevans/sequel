@@ -1,3 +1,7 @@
+=== HEAD
+
+* Make Dataset#each_page in pagination extension return enumerator if no block is given (justinj) (#702)
+
 === 4.2.0 (2013-09-01)
 
 * Support custom :flags option in mysql2 adapter (jeremyevans) (#700)
