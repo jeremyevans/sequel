@@ -32,6 +32,7 @@
     <li><a href="rdoc/files/doc/model_hooks_rdoc.html">Model Hooks</a></li>
     <li><a href="rdoc/files/doc/association_basics_rdoc.html">Model Associations Basics and Options</a></li>
     <li><a href="rdoc/files/doc/advanced_associations_rdoc.html">Advanced Model Associations</a></li>
+    <li><a href="rdoc/files/doc/model_plugins_rdoc.html">Model Plugins</a></li>
   </ul></li>
   <li>Misc.<ul>
     <li><a href="rdoc/files/doc/code_order_rdoc.html">Code Order</a></li>
