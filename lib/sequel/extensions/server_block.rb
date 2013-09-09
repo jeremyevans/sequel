@@ -25,9 +25,17 @@
 #   end
 #   DB[:a].all # Uses default
 # 
-# Note this this extension assumes the following shard names should use the
-# server/shard passed to with_server: :default, nil, :read_only.  All other
-# shard names will cause the standard behavior to be used.
+# Note that if you pass the nil, :default, or :read_only server/shard
+# names to Dataset#server inside a with_server block, they will be
+# ignored and the server/shard given to with_server will be used:
+#
+#   DB.with_server(:shard1) do
+#     DB[:a].all # Uses shard1
+#     DB[:a].server(:shard2).all # Uses shard2
+#     DB[:a].server(nil).all # Uses shard1
+#     DB[:a].server(:default).all # Uses shard1
+#     DB[:a].server(:read_only).all # Uses shard1
+#   end
 
 module Sequel
   module ServerBlock
