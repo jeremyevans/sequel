@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel extensions guide (jeremyevans)
+
 * Add model plugins guide (jeremyevans)
 
 * Add error_sql Database extension, allowing DatabaseError#sql to return SQL query that caused underlying exception (jeremyevans)
