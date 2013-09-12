@@ -1,5 +1,7 @@
 === HEAD
 
+* Make PostgreSQL empty array literalization work correctly on PostgreSQL <8.4 (jeremyevans)
+
 * Add Sequel extensions guide (jeremyevans)
 
 * Add model plugins guide (jeremyevans)

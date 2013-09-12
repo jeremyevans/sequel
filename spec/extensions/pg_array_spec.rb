@@ -147,6 +147,7 @@ describe "pg_array extension" do
   end
 
   it "should literalize with types correctly" do
+    @db.literal(@m::PGArray.new([], :int4)).should == "'{}'::int4[]"
     @db.literal(@m::PGArray.new([1], :int4)).should == 'ARRAY[1]::int4[]'
     @db.literal(@m::PGArray.new([nil], :text)).should == 'ARRAY[NULL]::text[]'
     @db.literal(@m::PGArray.new([nil, 1], :int8)).should == 'ARRAY[NULL,1]::int8[]'
@@ -230,7 +231,7 @@ describe "pg_array extension" do
       end
 
       @db.literal(@db.typecast_value(meth, [array_in])).should == "ARRAY[#{output}]::#{db_type}[]"
-      @db.literal(@db.typecast_value(meth, [])).should == "ARRAY[]::#{db_type}[]"
+      @db.literal(@db.typecast_value(meth, [])).should == "'{}'::#{db_type}[]"
     end
     proc{@db.typecast_value(:integer_array, {})}.should raise_error(Sequel::InvalidValue)
   end
@@ -311,7 +312,7 @@ describe "pg_array extension" do
 
   it "should support registering custom types with :array_type option" do
     Sequel::Postgres::PGArray.register('foo', :oid=>3, :array_type=>:blah)
-    @db.literal(Sequel::Postgres::PG_TYPES[3].call('{}')).should == 'ARRAY[]::blah[]'
+    @db.literal(Sequel::Postgres::PG_TYPES[3].call('{}')).should == "'{}'::blah[]"
   end
 
   it "should use and not override existing database typecast method if :typecast_method option is given" do

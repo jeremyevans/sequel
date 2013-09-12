@@ -110,6 +110,7 @@ module Sequel
 
       ARRAY = "ARRAY".freeze
       DOUBLE_COLON = '::'.freeze
+      EMPTY_ARRAY = "'{}'".freeze
       EMPTY_BRACKET = '[]'.freeze
       OPEN_BRACKET = '['.freeze
       CLOSE_BRACKET = ']'.freeze
@@ -518,9 +519,14 @@ module Sequel
       # If the receiver has a type, add a cast to the
       # database array type.
       def sql_literal_append(ds, sql)
-        sql << ARRAY
-        _literal_append(sql, ds, to_a)
-        if at = array_type
+        at = array_type
+        if empty? && at
+          sql << EMPTY_ARRAY
+        else
+          sql << ARRAY
+          _literal_append(sql, ds, to_a)
+        end
+        if at
           sql << DOUBLE_COLON << at.to_s << EMPTY_BRACKET
         end
       end
