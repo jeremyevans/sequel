@@ -7,7 +7,7 @@ module Sequel
 
       GUARDED_DRV_NAME = /^\{.+\}$/.freeze
       DRV_NAME_GUARDS = '{%s}'.freeze
-      DISCONNECT_ERRORS = /\A08S01/.freeze 
+      DISCONNECT_ERRORS = /\A08S01/.freeze
 
       def connect(server)
         opts = server_opts(server)
@@ -29,7 +29,7 @@ module Sequel
         end
         conn.autocommit = true
         conn
-      end      
+      end
 
       def disconnect_connection(c)
         c.disconnect
@@ -48,7 +48,7 @@ module Sequel
           nil
         end
       end
-      
+
       def execute_dui(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
@@ -60,7 +60,7 @@ module Sequel
       end
 
       private
-      
+
       def adapter_initialize
         case @opts[:db_type]
         when 'mssql'
@@ -91,7 +91,7 @@ module Sequel
         super || (e.is_a?(::ODBC::Error) && DISCONNECT_ERRORS.match(e.message))
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
@@ -116,11 +116,11 @@ module Sequel
         end
         self
       end
-      
+
       private
 
       def convert_odbc_value(v)
-        # When fetching a result set, the Ruby ODBC driver converts all ODBC 
+        # When fetching a result set, the Ruby ODBC driver converts all ODBC
         # SQL types to an equivalent Ruby type; with the exception of
         # SQL_TYPE_DATE, SQL_TYPE_TIME and SQL_TYPE_TIMESTAMP.
         #
@@ -137,7 +137,7 @@ module Sequel
           v
         end
       end
-      
+
       def default_timestamp_format
         TIMESTAMP_FORMAT
       end
@@ -145,11 +145,11 @@ module Sequel
       def literal_date(v)
         v.strftime(ODBC_DATE_FORMAT)
       end
-      
+
       def literal_false
         BOOL_FALSE
       end
-      
+
       def literal_true
         BOOL_TRUE
       end

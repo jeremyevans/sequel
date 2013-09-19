@@ -55,7 +55,7 @@ module Sequel
             end
           end
         end
-        
+
         def metadata_dataset
           super.extend(MetadataDatasetMethods)
         end

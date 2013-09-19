@@ -45,7 +45,7 @@ describe "Model#save" do
     @c.instance_dataset.autoid = @c.dataset.autoid = 13
     DB.reset
   end
-  
+
   it "should insert a record for a new model instance" do
     o = @c.new(:x => 1)
     o.save
@@ -61,7 +61,7 @@ describe "Model#save" do
     end
     o = @c.new(:x => 1)
     o.save
-    
+
     o.values.should == {:y=>2}
     DB.sqls.should == ["INSERT INTO items (y) VALUES (2) RETURNING *"]
   end
@@ -109,7 +109,7 @@ describe "Model#save" do
     o.save
     DB.sqls.should == ["UPDATE items SET x = 1 WHERE (id = 3)"]
   end
-  
+
   it "should raise a NoExistingObject exception if the dataset update call doesn't return 1, unless require_modification is false" do
     o = @c.load(:id => 3, :x => 1)
     t = o.this
@@ -119,20 +119,20 @@ describe "Model#save" do
     proc{o.save}.should raise_error(Sequel::NoExistingObject)
     t.numrows = 1
     proc{o.save}.should_not raise_error
-    
+
     o.require_modification = false
     t.numrows = 0
     proc{o.save}.should_not raise_error
     t.numrows = 2
     proc{o.save}.should_not raise_error
   end
-  
+
   it "should respect the :columns option to specify the columns to save" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.save(:columns=>:y)
     DB.sqls.first.should == "UPDATE items SET y = NULL WHERE (id = 3)"
   end
-  
+
   it "should mark saved columns as not changed" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o[:y] = 4
@@ -142,7 +142,7 @@ describe "Model#save" do
     o.save(:columns=>:y)
     o.changed_columns.should == []
   end
-  
+
   it "should mark all columns as not changed if this is a new record" do
     o = @c.new(:x => 1, :y => nil)
     o.x = 4
@@ -150,7 +150,7 @@ describe "Model#save" do
     o.save
     o.changed_columns.should == []
   end
-  
+
   it "should mark all columns as not changed if this is a new record and insert_select was used" do
     def (@c.dataset).insert_select(h) h.merge(:id=>1) end
     o = @c.new(:x => 1, :y => nil)
@@ -187,7 +187,7 @@ describe "Model#save" do
     o.after_save
     res.should == [nil, nil]
   end
-  
+
   it "should use Model's use_transactions setting by default" do
     @c.use_transactions = true
     @c.load(:id => 3, :x => 1, :y => nil).save(:columns=>:y)
@@ -214,7 +214,7 @@ describe "Model#save" do
     DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
-    @c.use_transactions = false 
+    @c.use_transactions = false
     o.save(:columns=>:y)
     DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
   end
@@ -522,27 +522,27 @@ describe "Model#modified?" do
     end
     DB.reset
   end
-  
+
   it "should be true if the object is new" do
     @c.new.modified?.should == true
   end
-  
+
   it "should be false if the object has not been modified" do
     @c.load(:id=>1).modified?.should == false
   end
-  
+
   it "should be true if the object has been modified" do
     o = @c.load(:id=>1, :x=>2)
     o.x = 3
     o.modified?.should == true
   end
-  
+
   it "should be true if the object is marked modified!" do
     o = @c.load(:id=>1, :x=>2)
     o.modified!
     o.modified?.should == true
   end
-  
+
   it "should be false if the object is marked modified! after saving until modified! again" do
     o = @c.load(:id=>1, :x=>2)
     o.modified!
@@ -551,13 +551,13 @@ describe "Model#modified?" do
     o.modified!
     o.modified?.should == true
   end
-  
+
   it "should be false if a column value is set that is the same as the current value after typecasting" do
     o = @c.load(:id=>1, :x=>2)
     o.x = '2'
     o.modified?.should == false
   end
-  
+
   it "should be true if a column value is set that is the different as the current value after typecasting" do
     o = @c.load(:id=>1, :x=>'2')
     o.x = '2'
@@ -603,7 +603,7 @@ describe "Model#modified!" do
     o.db.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 1)"]
   end
 end
-  
+
 describe "Model#save_changes" do
   before do
     @c = Class.new(Sequel::Model(:items)) do
@@ -612,7 +612,7 @@ describe "Model#save_changes" do
     end
     DB.reset
   end
-  
+
   it "should always save if the object is new" do
     o = @c.new(:x => 1)
     o.save_changes
@@ -633,14 +633,14 @@ describe "Model#save_changes" do
     o.save_changes
     DB.sqls.should == []
   end
-  
+
   it "should do nothing if modified? is false" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     def o.modified?; false; end
     o.save_changes
     DB.sqls.should == []
   end
-  
+
   it "should update only changed columns" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.x = 2
@@ -658,7 +658,7 @@ describe "Model#save_changes" do
     o.save_changes
     DB.sqls.should == []
   end
-  
+
   it "should not consider columns changed if the values did not change" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.x = 1
@@ -676,7 +676,7 @@ describe "Model#save_changes" do
     o.save_changes
     DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
   end
-  
+
   it "should clear changed_columns" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.x = 4
@@ -724,12 +724,12 @@ describe "Model#new?" do
     end
     DB.reset
   end
-  
+
   it "should be true for a new instance" do
     n = @c.new(:x => 1)
     n.should be_new
   end
-  
+
   it "should be false after saving" do
     n = @c.new(:x => 1)
     n.save
@@ -795,7 +795,7 @@ describe "Model#pk" do
     @m = Class.new(Sequel::Model)
     @m.columns :id, :x, :y
   end
-  
+
   it "should by default return the value of the :id column" do
     m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk.should == 111
@@ -829,7 +829,7 @@ describe "Model#pk_hash" do
     @m = Class.new(Sequel::Model)
     @m.columns :id, :x, :y
   end
-  
+
   it "should by default return a hash with the value of the :id column" do
     m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk_hash.should == {:id => 111}
@@ -879,7 +879,7 @@ describe Sequel::Model, "#set" do
     @o2.values.should == {:y => 1, :id=> 5}
     DB.sqls.should == []
   end
-  
+
   it "should work with both strings and symbols" do
     @o1.set('x'=> 1, 'z'=> 2)
     @o1.values.should == {:x => 1}
@@ -889,7 +889,7 @@ describe Sequel::Model, "#set" do
     @o2.values.should == {:y => 1, :id=> 5}
     DB.sqls.should == []
   end
-  
+
   it "should support virtual attributes" do
     @c.send(:define_method, :blah=){|v| self.x = v}
     @o1.set(:blah => 333)
@@ -899,7 +899,7 @@ describe Sequel::Model, "#set" do
     @o1.values.should == {:x => 334}
     DB.sqls.should == []
   end
-  
+
   it "should not modify the primary key" do
     @o1.set(:x => 1, :id => 2)
     @o1.values.should == {:x => 1}
@@ -1000,7 +1000,7 @@ describe Sequel::Model, "#update" do
     @o2 = @c.load(:id => 5)
     DB.reset
   end
-  
+
   it "should filter the given params using the model columns" do
     @o1.update(:x => 1, :z => 2)
     DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
@@ -1009,13 +1009,13 @@ describe Sequel::Model, "#update" do
     @o2.update(:y => 1, :abc => 2)
     DB.sqls.should == ["UPDATE items SET y = 1 WHERE (id = 5)"]
   end
-  
+
   it "should support virtual attributes" do
     @c.send(:define_method, :blah=){|v| self.x = v}
     @o1.update(:blah => 333)
     DB.sqls.should == ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
-  
+
   it "should not modify the primary key" do
     @o1.update(:x => 1, :id => 2)
     DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
@@ -1111,7 +1111,7 @@ describe Sequel::Model, "#update_fields" do
       set_primary_key :id
       columns :x, :y, :z, :id
     end
-    @c.strict_param_setting = true 
+    @c.strict_param_setting = true
     @o1 = @c.load(:id=>1)
     DB.reset
   end
@@ -1227,7 +1227,7 @@ describe Sequel::Model, "#destroy with filtered dataset" do
     proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
     def (@instance.this).execute_dui(*a) 1 end
     proc{@instance.delete}.should_not raise_error
-    
+
     @instance.require_modification = false
     def (@instance.this).execute_dui(*a) 0 end
     proc{@instance.delete}.should_not raise_error
@@ -1253,7 +1253,7 @@ describe Sequel::Model, "#destroy" do
     @model.send(:define_method, :after_destroy){3}
     @instance.destroy.should == @instance
   end
-  
+
   it "should raise a NoExistingObject exception if the dataset delete call doesn't return 1" do
     def (@model.dataset).execute_dui(*a) 0 end
     proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
@@ -1261,7 +1261,7 @@ describe Sequel::Model, "#destroy" do
     proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
     def (@model.dataset).execute_dui(*a) 1 end
     proc{@instance.delete}.should_not raise_error
-    
+
     @instance.require_modification = false
     def (@model.dataset).execute_dui(*a) 0 end
     proc{@instance.delete}.should_not raise_error
@@ -1330,7 +1330,7 @@ describe Sequel::Model, "#each" do
     @model.columns :a, :b, :id
     @m = @model.load(:a => 1, :b => 2, :id => 4444)
   end
-  
+
   specify "should iterate over the values" do
     h = {}
     @m.each{|k, v| h[k] = v}
@@ -1344,7 +1344,7 @@ describe Sequel::Model, "#keys" do
     @model.columns :a, :b, :id
     @m = @model.load(:a => 1, :b => 2, :id => 4444)
   end
-  
+
   specify "should return the value keys" do
     @m.keys.sort_by{|k| k.to_s}.should == [:a, :b, :id]
     @model.new.keys.should == []
@@ -1358,7 +1358,7 @@ describe Sequel::Model, "#==" do
     a = z.load(:id => 1, :x => 3)
     b = z.load(:id => 1, :x => 4)
     c = z.load(:id => 1, :x => 3)
-    
+
     a.should_not == b
     a.should == c
     b.should_not == c
@@ -1370,7 +1370,7 @@ describe Sequel::Model, "#==" do
     a = z.load(:id => 1, :x => 3)
     b = z.load(:id => 1, :x => 4)
     c = z.load(:id => 1, :x => 3)
-    
+
     a.eql?(b).should == false
     a.eql?(c).should == true
     b.eql?(c).should == false
@@ -1387,7 +1387,7 @@ describe Sequel::Model, "#===" do
     b = z.load(:id => 1, :x => 4)
     c = z.load(:id => 2, :x => 3)
     d = y.load(:id => 1, :x => 3)
-    
+
     a.should === b
     a.should_not === c
     a.should_not === d
@@ -1402,7 +1402,7 @@ describe Sequel::Model, "#===" do
     b = z.new(:x => 4)
     c = z.new(:x => 3)
     d = y.new(:x => 3)
-    
+
     a.should_not === b
     a.should_not === c
     a.should_not === d
@@ -1416,7 +1416,7 @@ describe Sequel::Model, "#hash" do
     y = Class.new(Sequel::Model)
     y.columns :id, :x
     a = z.load(:id => 1, :x => 3)
-    
+
     a.hash.should == z.load(:id => 1, :x => 4).hash
     a.hash.should_not == z.load(:id => 2, :x => 3).hash
     a.hash.should_not == y.load(:id => 1, :x => 3).hash
@@ -1428,7 +1428,7 @@ describe Sequel::Model, "#hash" do
     y = Class.new(Sequel::Model)
     y.columns :id, :x
     a = z.new(:x => 3)
-    
+
     a.hash.should_not == z.new(:x => 4).hash
     a.hash.should == z.new(:x => 3).hash
     a.hash.should_not == y.new(:x => 3).hash
@@ -1442,7 +1442,7 @@ describe Sequel::Model, "#hash" do
     y.columns :id, :id2, :x
     y.set_primary_key([:id, :id2])
     a = z.load(:id => 1, :id2=>2, :x => 3)
-    
+
     a.hash.should == z.load(:id => 1, :id2=>2, :x => 4).hash
     a.hash.should_not == z.load(:id => 2, :id2=>1, :x => 3).hash
     a.hash.should_not == y.load(:id => 1, :id2=>1, :x => 3).hash
@@ -1487,7 +1487,7 @@ describe Sequel::Model, "#hash" do
     y.columns :id, :x
     y.no_primary_key
     a = z.new(:x => 3)
-    
+
     a.hash.should_not == z.new(:x => 4).hash
     a.hash.should == z.new(:x => 3).hash
     a.hash.should_not == y.new(:x => 3).hash
@@ -1502,42 +1502,42 @@ describe Sequel::Model, "#initialize" do
     end
     @c.strict_param_setting = false
   end
-  
+
   specify "should accept values" do
     m = @c.new(:x => 2)
     m.values.should == {:x => 2}
   end
-  
+
   specify "should not modify the primary key" do
     m = @c.new(:id => 1, :x => 2)
     m.values.should == {:x => 2}
   end
-  
+
   specify "should accept no values" do
     m = @c.new
     m.values.should == {}
   end
-  
+
   specify "should accept a block to execute" do
     m = @c.new {|o| o[:id] = 1234}
     m.id.should == 1234
   end
-  
+
   specify "should accept virtual attributes" do
     @c.send(:define_method, :blah=){|x| @blah = x}
     @c.send(:define_method, :blah){@blah}
-    
+
     m = @c.new(:x => 2, :blah => 3)
     m.values.should == {:x => 2}
     m.blah.should == 3
   end
-  
+
   specify "should convert string keys into symbol keys" do
     m = @c.new('x' => 2)
     m.values.should == {:x => 2}
   end
 end
-  
+
 describe Sequel::Model, "#initialize_set" do
   before do
     @c = Class.new(Sequel::Model){columns :id, :x, :y}
@@ -1591,7 +1591,7 @@ describe Sequel::Model, ".create" do
     o2.should == :blah
     DB.sqls.should == ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
-  
+
   it "should create a row for a model with custom primary key" do
     @c.set_primary_key :x
     o = @c.create(:x => 30)
@@ -1617,14 +1617,14 @@ describe Sequel::Model, "#refresh" do
     @m[:x].should == 'kaboom'
     DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
   end
-  
+
   specify "should raise if the instance is not found" do
     @m = @c.new(:id => 555)
     @c.instance_dataset._fetch =@c.dataset._fetch = []
     proc {@m.refresh}.should raise_error(Sequel::Error)
     DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
   end
-  
+
   specify "should be aliased by #reload" do
     @m = @c.new(:id => 555)
     @c.instance_dataset._fetch =@c.dataset._fetch = {:x => 'kaboom', :id => 555}
@@ -2002,7 +2002,7 @@ describe "Model#lock!" do
     @c.dataset._fetch = {:id=>1}
     DB.reset
   end
-  
+
   it "should do nothing if the record is a new record" do
     o = @c.new
     def o._refresh(x) raise Sequel::Error; super(x) end
@@ -2010,7 +2010,7 @@ describe "Model#lock!" do
     x.should == o
     DB.sqls.should == []
   end
-    
+
   it "should refresh the record using for_update if it is not a new record" do
     o = @c.load(:id => 1)
     def o._refresh(x) instance_variable_set(:@a, 1); super(x) end

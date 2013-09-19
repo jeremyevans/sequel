@@ -1,9 +1,9 @@
 Sequel.require 'adapters/shared/postgres'
 
-begin 
-  require 'pg' 
+begin
+  require 'pg'
   SEQUEL_POSTGRES_USES_PG = true
-rescue LoadError => e 
+rescue LoadError => e
   SEQUEL_POSTGRES_USES_PG = false
   begin
     require 'postgres'
@@ -75,16 +75,16 @@ rescue LoadError => e
         end
       end
     end
-    class PGresult 
-      alias_method :nfields, :num_fields unless method_defined?(:nfields) 
-      alias_method :ntuples, :num_tuples unless method_defined?(:ntuples) 
-      alias_method :ftype, :type unless method_defined?(:ftype) 
-      alias_method :fname, :fieldname unless method_defined?(:fname) 
-      alias_method :cmd_tuples, :cmdtuples unless method_defined?(:cmd_tuples) 
-    end 
-  rescue LoadError 
-    raise e 
-  end 
+    class PGresult
+      alias_method :nfields, :num_fields unless method_defined?(:nfields)
+      alias_method :ntuples, :num_tuples unless method_defined?(:ntuples)
+      alias_method :ftype, :type unless method_defined?(:ftype)
+      alias_method :fname, :fieldname unless method_defined?(:fname)
+      alias_method :cmd_tuples, :cmdtuples unless method_defined?(:cmd_tuples)
+    end
+  rescue LoadError
+    raise e
+  end
 end
 
 module Sequel
@@ -109,14 +109,14 @@ module Sequel
     # pg, postgres, or postgres-pr driver.
     class Adapter < ::PGconn
       DISCONNECT_ERROR_RE = /\Acould not receive data from server/
-      
+
       self.translate_results = false if respond_to?(:translate_results=)
-      
+
       # Hash of prepared statements for this connection.  Keys are
       # string names of the server side prepared statement, and values
       # are SQL strings.
       attr_reader(:prepared_statements) if SEQUEL_POSTGRES_USES_PG
-      
+
       # Raise a Sequel::DatabaseDisconnectError if a PGError is raised and
       # the connection status cannot be determined or it is not OK.
       def check_disconnect_errors
@@ -161,7 +161,7 @@ module Sequel
         @db.log_yield(sql, args){args ? async_exec(sql, args) : async_exec(sql)}
       end
     end
-    
+
     # Database class for PostgreSQL databases used with Sequel and the
     # pg, postgres, or postgres-pr driver.
     class Database < Sequel::Database
@@ -169,7 +169,7 @@ module Sequel
 
       INFINITE_TIMESTAMP_STRINGS = ['infinity'.freeze, '-infinity'.freeze].freeze
       INFINITE_DATETIME_VALUES = ([PLUS_INFINITY, MINUS_INFINITY] + INFINITE_TIMESTAMP_STRINGS).freeze
-      
+
       set_adapter_scheme :postgres
 
       # Whether infinite timestamps/dates should be converted on retrieval.  By default, no
@@ -236,7 +236,7 @@ module Sequel
         connection_configuration_sqls.each{|sql| conn.execute(sql)}
         conn
       end
-      
+
       # Set whether to allow infinite timestamps/dates.  Make sure the
       # conversion proc for date reflects that setting.
       def convert_infinite_timestamps=(v)
@@ -301,7 +301,7 @@ module Sequel
           h
         end
       end
-      
+
       # Execute the given SQL with the given args on an available connection.
       def execute(sql, opts=OPTS, &block)
         synchronize(opts[:server]){|conn| check_database_errors{_execute(conn, sql, opts, &block)}}
@@ -322,7 +322,7 @@ module Sequel
         #           Sequel uses for options is only compatible with PostgreSQL 9.0+.
         # Dataset :: Uses a query instead of a table name when copying.
         # other :: Uses a table name (usually a symbol) when copying.
-        # 
+        #
         # The following options are respected:
         #
         # :format :: The format to use.  text is the default, so this should be :csv or :binary.
@@ -349,10 +349,10 @@ module Sequel
             ensure
               raise DatabaseDisconnectError, "disconnecting as a partial COPY may leave the connection in an unusable state" if buf
             end
-          end 
+          end
         end
 
-        # +copy_into+ uses PostgreSQL's +COPY FROM STDIN+ SQL statement to do very fast inserts 
+        # +copy_into+ uses PostgreSQL's +COPY FROM STDIN+ SQL statement to do very fast inserts
         # into a table using input preformatting in either CSV or PostgreSQL text format.
         # This method is only supported if pg 0.14.0+ is the underlying ruby driver.
         # This method should only be called if you want
@@ -401,7 +401,7 @@ module Sequel
                 check_database_errors{res.check}
               end
             end
-          end 
+          end
         end
 
         # Listens on the given channel (or multiple channels if channel is an array), waiting for notifications.
@@ -472,7 +472,7 @@ module Sequel
           super
         end
       end
-        
+
       private
 
       # Execute the given SQL string or prepared statement on the connection object.
@@ -572,7 +572,7 @@ module Sequel
           value == 'infinity' ? PLUS_INFINITY : MINUS_INFINITY
         end
       end
-      
+
       # Don't log, since logging is done by the underlying connection.
       def log_connection_execute(conn, sql)
         conn.execute(sql)
@@ -610,7 +610,7 @@ module Sequel
         end
       end
     end
-    
+
     # Dataset class for PostgreSQL datasets that use the pg, postgres, or
     # postgres-pr driver.
     class Dataset < Sequel::Dataset
@@ -618,14 +618,14 @@ module Sequel
 
       Database::DatasetClass = self
       APOS = Sequel::Dataset::APOS
-      
+
       # Yield all rows returned by executing the given SQL and converting
       # the types.
       def fetch_rows(sql)
         return cursor_fetch_rows(sql){|h| yield h} if @opts[:cursor]
         execute(sql){|res| yield_hash_rows(res, fetch_rows_set_cols(res)){|h| yield h}}
       end
-      
+
       # Uses a cursor for fetching records, instead of fetching the entire result
       # set at once.  Can be used to process large datasets without holding
       # all rows in memory (which is what the underlying drivers do
@@ -640,7 +640,7 @@ module Sequel
       #
       #   DB[:huge_table].use_cursor.each{|row| p row}
       #   DB[:huge_table].use_cursor(:rows_per_fetch=>10000).each{|row| p row}
-      #   DB[:huge_table].use_cursor(:cursor_name=>'my_cursor').each{|row| p row}      
+      #   DB[:huge_table].use_cursor(:cursor_name=>'my_cursor').each{|row| p row}
       #
       # This is untested with the prepared statement/bound variable support,
       # and unlikely to work with either.
@@ -649,24 +649,24 @@ module Sequel
       end
 
       if SEQUEL_POSTGRES_USES_PG
-        
+
         PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
-        
+
         # PostgreSQL specific argument mapper used for mapping the named
         # argument hash to a array with numbered arguments.  Only used with
         # the pg driver.
         module ArgumentMapper
           include Sequel::Dataset::ArgumentMapper
-          
+
           protected
-          
+
           # An array of bound variable values for this query, in the correct order.
           def map_to_prepared_args(hash)
             prepared_args.map{|k| hash[k.to_sym]}
           end
 
           private
-          
+
           def prepared_arg(k)
             y = k
             if i = prepared_args.index(y)
@@ -688,20 +688,20 @@ module Sequel
         module BindArgumentMethods
           include ArgumentMapper
           include ::Sequel::Postgres::DatasetMethods::PreparedStatementMethods
-          
+
           private
-          
+
           # Execute the given SQL with the stored bind arguments.
           def execute(sql, opts=OPTS, &block)
             super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
           end
-          
+
           # Same as execute, explicit due to intricacies of alias and super.
           def execute_dui(sql, opts=OPTS, &block)
             super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
           end
         end
-        
+
         # Allow use of server side prepared statements for PostgreSQL using the
         # pg driver.
         module PreparedStatementMethods
@@ -712,21 +712,21 @@ module Sequel
             raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
             super
           end
-          
+
           private
-          
+
           # Execute the stored prepared statement name and the stored bind
           # arguments instead of the SQL given.
           def execute(sql, opts=OPTS, &block)
             super(prepared_statement_name, opts, &block)
           end
-          
+
           # Same as execute, explicit due to intricacies of alias and super.
           def execute_dui(sql, opts=OPTS, &block)
             super(prepared_statement_name, opts, &block)
           end
         end
-        
+
         # Execute the given type of statement with the hash of values.
         def call(type, bind_vars=OPTS, *values, &block)
           ps = to_prepared_statement(type, values)
@@ -745,23 +745,23 @@ module Sequel
           end
           ps
         end
-        
+
         private
-        
+
         # PostgreSQL uses $N for placeholders instead of ?, so use a $
         # as the placeholder.
         def prepared_arg_placeholder
           PREPARED_ARG_PLACEHOLDER
         end
       end
-      
+
       private
-      
+
       # Use a cursor to fetch groups of records at a time, yielding them to the block.
       def cursor_fetch_rows(sql)
         server_opts = {:server=>@opts[:server] || :read_only}
         cursor_name = quote_identifier(@opts[:cursor][:cursor_name])
-        db.transaction(server_opts) do 
+        db.transaction(server_opts) do
           begin
             execute_ddl("DECLARE #{cursor_name} NO SCROLL CURSOR WITHOUT HOLD FOR #{sql}", server_opts)
             rows_per_fetch = @opts[:cursor][:rows_per_fetch].to_i
@@ -785,7 +785,7 @@ module Sequel
           end
         end
       end
-      
+
       # Set the @columns based on the result set, and return the array of
       # field numers, type conversion procs, and name symbol arrays.
       def fetch_rows_set_cols(res)
@@ -797,17 +797,17 @@ module Sequel
         @columns = cols.map{|c| c.at(2)}
         cols
       end
-      
+
       # Use the driver's escape_bytea
       def literal_blob_append(sql, v)
         sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_bytea(v)} << APOS
       end
-      
+
       # Use the driver's escape_string
       def literal_string_append(sql, v)
         sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS
       end
-      
+
       # For each row in the result set, yield a hash with column name symbol
       # keys and typecasted values.
       def yield_hash_rows(res, cols)

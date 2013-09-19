@@ -16,7 +16,7 @@ describe "force_encoding plugin" do
     o.x.should == 'blah'
     o.x.encoding.should == @e1
   end
-  
+
   specify "should force encoding to given encoding when setting column values" do
     s = 'blah'
     s.force_encoding('US-ASCII')
@@ -24,7 +24,7 @@ describe "force_encoding plugin" do
     o.x.should == 'blah'
     o.x.encoding.should == @e1
   end
-  
+
   specify "should work correctly when given a frozen string" do
     s = 'blah'
     s.force_encoding('US-ASCII')
@@ -33,7 +33,7 @@ describe "force_encoding plugin" do
     o.x.should == 'blah'
     o.x.encoding.should == @e1
   end
-  
+
   specify "should have a forced_encoding class accessor" do
     s = 'blah'
     s.force_encoding('US-ASCII')
@@ -42,7 +42,7 @@ describe "force_encoding plugin" do
     o.x.should == 'blah'
     o.x.encoding.should == Encoding.find('Windows-1258')
   end
-  
+
   specify "should not force encoding if forced_encoding is nil" do
     s = 'blah'
     s.force_encoding('US-ASCII')
@@ -51,7 +51,7 @@ describe "force_encoding plugin" do
     o.x.should == 'blah'
     o.x.encoding.should == Encoding.find('US-ASCII')
   end
-  
+
   specify "should work correctly when subclassing" do
     c = Class.new(@c)
     s = 'blah'
@@ -59,28 +59,28 @@ describe "force_encoding plugin" do
     o = c.load(:id=>1, :x=>s)
     o.x.should == 'blah'
     o.x.encoding.should == @e1
-    
+
     c.plugin :force_encoding, 'UTF-16LE'
     s = ''
     s.force_encoding('US-ASCII')
     o = c.load(:id=>1, :x=>s)
     o.x.should == ''
     o.x.encoding.should == Encoding.find('UTF-16LE')
-    
+
     @c.plugin :force_encoding, 'UTF-32LE'
     s = ''
     s.force_encoding('US-ASCII')
     o = @c.load(:id=>1, :x=>s)
     o.x.should == ''
     o.x.encoding.should == Encoding.find('UTF-32LE')
-    
+
     s = ''
     s.force_encoding('US-ASCII')
     o = c.load(:id=>1, :x=>s)
     o.x.should == ''
     o.x.encoding.should == Encoding.find('UTF-16LE')
   end
-  
+
   specify "should work when saving new model instances" do
     o = @c.new
     ds = DB[:a]
@@ -94,7 +94,7 @@ describe "force_encoding plugin" do
     o.x.should == 'blah'
     o.x.encoding.should == @e1
   end
-  
+
   specify "should work when refreshing model instances" do
     o = @c.load(:id=>1, :x=>'as')
     ds = DB[:a]
@@ -108,7 +108,7 @@ describe "force_encoding plugin" do
     o.x.should == 'blah'
     o.x.encoding.should == @e1
   end
-end 
+end
 else
   skip_warn "force_encoding plugin: only works on ruby 1.9+"
 end

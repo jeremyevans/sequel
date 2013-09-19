@@ -11,7 +11,7 @@
 # How accurate this count is depends on the number of rows
 # added/deleted from the table since the last time it was
 # analyzed.
-# 
+#
 # To load the extension into the database:
 #
 #   DB.extension :pg_loose_count

@@ -60,7 +60,7 @@ describe Sequel::Model, "pg_array_associations" do
     @o1.tags_dataset.sql.should == "SELECT * FROM tags WHERE ((tags.id / 3) IN (1, 2, 3))"
     @o2.artists_dataset.sql.should == "SELECT * FROM artists WHERE (artists.tag_ids @> ARRAY[6])"
   end
-  
+
   it "should allowing filtering by associations" do
     @c1.filter(:tags=>@o2).sql.should == "SELECT * FROM artists WHERE (artists.tag_ids @> ARRAY[2])"
     @c2.filter(:artists=>@o1).sql.should == "SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))"
@@ -104,7 +104,7 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.exclude(:artists=>@c1.where(:id=>1)).sql.should == "SELECT * FROM tags WHERE ((tags.id NOT IN (SELECT unnest(artists.tag_ids) FROM artists WHERE (id = 1))) OR (tags.id IS NULL))"
   end
 
-  it "filter by associations should respect key options" do 
+  it "filter by associations should respect key options" do
     @c1.class_eval{def tag3_ids; tag_ids.map{|x| x*3} end}
     @c1.pg_array_to_many :tags, :clone=>:tags, :primary_key=>Sequel.*(:id, 3), :primary_key_method=>:id3, :key=>:tag3_ids, :key_column=>Sequel.pg_array(:tag_ids)[1..2]
     @c2.many_to_pg_array :artists, :clone=>:artists, :primary_key=>Sequel.*(:id, 3), :primary_key_method=>:id3, :key=>:tag3_ids, :key_column=>Sequel.pg_array(:tag_ids)[1..2]
@@ -114,7 +114,7 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.filter(:tags=>@c2.where(:id=>1)).sql.should == "SELECT * FROM artists WHERE coalesce((artists.tag_ids[1:2] && (SELECT array_agg((tags.id * 3)) FROM tags WHERE (id = 1))), 'f')"
     @c2.filter(:artists=>@c1.where(:id=>1)).sql.should == "SELECT * FROM tags WHERE ((tags.id * 3) IN (SELECT unnest(artists.tag_ids[1:2]) FROM artists WHERE (id = 1)))"
   end
-  
+
   it "should support a :key option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :key=>:tag2_ids
     @c2.many_to_pg_array :artists, :clone=>:artists, :key=>:tag2_ids
@@ -122,12 +122,12 @@ describe Sequel::Model, "pg_array_associations" do
     @o1.tags_dataset.sql.should == "SELECT * FROM tags WHERE (tags.id IN (2, 4, 6))"
     @o2.artists_dataset.sql.should == "SELECT * FROM artists WHERE (artists.tag2_ids @> ARRAY[2])"
   end
-  
+
   it "should support a :key_column option" do
     @c2.many_to_pg_array :artists, :clone=>:artists, :key_column=>Sequel.pg_array(:tag_ids)[1..2], :key=>:tag2_ids
     @o2.artists_dataset.sql.should == "SELECT * FROM artists WHERE (artists.tag_ids[1:2] @> ARRAY[2])"
   end
-  
+
   it "should support a :primary_key option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :primary_key=>:id2
     @c2.many_to_pg_array :artists, :clone=>:artists, :primary_key=>:id2
@@ -135,28 +135,28 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.class_eval{def id2; id*2 end}
     @o2.artists_dataset.sql.should == "SELECT * FROM artists WHERE (artists.tag_ids @> ARRAY[4])"
   end
-  
+
   it "should support a :conditions option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :conditions=>{:a=>1}
     @c2.many_to_pg_array :artists, :clone=>:artists, :conditions=>{:a=>1}
     @o1.tags_dataset.sql.should == "SELECT * FROM tags WHERE ((a = 1) AND (tags.id IN (1, 2, 3)))"
     @o2.artists_dataset.sql.should == "SELECT * FROM artists WHERE ((a = 1) AND (artists.tag_ids @> ARRAY[2]))"
   end
-  
+
   it "should support an :order option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :order=>[:a, :b]
     @c2.many_to_pg_array :artists, :clone=>:artists, :order=>[:a, :b]
     @o1.tags_dataset.sql.should == "SELECT * FROM tags WHERE (tags.id IN (1, 2, 3)) ORDER BY a, b"
     @o2.artists_dataset.sql.should == "SELECT * FROM artists WHERE (artists.tag_ids @> ARRAY[2]) ORDER BY a, b"
   end
-  
+
   it "should support a select option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :select=>[:a, :b]
     @c2.many_to_pg_array :artists, :clone=>:artists, :select=>[:a, :b]
     @c1.load(:tag_ids=>Sequel.pg_array([1,2,3])).tags_dataset.sql.should == "SELECT a, b FROM tags WHERE (tags.id IN (1, 2, 3))"
     @c2.load(:id=>1).artists_dataset.sql.should == "SELECT a, b FROM artists WHERE (artists.tag_ids @> ARRAY[1])"
   end
-  
+
   it "should accept a block" do
     @c1.pg_array_to_many :tags, :clone=>:tags do |ds| ds.filter(:yyy=>@yyy) end
     @c2.many_to_pg_array :artists, :clone=>:artists do |ds| ds.filter(:a=>1) end
@@ -191,12 +191,12 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.association_reflection(:tags).associated_object_keys.should == [:id]
     @c2.association_reflection(:artists).associated_object_keys.should == [:tag_ids]
   end
-  
+
   it "reflection remove_before_destroy? should return correct values" do
     @c1.association_reflection(:tags).remove_before_destroy?.should be_true
     @c2.association_reflection(:artists).remove_before_destroy?.should be_false
   end
-  
+
   it "reflection reciprocal should be correct" do
     @c1.association_reflection(:tags).reciprocal.should == :artists
     @c2.association_reflection(:artists).reciprocal.should == :tags
@@ -206,7 +206,7 @@ describe Sequel::Model, "pg_array_associations" do
     a = @c1.eager(:tags).all
     a.should == [@o1]
     sqls = DB.sqls
-    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
+    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/
     sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@o2]
     DB.sqls.should == []
@@ -217,7 +217,7 @@ describe Sequel::Model, "pg_array_associations" do
     a.first.artists.should == [@o1]
     DB.sqls.should == []
   end
-  
+
   it "should support using custom key options when eager loading associations" do
     @c1.class_eval{def tag3_ids; tag_ids.map{|x| x*3} end}
     @c1.pg_array_to_many :tags, :clone=>:tags, :primary_key=>Sequel.*(:id, 3), :primary_key_method=>:id3, :key=>:tag3_ids
@@ -226,7 +226,7 @@ describe Sequel::Model, "pg_array_associations" do
     a = @c1.eager(:tags).all
     a.should == [@o1]
     sqls = DB.sqls
-    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(\(tags\.id \* 3\) IN \([369], [369], [369]\)\)/ 
+    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(\(tags\.id \* 3\) IN \([369], [369], [369]\)\)/
     sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@o2]
     DB.sqls.should == []
@@ -242,13 +242,13 @@ describe Sequel::Model, "pg_array_associations" do
     a = @c1.eager(:tags=>:artists).all
     a.should == [@o1]
     sqls = DB.sqls
-    sqls.slice!(1).should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
+    sqls.slice!(1).should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/
     sqls.should == ['SELECT * FROM artists', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2])"]
     a.first.tags.should == [@o2]
     a.first.tags.first.artists.should == [@o1]
     DB.sqls.should == []
   end
-  
+
   it "should respect :eager when lazily loading an association" do
     @c1.pg_array_to_many :tags2, :clone=>:tags, :eager=>:artists, :key=>:tag_ids
     @c2.many_to_pg_array :artists2, :clone=>:artists, :eager=>:tags
@@ -260,12 +260,12 @@ describe Sequel::Model, "pg_array_associations" do
 
     @o2.artists2.should == [@o1]
     sqls = DB.sqls
-    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
+    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/
     sqls.should == ["SELECT * FROM artists WHERE (artists.tag_ids @> ARRAY[2])"]
     @o2.artists2.first.tags.should == [@o2]
     DB.sqls.should == []
   end
-  
+
   it "should cascade eagerly loading when the :eager_graph association option is used" do
     @c1.pg_array_to_many :tags2, :clone=>:tags, :eager_graph=>:artists, :key=>:tag_ids
     @c2.many_to_pg_array :artists2, :clone=>:artists, :eager_graph=>:tags
@@ -274,7 +274,7 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.dataset._fetch = {:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])}
 
     @o1.tags2.should == [@o2]
-    DB.sqls.first.should =~ /SELECT tags\.id, artists\.id AS artists_id, artists\.tag_ids FROM tags LEFT OUTER JOIN artists ON \(artists.tag_ids @> ARRAY\[tags.id\]\) WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
+    DB.sqls.first.should =~ /SELECT tags\.id, artists\.id AS artists_id, artists\.tag_ids FROM tags LEFT OUTER JOIN artists ON \(artists.tag_ids @> ARRAY\[tags.id\]\) WHERE \(tags\.id IN \([123], [123], [123]\)\)/
     @o1.tags2.first.artists.should == [@o1]
     DB.sqls.should == []
 
@@ -288,7 +288,7 @@ describe Sequel::Model, "pg_array_associations" do
 
     a = @c1.eager(:tags2).all
     sqls = DB.sqls
-    sqls.pop.should =~ /SELECT tags\.id, artists\.id AS artists_id, artists\.tag_ids FROM tags LEFT OUTER JOIN artists ON \(artists.tag_ids @> ARRAY\[tags.id\]\) WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
+    sqls.pop.should =~ /SELECT tags\.id, artists\.id AS artists_id, artists\.tag_ids FROM tags LEFT OUTER JOIN artists ON \(artists.tag_ids @> ARRAY\[tags.id\]\) WHERE \(tags\.id IN \([123], [123], [123]\)\)/
     sqls.should == ["SELECT * FROM artists"]
     a.should == [@o1]
     a.first.tags2.should == [@o2]
@@ -305,7 +305,7 @@ describe Sequel::Model, "pg_array_associations" do
     a.first.artists2.first.tags.should == [@o2]
     DB.sqls.should == []
   end
-  
+
   it "should respect the :limit option when eager loading" do
     @c2.dataset._fetch = [{:id=>1},{:id=>2}, {:id=>3}]
 
@@ -313,7 +313,7 @@ describe Sequel::Model, "pg_array_associations" do
     a = @c1.eager(:tags).all
     a.should == [@o1]
     sqls = DB.sqls
-    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
+    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/
     sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@c2.load(:id=>1), @c2.load(:id=>2)]
     DB.sqls.should == []
@@ -322,7 +322,7 @@ describe Sequel::Model, "pg_array_associations" do
     a = @c1.eager(:tags).all
     a.should == [@o1]
     sqls = DB.sqls
-    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
+    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/
     sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@c2.load(:id=>2)]
     DB.sqls.should == []
@@ -331,7 +331,7 @@ describe Sequel::Model, "pg_array_associations" do
     a = @c1.eager(:tags).all
     a.should == [@o1]
     sqls = DB.sqls
-    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/ 
+    sqls.pop.should =~ /SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/
     sqls.should == ["SELECT * FROM artists"]
     a.first.tags.should == [@c2.load(:id=>2), @c2.load(:id=>3)]
     DB.sqls.length.should == 0
@@ -396,8 +396,8 @@ describe Sequel::Model, "pg_array_associations" do
     a.first.artists.first.tags.should == [@o2]
     DB.sqls.should == []
   end
-  
-  it "eager graphing should respect key options" do 
+
+  it "eager graphing should respect key options" do
     @c1.class_eval{def tag3_ids; tag_ids.map{|x| x*3} end}
     @c1.pg_array_to_many :tags, :clone=>:tags, :primary_key=>Sequel.*(:id, 3), :primary_key_method=>:id3, :key=>:tag3_ids, :key_column=>Sequel.pg_array(:tag_ids)[1..2]
     @c2.many_to_pg_array :artists, :clone=>:artists, :primary_key=>:id3, :key=>:tag3_ids, :key_column=>Sequel.pg_array(:tag_ids)[1..2]
@@ -417,8 +417,8 @@ describe Sequel::Model, "pg_array_associations" do
     a.first.artists.should == [@o1]
     DB.sqls.should == []
   end
-  
-  it "should respect the association's :graph_select option" do 
+
+  it "should respect the association's :graph_select option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :graph_select=>:id2
     @c2.many_to_pg_array :artists, :clone=>:artists, :graph_select=>:id
 
@@ -438,42 +438,42 @@ describe Sequel::Model, "pg_array_associations" do
     DB.sqls.should == []
   end
 
-  it "should respect the association's :graph_join_type option" do 
+  it "should respect the association's :graph_join_type option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :graph_join_type=>:inner
     @c2.many_to_pg_array :artists, :clone=>:artists, :graph_join_type=>:inner
     @c1.eager_graph(:tags).sql.should == "SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists INNER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id])"
     @c2.eager_graph(:artists).sql.should == "SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags INNER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id])"
   end
 
-  it "should respect the association's :conditions option" do 
+  it "should respect the association's :conditions option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :conditions=>{:a=>1}
     @c2.many_to_pg_array :artists, :clone=>:artists, :conditions=>{:a=>1}
     @c1.eager_graph(:tags).sql.should == "SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON ((tags.a = 1) AND (artists.tag_ids @> ARRAY[tags.id]))"
     @c2.eager_graph(:artists).sql.should == "SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON ((artists.a = 1) AND (artists.tag_ids @> ARRAY[tags.id]))"
   end
 
-  it "should respect the association's :graph_conditions option" do 
+  it "should respect the association's :graph_conditions option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :graph_conditions=>{:a=>1}
     @c2.many_to_pg_array :artists, :clone=>:artists, :graph_conditions=>{:a=>1}
     @c1.eager_graph(:tags).sql.should == "SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON ((tags.a = 1) AND (artists.tag_ids @> ARRAY[tags.id]))"
     @c2.eager_graph(:artists).sql.should == "SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON ((artists.a = 1) AND (artists.tag_ids @> ARRAY[tags.id]))"
   end
 
-  it "should respect the association's :graph_block option" do 
+  it "should respect the association's :graph_block option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :graph_block=>proc{|ja,lja,js| {Sequel.qualify(ja, :a)=>1}}
     @c2.many_to_pg_array :artists, :clone=>:artists, :graph_block=>proc{|ja,lja,js| {Sequel.qualify(ja, :a)=>1}}
     @c1.eager_graph(:tags).sql.should == "SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON ((tags.a = 1) AND (artists.tag_ids @> ARRAY[tags.id]))"
     @c2.eager_graph(:artists).sql.should == "SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON ((artists.a = 1) AND (artists.tag_ids @> ARRAY[tags.id]))"
   end
 
-  it "should respect the association's :graph_only_conditions option" do 
+  it "should respect the association's :graph_only_conditions option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :graph_only_conditions=>{:a=>1}
     @c2.many_to_pg_array :artists, :clone=>:artists, :graph_only_conditions=>{:a=>1}
     @c1.eager_graph(:tags).sql.should == "SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (tags.a = 1)"
     @c2.eager_graph(:artists).sql.should == "SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON (artists.a = 1)"
   end
 
-  it "should respect the association's :graph_only_conditions with :graph_block option" do 
+  it "should respect the association's :graph_only_conditions with :graph_block option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :graph_only_conditions=>{:a=>1}, :graph_block=>proc{|ja,lja,js| {Sequel.qualify(lja, :b)=>1}}
     @c2.many_to_pg_array :artists, :clone=>:artists, :graph_only_conditions=>{:a=>1}, :graph_block=>proc{|ja,lja,js| {Sequel.qualify(lja, :b)=>1}}
     @c1.eager_graph(:tags).sql.should == "SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON ((tags.a = 1) AND (artists.b = 1))"

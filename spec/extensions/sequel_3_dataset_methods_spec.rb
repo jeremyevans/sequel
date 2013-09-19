@@ -4,7 +4,7 @@ describe "Dataset#to_csv" do
   before do
     @ds = Sequel.mock(:fetch=>[{:a=>1, :b=>2, :c=>3}, {:a=>4, :b=>5, :c=>6}, {:a=>7, :b=>8, :c=>9}])[:items].columns(:a, :b, :c).extension(:sequel_3_dataset_methods)
   end
-  
+
   specify "should format a CSV representation of the records" do
     @ds.to_csv.should == "a, b, c\r\n1, 2, 3\r\n4, 5, 6\r\n7, 8, 9\r\n"
   end
@@ -28,7 +28,7 @@ describe "Dataset#insert_multiple" do
     @db = Sequel.mock(:autoid=>2)
     @ds = @db[:items].extension(:sequel_3_dataset_methods)
   end
-  
+
   specify "should insert all items in the supplied array" do
     @ds.insert_multiple(['aa', 5, 3, {:a => 2}])
     @db.sqls.should == ["INSERT INTO items VALUES ('aa')",
@@ -36,7 +36,7 @@ describe "Dataset#insert_multiple" do
       "INSERT INTO items VALUES (3)",
       "INSERT INTO items (a) VALUES (2)"]
   end
-  
+
   specify "should pass array items through the supplied block if given" do
     @ds.insert_multiple(["inevitable", "hello", "the ticking clock"]){|i| i.gsub('l', 'r')}
     @db.sqls.should == ["INSERT INTO items VALUES ('inevitabre')",

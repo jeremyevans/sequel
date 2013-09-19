@@ -47,7 +47,7 @@ describe Sequel::Model, ".restricted_columns " do
     @c.strict_param_setting = false
     @c.instance_variable_set(:@columns, [:x, :y, :z])
   end
-  
+
   it "should set the restricted columns correctly" do
     @c.restricted_columns.should == nil
     @c.set_restricted_columns :x

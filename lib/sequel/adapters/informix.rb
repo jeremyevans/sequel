@@ -7,22 +7,22 @@ module Sequel
       include DatabaseMethods
 
       set_adapter_scheme :informix
-      
+
       def connect(server)
         opts = server_opts(server)
         ::Informix.connect(opts[:database], opts[:user], opts[:password])
       end
-    
+
       # Returns number of rows affected
       def execute_dui(sql, opts=OPTS)
         synchronize(opts[:server]){|c| log_yield(sql){c.immediate(sql)}}
       end
-      
+
       def execute(sql, opts=OPTS)
         synchronize(opts[:server]){|c| yield log_yield(sql){c.cursor(sql)}}
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include DatasetMethods
 

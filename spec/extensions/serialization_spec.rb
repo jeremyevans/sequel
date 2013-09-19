@@ -11,7 +11,7 @@ describe "Serialization plugin" do
     end
     DB.reset
   end
-  
+
   it "should allow setting additional serializable attributes via plugin :serialization call" do
     @c.plugin :serialization, :yaml, :abc
     @c.create(:abc => 1, :def=> 2)
@@ -20,7 +20,7 @@ describe "Serialization plugin" do
     @c.plugin :serialization, :marshal, :def
     @c.create(:abc => 1, :def=> 1)
     DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n(\.\.\.\n)?', 'BAhpBg==\n'|'BAhpBg==\n', '--- 1\n(\.\.\.\n)?')\)/
-    
+
     @c.plugin :serialization, :json, :ghi
     @c.create(:ghi => [123])
     DB.sqls.last.should =~ /INSERT INTO items \((ghi)\) VALUES \('\[123\]'\)/
@@ -50,12 +50,12 @@ describe "Serialization plugin" do
       "INSERT INTO items (abc) VALUES ('#{x}')", \
     ]
   end
-  
+
   it "should allow serializing attributes to json" do
     @c.plugin :serialization, :json, :ghi
     @c.create(:ghi => [1])
     @c.create(:ghi => ["hello"])
-    
+
     x = ["hello"].to_json
     DB.sqls.should == [ \
       "INSERT INTO items (ghi) VALUES ('[1]')", \
@@ -68,11 +68,11 @@ describe "Serialization plugin" do
     @c.create(:abc => "hello")
     DB.sqls.should == ["INSERT INTO items (abc) VALUES ('olleh')"]
   end
-  
+
   it "should raise an error if specificing serializer as an unregistered symbol" do
     proc{@c.plugin :serialization, :foo, :abc}.should raise_error(Sequel::Error)
   end
-  
+
   it "should translate values to and from yaml serialization format using accessor methods" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
@@ -112,7 +112,7 @@ describe "Serialization plugin" do
       "INSERT INTO items (abc) VALUES ('#{[Marshal.dump([1, 2, 3])].pack('m')}')",
       "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
-  
+
   it "should handle old non-base-64 encoded marshal serialization format" do
     @c.set_primary_key :id
     @c.plugin :serialization, :marshal, :abc, :def
@@ -132,22 +132,22 @@ describe "Serialization plugin" do
     proc{o.abc}.should raise_error
     proc{o.def}.should raise_error
   end
-  
+
   it "should translate values to and from json serialization format using accessor methods" do
     @c.set_primary_key :id
     @c.plugin :serialization, :json, :abc, :def
     @c.dataset._fetch = {:id => 1, :abc => [1].to_json, :def => ["hello"].to_json}
-    
+
     o = @c.first
     o.id.should == 1
     o.abc.should == [1]
     o.abc.should == [1]
     o.def.should == ["hello"]
     o.def.should == ["hello"]
-    
+
     o.update(:abc => [23])
     @c.create(:abc => [1,2,3])
-    
+
     DB.sqls.should == ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = '#{[23].to_json}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[1,2,3].to_json}')",
@@ -158,17 +158,17 @@ describe "Serialization plugin" do
     @c.set_primary_key :id
     @c.plugin :serialization, [proc{|s| s.reverse}, proc{|s| s.reverse}], :abc, :def
     @c.dataset._fetch = {:id => 1, :abc => 'cba', :def => 'olleh'}
-    
+
     o = @c.first
     o.id.should == 1
     o.abc.should == 'abc'
     o.abc.should == 'abc'
     o.def.should == "hello"
     o.def.should == "hello"
-    
+
     o.update(:abc => 'foo')
     @c.create(:abc => 'bar')
-    
+
     DB.sqls.should == ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = 'oof' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('rab')",
@@ -180,17 +180,17 @@ describe "Serialization plugin" do
     Sequel::Plugins::Serialization.register_format(:reverse, proc{|s| s.reverse}, proc{|s| s.reverse})
     @c.plugin :serialization, :reverse, :abc, :def
     @c.dataset._fetch = {:id => 1, :abc => 'cba', :def => 'olleh'}
-    
+
     o = @c.first
     o.id.should == 1
     o.abc.should == 'abc'
     o.abc.should == 'abc'
     o.def.should == "hello"
     o.def.should == "hello"
-    
+
     o.update(:abc => 'foo')
     @c.create(:abc => 'bar')
-    
+
     DB.sqls.should == ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = 'oof' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('rab')",
@@ -227,7 +227,7 @@ describe "Serialization plugin" do
     o.refresh
     o.deserialized_values.length.should == 0
   end
-  
+
   it "should not clear the deserialized columns when refreshing after saving a new object" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
@@ -236,7 +236,7 @@ describe "Serialization plugin" do
     o.save
     o.deserialized_values.length.should == 2
   end
-  
+
   it "should not clear the deserialized columns when refreshing after saving a new object with insert_select" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
@@ -247,7 +247,7 @@ describe "Serialization plugin" do
     o.save
     o.deserialized_values.length.should == 2
   end
-  
+
   it "should raise an error if calling internal serialization methods with bad columns" do
     @c.set_primary_key :id
     @c.plugin :serialization

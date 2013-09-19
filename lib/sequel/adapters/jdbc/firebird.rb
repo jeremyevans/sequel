@@ -11,7 +11,7 @@ module Sequel
         extend Sequel::Database::ResetIdentifierMangling
         include Sequel::Firebird::DatabaseMethods
         include Sequel::JDBC::Transactions
-        
+
         # Add the primary_keys and primary_key_sequences instance variables,
         # so we can get the correct return values for inserted rows.
         def self.extended(db)

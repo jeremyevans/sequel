@@ -7,15 +7,15 @@
 #
 #   DB = Sequel.sqlite # Memory database
 #   DB = Sequel.sqlite('blog.db')
-#   DB = Sequel.postgres('database_name', :user=>'user', 
-#          :password=>'password', :host=>'host', :port=>5432, 
+#   DB = Sequel.postgres('database_name', :user=>'user',
+#          :password=>'password', :host=>'host', :port=>5432,
 #          :max_connections=>10)
 #
 # If a block is given to these methods, it is passed the opened Database
 # object, which is closed (disconnected) when the block exits, just
 # like a block passed to connect.  For example:
 #
-#   Sequel.sqlite('blog.db'){|db| puts db[:users].count} 
+#   Sequel.sqlite('blog.db'){|db| puts db[:users].count}
 #
 # For a more expanded introduction, see the {README}[link:files/README_rdoc.html].
 # For a quicker introduction, see the {cheat sheet}[link:files/doc/cheat_sheet_rdoc.html].
@@ -87,8 +87,8 @@ module Sequel
   # If a block is given, it is passed the opened +Database+ object, which is
   # closed when the block exits.  For example:
   #
-  #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
-  # 
+  #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}
+  #
   # For details, see the {"Connecting to a Database" guide}[link:files/doc/opening_databases_rdoc.html].
   # To set up a master/slave or sharded database connection, see the {"Master/Slave Databases and Sharding" guide}[link:files/doc/sharding_rdoc.html].
   def self.connect(*args, &block)
@@ -125,13 +125,13 @@ module Sequel
   def self.extension(*extensions)
     extensions.each{|e| Kernel.require "sequel/extensions/#{e}"}
   end
-  
+
   # Set the method to call on identifiers going into the database.  This affects
   # the literalization of identifiers by calling this method on them before they are input.
   # Sequel upcases identifiers in all SQL strings for most databases, so to turn that off:
   #
   #   Sequel.identifier_input_method = nil
-  # 
+  #
   # to downcase instead:
   #
   #   Sequel.identifier_input_method = :downcase
@@ -147,7 +147,7 @@ module Sequel
   # databases, so to turn that off:
   #
   #   Sequel.identifier_output_method = nil
-  # 
+  #
   # to upcase instead:
   #
   #   Sequel.identifier_output_method = :upcase
@@ -351,7 +351,7 @@ module Sequel
       vr.instance_exec(&block)
     else
       block.call(vr)
-    end  
+    end
   end
 
   ### Private Class Methods ###

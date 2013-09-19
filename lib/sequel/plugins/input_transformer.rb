@@ -13,13 +13,13 @@ module Sequel
     #
     #   Album.skip_input_transformer(:reverser, :foo)
     #   Album.new(:foo=>'bar').foo # => 'bar'
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances support input transformers (called before loading subclasses)
     #   Sequel::Model.plugin :input_transformer
     #
-    #   # Make the Album class support input transformers 
+    #   # Make the Album class support input transformers
     #   Album.plugin :input_transformer
     module InputTransformer
       def self.apply(model, *)

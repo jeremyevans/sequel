@@ -4,7 +4,7 @@ module Sequel
     # :section: 7 - Miscellaneous methods
     # These methods don't fit neatly into another category.
     # ---------------------
-    
+
     # Hash of extension name symbols to callable objects to load the extension
     # into the Database object (usually by extending it with a module defined
     # in the extension).
@@ -76,7 +76,7 @@ module Sequel
     end
 
     # Converts a uri to an options hash. These options are then passed
-    # to a newly created database object. 
+    # to a newly created database object.
     def self.uri_to_options(uri)
       { :user => uri.user,
         :password => uri.password,
@@ -88,10 +88,10 @@ module Sequel
 
     # The options hash for this database
     attr_reader :opts
-    
+
     # Set the timezone to use for this database, overridding <tt>Sequel.database_timezone</tt>.
     attr_writer :timezone
-    
+
     # The specific default size of string columns for this Sequel::Database, usually 255 by default.
     attr_accessor :default_string_column_size
 
@@ -105,7 +105,7 @@ module Sequel
     # :logger :: A specific logger to use
     # :loggers :: An array of loggers to use
     # :quote_identifiers :: Whether to quote identifiers
-    # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol 
+    # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol
     # :single_threaded :: Whether to use a single-threaded connection pool
     # :sql_log_level :: Method to use to log SQL to a logger, :info by default.
     #
@@ -118,7 +118,7 @@ module Sequel
       block ||= proc{|server| connect(server)}
       @opts[:servers] = {} if @opts[:servers].is_a?(String)
       @opts[:adapter_class] = self.class
-      
+
       @opts[:single_threaded] = @single_threaded = typecast_value_boolean(@opts.fetch(:single_threaded, Database.single_threaded))
       @schemas = {}
       @default_string_column_size = @opts[:default_string_column_size] || DEFAULT_STRING_COLUMN_SIZE
@@ -160,7 +160,7 @@ module Sequel
         end
       end
     end
-    
+
     # If a transaction is not currently in progress, ignore the block.
     # Otherwise, add the block to the list of the blocks to call after the currently
     # in progress transaction rolls back (and only if it rolls back).
@@ -175,7 +175,7 @@ module Sequel
         end
       end
     end
-    
+
     # Cast the given type to a literal type
     #
     #   DB.cast_type_literal(Float) # double precision
@@ -251,7 +251,7 @@ module Sequel
     def schema_type_class(type)
       @schema_type_classes[type]
     end
-    
+
     # Default serial primary key options, used by the table creation
     # code.
     def serial_primary_key_options
@@ -290,20 +290,20 @@ module Sequel
         raise Sequel.convert_exception_class(e, InvalidValue)
       end
     end
-    
+
     # Returns the URI use to connect to the database.  If a URI
     # was not used when connecting, returns nil.
     def uri
       opts[:uri]
     end
-    
+
     # Explicit alias of uri for easier subclassing.
     def url
       uri
     end
-    
+
     private
-    
+
     # Per adapter initialization method, empty by default.
     def adapter_initialize
     end
@@ -343,7 +343,7 @@ module Sequel
     def database_error_class(exception, opts)
       database_specific_error_class(exception, opts) || DatabaseError
     end
-    
+
     # Return the SQLState for the given exception, if one can be
     # determined
     def database_exception_sqlstate(exception, opts)
@@ -368,7 +368,7 @@ module Sequel
 
       nil
     end
-    
+
     NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
     FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23506 23504'.freeze.each{|s| s.freeze}
     UNIQUE_CONSTRAINT_SQLSTATES = %w'23505'.freeze.each{|s| s.freeze}
@@ -389,12 +389,12 @@ module Sequel
         SerializationFailure
       end
     end
-    
+
     # Return true if exception represents a disconnect error, false otherwise.
     def disconnect_error?(exception, opts)
       opts[:disconnect]
     end
-    
+
     # Convert the given exception to an appropriate Sequel::DatabaseError
     # subclass, keeping message and traceback.
     def raise_error(exception, opts=OPTS)
@@ -482,7 +482,7 @@ module Sequel
     else
     # :nocov:
       # Replacement string when replacing leading zeroes.
-      LEADING_ZERO_REP = "\\1".freeze 
+      LEADING_ZERO_REP = "\\1".freeze
       # Typecast the value to an Integer
       def typecast_value_integer(value)
         Integer(value.is_a?(String) ? value.sub(LEADING_ZERO_RE, LEADING_ZERO_REP) : value)

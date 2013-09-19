@@ -72,20 +72,20 @@ module Sequel
     }.each do |k,v|
       k.each{|n| SQLITE_TYPES[n] = v}
     end
-    
+
     # Database class for SQLite databases used with Sequel and the
     # ruby-sqlite3 driver.
     class Database < Sequel::Database
       include ::Sequel::SQLite::DatabaseMethods
-      
+
       set_adapter_scheme :sqlite
-      
+
       # Mimic the file:// uri, by having 2 preceding slashes specify a relative
       # path, and 3 preceding slashes specify an absolute path.
       def self.uri_to_options(uri) # :nodoc:
         { :database => (uri.host.nil? && uri.path == '/') ? nil : "#{uri.host}#{uri.path}" }
       end
-      
+
       private_class_method :uri_to_options
 
       # The conversion procs to use for this database
@@ -100,14 +100,14 @@ module Sequel
         opts[:database] = ':memory:' if blank_object?(opts[:database])
         db = ::SQLite3::Database.new(opts[:database])
         db.busy_timeout(opts.fetch(:timeout, 5000))
-        
+
         connection_pragmas.each{|s| log_yield(s){db.execute_batch(s)}}
-        
+
         class << db
           attr_reader :prepared_statements
         end
         db.instance_variable_set(:@prepared_statements, {})
-        
+
         db
       end
 
@@ -116,7 +116,7 @@ module Sequel
         c.prepared_statements.each_value{|v| v.first.close}
         c.close
       end
-      
+
       # Run the given SQL with the given arguments and yield each row.
       def execute(sql, opts=OPTS, &block)
         _execute(:select, sql, opts, &block)
@@ -126,7 +126,7 @@ module Sequel
       def execute_dui(sql, opts=OPTS)
         _execute(:update, sql, opts)
       end
-      
+
       # Drop any prepared statements on the connection when executing DDL.  This is because
       # prepared statements lock the table in such a way that you can't drop or alter the
       # table while a prepared statement that references it still exists.
@@ -137,12 +137,12 @@ module Sequel
           super
         end
       end
-      
+
       # Run the given SQL with the given arguments and return the last inserted row id.
       def execute_insert(sql, opts=OPTS)
         _execute(:insert, sql, opts)
       end
-      
+
       # Handle Integer and Float arguments, since SQLite can store timestamps as integers and floats.
       def to_application_timestamp(s)
         case s
@@ -158,13 +158,13 @@ module Sequel
       end
 
       private
-      
+
       def adapter_initialize
         @conversion_procs = SQLITE_TYPES.dup
         @conversion_procs['datetime'] = @conversion_procs['timestamp'] = method(:to_application_timestamp)
         set_integer_booleans
       end
-      
+
       # Yield an available connection.  Rescue
       # any SQLite3::Exceptions and turn them into DatabaseErrors.
       def _execute(type, sql, opts, &block)
@@ -189,7 +189,7 @@ module Sequel
           raise_error(e)
         end
       end
-      
+
       # The SQLite adapter does not need the pool to convert exceptions.
       # Also, force the max connections to 1 if a memory database is being
       # used, as otherwise each connection gets a separate database.
@@ -200,7 +200,7 @@ module Sequel
         o[:max_connections] = 1 if @opts[:database] == ':memory:' || blank_object?(@opts[:database])
         o
       end
-      
+
       def prepared_statement_argument(arg)
         case arg
         when Date, DateTime, Time
@@ -254,28 +254,28 @@ module Sequel
           end
         end
       end
-      
+
       # SQLite3 raises ArgumentError in addition to SQLite3::Exception in
       # some cases, such as operations on a closed database.
       def database_error_classes
         [SQLite3::Exception, ArgumentError]
       end
     end
-    
+
     # Dataset class for SQLite datasets that use the ruby-sqlite3 driver.
     class Dataset < Sequel::Dataset
       include ::Sequel::SQLite::DatasetMethods
 
       Database::DatasetClass = self
-      
+
       PREPARED_ARG_PLACEHOLDER = ':'.freeze
-      
+
       # SQLite already supports named bind arguments, so use directly.
       module ArgumentMapper
         include Sequel::Dataset::ArgumentMapper
-        
+
         protected
-        
+
         # Return a hash with the same values as the given hash,
         # but with the keys converted to strings.
         def map_to_prepared_args(hash)
@@ -283,9 +283,9 @@ module Sequel
           hash.each{|k,v| args[k.to_s.gsub('.', '__')] = v}
           args
         end
-        
+
         private
-        
+
         # SQLite uses a : before the name of the argument for named
         # arguments.
         def prepared_arg(k)
@@ -297,25 +297,25 @@ module Sequel
           true
         end
       end
-      
+
       # SQLite prepared statement uses a new prepared statement each time
       # it is called, but it does use the bind arguments.
       module BindArgumentMethods
         include ArgumentMapper
-        
+
         private
-        
+
         # Run execute_select on the database with the given SQL and the stored
         # bind arguments.
         def execute(sql, opts=OPTS, &block)
           super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
-        
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts=OPTS, &block)
           super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
-        
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_insert(sql, opts=OPTS, &block)
           super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
@@ -324,33 +324,33 @@ module Sequel
 
       module PreparedStatementMethods
         include BindArgumentMethods
-          
+
         private
-          
+
         # Execute the stored prepared statement name and the stored bind
         # arguments instead of the SQL given.
         def execute(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
-         
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
-          
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_insert(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
       end
-        
+
       # Execute the given type of statement with the hash of values.
       def call(type, bind_vars={}, *values, &block)
         ps = to_prepared_statement(type, values)
         ps.extend(BindArgumentMethods)
         ps.call(bind_vars, &block)
       end
-      
+
       # Yield a hash for each row in the dataset.
       def fetch_rows(sql)
         execute(sql) do |result|
@@ -372,7 +372,7 @@ module Sequel
           end
         end
       end
-      
+
       # Prepare the given type of query with the given name and store
       # it in the database.  Note that a new native prepared statement is
       # created on each call to this prepared statement.
@@ -385,9 +385,9 @@ module Sequel
         end
         ps
       end
-      
+
       private
-      
+
       # The base type name for a given type, without any parenthetical part.
       def base_type_name(t)
         (t =~ /^(.*?)\(/ ? $1 : t).downcase if t

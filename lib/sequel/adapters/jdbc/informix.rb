@@ -9,9 +9,9 @@ module Sequel
       module DatabaseMethods
         extend Sequel::Database::ResetIdentifierMangling
         include Sequel::Informix::DatabaseMethods
-        
+
         private
-        
+
         # TODO: implement
         def last_insert_id(conn, opts=OPTS)
           nil

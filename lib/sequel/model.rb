@@ -9,8 +9,8 @@ module Sequel
   #             from the returned class, where the name of the
   #             subclass sets the table name (which is combined
   #             with the +Database+ in +source+ to create the
-  #             dataset to use) 
-  # Dataset :: Sets the dataset for this model to +source+. 
+  #             dataset to use)
+  # Dataset :: Sets the dataset for this model to +source+.
   # other :: Sets the table name for this model to +source+. The
   #          class will use the default database for model
   #          classes in order to create the dataset.
@@ -81,7 +81,7 @@ module Sequel
     # Class methods added to model that call the method of the same name on the dataset
     DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS +
       [:each_server]) - [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases]
-    
+
     # Boolean settings that can be modified at the global, class, or instance level.
     BOOLEAN_SETTINGS = [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, \
       :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_after_commit_rollback, :use_transactions]
@@ -113,7 +113,7 @@ module Sequel
     # If the value is +nil+, the superclass's instance variable is used directly in the subclass.
     INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup,
       :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil,
-      :@raise_on_save_failure=>nil, :@require_modification=>nil, 
+      :@raise_on_save_failure=>nil, :@require_modification=>nil,
       :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
       :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,

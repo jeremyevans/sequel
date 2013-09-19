@@ -31,7 +31,7 @@
 #   ia[1]     # int_array_column[1]
 #   ia[1][2]  # int_array_column[1][2]
 #
-#   ia.contains(:other_int_array_column)     # @> 
+#   ia.contains(:other_int_array_column)     # @>
 #   ia.contained_by(:other_int_array_column) # <@
 #   ia.overlaps(:other_int_array_column)     # &&
 #   ia.concat(:other_int_array_column)       # ||
@@ -50,7 +50,7 @@
 #   ia.join(':')       # array_to_string(int_array_column, ':', NULL)
 #   ia.join(':', ' ')  # array_to_string(int_array_column, ':', ' ')
 #   ia.unnest          # unnest(int_array_column)
-# 
+#
 # See the PostgreSQL array function and operator documentation for more
 # details on what these functions and operators do.
 #
@@ -150,7 +150,7 @@ module Sequel
       def length(dimension = 1)
         function(:array_length, dimension)
       end
-      
+
       # Call the array_lower method:
       #
       #   array_op.lower    # array_lower(array, 1)
@@ -158,7 +158,7 @@ module Sequel
       def lower(dimension = 1)
         function(:array_lower, dimension)
       end
-      
+
       # Use the overlaps (&&) operator:
       #
       #   array_op.overlaps(:a) # (array && a)
@@ -205,14 +205,14 @@ module Sequel
         function(:array_to_string, joiner, null)
       end
       alias join to_string
-      
+
       # Call the unnest method:
       #
       #   array_op.unnest # unnest(array)
       def unnest
         function(:unnest)
       end
-      
+
       # Use the concatentation (||) operator, reversing the order:
       #
       #   array_op.unshift(:a) # (a || array)

@@ -8,15 +8,15 @@ module Sequel
       module DatabaseMethods
         extend Sequel::Database::ResetIdentifierMangling
         include Sequel::SQLite::DatabaseMethods
-        
+
         private
-        
+
         # Default to a single connection for a memory database.
         def connection_pool_default_options
           o = super
           uri == 'sqlite3::memory:' ? o.merge(:max_connections=>1) : o
         end
-        
+
         # Execute the connection pragmas on the connection
         def setup_connection(conn)
           connection_pragmas.each do |s|

@@ -20,7 +20,7 @@ module Sequel
     #
     #   # Make the Album class eagerly load for each
     #   Album.plugin :eager_each
-    module EagerEach 
+    module EagerEach
       module DatasetMethods
         # Call #all instead of #each if eager loading,
         # uless #each is being called by #all.

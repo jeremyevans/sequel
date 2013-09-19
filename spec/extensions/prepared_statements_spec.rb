@@ -14,7 +14,7 @@ describe "prepared_statements plugin" do
   specify "should correctly lookup by primary key" do
     @c[1].should == @p
     @db.sqls.should == ["SELECT * FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
-  end 
+  end
 
   shared_examples_for "prepared_statements plugin" do
     specify "should correctly delete instance" do
@@ -64,9 +64,9 @@ describe "prepared_statements plugin" do
     c = Class.new(@c)
     c[1].should == c.load(:id=>1, :name=>'foo', :i=>2)
     @db.sqls.should == ["SELECT * FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
-  end 
+  end
 
-  describe " with placeholder type specifiers" do 
+  describe " with placeholder type specifiers" do
     before do
       @ds.meta_def(:requires_placeholder_type_specifiers?){true}
     end
@@ -93,6 +93,6 @@ describe "prepared_statements plugin" do
       end
       @c[1].should == @p
       @db.sqls.should == ["SELECT * FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
-    end 
+    end
   end
 end

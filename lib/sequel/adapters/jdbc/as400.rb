@@ -13,7 +13,7 @@ module Sequel
         TRANSACTION_BEGIN = 'Transaction.begin'.freeze
         TRANSACTION_COMMIT = 'Transaction.commit'.freeze
         TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
-        
+
         # AS400 uses the :as400 database type.
         def database_type
           :as400
@@ -37,7 +37,7 @@ module Sequel
           super
         end
       end
-      
+
       # Dataset class for AS400 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include EmulateOffsetWithRowNumber
@@ -46,7 +46,7 @@ module Sequel
         FETCH_FIRST_ROW_ONLY = " FETCH FIRST ROW ONLY".freeze
         FETCH_FIRST = " FETCH FIRST ".freeze
         ROWS_ONLY = " ROWS ONLY".freeze
-        
+
         # Modify the sql to limit the number of rows returned
         def select_limit_sql(sql)
           if l = @opts[:limit]
@@ -59,7 +59,7 @@ module Sequel
             end
           end
         end
-          
+
         def supports_window_functions?
           true
         end

@@ -69,7 +69,7 @@ module Sequel
     #
     #   # Introspec columns for all of DB's datasets
     #   DB.extend_datasets(Sequel::ColumnsIntrospection)
-    #   
+    #
     #   # Trace all SELECT queries by printing the SQL and the full backtrace
     #   DB.extend_datasets do
     #     def fetch_rows(sql)
@@ -100,7 +100,7 @@ module Sequel
       reset_default_dataset
       @identifier_input_method = v
     end
-    
+
     # Set the method to call on identifiers coming from the database:
     #
     #   DB[:items].first # {:id=>1, :name=>'foo'}
@@ -120,14 +120,14 @@ module Sequel
       reset_default_dataset
       @quote_identifiers = v
     end
-    
+
     # Returns true if the database quotes identifiers.
     def quote_identifiers?
       @quote_identifiers
     end
-    
+
     private
-    
+
     # The default dataset class to use for the database
     def dataset_class_default
       self.class.const_get(:DatasetClass)
@@ -147,7 +147,7 @@ module Sequel
     def identifier_input_method_default
       :upcase
     end
-    
+
     # The method to apply to identifiers coming the database by default.
     # Should be overridden in subclasses for databases that fold unquoted
     # identifiers to lower case instead of uppercase, such as
@@ -155,7 +155,7 @@ module Sequel
     def identifier_output_method_default
       :downcase
     end
-    
+
     # Whether to quote identifiers by default for this database, true
     # by default.
     def quote_identifiers_default

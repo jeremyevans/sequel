@@ -10,7 +10,7 @@ module Sequel
     #   album = Album[1]
     #   album.id = 2
     #   album.save
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclasses support primary key updates

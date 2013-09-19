@@ -57,7 +57,7 @@ module Sequel
     #
     # Note that if you want to support internationalization of Errors#full_messages,
     # you need to override the method.  Here's an example:
-    #   
+    #
     #   class Sequel::Model::Errors
     #     ATTRIBUTE_JOINER = I18n.t('errors.joiner').freeze
     #     def full_messages
@@ -88,7 +88,7 @@ module Sequel
         :unique=>{:message=>lambda{'is already taken'}}
       }
 
-      module InstanceMethods 
+      module InstanceMethods
         # Check that the attribute values are the given exact length.
         def validates_exact_length(exact, atts, opts=OPTS)
           validatable_attributes_for_type(:exact_length, atts, opts){|a,v,m| validation_error_message(m, exact) if v.nil? || v.length != exact}
@@ -98,12 +98,12 @@ module Sequel
         def validates_format(with, atts, opts=OPTS)
           validatable_attributes_for_type(:format, atts, opts){|a,v,m| validation_error_message(m, with) unless v.to_s =~ with}
         end
-    
+
         # Check attribute value(s) is included in the given set.
         def validates_includes(set, atts, opts=OPTS)
           validatable_attributes_for_type(:includes, atts, opts){|a,v,m| validation_error_message(m, set) unless set.send(set.respond_to?(:cover?) ? :cover? : :include?, v)}
         end
-    
+
         # Check attribute value(s) string representation is a valid integer.
         def validates_integer(atts, opts=OPTS)
           validatable_attributes_for_type(:integer, atts, opts) do |a,v,m|
@@ -120,7 +120,7 @@ module Sequel
         def validates_length_range(range, atts, opts=OPTS)
           validatable_attributes_for_type(:length_range, atts, opts){|a,v,m| validation_error_message(m, range) if v.nil? || !range.send(range.respond_to?(:cover?) ? :cover? : :include?, v.length)}
         end
-    
+
         # Check that the attribute values are not longer than the given max length.
         #
         # Accepts a :nil_message option that is the error message to use when the
@@ -138,7 +138,7 @@ module Sequel
         def validates_not_null(atts, opts=OPTS)
           validatable_attributes_for_type(:not_null, atts, opts){|a,v,m| validation_error_message(m) if v.nil?}
         end
-        
+
         # Check attribute value(s) string representation is a valid float.
         def validates_numeric(atts, opts=OPTS)
           validatable_attributes_for_type(:numeric, atts, opts) do |a,v,m|
@@ -177,7 +177,7 @@ module Sequel
         def validates_presence(atts, opts=OPTS)
           validatable_attributes_for_type(:presence, atts, opts){|a,v,m| validation_error_message(m) if model.db.send(:blank_object?, v) && v != false}
         end
-        
+
         # Checks that there are no duplicate values in the database for the given
         # attributes.  Pass an array of fields instead of multiple
         # fields to specify that the combination of fields must be unique,
@@ -243,9 +243,9 @@ module Sequel
             errors.add(a, message) unless ds.count == 0
           end
         end
-        
+
         private
-        
+
         # The default options hash for the given type of validation.  Can
         # be overridden on a per-model basis for different per model defaults.
         # The hash return must include a :message option that is either a
@@ -270,13 +270,13 @@ module Sequel
             end
           end
         end
-        
+
         # Merge the given options with the default options for the given type
         # and call validatable_attributes with the merged options.
         def validatable_attributes_for_type(type, atts, opts, &block)
           validatable_attributes(atts, default_validation_helpers_options(type).merge(opts), &block)
         end
-        
+
         # The validation error message to use, as a string.  If message
         # is a Proc, call it with the args.  Otherwise, assume it is a string and
         # return it.

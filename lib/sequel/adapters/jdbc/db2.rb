@@ -10,7 +10,7 @@ module Sequel
       alias jdbc_views views
       alias jdbc_indexes indexes
     end
-    
+
     # Database and Dataset instance methods for DB2 specific
     # support via JDBC.
     module DB2
@@ -22,7 +22,7 @@ module Sequel
         include Sequel::DB2::DatabaseMethods
         include Sequel::JDBC::Transactions
         IDENTITY_VAL_LOCAL = "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1".freeze
-        
+
         %w'schema_parse_table tables views indexes'.each do |s|
           class_eval("def #{s}(*a) jdbc_#{s}(*a) end", __FILE__, __LINE__)
         end
@@ -37,7 +37,7 @@ module Sequel
             super
           end
         end
-        
+
         def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
             sql = IDENTITY_VAL_LOCAL
@@ -46,7 +46,7 @@ module Sequel
             rs.getInt(1)
           end
         end
-        
+
         # Primary key indexes appear to be named sqlNNNN on DB2
         def primary_key_index_re
           PRIMARY_KEY_INDEX_RE
@@ -61,7 +61,7 @@ module Sequel
         end
 
         DB2_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:db2_clob)
-      
+
         private
 
         # Return clob as blob if use_clob_as_blob is true

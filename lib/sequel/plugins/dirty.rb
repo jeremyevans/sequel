@@ -38,7 +38,7 @@ module Sequel
     #   artist.update(:name=>'Bar')
     #   artist.column_changes        # => {}
     #   artist.previous_changes      # => {:name=>['Foo', 'Bar']}
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances record previous values (called before loading subclasses)
@@ -86,7 +86,7 @@ module Sequel
         end
 
         # Duplicate internal data structures
-        def dup 
+        def dup
           s = self
           super.instance_eval do
             @initial_values = s.initial_values.dup

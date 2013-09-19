@@ -16,19 +16,19 @@ describe "Dataset#query" do
   before do
     @d = Sequel.mock.dataset.extension(:query)
   end
-  
+
   specify "should allow cloning without arguments" do
     q = @d.query {clone}
     q.class.should == @d.class
     q.sql.should == "SELECT *"
   end
-  
+
   specify "should support #from" do
     q = @d.query {from :xxx}
     q.class.should == @d.class
     q.sql.should == "SELECT * FROM xxx"
   end
-  
+
   specify "should support #select" do
     q = @d.query do
       select :a, :b___mongo
@@ -37,7 +37,7 @@ describe "Dataset#query" do
     q.class.should == @d.class
     q.sql.should == "SELECT a, b AS mongo FROM yyy"
   end
-  
+
   specify "should support #where" do
     q = @d.query do
       from :zzz
@@ -58,7 +58,7 @@ describe "Dataset#query" do
     q.class.should == @d.class
     q.sql.should == "SELECT * FROM zzz WHERE (x = 33)"
   end
-  
+
   specify "should support #group_by and #having" do
     q = @d.query do
       from :abc
@@ -68,7 +68,7 @@ describe "Dataset#query" do
     q.class.should == @d.class
     q.sql.should == "SELECT * FROM abc GROUP BY id HAVING (x >= 2)"
   end
-  
+
   specify "should support #order, #order_by" do
     q = @d.query do
       from :xyz
@@ -86,7 +86,7 @@ describe "Dataset#query" do
     end
     q.sql.should == "SELECT * FROM xyz"
   end
-  
+
   specify "should have an appropriate mutation method" do
     @d.query! do
       select :a, :b___mongo

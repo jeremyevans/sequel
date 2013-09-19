@@ -4,7 +4,7 @@ module Sequel
   module DBI
     class Database < Sequel::Database
       set_adapter_scheme :dbi
-      
+
       DBI_ADAPTERS = {
         :ado => "ADO",
         :db2 => "DB2",
@@ -19,7 +19,7 @@ module Sequel
         :sqlite => "SQLite",
         :sqlrelay => "SQLRelay"
       }
-      
+
       # Converts a uri to an options hash. These options are then passed
       # to a newly created database object.
       def self.uri_to_options(uri) # :nodoc:
@@ -38,7 +38,7 @@ module Sequel
       end
 
       private_class_method :uri_to_options
-      
+
       def connect(server)
         opts = server_opts(server)
         dbname = opts[:database]
@@ -52,7 +52,7 @@ module Sequel
       def disconnect_connection(c)
         c.disconnect
       end
-      
+
       def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           r = log_yield(sql){conn.execute(sql)}
@@ -60,7 +60,7 @@ module Sequel
           r
         end
       end
-      
+
       def execute_dui(sql, opts=OPTS)
         synchronize(opts[:server]){|conn| log_yield(sql){conn.do(sql)}}
       end
@@ -76,7 +76,7 @@ module Sequel
         end
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self
 

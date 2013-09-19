@@ -29,21 +29,21 @@ module Sequel
         db.set_integer_booleans
       end,
     }
-      
+
     class Database < Sequel::Database
       set_adapter_scheme :swift
 
       # The Swift adapter class being used by this database.  Connections
       # in this database's connection pool will be instances of this class.
       attr_accessor :swift_class
-      
+
       # Create an instance of swift_class for the given options.
       def connect(server)
         opts = server_opts(server)
         opts[:pass] = opts[:password]
         setup_connection(swift_class.new(opts))
       end
-      
+
       # Execute the given SQL, yielding a Swift::Result if a block is given.
       def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
@@ -56,7 +56,7 @@ module Sequel
           end
         end
       end
-      
+
       # Execute the SQL on the this database, returning the number of affected
       # rows.
       def execute_dui(sql, opts=OPTS)
@@ -68,7 +68,7 @@ module Sequel
           end
         end
       end
-      
+
       # Execute the SQL on this database, returning the primary key of the
       # table being inserted to.
       def execute_insert(sql, opts=OPTS)
@@ -80,16 +80,16 @@ module Sequel
           end
         end
       end
-      
+
       private
-      
+
       # Call the DATABASE_SETUP proc directly after initialization,
       # so the object always uses sub adapter specific code.  Also,
       # raise an error immediately if the connection doesn't have a
       # db_type specified, since one is required to include the correct
       # subadapter.
       def adapter_initialize
-        if db_type = @opts[:db_type] and !db_type.to_s.empty? 
+        if db_type = @opts[:db_type] and !db_type.to_s.empty?
           if prok = DATABASE_SETUP[db_type.to_s.to_sym]
             prok.call(self)
           else
@@ -99,13 +99,13 @@ module Sequel
           raise(Error, ":db_type option not valid, should be postgres, mysql, or sqlite")
         end
       end
-      
+
       # Method to call on a statement object to execute SQL that does
       # not return any rows.
       def connection_execute_method
         :execute
       end
-      
+
       def database_error_classes
         [::Swift::Error]
       end
@@ -117,14 +117,14 @@ module Sequel
         o[:db] ||= o[:database]
         o
       end
-      
+
       # Allow extending the given connection when it is first created.
       # By default, just returns the connection.
       def setup_connection(conn)
         conn
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self
 

@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-shared_examples_for "Sequel::ConnectionValidator" do  
+shared_examples_for "Sequel::ConnectionValidator" do
   before do
     @db.extend(Module.new do
       def disconnect_connection(conn)

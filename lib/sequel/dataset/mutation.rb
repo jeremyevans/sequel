@@ -4,10 +4,10 @@ module Sequel
     # :section: 7 - Mutation methods
     # These methods modify the receiving dataset and should be used with care.
     # ---------------------
-    
+
     # All methods that should have a ! method added that modifies the receiver.
     MUTATION_METHODS = QUERY_METHODS - [:naked, :from_self]
-    
+
     # Setup mutation (e.g. filter!) methods.  These operate the same as the
     # non-! methods, but replace the options of the current dataset with the
     # options of the resulting dataset.
@@ -22,14 +22,14 @@ module Sequel
         mod.class_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end", __FILE__, __LINE__)
       end
     end
-    
+
     # Add the mutation methods via metaprogramming
     def_mutation_method(*MUTATION_METHODS)
-    
+
     # The row_proc for this database, should be any object that responds to +call+ with
     # a single hash argument and returns the object you want #each to return.
     attr_reader :row_proc
-    
+
     # Load an extension into the receiver.  In addition to requiring the extension file, this
     # also modifies the dataset to work with the extension (usually extending it with a
     # module defined in the extension file).  If no related extension file exists or the
@@ -60,7 +60,7 @@ module Sequel
       raise_if_frozen!
       @identifier_input_method = v
     end
-    
+
     # Set the method to call on identifiers coming the database for this dataset
     def identifier_output_method=(v)
       raise_if_frozen!
@@ -73,7 +73,7 @@ module Sequel
       self.row_proc = nil
       self
     end
-    
+
     # Set whether to quote identifiers for this dataset
     def quote_identifiers=(v)
       raise_if_frozen!
@@ -85,9 +85,9 @@ module Sequel
       raise_if_frozen!
       @row_proc = v
     end
-    
+
     private
-    
+
     # Modify the receiver with the results of sending the meth, args, and block
     # to the receiver and merging the options of the resulting dataset into
     # the receiver's options.

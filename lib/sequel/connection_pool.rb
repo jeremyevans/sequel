@@ -25,13 +25,13 @@ class Sequel::ConnectionPool
 
   # The default server to use
   DEFAULT_SERVER = :default
-  
+
   # A map of [single threaded, sharded] values to symbols or ConnectionPool subclasses.
-  CONNECTION_POOL_MAP = {[true, false] => :single, 
+  CONNECTION_POOL_MAP = {[true, false] => :single,
     [true, true] => :sharded_single,
     [false, false] => :threaded,
     [false, true] => :sharded_threaded}
-  
+
   # Class methods used to return an appropriate pool subclass, separated
   # into a module for easier overridding by extensions.
   module ClassMethods
@@ -48,9 +48,9 @@ class Sequel::ConnectionPool
         connection_pool_class(opts).new(db, opts) || raise(Sequel::Error, "No connection pool class found")
       end
     end
-    
+
     private
-    
+
     # Return a connection pool class based on the given options.
     def connection_pool_class(opts)
       CONNECTION_POOL_MAP[opts[:pool_class]] || opts[:pool_class] || CONNECTION_POOL_MAP[[!!opts[:single_threaded], !!opts[:servers]]]
@@ -76,19 +76,19 @@ class Sequel::ConnectionPool
     @db = db
     @after_connect = opts[:after_connect]
   end
-  
+
   # Alias for +size+, not aliased directly for ease of subclass implementation
   def created_count(*args)
     size(*args)
   end
-  
+
   # An array of symbols for all shards/servers, which is a single <tt>:default</tt> by default.
   def servers
     [DEFAULT_SERVER]
   end
-  
+
   private
-  
+
   # Return a new connection by calling the connection proc with the given server name,
   # and checking for connection errors.
   def make_new(server)

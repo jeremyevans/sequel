@@ -1,6 +1,6 @@
 # The hash_aliases extension allows Dataset#select and Dataset#from
 # to treat a hash argument as an alias specification, with keys
-# being the expressions and values being the aliases, 
+# being the expressions and values being the aliases,
 # which was the historical behavior before Sequel 4.
 # It is only recommended to use this for backwards compatibility.
 #

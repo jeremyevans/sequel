@@ -12,9 +12,9 @@ module Sequel
         def supports_savepoints?
           false
         end
-      
+
         private
-        
+
         # Get the last inserted id using LAST_INSERT_ID().
         def last_insert_id(conn, opts=OPTS)
           if stmt = opts[:stmt]
@@ -35,7 +35,7 @@ module Sequel
         def execute_prepared_statement_insert(stmt)
           stmt.execute
         end
-      
+
         # Return generated keys for insert statements, and use
         # execute intead of executeUpdate as CUBRID doesn't
         # return generated keys in executeUpdate.

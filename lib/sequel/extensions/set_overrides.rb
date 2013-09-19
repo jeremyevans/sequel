@@ -30,7 +30,7 @@ module Sequel
 
     # Set the default values for insert and update statements.  The values hash passed
     # to insert or update are merged into this hash, so any values in the hash passed
-    # to insert or update will override values passed to this method.  
+    # to insert or update will override values passed to this method.
     #
     #   DB[:items].set_defaults(:a=>'a', :c=>'c').insert(:a=>'d', :b=>'b')
     #   # INSERT INTO items (a, c, b) VALUES ('d', 'c', 'b')

@@ -73,32 +73,32 @@ describe Sequel::Model, "dataset" do
   after do
     [:Elephant, :Maggot, :ShoeSize, :BootSize].each{|x| Object.send(:remove_const, x)}
   end
-  
+
   specify "should default to the plural of the class name" do
     Maggot.dataset.sql.should == 'SELECT * FROM maggots'
     ShoeSize.dataset.sql.should == 'SELECT * FROM shoe_sizes'
   end
-  
+
   specify "should return the dataset for the superclass if available" do
     BootSize.dataset.sql.should == 'SELECT * FROM shoe_sizes'
   end
-  
+
   specify "should return the correct dataset if set explicitly" do
     Elephant.dataset.sql.should == 'SELECT * FROM ele1'
     @a.dataset.sql.should == 'SELECT * FROM items'
   end
-  
+
   specify "should raise if no dataset is explicitly set and the class is anonymous" do
     proc {@b.dataset}.should raise_error(Sequel::Error)
   end
-  
+
   specify "should disregard namespaces for the table name" do
     begin
       module ::BlahBlah
         class MwaHaHa < Sequel::Model
         end
       end
-    
+
       BlahBlah::MwaHaHa.dataset.sql.should == 'SELECT * FROM mwa_ha_has'
     ensure
       Object.send(:remove_const, :BlahBlah)
@@ -110,7 +110,7 @@ describe Sequel::Model, ".def_dataset_method" do
   before do
     @c = Class.new(Sequel::Model(:items))
   end
-  
+
   it "should add a method to the dataset and model if called with a block argument" do
     @c.def_dataset_method(:return_3){3}
     @c.return_3.should == 3
@@ -176,7 +176,7 @@ describe Sequel::Model, ".dataset_module" do
   before do
     @c = Class.new(Sequel::Model(:items))
   end
-  
+
   it "should extend the dataset with the module if the model has a dataset" do
     @c.dataset_module{def return_3() 3 end}
     @c.dataset.return_3.should == 3
@@ -280,7 +280,7 @@ describe "A model class with implicit table name" do
   after do
     Object.send(:remove_const, :Donkey)
   end
-  
+
   specify "should have a dataset associated with the model class" do
     Donkey.dataset.model.should == Donkey
   end
@@ -295,7 +295,7 @@ describe "A model inheriting from a model" do
     Object.send(:remove_const, :Leopard)
     Object.send(:remove_const, :Feline)
   end
-  
+
   specify "should have a dataset associated with itself" do
     Feline.dataset.model.should == Feline
     Leopard.dataset.model.should == Leopard
@@ -306,7 +306,7 @@ describe "Model.primary_key" do
   before do
     @c = Class.new(Sequel::Model)
   end
-  
+
   specify "should default to id" do
     @c.primary_key.should == :id
   end
@@ -318,7 +318,7 @@ describe "Model.primary_key" do
     @c.set_primary_key([:id1, :id2])
     @c.primary_key.should == [:id1, :id2]
   end
-  
+
   specify "should use nil for no primary key" do
     @c.no_primary_key
     @c.primary_key.should == nil
@@ -329,7 +329,7 @@ describe "Model.primary_key_hash" do
   before do
     @c = Class.new(Sequel::Model)
   end
-  
+
   specify "should handle a single primary key" do
     @c.primary_key_hash(1).should == {:id=>1}
   end
@@ -349,7 +349,7 @@ describe "Model.qualified_primary_key_hash" do
   before do
     @c = Class.new(Sequel::Model(:items))
   end
-  
+
   specify "should handle a single primary key" do
     @c.qualified_primary_key_hash(1).should == {Sequel.qualify(:items, :id)=>1}
   end
@@ -425,13 +425,13 @@ describe "Model.db=" do
   before do
     @db1 = Sequel.mock
     @db2 = Sequel.mock
-    
+
     @m = Class.new(Sequel::Model(@db1[:blue].filter(:x=>1)))
   end
-  
+
   specify "should affect the underlying dataset" do
     @m.db = @db2
-    
+
     @m.dataset.db.should === @db2
     @m.dataset.db.should_not === @db1
   end
@@ -455,7 +455,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     @c.strict_param_setting = false
     @c.instance_variable_set(:@columns, [:x, :y, :z])
   end
-  
+
   it "should set the allowed columns correctly" do
     @c.allowed_columns.should == nil
     @c.set_allowed_columns :x
@@ -487,7 +487,7 @@ describe Sequel::Model, ".(un)?restrict_primary_key\\??" do
     end
     @c.strict_param_setting = false
   end
-  
+
   it "should restrict updates to primary key by default" do
     i = @c.new(:x => 1, :y => 2, :id => 3)
     i.values.should == {:x => 1, :y => 2}
@@ -524,7 +524,7 @@ describe Sequel::Model, ".strict_param_setting" do
       set_allowed_columns :x, :y
     end
   end
-  
+
   it "should be enabled by default" do
     @c.strict_param_setting.should == true
   end
@@ -568,7 +568,7 @@ describe Sequel::Model, ".require_modification" do
     Sequel::Model.require_modification = true
     Class.new(Sequel::Model).set_dataset(@ds1).require_modification.should == true
     Class.new(Sequel::Model).set_dataset(@ds2).require_modification.should == true
-    
+
     Sequel::Model.require_modification = false
     Class.new(Sequel::Model).set_dataset(@ds1).require_modification.should == false
     Class.new(Sequel::Model).set_dataset(@ds1).require_modification.should == false

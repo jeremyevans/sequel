@@ -2,7 +2,7 @@ Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   Postgres::CONVERTED_EXCEPTIONS << NativeException
-  
+
   module JDBC
     # Adapter, Database, and Dataset support for accessing a PostgreSQL
     # database via JDBC.
@@ -12,7 +12,7 @@ module Sequel
       module DatabaseMethods
         extend Sequel::Database::ResetIdentifierMangling
         include Sequel::Postgres::DatabaseMethods
-        
+
         # Add the primary_keys and primary_key_sequences instance variables,
         # so we can get the correct return values for inserted rows.
         def self.extended(db)
@@ -56,7 +56,7 @@ module Sequel
             end
           end
         end
-        
+
         # See Sequel::Postgres::Adapter#copy_table
         def copy_table(table, opts=OPTS)
           synchronize(opts[:server]) do |conn|
@@ -82,7 +82,7 @@ module Sequel
         end
 
         private
-        
+
         # Use setNull for nil arguments as the default behavior of setString
         # with nil doesn't appear to work correctly on PostgreSQL.
         def set_ps_arg_nil(cps, i)
@@ -98,12 +98,12 @@ module Sequel
           conn
         end
       end
-      
+
       # Dataset subclass used for datasets that connect to PostgreSQL via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Postgres::DatasetMethods
         APOS = Dataset::APOS
-        
+
         class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
           # Convert Java::OrgPostgresqlUtil::PGobject to ruby strings
           def pg_object(v)
@@ -119,7 +119,7 @@ module Sequel
             @conversion_proc_method = meth
             @conversion_proc = nil
           end
-          
+
           # Convert Java::OrgPostgresqlJdbc4::Jdbc4Array to ruby arrays
           def call(v)
             _pg_array(v.array)
@@ -150,7 +150,7 @@ module Sequel
         end
 
         PG_OBJECT_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:pg_object)
-      
+
         # Add the shared PostgreSQL prepared statement methods
         def prepare(type, name=nil, *values)
           ps = to_prepared_statement(type, values)
@@ -164,7 +164,7 @@ module Sequel
         end
 
         private
-        
+
         # Handle PostgreSQL array and object types. Object types are just
         # turned into strings, similarly to how the native adapter treats
         # the types.
@@ -178,7 +178,7 @@ module Sequel
             super
           end
         end
-        
+
         # Literalize strings similar to the native postgres adapter
         def literal_string_append(sql, v)
           sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS

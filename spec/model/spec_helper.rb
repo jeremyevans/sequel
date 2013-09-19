@@ -1,5 +1,5 @@
 require 'rubygems'
-unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model') 
+unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
   require 'sequel'
 end
@@ -19,7 +19,7 @@ Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line 
           Sequel::Deprecation.output = false
           instance_exec(&block)
         ensure
-          Sequel::Deprecation.output = output 
+          Sequel::Deprecation.output = output
         end
       end
     end

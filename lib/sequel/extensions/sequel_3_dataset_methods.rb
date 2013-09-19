@@ -60,7 +60,7 @@ module Sequel
         array.map{|i| insert(i)}
       end
     end
-    
+
     # Return a copy of the dataset with unqualified identifiers in the
     # SELECT, WHERE, GROUP, HAVING, and ORDER clauses qualified by the
     # given table. If no columns are currently selected, select all
@@ -71,7 +71,7 @@ module Sequel
     def qualify_to(table)
       qualify(table)
     end
-    
+
     # Qualify the dataset to its current first source.  This is useful
     # if you have unqualified identifiers in the query that all refer to
     # the first source, and you want to join to another table which
@@ -83,16 +83,16 @@ module Sequel
     def qualify_to_first_source
       qualify
     end
-    
+
     # Alias for update, but not aliased directly so subclasses
     # don't have to override both methods.
     def set(*args)
       update(*args)
     end
-    
-    # Returns a string in CSV format containing the dataset records. By 
+
+    # Returns a string in CSV format containing the dataset records. By
     # default the CSV representation includes the column titles in the
-    # first line. You can turn that off by passing false as the 
+    # first line. You can turn that off by passing false as the
     # include_column_titles argument.
     #
     # This does not use a CSV library or handle quoting of values in

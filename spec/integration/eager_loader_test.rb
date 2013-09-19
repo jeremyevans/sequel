@@ -10,12 +10,12 @@ describe "Eagerly loading a tree structure" do
     class ::Node < Sequel::Model
       many_to_one :parent
       one_to_many :children, :key=>:parent_id
-    
+
       # Only useful when eager loading
       many_to_one :ancestors, :eager_loader_key=>nil, :eager_loader=>(proc do |eo|
         # Handle cases where the root node has the same parent_id as primary_key
         # and also when it is NULL
-        non_root_nodes = eo[:rows].reject do |n| 
+        non_root_nodes = eo[:rows].reject do |n|
           if [nil, n.pk].include?(n.parent_id)
             # Make sure root nodes have their parent association set to nil
             n.associations[:parent] = nil
@@ -51,14 +51,14 @@ describe "Eagerly loading a tree structure" do
         Node.filter(:parent_id=>id_map.keys.sort).exclude(:id=>:parent_id).eager(:descendants).all do |node|
           # Get the parent from the identity map
           parent = id_map[node.parent_id]
-          # Set the child's parent association to the parent 
+          # Set the child's parent association to the parent
           node.associations[:parent] = parent
           # Add the child association to the array of children in the parent
           parent.associations[:children] << node
         end
       end)
     end
-    
+
     Node.insert(:parent_id=>1)
     Node.insert(:parent_id=>1)
     Node.insert(:parent_id=>1)
@@ -123,7 +123,7 @@ describe "Association Extensions" do
     module ::FindOrCreate
       def find_or_create(vals)
         first(vals) || model.create(vals.merge(:author_id=>model_object.pk))
-      end 
+      end
       def find_or_create_by_name(name)
         first(:name=>name) || model.create(:name=>name, :author_id=>model_object.pk)
       end
@@ -342,20 +342,20 @@ describe "Polymorphic Associations" do
         :eager_loader=>(proc do |eo|
           id_map = {}
           eo[:rows].each do |asset|
-            asset.associations[:attachable] = nil 
+            asset.associations[:attachable] = nil
             ((id_map[asset.attachable_type] ||= {})[asset.attachable_id] ||= []) << asset
-          end 
+          end
           id_map.each do |klass_name, idmap|
             klass = m.call(klass_name)
             klass.where(klass.primary_key=>idmap.keys).all do |attach|
               idmap[attach.pk].each do |asset|
                 asset.associations[:attachable] = attach
-              end 
-            end 
-          end 
+              end
+            end
+          end
         end)
-    end 
-  
+    end
+
     DB.create_table!(:posts) do
       primary_key :id
     end
@@ -364,13 +364,13 @@ describe "Polymorphic Associations" do
         :adder=>proc{|asset| asset.update(:attachable_id=>pk, :attachable_type=>'Post')},
         :remover=>proc{|asset| asset.update(:attachable_id=>nil, :attachable_type=>nil)},
         :clearer=>proc{assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)}
-    end 
-  
+    end
+
     DB.create_table!(:notes) do
       primary_key :id
     end
     class ::Note < Sequel::Model
-      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Note'},     
+      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Note'},
         :adder=>proc{|asset| asset.update(:attachable_id=>pk, :attachable_type=>'Note')},
         :remover=>proc{|asset| asset.update(:attachable_id=>nil, :attachable_type=>nil)},
         :clearer=>proc{assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)}
@@ -470,14 +470,14 @@ describe "many_to_one/one_to_many not referencing primary key" do
           eo[:rows].each do |client|
             id_map[client.name] = client
             client.associations[:invoices] = []
-          end 
+          end
           Invoice.filter(:client_name=>id_map.keys.sort).all do |inv|
             inv.associations[:client] = client = id_map[inv.client_name]
-            client.associations[:invoices] << inv 
-          end 
+            client.associations[:invoices] << inv
+          end
         end)
-    end 
-  
+    end
+
     DB.create_table!(:invoices) do
       primary_key :id
       String :client_name
@@ -491,7 +491,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
           eo[:rows].each{|inv| inv.associations[:client] = nil}
           Client.filter(:name=>id_map.keys).all do |client|
             id_map[client.name].each{|inv| inv.associations[:client] = client}
-          end 
+          end
         end)
     end
   end
@@ -591,13 +591,13 @@ describe "statistics associations" do
           p = eo[:id_map][t.values.delete(:project_id)].first
           p.associations[:ticket_hours] = t
          end
-       end)  
+       end)
       def ticket_hours
         if s = super
           s[:hours]
         end
-      end 
-    end 
+      end
+    end
 
     DB.create_table!(:tickets) do
       primary_key :id

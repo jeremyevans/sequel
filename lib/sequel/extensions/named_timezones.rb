@@ -41,7 +41,7 @@ require 'tzinfo'
 
 module Sequel
   self.datetime_class = DateTime
-  
+
   module NamedTimezones
     module DatabaseMethods
       def timezone=(tz)
@@ -56,8 +56,8 @@ module Sequel
     #   Sequel.tzinfo_disambiguator = proc{|datetime, periods| periods.first}
     attr_accessor :tzinfo_disambiguator
 
-    private 
-    
+    private
+
     # Assume the given DateTime has a correct time but a wrong timezone.  It is
     # currently in UTC timezone, but it should be converted to the input_timezone.
     # Keep the time the same but convert the timezone to the input_timezone.
@@ -77,7 +77,7 @@ module Sequel
       # Convert timezone offset from UTC to the offset for the output_timezone
       (v - local_offset).new_offset(local_offset)
     end
-    
+
     # Returns TZInfo::Timezone instance if given a String.
     def convert_timezone_setter_arg(tz)
       tz.is_a?(String) ? TZInfo::Timezone.get(tz) : super
@@ -92,7 +92,7 @@ module Sequel
       end
     end
   end
-  
+
   extend NamedTimezones
   Database.register_extension(:named_timezones, NamedTimezones::DatabaseMethods)
 end

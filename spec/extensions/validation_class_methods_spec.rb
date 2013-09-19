@@ -15,13 +15,13 @@ describe Sequel::Model do
       end
     end
   end
-  
+
   specify "should respond to validations, has_validations?, and validation_reflections" do
     @c.should respond_to(:validations)
     @c.should respond_to(:has_validations?)
     @c.should respond_to(:validation_reflections)
   end
-  
+
   specify "should be able to reflect on validations" do
     @c.validation_reflections.should == {}
     @c.validates_acceptance_of(:a)
@@ -54,7 +54,7 @@ describe Sequel::Model do
     @c.validates_each(:xx) {1}
     @c.has_validations?.should == true
   end
-  
+
   specify "should validate multiple attributes at once" do
     o = @c.new
     def o.xx
@@ -70,7 +70,7 @@ describe Sequel::Model do
     vals.should == [1,2]
     atts.should == [:xx, :yy]
   end
-  
+
   specify "should respect allow_missing option when using multiple attributes" do
     o = @c.new
     def o.xx
@@ -103,7 +103,7 @@ describe Sequel::Model do
     vals.should == nil
     atts.should == nil
   end
-  
+
   specify "should overwrite existing validation with the same tag and attribute" do
     @c.validates_each(:xx, :xx, :tag=>:low) {|o, a, v| o.xxx; o.errors.add(a, 'too low') if v < 50}
     @c.validates_each(:yy, :yy) {|o, a, v| o.yyy; o.errors.add(a, 'too low') if v < 50}
@@ -156,22 +156,22 @@ describe Sequel::Model do
         o.errors.add(a, 'too low') if v < 87
       end
     end
-    
+
     @o = @c.new
   end
-  
+
   specify "should supply a #valid? method that returns true if validations pass" do
     @o.score = 50
     @o.should_not be_valid
     @o.score = 100
     @o.should be_valid
   end
-  
+
   specify "should provide an errors object" do
     @o.score = 100
     @o.should be_valid
     @o.errors.should be_empty
-    
+
     @o.score = 86
     @o.should_not be_valid
     @o.errors[:score].should == ['too low']
@@ -182,14 +182,14 @@ end
 describe "Sequel::Plugins::ValidationClassMethods::ClassMethods::Generator" do
   before do
     @testit = testit = []
-    
+
     @c = model_class.call Sequel::Model do
       (class << self; self end).send(:define_method, :validates_blah) do
         testit << 1324
       end
     end
   end
-  
+
   specify "should instance_eval the block, sending everything to its receiver" do
     @c.validates do
       blah
@@ -202,7 +202,7 @@ describe Sequel::Model do
   before do
     @c = model_class.call Sequel::Model do
       columns :value
-      
+
       def self.filter(*args)
         o = Object.new
         def o.count; 2; end
@@ -221,7 +221,7 @@ describe Sequel::Model do
     @m.value = '1'
     @m.should be_valid
   end
-  
+
   specify "should validate acceptance_of with accept" do
     @c.validates_acceptance_of :value, :accept => 'true'
     @m.value = '1'
@@ -229,7 +229,7 @@ describe Sequel::Model do
     @m.value = 'true'
     @m.should be_valid
   end
-  
+
   specify "should validate acceptance_of with allow_nil => false" do
     @c.validates_acceptance_of :value, :allow_nil => false
     @m.should_not be_valid
@@ -280,14 +280,14 @@ describe Sequel::Model do
   specify "should validate confirmation_of" do
     @c.send(:attr_accessor, :value_confirmation)
     @c.validates_confirmation_of :value
-    
+
     @m.value = 'blah'
     @m.should_not be_valid
-    
+
     @m.value_confirmation = 'blah'
     @m.should be_valid
   end
-  
+
   specify "should validate confirmation_of with if => true" do
     @c.send(:attr_accessor, :value_confirmation)
     @c.validates_confirmation_of :value, :if => :dont_skip
@@ -321,12 +321,12 @@ describe Sequel::Model do
     @m.value = 'abc_def'
     @m.should be_valid
   end
-  
+
   specify "should raise for validate_format_of without regexp" do
     proc {@c.validates_format_of :value}.should raise_error(ArgumentError)
     proc {@c.validates_format_of :value, :with => :blah}.should raise_error(ArgumentError)
   end
-  
+
   specify "should validate format_of with if => true" do
     @c.validates_format_of :value, :with => /_/, :if => :dont_skip
 
@@ -340,7 +340,7 @@ describe Sequel::Model do
     @m.value = 'a'
     @m.should be_valid
   end
-  
+
   specify "should validate format_of with allow_missing => true" do
     @c.validates_format_of :value, :allow_missing => true, :with=>/./
     @m.should be_valid
@@ -401,7 +401,7 @@ describe Sequel::Model do
     @m.value = '1234'
     @m.should_not be_valid
   end
-  
+
   specify "should validate length_of with allow_nil" do
     @c.validates_length_of :value, :is => 3, :allow_nil => true
     @m.should be_valid
@@ -477,7 +477,7 @@ describe Sequel::Model do
     @m.value = '123.1231'
     @m.should_not be_valid
   end
-  
+
   specify "should validate numericality_of with if => true" do
     @c.validates_numericality_of :value, :if => :dont_skip
 
@@ -513,7 +513,7 @@ describe Sequel::Model do
     @m.value = false
     @m.should be_valid
   end
-  
+
   specify "should validate inclusion_of with an array" do
     @c.validates_inclusion_of :value, :in => [1,2]
     @m.should_not be_valid
@@ -522,11 +522,11 @@ describe Sequel::Model do
     @m.value = 1.5
     @m.should_not be_valid
     @m.value = 2
-    @m.should be_valid    
+    @m.should be_valid
     @m.value = 3
-    @m.should_not be_valid 
+    @m.should_not be_valid
   end
-  
+
   specify "should validate inclusion_of with a range" do
     @c.validates_inclusion_of :value, :in => 1..4
     @m.should_not be_valid
@@ -537,14 +537,14 @@ describe Sequel::Model do
     @m.value = 0
     @m.should_not be_valid
     @m.value = 5
-    @m.should_not be_valid    
+    @m.should_not be_valid
   end
-  
+
   specify "should raise an error if inclusion_of doesn't receive a valid :in option" do
     lambda{@c.validates_inclusion_of :value}.should raise_error(ArgumentError)
     lambda{@c.validates_inclusion_of :value, :in => 1}.should raise_error(ArgumentError)
   end
-  
+
   specify "should raise an error if inclusion_of handles :allow_nil too" do
     @c.validates_inclusion_of :value, :in => 1..4, :allow_nil => true
     @m.value = nil
@@ -582,7 +582,7 @@ describe Sequel::Model do
     @m.value = 'a'
     @m.should be_valid
   end
-  
+
   specify "should validate uniqueness_of with allow_missing => true" do
     @c.validates_uniqueness_of :value, :allow_missing => true
     @m.should be_valid
@@ -597,14 +597,14 @@ describe "Superclass validations" do
       columns :value
       validates_length_of :value, :minimum => 5
     end
-    
+
     @c2 = Class.new(@c1)
     @c2.class_eval do
       columns :value
       validates_format_of :value, :with => /^[a-z]+$/
     end
   end
-  
+
   specify "should be checked when validating" do
     o = @c2.new
     o.value = 'ab'
@@ -618,7 +618,7 @@ describe "Superclass validations" do
     o.value = 'abcde'
     o.valid?.should be_true
   end
-  
+
   specify "should have skip_superclass_validations? return whether superclass validations were skipped" do
     @c2.skip_superclass_validations?.should == nil
     @c2.skip_superclass_validations
@@ -651,7 +651,7 @@ describe ".validates with block" do
         end
       end
     end
-    
+
     o = @c.new
     o.vvv = 1
     o.should be_valid
@@ -675,7 +675,7 @@ describe Sequel::Model, "Validations" do
       plugin :validation_class_methods
       columns :id, :name
     end
-    
+
     class ::Cow < Sequel::Model
       plugin :validation_class_methods
       columns :id, :name, :got_milk
@@ -685,7 +685,7 @@ describe Sequel::Model, "Validations" do
       plugin :validation_class_methods
       columns :id, :username, :password
     end
-    
+
     class ::Address < Sequel::Model
       plugin :validation_class_methods
       columns :id, :zip_code
@@ -694,39 +694,39 @@ describe Sequel::Model, "Validations" do
   after(:all) do
     [:Person, :Smurf, :Cow, :User, :Address].each{|c| Object.send(:remove_const, c)}
   end
-  
+
   it "should validate the acceptance of a column" do
     class ::Cow < Sequel::Model
       validations.clear
       validates_acceptance_of :got_milk, :accept => 'blah', :allow_nil => false
     end
-    
+
     @cow = Cow.new
     @cow.should_not be_valid
     @cow.errors.full_messages.should == ["got_milk is not accepted"]
-    
+
     @cow.got_milk = "blah"
     @cow.should be_valid
   end
-  
+
   it "should validate the confirmation of a column" do
     class ::User < Sequel::Model
       def password_confirmation
         "test"
       end
-      
+
       validations.clear
       validates_confirmation_of :password
     end
-    
+
     @user = User.new
     @user.should_not be_valid
     @user.errors.full_messages.should == ["password is not confirmed"]
-    
+
     @user.password = "test"
     @user.should be_valid
   end
-  
+
   it "should validate format of column" do
     class ::Person < Sequel::Model
       validates_format_of :first_name, :with => /^[a-zA-Z]+$/
@@ -737,7 +737,7 @@ describe Sequel::Model, "Validations" do
     @person = Person.new :first_name => "Anita"
     @person.valid?.should be_true
   end
-  
+
   it "should validate length of column" do
     class ::Person < Sequel::Model
       validations.clear
@@ -746,14 +746,14 @@ describe Sequel::Model, "Validations" do
       validates_length_of :middle_name, :within => 1..5
       validates_length_of :initials, :is => 2
     end
-    
+
     @person = Person.new(
       :first_name => "Anamethatiswaytofreakinglongandwayoverthirtycharacters",
       :last_name => "Alastnameunderthirtychars",
       :initials => "LGC",
       :middle_name => "danger"
     )
-    
+
     @person.should_not be_valid
     @person.errors.full_messages.size.should == 4
     @person.errors.full_messages.should include(
@@ -762,14 +762,14 @@ describe Sequel::Model, "Validations" do
       'middle_name is the wrong length',
       'initials is the wrong length'
     )
-    
+
     @person.first_name  = "Lancelot"
     @person.last_name   = "1234567890123456789012345678901"
     @person.initials    = "LC"
     @person.middle_name = "Will"
     @person.should be_valid
   end
-  
+
   it "should validate that a column has the correct type for the schema column" do
     p = model_class.call Sequel::Model do
       columns :age, :d
@@ -778,7 +778,7 @@ describe Sequel::Model, "Validations" do
       validates_schema_type :d, :message=>'is a bad choice'
       @db_schema = {:age=>{:type=>:integer}, :d=>{:type=>:date}}
     end
-    
+
     @person = p.new
     @person.should be_valid
 
@@ -800,29 +800,29 @@ describe Sequel::Model, "Validations" do
       validations.clear
       validates_numericality_of :age
     end
-    
+
     @person = Person.new :age => "Twenty"
     @person.should_not be_valid
     @person.errors.full_messages.should == ['age is not a number']
-    
+
     @person.age = 20
     @person.should be_valid
   end
-  
+
   it "should validate the presence of a column" do
     class ::Cow < Sequel::Model
       validations.clear
       validates_presence_of :name
     end
-    
+
     @cow = Cow.new
     @cow.should_not be_valid
     @cow.errors.full_messages.should == ['name is not present']
-    
+
     @cow.name = "Betsy"
     @cow.should be_valid
   end
- 
+
   it "should validate the uniqueness of a column" do
     class ::User < Sequel::Model
       validations.clear
@@ -842,7 +842,7 @@ describe Sequel::Model, "Validations" do
         {:id => 3, :username => "1record", :password => "test"}
       end
     end
-    
+
     @user = User.new(:username => "2records", :password => "anothertest")
     @user.should_not be_valid
     @user.errors.full_messages.should == ['username is already taken']
@@ -869,7 +869,7 @@ describe Sequel::Model, "Validations" do
     @user.errors.full_messages.should == []
     User.db.sqls.should == []
   end
-  
+
   it "should validate the uniqueness of multiple columns" do
     class ::User < Sequel::Model
       validations.clear
@@ -893,7 +893,7 @@ describe Sequel::Model, "Validations" do
         end
       end
     end
-    
+
     @user = User.new(:username => "2records", :password => "anothertest")
     @user.should_not be_valid
     @user.errors.full_messages.should == ['username and password is already taken']
@@ -930,7 +930,7 @@ describe Sequel::Model, "Validations" do
     @user.errors.full_messages.should == []
     User.db.sqls.should == []
   end
-  
+
   it "should have a validates block that contains multiple validations" do
     class ::Person < Sequel::Model
       validations.clear
@@ -941,10 +941,10 @@ describe Sequel::Model, "Validations" do
     end
 
     Person.validations[:first_name].size.should == 2
-    
+
     @person = Person.new :first_name => "Lancelot99"
     @person.valid?.should be_false
-    
+
     @person2 = Person.new :first_name => "Wayne"
     @person2.valid?.should be_true
   end
@@ -980,11 +980,11 @@ describe Sequel::Model, "Validations" do
     class ::Can < Sequel::Model
       validates_length_of :name, :minimum => 4
     end
-    
+
     Can.new('name' => 'ab').should_not be_valid
     Can.new('name' => 'abcd').should be_valid
   end
-  
+
 end
 
 describe "Model#save" do
@@ -1005,24 +1005,24 @@ describe "Model#save" do
     @m.should_not be_valid
     @m.save
     DB.sqls.should be_empty
-    
+
     @m.x = 7
     @m.should be_valid
     @m.save.should_not be_false
     DB.sqls.should == ['UPDATE people SET x = 7 WHERE (id = 4)']
   end
-  
+
   specify "should skip validations if the :validate=>false option is used" do
     @m.raise_on_save_failure = false
     @m.should_not be_valid
     @m.save(:validate=>false)
     DB.sqls.should == ['UPDATE people SET x = 6 WHERE (id = 4)']
   end
-    
+
   specify "should raise error if validations fail and raise_on_save_faiure is true" do
     proc{@m.save}.should raise_error(Sequel::ValidationFailed)
   end
-  
+
   specify "should return nil if validations fail and raise_on_save_faiure is false" do
     @m.raise_on_save_failure = false
     @m.save.should == nil

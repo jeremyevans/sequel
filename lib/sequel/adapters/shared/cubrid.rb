@@ -163,7 +163,7 @@ module Sequel
         true
       end
     end
-    
+
     module DatasetMethods
       SELECT_CLAUSE_METHODS = Sequel::Dataset.clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
       LIMIT = Sequel::Dataset::LIMIT
@@ -199,7 +199,7 @@ module Sequel
       def literal_true
         BOOL_TRUE
       end
-     
+
       # CUBRID doesn't support CTEs or FOR UPDATE.
       def select_clause_methods
         SELECT_CLAUSE_METHODS

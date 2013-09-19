@@ -19,7 +19,7 @@ module Sequel
     #
     #   Album.create(:name=>'abc')
     #   # raises Sequel::ValidationFailed: name is shorter than 5 characters
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclasses use constraint validations (called before loading subclasses)
@@ -56,7 +56,7 @@ module Sequel
           end
           if vos = opts[:validation_options]
             vos.each do |k, v|
-              if existing_options = @constraint_validation_options[k]       
+              if existing_options = @constraint_validation_options[k]
                 v = existing_options.merge(v)
               end
               @constraint_validation_options[k] = v
@@ -170,7 +170,7 @@ module Sequel
           if arg
             a << arg
             reflection_opts = reflection_opts.merge(:argument=>arg)
-          end 
+          end
           a << column
           unless opts.empty?
             a << opts

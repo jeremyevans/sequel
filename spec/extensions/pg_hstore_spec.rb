@@ -77,7 +77,7 @@ describe "pg_hstore extension" do
     k = nil
     Sequel.hstore('foo2'=>'bar').fetch(:foo){|key| k = key }.should == 'foo'
     k.should == 'foo'
-    
+
     Sequel.hstore('foo'=>'bar').has_key?(:foo).should be_true
     Sequel.hstore('foo'=>'bar').has_key?(:bar).should be_false
     Sequel.hstore('foo'=>'bar').key?(:foo).should be_true
@@ -193,11 +193,11 @@ describe "pg_hstore extension" do
     proc{@db.typecast_value(:hstore, [])}.should raise_error(Sequel::InvalidValue)
   end
 
-  it "should be serializable" do 
+  it "should be serializable" do
     v = Sequel.hstore('foo'=>'bar')
-    dump = Marshal.dump(v) 
-    Marshal.load(dump).should == v    
-  end 
+    dump = Marshal.dump(v)
+    Marshal.load(dump).should == v
+  end
 
   it "should return correct results for Database#schema_type_class" do
     @db.schema_type_class(:hstore).should == Sequel::Postgres::HStore

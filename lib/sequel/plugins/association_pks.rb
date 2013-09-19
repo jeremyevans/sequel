@@ -34,7 +34,7 @@ module Sequel
       module ClassMethods
         private
 
-        # Define a association_pks method using the block for the association reflection 
+        # Define a association_pks method using the block for the association reflection
         def def_association_pks_getter(opts, &block)
           association_module_def(:"#{singularize(opts[:name])}_pks", opts, &block)
         end

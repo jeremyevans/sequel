@@ -6,12 +6,12 @@ describe "LooserTypecasting Extension" do
     def @db.supports_schema_parsing?() true end
     def @db.schema(*args)
       [[:id, {}], [:z, {:type=>:float}], [:b, {:type=>:integer}], [:d, {:type=>:decimal}], [:s, {:type=>:string}]]
-    end 
+    end
     @c = Class.new(Sequel::Model(@db[:items]))
     @db.extension(:looser_typecasting)
     @c.instance_eval do
-      @columns = [:id, :b, :z, :d, :s] 
-      def columns; @columns; end 
+      @columns = [:id, :b, :z, :d, :s]
+      def columns; @columns; end
     end
   end
 

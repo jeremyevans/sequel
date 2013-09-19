@@ -4,7 +4,7 @@ module Sequel
   module OpenBase
     class Database < Sequel::Database
       set_adapter_scheme :openbase
-      
+
       def connect(server)
         opts = server_opts(server)
         OpenBase.new(
@@ -18,7 +18,7 @@ module Sequel
       def disconnect_connection(c)
         c.disconnect
       end
-      
+
       def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           r = log_yield(sql){conn.execute(sql)}
@@ -27,12 +27,12 @@ module Sequel
         end
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
 
       Database::DatasetClass = self
-      
+
       def fetch_rows(sql)
         execute(sql) do |result|
           begin
@@ -48,9 +48,9 @@ module Sequel
         end
         self
       end
-      
+
       private
-      
+
       def select_clause_methods
         SELECT_CLAUSE_METHODS
       end

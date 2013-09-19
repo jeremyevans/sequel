@@ -17,7 +17,7 @@ module Sequel
     #   Album.filter{id<100}.all do |a|
     #     a.artists
     #   end
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances use tactical eager loading (called before loading subclasses)

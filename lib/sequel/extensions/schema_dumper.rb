@@ -98,9 +98,9 @@ END_MIG
     end
 
     private
-        
+
     # If a database default exists and can't be converted, and we are dumping with :same_db,
-    # return a string with the inspect method modified a literal string is created if the code is evaled.  
+    # return a string with the inspect method modified a literal string is created if the code is evaled.
     def column_schema_to_ruby_default_fallback(default, options)
       if default.is_a?(String) && options[:same_db] && use_column_schema_to_ruby_default_fallback?
         default = default.dup
@@ -237,7 +237,7 @@ END_MIG
 
       if options[:foreign_keys] != false && supports_foreign_key_parsing?
         fk_list = foreign_key_list(table)
-        
+
         if (sfk = options[:skipped_foreign_keys]) && (sfkt = sfk[table])
           fk_list.delete_if{|fk| sfkt.has_key?(fk[:columns])}
         end
@@ -284,7 +284,7 @@ END_MIG
       gen.dump_indexes(meth=>table, :ignore_errors=>!options[:same_db])
     end
 
-    # Convert the parsed index information into options to the Generators index method. 
+    # Convert the parsed index information into options to the Generators index method.
     def index_to_generator_opts(table, name, index_opts, options=OPTS)
       h = {}
       if options[:index_names] != false && default_index_name(table, index_opts[:columns]) != name.to_s
@@ -322,7 +322,7 @@ END_MIG
     def sort_dumped_tables_topologically(table_fks, sorted_tables)
       skipped_foreign_keys = {}
 
-      until table_fks.empty? 
+      until table_fks.empty?
         this_loop = []
 
         table_fks.each do |table, fks|
@@ -351,7 +351,7 @@ END_MIG
 
       [sorted_tables, skipped_foreign_keys]
     end
-    
+
     # Don't use a literal string fallback on MySQL, since the defaults it uses aren't
     # valid literal SQL values.
     def use_column_schema_to_ruby_default_fallback?
@@ -455,7 +455,7 @@ END_MIG
       def opts_inspect(opts)
         if opts[:default]
           opts = opts.dup
-          de = Sequel.eval_inspect(opts.delete(:default)) 
+          de = Sequel.eval_inspect(opts.delete(:default))
           ", :default=>#{de}#{", #{opts.inspect[1...-1]}" if opts.length > 0}"
         else
           ", #{opts.inspect[1...-1]}" if opts.length > 0

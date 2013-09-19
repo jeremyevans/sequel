@@ -146,4 +146,4 @@ describe Sequel::Model::DatasetMethods  do
     @c.no_primary_key
     proc{@c.paged_each{|r| }}.should raise_error(Sequel::Error)
   end
-end 
+end
