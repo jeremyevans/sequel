@@ -1692,7 +1692,7 @@ module Sequel
 
   # +LiteralString+ is used to represent literal SQL expressions. A 
   # +LiteralString+ is copied verbatim into an SQL statement. Instances of
-  # +LiteralString+ can be created by calling <tt>String#lit</tt>.
+  # +LiteralString+ can be created by calling <tt>Sequel.lit</tt>.
   class LiteralString
     include SQL::OrderMethods
     include SQL::ComplexExpressionMethods
