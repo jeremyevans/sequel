@@ -29,7 +29,7 @@ module Sequel
       def auto_vacuum
         AUTO_VACUUM[pragma_get(:auto_vacuum).to_i]
       end
-      
+
       # Set the auto_vacuum PRAGMA using the given symbol (:none, :full, or
       # :incremental).  See pragma_set.  Consider using the :auto_vacuum
       # Database option instead.
@@ -61,13 +61,13 @@ module Sequel
       def database_type
         :sqlite
       end
-      
+
       # Boolean signifying the value of the foreign_keys PRAGMA, or nil
       # if not using SQLite 3.6.19+.
       def foreign_keys
         pragma_get(:foreign_keys).to_i == 1 if sqlite_version >= 30619
       end
-      
+
       # Set the foreign_keys PRAGMA using the given boolean value, if using
       # SQLite 3.6.19+.  If not using 3.6.19+, no error is raised. See pragma_set.
       # Consider using the :foreign_keys Database option instead.
@@ -110,7 +110,7 @@ module Sequel
       def pragma_get(name)
         self["PRAGMA #{name}"].single_value
       end
-      
+
       # Set the value of the given PRAGMA to value.
       #
       # This method is not thread safe, and will not work correctly if there
@@ -125,7 +125,7 @@ module Sequel
       def set_integer_booleans
         @integer_booleans = @opts.has_key?(:integer_booleans) ? typecast_value_boolean(@opts[:integer_booleans]) : true
       end
-      
+
       # The version of the server as an integer, where 3.6.19 = 30619.
       # If the server version can't be determined, 0 is used.
       def sqlite_version
@@ -137,12 +137,12 @@ module Sequel
           0
         end
       end
-      
+
       # SQLite supports CREATE TABLE IF NOT EXISTS syntax since 3.3.0.
       def supports_create_table_if_not_exists?
         sqlite_version >= 30300
       end
-      
+
       # SQLite 3.6.19+ supports deferrable foreign key constraints.
       def supports_deferrable_foreign_key_constraints?
         sqlite_version >= 30619
@@ -153,7 +153,7 @@ module Sequel
         sqlite_version >= 30800
       end
 
-      # SQLite 3.6.8+ supports savepoints. 
+      # SQLite 3.6.8+ supports savepoints.
       def supports_savepoints?
         sqlite_version >= 30608
       end
@@ -175,14 +175,14 @@ module Sequel
       def synchronous
         SYNCHRONOUS[pragma_get(:synchronous).to_i]
       end
-      
+
       # Set the synchronous PRAGMA using the given symbol (:off, :normal, or :full). See pragma_set.
       # Consider using the :synchronous Database option instead.
       def synchronous=(value)
         value = SYNCHRONOUS.index(value) || (raise Error, "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
         pragma_set(:synchronous, value)
       end
-      
+
       # Array of symbols specifying the table names in the current database.
       #
       # Options:
@@ -190,19 +190,19 @@ module Sequel
       def tables(opts=OPTS)
         tables_and_views(TABLES_FILTER, opts)
       end
-      
+
       # A symbol signifying the value of the temp_store PRAGMA.
       def temp_store
         TEMP_STORE[pragma_get(:temp_store).to_i]
       end
-      
+
       # Set the temp_store PRAGMA using the given symbol (:default, :file, or :memory). See pragma_set.
       # Consider using the :temp_store Database option instead.
       def temp_store=(value)
         value = TEMP_STORE.index(value) || (raise Error, "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
         pragma_set(:temp_store, value)
       end
-      
+
       # Array of symbols specifying the view names in the current database.
       #
       # Options:
@@ -218,7 +218,7 @@ module Sequel
       def apply_alter_table(table, ops)
         fks = foreign_keys
         self.foreign_keys = false if fks
-        transaction do 
+        transaction do
           if ops.length > 1 && ops.all?{|op| op[:op] == :add_constraint}
             # If you are just doing constraints, apply all of them at the same time,
             # as otherwise all but the last one get lost.
@@ -301,13 +301,13 @@ module Sequel
       def column_definition_default_sql(sql, column)
         sql << " DEFAULT (#{literal(column[:default])})" if column.include?(:default)
       end
-    
+
       # Add null/not null SQL fragment to column creation SQL.
       def column_definition_null_sql(sql, column)
         column = column.merge(:null=>false) if column[:primary_key]
         super(sql, column)
       end
-    
+
       # Array of PRAGMA SQL statements based on the Database options that should be applied to
       # new connections.
       def connection_pragmas
@@ -379,7 +379,7 @@ module Sequel
           if ocp = opts[:old_columns_proc]
             fks.delete_if{|c| ocp.call(c[:columns].dup) != c[:columns]}
           end
-          
+
           # Skip any foreign key columns where a constraint for those
           # foreign keys is being dropped.
           if sfkc = opts[:skip_foreign_key_columns]
@@ -413,12 +413,12 @@ module Sequel
       def identifier_input_method_default
         nil
       end
-      
+
       # SQLite folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
       def identifier_output_method_default
         nil
       end
-      
+
       # Does the reverse of on_delete_clause, eg. converts strings like +'SET NULL'+
       # to symbols +:set_null+.
       def on_delete_sql_to_sym str
@@ -449,7 +449,7 @@ module Sequel
           row
         end
       end
-      
+
       # SQLite treats integer primary keys as autoincrementing (alias of rowid).
       def schema_autoincrementing_primary_key?(schema)
         super && schema[:db_type].downcase == 'integer'
@@ -463,7 +463,7 @@ module Sequel
           [m.call(row.delete(:name)), row]
         end
       end
-      
+
       # Backbone of the tables and views support.
       def tables_and_views(filter, opts)
         m = output_identifier_meth
@@ -477,7 +477,7 @@ module Sequel
         column[:auto_increment] ? :integer : super
       end
     end
-    
+
     # Instance methods for datasets that connect to an SQLite database
     module DatasetMethods
       include Dataset::Replace
@@ -540,7 +540,7 @@ module Sequel
           super
         end
       end
-      
+
       # SQLite has CURRENT_TIMESTAMP and related constants in UTC instead
       # of in localtime, so convert those constants to local time.
       def constant_sql_append(sql, constant)
@@ -550,14 +550,14 @@ module Sequel
           super
         end
       end
-      
+
       # SQLite performs a TRUNCATE style DELETE if no filter is specified.
       # Since we want to always return the count of records, add a condition
       # that is always true and then delete.
       def delete
         @opts[:where] ? super : where(1=>1).delete
       end
-      
+
       # Return an array of strings specifying a query explanation for a SELECT of the
       # current dataset. Currently, the options are ignore, but it accepts options
       # to be compatible with other adapters.
@@ -569,18 +569,18 @@ module Sequel
         rows = ds.all
         Sequel::PrettyTable.string(rows, ds.columns)
       end
-      
+
       # HAVING requires GROUP BY on SQLite
       def having(*cond)
         raise(InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]
         super
       end
-      
+
       # SQLite uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
         sql << BACKTICK << c.to_s.gsub(BACKTICK_RE, DOUBLE_BACKTICK) << BACKTICK
       end
-      
+
       # When a qualified column is selected on SQLite and the qualifier
       # is a subselect, the column name used is the full qualified name
       # (including the qualifier) instead of just the column name.  To
@@ -592,7 +592,7 @@ module Sequel
           super
         end
       end
-      
+
       # SQLite does not support INTERSECT ALL or EXCEPT ALL
       def supports_intersect_except_all?
         false
@@ -602,12 +602,12 @@ module Sequel
       def supports_is_true?
         false
       end
-      
+
       # SQLite does not support multiple columns for the IN/NOT IN operators
       def supports_multiple_column_in?
         false
       end
-      
+
       # SQLite supports timezones in literal timestamps, since it stores them
       # as text.  But using timezones in timestamps breaks SQLite datetime
       # functions, so we allow the user to override the default per database.
@@ -619,9 +619,9 @@ module Sequel
       def supports_where_true?
         false
       end
-      
+
       private
-      
+
       # SQLite uses string literals instead of identifiers in AS clauses.
       def as_sql_append(sql, aliaz)
         aliaz = aliaz.value if aliaz.is_a?(SQL::Identifier)
@@ -650,7 +650,7 @@ module Sequel
       def identifier_list(columns)
         columns.map{|i| quote_identifier(i)}.join(COMMA)
       end
-    
+
       # SQLite uses a preceding X for hex escaping strings
       def literal_blob_append(sql, v)
         sql << BLOB_START << v.unpack(HSTAR).first << APOS
@@ -670,7 +670,7 @@ module Sequel
       def select_clause_methods
         SELECT_CLAUSE_METHODS
       end
-      
+
       # SQLite does not support FOR UPDATE, but silently ignore it
       # instead of raising an error for compatibility with other
       # databases.

@@ -5,7 +5,7 @@ module Sequel
     # These methods all return booleans, with most describing whether or not the
     # database supprots a given feature.
     # ---------------------
-    
+
     # Whether the database uses a global namespace for the index.  If
     # false, the indexes are going to be namespaced per table.
     def global_index_namespace?

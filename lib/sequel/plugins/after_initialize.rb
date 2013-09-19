@@ -26,7 +26,7 @@ module Sequel
           super
           after_initialize
         end
-       
+
         # An empty after_initialize hook, so that plugins that use this
         # can always call super to get the default behavior.
         def after_initialize

@@ -4,7 +4,7 @@ describe Sequel::Model, "set_schema" do
   before do
     @model = Class.new(Sequel::Model(:items))
     @model.plugin :schema
-  end 
+  end
 
   specify "sets schema with implicit table name" do
     @model.set_schema do
@@ -93,12 +93,12 @@ describe Sequel::Model, "schema methods" do
     @model.drop_table?
     DB.sqls.should == ["SELECT NULL AS nil FROM items LIMIT 1", 'DROP TABLE items']
   end
-  
+
   it "create_table! should drop table if it exists and then create the table" do
     @model.create_table!
     DB.sqls.should == ["SELECT NULL AS nil FROM items LIMIT 1", 'DROP TABLE items', 'CREATE TABLE items ()']
   end
-  
+
   it "create_table? should not create the table if it already exists" do
     @model.should_receive(:table_exists?).and_return(true)
     @model.create_table?

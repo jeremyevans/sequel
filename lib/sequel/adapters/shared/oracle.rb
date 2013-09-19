@@ -41,15 +41,15 @@ module Sequel
         metadata_dataset.from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'TABLE').map{|r| m.call(r[:tname])}
       end
 
-      def views(opts=OPTS) 
+      def views(opts=OPTS)
         m = output_identifier_meth
         metadata_dataset.from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'VIEW').map{|r| m.call(r[:tname])}
-      end 
- 
-      def view_exists?(name) 
+      end
+
+      def view_exists?(name)
         m = input_identifier_meth
-        metadata_dataset.from(:tab).filter(:tname =>m.call(name), :tabtype => 'VIEW').count > 0 
-      end 
+        metadata_dataset.from(:tab).filter(:tname =>m.call(name), :tabtype => 'VIEW').count > 0
+      end
 
       # Oracle supports deferrable constraints.
       def supports_deferrable_constraints?
@@ -166,7 +166,7 @@ module Sequel
         @primary_key_sequences.delete(table)
         super
       end
-      
+
       TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>'READ COMMITTED'.freeze,
         :committed=>'READ COMMITTED'.freeze,
         :repeatable=>'SERIALIZABLE'.freeze,
@@ -176,7 +176,7 @@ module Sequel
       def set_transaction_isolation_sql(level)
         "SET TRANSACTION ISOLATION LEVEL #{TRANSACTION_ISOLATION_LEVELS[level]}"
       end
-    
+
       def sequence_for_table(table)
         return nil unless autosequence
         @primary_key_sequences.fetch(table) do |key|
@@ -299,7 +299,7 @@ module Sequel
           super
         end
       end
-      
+
       # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
       def except(dataset, opts=OPTS)
         raise(Sequel::Error, "EXCEPT ALL not supported") if opts[:all]
@@ -363,17 +363,17 @@ module Sequel
       def supports_is_true?
         false
       end
-      
+
       # Oracle does not support SELECT *, column
       def supports_select_all_and_column?
         false
       end
-      
+
       # Oracle supports timezones in literal timestamps.
       def supports_timestamp_timezones?
         true
       end
-      
+
       # Oracle does not support WHERE 'Y' for WHERE TRUE.
       def supports_where_true?
         false

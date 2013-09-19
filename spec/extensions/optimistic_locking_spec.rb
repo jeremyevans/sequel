@@ -52,14 +52,14 @@ describe "optimistic_locking plugin" do
     p2 = @c[1]
     p1.update(:name=>'Jim')
     proc{p2.update(:name=>'Bob')}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
-  end 
+  end
 
   specify "should raise an error when destroying a stale record" do
     p1 = @c[1]
     p2 = @c[1]
     p1.update(:name=>'Jim')
     proc{p2.destroy}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
-  end 
+  end
 
   specify "should not raise an error when updating the same record twice" do
     p1 = @c[1]

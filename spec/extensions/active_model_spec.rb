@@ -46,7 +46,7 @@ describe "ActiveModel plugin" do
       def test__to_model
         assert_equal @m.to_model.object_id.should, @m.object_id
       end
-      
+
       def test__to_key
         assert_equal nil, @m.to_key
         @o.id = 1
@@ -64,7 +64,7 @@ describe "ActiveModel plugin" do
         @o.id = nil
         assert_equal nil, @o.to_key
       end
-      
+
       def test__to_param
         assert_equal nil, @m.to_param
         @o.id = 1
@@ -92,7 +92,7 @@ describe "ActiveModel plugin" do
         assert_equal 'am_lint_tests/am_lint_test', @m.to_partial_path
         assert_equal 'blog/posts/post', Blog::Post.new.to_partial_path
       end
-      
+
     end
     if defined?(MiniTest::Unit)
       tc.instance_methods.map{|x| x.to_s}.reject{|n| n !~ /\Atest_/}.each do |m|
@@ -110,5 +110,5 @@ describe "ActiveModel plugin" do
       res.failure_count.should == 0
     end
   end
-end 
+end
 end

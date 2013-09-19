@@ -22,7 +22,7 @@ module Sequel
 
       # Delegate to the db's #_execute method.
       def execute(sql)
-        @db.send(:_execute, self, sql, :log=>false) 
+        @db.send(:_execute, self, sql, :log=>false)
       end
     end
 
@@ -143,7 +143,7 @@ module Sequel
       # the appropriate value using either the #autoid, #fetch, or
       # #numrows methods.
       def execute(sql, opts=OPTS, &block)
-        synchronize(opts[:server]){|c| _execute(c, sql, opts, &block)} 
+        synchronize(opts[:server]){|c| _execute(c, sql, opts, &block)}
       end
       alias execute_ddl execute
 
@@ -191,7 +191,7 @@ module Sequel
         sql += " -- #{@opts[:append]}" if @opts[:append]
         sql += " -- #{c.server.is_a?(Symbol) ? c.server : c.server.inspect}" if c.server != :default
         log_info(sql) unless opts[:log] == false
-        @sqls << sql 
+        @sqls << sql
 
         ds = opts[:dataset]
         begin

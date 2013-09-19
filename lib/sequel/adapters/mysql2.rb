@@ -10,7 +10,7 @@ module Sequel
       include Sequel::MySQL::PreparedStatements::DatabaseMethods
 
       set_adapter_scheme :mysql2
-      
+
       # Whether to convert tinyint columns to bool for this database
       attr_accessor :convert_tinyint_to_bool
 

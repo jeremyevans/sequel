@@ -11,8 +11,8 @@ module Sequel
       # ORA-01012: not logged on
       # ORA-03113: end-of-file on communication channel
       # ORA-03114: not connected to ORACLE
-      CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ]      
-      
+      CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ]
+
       ORACLE_TYPES = {
         :blob=>lambda{|b| Sequel::SQL::Blob.new(b.read)},
         :clob=>lambda{|b| b.read}
@@ -35,7 +35,7 @@ module Sequel
         end
         conn.autocommit = true
         conn.non_blocking = true
-        
+
         # The ruby-oci8 gem which retrieves oracle columns with a type of
         # DATE, TIMESTAMP, TIMESTAMP WITH TIME ZONE is complex based on the
         # ruby version (1.9.2 or later) and Oracle version (9 or later)
@@ -46,12 +46,12 @@ module Sequel
         if Sequel.application_timezone == :utc
           conn.exec("ALTER SESSION SET TIME_ZONE='-00:00'")
         end
-        
+
         class << conn
           attr_reader :prepared_statements
         end
         conn.instance_variable_set(:@prepared_statements, {})
-        
+
         conn
       end
 
@@ -214,7 +214,7 @@ module Sequel
         log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
         set_transaction_isolation(conn, opts)
       end
-      
+
       def commit_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
@@ -222,7 +222,7 @@ module Sequel
       def disconnect_error?(e, opts)
         super || (e.is_a?(::OCIError) && CONNECTION_ERROR_CODES.include?(e.code))
       end
-      
+
       def oracle_column_type(h)
         case h[:oci8_type]
         when :number
@@ -246,7 +246,7 @@ module Sequel
       ensure
         super
       end
-      
+
       def rollback_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
@@ -309,28 +309,28 @@ module Sequel
         table_schema
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include DatasetMethods
 
       Database::DatasetClass = self
 
       PREPARED_ARG_PLACEHOLDER = ':'.freeze
-      
+
       # Oracle already supports named bind arguments, so use directly.
       module ArgumentMapper
         include Sequel::Dataset::ArgumentMapper
-        
+
         protected
-        
+
         # Return a hash with the same values as the given hash,
         # but with the keys converted to strings.
         def map_to_prepared_args(bind_vars)
           prepared_args.map{|v, t| [bind_vars[v], t]}
         end
-        
+
         private
-        
+
         # Oracle uses a : before the name of the argument for named
         # arguments.
         def prepared_arg(k)
@@ -345,25 +345,25 @@ module Sequel
           true
         end
       end
-      
+
       # Oracle prepared statement uses a new prepared statement each time
       # it is called, but it does use the bind arguments.
       module BindArgumentMethods
         include ArgumentMapper
 
         private
-        
+
         # Run execute_select on the database with the given SQL and the stored
         # bind arguments.
         def execute(sql, opts=OPTS, &block)
           super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
-        
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts=OPTS, &block)
           super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
-        
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_insert(sql, opts=OPTS, &block)
           super(prepared_sql, {:arguments=>bind_arguments}.merge(opts), &block)
@@ -372,33 +372,33 @@ module Sequel
 
       module PreparedStatementMethods
         include BindArgumentMethods
-          
+
         private
-          
+
         # Execute the stored prepared statement name and the stored bind
         # arguments instead of the SQL given.
         def execute(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
-         
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
-          
+
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_insert(sql, opts=OPTS, &block)
           super(prepared_statement_name, opts, &block)
         end
       end
-        
+
       # Execute the given type of statement with the hash of values.
       def call(type, bind_vars={}, *values, &block)
         ps = to_prepared_statement(type, values)
         ps.extend(BindArgumentMethods)
         ps.call(bind_vars, &block)
       end
-      
+
       def fetch_rows(sql)
         execute(sql) do |cursor|
           cps = db.conversion_procs
@@ -427,7 +427,7 @@ module Sequel
         end
         ps
       end
-      
+
       # Oracle requires type specifiers for placeholders, at least
       # if you ever want to use a nil/NULL value as the value for
       # the placeholder.

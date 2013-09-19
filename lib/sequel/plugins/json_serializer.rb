@@ -22,7 +22,7 @@ module Sequel
     #   album.to_json(:include=>:artist)
     #   # => '{"json_class":"Album","id":1,"name":"RF","artist_id":2,
     #          "artist":{"json_class":"Artist","id":2,"name":"YJM"}}'
-    # 
+    #
     # You can use a hash value with <tt>:include</tt> to pass options
     # to associations:
     #
@@ -116,7 +116,7 @@ module Sequel
           @json_serializer_opts = (@json_serializer_opts || {}).merge(opts)
         end
       end
-      
+
       # Helper class used for making sure that cascading options
       # for model associations works correctly.  Cascaded options
       # work by creating instances of this class, which take a
@@ -126,7 +126,7 @@ module Sequel
         def initialize(json)
           @json = json
         end
-        
+
         # Return the literal JSON to use
         def to_json(*a)
           @json
@@ -181,7 +181,7 @@ module Sequel
 
         # Using the provided hash, update the instance with data contained in the hash. By default, just
         # calls set with the hash values.
-        # 
+        #
         # Options:
         # :associations :: Indicates that the associations cache should be updated by creating
         #                  a new associated object using data from the hash.  Should be a Symbol
@@ -328,7 +328,7 @@ module Sequel
             true
           end
 
-          res = if row_proc 
+          res = if row_proc
             array = if opts[:array]
               opts = opts.dup
               opts.delete(:array)

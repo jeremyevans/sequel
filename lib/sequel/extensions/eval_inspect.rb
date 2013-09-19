@@ -139,7 +139,7 @@ module Sequel
       # JoinOnClause's initializer takes the on argument as the first argument
       # instead of the last.
       def inspect_args
-        [:on, :join_type, :table, :table_alias] 
+        [:on, :join_type, :table, :table_alias]
       end
     end
 
@@ -149,7 +149,7 @@ module Sequel
       # JoinOnClause's initializer takes the using argument as the first argument
       # instead of the last.
       def inspect_args
-        [:using, :join_type, :table, :table_alias] 
+        [:using, :join_type, :table, :table_alias]
       end
     end
 
@@ -168,7 +168,7 @@ module Sequel
 
       # A hash of null information suitable for passing to the initializer.
       def opts_hash
-        {:nulls=>nulls} 
+        {:nulls=>nulls}
       end
     end
   end

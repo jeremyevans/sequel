@@ -13,14 +13,14 @@ module Sequel
 
   # Alias for HookFailed, kept for backwards compatibility
   BeforeHookFailed = HookFailed
-  
+
   # Exception class raised when +require_modification+ is set and an UPDATE or DELETE statement to modify the dataset doesn't
   # modify a single row.
   class NoExistingObject < Error; end
-  
+
   # Raised when an undefined association is used when eager loading.
   class UndefinedAssociation < Error; end
-  
+
   # Exception class raised when +raise_on_save_failure+ is set and validation fails
   class ValidationFailed < Error
     # The Sequel::Model object related to this exception.

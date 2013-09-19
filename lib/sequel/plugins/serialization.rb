@@ -69,7 +69,7 @@ module Sequel
           @serialization_map = {}
         end
       end
-      
+
       # Automatically call serialize_attributes with the format and columns unless
       # no columns were provided.
       def self.configure(model, format=nil, *columns)
@@ -112,7 +112,7 @@ module Sequel
         attr_accessor :serialization_module
 
         Plugins.inherited_instance_variables(self, :@deserialization_map=>:dup, :@serialization_map=>:dup)
-        
+
         # Create instance level reader that deserializes column values on request,
         # and instance level writer that stores new deserialized values.
         def serialize_attributes(format, *columns)
@@ -125,7 +125,7 @@ module Sequel
           raise(Error, "No columns given.  The serialization plugin requires you specify which columns to serialize") if columns.empty?
           define_serialized_attribute_accessor(serializer, deserializer, *columns)
         end
-        
+
         # The columns that will be serialized.  This is only for
         # backwards compatibility, use serialization_map in new code.
         def serialized_columns
@@ -142,7 +142,7 @@ module Sequel
             columns.each do |column|
               m.serialization_map[column] = serializer
               m.deserialization_map[column] = deserializer
-              define_method(column) do 
+              define_method(column) do
                 if deserialized_values.has_key?(column)
                   deserialized_values[column]
                 elsif frozen?
@@ -151,7 +151,7 @@ module Sequel
                   deserialized_values[column] = deserialize_value(column, super())
                 end
               end
-              define_method("#{column}=") do |v| 
+              define_method("#{column}=") do |v|
                 changed_columns << column unless changed_columns.include?(column)
                 deserialized_values[column] = v
               end
@@ -166,7 +166,7 @@ module Sequel
           serialize_deserialized_values
           super
         end
-        
+
         # Hash of deserialized values, used as a cache.
         def deserialized_values
           @deserialized_values ||= {}

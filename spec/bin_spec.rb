@@ -43,7 +43,7 @@ describe "bin/sequel" do
   after(:all) do
     File.delete(OUTPUT) if File.file?(OUTPUT)
   end
-  
+
   it "-h should print the help" do
     help = bin(:args=>"-h", :no_conn=>true)
     help.should =~ /\ASequel: The Database Toolkit for Ruby/
@@ -110,10 +110,10 @@ Sequel.migration do
       primary_key :a
       String :name, :size=>255
     end
-    
+
     create_table(:b, :ignore_index_errors=>true) do
       foreign_key :a, :a
-      
+
       index [:a]
     end
   end
@@ -126,10 +126,10 @@ Sequel.migration do
       primary_key :a
       column :name, "varchar(255)"
     end
-    
+
     create_table(:b) do
       foreign_key :a, :a
-      
+
       index [:a]
     end
   end

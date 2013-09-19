@@ -13,7 +13,7 @@ module Sequel
     # on datasets, so it updates all related rows in a single query, using
     # the SQL standard CURRENT_TIMESTAMP.  Both of these can be overridden
     # easily if necessary.
-    # 
+    #
     # Usage:
     #
     #   # Allow touching of all model instances (called before loading subclasses)

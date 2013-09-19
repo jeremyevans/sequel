@@ -4,7 +4,7 @@ describe "DB#create_table" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should accept the table name" do
     @db.create_table(:cats) {}
     @db.sqls.should == ['CREATE TABLE cats ()']
@@ -28,7 +28,7 @@ describe "DB#create_table" do
     @db.create_table(:cats){Integer :a}
     @db.instance_variable_get(:@schemas).should be_empty
   end
-  
+
   specify "should accept multiple columns" do
     @db.create_table(:cats) do
       column :id, :integer
@@ -36,7 +36,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ['CREATE TABLE cats (id integer, name text)']
   end
-  
+
   specify "should accept method calls as data types" do
     @db.create_table(:cats) do
       integer :id
@@ -44,7 +44,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ['CREATE TABLE cats (id integer, name text)']
   end
-  
+
   specify "should transform types given as ruby classes to database-specific types" do
     @db.create_table(:cats) do
       String :a
@@ -136,7 +136,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer DEFAULT 123, name text DEFAULT 'abc''def')"]
   end
-  
+
   specify "should accept not null definition" do
     @db.create_table(:cats) do
       integer :id
@@ -145,7 +145,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer, name text NOT NULL, name2 text NOT NULL)"]
   end
-  
+
   specify "should accept null definition" do
     @db.create_table(:cats) do
       integer :id
@@ -154,7 +154,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer, name text NULL, name2 text NULL)"]
   end
-  
+
   specify "should accept unique definition" do
     @db.create_table(:cats) do
       integer :id
@@ -162,14 +162,14 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer, name text UNIQUE)"]
   end
-  
+
   specify "should allow naming unique constraint with :unique_constraint_name option" do
     @db.create_table(:cats) do
       text :name, :unique => true, :unique_constraint_name=>:foo
     end
     @db.sqls.should == ["CREATE TABLE cats (name text CONSTRAINT foo UNIQUE)"]
   end
-  
+
   specify "should handle not deferred unique constraints" do
     @db.create_table(:cats) do
       integer :id
@@ -178,7 +178,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer, name text, UNIQUE (name) NOT DEFERRABLE)"]
   end
-  
+
   specify "should handle deferred unique constraints" do
     @db.create_table(:cats) do
       integer :id
@@ -187,7 +187,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer, name text, UNIQUE (name) DEFERRABLE INITIALLY DEFERRED)"]
   end
-  
+
   specify "should handle deferred initially immediate unique constraints" do
     @db.create_table(:cats) do
       integer :id
@@ -196,21 +196,21 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer, name text, UNIQUE (name) DEFERRABLE INITIALLY IMMEDIATE)"]
   end
-  
+
   specify "should accept unsigned definition" do
     @db.create_table(:cats) do
       integer :value, :unsigned => true
     end
     @db.sqls.should == ["CREATE TABLE cats (value integer UNSIGNED)"]
   end
-  
+
   specify "should accept [SET|ENUM](...) types" do
     @db.create_table(:cats) do
       set :color, :elements => ['black', 'tricolor', 'grey']
     end
     @db.sqls.should == ["CREATE TABLE cats (color set('black', 'tricolor', 'grey'))"]
   end
-  
+
   specify "should accept varchar size" do
     @db.create_table(:cats) do
       varchar :name
@@ -221,7 +221,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (name varchar(51))"]
   end
-  
+
   specify "should use double precision for double type" do
     @db.create_table(:cats) do
       double :name
@@ -249,18 +249,18 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer DEFAULT 3 REFERENCES projects)"]
   end
-  
+
   specify "should allowing naming foreign key constraint with :foreign_key_constraint_name option" do
     @db.create_table(:cats) do
       foreign_key :project_id, :projects, :foreign_key_constraint_name=>:foo
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer CONSTRAINT foo REFERENCES projects)"]
   end
-  
+
   specify "should raise an error if the table argument to foreign_key isn't a hash, symbol, or nil" do
     proc{@db.create_table(:cats){foreign_key :project_id, Object.new, :default=>3}}.should raise_error(Sequel::Error)
   end
-  
+
   specify "should accept foreign keys with arbitrary keys" do
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :key => :id
@@ -272,7 +272,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects(zzz))"]
   end
-  
+
   specify "should accept foreign keys with ON DELETE clause" do
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_delete => :restrict
@@ -336,7 +336,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE SET DEFAULT FOO)"]
   end
-  
+
   specify "should accept foreign keys with deferrable option" do
     @db.create_table(:cats) do
       foreign_key :project_id, :projects, :deferrable=>true
@@ -357,14 +357,14 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_id_index ON cats (id)"]
   end
-  
+
   specify "should accept inline index definition with a hash of options" do
     @db.create_table(:cats) do
       integer :id, :index => {:unique=>true}
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE UNIQUE INDEX cats_id_index ON cats (id)"]
   end
-  
+
   specify "should accept inline index definition for foreign keys" do
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_delete => :cascade, :index => true
@@ -372,7 +372,7 @@ describe "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON DELETE CASCADE)",
       "CREATE INDEX cats_project_id_index ON cats (project_id)"]
   end
-  
+
   specify "should accept inline index definition for foreign keys with a hash of options" do
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_delete => :cascade, :index => {:unique=>true}
@@ -380,7 +380,7 @@ describe "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON DELETE CASCADE)",
       "CREATE UNIQUE INDEX cats_project_id_index ON cats (project_id)"]
   end
-  
+
   specify "should accept index definitions" do
     @db.create_table(:cats) do
       integer :id
@@ -407,7 +407,7 @@ describe "DB#create_table" do
   end
 
   specify "should raise an error if partial indexes are not supported" do
-    proc do 
+    proc do
       @db.create_table(:cats) do
         integer :id
         index :id, :where=>proc{id > 1}
@@ -476,7 +476,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_id_index ON cats (id)", "CREATE INDEX cats_name_index ON cats (name)"]
   end
-  
+
   specify "should accept functional indexes" do
     @db.create_table(:cats) do
       integer :id
@@ -484,7 +484,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_lower_name__index ON cats (lower(name))"]
   end
-  
+
   specify "should accept indexes with identifiers" do
     @db.create_table(:cats) do
       integer :id
@@ -492,7 +492,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_lower__name_index ON cats (lower__name)"]
   end
-  
+
   specify "should accept custom index names" do
     @db.create_table(:cats) do
       integer :id
@@ -508,7 +508,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE UNIQUE INDEX cats_id_index ON cats (id)"]
   end
-  
+
   specify "should accept composite index definitions" do
     @db.create_table(:cats) do
       integer :id
@@ -516,7 +516,7 @@ describe "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE UNIQUE INDEX cats_id_name_index ON cats (id, name)"]
   end
-  
+
   specify "should accept unnamed constraint definitions with blocks" do
     @db.create_table(:cats) do
       integer :score
@@ -689,13 +689,13 @@ describe "DB#create_table!" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should create the table if it does not exist" do
     meta_def(@db, :table_exists?){|a| false}
     @db.create_table!(:cats){|*a|}
     @db.sqls.should == ['CREATE TABLE cats ()']
   end
-  
+
   specify "should drop the table before creating it if it already exists" do
     meta_def(@db, :table_exists?){|a| true}
     @db.create_table!(:cats){|*a|}
@@ -707,19 +707,19 @@ describe "DB#create_table?" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should not create the table if the table already exists" do
     meta_def(@db, :table_exists?){|a| true}
     @db.create_table?(:cats){|*a|}
     @db.sqls.should == []
   end
-  
+
   specify "should create the table if the table doesn't already exist" do
     meta_def(@db, :table_exists?){|a| false}
     @db.create_table?(:cats){|*a|}
     @db.sqls.should == ['CREATE TABLE cats ()']
   end
-  
+
   specify "should use IF NOT EXISTS if the database supports that" do
     meta_def(@db, :supports_create_table_if_not_exists?){true}
     @db.create_table?(:cats){|*a|}
@@ -731,42 +731,42 @@ describe "DB#create_join_table" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should take a hash with foreign keys and table name values" do
     @db.create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
     @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
   end
-  
+
   specify "should be able to have values be a hash of options" do
     @db.create_join_table(:cat_id=>{:table=>:cats, :null=>true}, :dog_id=>{:table=>:dogs, :default=>0})
     @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NULL REFERENCES cats, dog_id integer DEFAULT 0 NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
   end
-  
+
   specify "should be able to pass a second hash of table options" do
     @db.create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :temp=>true)
     @db.sqls.should == ['CREATE TEMPORARY TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
   end
-  
+
   specify "should recognize :name option in table options" do
     @db.create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :name=>:f)
     @db.sqls.should == ['CREATE TABLE f (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX f_dog_id_cat_id_index ON f (dog_id, cat_id)']
   end
-  
+
   specify "should recognize :index_options option in table options" do
     @db.create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :index_options=>{:name=>:foo_index})
     @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX foo_index ON cats_dogs (dog_id, cat_id)']
   end
-  
+
   specify "should recognize :no_index option in table options" do
     @db.create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :no_index=>true)
     @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))']
   end
-  
+
   specify "should recognize :no_primary_key option in table options" do
     @db.create_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :no_primary_key=>true)
     @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs)', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
   end
-  
+
   specify "should raise an error if the hash doesn't have 2 entries with table names" do
     proc{@db.create_join_table({})}.should raise_error(Sequel::Error)
     proc{@db.create_join_table({:cat_id=>:cats})}.should raise_error(Sequel::Error)
@@ -774,17 +774,17 @@ describe "DB#create_join_table" do
     proc{@db.create_join_table({:cat_id=>:cats, :dog_id=>{}})}.should raise_error(Sequel::Error)
   end
 end
-  
+
 describe "DB#drop_join_table" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should take a hash with foreign keys and table name values and drop the table" do
     @db.drop_join_table(:cat_id=>:cats, :dog_id=>:dogs)
     @db.sqls.should == ['DROP TABLE cats_dogs']
   end
-  
+
   specify "should be able to have values be a hash of options" do
     @db.drop_join_table(:cat_id=>{:table=>:cats, :null=>true}, :dog_id=>{:table=>:dogs, :default=>0})
     @db.sqls.should == ['DROP TABLE cats_dogs']
@@ -799,7 +799,7 @@ describe "DB#drop_join_table" do
     @db.drop_join_table({:cat_id=>:cats, :dog_id=>:dogs}, :name=>:f)
     @db.sqls.should == ['DROP TABLE f']
   end
-  
+
   specify "should raise an error if the hash doesn't have 2 entries with table names" do
     proc{@db.drop_join_table({})}.should raise_error(Sequel::Error)
     proc{@db.drop_join_table({:cat_id=>:cats})}.should raise_error(Sequel::Error)
@@ -833,19 +833,19 @@ describe "DB#drop_table?" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should drop the table if it exists" do
     meta_def(@db, :table_exists?){|a| true}
     @db.drop_table?(:cats)
     @db.sqls.should == ["DROP TABLE cats"]
   end
-  
+
   specify "should do nothing if the table does not exist" do
     meta_def(@db, :table_exists?){|a| false}
     @db.drop_table?(:cats)
     @db.sqls.should == []
   end
-  
+
   specify "should operate on multiple tables at once" do
     meta_def(@db, :table_exists?){|a| a == :cats}
     @db.drop_table? :cats, :dogs
@@ -875,14 +875,14 @@ describe "DB#alter_table" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should allow adding not null constraint via set_column_allow_null with false argument" do
     @db.alter_table(:cats) do
       set_column_allow_null :score, false
     end
     @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score SET NOT NULL"]
   end
-  
+
   specify "should allow removing not null constraint via set_column_allow_null with true argument" do
     @db.alter_table(:cats) do
       set_column_allow_null :score, true
@@ -896,7 +896,7 @@ describe "DB#alter_table" do
     end
     @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score SET NOT NULL"]
   end
-  
+
   specify "should allow removing not null constraint via set_column_allow_null without argument" do
     @db.alter_table(:cats) do
       set_column_allow_null :score
@@ -1036,7 +1036,7 @@ describe "DB#alter_table" do
 
   specify "should support drop_foreign_key" do
     def @db.foreign_key_list(table_name)
-      [{:name=>:cats_node_id_fkey, :columns=>[:node_id]}] 
+      [{:name=>:cats_node_id_fkey, :columns=>[:node_id]}]
     end
     @db.alter_table(:cats) do
       drop_foreign_key :node_id
@@ -1046,7 +1046,7 @@ describe "DB#alter_table" do
 
   specify "should support drop_foreign_key with composite foreign keys" do
     def @db.foreign_key_list(table_name)
-      [{:name=>:cats_node_id_prop_id_fkey, :columns=>[:node_id, :prop_id]}] 
+      [{:name=>:cats_node_id_prop_id_fkey, :columns=>[:node_id, :prop_id]}]
     end
     @db.alter_table(:cats) do
       drop_foreign_key [:node_id, :prop_id]
@@ -1061,14 +1061,14 @@ describe "DB#alter_table" do
 
   specify "should have drop_foreign_key raise Error if no name is found" do
     def @db.foreign_key_list(table_name)
-      [{:name=>:cats_node_id_fkey, :columns=>[:foo_id]}] 
+      [{:name=>:cats_node_id_fkey, :columns=>[:foo_id]}]
     end
     lambda{@db.alter_table(:cats){drop_foreign_key :node_id}}.should raise_error(Sequel::Error)
   end
 
   specify "should have drop_foreign_key raise Error if multiple foreign keys found" do
     def @db.foreign_key_list(table_name)
-      [{:name=>:cats_node_id_fkey, :columns=>[:node_id]}, {:name=>:cats_node_id_fkey2, :columns=>[:node_id]}] 
+      [{:name=>:cats_node_id_fkey, :columns=>[:node_id]}, {:name=>:cats_node_id_fkey2, :columns=>[:node_id]}]
     end
     lambda{@db.alter_table(:cats){drop_foreign_key :node_id}}.should raise_error(Sequel::Error)
   end
@@ -1133,7 +1133,7 @@ describe "DB#alter_table" do
     end
     @db.sqls.should == ["ALTER TABLE cats ADD COLUMN a integer, DROP COLUMN b, ALTER COLUMN c SET NOT NULL, RENAME COLUMN d TO e, ALTER COLUMN f SET DEFAULT 'g', ALTER COLUMN h TYPE integer, ADD CONSTRAINT i CHECK (a > 1), DROP CONSTRAINT j"]
   end
-  
+
   specify "should combine operations into consecutive groups of combinable operations if the database supports combining operations" do
     meta_def(@db, :supports_combining_alter_table_ops?){true}
     @db.alter_table(:cats) do
@@ -1151,14 +1151,14 @@ describe "DB#alter_table" do
       "CREATE INDEX cats_e_index ON cats (e)",
       "ALTER TABLE cats ALTER COLUMN f SET DEFAULT 'g', ALTER COLUMN h TYPE integer, ADD CONSTRAINT i CHECK (a > 1), DROP CONSTRAINT j"]
   end
-  
+
 end
 
 describe "Database#create_table" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL" do
     @db.create_table :test do
       primary_key :id, :integer, :null => false
@@ -1168,14 +1168,14 @@ describe "Database#create_table" do
     @db.sqls.should == ['CREATE TABLE test (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
       'CREATE UNIQUE INDEX test_name_index ON test (name)']
   end
-  
+
   specify "should create a temporary table" do
     @db.create_table :test_tmp, :temp => true do
       primary_key :id, :integer, :null => false
       column :name, :text
       index :name, :unique => true
     end
-    
+
     @db.sqls.should == ['CREATE TEMPORARY TABLE test_tmp (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
       'CREATE UNIQUE INDEX test_tmp_name_index ON test_tmp (name)']
   end
@@ -1185,7 +1185,7 @@ describe "Database#alter_table" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL" do
     @db.alter_table :xyz do
       add_column :aaa, :text, :null => false, :unique => true
@@ -1196,7 +1196,7 @@ describe "Database#alter_table" do
       add_index :fff, :unique => true
       drop_index :ggg
     end
-    
+
     @db.sqls.should == ['ALTER TABLE xyz ADD COLUMN aaa text NOT NULL UNIQUE',
       'ALTER TABLE xyz DROP COLUMN bbb',
       'ALTER TABLE xyz RENAME COLUMN ccc TO ddd',
@@ -1219,12 +1219,12 @@ describe "Database#drop_column" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL" do
     @db.drop_column :test, :name
     @db.sqls.should == ['ALTER TABLE test DROP COLUMN name']
   end
-  
+
   specify "should use CASCADE for :cascade=>true option" do
     @db.drop_column :test, :name, :cascade=>true
     @db.sqls.should == ['ALTER TABLE test DROP COLUMN name CASCADE']
@@ -1235,7 +1235,7 @@ describe "Database#rename_column" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL" do
     @db.rename_column :test, :abc, :def
     @db.sqls.should == ['ALTER TABLE test RENAME COLUMN abc TO def']
@@ -1246,7 +1246,7 @@ describe "Database#set_column_type" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL" do
     @db.set_column_type :test, :name, :integer
     @db.sqls.should == ['ALTER TABLE test ALTER COLUMN name TYPE integer']
@@ -1257,7 +1257,7 @@ describe "Database#set_column_default" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL" do
     @db.set_column_default :test, :name, 'zyx'
     @db.sqls.should == ["ALTER TABLE test ALTER COLUMN name SET DEFAULT 'zyx'"]
@@ -1268,12 +1268,12 @@ describe "Database#add_index" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL" do
     @db.add_index :test, :name, :unique => true
     @db.sqls.should == ['CREATE UNIQUE INDEX test_name_index ON test (name)']
   end
-  
+
   specify "should accept multiple columns" do
     @db.add_index :test, [:one, :two]
     @db.sqls.should == ['CREATE INDEX test_one_two_index ON test (one, two)']
@@ -1284,24 +1284,24 @@ describe "Database#drop_index" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL" do
     @db.drop_index :test, :name
     @db.sqls.should == ['DROP INDEX test_name_index']
   end
-  
+
 end
 
 describe "Database#drop_table" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL" do
     @db.drop_table :test
     @db.sqls.should == ['DROP TABLE test']
   end
-  
+
   specify "should accept multiple table names" do
     @db.drop_table :a, :bb, :ccc
     @db.sqls.should == ['DROP TABLE a', 'DROP TABLE bb', 'DROP TABLE ccc']
@@ -1312,7 +1312,7 @@ describe "Database#rename_table" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL" do
     @db.rename_table :abc, :xyz
     @db.sqls.should == ['ALTER TABLE abc RENAME TO xyz']
@@ -1323,14 +1323,14 @@ describe "Database#create_view" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL with raw SQL" do
     @db.create_view :test, "SELECT * FROM xyz"
     @db.sqls.should == ['CREATE VIEW test AS SELECT * FROM xyz']
     @db.create_view Sequel.identifier(:test), "SELECT * FROM xyz"
     @db.sqls.should == ['CREATE VIEW test AS SELECT * FROM xyz']
   end
-  
+
   specify "should construct proper SQL with dataset" do
     @db.create_view :test, @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
@@ -1365,7 +1365,7 @@ describe "Database#drop_view" do
   before do
     @db = Sequel.mock
   end
-  
+
   specify "should construct proper SQL" do
     @db.drop_view :test
     @db.drop_view Sequel.identifier(:test)

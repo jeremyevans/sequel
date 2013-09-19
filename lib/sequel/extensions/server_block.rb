@@ -5,7 +5,7 @@
 # First, you need to enable it on the database object:
 #
 #   DB.extension :server_block
-# 
+#
 # Then you can call with_server:
 #
 #   DB.with_server(:shard1) do
@@ -24,7 +24,7 @@
 #     DB[:a].all # Uses shard1
 #   end
 #   DB[:a].all # Uses default
-# 
+#
 # Note that if you pass the nil, :default, or :read_only server/shard
 # names to Dataset#server inside a with_server block, they will be
 # ignored and the server/shard given to with_server will be used:

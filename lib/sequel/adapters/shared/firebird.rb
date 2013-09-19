@@ -69,7 +69,7 @@ module Sequel
       def auto_increment_sql()
         AUTO_INCREMENT
       end
-      
+
       def create_sequence_sql(name, opts=OPTS)
         "CREATE SEQUENCE #{quote_identifier(name)}"
       end
@@ -123,7 +123,7 @@ module Sequel
         end_sql
         sql
       end
-      
+
       def drop_sequence_sql(name)
         "DROP SEQUENCE #{quote_identifier(name)}"
       end
@@ -157,7 +157,7 @@ module Sequel
       FIRST = " FIRST ".freeze
       SKIP = " SKIP ".freeze
       DEFAULT_FROM = " FROM RDB$DATABASE"
-      
+
       # Insert given values into the database.
       def insert(*values)
         if @opts[:sql] || @opts[:returning]
@@ -208,7 +208,7 @@ module Sequel
       def select_clause_methods
         SELECT_CLAUSE_METHODS
       end
-      
+
         # Use a default FROM table if the dataset does not contain a FROM table.
         def select_from_sql(sql)
           if @opts[:from]

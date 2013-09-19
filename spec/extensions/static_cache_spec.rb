@@ -9,7 +9,7 @@ describe "Sequel::Plugins::StaticCache with :frozen=>false option" do
     @c.columns :id, :name
   end
 
-  shared_examples_for "Sequel::Plugins::StaticCache" do  
+  shared_examples_for "Sequel::Plugins::StaticCache" do
     it "should use a ruby hash as a cache of all model instances" do
       @c.cache.should == {1=>@c.load(:id=>1), 2=>@c.load(:id=>2)}
       @c.cache[1].should equal(@c1)

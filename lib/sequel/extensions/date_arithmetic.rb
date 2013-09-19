@@ -165,7 +165,7 @@ module Sequel
         @interval = if interval.is_a?(Hash)
           interval.each_value do |v|
              # Attempt to prevent SQL injection by users who pass untrusted strings
-             # as interval values. 
+             # as interval values.
              if v.is_a?(String) && !v.is_a?(LiteralString)
                raise Sequel::InvalidValue, "cannot provide String value as interval part: #{v.inspect}"
              end

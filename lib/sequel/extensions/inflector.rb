@@ -1,6 +1,6 @@
 # The inflector extension adds inflection instance methods to String, which allows the easy transformation of
 # words from singular to plural, class names to table names, modularized class
-# names to ones without, and class names to foreign keys.  It exists for 
+# names to ones without, and class names to foreign keys.  It exists for
 # backwards compatibility to legacy Sequel code.
 #
 # To load the extension:
@@ -76,7 +76,7 @@ class String
     # The replacement should always be a string that may include references to the matched data from the rule.
     #
     # Example:
-    #   singular(/([^aeiouy]|qu)ies$/i, '\1y') 
+    #   singular(/([^aeiouy]|qu)ies$/i, '\1y')
     def self.singular(rule, replacement)
       @singulars.insert(0, [rule, replacement])
     end

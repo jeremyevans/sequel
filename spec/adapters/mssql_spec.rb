@@ -25,13 +25,13 @@ describe "A MSSQL database" do
     t = Time.utc(2001, 12, 31, 23, 59, 59, 997000)
     (t.usec/1000).should == @db["select cast(datepart(millisecond, ?) as int) as milliseconds", t].get
   end
-  
+
   specify "should not raise an error when getting the server version" do
     proc{@db.server_version}.should_not raise_error
     proc{@db.dataset.server_version}.should_not raise_error
   end
 end
-  
+
 describe "A MSSQL database" do
   before do
     @db = DB
@@ -82,7 +82,7 @@ describe "MSSQL full_text_search" do
   after do
     @db.drop_table?(:posts)
   end
-  
+
   specify "should support fulltext indexes and full_text_search" do
     log do
       @db.create_table(:posts){Integer :id, :null=>false; String :title; String :body; index :id, :name=>:fts_id_idx, :unique=>true; full_text_index :title, :key_index=>:fts_id_idx; full_text_index [:title, :body], :key_index=>:fts_id_idx}
@@ -128,7 +128,7 @@ describe "MSSQL Dataset#output" do
     @ds.output(nil, [Sequel::SQL::ColumnAll.new(:deleted)]).delete_sql.should =~
       /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].*/
   end
-  
+
   specify "should format OUTPUT clauses with INTO for DELETE statements" do
     @ds.output(:out, [:deleted__name, :deleted__value]).delete_sql.should =~
       /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\]/
@@ -227,7 +227,7 @@ describe "MSSQL::Dataset#import" do
   after do
     @db.drop_table?(:test)
   end
-  
+
   specify "#import should work correctly with an arbitrary output value" do
     @db.create_table!(:test){primary_key :x; Integer :y}
     @ds.output(nil, [:inserted__y, :inserted__x]).import([:y], [[3], [4]]).should == [{:y=>3, :x=>1}, {:y=>4, :x=>2}]
@@ -269,11 +269,11 @@ describe "Offset support" do
   after do
     @db.drop_table?(:i)
   end
-  
+
   specify "should return correct rows" do
     @ds.limit(2, 2).all.should == [{:id=>6, :parent_id=>3}, {:id=>8, :parent_id=>3}]
   end
-  
+
   specify "should not include offset column in hashes passed to row_proc" do
     @ds.limit(2, 2).all
     @hs.should == [{:id=>3, :parent_id=>1}, {:id=>4, :parent_id=>1}]
@@ -370,7 +370,7 @@ describe "MSSSQL::Dataset#insert" do
   specify "should have insert_select return nil if disable_insert_output is used" do
     @ds.disable_insert_output.insert_select(:value=>10).should == nil
   end
-  
+
   specify "should have insert_select return nil if the server version is not 2005+" do
     def @ds.server_version() 8000760 end
     @ds.insert_select(:value=>10).should == nil
@@ -420,7 +420,7 @@ describe "A MSSQL database" do
   after do
     @db.drop_table?(:a)
   end
-  
+
   specify "should handle many existing types for set_column_allow_null" do
     @db.create_table!(:a){column :a, 'integer'}
     @db.alter_table(:a){set_column_allow_null :a, false}
@@ -452,7 +452,7 @@ describe "MSSQL::Database#rename_table" do
     DB.drop_table? :foo
     proc { DB.rename_table 'foo bar', 'foo' }.should_not raise_error
   end
-  
+
   specify "should work on schema bound tables" do
     DB.execute(<<-SQL)
       IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'MY')
@@ -576,19 +576,19 @@ describe "Database#foreign_key_list" do
     DB.drop_table :items
   end
   it "should support typical foreign keys" do
-    DB.foreign_key_list(:prices).should == [{:name      => :fk_prices_items, 
-                                                   :table     => :items, 
-                                                   :columns   => [:item_id], 
-                                                   :key       => [:id], 
-                                                   :on_update => :no_action, 
+    DB.foreign_key_list(:prices).should == [{:name      => :fk_prices_items,
+                                                   :table     => :items,
+                                                   :columns   => [:item_id],
+                                                   :key       => [:id],
+                                                   :on_update => :no_action,
                                                    :on_delete => :no_action }]
   end
   it "should support a foreign key with multiple columns" do
-    DB.foreign_key_list(:sales).should == [{:name      => :fk_sales_prices, 
-                                                  :table     => :prices, 
-                                                  :columns   => [:price_item_id, :price_valid_from], 
-                                                  :key       => [:item_id, :valid_from], 
-                                                  :on_update => :no_action, 
+    DB.foreign_key_list(:sales).should == [{:name      => :fk_sales_prices,
+                                                  :table     => :prices,
+                                                  :columns   => [:price_item_id, :price_valid_from],
+                                                  :key       => [:item_id, :valid_from],
+                                                  :on_update => :no_action,
                                                   :on_delete => :cascade }]
   end
 

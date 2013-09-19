@@ -26,7 +26,7 @@ module Sequel
     def empty_array_value(op, cols)
       {1 => ((op == :IN) ? 0 : 1)}
     end
-    
+
   end
 
   Dataset.register_extension(:empty_array_ignore_nulls, EmptyArrayIgnoreNulls)

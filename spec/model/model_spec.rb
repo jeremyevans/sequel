@@ -221,7 +221,7 @@ describe Sequel::Model do
     @model.set_dataset(:foo___x)
     @model.table_name.should == :x
   end
-  
+
   it "set_dataset should raise an error unless given a Symbol or Dataset" do
     proc{@model.set_dataset(Object.new)}.should raise_error(Sequel::Error)
   end
@@ -298,15 +298,15 @@ describe Sequel::Model, "constructors" do
     m.values.should == {:a => 1, :b => 2}
     m.should be_new
   end
-  
+
   it "should accept a block and yield itself to the block" do
     block_called = false
     m = @m.new {|i| block_called = true; i.should be_a_kind_of(@m); i.values[:a] = 1}
-    
+
     block_called.should be_true
     m.values[:a].should == 1
   end
-  
+
   it "should have dataset row_proc create an existing object" do
     @m.dataset = Sequel.mock.dataset
     o = @m.dataset.row_proc.call(:a=>1)
@@ -314,14 +314,14 @@ describe Sequel::Model, "constructors" do
     o.values.should == {:a=>1}
     o.new?.should be_false
   end
-  
+
   it "should have .call create an existing object" do
     o = @m.call(:a=>1)
     o.should be_a_kind_of(@m)
     o.values.should == {:a=>1}
     o.new?.should be_false
   end
-  
+
   it "should have .load create an existing object" do
     o = @m.load(:a=>1)
     o.should be_a_kind_of(@m)
@@ -372,17 +372,17 @@ describe Sequel::Model, ".subset" do
 
   specify "should create a filter on the underlying dataset" do
     proc {@c.new_only}.should raise_error(NoMethodError)
-    
+
     @c.subset(:new_only){age < 'new'}
-    
+
     @c.new_only.sql.should == "SELECT * FROM items WHERE (age < 'new')"
     @c.dataset.new_only.sql.should == "SELECT * FROM items WHERE (age < 'new')"
-    
+
     @c.subset(:pricey){price > 100}
-    
+
     @c.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
     @c.dataset.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
-    
+
     @c.pricey.new_only.sql.should == "SELECT * FROM items WHERE ((price > 100) AND (age < 'new'))"
     @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE ((age < 'new') AND (price > 100))"
   end
@@ -400,7 +400,7 @@ describe Sequel::Model, ".find" do
     @c.dataset._fetch = {:name => 'sharon', :id => 1}
     DB.reset
   end
-  
+
   it "should return the first record matching the given filter" do
     @c.find(:name => 'sharon').should be_a_kind_of(@c)
     DB.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"]
@@ -408,7 +408,7 @@ describe Sequel::Model, ".find" do
     @c.find(Sequel.expr(:name).like('abc%')).should be_a_kind_of(@c)
     DB.sqls.should == ["SELECT * FROM items WHERE (name LIKE 'abc%' ESCAPE '\\') LIMIT 1"]
   end
-  
+
   specify "should accept filter blocks" do
     @c.find{id > 1}.should be_a_kind_of(@c)
     DB.sqls.should == ["SELECT * FROM items WHERE (id > 1) LIMIT 1"]
@@ -423,7 +423,7 @@ describe Sequel::Model, ".fetch" do
     DB.reset
     @c = Class.new(Sequel::Model(:items))
   end
-  
+
   it "should return instances of Model" do
     @c.fetch("SELECT * FROM items").first.should be_a_kind_of(@c)
   end
@@ -448,7 +448,7 @@ describe Sequel::Model, ".find_or_create" do
     @c.find_or_create(:x => 1).should == @c.load(:x=>1, :id=>1)
     DB.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1"]
   end
-  
+
   it "should create the record if not found" do
     @c.instance_dataset._fetch = @c.dataset._fetch = [[], {:x=>1, :id=>1}]
     @c.instance_dataset.autoid = @c.dataset.autoid = 1
@@ -626,7 +626,7 @@ describe "Model.db_schema" do
     def @db.supports_schema_parsing?() true end
     @dataset = @db[:items]
   end
-  
+
   specify "should not call database's schema if it isn't supported" do
     def @db.supports_schema_parsing?() false end
     def @db.schema(table, opts = {})
@@ -666,7 +666,7 @@ describe "Model.db_schema" do
     @c.dataset = @dataset.join(:x, :id).columns(:id, :x)
     @c.db_schema.should == {:x=>{}, :id=>{}}
   end
-  
+
   specify "should automatically set a singular primary key based on the schema" do
     ds = @dataset
     d = ds.db
@@ -676,7 +676,7 @@ describe "Model.db_schema" do
     @c.db_schema.should == {:x=>{:primary_key=>true}}
     @c.primary_key.should == :x
   end
-  
+
   specify "should automatically set the composite primary key based on the schema" do
     ds = @dataset
     d = ds.db
@@ -686,7 +686,7 @@ describe "Model.db_schema" do
     @c.db_schema.should == {:x=>{:primary_key=>true}, :y=>{:primary_key=>true}}
     @c.primary_key.should == [:x, :y]
   end
-  
+
   specify "should automatically set no primary key based on the schema" do
     ds = @dataset
     d = ds.db
@@ -696,7 +696,7 @@ describe "Model.db_schema" do
     @c.db_schema.should == {:x=>{:primary_key=>false}, :y=>{:primary_key=>false}}
     @c.primary_key.should == nil
   end
-  
+
   specify "should not modify the primary key unless all column schema hashes have a :primary_key entry" do
     ds = @dataset
     d = ds.db
@@ -726,7 +726,7 @@ describe "Model#use_transactions" do
     instance.use_transactions.should == false
     @c.use_transactions = true
     instance.use_transactions.should == false
-    
+
     instance.use_transactions = true
     instance.use_transactions.should == true
     @c.use_transactions = false

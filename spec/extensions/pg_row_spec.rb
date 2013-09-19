@@ -175,7 +175,7 @@ describe "pg_row extension" do
     @db.bound_variable_arg([@m::ArrayRow.call([nil, nil])], nil).should == '{"(,)"}'
     @db.bound_variable_arg([@m::HashRow.subclass(nil, [:a, :b]).call(:a=>nil, :b=>nil)], nil).should == '{"(,)"}'
   end
-  
+
   it "should allow registering row type parsers by introspecting system tables" do
     @db.conversion_procs[4] = p4 = proc{|s| s.to_i}
     @db.conversion_procs[5] = p5 = proc{|s| s * 2}

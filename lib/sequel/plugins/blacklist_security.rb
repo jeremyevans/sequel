@@ -7,7 +7,7 @@ module Sequel
     #
     # Usage:
     #
-    #   # Make all model subclasses support the blacklist security features. 
+    #   # Make all model subclasses support the blacklist security features.
     #   Sequel::Model.plugin :blacklist_security
     #
     #   # Make the Album class support the blacklist security features.
@@ -18,7 +18,7 @@ module Sequel
         # (default: not set).  Some columns are restricted regardless of
         # this setting, such as the primary key column and columns in Model::RESTRICTED_SETTER_METHODS.
         attr_reader :restricted_columns
-  
+
         # Set the columns to restrict when using mass assignment (e.g. +set+).  Using this means that
         # attempts to call setter methods for the columns listed here will cause an
         # exception or be silently skipped (based on the +strict_param_setting+ setting).
@@ -64,7 +64,7 @@ module Sequel
         def set_except(hash, *except)
           set_restricted(hash, ExceptionList.new(except.flatten))
         end
-    
+
         # Update all values using the entries in the hash, except for the keys
         # given in except.  You should probably use +update_fields+ or +update_only+
         # instead of this method, as blacklist approaches to security are a bad idea.

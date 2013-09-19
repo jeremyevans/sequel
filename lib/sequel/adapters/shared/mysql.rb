@@ -41,7 +41,7 @@ module Sequel
       MYSQL_TIMESTAMP_RE = /\ACURRENT_(?:DATE|TIMESTAMP)?\z/
 
       include Sequel::Database::SplitAlterTable
-      
+
       # MySQL's cast rules are restrictive in that you can't just cast to any possible
       # database type.
       def cast_type_literal(type)
@@ -71,7 +71,7 @@ module Sequel
           exclude(:CONSTRAINT_NAME=>'PRIMARY').
           exclude(:REFERENCED_TABLE_NAME=>nil).
           select(:CONSTRAINT_NAME___name, :COLUMN_NAME___column, :REFERENCED_TABLE_NAME___table, :REFERENCED_COLUMN_NAME___key)
-        
+
         h = {}
         ds.each do |row|
           if r = h[row[:name]]
@@ -123,12 +123,12 @@ module Sequel
           (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
         end
       end
-      
+
       # MySQL supports CREATE TABLE IF NOT EXISTS syntax.
       def supports_create_table_if_not_exists?
         true
       end
-      
+
       # MySQL supports prepared transactions (two-phase commit) using XA
       def supports_prepared_transactions?
         server_version >= 50000
@@ -157,7 +157,7 @@ module Sequel
       def tables(opts=OPTS)
         full_tables('BASE TABLE', opts)
       end
-      
+
       # Changes the database in use by issuing a USE statement.  I would be
       # very careful if I used this.
       def use(db_name)
@@ -166,7 +166,7 @@ module Sequel
         @schemas = {}
         self
       end
-      
+
       # Return an array of symbols specifying view names in the current database.
       #
       # Options:
@@ -174,9 +174,9 @@ module Sequel
       def views(opts=OPTS)
         full_tables('VIEW', opts)
       end
-      
+
       private
-      
+
       # Use MySQL specific syntax for some alter table operations.
       def alter_table_op_sql(table, op)
         case op[:op]
@@ -261,7 +261,7 @@ module Sequel
       # The SQL queries to execute on initial connection
       def mysql_connection_setting_sqls
         sqls = []
-        
+
         # Increase timeout so mysql server doesn't disconnect us
         # Value used by default is maximum allowed value on Windows.
         sqls << "SET @@wait_timeout = #{opts[:timeout] || 2147483}"
@@ -277,12 +277,12 @@ module Sequel
 
         sqls
       end
-      
+
       # Use MySQL specific AUTO_INCREMENT text.
       def auto_increment_sql
         AUTO_INCREMENT
       end
-      
+
       # MySQL needs to set transaction isolation before begining a transaction
       def begin_new_transaction(conn, opts)
         set_transaction_isolation(conn, opts)
@@ -311,7 +311,7 @@ module Sequel
         column.delete(:default) if column[:type] == File || (column[:type] == String && column[:text] == true)
         super
       end
-      
+
       # Prepare the XA transaction for a two-phase commit if the
       # :prepare option is given.
       def commit_transaction(conn, opts=OPTS)
@@ -332,7 +332,7 @@ module Sequel
 
         # Proc for figuring out the primary key for a given table.
         key_proc = lambda do |t|
-          if t == name 
+          if t == name
             if pk = generator.primary_key_name
               [pk]
             elsif !(pkc = generator.constraints.select{|con| con[:type] == :primary_key}).empty?
@@ -392,7 +392,7 @@ module Sequel
       def identifier_input_method_default
         nil
       end
-      
+
       # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
       def identifier_output_method_default
         nil
@@ -413,7 +413,7 @@ module Sequel
         end
         "CREATE #{index_type}INDEX #{index_name}#{using} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
       end
-      
+
       # Parse the schema for the given table to get an array of primary key columns
       def primary_key_from_schema(table)
         schema(table).select{|a| a[1][:primary_key]}.map{|a| a[0]}
@@ -514,7 +514,7 @@ module Sequel
         :'tinyint(1)'
       end
     end
-  
+
     # Dataset methods shared by datasets that use MySQL databases.
     module DatasetMethods
       BOOL_TRUE = '1'.freeze
@@ -608,7 +608,7 @@ module Sequel
           super
         end
       end
-      
+
       # Use GROUP BY instead of DISTINCT ON if arguments are provided.
       def distinct(*args)
         args.empty? ? super : group(*args)
@@ -621,7 +621,7 @@ module Sequel
       def calc_found_rows
         clone(:calc_found_rows => true)
       end
-      
+
       # Return the results of an EXPLAIN query as a string. Options:
       # :extended :: Use EXPLAIN EXPTENDED instead of EXPLAIN if true.
       def explain(opts=OPTS)
@@ -642,7 +642,7 @@ module Sequel
       def full_text_search(cols, terms, opts = OPTS)
         filter(full_text_sql(cols, terms, opts))
       end
-      
+
       # MySQL specific full text search syntax.
       def full_text_sql(cols, terms, opts = OPTS)
         terms = terms.join(' ') if terms.is_a?(Array)
@@ -656,7 +656,7 @@ module Sequel
         raise(Sequel::Error, "MySQL doesn't support FULL OUTER JOIN") if type == :full_outer
         super(type, table, expr, opts, &block)
       end
-      
+
       # Transforms :natural_inner to NATURAL LEFT JOIN and straight to
       # STRAIGHT_JOIN.
       def join_type_sql(join_type)
@@ -669,7 +669,7 @@ module Sequel
           super
         end
       end
-      
+
       # Sets up the insert methods to use INSERT IGNORE.
       # Useful if you have a unique key and want to just skip
       # inserting rows that violate the unique key restriction.
@@ -711,7 +711,7 @@ module Sequel
         expression_list_append(sql, values.map{|r| Array(r)})
         [insert_sql(columns, sql)]
       end
-      
+
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
         sql << BACKTICK << c.to_s.gsub(BACKTICK_RE, DOUBLE_BACKTICK) << BACKTICK
@@ -732,7 +732,7 @@ module Sequel
       def supports_intersect_except?
         false
       end
-      
+
       # MySQL supports modifying joined datasets
       def supports_modifying_joins?
         true
@@ -743,7 +743,7 @@ module Sequel
       def supports_ordered_distinct_on?
         false
       end
-    
+
       # MySQL supports pattern matching via regular expressions
       def supports_regexp?
         true
@@ -755,7 +755,7 @@ module Sequel
       def supports_timestamp_usecs?
         false
       end
-      
+
       # Sets up the update methods to use UPDATE IGNORE.
       # Useful if you have a unique key and want to just skip
       # updating rows that violate the unique key restriction.
@@ -765,14 +765,14 @@ module Sequel
       def update_ignore
         clone(:update_ignore=>true)
       end
-      
+
       private
 
       # MySQL supports the ORDER BY and LIMIT clauses for DELETE statements
       def delete_clause_methods
         DELETE_CLAUSE_METHODS
       end
-      
+
       # Consider the first table in the joined dataset is the table to delete
       # from, but include the others for the purposes of selecting rows.
       def delete_from_sql(sql)
@@ -840,7 +840,7 @@ module Sequel
           end
           if update_vals
             eq = EQ
-            update_vals.map do |col,v| 
+            update_vals.map do |col,v|
               sql << co if c
               quote_identifier_append(sql, col)
               sql << eq
@@ -899,12 +899,12 @@ module Sequel
       def literal_true
         BOOL_TRUE
       end
-      
+
       # MySQL does not support the SQL WITH clause for SELECT statements
       def select_clause_methods
         SELECT_CLAUSE_METHODS
       end
-      
+
       # Support FOR SHARE locking when using the :share lock style.
       def select_lock_sql(sql)
         @opts[:lock] == :share ? (sql << FOR_SHARE) : super

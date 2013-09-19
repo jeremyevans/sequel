@@ -37,7 +37,7 @@ class Array
   end
 
   # Return a <tt>Sequel::SQL::ValueList</tt> created from this array.  Used if this array contains
-  # all two element arrays and you want it treated as an SQL value list (IN predicate) 
+  # all two element arrays and you want it treated as an SQL value list (IN predicate)
   # instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using
   # this array as a value in a filter, but may be necessary if you are using it as a
   # value with placeholder SQL:
@@ -187,7 +187,7 @@ class String
   def lit(*args)
     args.empty? ? Sequel::LiteralString.new(self) : Sequel::SQL::PlaceholderLiteralString.new(self, args)
   end
-  
+
   # Returns a <tt>Sequel::SQL::Blob</tt> that holds the same data as this string. Blobs provide proper
   # escaping of binary data.
   def to_sequel_blob

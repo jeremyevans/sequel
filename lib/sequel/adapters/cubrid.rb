@@ -16,7 +16,7 @@ module Sequel
       LAST_INSERT_ID = "SELECT LAST_INSERT_ID()".freeze
 
       set_adapter_scheme :cubrid
-      
+
       def connect(server)
         opts = server_opts(server)
         conn = ::Cubrid.connect(
@@ -33,7 +33,7 @@ module Sequel
       def server_version
         @server_version ||= synchronize{|c| c.server_version}
       end
-      
+
       def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           r = log_yield(sql) do
@@ -92,7 +92,7 @@ module Sequel
       def begin_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_BEGIN){conn.auto_commit = false}
       end
-      
+
       def commit_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
@@ -106,25 +106,25 @@ module Sequel
       ensure
         super
       end
-      
+
       # This doesn't actually work, as the cubrid ruby driver
       # does not implement transactions correctly.
       def rollback_transaction(conn, opts=OPTS)
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include Sequel::Cubrid::DatasetMethods
       COLUMN_INFO_NAME = "name".freeze
       COLUMN_INFO_TYPE = "type_name".freeze
 
       Database::DatasetClass = self
-      
+
       def fetch_rows(sql)
         execute(sql) do |stmt|
           begin
-            procs = 
+            procs =
             cols = stmt.column_info.map{|c| [output_identifier(c[COLUMN_INFO_NAME]), CUBRID_TYPE_PROCS[c[COLUMN_INFO_TYPE]]]}
             @columns = cols.map{|c| c.first}
             stmt.each do |r|

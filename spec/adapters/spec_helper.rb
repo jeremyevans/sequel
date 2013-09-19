@@ -25,14 +25,14 @@ class Sequel::Database
 end
 
 (defined?(RSpec) ? RSpec::Core::ExampleGroup : Spec::Example::ExampleGroup).class_eval do
-  def log 
+  def log
     begin
       DB.loggers << Logger.new(STDOUT)
       yield
     ensure
      DB.loggers.pop
-    end 
-  end 
+    end
+  end
 
   def self.cspecify(message, *checked, &block)
     return specify(message, &block) if ENV['SEQUEL_NO_PENDING']

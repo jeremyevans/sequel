@@ -53,7 +53,7 @@ describe "Sequel::Deprecated" do
     @d.deprecate("foo")
     @output.first.should == 'foo'
     @output.count.should == 2
-    
+
     @output.clear
     @d.backtrace_filter = 3
     @d.deprecate("foo")

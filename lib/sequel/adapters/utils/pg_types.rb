@@ -8,11 +8,11 @@ module Sequel
     MINUS_INFINITY_STR  = '-Infinity'.freeze
     TRUE_STR = 't'.freeze
     DASH_STR = '-'.freeze
-    
+
     TYPE_TRANSLATOR = tt = Class.new do
       def boolean(s) s == TRUE_STR end
       def integer(s) s.to_i end
-      def float(s) 
+      def float(s)
         case s
         when NAN_STR
           NAN
@@ -21,7 +21,7 @@ module Sequel
         when MINUS_INFINITY_STR
           MINUS_INFINITY
         else
-          s.to_f 
+          s.to_f
         end
       end
       def date(s) ::Date.new(*s.split(DASH_STR).map{|x| x.to_i}) end
@@ -65,4 +65,4 @@ module Sequel
       k.each{|n| PG_TYPES[n] = v}
     end
   end
-end 
+end

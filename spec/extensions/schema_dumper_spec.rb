@@ -196,11 +196,11 @@ Sequel.migration do
       primary_key :c1
       String :c2, :size=>20
     end
-    
+
     create_table(:t2) do
       Integer :c1, :null=>false
       BigDecimal :c2, :null=>false
-      
+
       primary_key [:c1, :c2]
     end
   end
@@ -217,11 +217,11 @@ Sequel.migration do
       primary_key :c1
       String :c2, :size=>20
     end
-    
+
     create_table(:t2) do
       Integer :c1, :null=>false
       BigDecimal :c2, :null=>false
-      
+
       primary_key [:c1, :c2]
     end
   end
@@ -244,7 +244,7 @@ Sequel.migration do
     create_table(:t2) do
       primary_key :c1
     end
-    
+
     create_table(:t1) do
       foreign_key :c2, :t2, :key=>[:c1]
     end
@@ -268,11 +268,11 @@ Sequel.migration do
     create_table(:t1) do
       Integer :c2
     end
-    
+
     create_table(:t2) do
       foreign_key :c1, :t1, :key=>[:c2]
     end
-    
+
     alter_table(:t1) do
       add_foreign_key [:c2], :t2, :key=>[:c1]
     end
@@ -297,7 +297,7 @@ Sequel.migration do
     create_table(:t2) do
       primary_key :c1
     end
-    
+
     create_table(:t1) do
       foreign_key :c2, :t2, :key=>[:c1]
     end
@@ -315,11 +315,11 @@ Sequel.migration do
       primary_key :c1
       column :c2, "varchar(20)"
     end
-    
+
     create_table(:t2) do
       column :c1, "integer", :null=>false
       column :c2, "numeric", :null=>false
-      
+
       primary_key [:c1, :c2]
     end
   end
@@ -340,17 +340,17 @@ Sequel.migration do
     create_table(:t1, :ignore_index_errors=>true) do
       primary_key :c1
       String :c2, :size=>20
-      
+
       index [:c1]
       index [:c2, :c1], :unique=>true
     end
-    
+
     create_table(:t2, :ignore_index_errors=>true) do
       Integer :c1, :null=>false
       BigDecimal :c2, :null=>false
-      
+
       primary_key [:c1, :c2]
-      
+
       index [:c1]
       index [:c2, :c1], :unique=>true
     end
@@ -358,7 +358,7 @@ Sequel.migration do
 end
 END_MIG
   end
-  
+
   it "should make :index_names => :namespace option a noop if there is a  global index namespace" do
     @d.meta_def(:supports_index_parsing?){true}
     @d.meta_def(:indexes) do |t|
@@ -372,17 +372,17 @@ Sequel.migration do
     create_table(:t1, :ignore_index_errors=>true) do
       primary_key :c1
       String :c2, :size=>20
-      
+
       index [:c1], :name=>:i1
       index [:c2, :c1]
     end
-    
+
     create_table(:t2, :ignore_index_errors=>true) do
       Integer :c1, :null=>false
       BigDecimal :c2, :null=>false
-      
+
       primary_key [:c1, :c2]
-      
+
       index [:c1], :name=>:i1
       index [:c2, :c1], :name=>:t1_c2_c1_index
     end
@@ -405,17 +405,17 @@ Sequel.migration do
     create_table(:t1, :ignore_index_errors=>true) do
       primary_key :c1
       String :c2, :size=>20
-      
+
       index [:c1], :name=>:t1_i1
       index [:c2, :c1]
     end
-    
+
     create_table(:t2, :ignore_index_errors=>true) do
       Integer :c1, :null=>false
       BigDecimal :c2, :null=>false
-      
+
       primary_key [:c1, :c2]
-      
+
       index [:c1], :name=>:t2_i1
       index [:c2, :c1], :name=>:t2_t1_c2_c1_index
     end
@@ -438,11 +438,11 @@ Sequel.migration do
       primary_key :c1
       String :c2, :size=>20
     end
-    
+
     create_table(:t2) do
       Integer :c1, :null=>false
       BigDecimal :c2, :null=>false
-      
+
       primary_key [:c1, :c2]
     end
   end
@@ -511,7 +511,7 @@ Sequel.migration do
   change do
     add_index :t1, [:c1], :ignore_errors=>true, :name=>:i1
     add_index :t1, [:c2, :c1], :ignore_errors=>true
-    
+
     add_index :t2, [:c1], :ignore_errors=>true, :name=>:i1
     add_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t1_c2_c1_index
   end
@@ -532,7 +532,7 @@ Sequel.migration do
   change do
     add_index :t1, [:c1], :ignore_errors=>true, :name=>:t1_i1
     add_index :t1, [:c2, :c1], :ignore_errors=>true
-    
+
     add_index :t2, [:c1], :ignore_errors=>true, :name=>:t2_i1
     add_index :t2, [:c2, :c1], :ignore_errors=>true, :name=>:t2_t1_c2_c1_index
   end
@@ -545,7 +545,7 @@ END_MIG
     @d.dump_indexes_migration.should == <<-END_MIG
 Sequel.migration do
   change do
-    
+
   end
 end
 END_MIG
@@ -556,7 +556,7 @@ END_MIG
     @d.dump_foreign_key_migration.should == <<-END_MIG
 Sequel.migration do
   change do
-    
+
   end
 end
 END_MIG
@@ -584,7 +584,7 @@ Sequel.migration do
     alter_table(:t1) do
       add_foreign_key [:c2], :t2, :key=>[:c1]
     end
-    
+
     alter_table(:t2) do
       add_foreign_key [:c1, :c3], :t1, :key=>[:c2, :c4]
     end
@@ -597,7 +597,7 @@ END_MIG
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'date', :default=>"'now()'", :allow_null=>true}], [:c2, {:db_type=>'datetime', :allow_null=>false}]]}
     @d.dump_table_schema(:t3).should == "create_table(:t3) do\n  Date :c1\n  DateTime :c2, :null=>false\nend"
   end
-  
+
   it "should handle converting common defaults" do
     @d.meta_def(:schema) do |t, *os|
       s = [[:c1, {:db_type=>'boolean', :default=>"false", :type=>:boolean, :allow_null=>true}],
@@ -618,7 +618,7 @@ END_MIG
     @d.dump_table_schema(:t4).gsub(/[+-]\d\d\d\d"\)/, '")').gsub(/\.0+/, '.0').should == "create_table(:t4) do\n  TrueClass :c1, :default=>false\n  String :c2, :default=>\"blah\"\n  Integer :c3, :default=>-1\n  Float :c4, :default=>1.0\n  BigDecimal :c5, :default=>BigDecimal.new(\"0.1005E3\")\n  File :c6, :default=>Sequel::SQL::Blob.new(\"blah\")\n  Date :c7, :default=>Date.new(2008, 10, 29)\n  DateTime :c8, :default=>DateTime.parse(\"2008-10-29T10:20:30.0\")\n  Time :c9, :default=>Sequel::SQLTime.parse(\"10:20:30.0\"), :only_time=>true\n  String :c10\n  Date :c11, :default=>Sequel::CURRENT_DATE\n  DateTime :c12, :default=>Sequel::CURRENT_TIMESTAMP\nend"
     @d.dump_table_schema(:t4, :same_db=>true).gsub(/[+-]\d\d\d\d"\)/, '")').gsub(/\.0+/, '.0').should == "create_table(:t4) do\n  column :c1, \"boolean\", :default=>false\n  column :c2, \"varchar\", :default=>\"blah\"\n  column :c3, \"integer\", :default=>-1\n  column :c4, \"float\", :default=>1.0\n  column :c5, \"decimal\", :default=>BigDecimal.new(\"0.1005E3\")\n  column :c6, \"blob\", :default=>Sequel::SQL::Blob.new(\"blah\")\n  column :c7, \"date\", :default=>Date.new(2008, 10, 29)\n  column :c8, \"datetime\", :default=>DateTime.parse(\"2008-10-29T10:20:30.0\")\n  column :c9, \"time\", :default=>Sequel::SQLTime.parse(\"10:20:30.0\")\n  column :c10, \"foo\", :default=>Sequel::LiteralString.new(\"'6 weeks'\")\n  column :c11, \"date\", :default=>Sequel::CURRENT_DATE\n  column :c12, \"timestamp\", :default=>Sequel::CURRENT_TIMESTAMP\nend"
   end
-  
+
   it "should not use a literal string as a fallback if using MySQL with the :same_db option" do
     @d.meta_def(:database_type){:mysql}
     @d.meta_def(:supports_index_parsing?){false}
@@ -726,7 +726,7 @@ create_table(:x) do
   Integer :c70
   Integer :c71
   Integer :c72
-  
+
   check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c64), 0)
   check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c65), 0)
   check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c66), 0)
@@ -747,7 +747,7 @@ END_MIG
 create_table(:x) do
   Float :c1
   Float :c2
-  
+
   check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c2), 0)
 end
 END_MIG

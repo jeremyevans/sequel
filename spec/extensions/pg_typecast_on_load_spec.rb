@@ -8,7 +8,7 @@ describe Sequel::Model, "PgTypecastOnLoad plugin" do
     end
     @c = Class.new(Sequel::Model(@db[:items]))
     @c.plugin :pg_typecast_on_load, :b, :y
-  end 
+  end
 
   specify "should call the database conversion proc for all given columns" do
     @c.first.values.should == {:id=>1, :b=>true, :y=>0}
@@ -52,7 +52,7 @@ describe Sequel::Model, "PgTypecastOnLoad plugin" do
     @c.add_pg_typecast_on_load_columns :y
     @c.first.values.should == {:id=>1, :b=>true, :y=>0}
     c2.first.values.should == {:id=>1, :b=>true, :y=>"0"}
-    
+
     c1.add_pg_typecast_on_load_columns :y
     c1.first.values.should == {:id=>1, :b=>"t", :y=>0}
   end

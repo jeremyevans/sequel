@@ -37,20 +37,20 @@ module Sequel
             $1.to_i
           end
         end
-        
+
         # Derby supports transaction DDL statements.
         def supports_transactional_ddl?
           true
         end
 
         private
-        
+
         # Derby optimizes away Sequel's default check of SELECT NULL FROM table,
         # so use a SELECT * FROM table there.
         def _table_exists?(ds)
           ds.first
         end
-    
+
         # Derby-specific syntax for renaming columns and changing a columns type/nullity.
         def alter_table_sql(table, op)
           case op[:op]
@@ -75,7 +75,7 @@ module Sequel
         def column_definition_null_sql(sql, column)
           sql << " NOT NULL" if column.fetch(:null, column[:allow_null]) == false
         end
-    
+
         # Add NOT LOGGED for temporary tables to improve performance.
         def create_table_sql(name, generator, options)
           s = super
@@ -130,7 +130,7 @@ module Sequel
         def set_ps_arg_nil(cps, i)
           cps.setNull(i, cps.getParameterMetaData.getParameterType(i))
         end
-      
+
         # Derby uses RENAME TABLE syntax to rename tables.
         def rename_table_sql(name, new_name)
           "RENAME TABLE #{quote_schema_table(name)} TO #{quote_schema_table(new_name)}"
@@ -166,7 +166,7 @@ module Sequel
           @valid_connection_sql ||= select(1).sql
         end
       end
-      
+
       # Dataset class for Derby datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         PAREN_CLOSE = Dataset::PAREN_CLOSE
@@ -191,7 +191,7 @@ module Sequel
         EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
 
         # Derby doesn't support an expression between CASE and WHEN,
-        # so remove 
+        # so remove
         # conditions.
         def case_expression_sql_append(sql, ce)
           super(sql, ce.with_merged_expression)
@@ -253,7 +253,7 @@ module Sequel
         end
 
         DERBY_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:derby_clob)
-      
+
         # Handle clobs on Derby as strings.
         def convert_type_proc(v)
           if v.is_a?(JAVA_SQL_CLOB)
@@ -262,7 +262,7 @@ module Sequel
             super
           end
         end
-        
+
         # Derby needs a hex string casted to BLOB for blobs.
         def literal_blob_append(sql, v)
           sql << BLOB_OPEN << v.unpack(HSTAR).first << BLOB_CLOSE

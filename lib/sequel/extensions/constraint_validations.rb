@@ -9,7 +9,7 @@
 #
 # Note that you should only need to do this when modifying the constraint
 # validations (i.e. when migrating).  You should probably not load this
-# extension in general application code. 
+# extension in general application code.
 #
 # You also need to make sure to add the metadata table for the automatic
 # validations.  By default, this table is called sequel_constraint_validations.
@@ -141,7 +141,7 @@ module Sequel
         @generator = generator
       end
 
-      # Create constraint validation methods that don't take an argument 
+      # Create constraint validation methods that don't take an argument
       %w'presence unique'.each do |v|
         class_eval(<<-END, __FILE__, __LINE__+1)
           def #{v}(columns, opts=OPTS)
@@ -150,7 +150,7 @@ module Sequel
         END
       end
 
-      # Create constraint validation methods that take an argument 
+      # Create constraint validation methods that take an argument
       %w'exact_length min_length max_length length_range format like ilike includes'.each do |v|
         class_eval(<<-END, __FILE__, __LINE__+1)
           def #{v}(arg, columns, opts=OPTS)

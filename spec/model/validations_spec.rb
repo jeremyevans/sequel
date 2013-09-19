@@ -4,40 +4,40 @@ describe Sequel::Model::Errors do
   before do
     @errors = Sequel::Model::Errors.new
   end
-  
+
   specify "should be clearable using #clear" do
     @errors.add(:a, 'b')
     @errors.should == {:a=>['b']}
     @errors.clear
     @errors.should == {}
   end
-  
+
   specify "should be empty if there are no errors" do
     @errors.should be_empty
   end
-  
+
   specify "should not be empty if there are errors" do
     @errors.add(:blah, "blah")
     @errors.should_not be_empty
   end
-  
+
   specify "should return an array of errors for a specific attribute using #on if there are errors" do
     @errors.add(:blah, 'blah')
     @errors.on(:blah).should == ['blah']
   end
-  
+
   specify "should return nil using #on if there are no errors for that attribute" do
     @errors.on(:blah).should == nil
   end
-  
+
   specify "should accept errors using #add" do
     @errors.add :blah, 'zzzz'
     @errors[:blah].should == ['zzzz']
   end
-  
+
   specify "should return full messages using #full_messages" do
     @errors.full_messages.should == []
-    
+
     @errors.add(:blow, 'blieuh')
     @errors.add(:blow, 'blich')
     @errors.add(:blay, 'bliu')
@@ -48,7 +48,7 @@ describe Sequel::Model::Errors do
 
   specify "should not add column names for LiteralStrings" do
     @errors.full_messages.should == []
-    
+
     @errors.add(:blow, 'blieuh')
     @errors.add(:blow, Sequel.lit('blich'))
     @errors.add(:blay, 'bliu')
@@ -91,28 +91,28 @@ describe Sequel::Model do
         errors.add(:score, 'too low') if score < 87
       end
     end
-    
+
     @o = @c.new
   end
-  
+
   specify "should supply a #valid? method that returns true if validations pass" do
     @o.score = 50
     @o.should_not be_valid
     @o.score = 100
     @o.should be_valid
   end
-  
+
   specify "should provide an errors object" do
     @o.score = 100
     @o.should be_valid
     @o.errors.should be_empty
-    
+
     @o.score = 86
     @o.should_not be_valid
     @o.errors[:score].should == ['too low']
     @o.errors.on(:blah).should be_nil
   end
-  
+
   specify "should allow raising of ValidationFailed with a Model instance with errors" do
     @o.errors.add(:score, 'is too low')
     begin
@@ -123,7 +123,7 @@ describe Sequel::Model do
     e.errors.should equal(@o.errors)
     e.message.should == 'score is too low'
   end
-  
+
   specify "should allow raising of ValidationFailed with an Errors instance" do
     @o.errors.add(:score, 'is too low')
     begin
@@ -158,13 +158,13 @@ describe "Model#save" do
     @m.should_not be_valid
     @m.save
     DB.sqls.should be_empty
-    
+
     @m.x = 7
     @m.should be_valid
     @m.save.should_not be_false
     DB.sqls.should == ['UPDATE people SET x = 7 WHERE (id = 4)']
   end
-  
+
   specify "should skip validations if the :validate=>false option is used" do
     @m.raise_on_save_failure = false
     @m.should_not be_valid

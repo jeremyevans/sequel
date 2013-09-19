@@ -15,7 +15,7 @@
 #
 #   h = Sequel.hstore(:hstore_column)
 #
-# Also, on most Sequel expression objects, you can call the hstore 
+# Also, on most Sequel expression objects, you can call the hstore
 # method:
 #
 #   h = Sequel.expr(:hstore_column).hstore
@@ -36,7 +36,7 @@
 #   h.has_key?('a')                      # ?
 #   h.contain_all(:array_column)         # ?&
 #   h.contain_any(:array_column)         # ?|
-#   h.contains(:other_hstore_column)     # @> 
+#   h.contains(:other_hstore_column)     # @>
 #   h.contained_by(:other_hstore_column) # <@
 #
 #   h.defined        # defined(hstore_column)
@@ -189,7 +189,7 @@ module Sequel
       def populate(record)
         SQL::Function.new(:populate_record, record, self)
       end
-      
+
       # Update the values in a record using entries in the receiver:
       #
       #   hstore_op.record_set(:a) # (a #= hstore)
@@ -258,7 +258,7 @@ module Sequel
 
       # Wrap argument in a PGArray if it is an array
       def wrap_input_array(obj)
-        if obj.is_a?(Array) && Sequel.respond_to?(:pg_array) 
+        if obj.is_a?(Array) && Sequel.respond_to?(:pg_array)
           Sequel.pg_array(obj)
         else
           obj
@@ -267,7 +267,7 @@ module Sequel
 
       # Wrap argument in an Hstore if it is a hash
       def wrap_input_hash(obj)
-        if obj.is_a?(Hash) && Sequel.respond_to?(:hstore) 
+        if obj.is_a?(Hash) && Sequel.respond_to?(:hstore)
           Sequel.hstore(obj)
         else
           obj
@@ -276,7 +276,7 @@ module Sequel
 
       # Wrap argument in a PGArrayOp if supported
       def wrap_output_array(obj)
-        if Sequel.respond_to?(:pg_array_op) 
+        if Sequel.respond_to?(:pg_array_op)
           Sequel.pg_array_op(obj)
         else
           obj

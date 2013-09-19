@@ -1,11 +1,11 @@
 module Sequel
   module Plugins
     # The timestamps plugin creates hooks that automatically set create and
-    # update timestamp fields.  Both field names used are configurable, and you 
+    # update timestamp fields.  Both field names used are configurable, and you
     # can also set whether to overwrite existing create timestamps (false
     # by default), or whether to set the update timestamp when creating (also
     # false by default).
-    # 
+    #
     # Usage:
     #
     #   # Timestamp all model instances using +created_at+ and +updated_at+
@@ -41,15 +41,15 @@ module Sequel
 
         # The field to store the update timestamp
         attr_reader :update_timestamp_field
-        
+
         # Whether to overwrite the create timestamp if it already exists
         def create_timestamp_overwrite?
           @create_timestamp_overwrite
         end
-        
+
         Plugins.inherited_instance_variables(self, :@create_timestamp_field=>nil, :@update_timestamp_field=>nil,
           :@create_timestamp_overwrite=>nil, :@set_update_timestamp_on_create=>nil)
-        
+
         # Whether to set the update timestamp to the create timestamp when creating
         def set_update_timestamp_on_create?
           @set_update_timestamp_on_create
@@ -62,15 +62,15 @@ module Sequel
           set_create_timestamp
           super
         end
-        
+
         # Set the update timestamp when updating
         def before_update
           set_update_timestamp
           super
         end
-        
+
         private
-        
+
         # If the object has accessor methods for the create timestamp field, and
         # the create timestamp value is nil or overwriting it is allowed, set the
         # create timestamp field to the time given or the current time.  If setting
@@ -82,7 +82,7 @@ module Sequel
           self.send(meth, time||=Sequel.datetime_class.now) if respond_to?(field) && respond_to?(meth) && (model.create_timestamp_overwrite? || send(field).nil?)
           set_update_timestamp(time) if model.set_update_timestamp_on_create?
         end
-        
+
         # Set the update timestamp to the time given or the current time if the
         # object has a setter method for the update timestamp field.
         def set_update_timestamp(time=nil)

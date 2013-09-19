@@ -28,7 +28,7 @@ Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line 
           Sequel::Deprecation.output = false
           instance_exec(&block)
         ensure
-          Sequel::Deprecation.output = output 
+          Sequel::Deprecation.output = output
         end
       end
     end

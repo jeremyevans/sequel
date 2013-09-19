@@ -15,7 +15,7 @@ module Sequel
     #     String :name
     #     address :address
     #   end
-    # 
+    #
     # You can create a Sequel::Model for the address table, and load the plugin,
     # which registers the row type:
     #

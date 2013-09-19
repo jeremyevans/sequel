@@ -16,13 +16,13 @@ module Sequel
         END
         # Error messages for mysql and mysql2 that indicate the current connection should be disconnected
         MYSQL_DATABASE_DISCONNECT_ERRORS = /\A#{Regexp.union(disconnect_errors)}/o
-       
+
         # Support stored procedures on MySQL
         def call_sproc(name, opts=OPTS, &block)
-          args = opts[:args] || [] 
+          args = opts[:args] || []
           execute("CALL #{name}#{args.empty? ? '()' : literal(args)}", opts.merge(:sproc=>false), &block)
         end
-        
+
         # Executes the given SQL using an available connection, yielding the
         # connection if the block is given.
         def execute(sql, opts=OPTS, &block)
@@ -34,7 +34,7 @@ module Sequel
             synchronize(opts[:server]){|conn| _execute(conn, sql, opts, &block)}
           end
         end
-        
+
         private
 
         def add_prepared_statements_cache(conn)
@@ -85,7 +85,7 @@ module Sequel
 
       module DatasetMethods
         include Sequel::Dataset::StoredProcedures
-       
+
         # Methods to add to MySQL prepared statement calls without using a
         # real database prepared statement and bound variables.
         module CallableStatementMethods
@@ -99,53 +99,53 @@ module Sequel
             ps.prepared_sql
           end
         end
-        
+
         # Methods for MySQL prepared statements using the native driver.
         module PreparedStatementMethods
           include Sequel::Dataset::UnnumberedArgumentMapper
-          
+
           # Raise a more obvious error if you attempt to call a unnamed prepared statement.
           def call(*)
             raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
             super
           end
-          
+
           private
-          
+
           # Execute the prepared statement with the bind arguments instead of
           # the given SQL.
           def execute(sql, opts=OPTS, &block)
             super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
           end
-          
+
           # Same as execute, explicit due to intricacies of alias and super.
           def execute_dui(sql, opts=OPTS, &block)
             super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
           end
-          
+
           # Same as execute, explicit due to intricacies of alias and super.
           def execute_insert(sql, opts=OPTS, &block)
             super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
           end
         end
-        
+
         # Methods for MySQL stored procedures using the native driver.
         module StoredProcedureMethods
           include Sequel::Dataset::StoredProcedureMethods
-          
+
           private
-          
+
           # Execute the database stored procedure with the stored arguments.
           def execute(sql, opts=OPTS, &block)
             super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
           end
-          
+
           # Same as execute, explicit due to intricacies of alias and super.
           def execute_dui(sql, opts=OPTS, &block)
             super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
           end
         end
-        
+
         # MySQL is different in that it supports prepared statements but not bound
         # variables outside of prepared statements.  The default implementation
         # breaks the use of subselects in prepared statements, so extend the
@@ -156,7 +156,7 @@ module Sequel
           ps.extend(CallableStatementMethods)
           ps.call(bind_arguments, &block)
         end
-        
+
         # Store the given type of prepared statement in the associated database
         # with the given name.
         def prepare(type, name=nil, *values)
@@ -168,14 +168,14 @@ module Sequel
           end
           ps
         end
-        
+
         private
 
         # Extend the dataset with the MySQL stored procedure methods.
         def prepare_extend_sproc(ds)
           ds.extend(StoredProcedureMethods)
         end
-        
+
       end
     end
   end

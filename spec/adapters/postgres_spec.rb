@@ -115,8 +115,8 @@ describe "PostgreSQL views" do
   specify "should support :if_exists=>true for not raising an error if the view does not exist" do
     proc{@db.drop_view(:items_view, :if_exists=>true)}.should_not raise_error
   end
-end 
-    
+end
+
 describe "A PostgreSQL database" do
   before(:all) do
     @db = DB
@@ -264,10 +264,10 @@ describe "A PostgreSQL dataset" do
     proc{@db[:atest].insert(2)}.should raise_error(Sequel::Postgres::ExclusionConstraintViolation)
     @db.alter_table(:atest){drop_constraint 'atest_ex'}
   end if DB.server_version >= 90000
-  
+
   specify "should support deferrable exclusion constraints" do
     @db.create_table!(:atest){Integer :t; exclude [[Sequel.desc(:t, :nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}, :deferrable => true}
-    proc do 
+    proc do
       @db.transaction do
         @db[:atest].insert(2)
         proc{@db[:atest].insert(2)}.should_not raise_error
@@ -739,7 +739,7 @@ describe "A PostgreSQL database" do
     @db[:posts].insert.should == 21
     @db[:posts].order(:a).map(:a).should == [1, 2, 10, 20, 21]
   end
-    
+
   specify "should support specifying Integer/Bignum/Fixnum types in primary keys and have them be auto incrementing" do
     @db.create_table(:posts){primary_key :a, :type=>Integer}
     @db[:posts].insert.should == 1
@@ -1428,7 +1428,7 @@ if DB.adapter_scheme == :postgres
       two_rows = []
       @ds.order(:x).use_cursor(:cursor_name => 'cursor_one').each do |one|
         one_rows << one
-        if one[:x] % 1000 == 500 
+        if one[:x] % 1000 == 500
           two_rows = []
           @ds.order(:x).use_cursor(:cursor_name => 'cursor_two').each do |two|
             two_rows << two
@@ -2284,7 +2284,7 @@ describe 'PostgreSQL hstore handling' do
     c.filter(:other_items=>o2).all.should == [o]
     c.filter(:other_related_items=>o).all.should == [o]
     c.filter(:mtm_items=>o).all.should == [o]
-   
+
     # Filter By Associations - Model Datasets
     c.filter(:item=>c.filter(:id=>o2.id)).all.should == [o]
     c.filter(:items=>c.filter(:id=>o.id)).all.should == [o2]
@@ -2302,7 +2302,7 @@ describe 'PostgreSQL hstore handling' do
     h1 = Sequel.hstore(:h1)
     h2 = Sequel.hstore(:h2)
     h3 = Sequel.hstore(:h3)
-    
+
     @ds.get(h1['a']).should == 'b'
     @ds.get(h1['d']).should == nil
 
@@ -2755,7 +2755,7 @@ describe 'PostgreSQL range types' do
 
     @db.get(Sequel.pg_range(1..5, :int4range).op.overlaps(5..6)).should be_true
     @db.get(Sequel.pg_range(1...5, :int4range).op.overlaps(5..6)).should be_false
-    
+
     @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(6..10)).should be_true
     @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(5..10)).should be_false
     @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(-1..0)).should be_false

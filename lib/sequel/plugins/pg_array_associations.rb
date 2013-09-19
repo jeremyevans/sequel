@@ -89,12 +89,12 @@ module Sequel
         def default_key
           :"#{underscore(demodulize(self[:model].name))}_ids"
         end
-        
+
         # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
         def predicate_key
           cached_fetch(:predicate_key){qualify_assoc(self[:key_column])}
         end
-    
+
         # The column in the current table that the keys in the array column in the
         # associated table reference.
         def primary_key
@@ -106,9 +106,9 @@ module Sequel
         def remove_before_destroy?
           false
         end
-    
+
         private
-    
+
         # Only consider an association as a reciprocal if it has matching keys
         # and primary keys.
         def reciprocal_association?(assoc_reflect)
@@ -151,7 +151,7 @@ module Sequel
         def predicate_key
           cached_fetch(:predicate_key){qualify_assoc(primary_key)}
         end
-    
+
         # The primary key of the associated model.
         def primary_key
           cached_fetch(:primary_key){associated_class.primary_key}
@@ -163,7 +163,7 @@ module Sequel
         end
 
         private
-    
+
         # Only consider an association as a reciprocal if it has matching keys
         # and primary keys.
         def reciprocal_association?(assoc_reflect)
@@ -218,7 +218,7 @@ module Sequel
               if pks ||= assoc_record.send(key)
                 pks.each do |pkv|
                   next unless objects = id_map[pkv]
-                  objects.each do |object| 
+                  objects.each do |object|
                     object.associations[name].push(assoc_record)
                   end
                 end
@@ -272,7 +272,7 @@ module Sequel
               o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
             end
             association_module_private_def(opts._add_method, opts, &adder)
-    
+
             remover = opts[:remover] || proc do |o|
               if (array = o.send(key)) && !array.empty?
                 array.delete(send(pk))
@@ -321,7 +321,7 @@ module Sequel
             ds = model.eager_loading_dataset(opts, klass.where(opts.predicate_key=>id_map.keys), nil, eo[:associations], eo)
             ds.all do |assoc_record|
               if objects = id_map[assoc_record.send(pkm)]
-                objects.each do |object| 
+                objects.each do |object|
                   object.associations[name].push(assoc_record)
                 end
               end
@@ -371,7 +371,7 @@ module Sequel
             end
 
             adder = opts[:adder] || proc do |o|
-              opk = o.send(opts.primary_key) 
+              opk = o.send(opts.primary_key)
               if array = send(key)
                 modified!(key)
                 array << opk
@@ -381,7 +381,7 @@ module Sequel
               save_after_modify.call(self) if save_after_modify
             end
             association_module_private_def(opts._add_method, opts, &adder)
-    
+
             remover = opts[:remover] || proc do |o|
               if (array = send(key)) && !array.empty?
                 modified!(key)
