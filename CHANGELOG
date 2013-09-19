@@ -1,5 +1,7 @@
 === HEAD
 
+* Support composite keys in the tree plugin (jeremyevans)
+
 * Make Migrator.migrator_class public (robertjpayne, jeremyevans) (#708)
 
 * Make PostgreSQL empty array literalization work correctly on PostgreSQL <8.4 (jeremyevans)

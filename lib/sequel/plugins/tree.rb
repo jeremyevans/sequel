@@ -23,9 +23,9 @@ module Sequel
     #   end
     module Tree
       # Create parent and children associations.  Any options
-      # specified are passed to both associations.  You can
-      # specify options to use for the parent association
-      # using a :parent option, and options to use for the
+      # specified are passed to both associations.  You can also
+      # specify options to use for just the parent association
+      # using a :parent option, and options to use for just the
       # children association using a :children option.
       def self.apply(model, opts=OPTS)
         opts = opts.dup
@@ -72,7 +72,7 @@ module Sequel
         #
         #   TreeClass.roots_dataset => Sequel#Dataset
         def roots_dataset
-          ds = filter(parent_column => nil)
+          ds = where(Sequel.or(Array(parent_column).zip([])))
           ds = ds.order(*tree_order) if tree_order
           ds
         end
@@ -105,7 +105,7 @@ module Sequel
 
         # Returns true if this is a root node, false otherwise.
         def root?
-          !new? && self[model.parent_column].nil?
+          !new? && possible_root?
         end
 
         # Returns all siblings and a reference to the current node.
@@ -121,6 +121,13 @@ module Sequel
         def siblings
           self_and_siblings - [self]
         end
+
+        private
+
+        # True if if all parent columns values are not NULL.
+        def possible_root?
+          !Array(model.parent_column).map{|c| self[c]}.all?
+        end
       end
 
       # Plugin included when :single_root option is passed.
@@ -135,7 +142,7 @@ module Sequel
         module InstanceMethods
           # Hook that prevents a second root from being created.
           def before_save
-            if self[model.parent_column].nil? && (root = model.root) && pk != root.pk
+            if possible_root? && (root = model.root) && pk != root.pk
               raise TreeMultipleRootError, "there is already a root #{model.name} defined"
             end
             super

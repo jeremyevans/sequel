@@ -1538,12 +1538,50 @@ describe "List plugin with a scope" do
 end
 
 describe "Sequel::Plugins::Tree" do
-  before(:all) do
-    @db = DB
+  shared_examples_for "tree plugin" do
+    it "should instantiate" do
+      @Node.all.size.should == 12
+    end
+
+    it "should find all descendants of a node" do 
+      @Node.find(:name => 'two').descendants.map{|m| m.name}.should == %w'two.one two.two two.three two.two.one'
+    end
+
+    it "should find all ancestors of a node" do 
+      @Node.find(:name => "two.two.one").ancestors.map{|m| m.name}.should == %w'two.two two'
+    end
+    
+    it "should find all siblings of a node, excepting self" do 
+      @Node.find(:name=>"two.one").siblings.map{|m| m.name}.should == %w'two.two two.three'
+    end
+
+    it "should find all siblings of a node, including self" do 
+      @Node.find(:name=>"two.one").self_and_siblings.map{|m| m.name}.should == %w'two.one two.two two.three'
+    end
+
+    it "should find siblings for root nodes" do 
+      @Node.find(:name=>'three').self_and_siblings.map{|m| m.name}.should == %w'one two three four five'
+    end
+
+    it "should find correct root for a node" do
+      @Node.find(:name=>"two.two.one").root.name.should == 'two'
+      @Node.find(:name=>"three").root.name.should == 'three'
+      @Node.find(:name=>"five.one").root.name.should == 'five'
+    end
+
+    it "iterate top-level nodes in order" do
+      @Node.roots_dataset.count.should == 5
+      @Node.roots.map{|p| p.name}.should == %w'one two three four five'
+    end
+  
+    it "should have children" do
+      @Node.find(:name=>'one').children.map{|m| m.name}.should == %w'one.one one.two'
+    end
   end
 
-  describe "with natural database order" do
+  describe "with simple key" do
     before(:all) do
+      @db = DB
       @db.create_table!(:nodes) do
         Integer :id, :primary_key=>true
         String :name
@@ -1565,140 +1603,51 @@ describe "Sequel::Plugins::Tree" do
         {:id => 12, :name => "two.three", :parent_id => 2, :position => 3}]
       @nodes.each{|node| @db[:nodes].insert(node)}
 
-      class ::Node < Sequel::Model
-        plugin :tree
-      end
+      @Node = Class.new(Sequel::Model(:nodes))
+      @Node.plugin :tree, :order=>:position
     end
     after(:all) do
       @db.drop_table?(:nodes)
-      Object.send(:remove_const, :Node)
     end
 
-    it "should instantiate" do
-      Node.all.size.should == 12
-    end
-
-    it "should find top level nodes" do
-      Node.roots_dataset.count.should == 5
-    end
-
-    it "should find all descendants of a node" do 
-      two = Node.find(:id => 2)
-      two.name.should == "two"
-      two.descendants.map{|m| m[:id]}.should == [4, 5, 12, 6]
-    end
-
-    it "should find all ancestors of a node" do 
-      twotwoone = Node.find(:id => 6)
-      twotwoone.name.should == "two.two.one"
-      twotwoone.ancestors.map{|m| m[:id]}.should == [5, 2]
-    end
-    
-    it "should find all siblings of a node, excepting self" do 
-      twoone = Node.find(:id => 4)
-      twoone.name.should == "two.one"
-      twoone.siblings.map{|m| m[:id]}.should == [5, 12]
-    end
-
-    it "should find all siblings of a node, including self" do 
-      twoone = Node.find(:id => 4)
-      twoone.name.should == "two.one"
-      twoone.self_and_siblings.map{|m| m[:id]}.should == [4, 5, 12]
-    end
-
-    it "should find siblings for root nodes" do 
-      three = Node.find(:id => 3)
-      three.name.should == "three"
-      three.self_and_siblings.map{|m| m[:id]}.should == [1, 2, 3, 9, 10]
-    end
-
-    it "should find correct root for a node" do
-      twotwoone = Node.find(:id => 6)
-      twotwoone.name.should == "two.two.one"
-      twotwoone.root[:id].should == 2
-    
-      three = Node.find(:id => 3)
-      three.name.should == "three"
-      three.root[:id].should == 3
-    
-      fiveone = Node.find(:id => 11)
-      fiveone.name.should == "five.one"
-      fiveone.root[:id].should == 9
-    end
-
-    it "iterate top-level nodes in natural database order" do
-      Node.roots_dataset.count.should == 5
-      Node.roots.inject([]){|ids, p| ids << p.position}.should == [1, 2, 3, 5, 4]
-    end
-  
-    it "should have children" do
-      one = Node.find(:id => 1)
-      one.name.should == "one"
-      one.children.size.should == 2
-    end
-  
-    it "children should be natural database order" do 
-      one = Node.find(:id => 1)
-      one.name.should == "one"
-      one.children.map{|m| m[:position]}.should == [2, 1]
-    end
-
-    describe "Nodes in specified order" do
-      before(:all) do
-        class ::OrderedNode < Sequel::Model(:nodes)
-          plugin :tree, :order => :position
-        end
-      end
-      after(:all) do
-        Object.send(:remove_const, :OrderedNode)
-      end
-
-      it "iterate top-level nodes in order by position" do
-        OrderedNode.roots_dataset.count.should == 5
-        OrderedNode.roots.inject([]){|ids, p| ids << p.position}.should == [1, 2, 3, 4, 5]
-      end
-
-      it "children should be in specified order" do 
-        one = OrderedNode.find(:id => 1)
-        one.name.should == "one"
-        one.children.map{|m| m[:position]}.should == [1, 2]
-      end
-    end
+    it_should_behave_like "tree plugin"
   end
 
-  describe "Lorems in specified order" do
+  describe "with composite key" do
     before(:all) do
-      @db.create_table!(:lorems) do
-        Integer :id, :primary_key=>true
+      @db = DB
+      @db.create_table!(:nodes) do
+        Integer :id
+        Integer :id2
         String :name
-        Integer :ipsum_id
-        Integer :neque
+        Integer :parent_id
+        Integer :parent_id2
+        Integer :position 
+        primary_key [:id, :id2]
       end
 
-      @lorems = [{:id => 1, :name => 'Lorem', :ipsum_id => nil, :neque => 4}, 
-        {:id => 2, :name => 'Ipsum', :ipsum_id => nil, :neque => 3}, 
-        {:id => 4, :name => "Neque", :ipsum_id => 2, :neque => 2},
-        {:id => 5, :name => "Porro", :ipsum_id => 2, :neque => 1}]  
-      @lorems.each{|lorem| @db[:lorems].insert(lorem)}
+      @nodes = [{:id => 1, :id2=> 1, :name => 'one', :parent_id => nil, :parent_id2 => nil, :position => 1}, 
+        {:id => 2, :id2=> 1,  :name => 'two', :parent_id => nil, :parent_id2 => nil, :position => 2}, 
+        {:id => 1, :id2=> 2,  :name => 'three', :parent_id => nil, :parent_id2 => nil, :position => 3}, 
+        {:id => 2, :id2=> 2,  :name => "two.one", :parent_id => 2, :parent_id2 => 1, :position => 1},
+        {:id => 3, :id2=> 1,  :name => "two.two", :parent_id => 2, :parent_id2 => 1, :position => 2},
+        {:id => 3, :id2=> 2,  :name => "two.two.one", :parent_id => 3, :parent_id2 => 1, :position => 1},
+        {:id => 3, :id2=> 3,  :name => "one.two", :parent_id => 1, :parent_id2 => 1, :position => 2},
+        {:id => 1, :id2=> 3,  :name => "one.one", :parent_id => 1, :parent_id2 => 1, :position => 1},
+        {:id => 2, :id2=> 3,  :name => "five", :parent_id => nil, :parent_id2 => nil, :position => 5},
+        {:id => 4, :id2=> 1,  :name => "four", :parent_id => nil, :parent_id2 => nil, :position => 4},
+        {:id => 1, :id2=> 4,  :name => "five.one", :parent_id => 2, :parent_id2 => 3, :position => 1},
+        {:id => 2, :id2=> 4,  :name => "two.three", :parent_id => 2, :parent_id2 => 1, :position => 3}]
+      @nodes.each{|node| @db[:nodes].insert(node)}
 
-      class ::Lorem < Sequel::Model
-        plugin :tree, :key => :ipsum_id, :order => :neque
-      end
+      @Node = Class.new(Sequel::Model(:nodes))
+      @Node.plugin :tree, :order=>:position, :key=>[:parent_id, :parent_id2]
     end
     after(:all) do
-      @db.drop_table?(:lorems)
-      Object.send(:remove_const, :Lorem)
+      @db.drop_table?(:nodes)
     end
 
-    it "iterate top-level nodes in order by position" do
-      Lorem.roots_dataset.count.should == 2
-      Lorem.roots.inject([]){|ids, p| ids << p.neque}.should == [3, 4]
-    end
-
-    it "children should be specified order" do 
-      one = Lorem.find(:id => 2)
-      one.children.map{|m| m[:neque]}.should == [1, 2]
-    end
+    it_should_behave_like "tree plugin"
   end
 end
 
