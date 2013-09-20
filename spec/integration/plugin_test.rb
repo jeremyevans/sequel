@@ -705,43 +705,8 @@ describe "Composition plugin" do
   end
 end
 
-# DB2's implemention of CTE is too limited to use this plugin
-if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
-  describe "RcteTree Plugin" do
-    before(:all) do
-      @db = DB
-      @db.create_table!(:nodes) do
-        primary_key :id
-        Integer :parent_id
-        String :name
-      end
-      class ::Node < Sequel::Model(@db)
-        plugin :rcte_tree, :order=>:name
-      end
-      
-      @nodes = []
-      @nodes << @a = Node.create(:name=>'a')
-      @nodes << @b = Node.create(:name=>'b')
-      @nodes << @aa = Node.create(:name=>'aa', :parent=>@a)
-      @nodes << @ab = Node.create(:name=>'ab', :parent=>@a)
-      @nodes << @ba = Node.create(:name=>'ba', :parent=>@b)
-      @nodes << @bb = Node.create(:name=>'bb', :parent=>@b)
-      @nodes << @aaa = Node.create(:name=>'aaa', :parent=>@aa)
-      @nodes << @aab = Node.create(:name=>'aab', :parent=>@aa)
-      @nodes << @aba = Node.create(:name=>'aba', :parent=>@ab)
-      @nodes << @abb = Node.create(:name=>'abb', :parent=>@ab)
-      @nodes << @aaaa = Node.create(:name=>'aaaa', :parent=>@aaa)
-      @nodes << @aaab = Node.create(:name=>'aaab', :parent=>@aaa)
-      @nodes << @aaaaa = Node.create(:name=>'aaaaa', :parent=>@aaaa)
-    end
-    before do
-      @nodes.each{|n| n.associations.clear}
-    end
-    after(:all) do
-      @db.drop_table? :nodes
-      Object.send(:remove_const, :Node)
-    end
-    
+describe "RcteTree Plugin" do
+  shared_examples_for "rcte tree plugin"  do
     specify "should load all standard (not-CTE) methods correctly" do
       @a.children.should == [@aa, @ab]
       @b.children.should == [@ba, @bb]
@@ -803,7 +768,7 @@ if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
     end
     
     specify "should eagerly load all ancestors and descendants for a dataset" do
-      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:ancestors, :descendants).all
+      nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:ancestors, :descendants).all
       nodes.should == [@a, @aaa, @b]
       nodes[0].descendants.should == [@aa, @aaa, @aaaa, @aaaaa, @aaab, @aab, @ab, @aba, @abb]
       nodes[1].descendants.should == [@aaaa, @aaaaa, @aaab]
@@ -813,26 +778,14 @@ if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       nodes[2].ancestors.should == []
     end
 
-    specify "should work correctly if not all columns are selected" do
-      c = Class.new(Sequel::Model(@db[:nodes]))
-      c.plugin :rcte_tree, :order=>:name
-      c.plugin :lazy_attributes, :name
-      c[:name=>'aaaa'].descendants.should == [c.load(:parent_id=>11, :id=>13)]
-      c[:name=>'aa'].ancestors.should == [c.load(:parent_id=>nil, :id=>1)]
-      nodes = c.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:ancestors, :descendants).all
-      nodes.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>3, :id=>7}, {:parent_id=>nil, :id=>2}].map{|x| c.load(x)}
-      nodes[2].descendants.should == [{:parent_id=>2, :id=>5}, {:parent_id=>2, :id=>6}].map{|x| c.load(x)}
-      nodes[1].ancestors.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>1, :id=>3}].map{|x| c.load(x)}
-    end
-    
     specify "should eagerly load descendants to a given level" do
-      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>1).all
+      nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:descendants=>1).all
       nodes.should == [@a, @aaa, @b]
       nodes[0].descendants.should == [@aa, @ab]
       nodes[1].descendants.should == [@aaaa, @aaab]
       nodes[2].descendants.should == [@ba, @bb]
       
-      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>2).all
+      nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:descendants=>2).all
       nodes.should == [@a, @aaa, @b]
       nodes[0].descendants.should == [@aa, @aaa, @aab, @ab, @aba, @abb]
       nodes[1].descendants.should == [@aaaa, @aaaaa, @aaab]
@@ -840,7 +793,7 @@ if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
     end
     
     specify "should populate all :children associations when eagerly loading descendants for a dataset" do
-      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants).all
+      nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:descendants).all
       nodes[0].associations[:children].should == [@aa, @ab]
       nodes[1].associations[:children].should == [@aaaa, @aaab]
       nodes[2].associations[:children].should == [@ba, @bb]
@@ -854,7 +807,7 @@ if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
     end
     
     specify "should not populate :children associations for final level when loading descendants to a given level" do
-      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>1).all
+      nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:descendants=>1).all
       nodes[0].associations[:children].should == [@aa, @ab]
       nodes[0].associations[:children].map{|c1| c1.associations[:children]}.should == [nil, nil]
       nodes[1].associations[:children].should == [@aaaa, @aaab]
@@ -866,7 +819,7 @@ if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       nodes[1].associations[:children].map{|c1| c1.children}.should == [[@aaaaa], []]
       nodes[2].associations[:children].map{|c1| c1.children}.should == [[], []]
       
-      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>2).all
+      nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:descendants=>2).all
       nodes[0].associations[:children].should == [@aa, @ab]
       nodes[0].associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaa, @aab], [@aba, @abb]]
       nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[@aaaa, @aaab], nil], [nil, nil]]
@@ -904,7 +857,7 @@ if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
     end
     
     specify "should populate all :parent associations when eagerly loading ancestors for a dataset" do
-      nodes = Node.filter(:id=>[@a.id, @ba.id, @aaa.id, @aaaaa.id]).order(:name).eager(:ancestors).all
+      nodes = @Node.filter(@Node.primary_key=>[@a.pk, @ba.pk, @aaa.pk, @aaaaa.pk]).order(:name).eager(:ancestors).all
       nodes[0].associations.fetch(:parent, 1).should == nil
       nodes[1].associations[:parent].should == @aa
       nodes[1].associations[:parent].associations[:parent].should == @a
@@ -937,7 +890,91 @@ if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
       @aaaaa.associations[:parent].associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).should == nil
     end
   end
-end
+
+  before do
+    @nodes.each{|n| n.associations.clear}
+  end
+
+  describe "with single key" do
+    before(:all) do
+      @db = DB
+      @db.create_table!(:nodes) do
+        primary_key :id
+        Integer :parent_id
+        String :name
+      end
+      @Node = Class.new(Sequel::Model(@db[:nodes]))
+      @Node.plugin :rcte_tree, :order=>:name
+      @nodes = []
+      @nodes << @a = @Node.create(:name=>'a')
+      @nodes << @b = @Node.create(:name=>'b')
+      @nodes << @aa = @Node.create(:name=>'aa', :parent=>@a)
+      @nodes << @ab = @Node.create(:name=>'ab', :parent=>@a)
+      @nodes << @ba = @Node.create(:name=>'ba', :parent=>@b)
+      @nodes << @bb = @Node.create(:name=>'bb', :parent=>@b)
+      @nodes << @aaa = @Node.create(:name=>'aaa', :parent=>@aa)
+      @nodes << @aab = @Node.create(:name=>'aab', :parent=>@aa)
+      @nodes << @aba = @Node.create(:name=>'aba', :parent=>@ab)
+      @nodes << @abb = @Node.create(:name=>'abb', :parent=>@ab)
+      @nodes << @aaaa = @Node.create(:name=>'aaaa', :parent=>@aaa)
+      @nodes << @aaab = @Node.create(:name=>'aaab', :parent=>@aaa)
+      @nodes << @aaaaa = @Node.create(:name=>'aaaaa', :parent=>@aaaa)
+    end
+    after(:all) do
+      @db.drop_table? :nodes
+    end
+    
+    it_should_behave_like "rcte tree plugin"
+
+    specify "should work correctly if not all columns are selected" do
+      c = Class.new(Sequel::Model(@db[:nodes]))
+      c.plugin :rcte_tree, :order=>:name
+      c.plugin :lazy_attributes, :name
+      c[:name=>'aaaa'].descendants.should == [c.load(:parent_id=>11, :id=>13)]
+      c[:name=>'aa'].ancestors.should == [c.load(:parent_id=>nil, :id=>1)]
+      nodes = c.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:ancestors, :descendants).all
+      nodes.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>3, :id=>7}, {:parent_id=>nil, :id=>2}].map{|x| c.load(x)}
+      nodes[2].descendants.should == [{:parent_id=>2, :id=>5}, {:parent_id=>2, :id=>6}].map{|x| c.load(x)}
+      nodes[1].ancestors.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>1, :id=>3}].map{|x| c.load(x)}
+    end
+  end
+
+  describe "with composite keys" do
+    before(:all) do
+      @db = DB
+      @db.create_table!(:nodes) do
+        Integer :id
+        Integer :id2
+        Integer :parent_id
+        Integer :parent_id2
+        String :name
+        primary_key [:id, :id2]
+      end
+      @Node = Class.new(Sequel::Model(@db[:nodes]))
+      @Node.plugin :rcte_tree, :order=>:name, :key=>[:parent_id, :parent_id2]
+      @Node.unrestrict_primary_key
+      @nodes = []
+      @nodes << @a = @Node.create(:id=>1, :id2=>1, :name=>'a')
+      @nodes << @b = @Node.create(:id=>1, :id2=>2, :name=>'b')
+      @nodes << @aa = @Node.create(:id=>2, :id2=>1, :name=>'aa', :parent=>@a)
+      @nodes << @ab = @Node.create(:id=>2, :id2=>2, :name=>'ab', :parent=>@a)
+      @nodes << @ba = @Node.create(:id=>3, :id2=>1, :name=>'ba', :parent=>@b)
+      @nodes << @bb = @Node.create(:id=>3, :id2=>2, :name=>'bb', :parent=>@b)
+      @nodes << @aaa = @Node.create(:id=>3, :id2=>3, :name=>'aaa', :parent=>@aa)
+      @nodes << @aab = @Node.create(:id=>1, :id2=>3, :name=>'aab', :parent=>@aa)
+      @nodes << @aba = @Node.create(:id=>2, :id2=>3, :name=>'aba', :parent=>@ab)
+      @nodes << @abb = @Node.create(:id=>4, :id2=>1, :name=>'abb', :parent=>@ab)
+      @nodes << @aaaa = @Node.create(:id=>1, :id2=>4, :name=>'aaaa', :parent=>@aaa)
+      @nodes << @aaab = @Node.create(:id=>2, :id2=>4, :name=>'aaab', :parent=>@aaa)
+      @nodes << @aaaaa = @Node.create(:id=>3, :id2=>4, :name=>'aaaaa', :parent=>@aaaa)
+    end
+    after(:all) do
+      @db.drop_table? :nodes
+    end
+    
+    it_should_behave_like "rcte tree plugin"
+  end
+end if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
 
 describe "Instance Filters plugin" do 
   before(:all) do

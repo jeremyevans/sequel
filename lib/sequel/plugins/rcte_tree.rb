@@ -102,13 +102,8 @@ module Sequel
         
         key = opts[:key] ||= :parent_id
         prkey = opts[:primary_key] ||= model.primary_key
-        
-        parent = opts.merge(opts.fetch(:parent, {})).fetch(:name, :parent)
-        childrena = opts.merge(opts.fetch(:children, {})).fetch(:name, :children)
-        
         ka = opts[:key_alias] ||= :x_root_x
         t = opts[:cte_name] ||= :t
-        opts[:reciprocal] = nil
         c_all = if model.dataset.recursive_cte_requires_column_aliases?
           # Work around Oracle/ruby-oci8 bug that returns integers as BigDecimals in recursive queries.
           conv_bd = model.db.database_type == :oracle
@@ -119,13 +114,42 @@ module Sequel
           [SQL::ColumnAll.new(model.table_name)]
         end
         
+        bd_conv = lambda{|v| conv_bd && v.is_a?(BigDecimal) ? v.to_i : v}
+
+        key_array = Array(key)
+        prkey_array = Array(prkey)
+        if key.is_a?(Array)
+          key_conv = lambda{|m| key_array.map{|k| m[k]}}
+          key_present = lambda{|m| key_conv[m].all?}
+          prkey_conv = lambda{|m| prkey_array.map{|k| m[k]}}
+          key_aliases = (0...key_array.length).map{|i| :"#{ka}_#{i}"}
+          ka_conv = lambda{|m| key_aliases.map{|k| m[k]}}
+          ancestor_base_case_columns = prkey_array.zip(key_aliases).map{|k, ka_| SQL::AliasedExpression.new(k, ka_)} + c_all
+          descendant_base_case_columns = key_array.zip(key_aliases).map{|k, ka_| SQL::AliasedExpression.new(k, ka_)} + c_all
+          recursive_case_columns = prkey_array.zip(key_aliases).map{|k, ka_| SQL::QualifiedIdentifier.new(t, ka_)} + c_all
+          extract_key_alias = lambda{|m| key_aliases.map{|ka_| bd_conv[m.values.delete(ka_)]}}
+        else
+          key_present = key_conv = lambda{|m| m[key]}
+          prkey_conv = lambda{|m| m[prkey]}
+          key_aliases = [ka]
+          ka_conv = lambda{|m| m[ka]}
+          ancestor_base_case_columns = [SQL::AliasedExpression.new(prkey, ka)] + c_all
+          descendant_base_case_columns = [SQL::AliasedExpression.new(key, ka)] + c_all
+          recursive_case_columns = [SQL::QualifiedIdentifier.new(t, ka)] + c_all
+          extract_key_alias = lambda{|m| bd_conv[m.values.delete(ka)]}
+        end
+        
+        parent = opts.merge(opts.fetch(:parent, {})).fetch(:name, :parent)
+        childrena = opts.merge(opts.fetch(:children, {})).fetch(:name, :children)
+        
+        opts[:reciprocal] = nil
         a = opts.merge(opts.fetch(:ancestors, {}))
         ancestors = a.fetch(:name, :ancestors)
         a[:read_only] = true unless a.has_key?(:read_only)
         a[:eager_loader_key] = key
         a[:dataset] ||= proc do
-          base_ds = model.filter(prkey=>send(key))
-          recursive_ds = model.join(t, key=>prkey)
+          base_ds = model.filter(prkey_array.zip(key_array.map{|k| send(k)}))
+          recursive_ds = model.join(t, key_array.zip(prkey_array))
           if c = a[:conditions]
             (base_ds, recursive_ds) = [base_ds, recursive_ds].collect do |ds|
               (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
@@ -140,14 +164,14 @@ module Sequel
         aal = Array(a[:after_load])
         aal << proc do |m, ancs|
           unless m.associations.has_key?(parent)
-            parent_map = {m[prkey]=>m}
+            parent_map = {prkey_conv[m]=>m}
             child_map = {}
-            child_map[m[key]] = m if m[key]
+            child_map[key_conv[m]] = m if key_present[m]
             m.associations[parent] = nil
             ancs.each do |obj|
               obj.associations[parent] = nil
-              parent_map[obj[prkey]] = obj
-              if ok = obj[key]
+              parent_map[prkey_conv[obj]] = obj
+              if ok = key_conv[obj]
                 child_map[ok] = obj
               end
             end
@@ -164,16 +188,16 @@ module Sequel
           parent_map = {}
           children_map = {}
           eo[:rows].each do |obj|
-            parent_map[obj[prkey]] = obj
-            (children_map[obj[key]] ||= []) << obj
+            parent_map[prkey_conv[obj]] = obj
+            (children_map[key_conv[obj]] ||= []) << obj
             obj.associations[ancestors] = []
             obj.associations[parent] = nil
           end
           r = model.association_reflection(ancestors)
           base_case = model.filter(prkey=>id_map.keys).
-           select(SQL::AliasedExpression.new(prkey, ka), *c_all)
-          recursive_case = model.join(t, key=>prkey).
-           select(SQL::QualifiedIdentifier.new(t, ka), *c_all)
+           select(*ancestor_base_case_columns)
+          recursive_case = model.join(t, key_array.zip(prkey_array)).
+           select(*recursive_case_columns)
           if c = r[:conditions]
             (base_case, recursive_case) = [base_case, recursive_case].collect do |ds|
               (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
@@ -184,26 +208,24 @@ module Sequel
            model.from(SQL::AliasedExpression.new(t, table_alias)).
             with_recursive(t, base_case,
              recursive_case,
-             :args=>(([ka] + col_aliases) if col_aliases)),
+             :args=>((key_aliases + col_aliases) if col_aliases)),
            r.select,
            eo[:associations], eo)
           elds = elds.select_append(ka) unless elds.opts[:select] == nil
           elds.all do |obj|
-            opk = obj[prkey]
+            opk = prkey_conv[obj]
             if parent_map.has_key?(opk)
               if idm_obj = parent_map[opk]
-                idm_obj.values[ka] = obj.values[ka]
+                key_aliases.each{|ka_| idm_obj.values[ka_] = obj.values[ka_]}
                 obj = idm_obj
               end
             else
               obj.associations[parent] = nil
               parent_map[opk] = obj
-              (children_map[obj[key]] ||= []) << obj
+              (children_map[key_conv[obj]] ||= []) << obj
             end
             
-            kv = obj.values.delete(ka)
-            kv = kv.to_i if conv_bd && kv.is_a?(BigDecimal)
-            if roots = id_map[kv]
+            if roots = id_map[extract_key_alias[obj]]
               roots.each do |root|
                 root.associations[ancestors] << obj
               end
@@ -224,8 +246,8 @@ module Sequel
         d[:read_only] = true unless d.has_key?(:read_only)
         la = d[:level_alias] ||= :x_level_x
         d[:dataset] ||= proc do
-          base_ds = model.filter(key=>send(prkey))
-          recursive_ds = model.join(t, prkey=>key)
+          base_ds = model.filter(key_array.zip(prkey_array.map{|k| send(k)}))
+          recursive_ds = model.join(t, prkey_array.zip(key_array))
           if c = d[:conditions]
             (base_ds, recursive_ds) = [base_ds, recursive_ds].collect do |ds|
               (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
@@ -240,15 +262,15 @@ module Sequel
         dal = Array(d[:after_load])
         dal << proc do |m, descs|
           unless m.associations.has_key?(childrena)
-            parent_map = {m[prkey]=>m}
+            parent_map = {prkey_conv[m]=>m}
             children_map = {}
             m.associations[childrena] = []
             descs.each do |obj|
               obj.associations[childrena] = []
-              if opk = obj[prkey]
+              if opk = prkey_conv[obj]
                 parent_map[opk] = obj
               end
-              if ok = obj[key]
+              if ok = key_conv[obj]
                 (children_map[ok] ||= []) << obj
               end
             end
@@ -264,15 +286,15 @@ module Sequel
           parent_map = {}
           children_map = {}
           eo[:rows].each do |obj|
-            parent_map[obj[prkey]] = obj
+            parent_map[prkey_conv[obj]] = obj
             obj.associations[descendants] = []
             obj.associations[childrena] = []
           end
           r = model.association_reflection(descendants)
           base_case = model.filter(key=>id_map.keys).
-           select(SQL::AliasedExpression.new(key, ka), *c_all)
-          recursive_case = model.join(t, prkey=>key).
-           select(SQL::QualifiedIdentifier.new(t, ka), *c_all)
+           select(*descendant_base_case_columns)
+          recursive_case = model.join(t, prkey_array.zip(key_array)).
+           select(*recursive_case_columns)
           if c = r[:conditions]
             (base_case, recursive_case) = [base_case, recursive_case].collect do |ds|
               (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
@@ -288,7 +310,7 @@ module Sequel
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           elds = model.eager_loading_dataset(r,
            model.from(SQL::AliasedExpression.new(t, table_alias)).with_recursive(t, base_case, recursive_case,
-            :args=>(([ka] + col_aliases + (level ? [la] : [])) if col_aliases)),
+            :args=>((key_aliases + col_aliases + (level ? [la] : [])) if col_aliases)),
            r.select,
            associations, eo)
           elds = elds.select_append(ka) unless elds.opts[:select] == nil
@@ -297,10 +319,10 @@ module Sequel
               no_cache = no_cache_level == obj.values.delete(la)
             end
             
-            opk = obj[prkey]
+            opk = prkey_conv[obj]
             if parent_map.has_key?(opk)
               if idm_obj = parent_map[opk]
-                idm_obj.values[ka] = obj.values[ka]
+                key_aliases.each{|ka_| idm_obj.values[ka_] = obj.values[ka_]}
                 obj = idm_obj
               end
             else
@@ -308,13 +330,11 @@ module Sequel
               parent_map[opk] = obj
             end
             
-            kv = obj.values.delete(ka)
-            kv = kv.to_i if conv_bd && kv.is_a?(BigDecimal)
-            if root = id_map[kv].first
+            if root = id_map[extract_key_alias[obj]].first
               root.associations[descendants] << obj
             end
             
-            (children_map[obj[key]] ||= []) << obj
+            (children_map[key_conv[obj]] ||= []) << obj
           end
           children_map.each do |parent_id, objs|
             parent_map[parent_id].associations[childrena] = objs.uniq
