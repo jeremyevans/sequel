@@ -404,7 +404,6 @@ module Sequel
         self
       end
     end
-    private_class_method :migrator_class
     
     # The column to use to hold the migration version number for integer migrations or
     # filename for timestamp migrations (defaults to :version for integer migrations and
