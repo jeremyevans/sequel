@@ -580,8 +580,7 @@ module Sequel
     # has no records. Users should probably use +first+ instead of
     # this method.
     def single_record
-      clone(:limit=>1).each{|r| return r}
-      nil
+      clone(:limit=>1).all.first
     end
 
     # Returns the first value of the first record in the dataset.
