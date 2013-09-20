@@ -4529,6 +4529,12 @@ describe "Dataset#supports_replace?" do
   end
 end
 
+describe "Dataset#supports_lateral_subqueries?" do
+  it "should be false by default" do
+    Sequel::Dataset.new(nil).supports_lateral_subqueries?.should be_false
+  end
+end
+
 describe "Frozen Datasets" do
   before do
     @ds = Sequel.mock[:test].freeze
