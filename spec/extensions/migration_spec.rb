@@ -211,6 +211,21 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
   end
 end
 
+describe "Sequel::Migrator.migrator_class" do
+  specify "should return IntegerMigrator if not using timestamp migrations" do
+    Sequel::Migrator.migrator_class("spec/files/integer_migrations").should == Sequel::IntegerMigrator
+  end
+
+  specify "should return TimestampMigrator if using timestamp migrations" do
+    Sequel::Migrator.migrator_class('spec/files/timestamped_migrations').should == Sequel::TimestampMigrator
+  end
+
+  specify "should return self if run on a subclass" do
+    Sequel::IntegerMigrator.migrator_class("spec/files/timestamped_migrations").should == Sequel::IntegerMigrator
+    Sequel::TimestampMigrator.migrator_class("spec/files/integer_migrations").should == Sequel::TimestampMigrator
+  end
+end
+
 describe "Sequel::IntegerMigrator" do
   before do
     dbc = Class.new(Sequel::Mock::Database) do
