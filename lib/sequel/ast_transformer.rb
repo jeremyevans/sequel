@@ -66,6 +66,8 @@ module Sequel
         SQL::JoinUsingClause.new(v(o.using), o.join_type, v(o.table), v(o.table_alias))
       when SQL::JoinClause
         SQL::JoinClause.new(o.join_type, v(o.table), v(o.table_alias))
+      when SQL::DelayedEvaluation
+        SQL::DelayedEvaluation.new(lambda{v(o.callable.call)})
       when SQL::Wrapper
         SQL::Wrapper.new(v(o.value))
       else

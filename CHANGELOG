@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#qualify and Sequel.delay work together (jeremyevans)
+
 * Support composite keys in the rcte_tree plugin (jeremyevans)
 
 * Support composite keys in the tree plugin (jeremyevans)
