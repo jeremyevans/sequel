@@ -966,6 +966,8 @@ module Sequel
         case db_type
         when /\Ainterval\z/io
           :interval
+        when /\Acitext\z/io
+          :string
         else
           super
         end

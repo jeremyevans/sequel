@@ -1532,6 +1532,7 @@ describe "Schema Parser" do
     @db = Sequel.mock(:host=>'postgres')
     @db.extend(sm)
     @db.schema(:interval).first.last[:type].should == :interval
+    @db.schema(:citext).first.last[:type].should == :string
 
     @db = Sequel.mock(:host=>'mysql')
     @db.extend(sm)
