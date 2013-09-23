@@ -31,6 +31,10 @@ module Sequel
 
         private
 
+        def disconnect_error?(exception, opts)
+          super || exception.message =~ /\AThe connection does not exist\./
+        end
+
         # Use JDBC connection's setAutoCommit to false to start transactions
         def begin_transaction(conn, opts=OPTS)
           set_transaction_isolation(conn, opts)

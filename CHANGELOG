@@ -1,6 +1,10 @@
 === HEAD
 
+* Recognize another disconnect error in the jdbc/as400 adapter (jeremyevans)
+
 * Make Dataset#qualify and Sequel.delay work together (jeremyevans)
+
+* Recognize citext type as string on PostgreSQL (isc) (#710)
 
 * Support composite keys in the rcte_tree plugin (jeremyevans)
 
