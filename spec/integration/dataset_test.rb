@@ -371,6 +371,10 @@ describe Sequel::Database do
     DB.get(Sequel.cast(Sequel.blob("\1\2\3"), File).as(:a)).should == "\1\2\3"
   end
 
+  cspecify "should properly handle empty blobs", [:jdbc, :hsqldb], :oracle do
+    DB.get(Sequel.cast(Sequel.blob(""), File).as(:a)).should == ""
+  end
+
   cspecify "should properly escape identifiers", :db2, :oracle do
     DB.create_table(:"\\'\"[]"){Integer :id}
     DB.drop_table(:"\\'\"[]")

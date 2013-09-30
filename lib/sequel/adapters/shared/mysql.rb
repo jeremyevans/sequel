@@ -564,6 +564,7 @@ module Sequel
       BACKSLASH_RE = /\\/.freeze
       QUAD_BACKSLASH = "\\\\\\\\".freeze
       BLOB_START = "0x".freeze
+      EMPTY_BLOB = "''".freeze
       HSTAR = "H*".freeze
 
       include Sequel::Dataset::Replace
@@ -873,7 +874,11 @@ module Sequel
 
       # MySQL uses a preceding X for hex escaping strings
       def literal_blob_append(sql, v)
-        sql << BLOB_START << v.unpack(HSTAR).first
+        if v.empty?
+          sql << EMPTY_BLOB
+        else
+          sql << BLOB_START << v.unpack(HSTAR).first
+        end
       end
 
       # Use 0 for false on MySQL
