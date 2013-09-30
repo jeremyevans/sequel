@@ -23,6 +23,9 @@ describe "A paginated dataset" do
   specify "should set the page count correctly" do
     @paginated.page_count.should == 8
     @d.paginate(1, 50).page_count.should == 4
+
+    @d.meta_def(:count) {0}
+    @d.paginate(1, 50).page_count.should == 1
   end
   
   specify "should set the current page number correctly" do
@@ -63,6 +66,10 @@ describe "A paginated dataset" do
     @d.paginate(2, 20).last_page?.should be_false
     @d.paginate(5, 30).last_page?.should be_false
     @d.paginate(6, 30).last_page?.should be_true
+
+    @d.meta_def(:count) {0}
+    @d.paginate(1, 30).last_page?.should be_true
+    @d.paginate(2, 30).last_page?.should be_false
   end
 
   specify "should know if current page is first page" do

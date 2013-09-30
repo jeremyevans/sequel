@@ -49,7 +49,8 @@ module Sequel
       attr_accessor :page_size
 
       # The number of pages in the dataset before pagination, of which
-      # this paginated dataset is one.
+      # this paginated dataset is one.  Empty datasets are considered
+      # to have a single page.
       attr_accessor :page_count
 
       # The current page of the dataset, starting at 1 and not 0.
@@ -109,6 +110,7 @@ module Sequel
         @page_size = page_size
         @pagination_record_count = record_count
         @page_count = (record_count / page_size.to_f).ceil
+        @page_count = 1 if @page_count == 0
         self
       end
     end

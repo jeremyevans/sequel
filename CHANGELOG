@@ -1,5 +1,7 @@
 === HEAD
 
+* Ensure Dataset#page_count in pagination extension is at least one (jeremyevans) (#714)
+
 * Recognize another disconnect error in the jdbc/as400 adapter (jeremyevans)
 
 * Make Dataset#qualify and Sequel.delay work together (jeremyevans)
