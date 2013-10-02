@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.3.0 (2013-10-02)
 
 * Fix literalization of empty blobs on MySQL (jeremyevans) (#715)
 
