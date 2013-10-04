@@ -1,0 +1,33 @@
+Issue Guidelines
+----------------
+
+1) Issues should only be created for things that are definitely bugs.
+   If you are not sure that the behavior is a bug, ask about it on
+   IRC or the sequel-talk Google Group.  GitHub Issues should not be
+   used as a help forum.
+
+2) If you are sure it is a bug, then post a complete description of
+   the issue, the simplest possible self-contained example showing
+   the problem, the full backtrace of any exception, and for issues
+   involving database queries, an SQL log.
+
+Pull Request Guidelines
+-----------------------
+
+1) Try to include tests for all new features and substantial bug
+   fixes.  See the testing guide for details about testing Sequel.
+
+2) Try to include documentation for all new features.  In most cases
+   this should include RDoc method documentation, but updates to the
+   guides is also appropriate in some cases.
+
+3) Follow the style conventions of the surrounding code.  In most
+   cases, this is standard ruby style.
+
+4) Do not submit whitespace changes with code changes.  Sequel is not
+   pedantic about trailing whitespace, so if you have an editor that
+   automatically strips trailing whitespace, you may want to turn
+   that feature off.
+   
+5) All code in pull requests is assummed to be MIT licensed.  Do not
+   submit a pull request if that isn't the case.
