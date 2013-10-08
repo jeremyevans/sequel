@@ -304,7 +304,7 @@ module Sequel
             level = associations
             no_cache_level = level - 1
             associations = {}
-            base_case = base_case.select_more(SQL::AliasedExpression.new(0, la))
+            base_case = base_case.select_more(SQL::AliasedExpression.new(Sequel.cast(0, Integer), la))
             recursive_case = recursive_case.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, la) + 1, la)).filter(SQL::QualifiedIdentifier.new(t, la) < level - 1)
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym

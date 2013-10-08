@@ -70,6 +70,8 @@ module Sequel
         if Sequel.application_timezone == :utc
           @api.sqlany_execute_immediate(conn, "SET TEMPORARY OPTION time_zone_adjustment=0")
         end
+
+        conn
       end
 
       # Closes given database connection.

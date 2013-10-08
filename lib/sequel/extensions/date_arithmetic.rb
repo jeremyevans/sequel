@@ -91,9 +91,9 @@ module Sequel
             each_valid_interval_unit(h, MYSQL_DURATION_UNITS) do |value, sql_unit|
               expr = Sequel.function(:DATE_ADD, expr, Sequel.lit(["INTERVAL ", " "], value, sql_unit))
             end
-          when :mssql, :h2, :access
+          when :mssql, :h2, :access, :sqlanywhere
             units = case db_type
-            when :mssql
+            when :mssql, :sqlanywhere
               MSSQL_DURATION_UNITS
             when :h2
               H2_DURATION_UNITS
