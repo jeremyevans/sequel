@@ -157,6 +157,15 @@ describe "Simple Dataset operations" do
     @ds.order(:id).limit(2, 0).all.should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
     @ds.order(:id).limit(2, 1).all.should == [{:id=>2, :number=>20}]
   end
+
+  specify "should fetch correctly with a limit and offset using seperate methods" do
+    @ds.order(:id).limit(2).offset(0).all.should == [{:id=>1, :number=>10}]
+    @ds.order(:id).limit(2).offset(1).all.should == []
+    @ds.insert(:number=>20)
+    @ds.order(:id).limit(1).offset(1).all.should == [{:id=>2, :number=>20}]
+    @ds.order(:id).limit(2).offset(0).all.should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
+    @ds.order(:id).limit(2).offset(1).all.should == [{:id=>2, :number=>20}]
+  end
   
   specify "should provide correct columns when using a limit and offset" do
     ds = @ds.order(:id).limit(1, 1)
