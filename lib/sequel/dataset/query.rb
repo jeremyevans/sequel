@@ -568,6 +568,19 @@ module Sequel
       ds.row_proc = nil
       ds
     end
+
+    # Returns a copy of the dataset with a specified order. Can be safely combined with limit.
+    # If you call limit with an offset, it will override override the offset if you've called
+    # offset first.
+    #
+    #   DB[:items].offset(10) # SELECT * FROM items OFFSET 10
+    def offset(o)
+      o = o.to_i if o.is_a?(String) && !o.is_a?(LiteralString)
+      if o.is_a?(Integer)
+        raise(Error, 'Offsets must be greater than or equal to 0') unless o >= 0
+      end
+      clone(:offset => o)
+    end
     
     # Adds an alternate filter to an existing filter using OR. If no filter 
     # exists an +Error+ is raised.

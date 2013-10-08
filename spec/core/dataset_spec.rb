@@ -1625,6 +1625,38 @@ describe "Dataset#limit" do
   end
 end
 
+describe "Dataset#offset" do
+  before do
+    @dataset = Sequel.mock.dataset.from(:test)
+  end
+
+  specify "should include an OFFSET clause in the select statement" do
+    @dataset.offset(10).sql.should == 'SELECT * FROM test OFFSET 10'
+  end
+
+  specify "should convert regular strings to integers" do
+    @dataset.offset('a() - 1').sql.should == 'SELECT * FROM test OFFSET 0'
+  end
+
+  specify "should raise an error if an offset is used" do
+    proc{@dataset.offset(0)}.should_not raise_error(Sequel::Error)
+    proc{@dataset.offset(1)}.should_not raise_error
+    proc{@dataset.offset(-1)}.should raise_error(Sequel::Error)
+  end
+
+  specify "should be able to reset offset with nil values" do
+    @dataset.offset(6).offset(nil).sql.should == 'SELECT * FROM test'
+  end
+
+  specify "should not convert literal strings to integers" do
+    @dataset.offset(Sequel.lit('a() - 1')).sql.should == 'SELECT * FROM test OFFSET a() - 1'
+  end
+
+  specify "should not convert other objects" do
+    @dataset.offset(Sequel.function(:a) - 1).sql.should == 'SELECT * FROM test OFFSET (a() - 1)'
+  end
+end
+
 describe "Dataset#naked" do
   specify "should returned clone dataset without row_proc" do
     d = Sequel.mock.dataset
