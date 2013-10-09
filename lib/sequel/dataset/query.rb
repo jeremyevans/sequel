@@ -36,7 +36,7 @@ module Sequel
     QUERY_METHODS = (<<-METHS).split.map{|x| x.to_sym} + JOIN_METHODS
       add_graph_aliases and distinct except exclude exclude_having exclude_where
       filter for_update from from_self graph grep group group_and_count group_by having intersect invert
-      limit lock_style naked or order order_append order_by order_more order_prepend qualify
+      limit lock_style naked offset or order order_append order_by order_more order_prepend qualify
       reverse reverse_order select select_all select_append select_group select_more server
       set_graph_aliases unfiltered ungraphed ungrouped union
       unlimited unordered where with with_recursive with_sql
@@ -524,6 +524,7 @@ module Sequel
       return from_self.limit(l, o) if @opts[:sql]
 
       if l.is_a?(Range)
+        no_offset = false
         o = l.first
         l = l.last - l.first + (l.exclude_end? ? 0 : 1)
       end
@@ -531,17 +532,10 @@ module Sequel
       if l.is_a?(Integer)
         raise(Error, 'Limits must be greater than or equal to 1') unless l >= 1
       end
-      opts = {:limit => l}
-      if o
-        o = o.to_i if o.is_a?(String) && !o.is_a?(LiteralString)
-        if o.is_a?(Integer)
-          raise(Error, 'Offsets must be greater than or equal to 0') unless o >= 0
-        end
-        opts[:offset] = o
-      elsif !no_offset
-        opts[:offset] = nil
-      end
-      clone(opts)
+
+      ds = clone(:limit=>l)
+      ds = ds.offset(o) unless no_offset
+      ds
     end
     
     # Returns a cloned dataset with the given lock style.  If style is a

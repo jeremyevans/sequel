@@ -1,3 +1,7 @@
+=== HEAD
+
+* Add Dataset#offset for setting the offset separately from the limit (Paul Henry, jeremyevans) (#717)
+
 === 4.3.0 (2013-10-02)
 
 * Fix literalization of empty blobs on MySQL (jeremyevans) (#715)

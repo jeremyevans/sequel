@@ -1638,9 +1638,7 @@ describe "Dataset#offset" do
     @dataset.offset('a() - 1').sql.should == 'SELECT * FROM test OFFSET 0'
   end
 
-  specify "should raise an error if an offset is used" do
-    proc{@dataset.offset(0)}.should_not raise_error(Sequel::Error)
-    proc{@dataset.offset(1)}.should_not raise_error
+  specify "should raise an error if a negative offset is used" do
     proc{@dataset.offset(-1)}.should raise_error(Sequel::Error)
   end
 
@@ -1654,6 +1652,19 @@ describe "Dataset#offset" do
 
   specify "should not convert other objects" do
     @dataset.offset(Sequel.function(:a) - 1).sql.should == 'SELECT * FROM test OFFSET (a() - 1)'
+  end
+
+  specify "should override offset given to limit" do
+    @dataset.limit(nil, 5).offset(6).sql.should == 'SELECT * FROM test OFFSET 6'
+  end
+
+  specify "should not be overridable by limit if limit is not given an offset" do
+    @dataset.offset(6).limit(nil).sql.should == 'SELECT * FROM test OFFSET 6'
+  end
+
+  specify "should be overridable by limit if limit is given an offset" do
+    @dataset.offset(6).limit(nil, nil).sql.should == 'SELECT * FROM test'
+    @dataset.offset(6).limit(nil, 5).sql.should == 'SELECT * FROM test OFFSET 5'
   end
 end
 

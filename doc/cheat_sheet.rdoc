@@ -121,6 +121,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
   dataset.limit(30) # LIMIT 30
   dataset.limit(30, 10) # LIMIT 30 OFFSET 10
+  dataset.limit(30).offset(10) # LIMIT 30 OFFSET 10
 
 == Joins
 

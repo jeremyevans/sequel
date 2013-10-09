@@ -581,7 +581,7 @@ Here's a mapping of ActiveRecord +find+ options to <tt>Sequel::Dataset</tt> meth
 :order :: order
 :group :: group
 :limit :: limit
-:offset :: limit # second entry in limit array
+:offset :: offset
 :joins :: join, left_join, etc. # many other join methods
 :include :: eager, eager_graph # eager does preloading, eager_graph does JOINs
 :select :: select

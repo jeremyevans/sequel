@@ -81,7 +81,7 @@ WHERE:: where, filter, exclude, exclude_where, and, or, grep, invert, unfiltered
 GROUP:: group, group_by, group_and_count, select_group, ungrouped
 HAVING:: having, exclude_having, invert, unfiltered
 ORDER:: order, order_by, order_append, order_prepend, order_more, reverse, reverse_order, unordered
-LIMIT:: limit, unlimited
+LIMIT/OFFSET:: limit, offset, unlimited
 compounds:: union, intersect, except
 locking:: for_update, lock_style
 common table expressions:: with, with_recursive

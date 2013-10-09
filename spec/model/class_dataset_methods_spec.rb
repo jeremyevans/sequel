@@ -81,6 +81,7 @@ describe Sequel::Model, "class dataset methods"  do
     @c.natural_join(@c).sql.should == "SELECT * FROM items NATURAL JOIN items"
     @c.natural_left_join(@c).sql.should == "SELECT * FROM items NATURAL LEFT JOIN items"
     @c.natural_right_join(@c).sql.should == "SELECT * FROM items NATURAL RIGHT JOIN items"
+    @c.offset(2).sql.should == "SELECT * FROM items OFFSET 2"
     @c.order(:a).sql.should == "SELECT * FROM items ORDER BY a"
     @c.order_append(:a).sql.should == "SELECT * FROM items ORDER BY a"
     @c.order_by(:a).sql.should == "SELECT * FROM items ORDER BY a"

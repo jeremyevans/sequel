@@ -629,7 +629,12 @@ You can provide a second argument to +limit+ to specify an offset:
   Artist.limit(5, 10)
   # SELECT * FROM artists LIMIT 5 OFFSET 10
 
-This would return the 11th through 15th records in the original
+You can also call the +offset+ method separately:
+
+  Artist.limit(5).offset(10)
+  # SELECT * FROM artists LIMIT 5 OFFSET 10
+
+Either of these would return the 11th through 15th records in the original
 dataset.
 
 To remove a limit from a dataset, use +unlimited+:
