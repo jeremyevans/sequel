@@ -1,5 +1,4 @@
 require 'java'
-require 'pp'
 Sequel.require 'adapters/utils/stored_procedures'
 
 module Sequel
