@@ -76,45 +76,45 @@ module Sequel
       end
 
       # Returns number of rows affected
-      def execute_dui(sql, opts={})
+      def execute_dui(sql, opts=OPTS)
         synchronize do |conn|
-          begin
-            rs = log_yield(sql){ @api.sqlany_execute_direct(conn, sql)}
-            if rs.nil?
-              result, errstr = @api.sqlany_error(conn)
-              raise_error(SQLAnywhereException.new(errstr, result, sql))
-            end
-            affected_rows = @api.sqlany_affected_rows(rs)
-            @api.sqlany_commit(conn) unless in_transaction?
-            affected_rows
-          ensure
-            @api.sqlany_free_stmt(rs) unless rs.nil?
-          end
+          _execute(conn, :rows, sql, opts)
         end
       end
 
-      def execute(sql, opts={})
+      def execute(sql, opts=OPTS, &block)
         synchronize do |conn|
-          begin
-            rs = log_yield(sql){ @api.sqlany_execute_direct(conn, sql)}
-            if rs.nil?
-              result, errstr = @api.sqlany_error(conn)
-              raise_error(SQLAnywhereException.new(errstr, result, sql))
-            end
-            yield rs if block_given?
-            @api.sqlany_commit(conn) unless in_transaction?
-          ensure
-            @api.sqlany_free_stmt(rs) unless rs.nil?
-          end
+          _execute(conn, :select, sql, opts, &block)
         end
       end
 
-      def execute_insert(sql, opts={})
-        execute(sql, opts)
-        last_insert_id(opts)
+      def execute_insert(sql, opts=OPTS)
+        synchronize do |conn|
+          _execute(conn, :insert, sql, opts)
+        end
       end
 
       private
+
+      LAST_INSERT_ID = 'SELECT @@IDENTITY'.freeze
+      def _execute(conn, type, sql, opts)
+        unless rs = log_yield(sql){@api.sqlany_execute_direct(conn, sql)}
+          result, errstr = @api.sqlany_error(conn)
+          raise_error(SQLAnywhereException.new(errstr, result, sql))
+        end
+
+        case type
+        when :select
+          yield rs if block_given?
+        when :rows
+          return @api.sqlany_affected_rows(rs)
+        when :insert
+          _execute(conn, :select, LAST_INSERT_ID, opts){|rs| return @api.sqlany_get_column(rs, 0)[1] if rs && @api.sqlany_fetch_next(rs) == 1}
+        end
+      ensure
+        @api.sqlany_commit(conn) unless in_transaction?
+        @api.sqlany_free_stmt(rs) if rs
+      end
 
       def adapter_initialize
         @conversion_procs = SQLANYWHERE_TYPES.dup
@@ -125,20 +125,8 @@ module Sequel
       end
 
       def log_connection_execute(conn, sql)
-        log_yield(sql){ execute(sql)}
+        _execute(conn, nil, sql, OPTS)
       end
-
-      def last_insert_id(opts={})
-        sql = 'SELECT @@IDENTITY'
-        id = nil
-        execute(sql) do |rs|
-          if @api.sqlany_fetch_next(rs) == 1
-            id = @api.sqlany_get_column(rs, 0)[1]
-          end unless rs.nil?
-        end
-        id
-      end
-
     end
 
     # Dataset class for SqlAnywhere datasets accessed via the native driver.
