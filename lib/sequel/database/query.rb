@@ -6,7 +6,7 @@ module Sequel
     # ---------------------
 
     STRING_DEFAULT_RE = /\A'(.*)'\z/
-    CURRENT_TIMESTAMP_RE = /now|CURRENT|getdate|\ADate\(\)\z/io
+    CURRENT_TIMESTAMP_RE = /now|today|CURRENT|getdate|\ADate\(\)\z/io
     COLUMN_SCHEMA_DATETIME_TYPES = [:date, :datetime]
     COLUMN_SCHEMA_STRING_TYPES = [:string, :blob, :date, :datetime, :time, :enum, :set, :interval]
 

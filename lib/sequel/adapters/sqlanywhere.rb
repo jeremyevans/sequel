@@ -157,31 +157,32 @@ module Sequel
       def fetch_rows(sql)
         db = @db
         cps = db.conversion_procs
+        api = db.api
         execute(sql) do |rs|
-          max_cols = db.api.sqlany_num_cols(rs)
-          col_map = {}
-          max_cols.times do |cols|
-            col_map[db.api.sqlany_get_column_info(rs, cols)[2]] =
-                output_identifier(db.api.sqlany_get_column_info(rs, cols)[2])
+          convert = (convert_smallint_to_bool and db.convert_smallint_to_bool)
+          col_infos = []
+          api.sqlany_num_cols(rs).times do |i|
+            _, _, name, _, type = api.sqlany_get_column_info(rs, i)
+            cp = if type == 500
+              cps[500] if convert
+            else
+              cps[type]
+            end
+            col_infos << [i, output_identifier(name), cp]
           end
 
-          @columns  = col_map.values
-          convert = (convert_smallint_to_bool and db.convert_smallint_to_bool)
+          @columns = col_infos.map{|a| a[1]}
 
-          while db.api.sqlany_fetch_next(rs) == 1
-            max_cols = db.api.sqlany_num_cols(rs)
-            h2 = {}
-            max_cols.times do |cols|
-              h2[col_map[db.api.sqlany_get_column_info(rs, cols)[2]]||db.api.sqlany_get_column_info(rs, cols)[2]] =
-                cps[db.api.sqlany_get_column_info(rs, cols)[4]].nil? ?
-                    db.api.sqlany_get_column(rs, cols)[1] :
-                      db.api.sqlany_get_column_info(rs, cols)[4] != 500 ?
-                        cps[db.api.sqlany_get_column_info(rs, cols)[4]].call(db.api.sqlany_get_column(rs, cols)[1]) :
-                          convert ? cps[db.api.sqlany_get_column_info(rs, cols)[4]].call(db.api.sqlany_get_column(rs, cols)[1]) :
-                            db.api.sqlany_get_column(rs, cols)[1]
+          if rs
+            while api.sqlany_fetch_next(rs) == 1
+              h = {}
+              col_infos.each do |i, name, cp|
+                _, v = api.sqlany_get_column(rs, i)
+                h[name] = cp && v ? cp[v] : v
+              end
+              yield h
             end
-            yield h2
-          end unless rs.nil?
+          end
         end
         self
       end

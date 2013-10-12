@@ -62,16 +62,10 @@ module Sequel
           row[:allow_null] = row[:nulls_allowed].is_a?(Fixnum) ? row.delete(:nulls_allowed) == 1 : row.delete(:nulls_allowed)
           row[:db_type] = row.delete(:domain_name)
           row[:type] = if row[:db_type] =~ DECIMAL_TYPE_RE and (row[:scale].is_a?(Fixnum) ? row[:scale] == 0 : (not row[:scale]))
-                         :integer
-                       else
-                         schema_column_type(row[:db_type])
-                       end
-          row[:default] = case row[:default]
-                            when 'today()' then Sequel::CURRENT_DATE
-                            when 'now()' then Sequel::CURRENT_TIMESTAMP
-                            else
-                              row[:default]
-                          end
+            :integer
+          else
+            schema_column_type(row[:db_type])
+          end
           [m.call(row.delete(:name)), row]
         end
       end
