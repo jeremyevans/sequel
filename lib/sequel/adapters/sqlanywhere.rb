@@ -19,11 +19,11 @@ module Sequel
     end
 
     TYPE_TRANSLATOR = tt = Class.new do
-      def blob(s) ::Sequel::SQL::Blob.new(s) unless s.nil? end
-      def boolean(s) s.to_i != 0 unless s.nil? end
-      def date(s) ::Date.strptime(s) unless s.nil? end
-      def decimal(s) ::BigDecimal.new(s) unless s.nil? end
-      def time(s) ::Sequel.string_to_time(s) unless s.nil? end
+      def blob(s) ::Sequel::SQL::Blob.new(s) end
+      def boolean(s) s.to_i != 0 end
+      def date(s) ::Date.strptime(s) end
+      def decimal(s) ::BigDecimal.new(s) end
+      def time(s) ::Sequel.string_to_time(s) end
     end.new
 
     SQLANYWHERE_TYPES = {}
