@@ -1,4 +1,3 @@
-require 'uri'
 require 'sqlanywhere'
 
 Sequel.require %w'shared/sqlanywhere', 'adapters'
