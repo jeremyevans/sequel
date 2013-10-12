@@ -260,7 +260,7 @@ describe "Simple dataset operations with nasty table names" do
     @db.quote_identifiers = @qi
   end
 
-  cspecify "should work correctly", :mssql, :oracle do
+  cspecify "should work correctly", :mssql, :oracle, :sqlanywhere do
     @db.create_table!(@table) do
       primary_key :id
       Integer :number
@@ -384,7 +384,7 @@ describe Sequel::Database do
     DB.get(Sequel.cast(Sequel.blob(""), File).as(:a)).should == ""
   end
 
-  cspecify "should properly escape identifiers", :db2, :oracle do
+  cspecify "should properly escape identifiers", :db2, :oracle, :sqlanywhere do
     DB.create_table(:"\\'\"[]"){Integer :id}
     DB.drop_table(:"\\'\"[]")
   end
@@ -1348,7 +1348,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.filter([:a, :b]=>[]).all.should == []
     @ds.exclude([:a, :b]=>[]).all.should == []
 
-    unless Sequel.guarded?(:mssql, :oracle, :db2)
+    unless Sequel.guarded?(:mssql, :oracle, :db2, :sqlanywhere)
       # Some databases don't like boolean results in the select list
       pr = proc{|r| r.is_a?(Integer) ? (r != 0) : r}
       pr[@ds.get(Sequel.expr(:a=>[]))].should == nil
@@ -1366,7 +1366,7 @@ describe "Sequel::Dataset DSL support" do
     ds.filter([:a, :b]=>[]).all.should == []
     ds.exclude([:a, :b]=>[]).all.should == [{:a=>nil, :b=>nil}]
 
-    unless Sequel.guarded?(:mssql, :oracle, :db2)
+    unless Sequel.guarded?(:mssql, :oracle, :db2, :sqlanywhere)
       # Some databases don't like boolean results in the select list
       pr = proc{|r| r.is_a?(Integer) ? (r != 0) : r}
       pr[ds.get(Sequel.expr(:a=>[]))].should == false

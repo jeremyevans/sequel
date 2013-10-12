@@ -1,0 +1,170 @@
+SEQUEL_ADAPTER_TEST = :sqlanywhere
+
+require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
+
+if DB.table_exists?(:test)
+  DB.drop_table(:test)
+end
+
+describe "Convert smallint to boolean" do
+  before do
+    @db = DB
+  end
+  after do
+    Sequel::SqlAnywhere.convert_smallint_to_bool = true
+    @db.convert_smallint_to_bool = true
+  end
+  
+  describe "Sequel::SqlAnywhere.convert_smallint_to_bool" do
+    before do
+      @db.create_table!(:booltest){column :b, 'smallint'; column :i, 'integer'}
+      @ds = @db[:booltest]
+    end
+    after do
+      @db.drop_table(:booltest)
+    end
+
+    specify "should consider smallint datatypes as boolean if set, but if not, as larger smallints" do
+      @db.create_table!(:booltest){column :b, 'smallint'; column :i, 'integer'}
+      @db.schema(:booltest, :reload=>true).first.last[:type].should == :boolean
+      @db.schema(:booltest, :reload=>true).first.last[:db_type].should match /smallint/i
+
+      Sequel::SqlAnywhere.convert_smallint_to_bool = false
+      @db2 = Sequel.connect(DB.url)
+      @db2.schema(:booltest, :reload=>true).first.last[:type].should == :integer
+      @db2.schema(:booltest, :reload=>true).first.last[:db_type].should match /smallint/i
+
+      @db.schema(:booltest, :reload=>true).first.last[:type].should == :boolean
+      @db.schema(:booltest, :reload=>true).first.last[:db_type].should match /smallint/i
+
+      @db2.disconnect
+    end
+
+    describe "datasets" do
+      cspecify "should return smallints as bools and integers as integers when set", :jdbc do
+        @ds.delete
+        @ds << {:b=>true, :i=>10}
+        @ds.all.should == [{:b=>true, :i=>10}]
+        @ds.delete
+        @ds << {:b=>false, :i=>0}
+        @ds.all.should == [{:b=>false, :i=>0}]
+        @ds.delete
+        @ds << {:b=>true, :i=>1}
+        @ds.all.should == [{:b=>true, :i=>1}]
+      end
+
+      specify "should return all smallints as integers when unset" do
+        Sequel::SqlAnywhere.convert_smallint_to_bool = false
+        @db2 = Sequel.connect(DB.url)
+        @ds2 = @db2[:booltest]
+        @ds2.delete
+        @ds2 << {:b=>true, :i=>10}
+        @ds2.all.should == [{:b=>1, :i=>10}]
+        @ds2.delete
+        @ds2 << {:b=>false, :i=>0}
+        @ds2.all.should == [{:b=>0, :i=>0}]
+        
+        @ds2.delete
+        @ds2 << {:b=>1, :i=>10}
+        @ds2.all.should == [{:b=>1, :i=>10}]
+        @ds2.delete
+        @ds2 << {:b=>0, :i=>0}
+        @ds2.all.should == [{:b=>0, :i=>0}]
+
+        @db2.disconnect
+      end
+    end
+  end
+  
+  describe "Database#convert_smallint_to_bool" do
+    before do
+      @db.create_table!(:booltest){column :b, 'smallint'; column :i, 'integer'}
+    end
+    after do
+      @db.drop_table(:booltest)
+    end
+  
+    specify "should consider smallint datatypes as boolean if set, but not larger smallints" do
+      @db.schema(:booltest, :reload=>true).first.last[:type].should == :boolean
+      @db.schema(:booltest, :reload=>true).first.last[:db_type].should match /smallint/i
+      @db.convert_smallint_to_bool = false
+      @db.schema(:booltest, :reload=>true).first.last[:type].should == :integer
+      @db.schema(:booltest, :reload=>true).first.last[:db_type].should match /smallint/i
+    end
+  
+    describe "datasets" do
+      cspecify "should return smallints as bools and integers as integers when set", :jdbc do
+        @ds = @db[:booltest]
+        @ds.delete
+        @ds << {:b=>true, :i=>10}
+        @ds.all.should == [{:b=>true, :i=>10}]
+        @ds.delete
+        @ds << {:b=>false, :i=>0}
+        @ds.all.should == [{:b=>false, :i=>0}]
+        @ds.delete
+        @ds << {:b=>true, :i=>1}
+        @ds.all.should == [{:b=>true, :i=>1}]
+      end
+  
+      specify "should return all smallints as integers when unset" do
+        @db2 = Sequel.connect(DB.url)
+        @db2.convert_smallint_to_bool = false
+        @ds2 = @db2[:booltest]
+        @ds2.delete
+        @ds2 << {:b=>true, :i=>10}
+        @ds2.all.should == [{:b=>1, :i=>10}]
+        @ds2.delete
+        @ds2 << {:b=>false, :i=>0}
+        @ds2.all.should == [{:b=>0, :i=>0}]
+      
+        @ds2.delete
+        @ds2 << {:b=>1, :i=>10}
+        @ds2.all.should == [{:b=>1, :i=>10}]
+        @ds2.delete
+        @ds2 << {:b=>0, :i=>0}
+        @ds2.all.should == [{:b=>0, :i=>0}]
+
+        @db2.disconnect
+      end
+    end
+  end
+
+  describe "Dataset#convert_smallint_to_bool" do
+    before do
+      @db.create_table!(:booltest){column :b, 'smallint'; column :i, 'integer'}
+      @ds = @db[:booltest]
+    end
+    after do
+      @db.drop_table(:booltest)
+    end
+    
+    cspecify "should return smallints as bools and integers as integers when set", :jdbc do
+      @ds.delete
+      @ds << {:b=>true, :i=>10}
+      @ds.all.should == [{:b=>true, :i=>10}]
+      @ds.delete
+      @ds << {:b=>false, :i=>0}
+      @ds.all.should == [{:b=>false, :i=>0}]
+      @ds.delete
+      @ds << {:b=>true, :i=>1}
+      @ds.all.should == [{:b=>true, :i=>1}]
+    end
+
+    specify "should return all smallints as integers when unset" do
+      @ds.convert_smallint_to_bool = false
+      @ds.delete
+      @ds << {:b=>true, :i=>10}
+      @ds.all.should == [{:b=>1, :i=>10}]
+      @ds.delete
+      @ds << {:b=>false, :i=>0}
+      @ds.all.should == [{:b=>0, :i=>0}]
+    
+      @ds.delete
+      @ds << {:b=>1, :i=>10}
+      @ds.all.should == [{:b=>1, :i=>10}]
+      @ds.delete
+      @ds << {:b=>0, :i=>0}
+      @ds.all.should == [{:b=>0, :i=>0}]
+    end
+  end
+end

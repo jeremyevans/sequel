@@ -206,7 +206,7 @@ describe "Database foreign key parsing" do
   end
 
   specify "should parse foreign key information into an array of hashes" do
-    @db.create_table!(:a, :engine=>:InnoDB){primary_key :c; Integer :d; index :d, :unique=>true}
+    @db.create_table!(:a, :engine=>:InnoDB){primary_key :c; Integer :d, :null => false, :unique => true ; index :d, :unique=>true}
     @db.create_table!(:b, :engine=>:InnoDB){foreign_key :e, :a}
     @pr[:a]
     @pr[:b, [[:e], :a, [:pk, :c]]]
@@ -217,6 +217,7 @@ describe "Database foreign key parsing" do
     @db.alter_table(:b){add_foreign_key [:f], :a, :key=>[:c]}
     @pr[:b, [[:e], :a, [:pk, :c]], [[:f], :a, [:c]], [[:f], :a, [:d]]]
 
+    @db.alter_table(:a){add_unique_constraint [:d, :c]}
     @db.alter_table(:a){add_index [:d, :c], :unique=>true}
     @db.alter_table(:b){add_foreign_key [:f, :e], :a, :key=>[:d, :c]}
     @pr[:b, [[:e], :a, [:pk, :c]], [[:f], :a, [:c]], [[:f], :a, [:d]], [[:f, :e], :a, [:d, :c]]]
@@ -545,7 +546,7 @@ describe "Database schema modifiers" do
   end
 
   specify "should add unnamed unique constraints and foreign key table constraints correctly" do
-    @db.create_table!(:items, :engine=>:InnoDB){Integer :id; Integer :item_id}
+    @db.create_table!(:items, :engine=>:InnoDB){Integer :id, :null => false; Integer :item_id, :null => false}
     @db.alter_table(:items) do
       add_unique_constraint [:item_id, :id]
       add_foreign_key [:id, :item_id], :items, :key=>[:item_id, :id]
@@ -616,7 +617,7 @@ describe "Database schema modifiers" do
       foreign_key :item_id, :items
     end
     @ds.insert(:i=>10)
-    @db.drop_column(:items, :item_id)
+    @db.alter_table(:items){drop_foreign_key :item_id}
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :i]
   end
 

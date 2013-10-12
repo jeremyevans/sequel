@@ -143,6 +143,29 @@ module Sequel
         db.extend(Sequel::JDBC::Cubrid::DatabaseMethods)
         db.extend_datasets Sequel::Cubrid::DatasetMethods
         Java::cubrid.jdbc.driver.CUBRIDDriver
+      end,
+      :sqlanywhere=>proc do |db|
+        drivers = {
+            'sajdbc4.jar' => 'Java::sybase.jdbc4.sqlanywhere.IDriver',
+            'jodbc4.jar' => 'Java::ianywhere.ml.jdbcodbc.jdbc4.IDriver',
+            'sajdbc.jar' => 'Java::sybase.jdbc.sqlanywhere.IDriver',
+            'jodbc.jar' => 'Java::ianywhere.ml.jdbcodbc.jdbc.IDriver',
+            'jconn4.jar' => 'Java::com.sybase.jdbc4.jdbc.Sybdriver',
+            'jconn3.jar' => 'Java::com.sybase.jdbc3.jdbc.Sybdriver'
+        }
+        drv = drivers.map do |jar, d|
+          begin
+            require jar
+            eval(d)
+          rescue LoadError, NameError
+          end
+        end.first
+        drv
+        Sequel.require 'adapters/jdbc/sqlanywhere'
+        db.extend(Sequel::JDBC::SqlAnywhere::DatabaseMethods)
+        #db.extend_datasets Sequel::SqlAnywhere::DatasetMethods
+        db.dataset_class = Sequel::JDBC::SqlAnywhere::Dataset
+        drv
       end
     }
     
