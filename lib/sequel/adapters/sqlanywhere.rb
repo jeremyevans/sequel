@@ -48,24 +48,20 @@ module Sequel
       set_adapter_scheme :sqlanywhere
 
       def connect(server)
-        if opts[:uri].nil?
-          connection_string = "ServerName=#{(opts[:server] || opts[:database])};DatabaseName=#{opts[:database]};UserID=#{opts[:user]};Password=#{opts[:password]};"
-          connection_string += "CommLinks=#{opts[:commlinks]};" unless opts[:commlinks].nil?
-          connection_string += "ConnectionName=#{opts[:connection_name]};" unless opts[:connection_name].nil?
-          connection_string += "CharSet=#{opts[:encoding]};" unless opts[:encoding].nil?
-          connection_string += "Idle=0" # Prevent the server from disconnecting us if we're idle for >240mins (by default)
-        else
+        if opts[:uri]
           uri = URI(opts[:uri])
           connection_string = (uri.path.nil? or uri.path == "") ? "" : "DBN=#{File.basename(uri.path)};"
           connection_string += uri.query
+        else
+          connection_string = "ServerName=#{(opts[:server] || opts[:database])};DatabaseName=#{opts[:database]};UserID=#{opts[:user]};Password=#{opts[:password]};"
+          connection_string += "CommLinks=#{opts[:commlinks]};" if opts[:commlinks]
+          connection_string += "ConnectionName=#{opts[:connection_name]};" if opts[:connection_name]
+          connection_string += "CharSet=#{opts[:encoding]};" if opts[:encoding]
+          connection_string += "Idle=0" # Prevent the server from disconnecting us if we're idle for >240mins (by default)
         end
 
         conn = @api.sqlany_new_connection
-
-        ret = @api.sqlany_connect(conn, connection_string)
-        if ret != 1
-          raise LoadError, "Could not connect" if conn.nil?
-        end
+        raise LoadError, "Could not connect" unless conn && @api.sqlany_connect(conn, connection_string) == 1
 
         if Sequel.application_timezone == :utc
           @api.sqlany_execute_immediate(conn, "SET TEMPORARY OPTION time_zone_adjustment=0")
