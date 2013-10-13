@@ -608,10 +608,8 @@ describe "Database schema modifiers" do
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id]
   end
 
-  cspecify "should remove foreign key columns from tables correctly", :h2, :mssql, :hsqldb do
-    # MySQL with InnoDB cannot drop foreign key columns unless you know the
-    # name of the constraint, see Bug #14347
-    @db.create_table!(:items, :engine=>:MyISAM) do
+  specify "should remove foreign key columns from tables correctly" do
+    @db.create_table!(:items, :engine=>:InnoDB) do
       primary_key :id
       Integer :i
       foreign_key :item_id, :items
@@ -619,7 +617,7 @@ describe "Database schema modifiers" do
     @ds.insert(:i=>10)
     @db.alter_table(:items){drop_foreign_key :item_id}
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :i]
-  end
+  end if DB.supports_foreign_key_parsing?
 
   specify "should remove multiple columns in a single alter_table block" do
     @db.create_table!(:items) do
