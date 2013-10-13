@@ -5,7 +5,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 def DB.sqls
   (@sqls ||= [])
 end
-logger = Object.new
+logger = Logger.new($stdout)  #Object.new
 def logger.method_missing(m, msg)
   DB.sqls << msg
 end
@@ -380,6 +380,13 @@ describe "MSSSQL::Dataset#insert" do
     h = @ds.insert_select(:value=>10)
     h[:value].should == 10
     @ds.first(:xid=>h[:xid])[:value].should == 10
+  end
+
+  cspecify "should read blobs", :odbc do
+    blob = Sequel::SQL::Blob.new("01234")
+    @db[:test4].insert(:name => 'max varbinary test', :value => blob)
+    b = @db[:test4].where(:name => 'max varbinary test').get(:value)
+    b.should be_kind_of(Sequel::SQL::Blob)
   end
 
   cspecify "should allow large text and binary values", :odbc do

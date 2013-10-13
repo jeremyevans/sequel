@@ -332,6 +332,8 @@ module Sequel
           :boolean
         when /\A(?:(?:small)?money)\z/io
           :decimal
+        when /\A(timestamp|rowversion)\z/io
+          :blob
         else
           super
         end
