@@ -109,6 +109,14 @@ module Sequel
         fk_indexes.values
       end
 
+      def tables(opts=OPTS)
+        tables_and_views('U', opts)
+      end
+
+      def views(opts=OPTS)
+        tables_and_views('V', opts)
+      end
+
       private
 
       DATABASE_ERROR_REGEXPS = {
@@ -218,6 +226,14 @@ module Sequel
         "ALTER TABLE #{quote_schema_table(name)} RENAME #{quote_schema_table(new_name)}"
       end
 
+      def tables_and_views(type, opts=OPTS)
+        m = output_identifier_meth
+        metadata_dataset.
+          from(:sysobjects___a).
+          where(:a__type=>type).
+          select_map(:a__name).
+          map{|n| m.call(n)}
+      end
     end
 
     module DatasetMethods
