@@ -28,6 +28,24 @@ module Sequel
       #Dataset class for Sybase datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::SqlAnywhere::DatasetMethods
+
+        private
+
+        class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
+          def boolean(i) i != 0 end
+        end
+
+        BOOLEAN_METHOD =  TYPE_TRANSLATOR_INSTANCE.method(:boolean)
+
+        def convert_type_proc(v, ctn=nil)
+          convert = (convert_smallint_to_bool and @db.convert_smallint_to_bool)
+          case
+          when (convert and ctn =~ SqlAnywhere::DatabaseMethods::SMALLINT_RE)
+            BOOLEAN_METHOD
+          else
+            super(v, ctn)
+          end
+        end
       end
     end
   end

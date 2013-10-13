@@ -761,7 +761,7 @@ module Sequel
       # Return a callable object that will convert any value of <tt>v</tt>'s
       # class to a ruby object.  If no callable object can handle <tt>v</tt>'s
       # class, return false so that the negative lookup is cached.
-      def convert_type_proc(v)
+      def convert_type_proc(v, ctn=nil)
         case v
         when JAVA_BIG_DECIMAL
           DECIMAL_METHOD
@@ -800,7 +800,13 @@ module Sequel
         meta = result.getMetaData
         cols = []
         i = 0
-        meta.getColumnCount.times{cols << [output_identifier(meta.getColumnLabel(i+=1)), i]}
+        meta.getColumnCount.times do
+          cols << [
+            output_identifier(meta.getColumnLabel(i+=1)),
+            i,
+            meta.column_type_name(i)
+          ]
+        end
         columns = cols.map{|c| c.at(0)}
         @columns = columns
         ct = @convert_types
@@ -835,13 +841,13 @@ module Sequel
       def process_result_set_convert(cols, result)
         while result.next
           row = {}
-          cols.each do |n, i, p|
+          cols.each do |n, i, ctn, p|
             v = result.getObject(i)
             row[n] = if v
               if p
                 p.call(v)
               elsif p.nil?
-                cols[i-1][2] = p = convert_type_proc(v)
+                cols[i-1][3] = p = convert_type_proc(v, ctn)
                 if p
                   p.call(v)
                 else

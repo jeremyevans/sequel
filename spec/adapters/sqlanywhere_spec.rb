@@ -41,7 +41,7 @@ describe "Convert smallint to boolean" do
     end
 
     describe "datasets" do
-      cspecify "should return smallints as bools and integers as integers when set", :jdbc do
+      specify "should return smallints as bools and integers as integers when set" do
         @ds.delete
         @ds << {:b=>true, :i=>10}
         @ds.all.should == [{:b=>true, :i=>10}]
@@ -93,7 +93,7 @@ describe "Convert smallint to boolean" do
     end
   
     describe "datasets" do
-      cspecify "should return smallints as bools and integers as integers when set", :jdbc do
+      specify "should return smallints as bools and integers as integers when set" do
         @ds = @db[:booltest]
         @ds.delete
         @ds << {:b=>true, :i=>10}
@@ -138,7 +138,7 @@ describe "Convert smallint to boolean" do
       @db.drop_table(:booltest)
     end
     
-    cspecify "should return smallints as bools and integers as integers when set", :jdbc do
+    specify "should return smallints as bools and integers as integers when set" do
       @ds.delete
       @ds << {:b=>true, :i=>10}
       @ds.all.should == [{:b=>true, :i=>10}]
