@@ -1,12 +1,13 @@
 # The mssql_emulate_lateral_with_apply extension converts
 # queries that use LATERAL into queries that use CROSS/OUTER
 # APPLY, allowing code that works on databases that support
-# LATERAL via Dataset#lateral to run on Microsoft SQL Server.
+# LATERAL via Dataset#lateral to run on Microsoft SQL Server
+# and Sybase SQLAnywhere.
 #
 # This is available as a separate extension instead of
-# integrated into the Microsoft SQL Server support because
-# few people need it and there is a performance hit to
-# code that doesn't use it.
+# integrated into the Microsoft SQL Server and Sybase
+# SQLAnywhere support because few people need it and there
+# is a performance hit to code that doesn't use it.
 #
 # It is possible there are cases where this emulation does
 # not work.  Users should probably verify that correct

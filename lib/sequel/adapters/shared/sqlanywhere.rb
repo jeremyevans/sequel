@@ -291,58 +291,15 @@ module Sequel
         false
       end
 
-      def supports_lateral_subqueries?
-        true
-      end
-
       # Uses CROSS APPLY to join the given table into the current dataset.
       def cross_apply(table)
         join_table(:cross_apply, table)
-      end
-
-      def join_table(type, table, expr=nil, *)
-        if table.is_a?(Dataset) && table.opts[:lateral]
-          table = table.clone(:lateral=>nil)
-          case type
-          when :inner
-            type = :cross_apply
-            table = table.where(expr)
-            expr = nil
-          when :cross
-            type = :cross_apply
-          when :left, :left_outer
-            type = :outer_apply
-            table = table.where(expr)
-            expr = nil
-          end
-        end
-        super
-      end
-
-      # When a FROM entry uses a LATERAL subquery,
-      # convert that entry into a CROSS APPLY joining.
-      def from(*source, &block)
-        virtual_row_columns(source, block)
-        lateral, source = source.partition{|t| t.is_a?(Sequel::Dataset) && t.opts[:lateral] && t.opts[:join] || (t.is_a?(Sequel::SQL::AliasedExpression) && t.expression.is_a?(Sequel::Dataset) && t.expression.opts[:lateral] && t.expression.opts[:join])} unless source.empty?
-        return super(*source, &nil) if !lateral || lateral.empty?
-
-        ds = from(*source)
-        lateral.each do |l|
-          l = if l.is_a?(Sequel::SQL::AliasedExpression)
-            l.expression.clone(:lateral=>nil).as(l.aliaz)
-          else
-            l.clone(:lateral=>nil)
-          end
-          ds = ds.cross_apply(l)
-        end
-        ds
       end
 
       # SqlAnywhere requires recursive CTEs to have column aliases.
       def recursive_cte_requires_column_aliases?
         true
       end
-
 
       # SQLAnywhere uses + for string concatenation, and LIKE is case insensitive by default.
       def complex_expression_sql_append(sql, op, args)
