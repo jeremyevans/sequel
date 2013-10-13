@@ -110,7 +110,7 @@ module Sequel
         when :rows
           return @api.sqlany_affected_rows(rs)
         when :insert
-          _execute(conn, :select, LAST_INSERT_ID, opts){|rs| return @api.sqlany_get_column(rs, 0)[1] if rs && @api.sqlany_fetch_next(rs) == 1}
+          _execute(conn, :select, LAST_INSERT_ID, opts){|r| return @api.sqlany_get_column(r, 0)[1] if r && @api.sqlany_fetch_next(r) == 1}
         end
       ensure
         @api.sqlany_commit(conn) unless in_transaction?
