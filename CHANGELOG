@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sybase SQLAnywhere support via new sqlanywhere and jdbc/sqlanywhere adapters (gditrick, jeremyevans)
+
 * Add Dataset#offset for setting the offset separately from the limit (Paul Henry, jeremyevans) (#717)
 
 === 4.3.0 (2013-10-02)
