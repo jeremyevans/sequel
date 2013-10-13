@@ -33,7 +33,7 @@ module Sequel
         JTDS_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:jtds_clob)
       
         # Handle CLOB types retrieved via JTDS.
-        def convert_type_proc(v)
+        def convert_type_proc(v, ctn=nil)
           if v.is_a?(Java::NetSourceforgeJtdsJdbc::ClobImpl)
             JTDS_CLOB_METHOD
           else

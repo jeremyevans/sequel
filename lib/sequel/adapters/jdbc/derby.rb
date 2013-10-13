@@ -255,7 +255,7 @@ module Sequel
         DERBY_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:derby_clob)
       
         # Handle clobs on Derby as strings.
-        def convert_type_proc(v)
+        def convert_type_proc(v, ctn=nil)
           if v.is_a?(JAVA_SQL_CLOB)
             DERBY_CLOB_METHOD
           else

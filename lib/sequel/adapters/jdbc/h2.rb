@@ -202,7 +202,7 @@ module Sequel
         H2_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:h2_clob)
       
         # Handle H2 specific clobs as strings.
-        def convert_type_proc(v)
+        def convert_type_proc(v, ctn=nil)
           if v.is_a?(Java::OrgH2Jdbc::JdbcClob)
             H2_CLOB_METHOD
           else

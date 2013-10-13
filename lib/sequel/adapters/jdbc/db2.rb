@@ -65,7 +65,7 @@ module Sequel
         private
 
         # Return clob as blob if use_clob_as_blob is true
-        def convert_type_proc(v)
+        def convert_type_proc(v, ctn=nil)
           case v
           when JAVA_SQL_CLOB
             ::Sequel::DB2::use_clob_as_blob ? DB2_CLOB_METHOD : super

@@ -168,7 +168,7 @@ module Sequel
         # Handle PostgreSQL array and object types. Object types are just
         # turned into strings, similarly to how the native adapter treats
         # the types.
-        def convert_type_proc(v)
+        def convert_type_proc(v, ctn=nil)
           case v
           when Java::OrgPostgresqlJdbc4::Jdbc4Array
             PGArrayConverter.new(method(:convert_type_proc))
