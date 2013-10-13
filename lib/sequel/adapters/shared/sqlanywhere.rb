@@ -37,7 +37,7 @@ module Sequel
       end
 
       def to_application_timestamp_sa(v)
-        to_application_timestamp(v.to_s) unless v.nil?
+        to_application_timestamp(v.to_s) if v
       end
 
       # Convert smallint type to boolean if convert_smallint_to_bool is true
@@ -52,16 +52,16 @@ module Sequel
       def schema_parse_table(table, opts)
         m = output_identifier_meth(opts[:dataset])
         im = input_identifier_meth(opts[:dataset])
-        metadata_dataset.with_sql("SELECT * FROM sa_describe_query(#{literal("select * from #{im.call(table)}")}) A " +
-                                      "JOIN SYSCOLUMN B ON B.table_id = A.base_table_id " +
-                                      "AND B.column_id = A.base_column_id " +
-                                      "ORDER BY A.column_number").
-            map do |row|
+        metadata_dataset.
+         from{sa_describe_query("select * from #{im.call(table)}").as(:a)}.
+         join(:syscolumn___b, :table_id=>:base_table_id, :column_id=>:base_column_id).
+         order(:a__column_number).
+          map do |row|
           row[:auto_increment] = row.delete(:is_autoincrement) == 1
           row[:primary_key] = row.delete(:pkey) == 'Y'
           row[:allow_null] = row[:nulls_allowed].is_a?(Fixnum) ? row.delete(:nulls_allowed) == 1 : row.delete(:nulls_allowed)
           row[:db_type] = row.delete(:domain_name)
-          row[:type] = if row[:db_type] =~ DECIMAL_TYPE_RE and (row[:scale].is_a?(Fixnum) ? row[:scale] == 0 : (not row[:scale]))
+          row[:type] = if row[:db_type] =~ DECIMAL_TYPE_RE and (row[:scale].is_a?(Fixnum) ? row[:scale] == 0 : !row[:scale])
             :integer
           else
             schema_column_type(row[:db_type])
@@ -75,12 +75,12 @@ module Sequel
         im = input_identifier_meth
         indexes = {}
         metadata_dataset.
-            from(:dbo__sysobjects___z).
-            select(:z__name___table_name, :i__name___index_name, :si__indextype___type, :si__colnames___columns).
-            join(:dbo__sysindexes___i, :id___i=> :id___z).
-            join(:sys__sysindexes___si, :iname=> :name___i).
-            where(:z__type => 'U', :table_name=>im.call(table)).
-            each do |r|
+         from(:dbo__sysobjects___z).
+         select(:z__name___table_name, :i__name___index_name, :si__indextype___type, :si__colnames___columns).
+         join(:dbo__sysindexes___i, :id___i=> :id___z).
+         join(:sys__sysindexes___si, :iname=> :name___i).
+         where(:z__type => 'U', :table_name=>im.call(table)).
+         each do |r|
           indexes[m.call(r[:index_name])] =
             {:unique=>(r[:type].downcase=='unique'),
              :columns=>r[:columns].split(',').map{|v| m.call(v.split(' ').first)}} unless r[:type].downcase == 'primary key'
@@ -93,18 +93,19 @@ module Sequel
         im = input_identifier_meth
         fk_indexes = {}
         metadata_dataset.
-            from(:sys__sysforeignkey___fk).
-            select(:fk__role___name, :fks__columns___column_map, :si__indextype___type, :si__colnames___columns, :fks__primary_tname___table_name).
-            join(:sys__sysforeignkeys___fks, :role => :role).
-            join_table(:inner, :sys__sysindexes___si, [:iname=> :fk__role], {:implicit_qualifier => :fk}).
-            where(:fks__foreign_tname=>im.call(table)).
-            each do |r|
-          fk_indexes[r[:name]] =
+         from(:sys__sysforeignkey___fk).
+         select(:fk__role___name, :fks__columns___column_map, :si__indextype___type, :si__colnames___columns, :fks__primary_tname___table_name).
+         join(:sys__sysforeignkeys___fks, :role => :role).
+         join_table(:inner, :sys__sysindexes___si, [:iname=> :fk__role], {:implicit_qualifier => :fk}).
+         where(:fks__foreign_tname=>im.call(table)).
+         each do |r|
+          unless r[:type].downcase == 'primary key'
+            fk_indexes[r[:name]] =
               {:name=>m.call(r[:name]),
                :columns=>r[:columns].split(',').map{|v| m.call(v.split(' ').first)},
                :table=>m.call(r[:table_name]),
-               :key=>r[:column_map].split(',').map{|v| m.call(v.split(' IS ').last)},
-              } unless r[:type].downcase == 'primary key'
+               :key=>r[:column_map].split(',').map{|v| m.call(v.split(' IS ').last)}}
+           end
         end
         fk_indexes.values
       end
@@ -181,32 +182,32 @@ module Sequel
       # Sybase specific syntax for altering tables.
       def alter_table_sql(table, op)
         case op[:op]
-          when :add_column
-            "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op)}"
-          when :drop_column
-            "ALTER TABLE #{quote_schema_table(table)} DROP #{column_definition_sql(op)}"
-          when :drop_constraint
-            case op[:type]
-              when :primary_key
-                "ALTER TABLE #{quote_schema_table(table)} DROP PRIMARY KEY"
-              when :foreign_key
-                if op[:name] || op[:columns]
-                  name = op[:name] || foreign_key_name(table, op[:columns])
-                  unless name.nil?
-                    "ALTER TABLE #{quote_schema_table(table)} DROP FOREIGN KEY #{quote_identifier(name)}"
-                  end
-                end
-              else
-                super
+        when :add_column
+          "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op)}"
+        when :drop_column
+          "ALTER TABLE #{quote_schema_table(table)} DROP #{column_definition_sql(op)}"
+        when :drop_constraint
+          case op[:type]
+          when :primary_key
+            "ALTER TABLE #{quote_schema_table(table)} DROP PRIMARY KEY"
+          when :foreign_key
+            if op[:name] || op[:columns]
+              name = op[:name] || foreign_key_name(table, op[:columns])
+              if name
+                "ALTER TABLE #{quote_schema_table(table)} DROP FOREIGN KEY #{quote_identifier(name)}"
+              end
             end
-          when :rename_column
-            "ALTER TABLE #{quote_schema_table(table)} RENAME #{quote_identifier(op[:name])} TO #{quote_identifier(op[:new_name].to_s)}"
-          when :set_column_type
-            "ALTER TABLE #{quote_schema_table(table)} ALTER #{quote_identifier(op[:name])} #{type_literal(op)}"
-          when :set_column_null
-            "ALTER TABLE #{quote_schema_table(table)} ALTER #{quote_identifier(op[:name])} #{'NOT ' unless op[:null]}NULL"
-          when :set_column_default
-            "ALTER TABLE #{quote_schema_table(table)} ALTER #{quote_identifier(op[:name])} DEFAULT #{literal(op[:default])}"
+          else
+            super
+          end
+        when :rename_column
+          "ALTER TABLE #{quote_schema_table(table)} RENAME #{quote_identifier(op[:name])} TO #{quote_identifier(op[:new_name].to_s)}"
+        when :set_column_type
+          "ALTER TABLE #{quote_schema_table(table)} ALTER #{quote_identifier(op[:name])} #{type_literal(op)}"
+        when :set_column_null
+          "ALTER TABLE #{quote_schema_table(table)} ALTER #{quote_identifier(op[:name])} #{'NOT ' unless op[:null]}NULL"
+        when :set_column_default
+          "ALTER TABLE #{quote_schema_table(table)} ALTER #{quote_identifier(op[:name])} DEFAULT #{literal(op[:default])}"
         else
           super(table, op)
         end
@@ -286,10 +287,6 @@ module Sequel
         false
       end
 
-      #def supports_timestamp_timezones?
-      #  true
-      #end
-
       def supports_timestamp_usecs?
         false
       end
@@ -307,16 +304,16 @@ module Sequel
         if table.is_a?(Dataset) && table.opts[:lateral]
           table = table.clone(:lateral=>nil)
           case type
-            when :inner
-              type = :cross_apply
-              table = table.where(expr)
-              expr = nil
-            when :cross
-              type = :cross_apply
-            when :left, :left_outer
-              type = :outer_apply
-              table = table.where(expr)
-              expr = nil
+          when :inner
+            type = :cross_apply
+            table = table.where(expr)
+            expr = nil
+          when :cross
+            type = :cross_apply
+          when :left, :left_outer
+            type = :outer_apply
+            table = table.where(expr)
+            expr = nil
           end
         end
         super
@@ -332,10 +329,10 @@ module Sequel
         ds = from(*source)
         lateral.each do |l|
           l = if l.is_a?(Sequel::SQL::AliasedExpression)
-                l.expression.clone(:lateral=>nil).as(l.aliaz)
-              else
-                l.clone(:lateral=>nil)
-              end
+            l.expression.clone(:lateral=>nil).as(l.aliaz)
+          else
+            l.clone(:lateral=>nil)
+          end
           ds = ds.cross_apply(l)
         end
         ds
@@ -350,54 +347,54 @@ module Sequel
       # SQLAnywhere uses + for string concatenation, and LIKE is case insensitive by default.
       def complex_expression_sql_append(sql, op, args)
         case op
-          when :'||'
-            super(sql, :+, args)
-          when :<<
-            sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
-          when :>>
-            sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
-          when :LIKE, :"NOT LIKE"
-            sql << Sequel::Dataset::PAREN_OPEN
-            literal_append(sql, args.at(0))
-            sql << Sequel::Dataset::SPACE << (op == :LIKE ? REGEXP : NOT_REGEXP) << Sequel::Dataset::SPACE
-            pattern = ''
-            last_c = ''
-            args.at(1).each_char do |c|
-              if  c == '_' and not pattern.end_with?('\\') and last_c != '\\'
-                pattern << '.'
-              elsif c == '%' and not pattern.end_with?('\\') and last_c != '\\'
-                pattern << '.*'
-              elsif c == '[' and not pattern.end_with?('\\') and last_c != '\\'
-                pattern << '\['
-              elsif c == ']' and not pattern.end_with?('\\') and last_c != '\\'
-                pattern << '\]'
-              elsif c == '*' and not pattern.end_with?('\\') and last_c != '\\'
-                pattern << '\*'
-              elsif c == '?' and not pattern.end_with?('\\') and last_c != '\\'
-                pattern << '\?'
-              else
-                pattern << c
-              end
-              if c == '\\' and last_c == '\\'
-                last_c = ''
-              else
-                last_c = c
-              end
+        when :'||'
+          super(sql, :+, args)
+        when :<<
+          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
+        when :>>
+          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
+        when :LIKE, :"NOT LIKE"
+          sql << Sequel::Dataset::PAREN_OPEN
+          literal_append(sql, args.at(0))
+          sql << Sequel::Dataset::SPACE << (op == :LIKE ? REGEXP : NOT_REGEXP) << Sequel::Dataset::SPACE
+          pattern = ''
+          last_c = ''
+          args.at(1).each_char do |c|
+            if  c == '_' and not pattern.end_with?('\\') and last_c != '\\'
+              pattern << '.'
+            elsif c == '%' and not pattern.end_with?('\\') and last_c != '\\'
+              pattern << '.*'
+            elsif c == '[' and not pattern.end_with?('\\') and last_c != '\\'
+              pattern << '\['
+            elsif c == ']' and not pattern.end_with?('\\') and last_c != '\\'
+              pattern << '\]'
+            elsif c == '*' and not pattern.end_with?('\\') and last_c != '\\'
+              pattern << '\*'
+            elsif c == '?' and not pattern.end_with?('\\') and last_c != '\\'
+              pattern << '\?'
+            else
+              pattern << c
             end
-            literal_append(sql, pattern)
-            sql << Sequel::Dataset::ESCAPE
-            literal_append(sql, Sequel::Dataset::BACKSLASH)
-            sql << Sequel::Dataset::PAREN_CLOSE
-          when :ILIKE, :"NOT ILIKE"
-            super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args)
-          when :extract
-            sql << DATEPART + Sequel::Dataset::PAREN_OPEN
-            literal_append(sql, args.at(0))
-            sql << ','
-            literal_append(sql, args.at(1))
-            sql << Sequel::Dataset::PAREN_CLOSE
-          else
-            super
+            if c == '\\' and last_c == '\\'
+              last_c = ''
+            else
+              last_c = c
+            end
+          end
+          literal_append(sql, pattern)
+          sql << Sequel::Dataset::ESCAPE
+          literal_append(sql, Sequel::Dataset::BACKSLASH)
+          sql << Sequel::Dataset::PAREN_CLOSE
+        when :ILIKE, :"NOT ILIKE"
+          super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args)
+        when :extract
+          sql << DATEPART + Sequel::Dataset::PAREN_OPEN
+          literal_append(sql, args.at(0))
+          sql << ','
+          literal_append(sql, args.at(1))
+          sql << Sequel::Dataset::PAREN_CLOSE
+        else
+          super
         end
       end
 
@@ -409,14 +406,12 @@ module Sequel
       # Use Date() and Now() for CURRENT_DATE and CURRENT_TIMESTAMP
       def constant_sql_append(sql, constant)
         case constant
-          when :CURRENT_DATE
-            sql << DATE_FUNCTION
-          when :CURRENT_TIMESTAMP
-            sql << NOW_FUNCTION
-          when :CURRENT_TIME
-            sql << NOW_FUNCTION
-          else
-            super
+        when :CURRENT_DATE
+          sql << DATE_FUNCTION
+        when :CURRENT_TIMESTAMP, :CURRENT_TIME
+          sql << NOW_FUNCTION
+        else
+          super
         end
       end
 
@@ -493,12 +488,12 @@ module Sequel
 
       def join_type_sql(join_type)
         case join_type
-          when :cross_apply
-            CROSS_APPLY
-          when :outer_apply
-            OUTER_APPLY
-          else
-            super
+        when :cross_apply
+          CROSS_APPLY
+        when :outer_apply
+          OUTER_APPLY
+        else
+          super
         end
       end
     end
