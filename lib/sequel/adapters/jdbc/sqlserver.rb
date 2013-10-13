@@ -22,13 +22,13 @@ module Sequel
           def process_result_set_convert(cols, result)
             while result.next
               row = {}
-              cols.each do |n, i, p|
+              cols.each do |n, i, ctn, p|
                 v = (n == :is_autoincrement ? result.getString(i) : result.getObject(i))
                 row[n] = if v
                   if p
                     p.call(v)
                   elsif p.nil?
-                    cols[i-1][2] = p = convert_type_proc(v)
+                    cols[i-1][3] = p = convert_type_proc(v, ctn)
                     if p
                       p.call(v)
                     else
