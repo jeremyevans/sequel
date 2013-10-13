@@ -47,20 +47,22 @@ module Sequel
       set_adapter_scheme :sqlanywhere
 
       def connect(server)
-        if opts[:uri]
-          uri = URI(opts[:uri])
-          connection_string = (uri.path.nil? or uri.path == "") ? "" : "DBN=#{File.basename(uri.path)};"
-          connection_string += uri.query
-        else
-          connection_string = "ServerName=#{(opts[:server] || opts[:database])};DatabaseName=#{opts[:database]};UserID=#{opts[:user]};Password=#{opts[:password]};"
-          connection_string += "CommLinks=#{opts[:commlinks]};" if opts[:commlinks]
-          connection_string += "ConnectionName=#{opts[:connection_name]};" if opts[:connection_name]
-          connection_string += "CharSet=#{opts[:encoding]};" if opts[:encoding]
-          connection_string += "Idle=0" # Prevent the server from disconnecting us if we're idle for >240mins (by default)
+        unless conn_string = opts[:conn_string]
+          conn_string = []
+          conn_string << "Host=#{opts[:host]}#{":#{opts[:port]}" if opts[:port]}" if opts[:host]
+          conn_string << "DBN=#{opts[:database]}" if opts[:database]
+          conn_string << "UID=#{opts[:user]}" if opts[:user]
+          conn_string << "Password=#{opts[:password]}" if opts[:password]
+          conn_string << "CommLinks=#{opts[:commlinks]}" if opts[:commlinks]
+          conn_string << "ConnectionName=#{opts[:connection_name]}" if opts[:connection_name]
+          conn_string << "CharSet=#{opts[:encoding]}" if opts[:encoding]
+          conn_string << "Idle=0" # Prevent the server from disconnecting us if we're idle for >240mins (by default)
+          conn_string << nil
+          conn_string = conn_string.join(';')
         end
 
         conn = @api.sqlany_new_connection
-        raise LoadError, "Could not connect" unless conn && @api.sqlany_connect(conn, connection_string) == 1
+        raise LoadError, "Could not connect" unless conn && @api.sqlany_connect(conn, conn_string) == 1
 
         if Sequel.application_timezone == :utc
           @api.sqlany_execute_immediate(conn, "SET TEMPORARY OPTION time_zone_adjustment=0")
