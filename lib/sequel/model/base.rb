@@ -707,7 +707,7 @@ module Sequel
         schema_array = check_non_connection_error{db.schema(dataset, :reload=>reload)} if db.supports_schema_parsing?
         if schema_array
           schema_array.each{|k,v| schema_hash[k] = v}
-          if ds_opts.include?(:select)
+          if (select = ds_opts[:select]) && !(select.length == 1 && select.first.is_a?(SQL::ColumnAll))
             # We don't remove the columns from the schema_hash,
             # as it's possible they will be used for typecasting
             # even if they are not selected.

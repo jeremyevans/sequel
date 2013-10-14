@@ -697,6 +697,16 @@ describe "Model.db_schema" do
     @c.primary_key.should == nil
   end
   
+  specify "should automatically set primary key for dataset selecting table.*" do
+    ds = @dataset.select_all(:items)
+    d = ds.db
+    def d.schema(table, *opts) [[:x, {:primary_key=>true}]] end
+    @c.primary_key.should == :id
+    @c.dataset = ds
+    @c.db_schema.should == {:x=>{:primary_key=>true}}
+    @c.primary_key.should == :x
+  end
+  
   specify "should not modify the primary key unless all column schema hashes have a :primary_key entry" do
     ds = @dataset
     d = ds.db
