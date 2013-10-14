@@ -47,6 +47,7 @@ module Sequel
       set_adapter_scheme :sqlanywhere
 
       def connect(server)
+        opts = server_opts(server)
         unless conn_string = opts[:conn_string]
           conn_string = []
           conn_string << "Host=#{opts[:host]}#{":#{opts[:port]}" if opts[:port]}" if opts[:host]
