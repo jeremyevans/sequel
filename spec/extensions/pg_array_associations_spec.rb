@@ -513,6 +513,18 @@ describe Sequel::Model, "pg_array_associations" do
     DB.sqls.should == ["UPDATE artists SET tag_ids = array_remove(tag_ids, 2) WHERE (tag_ids @> ARRAY[2])"]
   end
 
+  it "should allow calling add_ and remove_ methods on new objects for pg_array_to_many associations" do
+    a = Artist.new
+    a.add_tag(@c2.load(:id=>4))
+    a.tag_ids.should == [4]
+    a.remove_tag(@c2.load(:id=>4))
+    a.tag_ids.should == []
+    a.add_tag(@c2.load(:id=>4))
+    a.tag_ids.should == [4]
+    a.remove_all_tags
+    a.tag_ids.should == []
+  end
+
   it "should have pg_array_to_many association modification methods save if :save_after_modify option is used" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :save_after_modify=>true
 
