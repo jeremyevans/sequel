@@ -67,6 +67,9 @@ module Sequel
     # This plugin should work on all supported PostgreSQL versions, except
     # the remove_all modification method for many_to_pg_array associations, which
     # requires the array_remove method added in PostgreSQL 9.3.
+    #
+    # This plugin requires that the underlying database have the pg_array
+    # extension loaded.
     module PgArrayAssociations
       # The AssociationReflection subclass for many_to_pg_array associations.
       class ManyToPgArrayAssociationReflection < Sequel::Model::Associations::AssociationReflection
