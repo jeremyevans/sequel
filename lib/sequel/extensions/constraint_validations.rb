@@ -401,10 +401,10 @@ module Sequel
       end
 
       ds = from(:sequel_constraint_validations)
-      ds.multi_insert(rows.flatten)
       unless drop_rows.empty?
         ds.where([:table, :constraint_name]=>drop_rows).delete
       end
+      ds.multi_insert(rows.flatten)
     end
 
     # Add the constraint to the generator, including a NOT NULL constraint

@@ -1,5 +1,7 @@
 === HEAD
 
+* Issue constraint_validation table deletes before inserts, so modifying constraint via drop/add in same alter_table block works (jeremyevans)
+
 * Support add_*/remove_*/remove_all_* pg_array_to_many association methods on unsaved model objects (jeremyevans)
 
 * Add Sybase SQLAnywhere support via new sqlanywhere and jdbc/sqlanywhere adapters (gditrick, jeremyevans)

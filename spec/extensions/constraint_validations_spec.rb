@@ -276,6 +276,13 @@ describe "constraint_validations extension" do
     @db.sqls.should == ["DELETE FROM sequel_constraint_validations WHERE ((table, constraint_name) IN (('foo', 'bar')))", "ALTER TABLE foo DROP CONSTRAINT bar"]
   end
 
+  it "should drop constraints and validations before adding new ones" do
+    @db.alter_table(:foo){String :name; validate{unique :name; drop :bar}}
+    sqls = @db.sqls
+    parse_insert(sqls.slice!(2)).should == {:validation_type=>"unique", :column=>"name", :table=>"foo"}
+    sqls.should == ["DELETE FROM sequel_constraint_validations WHERE ((table, constraint_name) IN (('foo', 'bar')))", "BEGIN", "COMMIT", "ALTER TABLE foo ADD UNIQUE (name)", "ALTER TABLE foo DROP CONSTRAINT bar"]
+  end
+
   it "should raise an error if attempting to validate inclusion with a range of non-integers" do
     proc{@db.create_table(:foo){String :name; validate{includes 'a'..'z', :name}}}.should raise_error(Sequel::Error)
   end
