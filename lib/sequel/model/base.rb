@@ -512,22 +512,7 @@ module Sequel
       # sharding support.
       def set_dataset(ds, opts=OPTS)
         inherited = opts[:inherited]
-        case ds
-        when Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, LiteralString
-          self.simple_table = db.literal(ds)
-          ds = db.from(ds)
-        when Dataset
-          self.simple_table = if ds.send(:simple_select_all?)
-            ds.literal(ds.first_source_table)
-          else
-            nil
-          end
-          @db = ds.db
-        else
-          raise(Error, "Model.set_dataset takes one of the following classes as an argument: Symbol, LiteralString, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, Dataset")
-        end
-        set_dataset_row_proc(ds)
-        @dataset = ds
+        @dataset = convert_input_dataset(ds)
         @require_modification = Sequel::Model.require_modification.nil? ? @dataset.provides_accurate_rows_matched? : Sequel::Model.require_modification
         if inherited
           self.simple_table = superclass.simple_table
@@ -642,6 +627,25 @@ module Sequel
         rescue
           nil
         end
+      end
+
+      # Convert the given object to a Dataset that should be used as
+      # this model's dataset.
+      def convert_input_dataset(ds)
+        case ds
+        when Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, LiteralString
+          self.simple_table = db.literal(ds)
+          ds = db.from(ds)
+        when Dataset
+          self.simple_table = if ds.send(:simple_select_all?)
+            ds.literal(ds.first_source_table)
+          end
+          @db = ds.db
+        else
+          raise(Error, "Model.set_dataset takes one of the following classes as an argument: Symbol, LiteralString, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, Dataset")
+        end
+        set_dataset_row_proc(ds)
+        ds
       end
 
       # Add the module to the class's dataset_method_modules.  Extend the dataset with the
