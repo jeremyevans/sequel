@@ -62,8 +62,15 @@ describe Sequel::Dataset, " graphing" do
   end
 
   it "#graph should accept a complex dataset and pass it directly to join" do
+    ds = @ds1.graph(@ds2.select_all(:lines), {:x=>:id})
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+  end
+
+  it "#graph should accept a complex dataset and pass it directly to join" do
     ds = @ds1.graph(@ds2.filter(:x=>1), {:x=>:id})
     ds.sql.should == 'SELECT points.id, points.x, points.y, t1.id AS t1_id, t1.x AS t1_x, t1.y AS t1_y, t1.graph_id FROM points LEFT OUTER JOIN (SELECT * FROM lines WHERE (x = 1)) AS t1 ON (t1.x = points.id)'
+    ds = @ds1.graph(@ds2.select_all(:lines).filter(:x=>1), {:x=>:id})
+    ds.sql.should == 'SELECT points.id, points.x, points.y, t1.id AS t1_id, t1.x AS t1_x, t1.y AS t1_y, t1.graph_id FROM points LEFT OUTER JOIN (SELECT lines.* FROM lines WHERE (x = 1)) AS t1 ON (t1.x = points.id)'
   end
 
   it "#graph should work on from_self datasets" do

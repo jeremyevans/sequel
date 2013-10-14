@@ -968,10 +968,24 @@ module Sequel
       !(@opts.collect{|k,v| k unless v.nil?}.compact & opts).empty?
     end
 
-    # Whether this dataset is a simple SELECT * FROM table.
+    # Whether this dataset is a simple select from an underlying table, such as:
+    #
+    #   SELECT * FROM table
+    #   SELECT table.* FROM table
     def simple_select_all?
       o = @opts.reject{|k,v| v.nil? || NON_SQL_OPTIONS.include?(k)}
-      o.length == 1 && (f = o[:from]) && f.length == 1 && (f.first.is_a?(Symbol) || f.first.is_a?(SQL::AliasedExpression))
+      if (f = o[:from]) && f.length == 1 && (f.first.is_a?(Symbol) || f.first.is_a?(SQL::AliasedExpression))
+        case o.length
+        when 1
+          true
+        when 2
+          (s = o[:select]) && s.length == 1 && s.first.is_a?(SQL::ColumnAll)
+        else
+          false
+        end
+      else
+        false
+      end
     end
 
     private
