@@ -206,7 +206,7 @@ describe "Database foreign key parsing" do
   end
 
   specify "should parse foreign key information into an array of hashes" do
-    @db.create_table!(:a, :engine=>:InnoDB){primary_key :c; Integer :d, :null => false, :unique => true ; index :d, :unique=>true}
+    @db.create_table!(:a, :engine=>:InnoDB){primary_key :c; Integer :d, :null => false, :unique => true}
     @db.create_table!(:b, :engine=>:InnoDB){foreign_key :e, :a}
     @pr[:a]
     @pr[:b, [[:e], :a, [:pk, :c]]]
@@ -233,9 +233,9 @@ describe "Database foreign key parsing" do
   end
 
   specify "should handle composite foreign and primary keys" do
-    @db.create_table!(:a, :engine=>:InnoDB){Integer :b; Integer :c; primary_key [:b, :c]; index [:c, :b], :unique=>true}
-    @db.create_table!(:b, :engine=>:InnoDB){Integer :e; Integer :f; foreign_key [:e, :f], :a; foreign_key [:f, :e], :a, :key=>[:c, :b]}
-    @pr[:b, [[:e, :f], :a, [:pk, :b, :c]], [[:f, :e], :a, [:c, :b]]]
+    @db.create_table!(:a, :engine=>:InnoDB){Integer :b; Integer :c; Integer :d; primary_key [:b, :c]; unique [:d, :c]}
+    @db.create_table!(:b, :engine=>:InnoDB){Integer :e; Integer :f; Integer :g; foreign_key [:e, :f], :a; foreign_key [:g, :f], :a, :key=>[:d, :c]}
+    @pr[:b, [[:e, :f], :a, [:pk, :b, :c]], [[:g, :f], :a, [:d, :c]]]
   end
 end if DB.supports_foreign_key_parsing?
 

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for foreign key parsing to the jdbc adapter (jeremyevans)
+
 * Make add_foreign_key work on HSQLDB (jeremyevans)
 
 * Add table_select plugin for selecting table.* instead of * for model datasets (jeremyevans)

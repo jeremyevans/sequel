@@ -305,15 +305,31 @@ module Sequel
       def execute_insert(sql, opts=OPTS)
         execute(sql, {:type=>:insert}.merge(opts))
       end
-      
+
+      # Use the JDBC metadata to get a list of foreign keys for the table.
+      def foreign_key_list(table, opts=OPTS)
+        m = output_identifier_meth
+        schema, table = metadata_schema_and_table(table, opts)
+        foreign_keys = {}
+        metadata(:getImportedKeys, nil, schema, table) do |r|
+          if fk = foreign_keys[r[:fk_name]]
+            fk[:columns] << [r[:key_seq], m.call(r[:fkcolumn_name])]
+            fk[:key] << [r[:key_seq], m.call(r[:pkcolumn_name])]
+          elsif r[:fk_name]
+            foreign_keys[r[:fk_name]] = {:name=>m.call(r[:fk_name]), :columns=>[[r[:key_seq], m.call(r[:fkcolumn_name])]], :table=>m.call(r[:pktable_name]), :key=>[[r[:key_seq], m.call(r[:pkcolumn_name])]]}
+          end
+        end
+        foreign_keys.values.each do |fk|
+          [:columns, :key].each do |k|
+            fk[k] = fk[k].sort.map{|_, v| v}
+          end
+        end
+      end
+
       # Use the JDBC metadata to get the index information for the table.
       def indexes(table, opts=OPTS)
         m = output_identifier_meth
-        im = input_identifier_meth
-        schema, table = schema_and_table(table)
-        schema ||= opts[:schema]
-        schema = im.call(schema) if schema
-        table = im.call(table)
+        schema, table = metadata_schema_and_table(table, opts)
         indexes = {}
         metadata(:getIndexInfo, nil, schema, table, false, true) do |r|
           next unless name = r[:column_name]
@@ -530,6 +546,16 @@ module Sequel
         end
       end
 
+      # Return the schema and table suitable for use with metadata queries.
+      def metadata_schema_and_table(table, opts)
+        im = input_identifier_meth(opts[:dataset])
+        schema, table = schema_and_table(table)
+        schema ||= opts[:schema]
+        schema = im.call(schema) if schema
+        table = im.call(table)
+        [schema, table]
+      end
+      
       # Created a JDBC prepared statement on the connection with the given SQL.
       def prepare_jdbc_statement(conn, sql, opts)
         conn.prepareStatement(sql)
@@ -582,12 +608,8 @@ module Sequel
       # Parse the table schema for the given table.
       def schema_parse_table(table, opts=OPTS)
         m = output_identifier_meth(opts[:dataset])
-        im = input_identifier_meth(opts[:dataset])
         ds = dataset
-        schema, table = schema_and_table(table)
-        schema ||= opts[:schema]
-        schema = im.call(schema) if schema
-        table = im.call(table)
+        schema, table = metadata_schema_and_table(table, opts)
         pks, ts = [], []
         metadata(:getPrimaryKeys, nil, schema, table) do |h|
           next if schema_parse_table_skip?(h, schema)
