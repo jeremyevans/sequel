@@ -1,5 +1,7 @@
 === HEAD
 
+* Make add_foreign_key work on HSQLDB (jeremyevans)
+
 * Add table_select plugin for selecting table.* instead of * for model datasets (jeremyevans)
 
 * Issue constraint_validation table deletes before inserts, so modifying constraint via drop/add in same alter_table block works (jeremyevans)

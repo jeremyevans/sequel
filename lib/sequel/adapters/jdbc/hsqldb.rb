@@ -37,6 +37,13 @@ module Sequel
         # HSQLDB specific SQL for renaming columns, and changing column types and/or nullity.
         def alter_table_sql(table, op)
           case op[:op]
+          when :add_column
+            if op[:table]
+              [super(table, op.merge(:table=>nil)),
+               alter_table_sql(table, op.merge(:op=>:add_constraint, :type=>:foreign_key, :name=>op[:foreign_key_name], :columns=>[op[:name]], :table=>op[:table]))]
+            else
+              super
+            end
           when :rename_column
             "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} RENAME TO #{quote_identifier(op[:new_name])}"
           when :set_column_type
