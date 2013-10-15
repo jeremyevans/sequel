@@ -93,7 +93,7 @@ module Sequel
         #   subchild1.ancestors # => [child1, root]
         def descendants
           nodes = children.dup
-          nodes.each{|child| nodes.concat(child.descendants)}
+          children.each{|child| nodes.concat(child.descendants)}
           nodes 
         end
 
