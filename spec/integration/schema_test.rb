@@ -400,7 +400,7 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:number=>10, :name=>nil}]
   end
 
-  cspecify "should add primary key columns to tables correctly", :h2, :derby do
+  cspecify "should add primary key columns to tables correctly", :derby do
     @db.create_table!(:items){Integer :number}
     @ds.insert(:number=>10)
     @db.alter_table(:items){add_primary_key :id}

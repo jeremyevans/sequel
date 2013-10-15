@@ -62,7 +62,7 @@ module Sequel
           when :add_column
             if (pk = op.delete(:primary_key)) || (ref = op.delete(:table))
               sqls = [super(table, op)]
-              sqls << "ALTER TABLE #{quote_schema_table(table)} ADD PRIMARY KEY (#{quote_identifier(op[:name])})" if pk
+              sqls << "ALTER TABLE #{quote_schema_table(table)} ADD PRIMARY KEY (#{quote_identifier(op[:name])})" if pk && op[:type] != :identity
               if ref
                 op[:table] = ref
                 sqls << "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])}) #{column_references_sql(op)}"

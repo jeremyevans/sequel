@@ -1,5 +1,7 @@
 === HEAD
 
+* Make add_primary_key work on h2 (jeremyevans)
+
 * Add support for foreign key parsing on Oracle (jeremyevans)
 
 * Add support for foreign key parsing to the jdbc adapter (jeremyevans)
