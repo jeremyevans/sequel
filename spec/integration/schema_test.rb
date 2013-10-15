@@ -232,8 +232,8 @@ describe "Database foreign key parsing" do
   end
 
   specify "should handle composite foreign and primary keys" do
-    @db.create_table!(:a, :engine=>:InnoDB){Integer :b; Integer :c; Integer :d; primary_key [:b, :c]; unique [:d, :c]}
-    @db.create_table!(:b, :engine=>:InnoDB){Integer :e; Integer :f; Integer :g; foreign_key [:e, :f], :a; foreign_key [:g, :f], :a, :key=>[:d, :c]}
+    @db.create_table!(:a, :engine=>:InnoDB){Integer :b, :null=>false; Integer :c, :null=>false; Integer :d, :null=>false; primary_key [:b, :c]; unique [:d, :c]}
+    @db.create_table!(:b, :engine=>:InnoDB){Integer :e, :null=>false; Integer :f, :null=>false; Integer :g, :null=>false; foreign_key [:e, :f], :a; foreign_key [:g, :f], :a, :key=>[:d, :c]}
     @pr[:b, [[:e, :f], :a, [:pk, :b, :c]], [[:g, :f], :a, [:d, :c]]]
   end
 end if DB.supports_foreign_key_parsing?
