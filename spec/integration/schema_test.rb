@@ -218,7 +218,6 @@ describe "Database foreign key parsing" do
     @pr[:b, [[:e], :a, [:pk, :c]], [[:f], :a, [:c]], [[:f], :a, [:d]]]
 
     @db.alter_table(:a){add_unique_constraint [:d, :c]}
-    @db.alter_table(:a){add_index [:d, :c], :unique=>true}
     @db.alter_table(:b){add_foreign_key [:f, :e], :a, :key=>[:d, :c]}
     @pr[:b, [[:e], :a, [:pk, :c]], [[:f], :a, [:c]], [[:f], :a, [:d]], [[:f, :e], :a, [:d, :c]]]
 
