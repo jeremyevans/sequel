@@ -4627,3 +4627,69 @@ describe "Frozen Datasets" do
     @ds.select(:a).sql.should == 'SELECT a FROM test'
   end
 end
+
+describe "Dataset mutation methods" do
+  def m(&block)
+    ds = Sequel.mock[:t]
+    ds.instance_exec(&block)
+    ds.sql
+  end
+
+  it "should modify the dataset in place" do
+    dsc = Sequel.mock[:u]
+    dsc.instance_variable_set(:@columns, [:v])
+
+    m{and!(:a=>1).or!(:b=>2)}.should == "SELECT * FROM t WHERE ((a = 1) OR (b = 2))"
+    m{select!(:f).graph!(dsc, :b=>:c).set_graph_aliases!(:e=>[:m, :n]).add_graph_aliases!(:d=>[:g, :c])}.should == "SELECT m.n AS e, g.c AS d FROM t LEFT OUTER JOIN u ON (u.b = t.c)"
+    m{cross_join!(:a)}.should == "SELECT * FROM t CROSS JOIN a"
+    m{distinct!}.should == "SELECT DISTINCT * FROM t"
+    m{except!(dsc)}.should == "SELECT * FROM (SELECT * FROM t EXCEPT SELECT * FROM u) AS t1"
+    m{exclude!(:a=>1)}.should == "SELECT * FROM t WHERE (a != 1)"
+    m{exclude_having!(:a=>1)}.should == "SELECT * FROM t HAVING (a != 1)"
+    m{exclude_where!(:a=>1)}.should == "SELECT * FROM t WHERE (a != 1)"
+    m{filter!(:a=>1)}.should == "SELECT * FROM t WHERE (a = 1)"
+    m{for_update!}.should == "SELECT * FROM t FOR UPDATE"
+    m{from!(:p)}.should == "SELECT * FROM p"
+    m{full_join!(:a, [:b])}.should == "SELECT * FROM t FULL JOIN a USING (b)"
+    m{full_outer_join!(:a, [:b])}.should == "SELECT * FROM t FULL OUTER JOIN a USING (b)"
+    m{grep!(:a, 'b')}.should == "SELECT * FROM t WHERE ((a LIKE 'b' ESCAPE '\\'))"
+    m{group!(:a)}.should == "SELECT * FROM t GROUP BY a"
+    m{group_and_count!(:a)}.should == "SELECT a, count(*) AS count FROM t GROUP BY a"
+    m{group_by!(:a)}.should == "SELECT * FROM t GROUP BY a"
+    m{having!(:a)}.should == "SELECT * FROM t HAVING a"
+    m{inner_join!(:a, [:b])}.should == "SELECT * FROM t INNER JOIN a USING (b)"
+    m{intersect!(dsc)}.should == "SELECT * FROM (SELECT * FROM t INTERSECT SELECT * FROM u) AS t1"
+    m{where!(:a).invert!}.should == "SELECT * FROM t WHERE NOT a"
+    m{join!(:a, [:b])}.should == "SELECT * FROM t INNER JOIN a USING (b)"
+    m{join_table!(:inner, :a, [:b])}.should == "SELECT * FROM t INNER JOIN a USING (b)"
+    m{left_join!(:a, [:b])}.should == "SELECT * FROM t LEFT JOIN a USING (b)"
+    m{left_outer_join!(:a, [:b])}.should == "SELECT * FROM t LEFT OUTER JOIN a USING (b)"
+    m{limit!(1)}.should == "SELECT * FROM t LIMIT 1"
+    m{lock_style!(:update)}.should == "SELECT * FROM t FOR UPDATE"
+    m{natural_full_join!(:a)}.should == "SELECT * FROM t NATURAL FULL JOIN a"
+    m{natural_join!(:a)}.should == "SELECT * FROM t NATURAL JOIN a"
+    m{natural_left_join!(:a)}.should == "SELECT * FROM t NATURAL LEFT JOIN a"
+    m{natural_right_join!(:a)}.should == "SELECT * FROM t NATURAL RIGHT JOIN a"
+    m{offset!(1)}.should == "SELECT * FROM t OFFSET 1"
+    m{order!(:a).reverse_order!}.should == "SELECT * FROM t ORDER BY a DESC"
+    m{order_by!(:a).order_more!(:b).order_append!(:c).order_prepend!(:d).reverse!}.should == "SELECT * FROM t ORDER BY d DESC, a DESC, b DESC, c DESC"
+    m{qualify!}.should == "SELECT t.* FROM t"
+    m{right_join!(:a, [:b])}.should == "SELECT * FROM t RIGHT JOIN a USING (b)"
+    m{right_outer_join!(:a, [:b])}.should == "SELECT * FROM t RIGHT OUTER JOIN a USING (b)"
+    m{select!(:a)}.should == "SELECT a FROM t"
+    m{select_all!(:t).select_more!(:b).select_append!(:c)}.should == "SELECT t.*, b, c FROM t"
+    m{select_group!(:a)}.should == "SELECT a FROM t GROUP BY a"
+    m{where!(:a).unfiltered!}.should == "SELECT * FROM t"
+    m{group!(:a).ungrouped!}.should == "SELECT * FROM t"
+    m{limit!(1).unlimited!}.should == "SELECT * FROM t"
+    m{order!(:a).unordered!}.should == "SELECT * FROM t"
+    m{union!(dsc)}.should == "SELECT * FROM (SELECT * FROM t UNION SELECT * FROM u) AS t1"
+    m{with!(:a, dsc)}.should == "WITH a AS (SELECT * FROM u) SELECT * FROM t"
+    m{with_recursive!(:a, dsc, dsc)}.should == "WITH a AS (SELECT * FROM u UNION ALL SELECT * FROM u) SELECT * FROM t"
+    m{with_sql!('SELECT foo')}.should == "SELECT foo"
+
+    dsc.server!(:a)
+    dsc.opts[:server].should == :a
+    dsc.graph!(dsc, {:b=>:c}, :table_alias=>:foo).ungraphed!.opts[:graph].should be_nil
+  end
+end
