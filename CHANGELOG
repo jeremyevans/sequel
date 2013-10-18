@@ -1,5 +1,9 @@
 === HEAD
 
+* Make association cloning handle :block correctly for clones of clones (jeremyevans)
+
+* Make association cloning handle :eager_block option correctly (jeremyevans)
+
 * Make add_primary_key work on h2 (jeremyevans)
 
 * Add support for foreign key parsing on Oracle (jeremyevans)

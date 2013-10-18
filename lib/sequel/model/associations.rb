@@ -958,7 +958,7 @@ module Sequel
           opts = orig_opts.merge(:type => type, :name => name, :cache=>{}, :model => self)
           opts[:block] = block if block
           opts = assoc_class.new.merge!(opts)
-          opts[:eager_block] = block unless opts.include?(:eager_block)
+          opts[:eager_block] = opts[:block] unless opts.include?(:eager_block)
           if !opts.has_key?(:predicate_key) && opts.has_key?(:eager_loading_predicate_key)
             opts[:predicate_key] = opts[:eager_loading_predicate_key]
           end
@@ -980,7 +980,7 @@ module Sequel
           send(:"def_#{type}", opts)
       
           orig_opts.delete(:clone)
-          orig_opts.merge!(:class_name=>opts[:class_name], :class=>opts[:class], :block=>block)
+          orig_opts.merge!(:class_name=>opts[:class_name], :class=>opts[:class], :block=>opts[:block])
           opts[:orig_opts] = orig_opts
           # don't add to association_reflections until we are sure there are no errors
           association_reflections[name] = opts
