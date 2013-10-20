@@ -21,13 +21,42 @@ describe "An Oracle database" do
       Integer :id
       String :cat_name, :size => 50
     end
+
+    DB.create_table!(:notes) do
+      Integer :id
+      String :title, :size => 50
+      String :content, :text => true
+    end
     @d = DB[:items]
   end
   after do
     @d.delete
   end
   after(:all) do
-    DB.drop_table?(:items, :books, :categories)
+    DB.drop_table?(:items, :books, :categories, :notes)
+  end
+
+  specify "should allow limit with clob columns" do
+    DB[:notes].to_a.should == []
+    DB[:notes] << {:id => 1, :title => 'abc', :content => 'zyx'}
+    DB[:notes] << {:id => 2, :title => 'def', :content => 'wvu'}
+    DB[:notes] << {:id => 3, :title => 'ghi', :content => 'tsr'}
+    DB[:notes] << {:id => 4, :title => 'jkl', :content => 'qpo'}
+    DB[:notes] << {:id => 5, :title => 'mno', :content => 'nml'}
+
+    DB[:notes].select_all.to_a.should == [
+      {:id => 1, :title => 'abc', :content => 'zyx'},
+      {:id => 2, :title => 'def', :content => 'wvu'},
+      {:id => 3, :title => 'ghi', :content => 'tsr'},
+      {:id => 4, :title => 'jkl', :content => 'qpo'},
+      {:id => 5, :title => 'mno', :content => 'nml'}
+    ]
+
+    DB[:notes].select_all.limit(0...2).to_a.should == [
+        {:id => 1, :title => 'abc', :content => 'zyx'},
+        {:id => 2, :title => 'def', :content => 'wvu'},
+        {:id => 3, :title => 'ghi', :content => 'tsr'},
+    ]
   end
 
   specify "should provide disconnect functionality" do
