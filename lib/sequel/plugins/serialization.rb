@@ -56,6 +56,17 @@ module Sequel
     #   user = User.create
     #   user.permissions = { :global => 'read-only' }
     #   user.save
+    #
+    # Note that if you mutate serialized column values without reassigning them,
+    # those changes won't be picked up by <tt>Model#save_changes</tt> or
+    # <tt>Model#update</tt>.  Example:
+    #
+    #   user = User[1]
+    #   user.permissions[:global] = 'foo'
+    #   user.save_changes # Will not pick up changes to permissions
+    #
+    # You can use the +serialization_modification_detection+ plugin to pick
+    # up such changes.
     module Serialization
       # The default serializers supported by the serialization module.
       # Use register_format to add serializers to this hash.
