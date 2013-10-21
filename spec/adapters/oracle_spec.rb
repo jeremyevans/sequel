@@ -36,27 +36,19 @@ describe "An Oracle database" do
     DB.drop_table?(:items, :books, :categories, :notes)
   end
 
-  specify "should allow limit with clob columns" do
-    DB[:notes].to_a.should == []
-    DB[:notes] << {:id => 1, :title => 'abc', :content => 'zyx'}
-    DB[:notes] << {:id => 2, :title => 'def', :content => 'wvu'}
-    DB[:notes] << {:id => 3, :title => 'ghi', :content => 'tsr'}
-    DB[:notes] << {:id => 4, :title => 'jkl', :content => 'qpo'}
-    DB[:notes] << {:id => 5, :title => 'mno', :content => 'nml'}
+  specify "should allow limit and offset with clob columns" do
+    notes = []
+    notes << {:id => 1, :title => 'abc', :content => 'zyx'}
+    notes << {:id => 2, :title => 'def', :content => 'wvu'}
+    notes << {:id => 3, :title => 'ghi', :content => 'tsr'}
+    notes << {:id => 4, :title => 'jkl', :content => 'qpo'}
+    notes << {:id => 5, :title => 'mno', :content => 'nml'}
+    DB[:notes].multi_insert(notes)
 
-    DB[:notes].select_all.to_a.should == [
-      {:id => 1, :title => 'abc', :content => 'zyx'},
-      {:id => 2, :title => 'def', :content => 'wvu'},
-      {:id => 3, :title => 'ghi', :content => 'tsr'},
-      {:id => 4, :title => 'jkl', :content => 'qpo'},
-      {:id => 5, :title => 'mno', :content => 'nml'}
-    ]
-
-    DB[:notes].select_all.limit(0...2).to_a.should == [
-        {:id => 1, :title => 'abc', :content => 'zyx'},
-        {:id => 2, :title => 'def', :content => 'wvu'},
-        {:id => 3, :title => 'ghi', :content => 'tsr'},
-    ]
+    DB[:notes].sort_by{|x| x[:id]}.should == notes
+    rows = DB[:notes].limit(3, 0).all
+    rows.length.should == 3
+    rows.all?{|v| notes.should include(v)}
   end
 
   specify "should provide disconnect functionality" do

@@ -247,8 +247,6 @@ module Sequel
     end
 
     module DatasetMethods
-      include EmulateOffsetWithRowNumber
-
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with select distinct columns from join where group having compounds order lock')
       ROW_NUMBER_EXPRESSION = LiteralString.new('ROWNUM').freeze
       SPACE = Dataset::SPACE
@@ -349,7 +347,23 @@ module Sequel
 
       # Handle LIMIT by using a unlimited subselect filtered with ROWNUM.
       def select_sql
-        if (limit = @opts[:limit]) && !@opts[:sql]
+        return super if @opts[:sql]
+        if o = @opts[:offset]
+          columns = clone(:append_sql=>'').columns
+          dsa1 = dataset_alias(1)
+          rn = row_number_column
+          limit = @opts[:limit]
+          ds = unlimited.
+            from_self(:alias=>dsa1).
+            select_append(ROW_NUMBER_EXPRESSION.as(rn)).
+            from_self(:alias=>dsa1).
+            select(*columns).
+            where(SQL::Identifier.new(rn) > o)
+          ds = ds.where(SQL::Identifier.new(rn) <= Sequel.+(o, limit)) if limit
+          sql = @opts[:append_sql] || ''
+          subselect_sql_append(sql, ds)
+          sql
+        elsif limit = @opts[:limit]
           ds = clone(:limit=>nil)
           # Lock doesn't work in subselects, so don't use a subselect when locking.
           # Don't use a subselect if custom SQL is used, as it breaks somethings.
