@@ -137,6 +137,21 @@ module Sequel
           true
         end
     
+        # Whether additional conditions should be added when using the filter
+        # by associations support.
+        def filter_by_associations_add_conditions?
+          self[:conditions] || self[:eager_block]
+        end
+
+        # The expression to use for the additional conditions to be added for
+        # the filter by association support, when the association itself is
+        # filtered.  Works by using a subquery to test that the objects passed
+        # also meet the association filter criteria.
+        def filter_by_associations_conditions_expression(obj)
+          ds = filter_by_associations_conditions_dataset.where(filter_by_associations_conditions_subquery_conditions(obj))
+          {filter_by_associations_conditions_key=>ds}
+        end
+
         # The limit and offset for this association (returned as a two element array).
         def limit_and_offset
           if (v = self[:limit]).is_a?(Array)
@@ -298,6 +313,35 @@ module Sequel
           end
         end
 
+        # The conditions to add to the filter by associations conditions
+        # subquery to restrict it to to the object(s) that was used as the
+        # filter value.
+        def filter_by_associations_conditions_subquery_conditions(obj)
+          key = qualify(associated_class.table_name, associated_class.primary_key)
+          case obj
+          when Array
+            {key=>obj.map{|o| o.pk}}
+          when Sequel::Dataset
+            {key=>obj.select(*Array(qualify(associated_class.table_name, associated_class.primary_key)))}
+          else
+            Array(key).zip(Array(obj.pk))
+          end
+        end
+
+        # The base dataset to use for the filter by associations conditions
+        # subquery, regardless of the objects that are passed in as filter
+        # values.
+        def filter_by_associations_conditions_dataset
+          cached_fetch(:filter_by_associations_conditions_dataset) do
+            ds = associated_dataset.unordered.unlimited
+            ds = filter_by_associations_add_conditions_dataset_filter(ds)
+            ds = self[:eager_block].call(ds) if self[:eager_block]
+            ds
+          end
+        end
+
+        # Whether the given association reflection is possible reciprocal
+        # association for the current association reflection.
         def reciprocal_association?(assoc_reflect)
           Array(reciprocal_type).include?(assoc_reflect[:type]) &&
             assoc_reflect.associated_class == self[:model] &&
@@ -395,6 +439,15 @@ module Sequel
     
         private
     
+        def filter_by_associations_add_conditions_dataset_filter(ds)
+          pk = qualify(associated_class.table_name, primary_keys)
+          ds.select(*pk).where(Sequel.negate(pk.zip([])))
+        end
+
+        def filter_by_associations_conditions_key
+          qualify(self[:model].table_name, self[:key_column])
+        end
+
         def reciprocal_association?(assoc_reflect)
           super && self[:keys] == assoc_reflect[:keys] && primary_key == assoc_reflect.primary_key
         end
@@ -465,6 +518,15 @@ module Sequel
     
         private
     
+        def filter_by_associations_add_conditions_dataset_filter(ds)
+          k = qualify(associated_class.table_name, self[:keys])
+          ds.select(*k).where(Sequel.negate(k.zip([])))
+        end
+
+        def filter_by_associations_conditions_key
+          qualify(self[:model].table_name, self[:primary_key_column])
+        end
+
         def reciprocal_association?(assoc_reflect)
           super && self[:keys] == assoc_reflect[:keys] && primary_key == assoc_reflect.primary_key
         end
@@ -635,6 +697,15 @@ module Sequel
         end
 
         private
+
+        def filter_by_associations_add_conditions_dataset_filter(ds)
+          ds.select(*qualify(join_table_alias, self[:left_keys])).
+            inner_join(self[:join_table], Array(self[:right_keys]).zip(right_primary_keys), :qualify=>:deep)
+        end
+
+        def filter_by_associations_conditions_key
+          qualify(self[:model].table_name, self[:left_primary_key_column])
+        end
 
         def reciprocal_association?(assoc_reflect)
           super && assoc_reflect[:left_keys] == self[:right_keys] &&
@@ -1978,7 +2049,18 @@ module Sequel
         end
       
         private
-      
+
+        # If the association has conditions itself, then it requires additional filters be
+        # added to the current dataset to ensure that the passed in object would also be
+        # included by the association's conditions.
+        def add_association_filter_conditions(ref, obj, expr)
+          if expr != SQL::Constants::FALSE && ref.filter_by_associations_add_conditions?
+            Sequel.&(expr, ref.filter_by_associations_conditions_expression(obj))
+          else
+            expr
+          end
+        end
+
         # Return an expression for filtering by the given association reflection and associated object.
         def association_filter_expression(op, ref, obj)
           meth = :"#{ref[:type]}_association_filter_expression"
@@ -2105,12 +2187,13 @@ module Sequel
             ref.right_primary_key_methods
           end
 
-          exp = association_filter_key_expression(ref.qualify(jt, rks), meths, obj)
-          if exp == SQL::Constants::FALSE
-            association_filter_handle_inversion(op, exp, Array(lpks))
-          else
-            association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>model.db.from(ref[:join_table]).select(*ref.qualify(jt, lks)).where(exp).exclude(SQL::BooleanExpression.from_value_pairs(ref.qualify(jt, lks).zip([]), :OR))), Array(lpks))
+          expr = association_filter_key_expression(ref.qualify(jt, rks), meths, obj)
+          unless expr == SQL::Constants::FALSE
+            expr = SQL::BooleanExpression.from_value_pairs(lpks=>model.db.from(ref[:join_table]).select(*ref.qualify(jt, lks)).where(expr).exclude(SQL::BooleanExpression.from_value_pairs(ref.qualify(jt, lks).zip([]), :OR)))
+            expr = add_association_filter_conditions(ref, obj, expr)
           end
+
+          association_filter_handle_inversion(op, expr, Array(lpks))
         end
 
         # Return a simple equality expression for filering by a many_to_one association
@@ -2121,7 +2204,10 @@ module Sequel
           else
             ref.primary_key_methods
           end
-          association_filter_handle_inversion(op, association_filter_key_expression(keys, meths, obj), keys)
+
+          expr = association_filter_key_expression(keys, meths, obj)
+          expr = add_association_filter_conditions(ref, obj, expr)
+          association_filter_handle_inversion(op, expr, keys)
         end
 
         # Return a simple equality expression for filering by a one_to_* association
@@ -2132,7 +2218,10 @@ module Sequel
           else
             ref[:key_methods]
           end
-          association_filter_handle_inversion(op, association_filter_key_expression(keys, meths, obj), keys)
+
+          expr = association_filter_key_expression(keys, meths, obj)
+          expr = add_association_filter_conditions(ref, obj, expr)
+          association_filter_handle_inversion(op, expr, keys)
         end
         alias one_to_one_association_filter_expression one_to_many_association_filter_expression
 

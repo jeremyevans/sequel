@@ -7,11 +7,13 @@ describe Sequel::Model, "pg_array_associations" do
       columns :id, :tag_ids
       plugin :pg_array_associations
       pg_array_to_many :tags
+      pg_array_to_many :a_tags, :clone=>:tags, :conditions=>{:name=>'A'}, :key=>:tag_ids
     end
     class ::Tag < Sequel::Model
       columns :id
       plugin :pg_array_associations
       many_to_pg_array :artists
+      many_to_pg_array :a_artists, :clone=>:artists, :conditions=>{:name=>'A'}
       def id3
         id*3
       end
@@ -66,9 +68,19 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.filter(:artists=>@o1).sql.should == "SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))"
   end
 
+  it "should allowing filtering by associations with :conditions" do
+    @c1.filter(:a_tags=>@o2).sql.should == "SELECT * FROM artists WHERE ((artists.tag_ids @> ARRAY[2]) AND coalesce((artists.tag_ids && (SELECT array_agg(tags.id) FROM tags WHERE ((name = 'A') AND (tags.id IS NOT NULL) AND (tags.id = 2)))), 'f'))"
+    @c2.filter(:a_artists=>@o1).sql.should == "SELECT * FROM tags WHERE ((tags.id IN (1, 2, 3)) AND (tags.id IN (SELECT unnest(artists.tag_ids) FROM artists WHERE ((name = 'A') AND (artists.tag_ids IS NOT NULL) AND (artists.id = 1)))))"
+  end
+
   it "should allowing excluding by associations" do
     @c1.exclude(:tags=>@o2).sql.should == "SELECT * FROM artists WHERE (NOT (artists.tag_ids @> ARRAY[2]) OR (artists.tag_ids IS NULL))"
     @c2.exclude(:artists=>@o1).sql.should == "SELECT * FROM tags WHERE ((tags.id NOT IN (1, 2, 3)) OR (tags.id IS NULL))"
+  end
+
+  it "should allowing excluding by associations with :conditions" do
+    @c1.exclude(:a_tags=>@o2).sql.should == "SELECT * FROM artists WHERE (NOT (artists.tag_ids @> ARRAY[2]) OR NOT coalesce((artists.tag_ids && (SELECT array_agg(tags.id) FROM tags WHERE ((name = 'A') AND (tags.id IS NOT NULL) AND (tags.id = 2)))), 'f') OR (artists.tag_ids IS NULL))"
+    @c2.exclude(:a_artists=>@o1).sql.should == "SELECT * FROM tags WHERE ((tags.id NOT IN (1, 2, 3)) OR (tags.id NOT IN (SELECT unnest(artists.tag_ids) FROM artists WHERE ((name = 'A') AND (artists.tag_ids IS NOT NULL) AND (artists.id = 1)))) OR (tags.id IS NULL))"
   end
 
   it "should allowing filtering by multiple associations" do
@@ -76,9 +88,19 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.filter(:artists=>[@c1.load(:tag_ids=>Sequel.pg_array([3, 4])), @c1.load(:tag_ids=>Sequel.pg_array([4, 5]))]).sql.should == "SELECT * FROM tags WHERE (tags.id IN (3, 4, 5))"
   end
 
+  it "should allowing filtering by multiple associations with :conditions" do
+    @c1.filter(:a_tags=>[@c2.load(:id=>1), @c2.load(:id=>2)]).sql.should == "SELECT * FROM artists WHERE ((artists.tag_ids && ARRAY[1,2]) AND coalesce((artists.tag_ids && (SELECT array_agg(tags.id) FROM tags WHERE ((name = 'A') AND (tags.id IS NOT NULL) AND (tags.id IN (1, 2))))), 'f'))"
+    @c2.filter(:a_artists=>[@c1.load(:id=>7, :tag_ids=>Sequel.pg_array([3, 4])), @c1.load(:id=>8, :tag_ids=>Sequel.pg_array([4, 5]))]).sql.should == "SELECT * FROM tags WHERE ((tags.id IN (3, 4, 5)) AND (tags.id IN (SELECT unnest(artists.tag_ids) FROM artists WHERE ((name = 'A') AND (artists.tag_ids IS NOT NULL) AND (artists.id IN (7, 8))))))"
+  end
+
   it "should allowing excluding by multiple associations" do
     @c1.exclude(:tags=>[@c2.load(:id=>1), @c2.load(:id=>2)]).sql.should == "SELECT * FROM artists WHERE (NOT (artists.tag_ids && ARRAY[1,2]) OR (artists.tag_ids IS NULL))"
     @c2.exclude(:artists=>[@c1.load(:tag_ids=>Sequel.pg_array([3, 4])), @c1.load(:tag_ids=>Sequel.pg_array([4, 5]))]).sql.should == "SELECT * FROM tags WHERE ((tags.id NOT IN (3, 4, 5)) OR (tags.id IS NULL))"
+  end
+
+  it "should allowing excluding by multiple associations with :conditions" do
+    @c1.exclude(:a_tags=>[@c2.load(:id=>1), @c2.load(:id=>2)]).sql.should == "SELECT * FROM artists WHERE (NOT (artists.tag_ids && ARRAY[1,2]) OR NOT coalesce((artists.tag_ids && (SELECT array_agg(tags.id) FROM tags WHERE ((name = 'A') AND (tags.id IS NOT NULL) AND (tags.id IN (1, 2))))), 'f') OR (artists.tag_ids IS NULL))"
+    @c2.exclude(:a_artists=>[@c1.load(:id=>7, :tag_ids=>Sequel.pg_array([3, 4])), @c1.load(:id=>8, :tag_ids=>Sequel.pg_array([4, 5]))]).sql.should == "SELECT * FROM tags WHERE ((tags.id NOT IN (3, 4, 5)) OR (tags.id NOT IN (SELECT unnest(artists.tag_ids) FROM artists WHERE ((name = 'A') AND (artists.tag_ids IS NOT NULL) AND (artists.id IN (7, 8))))) OR (tags.id IS NULL))"
   end
 
   it "should allowing filtering/excluding associations with NULL or empty values" do
@@ -99,9 +121,19 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.filter(:artists=>@c1.where(:id=>1)).sql.should == "SELECT * FROM tags WHERE (tags.id IN (SELECT unnest(artists.tag_ids) FROM artists WHERE (id = 1)))"
   end
 
+  it "should allowing filtering by association datasets with :conditions" do
+    @c1.filter(:a_tags=>@c2.where(:id=>1)).sql.should == "SELECT * FROM artists WHERE (coalesce((artists.tag_ids && (SELECT array_agg(tags.id) FROM tags WHERE (id = 1))), 'f') AND coalesce((artists.tag_ids && (SELECT array_agg(tags.id) FROM tags WHERE ((name = 'A') AND (tags.id IS NOT NULL) AND (tags.id IN (SELECT tags.id FROM tags WHERE (id = 1)))))), 'f'))"
+    @c2.filter(:a_artists=>@c1.where(:id=>1)).sql.should == "SELECT * FROM tags WHERE ((tags.id IN (SELECT unnest(artists.tag_ids) FROM artists WHERE (id = 1))) AND (tags.id IN (SELECT unnest(artists.tag_ids) FROM artists WHERE ((name = 'A') AND (artists.tag_ids IS NOT NULL) AND (artists.id IN (SELECT artists.id FROM artists WHERE (id = 1)))))))"
+  end
+
   it "should allowing excluding by association datasets" do
     @c1.exclude(:tags=>@c2.where(:id=>1)).sql.should == "SELECT * FROM artists WHERE (NOT coalesce((artists.tag_ids && (SELECT array_agg(tags.id) FROM tags WHERE (id = 1))), 'f') OR (artists.tag_ids IS NULL))"
     @c2.exclude(:artists=>@c1.where(:id=>1)).sql.should == "SELECT * FROM tags WHERE ((tags.id NOT IN (SELECT unnest(artists.tag_ids) FROM artists WHERE (id = 1))) OR (tags.id IS NULL))"
+  end
+
+  it "should allowing excluding by association datasets with :conditions" do
+    @c1.exclude(:a_tags=>@c2.where(:id=>1)).sql.should == "SELECT * FROM artists WHERE (NOT coalesce((artists.tag_ids && (SELECT array_agg(tags.id) FROM tags WHERE (id = 1))), 'f') OR NOT coalesce((artists.tag_ids && (SELECT array_agg(tags.id) FROM tags WHERE ((name = 'A') AND (tags.id IS NOT NULL) AND (tags.id IN (SELECT tags.id FROM tags WHERE (id = 1)))))), 'f') OR (artists.tag_ids IS NULL))"
+    @c2.exclude(:a_artists=>@c1.where(:id=>1)).sql.should == "SELECT * FROM tags WHERE ((tags.id NOT IN (SELECT unnest(artists.tag_ids) FROM artists WHERE (id = 1))) OR (tags.id NOT IN (SELECT unnest(artists.tag_ids) FROM artists WHERE ((name = 'A') AND (artists.tag_ids IS NOT NULL) AND (artists.id IN (SELECT artists.id FROM artists WHERE (id = 1)))))) OR (tags.id IS NULL))"
   end
 
   it "filter by associations should respect key options" do 

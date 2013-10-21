@@ -462,8 +462,22 @@ the other forms, this can be inverted:
  
 This will return all albums whose artist does not start with 'A'.
 
-Note that filtering by associations only works correctly for simple
-associations (ones without conditions).
+Filtering by associations even works for associations that have
+conditions added via the :conditions option or a block:
+
+  Album.one_to_many :popular_tags, :clone=>:tags do |ds|
+    ds.where{times_used > 1000}
+  end
+  Album.where(:popular_tags=>[@tag1, @tag2])
+
+This will return all albums that whose popular tags would include
+at least one of those tags.
+
+Note that filtering by associations does not work for associations
+that use blocks with instance-specific code, or associations that
+have a limit or offset. This includes many_to_one/one_to_one
+associations that would return multiple values if they were not
+limited to a single value.
 
 == Name Collisions
 

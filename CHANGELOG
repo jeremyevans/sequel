@@ -1,5 +1,7 @@
 === HEAD
 
+* Make filter by associations support handle associations with :conditions or block (jeremyevans)
+
 * Make association cloning handle :block correctly for clones of clones (jeremyevans)
 
 * Make association cloning handle :eager_block option correctly (jeremyevans)

@@ -138,6 +138,13 @@ module Sequel
           h.each{|k, v| cached_set(k, v)}
           h
         end
+
+        def filter_by_associations_add_conditions_dataset_filter(ds)
+          reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
+          ft = final_reverse_edge
+          ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])), :table_alias=>ft[:alias], :qualify=>:deep).
+            select(*qualify(ft[:alias], Array(self[:left_key])))
+        end
       end
 
       module ClassMethods
@@ -275,13 +282,14 @@ module Sequel
             ref.right_primary_key_methods
           end
 
-          exp = association_filter_key_expression(ref.qualify(last_alias, Array(ref.final_edge[:left])), meths, obj)
-          if exp == SQL::Constants::FALSE
-            association_filter_handle_inversion(op, exp, Array(lpks))
-          else
-            ds = ds.where(exp).exclude(SQL::BooleanExpression.from_value_pairs(ds.opts[:select].zip([]), :OR))
-            association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>ds), Array(lpks))
+          expr = association_filter_key_expression(ref.qualify(last_alias, Array(ref.final_edge[:left])), meths, obj)
+          unless expr == SQL::Constants::FALSE
+            ds = ds.where(expr).exclude(SQL::BooleanExpression.from_value_pairs(ds.opts[:select].zip([]), :OR))
+            expr = SQL::BooleanExpression.from_value_pairs(lpks=>ds)
+            expr = add_association_filter_conditions(ref, obj, expr)
           end
+
+          association_filter_handle_inversion(op, expr, Array(lpks))
         end
       end
     end

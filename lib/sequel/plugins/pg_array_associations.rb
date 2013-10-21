@@ -112,6 +112,15 @@ module Sequel
     
         private
     
+        def filter_by_associations_add_conditions_dataset_filter(ds)
+          key = qualify(associated_class.table_name, self[:key])
+          ds.select{unnest(key)}.exclude(key=>nil)
+        end
+        
+        def filter_by_associations_conditions_key
+          qualify(self[:model].table_name, primary_key)
+        end
+
         # Only consider an association as a reciprocal if it has matching keys
         # and primary keys.
         def reciprocal_association?(assoc_reflect)
@@ -165,8 +174,22 @@ module Sequel
           cached_fetch(:primary_key_method){primary_key}
         end
 
+        def filter_by_associations_conditions_expression(obj)
+          ds = filter_by_associations_conditions_dataset.where(filter_by_associations_conditions_subquery_conditions(obj))
+          Sequel.function(:coalesce, Sequel.pg_array(filter_by_associations_conditions_key).overlaps(ds), Sequel::SQL::Constants::FALSE)
+        end
+
         private
     
+        def filter_by_associations_add_conditions_dataset_filter(ds)
+          pk = qualify(associated_class.table_name, primary_key)
+          ds.select{array_agg(pk)}.exclude(pk=>nil)
+        end
+        
+        def filter_by_associations_conditions_key
+          qualify(self[:model].table_name, self[:key])
+        end
+
         # Only consider an association as a reciprocal if it has matching keys
         # and primary keys.
         def reciprocal_association?(assoc_reflect)
@@ -429,6 +452,7 @@ module Sequel
             Sequel.expr(pk=>obj.select{Sequel.pg_array_op(ref.qualify(obj.model.table_name, ref[:key_column])).unnest})
           end
           expr = Sequel::SQL::Constants::FALSE unless expr
+          expr = add_association_filter_conditions(ref, obj, expr)
           association_filter_handle_inversion(op, expr, [pk])
         end
 
@@ -448,6 +472,7 @@ module Sequel
             Sequel.function(:coalesce, Sequel.pg_array_op(key).overlaps(obj.select{array_agg(ref.qualify(obj.model.table_name, ref.primary_key))}), Sequel::SQL::Constants::FALSE)
           end
           expr = Sequel::SQL::Constants::FALSE unless expr
+          expr = add_association_filter_conditions(ref, obj, expr)
           association_filter_handle_inversion(op, expr, [key])
         end
       end
