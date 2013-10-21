@@ -1582,7 +1582,7 @@ module Sequel
     #   # Literal Strings
     #   ds.filter{{a=>`some SQL`}} # SELECT * FROM t WHERE (a = some SQL)
     #
-    # For a more detailed explanation, see the {Virtual Rows guide}[link:files/doc/virtual_rows_rdoc.html].
+    # For a more detailed explanation, see the {Virtual Rows guide}[rdoc-ref:doc/virtual_rows.rdoc].
     class VirtualRow < BasicObject
       WILDCARD = LiteralString.new('*').freeze
       QUESTION_MARK = LiteralString.new('?').freeze

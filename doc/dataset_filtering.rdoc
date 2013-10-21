@@ -29,7 +29,7 @@ If you are specifying a filter/selection/order, you can use a virtual row block:
 
   items.select{avg(price)}
 
-You can also use the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html] and the +sql_function+ method:
+You can also use the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc] and the +sql_function+ method:
 
   :avg.sql_function(:price)
 

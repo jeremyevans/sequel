@@ -78,7 +78,7 @@ Almost everywhere in Sequel, you can drop down to literal SQL by providing a lit
   DB[:albums].select('name') # SELECT 'name' FROM albums
   DB[:albums].select(Sequel.lit('name')) # SELECT name FROM albums
 
-For a simpler way of creating literal strings, you can also use the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html], which adds the <tt>String#lit</tt> method, and other methods that integrate Sequel's DSL with the ruby language:
+For a simpler way of creating literal strings, you can also use the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc], which adds the <tt>String#lit</tt> method, and other methods that integrate Sequel's DSL with the ruby language:
 
   DB[:albums].select('name'.lit)
 
@@ -137,7 +137,7 @@ The other way to qualify an identifier is to use the <tt>Sequel.qualify</tt> wit
 
   Sequel.qualify(:table, :column) # "table"."column"
 
-Another way to generate identifiers is to use Sequel's {virtual row support}[link:files/doc/virtual_rows_rdoc.html]:
+Another way to generate identifiers is to use Sequel's {virtual row support}[rdoc-ref:doc/virtual_rows.rdoc]:
 
   DB[:albums].select{name} # SELECT "name" FROM "albums"
   DB[:albums].select{albums__name} # SELECT "albums"."name" FROM "albums"
@@ -573,4 +573,4 @@ Note how +update+ and +delete+ used the +where+ argument, but that +insert+ did 
 
 === Methods Used for Each SQL Clause
 
-To see which methods exist that affect each SQL clause, see the {"Dataset Basics" guide}[link:files/doc/dataset_basics_rdoc.html].
+To see which methods exist that affect each SQL clause, see the {"Dataset Basics" guide}[rdoc-ref:doc/dataset_basics.rdoc].

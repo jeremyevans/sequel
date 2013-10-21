@@ -99,7 +99,7 @@ if rdoc_task_class
     rdoc_task_class.new(:website_rdoc_plugins) do |rdoc|
       rdoc.rdoc_dir = "www/public/rdoc-plugins"
       rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel --no-ignore-invalid'
-      rdoc.rdoc_files.add %w"lib/sequel/{extensions,plugins}/**/*.rb"
+      rdoc.rdoc_files.add %w"lib/sequel/{extensions,plugins}/**/*.rb doc/core_*"
     end
   
     desc "Update sequel.rubyforge.org"

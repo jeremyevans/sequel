@@ -1477,7 +1477,7 @@ module Sequel
       
       # Validates the object.  If the object is invalid, errors should be added
       # to the errors attribute.  By default, does nothing, as all models
-      # are valid by default.  See the {"Model Validations" guide}[link:files/doc/validations_rdoc.html].
+      # are valid by default.  See the {"Model Validations" guide}[rdoc-ref:doc/validations.rdoc].
       # for details about validation.  Should not be called directly by
       # user code, call <tt>valid?</tt> instead to check if an object
       # is valid.

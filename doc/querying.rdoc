@@ -11,7 +11,7 @@ aims to be a gentle introduction to Sequel's querying support.
 While you can easily use raw SQL with Sequel, a large part of the
 advantage you get from using Sequel is Sequel's ability to abstract
 SQL from you and give you a much nicer interface. Sequel also ships with
-a {core_extensions extension}[link:files/doc/core_extensions_rdoc.html],
+a {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
 which better integrates Sequel's DSL into the ruby language.
 
 == Retrieving Objects
@@ -25,7 +25,7 @@ method you can use.
 === Sequel::Dataset
 
 If you are new to Sequel and aren't familiar with Sequel, you should probably
-read the {"Dataset Basics" guide}[link:files/doc/dataset_basics_rdoc.html],
+read the {"Dataset Basics" guide}[rdoc-ref:doc/dataset_basics.rdoc],
 then come back here.
 
 === Retrieving a Single Object
@@ -380,7 +380,7 @@ If a block is passed to a filter, it is treated as a virtual row block:
   Artist.where{id > 5}
   # SELECT * FROM artists WHERE id > 5
 
-You can learn more about virtual row blocks in the {"Virtual Rows" guide}[link:files/doc/virtual_rows_rdoc.html].
+You can learn more about virtual row blocks in the {"Virtual Rows" guide}[rdoc-ref:doc/virtual_rows.rdoc].
 
 You can provide both regular arguments and a block, in which case the results
 will be ANDed together:

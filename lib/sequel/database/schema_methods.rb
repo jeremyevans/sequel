@@ -71,7 +71,7 @@ module Sequel
     # definitions using <tt>create_table</tt>, and +add_index+ accepts all the options
     # available for index definition.
     #
-    # See <tt>Schema::AlterTableGenerator</tt> and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
+    # See <tt>Schema::AlterTableGenerator</tt> and the {"Migrations and Schema Modification" guide}[rdoc-ref:doc/migration.rdoc].
     def alter_table(name, generator=nil, &block)
       generator ||= alter_table_generator(&block)
       remove_cached_schema(name)
@@ -159,7 +159,7 @@ module Sequel
     # :inherits :: Inherit from a different tables.  An array can be
     #              specified to inherit from multiple tables.
     #
-    # See <tt>Schema::Generator</tt> and the {"Schema Modification" guide}[link:files/doc/schema_modification_rdoc.html].
+    # See <tt>Schema::Generator</tt> and the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
     def create_table(name, options=OPTS, &block)
       remove_cached_schema(name)
       options = {:generator=>options} if options.is_a?(Schema::CreateTableGenerator)

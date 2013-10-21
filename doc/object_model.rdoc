@@ -204,7 +204,7 @@ If Sequel needs to represent an SQL concept that does not map directly to an exi
 ruby class, it will generally use a Sequel::SQL::Expression subclass to represent that
 concept.
 
-Some of the examples below show examples that require the {core_extensions extension}[link:files/doc/core_extensions_rdoc.html].
+Some of the examples below show examples that require the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc].
 
 === Sequel::LiteralString
 
@@ -530,7 +530,7 @@ block expression support:
 In the above code, the block is instance-evaled inside a VirtualRow instance.
 
 These objects are usually not instantiated manually.  See the
-{Virtual Row Guide}[link:files/doc/virtual_rows_rdoc.html] for details.
+{Virtual Row Guide}[rdoc-ref:doc/virtual_rows.rdoc] for details.
 
 === Sequel::SQL::Window
 

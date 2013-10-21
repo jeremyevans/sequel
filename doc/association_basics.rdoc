@@ -749,7 +749,7 @@ added methods:
   ds.model_object # @artist
   ds.association_reflection # same as Artist.association_reflection(:albums)
 
-For a more info on Sequel's reflection capabilities see the {Reflection page}[link:files/doc/reflection_rdoc.html].
+For a more info on Sequel's reflection capabilities see the {Reflection page}[rdoc-ref:doc/reflection.rdoc].
 
 == Overriding Method Behavior
 
@@ -1055,7 +1055,7 @@ the artist can perform any one of four tasks for the lyric:
 
 A module or array of modules to extend the dataset with.  These are used to
 set up association extensions.  For more information , please see the
-{Advanced Associations page}[link:files/doc/advanced_associations_rdoc.html].
+{Advanced Associations page}[rdoc-ref:doc/advanced_associations.rdoc].
 
 ==== :primary_key
 
@@ -1249,7 +1249,7 @@ to eagerly load:
 
 A custom loader to use when eagerly load associated objects via eager.
 For many details and examples of custom eager loaders, please see the
-{Advanced Associations guide}[link:files/doc/advanced_associations_rdoc.html].
+{Advanced Associations guide}[rdoc-ref:doc/advanced_associations.rdoc].
 
 ==== :eager_loader_key
 

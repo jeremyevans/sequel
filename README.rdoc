@@ -70,7 +70,7 @@ Sequel includes an IRB console for quick access to databases (usually referred t
 
 You get an IRB session with the database object stored in DB.
 
-In addition to providing an IRB shell (the default behavior), bin/sequel also has support for migrating databases, dumping schema migrations, and copying databases.  See the {bin/sequel guide}[link:files/doc/bin_sequel_rdoc.html] for more details.
+In addition to providing an IRB shell (the default behavior), bin/sequel also has support for migrating databases, dumping schema migrations, and copying databases.  See the {bin/sequel guide}[rdoc-ref:doc/bin_sequel.rdoc] for more details.
 
 == An Introduction
 
@@ -250,12 +250,12 @@ After filtering, you can retrieve the matching records by using any of the retri
 
   my_posts.each{|row| p row}
   
-See the {Dataset Filtering}[link:files/doc/dataset_filtering_rdoc.html] file for more details.
+See the {Dataset Filtering}[rdoc-ref:doc/dataset_filtering.rdoc] file for more details.
 
 === Security
 
 Designing apps with security in mind is a best practice.
-Please read the {Security Guide}[link:files/doc/security_rdoc.html] for details on security
+Please read the {Security Guide}[rdoc-ref:doc/security.rdoc] for details on security
 issues that you should be aware of when using Sequel.
 
 === Summarizing Records
@@ -313,7 +313,7 @@ You can also specify descending order:
 
 === Core Extensions
 
-Note the use of <tt>Sequel.desc(:stamp)</tt> in the above example.  Much of Sequel's DSL uses this style, calling methods on the Sequel module that return SQL expression objects.  Sequel also ships with a {core_extensions extension}[link:files/doc/core_extensions_rdoc.html]) that integrates Sequel's DSL better into the ruby language, allowing you to write:
+Note the use of <tt>Sequel.desc(:stamp)</tt> in the above example.  Much of Sequel's DSL uses this style, calling methods on the Sequel module that return SQL expression objects.  Sequel also ships with a {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc]) that integrates Sequel's DSL better into the ruby language, allowing you to write:
 
   :stamp.desc
 
@@ -574,7 +574,7 @@ That will just change the value for the object, it will not update the row in th
 
 === Mass assignment
 
-You can also set the values for multiple columns in a single method call, using one of the mass-assignment methods.  See the {mass assignment guide}[link:files/doc/mass_assignment_rdoc.html] for details.  For example +set+ updates the model's column values without saving:
+You can also set the values for multiple columns in a single method call, using one of the mass-assignment methods.  See the {mass assignment guide}[rdoc-ref:doc/mass_assignment.rdoc] for details.  For example +set+ updates the model's column values without saving:
 
   post.set(:title=>'hey there', :updated_by=>'foo')
 

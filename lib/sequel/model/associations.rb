@@ -781,8 +781,8 @@ module Sequel
       # as a column, you will probably end up with an association that doesn't work, or a SystemStackError.
       #
       # For a more in depth general overview, as well as a reference guide,
-      # see the {Association Basics guide}[link:files/doc/association_basics_rdoc.html].
-      # For examples of advanced usage, see the {Advanced Associations guide}[link:files/doc/advanced_associations_rdoc.html].
+      # see the {Association Basics guide}[rdoc-ref:doc/association_basics.rdoc].
+      # For examples of advanced usage, see the {Advanced Associations guide}[rdoc-ref:doc/advanced_associations.rdoc].
       module ClassMethods
         # All association reflections defined for this model (default: {}).
         attr_reader :association_reflections

@@ -24,7 +24,7 @@ In general, you probably want to provide a connection string argument to bin/seq
   sequel postgres://user:pass@host/database_name
   sequel mysql2://user:pass@host/database_name
 
-See the {Connecting to a database guide}[link:files/doc/opening_databases_rdoc.html] for more details about and examples of connection strings.
+See the {Connecting to a database guide}[rdoc-ref:doc/opening_databases.rdoc] for more details about and examples of connection strings.
 
 === YAML Connection File
 
@@ -77,7 +77,7 @@ You can use the -M attribute to set the version to migrate to:
 
   sequel -m /path/to/migrations/dir -M 3 postgres://host/database
 
-See the {migration guide}[link:files/doc/migration_rdoc.html] for more details about migrations.
+See the {migration guide}[rdoc-ref:doc/migration.rdoc] for more details about migrations.
 
 === Dump Schemas
 

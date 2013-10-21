@@ -79,7 +79,7 @@ in which case Sequel automatically literalizes the input:
 Sequel generally treats ruby strings as SQL strings (escaping them correctly), and
 not as raw SQL.  However, you can convert a ruby string to a literal string, and
 Sequel will then treat it as raw SQL.  This is typically done through String#lit
-if the {core_extensions}[link:files/doc/core_extensions_rdoc.html] are in use,
+if the {core_extensions}[rdoc-ref:doc/core_extensions.rdoc] are in use,
 or Sequel.lit[rdoc-ref:Sequel::SQL::Builders#lit] if they are not in use.
 
   'a'.lit
@@ -308,7 +308,7 @@ practice, though being explicit on a per-call basis is still recommended:
   Album.set_allowed_columns(:name, :copies_sold)
   Album.create(params[:album]) # Only name and copies_sold set
 
-For more details on the mass assignment methods, see the {Mass Assignment Guide}[link:files/doc/mass_assignment_rdoc.html].
+For more details on the mass assignment methods, see the {Mass Assignment Guide}[rdoc-ref:doc/mass_assignment.rdoc].
 
 == General Parameter Handling
 

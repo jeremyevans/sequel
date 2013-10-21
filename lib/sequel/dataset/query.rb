@@ -849,7 +849,7 @@ module Sequel
     # where also accepts a block, which should return one of the above argument
     # types, and is treated the same way.  This block yields a virtual row object,
     # which is easy to use to create identifiers and functions.  For more details
-    # on the virtual row support, see the {"Virtual Rows" guide}[link:files/doc/virtual_rows_rdoc.html]
+    # on the virtual row support, see the {"Virtual Rows" guide}[rdoc-ref:doc/virtual_rows.rdoc]
     #
     # If both a block and regular argument are provided, they get ANDed together.
     #
@@ -878,7 +878,7 @@ module Sequel
     #   software = dataset.where(:category => 'software').where{price < 100}
     #   # SELECT * FROM items WHERE ((category = 'software') AND (price < 100))
     #
-    # See the the {"Dataset Filtering" guide}[link:files/doc/dataset_filtering_rdoc.html] for more examples and details.
+    # See the the {"Dataset Filtering" guide}[rdoc-ref:doc/dataset_filtering.rdoc] for more examples and details.
     def where(*cond, &block)
       _filter(:where, *cond, &block)
     end

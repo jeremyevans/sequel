@@ -17,8 +17,8 @@
 #
 #   Sequel.sqlite('blog.db'){|db| puts db[:users].count} 
 #
-# For a more expanded introduction, see the {README}[link:files/README_rdoc.html].
-# For a quicker introduction, see the {cheat sheet}[link:files/doc/cheat_sheet_rdoc.html].
+# For a more expanded introduction, see the {README}[rdoc-ref:README.rdoc].
+# For a quicker introduction, see the {cheat sheet}[rdoc-ref:doc/cheat_sheet.rdoc].
 module Sequel
   @convert_two_digit_years = true
   @datetime_class = Time
@@ -89,8 +89,8 @@ module Sequel
   #
   #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
   # 
-  # For details, see the {"Connecting to a Database" guide}[link:files/doc/opening_databases_rdoc.html].
-  # To set up a master/slave or sharded database connection, see the {"Master/Slave Databases and Sharding" guide}[link:files/doc/sharding_rdoc.html].
+  # For details, see the {"Connecting to a Database" guide}[rdoc-ref:doc/opening_databases.rdoc].
+  # To set up a master/slave or sharded database connection, see the {"Master/Slave Databases and Sharding" guide}[rdoc-ref:doc/sharding.rdoc].
   def self.connect(*args, &block)
     Database.connect(*args, &block)
   end

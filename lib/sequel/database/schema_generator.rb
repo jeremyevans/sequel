@@ -13,7 +13,7 @@ module Sequel
     # the column method, which makes for a nicer DSL.
     #
     # For more information on Sequel's support for schema modification, see
-    # the {"Schema Modification" guide}[link:files/doc/schema_modification_rdoc.html].
+    # the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
     class CreateTableGenerator
       # Classes specifying generic types that Sequel will convert to database-specific types.
       GENERIC_TYPES=[String, Integer, Fixnum, Bignum, Float, Numeric, BigDecimal,
