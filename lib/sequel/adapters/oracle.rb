@@ -291,7 +291,7 @@ module Sequel
               :primary_key => pks.include?(column.name),
               :default => defaults[column.name],
               :oci8_type => column.data_type,
-              :db_type => column.type_string.split(' ')[0],
+              :db_type => column.type_string,
               :type_string => column.type_string,
               :charset_form => column.charset_form,
               :char_used => column.char_used?,
