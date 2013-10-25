@@ -171,14 +171,45 @@ module Sequel
         def convert_type_proc(v, ctn=nil)
           case v
           when Java::OrgPostgresqlJdbc4::Jdbc4Array
-            PGArrayConverter.new(method(:convert_type_proc))
+            if pr = db.conversion_procs[ctn]
+              lambda{|x| pr.call(PG_OBJECT_METHOD.call(x))}
+            else
+              PGArrayConverter.new(method(:convert_type_proc))
+            end
           when Java::OrgPostgresqlUtil::PGobject
-            PG_OBJECT_METHOD
+            if pr = db.conversion_procs[ctn]
+              lambda{|x| pr.call(PG_OBJECT_METHOD.call(x))}
+            else
+              PG_OBJECT_METHOD
+            end
+          when String
+            if pr = db.conversion_procs[ctn]
+              pr
+            else
+              false
+            end
+          when JAVA_HASH_MAP
+            if Sequel.respond_to?(:hstore)
+              lambda{|x| Sequel.hstore(HASH_MAP_METHOD.call(x))}
+            else
+              HASH_MAP_METHOD
+            end
           else
             super
           end
         end
         
+        # The jdbc/postgresql adapter uses column type oids when determining
+        # conversion procs.
+        def convert_type_proc_uses_column_info?
+          true
+        end
+
+        # Use the column type oid as the database specific column info value.
+        def convert_type_proc_column_info(meta, i)
+          meta.field(i).oid
+        end
+      
         # Literalize strings similar to the native postgres adapter
         def literal_string_append(sql, v)
           sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS

@@ -1763,8 +1763,7 @@ describe 'PostgreSQL array handling' do
     @db = DB
     @db.extension :pg_array
     @ds = @db[:items]
-    @native = DB.adapter_scheme == :postgres
-    @jdbc = DB.adapter_scheme == :jdbc
+    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
     @tp = lambda{@db.schema(:items).map{|a| a.last[:type]}}
   end
   after do
@@ -1783,10 +1782,8 @@ describe 'PostgreSQL array handling' do
     @ds.insert(Sequel.pg_array([1], :int2), Sequel.pg_array([nil, 2], :int4), Sequel.pg_array([3, nil], :int8), Sequel.pg_array([4, nil, 4.5], :real), Sequel.pg_array([5, nil, 5.5], "double precision"))
     @ds.count.should == 1
     rs = @ds.all
-    if @jdbc || @native
-      rs.should == [{:i2=>[1], :i4=>[nil, 2], :i8=>[3, nil], :r=>[4.0, nil, 4.5], :dp=>[5.0, nil, 5.5]}]
-    end
     if @native
+      rs.should == [{:i2=>[1], :i4=>[nil, 2], :i8=>[3, nil], :r=>[4.0, nil, 4.5], :dp=>[5.0, nil, 5.5]}]
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1798,10 +1795,8 @@ describe 'PostgreSQL array handling' do
     @ds.insert(Sequel.pg_array([[1], [2]], :int2), Sequel.pg_array([[nil, 2], [3, 4]], :int4), Sequel.pg_array([[3, nil], [nil, nil]], :int8), Sequel.pg_array([[4, nil], [nil, 4.5]], :real), Sequel.pg_array([[5, nil], [nil, 5.5]], "double precision"))
 
     rs = @ds.all
-    if @jdbc || @native
-      rs.should == [{:i2=>[[1], [2]], :i4=>[[nil, 2], [3, 4]], :i8=>[[3, nil], [nil, nil]], :r=>[[4, nil], [nil, 4.5]], :dp=>[[5, nil], [nil, 5.5]]}]
-    end
     if @native
+      rs.should == [{:i2=>[[1], [2]], :i4=>[[nil, 2], [3, 4]], :i8=>[[3, nil], [nil, nil]], :r=>[[4, nil], [nil, 4.5]], :dp=>[[5, nil], [nil, 5.5]]}]
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1818,10 +1813,8 @@ describe 'PostgreSQL array handling' do
     @ds.insert(Sequel.pg_array([BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')], :numeric))
     @ds.count.should == 1
     rs = @ds.all
-    if @jdbc || @native
-      rs.should == [{:n=>[BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')]}]
-    end
     if @native
+      rs.should == [{:n=>[BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')]}]
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1832,10 +1825,8 @@ describe 'PostgreSQL array handling' do
     @ds.delete
     @ds.insert(Sequel.pg_array([[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]], :numeric))
     rs = @ds.all
-    if @jdbc || @native
-      rs.should == [{:n=>[[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]]}]
-    end
     if @native
+      rs.should == [{:n=>[[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]]}]
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1854,10 +1845,8 @@ describe 'PostgreSQL array handling' do
     @ds.insert(Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], 'char(4)'), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], :varchar), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], :text))
     @ds.count.should == 1
     rs = @ds.all
-    if @jdbc || @native
-      rs.should == [{:c=>['a   ', nil, 'NULL', 'b"\'c'], :vc=>['a', nil, 'NULL', 'b"\'c'], :t=>['a', nil, 'NULL', 'b"\'c']}]
-    end
     if @native
+      rs.should == [{:c=>['a   ', nil, 'NULL', 'b"\'c'], :vc=>['a', nil, 'NULL', 'b"\'c'], :t=>['a', nil, 'NULL', 'b"\'c']}]
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1868,10 +1857,8 @@ describe 'PostgreSQL array handling' do
     @ds.delete
     @ds.insert(Sequel.pg_array([[['a'], [nil]], [['NULL'], ['b"\'c']]], 'char(4)'), Sequel.pg_array([[['a'], ['']], [['NULL'], ['b"\'c']]], :varchar), Sequel.pg_array([[['a'], [nil]], [['NULL'], ['b"\'c']]], :text))
     rs = @ds.all
-    if @jdbc || @native
-      rs.should == [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
-    end
     if @native
+      rs.should == [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1897,10 +1884,8 @@ describe 'PostgreSQL array handling' do
     @ds.insert(Sequel.pg_array([true, false], :bool), Sequel.pg_array([d, nil], :date), Sequel.pg_array([t, nil], :time), Sequel.pg_array([ts, nil], :timestamp), Sequel.pg_array([ts, nil], :timestamptz))
     @ds.count.should == 1
     rs = @ds.all
-    if @jdbc || @native
-      rs.should == [{:b=>[true, false], :d=>[d, nil], :t=>[t, nil], :ts=>[ts, nil], :tstz=>[ts, nil]}]
-    end
     if @native
+      rs.should == [{:b=>[true, false], :d=>[d, nil], :t=>[t, nil], :ts=>[ts, nil], :tstz=>[ts, nil]}]
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1978,7 +1963,7 @@ describe 'PostgreSQL array handling' do
       @ds.insert(rs.first)
       @ds.all.should == rs
     end
-  end unless DB.adapter_scheme == :jdbc
+  end
 
   specify 'use arrays in bound variables' do
     @db.create_table!(:items) do
@@ -2137,7 +2122,7 @@ describe 'PostgreSQL hstore handling' do
     @db.extension :pg_array, :pg_hstore
     @ds = @db[:items]
     @h = {'a'=>'b', 'c'=>nil, 'd'=>'NULL', 'e'=>'\\\\" \\\' ,=>'}
-    @native = DB.adapter_scheme == :postgres
+    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after do
     @db.drop_table?(:items)
@@ -2152,6 +2137,7 @@ describe 'PostgreSQL hstore handling' do
     if @native
       rs = @ds.all
       v = rs.first[:h]
+      v.should == @h
       v.should_not be_a_kind_of(Hash)
       v.to_hash.should be_a_kind_of(Hash)
       v.to_hash.should == @h
@@ -2387,7 +2373,7 @@ describe 'PostgreSQL json type' do
     @ds = @db[:items]
     @a = [1, 2, {'a'=>'b'}, 3.0]
     @h = {'a'=>'b', '1'=>[3, 4, 5]}
-    @native = DB.adapter_scheme == :postgres
+    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after do
     @db.drop_table?(:items)
@@ -2519,7 +2505,7 @@ describe 'PostgreSQL json type' do
     j = Sequel.pg_json([{'a'=>1, 'b'=>'c'}, {'a'=>2, 'b'=>'d'}]).op
     @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:a).should == [1, 2]
     @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:b).should == %w'c d'
-  end if DB.server_version >= 90300 && DB.adapter_scheme == :postgres
+  end if DB.server_version >= 90300 && (DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc)
 end if DB.server_version >= 90200
 
 describe 'PostgreSQL inet/cidr types' do
@@ -2539,7 +2525,7 @@ describe 'PostgreSQL inet/cidr types' do
       @ipv6 = IPAddr.new(@v6)
       @ipv6nm = IPAddr.new(@v6nm)
     end
-    @native = DB.adapter_scheme == :postgres
+    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after do
     @db.drop_table?(:items)
@@ -2650,7 +2636,7 @@ describe 'PostgreSQL range types' do
     @r.each{|k, v| @ra[k] = Sequel.pg_array([v], @map[k])}
     @r.each{|k, v| @pgr[k] = Sequel.pg_range(v)}
     @r.each{|k, v| @pgra[k] = Sequel.pg_array([Sequel.pg_range(v)], @map[k])}
-    @native = DB.adapter_scheme == :postgres
+    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after do
     @db.drop_table?(:items)
@@ -2732,14 +2718,12 @@ describe 'PostgreSQL range types' do
     v.delete(:id)
     v.should == @r
 
-    unless @db.adapter_scheme == :jdbc
-      @db.create_table!(:items){primary_key :id; column :i4, 'int4range[]'; column :i8, 'int8range[]'; column :n, 'numrange[]'; column :d, 'daterange[]'; column :t, 'tsrange[]'; column :tz, 'tstzrange[]'}
-      c = Class.new(Sequel::Model(@db[:items]))
-      c.plugin :pg_typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
-      v = c.create(@ra).values
-      v.delete(:id)
-      v.each{|k,v1| v1.should == @ra[k].to_a}
-    end
+    @db.create_table!(:items){primary_key :id; column :i4, 'int4range[]'; column :i8, 'int8range[]'; column :n, 'numrange[]'; column :d, 'daterange[]'; column :t, 'tsrange[]'; column :tz, 'tstzrange[]'}
+    c = Class.new(Sequel::Model(@db[:items]))
+    c.plugin :pg_typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
+    v = c.create(@ra).values
+    v.delete(:id)
+    v.each{|k,v1| v1.should == @ra[k].to_a}
   end
 
   specify 'operations/functions with pg_range_ops' do
@@ -2817,7 +2801,7 @@ describe 'PostgreSQL interval types' do
     @db = DB
     @db.extension :pg_array, :pg_interval
     @ds = @db[:items]
-    @native = DB.adapter_scheme == :postgres
+    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after(:all) do
     Sequel::Postgres::PG_TYPES.delete(1186)
@@ -2829,7 +2813,8 @@ describe 'PostgreSQL interval types' do
   specify 'insert and retrieve interval values' do
     @db.create_table!(:items){interval :i}
     [
-      ['0', '00:00:00',  0, [[:seconds, 0]]],
+      ['0', '00:00:00',  0, []],
+      ['1', '00:00:01',  1, [[:seconds, 1]]],
       ['1 microsecond', '00:00:00.000001',  0.000001, [[:seconds, 0.000001]]],
       ['1 millisecond', '00:00:00.001',  0.001, [[:seconds, 0.001]]],
       ['1 second', '00:00:01', 1, [[:seconds, 1]]],
@@ -2853,7 +2838,7 @@ describe 'PostgreSQL interval types' do
         rs = @ds.all
         rs.first[:i].is_a?(ActiveSupport::Duration).should be_true
         rs.first[:i].should == ActiveSupport::Duration.new(value, parts)
-        rs.first[:i].parts.sort_by{|k,v| k.to_s}.should == parts.sort_by{|k,v| k.to_s}
+        rs.first[:i].parts.sort_by{|k,v| k.to_s}.reject{|k,v| v == 0}.should == parts.sort_by{|k,v| k.to_s}
         @ds.delete
         @ds.insert(rs.first)
         @ds.all.should == rs
@@ -2935,7 +2920,7 @@ describe 'PostgreSQL row-valued/composite types' do
     @db.register_row_type(Sequel.qualify(:public, :person))
     @db.register_row_type(:public__company)
 
-    @native = DB.adapter_scheme == :postgres
+    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after(:all) do
     @db.drop_table?(:company, :person, :address)
@@ -2980,7 +2965,7 @@ describe 'PostgreSQL row-valued/composite types' do
       @db.drop_table(:domain_check)
       @db << "DROP DOMAIN positive_integer"
     end
-  end if DB.adapter_scheme == :postgres
+  end if DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
 
   specify 'insert and retrieve arrays of row types' do
     @ds = @db[:company]
@@ -3170,12 +3155,10 @@ describe 'PostgreSQL row-valued/composite types' do
 
       Company.plugin :pg_typecast_on_load, :employees unless @native
       e = Person.new(:id=>1, :address=>a)
-      unless @db.adapter_scheme == :jdbc
-        o = Company.create(:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}])
-        o.employees.should == [e]
-        o = Company.create(:id=>1, :employees=>[e])
-        o.employees.should == [e]
-      end
+      o = Company.create(:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}])
+      o.employees.should == [e]
+      o = Company.create(:id=>1, :employees=>[e])
+      o.employees.should == [e]
     end
   end
 end

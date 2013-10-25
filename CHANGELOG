@@ -1,5 +1,7 @@
 === HEAD
 
+* Improve PostgreSQL type support in the jdbc/postgresql adapter (jeremyevans)
+
 * Make offset emulation on Oracle work when using columns that can't be ordered (jeremyevans, sdeming) (#724, #725)
 
 * Make filter by associations support handle associations with :conditions or block (jeremyevans)
