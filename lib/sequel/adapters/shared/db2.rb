@@ -350,6 +350,11 @@ module Sequel
         end
       end
 
+      # DB2 does not require that ROW_NUMBER be ordered.
+      def require_offset_order?
+        false
+      end
+
       # Add a fallback table for empty from situation
       def select_from_sql(sql)
         @opts[:from] ? super : (sql << EMPTY_FROM_TABLE)

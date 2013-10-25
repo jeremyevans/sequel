@@ -11,9 +11,12 @@ module Sequel
     def select_sql
       return super unless o = @opts[:offset]
 
-      order = @opts[:order] || default_offset_order
-      if order.nil? || order.empty?
-        raise(Error, "#{db.database_type} requires an order be provided if using an offset")
+      order = @opts[:order]
+      if require_offset_order?
+        order ||= default_offset_order
+        if order.nil? || order.empty?
+          raise(Error, "#{db.database_type} requires an order be provided if using an offset")
+        end
       end
 
       columns = clone(:append_sql=>'').columns
@@ -37,6 +40,11 @@ module Sequel
     # By default, orders by all of the columns in the dataset.
     def default_offset_order
       clone(:append_sql=>'').columns
+    end
+
+    # Whether an order is required when using offset emulation via ROW_NUMBER, true by default.
+    def require_offset_order?
+      true
     end
   end
 end

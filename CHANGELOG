@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't automatically order on all columns when emulating offsets for unordered datasets on DB2 (jeremyevans)
+
 * Improve PostgreSQL type support in the jdbc/postgresql adapter (jeremyevans)
 
 * Make offset emulation on Oracle work when using columns that can't be ordered (jeremyevans, sdeming) (#724, #725)
