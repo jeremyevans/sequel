@@ -32,19 +32,24 @@ module Sequel
         private
 
         class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
-          def boolean(i) i != 0 end
+          def sqla_boolean(i) i != 0 end
         end
 
-        BOOLEAN_METHOD =  TYPE_TRANSLATOR_INSTANCE.method(:boolean)
+        BOOLEAN_METHOD =  TYPE_TRANSLATOR_INSTANCE.method(:sqla_boolean)
 
         def convert_type_proc(v, ctn=nil)
-          convert = (convert_smallint_to_bool and @db.convert_smallint_to_bool)
           case
-          when (convert and ctn =~ SqlAnywhere::DatabaseMethods::SMALLINT_RE)
+          when ctn && ctn =~ SqlAnywhere::DatabaseMethods::SMALLINT_RE
             BOOLEAN_METHOD
           else
             super(v, ctn)
           end
+        end
+
+        # SQLAnywhere needs the column info if it is converting smallint to bool,
+        # since the JDBC adapter always returns smallint as integer.
+        def convert_type_proc_uses_column_info?
+          convert_smallint_to_bool
         end
       end
     end

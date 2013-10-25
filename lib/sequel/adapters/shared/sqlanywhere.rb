@@ -265,7 +265,7 @@ module Sequel
       # Whether to convert smallint to boolean arguments for this dataset.
       # Defaults to the SqlAnywhere module setting.
       def convert_smallint_to_bool
-        defined?(@convert_smallint_to_bool) ? @convert_smallint_to_bool : (@convert_smallint_to_bool = ::Sequel::SqlAnywhere.convert_smallint_to_bool)
+        defined?(@convert_smallint_to_bool) ? @convert_smallint_to_bool : (@convert_smallint_to_bool = @db.convert_smallint_to_bool)
       end
 
       # Override the default SqlAnywhere.convert_smallint_to_bool setting for this dataset.

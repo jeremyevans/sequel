@@ -809,6 +809,16 @@ module Sequel
           false
         end
       end
+
+      # The generic JDBC support does not use column info when deciding on conversion procs.
+      def convert_type_proc_uses_column_info?
+        false
+      end
+
+      # By default, if using column info, assume the info needed is the column's type name.
+      def convert_type_proc_column_info(meta, i)
+        meta.column_type_name(i)
+      end
       
       # Extend the dataset with the JDBC stored procedure methods.
       def prepare_extend_sproc(ds)
@@ -822,20 +832,29 @@ module Sequel
         meta = result.getMetaData
         cols = []
         i = 0
-        meta.getColumnCount.times do
-          cols << [
-            output_identifier(meta.getColumnLabel(i+=1)),
-            i,
-            meta.column_type_name(i)
-          ]
-        end
-        columns = cols.map{|c| c.at(0)}
-        @columns = columns
         ct = @convert_types
-        if (ct.nil? ? db.convert_types : ct)
-          cols.each{|c| c << nil}
+        ct = db.convert_types if ct.nil?
+
+        if ct
+          use_column_info = convert_type_proc_uses_column_info?
+          # When converting types, four values are associated with every column:
+          # 1) column name symbol
+          # 2) index (starting at 1, as JDBC does)
+          # 3) database-specific value usable by convert_type_proc to determine the conversion proc to use for column
+          # 4) nil (later updated with the actual conversion proc during the lookup process)
+          meta.getColumnCount.times do
+            i += 1
+            cols << [output_identifier(meta.getColumnLabel(i)), i, (convert_type_proc_column_info(meta, i) if use_column_info), nil]
+          end
+          @columns = cols.map{|c| c.at(0)}
           process_result_set_convert(cols, result, &block)
         else
+          # When not converting types, only the type name and the index are used.
+          meta.getColumnCount.times do
+            i += 1
+            cols << [output_identifier(meta.getColumnLabel(i)), i]
+          end
+          @columns = cols.map{|c| c.at(0)}
           process_result_set_no_convert(cols, result, &block)
         end
       ensure
