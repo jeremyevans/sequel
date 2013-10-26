@@ -373,7 +373,7 @@ module Sequel
       migrator_class(directory).new(db, directory, opts).is_current?
     end
 
-    # Migrates the supplied database using the migration files in the the specified directory. Options:
+    # Migrates the supplied database using the migration files in the specified directory. Options:
     # :allow_missing_migration_files :: Don't raise an error if there are missing migration files.
     # :column :: The column in the :table argument storing the migration version (default: :version).
     # :current :: The current version of the database.  If not given, it is retrieved from the database

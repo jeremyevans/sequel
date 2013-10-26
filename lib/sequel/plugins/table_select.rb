@@ -4,7 +4,7 @@ module Sequel
     # model dataset from <tt>*</tt> to <tt>table.*</tt>.
     # This makes it so that if you join the model's dataset to
     # other tables, columns in the other tables do not appear
-    # the the result sets (and possibly overwrite columns in the
+    # in the result sets (and possibly overwrite columns in the
     # current model with the same name).
     #
     # Usage:

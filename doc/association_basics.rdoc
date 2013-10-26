@@ -445,7 +445,7 @@ use separate filter calls:
 
   Album.where(:tags=>@tag1).where(:tags=>@tag2)
 
-Or the the array form of condition specifiers:
+Or the array form of condition specifiers:
 
   Album.where([[:tags, @tag1], [:tags, @tag2]])
 
@@ -691,7 +691,7 @@ The add_<i>association</i> method returns the now associated object:
 
 === remove_<i>association</i>(object_to_disassociate) (e.g. remove_album) [+one_to_many+ and +many_to_many+]
 
-The remove_<i>association</i> method disassociates the the passed object from
+The remove_<i>association</i> method disassociates the passed object from
 the current object.  For +one_to_many+ associations, it sets the foreign key of
 the associated object to NULL, and saves the associated object.  For
 +many_to_many+ associations, this deletes the matching row in the join table.

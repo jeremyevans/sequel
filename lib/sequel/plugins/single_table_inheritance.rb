@@ -126,7 +126,7 @@ module Sequel
         attr_reader :sti_key_array
 
         # A hash/proc with class keys and column value values, mapping
-        # the the class to a particular value given to the sti_key column.
+        # the class to a particular value given to the sti_key column.
         # Used to set the column value when creating objects, and for the
         # filter when retrieving objects in subclasses.
         attr_reader :sti_key_map

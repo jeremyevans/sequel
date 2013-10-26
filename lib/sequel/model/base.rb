@@ -1026,7 +1026,7 @@ module Sequel
       
       # Like delete but runs hooks before and after delete.
       # If before_destroy returns false, returns false without
-      # deleting the object the the database. Otherwise, deletes
+      # deleting the object from the database. Otherwise, deletes
       # the item from the database and returns self.  Uses a transaction
       # if use_transactions is true or if the :transaction option is given and
       # true.

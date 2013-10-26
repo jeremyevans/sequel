@@ -68,7 +68,7 @@ inside the proc.  If that doesn't make sense, maybe this example will help:
   # WHERE c > (a - 32)
   
 There are two related differences here.  First is the usage of <tt>o.c</tt> vs +c+,
-and second is the difference between the the use of +a+.  In the regular proc,
+and second is the difference between the use of +a+.  In the regular proc,
 you couldn't call +c+ without an explicit receiver in the proc, unless the self of the
 surrounding scope responded to it.  For +a+, note how ruby calls the method on
 the receiver of the surrounding scope in the regular proc, which returns an integer,

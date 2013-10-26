@@ -44,7 +44,7 @@ module Sequel
     #            some metadata about the join that makes it important to use +graph+ instead
     #            of +join_table+.
     # :table_alias :: The alias to use for the table.  If not specified, doesn't
-    #                 alias the table.  You will get an error if the the alias (or table) name is
+    #                 alias the table.  You will get an error if the alias (or table) name is
     #                 used more than once.
     def graph(dataset, join_conditions = nil, options = OPTS, &block)
       # Allow the use of a dataset or symbol as the first argument
