@@ -293,7 +293,7 @@ module Sequel
 
       module DatasetMethods
         # Return a JSON string representing an array of all objects in
-        # this dataset.  Takes the same options as the the instance
+        # this dataset.  Takes the same options as the instance
         # method, and passes them to every instance.  Additionally,
         # respects the following options:
         #

@@ -586,7 +586,7 @@ the table if the table already exists.  On some databases, it uses
 <tt>IF NOT EXISTS</tt>, on others it does a separate query to check for
 existence.
 
-This should not be used inside migrations, as if the the tbale does not
+This should not be used inside migrations, as if the table does not
 exist, it may mess up the migration.
 
 === +rename_table+

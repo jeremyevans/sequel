@@ -70,7 +70,7 @@
 #
 #   DB[:a].select(a.splat).first # SELECT (a.*)::a FROM a
 #   # => {:a=>"(1,2)"} # or {:a=>{:a=>1, :b=>2}} if the "a" type has been registered
-#                      # with the the pg_row extension
+#                      # with the pg_row extension
 #
 # This feature is mostly useful for a different way to graph tables:
 #

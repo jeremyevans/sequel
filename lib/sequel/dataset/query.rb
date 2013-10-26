@@ -878,7 +878,7 @@ module Sequel
     #   software = dataset.where(:category => 'software').where{price < 100}
     #   # SELECT * FROM items WHERE ((category = 'software') AND (price < 100))
     #
-    # See the the {"Dataset Filtering" guide}[rdoc-ref:doc/dataset_filtering.rdoc] for more examples and details.
+    # See the {"Dataset Filtering" guide}[rdoc-ref:doc/dataset_filtering.rdoc] for more examples and details.
     def where(*cond, &block)
       _filter(:where, *cond, &block)
     end

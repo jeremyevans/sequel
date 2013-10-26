@@ -1477,7 +1477,7 @@ module Sequel
       end
 
       # Create a new +Subscript+ appending the given subscript(s)
-      # the the current array of subscripts.
+      # to the current array of subscripts.
       #
       #   :a.sql_subscript(2) # a[2]
       #   :a.sql_subscript(2) | 1 # a[2, 1]

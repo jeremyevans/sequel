@@ -950,7 +950,7 @@ module Sequel
         #         array of symbols for a composite key association.
         # :key_column :: Similar to, and usually identical to, :key, but :key refers to the model method
         #                to call, where :key_column refers to the underlying column.  Should only be
-        #                used if the the model method differs from the foreign key column, in conjunction
+        #                used if the model method differs from the foreign key column, in conjunction
         #                with defining a model alias method for the key column.
         # :primary_key :: column in the associated table that :key option references, as a symbol.
         #                 Defaults to the primary key of the associated table. Can use an
@@ -973,7 +973,7 @@ module Sequel
         #                 array of symbols for a composite key association.
         # :primary_key_column :: Similar to, and usually identical to, :primary_key, but :primary_key refers
         #                        to the model method call, where :primary_key_column refers to the underlying column.
-        #                        Should only be used if the the model method differs from the primary key column, in
+        #                        Should only be used if the model method differs from the primary key column, in
         #                        conjunction with defining a model alias method for the primary key column.
         # === :many_to_many
         # :graph_join_table_block :: The block to pass to +join_table+ for
