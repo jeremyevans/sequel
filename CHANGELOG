@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#tables not show tables in the recycle bin on Oracle (jeremyevans) (#728)
+
 * Don't automatically order on all columns when emulating offsets for unordered datasets on DB2 (jeremyevans)
 
 * Improve PostgreSQL type support in the jdbc/postgresql adapter (jeremyevans)

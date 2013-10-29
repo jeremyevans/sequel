@@ -61,7 +61,7 @@ module Sequel
 
       def tables(opts=OPTS)
         m = output_identifier_meth
-        metadata_dataset.from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'TABLE').map{|r| m.call(r[:tname])}
+        metadata_dataset.from(:tabs).server(opts[:server]).select(:table_name).map{|r| m.call(r[:table_name])}
       end
 
       def views(opts=OPTS) 
