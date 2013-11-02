@@ -542,8 +542,12 @@ module Sequel
       #   end
       def set_primary_key(key)
         clear_setter_methods_cache
-        if key.is_a?(Array) && key.length < 2
-          key = key.first
+        if key.is_a?(Array)
+          if key.length < 2
+            key = key.first
+          else
+            key = key.dup.freeze
+          end
         end
         self.simple_pk = if key && !key.is_a?(Array)
           (@dataset || db).literal(key)

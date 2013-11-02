@@ -686,6 +686,15 @@ describe "Model.db_schema" do
     @c.db_schema.should == {:x=>{:primary_key=>true}, :y=>{:primary_key=>true}}
     @c.primary_key.should == [:x, :y]
   end
+
+  specify "should set an immutable composite primary key based on the schema" do
+    ds = @dataset
+    d = ds.db
+    def d.schema(table, *opts) [[:x, {:primary_key=>true}], [:y, {:primary_key=>true}]] end
+    @c.dataset = ds
+    @c.primary_key.should == [:x, :y]
+    proc{@c.primary_key.pop}.should raise_error RuntimeError, /can't modify frozen Array/
+  end
   
   specify "should automatically set no primary key based on the schema" do
     ds = @dataset
