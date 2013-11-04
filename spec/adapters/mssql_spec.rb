@@ -607,8 +607,8 @@ describe "Database#foreign_key_list" do
       end
     end
     after(:all) do
-      DB.drop_table :vendor__mapping
-      DB.drop_table :vendor__vendors
+      DB.drop_table? :vendor__mapping
+      DB.drop_table? :vendor__vendors
       DB.execute_ddl "drop schema vendor"
     end
     it "should support mixed schema bound tables" do
