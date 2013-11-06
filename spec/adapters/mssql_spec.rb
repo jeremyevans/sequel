@@ -5,7 +5,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 def DB.sqls
   (@sqls ||= [])
 end
-logger = Logger.new($stdout)  #Object.new
+logger = Object.new
 def logger.method_missing(m, msg)
   DB.sqls << msg
 end
@@ -382,13 +382,6 @@ describe "MSSSQL::Dataset#insert" do
     @ds.first(:xid=>h[:xid])[:value].should == 10
   end
 
-  cspecify "should read blobs", :odbc do
-    blob = Sequel::SQL::Blob.new("01234")
-    @db[:test4].insert(:name => 'max varbinary test', :value => blob)
-    b = @db[:test4].where(:name => 'max varbinary test').get(:value)
-    b.should be_kind_of(Sequel::SQL::Blob)
-  end
-
   cspecify "should allow large text and binary values", :odbc do
     blob = Sequel::SQL::Blob.new("0" * (65*1024))
     @db[:test4].insert(:name => 'max varbinary test', :value => blob)
@@ -623,3 +616,30 @@ describe "Database#foreign_key_list" do
     end
   end
 end
+
+describe "MSSQL optimistic locking plugin" do
+  before do
+    @db = DB
+    @db.create_table! :items do
+      primary_key :id
+      String :name, :size => 20
+      column :timestamp, 'timestamp'
+    end
+   end
+  after do
+    @db.drop_table?(:items)
+  end
+
+  it "should not allow stale updates" do
+    c = Class.new(Sequel::Model(:items))
+    c.plugin :mssql_optimistic_locking
+    o = c.create(:name=>'test')
+    o2 = c.first
+    ts = o.timestamp
+    ts.should_not be_nil
+    o.name = 'test2'
+    o.save
+    o.timestamp.should_not == ts
+    proc{o2.save}.should raise_error(Sequel::NoExistingObject)
+  end
+end unless DB.adapter_scheme == :odbc

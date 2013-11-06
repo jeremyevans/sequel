@@ -49,6 +49,7 @@
 </ul></li>
 <li>Saving:<ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/InstanceFilters.html">instance_filters</a>: Allows you to add per instance filters that are used when updating or destroying the instance.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/MssqlOptimisticLocking.html">mssql_optimistic_locking</a>: Uses a timestamp/rowversion column on Microsoft SQL Server to prevent concurrent updates overwriting changes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking</a>: Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Sharding.html">sharding</a>: Additional model support for Sequel's sharding support.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SkipCreateRefresh.html">skip_create_refresh</a>: Allows you to skip the refresh when saving new model objects.</li>
