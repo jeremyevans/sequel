@@ -1,6 +1,6 @@
 === HEAD
 
-* Add mssql_optimistic_locking plugin, using a timestamp/rowversion column to protect against concurrent updates (pinx, jeremyevans) (#732)
+* Add mssql_optimistic_locking plugin, using a timestamp/rowversion column to protect against concurrent updates (pinx, jeremyevans) (#731)
 
 * Make Model.primary_key array immutable for composite keys (chanks) (#730)
 
