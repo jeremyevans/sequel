@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix usage of Sequel::SQL::Blob objects as prepared statement arguments in jdbc/db2 adapter when use_clob_as_blob is false (jeremyevans)
+
 * Add mssql_optimistic_locking plugin, using a timestamp/rowversion column to protect against concurrent updates (pinx, jeremyevans) (#731)
 
 * Make Model.primary_key array immutable for composite keys (chanks) (#730)

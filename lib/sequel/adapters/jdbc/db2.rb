@@ -32,7 +32,11 @@ module Sequel
         def set_ps_arg(cps, arg, i)
           case arg
           when Sequel::SQL::Blob
-            cps.setString(i, arg)
+            if ::Sequel::DB2.use_clob_as_blob
+              cps.setString(i, arg)
+            else
+              super
+            end
           else
             super
           end
