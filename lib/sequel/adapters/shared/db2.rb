@@ -2,7 +2,7 @@ Sequel.require 'adapters/utils/emulate_offset_with_row_number'
 
 module Sequel
   module DB2
-    @use_clob_as_blob = true
+    @use_clob_as_blob = false
 
     class << self
       # Whether to use clob as the generic File type, true by default.
