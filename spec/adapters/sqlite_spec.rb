@@ -640,4 +640,11 @@ describe "A SQLite database" do
     @db.transaction_mode.should == :immediate
     proc {@db.transaction(:mode => :invalid) {}}.should raise_error(Sequel::Error)
   end
+
+  specify "should keep unique constraints when copying tables" do
+    @db.alter_table(:test2){add_unique_constraint :name}
+    @db.alter_table(:test2){drop_column :value}
+    @db[:test2].insert(:name=>'a')
+    proc{@db[:test2].insert(:name=>'a')}.should raise_error(Sequel::ConstraintViolation)
+  end
 end

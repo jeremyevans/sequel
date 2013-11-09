@@ -1,5 +1,7 @@
 === HEAD
 
+* Copy unique constraints when emulating alter_table operations on SQLite (jeremyevans) (#735)
+
 * Don't return clob column values as SQL::Blob instances in the db2 and ibmdb adapters unless use_clob_as_blob is true (jeremyevans)
 
 * Make use_clob_as_blob false by default on DB2 (jeremyevans)

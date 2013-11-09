@@ -97,7 +97,8 @@ module Sequel
         im = input_identifier_meth
         indexes = {}
         metadata_dataset.with_sql("PRAGMA index_list(?)", im.call(table)).each do |r|
-          next if r[:name] =~ PRIMARY_KEY_INDEX_RE
+          # :only_autocreated internal option can be used to get only autocreated indexes
+          next if (!!(r[:name] =~ PRIMARY_KEY_INDEX_RE) ^ !!opts[:only_autocreated])
           indexes[m.call(r[:name])] = {:unique=>r[:unique].to_i==1}
         end
         indexes.each do |k, v|
@@ -389,6 +390,19 @@ module Sequel
           constraints.concat(fks.each{|h| h[:type] = :foreign_key})
         end
 
+        # Determine unique constraints and make sure the new columns have them
+        unique_columns = []
+        indexes(table, :only_autocreated=>true).each_value do |h|
+          unique_columns.concat(h[:columns]) if h[:columns].length == 1 && h[:unique]
+        end
+        unique_columns -= pks
+        unless unique_columns.empty?
+          unique_columns.map!{|c| quote_identifier(c)}
+          def_columns.each do |c|
+            c[:unique] = true if unique_columns.include?(quote_identifier(c[:name]))
+          end
+        end
+        
         def_columns_str = (def_columns.map{|c| column_definition_sql(c)} + constraints.map{|c| constraint_definition_sql(c)}).join(', ')
         new_columns = old_columns.dup
         opts[:new_columns_proc].call(new_columns) if opts[:new_columns_proc]
