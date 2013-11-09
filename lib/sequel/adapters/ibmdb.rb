@@ -25,7 +25,6 @@ module Sequel
       :time => ::Sequel.method(:string_to_time),
       :date => ::Sequel.method(:string_to_date)
     }
-    DB2_TYPES[:clob] = DB2_TYPES[:blob]
 
     # Wraps an underlying connection to DB2 using IBM_DB.
     class Connection
@@ -435,7 +434,8 @@ module Sequel
             key = output_identifier(k)
             type = stmt.field_type(k).downcase.to_sym
             # decide if it is a smallint from precision
-            type = :boolean  if type ==:int && convert && stmt.field_precision(k) < 8
+            type = :boolean  if type == :int && convert && stmt.field_precision(k) < 8
+            type = :blob if type == :clob && Sequel::DB2.use_clob_as_blob
             columns << [key, cps[type]]
           end
           cols = columns.map{|c| c.at(0)}

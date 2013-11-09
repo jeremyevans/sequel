@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't return clob column values as SQL::Blob instances in the db2 and ibmdb adapters unless use_clob_as_blob is true (jeremyevans)
+
 * Make use_clob_as_blob false by default on DB2 (jeremyevans)
 
 * Fix usage of Sequel::SQL::Blob objects as prepared statement arguments in jdbc/db2 adapter when use_clob_as_blob is false (jeremyevans)

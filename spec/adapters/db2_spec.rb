@@ -30,12 +30,12 @@ end
 
 describe "Simple Dataset operations" do
   before(:all) do
-    Sequel::DB2.use_clob_as_blob = false
+    Sequel::DB2.use_clob_as_blob = true
     DB.create_table!(:items) do
       Integer :id, :primary_key => true
       Integer :number
       column  :bin_string, 'varchar(20) for bit data'
-      column  :bin_blob, 'blob'
+      column  :bin_clob, 'clob'
     end
     @ds = DB[:items]
   end
@@ -43,7 +43,7 @@ describe "Simple Dataset operations" do
     @ds.delete
   end
   after(:all) do
-    Sequel::DB2.use_clob_as_blob = true
+    Sequel::DB2.use_clob_as_blob = false
     DB.drop_table(:items)
   end
 
@@ -54,8 +54,8 @@ describe "Simple Dataset operations" do
   end
 
   specify "should insert into binary columns" do
-    @ds.insert(:id => 1, :bin_string => Sequel.blob("\1"), :bin_blob => Sequel.blob("\2"))
-    @ds.select(:bin_string, :bin_blob).first.should == {:bin_string => "\1", :bin_blob => "\2"}
+    @ds.insert(:id => 1, :bin_string => Sequel.blob("\1"), :bin_clob => Sequel.blob("\2"))
+    @ds.select(:bin_string, :bin_clob).first.should == {:bin_string => "\1", :bin_clob => "\2"}
   end
 end
 

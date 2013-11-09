@@ -31,7 +31,6 @@ module Sequel
       DB2CLI::SQL_TYPE_TIME => tt.method(:time),
       DB2CLI::SQL_DECIMAL => ::BigDecimal.method(:new)
     }
-    DB2_TYPES[DB2CLI::SQL_CLOB] = DB2_TYPES[DB2CLI::SQL_BLOB]
 
     class Database < Sequel::Database
       include DatabaseMethods
@@ -217,6 +216,8 @@ module Sequel
           name, buflen, datatype, size, digits, nullable = db.checked_error("Could not describe column"){DB2CLI.SQLDescribeCol(sth, i, MAX_COL_SIZE)}
           pr = if datatype == DB2CLI::SQL_SMALLINT && convert && size <= 5 && digits <= 1
             cps[:boolean]
+          elsif datatype == DB2CLI::SQL_CLOB && Sequel::DB2.use_clob_as_blob
+            cps[DB2CLI::SQL_BLOB]
           else
             cps[datatype]
           end
