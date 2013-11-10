@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.36.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.36.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.36.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2012-06-01 08:13:02 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>An eager_each plugin has been added, which automatically makes eagerly
+            loaded datasets do eager loading if you call each (or another Enumerable
+            method) instead of all.  By default, if you call each on an eager dataset,
+            it will not do eager loading, and if you call each on an eager_graph
+            dataset, you will get plain hashes with columns from all joined tables
+            instead of model objects.  With this plugin, each on both eager and
+            eager_graph datasets will do eager loading.</p>
+            </li><li>
+            <p>The nested attributes plugin now supports composite primary keys in
+            associated records.  Additionally, it now deals better with natural primary
+            keys in associated records.  There is a new :unmatched_pk option that can
+            be set to :create if you want to create new associated records when the
+            input hash contains primary key information that doesn&#39;t match one of
+            the existing associated objects.</p>
+            
+            <p>The nested attributes plugin now also supports a :transform option. If
+            given, this option is called with the parent object and the input hash
+            given for each associated record passed into the nested atttributes setter.
+            The callable should return the hash of attributes to use.</p>
+            </li><li>
+            <p>Model#from_json in the json_serializer plugin now takes an options hash and
+            recognizes the :fields option.  If the :fields option is given, it should
+            be an array of field names, and set_fields is called with the array instead
+            of using set.  This allows you to easily filter which fields in the hash
+            are set in the model instance.  The entire options hash is also passed to
+            set_fields if :fields is present, so you can additionally use the :missing
+            =&gt; :raise or :missing =&gt; :skip options that set_fields supports.</p>
+            </li><li>
+            <p>The Dataset#to_json method in the json_serializer plugin now respects
+            :root=&gt;:collection and :root=&gt;:instance options.  If
+            :root=&gt;:collection is given, only the collection is wrapped in a hash,
+            and if :root=&gt;:instance is given, only the instances are wrapped in a
+            hash.  For backwards compatibility, both the instances and collection are
+            wrapped in a hash:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">root=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># {&quot;models&quot;:[{&quot;model&quot;:{&quot;id&quot;:1}}]}</span>&#x000A;&#x000A;<span class="ruby-constant">Model</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">root=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">collection</span>)&#x000A;<span class="ruby-comment"># {&quot;models&quot;:[{&quot;id&quot;:1}]}</span>&#x000A;&#x000A;<span class="ruby-constant">Model</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">root=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">instance</span>)&#x000A;<span class="ruby-comment"># [{&quot;model&quot;:{&quot;id&quot;:1}}]</span></pre>
+            
+            <p>Wrapping both the collection and instance in a root by default is probably
+            an undesired behavior, so the default for :root=&gt;true may change in the
+            next major version of <a href="../../../classes/Sequel.html">Sequel</a>. 
+            Users who want the current behavior should switch to using :root=&gt;:both.</p>
+            </li><li>
+            <p>The schema_dumper extension now respects an :index_names option when
+            dumping.  This option can be set to false to never dump the index names. 
+            It can also be set to :namespace, in which case if the database does not
+            have a global index namespace, it will automatically prefix the name of the
+            index with the name of the table.</p>
+            
+            <p>Database#global_index_namespace? was added to check if the database uses a
+            global index namespace.  If false, index names are probably namespaced per
+            table (MySQL, MSSQL, Oracle).</p>
+            </li><li>
+            <p>:each is now a valid prepared statement type.  This prepared statement type
+            requires a block when you call the statement, and iterates over the records
+            of the statement a row at a time. Previously, there wasn&#39;t a way to
+            iterate over the records of a prepared statement a row at a time, since the
+            :select and :all types collect all rows into an array before iterating over
+            them.</p>
+            </li><li>
+            <p>A :connection_handling=&gt;:queue option is now respected for database
+            objects, and changes the threaded connection pools to use a queue instead
+            of a stack as the data structure for storing available connections.  A
+            queue does not perform as well as a stack, but reduces the likelihood of
+            stale connections.</p>
+            
+            <p>It is possible that <a href="../../../classes/Sequel.html">Sequel</a> will
+            change in the future from using a stack by default to using a queue by
+            default, so any users who specifically desire a stack to be used should
+            specify the :connection_handling=&gt;:stack option.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel/Migrator.html">Sequel::Migrator</a> now
+            supports is_current? class method to check if there are no outstanding
+            migrations to apply.  It also supports a check_current class method, which
+            raises an exception if there are outstanding migrations to apply.</p>
+            </li><li>
+            <p>A pg_json extension has been added, supporting PostgreSQL&#39;s 9.2 json
+            type, similarly to the pg_array and pg_hstore extensions. Note that with
+            the current PostgreSQL json code, the root object can be a string or
+            number, but ruby&#39;s json library requires the root json value to be an
+            object or array.  So you will probably get an exception if you attempt to
+            retrieve a PostgreSQL json value that ruby&#39;s JSON library won&#39;t
+            parse.</p>
+            </li><li>
+            <p>A pg_inet extension has been added, which automatically typecasts
+            PostgreSQL inet and cidr types to ruby IPAddr objects on retrieval.</p>
+            </li><li>
+            <p>Database#transaction on PostgreSQL now recognizes :read_only and
+            :deferrable options, and can use them to set the READ ONLY and DEFERRABLE
+            transaction flags.  A :synchronous option is also recognized, which can be
+            set to true, false, :local, or :remote_write, and sets the value of
+            synchronous_commit just for that transaction.</p>
+            </li><li>
+            <p>When adding and dropping indexes on PostgreSQL, a :concurrently option can
+            be used to create or drop the index CONCURRENTLY, which doesn&#39;t require
+            a full write table lock.</p>
+            </li><li>
+            <p>When dropping indexes on PostgreSQL, :if_exists and :cascade options are
+            now recognized.</p>
+            </li><li>
+            <p>When using alter_table set_column_type on PostgreSQL, the :using option is
+            respected, and can be used to force a specific conversion from the previous
+            value to the new value with the USING syntax.</p>
+            </li><li>
+            <p>On MySQL, you can now set an :sql_mode option when connecting.  This can be
+            a string or symbol or an array of them, and each should match one of
+            MySQL&#39;s sql_modes.  MySQL&#39;s default SQL mode is fairly loose, and
+            using one of the strict sql modes is recommended, but for backwards
+            compatibility, <a href="../../../classes/Sequel.html">Sequel</a> will not
+            set a specific SQL mode by default.  However, that may change in the next
+            major version of <a href="../../../classes/Sequel.html">Sequel</a>, so to
+            be forwards compatible you should set :sql_mode=&gt;nil if you do not
+            desire a strict SQL mode to be set automatically.</p>
+            </li><li>
+            <p>Partial indexes are now supported on Microsoft SQL Server 2008 (SQL Server
+            refers to them as filtered indexes).  Attempting to use a partial index on
+            an earlier version of SQL Server will result in the database raising an
+            exception.</p>
+            </li><li>
+            <p>A jdbc/progress adapter has been added, supporting the Progress database
+            via the jdbc adapter.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p>Dataset#get now works correctly if you pass it a nil or false argument. 
+            Previously, it ignored the argument and used the block instead.  If you
+            want to use the block argument, you should not pass in a regular argument.</p>
+            </li><li>
+            <p>Database#call now passes any blocks given to it to the underlying prepared
+            statement object.  Before, a passed block was ignored.</p>
+            </li><li>
+            <p>Sequel::Model.db is no longer set automatically when creating an anonymous
+            class with an associated database object.  This fixes cases where a library
+            would create namespaced models, and the database used by the library would
+            be set as the default for the user&#39;s application code.</p>
+            </li><li>
+            <p>Model *_to_one association setters are now no-ops if you pass a value that
+            is the same as the cached value.  This fixes issues with reciprocal
+            associations getting reordered, and is better for performance.</p>
+            
+            <p>For cases where the old behavior is desired, the
+            set_associated_object_if_same? method can be overridden to return true for
+            object.  If you are manually setting objects in the associations cache
+            before calling the setter method, you may want to set that.</p>
+            </li><li>
+            <p>The dirty plugin no longer affects the return value of refresh and lock!. 
+            Internal changes should now help ensure that plugins don&#39;t affect the
+            return values of these methods.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports JRuby
+            1.7&#39;s new exception handling, fixing exception handling when connecting
+            in the jdbc adapter.</p>
+            </li><li>
+            <p>When dumping unsigned integer types in the schema dumper, if the unsigned
+            values could overflow a 32-bit signed integer type, the generic Bignum
+            class is used as the type.  This should fix issues when copying a database
+            containing an unsigned 32-bit integer column with values between 2^31 and
+            2^32-1.</p>
+            </li><li>
+            <p>In the optimistic_locking plugin, attempting to refresh and save after a
+            failed save now works correctly.  Before, the second save would never
+            modify a row.</p>
+            </li><li>
+            <p>Time types on jdbc/postgres are now typecasted accurately on retrieval,
+            before they could be off by up to a millisecond due to floating point
+            issues.</p>
+            </li><li>
+            <p>Disconnect detection in the mysql2 adapter has been improved.</p>
+            </li><li>
+            <p>The jdbc/mysql, do/mysql, and swift/mysql adapters all now support the
+            :timeout option to set the MySQL wait_timeout.</p>
+            </li><li>
+            <p>Savepoints in prepared transactions are now supported on MySQL 5.5.23+,
+            since the bug that caused them to be unsupported starting in 5.5.13 has
+            been fixed.</p>
+            </li><li>
+            <p>Parsing foreign key metadata for tables with an explicit schema now works
+            correctly on PostgreSQL.</p>
+            </li><li>
+            <p>bin/sequel -C now namespaces indexes automatically when copying from a
+            database without a global index namespace to a database with a global index
+            namespace.</p>
+            </li><li>
+            <p>Indexes are now dropped in reverse order that they were added in the
+            schema_dumper.</p>
+            </li><li>
+            <p>The Model typecasting code works around bugs in objects where
+            object.==(&#39;&#39;) would raise an exception instead of returning false.</p>
+            </li><li>
+            <p>A better error message is used if an invalid JDBC URL is provided and the
+            JDBC driver&#39;s new.connect method returns NULL.</p>
+            </li><li>
+            <p>A document describing Sequel&#39;s object model has been added, describing
+            the objects <a href="../../../classes/Sequel.html">Sequel</a> uses to
+            represent SQL concepts.</p>
+            </li><li>
+            <p>Most adapter specific options to Database methods are now mentioned in the
+            main Database method RDoc.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>The nested_attributes plugin internals changed significantly.  If you were
+            overriding one of the nested_attributes* private methods and calling super
+            to get the default behavior, you may have to update your code.</p>
+            </li><li>
+            <p>Database#case_sensitive_like has been removed on SQLite.  This method never
+            worked correctly, it always returned false even if the case_sensitive_like
+            PRAGMA was set.  That&#39;s because SQLite doesn&#39;t offer a getter for
+            this PRAGMA, only a setter.  Note that Database#case_sensitive_like= still
+            exists and works correctly.</p>
+            </li><li>
+            <p>Database#single_value has been removed from the native SQLite adapter. 
+            This method was designed for internal use, and hasn&#39;t been used for
+            some time.  Any current users of the method should switch to
+            Dataset#single_value.</p>
+            </li><li>
+            <p>The private Database#defined_columns_for method in the SQLite adapter no
+            longer takes an options hash.</p>
+            </li><li>
+            <p>A couple jdbc/postgres adapter methods are now private.  Previously, the
+            jdbc/postgres adapter overrode some private superclass methods but left the
+            methods public.</p>
+            </li><li>
+            <p>When using the optimistic_locking plugin, refreshing inside a before_update
+            method after calling super will now result in the lock checking being
+            skipped.</p>
+            </li><li>
+            <p>The private Model#_refresh no longer returns self, so external plugins
+            should no longer rely on that behavior.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

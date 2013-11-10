@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::ADO::Access::AdoSchema::Column</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::ADO::Access::AdoSchema::Column
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../../files/lib/sequel/adapters/ado/access_rb.html">lib/sequel/adapters/ado/access.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../AdoSchema.html">AdoSchema</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-5B-5D">[]</a></li>
+              <li><a target="docwin" href="#method-i-allow_null">allow_null</a></li>
+              <li><a target="docwin" href="#method-i-db_type">db_type</a></li>
+              <li><a target="docwin" href="#method-i-default">default</a></li>
+              <li><a target="docwin" href="#method-i-maximum_length">maximum_length</a></li>
+              <li><a target="docwin" href="#method-i-precision">precision</a></li>
+              <li><a target="docwin" href="#method-i-scale">scale</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DATA_TYPE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      {
+                      2   => "SMALLINT",
+                      3   => "INTEGER",
+                      4   => "REAL",
+                      5   => "DOUBLE",
+                      6   => "MONEY",
+                      7   => "DATETIME",
+                      11  => "BIT",
+                      14  => "DECIMAL",
+                      16  => "TINYINT",
+                      17  => "BYTE",
+                      72  => "GUID",
+                      128 => "BINARY",
+                      130 => "TEXT",
+                      131 => "DECIMAL",
+                      201 => "TEXT",
+                      205 => "IMAGE"
+                      }
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(row)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/access.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">row</span>)&#x000A;  <span class="ruby-ivar">@row</span> = <span class="ruby-identifier">row</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-5B-5D'>
+                <a name='method-i-5B-5D'></a>
+                <div class='synopsis'>
+                  <span class='name'>[]</span>
+                  <span class='arguments'>(col)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/access.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">col</span>)&#x000A;  <span class="ruby-ivar">@row</span>[<span class="ruby-identifier">col</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-allow_null'>
+                <a name='method-i-allow_null'></a>
+                <div class='synopsis'>
+                  <span class='name'>allow_null</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-allow_null-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-allow_null-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/access.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">allow_null</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-string">&quot;IS_NULLABLE&quot;</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-db_type'>
+                <a name='method-i-db_type'></a>
+                <div class='synopsis'>
+                  <span class='name'>db_type</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-db_type-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-db_type-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/access.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">db_type</span>&#x000A;  <span class="ruby-identifier">t</span> = <span class="ruby-constant">DATA_TYPE</span>[<span class="ruby-keyword">self</span>[<span class="ruby-string">&quot;DATA_TYPE&quot;</span>]]&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">t</span> <span class="ruby-operator">==</span> <span class="ruby-string">&quot;DECIMAL&quot;</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">precision</span>&#x000A;    <span class="ruby-identifier">t</span> <span class="ruby-operator">+</span> <span class="ruby-node">&quot;(#{precision.to_i},#{(scale || 0).to_i})&quot;</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">t</span> <span class="ruby-operator">==</span> <span class="ruby-string">&quot;TEXT&quot;</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">maximum_length</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">maximum_length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>&#x000A;    <span class="ruby-identifier">t</span> <span class="ruby-operator">+</span> <span class="ruby-node">&quot;(#{maximum_length.to_i})&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">t</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-default'>
+                <a name='method-i-default'></a>
+                <div class='synopsis'>
+                  <span class='name'>default</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-default-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-default-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/access.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-string">&quot;COLUMN_DEFAULT&quot;</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-maximum_length'>
+                <a name='method-i-maximum_length'></a>
+                <div class='synopsis'>
+                  <span class='name'>maximum_length</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-maximum_length-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-maximum_length-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/access.rb, line 80</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">maximum_length</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-string">&quot;CHARACTER_MAXIMUM_LENGTH&quot;</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-precision'>
+                <a name='method-i-precision'></a>
+                <div class='synopsis'>
+                  <span class='name'>precision</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-precision-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-precision-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/access.rb, line 72</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">precision</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-string">&quot;NUMERIC_PRECISION&quot;</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-scale'>
+                <a name='method-i-scale'></a>
+                <div class='synopsis'>
+                  <span class='name'>scale</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-scale-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-scale-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/access.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">scale</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-string">&quot;NUMERIC_SCALE&quot;</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

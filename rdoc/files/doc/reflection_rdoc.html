@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>reflection.rdoc</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>reflection.rdoc</h1>
+        <div class='paths'>
+          doc/reflection.rdoc
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-06-02 13:49:43 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Reflection">Reflection</h1>
+            
+            <p><a href="../../classes/Sequel.html">Sequel</a> supports reflection
+            information in multiple ways.</p>
+            
+            <h2 id="label-Adapter+in+Use">Adapter in Use</h2>
+            
+            <p>You can get the adapter in use using Database#adapter_scheme:</p>
+            
+            <pre>DB.adapter_scheme # e.g. :postgres, :jdbc, :odbc</pre>
+            
+            <h2 id="label-Database+Connected+To">Database Connected To</h2>
+            
+            <p>In some cases, the adapter scheme will be the same as the database to which
+            you are connecting.  However, many adapters support multiple databases. 
+            You can use the Database#database_type method to get the type of database
+            to which you are connecting:</p>
+            
+            <pre>DB.database_type # :postgres, :h2, :mssql</pre>
+            
+            <h2 id="label-Tables+in+the+Database">Tables in the Database</h2>
+            
+            <p>Database#tables gives an array of table name symbols:</p>
+            
+            <pre>DB.tables # [:table1, :table2, :table3, ...]</pre>
+            
+            <h2 id="label-Views+in+the+Database">Views in the Database</h2>
+            
+            <p>Database#views and gives an array of view name symbols:</p>
+            
+            <pre>DB.views # [:view1, :view2, :view3, ...]</pre>
+            
+            <h2 id="label-Indexes+on+a+table">Indexes on a table</h2>
+            
+            <p>Database#indexes takes a table name gives a hash of index information. 
+            Keys are index names, values are subhashes with the keys :columns and
+            :unique :</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">indexes</span>(:<span class="ruby-identifier">table1</span>) <span class="ruby-comment"># {:index1=&gt;{:columns=&gt;[:column1], :unique=&gt;false}, :index2=&gt;{:columns=&gt;[:column2, :column3], :unique=&gt;true}}</span></pre>
+            
+            <p>Index information generally does not include partial indexes, functional
+            indexes, or indexes on the primary key of the table.</p>
+            
+            <h2 id="label-Foreign+Key+Information+for+a+Table">Foreign Key Information for a Table</h2>
+            
+            <p>Database#foreign_key_list takes a table name and gives an array of hashes
+            of foreign key information:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">foreign_key_list</span>(:<span class="ruby-identifier">table1</span>) <span class="ruby-comment"># [{:columns=&gt;[:column1], :table=&gt;:referenced_table, :key=&gt;[:referenced_column1]}]</span></pre>
+            
+            <p>At least the following entries will be present in the hash:</p>
+            <dl class="rdoc-list note-list"><dt>:columns 
+            <dd>
+            <p>An array of columns in the given table</p>
+            </dd><dt>:table 
+            <dd>
+            <p>The table referenced by the columns</p>
+            </dd><dt>:key 
+            <dd>
+            <p>An array of columns referenced (in the table specified by :table), but can
+            be nil on certain adapters if the primary key is referenced.</p>
+            </dd></dl>
+            
+            <p>The hash may also contain entries for:</p>
+            <dl class="rdoc-list note-list"><dt>:deferrable 
+            <dd>
+            <p>Whether the constraint is deferrable</p>
+            </dd><dt>:name 
+            <dd>
+            <p>The name of the constraint</p>
+            </dd><dt>:on_delete 
+            <dd>
+            <p>The action to take ON DELETE</p>
+            </dd><dt>:on_update 
+            <dd>
+            <p>The action to take ON UPDATE</p>
+            </dd></dl>
+            
+            <h2 id="label-Column+Information+for+a+Table">Column Information for a Table</h2>
+            
+            <p>Database#schema takes a table symbol and returns column information in an
+            array with each element being an array with two elements.  The first
+            elements of the subarray is a column symbol, and the second element is a
+            hash of information about that column.  The hash should include the
+            following keys:</p>
+            <dl class="rdoc-list note-list"><dt>:allow_null 
+            <dd>
+            <p>Whether NULL/nil is an allowed value for this column. Used by the <a
+            href="../../classes/Sequel/Model.html">Sequel::Model</a> typecasting code.</p>
+            </dd><dt>:db_type 
+            <dd>
+            <p>The type of column the database provided, as a string.  Used by the
+            schema_dumper plugin for a more specific type translation.</p>
+            </dd><dt>:default 
+            <dd>
+            <p>The default value of the column, as either a string or nil.  Uses a
+            database specific format. Used by the schema_dumper plugin for converting
+            to a ruby value.</p>
+            </dd><dt>:primary_key 
+            <dd>
+            <p>Whether this column is one of the primary key columns for the table.  Used
+            by the <a href="../../classes/Sequel/Model.html">Sequel::Model</a> code to
+            determine primary key columns.</p>
+            </dd><dt>:ruby_default 
+            <dd>
+            <p>The default value of the column as a ruby object, or nil if there is no
+            default or the default could not be successfully parsed into a ruby object.</p>
+            </dd><dt>:type 
+            <dd>
+            <p>The type of column, as a symbol (e.g. :string).  Used by the <a
+            href="../../classes/Sequel/Model.html">Sequel::Model</a> typecasting code.</p>
+            </dd></dl>
+            
+            <p>Example:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">schema</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># [[:column1, {:allow_null=&gt;true, :db_type=&gt;&#39;varchar(255)&#39;, :default=&gt;&#39;blah&#39;, :primary_key=&gt;false, :type=&gt;:string}], ...]</span></pre>
+            
+            <h2 id="label-Column+Information+for+a+Model">Column Information for a Model</h2>
+            
+            <p>Model#db_schema returns pretty much the same information, except it returns
+            it as a hash with column keys instead of an array of two element arrays.</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db_schema</span> <span class="ruby-comment"># {:column1=&gt;{:allow_null=&gt;true, :db_type=&gt;&#39;varchar(255)&#39;, :default=&gt;&#39;blah&#39;, :primary_key=&gt;false, :type=&gt;:string}, ...}</span></pre>
+            
+            <h2 id="label-Columns+used+by+a+dataset%2Fmodel">Columns used by a dataset/model</h2>
+            
+            <p>Dataset#columns returns the columns of the current dataset as an array of
+            symbols:</p>
+            
+            <pre>DB[:table].columns # [:column1, :column2, :column3, ...]</pre>
+            
+            <p>Dataset#columns! does the same thing, except it ignores any cached value. 
+            In general, the cached value should never be incorrect, unless the database
+            schema is changed after the dataset is created.</p>
+            
+            <pre>DB[:table].columns! # [:column1, :column2, :column3, ...]</pre>
+            
+            <p>Model.columns does the same thing as Dataset#columns, using the model&#39;s
+            dataset:</p>
+            
+            <pre>Model.columns # [:column1, :column2, :column3, ...]</pre>
+            
+            <h2 id="label-Associations+Defined">Associations Defined</h2>
+            
+            <p><a href="../../classes/Sequel/Model.html">Sequel::Model</a> offers complete
+            introspection capability for all associations.</p>
+            
+            <p>You can get an array of association symbols with Model.associations:</p>
+            
+            <pre>Model.associations # [:association1, :association2, ...]</pre>
+            
+            <p>You can get the association reflection for a single association via the
+            Model.association_reflection.  Association reflections are subclasses of
+            hash, for ease of use and introspection (and backwards compatibility):</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">association_reflection</span>(:<span class="ruby-identifier">association1</span>) <span class="ruby-comment"># {:name=&gt;:association1, :type=&gt;:many_to_one, :model=&gt;Model, ...}</span></pre>
+            
+            <p>You can get an array of all association reflections via
+            Model.all_association_reflections:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">all_association_reflections</span> <span class="ruby-comment"># [{:name=&gt;:association1, :type=&gt;:many_to_one, :model=&gt;Model, ...}, ...]</span></pre>
+            
+            <p>Finally, you can get a hash of association reflections via
+            Model.association_reflections:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">association_reflections</span> <span class="ruby-comment"># {:association1=&gt;{:name=&gt;:association1, :type=&gt;:many_to_one, :model=&gt;Model, ...}, ...}</span></pre>
+            
+            <h2 id="label-Validations+Defined">Validations Defined</h2>
+            
+            <p>When using the validation_class_methods plugin, you can use the
+            validation_reflections class method to get a hash with validation
+            reflection information.  This returns a hash keyed on the column name
+            symbol:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">validation_reflections</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-comment"># =&gt; [[:presence, {}], [:length, {:maximum=&gt;255, :message=&gt;&#39;is just too long&#39;}]]</span></pre>
+            
+            <p>Similarly, when using the constraint_validations plugin, you can use the
+            constraint_validation_reflections class method:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">constraint_validation_reflections</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-comment"># =&gt; [[:presence, {}], [:max_length, {:argument=&gt;255, :message=&gt;&#39;is just too long&#39;}]]</span></pre>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

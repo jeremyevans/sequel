@@ -1,0 +1,339 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Postgres</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Postgres
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../files/lib/sequel/adapters/postgres_rb.html">lib/sequel/adapters/postgres.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/utils/pg_types_rb.html">lib/sequel/adapters/utils/pg_types.rb</a>
+          </li>
+          <li>
+            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Top level module for holding all PostgreSQL-related modules and classes for
+            <a href="../Sequel.html">Sequel</a>.  There are a few module level
+            accessors that are added via metaprogramming.  These are:</p>
+            <dl class="rdoc-list note-list"><dt><a href="Postgres.html#attribute-c-client_min_messages">::client_min_messages</a> 
+            <dd>
+            <p>Change the minimum level of messages that PostgreSQL will send to the the
+            client.  The PostgreSQL default is NOTICE, the <a
+            href="../Sequel.html">Sequel</a> default is WARNING.  Set to nil to not
+            change the server default. Overridable on a per instance basis via the :<a
+            href="Postgres.html#attribute-c-client_min_messages">::client_min_messages</a>
+            option.</p>
+            </dd><dt><a href="Postgres.html#attribute-c-force_standard_strings">::force_standard_strings</a> 
+            <dd>
+            <p>Set to false to not force the use of standard strings.  Overridable on a
+            per instance basis via the :<a
+            href="Postgres.html#attribute-c-force_standard_strings">::force_standard_strings</a>
+            option.</p>
+            </dd></dl>
+            
+            <p>It is not recommened you use these module-level accessors.  Instead, use
+            the database option to make the setting per-<a
+            href="Postgres/Database.html">Database</a>.</p>
+            
+            <p>All adapters that connect to PostgreSQL support the following option in
+            addition to those mentioned above:</p>
+            <dl class="rdoc-list note-list"><dt>:search_path 
+            <dd>
+            <p>Set the schema search_path for this Database&#39;s connections. Allows to
+            to set which schemas do not need explicit qualification, and in which order
+            to check the schemas when an unqualified object is referenced.</p>
+            </dd></dl>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-c-client_min_messages">client_min_messages</a></li>
+              <li><a target="docwin" href="#attribute-c-force_standard_strings">force_standard_strings</a></li>
+              <li><a target="docwin" href="#attribute-c-use_iso_date_format">use_iso_date_format</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-bytea">bytea</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="Postgres/DatabaseMethods.html">Sequel::Postgres::DatabaseMethods</a></li>
+              <li><a target="docwin" href="Postgres/DatasetMethods.html">Sequel::Postgres::DatasetMethods</a></li>
+              <li><a target="docwin" href="Postgres/Adapter.html">Sequel::Postgres::Adapter</a></li>
+              <li><a target="docwin" href="Postgres/AlterTableGenerator.html">Sequel::Postgres::AlterTableGenerator</a></li>
+              <li><a target="docwin" href="Postgres/CreateTableGenerator.html">Sequel::Postgres::CreateTableGenerator</a></li>
+              <li><a target="docwin" href="Postgres/Database.html">Sequel::Postgres::Database</a></li>
+              <li><a target="docwin" href="Postgres/Dataset.html">Sequel::Postgres::Dataset</a></li>
+              <li><a target="docwin" href="Postgres/ExclusionConstraintViolation.html">Sequel::Postgres::ExclusionConstraintViolation</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>CONVERTED_EXCEPTIONS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Array of exceptions that need to be converted.  <a
+                      href="JDBC.html">JDBC</a> uses NativeExceptions, the native adapter uses
+                      PGError.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DASH_STR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'-'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MINUS_INFINITY</td>
+                    <td>=</td>
+                    <td class='context-item-value'>-1.0/0.0</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MINUS_INFINITY_STR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'-Infinity'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NAN</td>
+                    <td>=</td>
+                    <td class='context-item-value'>0.0/0.0</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NAN_STR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'NaN'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PG_NAMED_TYPES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>{} unless defined?(PG_NAMED_TYPES)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Hash with type name strings/symbols and callable values for converting
+                      PostgreSQL types. Non-builtin types that don&#39;t have fixed numbers
+                      should use this to register conversion procs.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PG_TYPES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>{} unless defined?(PG_TYPES)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Hash with integer keys and callable values for converting PostgreSQL types.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PLUS_INFINITY</td>
+                    <td>=</td>
+                    <td class='context-item-value'>1.0/0.0</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PLUS_INFINITY_STR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'Infinity'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>STRING_TYPES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[18, 19, 25, 1042, 1043]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Type OIDs for string types used by PostgreSQL.  These types don&#39;t have
+                      conversion procs associated with them (since the data is already in the
+                      form of a string).</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>TRUE_STR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'t'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>TYPE_TRANSLATOR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      tt = Class.new do
+                      def boolean(s) s == TRUE_STR end
+                      def integer(s) s.to_i end
+                      def float(s) 
+                      case s
+                      when NAN_STR
+                      NAN
+                      when PLUS_INFINITY_STR
+                      PLUS_INFINITY
+                      when MINUS_INFINITY_STR
+                      MINUS_INFINITY
+                      else
+                      s.to_f 
+                      end
+                      end
+                      def date(s) ::Date.new(*s.split(DASH_STR).map{|x| x.to_i}) end
+                      def bytea(str)
+                      str = if str =~ /\A\\x/
+                      # PostgreSQL 9.0+ bytea hex format
+                      str[2..-1].gsub(/(..)/){|s| s.to_i(16).chr}
+                      else
+                      # Historical PostgreSQL bytea escape format
+                      str.gsub(/\\(\\|'|[0-3][0-7][0-7])/) {|s|
+                      if s.size == 2 then s[1,1] else s[1,3].oct.chr end
+                      }
+                      end
+                      ::Sequel::SQL::Blob.new(str)
+                      end
+                      end.new
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-c-client_min_messages'>client_min_messages</a>
+                    </td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>By default, <a href="../Sequel.html">Sequel</a> sets the minimum level of
+                      log messages sent to the client to WARNING, where PostgreSQL uses a default
+                      of NOTICE.  This is to avoid a lot of mostly useless messages when running
+                      migrations, such as a couple of lines for every serial primary key field.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-c-force_standard_strings'>force_standard_strings</a>
+                    </td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>By default, <a href="../Sequel.html">Sequel</a> forces the use of standard
+                      strings, so that &#39;\&#39; is interpreted as \ and not .  While
+                      PostgreSQL &lt;9.1 defaults to interpreting plain strings, newer versions
+                      use standard strings by default.  <a href="../Sequel.html">Sequel</a>
+                      assumes that SQL standard strings will be used.  Setting this to false
+                      means <a href="../Sequel.html">Sequel</a> will use the database&#39;s
+                      default.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-c-use_iso_date_format'>use_iso_date_format</a>
+                    </td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>As an optimization, <a href="../Sequel.html">Sequel</a> sets the date style
+                      to ISO, so that PostgreSQL provides the date in a known format that <a
+                      href="../Sequel.html">Sequel</a> can parse faster.  This can be turned off
+                      if you require a date style other than ISO.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-bytea'>
+                <a name='method-i-bytea'></a>
+                <div class='synopsis'>
+                  <span class='name'>bytea</span>
+                  <span class='arguments'>(s)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-bytea-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bytea</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">unescape_bytea</span>(<span class="ruby-identifier">s</span>)) <span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

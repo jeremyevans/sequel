@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>constraint_validations.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>constraint_validations.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/constraint_validations.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-10-14 13:19:12 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The constraint_validations extension is designed to easily create database
+            constraints inside create_table and alter_table blocks.  It also adds
+            relevant metadata about the constraints to a separate table, which the
+            constraint_validations model plugin uses to setup automatic validations.</p>
+            
+            <p>To use this extension, you first need to load it into the database:</p>
+            
+            <pre>DB.extension(:constraint_validations)</pre>
+            
+            <p>Note that you should only need to do this when modifying the constraint
+            validations (i.e. when migrating).  You should probably not load this
+            extension in general application code.</p>
+            
+            <p>You also need to make sure to add the metadata table for the automatic
+            validations.  By default, this table is called
+            sequel_constraint_validations.</p>
+            
+            <pre>DB.create_constraint_validations_table</pre>
+            
+            <p>This table should only be created once.  For new applications, you
+            generally want to create it first, before creating any other application
+            tables.</p>
+            
+            <p>Because migrations instance_eval the up and down blocks on a database,
+            using this extension in a migration can be done via:</p>
+            
+            <pre>Sequel.migration do&#x000A;  up do&#x000A;    extension(:constraint_validations)&#x000A;    # ...&#x000A;  end&#x000A;  down do&#x000A;    extension(:constraint_validations)&#x000A;    # ...&#x000A;  end&#x000A;end</pre>
+            
+            <p>However, note that you cannot use change migrations with this extension,
+            you need to use separate up/down migrations.</p>
+            
+            <p>The API for creating the constraints with automatic validations is similar
+            to the validation_helpers model plugin API.  However, instead of having
+            separate validates_* methods, it just adds a validate method that accepts a
+            block to the schema generators.  Like the create_table and alter_table
+            blocks, this block is instance_evaled and offers its own DSL. Example:</p>
+            
+            <pre>DB.create_table(:table) do&#x000A;  Integer :id&#x000A;  String :name&#x000A;  validate do&#x000A;    presence :id&#x000A;    min_length 5, :name&#x000A;  end&#x000A;end</pre>
+            
+            <p>instance_eval is used in this case because create_table and alter_table
+            already use instance_eval, so losing access to the surrounding receiver is
+            not an issue.</p>
+            
+            <p>Here&#39;s a breakdown of the constraints created for each constraint
+            validation method:</p>
+            <dl class="rdoc-list note-list"><dt>All constraints except unique unless :allow_nil is true 
+            <dd>
+            <p>CHECK column IS NOT NULL</p>
+            </dd><dt>presence (<a href="../../../../classes/String.html">String</a> column) 
+            <dd>
+            <p>CHECK trim(column) != &#39;&#39;</p>
+            </dd><dt>exact_length 5 
+            <dd>
+            <p>CHECK char_length(column) = 5</p>
+            </dd><dt>min_length 5 
+            <dd>
+            <p>CHECK char_length(column) &gt;= 5</p>
+            </dd><dt>max_length 5 
+            <dd>
+            <p>CHECK char_length(column) &lt;= 5</p>
+            </dd><dt>length_range 3..5 
+            <dd>
+            <p>CHECK char_length(column) &gt;= 3 AND char_length(column) &lt;= 5</p>
+            </dd><dt>length_range 3...5 
+            <dd>
+            <p>CHECK char_length(column) &gt;= 3 AND char_length(column) &lt; 5</p>
+            </dd><dt>format /foo\d+/ 
+            <dd>
+            <p>CHECK column ~ &#39;foo\d+&#39;</p>
+            </dd><dt>format /foo\d+/i 
+            <dd>
+            <p>CHECK column ~* &#39;foo\d+&#39;</p>
+            </dd><dt>like &#39;foo%&#39; 
+            <dd>
+            <p>CHECK column LIKE &#39;foo%&#39;</p>
+            </dd><dt>ilike &#39;foo%&#39; 
+            <dd>
+            <p>CHECK column ILIKE &#39;foo%&#39;</p>
+            </dd><dt>includes [&#39;a&#39;, &#39;b&#39;] 
+            <dd>
+            <p>CHECK column IN (&#39;a&#39;, &#39;b&#39;)</p>
+            </dd><dt>includes [1, 2] 
+            <dd>
+            <p>CHECK column IN (1, 2)</p>
+            </dd><dt>includes 3..5 
+            <dd>
+            <p>CHECK column &gt;= 3 AND column &lt;= 5</p>
+            </dd><dt>includes 3...5 
+            <dd>
+            <p>CHECK column &gt;= 3 AND column &lt; 5</p>
+            </dd><dt>unique 
+            <dd>
+            <p>UNIQUE (column)</p>
+            </dd></dl>
+            
+            <p>There are some additional API differences:</p>
+            <ul><li>
+            <p>Only the :message and :allow_nil options are respected.  The :allow_blank
+            and :allow_missing options are not respected.</p>
+            </li><li>
+            <p>A new option, :name, is respected, for providing the name of the
+            constraint.  It is highly recommended that you provide a name for all
+            constraint validations, as otherwise, it is difficult to drop the
+            constraints later.</p>
+            </li><li>
+            <p>The includes validation only supports an array of strings, and array of
+            integers, and a range of integers.</p>
+            </li><li>
+            <p>There are like and ilike validations, which are similar to the format
+            validation but use a case sensitive or case insensitive LIKE pattern. LIKE
+            patters are very simple, so many regexp patterns cannot be expressed by
+            them, but only a couple databases (PostgreSQL and MySQL) support regexp
+            patterns.</p>
+            </li><li>
+            <p>When using the unique validation, column names cannot have embedded commas.
+            For similar reasons, when using an includes validation with an array of
+            strings, none of the strings in the array can have embedded commas.</p>
+            </li><li>
+            <p>The unique validation does not support an arbitrary number of columns. For
+            a single column, just the symbol should be used, and for an array of
+            columns, an array of symbols should be used.  There is no support for
+            creating two separate unique validations for separate columns in a single
+            call.</p>
+            </li><li>
+            <p>A drop method can be called with a constraint name in a alter_table
+            validate block to drop an existing constraint and the related validation
+            metadata.</p>
+            </li><li>
+            <p>While it is allowed to create a presence constraint with :allow_nil set to
+            true, doing so does not create a constraint unless the column has <a
+            href="../../../../classes/String.html">String</a> type.</p>
+            </li></ul>
+            
+            <p>Note that this extension has the following issues on certain databases:</p>
+            <ul><li>
+            <p>MySQL does not support check constraints (they are parsed but ignored), so
+            using this extension does not actually set up constraints on MySQL, except
+            for the unique constraint.  It can still be used on MySQL to add the
+            validation metadata so that the plugin can setup automatic validations.</p>
+            </li><li>
+            <p>On SQLite, adding constraints to a table is not supported, so it must be
+            emulated by dropping the table and recreating it with the constraints. If
+            you want to use this plugin on SQLite with an alter_table block, you should
+            drop all constraint validation metadata using
+            <code>drop_constraint_validations_for(:table=&gt;&#39;table&#39;)</code>,
+            and then readd all constraints you want to use inside the alter table
+            block, making no other changes inside the alter_table block.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Sequel: The Database Toolkit for Ruby</title>
+
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+  <meta content="en" name="content-language" />
+
+  <meta name="keywords" content="ruby, sequel, sql, toolkit, orm, plugins, activerecord, documentation, howto, news" />
+  <meta name="description" content="Ruby Sequel is a lightweight database toolkit for Ruby." />
+
+  <link href="css/application.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="css/ruby.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="header">
+    <a href="index.html" id="logo"><img src="images/ruby-sequel.png" alt="Ruby Sequel Logo" /></a>
+    <h1>The Database Toolkit for Ruby</h1>
+    <div id="navigation">
+      <ul>
+        <li><a href="development.html">Development</a></li>
+        <li><a href="documentation.html">Documentation</a></li>
+        <li><a href="plugins.html">Plugins</a></li>
+        <li><a href="press.html">Press</a></li>
+        <li><a href="http://sequel.heroku.com">Blog</a></li>
+      </ul>
+      <form action="http://www.google.com/search">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input id="searchbox" type="search" placeholder="Site Search" name="q" value="" />
+      </form>
+    </div>
+    <br style="clear: both;" />
+  </div>
+
+  <hr />
+
+  <div id="content">
+    <br style="clear: both;" />
+    <h2>Sequel: The Database Toolkit for Ruby (v4.4.0)</h2>
+
+<p>&quot;Sequel has restored my faith in Ruby. It's really amazing. The O/RM I've been hoping for for years.&quot; -- Sam Smoot, creator of DataMapper</p>
+
+<h3 id='features'>Features:</h3>
+
+<ul>
+<li>Sequel provides thread safety, connection pooling and a concise DSL for constructing SQL queries and table schemas.</li>
+<li>Sequel includes a comprehensive ORM layer for mapping records to Ruby objects and handling associated records.</li>
+<li>Sequel supports advanced database features such as prepared statements, bound variables, stored procedures, savepoints, two-phase commit, transaction isolation, master/slave configurations, and database sharding.</li>
+<li>Sequel currently has adapters for ADO, Amalgalite, CUBRID, DataObjects, DB2, DBI, Firebird, IBM_DB, Informix, JDBC, MySQL, Mysql2, ODBC, OpenBase, Oracle, PostgreSQL, SQLAnywhere, SQLite3, Swift, and TinyTDS.</li>
+</ul>
+
+<h3 id='a_short_example'>A short example:</h3>
+
+<pre><code class='ruby' lang='ruby'><span class='ident'>require</span> <span class='punct'>&quot;</span><span class='string'>rubygems</span><span class='punct'>&quot;</span>
+<span class='ident'>require</span> <span class='punct'>&quot;</span><span class='string'>sequel</span><span class='punct'>&quot;</span>
+
+<span class='comment'># connect to an in-memory database</span>
+<span class='constant'>DB</span> <span class='punct'>=</span> <span class='constant'>Sequel</span><span class='punct'>.</span><span class='ident'>sqlite</span>
+
+<span class='comment'># create an items table</span>
+<span class='constant'>DB</span><span class='punct'>.</span><span class='ident'>create_table</span> <span class='symbol'>:items</span> <span class='keyword'>do</span>
+  <span class='ident'>primary_key</span> <span class='symbol'>:id</span>
+  <span class='ident'>String</span> <span class='symbol'>:name</span>
+  <span class='ident'>Float</span> <span class='symbol'>:price</span>
+<span class='keyword'>end</span>
+
+<span class='comment'># create a dataset from the items table</span>
+<span class='ident'>items</span> <span class='punct'>=</span> <span class='constant'>DB</span><span class='punct'>[</span><span class='symbol'>:items</span><span class='punct'>]</span>
+
+<span class='comment'># populate the table</span>
+<span class='ident'>items</span><span class='punct'>.</span><span class='ident'>insert</span><span class='punct'>(</span><span class='symbol'>:name</span> <span class='punct'>=&gt;</span> <span class='punct'>&#39;</span><span class='string'>abc</span><span class='punct'>&#39;,</span> <span class='symbol'>:price</span> <span class='punct'>=&gt;</span> <span class='ident'>rand</span> <span class='punct'>*</span> <span class='number'>100</span><span class='punct'>)</span>
+<span class='ident'>items</span><span class='punct'>.</span><span class='ident'>insert</span><span class='punct'>(</span><span class='symbol'>:name</span> <span class='punct'>=&gt;</span> <span class='punct'>&#39;</span><span class='string'>def</span><span class='punct'>&#39;,</span> <span class='symbol'>:price</span> <span class='punct'>=&gt;</span> <span class='ident'>rand</span> <span class='punct'>*</span> <span class='number'>100</span><span class='punct'>)</span>
+<span class='ident'>items</span><span class='punct'>.</span><span class='ident'>insert</span><span class='punct'>(</span><span class='symbol'>:name</span> <span class='punct'>=&gt;</span> <span class='punct'>&#39;</span><span class='string'>ghi</span><span class='punct'>&#39;,</span> <span class='symbol'>:price</span> <span class='punct'>=&gt;</span> <span class='ident'>rand</span> <span class='punct'>*</span> <span class='number'>100</span><span class='punct'>)</span>
+
+<span class='comment'># print out the number of records</span>
+<span class='ident'>puts</span> <span class='punct'>&quot;</span><span class='string'>Item count: <span class='expr'>#{items.count}</span></span><span class='punct'>&quot;</span>
+
+<span class='comment'># print out the average price</span>
+<span class='ident'>puts</span> <span class='punct'>&quot;</span><span class='string'>The average price is: <span class='expr'>#{items.avg(:price)}</span></span><span class='punct'>&quot;</span></code></pre>
+
+<h2><a href='documentation.html'>Learn more about Sequel&#8230;</a></h2>
+
+    <br style="clear: both;" />
+  </div>
+</body>
+</html>

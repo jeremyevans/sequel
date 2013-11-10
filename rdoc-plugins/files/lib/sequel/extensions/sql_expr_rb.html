@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>sql_expr.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>sql_expr.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/sql_expr.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2012-06-19 10:06:46 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The sql_expr extension adds the sql_expr method to every object, which
+            returns an wrapped object that works nicely with Sequel&#39;s DSL by
+            calling Sequel.expr:</p>
+            
+            <pre>1.sql_expr &lt; :a     # 1 &lt; a&#x000A;false.sql_expr &amp; :a # FALSE AND a&#x000A;true.sql_expr | :a  # TRUE OR a&#x000A;~nil.sql_expr       # NOT NULL&#x000A;&quot;a&quot;.sql_expr + &quot;b&quot;  # &#39;a&#39; || &#39;b&#39;</pre>
+            
+            <p>To load the extension:</p>
+            
+            <pre>Sequel.extension :sql_expr</pre>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>thread_safety.rdoc</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>thread_safety.rdoc</h1>
+        <div class='paths'>
+          doc/thread_safety.rdoc
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-10-26 06:54:00 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Thread+Safety">Thread Safety</h1>
+            
+            <p>Most <a href="../../classes/Sequel.html">Sequel</a> usage (and all common
+            <a href="../../classes/Sequel.html">Sequel</a> usage) is thread safe by
+            default.  Specifically, multiple threads can operate on Database instances,
+            Dataset instances, and Model classes concurrently without problems.  In
+            general, Database instance and Model classes are not modified after
+            application startup, and modifying Dataset instances returns modified
+            copies of the dataset instead of mutating it.</p>
+            
+            <h2 id="label-Connection+Pool">Connection Pool</h2>
+            
+            <p>In order to allow multiple threads to operate on the same database at the
+            same time, <a href="../../classes/Sequel.html">Sequel</a> uses a connection
+            pool.  The connection pool is designed so that a thread uses a connection
+            for the minimum amount of time, returning the connection to the pool as
+            soon as it is done using the connection.  If a thread requests a connection
+            and the pool does not have an available connection, a new connection will
+            be created.  If the maximum number of connections in the pool has already
+            been reached, the thread will block (actually busy-wait) until a connection
+            is available or the connection pool timeout has elapsed (in which case a
+            PoolTimeout error will be raised).</p>
+            
+            <h2 id="label-Exceptions">Exceptions</h2>
+            
+            <p>This is a small list of things that are specifically non thread-safe.  This
+            is not an exhaustive list, there may be cases not mentioned here.</p>
+            
+            <p>1) Model instances: Model instances are not thread-safe unless they are
+            frozen first.  Multiple threads should not operate on an unfrozen model
+            instance concurrently.</p>
+            
+            <p>2) Model class modifications: Model class modifications, such as adding
+            associations and loading plugins, are not designed to be thread safe.  You
+            should not modify a class in one thread if any other thread can
+            concurrently access it.  Model subclassing is designed to be thread-safe,
+            so you create a model subclass in a thread and modify it safely.</p>
+            
+            <p>3) Dataset mutation methods: Dataset mutation methods are not thread safe,
+            you should not call them on datasets that could be accessed by other
+            threads.  It is safe to clone the dataset first inside a thread and call
+            mutation methods on the cloned dataset.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

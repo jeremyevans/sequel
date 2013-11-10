@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::AssociationProxies::ClassMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::AssociationProxies::ClassMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/association_proxies_rb.html">lib/sequel/plugins/association_proxies.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../AssociationProxies.html">AssociationProxies</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-association_proxy_to_dataset">association_proxy_to_dataset</a></li>
+              <li><a target="docwin" href="#method-i-def_association_method">def_association_method</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-association_proxy_to_dataset'>association_proxy_to_dataset</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Proc that accepts a method name, array of arguments, and block and should
+                      return a truthy value to send the method to the dataset instead of the
+                      array of associated objects.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-def_association_method'>
+                <a name='method-i-def_association_method'></a>
+                <div class='synopsis'>
+                  <span class='name'>def_association_method</span>
+                  <span class='arguments'>(opts)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Changes the association method to return a proxy instead of the associated
+                  objects directly.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-def_association_method-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-def_association_method-source'><span class="ruby-comment"># File lib/sequel/plugins/association_proxies.rb, line 99</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">def_association_method</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">returns_array?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">association_module_def</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">association_method</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span>*<span class="ruby-identifier">r</span>, &amp;<span class="ruby-identifier">block</span><span class="ruby-operator">|</span> <span class="ruby-constant">AssociationProxy</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-identifier">r</span>[<span class="ruby-value">0</span>], &amp;<span class="ruby-identifier">block</span>)} <span class="ruby-operator">:</span> <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

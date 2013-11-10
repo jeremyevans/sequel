@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::JsonSerializer</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::JsonSerializer
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/json_serializer_rb.html">lib/sequel/plugins/json_serializer.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The json_serializer plugin handles serializing entire <a
+            href="../Model.html">Sequel::Model</a> objects to JSON, as well as support
+            for deserializing JSON directly into <a
+            href="../Model.html">Sequel::Model</a> objects.  It requires the json
+            library, and can work with either the pure ruby version or the C extension.</p>
+            
+            <p>Basic Example:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;json_class&quot;=&gt;&quot;Album&quot;,&quot;id&quot;=&gt;1,&quot;name&quot;=&gt;&quot;RF&quot;,&quot;artist_id&quot;=&gt;2}&#39;</span></pre>
+            
+            <p>In addition, you can provide options to control the JSON output:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">only=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">except=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">artist_id</span>])&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;json_class&quot;=&quot;Album&quot;,&quot;name&quot;=&gt;&quot;RF&quot;}&#39;</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">include=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist</span>)&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;json_class&quot;:&quot;Album&quot;,&quot;id&quot;:1,&quot;name&quot;:&quot;RF&quot;,&quot;artist_id&quot;:2,</span>&#x000A;       <span class="ruby-string">&quot;artist&quot;</span><span class="ruby-operator">:</span>{<span class="ruby-string">&quot;json_class&quot;</span><span class="ruby-operator">:</span><span class="ruby-string">&quot;Artist&quot;</span>,<span class="ruby-string">&quot;id&quot;</span><span class="ruby-operator">:</span><span class="ruby-value">2</span>,<span class="ruby-string">&quot;name&quot;</span><span class="ruby-operator">:</span><span class="ruby-string">&quot;YJM&quot;</span>}}<span class="ruby-string">&#39;&#x000A;</span></pre>
+            
+            <p>You can use a hash value with <code>:include</code> to pass options to
+            associations:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">include=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">only=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">name</span>}})&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;json_class&quot;:&quot;Album&quot;,&quot;id&quot;:1,&quot;name&quot;:&quot;RF&quot;,&quot;artist_id&quot;:2,</span>&#x000A;       <span class="ruby-string">&quot;artist&quot;</span><span class="ruby-operator">:</span>{<span class="ruby-string">&quot;json_class&quot;</span><span class="ruby-operator">:</span><span class="ruby-string">&quot;Artist&quot;</span>,<span class="ruby-string">&quot;name&quot;</span><span class="ruby-operator">:</span><span class="ruby-string">&quot;YJM&quot;</span>}}<span class="ruby-string">&#39;&#x000A;</span></pre>
+            
+            <p>You can specify the <code>:root</code> option to nest the JSON under the
+            name of the model:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">root</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;album&quot;:{&quot;id&quot;:1,&quot;name&quot;:&quot;RF&quot;,&quot;artist_id&quot;:2}}&#39;</span></pre>
+            
+            <p>Additionally, <code>to_json</code> also exists as a class and dataset
+            method, both of which return all objects in the dataset:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">to_json</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">include=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">tags</span>)</pre>
+            
+            <p>If you have an existing array of model instances you want to convert to
+            JSON, you can call the class to_json method with the :array option:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">array=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>], <span class="ruby-constant">Album</span>[<span class="ruby-value">2</span>]])</pre>
+            
+            <p>In addition to creating JSON, this plugin also enables <a
+            href="../Model.html">Sequel::Model</a> classes to create instances directly
+            from JSON using the from_json class method:</p>
+            
+            <pre>json = album.to_json&#x000A;album = Album.from_json(json)</pre>
+            
+            <p>The array_from_json class method exists to parse arrays of model instances
+            from json:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">json</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">to_json</span>&#x000A;<span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">array_from_json</span>(<span class="ruby-identifier">json</span>)</pre>
+            
+            <p>These does not necessarily round trip, since doing so would let users
+            create model objects with arbitrary values.  By default, from_json will
+            call set with the values in the hash.  If you want to specify the allowed
+            fields, you can use the :fields option, which will call set_fields with the
+            given fields:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_json</span>(<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>, :<span class="ruby-identifier">fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">%wid name&#39;</span>)</pre>
+            
+            <p>If you want to update an existing instance, you can use the from_json
+            instance method:</p>
+            
+            <pre>album.from_json(json)</pre>
+            
+            <p>Both of these allow creation of cached associated objects, if you provide
+            the :associations option:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_json</span>(<span class="ruby-identifier">json</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist</span>)</pre>
+            
+            <p>You can even provide options when setting up the associated objects:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_json</span>(<span class="ruby-identifier">json</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">%wid name&#39;</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">tags</span>}})</pre>
+            
+            <p>Note that active_support/json makes incompatible changes to the to_json
+            API, and breaks some aspects of the json_serializer plugin.  You can undo
+            the damage done by active_support/json by doing:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Array</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">to_json</span>(<span class="ruby-identifier">options</span> = {})&#x000A;    <span class="ruby-constant">JSON</span>.<span class="ruby-identifier">generate</span>(<span class="ruby-keyword">self</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Hash</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">to_json</span>(<span class="ruby-identifier">options</span> = {})&#x000A;    <span class="ruby-constant">JSON</span>.<span class="ruby-identifier">generate</span>(<span class="ruby-keyword">self</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>Note that this will probably cause active_support/json to no longer work
+            correctly in some cases.</p>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Add JSON output capability to all model subclass instances (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">json_serializer</span>&#x000A;&#x000A;<span class="ruby-comment"># Add JSON output capability to Album class instances</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">json_serializer</span></pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="JsonSerializer/ClassMethods.html">Sequel::Plugins::JsonSerializer::ClassMethods</a></li>
+              <li><a target="docwin" href="JsonSerializer/DatasetMethods.html">Sequel::Plugins::JsonSerializer::DatasetMethods</a></li>
+              <li><a target="docwin" href="JsonSerializer/InstanceMethods.html">Sequel::Plugins::JsonSerializer::InstanceMethods</a></li>
+              <li><a target="docwin" href="JsonSerializer/Literal.html">Sequel::Plugins::JsonSerializer::Literal</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model, opts={})</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set up the column readers to do deserialization and the column writers to
+                  save the value in deserialized_values.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/json_serializer.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>={})&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@json_serializer_opts</span> = (<span class="ruby-ivar">@json_serializer_opts</span> <span class="ruby-operator">||</span> {}).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

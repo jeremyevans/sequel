@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::IBMDB::Statement</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::IBMDB::Statement
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/adapters/ibmdb_rb.html">lib/sequel/adapters/ibmdb.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../IBMDB.html">IBMDB</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Wraps results returned by queries on IBM_DB.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-affected">affected</a></li>
+              <li><a target="docwin" href="#method-i-execute">execute</a></li>
+              <li><a target="docwin" href="#method-i-fetch_array">fetch_array</a></li>
+              <li><a target="docwin" href="#method-i-field_name">field_name</a></li>
+              <li><a target="docwin" href="#method-i-field_precision">field_precision</a></li>
+              <li><a target="docwin" href="#method-i-field_type">field_type</a></li>
+              <li><a target="docwin" href="#method-i-free">free</a></li>
+              <li><a target="docwin" href="#method-i-free_result">free_result</a></li>
+              <li><a target="docwin" href="#method-i-num_fields">num_fields</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(stmt)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Hold the given statement.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 124</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">stmt</span>)&#x000A;  <span class="ruby-ivar">@stmt</span> = <span class="ruby-identifier">stmt</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-affected'>
+                <a name='method-i-affected'></a>
+                <div class='synopsis'>
+                  <span class='name'>affected</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the number of rows affected.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-affected-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-affected-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 129</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">affected</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">num_rows</span>(<span class="ruby-ivar">@stmt</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-execute'>
+                <a name='method-i-execute'></a>
+                <div class='synopsis'>
+                  <span class='name'>execute</span>
+                  <span class='arguments'>(*values)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>If this statement is a prepared statement, execute it on the database with
+                  the given values.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 135</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-fetch_array'>
+                <a name='method-i-fetch_array'></a>
+                <div class='synopsis'>
+                  <span class='name'>fetch_array</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the results of a query as an array of values.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_array-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-fetch_array-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 140</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_array</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">fetch_array</span>(<span class="ruby-ivar">@stmt</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@stmt</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-field_name'>
+                <a name='method-i-field_name'></a>
+                <div class='synopsis'>
+                  <span class='name'>field_name</span>
+                  <span class='arguments'>(ind)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the field name at the given column in the result set.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-field_name-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-field_name-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 145</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">field_name</span>(<span class="ruby-identifier">ind</span>)&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">field_name</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">ind</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-field_precision'>
+                <a name='method-i-field_precision'></a>
+                <div class='synopsis'>
+                  <span class='name'>field_precision</span>
+                  <span class='arguments'>(key)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the field precision for the given field name in the result set.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-field_precision-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-field_precision-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 155</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">field_precision</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">field_precision</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-field_type'>
+                <a name='method-i-field_type'></a>
+                <div class='synopsis'>
+                  <span class='name'>field_type</span>
+                  <span class='arguments'>(key)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the field type for the given field name in the result set.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-field_type-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-field_type-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 150</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">field_type</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">field_type</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-free'>
+                <a name='method-i-free'></a>
+                <div class='synopsis'>
+                  <span class='name'>free</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Free the memory related to this statement.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-free-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-free-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 160</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">free</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">free_stmt</span>(<span class="ruby-ivar">@stmt</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-free_result'>
+                <a name='method-i-free_result'></a>
+                <div class='synopsis'>
+                  <span class='name'>free_result</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Free the memory related to this result set, only useful for prepared
+                  statements which have a different result set on every call.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-free_result-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-free_result-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 166</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">free_result</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">free_result</span>(<span class="ruby-ivar">@stmt</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-num_fields'>
+                <a name='method-i-num_fields'></a>
+                <div class='synopsis'>
+                  <span class='name'>num_fields</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the number of fields in the result set.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-num_fields-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-num_fields-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 171</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">num_fields</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">num_fields</span>(<span class="ruby-ivar">@stmt</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

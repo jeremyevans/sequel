@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Postgres::RangeOp</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Postgres::RangeOp
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/extensions/pg_range_ops_rb.html">lib/sequel/extensions/pg_range_ops.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The <a href="RangeOp.html">RangeOp</a> class is a simple container for a
+            single object that defines methods that yield <a
+            href="../../Sequel.html">Sequel</a> expression objects representing
+            PostgreSQL range operators and functions.</p>
+            
+            <p>Most methods in this class are defined via metaprogramming, see the
+            pg_range_ops extension documentation for details on the API.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-pg_range">pg_range</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>FUNCTIONS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>%w'lower upper isempty lower_inc upper_inc lower_inf upper_inf'</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>OPERATORS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      {
+                      :contains => ["(".freeze, " @> ".freeze, ")".freeze].freeze,
+                      :contained_by => ["(".freeze, " <@ ".freeze, ")".freeze].freeze,
+                      :left_of => ["(".freeze, " << ".freeze, ")".freeze].freeze,
+                      :right_of => ["(".freeze, " >> ".freeze, ")".freeze].freeze,
+                      :ends_before => ["(".freeze, " &< ".freeze, ")".freeze].freeze,
+                      :starts_after => ["(".freeze, " &> ".freeze, ")".freeze].freeze,
+                      :adjacent_to => ["(".freeze, " -|- ".freeze, ")".freeze].freeze,
+                      :overlaps => ["(".freeze, " && ".freeze, ")".freeze].freeze,
+                      }
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-pg_range'>
+                <a name='method-i-pg_range'></a>
+                <div class='synopsis'>
+                  <span class='name'>pg_range</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the receiver.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_range-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-pg_range-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range_ops.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_range</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

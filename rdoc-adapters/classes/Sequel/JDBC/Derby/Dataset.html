@@ -1,0 +1,343 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::JDBC::Derby::Dataset</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::JDBC::Derby::Dataset
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/adapters/jdbc/derby_rb.html">lib/sequel/adapters/jdbc/derby.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Derby.html">Derby</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p><a href="Dataset.html">Dataset</a> class for <a
+            href="../Derby.html">Derby</a> datasets accessed via <a
+            href="../../JDBC.html">JDBC</a>.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-case_expression_sql_append">case_expression_sql_append</a></li>
+              <li><a target="docwin" href="#method-i-cast_sql_append">cast_sql_append</a></li>
+              <li><a target="docwin" href="#method-i-complex_expression_sql_append">complex_expression_sql_append</a></li>
+              <li><a target="docwin" href="#method-i-supports_group_rollup-3F">supports_group_rollup?</a></li>
+              <li><a target="docwin" href="#method-i-supports_is_true-3F">supports_is_true?</a></li>
+              <li><a target="docwin" href="#method-i-supports_multiple_column_in-3F">supports_multiple_column_in?</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BITCOMP_CLOSE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>") - 1)".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BITCOMP_OPEN</td>
+                    <td>=</td>
+                    <td class='context-item-value'>"((0 - ".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BLOB_CLOSE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>"' AS BLOB)".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BLOB_OPEN</td>
+                    <td>=</td>
+                    <td class='context-item-value'>"CAST(X'".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BOOL_FALSE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'FALSE'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BOOL_FALSE_OLD</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'(1 = 0)'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BOOL_TRUE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'TRUE'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BOOL_TRUE_OLD</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'(1 = 1)'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>CAST_STRING_OPEN</td>
+                    <td>=</td>
+                    <td class='context-item-value'>"RTRIM(".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DEFAULT_FROM</td>
+                    <td>=</td>
+                    <td class='context-item-value'>" FROM sysibm.sysdummy1".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DERBY_CLOB_METHOD</td>
+                    <td>=</td>
+                    <td class='context-item-value'>TYPE_TRANSLATOR_INSTANCE.method(:derby_clob)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>EMULATED_FUNCTION_MAP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>{:char_length=>'length'.freeze}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>FETCH_FIRST</td>
+                    <td>=</td>
+                    <td class='context-item-value'>" FETCH FIRST ".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>HSTAR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>"H*".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>JAVA_SQL_CLOB</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Java::JavaSQL::Clob</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>OFFSET</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::OFFSET</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PAREN_CLOSE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::PAREN_CLOSE</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PAREN_OPEN</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::PAREN_OPEN</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ROWS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>" ROWS".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ROWS_ONLY</td>
+                    <td>=</td>
+                    <td class='context-item-value'>" ROWS ONLY".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SELECT_CLAUSE_METHODS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>clause_methods(:select, %w'select distinct columns from join where group having compounds order limit lock')</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>TIME_FORMAT</td>
+                    <td>=</td>
+                    <td class='context-item-value'>"'%H:%M:%S'".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-case_expression_sql_append'>
+                <a name='method-i-case_expression_sql_append'></a>
+                <div class='synopsis'>
+                  <span class='name'>case_expression_sql_append</span>
+                  <span class='arguments'>(sql, ce)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p><a href="../Derby.html">Derby</a> doesn&#39;t support an expression between
+                  CASE and WHEN, so remove  conditions.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-case_expression_sql_append-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-case_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 196</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">case_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ce</span>.<span class="ruby-identifier">with_merged_expression</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-cast_sql_append'>
+                <a name='method-i-cast_sql_append'></a>
+                <div class='synopsis'>
+                  <span class='name'>cast_sql_append</span>
+                  <span class='arguments'>(sql, expr, type)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>If the type is String, trim the extra spaces since CHAR is used instead of
+                  varchar.  This can cause problems if you are casting a char/varchar to a
+                  string and the ending whitespace is important.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast_sql_append-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-cast_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 203</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cast_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>, <span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CAST_STRING_OPEN</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_CLOSE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-complex_expression_sql_append'>
+                <a name='method-i-complex_expression_sql_append'></a>
+                <div class='synopsis'>
+                  <span class='name'>complex_expression_sql_append</span>
+                  <span class='arguments'>(sql, op, args)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-complex_expression_sql_append-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-complex_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 213</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:%</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">complex_expression_arg_pairs</span>(<span class="ruby-identifier">args</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;MOD(#{literal(a)}, #{literal(b)})&quot;</span>}&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:&amp;</span>, <span class="ruby-value">:|</span>, <span class="ruby-value">:^</span>, <span class="ruby-value">:&lt;&lt;</span>, <span class="ruby-value">:&gt;&gt;</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Derby doesn&#39;t support the #{op} operator&quot;</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:&#39;B~&#39;</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">BITCOMP_OPEN</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>))&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">BITCOMP_CLOSE</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:extract</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>).<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_OPEN</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1</span>))&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_CLOSE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_group_rollup-3F'>
+                <a name='method-i-supports_group_rollup-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_group_rollup?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p><a href="../Derby.html">Derby</a> supports GROUP BY ROLLUP (but not CUBE)</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_group_rollup-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_group_rollup-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 233</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_group_rollup?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_is_true-3F'>
+                <a name='method-i-supports_is_true-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_is_true?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p><a href="../Derby.html">Derby</a> does not support IS TRUE.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_is_true-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_is_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 238</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_is_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_multiple_column_in-3F'>
+                <a name='method-i-supports_multiple_column_in-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_multiple_column_in?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p><a href="../Derby.html">Derby</a> does not support IN/NOT IN with multiple
+                  columns</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_multiple_column_in-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_multiple_column_in-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 243</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_multiple_column_in?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::SQL</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::SQL
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The <a href="SQL.html">SQL</a> module holds classes whose instances
+            represent <a href="SQL.html">SQL</a> fragments. It also holds modules that
+            are included in core ruby classes that make <a
+            href="../Sequel.html">Sequel</a> a friendly DSL.</p>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="SQL/AliasMethods.html">Sequel::SQL::AliasMethods</a></li>
+              <li><a target="docwin" href="SQL/BitwiseMethods.html">Sequel::SQL::BitwiseMethods</a></li>
+              <li><a target="docwin" href="SQL/BooleanMethods.html">Sequel::SQL::BooleanMethods</a></li>
+              <li><a target="docwin" href="SQL/Builders.html">Sequel::SQL::Builders</a></li>
+              <li><a target="docwin" href="SQL/CastMethods.html">Sequel::SQL::CastMethods</a></li>
+              <li><a target="docwin" href="SQL/ComplexExpressionMethods.html">Sequel::SQL::ComplexExpressionMethods</a></li>
+              <li><a target="docwin" href="SQL/Constants.html">Sequel::SQL::Constants</a></li>
+              <li><a target="docwin" href="SQL/InequalityMethods.html">Sequel::SQL::InequalityMethods</a></li>
+              <li><a target="docwin" href="SQL/NumericMethods.html">Sequel::SQL::NumericMethods</a></li>
+              <li><a target="docwin" href="SQL/OperatorBuilders.html">Sequel::SQL::OperatorBuilders</a></li>
+              <li><a target="docwin" href="SQL/OrderMethods.html">Sequel::SQL::OrderMethods</a></li>
+              <li><a target="docwin" href="SQL/QualifyingMethods.html">Sequel::SQL::QualifyingMethods</a></li>
+              <li><a target="docwin" href="SQL/StringConcatenationMethods.html">Sequel::SQL::StringConcatenationMethods</a></li>
+              <li><a target="docwin" href="SQL/StringMethods.html">Sequel::SQL::StringMethods</a></li>
+              <li><a target="docwin" href="SQL/SubscriptMethods.html">Sequel::SQL::SubscriptMethods</a></li>
+              <li><a target="docwin" href="SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a></li>
+              <li><a target="docwin" href="SQL/Blob.html">Sequel::SQL::Blob</a></li>
+              <li><a target="docwin" href="SQL/BooleanConstant.html">Sequel::SQL::BooleanConstant</a></li>
+              <li><a target="docwin" href="SQL/BooleanExpression.html">Sequel::SQL::BooleanExpression</a></li>
+              <li><a target="docwin" href="SQL/CaseExpression.html">Sequel::SQL::CaseExpression</a></li>
+              <li><a target="docwin" href="SQL/Cast.html">Sequel::SQL::Cast</a></li>
+              <li><a target="docwin" href="SQL/ColumnAll.html">Sequel::SQL::ColumnAll</a></li>
+              <li><a target="docwin" href="SQL/ComplexExpression.html">Sequel::SQL::ComplexExpression</a></li>
+              <li><a target="docwin" href="SQL/Constant.html">Sequel::SQL::Constant</a></li>
+              <li><a target="docwin" href="SQL/DelayedEvaluation.html">Sequel::SQL::DelayedEvaluation</a></li>
+              <li><a target="docwin" href="SQL/EmulatedFunction.html">Sequel::SQL::EmulatedFunction</a></li>
+              <li><a target="docwin" href="SQL/Expression.html">Sequel::SQL::Expression</a></li>
+              <li><a target="docwin" href="SQL/Function.html">Sequel::SQL::Function</a></li>
+              <li><a target="docwin" href="SQL/GenericExpression.html">Sequel::SQL::GenericExpression</a></li>
+              <li><a target="docwin" href="SQL/Identifier.html">Sequel::SQL::Identifier</a></li>
+              <li><a target="docwin" href="SQL/JoinClause.html">Sequel::SQL::JoinClause</a></li>
+              <li><a target="docwin" href="SQL/JoinOnClause.html">Sequel::SQL::JoinOnClause</a></li>
+              <li><a target="docwin" href="SQL/JoinUsingClause.html">Sequel::SQL::JoinUsingClause</a></li>
+              <li><a target="docwin" href="SQL/NegativeBooleanConstant.html">Sequel::SQL::NegativeBooleanConstant</a></li>
+              <li><a target="docwin" href="SQL/NumericExpression.html">Sequel::SQL::NumericExpression</a></li>
+              <li><a target="docwin" href="SQL/OrderedExpression.html">Sequel::SQL::OrderedExpression</a></li>
+              <li><a target="docwin" href="SQL/PlaceholderLiteralString.html">Sequel::SQL::PlaceholderLiteralString</a></li>
+              <li><a target="docwin" href="SQL/QualifiedIdentifier.html">Sequel::SQL::QualifiedIdentifier</a></li>
+              <li><a target="docwin" href="SQL/StringExpression.html">Sequel::SQL::StringExpression</a></li>
+              <li><a target="docwin" href="SQL/Subscript.html">Sequel::SQL::Subscript</a></li>
+              <li><a target="docwin" href="SQL/ValueList.html">Sequel::SQL::ValueList</a></li>
+              <li><a target="docwin" href="SQL/VirtualRow.html">Sequel::SQL::VirtualRow</a></li>
+              <li><a target="docwin" href="SQL/Window.html">Sequel::SQL::Window</a></li>
+              <li><a target="docwin" href="SQL/WindowFunction.html">Sequel::SQL::WindowFunction</a></li>
+              <li><a target="docwin" href="SQL/Wrapper.html">Sequel::SQL::Wrapper</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

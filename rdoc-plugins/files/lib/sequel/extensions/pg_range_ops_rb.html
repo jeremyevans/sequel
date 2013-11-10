@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>pg_range_ops.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>pg_range_ops.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/pg_range_ops.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The pg_range_ops extension adds support to Sequel&#39;s DSL to make it
+            easier to call PostgreSQL range functions and operators.</p>
+            
+            <p>To load the extension:</p>
+            
+            <pre>Sequel.extension :pg_range_ops</pre>
+            
+            <p>The most common usage is passing an expression to Sequel.pg_range_op:</p>
+            
+            <pre>r = Sequel.pg_range_op(:range)</pre>
+            
+            <p>If you have also loaded the pg_range extension, you can use Sequel.pg_range
+            as well:</p>
+            
+            <pre>r = Sequel.pg_range(:range)</pre>
+            
+            <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
+            expression objects, you can call the pg_range method:</p>
+            
+            <pre>r = Sequel.expr(:range).pg_range</pre>
+            
+            <p>If you have loaded the <a
+            href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>
+            or you have loaded the core_refinements extension and have activated
+            refinements for the file, you can also use <a
+            href="../../../../classes/Sequel/Postgres/RangeOpMethods.html#method-i-pg_range">Sequel::Postgres::RangeOpMethods#pg_range</a>:</p>
+            
+            <pre>r = :range.pg_range</pre>
+            
+            <p>This creates a <a
+            href="../../../../classes/Sequel/Postgres/RangeOp.html">Sequel::Postgres::RangeOp</a>
+            object that can be used for easier querying:</p>
+            
+            <pre>r.contains(:other)      # range @&gt; other&#x000A;r.contained_by(:other)  # range &lt;@ other&#x000A;r.overlaps(:other)      # range &amp;&amp; other&#x000A;r.left_of(:other)       # range &lt;&lt; other&#x000A;r.right_of(:other)      # range &gt;&gt; other&#x000A;r.starts_after(:other)  # range &amp;&gt; other&#x000A;r.ends_before(:other)   # range &amp;&lt; other&#x000A;r.adjacent_to(:other)   # range -|- other&#x000A;r.lower            # lower(range)&#x000A;r.upper            # upper(range)&#x000A;r.isempty          # isempty(range)&#x000A;r.lower_inc        # lower_inc(range)&#x000A;r.upper_inc        # upper_inc(range)&#x000A;r.lower_inf        # lower_inf(range)&#x000A;r.upper_inf        # upper_inf(range)</pre>
+            
+            <p>See the PostgreSQL range function and operator documentation for more
+            details on what these functions and operators do.</p>
+            
+            <p>If you are also using the pg_range extension, you should load it before
+            loading this extension.  Doing so will allow you to use PGArray#op to get
+            an RangeOp, allowing you to perform range operations on range literals.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

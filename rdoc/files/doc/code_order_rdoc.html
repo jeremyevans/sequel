@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>code_order.rdoc</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>code_order.rdoc</h1>
+        <div class='paths'>
+          doc/code_order.rdoc
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-06-06 17:24:35 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Code+Order">Code Order</h1>
+            
+            <p>In <a href="../../classes/Sequel.html">Sequel</a>, the order in which code
+            is executed is important.  This guide provides the recommended way to order
+            your <a href="../../classes/Sequel.html">Sequel</a> code.  Some of these
+            guidelines are not strictly necessary, but others are, and this guide will
+            be specific about which are strictly necessary.</p>
+            
+            <h2 id="label-Require+Sequel">Require <a href="../../classes/Sequel.html">Sequel</a></h2>
+            
+            <p>This is sort of a no brainer, but you need to require the library first. 
+            This is a strict requirement, none of the other code can be executed unless
+            the library has been required first. Example:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel&#39;</span></pre>
+            
+            <h2 id="label-Add+Global+Extensions">Add Global Extensions</h2>
+            
+            <p>Global extensions are loaded with <a
+            href="../../classes/Sequel.html#method-c-extension">Sequel.extension</a>,
+            and affect other parts of <a href="../../classes/Sequel.html">Sequel</a> or
+            the general ruby environment.  It&#39;s not necessary to load them first,
+            but it is a recommended practice.</p>
+            
+            <p>The exception to this is global extensions that integrate with
+            Database-specific extensions, where the Database-specific extension should
+            be loaded first (such as some of the pg_* extensions).  In those cases, the
+            global extensions should be loaded after the Database-specific extensions.</p>
+            
+            <p>Example:</p>
+            
+            <pre>Sequel.extension :blank</pre>
+            
+            <h2 id="label-Add+Extensions+Applied+to+All+Databases%2FDatasets">Add Extensions Applied to All Databases/Datasets</h2>
+            
+            <p>If you want database or datasets extensions applied to all databases and
+            datasets, you must use <a
+            href="../../classes/Sequel/Database.html#method-c-extension">Sequel::Database.extension</a>
+            to load the extension before connecting to a database.  If you connect to a
+            database before using <a
+            href="../../classes/Sequel/Database.html#method-c-extension">Sequel::Database.extension</a>,
+            it will not have that extension loaded. Example:</p>
+            
+            <pre>Sequel::Database.extension :columns_introspection</pre>
+            
+            <h2 id="label-Connect+to+Databases">Connect to Databases</h2>
+            
+            <p>Connecting to a database is required before running any queries against
+            that database, or creating any datasets or models.  You cannot create model
+            classes without having a database object created first.  The convention for
+            an application with a single Database instance is to store that instance in
+            a constant named DB.  Example:</p>
+            
+            <pre>DB = Sequel.connect(&#39;postgres://user:pass@host/database&#39;)</pre>
+            
+            <h2 id="label-Add+Extensions+Specific+to+a+Database+or+All+Datasets+in+that+Database">Add Extensions Specific to a Database or All Datasets in that Database</h2>
+            
+            <p>If you want specific databases to use specific extensions, or have all
+            datasets in that database use a specific extension, you need to load that
+            extension into the database after creating it using <a
+            href="../../classes/Sequel/Database.html#method-i-extension">Sequel::Database#extension</a>.
+            Example:</p>
+            
+            <pre>DB.extension :pg_array</pre>
+            
+            <h2 id="label-Configure+Global+Model+Behavior">Configure Global Model Behavior</h2>
+            
+            <p>If you want to change the configuration for all model classes, you must do
+            so before loading your model classes, as configuration is copied into the
+            subclass when model subclasses are created.  Example:</p>
+            
+            <pre>Sequel::Model.raise_on_save_failure = false</pre>
+            
+            <h2 id="label-Add+Global+Model+Plugins">Add Global Model Plugins</h2>
+            
+            <p>If you want to load a plugin into all models classes, you must do so before
+            loading your model classes, as plugin specific data may need to be copied
+            into the subclass when model subclasses are created.  Example:</p>
+            
+            <pre>Sequel::Model.plugin :prepared_statements</pre>
+            
+            <h2 id="label-Load+Model+Classes">Load Model Classes</h2>
+            
+            <p>After you have established a database connection, and configured your
+            global model configration and global plugins, you can load your model
+            classes.  It&#39;s recommended to have a separate file for each model
+            class, unless the model classes are very simple.  Example:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Dir</span>[<span class="ruby-string">&#39;./models/*.rb&#39;</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">require</span> <span class="ruby-identifier">f</span>}</pre>
+            
+            <h2 id="label-Disconnect+If+Using+Forking+Webserver+with+Code+Preloading">Disconnect If Using Forking Webserver with Code Preloading</h2>
+            
+            <p>If you are using a forking webserver such as unicorn or passenger, with a
+            feature that loads your <a href="../../classes/Sequel.html">Sequel</a> code
+            before forking connections (code preloading), then you must disconnect your
+            database connections before forking.  If you don&#39;t do this, you can end
+            up with child processes sharing database connections and all sorts of weird
+            behavior.  <a href="../../classes/Sequel.html">Sequel</a> will
+            automatically reconnect on an as needed basis in the child processes, so
+            you only need to do the following in the parent process:</p>
+            
+            <pre>DB.disconnect</pre>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Postgres::PGArray::Parser</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Postgres::PGArray::Parser
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/extensions/pg_array_rb.html">lib/sequel/extensions/pg_array.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../PGArray.html">PGArray</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>PostgreSQL array parser that handles all types of input.</p>
+            
+            <p>This parser is very simple and unoptimized, but should still be O(n) where
+            n is the length of the input string.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-new_entry">new_entry</a></li>
+              <li><a target="docwin" href="#method-i-next_char">next_char</a></li>
+              <li><a target="docwin" href="#method-i-parse">parse</a></li>
+              <li><a target="docwin" href="#attribute-i-pos">pos</a></li>
+              <li><a target="docwin" href="#method-i-record">record</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-pos'>pos</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Current position in the input string.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(source, converter=nil)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set the source for the input, and any converter callable to call with
+                  objects to be created.  For nested parsers the source may contain text
+                  after the end current parse, which will be ignored.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 366</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">source</span>, <span class="ruby-identifier">converter</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@source</span> = <span class="ruby-identifier">source</span>&#x000A;  <span class="ruby-ivar">@source_length</span> = <span class="ruby-identifier">source</span>.<span class="ruby-identifier">length</span>&#x000A;  <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">converter</span> &#x000A;  <span class="ruby-ivar">@pos</span> = <span class="ruby-value">-1</span>&#x000A;  <span class="ruby-ivar">@entries</span> = []&#x000A;  <span class="ruby-ivar">@recorded</span> = <span class="ruby-string">&quot;&quot;</span>&#x000A;  <span class="ruby-ivar">@dimension</span> = <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-new_entry'>
+                <a name='method-i-new_entry'></a>
+                <div class='synopsis'>
+                  <span class='name'>new_entry</span>
+                  <span class='arguments'>(include_empty=false)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Take the buffer of recorded characters and add it to the array of entries,
+                  and use a new buffer for recorded characters.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-new_entry-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-new_entry-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 395</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">new_entry</span>(<span class="ruby-identifier">include_empty</span>=<span class="ruby-keyword">false</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@recorded</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">include_empty</span>&#x000A;    <span class="ruby-identifier">entry</span> = <span class="ruby-ivar">@recorded</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">entry</span> <span class="ruby-operator">==</span> <span class="ruby-constant">NULL</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">include_empty</span>&#x000A;      <span class="ruby-identifier">entry</span> = <span class="ruby-keyword">nil</span>&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@converter</span>&#x000A;      <span class="ruby-identifier">entry</span> = <span class="ruby-ivar">@converter</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">entry</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-ivar">@entries</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">entry</span>)&#x000A;    <span class="ruby-ivar">@recorded</span> = <span class="ruby-string">&quot;&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-next_char'>
+                <a name='method-i-next_char'></a>
+                <div class='synopsis'>
+                  <span class='name'>next_char</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return 2 objects, whether the next character in the input was escaped with
+                  a backslash, and what the next character is.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-next_char-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-next_char-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 378</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">next_char</span>&#x000A;  <span class="ruby-ivar">@pos</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">c</span> = <span class="ruby-ivar">@source</span>[<span class="ruby-ivar">@pos</span><span class="ruby-operator">..</span><span class="ruby-ivar">@pos</span>]) <span class="ruby-operator">==</span> <span class="ruby-constant">BACKSLASH</span>&#x000A;    <span class="ruby-ivar">@pos</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;    [<span class="ruby-keyword">true</span>, <span class="ruby-ivar">@source</span>[<span class="ruby-ivar">@pos</span><span class="ruby-operator">..</span><span class="ruby-ivar">@pos</span>]]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    [<span class="ruby-keyword">false</span>, <span class="ruby-identifier">c</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-parse'>
+                <a name='method-i-parse'></a>
+                <div class='synopsis'>
+                  <span class='name'>parse</span>
+                  <span class='arguments'>(nested=false)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Parse the input character by character, returning an array of parsed (and
+                  potentially converted) objects.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-parse-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-parse-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 410</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">parse</span>(<span class="ruby-identifier">nested</span>=<span class="ruby-keyword">false</span>)&#x000A;  <span class="ruby-comment"># quote sets whether we are inside of a quoted string.</span>&#x000A;  <span class="ruby-identifier">quote</span> = <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">until</span> <span class="ruby-ivar">@pos</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-ivar">@source_length</span>&#x000A;    <span class="ruby-identifier">escaped</span>, <span class="ruby-identifier">char</span> = <span class="ruby-identifier">next_char</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-constant">OPEN_BRACE</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">quote</span>&#x000A;      <span class="ruby-ivar">@dimension</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;      <span class="ruby-keyword">if</span> (<span class="ruby-ivar">@dimension</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>)&#x000A;        <span class="ruby-comment"># Multi-dimensional array encounter, use a subparser</span>&#x000A;        <span class="ruby-comment"># to parse the next level down.</span>&#x000A;        <span class="ruby-identifier">subparser</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@source</span>[<span class="ruby-ivar">@pos</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>], <span class="ruby-ivar">@converter</span>)&#x000A;        <span class="ruby-ivar">@entries</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">subparser</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-keyword">true</span>))&#x000A;        <span class="ruby-ivar">@pos</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">subparser</span>.<span class="ruby-identifier">pos</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-constant">CLOSE_BRACE</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">quote</span>&#x000A;      <span class="ruby-ivar">@dimension</span> <span class="ruby-operator">-=</span> <span class="ruby-value">1</span>&#x000A;      <span class="ruby-keyword">if</span> (<span class="ruby-ivar">@dimension</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>)&#x000A;        <span class="ruby-identifier">new_entry</span>&#x000A;        <span class="ruby-comment"># Exit early if inside a subparser, since the</span>&#x000A;        <span class="ruby-comment"># text after parsing the current level should be</span>&#x000A;        <span class="ruby-comment"># ignored as it is handled by the parent parser.</span>&#x000A;        <span class="ruby-keyword">return</span> <span class="ruby-ivar">@entries</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">nested</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-constant">QUOTE</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">escaped</span>&#x000A;      <span class="ruby-comment"># If already inside the quoted string, this is the</span>&#x000A;      <span class="ruby-comment"># ending quote, so add the entry.  Otherwise, this</span>&#x000A;      <span class="ruby-comment"># is the opening quote, so set the quote flag.</span>&#x000A;      <span class="ruby-identifier">new_entry</span>(<span class="ruby-keyword">true</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">quote</span>&#x000A;      <span class="ruby-identifier">quote</span> = <span class="ruby-operator">!</span><span class="ruby-identifier">quote</span>&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-constant">COMMA</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">quote</span>&#x000A;      <span class="ruby-comment"># If not inside a string and a comma occurs, it indicates</span>&#x000A;      <span class="ruby-comment"># the end of the entry, so add the entry.</span>&#x000A;      <span class="ruby-identifier">new_entry</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-comment"># Add the character to the recorded character buffer.</span>&#x000A;      <span class="ruby-identifier">record</span>(<span class="ruby-identifier">char</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;array dimensions not balanced&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@dimension</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;  <span class="ruby-ivar">@entries</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-record'>
+                <a name='method-i-record'></a>
+                <div class='synopsis'>
+                  <span class='name'>record</span>
+                  <span class='arguments'>(c)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add a new character to the buffer of recorded characters.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-record-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-record-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 389</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">record</span>(<span class="ruby-identifier">c</span>)&#x000A;  <span class="ruby-ivar">@recorded</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">c</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

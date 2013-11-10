@@ -1,0 +1,257 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>sharding.rdoc</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>sharding.rdoc</h1>
+        <div class='paths'>
+          doc/sharding.rdoc
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-06-02 13:49:43 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Read-Only+Slaves%2FWritable+Master+and+Database+Sharding">Read-Only Slaves/Writable Master and Database Sharding</h1>
+            
+            <p><a href="../../classes/Sequel.html">Sequel</a> has support for read only
+            slave databases with a writable master database, as well as database
+            sharding (where you can pick a server to use for a given dataset).  Support
+            for both features is database independent, and should work for all database
+            adapters that ship with <a href="../../classes/Sequel.html">Sequel</a>.</p>
+            
+            <h2 id="label-The+%3Aservers+Database+option">The :servers Database option</h2>
+            
+            <p>Sharding and read_only support are both enabled via the :servers database
+            option.  Using the :servers database option makes <a
+            href="../../classes/Sequel.html">Sequel</a> use a connection pool class
+            that supports sharding, and the minimum required to enable sharding support
+            is to use the empty hash:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://master_server/database&#39;</span>, :<span class="ruby-identifier">servers=</span><span class="ruby-operator">&gt;</span>{})</pre>
+            
+            <p>In most cases, you are probably not going to want to use an empty hash. 
+            Keys in the server hash are not restricted to type, but the general
+            recommendation is to use a symbol unless you have special requirements.
+            Values in the server hash should be either hashes or procs that return
+            hashes. These hashes are merged into the Database object&#39;s default
+            options hash to get the connection options for the shard, so you don&#39;t
+            need to override all options, just the ones that need to be modified.  For
+            example, if you are using the same user, password, and database name and
+            just the host is changing, you only need a :host entry in each shard&#39;s
+            hash.</p>
+            
+            <p>Note that all servers should have the same schema for all tables you are
+            accessing, unless you really know what you are doing.</p>
+            
+            <h2 id="label-Master+and+Slave+Database+Configurations">Master and Slave Database Configurations</h2>
+            
+            <h3 id="label-Single+Read-Only+Slave%2C+Single+Master">Single Read-Only Slave, Single Master</h3>
+            
+            <p>To use a single, read-only slave that handles SELECT queries, the following
+            is the simplest configuration:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://master_server/database&#39;</span>,    :<span class="ruby-identifier">servers=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">read_only=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;slave_server&#39;</span>}})</pre>
+            
+            <p>This will use the slave_server for SELECT queries and master_server for
+            other queries.</p>
+            
+            <h3 id="label-Multiple+Read-Only+Slaves%2C+Single+Master">Multiple Read-Only Slaves, Single Master</h3>
+            
+            <p>Let&#39;s say you have 4 slave database servers with names slave_server0,
+            slave_server1, slave_server2, and slave_server3.</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://master_server/database&#39;</span>,    :<span class="ruby-identifier">servers=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">read_only=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> {:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">db</span>.<span class="ruby-identifier">get_slave_host</span>}}})&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">get_slave_host</span>&#x000A;  <span class="ruby-ivar">@current_host</span> <span class="ruby-operator">||=</span> <span class="ruby-value">-1</span>&#x000A;  <span class="ruby-node">&quot;slave_server#{(@current_host+=1)%4}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>This will use one of the slave servers for SELECT queries and use the
+            master_server for other queries.  It&#39;s also possible to pick a random
+            host instead of using the round robin approach presented above, but that
+            can result in less optimal resource usage.</p>
+            
+            <h3 id="label-Multiple+Read-Only+Slaves%2C+Multiple+Masters">Multiple Read-Only Slaves, Multiple Masters</h3>
+            
+            <p>This involves the same basic idea as the multiple slaves, single master,
+            but it shows that the master database is named :default.  So for 4 masters
+            and 4 slaves:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://master_server/database&#39;</span>,    :<span class="ruby-identifier">servers=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">read_only=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> {:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">db</span>.<span class="ruby-identifier">get_slave_host</span>}},      :<span class="ruby-identifier">default=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> {:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">db</span>.<span class="ruby-identifier">get_master_host</span>}}})&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">get_slave_host</span>&#x000A;  <span class="ruby-ivar">@current_slave_host</span> <span class="ruby-operator">||=</span> <span class="ruby-value">-1</span>&#x000A;  <span class="ruby-node">&quot;slave_server#{(@current_slave_host+=1)%4}&quot;</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">get_master_host</span>&#x000A;  <span class="ruby-ivar">@current_master_host</span> <span class="ruby-operator">||=</span> <span class="ruby-value">-1</span>&#x000A;  <span class="ruby-node">&quot;master_server#{(@current_master_host+=1)%4}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <h2 id="label-Sharding">Sharding</h2>
+            
+            <p>There is specific support in <a href="../../classes/Sequel.html">Sequel</a>
+            for handling master/slave database combinations, with the only necessary
+            setup being the database configuration. However, since sharding is always
+            going to be implementation dependent, <a
+            href="../../classes/Sequel.html">Sequel</a> supplies the basic
+            infrastructure, but you have to tell it which server to use for each
+            dataset.  Let&#39;s assume a simple scenario, a distributed rainbow table
+            for SHA-1 hashes, sharding based on the first hex character (for a total of
+            16 shards).  First, you need to configure the database:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">servers</span> = {}&#x000A;((<span class="ruby-string">&#39;0&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;9&#39;</span>).<span class="ruby-identifier">to_a</span> <span class="ruby-operator">+</span> (<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;f&#39;</span>).<span class="ruby-identifier">to_a</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hex</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">servers</span>[<span class="ruby-identifier">hex</span>.<span class="ruby-identifier">to_sym</span>] = {:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">&quot;hash_host_#{hex}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://hash_host/hashes&#39;</span>, :<span class="ruby-identifier">servers=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">servers</span>)</pre>
+            
+            <p>This configures 17 servers, the 16 shard servers (/hash_host_[0-9a-f]/),
+            and 1 default server which will be used if no shard is specified
+            ("hash_host").  If you want the default server to be one of the shard
+            servers (e.g. hash_host_a), it&#39;s easiest to do:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://hash_host_a/hashes&#39;</span>, :<span class="ruby-identifier">servers=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">servers</span>)</pre>
+            
+            <p>That will still set up a second pool of connections for the default server,
+            since it considers the default server and shard servers independent.  Note
+            that if you always set the shard on a dataset before using it in queries,
+            it will not attempt to connect to the default server.  <a
+            href="../../classes/Sequel.html">Sequel</a> may use the default server in
+            queries it generates itself, such as to get column names or table schemas,
+            so you should always have a default server that works.</p>
+            
+            <p>To set the shard for a given query, you use the Dataset#server method:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">hashes</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">hash=</span><span class="ruby-operator">&gt;</span><span class="ruby-regexp">/31337/</span>)</pre>
+            
+            <p>That will return all matching rows on the hash_host_a shard that have a
+            hash column that contains 31337.</p>
+            
+            <p>Rainbow tables are generally used to find specific hashes, so to save some
+            work, you might want to add a method to the dataset that automatically sets
+            the shard to use.  This is fairly easy using a Sequel::Model:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Rainbow</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">hashes</span>)&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">def</span> <span class="ruby-identifier">plaintext_for_hash</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">raise</span>(<span class="ruby-constant">ArgumentError</span>, <span class="ruby-string">&#39;Invalid SHA-1 Hash&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-regexp">/\A[0-9a-f]{40}\z/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">server</span>(<span class="ruby-identifier">hash</span>[<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-value">1</span>].<span class="ruby-identifier">to_sym</span>).<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">hash=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">hash</span>).<span class="ruby-identifier">get</span>(:<span class="ruby-identifier">plaintext</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">plaintext_for_hash</span>(<span class="ruby-string">&quot;e580726d31f6e1ad216ffd87279e536d1f74e606&quot;</span>)</pre>
+            
+            <p>The connection pool can be further controlled to change how it handles
+            attempts to access shards that haven&#39;t been configured.  The default is
+            to assume the :default shard.  However, you can specify a different shard
+            using the :servers_hash option when connecting to the database:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-operator">...</span>, :<span class="ruby-identifier">servers_hash=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">some_shard</span>))</pre>
+            
+            <p>You can also use this feature to raise an exception if an unconfigured
+            shard is used:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-operator">...</span>, :<span class="ruby-identifier">servers_hash=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-operator">...</span>})</pre>
+            
+            <p>If you specify a :servers_hash option to raise an exception for non
+            configured shards you should also explicitly specify a :read_only entry in
+            your :servers option for the case where a shard is not specified. In most
+            cases it is sufficient to make the :read_only entry the same as the
+            :default shard:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">servers</span> = {:<span class="ruby-identifier">read_only</span> =<span class="ruby-operator">&gt;</span> {}}&#x000A;((<span class="ruby-string">&#39;0&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;9&#39;</span>).<span class="ruby-identifier">to_a</span> <span class="ruby-operator">+</span> (<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;f&#39;</span>).<span class="ruby-identifier">to_a</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hex</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">servers</span>[<span class="ruby-identifier">hex</span>.<span class="ruby-identifier">to_sym</span>] = {:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">&quot;hash_host_#{hex}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://hash_host/hashes&#39;</span>, :<span class="ruby-identifier">servers=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">servers</span>, &#x000A;  :<span class="ruby-identifier">servers_hash=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-constant">Exception</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&quot;Invalid Server&quot;</span>)})</pre>
+            
+            <h3 id="label-Sharding+Plugin">Sharding Plugin</h3>
+            
+            <p><a href="../../classes/Sequel.html">Sequel</a> comes with a sharding plugin
+            that makes it easy to use sharding with model objects. It makes sure that
+            objects retrieved from a specific shard are always saved back to that
+            shard, allows you to create objects on specific shards, and even makes sure
+            associations work well with shards.  You just need to remember to set to
+            model to use the plugin:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Rainbow</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">hashes</span>)&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">sharding</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">plaintext=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;VGM&#39;</span>)</pre>
+            
+            <p>If all of your models are sharded, you can set all models to use the plugin
+            via:</p>
+            
+            <pre>Sequel::Model.plugin :sharding</pre>
+            
+            <h3 id="label-server_block+Extension">server_block Extension</h3>
+            
+            <p>By default, you must specify the server/shard you want to use for every
+            dataset/action, or <a href="../../classes/Sequel.html">Sequel</a> will use
+            the default shard.  If you have a group of queries that should use the same
+            shard, it can get a bit redundent to specify the same shard for all of
+            them.</p>
+            
+            <p>The server_block extension adds a Database#with_server method that scopes
+            all database access inside the block to the given shard by default:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">server_block</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># this SELECT query uses the &quot;a&quot; shard</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">hash=</span><span class="ruby-operator">&gt;</span><span class="ruby-regexp">/31337/</span>)&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-comment"># this UPDATE query also uses the &quot;a&quot; shard</span>&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">save</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>The server_block extension doesn&#39;t currently integrate with the
+            sharding plugin, as it ties into the Dataset#server method.  This
+            shouldn&#39;t present a problem in practice as long as you just access the
+            models inside the with_server block, since they will use the shard set by
+            with_server by default.  However, you will probably have issues if you
+            retrieve the models inside the block and save them outside of the block. 
+            If you need to do that, call the server method explicitly on the dataset
+            used to retrieve the model objects.</p>
+            
+            <h3 id="label-arbitrary_servers+Extension">arbitrary_servers Extension</h3>
+            
+            <p>By default, Sequel&#39;s sharding support is designed to work with
+            predefined shards.  It ships with Database#add_servers and
+            Database#remove_servers methods to modify these predefined shards on the
+            fly, but it is a bit cumbersome to work with truly arbitrary servers
+            (requiring you to call add_servers before use, then remove_servers after
+            use).</p>
+            
+            <p>The arbitrary_servers extension allows you to pass a server/shard options
+            hash as the server to use, and those options will be merged directly into
+            the database&#39;s default options:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">arbitrary_servers</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">rainbows</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;hash_host_a&#39;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">rainbows</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;hash_host_b&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;backup&#39;</span>).<span class="ruby-identifier">all</span></pre>
+            
+            <p>arbitrary_servers is designed to work well in conjunction with the
+            server_block extension:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;hash_host_b&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;backup&#39;</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># All queries here default to the backup database on hash_host_b</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>If you are using arbitrary_servers with server_block, you may want to
+            define the following method (or something similar) so that you don&#39;t
+            need to call synchronize separately:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(*)&#x000A;  <span class="ruby-keyword">super</span>{<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">yield</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>The reason for the synchronize method is that it checks out a connection
+            and makes the same connection available for the duration of the block. If
+            you don&#39;t do that, <a href="../../classes/Sequel.html">Sequel</a> will
+            probably disconnect from the database and reconnect to the database on each
+            request, since connections to arbitrary servers are not cached.</p>
+            
+            <p>Note that this extension only works with the sharded threaded connection
+            pool.  If you are using the sharded single connection pool, you need to
+            switch to the sharded threaded connection pool before using this extension.
+            If you are passing the :single_threaded option to the Database, just remove
+            that option.  If you are setting:</p>
+            
+            <pre>Sequel.single_threaded = true</pre>
+            
+            <p>just remove or comment out that code.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Dataset::NullDataset</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Dataset::NullDataset
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/extensions/null_dataset_rb.html">lib/sequel/extensions/null_dataset.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Dataset.html">Dataset</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-columns">columns</a></li>
+              <li><a target="docwin" href="#method-i-delete">delete</a></li>
+              <li><a target="docwin" href="#method-i-each">each</a></li>
+              <li><a target="docwin" href="#method-i-fetch_rows">fetch_rows</a></li>
+              <li><a target="docwin" href="#method-i-insert">insert</a></li>
+              <li><a target="docwin" href="#method-i-truncate">truncate</a></li>
+              <li><a target="docwin" href="#method-i-update">update</a></li>
+            </ol>
+            <h3>Protected Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-_import">_import</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-columns'>
+                <a name='method-i-columns'></a>
+                <div class='synopsis'>
+                  <span class='name'>columns</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Create a new dataset from the dataset (which won&#39;t be nulled) to get
+                  the columns if they aren&#39;t already cached.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-columns-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-ivar">@columns</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-ivar">@opts</span>).<span class="ruby-identifier">columns</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-delete'>
+                <a name='method-i-delete'></a>
+                <div class='synopsis'>
+                  <span class='name'>delete</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return 0 without sending a database query.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-delete-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-delete-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 52</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">delete</span>&#x000A;  <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-each'>
+                <a name='method-i-each'></a>
+                <div class='synopsis'>
+                  <span class='name'>each</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return self without sending a database query, never yielding.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-each-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-fetch_rows'>
+                <a name='method-i-fetch_rows'></a>
+                <div class='synopsis'>
+                  <span class='name'>fetch_rows</span>
+                  <span class='arguments'>(sql)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return nil without sending a database query, never yielding.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-insert'>
+                <a name='method-i-insert'></a>
+                <div class='synopsis'>
+                  <span class='name'>insert</span>
+                  <span class='arguments'>(*)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return nil without sending a database query.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 67</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert</span>(*)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-truncate'>
+                <a name='method-i-truncate'></a>
+                <div class='synopsis'>
+                  <span class='name'>truncate</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return nil without sending a database query.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-truncate-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-truncate-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 72</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">truncate</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-update'>
+                <a name='method-i-update'></a>
+                <div class='synopsis'>
+                  <span class='name'>update</span>
+                  <span class='arguments'>(v=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return 0 without sending a database query.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-update-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-update-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 77</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">update</span>(<span class="ruby-identifier">v</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Protected Instance methods</h2>
+              <div class='method protected-instance' id='method-method-i-_import'>
+                <a name='method-i-_import'></a>
+                <div class='synopsis'>
+                  <span class='name'>_import</span>
+                  <span class='arguments'>(columns, values, opts)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return nil without sending a database query.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-_import-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-_import-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 84</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

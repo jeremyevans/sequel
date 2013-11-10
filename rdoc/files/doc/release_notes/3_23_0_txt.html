@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.23.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.23.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.23.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now allows dynamic
+            customization for eager loading. Previously, the parameters for eager
+            loading were fixed at association creation time.  Now, they can be modified
+            at query time.  To dynamically modify an eager load, you use a hash with
+            the proc as the value. For example, if you have this code:</p>
+            
+            <pre>Artist.eager(:albums)</pre>
+            
+            <p>And you only want to eagerly load albums where the id is greater than or
+            equal to some number provided by the user, you do:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">min</span> = <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">min</span>].<span class="ruby-identifier">to_i</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">min</span>}})</pre>
+            
+            <p>This also works when eager loading via eager_graph:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(:<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">min</span>}})</pre>
+            
+            <p>For eager_graph, the dataset is the dataset to graph into the current
+            dataset, and filtering it will result in an SQL query that joins to a
+            subquery.</p>
+            
+            <p>You can also use dynamic customization while cascading to also eagerly load
+            dependent associations, by making the hash value a single entry hash with a
+            proc key and the value being the dependent associations to eagerly load.
+            For example, if you want to eagerly load tracks for those albums:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">min</span>}}=<span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">tracks</span>})</pre>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> also now allows dynamic
+            customization for regular association loading.  Previously, this was
+            possible by using the association&#39;s dataset:</p>
+            
+            <pre>albums = artist.albums_dataset.filter{id &gt; min}</pre>
+            
+            <p>However, then there was no handling of caching, callbacks, or reciprocals. 
+            For example:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">artist</span>}</pre>
+            
+            <p>Would issue one query per album to get the artist, because the reciprocal
+            association was not set.  Now you can provide a block to the association
+            method:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">albums</span> = <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">min</span>}}</pre>
+            
+            <p>This block is called with the dataset used to retrieve the associated
+            objects, and should return a modified version of that dataset.</p>
+            
+            <p>Note that ruby 1.8.6 doesn&#39;t allow blocks to take block arguments, so
+            you have to pass the block as a separate proc argument to the association
+            method if you are still using 1.8.6.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports filtering by
+            associations.  This wasn&#39;t previously supported as filtering is a
+            dataset level feature and associations are a model level feature, and
+            datasets do not depend on models.  Now, model datasets have the ability to
+            filter by associations.  For example, to get all albums for a given artist,
+            you could do:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">artist</span>)</pre>
+            
+            <p>Since the above can also be accomplished with:</p>
+            
+            <pre>artist.albums</pre>
+            
+            <p>this may not seem like a big improvement, but it allows you to filter on
+            multiple associations simultaneously:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">publisher=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">publisher</span>)</pre>
+            
+            <p>For simple many_to_one associations, the above is just a simpler way to do:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">publisher_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">publisher</span>.<span class="ruby-identifier">id</span>)</pre>
+            
+            <p><a href="../../../classes/Sequel.html">Sequel</a> supports this for all
+            association types, including many_to_many and many_through_many, where a
+            subquery is used, and it also works when composite key associations are
+            used:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">tags=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">tag</span>)</pre>
+            
+            <p>This will give you the albums for that artist that are also tagged with
+            that tag.  To provide multiple values for the same association, mostly
+            useful for many_to_many associations, you can either use separate filter
+            calls or specify the conditions as an array:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">tags=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">tag1</span>).<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">tags=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">tag2</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>([[:<span class="ruby-identifier">tags</span>, <span class="ruby-identifier">tag1</span>], [:<span class="ruby-identifier">tags</span>, <span class="ruby-identifier">tag2</span>]])</pre>
+            </li><li>
+            <p>A columns_introspection extension has been added that makes datasets
+            attempt to guess their columns in some cases instead of issuing a database
+            query.  This can improve performance in cases where the columns are needed
+            implicitly, such as graphing.  After loading the extension, you can enable
+            the support for specific datasets by extending them with
+            Sequel::ColumnIntrospection.  To enable introspection for all datasets,
+            use:</p>
+            
+            <pre>Sequel::Dataset.introspect_all_columns</pre>
+            </li><li>
+            <p>A serialization_modification_detection plugin has been added. Previously,
+            <a href="../../../classes/Sequel.html">Sequel</a> could not detect
+            modifications made to serialized objects.  It could detect modification if
+            you assigned a new value:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">hash_column</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">hash_column</span>.<span class="ruby-identifier">merge</span>(:<span class="ruby-identifier">foo=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">bar</span>)</pre>
+            
+            <p>but not if you just modified the object directly:</p>
+            
+            <pre>model.hash_columns[:foo] = :bar</pre>
+            
+            <p>With this plugin, such modifications can be detected, at a potentially
+            significant performance cost.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p>When using a migration directory containing both older integer migrations
+            and newer timestamp migrations, where some integer migrations have not been
+            applied, make sure to apply the remaining integer migrations before the
+            timestamp migrations.  Previously, they could be applied out of order due
+            to a lexicographic sort being used instead of a numeric sort.</p>
+            </li><li>
+            <p>If a model does not select all columns from its table, the insert_select
+            optimization is no longer used.  Previously, creating a new model object
+            for such a model could result in the object containing columns that the
+            model does not select.</p>
+            </li><li>
+            <p>You can now use :select=&gt;[] as an option for many_to_many associations
+            to select all columns from both the associated table and the join table. 
+            Previously, this raised an error and required you do
+            :select=&gt;&#39;*&#39;.lit as a workaround.  The default remains to select
+            all columns in the associated table and none from the join table.</p>
+            </li><li>
+            <p>The xml_serializer plugin now handles namespaced models by using __ instead
+            of / as the namespace separator.  Previously, / was used and caused
+            problems as it is not valid XML.</p>
+            </li><li>
+            <p>The :eager_grapher association option can now accept a proc that takes a
+            single hash of options instead of a fixed 3 arguments. This is the
+            recommended way going forward of writing custom :eager_graphers, and all of
+            the internal ones have been converted. The previous way of using 3
+            arguments is still supported.</p>
+            </li><li>
+            <p>A bug in the identity_map plugin for many_to_one associations without full
+            association reflection information has been fixed.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> is now using GitHub
+            Issues for issue tracking.  Old issues have been migrated from Google Code.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>The filter by associations support breaks backward compatibilty for users
+            who previously added an sql_literal instance method to <a
+            href="../../../classes/Sequel/Model.html">Sequel::Model</a>.  Usually, that
+            was done to for reasons similar to but inferior than the filter by
+            association support.  The following code can be used as a temporary
+            workaround until you can modify your program to use the new filter by
+            associations support:</p>
+            
+            <pre>Sequel::Model::Associations::DatasetMethods.&#x000A;  send(:remove_method, :complex_expression_sql)</pre>
+            </li><li>
+            <p>The private Sequel::Model#_load_associated_objects method now takes an
+            additional, optional options hash.  Plugins that override that method need
+            to be modified.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

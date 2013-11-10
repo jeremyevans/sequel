@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Timezones</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Timezones
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../files/lib/sequel/timezones_rb.html">lib/sequel/timezones.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p><a href="../Sequel.html">Sequel</a> doesn&#39;t pay much attention to
+            timezones by default, but you can set it handle timezones if you want. 
+            There are three separate timezone settings, <a
+            href="Timezones.html#attribute-i-application_timezone">#application_timezone</a>,
+            <a
+            href="Timezones.html#attribute-i-database_timezone">#database_timezone</a>,
+            and typecast_timezone.  All three timezones have getter and setter methods.
+            You can set all three timezones to the same value at once via
+            <code>Sequel.default_timezone=</code>.</p>
+            
+            <p>The only timezone values that are supported by default are
+            <code>:utc</code> (convert to UTC), <code>:local</code> (convert to local
+            time), and <code>nil</code> (don&#39;t convert).  If you need to convert to
+            a specific timezone, or need the timezones being used to change based on
+            the environment (e.g. current user), you need to use the
+            <code>named_timezones</code> extension (and use <code>DateTime</code> as
+            the <code>datetime_class</code>). <a href="../Sequel.html">Sequel</a> also
+            ships with a <code>thread_local_timezones</code> extensions which allows
+            each thread to have its own timezone values for each of the timezones.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-application_timezone">application_timezone</a></li>
+              <li><a target="docwin" href="#method-i-application_to_database_timestamp">application_to_database_timestamp</a></li>
+              <li><a target="docwin" href="#method-i-convert_output_timestamp">convert_output_timestamp</a></li>
+              <li><a target="docwin" href="#method-i-convert_timestamp">convert_timestamp</a></li>
+              <li><a target="docwin" href="#attribute-i-database_timezone">database_timezone</a></li>
+              <li><a target="docwin" href="#method-i-database_to_application_timestamp">database_to_application_timestamp</a></li>
+              <li><a target="docwin" href="#method-i-default_timezone-3D">default_timezone=</a></li>
+              <li><a target="docwin" href="#attribute-i-typecast_timezone">typecast_timezone</a></li>
+              <li><a target="docwin" href="#method-i-typecast_to_application_timestamp">typecast_to_application_timestamp</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-application_timezone'>application_timezone</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The timezone you want the application to use.  This is the timezone that
+                      incoming times from the database and typecasting are converted to.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-database_timezone'>database_timezone</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The timezone for storage in the database.  This is the timezone to which <a
+                      href="../Sequel.html">Sequel</a> will convert timestamps before
+                      literalizing them for storage in the database.  It is also the timezone
+                      that <a href="../Sequel.html">Sequel</a> will assume database timestamp
+                      values are already in (if they don&#39;t include an offset).</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-typecast_timezone'>typecast_timezone</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The timezone that incoming data that <a href="../Sequel.html">Sequel</a>
+                      needs to typecast is assumed to be already in (if they don&#39;t include an
+                      offset).</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-application_to_database_timestamp'>
+                <a name='method-i-application_to_database_timestamp'></a>
+                <div class='synopsis'>
+                  <span class='name'>application_to_database_timestamp</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Convert the given <code>Time</code>/<code>DateTime</code> object into the
+                  database timezone, used when literalizing objects in an <a
+                  href="SQL.html">SQL</a> string.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-application_to_database_timestamp-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-application_to_database_timestamp-source'><span class="ruby-comment"># File lib/sequel/timezones.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">application_to_database_timestamp</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">convert_output_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-convert_output_timestamp'>
+                <a name='method-i-convert_output_timestamp'></a>
+                <div class='synopsis'>
+                  <span class='name'>convert_output_timestamp</span>
+                  <span class='arguments'>(v, output_timezone)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Converts the object to the given <code>output_timezone</code>.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-convert_output_timestamp-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-convert_output_timestamp-source'><span class="ruby-comment"># File lib/sequel/timezones.rb, line 43</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_output_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">output_timezone</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_timezone</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">DateTime</span>)&#x000A;      <span class="ruby-keyword">case</span> <span class="ruby-identifier">output_timezone</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:utc</span>&#x000A;        <span class="ruby-identifier">v</span>.<span class="ruby-identifier">new_offset</span>(<span class="ruby-value">0</span>)&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:local</span>&#x000A;        <span class="ruby-identifier">v</span>.<span class="ruby-identifier">new_offset</span>(<span class="ruby-identifier">local_offset_for_datetime</span>(<span class="ruby-identifier">v</span>))&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">convert_output_datetime_other</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">output_timezone</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">v</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">output_timezone</span> <span class="ruby-operator">==</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">?</span> <span class="ruby-value">:getutc</span> <span class="ruby-operator">:</span> <span class="ruby-value">:getlocal</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-convert_timestamp'>
+                <a name='method-i-convert_timestamp'></a>
+                <div class='synopsis'>
+                  <span class='name'>convert_timestamp</span>
+                  <span class='arguments'>(v, input_timezone)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Converts the given object from the given input timezone to the
+                  <code>application_timezone</code> using
+                  <code>convert_input_timestamp</code> and
+                  <code>convert_output_timestamp</code>.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-convert_timestamp-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-convert_timestamp-source'><span class="ruby-comment"># File lib/sequel/timezones.rb, line 65</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">input_timezone</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Date</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">DateTime</span>)&#x000A;      <span class="ruby-comment"># Dates handled specially as they are assumed to already be in the application_timezone</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">datetime_class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">DateTime</span>&#x000A;        <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">civil</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">day</span>, <span class="ruby-value">0</span>, <span class="ruby-value">0</span>, <span class="ruby-value">0</span>, <span class="ruby-identifier">application_timezone</span> <span class="ruby-operator">==</span> <span class="ruby-value">:local</span> <span class="ruby-operator">?</span> (<span class="ruby-keyword">defined?</span>(<span class="ruby-constant">Rational</span>) <span class="ruby-operator">?</span> <span class="ruby-constant">Rational</span>(<span class="ruby-constant">Time</span>.<span class="ruby-identifier">local</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">day</span>).<span class="ruby-identifier">utc_offset</span>, <span class="ruby-value">86400</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">local</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">day</span>).<span class="ruby-identifier">utc_offset</span><span class="ruby-operator">/</span><span class="ruby-value">86400.0</span>) <span class="ruby-operator">:</span> <span class="ruby-value">0</span>)&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-constant">Time</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">application_timezone</span> <span class="ruby-operator">==</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">?</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">:</span> <span class="ruby-value">:local</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">day</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">convert_output_timestamp</span>(<span class="ruby-identifier">convert_input_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">input_timezone</span>), <span class="ruby-identifier">application_timezone</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">InvalidValue</span>&#x000A;    <span class="ruby-identifier">raise</span>&#x000A;  <span class="ruby-keyword">rescue</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-database_to_application_timestamp'>
+                <a name='method-i-database_to_application_timestamp'></a>
+                <div class='synopsis'>
+                  <span class='name'>database_to_application_timestamp</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Convert the given object into an object of
+                  <code>Sequel.datetime_class</code> in the
+                  <code>application_timezone</code>.  Used when converting datetime/timestamp
+                  columns returned by the database.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-database_to_application_timestamp-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-database_to_application_timestamp-source'><span class="ruby-comment"># File lib/sequel/timezones.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_to_application_timestamp</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">convert_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-default_timezone-3D'>
+                <a name='method-i-default_timezone-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>default_timezone=</span>
+                  <span class='arguments'>(tz)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Sets the database, application, and typecasting timezones to the given
+                  timezone.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-default_timezone-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-default_timezone-3D-source'><span class="ruby-comment"># File lib/sequel/timezones.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_timezone=</span>(<span class="ruby-identifier">tz</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">database_timezone</span> = <span class="ruby-identifier">tz</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">application_timezone</span> = <span class="ruby-identifier">tz</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">typecast_timezone</span> = <span class="ruby-identifier">tz</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-typecast_to_application_timestamp'>
+                <a name='method-i-typecast_to_application_timestamp'></a>
+                <div class='synopsis'>
+                  <span class='name'>typecast_to_application_timestamp</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Convert the given object into an object of
+                  <code>Sequel.datetime_class</code> in the
+                  <code>application_timezone</code>.  Used when typecasting values when
+                  assigning them to model datetime attributes.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-typecast_to_application_timestamp-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-typecast_to_application_timestamp-source'><span class="ruby-comment"># File lib/sequel/timezones.rb, line 101</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">typecast_to_application_timestamp</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">convert_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">typecast_timezone</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

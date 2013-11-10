@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::Composition::ClassMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::Composition::ClassMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/composition_rb.html">lib/sequel/plugins/composition.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Composition.html">Composition</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-composition">composition</a></li>
+              <li><a target="docwin" href="#attribute-i-composition_module">composition_module</a></li>
+              <li><a target="docwin" href="#attribute-i-compositions">compositions</a></li>
+              <li><a target="docwin" href="#method-i-define_composition_accessor">define_composition_accessor</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-composition_module'>composition_module</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>A module included in the class holding the composition getter and setter
+                      methods.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-compositions'>compositions</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>A hash with composition name keys and composition reflection hash values.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-composition'>
+                <a name='method-i-composition'></a>
+                <div class='synopsis'>
+                  <span class='name'>composition</span>
+                  <span class='arguments'>(name, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Define a composition for this model, with name being the name of the
+                  composition. You must provide either a :mapping option or both the
+                  :composer and :decomposer options.</p>
+                  
+                  <p>Options:</p>
+                  <ul><li>
+                  <p>:class - if using the :mapping option, the class to use, as a Class, <a
+                  href="../../../String.html">String</a> or <a
+                  href="../../../Symbol.html">Symbol</a>.</p>
+                  </li><li>
+                  <p>:composer - A proc that is instance evaled when the composition getter
+                  method is called to create the composition.</p>
+                  </li><li>
+                  <p>:decomposer - A proc that is instance evaled before saving the model
+                  object, if the composition object exists, which sets the columns in the
+                  model object based on the value of the composition object.</p>
+                  </li><li>
+                  <p>:mapping - An array where each element is either a symbol or an array of
+                  two symbols. A symbol is treated like an array of two symbols where both
+                  symbols are the same. The first symbol represents the getter method in the
+                  model, and the second symbol represents the getter method in the
+                  composition object. Example:</p>
+                  
+                  <pre class="ruby"><span class="ruby-comment"># Uses columns year, month, and day in the current model</span>&#x000A;<span class="ruby-comment"># Uses year, month, and day methods in the composition object</span>&#x000A;:<span class="ruby-identifier">mapping=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">year</span>, :<span class="ruby-identifier">month</span>, :<span class="ruby-identifier">day</span>]&#x000A;<span class="ruby-comment"># Uses columns year, month, and day in the current model</span>&#x000A;<span class="ruby-comment"># Uses y, m, and d methods in the composition object where</span>&#x000A;<span class="ruby-comment"># for example y in the composition object represents year</span>&#x000A;<span class="ruby-comment"># in the model object.</span>&#x000A;:<span class="ruby-identifier">mapping=</span><span class="ruby-operator">&gt;</span>[[:<span class="ruby-identifier">year</span>, :<span class="ruby-identifier">y</span>], [:<span class="ruby-identifier">month</span>, :<span class="ruby-identifier">m</span>], [:<span class="ruby-identifier">day</span>, :<span class="ruby-identifier">d</span>]]</pre>
+                  </li></ul>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-composition-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-composition-source'><span class="ruby-comment"># File lib/sequel/plugins/composition.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">composition</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-identifier">compositions</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">opts</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">mapping</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:mapping</span>]&#x000A;    <span class="ruby-identifier">keys</span> = <span class="ruby-identifier">mapping</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">k</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">k</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">k</span>}&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:composer</span>]              &#x000A;      <span class="ruby-identifier">late_binding_class_option</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">name</span>)&#x000A;      <span class="ruby-identifier">klass</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>]&#x000A;      <span class="ruby-identifier">class_proc</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">klass</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">constantize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:class_name</span>])}&#x000A;      <span class="ruby-identifier">opts</span>[<span class="ruby-value">:composer</span>] = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span>&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">values</span> = <span class="ruby-identifier">keys</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">k</span>)} <span class="ruby-keyword">and</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>}&#x000A;          <span class="ruby-identifier">class_proc</span>.<span class="ruby-identifier">call</span>.<span class="ruby-identifier">new</span>(*<span class="ruby-identifier">values</span>)&#x000A;        <span class="ruby-keyword">else</span>&#x000A;          <span class="ruby-keyword">nil</span>&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:decomposer</span>]&#x000A;      <span class="ruby-identifier">setter_meths</span> = <span class="ruby-identifier">keys</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-value">:&quot;#{k}=&quot;</span>}&#x000A;      <span class="ruby-identifier">cov_methods</span> = <span class="ruby-identifier">mapping</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">k</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">k</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">k</span>}&#x000A;      <span class="ruby-identifier">setters</span> = <span class="ruby-identifier">setter_meths</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">cov_methods</span>)&#x000A;      <span class="ruby-identifier">opts</span>[<span class="ruby-value">:decomposer</span>] = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span>&#x000A;        <span class="ruby-keyword">if</span> (<span class="ruby-identifier">o</span> = <span class="ruby-identifier">compositions</span>[<span class="ruby-identifier">name</span>]).<span class="ruby-identifier">nil?</span>&#x000A;          <span class="ruby-identifier">setter_meths</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">sm</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">sm</span>, <span class="ruby-keyword">nil</span>)}&#x000A;        <span class="ruby-keyword">else</span>&#x000A;          <span class="ruby-identifier">setters</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">sm</span>, <span class="ruby-identifier">cm</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">sm</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">cm</span>))}&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must provide :composer and :decomposer options, or :mapping option&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:composer</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:decomposer</span>]&#x000A;  <span class="ruby-identifier">define_composition_accessor</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-define_composition_accessor'>
+                <a name='method-i-define_composition_accessor'></a>
+                <div class='synopsis'>
+                  <span class='name'>define_composition_accessor</span>
+                  <span class='arguments'>(name, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Define getter and setter methods for the composition object.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-define_composition_accessor-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-define_composition_accessor-source'><span class="ruby-comment"># File lib/sequel/plugins/composition.rb, line 130</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">define_composition_accessor</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">include</span>(<span class="ruby-ivar">@composition_module</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">composition_module</span>&#x000A;  <span class="ruby-identifier">composer</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:composer</span>]&#x000A;  <span class="ruby-identifier">composition_module</span>.<span class="ruby-identifier">class_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">name</span>) <span class="ruby-keyword">do</span> &#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">compositions</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">name</span>)&#x000A;        <span class="ruby-identifier">compositions</span>[<span class="ruby-identifier">name</span>]&#x000A;      <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">frozen?</span>&#x000A;        <span class="ruby-identifier">instance_eval</span>(&amp;<span class="ruby-identifier">composer</span>)&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">compositions</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">instance_eval</span>(&amp;<span class="ruby-identifier">composer</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">define_method</span>(<span class="ruby-node">&quot;#{name}=&quot;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">modified!</span>&#x000A;      <span class="ruby-identifier">compositions</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">v</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

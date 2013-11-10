@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>pg_array_ops.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>pg_array_ops.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/pg_array_ops.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The pg_array_ops extension adds support to Sequel&#39;s DSL to make it
+            easier to call PostgreSQL array functions and operators.</p>
+            
+            <p>To load the extension:</p>
+            
+            <pre>Sequel.extension :pg_array_ops</pre>
+            
+            <p>The most common usage is passing an expression to Sequel.pg_array_op:</p>
+            
+            <pre>ia = Sequel.pg_array_op(:int_array_column)</pre>
+            
+            <p>If you have also loaded the pg_array extension, you can use Sequel.pg_array
+            as well:</p>
+            
+            <pre>ia = Sequel.pg_array(:int_array_column)</pre>
+            
+            <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
+            expression objects, you can call the pg_array method:</p>
+            
+            <pre>ia = Sequel.expr(:int_array_column).pg_array</pre>
+            
+            <p>If you have loaded the <a
+            href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>
+            or you have loaded the core_refinements extension and have activated
+            refinements for the file, you can also use <a
+            href="../../../../classes/Sequel/Postgres/ArrayOpMethods.html#method-i-pg_array">Sequel::Postgres::ArrayOpMethods#pg_array</a>:</p>
+            
+            <pre>ia = :int_array_column.pg_array</pre>
+            
+            <p>This creates a <a
+            href="../../../../classes/Sequel/Postgres/ArrayOp.html">Sequel::Postgres::ArrayOp</a>
+            object that can be used for easier querying:</p>
+            
+            <pre>ia[1]     # int_array_column[1]&#x000A;ia[1][2]  # int_array_column[1][2]&#x000A;ia.contains(:other_int_array_column)     # @&gt; &#x000A;ia.contained_by(:other_int_array_column) # &lt;@&#x000A;ia.overlaps(:other_int_array_column)     # &amp;&amp;&#x000A;ia.concat(:other_int_array_column)       # ||&#x000A;&#x000A;ia.push(1)         # int_array_column || 1&#x000A;ia.unshift(1)      # 1 || int_array_column&#x000A;&#x000A;ia.any             # ANY(int_array_column)&#x000A;ia.all             # ALL(int_array_column)&#x000A;ia.dims            # array_dims(int_array_column)&#x000A;ia.length          # array_length(int_array_column, 1)&#x000A;ia.length(2)       # array_length(int_array_column, 2)&#x000A;ia.lower           # array_lower(int_array_column, 1)&#x000A;ia.lower(2)        # array_lower(int_array_column, 2)&#x000A;ia.join            # array_to_string(int_array_column, &#39;&#39;, NULL)&#x000A;ia.join(&#39;:&#39;)       # array_to_string(int_array_column, &#39;:&#39;, NULL)&#x000A;ia.join(&#39;:&#39;, &#39; &#39;)  # array_to_string(int_array_column, &#39;:&#39;, &#39; &#39;)&#x000A;ia.unnest          # unnest(int_array_column)</pre>
+            
+            <p>See the PostgreSQL array function and operator documentation for more
+            details on what these functions and operators do.</p>
+            
+            <p>If you are also using the pg_array extension, you should load it before
+            loading this extension.  Doing so will allow you to use PGArray#op to get
+            an ArrayOp, allowing you to perform array operations on array literals.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

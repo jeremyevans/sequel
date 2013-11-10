@@ -1,0 +1,366 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Postgres::JSONOp</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Postgres::JSONOp
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/extensions/pg_json_ops_rb.html">lib/sequel/extensions/pg_json_ops.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The <a href="JSONOp.html">JSONOp</a> class is a simple container for a
+            single object that defines methods that yield <a
+            href="../../Sequel.html">Sequel</a> expression objects representing
+            PostgreSQL json operators and functions.</p>
+            
+            <p>In the method documentation examples, assume that:</p>
+            
+            <pre>json_op = Sequel.pg_json(:json)</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-5B-5D">[]</a></li>
+              <li><a target="docwin" href="#method-i-array_elements">array_elements</a></li>
+              <li><a target="docwin" href="#method-i-array_length">array_length</a></li>
+              <li><a target="docwin" href="#method-i-each">each</a></li>
+              <li><a target="docwin" href="#method-i-each_text">each_text</a></li>
+              <li><a target="docwin" href="#method-i-extract">extract</a></li>
+              <li><a target="docwin" href="#method-i-extract_text">extract_text</a></li>
+              <li><a target="docwin" href="#method-i-get_text">get_text</a></li>
+              <li><a target="docwin" href="#method-i-keys">keys</a></li>
+              <li><a target="docwin" href="#method-i-pg_json">pg_json</a></li>
+              <li><a target="docwin" href="#method-i-populate">populate</a></li>
+              <li><a target="docwin" href="#method-i-populate_set">populate_set</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>GET</td>
+                    <td>=</td>
+                    <td class='context-item-value'>["(".freeze, " -> ".freeze, ")".freeze].freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>GET_PATH</td>
+                    <td>=</td>
+                    <td class='context-item-value'>["(".freeze, " #> ".freeze, ")".freeze].freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>GET_PATH_TEXT</td>
+                    <td>=</td>
+                    <td class='context-item-value'>["(".freeze, " #>> ".freeze, ")".freeze].freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>GET_TEXT</td>
+                    <td>=</td>
+                    <td class='context-item-value'>["(".freeze, " ->> ".freeze, ")".freeze].freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='aliases-list'>
+              <h2>Public Instance Aliases</h2>
+              <div class='name-list'>
+                <table summary='Public Instance Aliases'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>get</td>
+                    <td>-&gt;</td>
+                    <td class='context-item-value'><a target="docwin" href="#method-i-5B-5D">[]</a></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-5B-5D'>
+                <a name='method-i-5B-5D'></a>
+                <div class='synopsis'>
+                  <span class='name'>[]</span>
+                  <span class='arguments'>(key)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Get JSON array element or object field as json.  If an array is given, gets
+                  the object at the specified path.</p>
+                  
+                  <pre>json_op[1] # (json -&gt; 1)&#x000A;json_op[&#39;a&#39;] # (json -&gt; &#39;a&#39;)&#x000A;json_op[%w&#39;a b&#39;] # (json #&gt; ARRAY[&#39;a&#39;, &#39;b&#39;])</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)&#x000A;    <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET</span>, <span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-array_elements'>
+                <a name='method-i-array_elements'></a>
+                <div class='synopsis'>
+                  <span class='name'>array_elements</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns a set of json values for the elements in the json array.</p>
+                  
+                  <pre>json_op.array_elements # json_oarray_elements(json)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-array_elements-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-array_elements-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 85</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">array_elements</span>&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:json_array_elements</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-array_length'>
+                <a name='method-i-array_length'></a>
+                <div class='synopsis'>
+                  <span class='name'>array_length</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Get the length of the outermost json array.</p>
+                  
+                  <pre>json_op.array_length # json_array_length(json)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-array_length-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-array_length-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">array_length</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:json_array_length</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-each'>
+                <a name='method-i-each'></a>
+                <div class='synopsis'>
+                  <span class='name'>each</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns a set of key and value pairs, where the keys are text and the
+                  values are JSON.</p>
+                  
+                  <pre>json_op.each # json_each(json)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-each-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each</span>&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:json_each</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-each_text'>
+                <a name='method-i-each_text'></a>
+                <div class='synopsis'>
+                  <span class='name'>each_text</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns a set of key and value pairs, where the keys and values are both
+                  text.</p>
+                  
+                  <pre>json_op.each_text # json_each_text(json)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-each_text-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-each_text-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 108</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each_text</span>&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:json_each_text</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-extract'>
+                <a name='method-i-extract'></a>
+                <div class='synopsis'>
+                  <span class='name'>extract</span>
+                  <span class='arguments'>(*a)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns a json value for the object at the given path.</p>
+                  
+                  <pre>json_op.extract(&#39;a&#39;) # json_extract_path(json, &#39;a&#39;)&#x000A;json_op.extract(&#39;a&#39;, &#39;b&#39;) # json_extract_path(json, &#39;a&#39;, &#39;b&#39;)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-extract-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-extract-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 116</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">extract</span>(*<span class="ruby-identifier">a</span>)&#x000A;  <span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:json_extract_path</span>, *<span class="ruby-identifier">a</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-extract_text'>
+                <a name='method-i-extract_text'></a>
+                <div class='synopsis'>
+                  <span class='name'>extract_text</span>
+                  <span class='arguments'>(*a)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns a text value for the object at the given path.</p>
+                  
+                  <pre>json_op.extract_text(&#39;a&#39;) # json_extract_path_text(json, &#39;a&#39;)&#x000A;json_op.extract_text(&#39;a&#39;, &#39;b&#39;) # json_extract_path_text(json, &#39;a&#39;, &#39;b&#39;)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-extract_text-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-extract_text-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 124</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">extract_text</span>(*<span class="ruby-identifier">a</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:json_extract_path_text</span>, *<span class="ruby-identifier">a</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-get_text'>
+                <a name='method-i-get_text'></a>
+                <div class='synopsis'>
+                  <span class='name'>get_text</span>
+                  <span class='arguments'>(key)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Get JSON array element or object field as text.  If an array is given, gets
+                  the object at the specified path.</p>
+                  
+                  <pre>json_op.get_text(1) # (json -&gt;&gt; 1)&#x000A;json_op.get_text(&#39;a&#39;) # (json -&gt;&gt; &#39;a&#39;)&#x000A;json_op.get_text(%w&#39;a b&#39;) # (json #&gt;&gt; ARRAY[&#39;a&#39;, &#39;b&#39;])</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-get_text-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-get_text-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 134</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_text</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)&#x000A;    <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH_TEXT</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_TEXT</span>, <span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-keys'>
+                <a name='method-i-keys'></a>
+                <div class='synopsis'>
+                  <span class='name'>keys</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns a set of keys AS text in the json object.</p>
+                  
+                  <pre>json_op.keys # json_object_keys(json)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-keys-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-keys-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 145</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">keys</span>&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:json_object_keys</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-pg_json'>
+                <a name='method-i-pg_json'></a>
+                <div class='synopsis'>
+                  <span class='name'>pg_json</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the receiver, since it is already a <a
+                  href="JSONOp.html">JSONOp</a>.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_json-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-pg_json-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 150</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_json</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-populate'>
+                <a name='method-i-populate'></a>
+                <div class='synopsis'>
+                  <span class='name'>populate</span>
+                  <span class='arguments'>(arg)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Expands the given argument using the columns in the json.</p>
+                  
+                  <pre>json_op.populate(arg) # json_populate_record(arg, json)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-populate-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-populate-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 157</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">populate</span>(<span class="ruby-identifier">arg</span>)&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:json_populate_record</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-populate_set'>
+                <a name='method-i-populate_set'></a>
+                <div class='synopsis'>
+                  <span class='name'>populate_set</span>
+                  <span class='arguments'>(arg)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Expands the given argument using the columns in the json.</p>
+                  
+                  <pre>json_op.populate_set(arg) # json_populate_recordset(arg, json)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-populate_set-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-populate_set-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 164</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">populate_set</span>(<span class="ruby-identifier">arg</span>)&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:json_populate_recordset</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

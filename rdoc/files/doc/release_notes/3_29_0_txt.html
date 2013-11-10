@@ -1,0 +1,461 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.29.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.29.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.29.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2012-02-02 08:01:12 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Adapter+Support">New Adapter Support</h1>
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now has much better
+            support for Oracle, both in the ruby-oci8-based oracle adapter and in the
+            jdbc/oracle adapter.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now has much better
+            support for connecting to HSQLDB using the jdbc adapter.  This support does
+            not work correctly with the jdbc-hsqldb gem, since the version it uses is
+            too old.  You&#39;ll need to load the .jar file manually until the gem is
+            updated.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now has much better
+            support for connecting to Apache Derby databases using the jdbc adapter. 
+            This works with the jdbc-derby gem, but it&#39;s recommend you grab an
+            updated .jar file as the jdbc-derby gem doesn&#39;t currently support
+            truncate or booleans.</p>
+            </li><li>
+            <p>The db2 adapter has had most of the remaining issues fixed, and can now run
+            Sequel&#39;s test suite cleanly.  It&#39;s still recommended that users
+            switch to the ibmdb adapter if they are connecting to DB2.</p>
+            </li><li>
+            <p>A mock adapter has been added which provides a mock Database object that
+            allows you to easily set the returned rows, the number of rows modified by
+            update/delete, and the autogenerating primary key integer for insert.  It
+            also allows you to set specific columns in the dataset when retrieving
+            rows.  The specs were full of partial implementations of mock adapters,
+            this mock adapter is much more complete and offers full support for mocking
+            transactions and database sharding.  Example:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">mock</span>(:<span class="ruby-identifier">fetch=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, :<span class="ruby-identifier">numrows=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>, :<span class="ruby-identifier">autoid=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">all</span>            <span class="ruby-comment"># =&gt; [{:id =&gt; 1}]</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">insert</span>         <span class="ruby-comment"># =&gt; 3</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">insert</span>         <span class="ruby-comment"># =&gt; 4</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">delete</span>         <span class="ruby-comment"># =&gt; 2</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>) <span class="ruby-comment"># =&gt; 2</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">sqls</span> <span class="ruby-comment"># =&gt; [&#39;SELECT ...&#39;, &#39;INSERT ...&#39;, ...]</span></pre>
+            
+            <p>In addition to being useful in the specs, the mock adapter is also used if
+            you use bin/sequel without a database argument, which makes it much easier
+            to play around with <a href="../../../classes/Sequel.html">Sequel</a> on
+            the command line without being tied to a real database.</p>
+            </li></ul>
+            
+            <h1 id="label-New+Transaction+Features">New Transaction Features</h1>
+            <ul><li>
+            <p>Database after_commit and after_rollback hooks have been added, allowing
+            you to set procs that are called after the currently- in-effect transaction
+            commits or rolls back.  If the Database is not currently in a transaction,
+            the after_commit proc is called immediately and the after_rollback proc is
+            ignored.</p>
+            </li><li>
+            <p>Model after_commit, after_rollback, after_destroy_commit, and
+            after_destroy_rollback hooks have been added that use the new Database
+            after_commit/after_rollback hook to execute code after commit or rollback.</p>
+            </li><li>
+            <p>Database#transaction now supports a :rollback =&gt; :reraise option to
+            reraise any <a
+            href="../../../classes/Sequel/Rollback.html">Sequel::Rollback</a>
+            exceptions raised by the block.</p>
+            </li><li>
+            <p>Database#transaction now supports a :rollback =&gt; :always option to
+            always rollback the transaction, which is mostly useful when using
+            transaction-based testing.</p>
+            </li><li>
+            <p><a
+            href="../../../classes/Sequel.html#method-c-transaction">Sequel.transaction</a>
+            has been added, allowing you to run simultaneous transactions on multiple
+            Database objects:</p>
+            
+            <pre>Sequel.transaction([DB1, DB2]){...}&#x000A;# similar to:&#x000A;DB1.transaction{DB2.transaction{...}}</pre>
+            
+            <p>You can combine this with the :rollback =&gt; :always option to easily use
+            multiple databases in the same test suite and make sure that changes are
+            rolled back on all of them.</p>
+            </li><li>
+            <p>Database#in_transaction? has been added so that users can detect whether
+            the code is currently inside a transaction.</p>
+            </li><li>
+            <p>The generic JDBC transaction support, used by 6 of Sequel&#39;s jdbc
+            subapters, now supports savepoints if the underlying JDBC driver supports
+            savepoints.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+New+Features">Other New Features</h1>
+            <ul><li>
+            <p>A dataset_associations plugin has been added, allowing datasets to call
+            association methods, which return datasets of rows in the associated table
+            that are associated to rows in the current dataset.</p>
+            
+            <pre># Dataset of tracks from albums with name &lt; &#39;M&#39;&#x000A;# by artists with name &gt; &#39;M&#39;&#x000A;Artist.filter(:name &gt; &#39;M&#39;).albums.filter(:name &lt; &#39;M&#39;).tracks&#x000A;&#x000A;# SELECT * FROM tracks&#x000A;# WHERE (tracks.album_id IN (&#x000A;#   SELECT albums.id FROM albums&#x000A;#   WHERE ((albums.artist_id IN (&#x000A;#     SELECT artists.id FROM artists&#x000A;#     WHERE (name &gt; &#39;M&#39;)))&#x000A;#    AND (name &lt; &#39;M&#39;))))</pre>
+            </li><li>
+            <p>Database#extend_datasets has been added, allowing you to do the equivalent
+            of extending all of the database&#39;s future datasets with a module.  For
+            performance, it creates an anonymous subclass of the current dataset class
+            and includes a module in it, and uses the subclass to create future
+            datasets.</p>
+            
+            <p>Using this feature allows you to override any dataset method and call
+            super, similar to how <a
+            href="../../../classes/Sequel/Model.html">Sequel::Model</a> plugins work.
+            The method takes either a module:</p>
+            
+            <pre>Sequel.extension :columns_introspection&#x000A;DB.extend_datasets(Sequel::ColumnsIntrospection)</pre>
+            
+            <p>or a block that it uses to create an anonymous module:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># Always select from table.* instead of *</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">from</span>(*<span class="ruby-identifier">tables</span>)&#x000A;    <span class="ruby-identifier">ds</span> = <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[:<span class="ruby-identifier">select</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[:<span class="ruby-identifier">select</span>].<span class="ruby-identifier">empty?</span>&#x000A;      <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select_all</span>(*<span class="ruby-identifier">tables</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">ds</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            </li><li>
+            <p>Database#<< and Dataset#<< now return self, which allow them to be used in
+            chaining:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;UPDATE foo SET bar_id = NULL&quot;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;DROP TABLE bars&quot;</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foo</span>] <span class="ruby-operator">&lt;&lt;</span> {:<span class="ruby-identifier">bar_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>} <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">bars</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>)</pre>
+            </li><li>
+            <p>A Database#timezone accessor has been added, allowing you to override
+            Sequel.database_timezone on a per-Database basis, which allows you to use
+            two separate Database objects in the same process that have different
+            timezones.</p>
+            </li><li>
+            <p>You can now modify the type conversion procs on a per-Database basis when
+            using the mysql, sqlite, and ibmdb adapters, by modifying the hash returned
+            by Database#conversion_procs.</p>
+            </li><li>
+            <p>Model.dataset_module now accepts a Module instance as an argument, and
+            extends the model&#39;s dataset with that module.</p>
+            </li><li>
+            <p>When using the postgres adapter with the pg driver, you can now use
+            Database#listen to wait for notifications.  All adapters that connect to
+            postgres now support Database#notify to send notifications:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># process 1</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">listen</span>(<span class="ruby-string">&#39;foo&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ev</span>, <span class="ruby-identifier">pid</span>, <span class="ruby-identifier">payload</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ev</span> <span class="ruby-comment"># =&gt; &#39;foo&#39;</span>&#x000A;  <span class="ruby-identifier">notify_pid</span> <span class="ruby-comment"># =&gt; some Integer</span>&#x000A;  <span class="ruby-identifier">payload</span> <span class="ruby-comment"># =&gt; &#39;bar&#39;</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># process 2</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">notify</span>(<span class="ruby-string">&#39;foo&#39;</span>, :<span class="ruby-identifier">payload=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>)</pre>
+            </li><li>
+            <p>many_to_one associations now have a :qualify option that can be set to
+            false to not qualify the primary key when loading the association.  This
+            shouldn&#39;t be necessary to use in most cases, but in some cases
+            qualifying a primary key breaks certain queries (e.g. using JOIN USING on
+            the same column on Oracle).</p>
+            </li><li>
+            <p>Database#schema can now take a dataset as an argument if it just selects
+            from a single table.  If a dataset is provided, the schema parsing will use
+            that dataset&#39;s identifier_input_method and identifier_output_method for
+            the parsing, instead of the database&#39;s default.  This makes it possible
+            for Model classes to correctly get the table schema if they use a dataset
+            whose identifier_(input|output)_method differs from the database default.</p>
+            </li><li>
+            <p>On databases that support common table expressions (CTEs) but do not
+            support CTE usage in subselects, <a
+            href="../../../classes/Sequel.html">Sequel</a> now emulates support by
+            moving CTEs from the subselect to the main select when using the Dataset
+            from, from_self, with, with_recursive, union, intersect, and except
+            methods.</p>
+            </li><li>
+            <p>The bitwise compliment operator is now emulated on H2.</p>
+            </li><li>
+            <p>You can now set the convert_tinyint_to_bool setting on a per-Database basis
+            in the mysql and mysql2 adapters.</p>
+            </li><li>
+            <p>You can now set the convert_invalid_date_time setting on a per-Database
+            basis in the mysql adapter.</p>
+            </li><li>
+            <p>Database instances now have a dataset_class accessor that allows you to set
+            which class is used when creating datasets.  This is mostly used to
+            implement the extend_datasets support, but it could be useful for other
+            purposes.</p>
+            </li><li>
+            <p>Dataset#unused_table_alias now accepts an optional 2nd argument, which
+            should be an array of additional symbols that should be considered as
+            already used.</p>
+            </li><li>
+            <p>Dataset#requires_placeholder_type_specifiers? has been added to check if
+            the dataset requires you use type specifiers for bound variable
+            placeholders.</p>
+            
+            <p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a>
+            plugin now checks this setting and works correctly on adapters that set it
+            to true, such as oracle.</p>
+            </li><li>
+            <p>Dataset#recursive_cte_requires_column_aliases? has been added to check if
+            you must provide a column list for a recursive CTE.</p>
+            
+            <p>The rcte_tree plugin now checks this setting an works correctly on
+            databases that set it to true, such as Oracle and HSQLDB.</p>
+            </li></ul>
+            
+            <h1 id="label-Performance+Improvements">Performance Improvements</h1>
+            <ul><li>
+            <p>Numerous optimizations were made to loading model objects from the
+            database, resulting in a 7-16% speedup.</p>
+            
+            <p>Model.call was added, and now .load is just an alias for .call. This allows
+            you to make the model dataset&#39;s row_proc the model itself, instead of
+            needing a separate block, which improves performance.</p>
+            
+            <p>While Model.load used to call .new (and therefore initialize), Model.call
+            uses .allocate/set_values/after_initialize for speed. This saves a method
+            call or two, and skips setting the @new instance variable.</p>
+            </li><li>
+            <p>Dataset#map, to_hash, select_map, select_order_map, and select_hash are now
+            faster if any of the provided arguments are an array of symbols.</p>
+            </li><li>
+            <p>The Model.[] optimization is now applied in more cases.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now creates accessor
+            methods for all columns in a model&#39;s table, even if the dataset
+            doesn&#39;t select the columns.  This has been the specified behavior for a
+            while, but the spec was broken. This allows you do to:</p>
+            
+            <pre>Model.dataset = DB[:table].select(:column1, :column2)&#x000A;Model.select_more(:column3).first.column3</pre>
+            </li><li>
+            <p>Model.def_dataset_method now correctly handles method names that can&#39;t
+            be used directly (such as method names with spaces).  This isn&#39;t so the
+            method can be used with arbitrary user input, but it will allow safe
+            creation of dataset methods that are derived from column names, which could
+            contain spaces.</p>
+            </li><li>
+            <p>Model.def_dataset_method no longer overrides private model methods.</p>
+            </li><li>
+            <p>The optimization that Model.[] uses now works correctly if the model&#39;s
+            dataset uses a different identifier_input_method than the database.</p>
+            </li><li>
+            <p>Sharding is supported correctly by default for the transactions used by
+            model objects.  Previously, you had to use the sharding plugin to make sure
+            the same shard was used for transactions as for the insert/update/delete
+            statements.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now fully supports using
+            an aliased table for the :join_table option of a many_to_many association. 
+            The only real use case for an aliased :join_table option is when the join
+            table is the same as the associated model table.</p>
+            </li><li>
+            <p>A bug when eagerly loading a many_through_many association with composite
+            keys where one of the join tables requires an alias has been fixed.</p>
+            </li><li>
+            <p>Sequel&#39;s transaction internals have had substantial improvments. You
+            can now open up simultaneous transactions on two separate shards of the
+            same Database object in the same thread.  The new design allows for future
+            support of connection pools that aren&#39;t based on threads.  <a
+            href="../../../classes/Sequel.html">Sequel</a> no longer abuses
+            thread-local variables to store savepoint state.</p>
+            </li><li>
+            <p>Dataset#select_map and select_order_map now return an array of single
+            element arrays if given an array with a single entry as an argument. 
+            Previously, they returned an array of values, which wasn&#39;t consistent.</p>
+            </li><li>
+            <p>Sequel&#39;s emulation of bitwise operators with more than 2 arguments now
+            works on all adapters that use the emulation.  The emulation was broken in
+            3.28.0 when more than 2 arguments were used on H2, DB2, Microsoft SQL
+            Server, PostgreSQL, and SQLite.</p>
+            </li><li>
+            <p>Dataset#columns now correctly handles the emulated offset support used on
+            DB2, Oracle, and Microsoft SQL Server when using the jdbc, odbc, ado, and
+            dbi adapters.  Previously, Dataet#columns could contain the row number
+            column, which wasn&#39;t in the hashes yielded by Dataset#each.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> can now parse primary key
+            information on Microsoft SQL Server.  Previously, the only adapter that
+            supported this was the jdbc adapter, which uses the generic JDBC support. 
+            The shared mssql adapter now supports parsing the information directly from
+            the database system tables.  This means that if you are using Model objects
+            with a Microsoft SQL Server database using the tinytds, odbc, or ado
+            adapters, the model primary key information will be set automatically.</p>
+            </li><li>
+            <p>Sequel&#39;s prepared statement support no longer defines singleton methods
+            on the prepared statement objects.</p>
+            </li><li>
+            <p>StringMethods#like is now case sensitive on SQLite and Microsoft SQL
+            Server, making it more similar to other databases.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now works around an
+            SQLite column naming bug if you select columns qualified with the alias of
+            a subselect without providing an alias for the column itself.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now handles more bound
+            variable types when using bound variables outside of prepared statements on
+            SQLite.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now works around a bug in
+            certain versions of the JDBC/SQLite driver when emulating alter table
+            support for operations such as drop_column.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now emulates the
+            add_constraint and drop_constraint alter table operations on SQLite, though
+            the emulation has issues.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now correctly handles
+            composite primary keys when emulating alter_table operations on SQLite.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now applies the correct
+            PRAGMA statements by default when connecting to SQLite via the amalgalite
+            and swift adapters.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports using
+            savepoints inside prepared transactions on MySQL.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now closes JDBC ResultSet
+            objects as soon as it is done using them, leading to potentially lower
+            memory usage in the JDBC adapter, and fixes issues if you try to drop a
+            table before GC has collected a related ResultSet.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> can now correctly insert
+            all default values into a table on DB2.  Before, this didn&#39;t work
+            correctly if the table had more than one column.</p>
+            </li><li>
+            <p>Another type of disconnection error is now recognized in the mysql2
+            adapter.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now uses better error
+            messages if you attempt to execute a prepared statement without a name
+            using the postgres, mysql, and mysql2 adapters.</p>
+            </li><li>
+            <p>Some small fixes have been made that allow <a
+            href="../../../classes/Sequel.html">Sequel</a> to run better when $SAFE=1. 
+            However, <a href="../../../classes/Sequel.html">Sequel</a> is not
+            officially supported using $SAFE &gt; 0, so there could be many issues
+            remaining.</p>
+            </li><li>
+            <p>Sequel&#39;s core and model specs were cleaned up by using the mock adapter
+            to eliminate a lot of redundant code.</p>
+            </li><li>
+            <p>Sequel&#39;s integration tests were sped up considerably, halving the
+            execution time on some adapters.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>Because Model.load is now an alias for .call, plugins should no longer
+            override load.  Instead, they should override .call.</p>
+            </li><li>
+            <p>Loading model objects from the database no longer calls Model#initialize. 
+            Instead, it calls Model.allocate, Model#set_values, and
+            Model#after_initialize.  So if you were overriding initialize and expecting
+            the changes to affect model objects loaded from the database, you need to
+            change your code.</p>
+            
+            <p>Additionally, @new is no longer set to false for objects retieved from the
+            database, since setting it to false hurts performance. Model#new? still
+            returns true or false, so this only affects you if you are checking the
+            instance variables directly.</p>
+            </li><li>
+            <p>Dataset#<< no longer returns the autogenerated primary key for the inserted
+            row.  As mentioned above, it now returns self to allow for chaining.  If
+            you were previously relying on the return value, switch from << to insert.</p>
+            </li><li>
+            <p>Dataset#map no longer calls the row_proc if given an argument, and
+            Dataset#to_hash no longer calls the row_proc if given two arguments. This
+            should only affect your code if you were using a row_proc that modified the
+            content of the hash (e.g. Model#after_initialize). If you were relying on
+            the old behavior, switch:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">map</span>(:<span class="ruby-identifier">foo</span>)&#x000A;<span class="ruby-comment"># to</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[:<span class="ruby-identifier">foo</span>]}&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">to_hash</span>(:<span class="ruby-identifier">foo</span>, :<span class="ruby-identifier">bar</span>)&#x000A;<span class="ruby-comment"># to</span>&#x000A;<span class="ruby-identifier">h</span> = {}&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[:<span class="ruby-identifier">foo</span>]] = <span class="ruby-identifier">r</span>[:<span class="ruby-identifier">bar</span>]}&#x000A;<span class="ruby-identifier">h</span></pre>
+            </li><li>
+            <p>Model classes now need to have a dataset before you can define associations
+            on them.</p>
+            </li><li>
+            <p>Model classes now pass their dataset to Database#schema, instead of their
+            table name.</p>
+            </li><li>
+            <p>The :eager_block association option (which defaults to the
+            association&#39;s block argument) is now called before the :eager_graph
+            association option has been applied, instead of after.</p>
+            </li><li>
+            <p>The many_to_many association reflection :qualified_right_key entry is now a
+            method named qualified_right_key.  Switch any code using <a
+            href="http://:qualified_right_key">association_reflection</a> to use
+            association_reflection.qualified_right_key.</p>
+            </li><li>
+            <p>If you are using like on SQLite and Microsoft SQL Server and want it to be
+            case insensitive, switch to using ilike:</p>
+            
+            <pre># Case sensitive&#x000A;DB[:foos].where(:name.like(&#39;bar%&#39;))&#x000A;# Case insensitive&#x000A;DB[:foos].where(:name.ilike(&#39;bar%&#39;))</pre>
+            
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now sets the
+            case_sensitive_like PRAGMA to true by default on SQLite.  To set it to
+            false instead, pass the :case_sensitive_like=&gt;false option to the
+            database when creating it.</p>
+            </li><li>
+            <p>Sequel&#39;s alter table emulation on SQLite now renames the current table
+            then populates the replacement table, instead of populating the replacement
+            table at a temporary name, dropping the current table, and then renaming
+            the replacement table.</p>
+            </li><li>
+            <p>The strings &#39;n&#39; and &#39;no&#39; (case insensitive) when typecasted
+            to boolean are now considered false values instead of true.</p>
+            </li><li>
+            <p>The transaction internals had extensive changes, if you have any code that
+            depended on the transaction internals, it will probably require changes.</p>
+            </li><li>
+            <p>Using the Sequel::MySQL module settings for convert_tinyint_to_bool and
+            convert_invalid_date_time now only affects future Database objects.  You
+            should switch to using the per-Database methods if you are currently using
+            the Sequel::MySQL module methods.</p>
+            </li><li>
+            <p>The customized transaction support in the do (DataObjects) adapter was
+            removed.  All three subadapters (postgres, mysql, sqlite) of the do adapter
+            implement their own transaction support, so this should have no effect
+            unless you were using the do adapter with a different database type.</p>
+            </li><li>
+            <p>The oracle support changed dramatically, so if you were relying on the
+            internals of the oracle support, you should take extra care when upgrading.</p>
+            </li></ul>
+            
+            <h1 id="label-Advance+Notice">Advance Notice</h1>
+            <ul><li>
+            <p>The next release of <a href="../../../classes/Sequel.html">Sequel</a> will
+            contain significant changes to how a dataset is literalized into an SQL
+            string.  If you have a custom plugin, extension, or adapter that overrides
+            a method containing "literal", "sql", or "quote", or you make other
+            modifications or extensions to how <a
+            href="../../../classes/Sequel.html">Sequel</a> currently literalizes
+            datasets to SQL, your code will likely need to be modified to support the
+            next release.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

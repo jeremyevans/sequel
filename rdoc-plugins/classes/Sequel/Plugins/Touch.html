@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::Touch</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::Touch
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/touch_rb.html">lib/sequel/plugins/touch.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The touch plugin adds a touch method to model instances, which saves the
+            object with a modified timestamp.  By default, it uses the :updated_at
+            column, but you can set which column to use. It also supports touching of
+            associations, so that when the current model object is updated or
+            destroyed, the associated rows in the database can have their modified
+            timestamp updated to the current timestamp.</p>
+            
+            <p>Since the instance touch method works on model instances, it uses Time.now
+            for the timestamp.  The association touching works on datasets, so it
+            updates all related rows in a single query, using the <a
+            href="../SQL.html">SQL</a> standard CURRENT_TIMESTAMP.  Both of these can
+            be overridden easily if necessary.</p>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Allow touching of all model instances (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">touch</span>&#x000A;&#x000A;<span class="ruby-comment"># Allow touching of Album instances, with a custom column</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">touch</span>, :<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">updated_on</span>&#x000A;&#x000A;<span class="ruby-comment"># Allow touching of Artist instances, updating the albums and tags</span>&#x000A;<span class="ruby-comment"># associations when touching, touching the +updated_on+ column for</span>&#x000A;<span class="ruby-comment"># albums and the +updated_at+ column for tags</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">touch</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>[{:<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">updated_on</span>}, :<span class="ruby-identifier">tags</span>]</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-apply">apply</a></li>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="Touch/ClassMethods.html">Sequel::Plugins::Touch::ClassMethods</a></li>
+              <li><a target="docwin" href="Touch/InstanceMethods.html">Sequel::Plugins::Touch::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>TOUCH_COLUMN_DEFAULT</td>
+                    <td>=</td>
+                    <td class='context-item-value'>:updated_at</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The default column to update when touching</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
+                <div class='synopsis'>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(model, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@touched_associations</span>, {})&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set the touch_column and touched_associations variables for the model.
+                  Options:</p>
+                  <ul><li>
+                  <p>:associations - The associations to touch when a model instance is updated
+                  or destroyed.  Can be a symbol for a single association, a hash with
+                  association keys and column values, or an array of symbols and/or hashes. 
+                  If a symbol is used, the column used when updating the associated objects
+                  is the model&#39;s touch_column. If a hash is used, the value is used as
+                  the column to update.</p>
+                  </li><li>
+                  <p>:column - The column to modify when touching a model instance.</p>
+                  </li></ul>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">TOUCH_COLUMN_DEFAULT</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_associations</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

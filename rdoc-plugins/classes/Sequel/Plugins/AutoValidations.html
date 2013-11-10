@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::AutoValidations</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::AutoValidations
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/auto_validations_rb.html">lib/sequel/plugins/auto_validations.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The auto_validations plugin automatically sets up three types of
+            validations for your model columns:</p>
+            <ol><li>
+            <p>type validations for all columns</p>
+            </li><li>
+            <p>not_null validations on NOT NULL columns (optionally, presence validations)</p>
+            </li><li>
+            <p>unique validations on columns or sets of columns with unique indexes</p>
+            </li></ol>
+            
+            <p>To determine the columns to use for the not_null validations and the types
+            for the type validations, the plugin looks at the database schema for the
+            model&#39;s table.  To determine the unique validations, <a
+            href="../../Sequel.html">Sequel</a> looks at the indexes on the table.  In
+            order for this plugin to be fully functional, the underlying database
+            adapter needs to support both schema and index parsing.</p>
+            
+            <p>This plugin uses the validation_helpers plugin underneath to implement the
+            validations.  It does not allow for any per-column validation message
+            customization, but you can alter the messages for the given type of
+            validation on a per-model basis (see the validation_helpers documentation).</p>
+            
+            <p>You can skip certain types of validations from being automatically added
+            via:</p>
+            
+            <pre>Model.skip_auto_validations(:not_null)</pre>
+            
+            <p>If you want to skip all auto validations (only useful if loading the plugin
+            in a superclass):</p>
+            
+            <pre>Model.skip_auto_validations(:all)</pre>
+            
+            <p>By default, the plugin uses a not_null validation for NOT NULL columns, but
+            that can be changed to a presence validation using an option:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">auto_validations</span>, :<span class="ruby-identifier">not_null=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">presence</span></pre>
+            
+            <p>This is useful if you want to enforce that NOT NULL string columns do not
+            allow empty values.</p>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Make all model subclass use auto validations (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">auto_validations</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class use auto validations</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">auto_validations</span></pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-apply">apply</a></li>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="AutoValidations/ClassMethods.html">Sequel::Plugins::AutoValidations::ClassMethods</a></li>
+              <li><a target="docwin" href="AutoValidations/InstanceMethods.html">Sequel::Plugins::AutoValidations::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
+                <div class='synopsis'>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(model, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>&#x000A;    <span class="ruby-ivar">@auto_validate_presence</span> = <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-ivar">@auto_validate_not_null_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_explicit_not_null_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_unique_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_types</span> = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Setup auto validations for the model if it has a dataset.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">setup_auto_validations</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:not_null</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:presence</span>&#x000A;      <span class="ruby-ivar">@auto_validate_presence</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

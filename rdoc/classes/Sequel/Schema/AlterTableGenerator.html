@@ -1,0 +1,540 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Schema::AlterTableGenerator</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Schema::AlterTableGenerator
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/database/schema_generator_rb.html">lib/sequel/database/schema_generator.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Schema.html">Schema</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p><a href="AlterTableGenerator.html">Schema::AlterTableGenerator</a> is an
+            internal class that the user is not expected to instantiate directly. 
+            Instances are created by <a
+            href="../Database.html#method-i-alter_table">Sequel::Database#alter_table</a>.
+            It is used to specify table alteration parameters.  It takes a <a
+            href="../Database.html">Database</a> object and a block of operations to
+            perform on the table, and gives the <a href="../Database.html">Database</a>
+            an array of table altering operations, which the database uses to alter a
+            table&#39;s description.</p>
+            
+            <p>For more information on Sequel&#39;s support for schema modification, see
+            the <a href="../../../files/doc/schema_modification_rdoc.html">"Schema
+            Modification" guide</a>.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-add_column">add_column</a></li>
+              <li><a target="docwin" href="#method-i-add_constraint">add_constraint</a></li>
+              <li><a target="docwin" href="#method-i-add_foreign_key">add_foreign_key</a></li>
+              <li><a target="docwin" href="#method-i-add_full_text_index">add_full_text_index</a></li>
+              <li><a target="docwin" href="#method-i-add_index">add_index</a></li>
+              <li><a target="docwin" href="#method-i-add_primary_key">add_primary_key</a></li>
+              <li><a target="docwin" href="#method-i-add_spatial_index">add_spatial_index</a></li>
+              <li><a target="docwin" href="#method-i-add_unique_constraint">add_unique_constraint</a></li>
+              <li><a target="docwin" href="#method-i-drop_column">drop_column</a></li>
+              <li><a target="docwin" href="#method-i-drop_constraint">drop_constraint</a></li>
+              <li><a target="docwin" href="#method-i-drop_foreign_key">drop_foreign_key</a></li>
+              <li><a target="docwin" href="#method-i-drop_index">drop_index</a></li>
+              <li><a target="docwin" href="#attribute-i-operations">operations</a></li>
+              <li><a target="docwin" href="#method-i-rename_column">rename_column</a></li>
+              <li><a target="docwin" href="#method-i-set_column_allow_null">set_column_allow_null</a></li>
+              <li><a target="docwin" href="#method-i-set_column_default">set_column_default</a></li>
+              <li><a target="docwin" href="#method-i-set_column_not_null">set_column_not_null</a></li>
+              <li><a target="docwin" href="#method-i-set_column_type">set_column_type</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-operations'>operations</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>An array of DDL operations to perform</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(db, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set the <a href="../Database.html">Database</a> object to which to apply
+                  the DDL, and evaluate the block in the context of this object.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 307</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@operations</span> = []&#x000A;  <span class="ruby-identifier">instance_eval</span>(&amp;<span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-add_column'>
+                <a name='method-i-add_column'></a>
+                <div class='synopsis'>
+                  <span class='name'>add_column</span>
+                  <span class='arguments'>(name, type, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add a column with the given name, type, and opts to the DDL for the table.
+                  See <a
+                  href="CreateTableGenerator.html#method-i-column">Sequel::Schema::CreateTableGenerator#column</a>
+                  for the available options.</p>
+                  
+                  <pre>add_column(:name, String) # ADD COLUMN name varchar(255)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_column-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-add_column-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 317</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:add_column</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">type</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-add_constraint'>
+                <a name='method-i-add_constraint'></a>
+                <div class='synopsis'>
+                  <span class='name'>add_constraint</span>
+                  <span class='arguments'>(name, *args, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add a constraint with the given name and args to the DDL for the table. See
+                  <a
+                  href="CreateTableGenerator.html#method-i-constraint">Sequel::Schema::CreateTableGenerator#constraint</a>.</p>
+                  
+                  <pre class="ruby"><span class="ruby-identifier">add_constraint</span>(:<span class="ruby-identifier">valid_name</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>))&#x000A;<span class="ruby-comment"># ADD CONSTRAINT valid_name CHECK (name LIKE &#39;A%&#39;)</span>&#x000A;<span class="ruby-identifier">add_constraint</span>({:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">valid_name</span>, :<span class="ruby-identifier">deferrable=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}, :<span class="ruby-identifier">num=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># CONSTRAINT valid_name CHECK (name LIKE &#39;A%&#39;) DEFERRABLE INITIALLY DEFERRED</span></pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_constraint-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-add_constraint-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 328</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_constraint</span>(<span class="ruby-identifier">name</span>, *<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">name</span>}&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:op=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:add_constraint</span>, <span class="ruby-value">:type=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:check</span>, <span class="ruby-value">:check=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-add_foreign_key'>
+                <a name='method-i-add_foreign_key'></a>
+                <div class='synopsis'>
+                  <span class='name'>add_foreign_key</span>
+                  <span class='arguments'>(name, table, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add a foreign key with the given name and referencing the given table to
+                  the DDL for the table.  See <a
+                  href="CreateTableGenerator.html#method-i-column">Sequel::Schema::CreateTableGenerator#column</a>
+                  for the available options.</p>
+                  
+                  <p>You can also pass an array of column names for creating composite foreign
+                  keys. In this case, it will assume the columns exist and will only add the
+                  constraint.  You can provide a :name option to name the constraint.</p>
+                  
+                  <p>NOTE: If you need to add a foreign key constraint to a single existing
+                  column use the composite key syntax even if it is only one column.</p>
+                  
+                  <pre>add_foreign_key(:artist_id, :table) # ADD COLUMN artist_id integer REFERENCES table&#x000A;add_foreign_key([:name], :table) # ADD FOREIGN KEY (name) REFERENCES table</pre>
+                  
+                  <p>PostgreSQL specific options:</p>
+                  <dl class="rdoc-list note-list"><dt>:not_valid 
+                  <dd>
+                  <p>Set to true to add the constraint with the NOT VALID syntax. This makes it
+                  so that future inserts must respect referential integrity, but allows the
+                  constraint to be added even if existing column values reference rows that
+                  do not exist.  After all the existing data has been cleaned up,
+                  validate_constraint can be used to mark the constraint as valid.  Note that
+                  this option only makes sense when using an array of columns.</p>
+                  </dd></dl>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_foreign_key-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-add_foreign_key-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 365</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_foreign_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">add_composite_foreign_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;  <span class="ruby-identifier">add_column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-constant">Integer</span>, {<span class="ruby-value">:table=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">table</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-add_full_text_index'>
+                <a name='method-i-add_full_text_index'></a>
+                <div class='synopsis'>
+                  <span class='name'>add_full_text_index</span>
+                  <span class='arguments'>(columns, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add a full text index on the given columns to the DDL for the table. See <a
+                  href="CreateTableGenerator.html#method-i-index">Sequel::Schema::CreateTableGenerator#index</a>
+                  for available options.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_full_text_index-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-add_full_text_index-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 372</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_full_text_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">add_index</span>(<span class="ruby-identifier">columns</span>, {<span class="ruby-value">:type=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:full_text</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-add_index'>
+                <a name='method-i-add_index'></a>
+                <div class='synopsis'>
+                  <span class='name'>add_index</span>
+                  <span class='arguments'>(columns, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add an index on the given columns to the DDL for the table.  See <a
+                  href="CreateTableGenerator.html#method-i-index">Sequel::Schema::CreateTableGenerator#index</a>
+                  for available options.</p>
+                  
+                  <pre>add_index(:artist_id) # CREATE INDEX table_artist_id_index ON table (artist_id)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_index-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-add_index-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 380</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:add_index</span>, <span class="ruby-value">:columns</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>)}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-add_primary_key'>
+                <a name='method-i-add_primary_key'></a>
+                <div class='synopsis'>
+                  <span class='name'>add_primary_key</span>
+                  <span class='arguments'>(name, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add a primary key to the DDL for the table.  See <a
+                  href="CreateTableGenerator.html#method-i-column">Sequel::Schema::CreateTableGenerator#column</a>
+                  for the available options.  Like <code>add_foreign_key</code>, if you
+                  specify the column name as an array, it just creates a constraint:</p>
+                  
+                  <pre>add_primary_key(:id) # ADD COLUMN id serial PRIMARY KEY&#x000A;add_primary_key([:artist_id, :name]) # ADD PRIMARY KEY (artist_id, name)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_primary_key-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-add_primary_key-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 390</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_primary_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">add_composite_primary_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">serial_primary_key_options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">add_column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:type</span>), <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-add_spatial_index'>
+                <a name='method-i-add_spatial_index'></a>
+                <div class='synopsis'>
+                  <span class='name'>add_spatial_index</span>
+                  <span class='arguments'>(columns, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add a spatial index on the given columns to the DDL for the table. See <a
+                  href="CreateTableGenerator.html#method-i-index">Sequel::Schema::CreateTableGenerator#index</a>
+                  for available options.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_spatial_index-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-add_spatial_index-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 398</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_spatial_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">add_index</span>(<span class="ruby-identifier">columns</span>, {<span class="ruby-value">:type=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:spatial</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-add_unique_constraint'>
+                <a name='method-i-add_unique_constraint'></a>
+                <div class='synopsis'>
+                  <span class='name'>add_unique_constraint</span>
+                  <span class='arguments'>(columns, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add a unique constraint to the given column(s)</p>
+                  
+                  <pre class="ruby"><span class="ruby-identifier">add_unique_constraint</span>(:<span class="ruby-identifier">name</span>) <span class="ruby-comment"># ADD UNIQUE (name)</span>&#x000A;<span class="ruby-identifier">add_unique_constraint</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">unique_name</span>) <span class="ruby-comment"># ADD CONSTRAINT unique_name UNIQUE (name)</span></pre>
+                  
+                  <p>Supports the same :deferrable option as <a
+                  href="CreateTableGenerator.html#method-i-column">Sequel::Schema::CreateTableGenerator#column</a>.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_unique_constraint-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-add_unique_constraint-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 339</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_unique_constraint</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:add_constraint</span>, <span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:unique</span>, <span class="ruby-value">:columns</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>)}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-drop_column'>
+                <a name='method-i-drop_column'></a>
+                <div class='synopsis'>
+                  <span class='name'>drop_column</span>
+                  <span class='arguments'>(name, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Remove a column from the DDL for the table.</p>
+                  
+                  <pre class="ruby"><span class="ruby-identifier">drop_column</span>(:<span class="ruby-identifier">artist_id</span>) <span class="ruby-comment"># DROP COLUMN artist_id</span>&#x000A;<span class="ruby-identifier">drop_column</span>(:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">cascade=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>) <span class="ruby-comment"># DROP COLUMN artist_id CASCADE</span></pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_column-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-drop_column-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 406</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:drop_column</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-drop_constraint'>
+                <a name='method-i-drop_constraint'></a>
+                <div class='synopsis'>
+                  <span class='name'>drop_constraint</span>
+                  <span class='arguments'>(name, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Remove a constraint from the DDL for the table. MySQL/SQLite specific
+                  options:</p>
+                  <dl class="rdoc-list note-list"><dt>:type 
+                  <dd>
+                  <p>Set the type of constraint to drop, either :primary_key, :foreign_key, or
+                  :unique.</p>
+                  </dd></dl>
+                  
+                  <pre class="ruby"><span class="ruby-identifier">drop_constraint</span>(:<span class="ruby-identifier">unique_name</span>) <span class="ruby-comment"># DROP CONSTRAINT unique_name</span>&#x000A;<span class="ruby-identifier">drop_constraint</span>(:<span class="ruby-identifier">unique_name</span>, :<span class="ruby-identifier">cascade=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>) <span class="ruby-comment"># DROP CONSTRAINT unique_name CASCADE</span></pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_constraint-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-drop_constraint-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 417</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_constraint</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:drop_constraint</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-drop_foreign_key'>
+                <a name='method-i-drop_foreign_key'></a>
+                <div class='synopsis'>
+                  <span class='name'>drop_foreign_key</span>
+                  <span class='arguments'>(name, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Remove a foreign key and the associated column from the DDL for the table.
+                  General options:</p>
+                  <dl class="rdoc-list note-list"><dt>:name 
+                  <dd>
+                  <p>The name of the constraint to drop.  If not given, uses the same name that
+                  would be used by <a
+                  href="AlterTableGenerator.html#method-i-add_foreign_key">#add_foreign_key</a>
+                  with the same columns.</p>
+                  </dd></dl>
+                  
+                  <p>NOTE: If you want to drop only the foreign key constraint but keep the
+                  column, use the composite key syntax even if it is only one column.</p>
+                  
+                  <pre>drop_foreign_key(:artist_id) # DROP CONSTRAINT table_artist_id_fkey, DROP COLUMN artist_id&#x000A;drop_foreign_key([:name]) # DROP CONSTRAINT table_name_fkey</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_foreign_key-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-drop_foreign_key-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 431</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_foreign_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">drop_composite_foreign_key</span>(<span class="ruby-constant">Array</span>(<span class="ruby-identifier">name</span>), <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">drop_column</span>(<span class="ruby-identifier">name</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-drop_index'>
+                <a name='method-i-drop_index'></a>
+                <div class='synopsis'>
+                  <span class='name'>drop_index</span>
+                  <span class='arguments'>(columns, options=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Remove an index from the DDL for the table. General options:</p>
+                  <dl class="rdoc-list note-list"><dt>:name 
+                  <dd>
+                  <p>The name of the index to drop.  If not given, uses the same name that would
+                  be used by <a
+                  href="AlterTableGenerator.html#method-i-add_index">#add_index</a> with the
+                  same columns.</p>
+                  </dd></dl>
+                  
+                  <p>PostgreSQL specific options:</p>
+                  <dl class="rdoc-list note-list"><dt>:cascade 
+                  <dd>
+                  <p>Cascade the index drop to dependent objects.</p>
+                  </dd><dt>:concurrently 
+                  <dd>
+                  <p>Drop the index using CONCURRENTLY, which doesn&#39;t block operations on
+                  the table.  Supported in PostgreSQL 9.2+.</p>
+                  </dd><dt>:if_exists 
+                  <dd>
+                  <p>Only drop the index if it already exists.</p>
+                  </dd></dl>
+                  
+                  <pre class="ruby"><span class="ruby-identifier">drop_index</span>(:<span class="ruby-identifier">artist_id</span>) <span class="ruby-comment"># DROP INDEX table_artist_id_index</span>&#x000A;<span class="ruby-identifier">drop_index</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>]) <span class="ruby-comment"># DROP INDEX table_a_b_index</span>&#x000A;<span class="ruby-identifier">drop_index</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>], :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">foo</span>) <span class="ruby-comment"># DROP INDEX foo</span></pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_index-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-drop_index-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 451</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:drop_index</span>, <span class="ruby-value">:columns</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>)}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">options</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-rename_column'>
+                <a name='method-i-rename_column'></a>
+                <div class='synopsis'>
+                  <span class='name'>rename_column</span>
+                  <span class='arguments'>(name, new_name, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Modify a column&#39;s name in the DDL for the table.</p>
+                  
+                  <pre>rename_column(:name, :artist_name) # RENAME COLUMN name TO artist_name</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-rename_column-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-rename_column-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 458</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">rename_column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:rename_column</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:new_name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">new_name</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-set_column_allow_null'>
+                <a name='method-i-set_column_allow_null'></a>
+                <div class='synopsis'>
+                  <span class='name'>set_column_allow_null</span>
+                  <span class='arguments'>(name, allow_null=true)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set a given column as allowing NULL values.</p>
+                  
+                  <pre>set_column_allow_null(:artist_name) # ALTER COLUMN artist_name DROP NOT NULL</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_allow_null-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-set_column_allow_null-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 483</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">allow_null</span>=<span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_null</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:null</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">allow_null</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-set_column_default'>
+                <a name='method-i-set_column_default'></a>
+                <div class='synopsis'>
+                  <span class='name'>set_column_default</span>
+                  <span class='arguments'>(name, default)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Modify a column&#39;s default value in the DDL for the table.</p>
+                  
+                  <pre>set_column_default(:artist_name, &#39;a&#39;) # ALTER COLUMN artist_name SET DEFAULT &#39;a&#39;</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_default-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-set_column_default-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 465</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_default</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">default</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_default</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:default</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">default</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-set_column_not_null'>
+                <a name='method-i-set_column_not_null'></a>
+                <div class='synopsis'>
+                  <span class='name'>set_column_not_null</span>
+                  <span class='arguments'>(name)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set a given column as not allowing NULL values.</p>
+                  
+                  <pre>set_column_not_null(:artist_name) # ALTER COLUMN artist_name SET NOT NULL</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_not_null-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-set_column_not_null-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 490</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_not_null</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-set_column_type'>
+                <a name='method-i-set_column_type'></a>
+                <div class='synopsis'>
+                  <span class='name'>set_column_type</span>
+                  <span class='arguments'>(name, type, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Modify a column&#39;s type in the DDL for the table.</p>
+                  
+                  <pre>set_column_type(:artist_name, &#39;char(10)&#39;) # ALTER COLUMN artist_name TYPE char(10)</pre>
+                  
+                  <p>PostgreSQL specific options:</p>
+                  <dl class="rdoc-list note-list"><dt>:using 
+                  <dd>
+                  <p>Add a USING clause that specifies how to convert existing values to new
+                  values.</p>
+                  </dd></dl>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_type-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-set_column_type-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 476</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_type</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_type</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">type</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

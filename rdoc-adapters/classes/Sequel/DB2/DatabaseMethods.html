@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::DB2::DatabaseMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::DB2::DatabaseMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/adapters/shared/db2_rb.html">lib/sequel/adapters/shared/db2.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../DB2.html">DB2</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-database_type">database_type</a></li>
+              <li><a target="docwin" href="#method-i-db2_version">db2_version</a></li>
+              <li><a target="docwin" href="#method-i-indexes">indexes</a></li>
+              <li><a target="docwin" href="#method-i-schema_parse_table">schema_parse_table</a></li>
+              <li><a target="docwin" href="#method-i-supports_transaction_isolation_levels-3F">supports_transaction_isolation_levels?</a></li>
+              <li><a target="docwin" href="#method-i-tables">tables</a></li>
+              <li><a target="docwin" href="#method-i-views">views</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>AUTOINCREMENT</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'GENERATED ALWAYS AS IDENTITY'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DATABASE_ERROR_REGEXPS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      {
+                      /DB2 SQL Error: SQLCODE=-803, SQLSTATE=23505|One or more values in the INSERT statement, UPDATE statement, or foreign key update caused by a DELETE statement are not valid because the primary key, unique constraint or unique index/ => UniqueConstraintViolation,
+                      /DB2 SQL Error: (SQLCODE=-530, SQLSTATE=23503|SQLCODE=-532, SQLSTATE=23504)|The insert or update value of the FOREIGN KEY .+ is not equal to any value of the parent key of the parent table|A parent row cannot be deleted because the relationship .+ restricts the deletion/ => ForeignKeyConstraintViolation,
+                      /DB2 SQL Error: SQLCODE=-545, SQLSTATE=23513|The requested operation is not allowed because a row does not satisfy the check constraint/ => CheckConstraintViolation,
+                      /DB2 SQL Error: SQLCODE=-407, SQLSTATE=23502|Assignment of a NULL value to a NOT NULL column/ => NotNullConstraintViolation,
+                      /DB2 SQL Error: SQLCODE=-911, SQLSTATE=40001|The current transaction has been rolled back because of a deadlock or timeout/ => SerializationFailure,
+                      }.freeze
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NOT_NULL</td>
+                    <td>=</td>
+                    <td class='context-item-value'>' NOT NULL'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NULL</td>
+                    <td>=</td>
+                    <td class='context-item-value'>''.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='aliases-list'>
+              <h2>Public Instance Aliases</h2>
+              <div class='name-list'>
+                <table summary='Public Instance Aliases'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>server_version</td>
+                    <td>-&gt;</td>
+                    <td class='context-item-value'><a target="docwin" href="#method-i-db2_version">db2_version</a></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-database_type'>
+                <a name='method-i-database_type'></a>
+                <div class='synopsis'>
+                  <span class='name'>database_type</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p><a href="../DB2.html">DB2</a> always uses :db2 as it&#39;s database type</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-database_type-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 20</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-value">:db2</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-db2_version'>
+                <a name='method-i-db2_version'></a>
+                <div class='synopsis'>
+                  <span class='name'>db2_version</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the database version as a string.  Don&#39;t rely on this, it may
+                  return an integer in the future.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-db2_version-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-db2_version-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">db2_version</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@db2_version</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@db2_version</span>&#x000A;  <span class="ruby-ivar">@db2_version</span> = <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;select service_level from sysibmadm.env_inst_info&quot;</span>).<span class="ruby-identifier">first</span>[<span class="ruby-value">:service_level</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-indexes'>
+                <a name='method-i-indexes'></a>
+                <div class='synopsis'>
+                  <span class='name'>indexes</span>
+                  <span class='arguments'>(table, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Use SYSCAT.INDEXES to get the indexes for the table</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-indexes-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-indexes-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">indexes</span> = {}&#x000A;  <span class="ruby-identifier">metadata_dataset</span>.&#x000A;   <span class="ruby-identifier">from</span>(<span class="ruby-value">:syscat__indexes</span>).&#x000A;   <span class="ruby-identifier">select</span>(<span class="ruby-value">:indname</span>, <span class="ruby-value">:uniquerule</span>, <span class="ruby-value">:colnames</span>).&#x000A;   <span class="ruby-identifier">where</span>(<span class="ruby-value">:tabname=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">input_identifier_meth</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">table</span>), <span class="ruby-value">:system_required=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>).&#x000A;   <span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">indexes</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:indname</span>])] = {<span class="ruby-value">:unique=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:uniquerule</span>]<span class="ruby-operator">==</span><span class="ruby-string">&#39;U&#39;</span>), <span class="ruby-value">:columns=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:colnames</span>][<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>].<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;+&#39;</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>)}}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">indexes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-schema_parse_table'>
+                <a name='method-i-schema_parse_table'></a>
+                <div class='synopsis'>
+                  <span class='name'>schema_parse_table</span>
+                  <span class='arguments'>(table, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Use SYSIBM.SYSCOLUMNS to get the information on the tables.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-schema_parse_table-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-schema_parse_table-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">schema_parse_table</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:dataset</span>])&#x000A;  <span class="ruby-identifier">im</span> = <span class="ruby-identifier">input_identifier_meth</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:dataset</span>])&#x000A;  <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-node">&quot;SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = #{literal(im.call(table))} ORDER BY COLNO&quot;</span>).&#x000A;    <span class="ruby-identifier">collect</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span><span class="ruby-operator">|</span> &#x000A;      <span class="ruby-identifier">column</span>[<span class="ruby-value">:db_type</span>]     = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:typename</span>)&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>[<span class="ruby-value">:db_type</span>]  <span class="ruby-operator">==</span> <span class="ruby-string">&quot;DECIMAL&quot;</span>&#x000A;        <span class="ruby-identifier">column</span>[<span class="ruby-value">:db_type</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;(#{column[:longlength]},#{column[:scale]})&quot;</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">column</span>[<span class="ruby-value">:allow_null</span>]  = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:nulls</span>) <span class="ruby-operator">==</span> <span class="ruby-string">&#39;Y&#39;</span>&#x000A;      <span class="ruby-identifier">column</span>[<span class="ruby-value">:primary_key</span>] = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:identity</span>) <span class="ruby-operator">==</span> <span class="ruby-string">&#39;Y&#39;</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">column</span>[<span class="ruby-value">:keyseq</span>].<span class="ruby-identifier">nil?</span>&#x000A;      <span class="ruby-identifier">column</span>[<span class="ruby-value">:type</span>]        = <span class="ruby-identifier">schema_column_type</span>(<span class="ruby-identifier">column</span>[<span class="ruby-value">:db_type</span>])&#x000A;      [ <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">column</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:name</span>)), <span class="ruby-identifier">column</span>]&#x000A;    <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_transaction_isolation_levels-3F'>
+                <a name='method-i-supports_transaction_isolation_levels-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_transaction_isolation_levels?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p><a href="../DB2.html">DB2</a> supports transaction isolation levels.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_transaction_isolation_levels-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_transaction_isolation_levels-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 78</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_transaction_isolation_levels?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-tables'>
+                <a name='method-i-tables'></a>
+                <div class='synopsis'>
+                  <span class='name'>tables</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Use SYSCAT.TABLES to get the tables for the database</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-tables-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-tables-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">tables</span>&#x000A;  <span class="ruby-identifier">metadata_dataset</span>.&#x000A;    <span class="ruby-identifier">with_sql</span>(<span class="ruby-node">&quot;SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE=&#39;T&#39; AND OWNER = #{literal(input_identifier_meth.call(opts[:user]))}&quot;</span>).&#x000A;    <span class="ruby-identifier">all</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output_identifier_meth</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">h</span>[<span class="ruby-value">:tabname</span>]) }&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-views'>
+                <a name='method-i-views'></a>
+                <div class='synopsis'>
+                  <span class='name'>views</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Use SYSCAT.TABLES to get the views for the database</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-views-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">views</span>&#x000A;  <span class="ruby-identifier">metadata_dataset</span>.&#x000A;    <span class="ruby-identifier">with_sql</span>(<span class="ruby-node">&quot;SELECT TABNAME FROM SYSCAT.TABLES WHERE TYPE=&#39;V&#39; AND OWNER = #{literal(input_identifier_meth.call(opts[:user]))}&quot;</span>).&#x000A;    <span class="ruby-identifier">all</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output_identifier_meth</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">h</span>[<span class="ruby-value">:tabname</span>]) }&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

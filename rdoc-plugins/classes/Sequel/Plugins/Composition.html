@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::Composition</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::Composition
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/composition_rb.html">lib/sequel/plugins/composition.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The composition plugin allows you to easily define a virtual attribute
+            where the backing data is composed of other columns.</p>
+            
+            <p>There are two ways to use the plugin.  One way is with the :mapping option.
+            A simple example of this is when you have a database table with separate
+            columns for year, month, and day, but where you want to deal with Date
+            objects in your ruby code. This can be handled with:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">composition</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">composition</span> :<span class="ruby-identifier">date</span>, :<span class="ruby-identifier">mapping=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">year</span>, :<span class="ruby-identifier">month</span>, :<span class="ruby-identifier">day</span>]</pre>
+            
+            <p>With the :mapping option, you can provide a :class option that gives the
+            class to use, but if that is not provided, it is inferred from the name of
+            the composition (e.g. :date -&gt; Date). When the <code>date</code> method
+            is called, it will return a Date object by calling:</p>
+            
+            <pre>Date.new(year, month, day)</pre>
+            
+            <p>When saving the object, if the date composition has been used (by calling
+            either the getter or setter method), it will populate the related columns
+            of the object before saving:</p>
+            
+            <pre>self.year = date.year&#x000A;self.month = date.month&#x000A;self.day = date.day</pre>
+            
+            <p>The :mapping option is just a shortcut that works in particular cases.  To
+            handle any case, you can define a custom :composer and :decomposer procs. 
+            The :composer proc will be instance_evaled the first time the getter is
+            called, and the :decomposer proc will be instance_evaled before saving. 
+            The above example could also be implemented as:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">composition</span> :<span class="ruby-identifier">date</span>,&#x000A;  :<span class="ruby-identifier">composer=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-constant">Date</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">year</span>, <span class="ruby-identifier">month</span>, <span class="ruby-identifier">day</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">year</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">month</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">day</span>},&#x000A;  :<span class="ruby-identifier">decomposer=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">d</span> = <span class="ruby-identifier">compositions</span>[:<span class="ruby-identifier">date</span>]&#x000A;      <span class="ruby-keyword">self</span>.<span class="ruby-identifier">year</span> = <span class="ruby-identifier">d</span>.<span class="ruby-identifier">year</span>&#x000A;      <span class="ruby-keyword">self</span>.<span class="ruby-identifier">month</span> = <span class="ruby-identifier">d</span>.<span class="ruby-identifier">month</span>&#x000A;      <span class="ruby-keyword">self</span>.<span class="ruby-identifier">day</span> = <span class="ruby-identifier">d</span>.<span class="ruby-identifier">day</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">self</span>.<span class="ruby-identifier">year</span> = <span class="ruby-keyword">nil</span>&#x000A;      <span class="ruby-keyword">self</span>.<span class="ruby-identifier">month</span> = <span class="ruby-keyword">nil</span>&#x000A;      <span class="ruby-keyword">self</span>.<span class="ruby-identifier">day</span> = <span class="ruby-keyword">nil</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>)</pre>
+            
+            <p>Note that when using the composition object, you should not modify the
+            underlying columns if you are also instantiating the composition, as
+            otherwise the composition object values will override any underlying
+            columns when the object is saved.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-apply">apply</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="Composition/ClassMethods.html">Sequel::Plugins::Composition::ClassMethods</a></li>
+              <li><a target="docwin" href="Composition/InstanceMethods.html">Sequel::Plugins::Composition::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
+                <div class='synopsis'>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(model)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Define the necessary class instance variables.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/composition.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span>{<span class="ruby-ivar">@compositions</span> = {}}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

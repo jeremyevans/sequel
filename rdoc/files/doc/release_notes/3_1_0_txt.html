@@ -1,0 +1,394 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.1.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.1.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.1.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>New Plugins</p>
+            <hr style="height: 9px">
+            
+            <p>3 new plugins were added that implement features supported by DataMapper:
+            identity_map, tactical_eager_loading, and lazy_attributes.  These plugins
+            don&#39;t add any real new features,  since you can do most of what they
+            allow before simply by being a little more explicit in your <a
+            href="../../../classes/Sequel.html">Sequel</a> code. However, some people
+            prefer a less explicit approach that uses a bit more magic, and now <a
+            href="../../../classes/Sequel.html">Sequel</a> can accomodate them.</p>
+            <ul><li>
+            <p>The identity_map plugin allows you to create a 1-1 correspondence of model
+            objects to database rows via a temporary thread-local identity map.  It
+            makes the following statment true:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">with_identity_map</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>) &amp; (<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>)}.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">object_id</span> <span class="ruby-operator">==</span>      <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">object_id</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>As the code above implies, you need to use the with_identity_map method
+            with a block to use the identity mapping feature.</p>
+            
+            <p>By itself, identity maps don&#39;t offer much, but <a
+            href="../../../classes/Sequel.html">Sequel</a> uses them as a cache when
+            looking up objects by primary key or looking up many_to_one associated
+            objects.  Basically, it can be used as a performance enhancer, and it also
+            allows the support of the lazy_attributes plugin.</p>
+            
+            <p>The identity_map plugin is expected to be most useful in web applications. 
+            With that in mind, here&#39;s a Rack middleware that wraps each request in
+            a with_identity_map call, so the identity_map features are available inside
+            the web app:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">identity_map</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">SequelIdentityMap</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">app</span>)&#x000A;    <span class="ruby-ivar">@app</span> = <span class="ruby-identifier">app</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">env</span>)&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">with_identity_map</span>{<span class="ruby-ivar">@app</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">env</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            </li><li>
+            <p>The tactical_eager_loading plugin allows you to eagerly load an association
+            for all models retrieved in the same group whenever one of the models
+            accesses the association:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># 2 queries total</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">artists</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>In order for this correctly, you must use Dataset#all to load the records,
+            you cannot iterate over them via Dataset#each.  This is because eager
+            loading requires that you have all records in advance, and when using
+            Dataset#each you cannot know about later records in the dataset.</p>
+            
+            <p>Before, you could just be explicit about the associations you needed and
+            make sure to eagerly load them using eager before calling Dataset#all.</p>
+            </li><li>
+            <p>The lazy_attributes plugin builds on the identity_map and
+            tactical_eager_loading plugins and allows you to create attributes that are
+            lazily loaded from the database:</p>
+            
+            <pre>Album.plugin :lazy_attributes, :review</pre>
+            
+            <p>This will remove the :review attribute from being selected by default.  If
+            you try to access the attribute after it is selected, it&#39;ll retrieve
+            the value from the database.  If the object was retrieved with a group of
+            other objects and an identity map is in use, it&#39;ll retrieve the lazy
+            attribute for the entire group of objects at once, similar to the
+            tatical_eager_loading plugin:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># 2 queries total</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">with_identity_map</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">a</span>.<span class="ruby-identifier">review</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>Before, you could just set the default selected columns for a model to not
+            include the lazy attributes, and just use select_more to add them to any
+            query where the resulting model objects will need the attributes.</p>
+            </li><li>
+            <p>A many_through_many plugin was also added.  This very powerful plugin
+            allows you to create associations to multiple objects through multiple join
+            tables.  Here are some examples:</p>
+            
+            <pre># Assume the following many to many associations:&#x000A;Artist.many_to_many :albums&#x000A;Album.many_to_many :tags&#x000A;# Same as Artist.many_to_many :albums&#x000A;Artist.many_through_many :albums,&#x000A;  [[:albums_artists, :artist_id, :album_id]]&#x000A;&#x000A;# All tags associated to any album this artist is associated to&#x000A;Artist.many_through_many :tags,&#x000A;  [[:albums_artists, :artist_id, :album_id],&#x000A;   [:albums, :id, :id],&#x000A;   [:albums_tags, :album_id, :tag_id]]&#x000A;&#x000A;# All artists associated to any album this artist is associated to&#x000A;Artist.many_through_many :artists,&#x000A;  [[:albums_artists, :artist_id, :album_id],&#x000A;   [:albums, :id, :id],&#x000A;   [:albums_artists, :album_id, :artist_id]]&#x000A;&#x000A;# All albums by artists that are associated to any album this&#x000A;# artist is associated to&#x000A;Artist.many_through_many :artist_albums,&#x000A;  [[:albums_artists, :artist_id, :album_id],&#x000A;   [:albums, :id, :id],&#x000A;   [:albums_artists, :album_id, :artist_id],&#x000A;   [:artists, :id, :id],&#x000A;   [:albums_artists, :artist_id, :album_id]]</pre>
+            
+            <p>Basically, for each join table between this model and the associated model,
+            you use an array with a join table name, left key name (key closer to this
+            model), and right key name (key closer to the associated model).</p>
+            
+            <p>In usual <a href="../../../classes/Sequel.html">Sequel</a> fashion, this
+            association type works not just for single objects, but it can also be
+            eagerly loaded via eager or eager_graph.  There are numerous additional
+            configuration options, please see the RDoc for details.</p>
+            </li></ul>
+            
+            <p>New bin/sequel Features</p>
+            <hr style="height: 10px">
+            
+            <p>The bin/sequel command line tool now supports the following options:</p>
+            <ul><li>
+            <p>-C: Copies one database to another.  You must specify two database
+            arguments.  Works similar to Taps, copying the table schema, then the table
+            data, then creating the indexes.</p>
+            </li><li>
+            <p>-d: Dump the schema of the database in the database-independent migration
+            format.</p>
+            </li><li>
+            <p>-D: Dump the schema of the database in the database-specific migration
+            format.</p>
+            </li><li>
+            <p>-h: Display the help</p>
+            </li><li>
+            <p>-t: Output the full backtrace if an exception is raised</p>
+            </li></ul>
+            
+            <p>The bin/sequel tool is now better about checking which options can be used
+            together.  It also now supports using the -L option multiple times and
+            having it load model files from multiple directory trees.</p>
+            
+            <p>New Features</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>Dataset#qualify_to and qualify_to_first_source were added.  They allow you
+            to qualify unqualified columns in the current dataset to the given table or
+            the first source. This can be used to join a dataset that has unqualified
+            columns to a new table which has columns with the same name.</p>
+            
+            <p>For example, take this dataset:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM albums WHERE (id = 1) ORDER BY name</span></pre>
+            
+            <p>Let&#39;s say you want to join it to the artists table:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM albums </span>&#x000A;<span class="ruby-comment">#  INNER JOIN artists ON (artists.id = albums.artist_id)</span>&#x000A;<span class="ruby-comment">#  WHERE (id = 1) ORDER BY name</span></pre>
+            
+            <p>That&#39;s going to give you an error, as the artists table already has
+            columns named id and name.  This new feature allows you to do the
+            following:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">qualify_to_first_source</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT albums.name FROM albums</span>&#x000A;<span class="ruby-comment">#  INNER JOIN artists ON (artists.id = albums.artist_id)</span>&#x000A;<span class="ruby-comment">#  WHERE (albums.id = 1) ORDER BY albums.name</span></pre>
+            
+            <p>By doing this, all unqualified columns are qualified, so you get a usable
+            query.  This is expected to be most useful for users that have a default
+            order or filter on their models and want to join the model to another
+            table.  Before you had to replace the filters, selection, etc. manually, or
+            use qualified columns by default even though the weren&#39;t needed in most
+            cases.</p>
+            </li><li>
+            <p>Savepoints are now supported using SQLite and MySQL, assuming you are using
+            a database version that supports them.  You need to pass the :savepoint
+            option to Database#transaction to use a savepoint.</p>
+            </li><li>
+            <p>Model plugins can now depend on other plugins, simply by calling the
+            Model.plugin method inside the plugin&#39;s apply method:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">LazyAttributes</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;    <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">tactical_eager_loading</span>&#x000A;  <span class="ruby-keyword">end</span></pre>
+            </li><li>
+            <p>Model.plugin now takes a block with is passed to the plugin&#39;s apply and
+            configure method (see Backwards Compatibility section for more information
+            on the configure method).</p>
+            </li><li>
+            <p>You can see which plugins are loaded for a model by using Model.plugins.</p>
+            </li><li>
+            <p>You can use <a
+            href="../../../classes/Sequel.html#method-c-extension">Sequel.extension</a>
+            method to load extensions:</p>
+            
+            <pre>Sequel.extension :pagination, :query</pre>
+            
+            <p>This will only load extensions that ship with <a
+            href="../../../classes/Sequel.html">Sequel</a>, unlike the Model.plugin
+            method which will also load external plugins.</p>
+            </li><li>
+            <p>You can now use Database#create_table? to create the table if it
+            doesn&#39;t already exist (a very common need, it seems).  The schema
+            plugin now supports Model.create_table? as well.</p>
+            </li><li>
+            <p>sql_subscript is now an allowed method on most SQL expression objects that
+            <a href="../../../classes/Sequel.html">Sequel</a> generates.  Also,
+            arguments to sql_subscript can now be other expressions instead of just
+            integers.</p>
+            </li><li>
+            <p>Associations can now take a :cartesian_product_number option, which can be
+            used to tell <a href="../../../classes/Sequel.html">Sequel</a> whether to
+            turn on duplicate object detection when eagerly loading objects through
+            eager_graph.  This number should be 0 if the association can never create
+            multiple rows for each row in the current table, 1 if it can create
+            multiple rows in the each row in the current table, and 2 if the
+            association itself causes a cartesian product.</p>
+            </li><li>
+            <p>On MySQL, Dataset#insert_ignore now affects insert as well as multi_insert
+            and import.</p>
+            </li><li>
+            <p>Database#create_table now supports an :ignore_index_errors option, and
+            Database#add_index now supports an :ignore_errors option. These are used by
+            the schema_dumper when dumping an database schema to be restored on another
+            database type, since indexes aren&#39;t usually required for proper
+            operation and some indexes can&#39;t be transferred.</p>
+            </li><li>
+            <p>The ADO adapter now takes a :provider option, which can be used to set the
+            provider.</p>
+            </li><li>
+            <p>The ADO adapter now takes a :command_timeout option, which tells the
+            connection how long to wait before giving up and raising an exception.</p>
+            </li><li>
+            <p>The Sequel.amalgalite adapter method was added.  Like the Sequel.sqlite
+            method, you can call it with no arguments to get an in memory database.</p>
+            </li></ul>
+            
+            <p>Other Improvements</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>MySQL "commands out of sync" errors should no longer occur unless you are
+            nesting queries (calling Dataset#each inside Dataset#each). A bug dating at
+            least to 2007 and possibly since the initial creation of the <a
+            href="../../../classes/Sequel.html">Sequel</a> MySQL adapter was the cause.
+            Before, SQL that caused a result set that was sent using a method where <a
+            href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t yield a result
+            set would cause the "commands out of sync" error on the following query. 
+            For example, the following code would cause the error:</p>
+            
+            <pre>DB &lt;&lt; &quot;SHOW DATABASES&quot;</pre>
+            
+            <p>If for some reason a "commands out of sync" error does occur, <a
+            href="../../../classes/Sequel.html">Sequel</a> will disconnect the
+            connection from the connection pool, so it won&#39;t continually stay in
+            the pool and raise errors every time it is used.</p>
+            </li><li>
+            <p>The schema_dumper extension is much better about parsing defaults from the
+            database.  It can now correctly parse most defaults on MySQL, SQLite, and
+            PostgreSQL databases.  It no longer includes defaults that it can&#39;t
+            parse to a ruby object unless a database- specific dump is requested.</p>
+            </li><li>
+            <p>The schema_dumper extension now dumps tables in alphabetical order.</p>
+            </li><li>
+            <p>Ordered and limited datasets are now handled correctly when using union,
+            intersect, and except.  Also, union, intersect, and except now always
+            return a from_self dataset, so further limiting, filtering, and ordering of
+            them now works as expected.</p>
+            </li><li>
+            <p>Dataset#graph now works correctly with a complex dataset without having to
+            use from_self.  Before, code like the following didn&#39;t do what was
+            expected:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].&#x000A;  <span class="ruby-identifier">graph</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>}, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)</pre>
+            
+            <p>Before, the filter on <a target="_top" href="http://:artists">DB</a> would be dropped. 
+            Now, <a href="../../../classes/Sequel.html">Sequel</a> correctly uses a
+            subselect.</p>
+            </li><li>
+            <p>You can now specify serialization formats per column in the serialization
+            plugin, either by calling the plugin multiple times or by using the new
+            serialize_attributes method:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">serialization</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">serialize_attributes</span> :<span class="ruby-identifier">marshal</span>, :<span class="ruby-identifier">review</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">serialize_attributes</span> :<span class="ruby-identifier">yaml</span>, :<span class="ruby-identifier">name</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">serialization_map</span> <span class="ruby-comment">#{:name=&gt;:yaml, :review=&gt;:marshal}</span></pre>
+            
+            <p>The public API for the serialization plugin is still backwards compatible,
+            but the internals have changed slightly to support this new feature.</p>
+            </li><li>
+            <p>You can now use eager_graph to eagerly load associations for models that
+            lack primary keys.</p>
+            </li><li>
+            <p>The :eager_graph association option now works when lazily-loading
+            many_to_many associations.</p>
+            </li><li>
+            <p>Dataset#add_graph_aliases now works correctly even if set_graph_aliases
+            hasn&#39;t been used.</p>
+            </li><li>
+            <p>The PostgreSQL Database#tables method now assumes the public schema if a
+            schema is not given and there is no default_schema.</p>
+            </li><li>
+            <p>The PostgreSQL Database#indexes method no longer returns partial indexes or
+            functional indexes.</p>
+            </li><li>
+            <p>The MySQL Database#indexes method no longer returns indexes on partial
+            columns (prefix indexes).</p>
+            </li><li>
+            <p>Default values for <a href="../../../classes/String.html">String</a>
+            :text=&gt;true and File columns on MySQL are ignored, since MySQL
+            doesn&#39;t support them.  They are not ignored if you use text and blob,
+            since then you are using the database-specific syntax and <a
+            href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t do translation
+            when the database-specific syntax is used.</p>
+            </li><li>
+            <p>On PostgreSQL, attempting the reset the primary key sequence for a table
+            without a primary key no longer causes an error.</p>
+            </li><li>
+            <p>Using a placeholder string in an association&#39;s :condition option now
+            works correctly (e.g. :conditions=&gt;[&#39;n = ?&#39;, 1])</p>
+            </li><li>
+            <p>An error is no longer raised if you attempt to load a plugin that has a
+            DatasetMethods module but no public dataset methods.</p>
+            </li><li>
+            <p>The check for <a target="_top" href="http://n">dataset</a> where n is an integer was
+            fixed.  It now raises an error inside of returning a limited dataset.</p>
+            </li><li>
+            <p>On PostgreSQL, Dataset#insert with static SQL now works correctly.</p>
+            </li><li>
+            <p>A reflection.rdoc file was added giving an overview of Sequel&#39;s
+            reflection support.</p>
+            </li><li>
+            <p>The Migrator now works correctly with file names like
+            001_12312412_file_name.rb.</p>
+            </li><li>
+            <p>The association code now requires the classes match when looking for a
+            reciprocal association.</p>
+            </li><li>
+            <p>An unlikely threading bug (race condition) was possible when using the
+            validation_class_methods plugin. The plugin was refactored and now uses a
+            mutex to avoid the issue.  One of the refactoring changes makes it so that
+            you can no longer use a class level vaildation inside a Class.new block
+            (since inherited isn&#39;t called until the block finishes).</p>
+            </li><li>
+            <p>The exception messages when Sequel.string_to_* fail have been fixed.</p>
+            </li><li>
+            <p>The <a href="../../../classes/String.html">String</a> :text=&gt;true
+            generic database type has been fixed when using the Firebird adapter.</p>
+            </li></ul>
+            
+            <p>Backwards Compatibility</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>A plugin&#39;s apply method is now only called the first time a plugin is
+            loaded.  Plugins can now have a configure method that is called every time
+            the plugin is loaded, and is always called after the instance methods,
+            class methods, and dataset method submodules have been added to the model. 
+            This is different from apply, which is called before the submodules are
+            loaded.</p>
+            
+            <p>If you are a plugin author, please check your implementation to make sure
+            this doesn&#39;t cause problems for you.  If you have questions, please
+            post on the <a href="../../../classes/Sequel.html">Sequel</a> mailing list.</p>
+            
+            <p>This new plugin feature will make certain things a lot easier, and it
+            should be mostly backwards compatible.  However, if a plugin was previously
+            expected to be loaded multiple times with the apply method called each
+            time, it will no longer work correctly.</p>
+            </li><li>
+            <p>The plugin_opts methods defined now include multiple args in an array if
+            multiple args are given.  Before, the plugin_opts methods just returned the
+            first argument.</p>
+            </li><li>
+            <p>Database#table_exists? no longer checks the cached schema information.  By
+            default, it will always do a database query (unless overridden in an
+            adapter).  This shouldn&#39;t affect the results, but if were using the
+            method a lot and expecting it to use cached information, it doesn&#39;t
+            have the same performance characteristics.</p>
+            </li><li>
+            <p>The internal storage of the :select option for datasets have changed.  You
+            can no longer use a hash as a way of aliasing columns.  Dataset#select now
+            does the translation from the hash to SQL::AliasedExpression instances. 
+            Basically, if you were using Dataset#clone directly with a :select option
+            with hashes for aliasing, you should switch to using Dataset#select or
+            changing the hashes to AliasedExpressions yourself.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::IntegerMigrator</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::IntegerMigrator
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../files/lib/sequel/extensions/migration_rb.html">lib/sequel/extensions/migration.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The default migrator, recommended in most cases.  Uses a simple
+            incrementing version number starting with 1, where missing or duplicate
+            migration file versions are not allowed.  Part of the
+            <code>migration</code> extension.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-current">current</a></li>
+              <li><a target="docwin" href="#attribute-i-direction">direction</a></li>
+              <li><a target="docwin" href="#method-i-is_current-3F">is_current?</a></li>
+              <li><a target="docwin" href="#attribute-i-migrations">migrations</a></li>
+              <li><a target="docwin" href="#method-i-run">run</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DEFAULT_SCHEMA_COLUMN</td>
+                    <td>=</td>
+                    <td class='context-item-value'>:version</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DEFAULT_SCHEMA_TABLE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>:schema_info</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>Error</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Migrator::Error</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-current'>current</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The current version for this migrator</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-direction'>direction</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The direction of the migrator, either :up or :down</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-migrations'>migrations</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The migrations used by this migrator</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(db, directory, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set up all state for the migrator instance</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 504</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-ivar">@target</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:target</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">latest_migration_version</span>&#x000A;  <span class="ruby-ivar">@current</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:current</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">current_migration_version</span>&#x000A;&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No current version available&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">current</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No target version available, probably because no migration files found or filenames don&#39;t follow the migration filename convention&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">target</span>&#x000A;&#x000A;  <span class="ruby-ivar">@direction</span> = <span class="ruby-identifier">current</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">?</span> <span class="ruby-value">:up</span> <span class="ruby-operator">:</span> <span class="ruby-value">:down</span>&#x000A;  <span class="ruby-ivar">@migrations</span> = <span class="ruby-identifier">get_migrations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-is_current-3F'>
+                <a name='method-i-is_current-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>is_current?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The integer migrator is current if the current version is the same as the
+                  target version.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-is_current-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-is_current-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 517</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">is_current?</span>&#x000A;  <span class="ruby-identifier">current_migration_version</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">target</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-run'>
+                <a name='method-i-run'></a>
+                <div class='synopsis'>
+                  <span class='name'>run</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Apply all migrations on the database</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-run-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-run-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 522</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">run</span>&#x000A;  <span class="ruby-identifier">migrations</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">version_numbers</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">t</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>&#x000A;    <span class="ruby-identifier">lv</span> = <span class="ruby-identifier">up?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">log_info</span>(<span class="ruby-node">&quot;Begin applying migration version #{lv}, direction: #{direction}&quot;</span>)&#x000A;    <span class="ruby-identifier">checked_transaction</span>(<span class="ruby-identifier">m</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">m</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">direction</span>)&#x000A;      <span class="ruby-identifier">set_migration_version</span>(<span class="ruby-identifier">v</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">log_info</span>(<span class="ruby-node">&quot;Finished applying migration version #{lv}, direction: #{direction}, took #{sprintf(&#39;%0.6f&#39;, Time.now - t)} seconds&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  &#x000A;  <span class="ruby-identifier">target</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

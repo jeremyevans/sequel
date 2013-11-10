@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>pg_json_ops.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>pg_json_ops.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/pg_json_ops.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The pg_json_ops extension adds support to Sequel&#39;s DSL to make it
+            easier to call PostgreSQL JSON functions and operators (added first in
+            PostgreSQL 9.3).</p>
+            
+            <p>To load the extension:</p>
+            
+            <pre>Sequel.extension :pg_json_ops</pre>
+            
+            <p>The most common usage is passing an expression to Sequel.pg_json_op:</p>
+            
+            <pre>j = Sequel.pg_json_op(:json_column)</pre>
+            
+            <p>If you have also loaded the pg_json extension, you can use Sequel.pg_json
+            as well:</p>
+            
+            <pre>j = Sequel.pg_json(:json_column)</pre>
+            
+            <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
+            expression objects, you can call the pg_json method:</p>
+            
+            <pre>j = Sequel.expr(:json_column).pg_json</pre>
+            
+            <p>If you have loaded the <a
+            href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>
+            or you have loaded the core_refinements extension and have activated
+            refinements for the file, you can also use <a
+            href="../../../../classes/Sequel/Postgres/JSONOpMethods.html#method-i-pg_json">Sequel::Postgres::JSONOpMethods#pg_json</a>:</p>
+            
+            <pre>j = :json_column.pg_json</pre>
+            
+            <p>This creates a <a
+            href="../../../../classes/Sequel/Postgres/JSONOp.html">Sequel::Postgres::JSONOp</a>
+            object that can be used for easier querying:</p>
+            
+            <pre>j[1]                     # (json_column -&gt; 1)&#x000A;j[%w&#39;a b&#39;]               # (json_column #&gt; ARRAY[&#39;a&#39;,&#39;b&#39;])&#x000A;j.get_text(1)            # (json_column -&gt;&gt; 1)&#x000A;j.get_text(%w&#39;a b&#39;)      # (json_column #&gt;&gt; ARRAY[&#39;a&#39;,&#39;b&#39;])&#x000A;j.extract(&#39;a&#39;, &#39;b&#39;)      # json_extract_path(json_column, &#39;a&#39;, &#39;b&#39;)&#x000A;j.extract_text(&#39;a&#39;, &#39;b&#39;) # json_extract_path_text(json_column, &#39;a&#39;, &#39;b&#39;)&#x000A;j.array_length           # json_array_length(json_column)&#x000A;j.array_elements         # json_array_elements(json_column)&#x000A;j.each                   # json_each(json_column)&#x000A;j.each_text              # json_each_text(json_column)&#x000A;j.keys                   # json_object_keys(json_column)&#x000A;&#x000A;j.populate(:a)           # json_populate_record(:a, json_column)&#x000A;j.populate_set(:a)       # json_populate_recordset(:a, json_column)</pre>
+            
+            <p>If you are also using the pg_json extension, you should load it before
+            loading this extension.  Doing so will allow you to use JSONHash#op and
+            JSONArray#op to get a JSONOp, allowing you to perform json operations on
+            json literals.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

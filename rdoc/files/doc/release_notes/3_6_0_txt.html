@@ -1,0 +1,399 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.6.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.6.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.6.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>New Features</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>Dataset#filter and related methods now accept a string with named
+            placeholders, and a hash with placeholder values:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-string">&#39;copies_sold &gt; :sales&#39;</span>, :<span class="ruby-identifier">sales=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">500000</span>)</pre>
+            
+            <p>Sequel&#39;s general support for this syntax is nicer:</p>
+            
+            <pre>ds.filter{copies_sold &gt; 500000}</pre>
+            
+            <p>But named placeholder support can make it easier to port code from other
+            database libraries.  Also, it works much better than the ? placeholder
+            support if you have a long SQL statement:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT :n FROM t WHERE p &gt; :q AND p &lt; :r&#39;</span>, :<span class="ruby-identifier">n=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>,:<span class="ruby-identifier">q=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>,:<span class="ruby-identifier">r=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>]</pre>
+            
+            <p><a href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t subsitute
+            values that don&#39;t appear in the hash:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;price &lt; :p AND id in :ids&#39;</span>, :<span class="ruby-identifier">p=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">100</span>)&#x000A;<span class="ruby-comment"># WHERE (price &lt; 100 AND id in :ids)</span></pre>
+            
+            <p>This makes it easier to spot missed placeholders, and avoids issues</p>
+            <dl class="rdoc-list note-list"><dt>with PostgreSQL&#39;s 
+            <dd>
+            <p>casting syntax or : inside string literals.</p>
+            </dd></dl>
+            </li><li>
+            <p>The Model add_ association method now accepts a hash and creates a new
+            associated model object associated to the receiver:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>[:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;YJM&#39;</span>].<span class="ruby-identifier">add_album</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>)</pre>
+            </li><li>
+            <p>The Model remove_ association method now accepts a primary key and removes
+            the associated model object from the association. For models using
+            composite primary keys, an array of primary key values can be used. 
+            Example:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>[:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;YJM&#39;</span>].<span class="ruby-identifier">remove_album</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># regular pk</span>&#x000A;<span class="ruby-constant">Artist</span>[:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;YJM&#39;</span>].<span class="ruby-identifier">remove_album</span>([<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]) <span class="ruby-comment"># composite pk</span></pre>
+            </li><li>
+            <p>Dataset#bind was added, allowing you to bind values before calling
+            Dataset#call.  This is more consistent with Sequel&#39;s general approach
+            where queries can be built in any order.</p>
+            </li><li>
+            <p>The native postgres adapter now has Dataset#use_cursor, which allows you to
+            process huge datasets without keeping all records in memory.  The default
+            number of rows per cursor fetch is 1000, but that can be modified:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">huge_table</span>].<span class="ruby-identifier">use_cursor</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">r</span>}&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">huge_table</span>].<span class="ruby-identifier">use_cursor</span>(:<span class="ruby-identifier">rows_per_fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">10000</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">r</span>}</pre>
+            
+            <p>This probably won&#39;t work with prepared statements or bound variables.</p>
+            </li><li>
+            <p>The nested_attributes plugin now adds newly created objects to the cached
+            association array immediately, even though the changes are not persisted to
+            the database until after the object is saved. The reasoning for this is
+            that otherwise there is no way to access the newly created associated
+            objects before the save, and no way to access them at all if validation
+            fails.</p>
+            
+            <p>This makes the nested_attributes plugin much easier to use, since now you
+            can just iterate over the cached association array when building the form. 
+            If validation fails, it will have the newly created failed objects in the
+            array, so you can easily display the form as the user entered it for them
+            to make changes.</p>
+            
+            <p>This change doesn&#39;t affect many_to_one associations, since those
+            don&#39;t have a cached association array.  This also does not affect
+            updating existing records, since those are already in the cached array.</p>
+            </li><li>
+            <p>You can now easily override the default options used in the
+            validation_helpers plugin (the recommended validation plugin). Options can
+            be overridden at a global level:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">ValidationHelpers</span><span class="ruby-operator">::</span><span class="ruby-constant">DEFAULT_OPTIONS</span>[:<span class="ruby-identifier">format</span>].&#x000A;  <span class="ruby-identifier">merge!</span>(:<span class="ruby-identifier">message=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;incorrect format&quot;</span>, :<span class="ruby-identifier">allow_missing=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)</pre>
+            
+            <p>Options can also be overridden on a per-class level:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">validation_helpers</span>&#x000A;  <span class="ruby-constant">DEFAULT_VALIDATION_OPTIONS</span> = {&#x000A;   :<span class="ruby-identifier">format=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">message=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;incorrect format&quot;</span>, :<span class="ruby-identifier">allow_missing=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}}&#x000A;&#x000A;  <span class="ruby-identifier">private</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">default_validation_helpers_options</span>(<span class="ruby-identifier">type</span>)&#x000A;    <span class="ruby-keyword">super</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-constant">DEFAULT_VALIDATION_OPTIONS</span>[<span class="ruby-identifier">type</span>] <span class="ruby-operator">||</span> {})&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            </li><li>
+            <p>You can now use a proc instead of a string for the validation_helpers
+            :message option.  This should allow much easier internationalization
+            support.  If a proc is given, <a
+            href="../../../classes/Sequel.html">Sequel</a> calls it to get the format
+            string to use.  Whether the proc should take an argument depends on whether
+            the associated validation method takes an argument before the array of
+            columns to validate, and the argument provided is what is passed to the
+            proc.  The exception to this is the validates_not_string method, which
+            doesn&#39;t take an argument, but does pass one to the proc (a symbol with
+            the schema type of the column).</p>
+            
+            <p>Combined with the above default option support, full internationalization
+            support for the validation_helpers plugin should be fairly easy.</p>
+            </li><li>
+            <p>The nested_attributes plugin now accepts a :fields option that specifies
+            the fields that are allowed.  If specified, the plugin will use set_only
+            instead of set when mass assigning attributes.  Without this, the only way
+            to control which fields are allowed is to set allowed/restricted attributes
+            at a class level in the associated class.</p>
+            </li><li>
+            <p>Associations now accept a :distinct option which uses the SQL DISTINCT
+            clause.  This can be used instead of :uniq for many_to_many and
+            many_through_many associations to handle the uniqueness in the database
+            instead of in ruby.  It can also be useful for one_to_many associations to
+            models that don&#39;t have primary keys.</p>
+            </li><li>
+            <p>The caching plugin now accepts an :ignore_exceptions option that allows it
+            to work with memcached (which raises exceptions instead of returning nil
+            for missing records).</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now emulates JOIN USING
+            poorly using JOIN ON for databases that don&#39;t support JOIN USING (MSSQL
+            and H2).  This isn&#39;t guaranteed to work for all queries, since USING
+            and ON have different semantics, but should work in most cases.</p>
+            </li><li>
+            <p>The MSSQL shared adapter now supports insert_select, for faster model
+            object creation.  If for some reason you need to disable it, you can use
+            disable_insert_output.</p>
+            </li><li>
+            <p>Model#modified! has been added which explicitly marks the object as
+            modified.  So even if no column values have been modified, calling
+            save_changes/update will still run through the regular save process and
+            call all before and after save/update hooks.</p>
+            </li><li>
+            <p>Model#marshallable! has been added which removes unmarshallable attributes
+            from the object.  Previously, you couldn&#39;t marshal a saved model object
+            because it contained a dataset with a singleton class.  Custom _dump and
+            _load methods could be used instead, but this approach is easier to
+            implement.</p>
+            </li><li>
+            <p>Dataset#literal_other now calls sql_literal on the object with the current
+            dataset instance, if the object responds to it. This makes it easier to
+            support the literalization of arbitrary objects.</p>
+            
+            <p>Note that if the object is a subclass of a class handled by an existing
+            dataset literalization method, you cannot use this method.  You have to
+            override the specific Dataset#literal_* method in that case.</p>
+            </li><li>
+            <p>Model#save_changes now accepts an option hash that is passed to save:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">save_changes</span>(:<span class="ruby-identifier">validate=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)</pre>
+            </li><li>
+            <p>A bunch of Dataset#*_join methods have been added, for specific join types:</p>
+            <ul><li>
+            <p>cross_join</p>
+            </li><li>
+            <p>natural_join</p>
+            </li><li>
+            <p>full_join</p>
+            </li><li>
+            <p>left_join</p>
+            </li><li>
+            <p>right_join</p>
+            </li><li>
+            <p>natural_full_join</p>
+            </li><li>
+            <p>natural_left_join</p>
+            </li><li>
+            <p>natural_right_join</p>
+            </li></ul>
+            
+            <p>Previously, you had to use join_table(:cross, ...) to use a CROSS JOIN.</p>
+            </li><li>
+            <p>You can now create clustered indexes on Microsoft SQL Server using the
+            :clustered option.</p>
+            </li><li>
+            <p>AssociationReflection#associated_object_keys has been added, specifying the
+            keys in the associated model object that are related to this association.</p>
+            </li><li>
+            <p>Sequel::SQL::SQLArray#to_a was added.</p>
+            </li></ul>
+            
+            <p>Other Improvements</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>Constant lookup in virtual row blocks now works correctly in ruby 1.9. 
+            Virtual row blocks are based on BasicObject on ruby 1.9, which doesn&#39;t
+            allow referencing objects in the top level scope. So the following code
+            would cause an error on 1.9:</p>
+            
+            <pre>DB[:bonds].filter{maturity_date &gt; Time.now}</pre>
+            
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now uses a <a
+            href="../../../classes/Sequel/BasicObject.html">Sequel::BasicObject</a>
+            class on 1.9 with a const_missing that looks up constants in Object, which
+            allows the above code to work.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer attempts to
+            load associated objects when one of the key fields in the current table is
+            NULL.  This fixes the behavior when the :primary_key option for the
+            association is used to point to a non-primary key.</p>
+            
+            <p>A consequence of this change is that attempting to load a *_to_many
+            association for a new model object now returns an empty array instead of
+            raising an exception.  This has its own advantage of allowing the same
+            association viewing code to work on both new and existing objects. 
+            Previously, you had to actively avoid calling the association method on new
+            objects, or <a href="../../../classes/Sequel.html">Sequel</a> would raise
+            an exception.</p>
+            </li><li>
+            <p>Dataset aggreate methods (sum/avg/min/max/range/interval) now work
+            correctly with limited, grouped, or compound datasets. Previously, count
+            worked with them, but other aggregate methods did not.  These methods now
+            use a subquery if called on a limited, grouped or compound dataset.</p>
+            </li><li>
+            <p>It is no longer required to have an existing GROUP BY clause to use a
+            HAVING clause (except on SQLite, which doesn&#39;t permit it).  <a
+            href="../../../classes/Sequel.html">Sequel</a> has always had this
+            limitation, but it&#39;s not required by the SQL standard, and there are
+            valid reasons to use HAVING without GROUP BY.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> will now emulate support
+            for databases that don&#39;t support multiple column IN/NOT IN syntax, such
+            as MSSQL and SQLite:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>([:<span class="ruby-identifier">col1</span>, :<span class="ruby-identifier">col2</span>]=<span class="ruby-operator">&gt;</span>[[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]].<span class="ruby-identifier">sql_array</span>)&#x000A;<span class="ruby-comment"># default:  WHERE (col1, col2) IN ((1, 2), (3, 4))</span>&#x000A;<span class="ruby-comment"># emulated: WHERE (((col1 = 1) AND (col2 = 2)) OR</span>&#x000A;<span class="ruby-comment">#                  ((col1 = 3) AND (col2 = 4)))</span></pre>
+            
+            <p>This is necessary for eager loading associated objects for models with
+            composite primary keys.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now emulates
+            :column.ilike(&#39;blah%&#39;) for case insensitive searches on MSSQL and
+            H2.  MSSQL is case insensitive by default, so it is the same as like.  H2
+            is case sensitive, so <a href="../../../classes/Sequel.html">Sequel</a>
+            uses a case insensitive cast there.</p>
+            </li><li>
+            <p>The nested_attributes plugin no longer allows modification of keys related
+            to the association.  This fixes a possible security issue with the plugin,
+            where a user could associate the nested record to a different record.  For
+            example:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">nested_attributes</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">create</span>&#x000A;<span class="ruby-identifier">artist2</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">create</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">create</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-identifier">album</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums_attributes</span> = [{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">album</span>.<span class="ruby-identifier">id</span>,&#x000A; :<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">artist2</span>.<span class="ruby-identifier">id</span>}]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">save</span></pre>
+            </li><li>
+            <p>The one_to_many remove_* association method now makes sure that the object
+            to be removed is currently associated to this object. Before, the method
+            could be abused to disassociate the object from whatever object it was
+            associated to.</p>
+            </li><li>
+            <p>Model add_ and remove_ association methods now check that the passed object
+            is of the correct class.</p>
+            </li><li>
+            <p>Calling the add_* association method no longer adds the record to the
+            cached association array if the object is already in the array. 
+            Previously, <a href="../../../classes/Sequel.html">Sequel</a> did this for
+            reciprocal associations, but not for regular associations.</p>
+            
+            <p>This makes the most sense for one_to_many associations, since those can
+            only be associated to the object once.  For many_to_many associations, if
+            you want an option to disable the behavior, please bring it up on the <a
+            href="../../../classes/Sequel.html">Sequel</a> mailing list.</p>
+            </li><li>
+            <p>An array with a string and placeholders that is passed to Dataset#filter is
+            no longer modified.  Previously:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">options</span> = [<span class="ruby-string">&quot;name like ?&quot;</span>, <span class="ruby-string">&quot;%dog%&quot;</span>]&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">players</span>].<span class="ruby-identifier">where</span>(<span class="ruby-identifier">options</span>)&#x000A;<span class="ruby-identifier">options</span> <span class="ruby-comment"># =&gt; [&quot;%dog%&quot;]</span></pre>
+            </li><li>
+            <p>Getting the most recently inserted autoincremented primary key is now
+            optimized when connecting to MySQL via JDBC.</p>
+            </li><li>
+            <p>Model.inherited now calls Class.inherited.</p>
+            </li><li>
+            <p>The MSSQL shared adapter once again works on ruby 1.9.  It was broken in
+            3.5.0 due to minor syntax issues.</p>
+            </li><li>
+            <p>The force_encoding plugin now handles refreshing an existing object, either
+            explicitly or implicitly when new objects are created.</p>
+            
+            <p>To use the force_encoding plugin with the identity_map plugin, the
+            identity_map plugin should be loaded first.</p>
+            </li><li>
+            <p>Using nil as a bound variable now works on PostgreSQL.  Before, <a
+            href="../../../classes/Sequel.html">Sequel</a> would incorrectly use ""
+            instead of NULL, since it transformed all objects to strings before binding
+            them.  <a href="../../../classes/Sequel.html">Sequel</a> now binds the
+            objects directly.</p>
+            </li><li>
+            <p>The Amalgalite adapter is now significantly faster, especially for code
+            that modifies the schema or submits arbitrary SQL statements using Database
+            &lt;&lt;, run, or execute_ddl.</p>
+            </li><li>
+            <p>Model#save_changes is now used when updating existing associated objects in
+            the nested_attributes plugin.  This should be significantly faster for the
+            common case of submitting a complex form with nested objects without making
+            modifications.</p>
+            </li><li>
+            <p>You can now prepare insert statements that take multiple arguments, such as
+            insert(1, 2, 3) and insert(columns, values).</p>
+            </li><li>
+            <p>Dataset#group_and_count now supports aliased columns.</p>
+            </li><li>
+            <p>Adding indexes to tables outside the default schema now works.</p>
+            </li><li>
+            <p>Eager graphing now works better with models that use aliased tables.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now correctly parses the
+            column schema information for tables in a non-default schema on Microsoft
+            SQL Server.</p>
+            </li><li>
+            <p>changed_columns is now cleared for when saving new model objects for
+            adapters that support insert_select, such as PostgreSQL.</p>
+            </li><li>
+            <p>Dataset#replace on MySQL now works correctly when default values are used.</p>
+            </li><li>
+            <p>Dataset#lock on PostgreSQL now works correctly.</p>
+            </li><li>
+            <p>Dataset#explain now works correctly on SQLite, and works using any adapter.
+            It also works correctly on Amalgalite.</p>
+            </li><li>
+            <p>The JDBC adapter now handles binding Time arguments correctly when using
+            prepared statements.</p>
+            </li><li>
+            <p>Model add_ and remove_ association methods now have more descriptive
+            exception messages.</p>
+            </li><li>
+            <p>Dataset#simple_select_all? now ignores options that don&#39;t affect the
+            SQL, such as :server.</p>
+            </li><li>
+            <p>Dataset#window in the PostgreSQL adapter now respects existing named
+            windows.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now better handles a
+            failure to begin a new transaction.</p>
+            </li><li>
+            <p>The dataset code was split into some additional files for improved
+            readability.</p>
+            </li><li>
+            <p>Many documentation improvements were made.</p>
+            </li></ul>
+            
+            <p>Backwards Compatibility</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>Model::Errors no longer uses a default proc, but emulates one in the</p>
+            <dl class="rdoc-list label-list"><dt>
+            <dd>
+            <p>method.  This is unlikely to have a negative affect unless you</p>
+            </dd></dl>
+            
+            <p>are calling a method on it that doesn&#39;t call [] (maybe using it in a C
+            extension?).</p>
+            </li><li>
+            <p>Model#table_name now only provides the alias if an aliased table is used.</p>
+            </li><li>
+            <p>The Sequel::Dataset::STOCK_COUNT_OPTS constant has been removed.</p>
+            </li><li>
+            <p>Dataset#lock on PostgreSQL now returns nil instead of a dataset.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.12.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.12.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.12.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Migration+Changes">Migration Changes</h1>
+            <ul><li>
+            <p>A TimestampMigrator has been added to <a
+            href="../../../classes/Sequel.html">Sequel</a>, and is automatically used
+            if any migration has a version greater than</p>
+            <ol><li>
+            <p>This migrator operates similarly to the default</p>
+            </li></ol>
+            
+            <p>ActiveRecord migrator, in that it allows missing migrations. It differs
+            from the ActiveRecord migrator in that it supports migrations with the same
+            timestamp/version as well as a wide variety of timestamp formats (though
+            the ActiveRecord default of YYYYMMDDHHMMSS is recommended and should be
+            used in portable code).</p>
+            
+            <p><a href="../../../classes/Sequel.html">Sequel</a> still defaults to the old
+            migrator, but you can use the new one without making changes to your old
+            migrations.  Just make sure your new migration starts with a version
+            greater than 20000100, and <a
+            href="../../../classes/Sequel.html">Sequel</a> will automatically convert
+            the previous schema table to the new format.</p>
+            </li><li>
+            <p>A new migration DSL was added:</p>
+            
+            <pre>Sequel.migration do&#x000A;  up do&#x000A;  end&#x000A;  down do&#x000A;  end&#x000A;end</pre>
+            
+            <p>The old style of using a <a
+            href="../../../classes/Sequel/Migration.html">Sequel::Migration</a>
+            subclass is still supported, but it is recommended that new code use the
+            new DSL.</p>
+            </li><li>
+            <p>The default migrator also had significant issues fixed.  First, it now
+            saves the migration version after each migration, instead of after all
+            migrations, which means <a href="../../../classes/Sequel.html">Sequel</a>
+            won&#39;t attempt to apply already applied migrations if there was
+            previously an error when applying multiple migrations at once on a database
+            that didn&#39;t support transactional schema modification.</p>
+            
+            <p>Second, duplicate migration versions in the default migrator now raise an
+            exception, as do missing migration versions.  Neither should happen when
+            using the default migrator, which requires consecutive integer versions,
+            similar to the old ActiveRecord migrator.</p>
+            </li><li>
+            <p>Execution times for migrations are now logged to the database&#39;s
+            loggers.</p>
+            </li></ul>
+            
+            <h1 id="label-New+Plugins">New Plugins</h1>
+            <ul><li>
+            <p>A sharding plugin has been added that allows model objects to work well
+            with sharded databases.  When using it, model objects know which shard they
+            were retrieved from, so when you save the object, it is saved back to that
+            shard.  The sharding plugin also works with associations, so associated
+            records are retrieved from the same shard the main object was retreived
+            from.  The sharding plugin also works with both methods of eager loading,
+            and provides methods that you can use to create objects on specific shards.</p>
+            </li><li>
+            <p>An update_primary_key plugin has been added that allows <a
+            href="../../../classes/Sequel.html">Sequel</a> to work correctly if you
+            modify the primary key of a model object. This should not be necessary if
+            you are using surrogate keys, but if your database uses natural primary
+            keys which can change, this should be helpful.</p>
+            </li><li>
+            <p>An association_pks plugin has been added that adds association_pks and
+            association_pks= methods to model objects for both one_to_many and
+            many_to_many associations.  The association_pks method returns an array of
+            primary key values for the associated objects, and the association_pks=
+            method modifies the database to ensure that the object is only associated
+            to the objects specified by the array of primary keys provided to it.</p>
+            </li><li>
+            <p>A string_stripper plugin has been added that strips all strings that are
+            assigned to attribute values.  This is useful for web applications where
+            you want to easily remove leading and trailing whitespace in form entries
+            before storing them in the database.</p>
+            </li><li>
+            <p>A skip_create_refresh plugin has been added that skips the refresh of after
+            you save a new model object.  On most databases, <a
+            href="../../../classes/Sequel.html">Sequel</a> refreshes the model object
+            after inserting it in order to get values for all of the columns.  For
+            performance reasons, you can use this plugin to skip the refresh if it
+            isn&#39;t necessary for you.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+New+Features">Other New Features</h1>
+            <ul><li>
+            <p>Sequel::Model#set_fields and update_fields were added.  These methods have
+            a similar API to set_only and update_only, but they operate differently.
+            While set_only and update_only operate over the hash, these methods operate
+            over the array of fields, so they don&#39;t raise errors if the hash
+            contains fields not in the array:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">params</span> = {:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>, :<span class="ruby-identifier">c=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>}&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;&#x000A;<span class="ruby-comment"># raises Error because :a is not in the fields</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">set_only</span>(<span class="ruby-identifier">params</span>, [:<span class="ruby-identifier">b</span>, :<span class="ruby-identifier">c</span>])&#x000A;&#x000A;<span class="ruby-comment"># Just sets the value of album.b and album.c</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">set_fields</span>(<span class="ruby-identifier">params</span>, [:<span class="ruby-identifier">b</span>, :<span class="ruby-identifier">c</span>])</pre>
+            
+            <p>Other than handling entries in the hash that aren&#39;t in the array,
+            set_fields and update_fields also handle entries not in the hash
+            differently:</p>
+            
+            <pre># Doesn&#39;t modify the object, since the hash is empty&#x000A;album.set_only({}, [:b, :c])&#x000A;# Sets album.b and album.c to nil, since they aren&#39;t in the hash&#x000A;album.set_fields({}, [:b, :c])</pre>
+            </li><li>
+            <p>The :eager_loader association option has a new API, though the previous API
+            still works.  Instead of accepting three arguments, it can now accept a
+            single hash argument, which will use the :key_hash, :rows, and :association
+            keys for the previous three arguments.  The hash will also contain a :self
+            key whose value is the dataset doing the eager load, which was not possible
+            to determine using the old API.</p>
+            </li><li>
+            <p><a
+            href="../../../classes/Sequel/SQL/Expression.html#method-i-hash">Sequel::SQL::Expression#hash</a>
+            has been added so that the objects are now safe to use as hash keys.</p>
+            </li><li>
+            <p>A Dataset#order_prepend method has been added allowing you to prepend to an
+            existing order.  This is useful if want to modify a dataset&#39;s order
+            such that it first orders by the columns you provide, but for any rows
+            where the columns you provide are equal, uses the existing order to further
+            order the dataset:</p>
+            
+            <pre>ds.order(:albums__name).order_prepend(:artists__name)&#x000A;# ORDER BY artists.name, albums.name</pre>
+            </li><li>
+            <p>When creating foreign key columns, you can now use a :deferrable option to
+            set up a foreign key constraint that is not checked until the end of the
+            transaction:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">deferrable=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            </li><li>
+            <p>many_to_many associations now support a :join_table_block option that is
+            used by the add/remove/remove_all methods.  It can modify the dataset to
+            ensure that certain columns are included when inserting or to add a filter
+            so that only certain records are deleted.  It&#39;s useful if you have a
+            many_to_many association that is filtered to only a subset of the matching
+            rows in the join table.</p>
+            </li><li>
+            <p>The single_table_inheritance plugin now supports :model_map and :key_map
+            options to set up a custom mapping of column values to model classes.  For
+            simple situations such as when you are mapping integer values to certain
+            classes, a :model_map hash is sufficient:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">single_table_inheritance</span>, :<span class="ruby-identifier">type_id</span>,&#x000A; :<span class="ruby-identifier">model_map=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Staff</span>, <span class="ruby-value">2</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Manager</span>}</pre>
+            
+            <p>Here the :model_map keys are type_id column values, and the :model_map
+            values are symbols or strings specifying class names.</p>
+            
+            <p>For more complex conditions, you can use a pair of procs:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">single_table_inheritance</span>, :<span class="ruby-identifier">type_name</span>,&#x000A; :<span class="ruby-identifier">model_map=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>},&#x000A; :<span class="ruby-identifier">key_map=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">klass</span><span class="ruby-operator">|</span> <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">name</span>.<span class="ruby-identifier">reverse</span>}</pre>
+            
+            <p>Here the type_name column is a string column holding the reverse of the
+            class&#39;s name.</p>
+            </li><li>
+            <p>The single_table_inheritance plugin now correctly sets up subclass filters
+            for middle tables in a class hierarchy with more than 2 levels.  For
+            example, with this code:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Employee</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">single_table_inheritance</span>, :<span class="ruby-identifier">kind</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Manager</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Employee</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Executive</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Manager</span>; <span class="ruby-keyword">end</span></pre>
+            
+            <p><a href="../../../classes/Sequel.html">Sequel</a> previously would not
+            return Executives if you used Manager.all.  It now correctly recognizes
+            subclasses so that it will return both Managers and Executives.</p>
+            </li><li>
+            <p>Sequel::Model.qualified_primary_key_hash has been added, giving you a hash
+            that can be used for filtering.  It is similar to primary_key_hash, but it
+            qualifies the keys with the model&#39;s table.  It&#39;s useful if you have
+            joined the table to another table that has columns with the same name, but
+            you want to only look for a single model object in that dataset.</p>
+            </li><li>
+            <p>For consistency, you can now use Dataset#order_append as an alias for
+            order_more.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now correctly removes
+            schema entries when altering tables. Previously, some adapters that had to
+            query the existing schema when altering tables resulted in the previous
+            schema being cached.</p>
+            </li><li>
+            <p><a
+            href="../../../classes/Sequel/Model/Errors.html#method-i-on">Sequel::Model::Errors#on</a>
+            now always returns nil if there are no errors on the attribute. 
+            Previously, it would return an empty array in certain cases.  Additionally,
+            <a
+            href="../../../classes/Sequel/Model/Errors.html#method-i-empty-3F">Sequel::Model::Errors#empty?</a>
+            now returns true if there are no errors, where it certain cases it would
+            return false even if there were no errors.</p>
+            </li><li>
+            <p>The schema_dumper extension now works with tables specified as
+            Sequel::SQL::Identifiers.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now recognizes the
+            timestamp(N) with(out) time zone column type.</p>
+            </li><li>
+            <p>The lazy_attributes plugin no longer requires the core extensions to work
+            correctly.</p>
+            </li><li>
+            <p>DatabaseDisconnectError support has been added to the ODBC adapter,
+            allowing <a href="../../../classes/Sequel.html">Sequel</a> to detect
+            disconnects and remove the connection from the connection pool.</p>
+            </li><li>
+            <p>A leak of JDBC statement objects when using transactions was fixed in the
+            jdbc adapter.</p>
+            </li><li>
+            <p>The jdbc adapter now gives a nicer error message if you use a connection
+            string that it doesn&#39;t recognize and there is an error when connecting.</p>
+            </li><li>
+            <p>Temporary table creation was fixed on Microsoft SQL Server, but it is not
+            recommended as it changes the name of the table.  If you use Microsoft SQL
+            Server, you should prefix your temporary table names with # and use the
+            regular create table method.</p>
+            </li><li>
+            <p>A large number of guides were added to <a
+            href="../../../classes/Sequel.html">Sequel</a> to make it easier for new
+            and existing users to learn more about <a
+            href="../../../classes/Sequel.html">Sequel</a>.  The following guides were
+            added:</p>
+            <ul><li>
+            <p>Querying in <a href="../../../classes/Sequel.html">Sequel</a></p>
+            </li><li>
+            <p>Migration and Schema Modification</p>
+            </li><li>
+            <p>Model Hooks</p>
+            </li><li>
+            <p>Model Validations</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> for SQL Users</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> for ActiveRecord Users</p>
+            </li></ul>
+            </li><li>
+            <p>RDoc section support was added to <a
+            href="../../../classes/Sequel/Database.html">Sequel::Database</a>, making
+            the method documentation easier to read.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p><a href="../../../classes/Sequel/Database.html">Sequel::Database</a> now
+            defines the indexes and tables methods, even if the adapter does not
+            implement them, similar to how connect and execute are defined. 
+            Previously, you could use respond_to? to check if the adapter supported
+            them, now they raise Sequel::NotImplemented if the database adapter does
+            not implement them.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> used to raise
+            NotImplementedError in certain default definitions of methods inside <a
+            href="../../../classes/Sequel/Database.html">Sequel::Database</a> and <a
+            href="../../../classes/Sequel/Dataset.html">Sequel::Dataset</a>, when the
+            methods were supposed to be overridden in subclasses. <a
+            href="../../../classes/Sequel.html">Sequel</a> now uses a
+            Sequel::NotImplemented exception class for these exceptions, which is a
+            subclass of <a href="../../../classes/Sequel/Error.html">Sequel::Error</a>.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer applies all
+            association options to the dataset used to remove all many_to_many
+            associated objects.  You should use the new :join_table_block option to get
+            similar behavior if you were filtering the many_to_many association based
+            on columns in the join table and you wanted remove_all to only remove the
+            related columns.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now calls certain before
+            and after hook actions in plugins in a different order than before.  This
+            should not have an effect unless you were relying on them being called in
+            the previous order. Now, when overriding before hooks in plugins, <a
+            href="../../../classes/Sequel.html">Sequel</a> always does actions before
+            calling super, and when overriding after hooks in plugins, <a
+            href="../../../classes/Sequel.html">Sequel</a> always does actions after
+            calling super.</p>
+            </li><li>
+            <p>The hook_class_methods plugin no longer skips later after hooks if a
+            previous after hook returns false.  That behavior now only occurs for
+            before hooks.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now only removes primary
+            key values when updating objects if you are saving the entire object and
+            you have not modified the values of the primary keys.  Previously, <a
+            href="../../../classes/Sequel.html">Sequel</a> would remove primary key
+            values when updating even if you specified the primary key column
+            specifically or the primary key column was modified and you used
+            save_changes/update.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now uses explicit methods
+            instead of aliases for certain methods.  This should only affect you if for
+            example you overrode Dataset#group to do one thing and wanted
+            Dataset#group_by to do the default action.  Now, Dataset#group_by, and
+            methods like it, are explicit methods that just call the methods they
+            previously aliased.  This also means that if you were overriding
+            Dataset#group and explicitly aliasing group_by to it, you no longer need
+            the alias.</p>
+            </li><li>
+            <p>The single_table_inheritance plugin now uses IN instead of = for subclass
+            filters.  This could lead to poor performance if the database has a very
+            bad query planner.</p>
+            </li><li>
+            <p>The private transaction_statement_object method was removed from the JDBC
+            adapter, and <a href="../../../classes/Sequel.html">Sequel</a> will no
+            longer check for the presence of the method in the transaction code.</p>
+            </li><li>
+            <p>The <a href="../../../classes/Sequel/Migrator.html">Sequel::Migrator</a>
+            object is now a class instead of a module, and has been pretty much
+            rewritten.  If you were using any methods of it besides apply and run, they
+            no longer work.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

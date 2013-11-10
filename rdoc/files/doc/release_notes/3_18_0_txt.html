@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.18.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.18.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.18.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>Reversible migration support has been added:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;      <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">null=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>The change block acts the same way as an up block, except that it
+            automatically creates a down block that reverses the changes. So the above
+            is equivalent to:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;      <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">null=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">drop_table</span> :<span class="ruby-identifier">artists</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>The following methods are supported in a change block:</p>
+            <ul><li>
+            <p>create_table</p>
+            </li><li>
+            <p>add_column</p>
+            </li><li>
+            <p>add_index</p>
+            </li><li>
+            <p>rename_column</p>
+            </li><li>
+            <p>rename_table</p>
+            </li><li>
+            <p>alter_table (supporting the following methods):</p>
+            <ul><li>
+            <p>add_column</p>
+            </li><li>
+            <p>add_constraint</p>
+            </li><li>
+            <p>add_foreign_key (with a symbol, not an array)</p>
+            </li><li>
+            <p>add_primary_key (with a symbol, not an array)</p>
+            </li><li>
+            <p>add_index</p>
+            </li><li>
+            <p>add_full_text_index</p>
+            </li><li>
+            <p>add_spatial_index</p>
+            </li><li>
+            <p>rename_column</p>
+            </li></ul>
+            </li></ul>
+            
+            <p>Use of an other method in a change block will result in the creation of a
+            down block that raises an exception.</p>
+            </li><li>
+            <p>A to_dot extension has been added that adds a Dataset#to_dot method, which
+            returns a string that can be used as input to the graphviz dot program in
+            order to create visualizations of the dataset&#39;s abstract syntax tree. 
+            Examples:</p>
+            <ul><li>
+            <p><img src="http://sequel.heroku.com/images/to_dot_simple.gif" /></p>
+            </li><li>
+            <p><img src="http://sequel.heroku.com/images/to_dot_complex.gif" /></p>
+            </li><li>
+            <p><img src="http://imgpaste.com/i/lxngy.gif" /></p>
+            </li></ul>
+            
+            <p>Both the to_dot extension and reversible migrations support were inspired
+            by Aaron Patterson&#39;s recent work on ActiveRecord and ARel.</p>
+            </li><li>
+            <p>The user can now control how the connection pool handles attempts to access
+            shards that haven&#39;t been configured.  The default is still to assume
+            the :default shard.  However, you can specify a different shard using the
+            :servers_hash option when connecting to the database:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-operator">...</span>, :<span class="ruby-identifier">servers_hash=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">some_shard</span>))</pre>
+            
+            <p>You can also use this feature to raise an exception if an unconfigured
+            shard is used:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-operator">...</span>, :<span class="ruby-identifier">servers_hash=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-operator">...</span>})</pre>
+            </li><li>
+            <p>The mysql and mysql2 adapters now both support the :read_timeout and
+            :connect_timeout options.  read_timeout is the timeout in seconds for
+            reading back results of a query, and connect_timeout is the timeout in
+            seconds before a connection attempt is abandoned.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p>The json_serializer plugin will now typecast column values for columns with
+            unrestricted setter methods when parsing JSON into model objects.  It now
+            also calls the getter method when creating the JSON, instead of directly
+            taking the values from the underlying hash.</p>
+            </li><li>
+            <p>When parsing the schema for a model with an aliased table name, the
+            unaliased table name is now used.</p>
+            </li><li>
+            <p>The SQLite adapter has been updated to not rely on the native
+            type_translation support, since that will be removed in the next major
+            version of sqlite3-ruby.  <a href="../../../classes/Sequel.html">Sequel</a>
+            now implements it&#39;s own type translation in the sqlite adapter,
+            similarly to how the mysql and postgres adapters handle type translation.</p>
+            </li><li>
+            <p>On SQLite, when emulating natively unsupported schema methods such as
+            drop_column, <a href="../../../classes/Sequel.html">Sequel</a> will now
+            attempt to recreate applicable indexes on the underlying table.</p>
+            </li><li>
+            <p>A more informative error message is now used when connecting fails when
+            using the jdbc adapter.</p>
+            </li><li>
+            <p>method_missing is no longer removed from <a
+            href="../../../classes/Sequel/BasicObject.html">Sequel::BasicObject</a> on
+            ruby 1.8.  This should improve compatibility in some cases with Rubinius.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>On SQLite, <a href="../../../classes/Sequel.html">Sequel</a> no longer
+            assumes that a plain integer in a datetime or timestamp field represents a
+            unix epoch time.</p>
+            </li><li>
+            <p>Previously, saving a model object that used the instance_hooks plugin
+            removed all instance hooks.  Now, only the applicable hooks are removed. 
+            So if you save a new object, the update instance hooks won&#39;t be
+            removed.  And if you save an existing object, delete instance hooks
+            won&#39;t be removed.</p>
+            </li><li>
+            <p>The private Dataset#identifier_list method has been moved into the SQLite
+            adapter, since that is the only place it was used.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

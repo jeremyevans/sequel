@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::JDBC::JTDS::Dataset</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::JDBC::JTDS::Dataset
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/adapters/jdbc/jtds_rb.html">lib/sequel/adapters/jdbc/jtds.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../JTDS.html">JTDS</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p><a href="Dataset.html">Dataset</a> class for <a
+            href="../JTDS.html">JTDS</a> datasets accessed via <a
+            href="../../JDBC.html">JDBC</a>.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-convert_type_proc">convert_type_proc</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="../../MSSQL/DatasetMethods.html">Sequel::MSSQL::DatasetMethods</a></li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>JTDS_CLOB_METHOD</td>
+                    <td>=</td>
+                    <td class='context-item-value'>TYPE_TRANSLATOR_INSTANCE.method(:jtds_clob)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-convert_type_proc'>
+                <a name='method-i-convert_type_proc'></a>
+                <div class='synopsis'>
+                  <span class='name'>convert_type_proc</span>
+                  <span class='arguments'>(v, ctn=nil)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Handle CLOB types retrieved via <a href="../JTDS.html">JTDS</a>.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-convert_type_proc-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-convert_type_proc-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/jtds.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_type_proc</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">ctn</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">NetSourceforgeJtdsJdbc</span><span class="ruby-operator">::</span><span class="ruby-constant">ClobImpl</span>)&#x000A;    <span class="ruby-constant">JTDS_CLOB_METHOD</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>arbitrary_servers.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>arbitrary_servers.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/arbitrary_servers.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-09-19 07:06:56 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The arbitrary_servers extension allows you to connect to arbitrary
+            servers/shards that were not defined when you created the database. To use
+            it, you first load the extension into the Database object:</p>
+            
+            <pre>DB.extension :arbitrary_servers</pre>
+            
+            <p>Then you can pass arbitrary connection options for the server/shard to use
+            as a hash:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>).<span class="ruby-identifier">all</span></pre>
+            
+            <p>Because <a href="../../../../classes/Sequel.html">Sequel</a> can never be
+            sure that the connection will be reused, arbitrary connections are
+            disconnected as soon as the outermost block that uses them exits.  So this
+            example uses the same connection:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">server=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">server=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c2</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-comment"># c == c2</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>But this example does not:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">server=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">server=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c2</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-comment"># c != c2</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>You can use this extension in conjunction with the server_block extension:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># All of these use the host/database given to with_server</span>&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-operator">...</span>)&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-operator">...</span>)&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">tables</span>&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">all</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>Anyone using this extension in conjunction with the server_block extension
+            may want to do the following to so that you don&#39;t need to call
+            synchronize separately:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(*)&#x000A;  <span class="ruby-keyword">super</span>{<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">yield</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>Note that this extension only works with the sharded threaded connection
+            pool.  If you are using the sharded single connection pool, you need to
+            switch to the sharded threaded connection pool before using this extension.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

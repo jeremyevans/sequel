@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::HookClassMethods::ClassMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::HookClassMethods::ClassMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/hook_class_methods_rb.html">lib/sequel/plugins/hook_class_methods.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../HookClassMethods.html">HookClassMethods</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-add_hook_type">add_hook_type</a></li>
+              <li><a target="docwin" href="#method-i-has_hooks-3F">has_hooks?</a></li>
+              <li><a target="docwin" href="#method-i-hook_blocks">hook_blocks</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-add_hook_type'>
+                <a name='method-i-add_hook_type'></a>
+                <div class='synopsis'>
+                  <span class='name'>add_hook_type</span>
+                  <span class='arguments'>(*hooks)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>This adds a new hook type. It will define both a class method that you can
+                  use to add hooks, as well as an instance method that you can use to call
+                  all hooks of that type.  The class method can be called with a symbol or a
+                  block or both.  If a block is given and and symbol is not, it adds the hook
+                  block to the hook type.  If a block and symbol are both given, it replaces
+                  the hook block associated with that symbol for a given hook type, or adds
+                  it if there is no hook block with that symbol for that hook type.  If no
+                  block is given, it assumes the symbol specifies an instance method to call
+                  and adds it to the hook type.</p>
+                  
+                  <p>If any before hook block returns false, the instance method will return
+                  false immediately without running the rest of the hooks of that type.</p>
+                  
+                  <p>It is recommended that you always provide a symbol to this method, for
+                  descriptive purposes.  It&#39;s only necessary to do so when you  are using
+                  a system that reloads code.</p>
+                  
+                  <p>Example of usage:</p>
+                  
+                  <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">MyModel</span>&#x000A; <span class="ruby-identifier">define_hook</span> :<span class="ruby-identifier">before_move_to</span>&#x000A; <span class="ruby-identifier">before_move_to</span>(:<span class="ruby-identifier">check_move_allowed</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">allow_move?</span>}&#x000A; <span class="ruby-keyword">def</span> <span class="ruby-identifier">move_to</span>(<span class="ruby-identifier">there</span>)&#x000A;   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">before_move_to</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;   <span class="ruby-comment"># move MyModel object to there</span>&#x000A; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  
+                  <p>Do not call this method with untrusted input, as that can result in
+                  arbitrary code execution.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_hook_type-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-add_hook_type-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_hook_type</span>(*<span class="ruby-identifier">hooks</span>)&#x000A;  <span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">HOOKS</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">hooks</span>)&#x000A;  <span class="ruby-identifier">hooks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hook</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>] = []&#x000A;    <span class="ruby-identifier">instance_eval</span>(<span class="ruby-node">&quot;def #{hook}(method = nil, &amp;block); add_hook(:#{hook}, method, &amp;block) end&quot;</span>, <span class="ruby-keyword">__FILE__</span>, <span class="ruby-keyword">__LINE__</span>)&#x000A;    <span class="ruby-identifier">class_eval</span>(<span class="ruby-node">&quot;def #{hook}; model.hook_blocks(:#{hook}){|b| return false if instance_eval(&amp;b) == false}; end&quot;</span>, <span class="ruby-keyword">__FILE__</span>, <span class="ruby-keyword">__LINE__</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-has_hooks-3F'>
+                <a name='method-i-has_hooks-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>has_hooks?</span>
+                  <span class='arguments'>(hook)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns true if there are any hook blocks for the given hook.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-has_hooks-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-has_hooks-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 85</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">has_hooks?</span>(<span class="ruby-identifier">hook</span>)&#x000A;  <span class="ruby-operator">!</span><span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-hook_blocks'>
+                <a name='method-i-hook_blocks'></a>
+                <div class='synopsis'>
+                  <span class='name'>hook_blocks</span>
+                  <span class='arguments'>(hook)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Yield every block related to the given hook.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-hook_blocks-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-hook_blocks-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hook_blocks</span>(<span class="ruby-identifier">hook</span>)&#x000A;  <span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

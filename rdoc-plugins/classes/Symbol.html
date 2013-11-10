@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Symbol</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Symbol
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../files/lib/sequel/extensions/core_extensions_rb.html">lib/sequel/extensions/core_extensions.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/pg_array_ops_rb.html">lib/sequel/extensions/pg_array_ops.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/pg_hstore_ops_rb.html">lib/sequel/extensions/pg_hstore_ops.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/pg_json_ops_rb.html">lib/sequel/extensions/pg_json_ops.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/pg_range_ops_rb.html">lib/sequel/extensions/pg_range_ops.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/pg_row_ops_rb.html">lib/sequel/extensions/pg_row_ops.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/ruby18_symbol_extensions_rb.html">lib/sequel/extensions/ruby18_symbol_extensions.rb</a>
+          </li>
+          <li>
+            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../files/lib/sequel/extensions/core_extensions_rb.html">core_extensions.rb</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p><a href="Sequel.html">Sequel</a> extends <code>Symbol</code> to add methods
+            to implement the SQL DSL.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-5B-5D">[]</a></li>
+              <li><a target="docwin" href="#method-i-identifier">identifier</a></li>
+              <li><a target="docwin" href="#method-i-sql_function">sql_function</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li>Sequel::SQL::AliasMethods</li>
+                <li>Sequel::SQL::CastMethods</li>
+                <li>Sequel::SQL::OrderMethods</li>
+                <li>Sequel::SQL::BooleanMethods</li>
+                <li>Sequel::SQL::NumericMethods</li>
+                <li>Sequel::SQL::QualifyingMethods</li>
+                <li>Sequel::SQL::StringMethods</li>
+                <li>Sequel::SQL::SubscriptMethods</li>
+                <li>Sequel::SQL::ComplexExpressionMethods</li>
+                <li><a target="docwin" href="Sequel/Postgres/ArrayOpMethods.html">Sequel::Postgres::ArrayOpMethods</a></li>
+                <li><a target="docwin" href="Sequel/Postgres/HStoreOpMethods.html">Sequel::Postgres::HStoreOpMethods</a></li>
+                <li><a target="docwin" href="Sequel/Postgres/JSONOpMethods.html">Sequel::Postgres::JSONOpMethods</a></li>
+                <li><a target="docwin" href="Sequel/Postgres/RangeOpMethods.html">Sequel::Postgres::RangeOpMethods</a></li>
+                <li><a target="docwin" href="Sequel/Postgres/PGRowOp/ExpressionMethods.html">Sequel::Postgres::PGRowOp::ExpressionMethods</a></li>
+                <li>Sequel::SQL::InequalityMethods</li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-5B-5D'>
+                <a name='method-i-5B-5D'></a>
+                <div class='synopsis'>
+                  <span class='name'>[]</span>
+                  <span class='arguments'>(*args)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Create an SQL Function with the receiver as the function name and the given
+                  arguments.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/extensions/ruby18_symbol_extensions.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, *<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-identifier'>
+                <a name='method-i-identifier'></a>
+                <div class='synopsis'>
+                  <span class='name'>identifier</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns receiver wrapped in an <code>Sequel::SQL::Identifier</code>. 
+                  Usually used to prevent splitting the symbol.</p>
+                  
+                  <pre>:a__b # SQL: &quot;a&quot;.&quot;b&quot;&#x000A;:a__b.identifier # SQL: &quot;a__b&quot;</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-identifier-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-identifier-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 215</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">identifier</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-sql_function'>
+                <a name='method-i-sql_function'></a>
+                <div class='synopsis'>
+                  <span class='name'>sql_function</span>
+                  <span class='arguments'>(*args)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns a <code>Sequel::SQL::Function</code> with this as the function
+                  name, and the given arguments. This is aliased as <code>Symbol#[]</code> if
+                  the RUBY_VERSION is less than 1.9.0. Ruby 1.9 defines
+                  <code>Symbol#[]</code>, and <a href="Sequel.html">Sequel</a> doesn&#39;t
+                  override methods defined by ruby itself.</p>
+                  
+                  <pre>:now.sql_function # SQL: now()&#x000A;:sum.sql_function(:a) # SQL: sum(a)&#x000A;:concat.sql_function(:a, :b) # SQL: concat(a, b)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_function-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-sql_function-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 227</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_function</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, *<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

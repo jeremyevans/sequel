@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>2.0.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>2.0.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/2.0.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Blockless Filter Expressions</p>
+            <hr style="height: 10px">
+            
+            <p>Before 2.0.0, in order to specify complex SQL expressions, you either had
+            to resort to writing the SQL yourself in a string or using an expression
+            inside a block that was parsed by ParseTree. Because ParseTree was
+            required, only ruby 1.8.* was supported, and supporting other ruby versions
+            (ruby 1.9, JRuby, Rubinius) would never be possible.</p>
+            
+            <p>With 2.0.0, you no longer need to use a block to write complex SQL
+            expressions. The basics of the blockless filters are the usual arithmetic,
+            inequality, and binary operators:</p>
+            
+            <pre>+ = addition&#x000A;- = subtraction&#x000A;* = multiplication&#x000A;/ = division&#x000A;&gt; = greater than&#x000A;&lt; = less than&#x000A;&gt;= = greater than or equal to&#x000A;&lt;= = less than or equal to&#x000A;~ = negation&#x000A;&amp; = AND&#x000A;| = OR</pre>
+            
+            <p>You can use these operators on Symbols, LiteralStrings, and other
+            Sequel::SQL::Expressions.  Note that there is no equal operator or not
+            equal operator, to specify those, you use a <a
+            href="../../../classes/Hash.html">Hash</a>.</p>
+            
+            <p>Here are some examples:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Ruby code =&gt; SQL WHERE clause</span>&#x000A;:<span class="ruby-identifier">active</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">active</span>&#x000A;<span class="ruby-operator">~</span>:<span class="ruby-identifier">active</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">NOT</span> <span class="ruby-identifier">active</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-operator">~</span>:<span class="ruby-identifier">active</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">active</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-operator">~</span><span class="ruby-operator">~</span>:<span class="ruby-identifier">active</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">NOT</span> <span class="ruby-identifier">active</span>&#x000A;:<span class="ruby-identifier">is_true</span>[] =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">is_true</span>()&#x000A;<span class="ruby-operator">~</span>:<span class="ruby-identifier">is_true</span>[] =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">NOT</span> <span class="ruby-identifier">is_true</span>()&#x000A;:<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>)&#x000A;:<span class="ruby-identifier">x</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100.01</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100.01</span>)&#x000A;:<span class="ruby-identifier">x</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">0</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">0</span>)&#x000A;:<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">1</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-operator">~</span>(:<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>) =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">100</span>)&#x000A;{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> = <span class="ruby-value">100</span>)&#x000A;{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;a&#39;</span>} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> = <span class="ruby-string">&#39;a&#39;</span>)&#x000A;{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">nil</span>} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-constant">IS</span> <span class="ruby-constant">NULL</span>)&#x000A;<span class="ruby-operator">~</span>{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">!=</span> <span class="ruby-value">100</span>)&#x000A;<span class="ruby-operator">~</span>{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;a&#39;</span>} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;a&#39;</span>)&#x000A;<span class="ruby-operator">~</span>{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">nil</span>} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-constant">IS</span> <span class="ruby-constant">NOT</span> <span class="ruby-constant">NULL</span>)&#x000A;{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-regexp">/a/</span>} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">~</span> <span class="ruby-string">&#39;blah&#39;</span>) <span class="ruby-comment"># Default, MySQL different</span>&#x000A;<span class="ruby-operator">~</span>{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-regexp">/a/</span>} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">!~</span> <span class="ruby-string">&#39;blah&#39;</span>) <span class="ruby-comment"># Default, MySQL different</span>&#x000A;:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;a&#39;</span>) =<span class="ruby-operator">&gt;</span>  (<span class="ruby-identifier">x</span> <span class="ruby-constant">LIKE</span> <span class="ruby-string">&#39;a&#39;</span>)&#x000A;<span class="ruby-operator">~</span>:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;a&#39;</span>) =<span class="ruby-operator">&gt;</span>  (<span class="ruby-identifier">x</span> <span class="ruby-constant">NOT</span> <span class="ruby-constant">LIKE</span> <span class="ruby-string">&#39;a&#39;</span>)&#x000A;:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">like</span>(<span class="ruby-regexp">/a/</span>) =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">~</span> <span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># Default, MySQL different</span>&#x000A;<span class="ruby-operator">~</span>:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-regexp">/b/</span>) =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-constant">NOT</span> <span class="ruby-constant">LIKE</span> <span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-constant">AND</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">!~</span> <span class="ruby-string">&#39;b&#39;</span>)) <span class="ruby-comment"># Default</span>&#x000A;<span class="ruby-operator">~</span>{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>} =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>) <span class="ruby-constant">OR</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>))&#x000A;<span class="ruby-operator">~</span>{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">i</span>)} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-constant">NOT</span> <span class="ruby-constant">IN</span> (<span class="ruby-constant">SELECT</span> <span class="ruby-identifier">i</span> <span class="ruby-constant">FROM</span> <span class="ruby-identifier">items</span>))&#x000A;<span class="ruby-operator">~</span>{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-constant">NOT</span> <span class="ruby-constant">IN</span> (<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>))&#x000A;:<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span> =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>)&#x000A;(:<span class="ruby-identifier">x</span> * :<span class="ruby-identifier">y</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">100.01</span> =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> * <span class="ruby-identifier">y</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">100.01</span>)&#x000A;(:<span class="ruby-identifier">x</span> <span class="ruby-operator">-</span> :<span class="ruby-identifier">y</span><span class="ruby-operator">/</span><span class="ruby-value">2</span>) <span class="ruby-operator">&gt;=</span> <span class="ruby-value">100</span> =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-operator">-</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">/</span> <span class="ruby-value">2</span>)) <span class="ruby-operator">&gt;=</span> <span class="ruby-value">100</span>)&#x000A;(((:<span class="ruby-identifier">x</span> <span class="ruby-operator">-</span> :<span class="ruby-identifier">y</span>)<span class="ruby-operator">/</span>(:<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">y</span>))*:<span class="ruby-identifier">z</span>) <span class="ruby-operator">&lt;=</span> <span class="ruby-value">100</span> =<span class="ruby-operator">&gt;</span> ((((<span class="ruby-identifier">x</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">y</span>) <span class="ruby-operator">/</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">y</span>)) * <span class="ruby-identifier">z</span>) <span class="ruby-operator">&lt;=</span></pre>
+            
+            <p>100)</p>
+            
+            <pre class="ruby"><span class="ruby-operator">~</span>((((:<span class="ruby-identifier">x</span> <span class="ruby-operator">-</span> :<span class="ruby-identifier">y</span>)<span class="ruby-operator">/</span>(:<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">y</span>))*:<span class="ruby-identifier">z</span>) <span class="ruby-operator">&lt;=</span> <span class="ruby-value">100</span>) =<span class="ruby-operator">&gt;</span> ((((<span class="ruby-identifier">x</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">y</span>) <span class="ruby-operator">/</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">y</span>)) * <span class="ruby-identifier">z</span>) <span class="ruby-operator">&gt;</span></pre>
+            
+            <p>100)</p>
+            
+            <pre class="ruby">:<span class="ruby-identifier">x</span> &amp; :<span class="ruby-identifier">y</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-constant">AND</span> <span class="ruby-identifier">y</span>)&#x000A;:<span class="ruby-identifier">x</span> &amp; :<span class="ruby-identifier">y</span> &amp; :<span class="ruby-identifier">z</span> =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-constant">AND</span> <span class="ruby-identifier">y</span>) <span class="ruby-constant">AND</span> <span class="ruby-identifier">z</span>)&#x000A;:<span class="ruby-identifier">x</span> &amp; {:<span class="ruby-identifier">y</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">z</span>} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-constant">AND</span> (<span class="ruby-identifier">y</span> = <span class="ruby-identifier">z</span>))&#x000A;{:<span class="ruby-identifier">y</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">z</span>} &amp; :<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">y</span> = <span class="ruby-identifier">z</span>) <span class="ruby-constant">AND</span> <span class="ruby-identifier">x</span>)&#x000A;{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">a</span>} &amp; {:<span class="ruby-identifier">y</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">z</span>} =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> = <span class="ruby-identifier">a</span>) <span class="ruby-constant">AND</span> (<span class="ruby-identifier">y</span> = <span class="ruby-identifier">z</span>))&#x000A;(:<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">200</span>) &amp; (:<span class="ruby-identifier">y</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>) =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">200</span>) <span class="ruby-constant">AND</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>))&#x000A;:<span class="ruby-identifier">x</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">y</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-constant">OR</span> <span class="ruby-identifier">y</span>)&#x000A;:<span class="ruby-identifier">x</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">y</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">z</span> =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-constant">OR</span> <span class="ruby-identifier">y</span>) <span class="ruby-constant">OR</span> <span class="ruby-identifier">z</span>)&#x000A;:<span class="ruby-identifier">x</span> <span class="ruby-operator">|</span> {:<span class="ruby-identifier">y</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">z</span>} =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-constant">OR</span> (<span class="ruby-identifier">y</span> = <span class="ruby-identifier">z</span>))&#x000A;{:<span class="ruby-identifier">y</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">z</span>} <span class="ruby-operator">|</span> :<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">y</span> = <span class="ruby-identifier">z</span>) <span class="ruby-constant">OR</span> <span class="ruby-identifier">x</span>)&#x000A;{:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">a</span>} <span class="ruby-operator">|</span> {:<span class="ruby-identifier">y</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">z</span>} =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> = <span class="ruby-identifier">a</span>) <span class="ruby-constant">OR</span> (<span class="ruby-identifier">y</span> = <span class="ruby-identifier">z</span>))&#x000A;(:<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">200</span>) <span class="ruby-operator">|</span> (:<span class="ruby-identifier">y</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>) =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">200</span>) <span class="ruby-constant">OR</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>))&#x000A;(:<span class="ruby-identifier">x</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">y</span>) &amp; :<span class="ruby-identifier">z</span> =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-constant">OR</span> <span class="ruby-identifier">y</span>) <span class="ruby-constant">AND</span> <span class="ruby-identifier">z</span>)&#x000A;:<span class="ruby-identifier">x</span> <span class="ruby-operator">|</span> (:<span class="ruby-identifier">y</span> &amp; :<span class="ruby-identifier">z</span>) =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-constant">OR</span> (<span class="ruby-identifier">y</span> <span class="ruby-constant">AND</span> <span class="ruby-identifier">z</span>))&#x000A;(:<span class="ruby-identifier">x</span> &amp; :<span class="ruby-identifier">w</span>) <span class="ruby-operator">|</span> (:<span class="ruby-identifier">y</span> &amp; :<span class="ruby-identifier">z</span>) =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-constant">AND</span> <span class="ruby-identifier">w</span>) <span class="ruby-constant">OR</span> (<span class="ruby-identifier">y</span> <span class="ruby-constant">AND</span> <span class="ruby-identifier">z</span>))&#x000A;<span class="ruby-operator">~</span>((:<span class="ruby-identifier">x</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">y</span>) &amp; :<span class="ruby-identifier">z</span>) =<span class="ruby-operator">&gt;</span> ((<span class="ruby-constant">NOT</span> <span class="ruby-identifier">x</span> <span class="ruby-constant">AND</span> <span class="ruby-constant">NOT</span> <span class="ruby-identifier">y</span>) <span class="ruby-constant">OR</span> <span class="ruby-constant">NOT</span> <span class="ruby-identifier">z</span>)&#x000A;<span class="ruby-operator">~</span>((:<span class="ruby-identifier">x</span> &amp; :<span class="ruby-identifier">w</span>) <span class="ruby-operator">|</span> (:<span class="ruby-identifier">y</span> &amp; :<span class="ruby-identifier">z</span>)) =<span class="ruby-operator">&gt;</span> ((<span class="ruby-constant">NOT</span> <span class="ruby-identifier">x</span> <span class="ruby-constant">OR</span> <span class="ruby-constant">NOT</span> <span class="ruby-identifier">w</span>) <span class="ruby-constant">AND</span> (<span class="ruby-constant">NOT</span> <span class="ruby-identifier">y</span> <span class="ruby-constant">OR</span> <span class="ruby-constant">NOT</span> <span class="ruby-identifier">z</span>))&#x000A;<span class="ruby-operator">~</span>((:<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">200</span>) <span class="ruby-operator">|</span> (:<span class="ruby-identifier">y</span> &amp; :<span class="ruby-identifier">z</span>)) =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">200</span>) <span class="ruby-constant">AND</span> (<span class="ruby-constant">NOT</span> <span class="ruby-identifier">y</span> <span class="ruby-constant">OR</span> <span class="ruby-constant">NOT</span> <span class="ruby-identifier">z</span>))&#x000A;<span class="ruby-operator">~</span>(<span class="ruby-string">&#39;x&#39;</span>.<span class="ruby-identifier">lit</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>) =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&lt;=</span> <span class="ruby-value">100</span>)&#x000A;<span class="ruby-string">&#39;x&#39;</span>.<span class="ruby-identifier">lit</span>.<span class="ruby-identifier">like</span>(<span class="ruby-regexp">/a/</span>) =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">x</span> <span class="ruby-operator">~</span> <span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># (x ~ \&#39;a\&#39;)</span></pre>
+            
+            <p>None of these require blocks, you can use any directly in a call to filter:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">filter</span>((:<span class="ruby-identifier">price</span> * :<span class="ruby-identifier">tax</span>) <span class="ruby-operator">-</span> :<span class="ruby-identifier">discount</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>)&#x000A;<span class="ruby-comment"># =&gt; SELECT * FROM items WHERE (((price * tax) - discount) &gt; 100)</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">active</span> &amp; <span class="ruby-operator">~</span>:<span class="ruby-identifier">archived</span>)&#x000A;<span class="ruby-comment"># =&gt; SELECT * FROM items WHERE (active AND NOT archived)</span></pre>
+            
+            <p>SQL <a href="../../../classes/String.html">String</a> Concatenation</p>
+            <hr style="height: 10px">
+            
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now has support for
+            expressing SQL string concatenation in an easy way:</p>
+            
+            <pre>[:name, :title].sql_string_join(&quot; - &quot;)&#x000A;# SQL:  name || &#39; - &#39; || title</pre>
+            
+            <p>You can use this in selecting columns, creating filters, ordering datasets,
+            and possibly elsewhere.</p>
+            
+            <p>Schema Reflection Support/Typecasting on Assignment</p>
+            <hr style="height: 10px">
+            
+            <p>When used with PostgreSQL, MySQL, or SQLite, <a
+            href="../../../classes/Sequel.html">Sequel</a> now has the ability to get
+            information from the database&#39;s schema in regards to column types:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">schema</span>(:<span class="ruby-identifier">artist</span>)&#x000A;=<span class="ruby-operator">&gt;</span> [[:<span class="ruby-identifier">id</span>, {:<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">integer</span>, :<span class="ruby-identifier">db_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;integer&quot;</span>, :<span class="ruby-identifier">max_chars=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>&#x000A;   :<span class="ruby-identifier">numeric_precision=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">32</span>, :<span class="ruby-identifier">allow_null=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>,&#x000A;   :<span class="ruby-identifier">default=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;nextval(&#39;artist_id_seq&#39;::regclass)&quot;</span>}], [:<span class="ruby-identifier">name</span>,&#x000A;   {:<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">string</span>, :<span class="ruby-identifier">default=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>, :<span class="ruby-identifier">db_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;text&quot;</span>,&#x000A;   :<span class="ruby-identifier">numeric_precision=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>, :<span class="ruby-identifier">allow_null=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">max_chars=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>}]]</pre>
+            
+            <p>Models now use this information to typecast values on attribute assignment.
+            For example, if you have an integer column named number and a text (e.g.
+            varchar) column named title:</p>
+            
+            <pre class="ruby"><span class="ruby-value">1.5</span><span class="ruby-value">.1</span><span class="ruby-operator">:</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">number</span> = <span class="ruby-string">&#39;1&#39;</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">number</span> <span class="ruby-comment"># =&gt; &#39;1&#39;</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">title</span> = <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">title</span> <span class="ruby-comment"># =&gt; 1</span>&#x000A;<span class="ruby-value">2.0</span><span class="ruby-value">.0</span><span class="ruby-operator">:</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">number</span> = <span class="ruby-string">&#39;1&#39;</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">number</span> <span class="ruby-comment"># =&gt; 1</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">title</span> = <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">title</span> <span class="ruby-comment"># =&gt; &#39;1&#39;</span></pre>
+            
+            <p>Typecasting can be turned off on a global, per class, and per object basis:</p>
+            
+            <pre>Sequel::Model.typecast_on_assignment = false # Global&#x000A;Album.typecast_on_assignment = false # Per Class&#x000A;Album.new.typecast_on_assignment = false # Per Object</pre>
+            
+            <p>Typecasting is somewhat strict, it does not allow obviously bogus data to
+            be used:</p>
+            
+            <pre>model.number = &#39;a&#39; # Raises error</pre>
+            
+            <p>This is in contrast to how some other ORMs handle the situation:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">number</span> = <span class="ruby-string">&#39;a&#39;</span>&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">number</span> <span class="ruby-comment"># =&gt; 0</span></pre>
+            
+            <p>If <a href="../../../classes/Sequel.html">Sequel</a> is being used with a
+            web framework and you want to display friendly error messages to the user,
+            you should probably turn typecasting off and set up the necessary
+            validations in your models.</p>
+            
+            <p>Model Association Improvements</p>
+            <hr style="height: 10px">
+            
+            <p>Associations can now be eagerly loaded even if they have a block, though
+            the block should not rely on being evaluated in the context of an instance.
+            This allows you filter on associations when eagerly loading:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums_with_10_tracks</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Album</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">num_tracks</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%)).eager(:albums_with_10_tracks).all&#x000A;# SELECT * FROM artists WHERE (name LIKE &#39;</span><span class="ruby-constant">A</span><span class="ruby-operator">%</span><span class="ruby-string">&#39;)&#x000A;# SELECT albums.* FROM albums WHERE ((artist_id IN (...)) AND&#x000A;#   (num_tracks = 10))&#x000A;</span></pre>
+            
+            <p>Associations now have a remove_all_ method for removing all associated
+            objects in a single query:</p>
+            
+            <pre>Artist.many_to_many :albums&#x000A;Artist[1].remove_all_albums&#x000A;# DELETE FROM albums_artists WHERE artist_id = 1&#x000A;Artist.one_to_many :albums&#x000A;Artist[1].remove_all_albums&#x000A;# UPDATE albums SET artist_id = NULL WHERE artist_id = 1</pre>
+            
+            <p>All associations can specify a :select option to change which columns are
+            selected.  Previously only many to many associations suppported this.</p>
+            
+            <p>The SQL used when eagerly loading through eager_graph can be modified via
+            the :graph_join_type, :graph_conditions, and :graph_join_conditions
+            options.</p>
+            
+            <p>:graph_join_type changes the join type from the default of :left_outer. 
+            This can be useful if you do not want any albums that don&#39;t have an
+            artist in the result set:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">graph_join_type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">inner</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager_graph</span>(:<span class="ruby-identifier">artist</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT ... FROM albums INNER JOIN artists ...</span></pre>
+            
+            <p>:graph_conditions adds conditions on the join to the table you are joining,
+            the eager_graph equivalent of an association block argument in eager. It
+            takes either a hash or an array where all elements are arrays of length
+            two, similar to join_table, where key symbols specify columns in the joined
+            table and value symbols specify columns in the last joined or primary
+            table:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">graph_conditions=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">active=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager_graph</span>(:<span class="ruby-identifier">artist</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT ... FROM albums LEFT OUTER JOIN artists ON ((artists.id =</span>&#x000A;<span class="ruby-comment">#   albums.artist_id) AND (artists.active = &#39;t&#39;))</span></pre>
+            
+            <p>:graph_join_table_conditions exists for many to many associations only, and
+            operates the same as :graph_conditions, except it specifies a condition on
+            the many to many join table instead of the associated model&#39;s table.
+            This is necessary if the join table is also model table with other columns
+            on which you may want to filter:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">genres</span>, :<span class="ruby-identifier">join_table=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">ag</span>,    :<span class="ruby-identifier">graph_join_table_conditions=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">active=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager_graph</span>(:<span class="ruby-identifier">genres</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT ... FROM albums LEFT OUTER JOIN ag ON ((ag.album_id =</span>&#x000A;    <span class="ruby-identifier">albums</span>.<span class="ruby-identifier">id</span>) <span class="ruby-constant">AND</span> (<span class="ruby-identifier">ag</span>.<span class="ruby-identifier">active</span> = <span class="ruby-string">&#39;t&#39;</span>)) <span class="ruby-constant">LEFT</span> <span class="ruby-constant">OUTER</span> <span class="ruby-constant">JOIN</span> <span class="ruby-identifier">genres</span> <span class="ruby-constant">ON</span>&#x000A;    (<span class="ruby-identifier">genres</span>.<span class="ruby-identifier">id</span> = <span class="ruby-identifier">ag</span>.<span class="ruby-identifier">genre_id</span>)</pre>
+            
+            <p>Other Small Improvements</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>Dataset#invert returns a dataset that matches all records not matching the
+            current filter.</p>
+            </li><li>
+            <p>Dataset#unfiltered returns a dataset that has any filters removed.</p>
+            </li><li>
+            <p>Dataset#last_page? and Dataset#first_page? for paginated datasets.</p>
+            </li><li>
+            <p>The sequel command line tool now support an -E or --echo argument that logs
+            all SQL to the standard output.  It also can take a path to a yaml file
+            with database connection options, in addition to a database URL.</p>
+            </li><li>
+            <p>Databases can now have multiple SQL loggers, so you can log to the standard
+            output as well as a file.</p>
+            </li><li>
+            <p>SQL identifiers (columns and tables) are now quoted by default (you can
+            turn this off via Sequel.quote_identifiers = false if need be).</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html#method-c-connect">Sequel.connect</a>
+            now takes an optional block that will disconnect the database when the
+            block finishes.</p>
+            </li><li>
+            <p>AlterTableGenerator now has add_primary_key and add_foreign_key methods.</p>
+            </li><li>
+            <p>Running the specs without ParseTree installed skips the specs that require
+            ParseTree.</p>
+            </li><li>
+            <p>You can use an array of arrays instead of a hash when specifying
+            conditions, which may be necessary in certain situations where you would be
+            using the same hash key more than once.</p>
+            </li><li>
+            <p>Almost all documentation for <a
+            href="../../../classes/Sequel.html">Sequel</a> was updated for 2.0.0, so if
+            you found <a href="../../../classes/Sequel.html">Sequel</a> documentation
+            lacking before, check out the new RDoc pages.</p>
+            </li><li>
+            <p>There have been many minor refactoring improvements, the code should now be
+            easier to read and follow.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now has no external
+            dependencies.</p>
+            </li><li>
+            <p>Sequel::Models now have before_validation and after_validation hooks.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel/Model.html">Sequel::Model</a> hooks that
+            return false cause the methods that call them (such as save) to return
+            false.</p>
+            </li><li>
+            <p>Sequel::Models can now load their schema on first instantiation, instead of
+            when they are created, via Sequel::Model.lazy_load_schema=.  This is
+            helpful for certain web frameworks that reload all models on every request.</p>
+            </li><li>
+            <p>Hook methods that use blocks can now include an optional tag, which allows
+            them to work well with web frameworks that load source files every time
+            they are modified.</p>
+            </li></ul>
+            
+            <p>The PostgreSQL adapter has been rewritten and now supports ruby-pg. There
+            have also been improvements in the following adapters: DBI, MySQL, SQLite,
+            Oracle, and MSSQL.</p>
+            
+            <p>All of the methods that have been deprecated in 1.5.0 have now been
+            removed.  If you are want to upgrade to <a
+            href="../../../classes/Sequel.html">Sequel</a> 2.0.0 from version 1.4.0 or
+            previous, upgrade to 1.5.1 first, fix all of the deprecation warnings that
+            show up, and then upgrade to 2.0.0.</p>
+            
+            <p>There were some backwards incompatible changes made in 2.0.0 beyond the
+            removal of deprecated methods.  These are:</p>
+            <ul><li>
+            <p>Inflector is no longer used, the inflection methods were moved directly
+            into <a href="../../../classes/String.html">String</a> (where they belong
+            because inflections only make sense for strings).  So to override
+            singularization or pluralization rules, use String.inflections instead of
+            Inflector.inflections.</p>
+            </li><li>
+            <p>MySQL tinyints are now returned as boolean values instead of integers. 
+            MySQL doesn&#39;t have a boolean type, and usually it is recommended to use
+            tinyint for a boolean column.</p>
+            </li><li>
+            <p>You can no longer pass an array to Dataset#order or Dataset#select, you
+            need to pass each argument separately (the * operator is your friend).</p>
+            </li><li>
+            <p>You must use &#39;?&#39; instead of &#39;(?)&#39; when interpolating an
+            array argument into a string (e.g. filter(&#39;x IN ?&#39;, [1,2,3]))</p>
+            </li><li>
+            <p>You must pass an explicit table alias argument to join_table and related
+            methods, you can no longer include the table alias inside the table
+            argument.</p>
+            </li><li>
+            <p>sqlite:// URLs now operate the same as file:// URLs (2 slashes for a
+            relative path, 3 for an absolute path).</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

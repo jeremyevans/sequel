@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Swift</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Swift
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../files/lib/sequel/adapters/swift_rb.html">lib/sequel/adapters/swift.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/swift/mysql_rb.html">lib/sequel/adapters/swift/mysql.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/swift/postgres_rb.html">lib/sequel/adapters/swift/postgres.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/swift/sqlite_rb.html">lib/sequel/adapters/swift/sqlite.rb</a>
+          </li>
+          <li>
+            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Module holding the <a href="Swift.html">Swift</a> DB support for <a
+            href="../Sequel.html">Sequel</a>.  <a href="Swift.html">Swift</a> DB is a
+            collection of drivers used in <a href="Swift.html">Swift</a> ORM.</p>
+            
+            <p>The <a href="Swift.html">Swift</a> adapter currently supports PostgreSQL,
+            <a href="Swift/MySQL.html">MySQL</a> and SQLite3</p>
+            
+            <pre>Sequel.connect(&#39;swift://user:password@host/database?db_type=postgres&#39;)&#x000A;Sequel.connect(&#39;swift://user:password@host/database?db_type=mysql&#39;)</pre>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="Swift/MySQL.html">Sequel::Swift::MySQL</a></li>
+              <li><a target="docwin" href="Swift/Postgres.html">Sequel::Swift::Postgres</a></li>
+              <li><a target="docwin" href="Swift/SQLite.html">Sequel::Swift::SQLite</a></li>
+              <li><a target="docwin" href="Swift/Database.html">Sequel::Swift::Database</a></li>
+              <li><a target="docwin" href="Swift/Dataset.html">Sequel::Swift::Dataset</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DATABASE_SETUP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      {:postgres=>proc do |db|
+                      Sequel.require 'adapters/swift/postgres'
+                      db.extend(Sequel::Swift::Postgres::DatabaseMethods)
+                      db.extend_datasets Sequel::Postgres::DatasetMethods
+                      db.swift_class = ::Swift::DB::Postgres
+                      end,
+                      :mysql=>proc do |db|
+                      Sequel.require 'adapters/swift/mysql'
+                      db.extend(Sequel::Swift::MySQL::DatabaseMethods)
+                      db.dataset_class = Sequel::Swift::MySQL::Dataset
+                      db.swift_class = ::Swift::DB::Mysql
+                      end,
+                      :sqlite=>proc do |db|
+                      Sequel.require 'adapters/swift/sqlite'
+                      db.extend(Sequel::Swift::SQLite::DatabaseMethods)
+                      db.dataset_class = Sequel::Swift::SQLite::Dataset
+                      db.swift_class = ::Swift::DB::Sqlite3
+                      db.set_integer_booleans
+                      end,
+                      }
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Contains procs keyed on sub adapter type that extend the given database
+                      object so it supports the correct database type.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

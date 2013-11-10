@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::Sharding::DatasetMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::Sharding::DatasetMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/sharding_rb.html">lib/sequel/plugins/sharding.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Sharding.html">Sharding</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-server">server</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-server'>
+                <a name='method-i-server'></a>
+                <div class='synopsis'>
+                  <span class='name'>server</span>
+                  <span class='arguments'>(s)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>If a row proc exists on the dataset, replace it with one that calls the
+                  previous row_proc, but calls set_server on the output of that row_proc,
+                  ensuring that objects retrieved by a specific shard know which shard they
+                  are tied to.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-server-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-server-source'><span class="ruby-comment"># File lib/sequel/plugins/sharding.rb, line 98</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">server</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">rp</span> = <span class="ruby-identifier">row_proc</span>&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">row_proc</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">rp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>).<span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">s</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>pg_hstore.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>pg_hstore.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/pg_hstore.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The pg_hstore extension adds support for the PostgreSQL hstore type to <a
+            href="../../../../classes/Sequel.html">Sequel</a>.  hstore is an extension
+            that ships with PostgreSQL, and the hstore type stores an arbitrary
+            key-value table, where the keys are strings and the values are strings or
+            NULL.</p>
+            
+            <p>This extension integrates with Sequel&#39;s native postgres adapter, so
+            that when hstore fields are retrieved, they are parsed and returned as
+            instances of <a
+            href="../../../../classes/Sequel/Postgres/HStore.html">Sequel::Postgres::HStore</a>.
+            HStore is a DelegateClass of <a
+            href="../../../../classes/Hash.html">Hash</a>, so it mostly acts like a
+            hash, but not completely (is_a?(<a
+            href="../../../../classes/Hash.html">Hash</a>) is false).  If you want the
+            actual hash, you can call Hstore#to_hash.  This is done so that <a
+            href="../../../../classes/Sequel.html">Sequel</a> does not treat a HStore
+            like a <a href="../../../../classes/Hash.html">Hash</a> by default, which
+            would cause issues.</p>
+            
+            <p>In addition to the parsers, this extension comes with literalizers for
+            HStore using the standard <a
+            href="../../../../classes/Sequel.html">Sequel</a> literalization callbacks,
+            so they work with on all adapters.</p>
+            
+            <p>To turn an existing <a href="../../../../classes/Hash.html">Hash</a> into
+            an HStore, use Sequel.hstore:</p>
+            
+            <pre>Sequel.hstore(hash)</pre>
+            
+            <p>If you have loaded the <a
+            href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>
+            or you have loaded the core_refinements extension and have activated
+            refinements for the file, you can also use <a
+            href="../../../../classes/Hash.html#method-i-hstore">Hash#hstore</a>:</p>
+            
+            <pre>hash.hstore</pre>
+            
+            <p>Since the hstore type only supports strings, non string keys and values are
+            converted to strings</p>
+            
+            <pre class="ruby">{:<span class="ruby-identifier">foo=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}.<span class="ruby-identifier">hstore</span>.<span class="ruby-identifier">to_hash</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span>&#x000A;<span class="ruby-identifier">v</span> = {}.<span class="ruby-identifier">hstore</span>&#x000A;<span class="ruby-identifier">v</span>[:<span class="ruby-identifier">foo</span>] = <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">v</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span></pre>
+            
+            <p>However, to make life easier, lookups by key are converted to strings (even
+            when accessing the underlying hash directly):</p>
+            
+            <pre class="ruby">{<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>}.<span class="ruby-identifier">hstore</span>[:<span class="ruby-identifier">foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span>&#x000A;{<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>}.<span class="ruby-identifier">hstore</span>.<span class="ruby-identifier">to_hash</span>[:<span class="ruby-identifier">foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span></pre>
+            
+            <p>HStore instances mostly just delegate to the underlying hash instance, so
+            <a href="../../../../classes/Hash.html">Hash</a> methods that modify the
+            receiver or returned modified copies of the receiver may not do string
+            conversion. The following methods will handle string conversion, and more
+            can be added later if desired:</p>
+            <ul><li>
+            <p>[]</p>
+            </li><li>
+            <p>[]=</p>
+            </li><li>
+            <p>assoc (ruby 1.9 only)</p>
+            </li><li>
+            <p>delete</p>
+            </li><li>
+            <p>fetch</p>
+            </li><li>
+            <p>has_key?</p>
+            </li><li>
+            <p>has_value?</p>
+            </li><li>
+            <p>include?</p>
+            </li><li>
+            <p>key (ruby 1.9 only)</p>
+            </li><li>
+            <p>key?</p>
+            </li><li>
+            <p>member?</p>
+            </li><li>
+            <p>merge</p>
+            </li><li>
+            <p>merge!</p>
+            </li><li>
+            <p>rassoc (ruby 1.9 only)</p>
+            </li><li>
+            <p>replace</p>
+            </li><li>
+            <p>store</p>
+            </li><li>
+            <p>update</p>
+            </li><li>
+            <p>value?</p>
+            </li></ul>
+            
+            <p>If you want to insert a hash into an hstore database column:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>}.<span class="ruby-identifier">hstore</span>)</pre>
+            
+            <p>If you would like to use hstore columns in your model objects, you probably
+            want to modify the schema parsing/typecasting so that it recognizes and
+            correctly handles the hstore columns, which you can do by:</p>
+            
+            <pre>DB.extension :pg_hstore</pre>
+            
+            <p>If you are not using the native postgres adapter and are using hstore types
+            as model column values you probably should use the typecast_on_load plugin
+            if the column values are returned as a hash, and the pg_typecast_on_load
+            plugin if the column values are returned as a string.</p>
+            
+            <p>This extension requires the delegate and strscan libraries.</p>
+          </div>
+          <div id='context'>
+            <div id='requires'>
+              <h2>Required files</h2>
+              <ol>
+                <li>delegate</li>
+                <li>strscan</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

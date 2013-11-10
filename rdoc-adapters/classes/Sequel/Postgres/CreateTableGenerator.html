@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Postgres::CreateTableGenerator</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Postgres::CreateTableGenerator
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-exclude">exclude</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-exclude'>
+                <a name='method-i-exclude'></a>
+                <div class='synopsis'>
+                  <span class='name'>exclude</span>
+                  <span class='arguments'>(elements, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add an exclusion constraint when creating the table. Elements should be an
+                  array of 2 element arrays, with the first element being the column or
+                  expression the exclusion constraint is applied to, and the second element
+                  being the operator to use for the column/expression to check for exclusion.</p>
+                  
+                  <p>Example:</p>
+                  
+                  <pre>exclude([[:col1, &#39;&amp;&amp;&#39;], [:col2, &#39;=&#39;]])&#x000A;# EXCLUDE USING gist (col1 WITH &amp;&amp;, col2 WITH =)</pre>
+                  
+                  <p>Options supported:</p>
+                  <dl class="rdoc-list note-list"><dt>:name 
+                  <dd>
+                  <p>Name the constraint with the given name (useful if you may need to drop the
+                  constraint later)</p>
+                  </dd><dt>:using 
+                  <dd>
+                  <p>Override the index_method for the exclusion constraint (defaults to gist).</p>
+                  </dd><dt>:where 
+                  <dd>
+                  <p>Create a partial exclusion constraint, which only affects a subset of table
+                  rows, value should be a filter expression.</p>
+                  </dd></dl>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-exclude-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-exclude-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 66</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">exclude</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

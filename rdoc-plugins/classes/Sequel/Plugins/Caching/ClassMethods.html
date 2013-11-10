@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::Caching::ClassMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::Caching::ClassMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/caching_rb.html">lib/sequel/plugins/caching.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Caching.html">Caching</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-cache_delete_pk">cache_delete_pk</a></li>
+              <li><a target="docwin" href="#method-i-cache_get_pk">cache_get_pk</a></li>
+              <li><a target="docwin" href="#attribute-i-cache_ignore_exceptions">cache_ignore_exceptions</a></li>
+              <li><a target="docwin" href="#method-i-cache_key">cache_key</a></li>
+              <li><a target="docwin" href="#attribute-i-cache_store">cache_store</a></li>
+              <li><a target="docwin" href="#attribute-i-cache_ttl">cache_ttl</a></li>
+              <li><a target="docwin" href="#method-i-set_cache_ttl">set_cache_ttl</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-cache_ignore_exceptions'>cache_ignore_exceptions</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>If true, ignores exceptions when gettings cached records (the memcached
+                      API).</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-cache_store'>cache_store</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The cache store object for the model, which should implement the
+                      Ruby-Memcache (or memcached) API</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-cache_ttl'>cache_ttl</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The time to live for the cache store, in seconds.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-cache_delete_pk'>
+                <a name='method-i-cache_delete_pk'></a>
+                <div class='synopsis'>
+                  <span class='name'>cache_delete_pk</span>
+                  <span class='arguments'>(pk)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Delete the cached object with the given primary key.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-cache_delete_pk-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-cache_delete_pk-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_delete_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">cache_delete</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-cache_get_pk'>
+                <a name='method-i-cache_get_pk'></a>
+                <div class='synopsis'>
+                  <span class='name'>cache_get_pk</span>
+                  <span class='arguments'>(pk)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the cached object with the given primary key, or nil if no such
+                  object is in the cache.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-cache_get_pk-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-cache_get_pk-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_get_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-cache_key'>
+                <a name='method-i-cache_key'></a>
+                <div class='synopsis'>
+                  <span class='name'>cache_key</span>
+                  <span class='arguments'>(pk)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a key string for the given primary key.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-cache_key-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-cache_key-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;no primary key for this record&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>&#x000A;  <span class="ruby-node">&quot;#{self}:#{Array(pk).join(&#39;,&#39;)}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-set_cache_ttl'>
+                <a name='method-i-set_cache_ttl'></a>
+                <div class='synopsis'>
+                  <span class='name'>set_cache_ttl</span>
+                  <span class='arguments'>(ttl)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set the time to live for the cache store, in seconds (default is 3600, # so
+                  1 hour).</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_cache_ttl-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-set_cache_ttl-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_cache_ttl</span>(<span class="ruby-identifier">ttl</span>)&#x000A;  <span class="ruby-ivar">@cache_ttl</span> = <span class="ruby-identifier">ttl</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

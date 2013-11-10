@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::SQL::CaseExpression</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::SQL::CaseExpression
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../SQL.html">SQL</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Represents an <a href="../SQL.html">SQL</a> CASE expression, used for
+            conditional branching in <a href="../SQL.html">SQL</a>.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-conditions">conditions</a></li>
+              <li><a target="docwin" href="#attribute-i-default">default</a></li>
+              <li><a target="docwin" href="#attribute-i-expression">expression</a></li>
+              <li><a target="docwin" href="#method-i-expression-3F">expression?</a></li>
+              <li><a target="docwin" href="#method-i-with_merged_expression">with_merged_expression</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-conditions'>conditions</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>An array of all two pairs with the first element specifying the condition
+                      and the second element specifying the result if the condition matches.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-default'>default</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The default value if no conditions match.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-expression'>expression</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The expression to test the conditions against</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(conditions, default, expression=(no_expression=true; nil))</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Create an object with the given conditions and default value.  An
+                  expression can be provided to test each condition against, instead of
+                  having all conditions represent their own boolean expression.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1066</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">conditions</span>, <span class="ruby-identifier">default</span>, <span class="ruby-identifier">expression</span>=(<span class="ruby-identifier">no_expression</span>=<span class="ruby-keyword">true</span>; <span class="ruby-keyword">nil</span>))&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;CaseExpression conditions must be a hash or array of all two pairs&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">conditions</span>)&#x000A;  <span class="ruby-ivar">@conditions</span>, <span class="ruby-ivar">@default</span>, <span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@no_expression</span> = <span class="ruby-identifier">conditions</span>.<span class="ruby-identifier">to_a</span>, <span class="ruby-identifier">default</span>, <span class="ruby-identifier">expression</span>, <span class="ruby-identifier">no_expression</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-expression-3F'>
+                <a name='method-i-expression-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>expression?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Whether to use an expression for this CASE expression.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-expression-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-expression-3F-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1072</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">expression?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-ivar">@no_expression</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-with_merged_expression'>
+                <a name='method-i-with_merged_expression'></a>
+                <div class='synopsis'>
+                  <span class='name'>with_merged_expression</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Merge the CASE expression into the conditions, useful for databases that
+                  don&#39;t support CASE expressions.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_merged_expression-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-with_merged_expression-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1078</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_merged_expression</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">expression?</span>&#x000A;    <span class="ruby-identifier">e</span> = <span class="ruby-identifier">expression</span>&#x000A;    <span class="ruby-constant">CaseExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">conditions</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">r</span><span class="ruby-operator">|</span> [<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&#39;=&#39;</span>, <span class="ruby-identifier">e</span>, <span class="ruby-identifier">c</span>), <span class="ruby-identifier">r</span>]}, <span class="ruby-identifier">default</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

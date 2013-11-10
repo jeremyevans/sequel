@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Postgres::PGRow::ArrayRow</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Postgres::PGRow::ArrayRow
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/extensions/pg_row_rb.html">lib/sequel/extensions/pg_row.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../PGRow.html">PGRow</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Class for row-valued/composite types that are treated as arrays. By
+            default, this is only used for generic PostgreSQL record types, as
+            registered types use <a href="HashRow.html">HashRow</a> by default.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-c-db_type">db_type</a></li>
+              <li><a target="docwin" href="#method-c-subclass">subclass</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-db_type">db_type</a></li>
+              <li><a target="docwin" href="#attribute-i-db_type">db_type</a></li>
+              <li><a target="docwin" href="#method-i-sql_literal_append">sql_literal_append</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li>Sequel::SQL::AliasMethods</li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-c-db_type'>db_type</a>
+                    </td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The database type for this class.  May be nil if this class done not have a
+                      specific database type.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-db_type'>db_type</a>
+                    </td>
+                    <td class='context-item-value'>[W]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Sets the database type associated with this instance.  This is used to
+                      override the class&#39;s default database type.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-subclass'>
+                <a name='method-c-subclass'></a>
+                <div class='synopsis'>
+                  <span class='name'>subclass</span>
+                  <span class='arguments'>(db_type)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Create a subclass associated with a specific database type. This is done so
+                  that instances of this subclass are automatically casted to the database
+                  type when literalizing.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-subclass-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-subclass-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 112</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">subclass</span>(<span class="ruby-identifier">db_type</span>)&#x000A;  <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@db_type</span> = <span class="ruby-identifier">db_type</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-db_type'>
+                <a name='method-i-db_type'></a>
+                <div class='synopsis'>
+                  <span class='name'>db_type</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the instance&#39;s database type, or the class&#39;s database type
+                  if the instance has not overridden it.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-db_type-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-db_type-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 124</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">db_type</span>&#x000A;  <span class="ruby-ivar">@db_type</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">db_type</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-sql_literal_append'>
+                <a name='method-i-sql_literal_append'></a>
+                <div class='synopsis'>
+                  <span class='name'>sql_literal_append</span>
+                  <span class='arguments'>(ds, sql)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Append <a href="../../SQL.html">SQL</a> fragment related to this object to
+                  the sql.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_literal_append-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 129</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">ROW</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">to_a</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CAST</span>&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">db_type</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

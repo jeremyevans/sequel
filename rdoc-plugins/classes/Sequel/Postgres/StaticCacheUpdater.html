@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Postgres::StaticCacheUpdater</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Postgres::StaticCacheUpdater
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/extensions/pg_static_cache_updater_rb.html">lib/sequel/extensions/pg_static_cache_updater.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-create_static_cache_update_function">create_static_cache_update_function</a></li>
+              <li><a target="docwin" href="#method-i-create_static_cache_update_trigger">create_static_cache_update_trigger</a></li>
+              <li><a target="docwin" href="#method-i-default_static_cache_update_name">default_static_cache_update_name</a></li>
+              <li><a target="docwin" href="#method-i-listen_for_static_cache_updates">listen_for_static_cache_updates</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-create_static_cache_update_function'>
+                <a name='method-i-create_static_cache_update_function'></a>
+                <div class='synopsis'>
+                  <span class='name'>create_static_cache_update_function</span>
+                  <span class='arguments'>(opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add the static cache update function to the PostgreSQL database. This must
+                  be added before any triggers using this function are added.</p>
+                  
+                  <p>Options:</p>
+                  <dl class="rdoc-list note-list"><dt>:channel_name 
+                  <dd>
+                  <p>Override the channel name to use.</p>
+                  </dd><dt>:function_name 
+                  <dd>
+                  <p>Override the function name to use.</p>
+                  </dd></dl>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-create_static_cache_update_function-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-create_static_cache_update_function-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_static_cache_updater.rb, line 75</span>&#x000A;      <span class="ruby-keyword">def</span> <span class="ruby-identifier">create_static_cache_update_function</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;        <span class="ruby-identifier">create_function</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:function_name</span>]<span class="ruby-operator">||</span><span class="ruby-identifier">default_static_cache_update_name</span>, <span class="ruby-string">&quot;BEGIN&#x000A;  PERFORM pg_notify(#{literal((opts[:channel_name]||default_static_cache_update_name).to_s)}, TG_RELID::text);&#x000A;  RETURN NULL;&#x000A;END&#x000A;&quot;</span>, <span class="ruby-value">:returns=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:trigger</span>, <span class="ruby-value">:language=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:plpgsql</span>)&#x000A;      <span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-create_static_cache_update_trigger'>
+                <a name='method-i-create_static_cache_update_trigger'></a>
+                <div class='synopsis'>
+                  <span class='name'>create_static_cache_update_trigger</span>
+                  <span class='arguments'>(table, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add a trigger to the given table that calls the function which will notify
+                  about table changes.</p>
+                  
+                  <p>Options:</p>
+                  <dl class="rdoc-list note-list"><dt>:function_name 
+                  <dd>
+                  <p>Override the function name to use.</p>
+                  </dd><dt>:trigger_name 
+                  <dd>
+                  <p>Override the trigger name to use.</p>
+                  </dd></dl>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-create_static_cache_update_trigger-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-create_static_cache_update_trigger-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_static_cache_updater.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">create_static_cache_update_trigger</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">create_trigger</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:trigger_name</span>]<span class="ruby-operator">||</span><span class="ruby-identifier">default_static_cache_update_name</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:function_name</span>]<span class="ruby-operator">||</span><span class="ruby-identifier">default_static_cache_update_name</span>, <span class="ruby-value">:after=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-default_static_cache_update_name'>
+                <a name='method-i-default_static_cache_update_name'></a>
+                <div class='synopsis'>
+                  <span class='name'>default_static_cache_update_name</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The default name for the function, trigger, and notification channel for
+                  this extension.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-default_static_cache_update_name-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-default_static_cache_update_name-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_static_cache_updater.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_static_cache_update_name</span>&#x000A;  <span class="ruby-value">:sequel_static_cache_update</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-listen_for_static_cache_updates'>
+                <a name='method-i-listen_for_static_cache_updates'></a>
+                <div class='synopsis'>
+                  <span class='name'>listen_for_static_cache_updates</span>
+                  <span class='arguments'>(models, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Listen on the notification channel for changes to any of tables for the
+                  models given. If notified about a change to one of the tables, reload the
+                  cache for the related model.  Options given are also passed to
+                  Database#listen.</p>
+                  
+                  <p>Note that this implementation does not currently support model models that
+                  use the same underlying table.</p>
+                  
+                  <p>Options:</p>
+                  <dl class="rdoc-list note-list"><dt>:channel_name 
+                  <dd>
+                  <p>Override the channel name to use.</p>
+                  </dd></dl>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-listen_for_static_cache_updates-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-listen_for_static_cache_updates-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_static_cache_updater.rb, line 110</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">listen_for_static_cache_updates</span>(<span class="ruby-identifier">models</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;this database object does not respond to listen, use the postgres adapter with the pg driver&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:listen</span>)&#x000A;  <span class="ruby-identifier">models</span> = [<span class="ruby-identifier">models</span>] <span class="ruby-keyword">unless</span> <span class="ruby-identifier">models</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;array of models to listen for changes cannot be empty&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">models</span>.<span class="ruby-identifier">empty?</span>&#x000A;&#x000A;  <span class="ruby-identifier">oid_map</span> = {}&#x000A;  <span class="ruby-identifier">models</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">model</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;#{model.inspect} does not use the static_cache plugin&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:load_cache</span>, <span class="ruby-keyword">true</span>)&#x000A;    <span class="ruby-identifier">oid_map</span>[<span class="ruby-identifier">get</span>(<span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">first_source_table</span>))] = <span class="ruby-identifier">model</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">listen</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:channel_name</span>]<span class="ruby-operator">||</span><span class="ruby-identifier">default_static_cache_update_name</span>, {<span class="ruby-value">:loop=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">_</span>, <span class="ruby-identifier">oid</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span> = <span class="ruby-identifier">oid_map</span>[<span class="ruby-identifier">oid</span>.<span class="ruby-identifier">to_i</span>]&#x000A;        <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:load_cache</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>dataset_basics.rdoc</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>dataset_basics.rdoc</h1>
+        <div class='paths'>
+          doc/dataset_basics.rdoc
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-10-09 09:30:40 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Dataset+Basics+">Dataset Basics </h1>
+            
+            <h2 id="label-Introduction">Introduction</h2>
+            
+            <p>Datasets are the primary way <a href="../../classes/Sequel.html">Sequel</a>
+            uses to access the database. While most database libraries have specific
+            support for updating all records or only a single record, Sequel&#39;s
+            ability to represent SQL queries themselves as objects is what gives <a
+            href="../../classes/Sequel.html">Sequel</a> most of its power.  However, if
+            you haven&#39;t been exposed to the dataset concept before, it can be a
+            little disorienting.  This document aims to give a basic introduction to
+            datasets and how to use them.</p>
+            
+            <h2 id="label-What+a+Dataset+Represents">What a Dataset Represents</h2>
+            
+            <p>A Dataset can be thought of representing one of two concepts:</p>
+            <ul><li>
+            <p>An SQL query</p>
+            </li><li>
+            <p>An abstract set of rows and some related behavior</p>
+            </li></ul>
+            
+            <p>The first concept is more easily understood, so you should probably start
+            with that assumption.</p>
+            
+            <h2 id="label-Basics">Basics</h2>
+            
+            <p>The most basic dataset is the simple selection of all columns in a table:</p>
+            
+            <pre>ds = DB[:posts]&#x000A;# SELECT * FROM posts</pre>
+            
+            <p>Here, DB represents your <a
+            href="../../classes/Sequel/Database.html">Sequel::Database</a> object, and
+            ds is your dataset, with the SQL query it represents below it.</p>
+            
+            <p>One of the core dataset ideas that should be understood is that datasets
+            use a functional style of modification, in which methods called on the
+            dataset return modified copies of the dataset, they don&#39;t modify the
+            dataset themselves:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-identifier">ds2</span>&#x000A;<span class="ruby-comment"># SELECT * FROM posts WHERE id = 1</span>&#x000A;<span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-comment"># SELECT * FROM posts</span></pre>
+            
+            <p>Note how ds itself is not modified.  This is because ds.where returns a
+            modified copy of ds, instead of modifying ds itself.  This makes using
+            datasets both thread safe and easy to chain:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Thread safe:</span>&#x000A;<span class="ruby-value">100</span>.<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">i</span>).<span class="ruby-identifier">first</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Easy to chain:</span>&#x000A;<span class="ruby-identifier">ds3</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}&#x000A;<span class="ruby-comment"># SELECT id, name FROM posts WHERE id &lt; 100 ORDER BY name</span></pre>
+            
+            <p>Thread safety you don&#39;t really need to worry about, but chainability is
+            core to how <a href="../../classes/Sequel.html">Sequel</a> is generally
+            used.  Almost all dataset methods that affect the SQL produced return
+            modified copies of the receiving dataset.</p>
+            
+            <p>Another important thing to realize is that dataset methods that return
+            modified datasets do not execute the dataset&#39;s code on the database. 
+            Only dataset methods that return or yield results will execute the code on
+            the database:</p>
+            
+            <pre># No SQL queries sent:&#x000A;ds3 = ds.select(:id, :name).order(:name).filter{id &lt; 100}&#x000A;# Until you call a method that returns results&#x000A;results = ds3.all</pre>
+            
+            <p>One important consequence of this API style is that if you use a method
+            chain that includes both methods that return modified copies and a method
+            that executes the SQL, the method that executes the SQL should generally be
+            the last method in the chain:</p>
+            
+            <pre># Good&#x000A;ds.select(:id, :name).order(:name).filter{id &lt; 100}.all&#x000A;# Bad&#x000A;ds.all.select(:id, :name).order(:name).filter{id &lt; 100}</pre>
+            
+            <p>This is because all will return an array of hashes, and select, order, and
+            filter are dataset methods, not array methods.</p>
+            
+            <h2 id="label-Methods">Methods</h2>
+            
+            <p>Most Dataset methods that users will use can be broken down into two types:</p>
+            <ul><li>
+            <p>Methods that return modified datasets</p>
+            </li><li>
+            <p>Methods that execute code on the database</p>
+            </li></ul>
+            
+            <h3 id="label-Methods+that+return+modified+datasets">Methods that return modified datasets</h3>
+            
+            <p>Most dataset methods fall into this category, which can be further broken
+            down by the clause they affect:</p>
+            <dl class="rdoc-list note-list"><dt>SELECT
+            <dd>
+            <p>select, select_all, select_append, select_group, select_more</p>
+            </dd><dt>FROM
+            <dd>
+            <p>from, from_self</p>
+            </dd><dt>JOIN
+            <dd>
+            <p>join, left_join, right_join, full_join, natural_join, natural_left_join,
+            natural_right_join, natural_full_join, cross_join, inner_join,
+            left_outer_join, right_outer_join, full_outer_join, join_table</p>
+            </dd><dt>WHERE
+            <dd>
+            <p>where, filter, exclude, exclude_where, and, or, grep, invert, unfiltered</p>
+            </dd><dt>GROUP
+            <dd>
+            <p>group, group_by, group_and_count, select_group, ungrouped</p>
+            </dd><dt>HAVING
+            <dd>
+            <p>having, exclude_having, invert, unfiltered</p>
+            </dd><dt>ORDER
+            <dd>
+            <p>order, order_by, order_append, order_prepend, order_more, reverse,
+            reverse_order, unordered</p>
+            </dd><dt>LIMIT/OFFSET
+            <dd>
+            <p>limit, offset, unlimited</p>
+            </dd><dt>compounds
+            <dd>
+            <p>union, intersect, except</p>
+            </dd><dt>locking
+            <dd>
+            <p>for_update, lock_style</p>
+            </dd><dt>common table expressions
+            <dd>
+            <p>with, with_recursive</p>
+            </dd><dt>other
+            <dd>
+            <p>clone, distinct, naked, qualify, server, with_sql</p>
+            </dd></dl>
+            
+            <h3 id="label-Methods+that+execute+code+on+the+database">Methods that execute code on the database</h3>
+            
+            <p>Most other dataset methods commonly used will execute the dataset&#39;s SQL
+            on the database:</p>
+            <dl class="rdoc-list note-list"><dt>SELECT (All Records)
+            <dd>
+            <p>all, each, map, to_hash, to_hash_groups, select_map, select_order_map,
+            select_hash, select_hash_groups</p>
+            </dd><dt>SELECT (First Record)
+            <dd>
+            <p>first, last, [], single_record</p>
+            </dd><dt>SELECT (Single Value)
+            <dd>
+            <p>get, single_value</p>
+            </dd><dt>SELECT (Aggregates)
+            <dd>
+            <p>count, avg, max, min, sum, range, interval</p>
+            </dd><dt>INSERT
+            <dd>
+            <p>insert, &lt;&lt;, import, multi_insert</p>
+            </dd><dt>UPDATE
+            <dd>
+            <p>update</p>
+            </dd><dt>DELETE
+            <dd>
+            <p>delete</p>
+            </dd><dt>other
+            <dd>
+            <p>columns, columns!, truncate</p>
+            </dd></dl>
+            
+            <h3 id="label-Other+methods">Other methods</h3>
+            
+            <p>See the <a href="../../classes/Sequel/Dataset.html">Sequel::Dataset</a>
+            RDoc for other methods that are less commonly used.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

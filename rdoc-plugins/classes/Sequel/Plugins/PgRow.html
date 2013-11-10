@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::PgRow</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::PgRow
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/pg_row_rb.html">lib/sequel/plugins/pg_row.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The pg_row plugin allows you to use <a
+            href="../Model.html">Sequel::Model</a> classes as composite type classes,
+            via the pg_row extension.  So if you have an address table:</p>
+            
+            <pre>DB.create_table(:address) do&#x000A;  String :street&#x000A;  String :city&#x000A;  String :zip&#x000A;end</pre>
+            
+            <p>and a company table with an address:</p>
+            
+            <pre>DB.create_table(:company) do&#x000A;  String :name&#x000A;  address :address&#x000A;end</pre>
+            
+            <p>You can create a <a href="../Model.html">Sequel::Model</a> for the address
+            table, and load the plugin, which registers the row type:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Address</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">address</span>)&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">pg_row</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>Then when you select from the company table (even using a plain dataset),
+            it will return address values as instances of Address:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">company</span>].<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># =&gt; {:name=&gt;&#39;MS&#39;, :address=&gt;</span>&#x000A;  <span class="ruby-constant">Address</span>.<span class="ruby-identifier">load</span>(:<span class="ruby-identifier">street=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;123 Foo St&#39;</span>, :<span class="ruby-identifier">city=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bar Town&#39;</span>, :<span class="ruby-identifier">zip=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;12345&#39;</span>)}</pre>
+            
+            <p>If you want a lot of your models to be used as row types, you can load the
+            plugin into <a href="../Model.html">Sequel::Model</a> itself:</p>
+            
+            <pre>Sequel::Model.plugin :pg_row</pre>
+            
+            <p>And then call register_row_type in the class</p>
+            
+            <pre>Address.register_row_type</pre>
+            
+            <p>Note that automatic conversion only works with the native postgres adapter.
+            For other adapters that connect to PostgreSQL, you need to call the
+            conversion proc manually.</p>
+            
+            <p>In addition to returning row-valued/composite types as instances of <a
+            href="../Model.html">Sequel::Model</a>, this also lets you use model
+            instances in datasets when inserting, updating, and filtering:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">company</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;MS&#39;</span>, :<span class="ruby-identifier">address=</span><span class="ruby-operator">&gt;</span>&#x000A;  <span class="ruby-constant">Address</span>.<span class="ruby-identifier">load</span>(:<span class="ruby-identifier">street=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;123 Foo St&#39;</span>, :<span class="ruby-identifier">city=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bar Town&#39;</span>, :<span class="ruby-identifier">zip=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;12345&#39;</span>))</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="PgRow/ClassMethods.html">Sequel::Plugins::PgRow::ClassMethods</a></li>
+              <li><a target="docwin" href="PgRow/DatabaseMethods.html">Sequel::Plugins::PgRow::DatabaseMethods</a></li>
+              <li><a target="docwin" href="PgRow/InstanceMethods.html">Sequel::Plugins::PgRow::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>When loading the extension, make sure the database has the pg_row extension
+                  loaded, load the custom database extensions, and automatically register the
+                  row type if the model has a dataset.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_row.rb, line 56</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_row</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">DatabaseMethods</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">register_row_type</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@dataset</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

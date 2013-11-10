@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.33.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.33.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.33.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2012-03-01 09:28:32 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>A server_block extension has been added that makes Sequel&#39;s sharding
+            support easier to use by scoping database access inside the block to a
+            given server/shard:</p>
+            
+            <pre>Sequel.extension :server_block&#x000A;DB.extend Sequel::ServerBlock&#x000A;DB.with_server(:shard_1) do&#x000A;  # All of these will execute against shard_1&#x000A;  DB.tables&#x000A;  DB[:table].all&#x000A;  DB.run &#39;SOME SQL&#39;&#x000A;end</pre>
+            </li><li>
+            <p>An arbitrary_servers extension has been added that extends Sequel&#39;s
+            sharding support so that you can use arbitrary connection options instead
+            of referencing an existing, predefined server/shard:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">arbitrary_servers</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ArbitraryServers</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;foo&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>).<span class="ruby-identifier">all</span></pre>
+            
+            <p>You can use this extension in conjunction with the server_block extension:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;foo&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># All of these will execute on host foo, database bar</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">tables</span>&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">all</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-string">&#39;SOME SQL&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>The combination of these two extensions makes it pretty easy to write a
+            thread-safe Rack middleware that scopes each request to an arbitrary
+            database.</p>
+            </li><li>
+            <p>The sqlite adapter now supports an integer_booleans setting for using 1/0
+            for true/false values, instead of the the &#39;t&#39;/&#39;f&#39; values
+            used by default.  As SQLite recommends using integers to store booleans,
+            converting your existing database and enabling this setting is recommended,
+            but for backwards compatibility it is set to false.  You can convert you
+            existing database by doing the following for each table/column that has
+            booleans:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">boolean_column=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-string">&#39;t&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}.&#x000A;                    <span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, :<span class="ruby-identifier">boolean_column</span>))</pre>
+            
+            <p>The integer_booleans default setting may change in a future version of <a
+            href="../../../classes/Sequel.html">Sequel</a>, so you should set it
+            manually to false if you prefer the current default.</p>
+            </li><li>
+            <p>You can now disable transaction use in migrations, in one of two ways.  You
+            generally only need to do this if you are using an SQL query inside a
+            migration that is specifically not supported inside a transaction, such as
+            CREATE INDEX CONCURRENTLY on PostgreSQL.</p>
+            
+            <p>The first way to disable transactions is on a per-migration basis by
+            calling the no_transaction method inside the <a
+            href="../../../classes/Sequel.html#method-c-migration">Sequel.migration</a>
+            block:</p>
+            
+            <pre>Sequel.migration do&#x000A;  no_transaction&#x000A;  change do&#x000A;    # ...&#x000A;  end&#x000A;end</pre>
+            
+            <p>That will make it so that a transaction is not used for that particular
+            migration.  The second way is passing the :use_tranctions=&gt;false option
+            when calling Migrator.run (using the API), which will completely disable
+            transactions for all migrations during the migrator run.</p>
+            </li><li>
+            <p>The postgres adapter now respects an :sslmode option when using pg as the
+            underlying driver, you can set the value of this option to disable, allow,
+            prefer, or require.</p>
+            </li><li>
+            <p>Database#create_schema and drop_schema are now defined when connecting to
+            PostgreSQL.</p>
+            </li><li>
+            <p>Database#supports_savepoints_in_prepared_transactions? has been added for
+            checking if savepoints are supported inside prepared transactions.  This is
+            true if both savepoints and prepared transactions are both supported,
+            except on MySQL &gt; 5.5.12 (due to MySQL bug 64374).</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p>The mysql and mysql2 adapters now both provide an accurate number of rows
+            matched, so <a href="../../../classes/Sequel/Model.html">Sequel::Model</a>
+            usage on those adapters will now raise a NoExistingObject exception by
+            default if you attempt to delete or update an instance that no longer
+            exists in the database.</p>
+            </li><li>
+            <p>Foreign key creation now works correctly without specifying the :key option
+            when using MySQL with the InnoDB table engine.  InnoDB requires that you
+            list the column explicitly, even if you are referencing the primary key of
+            the table, so if the :key option is not given, the database schema is
+            introspected to find the primary key for the table.  If you are attempting
+            to create a table with a self-referential foreign key, it introspects the
+            generator to get the primary key for the table.</p>
+            </li><li>
+            <p>The sqlite adapter will now return 1/0 stored in boolean columns as
+            true/false.  It will convert dates stored as Integers/Floats to Date
+            objects by assuming they represent the julian date.  It will convert times
+            stored as Integers/Floats to <a
+            href="../../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a> objects by
+            assuming they represent a number of seconds. It will convert datetimes
+            stored as Integers by assuming they represent a unix epoch time integer,
+            and datetimes stored as Floats by assuming the represent the julian date
+            (with fractional part representing the time of day).  These changes make <a
+            href="../../../classes/Sequel.html">Sequel</a> handle SQLite&#39;s
+            recommendations for boolean/date/time storage.</p>
+            </li><li>
+            <p>The instance_hooks plugin&#39;s (before|after)_*_hook methods now return
+            self so they can be used in a method chain.</p>
+            </li><li>
+            <p>The list plugin now automatically adds new entries to the end of the list
+            when creating the entries, if the position field is not specifically set.</p>
+            </li><li>
+            <p>An identifier_output_method is now respected in the mysql2 adapter.</p>
+            </li><li>
+            <p>NaN/Infinity Float values are now quoted correctly for input on PostgreSQL,
+            and the postgres adapter correctly handles them on retrieval from the
+            database.</p>
+            </li><li>
+            <p>The :collate column option is now respected when creating tables or
+            altering columns on MySQL.</p>
+            </li><li>
+            <p>You can now force use of the TimestampMigrator when the IntegerMigrator
+            would be used by default by calling TimestampMigrator.apply or .run.</p>
+            </li><li>
+            <p>Mock adapter usage with a specific SQL dialect now uses the appropriate
+            defaults for quoting identifiers.</p>
+            </li><li>
+            <p>You can now disable the use of sudo in the rake install/uninstall tasks
+            using the SUDO=&#39;&#39; environment variable.</p>
+            </li><li>
+            <p>A very misleading error message has been fixed when attempting to
+            constantize an invalid string in the model inflector.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>The sqlite adapter now typecasts columns that SQLite stores as
+            INTEGER/REAL.  Previously, it only typecasted columns that SQLite stored as
+            TEXT/BLOB.  For details about SQLite storage, see <a
+            href="http://www.sqlite.org/datatype3.html.">www.sqlite.org/datatype3.html.</a></p>
+            
+            <p>Any custom type conversion procs used with the sqlite adapter should be
+            modified to work with Integer/Float objects in addition to <a
+            href="../../../classes/String.html">String</a> objects.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

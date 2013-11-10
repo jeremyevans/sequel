@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::AutoValidations::ClassMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::AutoValidations::ClassMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/auto_validations_rb.html">lib/sequel/plugins/auto_validations.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../AutoValidations.html">AutoValidations</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-auto_validate_explicit_not_null_columns">auto_validate_explicit_not_null_columns</a></li>
+              <li><a target="docwin" href="#attribute-i-auto_validate_not_null_columns">auto_validate_not_null_columns</a></li>
+              <li><a target="docwin" href="#method-i-auto_validate_presence-3F">auto_validate_presence?</a></li>
+              <li><a target="docwin" href="#method-i-auto_validate_types-3F">auto_validate_types?</a></li>
+              <li><a target="docwin" href="#attribute-i-auto_validate_unique_columns">auto_validate_unique_columns</a></li>
+              <li><a target="docwin" href="#method-i-skip_auto_validations">skip_auto_validations</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-auto_validate_explicit_not_null_columns'>auto_validate_explicit_not_null_columns</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The columns with automatic not_null validations for columns present in the
+                      values.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-auto_validate_not_null_columns'>auto_validate_not_null_columns</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The columns with automatic not_null validations</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-auto_validate_unique_columns'>auto_validate_unique_columns</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The columns or sets of columns with automatic unique validations</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-auto_validate_presence-3F'>
+                <a name='method-i-auto_validate_presence-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>auto_validate_presence?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Whether to use a presence validation for not null columns</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-auto_validate_presence-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-auto_validate_presence-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">auto_validate_presence?</span>&#x000A;  <span class="ruby-ivar">@auto_validate_presence</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-auto_validate_types-3F'>
+                <a name='method-i-auto_validate_types-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>auto_validate_types?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Whether to automatically validate schema types for all columns</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-auto_validate_types-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-auto_validate_types-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 86</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">auto_validate_types?</span>&#x000A;  <span class="ruby-ivar">@auto_validate_types</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-skip_auto_validations'>
+                <a name='method-i-skip_auto_validations'></a>
+                <div class='synopsis'>
+                  <span class='name'>skip_auto_validations</span>
+                  <span class='arguments'>(type)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Skip automatic validations for the given validation type (:not_null,
+                  :types, :unique). If :all is given as the type, skip all auto validations.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-skip_auto_validations-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-skip_auto_validations-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">skip_auto_validations</span>(<span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:all</span>&#x000A;    [<span class="ruby-value">:not_null</span>, <span class="ruby-value">:types</span>, <span class="ruby-value">:unique</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">skip_auto_validations</span>(<span class="ruby-identifier">v</span>)}&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:types</span>&#x000A;    <span class="ruby-ivar">@auto_validate_types</span> = <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">send</span>(<span class="ruby-node">&quot;auto_validate_#{type}_columns&quot;</span>).<span class="ruby-identifier">clear</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

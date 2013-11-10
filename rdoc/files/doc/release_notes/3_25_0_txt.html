@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.25.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.25.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.25.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>drop_table, drop_view, drop_column, and drop_constraint all now support a
+            :cascade option for using CASCADE.</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_table</span>(:<span class="ruby-identifier">tab</span>, :<span class="ruby-identifier">cascade=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># DROP TABLE tab CASCADE</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_column</span>(:<span class="ruby-identifier">tab</span>, :<span class="ruby-identifier">col</span>, :<span class="ruby-identifier">cascade=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># ALTER TABLE tab DROP COLUMN col CASCADE</span></pre>
+            
+            <p>A few databases support CASCADE for dropping tables and views, but only
+            PostgreSQL appears to support it for columns and constraints.  Using the
+            :cascade option when the underlying database doesn&#39;t support it will
+            probably result in a DatabaseError being raised.</p>
+            </li><li>
+            <p>You can now use datasets as expressions, allowing things such as:</p>
+            
+            <pre>DB[:table1].select(:column1) &gt; DB[:table2].select(:column2)&#x000A;# (SELECT column1 FROM table1) &gt; (SELECT column2 FROM table2)&#x000A;DB[:table1].select(:column1).cast(Integer)&#x000A;# CAST((SELECT column1 FROM table1) AS integer)</pre>
+            </li><li>
+            <p>Dataset#select_group has been added for grouping and selecting on the same
+            columns.</p>
+            
+            <pre>DB[:a].select_group(:b, :c)&#x000A;# SELECT b, c FROM a GROUP BY b, c</pre>
+            </li><li>
+            <p>Dataset#exclude_where and exclude_having methods have been added, allowing
+            you to specify which clause to affect.  exclude&#39;s behavior is still to
+            add to the HAVING clause if one is present, and use the WHERE clause
+            otherwise.</p>
+            </li><li>
+            <p>Dataset#select_all now accepts optional arguments and will select all
+            columns from those arguments if present:</p>
+            
+            <pre>DB[:a].select_all(:a)&#x000A;# SELECT a.* FROM a&#x000A;DB.from(:a, :b).select_all(:a, :b)&#x000A;# SELECT a.*, b.* FROM a, b</pre>
+            </li><li>
+            <p>Dataset#group and group_and_count now both accept virtual row blocks:</p>
+            
+            <pre>DB[:a].select(:b).group{c(d)}&#x000A;# SELECT b FROM a GROUP BY c(d)</pre>
+            </li><li>
+            <p>If you use a LiteralString as a validation error message, 
+            Errors#full_messages will now not add the related column name to the start
+            of the error message.</p>
+            </li><li>
+            <p>Model.set_dataset now accepts SQL::Identifier, SQL::QualifiedIdentifier,
+            and SQL::AliasedExpression instances, treating them like Symbols.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p>The association_pks plugin&#39;s setter method will now automatically
+            convert a given array of strings to an array of integers if the primary key
+            field is an integer field, which should make it easier to use in web
+            applications.</p>
+            </li><li>
+            <p>nil bound variable, prepared statement, and stored procedure arguments are
+            now handled correctly in the JDBC adapter.</p>
+            </li><li>
+            <p>On 1.9, you can now load plugins even when ::ClassMethods,
+            ::InstanceMethods, or ::DatasetMethods is defined.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>The tinytds adapter now only works with tiny_tds 0.4.5 and greater. Also,
+            if you were using the tinytds adapter with FreeTDS 0.91rc1, you need to
+            upgrade to FreeTDS 0.91rc2 for it to work.  Also, if you were referencing
+            an entry in the freetds.conf file, you now need to specify it directly
+            using the :dataserver option when connecting, the adapter no longer copies
+            the :host option to the :dataserver option.</p>
+            </li><li>
+            <p>On postgresql, <a href="../../../classes/Sequel.html">Sequel</a> now no
+            longer drops tables with CASCADE by default.  You now have to use the
+            :cascade option to drop_table if you want to use CASCADE.</p>
+            </li><li>
+            <p>The Database#drop_table_sql private method now takes an additional options
+            hash argument.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

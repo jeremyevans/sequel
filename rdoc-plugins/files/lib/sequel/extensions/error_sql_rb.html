@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>error_sql.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>error_sql.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/error_sql.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-09-05 16:10:21 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The error_sql extension adds a DatabaseError#sql method that you can use to
+            get the sql that caused the error to be raised.</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">begin</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-string">&quot;Invalid SQL&quot;</span>&#x000A;<span class="ruby-keyword">rescue</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;  <span class="ruby-identifier">puts</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment"># &quot;Invalid SQL&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>On some databases, the error message contains part or all of the SQL used,
+            but on other databases, none of the SQL used is displayed in the error
+            message, so it can be difficult to track down what is causing the error
+            without using a logger.  This extension should hopefully make debugging
+            easier on databases that have bad error messages.</p>
+            
+            <p>This extension may not work correctly in the following cases:</p>
+            <ul><li>
+            <p>log_yield is not used when executing the query.</p>
+            </li><li>
+            <p>The underlying exception is frozen or reused.</p>
+            </li><li>
+            <p>The underlying exception doesn&#39;t correctly record instance variables
+            set on it (seems to happen on JRuby when underlying exception objects are
+            Java exceptions).</p>
+            </li></ul>
+            
+            <p>To load the extension into the database:</p>
+            
+            <pre>DB.extension :error_sql</pre>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::AssociationDependencies</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::AssociationDependencies
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/association_dependencies_rb.html">lib/sequel/plugins/association_dependencies.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The <a href="AssociationDependencies.html">AssociationDependencies</a>
+            plugin allows you do easily set up before and/or after destroy hooks for
+            destroying, deleting, or nullifying associated model objects.  The
+            following association types support the following dependency actions:</p>
+            <ul><li>
+            <p>:many_to_many - :nullify (removes all related entries in join table)</p>
+            </li><li>
+            <p>:many_to_one - :delete, :destroy</p>
+            </li><li>
+            <p>:one_to_many, one_to_one - :delete, :destroy, :nullify (sets foreign key to
+            NULL for all associated objects)</p>
+            </li></ul>
+            
+            <p>This plugin works directly with the association datasets and does not use
+            any cached association values. The :delete action will delete all
+            associated objects from the database in a single <a
+            href="../SQL.html">SQL</a> call. The :destroy action will load each
+            associated object from the database and call the destroy method on it.</p>
+            
+            <p>To set up an association dependency, you must provide a hash with
+            association name symbols and dependency action values.  You can provide the
+            hash to the plugin call itself or to the add_association_dependencies
+            method:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Business</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_dependencies</span>, :<span class="ruby-identifier">address=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_dependencies</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">add_association_dependencies</span> :<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">destroy</span>, :<span class="ruby-identifier">reviews=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">delete</span>, :<span class="ruby-identifier">tags=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">nullify</span></pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-apply">apply</a></li>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="AssociationDependencies/ClassMethods.html">Sequel::Plugins::AssociationDependencies::ClassMethods</a></li>
+              <li><a target="docwin" href="AssociationDependencies/InstanceMethods.html">Sequel::Plugins::AssociationDependencies::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ASSOCIATION_MAPPING</td>
+                    <td>=</td>
+                    <td class='context-item-value'>{:one_to_many=>:before, :many_to_one=>:after, :many_to_many=>:before, :one_to_one=>:before}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Mapping of association types to when the dependency calls should be made
+                      (either :before for in before_destroy or :after for in after_destroy)</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DEPENDENCE_ACTIONS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[:delete, :destroy, :nullify]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The valid dependence actions</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
+                <div class='synopsis'>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(model, hash=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Initialize the association_dependencies hash for this model.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb, line 32</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">hash</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span>{<span class="ruby-ivar">@association_dependencies</span> = {<span class="ruby-value">:before_delete=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:before_destroy=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:before_nullify=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:after_delete=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:after_destroy=</span><span class="ruby-operator">&gt;</span>[]}}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model, hash=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Call add_association_dependencies with any dependencies given in the plugin
+                  call.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">hash</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">add_association_dependencies</span>(<span class="ruby-identifier">hash</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

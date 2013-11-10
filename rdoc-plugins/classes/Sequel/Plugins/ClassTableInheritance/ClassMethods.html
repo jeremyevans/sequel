@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::ClassTableInheritance::ClassMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::ClassTableInheritance::ClassMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/class_table_inheritance_rb.html">lib/sequel/plugins/class_table_inheritance.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../ClassTableInheritance.html">ClassTableInheritance</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-cti_base_model">cti_base_model</a></li>
+              <li><a target="docwin" href="#attribute-i-cti_columns">cti_columns</a></li>
+              <li><a target="docwin" href="#attribute-i-cti_key">cti_key</a></li>
+              <li><a target="docwin" href="#attribute-i-cti_table_map">cti_table_map</a></li>
+              <li><a target="docwin" href="#attribute-i-cti_tables">cti_tables</a></li>
+              <li><a target="docwin" href="#method-i-inherited">inherited</a></li>
+              <li><a target="docwin" href="#method-i-primary_key">primary_key</a></li>
+              <li><a target="docwin" href="#method-i-table_name">table_name</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-cti_base_model'>cti_base_model</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The parent/root/base model for this class table inheritance hierarchy. This
+                      is the only model in the hierarchy that load the class_table_inheritance
+                      plugin.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-cti_columns'>cti_columns</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="../../../Hash.html">Hash</a> with table name symbol keys and
+                      arrays of column symbol values, giving the columns to update in each
+                      backing database table.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-cti_key'>cti_key</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The column containing the class name as a string.  Used to return instances
+                      of subclasses when calling the superclass&#39;s load method.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-cti_table_map'>cti_table_map</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>A hash with class name symbol keys and table name symbol values. Specified
+                      with the :table_map option to the plugin, and used if the implicit naming
+                      is incorrect.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-cti_tables'>cti_tables</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>An array of table symbols that back this model.  The first is <a
+                      href="ClassMethods.html#attribute-i-cti_base_model">#cti_base_model</a>
+                      table symbol, and the last is the current model table symbol.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-inherited'>
+                <a name='method-i-inherited'></a>
+                <div class='synopsis'>
+                  <span class='name'>inherited</span>
+                  <span class='arguments'>(subclass)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add the appropriate data structures to the subclass.  Does not allow
+                  anonymous subclasses to be created, since they would not be mappable to a
+                  table.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-inherited-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-inherited-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 128</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-identifier">cc</span> = <span class="ruby-identifier">cti_columns</span>&#x000A;  <span class="ruby-identifier">ck</span> = <span class="ruby-identifier">cti_key</span>&#x000A;  <span class="ruby-identifier">ct</span> = <span class="ruby-identifier">cti_tables</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-identifier">ctm</span> = <span class="ruby-identifier">cti_table_map</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-identifier">cbm</span> = <span class="ruby-identifier">cti_base_model</span>&#x000A;  <span class="ruby-identifier">pk</span> = <span class="ruby-identifier">primary_key</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">dataset</span>&#x000A;  <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create anonymous subclass for model class using class_table_inheritance&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span>(<span class="ruby-identifier">n</span> = <span class="ruby-identifier">name</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">n</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">table</span> = <span class="ruby-identifier">ctm</span>[<span class="ruby-identifier">n</span>.<span class="ruby-identifier">to_sym</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">implicit_table_name</span>&#x000A;    <span class="ruby-identifier">columns</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">table</span>).<span class="ruby-identifier">columns</span>&#x000A;    <span class="ruby-ivar">@cti_key</span> = <span class="ruby-identifier">ck</span> &#x000A;    <span class="ruby-ivar">@cti_tables</span> = <span class="ruby-identifier">ct</span> <span class="ruby-operator">+</span> [<span class="ruby-identifier">table</span>]&#x000A;    <span class="ruby-ivar">@cti_columns</span> = <span class="ruby-identifier">cc</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">table</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">columns</span>)&#x000A;    <span class="ruby-ivar">@cti_table_map</span> = <span class="ruby-identifier">ctm</span>&#x000A;    <span class="ruby-ivar">@cti_base_model</span> = <span class="ruby-identifier">cbm</span>&#x000A;    <span class="ruby-comment"># Need to set dataset and columns before calling super so that</span>&#x000A;    <span class="ruby-comment"># the main column accessor module is included in the class before any</span>&#x000A;    <span class="ruby-comment"># plugin accessor modules (such as the lazy attributes accessor module).</span>&#x000A;    <span class="ruby-identifier">set_dataset</span>(<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">table</span>, [<span class="ruby-identifier">pk</span>]))&#x000A;    <span class="ruby-identifier">set_columns</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">m</span> = <span class="ruby-identifier">method</span>(<span class="ruby-value">:constantize</span>)&#x000A;    <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">row_proc</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">cti_key</span>&#x000A;      <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-identifier">ck</span>]) <span class="ruby-keyword">rescue</span> <span class="ruby-identifier">subclass</span>).<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>)}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">subclass</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    (<span class="ruby-identifier">columns</span> <span class="ruby-operator">-</span> [<span class="ruby-identifier">cbm</span>.<span class="ruby-identifier">primary_key</span>]).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">define_lazy_attribute_getter</span>(<span class="ruby-identifier">a</span>)}&#x000A;    <span class="ruby-identifier">cti_tables</span>.<span class="ruby-identifier">reverse</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">table</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">db</span>.<span class="ruby-identifier">schema</span>(<span class="ruby-identifier">table</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db_schema</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-primary_key'>
+                <a name='method-i-primary_key'></a>
+                <div class='synopsis'>
+                  <span class='name'>primary_key</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The primary key in the parent/base/root model, which should have a foreign
+                  key with the same name referencing it in each model subclass.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-primary_key-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-primary_key-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 168</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">primary_key</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">cti_base_model</span>&#x000A;  <span class="ruby-identifier">cti_base_model</span>.<span class="ruby-identifier">primary_key</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-table_name'>
+                <a name='method-i-table_name'></a>
+                <div class='synopsis'>
+                  <span class='name'>table_name</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The table name for the current model class&#39;s main table (not used by
+                  any superclasses).</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-table_name-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-table_name-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 175</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">table_name</span>&#x000A;  <span class="ruby-keyword">self</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">cti_base_model</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">super</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">cti_tables</span>.<span class="ruby-identifier">last</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

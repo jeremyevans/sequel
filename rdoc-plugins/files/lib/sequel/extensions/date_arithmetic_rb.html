@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>date_arithmetic.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>date_arithmetic.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/date_arithmetic.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-10-14 09:17:33 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The date_arithmetic extension adds the ability to perform
+            database-independent addition/substraction of intervals to/from dates and
+            timestamps.</p>
+            
+            <p>First, you need to load the extension into the database:</p>
+            
+            <pre>DB.extension :date_arithmetic</pre>
+            
+            <p>Then you can use the Sequel.date_add and Sequel.date_sub methods to return
+            <a href="../../../../classes/Sequel.html">Sequel</a> expressions:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">add</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_add</span>(:<span class="ruby-identifier">date_column</span>, :<span class="ruby-identifier">years=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">months=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>, :<span class="ruby-identifier">days=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)&#x000A;<span class="ruby-identifier">sub</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_sub</span>(:<span class="ruby-identifier">date_column</span>, :<span class="ruby-identifier">hours=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">minutes=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>, :<span class="ruby-identifier">seconds=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)</pre>
+            
+            <p>In addition to specifying the interval as a hash, there is also support for
+            specifying the interval as an ActiveSupport::Duration object:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;active_support/all&#39;</span>&#x000A;<span class="ruby-identifier">add</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_add</span>(:<span class="ruby-identifier">date_column</span>, <span class="ruby-value">1</span>.<span class="ruby-identifier">years</span> <span class="ruby-operator">+</span> <span class="ruby-value">2</span>.<span class="ruby-identifier">months</span> <span class="ruby-operator">+</span> <span class="ruby-value">3</span>.<span class="ruby-identifier">days</span>)&#x000A;<span class="ruby-identifier">sub</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_sub</span>(:<span class="ruby-identifier">date_column</span>, <span class="ruby-value">1</span>.<span class="ruby-identifier">hours</span> <span class="ruby-operator">+</span> <span class="ruby-value">2</span>.<span class="ruby-identifier">minutes</span> <span class="ruby-operator">+</span> <span class="ruby-value">3</span>.<span class="ruby-identifier">seconds</span>)</pre>
+            
+            <p>These expressions can be used in your datasets, or anywhere else that <a
+            href="../../../../classes/Sequel.html">Sequel</a> expressions are allowed:</p>
+            
+            <pre>DB[:table].select(add.as(:d)).where(sub &gt; Sequel::CURRENT_TIMESTAMP)</pre>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

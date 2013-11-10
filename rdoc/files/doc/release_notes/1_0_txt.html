@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>1.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>1.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/1.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h3 id="label-New+code+organization">New code organization</h3>
+            
+            <p><a href="../../../classes/Sequel.html">Sequel</a> is now divided into two
+            parts: sequel_core and sequel_model. These two parts are distributed as two
+            separate gems. The sequel gem bundles sequel_core and sequel_model
+            together. If you don&#39;t use <a
+            href="../../../classes/Sequel/Model.html">Sequel::Model</a> in your code,
+            you can just install and use sequel_core.</p>
+            
+            <h3 id="label-New+model+hooks+implementation">New model hooks implementation</h3>
+            
+            <p>The hooks implementation have been rewritten from scratch, is much more
+            robust and offers a few new features:</p>
+            <ul><li>
+            <p>More ways to define hooks: hooks can now be defined by supplying a</p>
+            </li></ul>
+            
+            <p>block or a method name, or by overriding the hook instance method.</p>
+            <ul><li>
+            <p>Inheritable hooks: Hooks can now be inherited, which means that you</p>
+            </li></ul>
+            
+            <p>can define general hooks in a model superclass, and use them in subclasses.
+            You can also define global hooks on <a
+            href="../../../classes/Sequel/Model.html">Sequel::Model</a> that will be
+            invoked for all model classes.</p>
+            <ul><li>
+            <p>Hook chains can be broken by returning false from within the hook.</p>
+            </li><li>
+            <p>New after_initialize hook, invoked after instance initialization.</p>
+            </li><li>
+            <p>The hook invocation order can no longer be changed. Hooks are</p>
+            </li></ul>
+            
+            <p>invoked in order of definition, from the top of the class hierarchy (that
+            is, from <a href="../../../classes/Sequel/Model.html">Sequel::Model</a>)
+            down to the specific class.</p>
+            
+            <h3 id="label-Miscellanea">Miscellanea</h3>
+            <ul><li>
+            <p>Removed deprecated adapter stubs, and all other deprecations in both</p>
+            </li></ul>
+            
+            <p>sequel_core and sequel_model.</p>
+            <ul><li>
+            <p>Fixed String#to_time to raise error correctly for invalid time</p>
+            </li></ul>
+            
+            <p>stamps.</p>
+            <ul><li>
+            <p>Fixed error behavior when parse_tree or ruby2ruby are not available.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

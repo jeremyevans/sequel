@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>mass_assignment.rdoc</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>mass_assignment.rdoc</h1>
+        <div class='paths'>
+          doc/mass_assignment.rdoc
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-06-02 13:49:43 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Sequel%3A%3AModel+Mass+Assignment"><a href="../../classes/Sequel/Model.html">Sequel::Model</a> Mass Assignment</h1>
+            
+            <p>Most Model methods that take a hash of attribute keys and values, including
+            <code>Model.new</code>, <code>Model.create</code>, <code>Model#set</code>
+            and <code>Model#update</code> are subject to Sequel&#39;s mass assignment
+            rules. When you pass a hash to these methods, each key has an
+            <code>=</code> appended to it (the setter method), and if the setter method
+            exists and access to it is not restricted, <a
+            href="../../classes/Sequel.html">Sequel</a> will call the setter method
+            with the hash value. By default, there are two types of setter methods that
+            are restricted.</p>
+            
+            <p>The first is methods like <code>typecast_on_assignment=</code> and
+            <code>==</code>, which don&#39;t affect columns. These methods cannot be
+            enabled for mass assignment. The second is primary key setters. To enable
+            use of primary key setters, you need to call
+            <code>unrestrict_primary_key</code> for that model:</p>
+            
+            <pre>Post.unrestrict_primary_key</pre>
+            
+            <p>Since mass assignment by default allows modification of all column values
+            except for primary key columns, it can be a security risk in some cases. <a
+            href="../../classes/Sequel.html">Sequel</a> has multiple ways of securing
+            mass assignment. The first way is using <code>set_allowed_columns</code>:</p>
+            
+            <pre>Post.set_allowed_columns :title, :body, :category</pre>
+            
+            <p>This explicitly sets which methods are allowed (<code>title=</code>,
+            <code>body=</code>, and <code>category=</code>), all other methods will not
+            be allowed. This method is useful in simple applications where the same
+            columns are allowed in all cases, but not appropriate when different
+            columns are allowed in different scenarios (e.g. admin access vs. user
+            access). To handle cases where different columns are allowed in different
+            cases, you can use <code>set_only</code> or <code>update_only</code>:</p>
+            
+            <pre># user case&#x000A;post.set_only(params[:post], :title, :body)&#x000A;# admin case&#x000A;post.set_only(params[:post], :title, :body, :deleted)</pre>
+            
+            <p>In this case, only the <code>title=</code> and <code>body=</code> methods
+            will be allowed in the mass assignment in the user case, and only
+            <code>title=</code>, <code>body=</code>, and <code>deleted=</code> will be
+            allowed for mass assignment in the admin case.</p>
+            
+            <p>By default, if an invalid setter method call is attempted, <a
+            href="../../classes/Sequel.html">Sequel</a> raises a
+            <code>Sequel::Error</code> exception.  You can have <a
+            href="../../classes/Sequel.html">Sequel</a> silently ignore invalid calls
+            by doing:</p>
+            
+            <pre># Global default&#x000A;Sequel::Model.strict_param_setting = false&#x000A;# Class level&#x000A;Post.strict_param_setting = false&#x000A;# Instance level&#x000A;post.strict_param_setting = false</pre>
+            
+            <p>In addition to <code>set_only</code> and <code>update_only</code>, <a
+            href="../../classes/Sequel.html">Sequel</a> also has
+            <code>set_fields</code> and <code>update_fields</code> methods, and these
+            may be a better mass assignment choice for most users. These methods take
+            two arguments, the attributes hash as the first argument, and a single
+            array of valid field names as the second argument:</p>
+            
+            <pre>post.set_fields(params[:post], [:title, :body])</pre>
+            
+            <p><code>set_fields</code> and <code>update_fields</code> differ in
+            implementation from <code>set_only</code> and <code>update_only</code>.
+            With <code>set_only</code> and <code>update_only</code>, the hash is
+            iterated over and it checks each method call attempt to see if it is valid.
+            With <code>set_fields</code> and <code>update_fields</code>, the array is
+            iterated over, and it just looks up the value in the hash and calls the
+            appropriate setter method.</p>
+            
+            <p><code>set_fields</code> and <code>update_fields</code> are designed for the
+            case where you are expecting specific fields in the input, and want to
+            ignore the other fields. They work great for things like HTML forms where
+            the form fields are static. <code>set_only</code> and
+            <code>update_only</code> are designed for cases where you are not sure what
+            fields are going to be present in the input, but still want to make sure
+            only certain setter methods can be called. They work great for flexible
+            APIs.</p>
+            
+            <p><code>set_fields</code> and <code>update_fields</code> take an optional
+            argument hash, and currently handles the :missing option.  With
+            <code>:missing=&gt;:skip</code>, <code>set_fields</code> and
+            <code>update_fields</code> will just skip missing entries in the hash,
+            allowing them to be used in flexible APIs.  With
+            <code>:missing=&gt;:raise</code>, <code>set_fields</code> and
+            <code>update_fields</code> will raise an error if one of the entries in the
+            hash is missing, instead of just assigning the value to nil or whatever the
+            hash&#39;s default value is.  That allows stricter checks, similar to the
+            :strict_param_checking setting for the default mass assignment methods. 
+            You can use the <code>Model.default_set_fields_options=</code> method to
+            set the default options to use for <code>set_fields</code> and
+            <code>update_fields</code> on a global or per-model basis.</p>
+            
+            <p>In all of the mass assignment cases, methods starting with <code>set</code>
+            will set the attributes without saving the object, while methods starting
+            with <code>update</code> will set the attributes and then save the changes
+            to the object.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

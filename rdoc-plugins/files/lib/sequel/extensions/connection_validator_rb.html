@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>connection_validator.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>connection_validator.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/connection_validator.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-02-21 21:43:08 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The connection_validator extension modifies a database&#39;s connection
+            pool to validate that connections checked out from the pool are still
+            valid, before yielding them for use.  If it detects an invalid connection,
+            it removes it from the pool and tries the next available connection,
+            creating a new connection if no available connection is valid.  Example of
+            use:</p>
+            
+            <pre>DB.extension(:connection_validator)</pre>
+            
+            <p>As checking connections for validity involves issuing a query, which is
+            potentially an expensive operation, the validation checks are only run if
+            the connection has been idle for longer than a certain threshold. By
+            default, that threshold is 3600 seconds (1 hour), but it can be modified by
+            the user, set to -1 to always validate connections on checkout:</p>
+            
+            <pre>DB.pool.connection_validation_timeout = -1</pre>
+            
+            <p>Note that if you set the timeout to validate connections on every checkout,
+            you should probably manually control connection checkouts on a coarse
+            basis, using Database#synchronize.  In a web application, the optimal place
+            for that would be a rack middleware.  Validating connections on every
+            checkout without setting up coarse connection checkouts will hurt
+            performance, in some cases significantly.  Note that setting up coarse
+            connection checkouts reduces the concurrency level acheivable.  For
+            example, in a web application, using Database#synchronize in a rack
+            middleware will limit the number of concurrent web requests to the number
+            to connections in the database connection pool.</p>
+            
+            <p>Note that this extension only affects the default threaded and the sharded
+            threaded connection pool.  The single threaded and sharded single threaded
+            connection pools are not affected.  As the only reason to use the single
+            threaded pools is for speed, and this extension makes the connection pool
+            slower, there&#39;s not much point in modifying this extension to work with
+            the single threaded pools.  The threaded pools work fine even in single
+            threaded code, so if you are currently using a single threaded pool and
+            want to use this extension, switch to using a threaded pool.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Unbinder</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Unbinder
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../files/lib/sequel/ast_transformer_rb.html">lib/sequel/ast_transformer.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p><code>Unbinder</code> is used to take a dataset filter and return a
+            modified version that unbinds already bound values and returns a dataset
+            with bound value placeholders and a hash of bind values.  You can then
+            prepare the dataset and use the bound variables to execute it with the same
+            values.</p>
+            
+            <p>This class only does a limited form of unbinding where the variable names
+            and values can be associated unambiguously.  The only cases it handles are
+            &lt;tt&gt;<a
+            href="SQL/ComplexExpression.html">SQL::ComplexExpression</a>&lt;tt&gt; with
+            an operator in <code>UNBIND_OPS</code>, a first argument that&#39;s an
+            instance of a member of <code>UNBIND_KEY_CLASSES</code>, and a second
+            argument that&#39;s an instance of a member of
+            <code>UNBIND_VALUE_CLASSES</code>.</p>
+            
+            <p>So it can handle cases like:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">c</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>}</pre>
+            
+            <p>But it cannot handle cases like:</p>
+            
+            <pre>DB.filter(:a + 1 &lt; 0)</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-binds">binds</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>UNBIND_KEY_CLASSES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[Symbol, SQL::Identifier, SQL::QualifiedIdentifier]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The key classes (first argument of the ComplexExpression) that will
+                      considered for transformation.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>UNBIND_OPS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[:'=', :'!=', :<, :>, :<=, :>=]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The &lt;tt&gt;<a
+                      href="SQL/ComplexExpression.html">SQL::ComplexExpression</a>&lt;tt&gt;
+                      operates that will be considered for transformation.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>UNBIND_VALUE_CLASSES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[Numeric, String, Date, Time]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The value classes (second argument of the ComplexExpression) that will be
+                      considered for transformation.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-binds'>binds</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The hash of bind variables that were extracted from the dataset filter.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Intialize an empty <code>binds</code> hash.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/ast_transformer.rb, line 152</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>&#x000A;  <span class="ruby-ivar">@binds</span> = {}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

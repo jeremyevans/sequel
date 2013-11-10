@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>connection_pool.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>connection_pool.rb</h1>
+        <div class='paths'>
+          lib/sequel/connection_pool.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-09-19 07:06:56 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The base connection pool class, which all other connection pools are based
+            on.  This class is not instantiated directly, but subclasses should at the
+            very least implement the following API:</p>
+            <dl class="rdoc-list note-list"><dt>initialize(Database, <a href="../../../classes/Hash.html">Hash</a>) 
+            <dd>
+            <p>Initialize using the passed <a
+            href="../../../classes/Sequel/Database.html">Sequel::Database</a> object
+            and options hash.</p>
+            </dd><dt>hold(<a href="../../../classes/Symbol.html">Symbol</a>, &amp;block) 
+            <dd>
+            <p>Yield a connection object (obtained from calling the block passed to
+            <code>initialize</code>) to the current block. For sharded connection
+            pools, the <a href="../../../classes/Symbol.html">Symbol</a> passed is the
+            shard/server to use.</p>
+            </dd><dt>disconnect(<a href="../../../classes/Symbol.html">Symbol</a>) 
+            <dd>
+            <p>Disconnect the connection object.  For sharded connection pools, the <a
+            href="../../../classes/Symbol.html">Symbol</a> passed is the shard/server
+            to use.</p>
+            </dd><dt>servers 
+            <dd>
+            <p>An array of shard/server symbols for all shards/servers that this
+            connection pool recognizes.</p>
+            </dd><dt>size 
+            <dd>
+            <p>an integer representing the total number of connections in the pool, or for
+            the given shard/server if sharding is supported.</p>
+            </dd></dl>
+            
+            <p>For sharded connection pools, the sharded API adds the following methods:</p>
+            <dl class="rdoc-list note-list"><dt>add_servers(<a href="../../../classes/Array.html">Array</a> of Symbols) 
+            <dd>
+            <p>start recognizing all shards/servers specified by the array of symbols.</p>
+            </dd><dt>remove_servers(<a href="../../../classes/Array.html">Array</a> of Symbols) 
+            <dd>
+            <p>no longer recognize all shards/servers specified by the array of symbols.</p>
+            </dd></dl>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

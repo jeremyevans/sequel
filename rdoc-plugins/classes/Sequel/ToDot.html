@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::ToDot</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::ToDot
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../files/lib/sequel/extensions/to_dot_rb.html">lib/sequel/extensions/to_dot.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+              <li><a target="docwin" href="#method-c-output">output</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-output">output</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="ToDot/DatasetMethods.html">Sequel::ToDot::DatasetMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>TO_DOT_OPTIONS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[:with, :distinct, :select, :from, :join, :where, :group, :having, :compounds, :order, :limit, :offset, :lock].freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The option keys that should be included in the dot output.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(ds)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Given a <code>Dataset</code>, parse the internal structure to generate a
+                  dataset visualization.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/to_dot.rb, line 32</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-ivar">@i</span> = <span class="ruby-value">0</span>&#x000A;  <span class="ruby-ivar">@stack</span> = [<span class="ruby-ivar">@i</span>]&#x000A;  <span class="ruby-ivar">@dot</span> = [<span class="ruby-string">&quot;digraph G {&quot;</span>, <span class="ruby-string">&quot;0 [label=\&quot;self\&quot;];&quot;</span>]&#x000A;  <span class="ruby-identifier">v</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-string">&quot;&quot;</span>)&#x000A;  <span class="ruby-ivar">@dot</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-output'>
+                <a name='method-c-output'></a>
+                <div class='synopsis'>
+                  <span class='name'>output</span>
+                  <span class='arguments'>(ds)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Given a <code>Dataset</code>, return a string in <code>dot</code> format
+                  that will generate a visualization of the dataset.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-output-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-output-source'><span class="ruby-comment"># File lib/sequel/extensions/to_dot.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">output</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-identifier">ds</span>).<span class="ruby-identifier">output</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-output'>
+                <a name='method-i-output'></a>
+                <div class='synopsis'>
+                  <span class='name'>output</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Output the dataset visualization as a string in <code>dot</code> format.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-output-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-output-source'><span class="ruby-comment"># File lib/sequel/extensions/to_dot.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">output</span>&#x000A;  <span class="ruby-ivar">@dot</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,423 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Mock::Database</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Mock::Database
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/adapters/mock_rb.html">lib/sequel/adapters/mock.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Mock.html">Mock</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p><a href="Database.html">Database</a> class for Sequel&#39;s mock adapter.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-autoid">autoid</a></li>
+              <li><a target="docwin" href="#attribute-i-columns">columns</a></li>
+              <li><a target="docwin" href="#method-i-connect">connect</a></li>
+              <li><a target="docwin" href="#method-i-disconnect_connection">disconnect_connection</a></li>
+              <li><a target="docwin" href="#method-i-execute">execute</a></li>
+              <li><a target="docwin" href="#method-i-execute_dui">execute_dui</a></li>
+              <li><a target="docwin" href="#method-i-execute_insert">execute_insert</a></li>
+              <li><a target="docwin" href="#attribute-i-fetch">fetch</a></li>
+              <li><a target="docwin" href="#attribute-i-numrows">numrows</a></li>
+              <li><a target="docwin" href="#attribute-i-server_version">server_version</a></li>
+              <li><a target="docwin" href="#method-i-sqls">sqls</a></li>
+              <li><a target="docwin" href="#method-i-supports_savepoints-3F">supports_savepoints?</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SHARED_ADAPTERS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      {
+                      'access'=>'Access',
+                      'db2'=>'DB2',
+                      'firebird'=>'Firebird',
+                      'informix'=>'Informix',
+                      'mssql'=>'MSSQL',
+                      'mysql'=>'MySQL',
+                      'oracle'=>'Oracle',
+                      'postgres'=>'Postgres',
+                      'sqlite'=>'SQLite'
+                      }
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Map of database type names to module names, used for handling mock adapters
+                      for specific database types.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SHARED_ADAPTER_SETUP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      {
+                      'postgres' => lambda do |db|
+                      db.instance_eval do
+                      @server_version = 90103
+                      initialize_postgres_adapter
+                      end
+                      db.extend(Module.new do
+                      def bound_variable_arg(arg, conn)
+                      arg
+                      end
+                      
+                      def primary_key(table)
+                      :id
+                      end
+                      end)
+                      end,
+                      'oracle' => lambda do |db|
+                      db.instance_eval do
+                      @primary_key_sequences = {}
+                      end
+                      end,
+                      'mssql' => lambda do |db|
+                      db.instance_eval do
+                      @server_version = 10000000
+                      end
+                      end
+                      }
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Procs to run for specific database types to get the mock adapter to work
+                      with the shared adapter</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='aliases-list'>
+              <h2>Public Instance Aliases</h2>
+              <div class='name-list'>
+                <table summary='Public Instance Aliases'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>execute_ddl</td>
+                    <td>-&gt;</td>
+                    <td class='context-item-value'><a target="docwin" href="#method-i-execute">execute</a></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-autoid'>autoid</a>
+                    </td>
+                    <td class='context-item-value'>[W]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Set the autogenerated primary key integer to be returned when running an
+                      insert query. Argument types supported:</p>
+                      <dl class="rdoc-list note-list"><dt>nil 
+                      <dd>
+                      <p>Return nil for all inserts</p>
+                      </dd><dt>Integer 
+                      <dd>
+                      <p>Starting integer for next insert, with futher inserts getting an
+                      incremented value</p>
+                      </dd><dt>Array 
+                      <dd>
+                      <p>First insert gets the first value in the array, second gets the second
+                      value, etc.</p>
+                      </dd><dt>Proc 
+                      <dd>
+                      <p>Called with the insert SQL query, uses the value returned</p>
+                      </dd><dt>Class 
+                      <dd>
+                      <p>Should be an Exception subclass, will create a new instance an raise it
+                      wrapped in a DatabaseError.</p>
+                      </dd></dl>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-columns'>columns</a>
+                    </td>
+                    <td class='context-item-value'>[W]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Set the columns to set in the dataset when the dataset fetches rows. 
+                      Argument types supported:</p>
+                      <dl class="rdoc-list note-list"><dt>nil 
+                      <dd>
+                      <p>Set no columns</p>
+                      </dd></dl>
+                      
+                      <p>Array of Symbols: Used for all datasets Array (otherwise): First retrieval
+                      gets the first value in the</p>
+                      
+                      <pre>array, second gets the second value, etc.</pre>
+                      <dl class="rdoc-list note-list"><dt>Proc 
+                      <dd>
+                      <p>Called with the select SQL query, uses the value returned, which should be
+                      an array of symbols</p>
+                      </dd></dl>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-fetch'>fetch</a>
+                    </td>
+                    <td class='context-item-value'>[W]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Set the hashes to yield by execute when retrieving rows. Argument types
+                      supported:</p>
+                      <dl class="rdoc-list note-list"><dt>nil 
+                      <dd>
+                      <p>Yield no rows</p>
+                      </dd><dt>Hash 
+                      <dd>
+                      <p>Always yield a single row with this hash</p>
+                      </dd><dt>Array of Hashes 
+                      <dd>
+                      <p>Yield separately for each hash in this array</p>
+                      </dd><dt>Array (otherwise) 
+                      <dd>
+                      <p>First retrieval gets the first value in the array, second gets the second
+                      value, etc.</p>
+                      </dd><dt>Proc 
+                      <dd>
+                      <p>Called with the select SQL query, uses the value returned, which should be
+                      a hash or array of hashes.</p>
+                      </dd><dt>Class 
+                      <dd>
+                      <p>Should be an Exception subclass, will create a new instance an raise it
+                      wrapped in a DatabaseError.</p>
+                      </dd></dl>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-numrows'>numrows</a>
+                    </td>
+                    <td class='context-item-value'>[W]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Set the number of rows to return from update or delete. Argument types
+                      supported:</p>
+                      <dl class="rdoc-list note-list"><dt>nil 
+                      <dd>
+                      <p>Return 0 for all updates and deletes</p>
+                      </dd><dt>Integer 
+                      <dd>
+                      <p>Used for all updates and deletes</p>
+                      </dd><dt>Array 
+                      <dd>
+                      <p>First update/delete gets the first value in the array, second gets the
+                      second value, etc.</p>
+                      </dd><dt>Proc 
+                      <dd>
+                      <p>Called with the update/delete SQL query, uses the value returned.</p>
+                      </dd><dt>Class 
+                      <dd>
+                      <p>Should be an Exception subclass, will create a new instance an raise it
+                      wrapped in a DatabaseError.</p>
+                      </dd></dl>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-server_version'>server_version</a>
+                    </td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="../Mock.html">Mock</a> the server version, useful when using the
+                      shared adapters</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-connect'>
+                <a name='method-i-connect'></a>
+                <div class='synopsis'>
+                  <span class='name'>connect</span>
+                  <span class='arguments'>(server)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a related <a href="Connection.html">Connection</a> option connecting
+                  to the given shard.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-connect-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 135</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-constant">Connection</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">server</span>, <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-disconnect_connection'>
+                <a name='method-i-disconnect_connection'></a>
+                <div class='synopsis'>
+                  <span class='name'>disconnect_connection</span>
+                  <span class='arguments'>(c)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-disconnect_connection-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-disconnect_connection-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 139</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-execute'>
+                <a name='method-i-execute'></a>
+                <div class='synopsis'>
+                  <span class='name'>execute</span>
+                  <span class='arguments'>(sql, opts=OPTS, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Store the sql used for later retrieval with <a
+                  href="Database.html#method-i-sqls">sqls</a>, and return the appropriate
+                  value using either the <a
+                  href="Database.html#attribute-i-autoid">autoid</a>, <a
+                  href="Database.html#attribute-i-fetch">fetch</a>, or <a
+                  href="Database.html#attribute-i-numrows">numrows</a> methods.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 145</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)} &#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-execute_dui'>
+                <a name='method-i-execute_dui'></a>
+                <div class='synopsis'>
+                  <span class='name'>execute_dui</span>
+                  <span class='arguments'>(sql, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Store the sql used, and return the value of the <a
+                  href="Database.html#attribute-i-numrows">numrows</a> method.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_dui-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 151</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:meth=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:numrows</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-execute_insert'>
+                <a name='method-i-execute_insert'></a>
+                <div class='synopsis'>
+                  <span class='name'>execute_insert</span>
+                  <span class='arguments'>(sql, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Store the sql used, and return the value of the <a
+                  href="Database.html#attribute-i-autoid">autoid</a> method.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_insert-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 156</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:meth=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:autoid</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-sqls'>
+                <a name='method-i-sqls'></a>
+                <div class='synopsis'>
+                  <span class='name'>sqls</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return all stored SQL queries, and clear the cache of SQL queries.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-sqls-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-sqls-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 162</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sqls</span>&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-ivar">@sqls</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-ivar">@sqls</span>.<span class="ruby-identifier">clear</span>&#x000A;  <span class="ruby-identifier">s</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_savepoints-3F'>
+                <a name='method-i-supports_savepoints-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_savepoints?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Enable use of savepoints.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_savepoints-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_savepoints-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 169</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_savepoints?</span>&#x000A;  <span class="ruby-identifier">shared_adapter?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">super</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

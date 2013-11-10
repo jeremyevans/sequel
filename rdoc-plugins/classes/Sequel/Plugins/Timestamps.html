@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::Timestamps</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::Timestamps
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/timestamps_rb.html">lib/sequel/plugins/timestamps.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The timestamps plugin creates hooks that automatically set create and
+            update timestamp fields.  Both field names used are configurable, and you 
+            can also set whether to overwrite existing create timestamps (false by
+            default), or whether to set the update timestamp when creating (also false
+            by default).</p>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Timestamp all model instances using +created_at+ and +updated_at+</span>&#x000A;<span class="ruby-comment"># (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">timestamps</span>&#x000A;&#x000A;<span class="ruby-comment"># Timestamp Album instances, with custom column names</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">timestamps</span>, :<span class="ruby-identifier">create=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">created_on</span>, :<span class="ruby-identifier">update=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">updated_on</span>&#x000A;&#x000A;<span class="ruby-comment"># Timestamp Artist instances, forcing an overwrite of the create</span>&#x000A;<span class="ruby-comment"># timestamp, and setting the update timestamp when creating</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">timestamps</span>, :<span class="ruby-identifier">force=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">update_on_create=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span></pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="Timestamps/ClassMethods.html">Sequel::Plugins::Timestamps::ClassMethods</a></li>
+              <li><a target="docwin" href="Timestamps/InstanceMethods.html">Sequel::Plugins::Timestamps::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Configure the plugin by setting the available options.  Note that if this
+                  method is run more than once, previous settings are ignored, and it will
+                  just use the settings given or the default settings.  Options:</p>
+                  <ul><li>
+                  <p>:create - The field to hold the create timestamp (default: :created_at)</p>
+                  </li><li>
+                  <p>:force - Whether to overwrite an existing create timestamp (default: false)</p>
+                  </li><li>
+                  <p>:update - The field to hold the update timestamp (default: :updated_at)</p>
+                  </li><li>
+                  <p>:update_on_create - Whether to set the update timestamp to the create
+                  timestamp when creating (default: false)</p>
+                  </li></ul>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@create_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:create</span>]<span class="ruby-operator">||</span><span class="ruby-value">:created_at</span>&#x000A;    <span class="ruby-ivar">@update_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update</span>]<span class="ruby-operator">||</span><span class="ruby-value">:updated_at</span>&#x000A;    <span class="ruby-ivar">@create_timestamp_overwrite</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:force</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-ivar">@set_update_timestamp_on_create</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update_on_create</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

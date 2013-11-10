@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::SQL::ComplexExpressionMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::SQL::ComplexExpressionMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../SQL.html">SQL</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Adds methods that allow you to treat an object as an instance of a specific
+            <code>ComplexExpression</code> subclass.  This is useful if another library
+            overrides the methods defined by <a href="../../Sequel.html">Sequel</a>.</p>
+            
+            <p>For example, if <code>Symbol#/</code> is overridden to produce a string
+            (for example, to make file system path creation easier), the following code
+            will not do what you want:</p>
+            
+            <pre>:price/10 &gt; 100</pre>
+            
+            <p>In that case, you need to do the following:</p>
+            
+            <pre>:price.sql_number/10 &gt; 100</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-extract">extract</a></li>
+              <li><a target="docwin" href="#method-i-sql_boolean">sql_boolean</a></li>
+              <li><a target="docwin" href="#method-i-sql_number">sql_number</a></li>
+              <li><a target="docwin" href="#method-i-sql_string">sql_string</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-extract'>
+                <a name='method-i-extract'></a>
+                <div class='synopsis'>
+                  <span class='name'>extract</span>
+                  <span class='arguments'>(datetime_part)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Extract a datetime part (e.g. year, month) from self:</p>
+                  
+                  <pre>:date.extract(:year) # extract(year FROM &quot;date&quot;)</pre>
+                  
+                  <p>Also has the benefit of returning the result as a <a
+                  href="NumericExpression.html">NumericExpression</a> instead of a generic <a
+                  href="ComplexExpression.html">ComplexExpression</a>.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-extract-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-extract-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 710</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">extract</span>(<span class="ruby-identifier">datetime_part</span>)&#x000A;  <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:extract</span>, <span class="ruby-identifier">datetime_part</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-sql_boolean'>
+                <a name='method-i-sql_boolean'></a>
+                <div class='synopsis'>
+                  <span class='name'>sql_boolean</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a <a href="BooleanExpression.html">BooleanExpression</a>
+                  representation of <code>self</code>.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_boolean-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-sql_boolean-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 715</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_boolean</span>&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-sql_number'>
+                <a name='method-i-sql_number'></a>
+                <div class='synopsis'>
+                  <span class='name'>sql_number</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a <a href="NumericExpression.html">NumericExpression</a>
+                  representation of <code>self</code>.</p>
+                  
+                  <pre>~:a # NOT &quot;a&quot;&#x000A;~:a.sql_number # ~&quot;a&quot;</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_number-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-sql_number-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 723</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_number</span>&#x000A;  <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-sql_string'>
+                <a name='method-i-sql_string'></a>
+                <div class='synopsis'>
+                  <span class='name'>sql_string</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a <a href="StringExpression.html">StringExpression</a>
+                  representation of <code>self</code>.</p>
+                  
+                  <pre>:a + :b # &quot;a&quot; + &quot;b&quot;&#x000A;:a.sql_string + :b # &quot;a&quot; || &quot;b&quot;</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_string-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-sql_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 731</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_string</span>&#x000A;  <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

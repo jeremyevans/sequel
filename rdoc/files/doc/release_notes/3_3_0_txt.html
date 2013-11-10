@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.3.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.3.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.3.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>New Features</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>An association_proxies plugin has been added.  This is not a full-blown
+            proxy implementation, but it allows you to write code such as:</p>
+            
+            <pre>artist.albums.filter{num_tracks &gt; 10}</pre>
+            
+            <p>Without the plugin, you have to call filter specifically on the
+            association&#39;s dataset:</p>
+            
+            <pre>artist.albums_dataset.filter{num_tracks &gt; 10}</pre>
+            
+            <p>The plugin works by proxying array methods to the array of associated
+            objects, and all other methods to the association&#39;s dataset.  This
+            results in the following behavior:</p>
+            
+            <pre># Will load the associated objects (unless they are already&#x000A;# cached), and return the length of the array&#x000A;artist.albums.length&#x000A;# Will issue an SQL query with COUNT (even if the association&#x000A;# is already cached), and return the result&#x000A;artist.albums.count</pre>
+            </li><li>
+            <p>The add_*/remove_*/remove_all_* association methods now take additional
+            arguments that are passed down to the
+            <em>add</em>*/<em>remove</em>*/<em>remove_all</em>* methods.  One of the
+            things this allows you to do is update additional columns in join tables
+            for many_to_many associations:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">artists</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">_add_artist</span>(<span class="ruby-identifier">artist</span>, <span class="ruby-identifier">values</span>={})&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums_artists</span>].&#x000A;      <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">values</span>.<span class="ruby-identifier">merge</span>(:<span class="ruby-identifier">album_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">id</span>,&#x000A;                          :<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">id</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">artist1</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">2</span>]&#x000A;<span class="ruby-identifier">artist2</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">3</span>]&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">add_artist</span>(<span class="ruby-identifier">artist1</span>, :<span class="ruby-identifier">relationship=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;composer&#39;</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">add_artist</span>(<span class="ruby-identifier">artist2</span>, :<span class="ruby-identifier">relationship=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;arranger&#39;</span>)</pre>
+            </li><li>
+            <p>The JDBC adapter now accepts a :convert_types option to turn off Java type
+            conversion.  The option is true by default for backwards compatibility and
+            correctness, but can be set to false to double performance.  The option can
+            be set at the database and dataset levels:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">jdbc</span>(<span class="ruby-string">&#39;jdbc:postgresql://host/database&#39;</span>,&#x000A;                 :<span class="ruby-identifier">convert_types=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">convert_types</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">convert_types</span> = <span class="ruby-keyword">false</span></pre>
+            </li><li>
+            <p>Dataset#from_self now takes an option hash and respects an :alias option,
+            giving the table alias to use.</p>
+            </li><li>
+            <p>Dataset#unlimited was added, similar to unfiltered and unordered.</p>
+            </li><li>
+            <p>SQL::WindowFunction is now a subclass of SQL::GenericExpression, so you can
+            alias it and treat it like any other SQL::Function.</p>
+            </li></ul>
+            
+            <p>Other Improvements</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>Microsoft SQL Server support is much, much better in <a
+            href="../../../classes/Sequel.html">Sequel</a> 3.3.0 than in previous
+            versions.  Support is pretty good with the ODBC, ADO, and JDBC adapters,
+            close to the level of support for PostreSQL, MySQL, SQLite, and H2. 
+            Improvements are too numerous to list, but here are some highlights:</p>
+            <ul><li>
+            <p>Dataset#insert now returns the primary key (identity field), so it can be
+            used easier with models.</p>
+            </li><li>
+            <p>Transactions can now use savepoints (except on ADO).</p>
+            </li><li>
+            <p>Offsets are supported when using SQL Server 2005 or 2008, using a
+            ROW_NUMBER window function.  However, you must specify an order for your
+            dataset (which you probably are already doing if you are using offsets).</p>
+            </li><li>
+            <p>Schema parsing has been implemented, though it doesn&#39;t support primary
+            key parsing (except on JDBC, since the JDBC support is used there).</p>
+            </li><li>
+            <p>The SQL syntax <a href="../../../classes/Sequel.html">Sequel</a> uses is
+            now much more compatible, and most schema modification methods and database
+            types now work correctly.</p>
+            </li></ul>
+            </li><li>
+            <p>The ADO and ODBC adapters both work much better now.  The ADO adapter no
+            longer attempts to use transactions, since I&#39;ve found that ADO does not
+            give a stable native connection (and hence transactions weren&#39;t
+            possible).  I strongly recommend against using the ADO adapter in
+            production.</p>
+            </li><li>
+            <p>The H2 JDBC subadapter now supports rename_column, set_column_null,
+            set_column_type, and add_foreign_key.</p>
+            </li><li>
+            <p>Altering a columns type, null status, or default is now supported on
+            SQLite.  You can also add primary keys and unique columns.</p>
+            </li><li>
+            <p>Both the ADO and ODBC adapters now catch the native exception classes and
+            raise Sequel::DatabaseErrors.</p>
+            </li><li>
+            <p>Model classes now default to associating to other classes in the same
+            scope.  This makes it easier to use namespaced models.</p>
+            </li><li>
+            <p>The schema parser and schema dumper now support the following types: nchar,
+            nvarchar, ntext, smalldatetime, smallmoney, binary, and varbinary.</p>
+            </li><li>
+            <p>You can now specify the null status for a column using :allow_null in
+            addition to :null.  This is to make it easier to use the table creation
+            methods with the results of the schema parser.</p>
+            </li><li>
+            <p>Renaming a NOT NULL column without a default now works on MySQL.</p>
+            </li><li>
+            <p>Model class initialization now raises an exception if there is a problem
+            connecting to the database.</p>
+            </li><li>
+            <p>Connection pool performance has been increased slightly.</p>
+            </li><li>
+            <p>The literal_time method in the ODBC adapter has been fixed.</p>
+            </li><li>
+            <p>An unlikely but potential bug in the MySQL adapter has been fixed.</p>
+            </li></ul>
+            
+            <p>Backwards Compatibility</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>The convert_tinyint_to_bool setting moved from the main <a
+            href="../../../classes/Sequel.html">Sequel</a> module to the Sequel::MySQL
+            module.  The native MySQL adapter is the only adapter that converted
+            tinyint columns to booleans when the rows are returned, so you can only use
+            the setting with the native MySQL adapter.</p>
+            
+            <p>Additionally, the setting&#39;s behavior has changed.  When parsing the
+            schema, now only tinyint(1) columns are now considered as boolean, instead
+            of all tinyint columns. This allows you to use tinyint(4) columns for
+            storing small integers and tinyint(1) columns as booleans, and not have the
+            schema parsing support consider the tinyint(4) columns as booleans. 
+            Unfortunately, due to limitations in the native MySQL driver, all tinyint
+            column values are converted to booleans upon retrieval, not just tinyint(1)
+            column values.</p>
+            
+            <p>Unfortunately, the previous <a
+            href="../../../classes/Sequel.html">Sequel</a> behavior was to use the
+            default tinyint size (tinyint(4)) when creating boolean columns (using the
+            TrueClass or FalseClass generic types).  If you were using the generic type
+            support to create the columns, you should modify your database to change
+            the column type from tinyint(4) to tinyint(1).</p>
+            
+            <p>If you use MySQL with tinyint columns, these changes have the potential to
+            break applications.  Care should be taken when upgrading if these changes
+            apply to you.</p>
+            </li><li>
+            <p>Model classes now default to associating to other classes in the same
+            scope.  It&#39;s highly unlikely anyone was relying on the previous
+            behavior, but if you have a model inside a module that you are associating
+            to a model outside of a module, you now need to specify the associated
+            class using the :class option.</p>
+            </li><li>
+            <p>Model#save no longer includes the primary key fields in the SET clause of
+            the UPDATE query, only in the WHERE clause.  I&#39;m not sure if this
+            affects backwards compatibility of production code, but it can break tests
+            that expect specific SQL.</p>
+            </li><li>
+            <p>Behavior to handle empty identifiers has now been standardized. If any
+            database adapter returns an empty identifier, <a
+            href="../../../classes/Sequel.html">Sequel</a> will use &#39;untitled&#39;
+            as the identifier.  This can break backwards compatibility if the adapter
+            previously used another default and you were relying on that default.  This
+            was necessary to fix any possible "interning empty string" exceptions.</p>
+            </li><li>
+            <p>On MSSQL, <a href="../../../classes/Sequel.html">Sequel</a> now uses the
+            datetime type instead of the timestamp type for generic DateTimes.  It now
+            uses bit for the TrueClass and FalseClass generic types, and image for the
+            File generic type.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now unescapes URL parts:</p>
+            
+            <pre>Sequel.connect(ado:///db?host=server%5cinstance)</pre>
+            
+            <p>However, this can break backward compatibility if you previously expected
+            it not to be unescaped.</p>
+            </li><li>
+            <p>The columns_for private SQLite Database method has been removed.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

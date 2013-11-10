@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::ClassTableInheritance</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::ClassTableInheritance
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/class_table_inheritance_rb.html">lib/sequel/plugins/class_table_inheritance.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The class_table_inheritance plugin allows you to model inheritance in the
+            database using a table per model class in the hierarchy, with only columns
+            unique to that model class (or subclass hierarchy) being stored in the
+            related table.  For example, with this hierarchy:</p>
+            
+            <pre>    Employee&#x000A;   /        \ &#x000A;Staff     Manager&#x000A;             |&#x000A;         Executive</pre>
+            
+            <p>the following database schema may be used (table - columns):</p>
+            <ul><li>
+            <p>employees - id, name, kind</p>
+            </li><li>
+            <p>staff - id, manager_id</p>
+            </li><li>
+            <p>managers - id, num_staff</p>
+            </li><li>
+            <p>executives - id, num_managers</p>
+            </li></ul>
+            
+            <p>The class_table_inheritance plugin assumes that the main table (e.g.
+            employees) has a primary key field (usually autoincrementing), and all
+            other tables have a foreign key of the same name that points to the same
+            key in their superclass&#39;s table.  For example:</p>
+            <ul><li>
+            <p>employees.id  - primary key, autoincrementing</p>
+            </li><li>
+            <p>staff.id - foreign key referencing employees(id)</p>
+            </li><li>
+            <p>managers.id - foreign key referencing employees(id)</p>
+            </li><li>
+            <p>executives.id - foreign key referencing managers(id)</p>
+            </li></ul>
+            
+            <p>When using the class_table_inheritance plugin, subclasses use joined 
+            datasets:</p>
+            
+            <pre>Employee.dataset.sql  # SELECT * FROM employees&#x000A;Manager.dataset.sql   # SELECT * FROM employees&#x000A;                      # INNER JOIN managers USING (id)&#x000A;Executive.dataset.sql # SELECT * FROM employees &#x000A;                      # INNER JOIN managers USING (id)&#x000A;                      # INNER JOIN executives USING (id)</pre>
+            
+            <p>This allows Executive.all to return instances with all attributes loaded. 
+            The plugin overrides the deleting, inserting, and updating in the model to
+            work with multiple tables, by handling each table individually.</p>
+            
+            <p>This plugin allows the use of a :key option when loading to mark a column
+            holding a class name.  This allows methods on the superclass to return
+            instances of specific subclasses. This plugin also requires the
+            lazy_attributes plugin and uses it to return subclass specific attributes
+            that would not be loaded when calling superclass methods (since those
+            wouldn&#39;t join to the subclass tables).  For example:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Employee</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># [&lt;#Staff&gt;, &lt;#Manager&gt;, &lt;#Executive&gt;]</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;Staff&#39;}</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">manager_id</span> <span class="ruby-comment"># Loads the manager_id attribute from the database</span></pre>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Set up class table inheritance in the parent class</span>&#x000A;<span class="ruby-comment"># (Not in the subclasses)</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">class_table_inheritance</span>&#x000A;&#x000A;<span class="ruby-comment"># Set the +kind+ column to hold the class name, and</span>&#x000A;<span class="ruby-comment"># set the subclass table to map to for each subclass </span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">class_table_inheritance</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">kind</span>, :<span class="ruby-identifier">table_map=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-constant">Staff=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">staff</span>}</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-apply">apply</a></li>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="ClassTableInheritance/ClassMethods.html">Sequel::Plugins::ClassTableInheritance::ClassMethods</a></li>
+              <li><a target="docwin" href="ClassTableInheritance/InstanceMethods.html">Sequel::Plugins::ClassTableInheritance::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
+                <div class='synopsis'>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(model, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The class_table_inheritance plugin requires the lazy_attributes plugin to
+                  handle lazily-loaded attributes for subclass instances returned by
+                  superclass methods.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 71</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Initialize the per-model data structures and set the dataset&#39;s row_proc
+                  to check for the :key option column for the type of class when loading
+                  objects. Options:</p>
+                  <ul><li>
+                  <p>:key - The column symbol holding the name of the model class this is an
+                  instance of.  Necessary if you want to call model methods using the
+                  superclass, but have them return subclass instances.</p>
+                  </li><li>
+                  <p>:table_map - <a href="../../Hash.html">Hash</a> with class name symbol keys
+                  and table name symbol values.  Necessary if the implicit table name for the
+                  model class does not match the database table name</p>
+                  </li></ul>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 84</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">m</span> = <span class="ruby-identifier">method</span>(<span class="ruby-value">:constantize</span>)&#x000A;    <span class="ruby-ivar">@cti_base_model</span> = <span class="ruby-keyword">self</span>&#x000A;    <span class="ruby-ivar">@cti_key</span> = <span class="ruby-identifier">key</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>] &#x000A;    <span class="ruby-ivar">@cti_tables</span> = [<span class="ruby-identifier">table_name</span>]&#x000A;    <span class="ruby-ivar">@cti_columns</span> = {<span class="ruby-identifier">table_name</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">columns</span>}&#x000A;    <span class="ruby-ivar">@cti_table_map</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:table_map</span>] <span class="ruby-operator">||</span> {}&#x000A;    <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">row_proc</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">key</span>&#x000A;      <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key</span>]) <span class="ruby-keyword">rescue</span> <span class="ruby-identifier">model</span>).<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>)}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">model</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,483 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>core_extensions.rdoc</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>core_extensions.rdoc</h1>
+        <div class='paths'>
+          doc/core_extensions.rdoc
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-06-02 13:49:43 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Sequel%27s+Core+Extensions">Sequel&#39;s Core Extensions</h1>
+            
+            <h2 id="label-Background">Background</h2>
+            
+            <p>Historically, <a href="../../classes/Sequel.html">Sequel</a> added methods
+            to many of the core classes, and usage of those methods was the primary and
+            recommended way to use <a href="../../classes/Sequel.html">Sequel</a>.  For
+            example:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Integer</span>)). <span class="ruby-comment"># Symbol#cast </span>&#x000A;  <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>)).              <span class="ruby-comment"># Symbol#like</span>&#x000A;  <span class="ruby-identifier">order</span>({<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, :<span class="ruby-identifier">a</span>))               <span class="ruby-comment"># Hash#case</span></pre>
+            
+            <p>While <a href="../../classes/Sequel.html">Sequel</a> never overrode any
+            methods defined by ruby, it is possible that other libraries could define
+            the same methods that <a href="../../classes/Sequel.html">Sequel</a>
+            defines, which could cause problems.  Also, some rubyists do not like using
+            libraries that add methods to the core classes.</p>
+            
+            <p>Alternatives for the core extension methods where added to <a
+            href="../../classes/Sequel.html">Sequel</a>, so the query above could be
+            written as:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-constant">Integer</span>)).&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-string">&#39;A%&#39;</span>)).&#x000A;  <span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">case</span>({<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}, <span class="ruby-value">0</span>, :<span class="ruby-identifier">a</span>))</pre>
+            
+            <p>Almost all of the core extension methods have a replacement on the <a
+            href="../../classes/Sequel.html">Sequel</a> module.  So it is now up to the
+            user which style to use.  Using the methods on the <a
+            href="../../classes/Sequel.html">Sequel</a> module results in slightly more
+            verbose code, but allows the code to work without modifications to the core
+            classes.</p>
+            
+            <h2 id="label-Issues">Issues</h2>
+            
+            <p>There is no recommendation on whether the <a
+            href="core_extensions_rdoc.html">core_extensions</a> should be used or not.
+            It is very rare that any of the methods added by <a
+            href="core_extensions_rdoc.html">core_extensions</a> actually causes a
+            problem, but some of them can make it more difficult to find other
+            problems.  For example, if you type:</p>
+            
+            <pre>do_something if value | other_value</pre>
+            
+            <p>while meaning to type:</p>
+            
+            <pre>do_something if value || other_value</pre>
+            
+            <p>and value is a <a href="../../classes/Symbol.html">Symbol</a>, instead of a
+            NoMethodError being raised because Symbol#| is not implemented by default,
+            <code>value | other_value</code> will return a <a
+            href="../../classes/Sequel.html">Sequel</a> expression object, which if
+            will evaluate as true, and do_something will be called.</p>
+            
+            <h2 id="label-Usage">Usage</h2>
+            
+            <p>All of Sequel&#39;s extensions to the core classes are stored in
+            Sequel&#39;s <a href="core_extensions_rdoc.html">core_extensions</a>
+            extension, which you can load via:</p>
+            
+            <pre>Sequel.extension :core_extensions</pre>
+            
+            <h2 id="label-No+Internal+Dependency">No Internal Dependency</h2>
+            
+            <p><a href="../../classes/Sequel.html">Sequel</a> has no internal dependency
+            on the core extensions.  This includes Sequel&#39;s core, <a
+            href="../../classes/Sequel/Model.html">Sequel::Model</a>, and all plugins
+            and extensions that ship with <a
+            href="../../classes/Sequel.html">Sequel</a>.  However, it is possible that
+            external plugins and extensions will depend on the core extensions.  Such
+            plugins and extensions should be updated so that they no longer depend on
+            the core extensions.</p>
+            
+            <h2 id="label-Core+Extension+Methods">Core Extension Methods</h2>
+            
+            <p>This section will briefly describe all of the methods added to the core
+            classes, and what the alternative method is that doesn&#39;t require the
+            core extensions.</p>
+            
+            <h3 id="label-Symbol+%26+String"><a href="../../classes/Symbol.html">Symbol</a> &amp; <a href="../../classes/String.html">String</a></h3>
+            
+            <h4 id="label-as">as</h4>
+            
+            <p>Symbol#as and String#as return <a
+            href="../../classes/Sequel.html">Sequel</a> aliased expressions using the
+            provided alias:</p>
+            
+            <pre>:a.as(:b)  # SQL: a AS b&#x000A;&#39;a&#39;.as(:b) # SQL: &#39;a&#39; AS b</pre>
+            
+            <p>Alternative: Sequel.as:</p>
+            
+            <pre>Sequel.as(:a, :b)</pre>
+            
+            <h4 id="label-cast">cast</h4>
+            
+            <p>Symbol#cast and String#cast return <a
+            href="../../classes/Sequel.html">Sequel</a> cast expressions for
+            typecasting in the database:</p>
+            
+            <pre>:a.cast(Integer)  # SQL: CAST(a AS integer)&#x000A;&#39;a&#39;.cast(Integer) # SQL: CAST(&#39;a&#39; AS integer)</pre>
+            
+            <p>Alternative: Sequel.cast:</p>
+            
+            <pre>Sequel.cast(:a, Integer)</pre>
+            
+            <h4 id="label-cast_numeric">cast_numeric</h4>
+            
+            <p>Symbol#cast_numeric and String#cast_numeric return <a
+            href="../../classes/Sequel.html">Sequel</a> cast expressions for
+            typecasting in the database, defaulting to integers, where the returned
+            expression is treated as an numeric value:</p>
+            
+            <pre>:a.cast_numeric         # SQL: CAST(a AS integer)&#x000A;&#39;a&#39;.cast_numeric(Float) # SQL: CAST(&#39;a&#39; AS double precision)</pre>
+            
+            <p>Alternative: Sequel.cast_numeric:</p>
+            
+            <pre>Sequel.cast_numeric(:a)</pre>
+            
+            <h4 id="label-cast_string">cast_string</h4>
+            
+            <p>Symbol#cast_string and String#cast_string return <a
+            href="../../classes/Sequel.html">Sequel</a> cast expressions for
+            typecasting in the database, defaulting to strings, where the returned
+            expression is treated as a string value:</p>
+            
+            <pre>:a.cast_string         # SQL: CAST(a AS varchar(255))&#x000A;&#39;a&#39;.cast_string(:text) # SQL: CAST(&#39;a&#39; AS text)</pre>
+            
+            <p>Alternative: Sequel.cast_string:</p>
+            
+            <pre>Sequel.cast_string(:a)</pre>
+            
+            <h3 id="label-Symbol"><a href="../../classes/Symbol.html">Symbol</a></h3>
+            
+            <h4 id="label-identifier">identifier</h4>
+            
+            <p><a
+            href="../../classes/Symbol.html#method-i-identifier">Symbol#identifier</a>
+            wraps the symbol in a single identifier that will not be split.  By
+            default, <a href="../../classes/Sequel.html">Sequel</a> will split symbols
+            with double or triple underscores to do qualifying and aliasing.</p>
+            
+            <pre>:table__column.identifier # SQL: table__column</pre>
+            
+            <p>Alternative: Sequel.identifier:</p>
+            
+            <pre>Sequel.identifier(:table__column)</pre>
+            
+            <h4 id="label-asc">asc</h4>
+            
+            <p>Symbol#asc is used to define an ascending order on a column.  It exists
+            mostly for consistency with desc, since ascending is the default order:</p>
+            
+            <pre>:a.asc # SQL: a ASC</pre>
+            
+            <p>Alternative: Sequel.asc:</p>
+            
+            <pre>Sequel.asc(:a)</pre>
+            
+            <h4 id="label-desc">desc</h4>
+            
+            <p>Symbol#desc is used to defined a descending order on a column.  The
+            returned value is usually passed to one of the dataset order methods.</p>
+            
+            <pre>:a.desc # SQL: a DESC</pre>
+            
+            <p>Alternative: Sequel.desc:</p>
+            
+            <pre>Sequel.desc(:a)</pre>
+            
+            <h4 id="label-%2B%2C+-%2C+%2A%2C+%2F">+, -, *, /</h4>
+            
+            <p>The standard mathematical operators are defined on <a
+            href="../../classes/Symbol.html">Symbol</a>, and return a <a
+            href="../../classes/Sequel.html">Sequel</a> numeric expression object
+            representing the operation:</p>
+            
+            <pre>:a + :b # SQL: a + b&#x000A;:a - :b # SQL: a - b&#x000A;:a * :b # SQL: a * b&#x000A;:a / :b # SQL: a / b</pre>
+            
+            <p>Alternatives:</p>
+            
+            <pre>Sequel.+(:a, :b)&#x000A;Sequel.-(:a, :b)&#x000A;Sequel.*(:a, :b)&#x000A;Sequel./(:a, :b)</pre>
+            
+            <h4 id="label-%2A">*</h4>
+            
+            <p>The * operator is overloaded on <a
+            href="../../classes/Symbol.html">Symbol</a> such that if it is called with
+            no arguments, it represents a selection of all columns in the table:</p>
+            
+            <pre>:a.* # SQL: a.*</pre>
+            
+            <p>Alternative: Sequel.expr.*:</p>
+            
+            <pre>Sequel.expr(:a).*</pre>
+            
+            <h4 id="label-qualify">qualify</h4>
+            
+            <p>Symbol#qualify qualifies the identifier (e.g. a column) with a another
+            identifier (e.g. a table):</p>
+            
+            <pre>:column.qualify(:table) # SQL: table.column</pre>
+            
+            <p>Alternative: Sequel.qualify:</p>
+            
+            <pre>Sequel.qualify(:table, :column)</pre>
+            
+            <p>Note the reversed order of the arguments.  For the Symbol#qualify method,
+            the argument is the qualifier, while for Sequel.qualify, the qualifier is
+            the first argument.</p>
+            
+            <h4 id="label-like">like</h4>
+            
+            <p>Symbol#like returns a case sensitive LIKE expression between the identifier
+            and the given argument:</p>
+            
+            <pre>:a.like(&#39;b%&#39;) # SQL: a LIKE &#39;b%&#39;</pre>
+            
+            <p>Alternative: Sequel.like:</p>
+            
+            <pre>Sequel.like(:a, &#39;b%&#39;)</pre>
+            
+            <h4 id="label-like">like</h4>
+            
+            <p>Symbol#ilike returns a case insensitive LIKE expression between the
+            identifier and the given argument:</p>
+            
+            <pre>:a.ilike(&#39;b%&#39;) # SQL: a ILIKE &#39;b%&#39;</pre>
+            
+            <p>Alternative: Sequel.ilike:</p>
+            
+            <pre>Sequel.ilike(:a, &#39;b%&#39;)</pre>
+            
+            <h4 id="label-sql_subscript">sql_subscript</h4>
+            
+            <p>Symbol#sql_subscript returns a <a
+            href="../../classes/Sequel.html">Sequel</a> expression representing an SQL
+            array access:</p>
+            
+            <pre>:a.sql_subscript(1) # SQL: a[1]</pre>
+            
+            <p>Alternative: Sequel.subscript:</p>
+            
+            <pre>Sequel.subscript(:a, 1)</pre>
+            
+            <h4 id="label-extract">extract</h4>
+            
+            <p>Symbol#extract does a datetime part extraction from the receiver:</p>
+            
+            <pre>:a.extract(:year) # SQL: extract(year FROM a)</pre>
+            
+            <p>Alternative: Sequel.extract:</p>
+            
+            <pre>Sequel.extract(:year, :a)</pre>
+            
+            <p>Note the reversed order of the arguments.  In Symbol#extract, the datetime
+            part is the argument, while in Sequel.extract, the datetime part is the
+            first argument.</p>
+            
+            <h4 id="label-sql_boolean%2C+sql_number%2C+sql_string">sql_boolean, sql_number, sql_string</h4>
+            
+            <p>These <a href="../../classes/Symbol.html">Symbol</a> methods are used to
+            force the treating of the object as a specific SQL type, instead of as a
+            general SQL type.  For example:</p>
+            
+            <pre>:a.sql_boolean + 1  # NoMethodError&#x000A;:a.sql_number &lt;&lt; 1  # SQL: a &lt;&lt; 1&#x000A;:a.sql_string + &#39;a&#39; # SQL: a || &#39;a&#39;</pre>
+            
+            <p>Alternative: Sequel.expr:</p>
+            
+            <pre>Sequel.expr(:a).sql_boolean&#x000A;Sequel.expr(:a).sql_number&#x000A;Sequel.expr(:a).sql_string</pre>
+            
+            <h4 id="label-sql_function">sql_function</h4>
+            
+            <p><a
+            href="../../classes/Symbol.html#method-i-sql_function">Symbol#sql_function</a>
+            returns an SQL function call expression object:</p>
+            
+            <pre>:now.sql_function # SQL: now()&#x000A;:sum.sql_function(:a) # SQL: sum(a)&#x000A;:concat.sql_function(:a, :b) # SQL: concat(a, b)</pre>
+            
+            <p>Alternative: Sequel.function:</p>
+            
+            <pre>Sequel.function(:sum, :a)</pre>
+            
+            <h3 id="label-String"><a href="../../classes/String.html">String</a></h3>
+            
+            <h4 id="label-lit">lit</h4>
+            
+            <p><a href="../../classes/String.html#method-i-lit">String#lit</a> creates a
+            literal string, using placeholders if any arguments are given.  Literal
+            strings are not escaped, they are treated as SQL code, not as an SQL
+            string:</p>
+            
+            <pre>&#39;a&#39;.lit          # SQL: a&#x000A;&#39;&quot;a&quot; = ?&#39;.lit(1) # SQL: &quot;a&quot; = 1</pre>
+            
+            <p>Alternative: Sequel.lit:</p>
+            
+            <pre>Sequel.lit(&#39;a&#39;)</pre>
+            
+            <h4 id="label-to_sequel_blob">to_sequel_blob</h4>
+            
+            <p><a
+            href="../../classes/String.html#method-i-to_sequel_blob">String#to_sequel_blob</a>
+            returns the string wrapper in <a
+            href="../../classes/Sequel.html">Sequel</a> blob object.  Often blobs need
+            to be handled differently than regular strings by the database adapters.</p>
+            
+            <pre>&quot;a\0&quot;.to_sequel_blob # SQL: X&#39;6100&#39;</pre>
+            
+            <p>Alternative: Sequel.blob:</p>
+            
+            <pre>Sequel.blob(&quot;a\0&quot;)</pre>
+            
+            <h3 id="label-Hash%2C+Array%2C+%26+Symbol"><a href="../../classes/Hash.html">Hash</a>, <a href="../../classes/Array.html">Array</a>, &amp; <a href="../../classes/Symbol.html">Symbol</a></h3>
+            
+            <h4 id="label-%7E">~</h4>
+            
+            <p>Array#~, Hash#~, and Symbol#~ treat the receiver as a conditions specifier,
+            not matching all of the conditions:</p>
+            
+            <pre class="ruby"><span class="ruby-operator">~</span>{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}     <span class="ruby-comment"># SQL: a != 1 OR b NOT IN (2, 3)</span>&#x000A;<span class="ruby-operator">~</span>[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]]] <span class="ruby-comment"># SQL: a != 1 OR b NOT IN (1, 2)</span></pre>
+            
+            <p>Alternative: <a href="../../classes/Sequel.html">Sequel</a>.~:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
+            
+            <h3 id="label-Hash+%26+Array"><a href="../../classes/Hash.html">Hash</a> &amp; <a href="../../classes/Array.html">Array</a></h3>
+            
+            <h4 id="label-case">case</h4>
+            
+            <p><a href="../../classes/Array.html#method-i-case">Array#case</a> and <a
+            href="../../classes/Hash.html#method-i-case">Hash#case</a> return an SQL
+            CASE expression, where the keys are conditions and the values are results:</p>
+            
+            <pre class="ruby">{{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>)   <span class="ruby-comment"># SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END</span>&#x000A;[[{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}, <span class="ruby-value">1</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>) <span class="ruby-comment"># SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END</span></pre>
+            
+            <p>Alternative: Sequel.case:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">case</span>({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, <span class="ruby-value">0</span>)</pre>
+            
+            <h4 id="label-sql_expr">sql_expr</h4>
+            
+            <p><a href="../../classes/Array.html#method-i-sql_expr">Array#sql_expr</a> and
+            <a href="../../classes/Hash.html#method-i-sql_expr">Hash#sql_expr</a> treat
+            the receiver as a conditions specifier, matching all of the conditions in
+            the array.</p>
+            
+            <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_expr</span>     <span class="ruby-comment"># SQL: a = 1 AND b IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_expr</span> <span class="ruby-comment"># SQL: a = 1 AND b IN (2, 3)</span></pre>
+            
+            <p>Alternative: Sequel.expr:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
+            
+            <h4 id="label-sql_negate">sql_negate</h4>
+            
+            <p><a href="../../classes/Array.html#method-i-sql_negate">Array#sql_negate</a>
+            and <a
+            href="../../classes/Hash.html#method-i-sql_negate">Hash#sql_negate</a>
+            treat the receiver as a conditions specifier, matching none of the
+            conditions in the array:</p>
+            
+            <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_negate</span>     <span class="ruby-comment"># SQL: a != 1 AND b NOT IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_negate</span> <span class="ruby-comment"># SQL: a != 1 AND b NOT IN (2, 3)</span></pre>
+            
+            <p>Alternative: Sequel.negate:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
+            
+            <h4 id="label-sql_or">sql_or</h4>
+            
+            <p><a href="../../classes/Array.html#method-i-sql_or">Array#sql_or</a> nd <a
+            href="../../classes/Hash.html#method-i-sql_or">Hash#sql_or</a> treat the
+            receiver as a conditions specifier, matching any of the conditions in the
+            array:</p>
+            
+            <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_or</span>     <span class="ruby-comment"># SQL: a = 1 OR b IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_or</span> <span class="ruby-comment"># SQL: a = 1 OR b IN (2, 3)</span></pre>
+            
+            <p>Alternative: Sequel.or:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
+            
+            <h3 id="label-Array"><a href="../../classes/Array.html">Array</a></h3>
+            
+            <h4 id="label-sql_value_list">sql_value_list</h4>
+            
+            <p><a
+            href="../../classes/Array.html#method-i-sql_value_list">Array#sql_value_list</a>
+            wraps the array in an array subclass, which <a
+            href="../../classes/Sequel.html">Sequel</a> will always treat as a value
+            list and not a conditions specifier.  By default, <a
+            href="../../classes/Sequel.html">Sequel</a> treats arrays of two element
+            arrays as a conditions specifier.</p>
+            
+            <pre>DB[:a].filter(&#39;(a, b) IN ?&#39;, [[1, 2], [3, 4]]) # SQL: (a, b) IN ((1 = 2) AND (3 = 4))&#x000A;DB[:a].filter(&#39;(a, b) IN ?&#39;, [[1, 2], [3, 4]].sql_value_list) # SQL: (a, b) IN ((1, 2), (3, 4))</pre>
+            
+            <p>Alternative: Sequel.value_list:</p>
+            
+            <pre>Sequel.value_list([[1, 2], [3, 4]])</pre>
+            
+            <h4 id="label-sql_string_join">sql_string_join</h4>
+            
+            <p><a
+            href="../../classes/Array.html#method-i-sql_string_join">Array#sql_string_join</a>
+            joins all of the elements in the array in an SQL string concatentation
+            expression:</p>
+            
+            <pre>[:a].sql_string_join # SQL: a&#x000A;[:a, :b].sql_string_join # SQL: a || b&#x000A;[:a, &#39;b&#39;].sql_string_join # SQL: a || &#39;b&#39;&#x000A;[&#39;a&#39;, :b].sql_string_join(&#39; &#39;) # SQL: &#39;a&#39; || &#39; &#39; || b</pre>
+            
+            <p>Alternative: Sequel.join:</p>
+            
+            <pre>Sequel.join([&#39;a&#39;, :b], &#39; &#39;)</pre>
+            
+            <h3 id="label-Hash+%26+Symbol"><a href="../../classes/Hash.html">Hash</a> &amp; <a href="../../classes/Symbol.html">Symbol</a></h3>
+            
+            <h4 id="label-%26">&amp;</h4>
+            
+            <p>Hash#&amp; and Symbol#&amp; return a <a
+            href="../../classes/Sequel.html">Sequel</a> boolean expression, matching
+            the condition specified by the receiver and the condition specified by the
+            given argument:</p>
+            
+            <pre class="ruby">:<span class="ruby-identifier">a</span> &amp; :<span class="ruby-identifier">b</span>         <span class="ruby-comment"># SQL: a AND b</span>&#x000A;{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>} &amp; :<span class="ruby-identifier">b</span>    <span class="ruby-comment"># SQL: a = 1 AND b</span>&#x000A;{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>} &amp; :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a IS TRUE AND b</span></pre>
+            
+            <p>Alternative: <a href="../../classes/Sequel.html">Sequel</a>.&amp;:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.&amp;({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, :<span class="ruby-identifier">b</span>)</pre>
+            
+            <h4 id="label-%7C">|</h4>
+            
+            <p>Hash#| returns a <a href="../../classes/Sequel.html">Sequel</a> boolean
+            expression, matching the condition specified by the receiver or the
+            condition specified by the given argument:</p>
+            
+            <pre class="ruby">:<span class="ruby-identifier">a</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">b</span>         <span class="ruby-comment"># SQL: a OR b</span>&#x000A;{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>} <span class="ruby-operator">|</span> :<span class="ruby-identifier">b</span>    <span class="ruby-comment"># SQL: a = 1 OR b</span>&#x000A;{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>} <span class="ruby-operator">|</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a IS TRUE OR b</span></pre>
+            
+            <p>Alternative: <a href="../../classes/Sequel.html">Sequel</a>.|:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">|</span>({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, :<span class="ruby-identifier">b</span>)</pre>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

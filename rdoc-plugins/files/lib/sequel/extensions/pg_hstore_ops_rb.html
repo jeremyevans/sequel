@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>pg_hstore_ops.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>pg_hstore_ops.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/pg_hstore_ops.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The pg_hstore_ops extension adds support to Sequel&#39;s DSL to make it
+            easier to call PostgreSQL hstore functions and operators.</p>
+            
+            <p>To load the extension:</p>
+            
+            <pre>Sequel.extension :pg_hstore_ops</pre>
+            
+            <p>The most common usage is taking an object that represents an SQL expression
+            (such as a :symbol), and calling Sequel.hstore_op with it:</p>
+            
+            <pre>h = Sequel.hstore_op(:hstore_column)</pre>
+            
+            <p>If you have also loaded the pg_hstore extension, you can use Sequel.hstore
+            as well:</p>
+            
+            <pre>h = Sequel.hstore(:hstore_column)</pre>
+            
+            <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
+            expression objects, you can call the hstore  method:</p>
+            
+            <pre>h = Sequel.expr(:hstore_column).hstore</pre>
+            
+            <p>If you have loaded the <a
+            href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>
+            or you have loaded the core_refinements extension and have activated
+            refinements for the file, you can also use <a
+            href="../../../../classes/Sequel/Postgres/HStoreOpMethods.html#method-i-hstore">Sequel::Postgres::HStoreOpMethods#hstore</a>:</p>
+            
+            <pre>h = :hstore_column.hstore</pre>
+            
+            <p>This creates a <a
+            href="../../../../classes/Sequel/Postgres/HStoreOp.html">Sequel::Postgres::HStoreOp</a>
+            object that can be used for easier querying:</p>
+            
+            <pre>h - &#39;a&#39;    # hstore_column - CAST(&#39;a&#39; AS text)&#x000A;h[&#39;a&#39;]     # hstore_column -&gt; &#39;a&#39;&#x000A;h.concat(:other_hstore_column)       # ||&#x000A;h.has_key?(&#39;a&#39;)                      # ?&#x000A;h.contain_all(:array_column)         # ?&amp;&#x000A;h.contain_any(:array_column)         # ?|&#x000A;h.contains(:other_hstore_column)     # @&gt; &#x000A;h.contained_by(:other_hstore_column) # &lt;@&#x000A;&#x000A;h.defined        # defined(hstore_column)&#x000A;h.delete(&#39;a&#39;)    # delete(hstore_column, &#39;a&#39;)&#x000A;h.each           # each(hstore_column)&#x000A;h.keys           # akeys(hstore_column)&#x000A;h.populate(:a)   # populate_record(a, hstore_column)&#x000A;h.record_set(:a) # (a #= hstore_column)&#x000A;h.skeys          # skeys(hstore_column)&#x000A;h.slice(:a)      # slice(hstore_column, a)&#x000A;h.svals          # svals(hstore_column)&#x000A;h.to_array       # hstore_to_array(hstore_column)&#x000A;h.to_matrix      # hstore_to_matrix(hstore_column)&#x000A;h.values         # avals(hstore_column)</pre>
+            
+            <p>See the PostgreSQL hstore function and operator documentation for more
+            details on what these functions and operators do.</p>
+            
+            <p>If you are also using the pg_hstore extension, you should load it before
+            loading this extension.  Doing so will allow you to use HStore#op to get an
+            HStoreOp, allowing you to perform hstore operations on hstore literals.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

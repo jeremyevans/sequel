@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Postgres::InetDatabaseMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Postgres::InetDatabaseMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/extensions/pg_inet_rb.html">lib/sequel/extensions/pg_inet.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Methods enabling <a href="../Database.html">Database</a> object integration
+            with the inet/cidr types.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-extended">extended</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-bound_variable_arg">bound_variable_arg</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-extended'>
+                <a name='method-c-extended'></a>
+                <div class='synopsis'>
+                  <span class='name'>extended</span>
+                  <span class='arguments'>(db)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Reset the conversion procs when extending the <a
+                  href="../Database.html">Database</a> object, so it will pick up the
+                  inet/cidr converter.  Also, extend the datasets with support for
+                  literalizing the IPAddr types.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-extended-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">InetDatasetMethods</span>)&#x000A;    <span class="ruby-identifier">copy_conversion_procs</span>([<span class="ruby-value">869</span>, <span class="ruby-value">650</span>, <span class="ruby-value">1041</span>, <span class="ruby-value">651</span>, <span class="ruby-value">1040</span>])&#x000A;    <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:ipaddr</span>] = <span class="ruby-constant">IPAddr</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-bound_variable_arg'>
+                <a name='method-i-bound_variable_arg'></a>
+                <div class='synopsis'>
+                  <span class='name'>bound_variable_arg</span>
+                  <span class='arguments'>(arg, conn)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Convert an IPAddr arg to a string.  Probably not necessary, but done for
+                  safety.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-bound_variable_arg-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-bound_variable_arg-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">IPAddr</span>&#x000A;    <span class="ruby-node">&quot;#{arg.to_s}/#{arg.instance_variable_get(:@mask_addr).to_s(2).count(&#39;1&#39;)}&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

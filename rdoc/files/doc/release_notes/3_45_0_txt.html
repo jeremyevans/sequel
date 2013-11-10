@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.45.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.45.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.45.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-03-01 08:41:24 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>Database#transaction now recognizes a :retry_on option, which should
+            contain an exception class or array of exception classes. If the
+            transaction raises one of the given exceptions, <a
+            href="../../../classes/Sequel.html">Sequel</a> will automatically retry the
+            transaction block.  It&#39;s a bad idea to use this option if the
+            transaction block is not idempotent.</p>
+            
+            <p>By default, <a href="../../../classes/Sequel.html">Sequel</a> only retries
+            the block 5 times by default, to protect against infinite looping.  You can
+            change the number of retries with the :num_retries option.</p>
+            
+            <p>Users of the :disconnect=&gt;:retry option are encouraged to switch to
+            :retry_on=&gt;<a
+            href="../../../classes/Sequel/DatabaseDisconnectError.html">Sequel::DatabaseDisconnectError</a>.</p>
+            </li><li>
+            <p>Dataset#escape_like has been added for escaping LIKE metacharacters.  This
+            is designed for the case where part of the LIKE pattern is based on user
+            input that should not treat the metacharacters specially.</p>
+            </li><li>
+            <p>Serialization failures/deadlocks are now raised as <a
+            href="../../../classes/Sequel/SerializationFailure.html">Sequel::SerializationFailure</a>
+            exception instances.  This exception class is a good candidate for the
+            transaction :retry_on option.</p>
+            </li><li>
+            <p>On PostgreSQL, you can now provide the :force_standard_strings and
+            :client_min_messages Database options to override the defaults on a
+            per-instance basis.</p>
+            </li><li>
+            <p>On PostgreSQL, Database#tables and views now recognizes a :qualify option,
+            which if true will return qualified identifiers instead of plain symbols.</p>
+            </li><li>
+            <p>Transaction isolation levels are now supported on Oracle, DB2, and all jdbc
+            subadapters using the JDBC transaction support.</p>
+            </li><li>
+            <p>Dataset.def_mutation_method now accepts a :module option for the module in
+            which to define the methods (defaulting to self).</p>
+            </li><li>
+            <p>An unlimited_update plugin has been added.  It&#39;s sole purpose is to
+            eliminate a MySQL warning in replicated environments, since by default <a
+            href="../../../classes/Sequel/Model.html">Sequel::Model</a> uses a LIMIT
+            clause when updating on MySQL.</p>
+            </li><li>
+            <p>The named_timezones extension now adds a Sequel.tzinfo_disambiguator
+            accessor to automatically handle TZInfo::AmbiguousTime exceptions.  This
+            should be a callable object that accepts two arguments, a DateTime instance
+            and an array of timezone periods, and returns the timezone period to use.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now handles JSON
+            securely, specifying the :create_additions=&gt;false option when using
+            JSON.parse.  If you really want to get the old vulnerable behavior back,
+            override <a
+            href="../../../classes/Sequel.html#method-c-parse_json">Sequel.parse_json</a>.</p>
+            </li><li>
+            <p>The json_serializer and xml_serializer plugins are now secure by default. 
+            Before, the default behavior of these plugins allowed for round tripping,
+            such that:</p>
+            
+            <pre>Album.from_xml(album.to_xml) == album</pre>
+            
+            <p>Unfortunately, that requires that the deserialization allow the setting of
+            any column.  Since the plugins also handle associations, you could also set
+            any column in any associated object, even cascading to associated objects
+            of those objects.</p>
+            
+            <p>The new default behavior only allows deserialization to set the same
+            columns that mass-assignment would set, and not to handle associated
+            objects at all by default.  The following additional options are supported:</p>
+            
+            <pre>:fields :: The specific fields to set (this was already supported&#x000A;           by the json_serializer plugin).&#x000A;:associations :: The specific associations to handle.&#x000A;:all_columns :: The previous behavior of setting all columns.&#x000A;:all_associations :: The previous behavior of setting all&#x000A;                     associations.</pre>
+            
+            <p>Since JSON parsing no longer deserializes into arbitrary ruby instances,
+            from_json and array_from_json class methods have been added to the
+            json_serializer plugin, for deserializing into model instances.  These
+            mirror the from_xml and array_from_xml class methods in the xml_serializer
+            plugin.</p>
+            
+            <p>Note that the :all_columns and :all_associations methods were only added to
+            make backwards compatibility easier.  It is likely they will be removed in
+            <a href="../../../classes/Sequel.html">Sequel</a> 4, along with the
+            json_create class method.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now attempts to use
+            database specific error codes or SQLState codes instead of regexp parsing
+            to determine if a more specific DatabaseError subclass should be used. 
+            This should make error handling faster and more robust.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now uses ESCAPE &#39;'
+            when using LIKE, for similar behavior across databases.  Previously, no
+            ESCAPE clause was used, so behavior differed across databases, with most
+            not using escaping, and PostgreSQL, MySQL, and H2 defaulting to backslash
+            as the escape character.</p>
+            </li><li>
+            <p>The query extension has been reimplemented and now uses a proxy object
+            instead of Object#extend.</p>
+            </li><li>
+            <p>The :pool_timeout Database option now supports fractional seconds.</p>
+            </li><li>
+            <p>Database#quote_identifier is now a public method.</p>
+            </li><li>
+            <p>Metadata parsing (schema, indexes, foreign_key_list) on PostgreSQL now
+            correctly handles the case where an unqualified table name is used and
+            tables with that name exist in multiple schemas.  It now picks the first
+            matching table in the schema_search_path, instead of failing or returning
+            results from all tables.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel/Model.html">Sequel::Model</a> instances no
+            longer attempt to typecast the money type on PostgreSQL, since the previous
+            typecast didn&#39;t work correctly, and correct typecasting is
+            locale-dependent.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer picks up
+            foreign keys for tables in other databases when using
+            Database#foreign_key_list on MySQL.</p>
+            </li><li>
+            <p>A warning when using the mysql2 3.12 beta has been eliminated.</p>
+            </li><li>
+            <p>A warning has been eliminated when using the jdbc/oracle adapter on JRuby
+            1.7.</p>
+            </li><li>
+            <p>Sequel&#39;s ilike emulation should now work by default on databases
+            without specific syntax support.</p>
+            </li><li>
+            <p>Dataset#from_self! no longer creates a self referential dataset.</p>
+            </li><li>
+            <p>Coverage testing now uses simplecov instead of rcov on ruby 1.9+.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>The switch to using JSON.parse :create_additions=&gt;false means that if
+            your app expected JSON to deserialize into arbitrary ruby objects, it is
+            probably broken.  You should update your application code to manually
+            convert the deserialized hashes into the ruby objects you want.</p>
+            
+            <p>Note that it&#39;s not just this new version of <a
+            href="../../../classes/Sequel.html">Sequel</a> that will cause that, older
+            versions of <a href="../../../classes/Sequel.html">Sequel</a> will break in
+            the same way if you update your JSON library to a version that is not
+            vulnerable by default.</p>
+            
+            <p>This potentially affects the pg_json extension and serialization plugin if
+            you were expecting the JSON stored in the database to be deserialized into
+            arbitrary ruby objects.</p>
+            
+            <p>See the json_serializer/xml_serializer changes mentioned in the Other
+            Improvements section.</p>
+            </li><li>
+            <p>The reimplemented query extension is not completely backwards compatible. 
+            For example, inside a query block, self refers to the proxy object instead
+            of a dataset, and calling methods that return rows no longer raises an
+            exception.</p>
+            </li><li>
+            <p>The metadata parsing methods on PostgreSQL no longer work with unqualified
+            tables where the table is not in the schema search path.  This makes
+            metadata parsing consistent with how datasets operate.  For tables outside
+            the schema search path, you must qualify it before use now.</p>
+            
+            <p>Additionally, using a nonexistent table name will raise an exception
+            instead of returning empty results in some cases.</p>
+            </li><li>
+            <p>The Dataset#def_mutation_method instance method has been removed. This
+            method added mutation methods directly on the dataset instance, which is
+            generally not desired.  Using the def_mutation_method class method with the
+            :module option is now the recommended approach.</p>
+            </li><li>
+            <p>The switch to using ESCAPE for LIKE characters is backwards incompatible on
+            databases that don&#39;t use escaping by default,  when backslash is used
+            in a LIKE pattern as a regular character. Now you have to double the
+            backslash in the pattern.</p>
+            </li><li>
+            <p>Database#database_error_regexps private method now can return any
+            enumerable yielding regexp/exception class pairs, it is no longer specified
+            to return a hash.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

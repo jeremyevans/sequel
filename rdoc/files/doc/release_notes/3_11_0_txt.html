@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.11.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.11.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.11.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>A few new features were added to query logging.  <a
+            href="../../../classes/Sequel.html">Sequel</a> now includes execution time
+            when logging queries.  Queries that raise exceptions are now logged at
+            ERROR level.  You can now set the log_warn_duration attribute on the
+            Database instance and queries that take longer than that will be logged at
+            WARN  level.  By using different log levels, you can now only log queries
+            that raise errors, or only log queries that take a long time.</p>
+            
+            <pre># The default - Log all successful queries at INFO level&#x000A;DB.log_warn_duration = nil&#x000A;# Log all successful queries at WARN level&#x000A;DB.log_warn_duration = 0&#x000A;&#x000A;# Log successful queries that take the database more than half a&#x000A;# second at WARN level, other successful queries at INFO level&#x000A;DB.log_warn_duration = 0.5</pre>
+            
+            <p>All adapters included with <a
+            href="../../../classes/Sequel.html">Sequel</a> have been modified to
+            support the new logging API.  The previous API is still available, so any
+            external adapters should still work, though switching to the new logging
+            API is encouraged.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel/Model.html">Sequel::Model</a> now has a
+            require_modification flag.  If not set explicitly, it is enabled by default
+            if the dataset provides an accurate number of rows matched by an update or
+            delete statement.</p>
+            
+            <p>When this setting is enabled, <a
+            href="../../../classes/Sequel.html">Sequel</a> will raise an exception if
+            you attempt to update or delete a model object and it doesn&#39;t end up
+            affecting exactly one row.  For example:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">as</span>){<span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>}&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">A</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">a</span> = <span class="ruby-constant">A</span>.<span class="ruby-identifier">create</span>&#x000A;&#x000A;<span class="ruby-comment"># delete object from database</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">delete</span>&#x000A;&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">save</span> <span class="ruby-comment"># no error!</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">delete</span> <span class="ruby-comment"># no error!</span>&#x000A;&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">save</span> <span class="ruby-comment"># Sequel::NoExistingObject exception raised</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Sequel::NoExistingObject exception raised</span></pre>
+            
+            <p>Like many other <a
+            href="../../../classes/Sequel/Model.html">Sequel::Model</a> settings, this
+            can be set on a global, per class, and per instance level:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># global</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">true</span> <span class="ruby-comment"># class</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># instance</span></pre>
+            </li><li>
+            <p>An instance_filters plugin was added to the list of built in plugins,
+            allowing you to add arbitrary filters when updating or destroying an
+            instance.  This allows you to continue using models when previously you
+            would have had to drop down to using datasets to get the desired behavior:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Item</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">instance_filters</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># These are two separate objects that represent the same</span>&#x000A;<span class="ruby-comment"># database row. </span>&#x000A;<span class="ruby-identifier">i1</span> = <span class="ruby-constant">Item</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">delete_allowed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-identifier">i2</span> = <span class="ruby-constant">Item</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">delete_allowed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)&#x000A;&#x000A;<span class="ruby-comment"># Add an instance filter to the object. This filter is in effect</span>&#x000A;<span class="ruby-comment"># until the object is successfully updated or deleted.</span>&#x000A;<span class="ruby-identifier">i1</span>.<span class="ruby-identifier">instance_filter</span>(:<span class="ruby-identifier">delete_allowed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;&#x000A;<span class="ruby-comment"># Attempting to delete the object where the filter doesn&#39;t</span>&#x000A;<span class="ruby-comment"># match any rows raises an error.</span>&#x000A;<span class="ruby-identifier">i1</span>.<span class="ruby-identifier">delete</span> <span class="ruby-comment"># raises Sequel::Error</span>&#x000A;&#x000A;<span class="ruby-comment"># The other object that represents the same row has no</span>&#x000A;<span class="ruby-comment"># instance filters, and can be updated normally.</span>&#x000A;<span class="ruby-identifier">i2</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">delete_allowed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;&#x000A;<span class="ruby-comment"># Even though the filter is now still in effect, since the</span>&#x000A;<span class="ruby-comment"># database row has been updated to allow deleting,</span>&#x000A;<span class="ruby-comment"># delete now works.</span>&#x000A;<span class="ruby-identifier">i1</span>.<span class="ruby-identifier">delete</span></pre>
+            </li><li>
+            <p>An :after_connect database option is now supported.  If provided, the
+            option value should be a proc that takes a single argument. It will be
+            called with the underlying connection object before connection object is
+            added to the connection pool, allowing you to set per connection options in
+            a thread-safe manner.</p>
+            
+            <p>This is useful for customizations you want set on every connection that <a
+            href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t already support.
+            For example, on PostgreSQL if you wanted to set the schema search_path on
+            every connection:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(<span class="ruby-string">&#39;dbname&#39;</span>, :<span class="ruby-identifier">after_connect=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-string">&#39;SET search_path TO schema1,schema2&#39;</span>)&#x000A;<span class="ruby-keyword">end</span>))</pre>
+            </li><li>
+            <p>A :test database option is now supported.  If set to true, it automatically
+            calls test_connection to make sure a connection can be made before
+            returning a Database instance.  For backwards compatibility reasons, this
+            is not set to true by default, but it is possible that the default will
+            change in a future version of <a
+            href="../../../classes/Sequel.html">Sequel</a>.</p>
+            </li><li>
+            <p>The Dataset#select_append method was added, which always appends to the
+            existing selected columns.  It operates identically to select_more, except
+            in the case that no columns are currently selected:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM items</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select_more</span>({:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">b</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">a_id</span>)}.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">in_b</span>))&#x000A;<span class="ruby-comment"># SELECT id IN (SELECT a_id FROM b) AS in_b FROM a</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select_append</span>({:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">b</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">a_id</span>)}.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">in_b</span>))&#x000A;<span class="ruby-comment"># SELECT *, id IN (SELECT a_id FROM b) AS in_b FROM a</span></pre>
+            </li><li>
+            <p>The Dataset#provides_accurate_rows_matched? method was added which allows
+            you to see if the dataset will return the actual number of rows
+            matched/affected by an update or delete call.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> will now emulate DISTINCT
+            ON support using GROUP BY on MySQL.  On MySQL, GROUP BY is similar to
+            DISTINCT ON, except that the order of returned rows is not deterministic.</p>
+            </li><li>
+            <p>Support for connecting to Microsoft SQL Server using the JTDS JDBC driver
+            was added to the jdbc adapter.</p>
+            </li><li>
+            <p>JDNI connection strings are now supported in the JDBC adapter.</p>
+            </li><li>
+            <p>The JDBC adapter should now work in situations where driver auto-loading
+            has problems, just as when using Tomcat or Trinidad.</p>
+            </li><li>
+            <p>Sequel&#39;s JDBC adapter schema parsing now supports a :scale option,
+            useful for numeric/decimal columns.</p>
+            </li><li>
+            <p>Sequel&#39;s schema parsing on Microsoft SQL Server now supports
+            :column_size and :scale options.</p>
+            </li><li>
+            <p>When connecting to SQLite, a Database#sqlite_version method is available
+            that gives you the SQLite version as an integer (e.g. 30613 for 3.6.13).</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer raises an error
+            if you give Dataset#filter or related method an empty argument such as {},
+            [], or &#39;&#39;. This allows code such as the following to work:</p>
+            
+            <pre>h = {}&#x000A;h[:name] = name if name&#x000A;h[:number] = number if number&#x000A;ds = ds.filter(h)</pre>
+            
+            <p>Before, this would raise an error if both name and number were nil.</p>
+            </li><li>
+            <p>Numeric and decimal columns with a 0 scale are now treated as integer
+            columns by the model typecasting code, since such columns cannot store
+            non-integer values.</p>
+            </li><li>
+            <p>Calling Database#disconnect when using the single threaded connection pool
+            no longer raises an error if there is no current connection.</p>
+            </li><li>
+            <p>When using the :ignore_index_errors options to Database#create_table,
+            correctly swallow errors raised by <a
+            href="../../../classes/Sequel.html">Sequel</a> due to the adapter not
+            supporting the given index type.</p>
+            </li><li>
+            <p>The JDBC adapter no longer leaks ResultSets when retrieving metadata.</p>
+            </li><li>
+            <p>You can now connect to PostgreSQL when using ruby 1.9 with the -Ku switch.</p>
+            </li><li>
+            <p>When using the native MySQL adapter, only tinyint(1) columns are now
+            returned as booleans when using the convert_tinyint_to_bool setting (the
+            default).  Previously, all tinyint columns would be converted to booleans
+            if the setting was enabled.</p>
+            </li><li>
+            <p>Correctly handle inserts returning the autogenerated keys when using MySQL
+            JDBC Driver version 5.1.12 with the jdbc adapter.</p>
+            </li><li>
+            <p>The native MySQL adapter now supports :config_default_group and
+            :config_local_infile options.</p>
+            </li><li>
+            <p>When connecting to SQLite, you can provide the :auto_vacuum, :foreign_keys,
+            :synchronous, and :temp_store options for making the appropriate PRAGMA
+            setting on the database in a thread-safe manner.  The previous
+            thread-unsafe PRAGMA setting methods are available, but their use is
+            discouraged.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> will not enable
+            savepoints when connecting to SQLite unless the version is 3.6.8 or
+            greater.</p>
+            </li><li>
+            <p>Using limit with distinct now works correctly on Microsoft SQL Server.</p>
+            </li><li>
+            <p>Database#rename_table now works correctly on Microsoft SQL Server.</p>
+            </li><li>
+            <p>If you specify an explicit :provider when using the ADO adapter,
+            transactions will now work correctly.  The default :provider uses a new
+            native connection for each query, so it cannot work with transactions, or
+            things like temporary tables.</p>
+            </li><li>
+            <p>If you specify an explicit :provider when connecting to Microsoft SQL
+            Server using the ADO adapter (e.g. SQLNCLI10 or SQLNCLI), <a
+            href="../../../classes/Sequel.html">Sequel</a> is now able to provide an
+            accurate number of rows modified and deleted.</p>
+            </li><li>
+            <p>Using set_column_allow_null with a decimal column with a precision and
+            scale now works correctly when connecting to Microsoft SQL Server.</p>
+            </li><li>
+            <p>You can now connect to Microsoft SQL Server using the dbi adapter.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now recognizes the NUMBER
+            database type as a synonym for NUMERIC and DECIMAL, which may help some
+            Oracle users.</p>
+            </li><li>
+            <p>Transactions can now be rolled back correctly when connecting to Oracle via
+            JDBC.</p>
+            </li><li>
+            <p>The active_model plugin now supports ActiveModel 3.0.0beta2.</p>
+            </li><li>
+            <p>Many documentation improvements were made, including the addition of a
+            dataset basics guide, an association basics guide, an expanded virtual row
+            guide, and the separation of the <a
+            href="../../../classes/Sequel/Dataset.html">Sequel::Dataset</a> RDoc page
+            into sections.  Additional, the RDoc class/method documentation now
+            contains links to the appropriate guides.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>When connecting to SQLite, <a
+            href="../../../classes/Sequel.html">Sequel</a> now automatically sets the
+            foreign_keys PRAGMA to true, which will make SQLite 3.6.19+ use database
+            enforced foreign key constraints.  If you do not want the database to
+            enforce the foreign key constraints, you should use the
+            :foreign_keys=&gt;false option when connecting to the database.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer creates
+            #{plugin_name}_opts class, instance, and dataset methods for each plugin
+            loaded.  No built-in plugin used them, and I couldn&#39;t find an external
+            plugin that did either.</p>
+            </li><li>
+            <p>The Model#associations method is no longer available if the  default
+            Associations plugin is not loaded due to the  SEQUEL_NO_ASSOCIATIONS
+            constant or environment variable being set.</p>
+            </li><li>
+            <p>DISTINCT ON support is turned off by default, and only enabled when using
+            PostgreSQL, since that appears to be the only database that supports it. 
+            Previously, it was enabled by default and most common adapters turned it
+            off.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,783 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Postgres::DatasetMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Postgres::DatasetMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Instance methods for datasets that connect to a PostgreSQL database.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-analyze">analyze</a></li>
+              <li><a target="docwin" href="#method-i-complex_expression_sql_append">complex_expression_sql_append</a></li>
+              <li><a target="docwin" href="#method-i-explain">explain</a></li>
+              <li><a target="docwin" href="#method-i-for_share">for_share</a></li>
+              <li><a target="docwin" href="#method-i-full_text_search">full_text_search</a></li>
+              <li><a target="docwin" href="#method-i-insert">insert</a></li>
+              <li><a target="docwin" href="#method-i-insert_select">insert_select</a></li>
+              <li><a target="docwin" href="#method-i-lock">lock</a></li>
+              <li><a target="docwin" href="#method-i-multi_insert_sql">multi_insert_sql</a></li>
+              <li><a target="docwin" href="#method-i-supports_cte_in_subqueries-3F">supports_cte_in_subqueries?</a></li>
+              <li><a target="docwin" href="#method-i-supports_distinct_on-3F">supports_distinct_on?</a></li>
+              <li><a target="docwin" href="#method-i-supports_lateral_subqueries-3F">supports_lateral_subqueries?</a></li>
+              <li><a target="docwin" href="#method-i-supports_modifying_joins-3F">supports_modifying_joins?</a></li>
+              <li><a target="docwin" href="#method-i-supports_regexp-3F">supports_regexp?</a></li>
+              <li><a target="docwin" href="#method-i-supports_returning-3F">supports_returning?</a></li>
+              <li><a target="docwin" href="#method-i-supports_timestamp_timezones-3F">supports_timestamp_timezones?</a></li>
+              <li><a target="docwin" href="#method-i-supports_window_functions-3F">supports_window_functions?</a></li>
+              <li><a target="docwin" href="#method-i-truncate">truncate</a></li>
+              <li><a target="docwin" href="#method-i-window">window</a></li>
+            </ol>
+            <h3>Protected Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-_import">_import</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="DatasetMethods/PreparedStatementMethods.html">Sequel::Postgres::DatasetMethods::PreparedStatementMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ACCESS_EXCLUSIVE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'ACCESS EXCLUSIVE'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ACCESS_SHARE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'ACCESS SHARE'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>APOS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::APOS</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>APOS_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::APOS_RE</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>AS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::AS</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BACKSLASH</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::BACKSLASH</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BLOB_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/[\000-\037\047\134\177-\377]/n.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BOOL_FALSE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'false'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BOOL_TRUE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'true'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>COMMA</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::COMMA</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>COMMA_SEPARATOR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>', '.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>CRLF</td>
+                    <td>=</td>
+                    <td class='context-item-value'>"\r\n".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DELETE_CLAUSE_METHODS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset.clause_methods(:delete, %w'delete from using where returning')</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DELETE_CLAUSE_METHODS_91</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset.clause_methods(:delete, %w'with delete from using where returning')</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DOUBLE_APOS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::DOUBLE_APOS</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>EMPTY_STRING</td>
+                    <td>=</td>
+                    <td class='context-item-value'>''.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ESCAPE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::ESCAPE</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>EXCLUSIVE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'EXCLUSIVE'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>EXPLAIN</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'EXPLAIN '.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>EXPLAIN_ANALYZE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'EXPLAIN ANALYZE '.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>FOR_SHARE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>' FOR SHARE'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>FROM</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::FROM</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>INSERT_CLAUSE_METHODS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset.clause_methods(:insert, %w'insert into columns values returning')</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>INSERT_CLAUSE_METHODS_91</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset.clause_methods(:insert, %w'with insert into columns values returning')</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>LOCK_MODES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each{|s| s.freeze}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NULL</td>
+                    <td>=</td>
+                    <td class='context-item-value'>LiteralString.new('NULL').freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PAREN_CLOSE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::PAREN_CLOSE</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PAREN_OPEN</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::PAREN_OPEN</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PG_TIMESTAMP_FORMAT</td>
+                    <td>=</td>
+                    <td class='context-item-value'>"TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>QUERY_PLAN</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'QUERY PLAN'.to_sym</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ROW_EXCLUSIVE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'ROW EXCLUSIVE'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ROW_SHARE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'ROW SHARE'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SELECT_CLAUSE_METHODS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset.clause_methods(:select, %w'select distinct columns from join where group having compounds order limit lock')</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SELECT_CLAUSE_METHODS_84</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset.clause_methods(:select, %w'with select distinct columns from join where group having window compounds order limit lock')</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SHARE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'SHARE'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SHARE_ROW_EXCLUSIVE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'SHARE ROW EXCLUSIVE'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SHARE_UPDATE_EXCLUSIVE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'SHARE UPDATE EXCLUSIVE'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SPACE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::SPACE</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SQL_WITH_RECURSIVE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>"WITH RECURSIVE ".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>UPDATE_CLAUSE_METHODS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset.clause_methods(:update, %w'update table set from where returning')</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>UPDATE_CLAUSE_METHODS_91</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset.clause_methods(:update, %w'with update table set from where returning')</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>WINDOW</td>
+                    <td>=</td>
+                    <td class='context-item-value'>" WINDOW ".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>XOR_OP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>' # '.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-analyze'>
+                <a name='method-i-analyze'></a>
+                <div class='synopsis'>
+                  <span class='name'>analyze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the results of an <a href="DatasetMethods.html#EXPLAIN">EXPLAIN</a>
+                  ANALYZE query as a string</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-analyze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-analyze-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1138</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">analyze</span>&#x000A;  <span class="ruby-identifier">explain</span>(<span class="ruby-value">:analyze=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-complex_expression_sql_append'>
+                <a name='method-i-complex_expression_sql_append'></a>
+                <div class='synopsis'>
+                  <span class='name'>complex_expression_sql_append</span>
+                  <span class='arguments'>(sql, op, args)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Handle converting the ruby xor operator (^) into the PostgreSQL xor
+                  operator (#), and use the ILIKE and NOT ILIKE operators.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-complex_expression_sql_append-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-complex_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1145</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:^</span>&#x000A;    <span class="ruby-identifier">j</span> = <span class="ruby-constant">XOR_OP</span>&#x000A;    <span class="ruby-identifier">c</span> = <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-identifier">args</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">j</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>&#x000A;      <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">a</span>)&#x000A;      <span class="ruby-identifier">c</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:ILIKE</span>, <span class="ruby-value">:&#39;NOT ILIKE&#39;</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_OPEN</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>))&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">SPACE</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">op</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">SPACE</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1</span>))&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">ESCAPE</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">BACKSLASH</span>)&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_CLOSE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-explain'>
+                <a name='method-i-explain'></a>
+                <div class='synopsis'>
+                  <span class='name'>explain</span>
+                  <span class='arguments'>(opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the results of an <a href="DatasetMethods.html#EXPLAIN">EXPLAIN</a>
+                  query as a string</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-explain-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-explain-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1169</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">explain</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">with_sql</span>((<span class="ruby-identifier">opts</span>[<span class="ruby-value">:analyze</span>] <span class="ruby-operator">?</span> <span class="ruby-constant">EXPLAIN_ANALYZE</span> <span class="ruby-operator">:</span> <span class="ruby-constant">EXPLAIN</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">select_sql</span>).<span class="ruby-identifier">map</span>(<span class="ruby-constant">QUERY_PLAN</span>).<span class="ruby-identifier">join</span>(<span class="ruby-constant">CRLF</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-for_share'>
+                <a name='method-i-for_share'></a>
+                <div class='synopsis'>
+                  <span class='name'>for_share</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a cloned dataset which will use FOR <a
+                  href="DatasetMethods.html#SHARE">SHARE</a> to lock returned rows.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-for_share-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-for_share-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1174</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">for_share</span>&#x000A;  <span class="ruby-identifier">lock_style</span>(<span class="ruby-value">:share</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-full_text_search'>
+                <a name='method-i-full_text_search'></a>
+                <div class='synopsis'>
+                  <span class='name'>full_text_search</span>
+                  <span class='arguments'>(cols, terms, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>PostgreSQL specific full text search syntax, using tsearch2 (included in
+                  8.3 by default, and available for earlier versions as an add-on).</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-full_text_search-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-full_text_search-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1180</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">full_text_search</span>(<span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">lang</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:language</span>] <span class="ruby-operator">||</span> <span class="ruby-string">&#39;simple&#39;</span>&#x000A;  <span class="ruby-identifier">terms</span> = <span class="ruby-identifier">terms</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39; | &#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">terms</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;  <span class="ruby-identifier">filter</span>(<span class="ruby-string">&quot;to_tsvector(?::regconfig, ?) @@ to_tsquery(?::regconfig, ?)&quot;</span>, <span class="ruby-identifier">lang</span>, <span class="ruby-identifier">full_text_string_join</span>(<span class="ruby-identifier">cols</span>), <span class="ruby-identifier">lang</span>, <span class="ruby-identifier">terms</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-insert'>
+                <a name='method-i-insert'></a>
+                <div class='synopsis'>
+                  <span class='name'>insert</span>
+                  <span class='arguments'>(*values)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Insert given values into the database.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1187</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;    <span class="ruby-comment"># already know which columns to return, let the standard code</span>&#x000A;    <span class="ruby-comment"># handle it</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>]&#x000A;    <span class="ruby-comment"># raw SQL used, so don&#39;t know which table is being inserted</span>&#x000A;    <span class="ruby-comment"># into, and therefore can&#39;t determine primary key.  Run the</span>&#x000A;    <span class="ruby-comment"># insert statement and return nil.</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Force the use of RETURNING with the primary key value.</span>&#x000A;    <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">insert</span>(*<span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-insert_select'>
+                <a name='method-i-insert_select'></a>
+                <div class='synopsis'>
+                  <span class='name'>insert_select</span>
+                  <span class='arguments'>(*values)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Insert a record returning the record inserted</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert_select-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-insert_select-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1205</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_select</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">returning</span>.<span class="ruby-identifier">insert</span>(*<span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-lock'>
+                <a name='method-i-lock'></a>
+                <div class='synopsis'>
+                  <span class='name'>lock</span>
+                  <span class='arguments'>(mode, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Locks all tables in the dataset&#39;s <a
+                  href="DatasetMethods.html#FROM">FROM</a> clause (but not in JOINs) with the
+                  specified mode (e.g. &#39;EXCLUSIVE&#39;).  If a block is given, starts a
+                  new transaction, locks the table, and yields.  If a block is not given just
+                  locks the tables.  Note that PostgreSQL will probably raise an error if you
+                  lock the table outside of an existing transaction.  Returns nil.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-lock-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-lock-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1214</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">lock</span>(<span class="ruby-identifier">mode</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span> <span class="ruby-comment"># perform locking inside a transaction and yield to block</span>&#x000A;    <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">lock</span>(<span class="ruby-identifier">mode</span>, <span class="ruby-identifier">opts</span>); <span class="ruby-keyword">yield</span>}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">sql</span> = <span class="ruby-string">&#39;LOCK TABLE &#39;</span>&#x000A;    <span class="ruby-identifier">source_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:from</span>])&#x000A;    <span class="ruby-identifier">mode</span> = <span class="ruby-identifier">mode</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">upcase</span>.<span class="ruby-identifier">strip</span>&#x000A;    <span class="ruby-keyword">unless</span> <span class="ruby-constant">LOCK_MODES</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">mode</span>)&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Unsupported lock mode: #{mode}&quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot; IN #{mode} MODE&quot;</span>&#x000A;    <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-multi_insert_sql'>
+                <a name='method-i-multi_insert_sql'></a>
+                <div class='synopsis'>
+                  <span class='name'>multi_insert_sql</span>
+                  <span class='arguments'>(columns, values)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>PostgreSQL allows inserting multiple rows at once.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-multi_insert_sql-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-multi_insert_sql-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1231</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">multi_insert_sql</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">sql</span> = <span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&#39;VALUES &#39;</span>)&#x000A;  <span class="ruby-identifier">expression_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">values</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">r</span>)})&#x000A;  [<span class="ruby-identifier">insert_sql</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">sql</span>)]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_cte_in_subqueries-3F'>
+                <a name='method-i-supports_cte_in_subqueries-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_cte_in_subqueries?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>PostgreSQL supports using the WITH clause in subqueries if it supports
+                  using WITH at all (i.e. on PostgreSQL 8.4+).</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_cte_in_subqueries-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_cte_in_subqueries-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1239</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_cte_in_subqueries?</span>&#x000A;  <span class="ruby-identifier">supports_cte?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_distinct_on-3F'>
+                <a name='method-i-supports_distinct_on-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_distinct_on?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>DISTINCT ON is a PostgreSQL extension</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_distinct_on-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_distinct_on-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1244</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_distinct_on?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_lateral_subqueries-3F'>
+                <a name='method-i-supports_lateral_subqueries-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_lateral_subqueries?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>PostgreSQL 9.3rc1+ supports lateral subqueries</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_lateral_subqueries-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_lateral_subqueries-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1249</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_lateral_subqueries?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90300</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_modifying_joins-3F'>
+                <a name='method-i-supports_modifying_joins-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_modifying_joins?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>PostgreSQL supports modifying joined datasets</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_modifying_joins-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_modifying_joins-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1254</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_modifying_joins?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_regexp-3F'>
+                <a name='method-i-supports_regexp-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_regexp?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>PostgreSQL supports pattern matching via regular expressions</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_regexp-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_regexp-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1264</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_regexp?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_returning-3F'>
+                <a name='method-i-supports_returning-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_returning?</span>
+                  <span class='arguments'>(type)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returning is always supported.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_returning-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_returning-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1259</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_returning?</span>(<span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_timestamp_timezones-3F'>
+                <a name='method-i-supports_timestamp_timezones-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_timestamp_timezones?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>PostgreSQL supports timezones in literal timestamps</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_timestamp_timezones-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_timestamp_timezones-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1269</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_timestamp_timezones?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_window_functions-3F'>
+                <a name='method-i-supports_window_functions-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_window_functions?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>PostgreSQL 8.4+ supports window functions</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_window_functions-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_window_functions-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1274</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_window_functions?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-truncate'>
+                <a name='method-i-truncate'></a>
+                <div class='synopsis'>
+                  <span class='name'>truncate</span>
+                  <span class='arguments'>(opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Truncates the dataset.  Returns nil.</p>
+                  
+                  <p>Options:</p>
+                  <dl class="rdoc-list note-list"><dt>:cascade 
+                  <dd>
+                  <p>whether to use the CASCADE option, useful when truncating</p>
+                  </dd></dl>
+                  
+                  <pre>tables with Foreign Keys.</pre>
+                  <dl class="rdoc-list note-list"><dt>:only 
+                  <dd>
+                  <p>truncate using ONLY, so child tables are unaffected</p>
+                  </dd><dt>:restart 
+                  <dd>
+                  <p>use RESTART IDENTITY to restart any related sequences</p>
+                  </dd></dl>
+                  
+                  <p>:only and :restart only work correctly on PostgreSQL 8.4+.</p>
+                  
+                  <p>Usage:</p>
+                  
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">truncate</span> <span class="ruby-comment"># TRUNCATE TABLE &quot;table&quot;</span>&#x000A;<span class="ruby-comment"># =&gt; nil</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">truncate</span>(:<span class="ruby-identifier">cascade</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>, :<span class="ruby-identifier">only=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">restart=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>) <span class="ruby-comment"># TRUNCATE TABLE ONLY &quot;table&quot; RESTART IDENTITY CASCADE</span>&#x000A;<span class="ruby-comment"># =&gt; nil</span></pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-truncate-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-truncate-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1293</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">truncate</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">super</span>()&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">clone</span>(<span class="ruby-value">:truncate_opts=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">opts</span>).<span class="ruby-identifier">truncate</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-window'>
+                <a name='method-i-window'></a>
+                <div class='synopsis'>
+                  <span class='name'>window</span>
+                  <span class='arguments'>(name, opts)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a clone of the dataset with an addition named window that can be
+                  referenced in window functions.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-window-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-window-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1302</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">window</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:window=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:window</span>]<span class="ruby-operator">||</span>[]) <span class="ruby-operator">+</span> [[<span class="ruby-identifier">name</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>)]])&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Protected Instance methods</h2>
+              <div class='method protected-instance' id='method-method-i-_import'>
+                <a name='method-i-_import'></a>
+                <div class='synopsis'>
+                  <span class='name'>_import</span>
+                  <span class='arguments'>(columns, values, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>If returned primary keys are requested, use RETURNING unless already set on
+                  the dataset.  If RETURNING is already set, use existing returning values. 
+                  If RETURNING is only set to return a single columns, return an array of
+                  just that column. Otherwise, return an array of hashes.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-_import-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-_import-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1312</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;    <span class="ruby-identifier">statements</span> = <span class="ruby-identifier">multi_insert_sql</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)&#x000A;    <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:server=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:server</span>])) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">statements</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">st</span><span class="ruby-operator">|</span> <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">st</span>)}&#x000A;    <span class="ruby-keyword">end</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>}&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:return</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:primary_key</span>&#x000A;    <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

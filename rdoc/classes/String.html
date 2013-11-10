@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>String</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          String
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../files/lib/sequel/extensions/core_extensions_rb.html">lib/sequel/extensions/core_extensions.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../files/lib/sequel/extensions/core_extensions_rb.html">core_extensions.rb</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p><a href="Sequel.html">Sequel</a> extends <code>String</code> to add methods
+            to implement the SQL DSL.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-lit">lit</a></li>
+              <li><a target="docwin" href="#method-i-to_sequel_blob">to_sequel_blob</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="Sequel/SQL/AliasMethods.html">Sequel::SQL::AliasMethods</a></li>
+                <li><a target="docwin" href="Sequel/SQL/CastMethods.html">Sequel::SQL::CastMethods</a></li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-lit'>
+                <a name='method-i-lit'></a>
+                <div class='synopsis'>
+                  <span class='name'>lit</span>
+                  <span class='arguments'>(*args)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Converts a string into a <code>Sequel::LiteralString</code>, in order to
+                  override string literalization, e.g.:</p>
+                  
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">abc</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;def&#39;</span>).<span class="ruby-identifier">sql</span> <span class="ruby-comment">#=&gt;</span>&#x000A;  <span class="ruby-string">&quot;SELECT * FROM items WHERE (abc = &#39;def&#39;)&quot;</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">abc</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;def&#39;</span>.<span class="ruby-identifier">lit</span>).<span class="ruby-identifier">sql</span> <span class="ruby-comment">#=&gt;</span>&#x000A;  <span class="ruby-string">&quot;SELECT * FROM items WHERE (abc = def)&quot;</span></pre>
+                  
+                  <p>You can also provide arguments, to create a
+                  <code>Sequel::SQL::PlaceholderLiteralString</code>:</p>
+                  
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-string">&#39;DISTINCT ?&#39;</span>.<span class="ruby-identifier">lit</span>(:<span class="ruby-identifier">a</span>))}.<span class="ruby-identifier">sql</span> <span class="ruby-comment">#=&gt;</span>&#x000A;  <span class="ruby-string">&quot;SELECT count(DISTINCT a) FROM items&quot;</span></pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-lit-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-lit-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 187</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">lit</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-to_sequel_blob'>
+                <a name='method-i-to_sequel_blob'></a>
+                <div class='synopsis'>
+                  <span class='name'>to_sequel_blob</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns a <code>Sequel::SQL::Blob</code> that holds the same data as this
+                  string. Blobs provide proper escaping of binary data.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_sequel_blob-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-to_sequel_blob-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 193</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_sequel_blob</span>&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

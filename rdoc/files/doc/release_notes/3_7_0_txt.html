@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.7.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.7.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.7.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>New Features</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now has support for
+            deleting and updating joined datasets on MySQL and PostgreSQL.  Previously,
+            <a href="../../../classes/Sequel.html">Sequel</a> only supported this to a
+            limited extent on Microsoft SQL Server, and support there has been improved
+            as well.</p>
+            
+            <p>This allows you to do:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(:<span class="ruby-identifier">a</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a</span>; <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">d</span>}&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(:<span class="ruby-identifier">b</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">b</span>; <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">e</span>}&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(:<span class="ruby-identifier">c</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">c</span>; <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">f</span>}&#x000A;&#x000A;<span class="ruby-comment"># Insert some rows</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>).&#x000A;  <span class="ruby-identifier">join</span>(:<span class="ruby-identifier">c</span>, :<span class="ruby-identifier">c=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">e</span>.<span class="ruby-identifier">identifier</span>).&#x000A;  <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">d=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">f=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">6</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">a</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">f=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">5</span>).<span class="ruby-identifier">delete</span></pre>
+            
+            <p>Which will set the a column to 10 for all rows in table a, where an
+            associated row in table c (through table b) has a value of 6 for column f. 
+            It will delete rows from table a where an associated row in table c
+            (through table b) has a value of 5 for column f.</p>
+            
+            <p><a href="../../../classes/Sequel.html">Sequel</a> assumes the that first
+            FROM table is the table being updated/deleted.  MySQL and Microsoft SQL
+            Server do not require multiple FROM tables, but PostgreSQL does.</p>
+            </li><li>
+            <p>Dataset select_map, select_order_map, and select_hash convenience methods
+            were added for quickly creating arrays and hashes from a dataset.</p>
+            
+            <p>select_map and select_order_map both return arrays of values for the column
+            specified.  The column can be specified either via an argument or a block,
+            similar to Dataset#get.  Both accept any valid objects as arguments.</p>
+            
+            <p>select_hash returns a hash.  It requires two symbol arguments, but can
+            handle implicit qualifiers or aliases in the symbols.</p>
+            
+            <p>Neither of these methods offer any new functionality, they just cut down on
+            the number of required key strokes:</p>
+            
+            <pre>select_map(:column)       # select(:column).map(:column)&#x000A;select_order_map(:column) # select(:column).order(:column).&#x000A;                          #  map(:column)&#x000A;select_hash(:key_column, :value_column)&#x000A;# select(:key_column, :value_column).&#x000A;#  to_hash(:key_column, :value_column)</pre>
+            </li><li>
+            <p>The NULL, NOTNULL, TRUE, SQLTRUE, FALSE, and SQLFALSE constants were added
+            to <a
+            href="../../../classes/Sequel/SQL/Constants.html">Sequel::SQL::Constants</a>.
+            This allows you to do:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">include</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Constants</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;1&#39;</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">NOTNULL</span>)</pre>
+            
+            <p>Previously, the shortest way to do this was:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;1&#39;</span>).<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>)</pre>
+            
+            <p>It may make the code more descriptive:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">NULL</span>)&#x000A;<span class="ruby-comment"># compared to</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>)</pre>
+            
+            <p>This gives the option to use SQL terminology instead of ruby terminology.</p>
+            
+            <p>The other advantage of using the constants it that they handle operators
+            and methods like other <a
+            href="../../../classes/Sequel/SQL.html">Sequel::SQL</a> objects:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">NULL</span> &amp; <span class="ruby-constant">SQLFALSE</span> <span class="ruby-comment"># BooleanExpression =&gt; &quot;(NULL AND FALSE)&quot;</span>&#x000A;<span class="ruby-keyword">nil</span> &amp; <span class="ruby-keyword">false</span>     <span class="ruby-comment"># false</span>&#x000A;&#x000A;<span class="ruby-constant">NULL</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">a</span>       <span class="ruby-comment"># NumericExpression =&gt; &quot;(NULL + a)&quot;</span>&#x000A;<span class="ruby-keyword">nil</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">a</span>        <span class="ruby-comment"># raises NoMethodError</span>&#x000A;<span class="ruby-constant">NULL</span>.<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">a</span>  <span class="ruby-comment"># StringExpression =&gt; &quot;(NULL || a)&quot;</span>&#x000A;<span class="ruby-constant">NULL</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">b</span>)     <span class="ruby-comment"># AliasedExpression =&gt; &quot;NULL AS b&quot;</span></pre>
+            
+            <p>For complex systems that want to represent SQL boolean objects in ruby
+            (where you don&#39;t know exactly how they&#39;ll be used), using the
+            constants is recommended.</p>
+            
+            <p>In order not to be too verbose, including <a
+            href="../../../classes/Sequel/SQL/Constants.html">Sequel::SQL::Constants</a>
+            is recommended.  It&#39;s not done by default, but you can still reference
+            the constants under the main <a
+            href="../../../classes/Sequel.html">Sequel</a> module by default (e.g.
+            Sequel::NULL).</p>
+            </li><li>
+            <p>The validates_unique method in the validation_helpers plugin now supports
+            an :only_if_modified option, which should speed up the common case where
+            the unique attribute is not modified for an existing record.  It&#39;s not
+            on by default, since it&#39;s possible the database could be changed
+            between retrieving the model object and updating it.</p>
+            </li><li>
+            <p>The Dataset union, intersect, and except methods now accept an :alias
+            option which is used as the alias for the returned dataset.</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">union</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">old_table</span>], :<span class="ruby-keyword">alias</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">table</span>)</pre>
+            </li><li>
+            <p>Model#destroy now supports a :transaction option, similar to Model#save.</p>
+            </li><li>
+            <p>The shared Oracle adapter now supports Dataset#sequence for returning
+            autogenerated primary key values on insert from a related sequence.</p>
+            
+            <p>This makes Oracle work correctly when using models, with something like the
+            following:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">set_dataset</span> <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sequence</span>(:<span class="ruby-identifier">seq_albums_id</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>You currently need to call Dataset#sequence in every model class where the
+            underlying table uses a sequence to generate primary key values.</p>
+            </li></ul>
+            
+            <p>Other Improvements</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>In Model save and destroy when using transactions and when
+            raise_on_save_failure is false, ensure that transactions are rolled back if
+            a before hook returns false.</p>
+            </li><li>
+            <p>Dataset#group_and_count now handles arguments other than Symbols. A
+            previous change to the method raised an exception if a <a
+            href="../../../classes/Symbol.html">Symbol</a> was not provided.  It also
+            handles AliasedExpressions natively, so the following works correctly:</p>
+            
+            <pre>DB[:table].group_and_count(:column.as(:alias))</pre>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer uses native
+            autoreconnection in the mysql adapter. Native autoreconnection has problems
+            with prepared statements, where a new native connection is used behind
+            Sequel&#39;s back, so <a href="../../../classes/Sequel.html">Sequel</a>
+            thinks the prepared statement has already been defined on the connection,
+            when it fact it hasn&#39;t.  Any other changes that affect the state of the
+            connection will be lost when native autoreconnection is used as well.</p>
+            
+            <p>Sequel&#39;s connection pool already handles reconnection if it detects a
+            disconnection.  This commit also adds an additional exception message to
+            recognize as a disconnect.  If there other exception messages related to
+            disconnects, please post them on the <a
+            href="../../../classes/Sequel.html">Sequel</a> mailing list.</p>
+            </li><li>
+            <p>The schema_dumper plugin now specifies the :type option for primary key if
+            it isn&#39;t Integer.</p>
+            </li><li>
+            <p>On PostgreSQL, the bigserial type is used if :type=&gt;Bignum is given as
+            an option to primary key.  This makes it operate more similarly to other
+            adapters that support autoincrementing 64-bit integer primary keys.</p>
+            </li><li>
+            <p>The native mysql adapter will now attempt to load options in the</p>
+            <dl class="rdoc-list label-list"><dt>client
+            <dd>
+            <p>section of the my.cnf file.</p>
+            </dd></dl>
+            </li><li>
+            <p>The rake spec tasks for the project now work correctly with RSpec 1.2.9.</p>
+            </li></ul>
+            
+            <p>Backwards Compatibility</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>Dataset::GET_ERROR_MSG and Dataset::MAP_ERROR_MSG constants were removed. 
+            Both were replaced with Dataset::ARG_BLOCK_ERROR_MSG.</p>
+            </li><li>
+            <p>The behavior of the Model#save_failure private instance method was
+            modified.  It now always raises an exception, and validation failures no
+            longer call it.</p>
+            </li><li>
+            <p>The internals of how autogenerated primary key metadata is stored when
+            creating tables on PostgreSQL has been modified.</p>
+            </li><li>
+            <p>The native MySQL adapter no longer sets the OPT_LOCAL_INFILE option to
+            "client" on the native connection.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

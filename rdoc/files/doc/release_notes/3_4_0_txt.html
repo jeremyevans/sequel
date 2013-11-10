@@ -1,0 +1,372 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.4.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.4.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.4.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>New Plugins</p>
+            <hr style="height: 9px">
+            <ul><li>
+            <p>A nested_attributes plugin was added allowing you to modify associated
+            objects directly through a model object, similar to ActiveRecord&#39;s
+            Nested Attributes.</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">nested_attributes</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;YJM&#39;</span>,&#x000A; :<span class="ruby-identifier">albums_attributes=</span><span class="ruby-operator">&gt;</span>[{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>}, {:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;MO&#39;</span>}])&#x000A;<span class="ruby-comment"># No database activity yet</span>&#x000A;&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">save</span> <span class="ruby-comment"># Saves artist and both albums</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">name</span>} <span class="ruby-comment"># [&#39;RF&#39;, &#39;MO&#39;]</span></pre>
+            
+            <p>It takes most of the same options as ActiveRecord, as well as a a few
+            additional options:</p>
+            <ul><li>
+            <p>:destroy - Allow destruction of nested records.</p>
+            </li><li>
+            <p>:limit - For *_to_many associations, a limit on the number of records that
+            will be processed, to prevent denial of service attacks.</p>
+            </li><li>
+            <p>:remove - Allow disassociation of nested records (can remove the associated
+            object from the parent object, but not destroy the associated object).</p>
+            </li><li>
+            <p>:strict - Set to false to not raise an error message if a primary key is
+            provided in a record, but it doesn&#39;t match an existing associated
+            object.</p>
+            </li></ul>
+            
+            <p>If a block is provided, it is passed each nested attribute hash. If the
+            hash should be ignored, the block should return anything except false or
+            nil.</p>
+            </li><li>
+            <p>A timestamps plugin was added for automatically adding before_create and
+            before_update hooks for setting values on timestamp columns.  There are a
+            couple of existing external plugins that handle timestamps, but the
+            implementations are suboptimal.  The new built-in plugin supports the
+            following options (with the default in parentheses):</p>
+            <ul><li>
+            <p>:create - The field to hold the create timestamp (:created_at)</p>
+            </li><li>
+            <p>:force - Whether to overwrite an existing create timestamp (false)</p>
+            </li><li>
+            <p>:update - The field to hold the update timestamp (:updated_at)</p>
+            </li><li>
+            <p>:update_on_create - Whether to set the update timestamp to the create
+            timestamp when creating (false)</p>
+            </li></ul>
+            </li><li>
+            <p>An instance_hooks plugin was added for adding hooks to specific w model
+            instances:</p>
+            
+            <pre>obj = Model.new&#x000A;obj.after_save_hook{do_something}&#x000A;obj.save # calls do_something after the obj has been saved</pre>
+            
+            <p>All of the standard hooks are supported, except for after_initialize. 
+            Instance level before hooks are executed in reverse order of addition
+            before calling super.  Instance level after hooks are executed in order of
+            addition after calling super. If any of the instance level before hook
+            blocks return false, no more instance level before hooks are called and
+            false is returned.</p>
+            
+            <p>Instance level hooks are cleared when the object is saved successfully.</p>
+            </li><li>
+            <p>A boolean_readers plugin was added for creating attribute? methods for
+            boolean columns.  This can provide a nicer API:</p>
+            
+            <pre>obj = Model[1]&#x000A;obj.active  # Sequel default column reader&#x000A;obj.active? # Using the boolean_readers plugin</pre>
+            
+            <p>You can provide a block when loading the plugin to change the criteria used
+            to determine if the column is boolean:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span>(:<span class="ruby-identifier">boolean_readers</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">db_schema</span>[<span class="ruby-identifier">c</span>][:<span class="ruby-identifier">db_type</span>] <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\Atinyint/</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>This may be useful if you are using MySQL and have some tinyint columns
+            that represent booleans and others that represent integers. You can turn
+            the convert_tinyint_to_bool setting off and use the attribute methods for
+            the integer value and the attribute? methods for the boolean value.</p>
+            </li></ul>
+            
+            <p>Other New Features</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now has support for
+            converting Time/DateTime to local or UTC time upon storage, retrieval, or
+            typecasting.</p>
+            
+            <p>There are three different timezone settings:</p>
+            <ul><li>
+            <p>Sequel.database_timezone - The timezone that timestamps use in the
+            database.  If the database returns a time without an offset, it is assumed
+            to be in this timezone.</p>
+            </li><li>
+            <p>Sequel.typecast_timezone - Similar to database_timezone, but used for
+            typecasting data from a source other than the database.  This is currently
+            only used by the model typecasting code.</p>
+            </li><li>
+            <p>Sequel.application_timezone - The timezone that the application wants to
+            deal with.  All Time/DateTime objects are converted into this timezone upon
+            retrieval from the database.</p>
+            </li></ul>
+            
+            <p>Unlike most things in <a href="../../../classes/Sequel.html">Sequel</a>,
+            these are only global settings, you cannot change them per database.  There
+            are only three valid timezone settings:</p>
+            <ul><li>
+            <p>nil (the default) - Don&#39;t do any timezone conversion.  This is the
+            historical behavior.</p>
+            </li><li>
+            <p>:local - Convert to local time/Consider time to be in local time.</p>
+            </li><li>
+            <p>:utc - Convert to UTC/Consider time to be in UTC.</p>
+            </li></ul>
+            
+            <p>So if you want to store times in the database as UTC, but deal with them in
+            local time in the application:</p>
+            
+            <pre>Sequel.application_timezone = :local&#x000A;Sequel.database_timezone = :utc</pre>
+            
+            <p>If you want to set all three timezones to the same value:</p>
+            
+            <pre>Sequel.default_timezone = :utc</pre>
+            
+            <p>There are three conversion methods that are called:</p>
+            <ul><li>
+            <p>Sequel.database_to_application_timestamp - Called on time objects coming
+            out of the database.  If the object coming out of the database (usually a
+            string) does not have an offset, assume it is already in the
+            database_timezone.  Return a Time/DateTime object (depending on <a
+            href="../../../classes/Sequel.html#attribute-c-datetime_class">Sequel.datetime_class</a>),
+            in the application_timzone.</p>
+            </li><li>
+            <p>Sequel.application_to_database_timestamp - Used when literalizing
+            Time/DateTime objects into an SQL string.  Converts the object to the
+            database_timezone before literalizing them.</p>
+            </li><li>
+            <p>Sequel.typecast_to_application_timestamp - Called when typecasting objects
+            for model datetime columns.  If the object being typecasted does not
+            already have an offset, assume it is already in the typecast_timezone. 
+            Return a Time/DateTime object (depending on <a
+            href="../../../classes/Sequel.html#attribute-c-datetime_class">Sequel.datetime_class</a>),
+            in the application_timezone.</p>
+            </li></ul>
+            
+            <p><a href="../../../classes/Sequel.html">Sequel</a> does not yet support
+            named timezones or per thread modification of the timezone (for showing all
+            timestamps in the current user&#39;s timezone).  Extensions to support both
+            features are planned for a future version.</p>
+            </li><li>
+            <p>Dataset#truncate was added for truncating tables.  Truncate allows for fast
+            removal of all rows in a table.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports typecasting
+            a hash to date, time, and datetime types.  This allows easy usage of <a
+            href="../../../classes/Sequel.html">Sequel</a> with forms that split the
+            entry of these database types into separate from fields. With this code,
+            you can just have field names like:</p>
+            
+            <pre>date[year]&#x000A;date[month]&#x000A;date[day]</pre>
+            
+            <p>Rack will parse that into:</p>
+            
+            <pre class="ruby">{<span class="ruby-string">&#39;date&#39;</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-string">&#39;year&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">,</span> <span class="ruby-string">&#39;month&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">,</span> <span class="ruby-string">&#39;day&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">}</span>}</pre>
+            
+            <p>So then you can do:</p>
+            
+            <pre>obj.date = params[&#39;date&#39;]&#x000A;# or&#x000A;obj.set(params)</pre>
+            </li><li>
+            <p>validates_unique now takes a block that can be used to scope the uniqueness
+            constraint. This allows you to easily set up uniqueness validations that
+            are only necessary in a given scope.  For example, a validation on
+            username, but only for active users (as inactive users are soft deleted but
+            remain in the table).  You just pass a block to validates_unique:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">validates_unique</span>(:<span class="ruby-identifier">name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">active</span>)}</pre>
+            </li><li>
+            <p>The serialization plugin now supports json.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports generic
+            concepts of CURRENT_{DATE,TIME,TIMESTAMP}.  Most databases support these
+            SQL concepts, but not all, and some implementations act differently.</p>
+            
+            <p>The <a
+            href="../../../classes/Sequel/SQL/Constants.html">Sequel::SQL::Constants</a>
+            module holds the three constants, which are instances of SQL::Constant, an
+            SQL::GenericExpression subclass.  This module is included in <a
+            href="../../../classes/Sequel.html">Sequel</a>, so you can reference the
+            constants more easily (e.g. Sequel::CURRENT_TIMESTAMP). It&#39;s separated
+            out into a separate module so that you can just include that module in the
+            top level scope, allowing you to reference the constants directly (e.g.
+            CURRENT_TIMESTAMP).</p>
+            
+            <pre>DB[:events].filter{date &lt; ::Sequel::CURRENT_DATE}&#x000A;# or:&#x000A;include Sequel::SQL::Constants&#x000A;DB[:events].filter{date &lt; ::CURRENT_DATE}</pre>
+            </li><li>
+            <p>Database#run was added for executing arbitrary SQL on a database. It&#39;s
+            an alias for Database#<<, but it allows for a nicer API inside migrations,
+            since you can now do:</p>
+            
+            <pre>run &#39;SQL&#39;</pre>
+            
+            <p>instead of:</p>
+            
+            <pre>self &lt;&lt; &#39;SQL&#39;</pre>
+            
+            <p>You can also provide a :server option to run the SQL on the given
+            server/shard:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">run</span> <span class="ruby-string">&#39;SQL&#39;</span>, :<span class="ruby-identifier">server=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">shard1</span></pre>
+            </li><li>
+            <p>Sequel::Model() can now take a database argument in addition to a symbol or
+            dataset argument.  If a database is given, it&#39;ll create an anonymous
+            subclass attached to the given database.  Other changes were made to allow
+            the following code to work:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Item</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB2</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>That will work correctly assuming a table named items in DB2.</p>
+            </li><li>
+            <p>Dataset#ungrouped was added for removing a grouping from an existing
+            dataset.  Also, Dataset#group when called with no arguments or with a nil
+            argument also removes any existing grouping instead of resulting in invalid
+            SQL.</p>
+            </li><li>
+            <p>Model#modified? was added, letting you know if the model has been modified.
+            If the model hasn&#39;t been modified, calling Model#save_changes will do
+            nothing.</p>
+            </li><li>
+            <p>SQL::OrderedExpression now supports asc, desc, and invert.</p>
+            </li></ul>
+            
+            <p>Other Improvements</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>The serialization and lazy_attribute plugins now add accessor methods to a
+            module included in the class, instead of to the model class itself.  This
+            allows the methods to be overridden in the class and work well with super,
+            as well for the plugins to work together on the same column.  Make sure the
+            lazy_attributes accessor is setup before the serialization accessor if you
+            want to have a lazy serialized column.</p>
+            </li><li>
+            <p>Calling the add_* method for many_to_many association now saves the record
+            if the record is new.  This makes it operate more similarly to one_to_many
+            associations.  Previously, it raised an Error.</p>
+            </li><li>
+            <p>Dataset#import now works correctly when called with a dataset. Previously,
+            it generated incorrect SQL.</p>
+            </li><li>
+            <p>The JDBC adapter now converts byte arrays to/from SQL::Blob.</p>
+            </li><li>
+            <p>The JDBC adapter now attempts to bind unknown types using setObject instead
+            of raising, so it can work with native Java objects.  It also binds boolean
+            parameters correctly.</p>
+            </li><li>
+            <p>Using multiple emulated ALTER TABLE statements (such as drop_column) in a
+            single alter_table block now works correctly on SQLite.</p>
+            </li><li>
+            <p>Database#indexes now works on JDBC for tables in a non-default schema.  It
+            also now properly detects unique indexes on MSSQL.</p>
+            </li><li>
+            <p>Database#schema on JDBC now accepts a :schema option.  Also, returned
+            schema hashes now include a :column_size entry specifying the maximum
+            length/precision for the column, since the :db_type entry doesn&#39;t have
+            contain the information on JDBC.</p>
+            </li><li>
+            <p>Datasets without tables now work correctly on Oracle, so things like
+            DB.get(...) now work.</p>
+            </li><li>
+            <p>A descriptive error message is given if you attempt to use <a
+            href="../../../classes/Sequel.html">Sequel</a> with the mysql.rb driver
+            (which <a href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t
+            support).</p>
+            </li><li>
+            <p>The postgres adapter now works correctly with a modified postgres-pr that
+            raises PGErrors instead of RuntimeErrors (e.g. <a
+            href="http://github.com/jeremyevans/postgres-pr">github.com/jeremyevans/postgres-pr</a>).</p>
+            </li><li>
+            <p>You now get a <a
+            href="../../../classes/Sequel/InvalidOperation.html">Sequel::InvalidOperation</a>
+            instead of a NoMethodError if you attempt to update a dataset without a
+            table.</p>
+            </li><li>
+            <p>The inflection support has been modified to reduce code duplication.</p>
+            </li></ul>
+            
+            <p>Backwards Compatibility</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now includes fractional
+            seconds in timestamps for all adapters except MySQL.  It&#39;s possible
+            that this may break timestamp columns for databases that are not regularly
+            tested.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now includes timezone
+            values in timestamps on Microsoft SQL Server, Oracle, PostgreSQL and
+            SQLite.  The modification for SQLite is probably the biggest cause for
+            concern, since SQLite stores times as text.  If you have an SQLite database
+            that uses timestamps and is accessed by something other than <a
+            href="../../../classes/Sequel.html">Sequel</a>, you should make sure that
+            it works with the timestamp format that <a
+            href="../../../classes/Sequel.html">Sequel</a> now uses.</p>
+            </li><li>
+            <p>The default timestamp format used by <a
+            href="../../../classes/Sequel.html">Sequel</a> now uses a space instead of
+            &#39;T&#39; between the date and time parts, which could possibly affect
+            some databases that are not regularly tested.</p>
+            </li><li>
+            <p>Attempting to insert into a grouped dataset or a dataset that selects from
+            multiple tables will now raise an Error.  Previously, it would ignore any
+            GROUP or JOIN settings and generate bad SQL if there were multiple FROM
+            tables.</p>
+            </li><li>
+            <p>Database#<< now always returns nil.  Before, the return value was adapter
+            dependent.</p>
+            </li><li>
+            <p>ODBC::Time and ODBC::DateTime values are now converted to the <a
+            href="../../../classes/Sequel.html#attribute-c-datetime_class">Sequel.datetime_class</a>.
+            Before, ODBC::Time used Time and ODBC::DateTime used DateTime regardless of
+            the <a
+            href="../../../classes/Sequel.html#attribute-c-datetime_class">Sequel.datetime_class</a>
+            setting.</p>
+            </li><li>
+            <p>The default inflections were modified, fixing some obvious errors and
+            possibly changing some existing inflections.  Further changes to the
+            default inflections are unlikely.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

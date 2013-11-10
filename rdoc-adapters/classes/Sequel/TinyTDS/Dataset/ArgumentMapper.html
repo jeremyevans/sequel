@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::TinyTDS::Dataset::ArgumentMapper</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::TinyTDS::Dataset::ArgumentMapper
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/adapters/tinytds_rb.html">lib/sequel/adapters/tinytds.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Dataset.html">Dataset</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p><a href="../../SQLite.html">SQLite</a> already supports named bind
+            arguments, so use directly.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Protected Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-map_to_prepared_args">map_to_prepared_args</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li>Sequel::Dataset::ArgumentMapper</li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Protected Instance methods</h2>
+              <div class='method protected-instance' id='method-method-i-map_to_prepared_args'>
+                <a name='method-i-map_to_prepared_args'></a>
+                <div class='synopsis'>
+                  <span class='name'>map_to_prepared_args</span>
+                  <span class='arguments'>(hash)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a hash with the same values as the given hash, but with the keys
+                  converted to strings.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-map_to_prepared_args-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-map_to_prepared_args-source'><span class="ruby-comment"># File lib/sequel/adapters/tinytds.rb, line 185</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">map_to_prepared_args</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-identifier">args</span> = {}&#x000A;  <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">args</span>[<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;.&#39;</span>, <span class="ruby-string">&#39;__&#39;</span>)] = <span class="ruby-identifier">v</span>}&#x000A;  <span class="ruby-identifier">args</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

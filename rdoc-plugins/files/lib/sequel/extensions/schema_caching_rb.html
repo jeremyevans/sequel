@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>schema_caching.rb</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>schema_caching.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/schema_caching.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-06-02 14:13:04 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The schema_caching extension adds a few methods to <a
+            href="../../../../classes/Sequel/Database.html">Sequel::Database</a> that
+            make it easy to dump the parsed schema information to a file, and load it
+            from that file.  Loading the schema information from a dumped file is
+            faster than parsing it from the database, so this can save bootup time for
+            applications with large numbers of models.</p>
+            
+            <p>Basic usage in application code:</p>
+            
+            <pre>DB = Sequel.connect(&#39;...&#39;)&#x000A;DB.extension :schema_caching&#x000A;DB.load_schema_cache(&#39;/path/to/schema.dump&#39;)&#x000A;# load model files</pre>
+            
+            <p>Then, whenever the database schema is modified, write a new cached file. 
+            You can do that with <code>bin/sequel</code>&#39;s -S option:</p>
+            
+            <pre>bin/sequel -S /path/to/schema.dump postgres://...</pre>
+            
+            <p>Alternatively, if you don&#39;t want to dump the schema information for all
+            tables, and you don&#39;t worry about race conditions, you can choose to
+            use the following in your application code:</p>
+            
+            <pre>DB = Sequel.connect(&#39;...&#39;)&#x000A;DB.extension :schema_caching&#x000A;DB.load_schema_cache?(&#39;/path/to/schema.dump&#39;)&#x000A;# load model files&#x000A;&#x000A;DB.dump_schema_cache?(&#39;/path/to/schema.dump&#39;)</pre>
+            
+            <p>With this method, you just have to delete the schema dump file if the
+            schema is modified, and the application will recreate it for you using just
+            the tables that your models use.</p>
+            
+            <p>Note that it is up to the application to ensure that the dumped cached
+            schema reflects the current state of the database.  <a
+            href="../../../../classes/Sequel.html">Sequel</a> does no checking to
+            ensure this, as checking would take time and the purpose of this code is to
+            take a shortcut.</p>
+            
+            <p>The cached schema is dumped in Marshal format, since it is the fastest and
+            it handles all ruby objects used in the schema hash.  Because of this, you
+            should not attempt to load the schema from a untrusted file.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

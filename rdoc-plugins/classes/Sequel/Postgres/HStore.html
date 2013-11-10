@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Postgres::HStore</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Postgres::HStore
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/extensions/pg_hstore_rb.html">lib/sequel/extensions/pg_hstore.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../../files/lib/sequel/extensions/pg_hstore_ops_rb.html">lib/sequel/extensions/pg_hstore_ops.rb</a>
+          </li>
+          <li>
+            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-_load">_load</a></li>
+              <li><a target="docwin" href="#method-c-parse">parse</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-_dump">_dump</a></li>
+              <li><a target="docwin" href="#method-i-fetch">fetch</a></li>
+              <li><a target="docwin" href="#method-i-merge">merge</a></li>
+              <li><a target="docwin" href="#method-i-op">op</a></li>
+              <li><a target="docwin" href="#method-i-sql_literal_append">sql_literal_append</a></li>
+              <li><a target="docwin" href="#method-i-unquoted_literal">unquoted_literal</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li>Sequel::SQL::AliasMethods</li>
+              </ol>
+            </div>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="HStore/DatabaseMethods.html">Sequel::Postgres::HStore::DatabaseMethods</a></li>
+              <li><a target="docwin" href="HStore/Parser.html">Sequel::Postgres::HStore::Parser</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>COMMA</td>
+                    <td>=</td>
+                    <td class='context-item-value'>",".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DEFAULT_PROC</td>
+                    <td>=</td>
+                    <td class='context-item-value'>lambda{|h, k| h[k.to_s] unless k.is_a?(String)}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Default proc used for all underlying <a href="HStore.html">HStore</a>
+                      hashes, so that even if you grab the underlying hash, it will still convert
+                      non-string keys to strings during lookup.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ESCAPE_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/("|\\)/.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ESCAPE_REPLACE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'\\\\\1'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>HSTORE_CAST</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'::hstore'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>KV_SEP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>"=>".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NULL</td>
+                    <td>=</td>
+                    <td class='context-item-value'>"NULL".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>QUOTE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'"'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-_load'>
+                <a name='method-c-_load'></a>
+                <div class='synopsis'>
+                  <span class='name'>_load</span>
+                  <span class='arguments'>(args)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Use custom marshal loading, since underlying hash uses a default proc.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-_load-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-_load-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 207</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">_load</span>(<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-constant">Hash</span>[<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">args</span>)])&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-parse'>
+                <a name='method-c-parse'></a>
+                <div class='synopsis'>
+                  <span class='name'>parse</span>
+                  <span class='arguments'>(str)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Parse the given string into an <a href="HStore.html">HStore</a>, assuming
+                  the str is in PostgreSQL hstore output format.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-parse-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-parse-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 213</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">str</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-constant">Parser</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">str</span>).<span class="ruby-identifier">parse</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-_dump'>
+                <a name='method-i-_dump'></a>
+                <div class='synopsis'>
+                  <span class='name'>_dump</span>
+                  <span class='arguments'>(*)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Use custom marshal dumping, since underlying hash uses a default proc.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-_dump-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-_dump-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 239</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_dump</span>(*)&#x000A;  <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">to_a</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-fetch'>
+                <a name='method-i-fetch'></a>
+                <div class='synopsis'>
+                  <span class='name'>fetch</span>
+                  <span class='arguments'>(key, *args, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Override to force the key argument to a string.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-fetch-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 244</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">key</span>, *<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">key</span>.<span class="ruby-identifier">to_s</span>, *<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-merge'>
+                <a name='method-i-merge'></a>
+                <div class='synopsis'>
+                  <span class='name'>merge</span>
+                  <span class='arguments'>(hash, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Convert the input hash to string keys and values before merging, and return
+                  a new <a href="HStore.html">HStore</a> instance with the merged hash.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-merge-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-merge-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 250</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">merge</span>(<span class="ruby-identifier">hash</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>(<span class="ruby-identifier">convert_hash</span>(<span class="ruby-identifier">hash</span>), &amp;<span class="ruby-identifier">block</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-op'>
+                <a name='method-i-op'></a>
+                <div class='synopsis'>
+                  <span class='name'>op</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Wrap the receiver in an <a href="HStoreOp.html">HStoreOp</a> so you can
+                  easily use the PostgreSQL hstore functions and operators with it.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-op-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 299</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-sql_literal_append'>
+                <a name='method-i-sql_literal_append'></a>
+                <div class='synopsis'>
+                  <span class='name'>sql_literal_append</span>
+                  <span class='arguments'>(ds, sql)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Append a literalize version of the hstore to the sql.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_literal_append-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 258</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">unquoted_literal</span>)&#x000A;  <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">HSTORE_CAST</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-unquoted_literal'>
+                <a name='method-i-unquoted_literal'></a>
+                <div class='synopsis'>
+                  <span class='name'>unquoted_literal</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a string containing the unquoted, unstring-escaped literal version
+                  of the hstore.  Separated out for use by the bound argument code.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-unquoted_literal-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-unquoted_literal-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 266</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">unquoted_literal</span>&#x000A;  <span class="ruby-identifier">str</span> = <span class="ruby-string">&#39;&#39;</span>&#x000A;  <span class="ruby-identifier">comma</span> = <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-identifier">commas</span> = <span class="ruby-constant">COMMA</span>&#x000A;  <span class="ruby-identifier">quote</span> = <span class="ruby-constant">QUOTE</span>&#x000A;  <span class="ruby-identifier">kv_sep</span> = <span class="ruby-constant">KV_SEP</span>&#x000A;  <span class="ruby-identifier">null</span> = <span class="ruby-constant">NULL</span>&#x000A;  <span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">commas</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">comma</span>&#x000A;    <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">escape_value</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span>&#x000A;    <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">kv_sep</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>&#x000A;      <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">null</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">escape_value</span>(<span class="ruby-identifier">v</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">comma</span> = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">str</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

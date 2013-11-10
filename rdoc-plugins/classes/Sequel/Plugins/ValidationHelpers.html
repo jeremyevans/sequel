@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::ValidationHelpers</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::ValidationHelpers
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/validation_helpers_rb.html">lib/sequel/plugins/validation_helpers.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The validation_helpers plugin contains instance method equivalents for most
+            of the legacy class-level validations.  The names and APIs are different,
+            though. Example:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">validation_helpers</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">1</span>, :<span class="ruby-identifier">num_tracks</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>The validates_unique method has a unique API, but the other validations
+            have the API explained here:</p>
+            
+            <p>Arguments:</p>
+            <dl class="rdoc-list note-list"><dt>atts 
+            <dd>
+            <p>Single attribute symbol or an array of attribute symbols specifying the
+            attribute(s) to validate.</p>
+            </dd></dl>
+            
+            <p>Options:</p>
+            <dl class="rdoc-list note-list"><dt>:allow_blank 
+            <dd>
+            <p>Whether to skip the validation if the value is blank.  You should make sure
+            all objects respond to blank if you use this option, which you can do by:</p>
+            </dd></dl>
+            
+            <pre>Sequel.extension :blank</pre>
+            <dl class="rdoc-list note-list"><dt>:allow_missing 
+            <dd>
+            <p>Whether to skip the validation if the attribute isn&#39;t a key in the
+            values hash.  This is different from allow_nil, because <a
+            href="../../Sequel.html">Sequel</a> only sends the attributes in the values
+            when doing an insert or update.  If the attribute is not present, <a
+            href="../../Sequel.html">Sequel</a> doesn&#39;t specify it, so the database
+            will use the table&#39;s default value.  This is different from having an
+            attribute in values with a value of nil, which <a
+            href="../../Sequel.html">Sequel</a> will send as NULL. If your database
+            table has a non NULL default, this may be a good option to use.  You
+            don&#39;t want to use allow_nil, because if the attribute is in values but
+            has a value nil, <a href="../../Sequel.html">Sequel</a> will attempt to
+            insert a NULL value into the database, instead of using the database&#39;s
+            default.</p>
+            </dd><dt>:allow_nil 
+            <dd>
+            <p>Whether to skip the validation if the value is nil.</p>
+            </dd><dt>:message 
+            <dd>
+            <p>The message to use.  Can be a string which is used directly, or a proc
+            which is called.  If the validation method takes a argument before the
+            array of attributes, that argument is passed as an argument to the proc.</p>
+            </dd></dl>
+            
+            <p>The default validation options for all models can be modified by changing
+            the values of the Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS hash.
+            You change change the default options on a per model basis by overriding a
+            private instance method default_validation_helpers_options.</p>
+            
+            <p>By changing the default options, you can setup internationalization of the
+            error messages.  For example, you would modify the default options:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">ValidationHelpers</span><span class="ruby-operator">::</span><span class="ruby-constant">DEFAULT_OPTIONS</span>.<span class="ruby-identifier">merge!</span>(&#x000A;  :<span class="ruby-identifier">exact_length=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">message=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">exact</span><span class="ruby-operator">|</span> <span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.exact_length&quot;</span>, :<span class="ruby-identifier">exact</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">exact</span>)}},&#x000A;  :<span class="ruby-identifier">integer=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">message=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">lambda</span>{<span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.integer&quot;</span>)}},&#x000A;  <span class="ruby-operator">...</span>&#x000A;)</pre>
+            
+            <p>and then use something like this in your yaml translation file:</p>
+            
+            <pre>en:&#x000A;  errors:&#x000A;    exact_length: &quot;is not %{exact} characters&quot;&#x000A;    integer: &quot;is not a number&quot;</pre>
+            
+            <p>Note that if you want to support internationalization of
+            Errors#full_messages, you need to override the method.  Here&#39;s an
+            example:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">Errors</span>&#x000A;  <span class="ruby-constant">ATTRIBUTE_JOINER</span> = <span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&#39;errors.joiner&#39;</span>).<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">full_messages</span>&#x000A;    <span class="ruby-identifier">inject</span>([]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">kv</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">att</span>, <span class="ruby-identifier">errors</span> = *<span class="ruby-identifier">kv</span>&#x000A;      <span class="ruby-identifier">att</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">att</span>).<span class="ruby-identifier">map!</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-node">&quot;attributes.#{v}&quot;</span>)} <span class="ruby-operator">:</span> <span class="ruby-identifier">att</span> = <span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-node">&quot;attributes.#{att}&quot;</span>)&#x000A;      <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;#{Array(att).join(ATTRIBUTE_JOINER)} #{e}&quot;</span>)}&#x000A;      <span class="ruby-identifier">m</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="ValidationHelpers/InstanceMethods.html">Sequel::Plugins::ValidationHelpers::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DEFAULT_OPTIONS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      {
+                      :exact_length=>{:message=>lambda{|exact| "is not #{exact} characters"}},
+                      :format=>{:message=>lambda{|with| 'is invalid'}},
+                      :includes=>{:message=>lambda{|set| "is not in range or set: #{set.inspect}"}},
+                      :integer=>{:message=>lambda{"is not a number"}},
+                      :length_range=>{:message=>lambda{|range| "is too short or too long"}},
+                      :max_length=>{:message=>lambda{|max| "is longer than #{max} characters"}, :nil_message=>lambda{"is not present"}},
+                      :min_length=>{:message=>lambda{|min| "is shorter than #{min} characters"}},
+                      :not_null=>{:message=>lambda{"is not present"}},
+                      :numeric=>{:message=>lambda{"is not a number"}},
+                      :type=>{:message=>lambda{|klass| klass.is_a?(Array) ? "is not a valid #{klass.join(" or ").downcase}" : "is not a valid #{klass.to_s.downcase}"}},
+                      :presence=>{:message=>lambda{"is not present"}},
+                      :unique=>{:message=>lambda{'is already taken'}}
+                      }
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Default validation options used by <a href="../../Sequel.html">Sequel</a>. 
+                      Can be modified to change the error messages for all models (e.g. for
+                      internationalization), or to set certain default options for validations
+                      (e.g. :allow_nil=&gt;true for all validates_format).</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::Tree</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::Tree
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/tree_rb.html">lib/sequel/plugins/tree.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The <a href="Tree.html">Tree</a> plugin adds additional associations and
+            methods that allow you to  treat a <a href="../Model.html">Model</a> as a
+            tree.</p>
+            
+            <p>A column for holding the parent key is required and is :parent_id by
+            default.</p>
+            
+            <p>This may be overridden by passing column name via :key.</p>
+            
+            <p>Optionally, a column to control order of nodes returned can be specified by
+            passing column name via :order.</p>
+            
+            <p>If you pass true for the :single_root option, the class will ensure there
+            is only ever one root in the tree.</p>
+            
+            <p>Examples:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">tree</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">tree</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">parentid</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">position</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-apply">apply</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="Tree/ClassMethods.html">Sequel::Plugins::Tree::ClassMethods</a></li>
+              <li><a target="docwin" href="Tree/InstanceMethods.html">Sequel::Plugins::Tree::InstanceMethods</a></li>
+              <li><a target="docwin" href="Tree/SingleRoot.html">Sequel::Plugins::Tree::SingleRoot</a></li>
+              <li><a target="docwin" href="Tree/TreeMultipleRootError.html">Sequel::Plugins::Tree::TreeMultipleRootError</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
+                <div class='synopsis'>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(model, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Create parent and children associations.  Any options specified are passed
+                  to both associations.  You can also specify options to use for just the
+                  parent association using a :parent option, and options to use for just the
+                  children association using a :children option.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>] = <span class="ruby-identifier">model</span>&#x000A;&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@parent_column</span> = (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">:parent_id</span>)&#x000A;    <span class="ruby-ivar">@tree_order</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:order</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  &#x000A;  <span class="ruby-identifier">par</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:parent</span>, {}))&#x000A;  <span class="ruby-identifier">parent</span> = <span class="ruby-identifier">par</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:parent</span>)&#x000A;  &#x000A;  <span class="ruby-identifier">chi</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:children</span>, {}))&#x000A;  <span class="ruby-identifier">children</span> = <span class="ruby-identifier">chi</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:children</span>)&#x000A;&#x000A;  <span class="ruby-identifier">par</span>[<span class="ruby-value">:reciprocal</span>] = <span class="ruby-identifier">children</span>&#x000A;  <span class="ruby-identifier">chi</span>[<span class="ruby-value">:recripocal</span>] = <span class="ruby-identifier">parent</span>&#x000A;&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-identifier">parent</span>, <span class="ruby-identifier">par</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-identifier">children</span>, <span class="ruby-identifier">chi</span>&#x000A;&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-constant">SingleRoot</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:single_root</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

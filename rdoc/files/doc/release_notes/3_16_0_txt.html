@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.16.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.16.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.16.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Adapter">New Adapter</h1>
+            <ul><li>
+            <p>A swift adapter was added to <a
+            href="../../../classes/Sequel.html">Sequel</a>.  Swift is a relatively new
+            ruby database library, built on top of a relatively new backend called
+            dbic++.  While not yet considered production ready, it is very fast.  The
+            swift adapter is about 33% faster and 40% more memory efficient for selects
+            than the postgres adapter using pg with sequel_pg, though it is slower and
+            less memory efficient for inserts and updates.</p>
+            
+            <p>Sequel&#39;s swift adapter currently supports only PostgreSQL and MySQL,
+            but support for other databases will probably be added in the future.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now correctly literalizes
+            DateTime objects on ruby 1.9 for databases that support fractional seconds.</p>
+            </li><li>
+            <p>The identity_map plugin now handles composite keys in many_to_one
+            associations.</p>
+            </li><li>
+            <p>The rcte_tree plugin now works when the model&#39;s dataset does not select
+            all columns.  This can happen when using the lazy_attributes plugin on the
+            same model.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports INTERSECT
+            and EXCEPT on Microsoft SQL Server 2005+.</p>
+            </li><li>
+            <p>The Database#create_language method in the shared PostgreSQL adapter now
+            accepts a :replace option to replace the currently loaded procedural
+            language if it already exists.  This option is ignored for PostgreSQL
+            versions before 9.0.</p>
+            </li><li>
+            <p>The identity_map plugin now handles cases where the plugin is loaded
+            separately by two different models.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>While not technically backwards compatibility related, it was discovered
+            that the identity_map plugin is incompatible with the standard eager
+            loading of many_to_many and many_through_many associations.  If you want to
+            eagerly load those associations and use the identity_map plugin, you should
+            use eager_graph instead of eager.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

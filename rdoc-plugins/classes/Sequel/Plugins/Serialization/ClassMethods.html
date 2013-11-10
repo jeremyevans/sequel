@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::Serialization::ClassMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::Serialization::ClassMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/serialization_rb.html">lib/sequel/plugins/serialization.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Serialization.html">Serialization</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-deserialization_map">deserialization_map</a></li>
+              <li><a target="docwin" href="#attribute-i-serialization_map">serialization_map</a></li>
+              <li><a target="docwin" href="#attribute-i-serialization_module">serialization_module</a></li>
+              <li><a target="docwin" href="#method-i-serialize_attributes">serialize_attributes</a></li>
+              <li><a target="docwin" href="#method-i-serialized_columns">serialized_columns</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-deserialization_map'>deserialization_map</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>A hash with column name symbols and callable values, with the value called
+                      to deserialize the column.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-serialization_map'>serialization_map</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>A hash with column name symbols and callable values, with the value called
+                      to serialize the column.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-serialization_module'>serialization_module</a>
+                    </td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Module to store the serialized column accessor methods, so they can call be
+                      overridden and call super to get the serialization behavior</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-serialize_attributes'>
+                <a name='method-i-serialize_attributes'></a>
+                <div class='synopsis'>
+                  <span class='name'>serialize_attributes</span>
+                  <span class='arguments'>(format, *columns)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Create instance level reader that deserializes column values on request,
+                  and instance level writer that stores new deserialized values.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-serialize_attributes-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-serialize_attributes-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 129</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">serialize_attributes</span>(<span class="ruby-identifier">format</span>, *<span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">format</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;    <span class="ruby-keyword">unless</span> <span class="ruby-identifier">format</span> = <span class="ruby-constant">REGISTERED_FORMATS</span>[<span class="ruby-identifier">format</span>]&#x000A;      <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Unsupported serialization format: #{format} (valid formats: #{REGISTERED_FORMATS.keys.map{|k| k.inspect}.join})&quot;</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span> = <span class="ruby-identifier">format</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No columns given.  The serialization plugin requires you specify which columns to serialize&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-identifier">define_serialized_attribute_accessor</span>(<span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span>, *<span class="ruby-identifier">columns</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-serialized_columns'>
+                <a name='method-i-serialized_columns'></a>
+                <div class='synopsis'>
+                  <span class='name'>serialized_columns</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The columns that will be serialized.  This is only for backwards
+                  compatibility, use <a
+                  href="ClassMethods.html#attribute-i-serialization_map">#serialization_map</a>
+                  in new code.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-serialized_columns-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-serialized_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 142</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">serialized_columns</span>&#x000A;  <span class="ruby-identifier">serialization_map</span>.<span class="ruby-identifier">keys</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

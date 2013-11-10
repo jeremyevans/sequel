@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.46.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.46.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.46.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-04-02 10:20:49 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>Dataset#first! has been added.  This is identical to first, except where
+            first would return nil due to no row matching, first! raises a <a
+            href="../../../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
+            exception.  The main benefit here is that a standard exception class is now
+            used, so external libraries can deal with these exceptions appropriately
+            (such as web applications returning a 404 error).</p>
+            </li><li>
+            <p>Dataset#with_pk! has been added to model datasets.  Similar to first!, this
+            raises a <a
+            href="../../../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
+            exception instead of returning nil if there is no matching row.</p>
+            </li><li>
+            <p>A drop_foreign_key method has been added to the alter_table generator:</p>
+            
+            <pre>alter_table(:tab){drop_foreign_key :col}</pre>
+            
+            <p>This relies on foreign_key_list working and including the name of the
+            foreign key.  Previously, you&#39;d have to drop the foreign key constraint
+            before dropping the column in some cases.</p>
+            </li><li>
+            <p>Column constraints can now be named using :*_constraint_name options:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">tab</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">primary_key_constraint_name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">pk_name</span>&#x000A;  <span class="ruby-identifier">foriegn_key</span> :<span class="ruby-identifier">t_id</span>, :<span class="ruby-identifier">t</span>, :<span class="ruby-identifier">foreign_key_constraint_name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">fk_name</span>,&#x000A;    :<span class="ruby-identifier">unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">unique_constraint_name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">uk_name</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>This makes it easier to name constraints, which has always been recommended
+            as it makes it easier to drop such constraints in the future.</p>
+            </li><li>
+            <p>On Microsoft SQL Server, Dataset#cross_apply and outer_apply have been
+            added to use CROSS/OUTER APPLY.  These are useful if you want to join a
+            table to the output of a function that takes the table as an argument.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p>The connection pools are now faster when using the
+            :connection_handling=&gt;:queue option.</p>
+            </li><li>
+            <p>External connection pool classes can now be loaded automatically by the
+            :pool_class option.</p>
+            </li><li>
+            <p>Database#each_server now raises if not given a block.  Previously, it just
+            leaked Database references.</p>
+            </li><li>
+            <p>On Microsoft SQL Server, ] characters are now escaped correctly in
+            identifiers.</p>
+            </li><li>
+            <p>On PostgreSQL, infinite dates are also handled when using
+            Database#convert_infinite_timestamps.  Previously, infinite dates were
+            incorrectly converted to 0000-01-01.</p>
+            </li><li>
+            <p>The associations, composition, serialization, and dirty plugins now clear
+            caches stored in the instance in some additional cases, such as when saving
+            model instances when the dataset supports insert_select.</p>
+            </li><li>
+            <p>Model#validates_type in the validation_helpers plugin now handles false
+            values correctly.</p>
+            </li><li>
+            <p>The string_stripper plugin has been fixed to not change the result of
+            Model.set_dataset.</p>
+            </li><li>
+            <p>You can now drop primary key constraints on H2, using:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">tab</span>){<span class="ruby-identifier">drop_constraint</span> :<span class="ruby-identifier">foo</span>, :<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">primary_key</span>}</pre>
+            </li><li>
+            <p>The jdbc/as400 adapter has been fixed, it was broken starting in <a
+            href="../../../classes/Sequel.html">Sequel</a> 3.44.0.</p>
+            </li><li>
+            <p>A Security guide has been added explaining various security issues to think
+            about when using <a href="../../../classes/Sequel.html">Sequel</a>.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>The change to make associations, composition, serialization, and dirty now
+            clear caches after saving when the dataset supports insert_select can break
+            code that expected the previous behavior. For example:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">has_albums</span> <span class="ruby-comment"># =&gt; false</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">artist</span>)&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">after_create</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">has_albums=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">save</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">has_albums</span> <span class="ruby-comment"># =&gt; false</span></pre>
+            
+            <p>Such code should either refresh the artist after saving the album, or use
+            album.artist.has_albums.  You already had to do that if the dataset did not
+            support insert_select; the impetus for this change was to make the behavior
+            consistent.</p>
+            </li><li>
+            <p>Decimal/numeric columns are now strictly typecast by default, similar to
+            integer and real/double precision columns.  If you want the previous loose
+            typecasting to for decimal/numeric columns, use the looser_typecasting
+            extension.</p>
+            </li><li>
+            <p>External adapters that called Database.set_adapter_scheme with a string
+            should change to using a symbol.</p>
+            </li><li>
+            <p>Dataset#select_map, select_order_map, and get now raise an exception if
+            they are passed a plain string inside an array.</p>
+            
+            <p>If you do want to use a plain string, you now need to alias it:</p>
+            
+            <pre>dataset.get([Sequel.as(&#39;string&#39;, :some_alias)])</pre>
+            </li></ul>
+            
+            <h1 id="label-Sequel+4+Implementation+Planning"><a href="../../../classes/Sequel.html">Sequel</a> 4 Implementation Planning</h1>
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> 4 implementation planning
+            has begun.  If you want to view and/or provide feedback on the
+            implementation plan, see <a
+            href="https://github.com/jeremyevans/sequel-4-plans">github.com/jeremyevans/sequel-4-plans</a></p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

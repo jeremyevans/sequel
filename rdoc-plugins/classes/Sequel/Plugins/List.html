@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::List</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::List
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/list_rb.html">lib/sequel/plugins/list.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The list plugin allows for model instances to be part of an ordered list,
+            based on a position field in the database.  It can either consider all rows
+            in the table as being from the same list, or you can specify scopes so that
+            multiple lists can be kept in the same table.</p>
+            
+            <p>Basic Example:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Item</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">items</span>)&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">list</span> <span class="ruby-comment"># will use :position field for position</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">list</span>, :<span class="ruby-identifier">field=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">pos</span> <span class="ruby-comment"># will use :pos field for position</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">item</span> = <span class="ruby-constant">Item</span>[<span class="ruby-value">1</span>]&#x000A;&#x000A;<span class="ruby-comment"># Get the next or previous item in the list</span>&#x000A;&#x000A;<span class="ruby-identifier">item</span>.<span class="ruby-identifier">next</span>&#x000A;<span class="ruby-identifier">item</span>.<span class="ruby-identifier">prev</span>&#x000A;&#x000A;<span class="ruby-comment"># Modify the item&#39;s position, which may require modifying other items in</span>&#x000A;<span class="ruby-comment"># the same list</span>&#x000A;&#x000A;<span class="ruby-identifier">item</span>.<span class="ruby-identifier">move_to</span>(<span class="ruby-value">3</span>)&#x000A;<span class="ruby-identifier">item</span>.<span class="ruby-identifier">move_to_top</span>&#x000A;<span class="ruby-identifier">item</span>.<span class="ruby-identifier">move_to_bottom</span>&#x000A;<span class="ruby-identifier">item</span>.<span class="ruby-identifier">move_up</span>&#x000A;<span class="ruby-identifier">item</span>.<span class="ruby-identifier">move_down</span></pre>
+            
+            <p>You can provide a <code>:scope</code> option to scope the list.  This
+            option can be a symbol or array of symbols specifying column name(s), or a
+            proc that accepts a model instance and returns a dataset representing the
+            list the object is in.</p>
+            
+            <p>For example, if each item has a <code>user_id</code> field, and you want
+            every user to have their own list:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Item</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">list</span>, :<span class="ruby-identifier">scope=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">user_id</span></pre>
+            
+            <p>Note that using this plugin modifies the order of the model&#39;s dataset
+            to sort by the position and scope fields.  Also note that this plugin is
+            subject to race conditions, and is not safe when concurrent modifications
+            are made to the same list.</p>
+            
+            <p>Additionally, note that unlike ruby arrays, the list plugin assumes that
+            the first entry in the list has position 1, not position 0.</p>
+            
+            <p>Copyright (c) 2007-2010 Sharon Rosner, Wayne E. Seguin, Aman Gupta, Adrian
+            Madrid, Jeremy Evans</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="List/ClassMethods.html">Sequel::Plugins::List::ClassMethods</a></li>
+              <li><a target="docwin" href="List/InstanceMethods.html">Sequel::Plugins::List::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model, opts = OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set the <code>position_field</code> and <code>scope_proc</code> attributes
+                  for the model, using the <code>:field</code> and <code>:scope</code>
+                  options, respectively. The <code>:scope</code> option can be a symbol,
+                  array of symbols, or a proc that accepts a model instance and returns a
+                  dataset representing the list. Also, modify the model dataset&#39;s order
+                  to order by the position and scope fields.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 56</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">position_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:field</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:position</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order_prepend</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">position_field</span>)&#x000A;  &#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">scope_proc</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">scope</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:scope</span>]&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>&#x000A;    <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order_prepend</span>(<span class="ruby-identifier">scope</span>)&#x000A;    <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">model</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">scope</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">scope</span>))}&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;    <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order_prepend</span>(*<span class="ruby-identifier">scope</span>)&#x000A;    <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">model</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">scope</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">s</span>, <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">s</span>)]})}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">scope</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

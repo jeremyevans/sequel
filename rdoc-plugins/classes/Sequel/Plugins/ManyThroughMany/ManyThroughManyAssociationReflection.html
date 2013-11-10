@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::ManyThroughMany::ManyThroughManyAssociationReflection</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Plugins::ManyThroughMany::ManyThroughManyAssociationReflection
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/many_through_many_rb.html">lib/sequel/plugins/many_through_many.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../ManyThroughMany.html">ManyThroughMany</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The AssociationReflection subclass for many_through_many associations.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-default_associated_key_alias">default_associated_key_alias</a></li>
+              <li><a target="docwin" href="#method-i-reciprocal">reciprocal</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-default_associated_key_alias'>
+                <a name='method-i-default_associated_key_alias'></a>
+                <div class='synopsis'>
+                  <span class='name'>default_associated_key_alias</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The default associated key alias(es) to use when eager loading associations
+                  via eager.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-default_associated_key_alias-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-default_associated_key_alias-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_associated_key_alias</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:uses_left_composite_keys</span>] <span class="ruby-operator">?</span> (<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-keyword">self</span>[<span class="ruby-value">:through</span>].<span class="ruby-identifier">first</span>[<span class="ruby-value">:left</span>].<span class="ruby-identifier">length</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-value">:&quot;x_foreign_key_#{i}_x&quot;</span>} <span class="ruby-operator">:</span> <span class="ruby-value">:x_foreign_key_x</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-reciprocal'>
+                <a name='method-i-reciprocal'></a>
+                <div class='synopsis'>
+                  <span class='name'>reciprocal</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Many through many associations don&#39;t have a reciprocal</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-reciprocal-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-reciprocal-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 88</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reciprocal</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

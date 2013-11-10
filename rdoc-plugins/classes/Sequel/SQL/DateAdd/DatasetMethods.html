@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::SQL::DateAdd::DatasetMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::SQL::DateAdd::DatasetMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/extensions/date_arithmetic_rb.html">lib/sequel/extensions/date_arithmetic.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../DateAdd.html">DateAdd</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>These methods are added to datasets using the date_arithmetic extension,
+            for the purposes of correctly literalizing <a
+            href="../DateAdd.html">DateAdd</a> expressions for the appropriate database
+            type.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-date_add_sql_append">date_add_sql_append</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ACCESS_DURATION_UNITS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>DURATION_UNITS.zip(%w'yyyy m d h n s'.map{|s| s.freeze}).freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DB2_DURATION_UNITS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s).freeze}).freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DEF_DURATION_UNITS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| s.to_s.freeze}).freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DERBY_DURATION_UNITS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit("SQL_TSI_#{s.to_s.upcase[0...-1]}").freeze}).freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DURATION_UNITS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[:years, :months, :days, :hours, :minutes, :seconds].freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>H2_DURATION_UNITS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| s.to_s[0...-1].freeze}).freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MSSQL_DURATION_UNITS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s[0...-1]).freeze}).freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MYSQL_DURATION_UNITS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s.upcase[0...-1]).freeze}).freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-date_add_sql_append'>
+                <a name='method-i-date_add_sql_append'></a>
+                <div class='synopsis'>
+                  <span class='name'>date_add_sql_append</span>
+                  <span class='arguments'>(sql, da)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Append the <a href="../../SQL.html">SQL</a> fragment for the <a
+                  href="../DateAdd.html">DateAdd</a> expression to the <a
+                  href="../../SQL.html">SQL</a> query.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-date_add_sql_append-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-date_add_sql_append-source'><span class="ruby-comment"># File lib/sequel/extensions/date_arithmetic.rb, line 66</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">date_add_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">da</span>)&#x000A;  <span class="ruby-identifier">h</span> = <span class="ruby-identifier">da</span>.<span class="ruby-identifier">interval</span>&#x000A;  <span class="ruby-identifier">expr</span> = <span class="ruby-identifier">da</span>.<span class="ruby-identifier">expr</span>&#x000A;  <span class="ruby-identifier">cast</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">db_type</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:postgres</span>&#x000A;    <span class="ruby-identifier">interval</span> = <span class="ruby-string">&quot;&quot;</span>&#x000A;    <span class="ruby-identifier">each_valid_interval_unit</span>(<span class="ruby-identifier">h</span>, <span class="ruby-constant">DEF_DURATION_UNITS</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">interval</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{value} #{sql_unit} &quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">empty?</span>&#x000A;      <span class="ruby-keyword">return</span> <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-constant">Time</span>))&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">return</span> <span class="ruby-identifier">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-value">:+</span>, [<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-constant">Time</span>), <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-identifier">interval</span>, <span class="ruby-value">:interval</span>)])&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:sqlite</span>&#x000A;    <span class="ruby-identifier">args</span> = [<span class="ruby-identifier">expr</span>]&#x000A;    <span class="ruby-identifier">each_valid_interval_unit</span>(<span class="ruby-identifier">h</span>, <span class="ruby-constant">DEF_DURATION_UNITS</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">args</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{value} #{sql_unit}&quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-identifier">_function_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-value">:datetime</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:mysql</span>, <span class="ruby-value">:hsqldb</span>, <span class="ruby-value">:cubrid</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:hsqldb</span>&#x000A;      <span class="ruby-comment"># HSQLDB requires 2.2.9+ for the DATE_ADD function</span>&#x000A;      <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-constant">Time</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">each_valid_interval_unit</span>(<span class="ruby-identifier">h</span>, <span class="ruby-constant">MYSQL_DURATION_UNITS</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:DATE_ADD</span>, <span class="ruby-identifier">expr</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;INTERVAL &quot;</span>, <span class="ruby-string">&quot; &quot;</span>], <span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span>))&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:mssql</span>, <span class="ruby-value">:h2</span>, <span class="ruby-value">:access</span>, <span class="ruby-value">:sqlanywhere</span>&#x000A;    <span class="ruby-identifier">units</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">db_type</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:mssql</span>, <span class="ruby-value">:sqlanywhere</span>&#x000A;      <span class="ruby-constant">MSSQL_DURATION_UNITS</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:h2</span>&#x000A;      <span class="ruby-constant">H2_DURATION_UNITS</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:access</span>&#x000A;      <span class="ruby-constant">ACCESS_DURATION_UNITS</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">each_valid_interval_unit</span>(<span class="ruby-identifier">h</span>, <span class="ruby-identifier">units</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:DATEADD</span>, <span class="ruby-identifier">sql_unit</span>, <span class="ruby-identifier">value</span>, <span class="ruby-identifier">expr</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:derby</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Date</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">DateTime</span>)&#x000A;      <span class="ruby-comment"># Work around for https://issues.apache.org/jira/browse/DERBY-896</span>&#x000A;      <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_string</span>(<span class="ruby-identifier">expr</span>) <span class="ruby-operator">+</span> <span class="ruby-string">&#39; 00:00:00&#39;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">each_valid_interval_unit</span>(<span class="ruby-identifier">h</span>, <span class="ruby-constant">DERBY_DURATION_UNITS</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-node">&quot;{fn timestampadd(#{sql_unit}, &quot;</span>, <span class="ruby-string">&quot;, timestamp(&quot;</span>, <span class="ruby-string">&quot;))}&quot;</span>], <span class="ruby-identifier">value</span>, <span class="ruby-identifier">expr</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:oracle</span>&#x000A;    <span class="ruby-identifier">each_valid_interval_unit</span>(<span class="ruby-identifier">h</span>, <span class="ruby-constant">MYSQL_DURATION_UNITS</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;INTERVAL &quot;</span>, <span class="ruby-string">&quot; &quot;</span>], <span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-identifier">sql_unit</span>))&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:db2</span>&#x000A;    <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-constant">Time</span>)&#x000A;    <span class="ruby-identifier">each_valid_interval_unit</span>(<span class="ruby-identifier">h</span>, <span class="ruby-constant">DB2_DURATION_UNITS</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;&quot;</span>, <span class="ruby-string">&quot; &quot;</span>], <span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span>))&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;date arithmetic is not implemented on #{db.database_type}&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cast</span>&#x000A;    <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-constant">Time</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

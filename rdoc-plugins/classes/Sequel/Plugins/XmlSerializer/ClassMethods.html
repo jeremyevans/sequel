@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::XmlSerializer::ClassMethods</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::XmlSerializer::ClassMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/xml_serializer_rb.html">lib/sequel/plugins/xml_serializer.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../XmlSerializer.html">XmlSerializer</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-array_from_xml">array_from_xml</a></li>
+              <li><a target="docwin" href="#method-i-from_xml">from_xml</a></li>
+              <li><a target="docwin" href="#method-i-from_xml_node">from_xml_node</a></li>
+              <li><a target="docwin" href="#method-i-xml_builder">xml_builder</a></li>
+              <li><a target="docwin" href="#method-i-xml_deserialize_name_proc">xml_deserialize_name_proc</a></li>
+              <li><a target="docwin" href="#method-i-xml_serialize_name_proc">xml_serialize_name_proc</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>CAMELIZE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>proc{|s| s.camelize}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Proc that camelizes the input string, used for the :camelize option</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DASHERIZE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>proc{|s| s.dasherize}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Proc that dasherizes the input string, used for the :dasherize option</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>IDENTITY</td>
+                    <td>=</td>
+                    <td class='context-item-value'>proc{|s| s}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Proc that returns the input string as is, used if no :name_proc,
+                      :dasherize, or :camelize option is used.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>UNDERSCORE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>proc{|s| s.underscore}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Proc that underscores the input string, used for the :underscore option</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-array_from_xml'>
+                <a name='method-i-array_from_xml'></a>
+                <div class='synopsis'>
+                  <span class='name'>array_from_xml</span>
+                  <span class='arguments'>(xml, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return an array of instances of this class based on the provided XML.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-array_from_xml-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-array_from_xml-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 130</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">array_from_xml</span>(<span class="ruby-identifier">xml</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">node</span> = <span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span>(<span class="ruby-identifier">xml</span>).<span class="ruby-identifier">children</span>.<span class="ruby-identifier">first</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">node</span> &#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Malformed XML used&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">node</span>.<span class="ruby-identifier">children</span>.<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Text</span>)}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">opts</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-from_xml'>
+                <a name='method-i-from_xml'></a>
+                <div class='synopsis'>
+                  <span class='name'>from_xml</span>
+                  <span class='arguments'>(xml, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return an instance of this class based on the provided XML.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-from_xml-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-from_xml-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 140</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">from_xml_node</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span>(<span class="ruby-identifier">xml</span>).<span class="ruby-identifier">children</span>.<span class="ruby-identifier">first</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-from_xml_node'>
+                <a name='method-i-from_xml_node'></a>
+                <div class='synopsis'>
+                  <span class='name'>from_xml_node</span>
+                  <span class='arguments'>(parent, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return an instance of this class based on the given XML node, which should
+                  be Nokogiri::XML::Node instance. This should probably not be used directly
+                  by user code.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-from_xml_node-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-from_xml_node-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 147</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">parent</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">new</span>.<span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">parent</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-xml_builder'>
+                <a name='method-i-xml_builder'></a>
+                <div class='synopsis'>
+                  <span class='name'>xml_builder</span>
+                  <span class='arguments'>(opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return an appropriate Nokogiri::XML::Builder instance used to create the
+                  XML.  This should probably not be used directly by user code.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-xml_builder-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-xml_builder-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 154</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">xml_builder</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder</span>]&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">builder_opts</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder_opts</span>]&#x000A;      <span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder_opts</span>]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      {}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">builder_opts</span>[<span class="ruby-value">:encoding</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:encoding</span>)&#x000A;    <span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Builder</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">builder_opts</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-xml_deserialize_name_proc'>
+                <a name='method-i-xml_deserialize_name_proc'></a>
+                <div class='synopsis'>
+                  <span class='name'>xml_deserialize_name_proc</span>
+                  <span class='arguments'>(opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a proc (or any other object that responds to []), used for
+                  formatting XML tag names when serializing to XML. This should probably not
+                  be used directly by user code.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-xml_deserialize_name_proc-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-xml_deserialize_name_proc-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 171</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">xml_deserialize_name_proc</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:underscore</span>]&#x000A;    <span class="ruby-constant">UNDERSCORE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">IDENTITY</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-xml_serialize_name_proc'>
+                <a name='method-i-xml_serialize_name_proc'></a>
+                <div class='synopsis'>
+                  <span class='name'>xml_serialize_name_proc</span>
+                  <span class='arguments'>(opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a proc (or any other object that responds to []), used for
+                  formatting XML tag names when serializing to XML. This should probably not
+                  be used directly by user code.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-xml_serialize_name_proc-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-xml_serialize_name_proc-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 184</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">xml_serialize_name_proc</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">pr</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:dasherize</span>]&#x000A;    <span class="ruby-constant">DASHERIZE</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:camelize</span>]&#x000A;    <span class="ruby-constant">CAMELIZE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">IDENTITY</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;#{pr[s]}_&quot;</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.30.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.30.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.30.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-12-01 10:07:58 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Dataset+Literalization+Refactoring">Dataset Literalization Refactoring</h1>
+            <ul><li>
+            <p>As warned about in the 3.29.0 release notes, dataset literalization has
+            been completely refactored.  It now uses an append-only design which is
+            faster in all cases, about twice as fast for large objects and deeply
+            nested structures, and over two orders of magnitude faster in some
+            pathological cases.</p>
+            
+            <p>This change should not affect applications, but may affect custom
+            extensions or adapters that dealt with literalization of objects. Most
+            literalization methods now have a method with an _append suffix that does
+            the actual literalization, which takes the sql string to append to as the
+            first argument.  If you were overriding a literalization method, you now
+            probably need to override the _append version instead.  If you have this
+            literalization method:</p>
+            
+            <pre class="ruby"> <span class="ruby-keyword">def</span> <span class="ruby-identifier">foo_sql</span>(<span class="ruby-identifier">bar</span>)&#x000A;   <span class="ruby-node">&quot;BAR #{literal(bar.baz)}&quot;</span>&#x000A; <span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">You</span> <span class="ruby-identifier">need</span> <span class="ruby-identifier">to</span> <span class="ruby-identifier">change</span> <span class="ruby-identifier">the</span> <span class="ruby-identifier">code</span> <span class="ruby-identifier">to</span><span class="ruby-operator">:</span>&#x000A;&#x000A; <span class="ruby-keyword">def</span> <span class="ruby-identifier">foo_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">bar</span>)&#x000A;   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;BAR &quot;</span>&#x000A;   <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">bar</span>.<span class="ruby-identifier">baz</span>)&#x000A; <span class="ruby-keyword">end</span>&#x000A;&#x000A; <span class="ruby-keyword">def</span> <span class="ruby-identifier">foo_sql</span>(<span class="ruby-identifier">bar</span>)&#x000A;   <span class="ruby-identifier">sql</span> = <span class="ruby-string">&quot;&quot;</span>&#x000A;   <span class="ruby-identifier">foo_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">bar</span>)&#x000A;   <span class="ruby-identifier">sql</span>&#x000A; <span class="ruby-keyword">end</span></pre>
+            
+            <p>If you have questions about modifying your custom adapter or extension,
+            please ask on the Google Group or the IRC channel.</p>
+            </li></ul>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>Model#set_server has been added to the base support (it was previously only
+            in the sharding plugin), which allows you to set the shard on which to
+            save/delete the model instance:</p>
+            
+            <pre>foo1.set_server(:server_a).save&#x000A;foo2.set_server(:server_a).destroy</pre>
+            </li><li>
+            <p>Model#save now accepts a :server option that uses set_server to set the
+            shard to use.  Unlike most other save options, this option persists past
+            the end of the save.  Previously, the :server option only affected the
+            transaction code, it now affects the INSERT/UPDATE statement as well.</p>
+            </li><li>
+            <p>When initiating a new dataset graph, any existing selected columns is
+            assumed to be the columns to select for the graph from the current/master
+            table.  Before, there was not a way to specify the columns to select from
+            the current/master table.</p>
+            </li><li>
+            <p>A :graph_alias_base association option has been added, which is used to set
+            the base alias name to use when eager graphing.  This is mostly useful when
+            cascading eager graphs to dependent associations, where multiple
+            associations with the same name in different models are being graphed
+            simultaneously.</p>
+            </li><li>
+            <p>You can now specify nanoseconds and a timezone offset when converting a
+            hash or array to a timestamp.  The nanoseconds and offset are the 7th and
+            8th entries in the array, and the :nanos and :offset entry in the hash.</p>
+            </li><li>
+            <p>The postgres adapter now respects a :connect_timeout option if you are
+            using the pg driver.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p>Type conversion of Java to Ruby types in the JDBC adapter has been made
+            much faster, as conversion method lookup is now O(number of columns)
+            instead of O(number of columns*number of rows).</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel/SQL/Blob.html">Sequel::SQL::Blob</a>
+            literalization is now much faster on adapters that use hex encoding, by
+            switching to String#unpack(&#39;H*&#39;).</p>
+            </li><li>
+            <p>Database#after_commit and after_rollback now respect the :server option to
+            set the server/shard to use.</p>
+            </li><li>
+            <p><a href="../../../classes/Symbol.html">Symbol</a> splitting (e.g. for
+            table__column) is now slightly faster.</p>
+            </li><li>
+            <p>All adapters now pass the dataset :limit/:offset value through
+            Dataset#literal instead of using it verbatim.  Note that Dataset#limit
+            already called to_i on input strings, so this isn&#39;t a security issue. 
+            However, the previous code broke if you provided a Sequel-specific object
+            (e.g. <a
+            href="../../../classes/Sequel/SQL/Function.html">Sequel::SQL::Function</a>)
+            as the :limit/:offset value.</p>
+            </li><li>
+            <p>Calling graph and eager_graph on an already graphed dataset no longer
+            modifies the receiver.</p>
+            </li><li>
+            <p>Model#set_server now correctly handles the case where @this is already
+            loaded.</p>
+            </li><li>
+            <p>Dataset#destroy for model datasets now uses the dataset&#39;s shard for
+            transactions.</p>
+            </li><li>
+            <p>When emulating offset support using ROW_NUMBER (on Microsoft SQL Server,
+            DB2, and Oracle), explicitly order by the ROW_NUMBER result, as otherwise
+            the results are not guaranteed to be ordered.</p>
+            </li><li>
+            <p>Explicitly force a case insensitive collation when emulating ILIKE on
+            Microsoft SQL Server.  Previously, ILIKE could be case sensitive on
+            Microsoft SQL Server if case sensitive collation was the database default.</p>
+            </li><li>
+            <p>Using on_duplicate_key_update with prepared statements on MySQL now works
+            correctly.</p>
+            </li><li>
+            <p>The tinytds adapter now works correctly if the identifier_output_method is
+            nil.</p>
+            </li><li>
+            <p>The plugin/extension specs were cleaned up using the mock adapter.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>In addition to the previously mentioned dataset literalization changes, any
+            custom adapters that overrode *_clause_methods methods need to be modified
+            to add a method that adds the SELECT/UPDATE/INSERT/DELETE.  Previously,
+            this was done by default, but due to common table expressions and the
+            dataset literalization changes, a separate method is now needed.</p>
+            </li><li>
+            <p>Dataset#on_duplicate_key_update_sql has been removed from the shared mysql
+            adapter.</p>
+            </li><li>
+            <p>The :columns dataset option used when inserting is no longer literalized in
+            advance.</p>
+            </li><li>
+            <p>Dataset#as_sql no longer takes an expression, it just takes the alias, and
+            only adds the alias part.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

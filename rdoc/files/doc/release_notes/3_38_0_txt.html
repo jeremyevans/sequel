@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.38.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.38.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.38.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2012-08-01 09:25:38 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>A pg_row extension has been added that supports PostgreSQL&#39;s
+            row-valued/composite types.  You can register support for specific row
+            types:</p>
+            
+            <pre>DB.register_row_type(:address)</pre>
+            
+            <p>Then you can create values of that row type:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ad</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">row_type</span>(:<span class="ruby-identifier">address</span>, [<span class="ruby-string">&#39;555 Foo St.&#39;</span>, <span class="ruby-string">&#39;Bar City&#39;</span>, <span class="ruby-string">&#39;98765&#39;</span>])&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-identifier">ad</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">row_type</span>(:<span class="ruby-identifier">address</span>, :<span class="ruby-identifier">street=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;555 Foo St.&#39;</span>,&#x000A;                      :<span class="ruby-identifier">city=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bar City&#39;</span>, :<span class="ruby-identifier">zip=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;98765&#39;</span>)</pre>
+            
+            <p>Which you can use in your datasets:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">people</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Me&#39;</span>, :<span class="ruby-identifier">address=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">ad</span>)</pre>
+            
+            <p>If you are using the native postgres adapter, when retreiving row type
+            values, they will be returned as instances of the row type, which are
+            hash-like objects:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ad</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">people</span>].<span class="ruby-identifier">get</span>(:<span class="ruby-identifier">address</span>)&#x000A;<span class="ruby-identifier">ad</span>[:<span class="ruby-identifier">street</span>] <span class="ruby-comment"># =&gt; &#39;555 Foo St.&#39;</span>&#x000A;<span class="ruby-identifier">ad</span>[:<span class="ruby-identifier">city</span>]   <span class="ruby-comment"># =&gt; &#39;Bar City&#39;</span>&#x000A;<span class="ruby-identifier">ad</span>[:<span class="ruby-identifier">zip</span>]    <span class="ruby-comment"># =&gt; &#39;98765&#39;</span></pre>
+            
+            <p>If you are also using the pg_array extension, then arrays of composite
+            types are supported automatically.  Composite types can also include arrays
+            of other types as well as other composite types, though recursive composite
+            types are not allowed by PostgreSQL.</p>
+            
+            <p>Using arrays and composite types brings one of the benefits of document
+            databases to PostgreSQL, allowing you to store nested structures inside a
+            single row.</p>
+            </li><li>
+            <p>A pg_row_ops extension has been added that adds DSL support for accessing
+            members of row-valued/composite types. You first create a row op:</p>
+            
+            <pre>r = Sequel.pg_row_op(:row_column)</pre>
+            
+            <p>Then you can get DSL support for accessing members of that row_column via
+            the [] method:</p>
+            
+            <pre>r[:a] # (row_column).a</pre>
+            
+            <p>This works with composite types containing composite types:</p>
+            
+            <pre>r[:a][:b] # ((row_column).a).b</pre>
+            
+            <p>When used in conjunction with the pg_array_ops extension, there is support
+            for composite types that include arrays, as well as arrays of composite
+            types:</p>
+            
+            <pre>r[1][:a] # (row_column[1]).a&#x000A;r[:a][1] # (row_column).a[1]</pre>
+            
+            <p>The extension offers additional support for referencing a table&#39;s type
+            when it contains a column with the same name, see the RDoc for details.</p>
+            </li><li>
+            <p>A pg_row plugin has been added, that works with the pg_row extension, and
+            allows you to represent row-valued types as <a
+            href="../../../classes/Sequel/Model.html">Sequel::Model</a> objects
+            (instead of the hash-like objects they use by default).  In your model
+            class, you load the plugin:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Address</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">address</span>)&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">pg_row</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>Then you can use Address instances in your datasets:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ad</span> = <span class="ruby-constant">Address</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">street=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;555 Foo St.&#39;</span>,&#x000A;                 :<span class="ruby-identifier">city=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bar City&#39;</span>, :<span class="ruby-identifier">zip=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;98765&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">people</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Me&#39;</span>, :<span class="ruby-identifier">address=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">ad</span>)</pre>
+            
+            <p>And if you are using the native postgres adapter, the dataset will return
+            the type as a model instance:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ad</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">people</span>].<span class="ruby-identifier">get</span>(:<span class="ruby-identifier">address</span>)&#x000A;<span class="ruby-identifier">ad</span>.<span class="ruby-identifier">street</span> <span class="ruby-comment"># =&gt; &#39;555 Foo St.&#39;</span>&#x000A;<span class="ruby-identifier">ad</span>.<span class="ruby-identifier">city</span>   <span class="ruby-comment"># =&gt; &#39;Bar City&#39;</span>&#x000A;<span class="ruby-identifier">ad</span>.<span class="ruby-identifier">zip</span>    <span class="ruby-comment"># =&gt; &#39;98765&#39;</span></pre>
+            </li><li>
+            <p>A pg_typecast_on_load plugin has been added.  This plugin is designed for
+            use with the jdbc/postgres, do/postgres, and swift/postgres adapters, and
+            it is similar to the typecast_on_load plugin.  However, while the
+            typecast_on_load plugin uses setter methods, the pg_typecast_on_load plugin
+            uses the same code that the native postgres adapter uses for typecasting.</p>
+            </li><li>
+            <p>The tinytds adapter now supports a :textsize option to override the default
+            TEXTSIZE setting.  The FreeTDS default is fairly small (~64k), so if you
+            want to use large blob or text columns, you should probably set this to a
+            value larger than the largest text/blob you want to use.</p>
+            </li><li>
+            <p>Sequel.expr when called with a symbol now splits the symbol and returns an
+            Identifier, QualifiedIdentifier, or AliasedExpression,  depending on the
+            content of the symbol.  Previously, it only wrapped the symbol using a
+            Wrapper.</p>
+            </li><li>
+            <p>Identifier#* and QualifiedIdentifier#* when called without any argument now
+            represent a selection of all columns from the represented table:</p>
+            
+            <pre>Sequel.expr(:table).*          # table.*&#x000A;Sequel.expr(:schema__table).*  # schema.table.*</pre>
+            
+            <p>This makes it easier to represent the selection of all columns in a table
+            without using the core extensions.</p>
+            </li><li>
+            <p>Model#values now has a Model#to_hash alias.</p>
+            </li><li>
+            <p>SQL::Blob values now have as, cast, and lit methods even if the core
+            extensions are not loaded.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p>When loading multiple pg_* extensions into a Database instance, the
+            conversion procs are only reset once instead of once per extension.</p>
+            </li><li>
+            <p>All adapters that access PostgreSQL now store type conversion procs,
+            similar to the native postgres adapter.  This has been added to make it
+            easier to write extensions that support advanced PostgreSQL types.</p>
+            </li><li>
+            <p>Database#schema output on PostgreSQL now includes the type oid for each
+            column.</p>
+            </li><li>
+            <p>You can now register custom array types to specific Database instances,
+            using the :type_procs and :typecast_methods_module options, so it is now
+            possible to have custom array types without affecting global state.</p>
+            </li><li>
+            <p>Dropping of columns with defaults now works correctly on Microsoft SQL
+            Server.  Before, it would fail as the related constraint was not dropped
+            first.</p>
+            </li><li>
+            <p>The MySQL type "double(x,y)" is now recognized as a float type.</p>
+            </li><li>
+            <p>The jdbc/jtds and jdbc/derby adapters now handle nil prepared statement
+            values in more cases.</p>
+            </li><li>
+            <p>Blob prepared statement arguments are now handled correctly on jdbc/db2 and
+            jdbc/oracle.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now works around a
+            Time#nsec bug in JRuby 1.6 ruby 1.9 mode when using Time values in prepared
+            statements in the jdbc adapter.</p>
+            </li><li>
+            <p>Java::JavaUtil::UUID types are now returned as ruby strings when converting
+            types in the jdbc adapter.</p>
+            </li><li>
+            <p>Real boolean literals are now used on derby 10.7+.  On derby &lt;10.7 <a
+            href="../../../classes/Sequel.html">Sequel</a> still uses (1 = 1) and (1 !=
+            1) for true and false.  This allows you to use boolean columns with a
+            true/false default on derby 10.7+.</p>
+            </li><li>
+            <p>Clobs are now treated as string types instead of blobs on derby, since
+            treating clob as blob doesn&#39;t work there.</p>
+            </li><li>
+            <p>The swift adapter now supports an output identifier method.</p>
+            </li><li>
+            <p>The swift adapter now returns blobs as SQL::Blob instances.</p>
+            </li><li>
+            <p>The schema_dumper extension no longer produces code that requires the core
+            extensions.</p>
+            </li><li>
+            <p>All of Sequel&#39;s specs now run without the core extensions loaded,
+            ensuring that none of the internals depend on the core extensions. The only
+            exception is the specs for the core extensions themselves.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>The pg_* extensions no longer modify core classes if the <a
+            href="../core_extensions_rdoc.html">core_extensions</a> extension is not
+            loaded.  All methods they added now have equivalent methods on the main <a
+            href="../../../classes/Sequel.html">Sequel</a> module:</p>
+            
+            <pre>Sequel.pg_array&#x000A;Sequel.pg_array_op&#x000A;Sequel.hstore&#x000A;Sequel.hstore_op&#x000A;Sequel.pg_json&#x000A;Sequel.pg_range&#x000A;Sequel.pg_range_op</pre>
+            </li><li>
+            <p>The Sequel::SQL::IdentifierMethods module has been removed.  This module
+            was only included in <a href="../../../classes/Symbol.html">Symbol</a> if
+            the <a href="../core_extensions_rdoc.html">core_extensions</a> were
+            enabled.  Since it only defined a single method, now the core extensions
+            just define that method directly on <a
+            href="../../../classes/Symbol.html">Symbol</a>.</p>
+            </li><li>
+            <p>The swift adapter now requires swift-db-{postgres,mysql,sqlite3} gems
+            instead of the swift gem.  swift/postgres requires swift-db-postgres
+            0.2.0+, swift/sqlite requires swift-db-sqlite 0.1.2+, and swift/mysql
+            requires swift-db-mysql.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> will no longer typecast a
+            string to a PostgreSQL array or hstore column in a model column setter. 
+            This is because the parsers that <a
+            href="../../../classes/Sequel.html">Sequel</a> uses were designed to
+            support only PostgreSQL&#39;s output format.  It&#39;s unlikely that a user
+            would provide that format for typecasting, and while there aren&#39;t known
+            security issues with the parsers, they were not designed to handle
+            arbtirary user input, so typecasting from string is no longer allowed and
+            will now raise an error.</p>
+            
+            <p>The only reason such typecasting was allowed in the first place was to work
+            around issues in the jdbc/postgres, do/postgres, and swift/postgres
+            adapters, using the the typecast_on_load plugin. If you were previously
+            using the typecast_on_load plugin for hstore or array columns, you need to
+            switch to using the new pg_typecast_on_load plugin.</p>
+            </li><li>
+            <p>The private get_conversion_procs method in the postgres adapter no longer
+            accepts an argument.</p>
+            </li><li>
+            <p>The Sequel::Postgres::PGArray::DatabaseMethods singleton
+            define_array_typecast_method method has been removed.  This method was
+            designed for internal use.</p>
+            </li><li>
+            <p>The change to make Sequel.expr split symbols can cause the following type
+            of code to break:</p>
+            
+            <pre>Sequel.expr(:column___alias).desc</pre>
+            
+            <p>This is because expr now returns an AliasedExpression, which doesn&#39;t
+            support the desc method.  However, as you can&#39;t apply an order to an
+            aliased expression, nobody should be relying on this.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

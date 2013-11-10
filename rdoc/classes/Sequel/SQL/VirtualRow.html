@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::SQL::VirtualRow</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::SQL::VirtualRow
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../SQL.html">SQL</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The purpose of the <code>VirtualRow</code> class is to allow the easy
+            creation of <a href="../SQL.html">SQL</a> identifiers and functions without
+            relying on methods defined on <code>Symbol</code>.  This is useful if
+            another library defines the methods defined by <a
+            href="../../Sequel.html">Sequel</a>, if you are running on ruby 1.9, or if
+            you are not using the core extensions.</p>
+            
+            <p>An instance of this class is yielded to the block supplied to
+            <code>Dataset#filter</code>, <code>Dataset#order</code>, and
+            <code>Dataset#select</code> (and the other methods that accept a block and
+            pass it to one of those methods). If the block doesn&#39;t take an
+            argument, the block is instance_execed in the context of an instance of
+            this class.</p>
+            
+            <p><code>VirtualRow</code> uses <code>method_missing</code> to return either
+            an <code>Identifier</code>, <code>QualifiedIdentifier</code>,
+            <code>Function</code>, or <code>WindowFunction</code>,  depending on how it
+            is called.</p>
+            
+            <p>If a block is <em>not</em> given, creates one of the following objects:</p>
+            <dl class="rdoc-list note-list"><dt><code>Function</code> 
+            <dd>
+            <p>Returned if any arguments are supplied, using the method name as the
+            function name, and the arguments as the function arguments.</p>
+            </dd><dt><code>QualifiedIdentifier</code> 
+            <dd>
+            <p>Returned if the method name contains __, with the table being the part
+            before __, and the column being the part after.</p>
+            </dd><dt><code>Identifier</code> 
+            <dd>
+            <p>Returned otherwise, using the method name.</p>
+            </dd></dl>
+            
+            <p>If a block is given, it returns either a <code>Function</code> or
+            <code>WindowFunction</code>, depending on the first argument to the method.
+            Note that the block is currently not called by the code, though this may
+            change in a future version.  If the first argument is:</p>
+            <dl class="rdoc-list note-list"><dt>no arguments given 
+            <dd>
+            <p>creates a <code>Function</code> with no arguments.</p>
+            </dd><dt>:* 
+            <dd>
+            <p>creates a <code>Function</code> with a literal wildcard argument (*),
+            mostly useful for COUNT.</p>
+            </dd><dt>:distinct 
+            <dd>
+            <p>creates a <code>Function</code> that prepends <a
+            href="VirtualRow.html#DISTINCT">DISTINCT</a> to the rest of the arguments,
+            mostly useful for aggregate functions.</p>
+            </dd><dt>:over 
+            <dd>
+            <p>creates a <code>WindowFunction</code>.  If a second argument is provided,
+            it should be a hash of options which are passed to <a
+            href="Window.html">Window</a> (with possible keys :window, :partition,
+            :order, and :frame).  The arguments to the function itself should be
+            specified as <code>:*=&gt;true</code> for a wildcard, or via the
+            <code>:args</code> option.</p>
+            </dd></dl>
+            
+            <p>Examples:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">t</span>]&#x000A;&#x000A;<span class="ruby-comment"># Argument yielded to block</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>} <span class="ruby-comment"># SELECT * FROM t WHERE (name &lt; 2)</span>&#x000A;&#x000A;<span class="ruby-comment"># Block without argument (instance_eval)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>} <span class="ruby-comment"># SELECT * FROM t WHERE (name &lt; 2)</span>&#x000A;&#x000A;<span class="ruby-comment"># Qualified identifiers</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">table__column</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>} <span class="ruby-comment"># SELECT * FROM t WHERE ((table.column + 1) &lt; 2)</span>&#x000A;&#x000A;<span class="ruby-comment"># Functions</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">is_active</span>(<span class="ruby-value">1</span>, <span class="ruby-string">&#39;arg2&#39;</span>)} <span class="ruby-comment"># SELECT * FROM t WHERE is_active(1, &#39;arg2&#39;)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">version</span>{}} <span class="ruby-comment"># SELECT version() FROM t</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(:*){}} <span class="ruby-comment"># SELECT count(*) FROM t</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(:<span class="ruby-identifier">distinct</span>, <span class="ruby-identifier">col1</span>){}} <span class="ruby-comment"># SELECT count(DISTINCT col1) FROM t</span>&#x000A;&#x000A;<span class="ruby-comment"># Window Functions</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">rank</span>(:<span class="ruby-identifier">over</span>){}} <span class="ruby-comment"># SELECT rank() OVER () FROM t</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(:<span class="ruby-identifier">over</span>, :<span class="ruby-operator">*=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>){}} <span class="ruby-comment"># SELECT count(*) OVER () FROM t</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">over</span>, :<span class="ruby-identifier">args=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col1</span>, :<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col2</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col3</span>){}} <span class="ruby-comment"># SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3) FROM t</span>&#x000A;&#x000A;<span class="ruby-comment"># Math Operators</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">+</span>(<span class="ruby-value">1</span>, :<span class="ruby-identifier">a</span>).<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">b</span>)} <span class="ruby-comment"># SELECT (1 + a) AS b FROM t</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">-</span>(<span class="ruby-value">2</span>, :<span class="ruby-identifier">a</span>).<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">b</span>)} <span class="ruby-comment"># SELECT (2 - a) AS b FROM t</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.*(<span class="ruby-value">3</span>, :<span class="ruby-identifier">a</span>).<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">b</span>)} <span class="ruby-comment"># SELECT (3 * a) AS b FROM t</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">/</span>(<span class="ruby-value">4</span>, :<span class="ruby-identifier">a</span>).<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">b</span>)} <span class="ruby-comment"># SELECT (4 / a) AS b FROM t</span>&#x000A;&#x000A;<span class="ruby-comment"># Boolean Operators</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.&amp;({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, :<span class="ruby-identifier">b</span>)}    <span class="ruby-comment"># SELECT * FROM t WHERE ((a = 1) AND b)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">|</span>({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, :<span class="ruby-identifier">b</span>)}    <span class="ruby-comment"># SELECT * FROM t WHERE ((a = 1) OR b)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">~</span>({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>})}        <span class="ruby-comment"># SELECT * FROM t WHERE (a != 1)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">~</span>({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>})} <span class="ruby-comment"># SELECT * FROM t WHERE ((a != 1) OR (b != 2))</span>&#x000A;&#x000A;<span class="ruby-comment"># Inequality Operators</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">&gt;</span>(<span class="ruby-value">1</span>, :<span class="ruby-identifier">a</span>)}  <span class="ruby-comment"># SELECT * FROM t WHERE (1 &gt; a)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">&lt;</span>(<span class="ruby-value">2</span>, :<span class="ruby-identifier">a</span>)}  <span class="ruby-comment"># SELECT * FROM t WHERE (2 &lt; a)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">&gt;=</span>(<span class="ruby-value">3</span>, :<span class="ruby-identifier">a</span>)} <span class="ruby-comment"># SELECT * FROM t WHERE (3 &gt;= a)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">&lt;=</span>(<span class="ruby-value">4</span>, :<span class="ruby-identifier">a</span>)} <span class="ruby-comment"># SELECT * FROM t WHERE (4 &lt;= a)</span>&#x000A;&#x000A;<span class="ruby-comment"># Literal Strings</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{{<span class="ruby-identifier">a</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">%xsome SQL`</span>}} <span class="ruby-comment"># SELECT * FROM t WHERE (a = some SQL)</span></pre>
+            
+            <p>For a more detailed explanation, see the <a
+            href="../../../files/doc/virtual_rows_rdoc.html">Virtual Rows guide</a></p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-60">`</a></li>
+              <li><a target="docwin" href="#method-i-method_missing">method_missing</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="OperatorBuilders.html">OperatorBuilders</a></li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>COMMA_ARRAY</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[COMMA_SEPARATOR].freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>COMMA_SEPARATOR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>LiteralString.new(', ').freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DISTINCT</td>
+                    <td>=</td>
+                    <td class='context-item-value'>["DISTINCT ".freeze].freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DOUBLE_UNDERSCORE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'__'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>QUESTION_MARK</td>
+                    <td>=</td>
+                    <td class='context-item-value'>LiteralString.new('?').freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>VIRTUAL_ROW</td>
+                    <td>=</td>
+                    <td class='context-item-value'>new</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>WILDCARD</td>
+                    <td>=</td>
+                    <td class='context-item-value'>LiteralString.new('*').freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-60'>
+                <a name='method-i-60'></a>
+                <div class='synopsis'>
+                  <span class='name'>`</span>
+                  <span class='arguments'>(s)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a literal string created with the given string.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-60-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-60-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1605</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">`</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-method_missing'>
+                <a name='method-i-method_missing'></a>
+                <div class='synopsis'>
+                  <span class='name'>method_missing</span>
+                  <span class='arguments'>(m, *args, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return an <code>Identifier</code>, <code>QualifiedIdentifier</code>,
+                  <code>Function</code>, or <code>WindowFunction</code>, depending on
+                  arguments and whether a block is provided.  Does not currently call the
+                  block. See the class level documentation.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-method_missing-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-method_missing-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1612</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">m</span>, *<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;      <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">case</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:*</span>&#x000A;        <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-constant">WILDCARD</span>)&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:distinct</span>&#x000A;        <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">DISTINCT</span> <span class="ruby-operator">+</span> <span class="ruby-constant">COMMA_ARRAY</span> * (<span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>), <span class="ruby-identifier">args</span>))&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:over</span>&#x000A;        <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span> <span class="ruby-operator">||</span> {}&#x000A;        <span class="ruby-identifier">fun_args</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Kernel</span>.<span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:*</span>] <span class="ruby-operator">?</span> <span class="ruby-constant">WILDCARD</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:args</span>])&#x000A;        <span class="ruby-constant">WindowFunction</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, *<span class="ruby-identifier">fun_args</span>), <span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>))&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;unsupported VirtualRow method argument used with block&#39;</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-constant">DOUBLE_UNDERSCORE</span>, <span class="ruby-value">2</span>)&#x000A;    <span class="ruby-identifier">column</span> <span class="ruby-operator">?</span> <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

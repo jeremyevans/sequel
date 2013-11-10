@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.0.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.0.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.0.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Deprecated Methods/Features Removed</p>
+            <hr style="height: 10px">
+            
+            <p>Methods and features that were deprecated in 2.12.0 have been removed in
+            3.0.0.  Many features were moved into plugins or extensions, so in many
+            cases you just need to require an extension or use Model.plugin and not
+            make any changes to your code.  See the 2.12.0 release notes for the list
+            of methods/features deprecated in 2.12.0.</p>
+            
+            <p>If you are upgrading from a previous 2.x release, please upgrade to 2.12.0
+            first, fix your code to remove all deprecation warnings, and then upgrade
+            to 3.0.0.</p>
+            
+            <p>New Adapter</p>
+            <hr style="height: 9px">
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now has an Amalgalite
+            adapter.  Amalgalite is a ruby extension that embeds SQLite without
+            requiring a separate SQLite installation.  The adapter is functionality
+            complete but significantly slower than the native SQLite adapter.</p>
+            </li></ul>
+            
+            <p>New Features</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p>The JDBC, PostgreSQL, MySQL, and SQLite adapters all now have a
+            Database#indexes method that returns indexes for a given table:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">indexes</span>(:<span class="ruby-identifier">songs</span>)&#x000A;=<span class="ruby-operator">&gt;</span> {:<span class="ruby-identifier">songs_name_index=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">columns=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">name</span>]},&#x000A;    :<span class="ruby-identifier">songs_lyricid_index=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>, :<span class="ruby-identifier">columns=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">lyricid</span>]}}</pre>
+            </li><li>
+            <p>A schema_dumper extension was added to <a
+            href="../../../classes/Sequel.html">Sequel</a>.  It supports dumping the
+            schema of a table (including indexes) as a string that can be evaluated in
+            the context of a Database object to create the table. It also supports
+            dumping all tables in the database as a string containing a Migration
+            subclass that will rebuild the database.</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel/extensions/schema_dumper&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_table_schema</span>(:<span class="ruby-identifier">table</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_migration</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_migration</span>(:<span class="ruby-identifier">same_db=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_migration</span>(:<span class="ruby-identifier">indexes=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_indexes_migration</span></pre>
+            
+            <p>The :same_db option causes <a
+            href="../../../classes/Sequel.html">Sequel</a> to not translate column
+            types to generic column types.  By default, the migration created will use
+            generic types so it will run on other databases.  However, if you only want
+            to support a single database, using the :same_db option will make the
+            migration use the exact database type parsed from the database.</p>
+            
+            <p>The :indexes=&gt;false option causes indexes not be included in the
+            migration.  The dump_indexes_migration can be used to create a separate
+            migration with the indexes.  This can be useful if you  plan on loading a
+            lot of data right after creating the tables, since it is faster to add
+            indexes after the data has been added.</p>
+            </li><li>
+            <p>Using options with the generic database types is now supported to a limited
+            extent.  For example, the following code now works:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">50</span>               <span class="ruby-comment"># varchar(50)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">b</span>, :<span class="ruby-identifier">text=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>             <span class="ruby-comment"># text</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">c</span>, :<span class="ruby-identifier">fixed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">30</span> <span class="ruby-comment"># char(30)</span>&#x000A;  <span class="ruby-constant">Time</span> :<span class="ruby-identifier">ts</span>                           <span class="ruby-comment"># timestamp</span>&#x000A;  <span class="ruby-constant">Time</span> :<span class="ruby-identifier">t</span>, :<span class="ruby-identifier">only_time=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>          <span class="ruby-comment"># time</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            </li><li>
+            <p>Using Dataset#filter and related methods with multiple arguments now works
+            much more intuitively:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># 2.12.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a IS NULL AND (b = 1) IS NULL</span>&#x000A;<span class="ruby-comment"># 3.0.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a AND b = 1</span></pre>
+            </li><li>
+            <p>You can now create temporary tables by passing the :temp=&gt;true option to
+            Database#create_table.</p>
+            </li><li>
+            <p>The Oracle shared adapter now supports emulation of autoincrementing
+            primary keys by creating a sequence and a trigger, similar to how the
+            Firebird adapter works.</p>
+            </li><li>
+            <p>The Database#database_type method was added that returns a symbol
+            specifying the database type being used.  This can be different than
+            Database.adapter_scheme if you are using an adapter like JDBC that allows
+            connecting to multiple different types of databases.</p>
+            </li><li>
+            <p>Database#drop_index and related methods now support an options hash that
+            respects the :name option, so they can now be used to drop an index that
+            doesn&#39;t use the default index name.</p>
+            </li><li>
+            <p>The PostgreSQL shared adapter now supports a
+            Database#reset_primary_key_sequence method to reset the primary key
+            sequence for a given table, based on code from ActiveRecord.</p>
+            </li><li>
+            <p>SQL::QualifiedIdentifiers can now be qualified, allowing you to do:</p>
+            
+            <pre>:column.qualify(:table).qualify(:schema)</pre>
+            </li><li>
+            <p>Using the :db_type=&gt;&#39;mssql&#39; option with the DBI adapter will now
+            load the MSSQL support.</p>
+            </li><li>
+            <p>The MySQL shared adapter now supports Dataset#full_text_sql, which you can
+            use in queries like the following:</p>
+            
+            <pre>ds.select(:table.*, ds.full_text_sql(:column, &#39;value&#39;).as(:ft))</pre>
+            </li></ul>
+            
+            <p>Other Improvements</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> will now release
+            connections from the connection pool automatically if they are held by a
+            dead thread.  This can happen if you are using MRI 1.8 and you are heavily
+            multithreaded or you call Thread#exit! or similar method explicitly.  Those
+            methods skip the execution of ensure blocks which normally release the
+            connections when the threads exit.</p>
+            </li><li>
+            <p>Model#save will now always use the same server when refreshing data after
+            an insert.  This fixes an issue when Sequel&#39;s master/slave database
+            support is used with models.</p>
+            </li><li>
+            <p>SQL <a href="../../../classes/Array.html">Array</a> references are now
+            quoted correctly, so code like this now works:</p>
+            
+            <pre>:table__column.sql_subscript(1)</pre>
+            </li><li>
+            <p>The PostgreSQL shared adapter now handles sequences that need to be quoted
+            correctly (previously these were quoted twice).</p>
+            </li><li>
+            <p><a href="../../../classes/String.html">String</a> quoting on Oracle no
+            longer doubles backslashes.</p>
+            </li><li>
+            <p>Database#count now works correctly when used on MSSQL when using an adapter
+            that doesn&#39;t handle unnamed columns.</p>
+            </li><li>
+            <p>Full text searching in the MySQL adapter now works correctly when multiple
+            search terms are used.</p>
+            </li><li>
+            <p>Altering a column&#39;s name, type, default, or NULL/NOT NULL status on
+            MySQL now keeps other relevent column information.  For example, if you
+            alter a column&#39;s type, it&#39;ll keep an existing default. This
+            functionality isn&#39;t complete, there may be other column information
+            that is lost.</p>
+            </li><li>
+            <p>Fix creation of an index with a given type on MySQL, since MySQL&#39;s
+            documentation lies.</p>
+            </li><li>
+            <p>The schema parser now handles decimal types with size specifiers, fixing
+            use on MySQL.</p>
+            </li><li>
+            <p>Dataset#quote_identifier now works correctly when given an SQL::Identifier.
+            This allows you to do:</p>
+            
+            <pre>dataset.select{sum(hours).as(hours)}</pre>
+            </li></ul>
+            
+            <p>Backwards Compatibility</p>
+            <hr style="height: 10px">
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> will now use
+            instance_eval on all virtual row blocks without an argument.  This can lead
+            to much nicer code:</p>
+            
+            <pre>dataset.filter{(number &gt; 10) &amp; (name &gt; &#39;M&#39;)}&#x000A;# WHERE number &gt; 10 AND name &gt; &#39;M&#39;</pre>
+            
+            <p>2.12.0 raised a deprecation warning if you used a virtual row block without
+            an argument and you hadn&#39;t set Sequel.virtual_row_instance_eval = true.</p>
+            </li><li>
+            <p>Dataset#exclude now inverts the given argument, instead of negating it.
+            This only changes its behavior if it is called with a hash or array of all
+            two pairs that have more than one element.</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># 2.12.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a != 1 AND b != 1</span>&#x000A;<span class="ruby-comment"># 3.0.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a != 1 OR b != 1</span></pre>
+            
+            <p>This was done for consistency, since exclude would only negate a hash if it
+            was given an argument, it would invert the same hash if you used a block:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># 2.12.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>{{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}} <span class="ruby-comment"># a != 1 OR b != 1</span></pre>
+            
+            <p>If you want the previous behavior, change the code to the following:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}.<span class="ruby-identifier">sql_negate</span>)</pre>
+            </li><li>
+            <p>As noted above, the methods/features deprecated in 2.12.0 were removed.</p>
+            </li><li>
+            <p>The private Dataset#select_*_sql methods now only take a single argument,
+            the SQL string being built.</p>
+            </li><li>
+            <p>Dataset#from when called without arguments would previously cause an error
+            to be raised when the SQL string is generated.  Now it causes no FROM
+            clause to be used, similar to how Dataset#select with no arguments causes
+            SELECT * to be used.</p>
+            </li><li>
+            <p>The internals of the generic type support and the schema generators were
+            changed significantly, which could have some fallout in terms of old
+            migrations breaking if they used the generic types and were relying on some
+            undocumented behavior (such as using Integer as a type with the :unsigned
+            option).</p>
+            </li><li>
+            <p>The Firebird adapter no longer translates the text database specific type. 
+            Use the following instead:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">String</span> :<span class="ruby-identifier">column</span>, :<span class="ruby-identifier">text=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span></pre>
+            </li><li>
+            <p>The MySQL shared adapter used to use the timestamp type for Time, now it
+            uses datetime.  This is because the timestamp type cannot represent
+            everything that the ruby Time class can represent.</p>
+            </li><li>
+            <p>Metaprogramming#metaattr_accessor and metaattr_reader methods were removed.</p>
+            </li><li>
+            <p>Dataset#irregular_function_sql was removed.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

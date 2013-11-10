@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>3.43.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>3.43.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/3.43.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-01-08 15:33:17 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>A core_refinements extension has been added, which offers refinement
+            versions of Sequel&#39;s core extensions.  This requires the new
+            experimental refinement support added in ruby 2.0, and allows you to use
+            the <a href="../../../classes/Sequel.html">Sequel</a> DSL methods in a file
+            without actually modifying the <a
+            href="../../../classes/Symbol.html">Symbol</a>, <a
+            href="../../../classes/String.html">String</a>, <a
+            href="../../../classes/Array.html">Array</a>, and <a
+            href="../../../classes/Hash.html">Hash</a> classes.</p>
+            </li><li>
+            <p>A date_arithmetic extension has been added for performing
+            database-independent date calculations (adding/subtracting an interval
+            to/from a date):</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">date_arithmetic</span>&#x000A;<span class="ruby-identifier">e</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_add</span>(:<span class="ruby-identifier">date_column</span>, :<span class="ruby-identifier">years=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">months=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>, :<span class="ruby-identifier">days=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-identifier">e</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_DATE</span>)</pre>
+            
+            <p>In addition to providing the interval as a hash, you can also provide it as
+            an ActiveSupport::Duration object.  This extension is supported on 11
+            database types.</p>
+            </li><li>
+            <p>Dataset#get can now take an array of multiple expressions to get an array
+            of values, similar to map/select_map:</p>
+            
+            <pre>value1, value2 = DB[:table].get([:column1, :column2])</pre>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> can now handle
+            [host.]database.schema.table qualified tables on Microsoft SQL Server.  To
+            implement this support, the split_qualifiers method has been added to
+            Database and Dataset for taking a possibly qualified identifier and
+            splitting it into an array of identifier strings.</p>
+            </li><li>
+            <p>The string_stripper plugin now offers the ability to manually specify which
+            columns to skip stripping for via Model.skip_string_stripping.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p>The jdbc adapter now works with the new jdbc-* gems, which require a manual
+            load_driver step that the older jdbc-* gems did not require.</p>
+            </li><li>
+            <p>The string_stripper plugin no longer strips blob columns or values.</p>
+            </li><li>
+            <p>Database#copy_into in both the postgres and jdbc/postgres adapters has been
+            fixed to better handle exceptions.</p>
+            </li><li>
+            <p>Dataset#hash and Model#hash are now significantly faster.</p>
+            </li><li>
+            <p>Lambda procs with 0 arity can now be used as virtual row blocks on ruby
+            1.9.  Previously, attempting to use a lambda proc with 0 arity as a virtual
+            row block on ruby 1.9 would raise an exception.</p>
+            </li><li>
+            <p>Schema-qualified composite types are now handled correctly in the pg_row
+            extension.</p>
+            </li><li>
+            <p>Database#reset_primary_key_sequence on PostgreSQL now works correctly when
+            a default_schema is set.</p>
+            </li><li>
+            <p>tinyint(1) unsigned columns on MySQL are now parsed as booleans instead of
+            integers on MySQL if converting tinyint to boolean.</p>
+            </li><li>
+            <p>The jdbc adapter now supports the jdbc-hsqldb gem, so you can now install
+            that instead of having to require the .jar manually.</p>
+            </li><li>
+            <p>Blobs are now casted correctly on DB2 when the use_clob_as_blob setting is
+            false.</p>
+            </li><li>
+            <p>Oracle timestamptz types are now handled correctly in the jdbc/oracle
+            adapter.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now defaults to
+            :prefetch_rows = 100 in the oracle adapter, which can significantly improve
+            performance.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now defines
+            respond_to_missing? where method_missing? is defined and the object also
+            responds to respond_to?.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel/BasicObject.html">Sequel::BasicObject</a>
+            now responds to instance_exec on ruby 1.8.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>The meta_def method that was defined on Database, Dataset, and Model
+            classes and instances has been moved to an extension named meta_def, and is
+            no longer loaded by default.  This method was previously used internally,
+            and it wasn&#39;t designed for external use.  If you have code that uses
+            meta_def, you should now load the extension manually:</p>
+            
+            <pre>Sequel.extension :meta_def</pre>
+            </li><li>
+            <p>The private _*_dataset_helper model association methods are no longer
+            defined.  The AssociationReflection#dataset_helper_method public method is
+            also no longer defined.</p>
+            </li><li>
+            <p>Dataset#schema_and_table now always returns strings (or nil). Before, in
+            some cases it would return symbols.</p>
+            </li><li>
+            <p>Using a conditions specifier array with Dataset#get no longer works due to
+            the new multiple values support in Database#get. So code such as:</p>
+            
+            <pre>DB[:table].get([[:a, 1], [:b, 2]])</pre>
+            
+            <p>should be changed to:</p>
+            
+            <pre>DB[:table].get(Sequel.expr([[:a, 1], [:b, 2]]))</pre>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

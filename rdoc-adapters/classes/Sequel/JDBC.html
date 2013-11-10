@@ -1,0 +1,349 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::JDBC</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::JDBC
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc_rb.html">lib/sequel/adapters/jdbc.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/as400_rb.html">lib/sequel/adapters/jdbc/as400.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/cubrid_rb.html">lib/sequel/adapters/jdbc/cubrid.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/db2_rb.html">lib/sequel/adapters/jdbc/db2.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/derby_rb.html">lib/sequel/adapters/jdbc/derby.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/firebird_rb.html">lib/sequel/adapters/jdbc/firebird.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/h2_rb.html">lib/sequel/adapters/jdbc/h2.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/hsqldb_rb.html">lib/sequel/adapters/jdbc/hsqldb.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/informix_rb.html">lib/sequel/adapters/jdbc/informix.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/jtds_rb.html">lib/sequel/adapters/jdbc/jtds.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/mssql_rb.html">lib/sequel/adapters/jdbc/mssql.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/mysql_rb.html">lib/sequel/adapters/jdbc/mysql.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/oracle_rb.html">lib/sequel/adapters/jdbc/oracle.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/postgresql_rb.html">lib/sequel/adapters/jdbc/postgresql.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/progress_rb.html">lib/sequel/adapters/jdbc/progress.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/sqlanywhere_rb.html">lib/sequel/adapters/jdbc/sqlanywhere.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/sqlite_rb.html">lib/sequel/adapters/jdbc/sqlite.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/sqlserver_rb.html">lib/sequel/adapters/jdbc/sqlserver.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/transactions_rb.html">lib/sequel/adapters/jdbc/transactions.rb</a>
+          </li>
+          <li>
+            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Houses Sequel&#39;s <a href="JDBC.html">JDBC</a> support when running on
+            JRuby.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-load_gem">load_gem</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="JDBC/AS400.html">Sequel::JDBC::AS400</a></li>
+              <li><a target="docwin" href="JDBC/Cubrid.html">Sequel::JDBC::Cubrid</a></li>
+              <li><a target="docwin" href="JDBC/DB2.html">Sequel::JDBC::DB2</a></li>
+              <li><a target="docwin" href="JDBC/Derby.html">Sequel::JDBC::Derby</a></li>
+              <li><a target="docwin" href="JDBC/Firebird.html">Sequel::JDBC::Firebird</a></li>
+              <li><a target="docwin" href="JDBC/H2.html">Sequel::JDBC::H2</a></li>
+              <li><a target="docwin" href="JDBC/HSQLDB.html">Sequel::JDBC::HSQLDB</a></li>
+              <li><a target="docwin" href="JDBC/Informix.html">Sequel::JDBC::Informix</a></li>
+              <li><a target="docwin" href="JDBC/JTDS.html">Sequel::JDBC::JTDS</a></li>
+              <li><a target="docwin" href="JDBC/JavaLang.html">Sequel::JDBC::JavaLang</a></li>
+              <li><a target="docwin" href="JDBC/JavaSQL.html">Sequel::JDBC::JavaSQL</a></li>
+              <li><a target="docwin" href="JDBC/JavaxNaming.html">Sequel::JDBC::JavaxNaming</a></li>
+              <li><a target="docwin" href="JDBC/MSSQL.html">Sequel::JDBC::MSSQL</a></li>
+              <li><a target="docwin" href="JDBC/MySQL.html">Sequel::JDBC::MySQL</a></li>
+              <li><a target="docwin" href="JDBC/Oracle.html">Sequel::JDBC::Oracle</a></li>
+              <li><a target="docwin" href="JDBC/Postgres.html">Sequel::JDBC::Postgres</a></li>
+              <li><a target="docwin" href="JDBC/Progress.html">Sequel::JDBC::Progress</a></li>
+              <li><a target="docwin" href="JDBC/SQLServer.html">Sequel::JDBC::SQLServer</a></li>
+              <li><a target="docwin" href="JDBC/SQLite.html">Sequel::JDBC::SQLite</a></li>
+              <li><a target="docwin" href="JDBC/SqlAnywhere.html">Sequel::JDBC::SqlAnywhere</a></li>
+              <li><a target="docwin" href="JDBC/Transactions.html">Sequel::JDBC::Transactions</a></li>
+              <li><a target="docwin" href="JDBC/Database.html">Sequel::JDBC::Database</a></li>
+              <li><a target="docwin" href="JDBC/Dataset.html">Sequel::JDBC::Dataset</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DATABASE_SETUP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      {:postgresql=>proc do |db|
+                      JDBC.load_gem(:Postgres)
+                      org.postgresql.Driver
+                      Sequel.require 'adapters/jdbc/postgresql'
+                      db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
+                      db.dataset_class = Sequel::JDBC::Postgres::Dataset
+                      org.postgresql.Driver
+                      end,
+                      :mysql=>proc do |db|
+                      JDBC.load_gem(:MySQL)
+                      com.mysql.jdbc.Driver
+                      Sequel.require 'adapters/jdbc/mysql'
+                      db.extend(Sequel::JDBC::MySQL::DatabaseMethods)
+                      db.extend_datasets Sequel::MySQL::DatasetMethods
+                      com.mysql.jdbc.Driver
+                      end,
+                      :sqlite=>proc do |db|
+                      JDBC.load_gem(:SQLite3)
+                      org.sqlite.JDBC
+                      Sequel.require 'adapters/jdbc/sqlite'
+                      db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
+                      db.extend_datasets Sequel::SQLite::DatasetMethods
+                      db.set_integer_booleans
+                      org.sqlite.JDBC
+                      end,
+                      :oracle=>proc do |db|
+                      Java::oracle.jdbc.driver.OracleDriver
+                      Sequel.require 'adapters/jdbc/oracle'
+                      db.extend(Sequel::JDBC::Oracle::DatabaseMethods)
+                      db.dataset_class = Sequel::JDBC::Oracle::Dataset
+                      Java::oracle.jdbc.driver.OracleDriver
+                      end,
+                      :sqlserver=>proc do |db|
+                      com.microsoft.sqlserver.jdbc.SQLServerDriver
+                      Sequel.require 'adapters/jdbc/sqlserver'
+                      db.extend(Sequel::JDBC::SQLServer::DatabaseMethods)
+                      db.extend_datasets Sequel::MSSQL::DatasetMethods
+                      db.send(:set_mssql_unicode_strings)
+                      com.microsoft.sqlserver.jdbc.SQLServerDriver
+                      end,
+                      :jtds=>proc do |db|
+                      JDBC.load_gem(:JTDS)
+                      Java::net.sourceforge.jtds.jdbc.Driver
+                      Sequel.require 'adapters/jdbc/jtds'
+                      db.extend(Sequel::JDBC::JTDS::DatabaseMethods)
+                      db.dataset_class = Sequel::JDBC::JTDS::Dataset
+                      db.send(:set_mssql_unicode_strings)
+                      Java::net.sourceforge.jtds.jdbc.Driver
+                      end,
+                      :h2=>proc do |db|
+                      JDBC.load_gem(:H2)
+                      org.h2.Driver
+                      Sequel.require 'adapters/jdbc/h2'
+                      db.extend(Sequel::JDBC::H2::DatabaseMethods)
+                      db.dataset_class = Sequel::JDBC::H2::Dataset
+                      org.h2.Driver
+                      end,
+                      :hsqldb=>proc do |db|
+                      JDBC.load_gem(:HSQLDB)
+                      org.hsqldb.jdbcDriver
+                      Sequel.require 'adapters/jdbc/hsqldb'
+                      db.extend(Sequel::JDBC::HSQLDB::DatabaseMethods)
+                      db.dataset_class = Sequel::JDBC::HSQLDB::Dataset
+                      org.hsqldb.jdbcDriver
+                      end,
+                      :derby=>proc do |db|
+                      JDBC.load_gem(:Derby)
+                      org.apache.derby.jdbc.EmbeddedDriver
+                      Sequel.require 'adapters/jdbc/derby'
+                      db.extend(Sequel::JDBC::Derby::DatabaseMethods)
+                      db.dataset_class = Sequel::JDBC::Derby::Dataset
+                      org.apache.derby.jdbc.EmbeddedDriver
+                      end,
+                      :as400=>proc do |db|
+                      com.ibm.as400.access.AS400JDBCDriver
+                      Sequel.require 'adapters/jdbc/as400'
+                      db.extend(Sequel::JDBC::AS400::DatabaseMethods)
+                      db.dataset_class = Sequel::JDBC::AS400::Dataset
+                      com.ibm.as400.access.AS400JDBCDriver
+                      end,
+                      :"informix-sqli"=>proc do |db|
+                      com.informix.jdbc.IfxDriver
+                      Sequel.require 'adapters/jdbc/informix'
+                      db.extend(Sequel::JDBC::Informix::DatabaseMethods)
+                      db.extend_datasets Sequel::Informix::DatasetMethods
+                      com.informix.jdbc.IfxDriver
+                      end,
+                      :db2=>proc do |db|
+                      com.ibm.db2.jcc.DB2Driver
+                      Sequel.require 'adapters/jdbc/db2'
+                      db.extend(Sequel::JDBC::DB2::DatabaseMethods)
+                      db.dataset_class = Sequel::JDBC::DB2::Dataset
+                      com.ibm.db2.jcc.DB2Driver
+                      end,
+                      :firebirdsql=>proc do |db|
+                      org.firebirdsql.jdbc.FBDriver
+                      Sequel.require 'adapters/jdbc/firebird'
+                      db.extend(Sequel::JDBC::Firebird::DatabaseMethods)
+                      db.extend_datasets Sequel::Firebird::DatasetMethods
+                      org.firebirdsql.jdbc.FBDriver
+                      end,
+                      :jdbcprogress=>proc do |db|
+                      com.progress.sql.jdbc.JdbcProgressDriver
+                      Sequel.require 'adapters/jdbc/progress'
+                      db.extend(Sequel::JDBC::Progress::DatabaseMethods)
+                      db.extend_datasets Sequel::Progress::DatasetMethods
+                      com.progress.sql.jdbc.JdbcProgressDriver
+                      end,
+                      :cubrid=>proc do |db|
+                      Java::cubrid.jdbc.driver.CUBRIDDriver
+                      Sequel.require 'adapters/jdbc/cubrid'
+                      db.extend(Sequel::JDBC::Cubrid::DatabaseMethods)
+                      db.extend_datasets Sequel::Cubrid::DatasetMethods
+                      Java::cubrid.jdbc.driver.CUBRIDDriver
+                      end,
+                      :sqlanywhere=>proc do |db|
+                      drv = [
+                      lambda{Java::sybase.jdbc4.sqlanywhere.IDriver},
+                      lambda{Java::ianywhere.ml.jdbcodbc.jdbc4.IDriver},
+                      lambda{Java::sybase.jdbc.sqlanywhere.IDriver},
+                      lambda{Java::ianywhere.ml.jdbcodbc.jdbc.IDriver},
+                      lambda{Java::com.sybase.jdbc4.jdbc.Sybdriver},
+                      lambda{Java::com.sybase.jdbc3.jdbc.Sybdriver}
+                      ].each do |class_proc|
+                      begin
+                      break class_proc.call
+                      rescue NameError
+                      end
+                      end
+                      Sequel.require 'adapters/jdbc/sqlanywhere'
+                      db.extend(Sequel::JDBC::SqlAnywhere::DatabaseMethods)
+                      db.dataset_class = Sequel::JDBC::SqlAnywhere::Dataset
+                      drv
+                      end
+                      }
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Contains procs keyed on sub adapter type that extend the given database
+                      object so it supports the correct database type.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DECIMAL_TYPE_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/number|numeric|decimal/io</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The types to check for 0 scale to transform :decimal types to :integer.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>JNDI_URI_REGEXP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/\Ajdbc:jndi:(.+)/</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Used to identify a jndi connection and to extract the jndi resource name.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-load_gem'>
+                <a name='method-c-load_gem'></a>
+                <div class='synopsis'>
+                  <span class='name'>load_gem</span>
+                  <span class='arguments'>(name)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Allowing loading the necessary <a href="JDBC.html">JDBC</a> support via a
+                  gem, which works for PostgreSQL, <a href="JDBC/MySQL.html">MySQL</a>, and
+                  <a href="JDBC/SQLite.html">SQLite</a>.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-load_gem-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-load_gem-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 170</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">load_gem</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">require</span> <span class="ruby-node">&quot;jdbc/#{name.to_s.downcase}&quot;</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">LoadError</span>&#x000A;    <span class="ruby-comment"># jdbc gem not used, hopefully the user has the .jar in their CLASSPATH</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Jdbc</span>) <span class="ruby-operator">&amp;&amp;</span> ( <span class="ruby-operator">::</span><span class="ruby-constant">Jdbc</span>.<span class="ruby-identifier">const_defined?</span>(<span class="ruby-identifier">name</span>) <span class="ruby-keyword">rescue</span> <span class="ruby-keyword">nil</span> )&#x000A;      <span class="ruby-identifier">jdbc_module</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Jdbc</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">name</span>) <span class="ruby-comment"># e.g. Jdbc::SQLite3</span>&#x000A;      <span class="ruby-identifier">jdbc_module</span>.<span class="ruby-identifier">load_driver</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">jdbc_module</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:load_driver</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

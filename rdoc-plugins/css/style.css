@@ -1,0 +1,328 @@
+html, body {
+  height: 100%; }
+
+body {
+  font-family: Lucida Grande, Verdana, Arial, Helvetica, sans-serif;
+  font-size: 90%;
+  margin: 0;
+  padding: 0;
+  background: white;
+  color: black; }
+
+#wrapper {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -43px; }
+
+#footer-push {
+  height: 43px; }
+
+div.header, #footer {
+  background: #eeeeee; }
+
+#footer {
+  border-top: 1px solid silver;
+  margin-top: 12px;
+  padding: 0 2em;
+  line-height: 30px;
+  text-align: center;
+  font-variant: small-caps;
+  font-size: 95%; }
+
+.clearing:after {
+  content: ".";
+  visibility: hidden;
+  height: 0;
+  display: block;
+  clear: both; }
+* html .clearing {
+  height: 1px; }
+.clearing *:first-child + html {
+  overflow: hidden; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: normal; }
+
+a {
+  color: #0b3e71; }
+  a:hover {
+    background: #336699;
+    text-decoration: none;
+    color: #eeeeff; }
+
+#diagram img {
+  border: 0; }
+
+#description a, .method .description a, .header a {
+  color: #336699; }
+  #description a:hover, .method .description a:hover, .header a:hover {
+    color: #eeeeee; }
+#description h1 a, #description h2 a, #description h3 a, #description h4 a, #description h5 a, #description h6 a, .method .description h1 a, .method .description h2 a, .method .description h3 a, .method .description h4 a, .method .description h5 a, .method .description h6 a, .header h1 a, .header h2 a, .header h3 a, .header h4 a, .header h5 a, .header h6 a {
+  color: #0b3e71; }
+
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none; }
+  ol li {
+    margin-left: 0;
+    white-space: nowrap; }
+    ol li.other {
+      display: none; }
+
+ol.expanded li.other {
+  display: list-item; }
+
+table {
+  margin-bottom: 1em;
+  font-size: 1em;
+  border-collapse: collapse; }
+  table td, table th {
+    padding: 0.4em 0.8em; }
+  table thead {
+    background-color: #e8e8e8; }
+    table thead th {
+      font-variant: small-caps;
+      color: #666666; }
+  table tr {
+    border-bottom: 1px solid silver; }
+
+#index a.show, div.header a.show {
+  text-decoration: underline;
+  font-style: italic;
+  color: #666666; }
+  #index a.show:after, div.header a.show:after {
+    content: " ..."; }
+  #index a.show:hover, div.header a.show:hover {
+    color: black;
+    background: #ffffee; }
+
+#index {
+  font: 85%/1.2 Arial, Helvetica, sans-serif; }
+  #index a {
+    text-decoration: none; }
+  #index h1 {
+    padding: 0.2em 0.5em 0.1em;
+    background: #cccccc;
+    font: small-caps 1.2em Georgia, serif;
+    color: #333333;
+    border-bottom: 1px solid gray; }
+  #index form {
+    margin: 0;
+    padding: 0; }
+    #index form input {
+      margin: 0.4em 3px 0 0.4em;
+      width: 80%; }
+    #index form #search.untouched {
+      color: #777777; }
+    #index form .clear_button {
+      -moz-border-radius: 7px;
+      -webkit-border-radius: 7px;
+      background: #aaaaaa;
+      color: white;
+      padding: 0 5px 1px 5px;
+      cursor: pointer; }
+  #index ol {
+    padding: 0.4em 0.5em; }
+    #index ol li {
+      white-space: nowrap; }
+  #index #index-entries li a {
+    padding: 1px 2px; }
+  #index #index-entries.classes {
+    font-size: 1.1em; }
+    #index #index-entries.classes ol {
+      padding: 0; }
+    #index #index-entries.classes span.nodoc {
+      display: none; }
+    #index #index-entries.classes span.nodoc, #index #index-entries.classes a {
+      font-weight: bold; }
+    #index #index-entries.classes .parent {
+      font-weight: normal; }
+  #index #index-entries.methods li, #index #search-results.methods li {
+    margin-bottom: 0.2em; }
+    #index #index-entries.methods li a .method_name, #index #search-results.methods li a .method_name {
+      margin-right: 0.25em; }
+    #index #index-entries.methods li a .module_name, #index #search-results.methods li a .module_name {
+      color: #666666; }
+    #index #index-entries.methods li a:hover .module_name, #index #search-results.methods li a:hover .module_name {
+      color: #dddddd; }
+
+#attribute-list .context-item-name {
+  font-weight: bold; }
+
+div.header {
+  font-size: 80%;
+  padding: 0.5em 2%;
+  font-family: Arial, Helvetica, sans-serif;
+  border-bottom: 1px solid silver; }
+  div.header .name {
+    font-size: 1.6em;
+    font-family: Georgia, serif; }
+    div.header .name .type {
+      color: #666666;
+      font-size: 80%;
+      font-variant: small-caps; }
+  div.header h1.name {
+    font-size: 2.2em; }
+  div.header .paths, div.header .last-update, div.header .parent {
+    color: #666666; }
+  div.header .last-update .datetime {
+    color: #484848; }
+  div.header .parent {
+    margin-top: 0.3em; }
+    div.header .parent strong {
+      font-weight: normal;
+      color: #484848; }
+
+#content {
+  padding: 12px 2%; }
+  div.class #content {
+    position: relative;
+    width: 72%; }
+  #content pre, #content .method .synopsis {
+    font: 14px Monaco, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace; }
+  #content pre {
+    color: black;
+    background: #eeeeee;
+    border: 1px solid silver;
+    padding: 0.5em 0.8em;
+    overflow: auto; }
+  #content p code, #content p tt, #content li code, #content li tt, #content dl code, #content dl tt {
+    font: 14px Monaco, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+    background: #ffffe3;
+    padding: 2px 3px;
+    line-height: 1.4; }
+  #content h1 code, #content h1 tt, #content h2 code, #content h2 tt, #content h3 code, #content h3 tt, #content h4 code, #content h4 tt, #content h5 code, #content h5 tt, #content h6 code, #content h6 tt {
+    font-size: 1.1em; }
+  #content #text {
+    position: relative; }
+  #content #description p {
+    margin-top: 0.5em; }
+  #content #description h1, #content #description h2, #content #description h3, #content #description h4, #content #description h5, #content #description h6 {
+    font-family: Georgia, serif; }
+  #content #description h1 {
+    font-size: 2.2em;
+    margin-bottom: 0.2em;
+    border-bottom: 3px double #d8d8d8;
+    padding-bottom: 0.1em; }
+  #content #description h2 {
+    font-size: 1.8em;
+    color: #0e3062;
+    margin: 0.8em 0 0.3em 0; }
+  #content #description h3 {
+    font-size: 1.6em;
+    margin: 0.8em 0 0.3em 0;
+    color: #666666; }
+  #content #description h4 {
+    font-size: 1.4em;
+    margin: 0.8em 0 0.3em 0; }
+  #content #description h5 {
+    font-size: 1.2em;
+    margin: 0.8em 0 0.3em 0;
+    color: #0e3062; }
+  #content #description h6 {
+    font-size: 1em;
+    margin: 0.8em 0 0.3em 0;
+    color: #666666; }
+  #content #description ul, #content #description ol, #content .method .description ul, #content .method .description ol {
+    margin: 0.8em 0;
+    padding-left: 1.5em; }
+  #content #description ol, #content .method .description ol {
+    list-style: decimal; }
+    #content #description ol li, #content .method .description ol li {
+      white-space: normal; }
+
+#method-list {
+  position: absolute;
+  top: 0px;
+  right: -33%;
+  width: 28%;
+  background: #eeeeee;
+  border: 1px solid silver;
+  padding: 0.4em 1%;
+  overflow: hidden; }
+  #method-list h2 {
+    font-size: 1.3em; }
+  #method-list h3 {
+    font-variant: small-caps;
+    text-transform: capitalize;
+    font-family: Georgia, serif;
+    color: #666666;
+    font-size: 1.1em; }
+  #method-list ol {
+    padding: 0 0 0.5em 0.5em; }
+
+#context {
+  border-top: 1px dashed silver;
+  margin-top: 1em;
+  margin-bottom: 1em; }
+
+#context h2, #section h2 {
+  font: small-caps 1.2em Georgia, serif;
+  color: #444444;
+  margin: 1em 0 0.2em 0; }
+
+#methods .method {
+  border: 1px solid silver;
+  margin-top: 0.5em;
+  background: #eeeeee; }
+  #methods .method .synopsis {
+    color: black;
+    background: silver;
+    padding: 0.2em 1em; }
+    #methods .method .synopsis .name {
+      font-weight: bold; }
+    #methods .method .synopsis a {
+      text-decoration: none; }
+  #methods .method .description {
+    padding: 0 1em; }
+    #methods .method .description pre {
+      background: #f8f8f8; }
+  #methods .method .source {
+    margin: 0.5em 0; }
+  #methods .method .source-toggle {
+    font-size: 85%;
+    margin-left: 1em; }
+#methods .public-class {
+  background: #ffffe4; }
+#methods .public-instance .synopsis {
+  color: #eeeeee;
+  background: #336699; }
+
+#content .method .source pre {
+  background: #262626;
+  color: #ffdead;
+  margin: 1em;
+  padding: 0.5em;
+  border: 1px dashed #999999;
+  overflow: auto; }
+  #content .method .source pre .ruby-constant {
+    color: #7fffd4;
+    background: transparent; }
+  #content .method .source pre .ruby-keyword {
+    color: aqua;
+    background: transparent; }
+  #content .method .source pre .ruby-ivar {
+    color: #eedd82;
+    background: transparent; }
+  #content .method .source pre .ruby-operator {
+    color: #00ffee;
+    background: transparent; }
+  #content .method .source pre .ruby-identifier {
+    color: #ffdead;
+    background: transparent; }
+  #content .method .source pre .ruby-node {
+    color: #ffa07a;
+    background: transparent; }
+  #content .method .source pre .ruby-comment {
+    color: #b22222;
+    font-weight: bold;
+    background: transparent; }
+  #content .method .source pre .ruby-regexp {
+    color: #ffa07a;
+    background: transparent; }
+  #content .method .source pre .ruby-value {
+    color: #7fffd4;
+    background: transparent; }

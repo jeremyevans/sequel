@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::SQL::StringExpression</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::SQL::StringExpression
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../SQL.html">SQL</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Subclass of <code>ComplexExpression</code> where the expression results in
+            a text/string/varchar value in <a href="../SQL.html">SQL</a>.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-like">like</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-sql_string">sql_string</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="StringMethods.html">StringMethods</a></li>
+                <li><a target="docwin" href="StringConcatenationMethods.html">StringConcatenationMethods</a></li>
+                <li><a target="docwin" href="InequalityMethods.html">InequalityMethods</a></li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>LIKE_MAP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>{[true, true]=>:'~*', [true, false]=>:~, [false, true]=>:ILIKE, [false, false]=>:LIKE}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Map of [regexp, case_insenstive] to <code>ComplexExpression</code> operator
+                      symbol</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-like'>
+                <a name='method-c-like'></a>
+                <div class='synopsis'>
+                  <span class='name'>like</span>
+                  <span class='arguments'>(l, *ces)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Creates a <a href="../SQL.html">SQL</a> pattern match exprssion. left (l)
+                  is the <a href="../SQL.html">SQL</a> string we are matching against, and
+                  ces are the patterns we are matching. The match succeeds if any of the
+                  patterns match (<a href="../SQL.html">SQL</a> OR).</p>
+                  
+                  <p>If a regular expression is used as a pattern, an <a
+                  href="../SQL.html">SQL</a> regular expression will be used, which is
+                  currently only supported on MySQL and PostgreSQL.  Be aware that MySQL and
+                  PostgreSQL regular expression syntax is similar to ruby regular expression
+                  syntax, but it not exactly the same, especially for advanced regular
+                  expression features.  <a href="../../Sequel.html">Sequel</a> just uses the
+                  source of the ruby regular expression verbatim as the <a
+                  href="../SQL.html">SQL</a> regular expression string.</p>
+                  
+                  <p>If any other object is used as a regular expression, the <a
+                  href="../SQL.html">SQL</a> LIKE operator will be used, and should be
+                  supported by most databases.</p>
+                  
+                  <p>The pattern match will be case insensitive if the last argument is a hash
+                  with a key of :case_insensitive that is not false or nil. Also, if a case
+                  insensitive regular expression is used (//i), that particular pattern which
+                  will always be case insensitive.</p>
+                  
+                  <pre class="ruby"><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;a%&#39;</span>) <span class="ruby-comment"># &quot;a&quot; LIKE &#39;a%&#39;</span>&#x000A;<span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;a%&#39;</span>, :<span class="ruby-identifier">case_insensitive=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>) <span class="ruby-comment"># &quot;a&quot; ILIKE &#39;a%&#39;</span>&#x000A;<span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;a%&#39;</span>, <span class="ruby-regexp">/^a/</span>) <span class="ruby-comment"># &quot;a&quot; LIKE &#39;a%&#39; OR &quot;a&quot; ~* &#39;^a&#39;</span></pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-like-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-like-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1437</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">like</span>(<span class="ruby-identifier">l</span>, *<span class="ruby-identifier">ces</span>)&#x000A;  <span class="ruby-identifier">l</span>, <span class="ruby-identifier">lre</span>, <span class="ruby-identifier">lci</span> = <span class="ruby-identifier">like_element</span>(<span class="ruby-identifier">l</span>)&#x000A;  <span class="ruby-identifier">lci</span> = (<span class="ruby-identifier">ces</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {})[<span class="ruby-value">:case_insensitive</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">true</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">lci</span>&#x000A;  <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">collect!</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ce</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">r</span>, <span class="ruby-identifier">rre</span>, <span class="ruby-identifier">rci</span> = <span class="ruby-identifier">like_element</span>(<span class="ruby-identifier">ce</span>)&#x000A;    <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">LIKE_MAP</span>[[<span class="ruby-identifier">lre</span><span class="ruby-operator">||</span><span class="ruby-identifier">rre</span>, <span class="ruby-identifier">lci</span><span class="ruby-operator">||</span><span class="ruby-identifier">rci</span>]], <span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, *<span class="ruby-identifier">ces</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-sql_string'>
+                <a name='method-i-sql_string'></a>
+                <div class='synopsis'>
+                  <span class='name'>sql_string</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return self instead of creating a new object to save on memory.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_string-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-sql_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1461</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_string</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

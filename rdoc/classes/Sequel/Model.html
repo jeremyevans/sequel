@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Model</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Model
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../files/lib/sequel/model_rb.html">lib/sequel/model.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/model/associations_rb.html">lib/sequel/model/associations.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/model/base_rb.html">lib/sequel/model/base.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/model/dataset_module_rb.html">lib/sequel/model/dataset_module.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/model/errors_rb.html">lib/sequel/model/errors.rb</a>
+          </li>
+          <li>
+            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p><code>Sequel::Model</code> is an object relational mapper built on top of
+            <a href="../Sequel.html">Sequel</a> core.  Each model class is backed by a
+            dataset instance, and many dataset methods can be called directly on the
+            class.  <a href="Model.html">Model</a> datasets return rows as model
+            instances, which have fairly standard ORM instance behavior.</p>
+            
+            <p><code>Sequel::Model</code> is built completely out of plugins.  <a
+            href="Plugins.html">Plugins</a> can override any class, instance, or
+            dataset method defined by a previous plugin and call super to get the
+            default behavior.  By default, <code>Sequel::Model</code> loads two
+            plugins, <code>Sequel::Model</code> (which is itself a plugin) for the base
+            support, and <code>Sequel::Model::Associations</code> for the associations
+            support.</p>
+            
+            <p>You can set the <code>SEQUEL_NO_ASSOCIATIONS</code> constant or environment
+            variable to make <a href="../Sequel.html">Sequel</a> not load the
+            associations plugin by default.</p>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="Model/Associations.html">Sequel::Model::Associations</a></li>
+              <li><a target="docwin" href="Model/ClassMethods.html">Sequel::Model::ClassMethods</a></li>
+              <li><a target="docwin" href="Model/DatasetMethods.html">Sequel::Model::DatasetMethods</a></li>
+              <li><a target="docwin" href="Model/InstanceMethods.html">Sequel::Model::InstanceMethods</a></li>
+              <li><a target="docwin" href="Model/DatasetModule.html">Sequel::Model::DatasetModule</a></li>
+              <li><a target="docwin" href="Model/Errors.html">Sequel::Model::Errors</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>AFTER_HOOKS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      [:after_create, :after_update, :after_save, :after_destroy,
+                      :after_validation, :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback]
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Hooks that are called after an action.  When overriding these, it is
+                      recommended to call <code>super</code> on the first line of your method, so
+                      later hooks are called after earlier hooks.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ANONYMOUS_MODEL_CLASSES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>{}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Map that stores model classes created with <code>Sequel::Model()</code>, to
+                      allow the reopening of classes when dealing with code reloading.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>AROUND_HOOKS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[:around_create, :around_update, :around_save, :around_destroy, :around_validation]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Hooks that are called around an action.  If overridden, these methods must
+                      call super exactly once if the behavior they wrap is desired.  The can be
+                      used to rescue exceptions raised by the code they wrap or ensure that some
+                      behavior is executed no matter what.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BEFORE_HOOKS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[:before_create, :before_update, :before_save, :before_destroy, :before_validation]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Hooks that are called before an action.  Can return false to not do the
+                      action.  When overriding these, it is recommended to call
+                      <code>super</code> as the last line of your method, so later hooks are
+                      called before earlier hooks.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>BOOLEAN_SETTINGS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, \
+                      :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_after_commit_rollback, :use_transactions]
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Boolean settings that can be modified at the global, class, or instance
+                      level.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DATASET_METHODS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS +
+                      [:each_server]) - [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases]
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Class methods added to model that call the method of the same name on the
+                      dataset</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>HOOKS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>BEFORE_HOOKS + AFTER_HOOKS</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Empty instance methods to create that the user can override to get
+                      hook/callback behavior. Just like any other method defined by <a
+                      href="../Sequel.html">Sequel</a>, if you override one of these, you should
+                      call <code>super</code> to get the default behavior (while empty by
+                      default, they can also be defined by plugins).  See the <a
+                      href="../../files/doc/model_hooks_rdoc.html">"Model Hooks" guide</a> for
+                      more detail on hooks.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>INHERITED_INSTANCE_VARIABLES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      {:@allowed_columns=>:dup,
+                      :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil,
+                      :@raise_on_save_failure=>nil, :@require_modification=>nil, 
+                      :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
+                      :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
+                      :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
+                      :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
+                      :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
+                      :@fast_instance_delete_sql=>nil,
+                      :@db=>nil, :@default_set_fields_options=>:dup}
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Class instance variables that are inherited in subclasses.  If the value is
+                      <code>:dup</code>, dup is called on the superclass&#39;s instance variable
+                      when creating the instance variable in the subclass. If the value is
+                      <code>nil</code>, the superclass&#39;s instance variable is used directly
+                      in the subclass.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NORMAL_METHOD_NAME_REGEXP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/\A[A-Za-z_][A-Za-z0-9_]*\z/</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Regular expression that determines if a method name is normal in the sense
+                      that it could be used literally in ruby code without using send.  Used to
+                      avoid problems when using eval with a string to define methods.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>OPTS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Sequel::OPTS</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>RESTRICTED_SETTER_METHODS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>instance_methods.map{|x| x.to_s}.grep(SETTER_METHOD_REGEXP)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The setter methods (methods ending with =) that are never allowed to be
+                      called automatically via
+                      <code>set</code>/<code>update</code>/<code>new</code>/etc..</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SETTER_METHOD_REGEXP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/=\z/</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Regular expression that determines if the method is a valid setter name
+                      (i.e. it ends with =).</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::Serialization</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::Serialization
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/serialization_rb.html">lib/sequel/plugins/serialization.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>Sequel&#39;s built in <a href="Serialization.html">Serialization</a> plugin
+            allows you to keep serialized ruby objects in the database, while giving
+            you deserialized objects when you call an accessor.</p>
+            
+            <p>This plugin works by keeping the serialized value in the values, and adding
+            a @deserialized_values hash.  The reader method for serialized columns will
+            check the @deserialized_values for the value, return it if present, or
+            deserialized the entry in @values and return it.  The writer method will
+            set the @deserialized_values entry.  This plugin adds a before_save hook
+            that serializes all @deserialized_values to @values.</p>
+            
+            <p>You can specify the serialization format as a pair of
+            serializer/deserializer callable objects.  You can also specify the
+            serialization format as a single symbol, if such a symbol has a registered
+            serializer/deserializer pair in the plugin.  By default, the plugin
+            registers the :marshal, :yaml, and :json serialization formats.  To
+            register your own serialization formats, use <a
+            href="Serialization.html#method-c-register_format">::register_format</a>.
+            If you use yaml or json format, you need to require the libraries, <a
+            href="../../Sequel.html">Sequel</a> does not do the requiring for you.</p>
+            
+            <p>You can specify the columns to serialize when loading the plugin, or later
+            using the serialize_attributes class method.</p>
+            
+            <p>Because of how this plugin works, it must be used inside each model class
+            that needs serialization, after any set_dataset method calls in that class.
+            Otherwise, it is possible that the default column accessors will take
+            precedence.</p>
+            
+            <h2 id="label-Example">Example</h2>
+            
+            <pre class="ruby"><span class="ruby-comment"># Require json if you plan to use it, as the plugin doesn&#39;t require it for you.</span>&#x000A;<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;json&#39;</span>&#x000A;&#x000A;<span class="ruby-comment"># Register custom serializer/deserializer pair, if desired</span>&#x000A;<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel/plugins/serialization&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Serialization</span>.<span class="ruby-identifier">register_format</span>(:<span class="ruby-identifier">reverse</span>,&#x000A;  <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>},&#x000A;  <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>})&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">User</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-comment"># Built-in format support when loading the plugin</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">serialization</span>, :<span class="ruby-identifier">json</span>, :<span class="ruby-identifier">permissions</span>&#x000A;&#x000A;  <span class="ruby-comment"># Built-in format support after loading the plugin using serialize_attributes</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">serialization</span>&#x000A;  <span class="ruby-identifier">serialize_attributes</span> :<span class="ruby-identifier">marshal</span>, :<span class="ruby-identifier">permissions</span>&#x000A;&#x000A;  <span class="ruby-comment"># Use custom registered serialization format just like built-in format</span>&#x000A;  <span class="ruby-identifier">serialize_attributes</span> :<span class="ruby-identifier">reverse</span>, :<span class="ruby-identifier">password</span>&#x000A;&#x000A;  <span class="ruby-comment"># Use a custom serializer/deserializer pair without registering</span>&#x000A;  <span class="ruby-identifier">serialize_attributes</span> [<span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>}, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>}], :<span class="ruby-identifier">password</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">user</span> = <span class="ruby-constant">User</span>.<span class="ruby-identifier">create</span>&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">permissions</span> = { :<span class="ruby-identifier">global</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;read-only&#39;</span> }&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">save</span></pre>
+            
+            <p>Note that if you mutate serialized column values without reassigning them,
+            those changes won&#39;t be picked up by <code>Model#save_changes</code> or
+            <code>Model#update</code>.  Example:</p>
+            
+            <pre>user = User[1]&#x000A;user.permissions[:global] = &#39;foo&#39;&#x000A;user.save_changes # Will not pick up changes to permissions</pre>
+            
+            <p>You can use the <code>serialization_modification_detection</code> plugin to
+            pick up such changes.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-apply">apply</a></li>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+              <li><a target="docwin" href="#method-c-register_format">register_format</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="Serialization/ClassMethods.html">Sequel::Plugins::Serialization::ClassMethods</a></li>
+              <li><a target="docwin" href="Serialization/InstanceMethods.html">Sequel::Plugins::Serialization::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>REGISTERED_FORMATS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>{}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The default serializers supported by the serialization module. Use <a
+                      href="Serialization.html#method-c-register_format">::register_format</a> to
+                      add serializers to this hash.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
+                <div class='synopsis'>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(model, *args)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set up the column readers to do deserialization and the column writers to
+                  save the value in deserialized_values.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 77</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@deserialization_map</span> = {}&#x000A;    <span class="ruby-ivar">@serialization_map</span> = {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model, format=nil, *columns)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Automatically call serialize_attributes with the format and columns unless
+                  no columns were provided.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 86</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">format</span>=<span class="ruby-keyword">nil</span>, *<span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">serialize_attributes</span>(<span class="ruby-identifier">format</span>, *<span class="ruby-identifier">columns</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-register_format'>
+                <a name='method-c-register_format'></a>
+                <div class='synopsis'>
+                  <span class='name'>register_format</span>
+                  <span class='arguments'>(format, serializer, deserializer)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Register a serializer/deserializer pair with a format symbol, to allow
+                  models to pick this format by name.  Both serializer and deserializer
+                  should be callable objects.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-register_format-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-register_format-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">register_format</span>(<span class="ruby-identifier">format</span>, <span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span>)&#x000A;  <span class="ruby-constant">REGISTERED_FORMATS</span>[<span class="ruby-identifier">format</span>] = [<span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Informix::Database</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Informix::Database
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/adapters/informix_rb.html">lib/sequel/adapters/informix.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Informix.html">Informix</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-connect">connect</a></li>
+              <li><a target="docwin" href="#method-i-execute">execute</a></li>
+              <li><a target="docwin" href="#method-i-execute_dui">execute_dui</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="DatabaseMethods.html">DatabaseMethods</a></li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-connect'>
+                <a name='method-i-connect'></a>
+                <div class='synopsis'>
+                  <span class='name'>connect</span>
+                  <span class='arguments'>(server)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-connect-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/informix.rb, line 11</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Informix</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>], <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>], <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-execute'>
+                <a name='method-i-execute'></a>
+                <div class='synopsis'>
+                  <span class='name'>execute</span>
+                  <span class='arguments'>(sql, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/informix.rb, line 21</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-identifier">c</span>.<span class="ruby-identifier">cursor</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-execute_dui'>
+                <a name='method-i-execute_dui'></a>
+                <div class='synopsis'>
+                  <span class='name'>execute_dui</span>
+                  <span class='arguments'>(sql, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns number of rows affected</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_dui-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/informix.rb, line 17</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-identifier">c</span>.<span class="ruby-identifier">immediate</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

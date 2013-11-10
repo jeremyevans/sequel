@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>transactions.rdoc</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>transactions.rdoc</h1>
+        <div class='paths'>
+          doc/transactions.rdoc
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2013-06-02 13:49:43 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Database+Transactions+">Database Transactions </h1>
+            
+            <p><a href="../../classes/Sequel.html">Sequel</a> uses autocommit mode by
+            default for all of its database adapters, so in general in <a
+            href="../../classes/Sequel.html">Sequel</a> if you want to use database
+            transactions, you need to be explicit about it.  There are a few cases
+            where transactions are used implicitly by default:</p>
+            <ul><li>
+            <p>Dataset#import to insert many records at once</p>
+            </li><li>
+            <p>Model#save</p>
+            </li><li>
+            <p>Model#destroy</p>
+            </li><li>
+            <p>Migrations if the database supports transactional schema</p>
+            </li><li>
+            <p>A few model plugins</p>
+            </li></ul>
+            
+            <p>Everywhere else, it is up to you to use a database transaction if you want
+            to.</p>
+            
+            <h2 id="label-Basic+Transaction+Usage">Basic Transaction Usage</h2>
+            
+            <p>In <a href="../../classes/Sequel.html">Sequel</a>, the
+            <code>Database#transaction</code> method should be called if you want to
+            use a database transaction.  This method must be called with a block.  If
+            the block does not raise an exception, the transaction is committed:</p>
+            
+            <pre>DB.transaction do # BEGIN&#x000A;  DB[:foo].insert(1) # INSERT&#x000A;end # COMMIT</pre>
+            
+            <p>If the block raises a <a
+            href="../../classes/Sequel/Rollback.html">Sequel::Rollback</a> exception,
+            the transaction is rolled back, but no exception is raised outside the
+            block:</p>
+            
+            <pre>DB.transaction do # BEGIN&#x000A;  raise Sequel::Rollback&#x000A;end # ROLLBACK&#x000A;# no exception raised</pre>
+            
+            <p>If any other exception is raised, the transaction is rolled back, and the
+            exception is raised outside the block:</p>
+            
+            <pre>DB.transaction do # BEGIN&#x000A;  raise ArgumentError&#x000A;end # ROLLBACK&#x000A;# ArgumentError raised</pre>
+            
+            <p>If you want <a
+            href="../../classes/Sequel/Rollback.html">Sequel::Rollback</a> exceptions
+            to be reraised, use the <code>:rollback =&gt; :reraise</code> option:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">reraise</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># Sequel::Rollback raised</span></pre>
+            
+            <p>If you always want to rollback (useful for testing), use the
+            <code>:rollback =&gt; :always</code> option:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">always</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># no exception raised</span></pre>
+            
+            <p>If you want to check whether you are currently in a transaction, use the
+            Database#in_transaction? method:</p>
+            
+            <pre>DB.in_transaction? # false&#x000A;DB.transaction do&#x000A;  DB.in_transaction? # true&#x000A;end</pre>
+            
+            <h2 id="label-Transaction+Hooks">Transaction Hooks</h2>
+            
+            <p>You can add hooks to an in progress transaction that are called after the
+            transaction commits or rolls back:</p>
+            
+            <pre>x = nil&#x000A;DB.transaction do&#x000A;  DB.after_commit{x = 1}&#x000A;  DB.after_rollback{x = 2}&#x000A;  x # nil&#x000A;end&#x000A;x # 1&#x000A;x = nil&#x000A;DB.transaction do&#x000A;  DB.after_commit{x = 1}&#x000A;  DB.after_rollback{x = 2}&#x000A;  raise Sequel::Rollback&#x000A;end&#x000A;x # 2</pre>
+            
+            <h2 id="label-Nested+Transaction+Calls+%2F+Savepoints">Nested Transaction Calls / Savepoints</h2>
+            
+            <p>You can nest calls to transaction, which by default just reuses the
+            existing transaction:</p>
+            
+            <pre>DB.transaction do # BEGIN&#x000A;  DB.transaction do&#x000A;    DB[:foo].insert(1) # INSERT&#x000A;  end&#x000A;end # COMMIT</pre>
+            
+            <p>You can use the <code>:savepoint =&gt; true</code> option in the inner
+            transaction to explicitly use a savepoint (if the database supports it):</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">savepoint</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+            
+            <p>If a <a href="../../classes/Sequel/Rollback.html">Sequel::Rollback</a>
+            exception is raised inside the savepoint block, it will only rollback to
+            the savepoint:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">savepoint</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;  <span class="ruby-comment"># no exception raised</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+            
+            <p>Other exceptions, unless rescued inside the outer transaction block, will
+            rollback the savepoint and the outer transactions, since they are reraised
+            by the transaction code:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">savepoint</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># ArgumentError raised</span></pre>
+            
+            <h2 id="label-Prepared+Transactions+%2F+Two-Phase+Commit">Prepared Transactions / Two-Phase Commit</h2>
+            
+            <p><a href="../../classes/Sequel.html">Sequel</a> supports database prepared
+            transactions on PostgreSQL, MySQL, and H2.  With prepared transactions, at
+            the end of the transaction, the transaction is not immediately committed
+            (it acts like a rollback).  Later, you can call
+            <code>commit_prepared_transaction</code> to commit the transaction or
+            <code>rollback_prepared_transaction</code> to roll the transaction back. 
+            Prepared transactions are usually used with distributed databases to make
+            sure all databases commit the same transaction or none of them do.</p>
+            
+            <p>To use prepared transactions in <a
+            href="../../classes/Sequel.html">Sequel</a>, you provide a string as the
+            value of the :prepare option:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">prepare</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;foo&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># PREPARE TRANSACTION &#39;foo&#39;</span></pre>
+            
+            <p>Later, you can commit the prepared transaction:</p>
+            
+            <pre>DB.commit_prepared_transaction(&#39;foo&#39;)</pre>
+            
+            <p>or roll the prepared transaction back:</p>
+            
+            <pre>DB.rollback_prepared_transaction(&#39;foo&#39;)</pre>
+            
+            <h2 id="label-Transaction+Isolation+Levels">Transaction Isolation Levels</h2>
+            
+            <p>The SQL standard supports 4 isolation levels: READ UNCOMMITTED, READ
+            COMMITTED, REPEATABLE READ, and SERIALIZABLE.  Not all databases implement
+            the levels as specified in the standard (or implement the levels at all),
+            but on most databases, you can specify which transaction isolation level
+            you want to use via the :isolation option to
+            <code>Database#transaction</code>.  The isolation level is specified as one
+            of the following symbols: :uncommitted, :committed, :repeatable, and
+            :serializable.  Using this option make <a
+            href="../../classes/Sequel.html">Sequel</a> use the correct transaction
+            isolation syntax for your database:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">isolation</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">serializable</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-comment"># SET TRANSACTION ISOLATION LEVEL SERIALIZABLE</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+            
+            <h2 id="label-Automatically+Restarting+Transactions">Automatically Restarting Transactions</h2>
+            
+            <p><a href="../../classes/Sequel.html">Sequel</a> offers the ability to
+            automatically restart transactions if specific types of errors are
+            detected.  For example, if you want to automatically restart a transaction
+            if a serialization failure is detected:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">isolation</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">serializable</span>, :<span class="ruby-identifier">retry_on=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SerializationFailure</span>]) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">ModelClass</span>.<span class="ruby-identifier">find_or_create</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Foo&#39;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>At the serializable transaction isolation level, find_or_create may raises
+            a <a
+            href="../../classes/Sequel/SerializationFailure.html">Sequel::SerializationFailure</a>
+            exception if multiple threads simultaneously run that code.  With the
+            :retry_on option set, the transaction will be automatically retried until
+            it succeeds.</p>
+            
+            <p>Note that automatic retrying should not be used unless the entire
+            transaction block is idempotent, as otherwise it can cause non-idempotent
+            behavior to execute multiple times.  For example, with the following code:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">isolation</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">serializable</span>, :<span class="ruby-identifier">retry_on=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SerializationFailure</span>]) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">logger</span>.<span class="ruby-identifier">info</span> <span class="ruby-string">&#39;Ensuring existence of ModelClass with name Foo&#39;</span>&#x000A;  <span class="ruby-constant">ModelClass</span>.<span class="ruby-identifier">find_or_create</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Foo&#39;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>The logger.info method will be called multiple times if there is a
+            serialization failure.</p>
+            
+            <p>The :num_retries option can be used to set the maxmimum number of times to
+            retry.  It is set to 5 times by default.</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

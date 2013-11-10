@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::NestedAttributes</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::NestedAttributes
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/nested_attributes_rb.html">lib/sequel/plugins/nested_attributes.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The nested_attributes plugin allows you to create, update, and delete
+            associated objects directly by calling a method on the current object.
+            Nested attributes are defined using the nested_attributes class method:</p>
+            
+            <pre>Artist.one_to_many :albums&#x000A;Artist.plugin :nested_attributes&#x000A;Artist.nested_attributes :albums</pre>
+            
+            <p>The nested_attributes call defines a single method,
+            <code><em>association</em>_attributes=</code>, (e.g.
+            <code>albums_attributes=</code>).  So if you have an Artist instance:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;YJM&#39;</span>)</pre>
+            
+            <p>You can create new album instances related to this artist:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">albums_attributes</span> = [{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>}, {:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;MO&#39;</span>}]</pre>
+            
+            <p>Note that this doesn&#39;t send any queries to the database yet.  That
+            doesn&#39;t happen till you save the object:</p>
+            
+            <pre>a.save</pre>
+            
+            <p>That will save the artist first, and then save both albums.  If either the
+            artist is invalid or one of the albums is invalid, none of the objects will
+            be saved to the database, and all related validation errors will be
+            available in the artist&#39;s validation errors.</p>
+            
+            <p>In addition to creating new associated objects, you can also update
+            existing associated objects.  You just need to make sure that the primary
+            key field is filled in for the associated object:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;T&#39;</span>}])</pre>
+            
+            <p>Since the primary key field is filled in, the plugin will update the album
+            with id 1 instead of creating a new album.</p>
+            
+            <p>If you would like to delete the associated object instead of updating it,
+            you add a _delete entry to the hash:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">_delete=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}])</pre>
+            
+            <p>This will delete the related associated object from the database.  If you
+            want to leave the associated object in the database, but just remove it
+            from the association, add a _remove entry in the hash:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">_remove=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}])</pre>
+            
+            <p>The above example was for a one_to_many association, but the plugin also
+            works similarly for other association types.  For one_to_one and
+            many_to_one associations, you need to pass a single hash instead of an
+            array of hashes.</p>
+            
+            <p>This plugin is mainly designed to make it easy to use on html forms, where
+            a single form submission can contained nested attributes (and even nested
+            attributes of those attributes). You just need to name your form inputs
+            correctly:</p>
+            
+            <pre>artist[name]&#x000A;artist[albums_attributes][0][:name]&#x000A;artist[albums_attributes][1][:id]&#x000A;artist[albums_attributes][1][:name]</pre>
+            
+            <p>Your web stack will probably parse that into a nested hash similar to:</p>
+            
+            <pre class="ruby">{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">,</span> <span class="ruby-operator">:</span><span class="ruby-identifier">albums_attributes</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-value">0</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">}</span>, <span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">,</span> <span class="ruby-operator">:</span><span class="ruby-identifier">name</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">}</span>}}}</pre>
+            
+            <p>Then you can do:</p>
+            
+            <pre>artist.update(params[:artist])</pre>
+            
+            <p>To save changes to the artist, create the first album and associate it to
+            the artist, and update the other existing associated album.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-apply">apply</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="NestedAttributes/ClassMethods.html">Sequel::Plugins::NestedAttributes::ClassMethods</a></li>
+              <li><a target="docwin" href="NestedAttributes/InstanceMethods.html">Sequel::Plugins::NestedAttributes::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
+                <div class='synopsis'>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(model)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Depend on the instance_hooks plugin.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:instance_hooks</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>
