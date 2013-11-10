@@ -26,7 +26,7 @@ options = OptionParser.new do |opts|
   opts.separator "  sequel postgres://localhost/my_blog"
   opts.separator "  sequel config/database.yml"
   opts.separator ""
-  opts.separator "For more information see http://sequel.rubyforge.org"
+  opts.separator "For more information see http://sequel.jeremyevans.net"
   opts.separator ""
   opts.separator "Options:"
 

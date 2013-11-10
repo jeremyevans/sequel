@@ -18,12 +18,12 @@ toolkit for Ruby.
 
 == Resources
 
-* {Website}[http://sequel.rubyforge.org]
+* {Website}[http://sequel.jeremyevans.net]
 * {Blog}[http://sequel.heroku.com]
 * {Source code}[http://github.com/jeremyevans/sequel]
 * {Bug tracking}[http://github.com/jeremyevans/sequel/issues]
 * {Google group}[http://groups.google.com/group/sequel-talk]
-* {RDoc}[http://sequel.rubyforge.org/rdoc]
+* {RDoc}[http://sequel.jeremyevans.net/rdoc]
 
 To check out the source code:
   

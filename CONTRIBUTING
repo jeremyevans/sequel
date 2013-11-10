@@ -31,13 +31,3 @@ Pull Request Guidelines
    
 5) All code in pull requests is assummed to be MIT licensed.  Do not
    submit a pull request if that isn't the case.
-
-Documentation Links on GitHub
------------------------------
-
-Links in the documentation on GitHub are broken, this is a known issue.
-The links in the documentation are designed to work correctly on the
-website (http://sequel.rubyforge.org), and fixing them on GitHub would
-break them on the website.  So please don't submit any pull requests
-to make the links work on GitHub, unless you can do so in such a way
-that makes them still work correctly on the website.
