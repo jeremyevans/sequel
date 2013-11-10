@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#insert work on PostgreSQL if the table name is a SQL::PlaceholderLiteralString (jeremyevans) (#736)
+
 * Copy unique constraints when emulating alter_table operations on SQLite (jeremyevans) (#735)
 
 * Don't return clob column values as SQL::Blob instances in the db2 and ibmdb adapters unless use_clob_as_blob is true (jeremyevans)

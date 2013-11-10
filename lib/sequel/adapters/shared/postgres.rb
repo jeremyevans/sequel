@@ -1367,8 +1367,13 @@ module Sequel
 
       # Return the primary key to use for RETURNING in an INSERT statement
       def insert_pk
-        if (f = opts[:from]) && !f.empty? && (pk = db.primary_key(f.first))
-          Sequel::SQL::Identifier.new(pk)
+        if (f = opts[:from]) && !f.empty?
+          case t = f.first
+          when Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier
+            if pk = db.primary_key(t)
+              Sequel::SQL::Identifier.new(pk)
+            end
+          end
         end
       end
 

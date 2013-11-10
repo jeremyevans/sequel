@@ -161,6 +161,12 @@ describe "A PostgreSQL database" do
   specify "should return uuid fields as strings" do
     @db.get(Sequel.cast('550e8400-e29b-41d4-a716-446655440000', :uuid)).should == '550e8400-e29b-41d4-a716-446655440000'
   end
+
+  specify "should handle inserts with placeholder literal string tables" do
+    ds = @db.from(Sequel.lit('?', :testfk))
+    ds.insert(:id=>1)
+    ds.select_map(:id).should == [1]
+  end
 end
 
 describe "A PostgreSQL database with domain types" do
