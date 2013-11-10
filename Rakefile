@@ -50,9 +50,7 @@ begin
   gem 'rdoc', '= 3.12.2'
   gem 'hanna-nouveau'
   RDOC_DEFAULT_OPTS.concat(['-f', 'hanna'])
-  true
 rescue Gem::LoadError
-  false
 end
 
 rdoc_task_class = begin
@@ -94,7 +92,7 @@ if rdoc_task_class
     rdoc.rdoc_dir = "www/public/rdoc-plugins"
     rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel --no-ignore-invalid'
     rdoc.rdoc_files.add %w"lib/sequel/{extensions,plugins}/**/*.rb doc/core_*"
-end
+  end
 end
 
 ### Specs
