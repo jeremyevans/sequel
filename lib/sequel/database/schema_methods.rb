@@ -155,6 +155,7 @@ module Sequel
     # :engine :: The table engine to use for the table.
     #
     # PostgreSQL specific options:
+    # :on_commit :: Either :preserve_rows (default), :drop or :delete_rows.
     # :unlogged :: Create the table as an unlogged table.
     # :inherits :: Inherit from a different tables.  An array can be
     #              specified to inherit from multiple tables.

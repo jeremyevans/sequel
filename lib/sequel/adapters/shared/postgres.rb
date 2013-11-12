@@ -94,6 +94,9 @@ module Sequel
       FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'.freeze=>:no_action, 'r'.freeze=>:restrict, 'c'.freeze=>:cascade, 'n'.freeze=>:set_null, 'd'.freeze=>:set_default}.freeze
       POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/
       UNLOGGED = 'UNLOGGED '.freeze
+      ON_COMMIT = {
+        :drop => 'DROP', :delete_rows => 'DELETE ROWS', :preserve_rows => 'PRESERVE ROWS',
+      }.freeze
 
       # SQL fragment for custom sequences (ones not created by serial primary key),
       # Returning the schema and literal form of the sequence name, by parsing
@@ -766,6 +769,10 @@ module Sequel
 
       # DDL statement for creating a table with the given name, columns, and options
       def create_table_prefix_sql(name, options)
+        if on_commit = options[:on_commit]
+          raise(Error, "can't provide :on_commit without :temp to create_table") unless options[:temp]
+          raise(Error, "unsupported on_commit option: #{on_commit.inspect}") unless ON_COMMIT.has_key? on_commit
+        end
         temp_or_unlogged_sql = if options[:temp]
          raise(Error, "can't provide both :temp and :unlogged to create_table") if options[:unlogged]
          temporary_table_sql
@@ -780,7 +787,18 @@ module Sequel
         if inherits = options[:inherits]
           sql << " INHERITS (#{Array(inherits).map{|t| quote_schema_table(t)}.join(', ')})"
         end
+        if on_commit = options[:on_commit]
+          sql << " ON COMMIT #{ON_COMMIT[on_commit]}"
+        end
         sql
+      end
+
+      def create_table_as_sql(name, sql, options)
+        result = create_table_prefix_sql name, options
+        if on_commit = options[:on_commit]
+          result << " ON COMMIT #{ON_COMMIT[on_commit]}"
+        end
+        result << " AS #{sql}"
       end
 
       # Use a PostgreSQL-specific create table generator
