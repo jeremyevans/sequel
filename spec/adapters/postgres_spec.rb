@@ -27,33 +27,44 @@ describe "PostgreSQL", '#create_table' do
     end
   end
 
-  specify "temporary table should accept on_commit: (:drop|:preserve_rows|:delete_rows)" do
-    [:drop, :delete_rows, :preserve_rows].each do |on_commit|
-      @db.create_table(:"tmp_#{on_commit}", :temp => true, :on_commit => on_commit){text :name}
+  specify "temporary table should support :on_commit option" do
+    @db.drop_table?(:some_table)
+    @db.transaction do
+      @db.create_table(:some_table, :temp => true, :on_commit => :drop){text :name}
     end
-    check_sqls do
-      @db.sqls.should == [
-        %Q{CREATE TEMPORARY TABLE "tmp_drop" ("name" text) ON COMMIT DROP},
-        %Q{CREATE TEMPORARY TABLE "tmp_delete_rows" ("name" text) ON COMMIT DELETE ROWS},
-        %Q{CREATE TEMPORARY TABLE "tmp_preserve_rows" ("name" text) ON COMMIT PRESERVE ROWS},
-      ]
+    @db.table_exists?(:some_table).should be_false
+
+    @db.transaction do
+      @db.create_table(:some_table, :temp => true, :on_commit => :delete_rows){text :name}
+      @db[:some_table].insert('a')
     end
-    proc do
-      @db.create_table(:some_table, :temp => true, :on_commit => :unsupported){text :name}
-    end.should raise_error(Sequel::Error,  'unsupported on_commit option: :unsupported')
+    @db.table_exists?(:some_table).should be_true
+    @db[:some_table].empty?.should be_true
+
+    @db.drop_table(:some_table)
+    @db.transaction do
+      @db.create_table(:some_table, :temp => true, :on_commit => :preserve_rows){text :name}
+      @db[:some_table].insert('a')
+    end
+    @db.table_exists?(:some_table).should be_true
+    @db[:some_table].count.should == 1
+    @db.drop_table(:some_table)
   end
 
-  specify "temporary table should accept on_commit with as option" do
-    @db.create_table(:some_table, :temp => true, :on_commit => :drop, as: 'select 1')
-    check_sqls do
-      @db.sqls.should == ['CREATE TEMPORARY TABLE "some_table" ON COMMIT DROP AS select 1']
+  specify "temporary table should accept :on_commit with :as option" do
+    @db.drop_table?(:some_table)
+    @db.transaction do
+      @db.create_table(:some_table, :temp => true, :on_commit => :drop, :as => 'select 1')
     end
+    @db.table_exists?(:some_table).should be_false
   end
 
-  specify "on_commit is only valid for temporary tables" do
-    proc do
-      @db.create_table(:some_table, :on_commit => :drop)
-    end.should raise_error(Sequel::Error, "can't provide :on_commit without :temp to create_table")
+  specify ":on_commit should raise error if not used on a temporary table" do
+    proc{@db.create_table(:some_table, :on_commit => :drop)}.should raise_error(Sequel::Error)
+  end
+
+  specify ":on_commit should raise error if given unsupported value" do
+    proc{@db.create_table(:some_table, :temp => true, :on_commit => :unsupported){text :name}}.should raise_error(Sequel::Error)
   end
 
   specify "should create an unlogged table" do

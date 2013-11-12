@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :on_commit=>(:drop|:delete_rows|:preserve_rows) options when creating temp tables on PostgreSQL (rosenfeld) (#737)
+
 * Make Dataset#insert work on PostgreSQL if the table name is a SQL::PlaceholderLiteralString (jeremyevans) (#736)
 
 * Copy unique constraints when emulating alter_table operations on SQLite (jeremyevans) (#735)
