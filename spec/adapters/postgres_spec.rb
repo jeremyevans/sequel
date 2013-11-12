@@ -27,6 +27,35 @@ describe "PostgreSQL", '#create_table' do
     end
   end
 
+  specify "temporary table should accept on_commit: (:drop|:preserve_rows|:delete_rows)" do
+    [:drop, :delete_rows, :preserve_rows].each do |on_commit|
+      @db.create_table(:"tmp_#{on_commit}", :temp => true, :on_commit => on_commit){text :name}
+    end
+    check_sqls do
+      @db.sqls.should == [
+        %Q{CREATE TEMPORARY TABLE "tmp_drop" ("name" text) ON COMMIT DROP},
+        %Q{CREATE TEMPORARY TABLE "tmp_delete_rows" ("name" text) ON COMMIT DELETE ROWS},
+        %Q{CREATE TEMPORARY TABLE "tmp_preserve_rows" ("name" text) ON COMMIT PRESERVE ROWS},
+      ]
+    end
+    proc do
+      @db.create_table(:some_table, :temp => true, :on_commit => :unsupported){text :name}
+    end.should raise_error(Sequel::Error,  'unsupported on_commit option: :unsupported')
+  end
+
+  specify "temporary table should accept on_commit with as option" do
+    @db.create_table(:some_table, :temp => true, :on_commit => :drop, as: 'select 1')
+    check_sqls do
+      @db.sqls.should == ['CREATE TEMPORARY TABLE "some_table" ON COMMIT DROP AS select 1']
+    end
+  end
+
+  specify "on_commit is only valid for temporary tables" do
+    proc do
+      @db.create_table(:some_table, :on_commit => :drop)
+    end.should raise_error(Sequel::Error, "can't provide :on_commit without :temp to create_table")
+  end
+
   specify "should create an unlogged table" do
     @db.create_table(:unlogged_dolls, :unlogged => true){text :name}
     check_sqls do
