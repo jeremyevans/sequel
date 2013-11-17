@@ -28,7 +28,7 @@ You can use URI query parameters to specify options:
 
 You can also pass an additional option hash with the connection string:
 
-  DB = Sequel.connect('postgres://localhost/blog' :user=>'user', :password=>'password')
+  DB = Sequel.connect('postgres://localhost/blog', :user=>'user', :password=>'password')
 
 You can also just use an options hash without a connection string.  If you do this, you must
 provide the adapter to use:
