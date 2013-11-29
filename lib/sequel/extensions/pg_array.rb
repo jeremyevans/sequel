@@ -36,7 +36,7 @@
 #
 #   DB.extension :pg_array
 #
-# See {schema_modification.rdoc}[rdoc-ref:doc/schema_modification.rdoc]
+# See {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # about how to add a postgres array column.
 #
 # If you are not using the native postgres adapter and are using array
