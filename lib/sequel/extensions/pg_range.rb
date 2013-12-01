@@ -49,6 +49,9 @@
 # types as model column values you probably should use the
 # pg_typecast_on_load plugin if the column values are returned as a string.
 #
+# See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
+# for details on using range type columns in CREATE/ALTER TABLE statements.
+#
 # This extension integrates with the pg_array extension.  If you plan
 # to use arrays of range types, load the pg_array extension before the
 # pg_range extension:

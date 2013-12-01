@@ -46,6 +46,9 @@
 # types as model column values you probably should use the
 # pg_typecast_on_load plugin if the column values are returned as a string.
 #
+# See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
+# for details on using json columns in CREATE/ALTER TABLE statements.
+#
 # This extension integrates with the pg_array extension.  If you plan
 # to use the json[] type, load the pg_array extension before the
 # pg_json extension:

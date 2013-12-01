@@ -31,6 +31,9 @@
 # very simple, and is only designed to parse PostgreSQL's default output
 # format, it is not designed to support all input formats that PostgreSQL
 # supports.
+#
+# See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
+# for details on using interval columns in CREATE/ALTER TABLE statements.
 
 require 'active_support/duration'
 Sequel.require 'adapters/utils/pg_types'

@@ -75,8 +75,8 @@
 #
 #   DB.extension :pg_hstore
 #
-# See {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
-# about how to add a postgres hstore column.
+# See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
+# for details on using hstore columns in CREATE/ALTER TABLE statements.
 #
 # If you are not using the native postgres adapter and are using hstore
 # types as model column values you probably should use the
