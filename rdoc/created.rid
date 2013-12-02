@@ -1,6 +1,6 @@
-Sun, 10 Nov 2013 14:47:56 -0800
+Mon, 02 Dec 2013 13:54:22 -0800
 README.rdoc	Sun, 10 Nov 2013 14:41:49 -0800
-CHANGELOG	Sun, 10 Nov 2013 12:38:38 -0800
+CHANGELOG	Sun, 01 Dec 2013 15:11:52 -0800
 MIT-LICENSE	Tue, 08 Jan 2013 11:56:58 -0800
 lib/sequel.rb	Thu, 11 Feb 2010 00:27:07 -0800
 lib/sequel/ast_transformer.rb	Mon, 23 Sep 2013 07:36:57 -0700
@@ -14,7 +14,7 @@ lib/sequel/model.rb	Mon, 21 Oct 2013 11:50:03 -0700
 lib/sequel/no_core_ext.rb	Sun, 02 Jun 2013 13:49:44 -0700
 lib/sequel/sql.rb	Sat, 26 Oct 2013 06:54:00 -0700
 lib/sequel/timezones.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/version.rb	Fri, 01 Nov 2013 07:58:58 -0700
+lib/sequel/version.rb	Sun, 01 Dec 2013 15:11:36 -0800
 lib/sequel/connection_pool/sharded_single.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/connection_pool/single.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -27,7 +27,7 @@ lib/sequel/database/logging.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/database/misc.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/database/query.rb	Mon, 14 Oct 2013 09:17:33 -0700
 lib/sequel/database/schema_generator.rb	Mon, 21 Oct 2013 11:50:03 -0700
-lib/sequel/database/schema_methods.rb	Mon, 21 Oct 2013 11:50:03 -0700
+lib/sequel/database/schema_methods.rb	Tue, 12 Nov 2013 11:33:52 -0800
 lib/sequel/database/transactions.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/dataset/actions.rb	Fri, 04 Oct 2013 15:15:20 -0700
 lib/sequel/dataset/features.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -60,7 +60,7 @@ doc/migration.rdoc	Mon, 21 Oct 2013 11:50:03 -0700
 doc/model_hooks.rdoc	Sun, 02 Jun 2013 13:49:43 -0700
 doc/model_plugins.rdoc	Fri, 06 Sep 2013 13:38:06 -0700
 doc/object_model.rdoc	Mon, 21 Oct 2013 11:50:03 -0700
-doc/opening_databases.rdoc	Sat, 26 Oct 2013 06:54:00 -0700
+doc/opening_databases.rdoc	Sun, 17 Nov 2013 15:14:46 -0800
 doc/postgresql.rdoc	Sun, 07 Apr 2013 16:43:44 -0700
 doc/prepared_statements.rdoc	Sat, 06 Jul 2013 16:17:44 -0700
 doc/querying.rdoc	Mon, 21 Oct 2013 11:50:03 -0700
@@ -146,5 +146,6 @@ doc/release_notes/4.1.0.txt	Thu, 01 Aug 2013 08:50:49 -0700
 doc/release_notes/4.2.0.txt	Fri, 30 Aug 2013 12:10:20 -0700
 doc/release_notes/4.3.0.txt	Wed, 02 Oct 2013 14:34:47 -0700
 doc/release_notes/4.4.0.txt	Fri, 01 Nov 2013 07:58:58 -0700
+doc/release_notes/4.5.0.txt	Sun, 01 Dec 2013 15:10:28 -0800
 lib/sequel/extensions/migration.rb	Sat, 26 Oct 2013 06:54:00 -0700
 lib/sequel/extensions/core_extensions.rb	Thu, 19 Sep 2013 07:06:56 -0700

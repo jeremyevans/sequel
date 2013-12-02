@@ -1,4 +1,4 @@
-Sun, 10 Nov 2013 14:49:09 -0800
+Mon, 02 Dec 2013 13:55:36 -0800
 lib/sequel/extensions/_pretty_table.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/blank.rb	Tue, 19 Jun 2012 10:06:46 -0700
@@ -23,18 +23,18 @@ lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Mon, 14 Oct 2013 09:17
 lib/sequel/extensions/named_timezones.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/null_dataset.rb	Sun, 02 Jun 2013 14:09:32 -0700
 lib/sequel/extensions/pagination.rb	Mon, 30 Sep 2013 17:19:34 -0700
-lib/sequel/extensions/pg_array.rb	Mon, 21 Oct 2013 11:50:03 -0700
+lib/sequel/extensions/pg_array.rb	Sun, 01 Dec 2013 14:54:14 -0800
 lib/sequel/extensions/pg_array_ops.rb	Mon, 21 Oct 2013 11:50:03 -0700
-lib/sequel/extensions/pg_hstore.rb	Mon, 21 Oct 2013 11:50:03 -0700
+lib/sequel/extensions/pg_hstore.rb	Sun, 01 Dec 2013 14:51:56 -0800
 lib/sequel/extensions/pg_hstore_ops.rb	Mon, 21 Oct 2013 11:50:03 -0700
-lib/sequel/extensions/pg_inet.rb	Thu, 05 Sep 2013 16:10:21 -0700
-lib/sequel/extensions/pg_interval.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/extensions/pg_json.rb	Mon, 21 Oct 2013 11:50:03 -0700
+lib/sequel/extensions/pg_inet.rb	Sun, 01 Dec 2013 14:52:18 -0800
+lib/sequel/extensions/pg_interval.rb	Sun, 01 Dec 2013 14:52:34 -0800
+lib/sequel/extensions/pg_json.rb	Sun, 01 Dec 2013 14:52:52 -0800
 lib/sequel/extensions/pg_json_ops.rb	Mon, 21 Oct 2013 11:50:03 -0700
 lib/sequel/extensions/pg_loose_count.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/extensions/pg_range.rb	Mon, 21 Oct 2013 11:50:03 -0700
+lib/sequel/extensions/pg_range.rb	Sun, 01 Dec 2013 14:53:24 -0800
 lib/sequel/extensions/pg_range_ops.rb	Mon, 21 Oct 2013 11:50:03 -0700
-lib/sequel/extensions/pg_row.rb	Mon, 21 Oct 2013 11:50:03 -0700
+lib/sequel/extensions/pg_row.rb	Sun, 01 Dec 2013 14:53:47 -0800
 lib/sequel/extensions/pg_row_ops.rb	Sat, 26 Oct 2013 06:54:00 -0700
 lib/sequel/extensions/pg_static_cache_updater.rb	Fri, 23 Aug 2013 16:59:00 -0700
 lib/sequel/extensions/pretty_table.rb	Thu, 22 Aug 2013 12:22:05 -0700
