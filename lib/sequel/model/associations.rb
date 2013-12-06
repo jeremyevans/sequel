@@ -2229,7 +2229,7 @@ module Sequel
         # and/or load other associations if #eager was used.
         def post_load(all_records)
           eager_graph_build_associations(all_records) if @opts[:eager_graph]
-          eager_load(all_records) if @opts[:eager]
+          eager_load(all_records) if @opts[:eager] && (row_proc || @opts[:eager_graph])
           super
         end
       end

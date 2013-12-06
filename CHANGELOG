@@ -1,5 +1,7 @@
 === HEAD
 
+* Do not attempt and eager load and raise an exception when doing Model.eager(...).naked.all (jeremyevans)
+
 * Recognize a couple additional disconnect errors in the jdbc/postgresql adapter (jeremyevans) (#742)
 
 === 4.5.0 (2013-12-02)

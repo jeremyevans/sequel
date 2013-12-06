@@ -149,6 +149,13 @@ describe Sequel::Model, "#eager" do
     DB.sqls.should == []
   end
   
+  it "should not break if the dataset does not have a row proc" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id
+    a = EagerAlbum.eager(:track).naked.all
+    a.should == [{:id => 1, :band_id => 2}]
+    DB.sqls.should == ['SELECT * FROM albums']
+  end
+  
   it "should use first matching entry when eager loading one_to_one association" do
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id
     EagerTrack.dataset._fetch = [{:id => 3, :album_id=>1}, {:id => 4, :album_id=>1}]
