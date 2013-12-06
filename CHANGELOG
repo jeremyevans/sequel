@@ -1,3 +1,7 @@
+=== HEAD
+
+* Recognize a couple additional disconnect errors in the jdbc/postgresql adapter (jeremyevans) (#742)
+
 === 4.5.0 (2013-12-02)
 
 * Support :on_commit=>(:drop|:delete_rows|:preserve_rows) options when creating temp tables on PostgreSQL (rosenfeld) (#737)

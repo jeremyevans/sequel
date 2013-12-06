@@ -83,6 +83,10 @@ module Sequel
 
         private
         
+        def disconnect_error?(exception, opts)
+          super || exception.message =~ /\AThis connection has been closed\.\z|\AFATAL: terminating connection due to administrator command\z/
+        end
+
         # Use setNull for nil arguments as the default behavior of setString
         # with nil doesn't appear to work correctly on PostgreSQL.
         def set_ps_arg_nil(cps, i)
