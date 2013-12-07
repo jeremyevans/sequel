@@ -52,9 +52,8 @@
   the graphviz dot program in order to create visualizations
   of the dataset's abstract syntax tree.  Examples:
 
-  * http://sequel.heroku.com/images/to_dot_simple.gif
-  * http://sequel.heroku.com/images/to_dot_complex.gif
-  * http://imgpaste.com/i/lxngy.gif
+  * http://sequel.jeremyevans.net/images/to_dot_simple.gif
+  * http://sequel.jeremyevans.net/images/to_dot_complex.gif
 
   Both the to_dot extension and reversible migrations support
   were inspired by Aaron Patterson's recent work on ActiveRecord

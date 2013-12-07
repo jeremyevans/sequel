@@ -230,4 +230,4 @@ Backwards Compatibility
 Other News
 ----------
 
-* Sequel now has an official blog at http://sequel.heroku.com.
+* Sequel now has an official blog at http://sequel.jeremyevans.net/blog.html.
