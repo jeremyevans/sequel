@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+	<link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection">
+	<link rel="stylesheet" href="/css/blueprint/plugins/fancy-type/screen.css" type="text/css" media="screen, projection">
+	<link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"> 
+	<!--[if lt IE 8]>
+		<link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection">
+	<![endif]-->
+	<link rel="stylesheet" type="text/css" href="/css/main.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+	<script src="/js/main.js" type="text/javascript" charset="utf-8"></script>
+	<title>Blog II - The Sequel Blog - {{ page.title }}</title>
+</head>
+<body>
+	<div class="container prepend-top append-bottom">
+		<div class="prepend-top append-bottom prepend-1 append-1">
+			<header>
+				<div class="span-22 prepend-top" id="header">
+					<div class="span-7">
+						<h1><a href="/"><img src="/images/ruby-sequel.png" alt="Sequel" /></a></h1>
+					</div>
+					<div class="span-15 last" id="query">
+						<div class="box"><code>
+							BLOG_II[:articles][:title =&gt; &quot;{{ page.title }}&quot;]
+						</code></div>
+					</div>
+				</div>
+			</header>
+
+			<section class="content">
+        <div class="span-15 append-1 border">
+				  <article class="post">
+            <h2>{{ page.title }}</h2>
+            {{ content }}
+          </article>
+        </div>
+
+        <section class="archives">
+          <div class="span-7 small last">
+            {% for post in site.posts %}
+              <div><a href="{{ post.url }}">{{ post.title }}</a></div>
+            {% endfor %}
+          </div>
+        </section>
+			</section>
+
+			<footer>
+				<div class="span-22 prepend-top append-bottom" id="footer">
+					<hr />
+
+					<div class="span-5 prepend-1">
+						<a href="http://sequel.jeremyevans.net/">Website</a>
+					</div>
+					<div class="span-5">
+						<a href="http://github.com/jeremyevans/sequel">Source Code</a>
+					</div>
+					<div class="span-5">
+						<a href="http://groups.google.com/group/sequel-talk">Discussion Group</a>
+					</div>
+					<div class="span-5 append-1 last">
+						<a href="http://github.com/jeremyevans/sequel/issues">Bug Tracker</a>
+					</div>
+				</div>
+			</footer>
+		</div>
+	</div>
+
+</body>
+</html>
