@@ -156,8 +156,8 @@ module Sequel
 
       # Commit an existing prepared transaction with the given transaction
       # identifier string.
-      def commit_prepared_transaction(transaction_id)
-        run("COMMIT PREPARED #{literal(transaction_id)}")
+      def commit_prepared_transaction(transaction_id, opts=OPTS)
+        run("COMMIT PREPARED #{literal(transaction_id)}", opts)
       end
 
       # Creates the function in the database.  Arguments:
@@ -426,8 +426,8 @@ module Sequel
 
       # Rollback an existing prepared transaction with the given transaction
       # identifier string.
-      def rollback_prepared_transaction(transaction_id)
-        run("ROLLBACK PREPARED #{literal(transaction_id)}")
+      def rollback_prepared_transaction(transaction_id, opts=OPTS)
+        run("ROLLBACK PREPARED #{literal(transaction_id)}", opts)
       end
 
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for

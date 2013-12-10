@@ -50,8 +50,8 @@ module Sequel
 
       # Commit an existing prepared transaction with the given transaction
       # identifier string.
-      def commit_prepared_transaction(transaction_id)
-        run("XA COMMIT #{literal(transaction_id)}")
+      def commit_prepared_transaction(transaction_id, opts=OPTS)
+        run("XA COMMIT #{literal(transaction_id)}", opts)
       end
 
       # MySQL uses the :mysql database type
@@ -112,8 +112,8 @@ module Sequel
 
       # Rollback an existing prepared transaction with the given transaction
       # identifier string.
-      def rollback_prepared_transaction(transaction_id)
-        run("XA ROLLBACK #{literal(transaction_id)}")
+      def rollback_prepared_transaction(transaction_id, opts=OPTS)
+        run("XA ROLLBACK #{literal(transaction_id)}", opts)
       end
 
       # Get version of MySQL server, used for determined capabilities.

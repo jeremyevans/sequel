@@ -1,6 +1,8 @@
 === HEAD
 
-* Do not attempt and eager load and raise an exception when doing Model.eager(...).naked.all (jeremyevans)
+* Support :server option for Database#{commit,rollback}_prepared_transaction on PostgreSQL, MySQL, and H2 (jeremyevans) (#743)
+
+* Do not attempt to eager load and raise an exception when doing Model.eager(...).naked.all (jeremyevans)
 
 * Recognize a couple additional disconnect errors in the jdbc/postgresql adapter (jeremyevans) (#742)
 

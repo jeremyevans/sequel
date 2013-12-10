@@ -9,8 +9,8 @@ module Sequel
       
         # Commit an existing prepared transaction with the given transaction
         # identifier string.
-        def commit_prepared_transaction(transaction_id)
-          run("COMMIT TRANSACTION #{transaction_id}")
+        def commit_prepared_transaction(transaction_id, opts=OPTS)
+          run("COMMIT TRANSACTION #{transaction_id}", opts)
         end
 
         # H2 uses the :h2 database type.
@@ -20,8 +20,8 @@ module Sequel
 
         # Rollback an existing prepared transaction with the given transaction
         # identifier string.
-        def rollback_prepared_transaction(transaction_id)
-          run("ROLLBACK TRANSACTION #{transaction_id}")
+        def rollback_prepared_transaction(transaction_id, opts=OPTS)
+          run("ROLLBACK TRANSACTION #{transaction_id}", opts)
         end
 
         # H2 uses an IDENTITY type
