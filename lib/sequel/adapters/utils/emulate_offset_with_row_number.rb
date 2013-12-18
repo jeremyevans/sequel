@@ -9,8 +9,9 @@ module Sequel
     # If offset is used, an order must be provided, because the use of ROW_NUMBER
     # requires an order.
     def select_sql
-      return super unless o = @opts[:offset]
+      return super unless emulate_offset_with_row_number?
 
+      offset = @opts[:offset]
       order = @opts[:order]
       if require_offset_order?
         order ||= default_offset_order
@@ -29,7 +30,7 @@ module Sequel
         from_self(:alias=>dsa1).
         select(*columns).
         limit(@opts[:limit]).
-        where(SQL::Identifier.new(rn) > o).
+        where(SQL::Identifier.new(rn) > offset).
         order(rn))
       sql
     end
@@ -45,6 +46,11 @@ module Sequel
     # Whether an order is required when using offset emulation via ROW_NUMBER, true by default.
     def require_offset_order?
       true
+    end
+
+    # Whether to use ROW_NUMBER to emulate offsets
+    def emulate_offset_with_row_number?
+      @opts[:offset]
     end
   end
 end

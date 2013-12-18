@@ -457,6 +457,10 @@ module Sequel
       FORMAT_DATE = "'%Y%m%d'".freeze
       CROSS_APPLY = 'CROSS APPLY'.freeze
       OUTER_APPLY = 'OUTER APPLY'.freeze
+      OFFSET = " OFFSET ".freeze
+      ROWS = " ROWS".freeze
+      ROWS_ONLY = " ROWS ONLY".freeze
+      FETCH_NEXT = " FETCH NEXT ".freeze
 
       Sequel::Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
 
@@ -703,6 +707,11 @@ module Sequel
         server_version >= 10000000
       end
 
+      # Whether we are using SQL Server 2012 or later.
+      def is_2012_or_later?
+        server_version >= 11000000
+      end
+
       # Use strict ISO-8601 format with T between date and time,
       # since that is the format that is multilanguage and not
       # DATEFORMAT dependent.
@@ -730,6 +739,11 @@ module Sequel
         end
       end
       alias update_from_sql delete_from2_sql
+
+      # Microsoft SQL Server 2012 has native support for offsets, but only for ordered datasets.
+      def emulate_offset_with_row_number?
+        super && !(is_2012_or_later? && @opts[:order])
+      end
       
       # Return the first primary key for the current table.  If this table has
       # multiple primary keys, this will only return one of them.  Used by #_import.
@@ -800,7 +814,8 @@ module Sequel
         BOOL_TRUE
       end
       
-      # MSSQL adds the limit before the columns
+      # MSSQL adds the limit before the columns, except on 2012+ when using
+      # offsets on ordered queries.
       def select_clause_methods
         SELECT_CLAUSE_METHODS
       end
@@ -816,6 +831,8 @@ module Sequel
       # to allow the limit to be a bound variable.
       def select_limit_sql(sql)
         if l = @opts[:limit]
+          return if is_2012_or_later? && @opts[:order] && @opts[:offset]
+
           if is_2005_or_later?
             sql << TOP_PAREN
             literal_append(sql, l)
@@ -837,6 +854,25 @@ module Sequel
           sql << NOLOCK
         else
           super
+        end
+      end
+
+      # On 2012+ when there is an order with an offset, append the offset (and possible
+      # limit) at the end of the order clause.
+      def select_order_sql(sql)
+        super
+        if is_2012_or_later? && @opts[:order]
+          if o = @opts[:offset]
+            sql << OFFSET
+            literal_append(sql, o)
+            sql << ROWS
+
+            if l = @opts[:limit]
+              sql << FETCH_NEXT
+              literal_append(sql, l)
+              sql << ROWS_ONLY
+            end
+          end
         end
       end
 
