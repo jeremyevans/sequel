@@ -195,6 +195,12 @@ describe "Simple Dataset operations" do
     @ds.limit(2, 1).all.should == []
   end
 
+  specify "should be orderable by column number" do
+    @ds.insert(:number=>20)
+    @ds.insert(:number=>10)
+    @ds.order(2, 1).select_map([:id, :number]).should == [[1, 10], [3, 10], [2, 20]]
+  end
+
   specify "should fetch correctly with a limit in an IN subselect" do
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2)).all.should == [{:id=>1, :number=>10}]
     @ds.insert(:number=>20)
