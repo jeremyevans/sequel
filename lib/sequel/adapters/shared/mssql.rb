@@ -611,6 +611,18 @@ module Sequel
         sql << BRACKET_OPEN << name.to_s.gsub(/\]/, DOUBLE_BRACKET_CLOSE) << BRACKET_CLOSE
       end
       
+      # On MSSQL 2012+ add a default order to the current dataset if an offset is used.
+      # The default offset emulation using a subquery would be used in the unordered
+      # case by default, and that also adds a default order, so it's better to just
+      # avoid the subquery.
+      def select_sql
+        if @opts[:offset] && !@opts[:order] && is_2012_or_later?
+          order(1).select_sql
+        else
+          super
+        end
+      end
+
       # The version of the database server.
       def server_version
         db.server_version(@opts[:server])
