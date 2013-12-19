@@ -285,8 +285,8 @@ describe "pg_range extension" do
 
     it "should quack like a range" do
       if RUBY_VERSION >= '1.9'
-        @r1.cover?(1.5).should be_true
-        @r1.cover?(2.5).should be_false
+        @r1.cover?(1.5).should == true
+        @r1.cover?(2.5).should == false
         @r1.first(1).should == [1]
         @r1.last(1).should == [2]
       end
@@ -357,12 +357,12 @@ describe "pg_range extension" do
     end
 
     it "should have #exclude_begin? and #exclude_end indicate whether the beginning or ending of the range is excluded" do
-      @r1.exclude_begin?.should be_false
-      @r1.exclude_end?.should be_false
-      @r2.exclude_begin?.should be_true
-      @r2.exclude_end?.should be_false
-      @r3.exclude_begin?.should be_false
-      @r3.exclude_end?.should be_true
+      @r1.exclude_begin?.should == false
+      @r1.exclude_end?.should == false
+      @r2.exclude_begin?.should == true
+      @r2.exclude_end?.should == false
+      @r3.exclude_begin?.should == false
+      @r3.exclude_end?.should == true
     end
 
     it "should have #to_range raise an exception if the PGRange cannot be represented by a Range" do
@@ -381,24 +381,24 @@ describe "pg_range extension" do
     end
 
     it "should have #unbounded_begin? and #unbounded_end indicate whether the beginning or ending of the range is unbounded" do
-      @r1.unbounded_begin?.should be_false
-      @r1.unbounded_end?.should be_false
-      @r2.unbounded_begin?.should be_false
-      @r2.unbounded_end?.should be_true
-      @r3.unbounded_begin?.should be_true
-      @r3.unbounded_end?.should be_false
+      @r1.unbounded_begin?.should == false
+      @r1.unbounded_end?.should == false
+      @r2.unbounded_begin?.should == false
+      @r2.unbounded_end?.should == true
+      @r3.unbounded_begin?.should == true
+      @r3.unbounded_end?.should == false
     end
 
     it "should have #valid_ruby_range? return true if the PGRange can be represented as a Range" do
-      @r1.valid_ruby_range?.should be_true
-      @R.new(1, 2, :exclude_end=>true).valid_ruby_range?.should be_true
+      @r1.valid_ruby_range?.should == true
+      @R.new(1, 2, :exclude_end=>true).valid_ruby_range?.should == true
     end
 
     it "should have #valid_ruby_range? return false if the PGRange cannot be represented as a Range" do
-      @R.new(nil, 1).valid_ruby_range?.should be_false
-      @R.new(1, nil).valid_ruby_range?.should be_false
-      @R.new(0, 1, :exclude_begin=>true).valid_ruby_range?.should be_false
-      @R.empty.valid_ruby_range?.should be_false
+      @R.new(nil, 1).valid_ruby_range?.should == false
+      @R.new(1, nil).valid_ruby_range?.should == false
+      @R.new(0, 1, :exclude_begin=>true).valid_ruby_range?.should == false
+      @R.empty.valid_ruby_range?.should == false
     end
   end
 end

@@ -3736,7 +3736,7 @@ describe "Model#freeze" do
   end
 
   it "should freeze the object's associations" do
-    @o.associations.frozen?.should be_true
+    @o.associations.frozen?.should == true
   end
 
   it "should not break associations getters" do

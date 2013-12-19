@@ -303,7 +303,7 @@ describe Sequel::Model, "constructors" do
     block_called = false
     m = @m.new {|i| block_called = true; i.should be_a_kind_of(@m); i.values[:a] = 1}
     
-    block_called.should be_true
+    block_called.should == true
     m.values[:a].should == 1
   end
   
@@ -312,21 +312,21 @@ describe Sequel::Model, "constructors" do
     o = @m.dataset.row_proc.call(:a=>1)
     o.should be_a_kind_of(@m)
     o.values.should == {:a=>1}
-    o.new?.should be_false
+    o.new?.should == false
   end
   
   it "should have .call create an existing object" do
     o = @m.call(:a=>1)
     o.should be_a_kind_of(@m)
     o.values.should == {:a=>1}
-    o.new?.should be_false
+    o.new?.should == false
   end
   
   it "should have .load create an existing object" do
     o = @m.load(:a=>1)
     o.should be_a_kind_of(@m)
     o.values.should == {:a=>1}
-    o.new?.should be_false
+    o.new?.should == false
   end
 end
 

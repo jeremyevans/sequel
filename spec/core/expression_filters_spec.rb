@@ -1066,6 +1066,6 @@ end
 
 describe "Sequel core extensions" do
   specify "should have Sequel.core_extensions? be false by default" do
-    Sequel.core_extensions?.should be_false
+    Sequel.core_extensions?.should == false
   end
 end

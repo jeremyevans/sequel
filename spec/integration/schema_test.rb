@@ -298,7 +298,7 @@ describe "Database schema modifiers" do
   specify "should handle create table in a rolled back transaction" do
     @db.drop_table?(:items)
     @db.transaction(:rollback=>:always){@db.create_table(:items){Integer :number}}
-    @db.table_exists?(:items).should be_false
+    @db.table_exists?(:items).should == false
   end if DB.supports_transactional_ddl?
   
   describe "join tables" do

@@ -142,9 +142,9 @@ describe Sequel::Model do
   specify "should have the validates block have appropriate respond_to?" do
     c = nil
     @c.validates{c = respond_to?(:foo)}
-    c.should be_false
+    c.should == false
     @c.validates{c = respond_to?(:length_of)}
-    c.should be_true
+    c.should == true
   end if RUBY_VERSION >= '1.9'
 end
 
@@ -616,7 +616,7 @@ describe "Superclass validations" do
     o.errors.full_messages.should == ['value is too short', 'value is invalid']
 
     o.value = 'abcde'
-    o.valid?.should be_true
+    o.valid?.should == true
   end
   
   specify "should have skip_superclass_validations? return whether superclass validations were skipped" do
@@ -630,14 +630,14 @@ describe "Superclass validations" do
 
     o = @c2.new
     o.value = 'ab'
-    o.valid?.should be_true
+    o.valid?.should == true
 
     o.value = '12'
     o.valid?.should == false
     o.errors.full_messages.should == ['value is invalid']
 
     o.value = 'abcde'
-    o.valid?.should be_true
+    o.valid?.should == true
   end
 end
 
@@ -733,9 +733,9 @@ describe Sequel::Model, "Validations" do
     end
 
     @person = Person.new :first_name => "Lancelot99"
-    @person.valid?.should be_false
+    @person.valid?.should == false
     @person = Person.new :first_name => "Anita"
-    @person.valid?.should be_true
+    @person.valid?.should == true
   end
   
   it "should validate length of column" do
@@ -943,10 +943,10 @@ describe Sequel::Model, "Validations" do
     Person.validations[:first_name].size.should == 2
     
     @person = Person.new :first_name => "Lancelot99"
-    @person.valid?.should be_false
+    @person.valid?.should == false
     
     @person2 = Person.new :first_name => "Wayne"
-    @person2.valid?.should be_true
+    @person2.valid?.should == true
   end
 
   it "should allow 'longhand' validations direcly within the model." do
@@ -1008,7 +1008,7 @@ describe "Model#save" do
     
     @m.x = 7
     @m.should be_valid
-    @m.save.should_not be_false
+    @m.save.should_not == false
     DB.sqls.should == ['UPDATE people SET x = 7 WHERE (id = 4)']
   end
   

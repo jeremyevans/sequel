@@ -78,7 +78,7 @@ describe "Sequel::Plugins::StaticCache with :frozen=>false option" do
     end
 
     it "should have map without a block not return a frozen object" do
-      @c.map.frozen?.should be_false
+      @c.map.frozen?.should == false
     end
 
     it "should have map with a block and argument raise" do
@@ -100,7 +100,7 @@ describe "Sequel::Plugins::StaticCache with :frozen=>false option" do
     end
 
     it "should have all not return a frozen object" do
-      @c.all.frozen?.should be_false
+      @c.all.frozen?.should == false
     end
 
     it "should have all return things in dataset order" do
@@ -135,7 +135,7 @@ describe "Sequel::Plugins::StaticCache with :frozen=>false option" do
     end
 
     it "should have to_hash not return a frozen object" do
-      @c.to_hash.frozen?.should be_false
+      @c.to_hash.frozen?.should == false
     end
 
     it "should have to_hash_groups without arguments return the cached objects without a query" do
@@ -201,7 +201,7 @@ describe "Sequel::Plugins::StaticCache with :frozen=>false option" do
     end
 
     it "all of the static cache values (model instances) should be frozen" do
-      @c.all.all?{|o| o.frozen?}.should be_true
+      @c.all.all?{|o| o.frozen?}.should == true
     end
 
     it "should make .[] method with primary key return cached instances" do
@@ -286,47 +286,47 @@ describe "Sequel::Plugins::StaticCache with :frozen=>false option" do
     it_should_behave_like "Sequel::Plugins::StaticCache"
 
     it "record retrieved by primary key should not be frozen" do
-      @c[1].frozen?.should be_false
-      @c.cache_get_pk(1).frozen?.should be_false
+      @c[1].frozen?.should == false
+      @c.cache_get_pk(1).frozen?.should == false
     end
 
     it "none of values returned in #all should be frozen" do
-      @c.all.all?{|o| !o.frozen?}.should be_true
+      @c.all.all?{|o| !o.frozen?}.should == true
     end
 
     it "none of values yielded by each should be frozen" do
       a = []
       @c.each{|o| a << o}
-      a.all?{|o| !o.frozen?}.should be_true
+      a.all?{|o| !o.frozen?}.should == true
     end
 
     it "none of values yielded by Enumerable method should be frozen" do
-      @c.sort_by{|o| o.id}.all?{|o| !o.frozen?}.should be_true
+      @c.sort_by{|o| o.id}.all?{|o| !o.frozen?}.should == true
     end
 
     it "none of values returned by map without an argument or block should be frozen" do
-      @c.map{|o| o}.all?{|o| !o.frozen?}.should be_true
-      @c.map.all?{|o| !o.frozen?}.should be_true
+      @c.map{|o| o}.all?{|o| !o.frozen?}.should == true
+      @c.map.all?{|o| !o.frozen?}.should == true
     end
 
     it "none of values in the hash returned by to_hash without an argument should be frozen" do
-      @c.to_hash.values.all?{|o| !o.frozen?}.should be_true
+      @c.to_hash.values.all?{|o| !o.frozen?}.should == true
     end
 
     it "none of values in the hash returned by to_hash with a single argument should be frozen" do
-      @c.to_hash(:id).values.all?{|o| !o.frozen?}.should be_true
+      @c.to_hash(:id).values.all?{|o| !o.frozen?}.should == true
     end
 
     it "none of values in the hash returned by to_hash with a single array argument should be frozen" do
-      @c.to_hash([:id, :id]).values.all?{|o| !o.frozen?}.should be_true
+      @c.to_hash([:id, :id]).values.all?{|o| !o.frozen?}.should == true
     end
 
     it "none of values in the hash returned by to_hash_groups with a single argument should be frozen" do
-      @c.to_hash_groups(:id).values.flatten.all?{|o| !o.frozen?}.should be_true
+      @c.to_hash_groups(:id).values.flatten.all?{|o| !o.frozen?}.should == true
     end
 
     it "none of values in the hash returned by to_hash_groups with a single array argument should be frozen" do
-      @c.to_hash_groups([:id, :id]).values.flatten.all?{|o| !o.frozen?}.should be_true
+      @c.to_hash_groups([:id, :id]).values.flatten.all?{|o| !o.frozen?}.should == true
     end
 
     it "should not automatically update the cache when creating new model objects" do

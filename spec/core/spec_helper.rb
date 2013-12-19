@@ -11,7 +11,9 @@ unless Object.const_defined?('Sequel')
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
 
-(defined?(RSpec) ? RSpec::Core::ExampleGroup : Spec::Example::ExampleGroup).class_eval do
+require File.join(File.dirname(File.expand_path(__FILE__)), "../rspec_helper.rb")
+
+RSPEC_EXAMPLE_GROUP.class_eval do
   def meta_def(obj, name, &block)
     (class << obj; self end).send(:define_method, name, &block)
   end

@@ -39,7 +39,7 @@ describe "Dataset" do
     ds._fetch = {:x=>1}
     called = false
     ds.each{|a| called = true; a.should == {:x=>1}}
-    called.should be_true
+    called.should == true
   end
   
   specify "should get quote_identifiers default from database" do
@@ -4327,11 +4327,11 @@ end
 
 describe "Dataset feature defaults" do
   it "should not require aliases for recursive CTEs by default" do
-    Sequel::Database.new.dataset.recursive_cte_requires_column_aliases?.should be_false
+    Sequel::Database.new.dataset.recursive_cte_requires_column_aliases?.should == false
   end
 
   it "should not require placeholder type specifiers by default" do
-    Sequel::Database.new.dataset.requires_placeholder_type_specifiers?.should be_false
+    Sequel::Database.new.dataset.requires_placeholder_type_specifiers?.should == false
   end
 end
 
@@ -4363,13 +4363,13 @@ describe "Dataset extensions" do
   specify "should be able to register an extension with a block and Database#extension call the block" do
     @ds.quote_identifiers = false
     Sequel::Dataset.register_extension(:foo){|db| db.quote_identifiers = true}
-    @ds.extension(:foo).quote_identifiers?.should be_true
+    @ds.extension(:foo).quote_identifiers?.should == true
   end
 
   specify "should be able to register an extension with a callable and Database#extension call the callable" do
     @ds.quote_identifiers = false
     Sequel::Dataset.register_extension(:foo, proc{|db| db.quote_identifiers = true})
-    @ds.extension(:foo).quote_identifiers?.should be_true
+    @ds.extension(:foo).quote_identifiers?.should == true
   end
 
   specify "should be able to load multiple extensions in the same call" do
@@ -4378,7 +4378,7 @@ describe "Dataset extensions" do
     Sequel::Dataset.register_extension(:foo, proc{|ds| ds.quote_identifiers = true})
     Sequel::Dataset.register_extension(:bar, proc{|ds| ds.identifier_input_method = nil})
     ds = @ds.extension(:foo, :bar)
-    ds.quote_identifiers?.should be_true
+    ds.quote_identifiers?.should == true
     ds.identifier_input_method.should be_nil
   end
 
@@ -4576,13 +4576,13 @@ end
 
 describe "Dataset#supports_replace?" do
   it "should be false by default" do
-    Sequel::Dataset.new(nil).supports_replace?.should be_false
+    Sequel::Dataset.new(nil).supports_replace?.should == false
   end
 end
 
 describe "Dataset#supports_lateral_subqueries?" do
   it "should be false by default" do
-    Sequel::Dataset.new(nil).supports_lateral_subqueries?.should be_false
+    Sequel::Dataset.new(nil).supports_lateral_subqueries?.should == false
   end
 end
 

@@ -24,7 +24,9 @@ class Sequel::Database
   end
 end
 
-(defined?(RSpec) ? RSpec::Core::ExampleGroup : Spec::Example::ExampleGroup).class_eval do
+require File.join(File.dirname(File.expand_path(__FILE__)), "../rspec_helper.rb")
+
+RSPEC_EXAMPLE_GROUP.class_eval do
   def log 
     begin
       DB.loggers << Logger.new(STDOUT)

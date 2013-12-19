@@ -225,8 +225,8 @@ describe Sequel::Model, "pg_array_associations" do
   end
   
   it "reflection remove_before_destroy? should return correct values" do
-    @c1.association_reflection(:tags).remove_before_destroy?.should be_true
-    @c2.association_reflection(:artists).remove_before_destroy?.should be_false
+    @c1.association_reflection(:tags).remove_before_destroy?.should == true
+    @c2.association_reflection(:artists).remove_before_destroy?.should == false
   end
   
   it "reflection reciprocal should be correct" do

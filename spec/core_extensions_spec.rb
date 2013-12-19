@@ -22,9 +22,11 @@ if RUBY_VERSION < '1.9.0'
   Sequel.extension :ruby18_symbol_extensions
 end
 
+require File.join(File.dirname(File.expand_path(__FILE__)), "rspec_helper.rb")
+
 describe "Sequel core extensions" do
   specify "should have Sequel.core_extensions? be true if enabled" do
-    Sequel.core_extensions?.should be_true
+    Sequel.core_extensions?.should == true
   end
 end
 

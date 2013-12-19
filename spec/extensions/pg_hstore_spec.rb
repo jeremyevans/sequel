@@ -78,14 +78,14 @@ describe "pg_hstore extension" do
     Sequel.hstore('foo2'=>'bar').fetch(:foo){|key| k = key }.should == 'foo'
     k.should == 'foo'
     
-    Sequel.hstore('foo'=>'bar').has_key?(:foo).should be_true
-    Sequel.hstore('foo'=>'bar').has_key?(:bar).should be_false
-    Sequel.hstore('foo'=>'bar').key?(:foo).should be_true
-    Sequel.hstore('foo'=>'bar').key?(:bar).should be_false
-    Sequel.hstore('foo'=>'bar').member?(:foo).should be_true
-    Sequel.hstore('foo'=>'bar').member?(:bar).should be_false
-    Sequel.hstore('foo'=>'bar').include?(:foo).should be_true
-    Sequel.hstore('foo'=>'bar').include?(:bar).should be_false
+    Sequel.hstore('foo'=>'bar').has_key?(:foo).should == true
+    Sequel.hstore('foo'=>'bar').has_key?(:bar).should == false
+    Sequel.hstore('foo'=>'bar').key?(:foo).should == true
+    Sequel.hstore('foo'=>'bar').key?(:bar).should == false
+    Sequel.hstore('foo'=>'bar').member?(:foo).should == true
+    Sequel.hstore('foo'=>'bar').member?(:bar).should == false
+    Sequel.hstore('foo'=>'bar').include?(:foo).should == true
+    Sequel.hstore('foo'=>'bar').include?(:bar).should == false
 
     Sequel.hstore('foo'=>'bar', '1'=>'2').values_at(:foo3, :foo, :foo2, 1).should == [nil, 'bar', nil, '2']
 
@@ -96,16 +96,16 @@ describe "pg_hstore extension" do
   end
 
   it "should convert has_value?/value? lookups to string" do
-    Sequel.hstore('foo'=>'bar').has_value?(:bar).should be_true
-    Sequel.hstore('foo'=>'bar').has_value?(:foo).should be_false
-    Sequel.hstore('foo'=>'bar').value?(:bar).should be_true
-    Sequel.hstore('foo'=>'bar').value?(:foo).should be_false
+    Sequel.hstore('foo'=>'bar').has_value?(:bar).should == true
+    Sequel.hstore('foo'=>'bar').has_value?(:foo).should == false
+    Sequel.hstore('foo'=>'bar').value?(:bar).should == true
+    Sequel.hstore('foo'=>'bar').value?(:foo).should == false
   end
 
   it "should handle nil values in has_value?/value? lookups" do
-    Sequel.hstore('foo'=>'').has_value?('').should be_true
-    Sequel.hstore('foo'=>'').has_value?(nil).should be_false
-    Sequel.hstore('foo'=>nil).has_value?(nil).should be_true
+    Sequel.hstore('foo'=>'').has_value?('').should == true
+    Sequel.hstore('foo'=>'').has_value?(nil).should == false
+    Sequel.hstore('foo'=>nil).has_value?(nil).should == true
   end
 
   it "should have underlying hash convert lookups by key to string" do

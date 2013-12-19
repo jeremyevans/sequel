@@ -327,7 +327,7 @@ describe "pg_array extension" do
     @db.fetch = [{:name=>'id', :db_type=>'banana[]'}]
     @db.schema(:items).map{|e| e[1][:type]}.should == [:banana_array]
     @db.conversion_procs.should have_key(7865)
-    @db.respond_to?(:typecast_value_banana_array, true).should be_true
+    @db.respond_to?(:typecast_value_banana_array, true).should == true
 
     db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
@@ -335,7 +335,7 @@ describe "pg_array extension" do
     db.fetch = [{:name=>'id', :db_type=>'banana[]'}]
     db.schema(:items).map{|e| e[1][:type]}.should == [nil]
     db.conversion_procs.should_not have_key(7865)
-    db.respond_to?(:typecast_value_banana_array, true).should be_false
+    db.respond_to?(:typecast_value_banana_array, true).should == false
   end
 
   it "should automatically look up the array and scalar oids when registering per-Database types" do

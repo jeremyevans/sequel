@@ -364,20 +364,20 @@ describe "Model#freeze" do
   end
 
   it "should freeze the object" do
-    @o.frozen?.should be_true
+    @o.frozen?.should == true
   end
 
   it "should freeze the object if the model doesn't have a primary key" do
     Album.no_primary_key
     @o = Album.load(:id=>1).freeze
-    @o.frozen?.should be_true
+    @o.frozen?.should == true
   end
 
   it "should freeze the object's values, associations, changed_columns, errors, and this" do
-    @o.values.frozen?.should be_true
-    @o.changed_columns.frozen?.should be_true
-    @o.errors.frozen?.should be_true
-    @o.this.frozen?.should be_true
+    @o.values.frozen?.should == true
+    @o.changed_columns.frozen?.should == true
+    @o.errors.frozen?.should == true
+    @o.this.frozen?.should == true
   end
 
   it "should still have working class attr overriddable methods" do
@@ -385,16 +385,16 @@ describe "Model#freeze" do
   end
 
   it "should have working new? method" do
-    @o.new?.should be_false
-    Album.new.freeze.new?.should be_true
+    @o.new?.should == false
+    Album.new.freeze.new?.should == true
   end
 
   it "should have working valid? method" do
-    @o.valid?.should be_true
+    @o.valid?.should == true
     o = Album.new
     def o.validate() errors.add(:foo, '') end
     o.freeze
-    o.valid?.should be_false
+    o.valid?.should == false
   end
 
   it "should raise an Error if trying to save/destroy/delete/refresh" do
@@ -430,8 +430,8 @@ describe "Model#dup" do
   end
 
   it "should keep new status" do
-    @o.dup.new?.should be_false
-    @Album.new.dup.new?.should be_true
+    @o.dup.new?.should == false
+    @Album.new.dup.new?.should == true
   end
 
   it "should not copy frozen status" do
@@ -467,8 +467,8 @@ describe "Model#clone" do
   end
 
   it "should keep new status" do
-    @o.clone.new?.should be_false
-    @Album.new.clone.new?.should be_true
+    @o.clone.new?.should == false
+    @Album.new.clone.new?.should == true
   end
 
   it "should copy frozen status" do
@@ -566,9 +566,9 @@ describe "Model#modified?" do
 
   it "should be true if given a column argument and the column has been changed" do
     o = @c.new
-    o.modified?(:id).should be_false
+    o.modified?(:id).should == false
     o.id = 1
-    o.modified?(:id).should be_true
+    o.modified?(:id).should == true
   end
 end
 
@@ -1182,7 +1182,7 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
 
   it "#set_all should set not set restricted fields" do
     @o1.set_all(:x => 1, :use_after_commit_rollback => false)
-    @o1.use_after_commit_rollback.should be_true
+    @o1.use_after_commit_rollback.should == true
     @o1.values.should == {:x => 1}
   end
 
@@ -1309,17 +1309,17 @@ describe Sequel::Model, "#exists?" do
   end
 
   it "should do a query to check if the record exists" do
-    @model.load(:id=>1).exists?.should be_true
+    @model.load(:id=>1).exists?.should == true
     DB.sqls.should == ['SELECT 1 AS one FROM items WHERE (id = 1) LIMIT 1']
   end
 
   it "should return false when #this.count == 0" do
-    @model.load(:id=>2).exists?.should be_false
+    @model.load(:id=>2).exists?.should == false
     DB.sqls.should == ['SELECT 1 AS one FROM items WHERE (id = 2) LIMIT 1']
   end
 
   it "should return false without issuing a query if the model object is new" do
-    @model.new.exists?.should be_false
+    @model.new.exists?.should == false
     DB.sqls.should == []
   end
 end

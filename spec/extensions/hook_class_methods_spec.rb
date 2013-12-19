@@ -354,17 +354,17 @@ describe "Model.has_hooks?" do
   end
   
   specify "should return false if no hooks are defined" do
-    @c.has_hooks?(:before_save).should be_false
+    @c.has_hooks?(:before_save).should == false
   end
   
   specify "should return true if hooks are defined" do
     @c.before_save {'blah'}
-    @c.has_hooks?(:before_save).should be_true
+    @c.has_hooks?(:before_save).should == true
   end
   
   specify "should return true if hooks are inherited" do
     @d = Class.new(@c)
-    @d.has_hooks?(:before_save).should be_false
+    @d.has_hooks?(:before_save).should == false
   end
 end
 
@@ -399,15 +399,15 @@ describe "Model#add_hook_type" do
   specify "it should return true for bar when before_bar and after_bar hooks are returing true" do
     a = 1
     @f.before_bar { a += 1}
-    @f.new.bar.should be_true
+    @f.new.bar.should == true
     a.should == 2
     @f.after_bar { a *= 2}
-    @f.new.bar.should be_true
+    @f.new.bar.should == true
     a.should == 6
   end
 
   specify "it should return nil for bar when before_bar and after_bar hooks are returing false" do
-    @f.new.bar.should be_true
+    @f.new.bar.should == true
     @f.after_bar { false }
     @f.new.bar.should == :a
     @f.before_bar { false }

@@ -161,7 +161,7 @@ describe "Model#save" do
     
     @m.x = 7
     @m.should be_valid
-    @m.save.should_not be_false
+    @m.save.should_not == false
     DB.sqls.should == ['UPDATE people SET x = 7 WHERE (id = 4)']
   end
   

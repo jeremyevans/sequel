@@ -49,18 +49,18 @@ describe "pg_interval extension" do
     d = ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
     @db.typecast_value(:interval, d).object_id.should == d.object_id
 
-    @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07").is_a?(ActiveSupport::Duration).should be_true
+    @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07").is_a?(ActiveSupport::Duration).should == true
     @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07").should == d
     @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07").parts.sort_by{|k,v| k.to_s}.should == d.parts.sort_by{|k,v| k.to_s}
     @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07.0").parts.sort_by{|k,v| k.to_s}.should == d.parts.sort_by{|k,v| k.to_s}
 
-    @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7 secs").is_a?(ActiveSupport::Duration).should be_true
+    @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7 secs").is_a?(ActiveSupport::Duration).should == true
     @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7 secs").should == d
     @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7 secs").parts.sort_by{|k,v| k.to_s}.should == d.parts.sort_by{|k,v| k.to_s}
     @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7.0 secs").parts.sort_by{|k,v| k.to_s}.should == d.parts.sort_by{|k,v| k.to_s}
 
     d2 = ActiveSupport::Duration.new(1, [[:seconds, 1]])
-    @db.typecast_value(:interval, 1).is_a?(ActiveSupport::Duration).should be_true
+    @db.typecast_value(:interval, 1).is_a?(ActiveSupport::Duration).should == true
     @db.typecast_value(:interval, 1).should == d2
     @db.typecast_value(:interval, 1).parts.sort_by{|k,v| k.to_s}.should == d2.parts.sort_by{|k,v| k.to_s}
 

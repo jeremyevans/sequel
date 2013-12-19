@@ -173,14 +173,14 @@ describe Sequel::Model, "caching" do
     @cache[m.cache_key].should == m
     m.name = 'hey'
     m.save
-    @cache.has_key?(m.cache_key).should be_false
+    @cache.has_key?(m.cache_key).should == false
     @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "UPDATE items SET name = 'hey' WHERE (id = 1)"]
 
     m = @c2[1]
     @cache[m.cache_key].should == m
     m.name = 'hey'
     m.save
-    @cache.has_key?(m.cache_key).should be_false
+    @cache.has_key?(m.cache_key).should == false
     @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "UPDATE items SET name = 'hey' WHERE (id = 1)"]
   end
 
@@ -188,13 +188,13 @@ describe Sequel::Model, "caching" do
     m = @c[1]
     @cache[m.cache_key].should == m
     m.delete
-    @cache.has_key?(m.cache_key).should be_false
+    @cache.has_key?(m.cache_key).should == false
     @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "DELETE FROM items WHERE id = 1"]
 
     m = @c2[1]
     @cache[m.cache_key].should == m
     m.delete
-    @cache.has_key?(m.cache_key).should be_false
+    @cache.has_key?(m.cache_key).should == false
     @c.db.sqls.should == ["SELECT * FROM items WHERE id = 1", "DELETE FROM items WHERE id = 1"]
   end
   

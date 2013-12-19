@@ -483,18 +483,18 @@ describe "Database#disconnect_connection" do
     o = Object.new
     def o.close() @closed=true end
     Sequel::Database.new.disconnect_connection(o)
-    o.instance_variable_get(:@closed).should be_true
+    o.instance_variable_get(:@closed).should == true
   end
 end
 
 describe "Database#valid_connection?" do
   specify "should issue a query to validate the connection" do
     db = Sequel.mock
-    db.synchronize{|c| db.valid_connection?(c)}.should be_true
+    db.synchronize{|c| db.valid_connection?(c)}.should == true
     db.synchronize do |c|
       def c.execute(*) raise Sequel::DatabaseError, "error" end
       db.valid_connection?(c)
-    end.should be_false
+    end.should == false
   end
 end
 
@@ -581,7 +581,7 @@ describe "Database#test_connection" do
   end
   
   specify "should return true if successful" do
-    @db.test_connection.should be_true
+    @db.test_connection.should == true
   end
 
   specify "should raise an error if the attempting to connect raises an error" do
@@ -593,10 +593,10 @@ end
 describe "Database#table_exists?" do
   specify "should test existence by selecting a row from the table's dataset" do
     db = Sequel.mock(:fetch=>[Sequel::Error, [], [{:a=>1}]])
-    db.table_exists?(:a).should be_false
+    db.table_exists?(:a).should == false
     db.sqls.should == ["SELECT NULL AS nil FROM a LIMIT 1"]
-    db.table_exists?(:b).should be_true
-    db.table_exists?(:c).should be_true
+    db.table_exists?(:b).should == true
+    db.table_exists?(:c).should == true
   end
 end
 
@@ -746,7 +746,7 @@ shared_examples_for "Database#transaction" do
   specify "should have in_transaction? return true if inside a transaction" do
     c = nil
     @db.transaction{c = @db.in_transaction?}
-    c.should be_true
+    c.should == true
   end
   
   specify "should have in_transaction? handle sharding correctly" do
@@ -757,7 +757,7 @@ shared_examples_for "Database#transaction" do
   end
   
   specify "should have in_transaction? return false if not in a transaction" do
-    @db.in_transaction?.should be_false
+    @db.in_transaction?.should == false
   end
   
   specify "should return nil if Sequel::Rollback is called in the transaction" do
@@ -1741,16 +1741,16 @@ describe "Database#typecast_value" do
   end
 
   specify "should typecast boolean values to true, false, or nil" do
-    @db.typecast_value(:boolean, false).should be_false
-    @db.typecast_value(:boolean, 0).should be_false
-    @db.typecast_value(:boolean, "0").should be_false
-    @db.typecast_value(:boolean, 'f').should be_false
-    @db.typecast_value(:boolean, 'false').should be_false
-    @db.typecast_value(:boolean, true).should be_true
-    @db.typecast_value(:boolean, 1).should be_true
-    @db.typecast_value(:boolean, '1').should be_true
-    @db.typecast_value(:boolean, 't').should be_true
-    @db.typecast_value(:boolean, 'true').should be_true
+    @db.typecast_value(:boolean, false).should == false
+    @db.typecast_value(:boolean, 0).should == false
+    @db.typecast_value(:boolean, "0").should == false
+    @db.typecast_value(:boolean, 'f').should == false
+    @db.typecast_value(:boolean, 'false').should == false
+    @db.typecast_value(:boolean, true).should == true
+    @db.typecast_value(:boolean, 1).should == true
+    @db.typecast_value(:boolean, '1').should == true
+    @db.typecast_value(:boolean, 't').should == true
+    @db.typecast_value(:boolean, 'true').should == true
     @db.typecast_value(:boolean, '').should be_nil
   end
 
@@ -2326,13 +2326,13 @@ describe "Database extensions" do
   specify "should be able to register an extension with a block and have Database#extension call the block" do
     @db.quote_identifiers = false
     Sequel::Database.register_extension(:foo){|db| db.quote_identifiers = true}
-    @db.extension(:foo).quote_identifiers?.should be_true
+    @db.extension(:foo).quote_identifiers?.should == true
   end
 
   specify "should be able to register an extension with a callable and Database#extension call the callable" do
     @db.quote_identifiers = false
     Sequel::Database.register_extension(:foo, proc{|db| db.quote_identifiers = true})
-    @db.extension(:foo).quote_identifiers?.should be_true
+    @db.extension(:foo).quote_identifiers?.should == true
   end
 
   specify "should be able to load multiple extensions in the same call" do
@@ -2341,7 +2341,7 @@ describe "Database extensions" do
     Sequel::Database.register_extension(:foo, proc{|db| db.quote_identifiers = true})
     Sequel::Database.register_extension(:bar, proc{|db| db.identifier_input_method = nil})
     @db.extension(:foo, :bar)
-    @db.quote_identifiers?.should be_true
+    @db.quote_identifiers?.should == true
     @db.identifier_input_method.should be_nil
   end
 

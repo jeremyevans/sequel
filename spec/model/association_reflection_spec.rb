@@ -269,16 +269,16 @@ describe Sequel::Model::Associations::AssociationReflection, "#remove_before_des
 
   it "should be true for many_to_one and many_to_many associations" do
     @c.many_to_one :c, :class=>@c
-    @c.association_reflection(:c).remove_before_destroy?.should be_true
+    @c.association_reflection(:c).remove_before_destroy?.should == true
     @c.many_to_many :cs, :class=>@c
-    @c.association_reflection(:cs).remove_before_destroy?.should be_true
+    @c.association_reflection(:cs).remove_before_destroy?.should == true
   end
 
   it "should be false for one_to_one and one_to_many associations" do
     @c.one_to_one :c, :class=>@c
-    @c.association_reflection(:c).remove_before_destroy?.should be_false
+    @c.association_reflection(:c).remove_before_destroy?.should == false
     @c.one_to_many :cs, :class=>@c
-    @c.association_reflection(:cs).remove_before_destroy?.should be_false
+    @c.association_reflection(:cs).remove_before_destroy?.should == false
   end
 end
 

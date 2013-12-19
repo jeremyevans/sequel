@@ -26,6 +26,8 @@ DB2 = Sequel.connect("#{CONN_PREFIX}#{BIN_SPEC_DB2}")
 File.delete(BIN_SPEC_DB) if File.file?(BIN_SPEC_DB)
 File.delete(BIN_SPEC_DB2) if File.file?(BIN_SPEC_DB2)
 
+require File.join(File.dirname(File.expand_path(__FILE__)), "rspec_helper.rb")
+
 describe "bin/sequel" do
   def bin(opts={})
     cmd = "#{opts[:pre]}\"#{RUBY}\" -I lib bin/sequel #{opts[:args]} #{"#{CONN_PREFIX}#{BIN_SPEC_DB}" unless opts[:no_conn]} #{opts[:post]}> #{OUTPUT}#{" 2>&1" if opts[:stderr]}"

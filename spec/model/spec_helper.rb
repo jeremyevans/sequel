@@ -5,8 +5,9 @@ unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
 
+require File.join(File.dirname(File.expand_path(__FILE__)), "../rspec_helper.rb")
 
-(defined?(RSpec) ? RSpec::Core::ExampleGroup : Spec::Example::ExampleGroup).class_eval do
+RSPEC_EXAMPLE_GROUP.class_eval do
   if ENV['SEQUEL_DEPRECATION_WARNINGS']
     class << self
       alias qspecify specify

@@ -60,15 +60,15 @@ describe "An Oracle database" do
 
   specify "should have working view_exists?" do
     begin
-      DB.view_exists?(:cats).should be_false
+      DB.view_exists?(:cats).should == false
       DB.create_view(:cats, DB[:categories])
-      DB.view_exists?(:cats).should be_true
+      DB.view_exists?(:cats).should == true
       om = DB.identifier_output_method
       im = DB.identifier_input_method
       DB.identifier_output_method = :reverse
       DB.identifier_input_method = :reverse
-      DB.view_exists?(:STAC).should be_true
-      DB.view_exists?(:cats).should be_false
+      DB.view_exists?(:STAC).should == true
+      DB.view_exists?(:cats).should == false
     ensure
       DB.identifier_output_method = om
       DB.identifier_input_method = im

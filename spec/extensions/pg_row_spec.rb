@@ -272,7 +272,7 @@ describe "pg_row extension" do
     @db.conversion_procs[4] = proc{|s| called = true; s}
     @db.register_row_type(:foo)
     @db.conversion_procs[1].call('()').should == {:bar=>nil}
-    called.should be_false
+    called.should == false
   end
 
   it "should registering array type for row type if type has an array oid" do

@@ -107,7 +107,7 @@ describe "Sequel::Model basic support" do
 
     i.rb = true
     i.destroy.should be_nil
-    i.exists?.should be_true
+    i.exists?.should == true
     i.hooks.should == [:ad, :adr]
 
     i.name = 'K'
@@ -118,7 +118,7 @@ describe "Sequel::Model basic support" do
 
     i.rb = false
     i.destroy.should_not be_nil
-    i.exists?.should be_false
+    i.exists?.should == false
     i.hooks.should == [:ad, :adc]
   end
 

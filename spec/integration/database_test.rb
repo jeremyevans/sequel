@@ -78,7 +78,7 @@ describe Sequel::Database do
       @db << "SELECT"
     rescue Sequel::DatabaseError=>e
       if defined?(Java::JavaLang::Exception)
-        (e.wrapped_exception.is_a?(Exception) || e.wrapped_exception.is_a?(Java::JavaLang::Exception)).should be_true
+        (e.wrapped_exception.is_a?(Exception) || e.wrapped_exception.is_a?(Java::JavaLang::Exception)).should == true
       else
         e.wrapped_exception.should be_a_kind_of(Exception)
       end
@@ -98,8 +98,8 @@ describe Sequel::Database do
 
   cspecify "should provide ability to check connections for validity", [:do, :postgres] do
     conn = @db.synchronize{|c| c}
-    @db.valid_connection?(conn).should be_true
+    @db.valid_connection?(conn).should == true
     @db.disconnect
-    @db.valid_connection?(conn).should be_false
+    @db.valid_connection?(conn).should == false
   end
 end

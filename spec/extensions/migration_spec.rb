@@ -60,8 +60,8 @@ describe "Migration.apply" do
 
   specify "should respond to the methods the database responds to" do
     m = Sequel::Migration.new(Sequel.mock)
-    m.respond_to?(:foo).should be_false
-    m.respond_to?(:execute).should be_true
+    m.respond_to?(:foo).should == false
+    m.respond_to?(:execute).should == true
   end if RUBY_VERSION >= '1.9'
 end
 
@@ -292,16 +292,16 @@ describe "Sequel::IntegerMigrator" do
   end
 
   specify "should automatically create the schema_info table with the version column" do
-    @db.table_exists?(:schema_info).should be_false
+    @db.table_exists?(:schema_info).should == false
     Sequel::Migrator.run(@db, @dirname, :target=>0)
-    @db.table_exists?(:schema_info).should be_true
+    @db.table_exists?(:schema_info).should == true
     @db.dataset.columns.should == [:version]
   end
 
   specify "should allow specifying the table and columns" do
-    @db.table_exists?(:si).should be_false
+    @db.table_exists?(:si).should == false
     Sequel::Migrator.run(@db, @dirname, :target=>0, :table=>:si, :column=>:sic)
-    @db.table_exists?(:si).should be_true
+    @db.table_exists?(:si).should == true
     @db.dataset.columns.should == [:sic]
   end
   
@@ -313,9 +313,9 @@ describe "Sequel::IntegerMigrator" do
   end
   
   specify "should be able to tell whether there are outstanding migrations" do
-    Sequel::Migrator.is_current?(@db, @dirname).should be_false
+    Sequel::Migrator.is_current?(@db, @dirname).should == false
     Sequel::Migrator.apply(@db, @dirname)
-    Sequel::Migrator.is_current?(@db, @dirname).should be_true
+    Sequel::Migrator.is_current?(@db, @dirname).should == true
   end 
 
   specify "should have #check_current raise an exception if the migrator is not current" do
@@ -474,31 +474,31 @@ describe "Sequel::TimestampMigrator" do
   specify "should handle migrating up or down all the way" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
     @m.apply(@db, @dir, 0)
-    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_false}
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
     @db[:schema_migrations].select_order_map(:filename).should == []
   end
 
   specify "should handle migrating up or down to specific timestamps" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir, 1273253851)
-    [:schema_migrations, :sm1111, :sm2222].each{|n| @db.table_exists?(n).should be_true}
-    @db.table_exists?(:sm3333).should be_false
+    [:schema_migrations, :sm1111, :sm2222].each{|n| @db.table_exists?(n).should == true}
+    @db.table_exists?(:sm3333).should == false
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb'
     @m.apply(@db, @dir, 1273253849)
-    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_false}
-    @db.table_exists?(:sm1111).should be_true
+    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
+    @db.table_exists?(:sm1111).should == true
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb'
   end
 
   specify "should not be current when there are migrations to apply" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
-    @m.is_current?(@db, @dir).should be_true
+    @m.is_current?(@db, @dir).should == true
     @dir = 'spec/files/interleaved_timestamped_migrations'
-    @m.is_current?(@db, @dir).should be_false
+    @m.is_current?(@db, @dir).should == false
   end
 
   specify "should raise an exception if the migrator is not current" do
@@ -514,7 +514,7 @@ describe "Sequel::TimestampMigrator" do
     @m.apply(@db, @dir)
     @dir = 'spec/files/interleaved_timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm1122, :sm2222, :sm2233, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :sm1111, :sm1122, :sm2222, :sm2233, :sm3333].each{|n| @db.table_exists?(n).should == true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253850_create_artists.rb 1273253851_create_nodes.rb 1273253852_create_albums.rb 1273253853_3_create_users.rb'
   end
 
@@ -523,7 +523,7 @@ describe "Sequel::TimestampMigrator" do
     @m.apply(@db, @dir)
     @dir = 'spec/files/interleaved_timestamped_migrations'
     @m.apply(@db, @dir, 0)
-    [:sm1111, :sm1122, :sm2222, :sm2233, :sm3333].each{|n| @db.table_exists?(n).should be_false}
+    [:sm1111, :sm1122, :sm2222, :sm2233, :sm3333].each{|n| @db.table_exists?(n).should == false}
     @db[:schema_migrations].select_order_map(:filename).should == []
   end
 
@@ -532,113 +532,113 @@ describe "Sequel::TimestampMigrator" do
     @m.apply(@db, @dir)
     @dir = 'spec/files/interleaved_timestamped_migrations'
     @m.apply(@db, @dir, 1273253851)
-    [:schema_migrations, :sm1111, :sm1122, :sm2222].each{|n| @db.table_exists?(n).should be_true}
-    [:sm2233, :sm3333].each{|n| @db.table_exists?(n).should be_false}
+    [:schema_migrations, :sm1111, :sm1122, :sm2222].each{|n| @db.table_exists?(n).should == true}
+    [:sm2233, :sm3333].each{|n| @db.table_exists?(n).should == false}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253850_create_artists.rb 1273253851_create_nodes.rb'
   end
 
   specify "should correctly update schema_migrations table when an error occurs when migrating up or down" do
     @dir = 'spec/files/bad_timestamped_migrations'
     proc{@m.apply(@db, @dir)}.should raise_error
-    [:schema_migrations, :sm1111, :sm2222].each{|n| @db.table_exists?(n).should be_true}
-    @db.table_exists?(:sm3333).should be_false
+    [:schema_migrations, :sm1111, :sm2222].each{|n| @db.table_exists?(n).should == true}
+    @db.table_exists?(:sm3333).should == false
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb'
     proc{@m.apply(@db, @dir, 0)}.should raise_error
-    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_false}
-    @db.table_exists?(:sm1111).should be_true
+    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
+    @db.table_exists?(:sm1111).should == true
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb'
   end
 
   specify "should handle multiple migrations with the same timestamp correctly" do
     @dir = 'spec/files/duplicate_timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253853_create_nodes.rb 1273253853_create_users.rb'
     @m.apply(@db, @dir, 1273253853)
-    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253853_create_nodes.rb 1273253853_create_users.rb'
     @m.apply(@db, @dir, 1273253849)
-    [:sm1111].each{|n| @db.table_exists?(n).should be_true}
-    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_false}
+    [:sm1111].each{|n| @db.table_exists?(n).should == true}
+    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb'
     @m.apply(@db, @dir, 1273253848)
-    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_false}
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
     @db[:schema_migrations].select_order_map(:filename).should == []
   end
 
   specify "should convert schema_info table to schema_migrations table" do
     @dir = 'spec/files/integer_migrations'
     @m.apply(@db, @dir)
-    [:schema_info, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
-    [:schema_migrations, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should be_false}
+    [:schema_info, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
+    [:schema_migrations, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
 
     @dir = 'spec/files/convert_to_timestamp_migrations'
     @m.apply(@db, @dir)
-    [:schema_info, :sm1111, :sm2222, :sm3333, :schema_migrations, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_info, :sm1111, :sm2222, :sm3333, :schema_migrations, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb 1273253850_create_artists.rb 1273253852_create_albums.rb'
 
     @m.apply(@db, @dir, 4)
-    [:schema_info, :schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
-    [:sm1122, :sm2233].each{|n| @db.table_exists?(n).should be_false}
+    [:schema_info, :schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
+    [:sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
     @db[:schema_migrations].select_order_map(:filename).should == %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb'
 
     @m.apply(@db, @dir, 0)
-    [:schema_info, :schema_migrations].each{|n| @db.table_exists?(n).should be_true}
-    [:sm1111, :sm2222, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should be_false}
+    [:schema_info, :schema_migrations].each{|n| @db.table_exists?(n).should == true}
+    [:sm1111, :sm2222, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
     @db[:schema_migrations].select_order_map(:filename).should == []
   end
 
   specify "should handle unapplied migrations when migrating schema_info table to schema_migrations table" do
     @dir = 'spec/files/integer_migrations'
     @m.apply(@db, @dir, 2)
-    [:schema_info, :sm1111, :sm2222].each{|n| @db.table_exists?(n).should be_true}
-    [:schema_migrations, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should be_false}
+    [:schema_info, :sm1111, :sm2222].each{|n| @db.table_exists?(n).should == true}
+    [:schema_migrations, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
 
     @dir = 'spec/files/convert_to_timestamp_migrations'
     @m.apply(@db, @dir, 1273253850)
-    [:schema_info, :sm1111, :sm2222, :sm3333, :schema_migrations, :sm1122].each{|n| @db.table_exists?(n).should be_true}
-    [:sm2233].each{|n| @db.table_exists?(n).should be_false}
+    [:schema_info, :sm1111, :sm2222, :sm3333, :schema_migrations, :sm1122].each{|n| @db.table_exists?(n).should == true}
+    [:sm2233].each{|n| @db.table_exists?(n).should == false}
     @db[:schema_migrations].select_order_map(:filename).should == %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb 1273253850_create_artists.rb'
   end
 
   specify "should handle unapplied migrations when migrating schema_info table to schema_migrations table and target is less than last integer migration version" do
     @dir = 'spec/files/integer_migrations'
     @m.apply(@db, @dir, 1)
-    [:schema_info, :sm1111].each{|n| @db.table_exists?(n).should be_true}
-    [:schema_migrations, :sm2222, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should be_false}
+    [:schema_info, :sm1111].each{|n| @db.table_exists?(n).should == true}
+    [:schema_migrations, :sm2222, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
 
     @dir = 'spec/files/convert_to_timestamp_migrations'
     @m.apply(@db, @dir, 2)
-    [:schema_info, :sm1111, :sm2222, :schema_migrations].each{|n| @db.table_exists?(n).should be_true}
-    [:sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should be_false}
+    [:schema_info, :sm1111, :sm2222, :schema_migrations].each{|n| @db.table_exists?(n).should == true}
+    [:sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
     @db[:schema_migrations].select_order_map(:filename).should == %w'001_create_sessions.rb 002_create_nodes.rb'
 
     @m.apply(@db, @dir)
-    [:schema_info, :sm1111, :sm2222, :schema_migrations, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_info, :sm1111, :sm2222, :schema_migrations, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb 1273253850_create_artists.rb 1273253852_create_albums.rb'
   end
 
   specify "should raise error for applied migrations not in file system" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
 
     @dir = 'spec/files/missing_timestamped_migrations'
     proc{@m.apply(@db, @dir, 0)}.should raise_error(Sequel::Migrator::Error)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
   end
   
   specify "should not raise error for applied migrations not in file system if :allow_missing_migration_files is true" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
 
     @dir = 'spec/files/missing_timestamped_migrations'
     proc{@m.run(@db, @dir, :allow_missing_migration_files => true)}.should_not raise_error
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
   end
   
@@ -651,21 +651,21 @@ describe "Sequel::TimestampMigrator" do
   specify "should handle migration filenames in a case insensitive manner" do
     @dir = 'spec/files/uppercase_timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir, 0)
-    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_false}
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
     @db[:schema_migrations].select_order_map(:filename).should == []
   end
 
   specify "should :table and :column options" do
     @dir = 'spec/files/timestamped_migrations'
     @m.run(@db, @dir, :table=>:sm, :column=>:fn)
-    [:sm, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    [:sm, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
     @db[:sm].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
     @m.run(@db, @dir, :target=>0, :table=>:sm, :column=>:fn)
-    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_false}
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
     @db[:sm].select_order_map(:fn).should == []
   end
 

@@ -14,7 +14,7 @@ describe "Sequel Mock Adapter" do
   specify "should each not return any rows by default" do
     called = false
     Sequel.mock[:t].each{|r| called = true}
-    called.should be_false
+    called.should == false
   end
 
   specify "should return 0 for update/delete/with_sql_delete/execute_dui by default" do
@@ -299,7 +299,7 @@ describe "Sequel Mock Adapter" do
   end
 
   specify "should not quote identifiers by default" do
-    Sequel.mock.send(:quote_identifiers_default).should be_false
+    Sequel.mock.send(:quote_identifiers_default).should == false
   end
 
   specify "should allow overriding of server_version" do

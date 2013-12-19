@@ -20,7 +20,7 @@ describe Sequel::Schema::Generator do
   end
   
   it "should respond to everything" do
-    @generator.respond_to?(:foo).should be_true
+    @generator.respond_to?(:foo).should == true
   end if RUBY_VERSION >= '1.9'
 
   it "should primary key column first" do
@@ -68,9 +68,9 @@ describe Sequel::Schema::Generator do
   
   it "finds columns" do
     [:title, :body, :parent_id, :id].each do |col|
-      @generator.has_column?(col).should be_true
+      @generator.has_column?(col).should == true
     end
-    @generator.has_column?(:foo).should_not be_true
+    @generator.has_column?(:foo).should_not == true
   end
   
   it "creates constraints" do

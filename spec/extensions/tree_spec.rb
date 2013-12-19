@@ -89,12 +89,12 @@ describe Sequel::Model, "tree plugin" do
   end
 
   it "should have root? return true for a root node and false for a child node" do
-    @c.load(:parent_id => nil).root?.should be_true
-    @c.load(:parent_id => 1).root?.should be_false
+    @c.load(:parent_id => nil).root?.should == true
+    @c.load(:parent_id => 1).root?.should == false
   end
 
   it "should have root? return false for an new node" do
-    @c.new.root?.should be_false
+    @c.new.root?.should == false
   end
 
   it "should have self_and_siblings return the children of the current node's parent" do
@@ -207,14 +207,14 @@ describe Sequel::Model, "tree plugin with composite keys" do
   end
 
   it "should have root? return true for a root node and false for a child node" do
-    @c.load(:parent_id => nil, :parent_id2=>nil).root?.should be_true
-    @c.load(:parent_id => 1, :parent_id2=>nil).root?.should be_true
-    @c.load(:parent_id => nil, :parent_id2=>2).root?.should be_true
-    @c.load(:parent_id => 1, :parent_id2=>2).root?.should be_false
+    @c.load(:parent_id => nil, :parent_id2=>nil).root?.should == true
+    @c.load(:parent_id => 1, :parent_id2=>nil).root?.should == true
+    @c.load(:parent_id => nil, :parent_id2=>2).root?.should == true
+    @c.load(:parent_id => 1, :parent_id2=>2).root?.should == false
   end
 
   it "should have root? return false for an new node" do
-    @c.new.root?.should be_false
+    @c.new.root?.should == false
   end
 
   it "should have self_and_siblings return the children of the current node's parent" do

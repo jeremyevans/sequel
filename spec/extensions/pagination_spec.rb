@@ -62,20 +62,20 @@ describe "A paginated dataset" do
   end
 
   specify "should know if current page is last page" do
-    @paginated.last_page?.should be_false
-    @d.paginate(2, 20).last_page?.should be_false
-    @d.paginate(5, 30).last_page?.should be_false
-    @d.paginate(6, 30).last_page?.should be_true
+    @paginated.last_page?.should == false
+    @d.paginate(2, 20).last_page?.should == false
+    @d.paginate(5, 30).last_page?.should == false
+    @d.paginate(6, 30).last_page?.should == true
 
     @d.meta_def(:count) {0}
-    @d.paginate(1, 30).last_page?.should be_true
-    @d.paginate(2, 30).last_page?.should be_false
+    @d.paginate(1, 30).last_page?.should == true
+    @d.paginate(2, 30).last_page?.should == false
   end
 
   specify "should know if current page is first page" do
-    @paginated.first_page?.should be_true
-    @d.paginate(1, 20).first_page?.should be_true
-    @d.paginate(2, 20).first_page?.should be_false
+    @paginated.first_page?.should == true
+    @d.paginate(1, 20).first_page?.should == true
+    @d.paginate(2, 20).first_page?.should == false
   end
 
   specify "should work with fixed sql" do
