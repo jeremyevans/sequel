@@ -44,7 +44,7 @@ module Sequel
                 v, type = ps_arg_type(v)
                 if out
                   declarations << "@#{k} #{type}"
-                  outputs << "@#{k}"
+                  outputs << "@#{k} AS #{k}"
                   types << "@#{k}OUT #{type} OUTPUT"
                   values << "@#{k}OUT = @#{k} OUTPUT"
                 else
