@@ -34,12 +34,23 @@ module Sequel
             m = opts[:return]
             r = nil
             if (args = opts[:arguments]) && !args.empty?
+              out = false
               types = []
               values = []
+              declarations = []
+              outputs = []
               args.each_with_index do |(k, v), i|
+                out = v.nil? || out
                 v, type = ps_arg_type(v)
-                types << "@#{k} #{type}"
-                values << "@#{k} = #{v}"
+                if out
+                  declarations << "@#{k} #{type}"
+                  outputs << "@#{k}"
+                  types << "@#{k}OUT #{type} OUTPUT"
+                  values << "@#{k}OUT = @#{k} OUTPUT"
+                else
+                  types << "@#{k} #{type}"
+                  values << "@#{k} = #{v}"
+                end
               end
               case m
               when :do
@@ -50,6 +61,9 @@ module Sequel
                 single_value = true
               end
               sql = "EXEC sp_executesql N'#{c.escape(sql)}', N'#{c.escape(types.join(', '))}', #{values.join(', ')}"
+              if out
+                sql = "DECLARE #{declarations.join(', ')}; #{sql}; SELECT #{outputs.join(', ')}, @@ROWCOUNT AS AffectedRows"
+              end
               log_yield(sql) do
                 r = c.execute(sql)
                 r.each{|row| return row.values.first} if single_value
