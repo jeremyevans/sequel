@@ -67,6 +67,7 @@ module Sequel
               log_yield(sql) do
                 r = c.execute(sql)
                 r.each{|row| return row.values.first} if single_value
+                return r.first if out
               end
             else
               log_yield(sql) do
