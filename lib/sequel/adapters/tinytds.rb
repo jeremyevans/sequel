@@ -34,15 +34,15 @@ module Sequel
             m = opts[:return]
             r = nil
             if (args = opts[:arguments]) && !args.empty?
-              out = false
               types = []
               values = []
               declarations = []
               outputs = []
               args.each_with_index do |(k, v), i|
-                out = v.nil? || out
+                out = k.end_with? 'OUT'
                 v, type = ps_arg_type(v)
                 if out
+                  k = k.chomp('OUT')
                   declarations << "@#{k} #{type}"
                   outputs << "@#{k} AS #{k}"
                   types << "@#{k}OUT #{type} OUTPUT"
@@ -52,6 +52,7 @@ module Sequel
                   values << "@#{k} = #{v}"
                 end
               end
+              out = outputs.length > 0
               case m
               when :do
                 sql = "#{sql}; SELECT @@ROWCOUNT AS AffectedRows"
