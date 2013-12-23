@@ -36,11 +36,23 @@ module Sequel
             if (args = opts[:arguments]) && !args.empty?
               types = []
               values = []
+              declarations = []
+              outputs = []
               args.each_with_index do |(k, v), i|
+                out = k.end_with? 'OUT'
                 v, type = ps_arg_type(v)
-                types << "@#{k} #{type}"
-                values << "@#{k} = #{v}"
+                if out
+                  k = k.chomp('OUT')
+                  declarations << "@#{k} #{type}"
+                  outputs << "@#{k} AS #{k}"
+                  types << "@#{k}OUT #{type} OUTPUT"
+                  values << "@#{k}OUT = @#{k} OUTPUT"
+                else
+                  types << "@#{k} #{type}"
+                  values << "@#{k} = #{v}"
+                end
               end
+              out = outputs.length > 0
               case m
               when :do
                 sql = "#{sql}; SELECT @@ROWCOUNT AS AffectedRows"
@@ -50,9 +62,13 @@ module Sequel
                 single_value = true
               end
               sql = "EXEC sp_executesql N'#{c.escape(sql)}', N'#{c.escape(types.join(', '))}', #{values.join(', ')}"
+              if out
+                sql = "DECLARE #{declarations.join(', ')}; #{sql}; SELECT #{outputs.join(', ')}, @@ROWCOUNT AS AffectedRows"
+              end
               log_yield(sql) do
                 r = c.execute(sql)
                 r.each{|row| return row.values.first} if single_value
+                return r.first if out
               end
             else
               log_yield(sql) do

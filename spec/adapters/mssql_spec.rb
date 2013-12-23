@@ -643,3 +643,32 @@ describe "MSSQL optimistic locking plugin" do
     proc{o2.save}.should raise_error(Sequel::NoExistingObject)
   end
 end unless DB.adapter_scheme == :odbc
+
+describe "MSSQL::Database Stored procedure output variables support" do
+  before do
+    @db = DB
+    DB.execute('CREATE PROCEDURE dbo.SequelTest(@Input varchar(25), @Output varchar(25) OUTPUT) AS BEGIN SET @Output = @Input RETURN 0 END')
+  end
+
+  after do
+    DB.execute('DROP PROCEDURE dbo.SequelTest')
+  end
+
+  it "should return a hash of the output variables" do
+    now = DateTime.now.to_s
+    result = @db.execute(
+      'EXEC dbo.SequelTest @Input, @OutputOUT OUTPUT',
+      {:arguments => [['Input', now], ['OutputOUT', nil]]}
+    )
+    result['Output'].should == now
+  end
+
+  it "should return the number of Affected Rows" do
+    now = DateTime.new.to_s
+    result = @db.execute(
+      'EXEC dbo.SequelTest @Input, @OutputOUT OUTPUT',
+      {:arguments => [['Input', now], ['OutputOUT', nil]]}
+    )
+    result['AffectedRows'].should == 1
+  end
+end
