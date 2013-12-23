@@ -1,0 +1,35 @@
+= Stored Procedures in MSSQL
+
+This guide documents the workaround implemented to allow executing stored procedures
+in MSSQL, as well as getting the values of output variables.
+
+=== Simple Execution
+
+The following stored procedure is used as an example:
+
+  CREATE PROCEDURE dbo.SequelTest(
+    @Input varchar(25),
+    @Output varchar(25) OUTPUR
+  )
+  AS
+    SET @Output = @Input
+    RETURN 0
+
+Execute it as follows:
+
+  result = db.execute(
+    'EXEC dbo.SequelTest @Input, @OutputOUT OUTPUT',
+    {:arguments => [['Input', 'Input String'], ['OutputOUT', nil]]}
+  )
+
+It's important to note the `OUT` appended to the output variable name to identify
+it as an output variable. Result will contain a hash of the output variables, as
+well as the number of affected rows:
+
+  {
+    "Output":"Input String",
+    "AffectedRows":1
+  }
+
+Note that the key of the output variables don't have the `OUT` appended to the variable
+name.
