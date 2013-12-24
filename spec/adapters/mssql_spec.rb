@@ -672,7 +672,7 @@ describe "MSSQL::Database Stored Procedure support" do
       :SequelTest,
       {:args => [now, 1, :output, [:output, 'int']]}
     )
-    result['var3'].should == 1
+    result['var3'].should be_a(Integer)
   end
 
   it "should support named output variables" do
