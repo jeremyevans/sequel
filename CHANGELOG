@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle RuntimeErrors raised by oci8 in the oracle adapter (jeremyevans)
+
 * Support OFFSET/FETCH on Microsoft SQL Server 2012 (jeremyevans)
 
 * Support :server option for Database#{commit,rollback}_prepared_transaction on PostgreSQL, MySQL, and H2 (jeremyevans) (#743)
