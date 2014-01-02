@@ -261,11 +261,29 @@ module Sequel
       # various cases.
       def fetch_rows(sql)
         execute(sql) do |result|
-          @columns = result.fields.map!{|c| output_identifier(c)}
-          if db.timezone == :utc
-            result.each(:timezone=>:utc){|r| yield r}
+          columns = result.fields.map!{|c| output_identifier(c)}
+          if columns.empty?
+            args = []
+            args << {:timezone=>:utc} if db.timezone == :utc
+            cols = nil
+            result.each(*args) do |r|
+              unless cols
+                cols = result.fields.map{|c| [c, output_identifier(c)]}
+                @columns = columns = cols.map{|c| c.last}
+              end
+              h = {}
+              cols.each do |s, sym|
+                h[sym] = r[s]
+              end
+              yield h
+            end
           else
-            result.each{|r| yield r}
+            @columns = columns
+            if db.timezone == :utc
+              result.each(:timezone=>:utc){|r| yield r}
+            else
+              result.each{|r| yield r}
+            end
           end
         end
         self
