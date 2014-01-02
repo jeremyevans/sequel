@@ -168,6 +168,13 @@ Instead, you should do:
 The Sequel::Dataset#lock_style method also treats an input string 
 as SQL code. This method should not be called with user input.
 
+==== SQL Type Names
+
+In general, most places where Sequel needs to use an SQL type that should
+be specified by the user, it allows you to use a ruby string, and that
+string is used verbatim as the SQL type.  You should not use user input
+for type strings.
+
 === SQL Identifier Injections
 
 Usually, Sequel treats ruby symbols as SQL identifiers, and ruby
