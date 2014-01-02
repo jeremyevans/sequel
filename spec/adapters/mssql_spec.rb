@@ -643,3 +643,62 @@ describe "MSSQL optimistic locking plugin" do
     proc{o2.save}.should raise_error(Sequel::NoExistingObject)
   end
 end unless DB.adapter_scheme == :odbc
+
+describe "MSSQL::Database Stored Procedure support" do
+  before do
+    @db = DB
+    DB.execute('CREATE PROCEDURE dbo.SequelTest
+      (@Input varchar(25), @IntegerInput int, @Output varchar(25) OUTPUT, @IntegerOutput int OUTPUT) AS
+      BEGIN SET @Output = @Input SET @IntegerOutput = @IntegerInput RETURN @IntegerInput END')
+  end
+
+  after do
+    DB.execute('DROP PROCEDURE dbo.SequelTest')
+  end
+
+  it "should return a hash of output variables" do
+    now = DateTime.now.to_s
+    result = @db.call_sproc(
+      :SequelTest,
+      {:args => [now, 1, :output, :output]}
+    )
+    result['var2'].should == now
+    result['var3'].should == "1"
+  end
+
+  it "should support typed output variables" do
+    now = DateTime.now.to_s
+    result = @db.call_sproc(
+      :SequelTest,
+      {:args => [now, 1, :output, [:output, 'int']]}
+    )
+    result['var3'].should be_a(Integer)
+  end
+
+  it "should support named output variables" do
+    now = DateTime.now.to_s
+    result = @db.call_sproc(
+      :SequelTest,
+      {:args => [now, 1, [:output, nil, 'Output'], :output]}
+    )
+    result['Output'].should == now
+  end
+
+  it "should return the number of Affected Rows" do
+    now = DateTime.new.to_s
+    result = @db.call_sproc(
+      :SequelTest,
+      {:args => [now, 1, :output, :output]}
+    )
+    result['AffectedRows'].should == 1
+  end
+
+  it "should return the Result Code" do
+    now = DateTime.new.to_s
+    result = @db.call_sproc(
+      :SequelTest,
+      {:args => [now, 1, :output, :output]}
+    )
+    result['ResultCode'].should == 1
+  end
+end
