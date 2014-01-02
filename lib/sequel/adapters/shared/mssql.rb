@@ -45,9 +45,9 @@ module Sequel
       #
       # Examples:
       #
-      #     DB.call_sproc(:SequelTest, {:args => ['input arg', :output]})
-      #     DB.call_sproc(:SequelTest, {:args => ['input arg', [:output, 'int', 'varname']]})
-      def call_sproc(name, opts=OPTS)
+      #     DB.call_mssql_sproc(:SequelTest, {:args => ['input arg', :output]})
+      #     DB.call_mssql_sproc(:SequelTest, {:args => ['input arg', [:output, 'int', 'varname']]})
+      def call_mssql_sproc(name, opts=OPTS)
         args = opts[:args] || []
         names = ['@RC AS RESULT', '@@ROWCOUNT AS NUMROWS']
         declarations = ['@RC int']

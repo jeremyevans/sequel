@@ -657,24 +657,24 @@ describe "MSSQL Stored Procedure support" do
   end
 
   it "should return a hash of output variables" do
-    r = @db.call_sproc(:SequelTest, {:args => [@now, 1, :output, :output]})
+    r = @db.call_mssql_sproc(:SequelTest, {:args => [@now, 1, :output, :output]})
     r.should be_a_kind_of(Hash)
     r.values_at(:var2, :var3).should == [@now, '1']
   end
 
   it "should support typed output variables" do
-    @db.call_sproc(:SequelTest, {:args => [@now, 1, :output, [:output, 'int']]})[:var3].should == 1
+    @db.call_mssql_sproc(:SequelTest, {:args => [@now, 1, :output, [:output, 'int']]})[:var3].should == 1
   end
 
   it "should support named output variables" do
-    @db.call_sproc(:SequelTest, {:args => [@now, 1, [:output, nil, 'output'], :output]})[:output].should == @now
+    @db.call_mssql_sproc(:SequelTest, {:args => [@now, 1, [:output, nil, 'output'], :output]})[:output].should == @now
   end
 
   it "should return the number of Affected Rows" do
-    @db.call_sproc(:SequelTest, {:args => [@now, 1, :output, :output]})[:numrows].should == 1
+    @db.call_mssql_sproc(:SequelTest, {:args => [@now, 1, :output, :output]})[:numrows].should == 1
   end
 
   it "should return the Result Code" do
-    @db.call_sproc(:SequelTest, {:args => [@now, 1, :output, :output]})[:result].should == 1
+    @db.call_mssql_sproc(:SequelTest, {:args => [@now, 1, :output, :output]})[:result].should == 1
   end
 end unless DB.adapter_scheme == :odbc
