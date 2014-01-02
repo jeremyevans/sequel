@@ -17,45 +17,27 @@ The following stored procedure is used as an example:
 
 Execute it as follows:
 
-  result = db.call_sproc(:SequelTest,
-    {:args => ['Input String', :output]}
-  )
+  DB.call_sproc(:SequelTest, {:args => ['Input String', :output]})
 
 Use the +:output+ symbol to denote an output variable. The result will contain a
 hash of the output variables, as well as the result code and number of affected rows:
 
-  {
-    "ResultCode":0,
-    "AffectedRows":1,
-    "var1":"1"
-  }
+  {:result => 0, :numrows => 1, :var1 => "1"}
 
 Output variables will be strings by default. To specify their type, include the
 SQL type:
 
-  result = db.call_sproc(:SequelTest,
-    {:args => ['Input String', [:output, 'int']]}
-  )
+  DB.call_sproc(:SequelTest, {:args => ['Input String', [:output, 'int']]})
 
 Result:
 
-  {
-    "ResultCode":0,
-    "AffectedRows":1,
-    "var1":1
-  }
+  {:result => 0, :numrows => 1, :var1 => 1}
 
 Output variables will be named +var#{n}+ where n is their zero indexed position
 in the parameter list. To name the output variable, include their name:
 
-  result = db.call_sproc(:SequelTest,
-    {:args => ['Input String', [:output, nil, 'Output']]}
-  )
+  DB.call_sproc(:SequelTest, {:args => ['Input String', [:output, nil, 'Output']]})
 
 Result:
 
-  {
-    "ResultCode":0,
-    "AffectedRows":1,
-    "Output":"1"
-  }
+  {:result => 0, :numrows => 1, :output => "1"}

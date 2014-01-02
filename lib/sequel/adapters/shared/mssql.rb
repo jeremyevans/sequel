@@ -34,6 +34,51 @@ module Sequel
       # to :integer.
       DECIMAL_TYPE_RE = /number|numeric|decimal/io
 
+      # Execute the given stored procedure with the given name.
+      #
+      # Options:
+      # :args :: Array of arguments to stored procedure.  Output parameters to
+      #          the function are specified using :output.  You can also name
+      #          output parameters and provide a type by using an array containing
+      #          :output, the type name, and the parameter name.
+      # :server :: The server/shard on which to execute the procedure.
+      #
+      # Examples:
+      #
+      #     DB.call_sproc(:SequelTest, {:args => ['input arg', :output]})
+      #     DB.call_sproc(:SequelTest, {:args => ['input arg', [:output, 'int', 'varname']]})
+      def call_sproc(name, opts=OPTS)
+        args = opts[:args] || []
+        names = ['@RC AS RESULT', '@@ROWCOUNT AS NUMROWS']
+        declarations = ['@RC int']
+        values = []
+
+        args.each_with_index do |v, i|
+          if v.is_a?(Array)
+            v, type, select = v
+          else
+            type = select = nil
+          end
+
+          if v == :output
+            type = "nvarchar(max)" unless type
+            varname = "var#{i}" unless varname
+            select ||= varname
+            names << "@#{varname} AS #{quote_identifier(select)}"
+            declarations << "@#{varname} #{type}"
+            values << "@#{varname} OUTPUT"
+          else
+            values << literal(v)
+          end
+        end
+
+        sql = "DECLARE #{declarations.join(', ')}; EXECUTE @RC = #{name} #{values.join(', ')}; SELECT #{names.join(', ')}"
+
+        ds = dataset.with_sql(sql)
+        ds = ds.server(opts[:server]) if opts[:server]
+        ds.first
+      end
+
       # Microsoft SQL Server uses the :mssql type.
       def database_type
         :mssql

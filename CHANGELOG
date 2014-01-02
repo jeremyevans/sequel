@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#call_sproc on MSSQL for calling stored procedures and handling output parameters (jrgns, jeremyevans) (#748)
+
 * Handle RuntimeErrors raised by oci8 in the oracle adapter (jeremyevans)
 
 * Support OFFSET/FETCH on Microsoft SQL Server 2012 (jeremyevans)

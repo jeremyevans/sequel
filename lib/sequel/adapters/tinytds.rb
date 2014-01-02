@@ -86,37 +86,6 @@ module Sequel
         nil
       end
 
-      # Execute the given stored procedure with the given name. Output parameters
-      # need to be identified using +:output+. Output variables can be named and
-      # typed by specifying an array containing +:output+, the type and the name
-      def call_sproc(name, opts = OPTS)
-        args = opts[:args] || []
-        synchronize(opts[:server]) do |c|
-          names = ['@RC AS ResultCode', '@@ROWCOUNT AS AffectedRows']
-          declarations = ['@RC int']
-          values = []
-          args.each_with_index do |(v, type, name), i|
-            if v == :output
-              type = "nvarchar(max)" if type.nil?
-              name = "var#{i}" if name.nil?
-              names << "@#{name} AS #{name}"
-              declarations << "@#{name} #{type}"
-              values << "@#{name} OUTPUT"
-            else
-              v, type = ps_arg_type(v)
-              values << v
-            end
-          end
-
-          sql = "EXECUTE @RC = #{name} #{values.join(', ')}"
-          sql = "DECLARE #{declarations.join(', ')}; #{sql}; SELECT #{names.join(', ')}"
-
-          result = c.execute(sql)
-
-          result.first
-        end
-      end
-
       private
 
       # Choose whether to use unicode strings on initialization
