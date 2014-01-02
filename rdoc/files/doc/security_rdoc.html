@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+          <span class='datetime'>2014-01-02 10:46:37 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -284,6 +284,14 @@
             href="../../classes/Sequel/Dataset.html#method-i-lock_style">Sequel::Dataset#lock_style</a>
             method also treats an input string  as SQL code. This method should not be
             called with user input.</p>
+            
+            <h4 id="label-SQL+Type+Names">SQL Type Names</h4>
+            
+            <p>In general, most places where <a
+            href="../../classes/Sequel.html">Sequel</a> needs to use an SQL type that
+            should be specified by the user, it allows you to use a ruby string, and
+            that string is used verbatim as the SQL type.  You should not use user
+            input for type strings.</p>
             
             <h3 id="label-SQL+Identifier+Injections">SQL Identifier Injections</h3>
             

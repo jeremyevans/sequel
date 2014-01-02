@@ -158,7 +158,7 @@
                 <a name='method-i-commit_prepared_transaction'></a>
                 <div class='synopsis'>
                   <span class='name'>commit_prepared_transaction</span>
-                  <span class='arguments'>(transaction_id)</span>
+                  <span class='arguments'>(transaction_id, opts=OPTS)</span>
                 </div>
                 <div class='description'>
                   
@@ -169,7 +169,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-commit_prepared_transaction-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-commit_prepared_transaction-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">commit_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>)&#x000A;  <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;XA COMMIT #{literal(transaction_id)}&quot;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-commit_prepared_transaction-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">commit_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;XA COMMIT #{literal(transaction_id)}&quot;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-database_type'>
@@ -248,7 +248,7 @@
                 <a name='method-i-rollback_prepared_transaction'></a>
                 <div class='synopsis'>
                   <span class='name'>rollback_prepared_transaction</span>
-                  <span class='arguments'>(transaction_id)</span>
+                  <span class='arguments'>(transaction_id, opts=OPTS)</span>
                 </div>
                 <div class='description'>
                   
@@ -259,7 +259,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-rollback_prepared_transaction-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-rollback_prepared_transaction-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 115</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">rollback_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>)&#x000A;  <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;XA ROLLBACK #{literal(transaction_id)}&quot;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-rollback_prepared_transaction-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 115</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">rollback_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;XA ROLLBACK #{literal(transaction_id)}&quot;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-server_version'>

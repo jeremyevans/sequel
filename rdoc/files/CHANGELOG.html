@@ -31,12 +31,31 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-12-01 15:11:52 -0800</span>
+          <span class='datetime'>2014-01-02 12:13:25 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.6.0+%282014-01-02%29">4.6.0 (2014-01-02)</h3>
+            <ul><li>
+            <p>Add Database#call_mssql_sproc on MSSQL for calling stored procedures and
+            handling output parameters (jrgns, jeremyevans) (#748)</p>
+            </li><li>
+            <p>Handle RuntimeErrors raised by oci8 in the oracle adapter (jeremyevans)</p>
+            </li><li>
+            <p>Support OFFSET/FETCH on Microsoft SQL Server 2012 (jeremyevans)</p>
+            </li><li>
+            <p>Support :server option for Database#{commit,rollback}_prepared_transaction
+            on PostgreSQL, MySQL, and H2 (jeremyevans) (#743)</p>
+            </li><li>
+            <p>Do not attempt to eager load and raise an exception when doing
+            Model.eager(...).naked.all (jeremyevans)</p>
+            </li><li>
+            <p>Recognize a couple additional disconnect errors in the jdbc/postgresql
+            adapter (jeremyevans) (#742)</p>
+            </li></ul>
             
             <h3 id="label-4.5.0+%282013-12-02%29">4.5.0 (2013-12-02)</h3>
             <ul><li>
