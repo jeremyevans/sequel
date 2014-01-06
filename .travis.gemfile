@@ -20,3 +20,9 @@ gem "pg", :platform => :ruby
 gem 'jdbc-sqlite3', :platform => :jruby
 gem 'jdbc-mysql', :platform => :jruby
 gem 'jdbc-postgres', :platform => :jruby
+
+platforms :rbx do
+  gem 'racc'
+  gem 'rubysl', '~> 2.0'
+  gem 'psych'
+end
