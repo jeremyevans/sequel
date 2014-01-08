@@ -384,11 +384,6 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @user.should_not be_valid
     @user.errors.full_messages.should == ['username is already taken']
 
-    ds1 = @c.dataset.filter([[:username, '0records']])
-    ds2 = ds1.exclude(:id=>1)
-    @c.dataset.should_receive(:where).with([[:username, '0records']]).twice.and_return(ds1)
-    ds1.should_receive(:exclude).with(:id=>1).once.and_return(ds2)
-
     @user = @c.load(:id=>1, :username => "0records", :password => "anothertest")
     @user.should be_valid
     DB.sqls.last.should == "SELECT count(*) AS count FROM items WHERE ((username = '0records') AND (id != 1)) LIMIT 1"
@@ -433,11 +428,6 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @user = @c.load(:id=>4, :username => "1record", :password => "anothertest")
     @user.should_not be_valid
     @user.errors.full_messages.should == ['username and password is already taken']
-
-    ds1 = @c.dataset.filter([[:username, '0records'], [:password, 'anothertest']])
-    ds2 = ds1.exclude(:id=>1)
-    @c.dataset.should_receive(:where).with([[:username, '0records'], [:password, 'anothertest']]).twice.and_return(ds1)
-    ds1.should_receive(:exclude).with(:id=>1).once.and_return(ds2)
 
     @user = @c.load(:id=>1, :username => "0records", :password => "anothertest")
     @user.should be_valid
