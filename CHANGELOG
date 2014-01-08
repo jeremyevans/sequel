@@ -1,5 +1,7 @@
 === HEAD
 
+* Add update_or_create plugin, for updating an object if it exists, or creating such an object if it does not (jeremyevans)
+
 * Make auto_validations uniqueness validations work correctly for STI subclasses (jeremyevans)
 
 * Support :dataset option to validates_unique vaildation (jeremyevans)

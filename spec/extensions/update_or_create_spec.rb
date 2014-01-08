@@ -1,0 +1,81 @@
+require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
+
+describe "Sequel::Plugins::UpdateOrCreate" do
+  before do
+    @db = Sequel.mock(:autoid=>proc{1}, :numrows=>1)
+    @c = Class.new(Sequel::Model(@db[:test]))
+    @c.plugin :update_or_create
+    @c.columns :id, :a, :b 
+    @db.sqls
+  end
+
+  it ".update_or_create should update an existing record if one exists" do
+    @db.fetch = [[{:id=>1, :a=>2, :b=>3}]]
+    @c.update_or_create(:a=>2){|t| t.b = 4}.should == @c.load(:id=>1, :a=>2, :b=>4)
+    @db.sqls.should == ["SELECT * FROM test WHERE (a = 2) LIMIT 1", "UPDATE test SET b = 4 WHERE (id = 1)"]
+
+    @db.fetch = [[{:id=>1, :a=>2, :b=>3}]]
+    @c.update_or_create({:a=>2}, :b=>4).should == @c.load(:id=>1, :a=>2, :b=>4)
+    @db.sqls.should == ["SELECT * FROM test WHERE (a = 2) LIMIT 1", "UPDATE test SET b = 4 WHERE (id = 1)"]
+
+    @db.fetch = [[{:id=>1, :a=>2, :b=>3}]]
+    @c.update_or_create({:a=>2}, :a=>3){|t| t.b = 4}.should == @c.load(:id=>1, :a=>3, :b=>4)
+    sqls = @db.sqls
+    sqls.shift.should == "SELECT * FROM test WHERE (a = 2) LIMIT 1"
+    sqls.shift.should =~ /UPDATE test SET [ab] = [34], [ab] = [34] WHERE \(id = 1\)/
+  end
+
+  it ".update_or_create should create a record if an existing record does not exist" do
+    @db.fetch = [[], [{:id=>1, :a=>1, :b=>4}]]
+    @c.update_or_create(:a=>1){|t| t.b = 4}.should == @c.load(:id=>1, :a=>1, :b=>4)
+    sqls = @db.sqls
+    sqls.shift.should == "SELECT * FROM test WHERE (a = 1) LIMIT 1"
+    sqls.shift.should =~ /INSERT INTO test \([ab], [ab]\) VALUES \([14], [14]\)/
+    sqls.shift.should == "SELECT * FROM test WHERE (id = 1) LIMIT 1"
+
+    @db.fetch = [[], [{:id=>1, :a=>1, :b=>4}]]
+    @c.update_or_create({:a=>1}, :b=>4).should == @c.load(:id=>1, :a=>1, :b=>4)
+    sqls = @db.sqls
+    sqls.shift.should == "SELECT * FROM test WHERE (a = 1) LIMIT 1"
+    sqls.shift.should =~ /INSERT INTO test \([ab], [ab]\) VALUES \([14], [14]\)/
+    sqls.shift.should == "SELECT * FROM test WHERE (id = 1) LIMIT 1"
+
+    @db.fetch = [[], [{:id=>1, :a=>3, :b=>4}]]
+    @c.update_or_create({:a=>1}, :a=>3){|t| t.b = 4}.should == @c.load(:id=>1, :a=>3, :b=>4)
+    sqls = @db.sqls
+    sqls.shift.should == "SELECT * FROM test WHERE (a = 1) LIMIT 1"
+    sqls.shift.should =~ /INSERT INTO test \([ab], [ab]\) VALUES \([34], [34]\)/
+    sqls.shift.should == "SELECT * FROM test WHERE (id = 1) LIMIT 1"
+  end
+
+  it ".find_or_new should return an existing record" do
+    @db.fetch = [[{:id=>1, :a=>2, :b=>3}]]
+    @c.find_or_new(:a=>2){|t| t.b = 4}.should == @c.load(:id=>1, :a=>2, :b=>4)
+    @db.sqls.should == ["SELECT * FROM test WHERE (a = 2) LIMIT 1"]
+
+    @db.fetch = [[{:id=>1, :a=>2, :b=>3}]]
+    @c.find_or_new({:a=>2}, :b=>4).should == @c.load(:id=>1, :a=>2, :b=>4)
+    @db.sqls.should == ["SELECT * FROM test WHERE (a = 2) LIMIT 1"]
+
+    @db.fetch = [[{:id=>1, :a=>2, :b=>3}]]
+    @c.find_or_new({:a=>2}, :a=>3){|t| t.b = 4}.should == @c.load(:id=>1, :a=>3, :b=>4)
+    @db.sqls.should == ["SELECT * FROM test WHERE (a = 2) LIMIT 1"]
+  end
+
+  it ".find_or_new should return a new record if no record exists" do
+    o = @c.find_or_new(:a=>1){|t| t.b = 4}
+    o.should == @c.load(:a=>1, :b=>4)
+    o.new?.should == true
+    @db.sqls.should == ["SELECT * FROM test WHERE (a = 1) LIMIT 1"]
+
+    o = @c.find_or_new({:a=>1}, :b=>4)
+    o.should == @c.load(:a=>1, :b=>4)
+    o.new?.should == true
+    @db.sqls.should == ["SELECT * FROM test WHERE (a = 1) LIMIT 1"]
+
+    o = @c.find_or_new({:a=>1}, :a=>3){|t| t.b = 4}
+    o.should == @c.load(:a=>3, :b=>4)
+    o.new?.should == true
+    @db.sqls.should == ["SELECT * FROM test WHERE (a = 1) LIMIT 1"]
+  end
+end
