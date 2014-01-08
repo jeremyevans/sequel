@@ -14,7 +14,6 @@ module Sequel
         conn = if opts.include?(:drvconnect)
           ::ODBC::Database.new.drvconnect(opts[:drvconnect])
         elsif opts.include?(:driver)
-          Deprecation.deprecate("The odbc driver's handling of the :driver option is thought to be broken and will probably be removed in the future. If you are successfully using it, please contact the developers.")
           drv = ::ODBC::Driver.new
           drv.name = 'Sequel ODBC Driver130'
           opts.each do |param, value|
