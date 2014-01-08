@@ -1,3 +1,7 @@
+=== HEAD
+
+* Support :dataset option to validates_unique vaildation (jeremyevans)
+
 === 4.6.0 (2014-01-02)
 
 * Add Database#call_mssql_sproc on MSSQL for calling stored procedures and handling output parameters (jrgns, jeremyevans) (#748)

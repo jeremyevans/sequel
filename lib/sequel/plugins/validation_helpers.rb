@@ -202,6 +202,8 @@ module Sequel
         # since it can deal with a grouping of multiple attributes.
         #
         # Possible Options:
+        # :dataset :: The base dataset to use for the unique query, defaults to the
+        #             model's dataset.
         # :message :: The message to use (default: 'is already taken')
         # :only_if_modified :: Only check the uniqueness if the object is new or
         #                      one of the columns has been modified.
@@ -231,12 +233,13 @@ module Sequel
             arr = Array(a)
             next if arr.any?{|x| errors.on(x)}
             next if opts[:only_if_modified] && !new? && !arr.any?{|x| changed_columns.include?(x)}
+            ds = opts[:dataset] || model.dataset
             ds = if where
-              where.call(model.dataset, self, arr)
+              where.call(ds, self, arr)
             else
               vals = arr.map{|x| send(x)}
               next if vals.any?{|v| v.nil?}
-              model.where(arr.zip(vals))
+              ds.where(arr.zip(vals))
             end
             ds = yield(ds) if block_given?
             ds = ds.exclude(pk_hash) unless new?

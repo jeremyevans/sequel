@@ -294,10 +294,18 @@ You can mix and match the two approaches.  For example, if all albums should hav
 
 If you provide a block, it is called with the dataset to use for the uniqueness check, which you can then filter to scope the uniqueness validation to a subset of the model's dataset.
 
-Additionally, you can also include an optional options hash as the last argument.  Unlike the other validations, the options hash for +validates_unique+ only checks for two options:
+You can also include an options hash as the last argument.  Unlike the other validations, the options hash for +validates_unique+ only recognizes for these options:
 
+:dataset :: The base dataset to use for the unique query, defaults to the model's dataset
 :message :: The message to use
 :only_if_modified :: Only check the uniqueness if the object is new or one of the columns has been modified.
+:where :: A callable object where call takes three arguments, a dataset,
+          the current object, and an array of columns, and should return
+          a modified dataset that is filtered to include only rows with
+          the same values as the current object for each column in the array.
+          This is useful any time the unique constraints are derived from
+          the columns and not the columns themselves (such as unique constraints
+          on lower(column)).
 
 +validates_unique+ is the only method in +validation_helpers+ that checks with the database.  Attempting to validate uniqueness outside of the database suffers from a race condition, so any time you want to add a uniqueness validation, you should make sure to add a uniqueness constraint or unique index on the underlying database table.  See the {"Migrations and Schema Modification" guide}[rdoc-ref:doc/migration.rdoc] for details on how to do that.  
 
