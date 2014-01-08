@@ -1,5 +1,7 @@
 === HEAD
 
+* Make auto_validations uniqueness validations work correctly for STI subclasses (jeremyevans)
+
 * Support :dataset option to validates_unique vaildation (jeremyevans)
 
 === 4.6.0 (2014-01-02)

@@ -136,7 +136,11 @@ module Sequel
 
           validates_schema_types if model.auto_validate_types?
 
-          model.auto_validate_unique_columns.each{|cols| validates_unique(cols)}
+          unique_opts = {}
+          if model.respond_to?(:sti_dataset)
+            unique_opts[:dataset] = model.sti_dataset
+          end
+          model.auto_validate_unique_columns.each{|cols| validates_unique(cols, unique_opts)}
         end
       end
     end

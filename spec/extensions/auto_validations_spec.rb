@@ -106,6 +106,24 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.errors.should == {[:name, :num]=>["is already taken"]}
   end
 
+  it "should work correctly in STI subclasses" do
+    @c.plugin(:single_table_inheritance, :num, :model_map=>{1=>@c}, :key_map=>proc{[1, 2]})
+    sc = Class.new(@c)
+    @m = sc.new
+    @m.valid?.should == false
+    @m.errors.should == {:d=>["is not present"], :name=>["is not present"]}
+
+    @m.set(:d=>'/', :num=>'a', :name=>'1')
+    @m.valid?.should == false
+    @m.errors.should == {:d=>["is not a valid date"], :num=>["is not a valid integer"]}
+
+    @m.db.sqls
+    @m.set(:d=>Date.today, :num=>1)
+    @m.valid?.should == false
+    @m.errors.should == {[:name, :num]=>["is already taken"]}
+    @m.db.sqls.should == ["SELECT count(*) AS count FROM test WHERE ((name = '1') AND (num = 1)) LIMIT 1"]
+  end
+
   it "should work correctly when changing the dataset" do
     @c.set_dataset(@c.db[:foo])
     @c.new.valid?.should == true
