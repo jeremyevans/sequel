@@ -825,7 +825,7 @@ shared_examples_for "Database#transaction" do
     @db.sqls.should == ['BEGIN', 'BEGIN -- test', 'DROP TABLE test;', 'COMMIT -- test', 'COMMIT']
   end
   
-  if (!defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or RUBY_ENGINE == 'rbx') and RUBY_VERSION < '1.9'
+  if (!defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or RUBY_ENGINE == 'rbx') and !RUBY_VERSION.start_with?('1.9')
     specify "should handle Thread#kill for transactions inside threads" do
       q = Queue.new
       q1 = Queue.new

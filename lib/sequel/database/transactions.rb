@@ -216,7 +216,7 @@ module Sequel
       SQL_BEGIN
     end
 
-    if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or RUBY_ENGINE == 'rbx') and RUBY_VERSION < '1.9'
+    if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or RUBY_ENGINE == 'rbx') and !RUBY_VERSION.start_with?('1.9')
     # :nocov:
       # Whether to commit the current transaction. On ruby 1.8 and rubinius,
       # Thread.current.status is checked because Thread#kill skips rescue
