@@ -216,32 +216,17 @@ module Sequel
       SQL_BEGIN
     end
 
-    if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or RUBY_ENGINE == 'rbx') and RUBY_VERSION < '1.9'
-    # :nocov:
-      # Whether to commit the current transaction. On ruby 1.8 and rubinius,
-      # Thread.current.status is checked because Thread#kill skips rescue
-      # blocks (so exception would be nil), but the transaction should
-      # still be rolled back.
-      def commit_or_rollback_transaction(exception, conn, opts)
-        if exception
-          false
-        else
-          if Thread.current.status == 'aborting'
-            rollback_transaction(conn, opts)
-            false
-          else
-            commit_transaction(conn, opts)
-            true
-          end
-        end
-      end
-    # :nocov:
-    else
-      # Whether to commit the current transaction.  On ruby 1.9 and JRuby,
-      # transactions will be committed if Thread#kill is used on an thread
-      # that has a transaction open, and there isn't a work around.
-      def commit_or_rollback_transaction(exception, conn, opts)
-        if exception
+    # Whether to commit the current transaction. Thread.current.status is
+    # checked because Thread#kill skips rescue blocks (so exception would be
+    # nil), but the transaction should still be rolled back. On Ruby 1.9 (but
+    # not 1.8 or 2.0), the thread status will still be "run", so Thread#kill
+    # will erroneously commit the transaction, and there isn't a workaround.
+    def commit_or_rollback_transaction(exception, conn, opts)
+      if exception
+        false
+      else
+        if Thread.current.status == 'aborting'
+          rollback_transaction(conn, opts)
           false
         else
           commit_transaction(conn, opts)
