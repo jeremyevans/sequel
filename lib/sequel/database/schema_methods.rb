@@ -44,6 +44,7 @@ module Sequel
     #
     # Options:
     # :ignore_errors :: Ignore any DatabaseErrors that are raised
+    # :name :: Name to use for index instead of default
     #
     # See <tt>alter_table</tt>.
     def add_index(table, columns, options=OPTS)
