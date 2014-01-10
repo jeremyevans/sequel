@@ -245,7 +245,7 @@ These methods check that the specified attributes can be valid integers or valid
 
 === +validates_schema_types+
 
-+validates_schema_types+ uses the database metadata for the model's table to determine which ruby type(s) should be used for the given database type, and calls +validates_type+ with that ruby type.  It's designed to be used with the <tt>raise_on_typecast_failure = false</tt> setting (the default starting in Sequel 4).  <tt>raise_on_typecast_failure = false</tt, Sequel attempts to typecast values, but silently ignores any errors raised:
++validates_schema_types+ uses the database metadata for the model's table to determine which ruby type(s) should be used for the given database type, and calls +validates_type+ with that ruby type.  It's designed to be used with the <tt>raise_on_typecast_failure = false</tt> setting (the default starting in Sequel 4).  <tt>raise_on_typecast_failure = false</tt>, Sequel attempts to typecast values, but silently ignores any errors raised:
 
   Album.raise_on_typecast_failure = false
   album = Album.new
