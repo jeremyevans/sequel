@@ -1493,6 +1493,7 @@ describe "Schema Parser" do
     @db.schema(:integer).first.last[:type].should == :integer
     @db.schema(:bigint).first.last[:type].should == :integer
     @db.schema(:smallint).first.last[:type].should == :integer
+    @db.schema(:byteint).first.last[:type].should == :integer
     @db.schema(:character).first.last[:type].should == :string
     @db.schema(:"character varying").first.last[:type].should == :string
     @db.schema(:varchar).first.last[:type].should == :string
@@ -1528,6 +1529,8 @@ describe "Schema Parser" do
     @db.schema(:binary).first.last[:type].should == :blob
     @db.schema(:varbinary).first.last[:type].should == :blob
     @db.schema(:enum).first.last[:type].should == :enum
+    @db.schema(:varbyte).first.last[:type].should == :blob
+    @db.schema(:byte).first.last[:type].should == :blob
 
     @db = Sequel.mock(:host=>'postgres')
     @db.extend(sm)
