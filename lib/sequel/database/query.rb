@@ -289,7 +289,7 @@ module Sequel
       case db_type
       when /\A(character( varying)?|n?(var)?char|n?text|string|clob)/io
         :string
-      when /\A(int(eger)?|(big|small|tiny)int)/io
+      when /\A(int(eger)?|(big|small|tiny|byte)int)/io
         :integer
       when /\Adate\z/io
         :date
@@ -303,7 +303,7 @@ module Sequel
         :float
       when /\A(?:(?:(?:num(?:ber|eric)?|decimal)(?:\(\d+,\s*(\d+|false|true)\))?))\z/io
         $1 && ['0', 'false'].include?($1) ? :integer : :decimal
-      when /bytea|blob|image|(var)?binary/io
+      when /bytea|blob|image|(var)?(binary|byte)/io
         :blob
       when /\Aenum/io
         :enum
