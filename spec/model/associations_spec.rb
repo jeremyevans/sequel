@@ -1080,6 +1080,14 @@ describe Sequel::Model, "one_to_one" do
     proc{p.parent = nil}.should raise_error(Sequel::Error)
   end
 
+  it "should not validate the associated object in setter if the :validate=>false option is used" do
+    @c2.one_to_one :parent, :class => @c2, :validate=>false
+    n = @c2.new(:id => 1234)
+    a = @c2.new(:id => 2345)
+    def a.validate() errors.add(:id, 'foo') end
+    (n.parent = a).should == a
+  end
+
   it "should raise an error if a callback is not a proc or symbol" do
     @c2.one_to_one :parent, :class => @c2, :before_set=>Object.new
     proc{@c2.new.parent = @c2.load(:id=>1)}.should raise_error(Sequel::Error)
