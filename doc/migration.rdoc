@@ -482,6 +482,36 @@ depend on which migrations that have been applied.  Applied migrations greater
 than that version will be migrated down, while unapplied migrations less than
 or equal to that version will be migrated up.
 
+== Running migrations from a Rake task
+
+You can also incorporate migrations into a Rakefile. Here's an example
+using integer migration versions.
+
+  namespace :db do
+    desc "Run migrations"
+    task :migrate, [:version] do |t, args|
+      require "sequel"
+      Sequel.extension :migration
+      db = Sequel.connect(ENV.fetch("DATABASE_URL"))
+      if args[:version]
+        puts "Migrating to version #{args[:version]}"
+        Sequel::Migrator.run(db, "db/migrations", target: args[:version].to_i)
+      else
+        puts "Migrating to latest"
+        Sequel::Migrator.run(db, "db/migrations")
+      end
+    end
+  end
+
+To migrate to the latest version, run:
+
+  rake db:migrate
+
+This Rake task takes an optional argument specifying the target
+version. To migrate to version 42, run:
+
+  rake db:migrate[42]
+
 == Verbose migrations
 
 By default, <tt>sequel -m</tt> operates as a well behaved command line utility
