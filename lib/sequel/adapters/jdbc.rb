@@ -497,7 +497,10 @@ module Sequel
       def get_tables(type, opts)
         ts = []
         m = output_identifier_meth
-        metadata(:getTables, nil, opts[:schema], nil, [type].to_java(:string)){|h| ts << m.call(h[:table_name])}
+        if schema = opts[:schema]
+          schema = schema.to_s
+        end
+        metadata(:getTables, nil, schema, nil, [type].to_java(:string)){|h| ts << m.call(h[:table_name])}
         ts
       end
 
