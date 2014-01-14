@@ -48,6 +48,17 @@ module Sequel
       t = now
       local(t.year, t.month, t.day, hour, minute, second, usec)
     end
+
+    # Return a string in HH:MM:SS format representing the time.
+    def to_s(*args)
+      if args.empty?
+        strftime('%H:%M:%S')
+      else
+        # Superclass may have defined a method that takes a format string,
+        # and we shouldn't override in that case.
+        super
+      end
+    end
   end
 
   # The SQL module holds classes whose instances represent SQL fragments.

@@ -1,5 +1,7 @@
 === HEAD
 
+* Make SQLTime#to_s return a string in HH:MM:SS format, since it shouldn't include date information (jeremyevans)
+
 * Support the Database#tables :schema option in the jdbc adapter (robbiegill, jeremyevans) (#755)
 
 * Automatically rollback transactions in killed threads in ruby 2.0+ (chanks) (#752)

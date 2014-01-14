@@ -903,6 +903,22 @@ describe "Sequel::SQLTime" do
     @db.literal(Sequel::SQLTime.create(1, 2, 3)).should == "'01:02:03.000000'"
     @db.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).should == "'01:02:03.500000'"
   end
+
+  specify "#to_s should include hour, minute, and second by default" do
+    Sequel::SQLTime.create(1, 2, 3).to_s.should == "01:02:03"
+    Sequel::SQLTime.create(1, 2, 3, 500000).to_s.should == "01:02:03"
+  end
+
+  specify "#to_s should handle arguments with super" do
+    t = Sequel::SQLTime.create(1, 2, 3)
+    begin
+      Time.now.to_s('%F')
+    rescue
+      proc{t.to_s('%F')}.should raise_error
+    else
+      proc{t.to_s('%F')}.should_not raise_error
+    end
+  end
 end
 
 describe "Sequel::SQL::Wrapper" do
