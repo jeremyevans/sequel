@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't clear validation instance_hooks until after a successful save (jeremyevans)
+
 * Support :raise_on_save_failure option for one_to_many, pg_array_to_many, and many_to_pg_array associations (jeremyevans)
 
 * Make SQLTime#to_s return a string in HH:MM:SS format, since it shouldn't include date information (jeremyevans)

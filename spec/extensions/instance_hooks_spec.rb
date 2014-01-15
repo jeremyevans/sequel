@@ -177,6 +177,20 @@ describe "InstanceHooks plugin" do
     @r.should == [2, 1, 4, 3]
   end
 
+  it "should not clear validations hooks on successful save" do
+    @x.after_validation_hook{@x.errors.add(:id, 'a') if @x.id == 1; r 1}
+    @x.before_validation_hook{r 2}
+    @x.save.should == nil
+    @r.should == [2, 1]
+    @x.save.should == nil
+    @r.should == [2, 1, 2, 1]
+    @x.id = 2
+    @x.save.should == @x
+    @r.should == [2, 1, 2, 1, 2, 1]
+    @x.save.should == @x
+    @r.should == [2, 1, 2, 1, 2, 1]
+  end
+
   it "should not allow addition of instance hooks to frozen instances" do
     @x.after_destroy_hook{r 1}
     @x.before_destroy_hook{r 2}
