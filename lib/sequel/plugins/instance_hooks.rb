@@ -4,7 +4,7 @@ module Sequel
     # by passing a block to a _hook method (e.g. before_save_hook{do_something}).
     # The block is executed when the hook is called (e.g. before_save).
     #
-    # All of the standard hooks are supported, except for after_initialize.
+    # All of the standard hooks are supported.
     # Instance level before hooks are executed in reverse order of addition before
     # calling super.  Instance level after hooks are executed in order of addition
     # after calling super.  If any of the instance level before hook blocks return
@@ -27,7 +27,7 @@ module Sequel
     module InstanceHooks
       module InstanceMethods 
         BEFORE_HOOKS = Sequel::Model::BEFORE_HOOKS
-        AFTER_HOOKS = Sequel::Model::AFTER_HOOKS - [:after_initialize]
+        AFTER_HOOKS = Sequel::Model::AFTER_HOOKS
         HOOKS = BEFORE_HOOKS + AFTER_HOOKS
         HOOKS.each{|h| class_eval(<<-END , __FILE__, __LINE__+1)}
           def #{h}_hook(&block)
