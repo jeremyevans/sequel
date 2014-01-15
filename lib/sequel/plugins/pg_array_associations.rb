@@ -52,6 +52,8 @@ module Sequel
     #                such as when this plugin needs to create an array type,
     #                and typecasting is turned off or not setup correctly
     #                for the model object.
+    # :raise_on_save_failure :: Do not raise exceptions for hook or validation failures when saving associated
+    #                           objects in the add/remove methods (return nil instead).
     # :save_after_modify :: For pg_array_to_many associations, this makes the
     #                       the modification methods save the current object,
     #                       so they operate more similarly to the one_to_many
@@ -93,6 +95,11 @@ module Sequel
           :"#{underscore(demodulize(self[:model].name))}_ids"
         end
         
+        # Handle silent failure of add/remove methods if raise_on_save_failure is false.
+        def handle_silent_modification_failure?
+          self[:raise_on_save_failure] == false
+        end
+
         # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
         def predicate_key
           cached_fetch(:predicate_key){qualify_assoc(self[:key_column])}
@@ -157,6 +164,12 @@ module Sequel
         # that use *_id for single keys.
         def default_key
           :"#{singularize(self[:name])}_ids"
+        end
+
+        # Handle silent failure of add/remove methods if raise_on_save_failure is false
+        # and save_after_modify is true.
+        def handle_silent_modification_failure?
+          self[:raise_on_save_failure] == false && self[:save_after_modify]
         end
 
         # A qualified version of the associated primary key.
@@ -286,7 +299,8 @@ module Sequel
           def_association_dataset_methods(opts)
 
           unless opts[:read_only]
-            validate = opts[:validate]
+            save_opts = {:validate=>opts[:validate]}
+            save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
 
             array_type = opts[:array_type] ||= :integer
             adder = opts[:adder] || proc do |o|
@@ -295,14 +309,14 @@ module Sequel
               else
                 o.send("#{key}=", Sequel.pg_array([send(pk)], array_type))
               end
-              o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
+              o.save(save_opts)
             end
             association_module_private_def(opts._add_method, opts, &adder)
     
             remover = opts[:remover] || proc do |o|
               if (array = o.send(key)) && !array.empty?
                 array.delete(send(pk))
-                o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
+                o.save(save_opts)
               end
             end
             association_module_private_def(opts._remove_method, opts, &remover)
@@ -388,11 +402,13 @@ module Sequel
           def_association_dataset_methods(opts)
 
           unless opts[:read_only]
-            validate = opts[:validate]
+            save_opts = {:validate=>opts[:validate]}
+            save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
             array_type = opts[:array_type] ||= :integer
+
             if opts[:save_after_modify]
               save_after_modify = proc do |obj|
-                obj.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
+                obj.save(save_opts)
               end
             end
 

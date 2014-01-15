@@ -644,4 +644,44 @@ describe Sequel::Model, "pg_array_associations" do
     @o2.add_artist(@c1.load(:id=>1))
     DB.sqls.should == ["UPDATE artists SET tag_ids = ARRAY[2]::int8[] WHERE (id = 1)"]
   end
+
+  it "should not validate the current/associated object in add_ and remove_ if the :validate=>false option is used" do
+    @c1.pg_array_to_many :tags, :clone=>:tags, :validate=>false, :save_after_modify=>true
+    @c2.many_to_pg_array :artists, :clone=>:artists, :validate=>false
+    a = @c1.load(:id=>1)
+    t = @c2.load(:id=>2)
+    def a.validate() errors.add(:id, 'foo') end
+    a.associations[:tags] = []
+    a.add_tag(t).should == t
+    a.tags.should == [t]
+    a.remove_tag(t).should == t
+    a.tags.should == []
+
+    t.associations[:artists] = []
+    t.add_artist(a).should == a
+    t.artists.should == [a]
+    t.remove_artist(a).should == a
+    t.artists.should == []
+  end
+
+  it "should not raise exception in add_ and remove_ if the :raise_on_save_failure=>false option is used" do
+    @c1.pg_array_to_many :tags, :clone=>:tags, :raise_on_save_failure=>false, :save_after_modify=>true
+    @c2.many_to_pg_array :artists, :clone=>:artists, :raise_on_save_failure=>false
+    a = @c1.load(:id=>1)
+    t = @c2.load(:id=>2)
+    def a.validate() errors.add(:id, 'foo') end
+    a.associations[:tags] = []
+    a.add_tag(t).should == nil
+    a.tags.should == []
+    a.associations[:tags] = [t]
+    a.remove_tag(t).should == nil
+    a.tags.should == [t]
+
+    t.associations[:artists] = []
+    t.add_artist(a).should == nil
+    t.artists.should == []
+    t.associations[:artists] = [a]
+    t.remove_artist(a).should == nil
+    t.artists.should == [a]
+  end
 end
