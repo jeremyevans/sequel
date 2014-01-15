@@ -152,6 +152,12 @@ module Sequel
           {filter_by_associations_conditions_key=>ds}
         end
 
+        # Whether to handle silent modification failure when adding/removing
+        # associated records, false by default.
+        def handle_silent_modification_failure?
+          false
+        end
+
         # The limit and offset for this association (returned as a two element array).
         def limit_and_offset
           if (v = self[:limit]).is_a?(Array)
@@ -479,6 +485,11 @@ module Sequel
           :"#{underscore(demodulize(self[:model].name))}_id"
         end
         
+        # Handle silent failure of add/remove methods if raise_on_save_failure is false.
+        def handle_silent_modification_failure?
+          self[:raise_on_save_failure] == false
+        end
+
         # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3))
         def predicate_key
           cached_fetch(:predicate_key){qualify_assoc(self[:key])}
@@ -975,6 +986,8 @@ module Sequel
         #                        to the model method call, where :primary_key_column refers to the underlying column.
         #                        Should only be used if the model method differs from the primary key column, in
         #                        conjunction with defining a model alias method for the primary key column.
+        # :raise_on_save_failure :: Do not raise exceptions for hook or validation failures when saving associated
+        #                           objects in the add/remove methods (return nil instead) [one_to_many only].
         # === :many_to_many
         # :graph_join_table_block :: The block to pass to +join_table+ for
         #                            the join table when eagerly loading the association via +eager_graph+.
@@ -1426,7 +1439,7 @@ module Sequel
           cks.each{|k| ck_nil_hash[k] = nil}
 
           unless opts[:read_only]
-            validate = opts[:validate]
+            save_opts = {:validate=>opts[:validate]}
 
             if one_to_one
               setter = opts[:setter] || proc do |o|
@@ -1437,21 +1450,23 @@ module Sequel
                 end
                 checked_transaction do
                   up_ds.update(ck_nil_hash)
-                  o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save") if o
+                  o.save(save_opts) || raise(Sequel::Error, "invalid associated object, cannot save") if o
                 end
               end
               association_module_private_def(opts._setter_method, opts, &setter)
               association_module_def(opts.setter_method, opts){|o| set_one_to_one_associated_object(opts, o)}
             else 
+              save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
+
               adder = opts[:adder] || proc do |o|
                 cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
-                o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
+                o.save(save_opts)
               end
               association_module_private_def(opts._add_method, opts, &adder)
       
               remover = opts[:remover] || proc do |o|
                 cks.each{|k| o.send(:"#{k}=", nil)}
-                o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
+                o.save(save_opts)
               end
               association_module_private_def(opts._remove_method, opts, &remover)
 
@@ -1590,7 +1605,7 @@ module Sequel
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
           ensure_associated_primary_key(opts, o, *args)
           return if run_association_callbacks(opts, :before_add, o) == false
-          send(opts._add_method, o, *args)
+          return if !send(opts._add_method, o, *args) && opts.handle_silent_modification_failure?
           if array = associations[opts[:name]] and !array.include?(o)
             array.push(o)
           end
@@ -1699,7 +1714,7 @@ module Sequel
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
           raise(Sequel::Error, "associated object #{o.inspect} does not have a primary key") if opts.need_associated_primary_key? && !o.pk
           return if run_association_callbacks(opts, :before_remove, o) == false
-          send(opts._remove_method, o, *args)
+          return if !send(opts._remove_method, o, *args) && opts.handle_silent_modification_failure?
           associations[opts[:name]].delete_if{|x| o === x} if associations.include?(opts[:name])
           remove_reciprocal_object(opts, o)
           run_association_callbacks(opts, :after_remove, o)

@@ -1367,6 +1367,18 @@ describe Sequel::Model, "one_to_many" do
     n.remove_attribute(a).should == a
   end
 
+  it "should not raise exception in add_ and remove_ if the :raise_on_save_failure=>false option is used" do
+    @c2.one_to_many :attributes, :class => @c1, :raise_on_save_failure=>false
+    n = @c2.new(:id => 1234)
+    a = @c1.new(:id => 2345)
+    def a.validate() errors.add(:id, 'foo') end
+    n.associations[:attributes] = []
+    n.add_attribute(a).should == nil
+    n.associations[:attributes].should == []
+    n.remove_attribute(a).should == nil
+    n.associations[:attributes].should == []
+  end
+
   it "should raise an error if the model object doesn't have a valid primary key" do
     @c2.one_to_many :attributes, :class => @c1 
     a = @c2.new

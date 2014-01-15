@@ -689,6 +689,14 @@ The add_<i>association</i> method returns the now associated object:
 
   @album = @artist.add_album(:name=>'RF')
 
+Note that the add_* methods for +one_to_many+ persist the changes by
+saving the passed in (or newly created) object.  However, to avoid
+silent failures of these methods, they explicitly raise exceptions
+even when raise_on_save_failure is false for the associated model.
+You can disable this behavior (i.e. return nil instead of raising
+exceptions on a save failure) by setting the <tt>:raise_on_save_failure=>false</tt>
+option for the association.
+
 === remove_<i>association</i>(object_to_disassociate) (e.g. remove_album) [+one_to_many+ and +many_to_many+]
 
 The remove_<i>association</i> method disassociates the passed object from
@@ -1644,6 +1652,16 @@ setter method, or creating a new object by passing a hash to the
 add_<i>association</i> method, Sequel will automatically save the object.
 If you don't want to validate objects when these implicit saves are done,
 the validate option should be set to false.
+
+==== :raise_on_save_failure [+one_to_many+ associations]
+
+Set to false to not raise an exception when validation or a before hook
+fails when implicitly saving an associated object in the add_* or remove_*
+methods.  This mirrors the raise_on_save_failure model setting, which these
+methods do not respect (by design, since the setting is dangerous).
+
+If you use this option, you must explicitly check all add_* and remove_* return
+values to see if they were successful.
 
 ==== :allow_eager
 

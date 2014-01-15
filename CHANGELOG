@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :raise_on_save_failure option for one_to_many associations (jeremyevans)
+
 * Make SQLTime#to_s return a string in HH:MM:SS format, since it shouldn't include date information (jeremyevans)
 
 * Support the Database#tables :schema option in the jdbc adapter (robbiegill, jeremyevans) (#755)
