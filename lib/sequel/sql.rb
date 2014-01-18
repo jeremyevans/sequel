@@ -1211,6 +1211,7 @@ module Sequel
 
     # Represents an SQL function call.
     class Function < GenericExpression
+      WILDCARD = LiteralString.new('*').freeze
       DISTINCT = ["DISTINCT ".freeze].freeze
       COMMA_ARRAY = [LiteralString.new(', ').freeze].freeze
 
@@ -1223,6 +1224,18 @@ module Sequel
       # Set the functions and args to the given arguments
       def initialize(f, *args)
         @f, @args = f, args
+      end
+
+      # If no arguments are given, return a new function with the wildcard prepended to the arguments.
+      #
+      #   Sequel.function(:count).*  # count(*)
+      #   Sequel.function(:count, 1).*  # count(*, 1)
+      def *(ce=(arg=false;nil))
+        if arg == false
+          Function.new(f, WILDCARD, *args)
+        else
+          super(ce)
+        end
       end
 
       # Return a new function with DISTINCT before the method arguments.
@@ -1620,11 +1633,8 @@ module Sequel
     #
     # For a more detailed explanation, see the {Virtual Rows guide}[rdoc-ref:doc/virtual_rows.rdoc].
     class VirtualRow < BasicObject
-      WILDCARD = LiteralString.new('*').freeze
       QUESTION_MARK = LiteralString.new('?').freeze
       DOUBLE_UNDERSCORE = '__'.freeze
-      DISTINCT = Function::DISTINCT
-      COMMA_ARRAY = Function::COMMA_ARRAY
 
       include OperatorBuilders
 
@@ -1651,13 +1661,14 @@ module Sequel
           else
             case args.shift
             when :*
-              Function.new(m, WILDCARD)
+              Function.new(m, *args).*
             when :distinct
               Function.new(m, *args).distinct
             when :over
-              opts = args.shift || {}
-              fun_args = ::Kernel.Array(opts[:*] ? WILDCARD : opts[:args])
-              Function.new(m, *fun_args).over(opts)
+              opts = args.shift || OPTS
+              f = Function.new(m, *::Kernel.Array(opts[:args]))
+              f = f.* if opts[:*]
+              f.over(opts)
             else
               Kernel.raise(Error, 'unsupported VirtualRow method argument used with block')
             end

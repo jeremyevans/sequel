@@ -419,8 +419,15 @@ describe Sequel::SQL::VirtualRow do
     @d.l{version{}}.should == 'version()'
   end
 
-  it "should treat methods with a block and a leading argument :* as a function call with the SQL wildcard" do
+  it "should treat methods with a block and a leading argument :* as a function call starting with the SQL wildcard" do
     @d.l{count(:*){}}.should == 'count(*)'
+    @d.l{count(:*, 1){}}.should == 'count(*, 1)'
+  end
+
+  it "should support * method on functions to add * as the first argument" do
+    @d.l{count{}.*}.should == 'count(*)'
+    @d.l{count(1).*}.should == 'count(*, 1)'
+    @d.literal(Sequel.expr{count(1) * 2}).should == '(count(1) * 2)'
   end
 
   it "should treat methods with a block and a leading argument :distinct as a function call with DISTINCT and the additional method arguments" do

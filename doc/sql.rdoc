@@ -182,7 +182,7 @@ You can also use the <tt>Sequel.as</tt> method to create an alias, and the +as+ 
 
 The easiest way to use SQL functions is via a virtual row:
 
-  DB[:albums].select{func{}} # SELECT func() FROM "albums"
+  DB[:albums].select{func.function} # SELECT func() FROM "albums"
   DB[:albums].select{func(col1, col2)} # SELECT func("col1", "col2") FROM "albums"
 
 You can also use the <tt>Sequel.function</tt> method on the symbol that contains the function name:
@@ -200,10 +200,10 @@ To use the DISTINCT modifier to an aggregate function, call the distinct method 
 
   DB[:albums].select{sum(:column).distinct} # SELECT sum(DISTINCT column) FROM albums
 
-If you want to use the wildcard as the sole argument of the aggregate function, you again have to use literal SQL or a virtual row block:
+If you want to use the wildcard as the sole argument of the aggregate function, use the * method on the Function:
 
-  Sequel.function(:count, Sequel.lit('*')) # count(*)
-  DB[:albums].select{count(:*){}} # SELECT count(*) FROM albums
+  Sequel.function(:count).* # count(*)
+  DB[:albums].select{count.function.*} # SELECT count(*) FROM albums
 
 Note that Sequel provides helper methods for aggregate functions such as +count+, +sum+, +min+, +max+, +avg+, and +group_and_count+, which handle common uses of aggregate functions.
 
@@ -211,10 +211,10 @@ Note that Sequel provides helper methods for aggregate functions such as +count+
 
 If the database supports window functions, Sequel can handle them by calling the over method on a Function:
 
-  DB[:albums].select{function{}.over}
+  DB[:albums].select{function.function.over}
   # SELECT function() OVER () FROM albums
 
-  DB[:albums].select{count(:*){}.over}
+  DB[:albums].select{count.function.*.over}
   # SELECT count(*) OVER () FROM albums
 
   DB[:albums].select{function(:col1).over(:partition=>col2, :order=>col3)}

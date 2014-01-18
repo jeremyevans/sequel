@@ -1,5 +1,7 @@
 === HEAD
 
+* Make #* method without arguments on SQL::Function return a Function with * prepended to the arguments (jeremyevans)
+
 * Add #function to SQL::Identifier and SQL::QualifiedIdentifier, allowing for easy use of schema qualified functions or functions names that need quoting (jeremyevans)
 
 * Add SQL::Function#distinct for easier creation of aggregate functions using DISTINCT (jeremyevans)
