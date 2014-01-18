@@ -175,20 +175,19 @@ the method call:
 
 SQL::WindowFunctions can be thought of as calls to SQL window functions.  Not
 all databases support them, but they are very helpful for certain types of
-queries.  To use them, you need to make :over the first argument of the method
-call, with an optional hash as the second argument, and provide an empty block
-to the method. Here are some examples of use:
+queries.  To use them, you should just call the over method on the Function
+object returned, with the options for the window:
 
-  ds.select{|o| o.rank(:over){}}
-  ds.select{rank(:over){}}
+  ds.select{|o| o.rank{}.over}
+  ds.select{rank{}.over}
   # SELECT rank() OVER ()
   
-  ds.select{|o| o.count(:over, :*=>true){}}
-  ds.select{count(:over, :*=>true){}}
+  ds.select{|o| o.count(:*){}.over}
+  ds.select{count(:*){}.over}
   # SELECT count(*) OVER ()
   
-  ds.select{|o| o.sum(:over, :args=>o.col1, :partition=>o.col2, :order=>o.col3){}}
-  ds.select{sum(:over, :args=>col1, :partition=>col2, :order=>col3){}}
+  ds.select{|o| o.sum(o.col1).over(:partition=>o.col2, :order=>o.col3)}
+  ds.select{sum(col1).over(:partition=>col2, :order=>col3)}
   # SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)
 
 == Operators

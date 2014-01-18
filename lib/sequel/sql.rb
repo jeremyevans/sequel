@@ -1222,6 +1222,11 @@ module Sequel
         @f, @args = f, args
       end
 
+      # Create a WindowFunction using the receiver and the appropriate options for the window.
+      def over(opts=OPTS)
+        WindowFunction.new(self, Window.new(opts))
+      end
+
       to_s_method :function_sql
     end
 

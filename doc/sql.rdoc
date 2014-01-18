@@ -210,18 +210,18 @@ Note that Sequel provides helper methods for aggregate functions such as +count+
 
 === Window Functions
 
-If the database supports window functions, Sequel can handle them using a virtual row block:
+If the database supports window functions, Sequel can handle them by calling the over method on a Function:
 
-  DB[:albums].select{function(:over){}}
+  DB[:albums].select{function{}.over}
   # SELECT function() OVER () FROM albums
 
-  DB[:albums].select{count(:over, :*=>true){}}
+  DB[:albums].select{count(:*){}.over}
   # SELECT count(*) OVER () FROM albums
 
-  DB[:albums].select{function(:over, :args=>col1, :partition=>col2, :order=>col3){}}
+  DB[:albums].select{function(:col1).over(:partition=>col2, :order=>col3)}
   # SELECT function(col1) OVER (PARTITION BY col2 ORDER BY col3) FROM albums
 
-  DB[:albums].select{function(:over, :args=>[c1, c2], :partition=>[c3, c4], :order=>[c5, c6]){}}
+  DB[:albums].select{function(c1, c2).over(:partition=>[c3, c4], :order=>[c5, c6])}
   # SELECT function(c1, c2) OVER (PARTITION BY c3, c4 ORDER BY c5, c6) FROM albums
 
 === Equality Operator (=)

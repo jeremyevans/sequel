@@ -479,6 +479,11 @@ describe Sequel::SQL::VirtualRow do
     @d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.should == 'count(*) OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
   end
 
+  it "should support over method on functions to create window functions" do
+    @d.l{rank{}.over}.should == 'rank() OVER ()'
+    @d.l{sum(c).over(:partition=>a, :order=>b, :window=>:win, :frame=>:rows)}.should == 'sum("c") OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
+  end
+
   it "should raise an error if window functions are not supported" do
     class << @d; remove_method :supports_window_functions? end
     meta_def(@d, :supports_window_functions?){false}
