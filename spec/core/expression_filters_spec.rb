@@ -496,6 +496,18 @@ describe Sequel::SQL::VirtualRow do
     proc{Sequel.mock.dataset.filter{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.sql}.should raise_error(Sequel::Error)
   end
   
+  it "should support function method on identifiers to create functions" do
+    @d.l{rank.function}.should == '"rank"()' 
+    @d.l{sum.function(c)}.should == '"sum"("c")'
+    @d.l{sum.function(c, 1)}.should == '"sum"("c", 1)'
+  end
+
+  it "should support function method on qualified identifiers to create functions" do
+    @d.l{sch__rank.function}.should == '"sch"."rank"()' 
+    @d.l{sch__sum.function(c)}.should == '"sch"."sum"("c")'
+    @d.l{sch__sum.function(c, 1)}.should == '"sch"."sum"("c", 1)'
+  end
+
   it "should deal with classes without requiring :: prefix" do
     @d.l{date < Date.today}.should == "(\"date\" < '#{Date.today}')"
     @d.l{date < Sequel::CURRENT_DATE}.should == "(\"date\" < CURRENT_DATE)"

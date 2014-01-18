@@ -1,5 +1,7 @@
 === HEAD
 
+* Add #function to SQL::Identifier and SQL::QualifiedIdentifier, allowing for easy use of schema qualified functions or functions names that need quoting (jeremyevans)
+
 * Add SQL::Function#distinct for easier creation of aggregate functions using DISTINCT (jeremyevans)
 
 * Add SQL::Function#over for easier creation of window functions (jeremyevans)

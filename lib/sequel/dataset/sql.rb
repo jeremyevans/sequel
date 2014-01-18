@@ -743,7 +743,12 @@ module Sequel
 
     # Backbone of function_sql_append and emulated_function_sql_append.
     def _function_sql_append(sql, name, args)
-      sql << name.to_s
+      case name
+      when SQL::Identifier, SQL::QualifiedIdentifier
+        literal_append(sql, name)
+      else
+        sql << name.to_s
+      end
       if args.empty?
         sql << FUNCTION_EMPTY
       else

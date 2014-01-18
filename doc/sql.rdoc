@@ -223,6 +223,16 @@ If the database supports window functions, Sequel can handle them by calling the
   DB[:albums].select{function(c1, c2).over(:partition=>[c3, c4], :order=>[c5, c6])}
   # SELECT function(c1, c2) OVER (PARTITION BY c3, c4 ORDER BY c5, c6) FROM albums
 
+=== Schema Qualified Functions
+
+If the database supports schema qualified functions, Sequel can handle them by calling the function method on a QuailfiedIdentifier:
+
+  DB[:albums].select{schema__function.function}
+  # SELECT schema.function() FROM albums
+  
+  DB[:albums].select{schema__function.function(col, 2, "a")}
+  # SELECT schema.function(col, 2, 'a') FROM albums
+
 === Equality Operator (=)
 
 Sequel uses hashes to specify equality:

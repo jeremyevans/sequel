@@ -302,6 +302,11 @@ describe Sequel::Dataset do
     @d.count.should == 3
   end
 
+  specify "should handle functions with identifier names correctly" do
+    @d << {:name => 'abc', :value => 6}
+    @d.get{sum.function(:value)}.should == 6
+  end
+
   specify "should handle aggregate methods on limited datasets correctly" do
     @d << {:name => 'abc', :value => 6}
     @d << {:name => 'bcd', :value => 12}

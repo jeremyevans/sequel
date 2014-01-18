@@ -1269,6 +1269,12 @@ module Sequel
       def initialize(value)
         @value = value
       end
+
+      # Create a Function using this identifier as the functions name, with
+      # the given args.
+      def function(*args)
+        Function.new(self, *args)
+      end
       
       to_s_method :quote_identifier, '@value'
     end
@@ -1421,6 +1427,12 @@ module Sequel
       # Set the table and column to the given arguments
       def initialize(table, column)
         @table, @column = table, column
+      end
+      
+      # Create a Function using this identifier as the functions name, with
+      # the given args.
+      def function(*args)
+        Function.new(self, *args)
       end
       
       to_s_method :qualified_identifier_sql, "@table, @column"
