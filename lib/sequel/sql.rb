@@ -1211,6 +1211,9 @@ module Sequel
 
     # Represents an SQL function call.
     class Function < GenericExpression
+      DISTINCT = ["DISTINCT ".freeze].freeze
+      COMMA_ARRAY = [LiteralString.new(', ').freeze].freeze
+
       # The SQL function to call
       attr_reader :f
       
@@ -1220,6 +1223,11 @@ module Sequel
       # Set the functions and args to the given arguments
       def initialize(f, *args)
         @f, @args = f, args
+      end
+
+      # Return a new function with DISTINCT before the method arguments.
+      def distinct
+        Function.new(f, PlaceholderLiteralString.new(DISTINCT + COMMA_ARRAY * (args.length-1), args))
       end
 
       # Create a WindowFunction using the receiver and the appropriate options for the window.
@@ -1602,10 +1610,9 @@ module Sequel
     class VirtualRow < BasicObject
       WILDCARD = LiteralString.new('*').freeze
       QUESTION_MARK = LiteralString.new('?').freeze
-      COMMA_SEPARATOR = LiteralString.new(', ').freeze
       DOUBLE_UNDERSCORE = '__'.freeze
-      DISTINCT = ["DISTINCT ".freeze].freeze
-      COMMA_ARRAY = [COMMA_SEPARATOR].freeze
+      DISTINCT = Function::DISTINCT
+      COMMA_ARRAY = Function::COMMA_ARRAY
 
       include OperatorBuilders
 
@@ -1634,11 +1641,11 @@ module Sequel
             when :*
               Function.new(m, WILDCARD)
             when :distinct
-              Function.new(m, PlaceholderLiteralString.new(DISTINCT + COMMA_ARRAY * (args.length-1), args))
+              Function.new(m, *args).distinct
             when :over
               opts = args.shift || {}
               fun_args = ::Kernel.Array(opts[:*] ? WILDCARD : opts[:args])
-              WindowFunction.new(Function.new(m, *fun_args), Window.new(opts))
+              Function.new(m, *fun_args).over(opts)
             else
               Kernel.raise(Error, 'unsupported VirtualRow method argument used with block')
             end

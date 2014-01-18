@@ -196,10 +196,9 @@ Aggregate functions work the same way as normal functions, since they share the 
 
   Sequel.function(:sum, :column) # sum(column)
 
-However, if you want to use the DISTINCT modifier to an aggregate function, you either have to use literal SQL or a virtual row block:
+To use the DISTINCT modifier to an aggregate function, call the distinct method on the function:
 
-  Sequel.function(:sum, Sequel.lit('DISTINCT column')) # sum(DISTINCT column)
-  DB[:albums].select{sum(:distinct, :column){}} # SELECT sum(DISTINCT column) FROM albums
+  DB[:albums].select{sum(:column).distinct} # SELECT sum(DISTINCT column) FROM albums
 
 If you want to use the wildcard as the sole argument of the aggregate function, you again have to use literal SQL or a virtual row block:
 

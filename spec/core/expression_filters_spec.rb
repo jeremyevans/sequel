@@ -428,6 +428,11 @@ describe Sequel::SQL::VirtualRow do
     @d.l{count(:distinct, column1, column2){}}.should == 'count(DISTINCT "column1", "column2")'
   end
 
+  it "should support distinct methods on functions to use DISTINCT before the arguments" do
+    @d.l{count(column1).distinct}.should == 'count(DISTINCT "column1")'
+    @d.l{count(column1, column2).distinct}.should == 'count(DISTINCT "column1", "column2")'
+  end
+
   it "should raise an error if an unsupported argument is used with a block" do
     proc{@d.where{count(:blah){}}}.should raise_error(Sequel::Error)
   end

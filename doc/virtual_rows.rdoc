@@ -156,19 +156,15 @@ the method, and provide an empty block to the method:
   ds.select{count(:*){}}
   # SELECT count(*)
 
-To append the DISTINCT keyword before the method arguments, you need to make
-:distinct the first argument of the method call, and provide an empty block to
-the method:
+To append the DISTINCT keyword before the method arguments, just call the
+distinct method on the returned Function:
 
-  ds.select{|o| o.count(:distinct, o.col1){}}
-  ds.select{count(:distinct, col1){}}
+  ds.select{|o| o.count(o.col1).distinct)}
+  ds.select{count(col1).distinct}
   # SELECT count(DISTINCT col1)
   
-To use multiple columns with the DISTINCT keyword, use multiple arguments in
-the method call:
-
-  ds.select{|o| o.count(:distinct, o.col1, o.col2){}}
-  ds.select{count(:distinct, col1, col2){}}
+  ds.select{|o| o.count(o.col1, o.col2).distinct}
+  ds.select{count(col1, col2).distinct}
   # SELECT count(DISTINCT col1, col2)
   
 == SQL::WindowFunctions - SQL window function calls
