@@ -167,6 +167,11 @@ module Sequel
       true
     end
 
+    # Whether the database supports quoting function names, false by default.
+    def supports_quoted_function_names?
+      false
+    end
+
     # Whether the RETURNING clause is used for the given dataset.
     # +type+ can be :insert, :update, or :delete.
     def uses_returning?(type)

@@ -223,6 +223,11 @@ module Sequel
         def select_clause_methods
           SELECT_CLAUSE_METHODS
         end
+
+        # H2 supports quoted function names.
+        def supports_quoted_function_names?
+          true
+        end
       end
     end
   end

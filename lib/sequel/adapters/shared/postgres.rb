@@ -1485,6 +1485,11 @@ module Sequel
         db.server_version(@opts[:server])
       end
 
+      # PostgreSQL supports quoted function names.
+      def supports_quoted_function_names?
+        true
+      end
+
       # Concatenate the expressions with a space in between
       def full_text_string_join(cols)
         cols = Array(cols).map{|x| SQL::Function.new(:COALESCE, x, EMPTY_STRING)}

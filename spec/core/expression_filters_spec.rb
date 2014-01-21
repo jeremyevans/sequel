@@ -504,15 +504,22 @@ describe Sequel::SQL::VirtualRow do
   end
   
   it "should support function method on identifiers to create functions" do
-    @d.l{rank.function}.should == '"rank"()' 
-    @d.l{sum.function(c)}.should == '"sum"("c")'
-    @d.l{sum.function(c, 1)}.should == '"sum"("c", 1)'
+    @d.l{rank.function}.should == 'rank()' 
+    @d.l{sum.function(c)}.should == 'sum("c")'
+    @d.l{sum.function(c, 1)}.should == 'sum("c", 1)'
   end
 
   it "should support function method on qualified identifiers to create functions" do
+    @d.l{sch__rank.function}.should == 'sch.rank()' 
+    @d.l{sch__sum.function(c)}.should == 'sch.sum("c")'
+    @d.l{sch__sum.function(c, 1)}.should == 'sch.sum("c", 1)'
+    @d.l{Sequel.qualify(sch__sum, :x__y).function(c, 1)}.should == 'sch.sum.x.y("c", 1)'
+  end
+
+  it "should handle quoted function names" do
+    def @d.supports_quoted_function_names?; true; end
+    @d.l{rank.function}.should == '"rank"()' 
     @d.l{sch__rank.function}.should == '"sch"."rank"()' 
-    @d.l{sch__sum.function(c)}.should == '"sch"."sum"("c")'
-    @d.l{sch__sum.function(c, 1)}.should == '"sch"."sum"("c", 1)'
   end
 
   it "should deal with classes without requiring :: prefix" do

@@ -170,6 +170,16 @@ describe "A PostgreSQL database" do
     @db.server_version.should > 70000
   end
 
+  specify "should support functions with and without quoting" do
+    ds = @db[:public__testfk]
+    ds.insert
+    ds.get{sum(1)}.should == 1
+    ds.get{Sequel.function('pg_catalog.sum', 1)}.should == 1
+    ds.get{sum.function(1)}.should == 1
+    ds.get{pg_catalog__sum.function(1)}.should == 1
+    ds.delete
+  end
+
   specify "should support a :qualify option to tables and views" do
     @db.tables(:qualify=>true).should include(Sequel.qualify(:public, :testfk))
     begin

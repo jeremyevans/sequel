@@ -692,6 +692,11 @@ module Sequel
         super unless @opts[:lock] == :update
       end
 
+      # SQLite supports quoted function names.
+      def supports_quoted_function_names?
+        true
+      end
+
       # SQLite treats a DELETE with no WHERE clause as a TRUNCATE
       def _truncate_sql(table)
         "DELETE FROM #{table}"

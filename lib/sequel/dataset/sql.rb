@@ -744,8 +744,18 @@ module Sequel
     # Backbone of function_sql_append and emulated_function_sql_append.
     def _function_sql_append(sql, name, args)
       case name
-      when SQL::Identifier, SQL::QualifiedIdentifier
-        literal_append(sql, name)
+      when SQL::Identifier
+        if supports_quoted_function_names?
+          literal_append(sql, name)
+        else
+          sql << name.value.to_s
+        end
+      when SQL::QualifiedIdentifier
+        if supports_quoted_function_names?
+          literal_append(sql, name)
+        else
+          sql << split_qualifiers(name).join(DOT)
+        end
       else
         sql << name.to_s
       end
