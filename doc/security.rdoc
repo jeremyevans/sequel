@@ -175,6 +175,11 @@ be specified by the user, it allows you to use a ruby string, and that
 string is used verbatim as the SQL type.  You should not use user input
 for type strings.
 
+==== SQL Function Names
+
+In most cases, Sequel does not quote SQL function names.  You should not use
+user input for function names.
+
 === SQL Identifier Injections
 
 Usually, Sequel treats ruby symbols as SQL identifiers, and ruby
