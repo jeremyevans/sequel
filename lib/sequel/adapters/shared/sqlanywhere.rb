@@ -121,7 +121,7 @@ module Sequel
       private
 
       DATABASE_ERROR_REGEXPS = {
-        /would not be unique/ => Sequel::UniqueConstraintViolation,
+        /would not be unique|Primary key for table.+is not unique/ => Sequel::UniqueConstraintViolation,
         /Column .* in table .* cannot be NULL/ => Sequel::NotNullConstraintViolation,
         /Constraint .* violated: Invalid value in table .*/ => Sequel::CheckConstraintViolation,
         /No primary key value for foreign key .* in table .*/ => Sequel::ForeignKeyConstraintViolation,

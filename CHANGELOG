@@ -1,6 +1,6 @@
 === HEAD
 
-* Recognize primary key unique constraint violations on MSSQL (jeremyevans)
+* Recognize primary key unique constraint violations on MSSQL and SQLAnywhere (jeremyevans)
 
 * Recognize composite unique constraint violations on SQLite (timcraft) (#758)
 
