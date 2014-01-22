@@ -18,7 +18,8 @@ module Sequel
         Fb::Database.new(
           :database => "#{opts[:host]}:#{opts[:database]}",
           :username => opts[:user],
-          :password => opts[:password]).connect
+          :password => opts[:password],
+          :encoding => opts[:encoding]).connect
       end
 
       def disconnect_connection(conn)
