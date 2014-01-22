@@ -781,7 +781,9 @@ module Sequel
       # Module that the class includes that holds methods the class adds for column accessors and
       # associations so that the methods can be overridden with +super+.
       def overridable_methods_module
-        include(@overridable_methods_module = Module.new) unless @overridable_methods_module
+        unless defined?(@overridable_methods_module) && @overridable_methods_module
+          include(@overridable_methods_module = Module.new)
+        end
         @overridable_methods_module
       end
       
