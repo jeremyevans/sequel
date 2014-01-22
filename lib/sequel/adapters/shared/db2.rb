@@ -382,6 +382,11 @@ module Sequel
         end
       end
       
+      # DB2 supports quoted function names.
+      def supports_quoted_function_names?
+        true
+      end
+
       def _truncate_sql(table)
         # "TRUNCATE #{table} IMMEDIATE" is only for newer version of db2, so we
         # use the following one
