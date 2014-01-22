@@ -45,6 +45,14 @@ describe Sequel::Database do
       proc{@db[:test].update(:a=>'1')}.should raise_error(Sequel::UniqueConstraintViolation)
     end
 
+    cspecify "should raise Sequel::UniqueConstraintViolation when a unique constraint is violated for composite primary keys", [:jdbc, :sqlite], [:db2] do
+      @db.create_table!(:test){String :a; String :b; primary_key [:a, :b]}
+      @db[:test].insert(:a=>'1', :b=>'2')
+      proc{@db[:test].insert(:a=>'1', :b=>'2')}.should raise_error(Sequel::UniqueConstraintViolation)
+      @db[:test].insert(:a=>'3', :b=>'4')
+      proc{@db[:test].update(:a=>'1', :b=>'2')}.should raise_error(Sequel::UniqueConstraintViolation)
+    end
+
     cspecify "should raise Sequel::CheckConstraintViolation when a check constraint is violated", :mysql, :sqlite, [:db2] do
       @db.create_table!(:test){String :a; check Sequel.~(:a=>'1')}
       proc{@db[:test].insert('1')}.should raise_error(Sequel::CheckConstraintViolation)

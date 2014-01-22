@@ -332,7 +332,7 @@ module Sequel
       end
 
       DATABASE_ERROR_REGEXPS = {
-        /is not unique\z/ => UniqueConstraintViolation,
+        /(is|are) not unique\z/ => UniqueConstraintViolation,
         /foreign key constraint failed\z/ => ForeignKeyConstraintViolation,
         /\A(SQLITE ERROR 19 \(CONSTRAINT\) : )?constraint failed\z/ => ConstraintViolation,
         /may not be NULL\z/ => NotNullConstraintViolation,
