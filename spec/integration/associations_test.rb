@@ -1377,7 +1377,7 @@ describe "Sequel::Model Associations with clashing column names" do
     @bar.obj_id.should == 2
 
     @foo.add_bar(b)
-    @foo.bars.sort_by{|x| x.obj_id}.should == [@bar, b]
+    @foo.bars.sort_by{|x| x.id}.should == [@bar, b]
     @foo.remove_bar(b)
     @foo.bars.should == [@bar]
     @foo.remove_all_bars
