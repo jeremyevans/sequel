@@ -485,6 +485,11 @@ module Sequel
         sql << FROM
         source_list_append(sql, @opts[:from] || DUAL)
       end
+
+      # Oracle supports quoted function names.
+      def supports_quoted_function_names?
+        true
+      end
     end
   end
 end
