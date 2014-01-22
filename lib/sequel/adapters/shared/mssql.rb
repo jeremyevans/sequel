@@ -301,7 +301,7 @@ module Sequel
       end
     
       DATABASE_ERROR_REGEXPS = {
-        /Violation of UNIQUE KEY constraint/ => UniqueConstraintViolation,
+        /Violation of UNIQUE KEY constraint|Violation of PRIMARY KEY constraint.+Cannot insert duplicate key/ => UniqueConstraintViolation,
         /conflicted with the (FOREIGN KEY.*|REFERENCE) constraint/ => ForeignKeyConstraintViolation,
         /conflicted with the CHECK constraint/ => CheckConstraintViolation,
         /column does not allow nulls/ => NotNullConstraintViolation,
