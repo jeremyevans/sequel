@@ -1129,7 +1129,7 @@ module Sequel
         def apply_window_function_eager_limit_strategy(ds, opts)
           rn = ds.row_number_column 
           limit, offset = opts.limit_and_offset
-          ds = ds.unordered.select_append{row_number(:over, :partition=>opts.predicate_key, :order=>ds.opts[:order]){}.as(rn)}.from_self
+          ds = ds.unordered.select_append{row_number{}.over(:partition=>opts.predicate_key, :order=>ds.opts[:order]).as(rn)}.from_self
           ds = if opts[:type] == :one_to_one
             ds.where(rn => offset ? offset+1 : 1)
           elsif offset

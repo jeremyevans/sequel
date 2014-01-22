@@ -124,7 +124,7 @@ END
   end
 
   it "should handle SQL::WindowFunction" do
-    dot(@ds.select{sum(:over, :partition=>(:a)){}}).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"WindowFunction\"];", "3 -> 4 [label=\"function\"];", "4 [label=\"Function: sum\"];", "3 -> 5 [label=\"window\"];", "5 [label=\"Window\"];", "5 -> 6 [label=\"opts\"];", "6 [label=\"Hash\"];", "6 -> 7 [label=\"partition\"];", "7 [label=\":a\"];"]
+    dot(@ds.select{sum{}.over(:partition=>:a)}).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"WindowFunction\"];", "3 -> 4 [label=\"function\"];", "4 [label=\"Function: sum\"];", "3 -> 5 [label=\"window\"];", "5 [label=\"Window\"];", "5 -> 6 [label=\"opts\"];", "6 [label=\"Hash\"];", "6 -> 7 [label=\"partition\"];", "7 [label=\":a\"];"]
   end
 
   it "should handle SQL::PlaceholderLiteralString" do

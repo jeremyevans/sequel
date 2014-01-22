@@ -102,14 +102,14 @@ module Sequel
       if no_arg
         if block
           arg = Sequel.virtual_row(&block)
-          aggregate_dataset.get{count(arg).as(count)}
+          aggregate_dataset.get{count(arg).as(:count)}
         else
-          aggregate_dataset.get{count(:*){}.as(count)}.to_i
+          aggregate_dataset.get{count{}.*.as(:count)}.to_i
         end
       elsif block
         raise Error, 'cannot provide both argument and block to Dataset#count'
       else
-        aggregate_dataset.get{count(arg).as(count)}
+        aggregate_dataset.get{count(arg).as(:count)}
       end
     end
     

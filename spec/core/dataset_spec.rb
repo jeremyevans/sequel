@@ -3582,7 +3582,7 @@ describe "Sequel::Dataset#qualify" do
 
   specify "should handle SQL::WindowFunctions" do
     meta_def(@ds, :supports_window_functions?){true}
-    @ds.select{sum(:over, :args=>:a, :partition=>:b, :order=>:c){}}.qualify.sql.should == 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
+    @ds.select{sum(:a).over(:partition=>:b, :order=>:c)}.qualify.sql.should == 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
   end
 
   specify "should handle SQL::DelayedEvaluation" do

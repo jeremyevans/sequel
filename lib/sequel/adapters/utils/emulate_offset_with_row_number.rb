@@ -26,7 +26,7 @@ module Sequel
       sql = @opts[:append_sql] || ''
       subselect_sql_append(sql, unlimited.
         unordered.
-        select_append{ROW_NUMBER(:over, :order=>order){}.as(rn)}.
+        select_append{ROW_NUMBER{}.over(:order=>order).as(rn)}.
         from_self(:alias=>dsa1).
         select(*columns).
         limit(@opts[:limit]).
