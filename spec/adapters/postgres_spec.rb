@@ -1466,6 +1466,17 @@ if DB.adapter_scheme == :postgres
       @ds.all.should == @ds.use_cursor.all
     end
 
+    specify "should not swallow errors if closing cursor raises an error" do
+      proc do
+        @db.synchronize do |c|
+          @ds.use_cursor.each do |r|
+            @db.run "CLOSE sequel_cursor"
+            raise ArgumentError
+          end
+        end
+      end.should raise_error(ArgumentError)
+    end
+
     specify "should respect the :rows_per_fetch option" do
       @db.sqls.clear
       @ds.use_cursor.all

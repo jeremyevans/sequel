@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't swallow underlying exception if there is an exception closing the cursor on PostgreSQL (jeremyevans) (#761)
+
 * Recognize primary key unique constraint violations on MSSQL and SQLAnywhere (jeremyevans)
 
 * Recognize composite unique constraint violations on SQLite (timcraft) (#758)

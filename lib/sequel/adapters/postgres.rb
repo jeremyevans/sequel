@@ -781,7 +781,13 @@ module Sequel
               end
             end
           ensure
-            execute_ddl("CLOSE #{cursor_name}", server_opts)
+            e = $!
+            begin
+              execute_ddl("CLOSE #{cursor_name}", server_opts)
+            rescue
+              raise e if e
+              raise
+            end
           end
         end
       end
