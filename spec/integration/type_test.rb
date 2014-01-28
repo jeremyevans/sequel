@@ -6,6 +6,10 @@ describe "Supported types" do
     DB[:items]
   end
 
+  after(:all) do
+    DB.drop_table?(:items)
+  end
+
   specify "should support casting correctly" do
     ds = create_items_table_with_column(:number, Integer)
     ds.insert(:number => 1)
