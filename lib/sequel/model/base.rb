@@ -41,8 +41,8 @@ module Sequel
       attr_reader :primary_key
   
       # Whether to raise an error instead of returning nil on a failure
-      # to save/create/save_changes/etc due to a validation failure or
-      # a before_* hook returning false.
+      # to save/create/save_changes/update/destroy due to a validation failure or
+      # a before_* hook returning false (default: true). 
       attr_accessor :raise_on_save_failure
   
       # Whether to raise an error when unable to typecast data for a column
