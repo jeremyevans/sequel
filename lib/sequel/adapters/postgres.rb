@@ -780,8 +780,9 @@ module Sequel
                 return if res.ntuples < rows_per_fetch
               end
             end
+          rescue Exception => e
+            raise
           ensure
-            e = $!
             begin
               execute_ddl("CLOSE #{cursor_name}", server_opts)
             rescue
