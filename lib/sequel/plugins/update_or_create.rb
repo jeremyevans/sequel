@@ -7,14 +7,14 @@ module Sequel
     #
     # You can call create_or_update with a block:
     #
-    #   Album.create_or_update(:name=>'Hello') do |album|
+    #   Album.update_or_create(:name=>'Hello') do |album|
     #     album.num_copies_sold = 1000
     #   end
     #
     # or provide two hashes, with the second one being the attributes
     # to set.
     #
-    #   Album.create_or_update({:name=>'Hello'}, {:num_copies_sold=>1000})
+    #   Album.update_or_create({:name=>'Hello'}, {:num_copies_sold=>1000})
     #
     # In both cases, this will check the database to find the album with
     # the name "Hello". If such an album exists, it will be updated to set
