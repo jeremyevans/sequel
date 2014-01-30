@@ -8,6 +8,9 @@ rvm:
   - jruby-18mode
   - jruby-19mode
   - rbx-2
+matrix:
+  allow_failures:
+    - rvm: rbx-2
 script: bundle exec rake spec_travis
 gemfile: .travis.gemfile
 before_script:
