@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.7.0 (2014-02-01)
 
 * Don't swallow underlying exception if there is an exception closing the cursor on PostgreSQL (jeremyevans) (#761)
 
