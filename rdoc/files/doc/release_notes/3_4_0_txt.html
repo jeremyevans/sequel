@@ -228,8 +228,8 @@
             <pre>DB[:events].filter{date &lt; ::Sequel::CURRENT_DATE}&#x000A;# or:&#x000A;include Sequel::SQL::Constants&#x000A;DB[:events].filter{date &lt; ::CURRENT_DATE}</pre>
             </li><li>
             <p>Database#run was added for executing arbitrary SQL on a database. It&#39;s
-            an alias for Database#<<, but it allows for a nicer API inside migrations,
-            since you can now do:</p>
+            an alias for Database#&lt;&lt;, but it allows for a nicer API inside
+            migrations, since you can now do:</p>
             
             <pre>run &#39;SQL&#39;</pre>
             
@@ -344,8 +344,8 @@
             GROUP or JOIN settings and generate bad SQL if there were multiple FROM
             tables.</p>
             </li><li>
-            <p>Database#<< now always returns nil.  Before, the return value was adapter
-            dependent.</p>
+            <p>Database#&lt;&lt; now always returns nil.  Before, the return value was
+            adapter dependent.</p>
             </li><li>
             <p>ODBC::Time and ODBC::DateTime values are now converted to the <a
             href="../../../classes/Sequel.html#attribute-c-datetime_class">Sequel.datetime_class</a>.

@@ -55,6 +55,7 @@
             </ol>
             <h3>Public Instance</h3>
             <ol>
+              <li><a target="docwin" href="#method-i-function">function</a></li>
               <li><a target="docwin" href="#attribute-i-value">value</a></li>
             </ol>
           </div>
@@ -100,7 +101,26 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1245</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-ivar">@value</span> = <span class="ruby-identifier">value</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1282</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-ivar">@value</span> = <span class="ruby-identifier">value</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-function'>
+                <a name='method-i-function'></a>
+                <div class='synopsis'>
+                  <span class='name'>function</span>
+                  <span class='arguments'>(*args)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Create a <a href="Function.html">Function</a> using this identifier as the
+                  functions name, with the given args.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-function-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-function-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1288</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">function</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, *<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

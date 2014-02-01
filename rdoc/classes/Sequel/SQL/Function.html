@@ -53,13 +53,44 @@
             </ol>
             <h3>Public Instance</h3>
             <ol>
+              <li><a target="docwin" href="#method-i-2A">*</a></li>
               <li><a target="docwin" href="#attribute-i-args">args</a></li>
+              <li><a target="docwin" href="#method-i-distinct">distinct</a></li>
               <li><a target="docwin" href="#attribute-i-f">f</a></li>
+              <li><a target="docwin" href="#method-i-over">over</a></li>
             </ol>
           </div>
           <div id='context'>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>COMMA_ARRAY</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[LiteralString.new(', ').freeze].freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DISTINCT</td>
+                    <td>=</td>
+                    <td class='context-item-value'>["DISTINCT ".freeze].freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>WILDCARD</td>
+                    <td>=</td>
+                    <td class='context-item-value'>LiteralString.new('*').freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='attribute-list'>
               <h2 class='section-bar'>Attributes</h2>
               <div class='name-list'>
@@ -103,7 +134,64 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1210</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">f</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-ivar">@f</span>, <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">f</span>, <span class="ruby-identifier">args</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1225</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">f</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-ivar">@f</span>, <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">f</span>, <span class="ruby-identifier">args</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-2A'>
+                <a name='method-i-2A'></a>
+                <div class='synopsis'>
+                  <span class='name'>*</span>
+                  <span class='arguments'>(ce=(arg=false;nil))</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>If no arguments are given, return a new function with the wildcard
+                  prepended to the arguments.</p>
+                  
+                  <pre>Sequel.function(:count).*  # count(*)&#x000A;Sequel.function(:count, 1).*  # count(*, 1)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-2A-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-2A-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1233</span>&#x000A;<span class="ruby-keyword">def</span> *(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">f</span>, <span class="ruby-constant">WILDCARD</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-distinct'>
+                <a name='method-i-distinct'></a>
+                <div class='synopsis'>
+                  <span class='name'>distinct</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a new function with <a href="Function.html#DISTINCT">DISTINCT</a>
+                  before the method arguments.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-distinct-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-distinct-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1242</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">distinct</span>&#x000A;  <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">f</span>, <span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">DISTINCT</span> <span class="ruby-operator">+</span> <span class="ruby-constant">COMMA_ARRAY</span> * (<span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>), <span class="ruby-identifier">args</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-over'>
+                <a name='method-i-over'></a>
+                <div class='synopsis'>
+                  <span class='name'>over</span>
+                  <span class='arguments'>(opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Create a <a href="WindowFunction.html">WindowFunction</a> using the
+                  receiver and the appropriate options for the window.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-over-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-over-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1247</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">over</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-constant">WindowFunction</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

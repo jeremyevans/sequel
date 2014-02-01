@@ -77,6 +77,10 @@
             to set in very narrow circumstances, such as when this plugin needs to
             create an array type, and typecasting is turned off or not setup correctly
             for the model object.</p>
+            </dd><dt>:raise_on_save_failure 
+            <dd>
+            <p>Do not raise exceptions for hook or validation failures when saving
+            associated objects in the add/remove methods (return nil instead).</p>
             </dd><dt>:save_after_modify 
             <dd>
             <p>For pg_array_to_many associations, this makes the the modification methods

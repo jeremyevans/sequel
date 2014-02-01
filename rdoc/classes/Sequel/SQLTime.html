@@ -52,6 +52,10 @@
             <ol>
               <li><a target="docwin" href="#method-c-create">create</a></li>
             </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-to_s">to_s</a></li>
+            </ol>
           </div>
           <div id='context'>
           </div>
@@ -74,6 +78,24 @@
                     [show source]
                   </a>
                   <pre id='method-c-create-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">hour</span>, <span class="ruby-identifier">minute</span>, <span class="ruby-identifier">second</span>, <span class="ruby-identifier">usec</span> = <span class="ruby-value">0</span>)&#x000A;  <span class="ruby-identifier">t</span> = <span class="ruby-identifier">now</span>&#x000A;  <span class="ruby-identifier">local</span>(<span class="ruby-identifier">t</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">day</span>, <span class="ruby-identifier">hour</span>, <span class="ruby-identifier">minute</span>, <span class="ruby-identifier">second</span>, <span class="ruby-identifier">usec</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-to_s'>
+                <a name='method-i-to_s'></a>
+                <div class='synopsis'>
+                  <span class='name'>to_s</span>
+                  <span class='arguments'>(*args)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a string in HH:MM:SS format representing the time.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_s-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-to_s-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_s</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">strftime</span>(<span class="ruby-string">&#39;%H:%M:%S&#39;</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Superclass may have defined a method that takes a format string,</span>&#x000A;    <span class="ruby-comment"># and we shouldn&#39;t override in that case.</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

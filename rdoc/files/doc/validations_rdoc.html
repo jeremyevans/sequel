@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+          <span class='datetime'>2014-01-10 07:39:31 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -279,7 +279,7 @@
             type.  It&#39;s designed to be used with the
             <code>raise_on_typecast_failure = false</code> setting (the default
             starting in <a href="../../classes/Sequel.html">Sequel</a> 4). 
-            &lt;tt&gt;raise_on_typecast_failure = false&lt;/tt, <a
+            <code>raise_on_typecast_failure = false</code>, <a
             href="../../classes/Sequel.html">Sequel</a> attempts to typecast values,
             but silently ignores any errors raised:</p>
             
@@ -345,16 +345,28 @@
             uniqueness check, which you can then filter to scope the uniqueness
             validation to a subset of the model&#39;s dataset.</p>
             
-            <p>Additionally, you can also include an optional options hash as the last
-            argument.  Unlike the other validations, the options hash for
-            <code>validates_unique</code> only checks for two options:</p>
-            <dl class="rdoc-list note-list"><dt>:message 
+            <p>You can also include an options hash as the last argument.  Unlike the
+            other validations, the options hash for <code>validates_unique</code> only
+            recognizes for these options:</p>
+            <dl class="rdoc-list note-list"><dt>:dataset 
+            <dd>
+            <p>The base dataset to use for the unique query, defaults to the model&#39;s
+            dataset</p>
+            </dd><dt>:message 
             <dd>
             <p>The message to use</p>
             </dd><dt>:only_if_modified 
             <dd>
             <p>Only check the uniqueness if the object is new or one of the columns has
             been modified.</p>
+            </dd><dt>:where 
+            <dd>
+            <p>A callable object where call takes three arguments, a dataset, the current
+            object, and an array of columns, and should return a modified dataset that
+            is filtered to include only rows with the same values as the current object
+            for each column in the array. This is useful any time the unique
+            constraints are derived from the columns and not the columns themselves
+            (such as unique constraints on lower(column)).</p>
             </dd></dl>
             
             <p><code>validates_unique</code> is the only method in

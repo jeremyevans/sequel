@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-08-01 08:50:49 -0700</span>
+          <span class='datetime'>2014-01-07 21:09:24 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -40,8 +40,9 @@
             
             <h1 id="label-New+Features">New Features</h1>
             <ul><li>
-            <p>Database#run and << now accept SQL::PlaceholderLiteralString objects,
-            allowing you to more easily run arbitrary DDL queries with placeholders:</p>
+            <p>Database#run and #&lt;&lt; now accept SQL::PlaceholderLiteralString
+            objects, allowing you to more easily run arbitrary DDL queries with
+            placeholders:</p>
             
             <pre>DB.run Sequel.lit(&quot;CREATE TABLE ? (? integer)&quot;, :table, :column)</pre>
             </li><li>

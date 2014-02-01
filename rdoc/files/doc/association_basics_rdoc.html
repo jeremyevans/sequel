@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-10-26 06:54:00 -0700</span>
+          <span class='datetime'>2014-01-15 10:40:54 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -500,6 +500,14 @@
             <p>The add_<em>association</em> method returns the now associated object:</p>
             
             <pre class="ruby"><span class="ruby-ivar">@album</span> = <span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">add_album</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>)</pre>
+            
+            <p>Note that the add_* methods for <code>one_to_many</code> persist the
+            changes by saving the passed in (or newly created) object.  However, to
+            avoid silent failures of these methods, they explicitly raise exceptions
+            even when raise_on_save_failure is false for the associated model. You can
+            disable this behavior (i.e. return nil instead of raising exceptions on a
+            save failure) by setting the <code>:raise_on_save_failure=&gt;false</code>
+            option for the association.</p>
             
             <h3 id="label-remove_association%28object_to_disassociate%29+%28e.g.+remove_album%29+%5Bone_to_many+and+many_to_many%5D">remove_<em>association</em>(object_to_disassociate) (e.g. remove_album) [<code>one_to_many</code> and <code>many_to_many</code>]</h3>
             
@@ -1285,6 +1293,16 @@
             href="../../classes/Sequel.html">Sequel</a> will automatically save the
             object. If you don&#39;t want to validate objects when these implicit saves
             are done, the validate option should be set to false.</p>
+            
+            <h4 id="label-%3Araise_on_save_failure+%5Bone_to_many+associations%5D">:raise_on_save_failure [<code>one_to_many</code> associations]</h4>
+            
+            <p>Set to false to not raise an exception when validation or a before hook
+            fails when implicitly saving an associated object in the add_* or remove_*
+            methods.  This mirrors the raise_on_save_failure model setting, which these
+            methods do not respect (by design, since the setting is dangerous).</p>
+            
+            <p>If you use this option, you must explicitly check all add_* and remove_*
+            return values to see if they were successful.</p>
             
             <h4 id="label-%3Aallow_eager">:allow_eager</h4>
             

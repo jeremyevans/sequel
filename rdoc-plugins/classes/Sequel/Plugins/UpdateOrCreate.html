@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::UpdateOrCreate</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::UpdateOrCreate
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/update_or_create_rb.html">lib/sequel/plugins/update_or_create.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The update_or_create plugin adds a couple of methods that make it easier to
+            deal with objects which may or may not yet exist in the database. The first
+            method is update_or_create, which updates an object if it exists in the
+            database, or creates the object if it does not.</p>
+            
+            <p>You can call create_or_update with a block:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Hello&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">num_copies_sold</span> = <span class="ruby-value">1000</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>or provide two hashes, with the second one being the attributes to set.</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>({:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Hello&#39;</span>}, {:<span class="ruby-identifier">num_copies_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1000</span>})</pre>
+            
+            <p>In both cases, this will check the database to find the album with the name
+            "Hello". If such an album exists, it will be updated to set num_copies_sold
+            to 1000.  If no such album exists, an album with the name "Hello" and
+            num_copies_sold 1000 will be created.</p>
+            
+            <p>The second method is find_or_new, which returns the object from the
+            database if it exists, or returns a new (unsaved) object if not. It has the
+            same API as update_or_create, and operates identically to update_or_create
+            except that it doesn&#39;t persist any changes.</p>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Make all model subclass support update_or_create</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">update_or_create</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support update_or_create</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">update_or_create</span></pre>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="UpdateOrCreate/ClassMethods.html">Sequel::Plugins::UpdateOrCreate::ClassMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

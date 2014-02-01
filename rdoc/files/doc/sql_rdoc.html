@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+          <span class='datetime'>2014-01-18 10:59:05 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -127,7 +127,7 @@
             
             <pre>DB.run &quot;CREATE TABLE albums (id integer primary key, name varchar(255))&quot;</pre>
             
-            <p>You can also use <code>Database#<<</code>:</p>
+            <p>You can also use <code>Database#&lt;&lt;</code>:</p>
             
             <pre>DB &lt;&lt; &quot;ALTER TABLE albums ADD COLUMN copies_sold INTEGER&quot;</pre>
             
@@ -257,7 +257,7 @@
             
             <p>The easiest way to use SQL functions is via a virtual row:</p>
             
-            <pre>DB[:albums].select{func{}} # SELECT func() FROM &quot;albums&quot;&#x000A;DB[:albums].select{func(col1, col2)} # SELECT func(&quot;col1&quot;, &quot;col2&quot;) FROM &quot;albums&quot;</pre>
+            <pre>DB[:albums].select{func.function} # SELECT func() FROM &quot;albums&quot;&#x000A;DB[:albums].select{func(col1, col2)} # SELECT func(&quot;col1&quot;, &quot;col2&quot;) FROM &quot;albums&quot;</pre>
             
             <p>You can also use the <code>Sequel.function</code> method on the symbol that
             contains the function name:</p>
@@ -271,15 +271,15 @@
             
             <pre>Sequel.function(:sum, :column) # sum(column)</pre>
             
-            <p>However, if you want to use the DISTINCT modifier to an aggregate function,
-            you either have to use literal SQL or a virtual row block:</p>
+            <p>To use the DISTINCT modifier to an aggregate function, call the distinct
+            method on the function:</p>
             
-            <pre>Sequel.function(:sum, Sequel.lit(&#39;DISTINCT column&#39;)) # sum(DISTINCT column)&#x000A;DB[:albums].select{sum(:distinct, :column){}} # SELECT sum(DISTINCT column) FROM albums</pre>
+            <pre>DB[:albums].select{sum(:column).distinct} # SELECT sum(DISTINCT column) FROM albums</pre>
             
             <p>If you want to use the wildcard as the sole argument of the aggregate
-            function, you again have to use literal SQL or a virtual row block:</p>
+            function, use the * method on the Function:</p>
             
-            <pre>Sequel.function(:count, Sequel.lit(&#39;*&#39;)) # count(*)&#x000A;DB[:albums].select{count(:*){}} # SELECT count(*) FROM albums</pre>
+            <pre>Sequel.function(:count).* # count(*)&#x000A;DB[:albums].select{count.function.*} # SELECT count(*) FROM albums</pre>
             
             <p>Note that <a href="../../classes/Sequel.html">Sequel</a> provides helper
             methods for aggregate functions such as <code>count</code>,
@@ -290,10 +290,18 @@
             <h3 id="label-Window+Functions">Window Functions</h3>
             
             <p>If the database supports window functions, <a
-            href="../../classes/Sequel.html">Sequel</a> can handle them using a virtual
-            row block:</p>
+            href="../../classes/Sequel.html">Sequel</a> can handle them by calling the
+            over method on a Function:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">over</span>){}}&#x000A;<span class="ruby-comment"># SELECT function() OVER () FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(:<span class="ruby-identifier">over</span>, :<span class="ruby-operator">*=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>){}}&#x000A;<span class="ruby-comment"># SELECT count(*) OVER () FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">over</span>, :<span class="ruby-identifier">args=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col1</span>, :<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col2</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col3</span>){}}&#x000A;<span class="ruby-comment"># SELECT function(col1) OVER (PARTITION BY col2 ORDER BY col3) FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">over</span>, :<span class="ruby-identifier">args=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-identifier">c1</span>, <span class="ruby-identifier">c2</span>], :<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-identifier">c3</span>, <span class="ruby-identifier">c4</span>], :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-identifier">c5</span>, <span class="ruby-identifier">c6</span>]){}}&#x000A;<span class="ruby-comment"># SELECT function(c1, c2) OVER (PARTITION BY c3, c4 ORDER BY c5, c6) FROM albums</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-comment"># SELECT function() OVER () FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.*.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-comment"># SELECT count(*) OVER () FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col2</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col3</span>)}&#x000A;<span class="ruby-comment"># SELECT function(col1) OVER (PARTITION BY col2 ORDER BY col3) FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>(<span class="ruby-identifier">c1</span>, <span class="ruby-identifier">c2</span>).<span class="ruby-identifier">over</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-identifier">c3</span>, <span class="ruby-identifier">c4</span>], :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-identifier">c5</span>, <span class="ruby-identifier">c6</span>])}&#x000A;<span class="ruby-comment"># SELECT function(c1, c2) OVER (PARTITION BY c3, c4 ORDER BY c5, c6) FROM albums</span></pre>
+            
+            <h3 id="label-Schema+Qualified+Functions">Schema Qualified Functions</h3>
+            
+            <p>If the database supports schema qualified functions, <a
+            href="../../classes/Sequel.html">Sequel</a> can handle them by calling the
+            function method on a QuailfiedIdentifier:</p>
+            
+            <pre>DB[:albums].select{schema__function.function}&#x000A;# SELECT schema.function() FROM albums&#x000A;DB[:albums].select{schema__function.function(col, 2, &quot;a&quot;)}&#x000A;# SELECT schema.function(col, 2, &#39;a&#39;) FROM albums</pre>
             
             <h3 id="label-Equality+Operator+%28%3D%29">Equality Operator (=)</h3>
             

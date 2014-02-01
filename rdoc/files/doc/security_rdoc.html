@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-01-02 10:46:37 -0800</span>
+          <span class='datetime'>2014-01-22 08:08:08 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -110,11 +110,9 @@
             <p><a
             href="../../classes/Sequel/Database.html#method-i-run">Sequel::Database#run</a></p>
             </li><li>
-            <p><a
-            href="../../classes/Sequel/Database.html#method-i-3C-3C">Sequel::Database#<<</a></p>
+            <p>Sequel::Database#&lt;&lt;</p>
             </li><li>
-            <p><a
-            href="../../classes/Sequel/Database.html#method-i-5B-5D">Sequel::Database#[]</a></p>
+            <p>Sequel::Database#[]</p>
             </li><li>
             <p><a
             href="../../classes/Sequel/Database.html#method-i-fetch">Sequel::Database#fetch</a></p>
@@ -130,19 +128,15 @@
             <p>If you pass a string to these methods that is derived from user input, you
             open yourself up to SQL injection.  The <a
             href="../../classes/Sequel/Database.html#method-i-run">Sequel::Database#run</a>,
-            <a
-            href="../../classes/Sequel/Database.html#method-i-3C-3C">Sequel::Database#<<</a>,
-            and Sequel::Database#execute methods are not designed to work at all with
-            user input. If you must use them with user input, you should escape the
-            user input manually via <a
+            Sequel::Database#&lt;&lt;, and Sequel::Database#execute methods are not
+            designed to work at all with user input. If you must use them with user
+            input, you should escape the user input manually via <a
             href="../../classes/Sequel/Database.html#method-i-literal">Sequel::Database#literal</a>.
             Example:</p>
             
             <pre>DB.run &quot;SOME SQL #{DB.literal(params[:user].to_s)}&quot;</pre>
             
-            <p>With <a
-            href="../../classes/Sequel/Database.html#method-i-5B-5D">Sequel::Database#[]</a>,
-            <a
+            <p>With Sequel::Database#[], <a
             href="../../classes/Sequel/Database.html#method-i-fetch">Sequel::Database#fetch</a>
             and <a
             href="../../classes/Sequel/Dataset.html#method-i-with_sql">Sequel::Dataset#with_sql</a>,
@@ -250,8 +244,7 @@
             <p><a
             href="../../classes/Sequel/Dataset.html#method-i-last">Sequel::Dataset#last</a></p>
             </li><li>
-            <p><a
-            href="../../classes/Sequel/Dataset.html#method-i-5B-5D">Sequel::Dataset#[]</a></p>
+            <p>Sequel::Dataset#[]</p>
             </li><li>
             <p>Sequel::Dataset#[]=</p>
             </li></ul>
@@ -292,6 +285,12 @@
             should be specified by the user, it allows you to use a ruby string, and
             that string is used verbatim as the SQL type.  You should not use user
             input for type strings.</p>
+            
+            <h4 id="label-SQL+Function+Names">SQL Function Names</h4>
+            
+            <p>In most cases, <a href="../../classes/Sequel.html">Sequel</a> does not
+            quote SQL function names.  You should not use user input for function
+            names.</p>
             
             <h3 id="label-SQL+Identifier+Injections">SQL Identifier Injections</h3>
             

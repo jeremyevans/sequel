@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>4.7.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>4.7.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/4.7.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2014-01-31 11:26:01 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>Alternatives for the more complex virtual row method calls have been added:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Window Functions using SQL::Function#over</span>&#x000A;<span class="ruby-comment"># before: select{sum(:over, :args=&gt;:col1, :partition=&gt;:col2){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">col2</span>)}&#x000A;&#x000A;<span class="ruby-comment"># count(*) using SQL::Function#*</span>&#x000A;<span class="ruby-comment"># before: select{count(:*){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>{}.*}&#x000A;&#x000A;<span class="ruby-comment"># count(distinct col) using SQL::Function#distinct</span>&#x000A;<span class="ruby-comment"># before: select{count(:distinct, :col){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(:<span class="ruby-identifier">col</span>).<span class="ruby-identifier">distinct</span>}</pre>
+            
+            <p>Additionally, schema qualified functions are now supported via
+            SQL::QualifiedIdentifier#function, and quoted functions are now supported
+            via SQL::Identifier#function on some databases:</p>
+            
+            <pre># &quot;func&quot;(&quot;col&quot;)&#x000A;select{func.function(:col)}&#x000A;# &quot;schema&quot;.&quot;func&quot;(&quot;col1&quot;)&#x000A;select{schema__func.function(:col1)}</pre>
+            
+            <p>If the database does not support quoting function names, then <a
+            href="../../../classes/Sequel.html">Sequel</a> will not quote them.</p>
+            </li><li>
+            <p>An update_or_create plugin has been added, for updating a matching object
+            if one exists, or creating an object if it does not. For example, the
+            following code will update the number of copies sold for album with the
+            name &#39;Hello&#39;, or it will create an album with the name
+            &#39;Hello&#39; and 1000 number of copies sold:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">update_or_create</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Hello&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">num_copies_sold</span> = <span class="ruby-value">1000</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>You can also use a shorter form of this, with two hashes:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>({:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Hello&#39;</span>}, {:<span class="ruby-identifier">num_copies_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1000</span>})</pre>
+            
+            <p>This plugin also adds a method named find_or_new, which does the same thing
+            as update_or_create, except it doesn&#39;t persist any changes.</p>
+            </li><li>
+            <p>A :raise_on_save_failure option has been added for one_to_many,
+            pg_array_to_many, and many_to_pg_array associations.  This mirrors the
+            Model.raise_on_save_failure setting, and if set to false, it will make the
+            add/remove methods return nil instead of raising an error if there is a
+            validation/hook error when saving the associated record.</p>
+            </li><li>
+            <p>The validates_unique validation in validation_helpers now supports a
+            :dataset option to provide the base dataset to use to check uniqueness. 
+            This is useful when the model itself uses a filtered dataset, but the
+            unique index in the database is on an unfiltered dataset.</p>
+            
+            <p>The auto_validations plugin uses this option to ensure that unique
+            validations are setup correctly in subclasses using single table
+            inheritance.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now automatically rolls
+            back transactions in killed threads on ruby 2.0+.  It is still impossible
+            to do so on ruby 1.9.</p>
+            </li><li>
+            <p>In the instance_hooks plugin, validation instance hooks are now not cleared
+            until after a successful save.</p>
+            </li><li>
+            <p>Composite unique key constraint violations are now recognized and raised as
+            <a
+            href="../../../classes/Sequel/UniqueConstraintViolation.html">Sequel::UniqueConstraintViolation</a>
+            on SQLite.</p>
+            </li><li>
+            <p>Primary key unique constraint violations are now recognized and and raised
+            as <a
+            href="../../../classes/Sequel/UniqueConstraintViolation.html">Sequel::UniqueConstraintViolation</a>
+            on Microsoft SQL Server and SQLAnywhere.</p>
+            </li><li>
+            <p>If an exception occurs when using a cursor in the postgres adapter, and an
+            exception also occurs when closing the cursor when cleaning up, the initial
+            exception is now raised.</p>
+            </li><li>
+            <p>You can now get tables in a specific schema in the jdbc adapter using the
+            :schema option to Database#tables.  This was already supported in most jdbc
+            subadapters because they implement tables using database specific code
+            instead of looking at the JDBC metadata, but it should now work for all
+            jdbc subadapters.</p>
+            </li><li>
+            <p><a
+            href="../../../classes/Sequel/SQLTime.html#method-i-to_s">Sequel::SQLTime#to_s</a>
+            is now defined and returns a string in HH:MM:SS format (leaving off the
+            date).</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>The odbc adapter&#39;s :driver option is no longer deprecated, as reports
+            were received that it still works.</p>
+            </li><li>
+            <p>If you were re-adding instance validation hooks using instance_hooks after
+            a save failure, and then retrying the save, you may now end up with
+            duplicate validations.  You no longer need to re-add validation hooks
+            unless the object was saved successfully.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -31,12 +31,60 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-01-02 12:13:25 -0800</span>
+          <span class='datetime'>2014-01-31 11:26:01 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.7.0+%282014-02-01%29">4.7.0 (2014-02-01)</h3>
+            <ul><li>
+            <p>Don&#39;t swallow underlying exception if there is an exception closing the
+            cursor on PostgreSQL (jeremyevans) (#761)</p>
+            </li><li>
+            <p>Recognize primary key unique constraint violations on MSSQL and SQLAnywhere
+            (jeremyevans)</p>
+            </li><li>
+            <p>Recognize composite unique constraint violations on SQLite (timcraft)
+            (#758)</p>
+            </li><li>
+            <p>Make #* method without arguments on SQL::Function return a Function with *
+            prepended to the arguments (jeremyevans)</p>
+            </li><li>
+            <p>Add function to SQL::Identifier and SQL::QualifiedIdentifier, allowing for
+            easy use of schema qualified functions or functions names that need quoting
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add SQL::Function#distinct for easier creation of aggregate functions using
+            DISTINCT (jeremyevans)</p>
+            </li><li>
+            <p>Add SQL::Function#over for easier creation of window functions
+            (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t clear validation instance_hooks until after a successful save
+            (jeremyevans)</p>
+            </li><li>
+            <p>Support :raise_on_save_failure option for one_to_many, pg_array_to_many,
+            and many_to_pg_array associations (jeremyevans)</p>
+            </li><li>
+            <p>Make SQLTime#to_s return a string in HH:MM:SS format, since it
+            shouldn&#39;t include date information (jeremyevans)</p>
+            </li><li>
+            <p>Support the Database#tables :schema option in the jdbc adapter (robbiegill,
+            jeremyevans) (#755)</p>
+            </li><li>
+            <p>Automatically rollback transactions in killed threads in ruby 2.0+ (chanks)
+            (#752)</p>
+            </li><li>
+            <p>Add update_or_create plugin, for updating an object if it exists, or
+            creating such an object if it does not (jeremyevans)</p>
+            </li><li>
+            <p>Make auto_validations uniqueness validations work correctly for STI
+            subclasses (jeremyevans)</p>
+            </li><li>
+            <p>Support :dataset option to validates_unique vaildation (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.6.0+%282014-01-02%29">4.6.0 (2014-01-02)</h3>
             <ul><li>
@@ -231,7 +279,7 @@
             <p>Support deferrable exclusion constraints on PostgreSQL using the
             :deferrable option (mfoody) (#687)</p>
             </li><li>
-            <p>Make Database#run and << accept SQL::PlaceholderLiteralString values
+            <p>Make Database#run and #&lt;&lt; accept SQL::PlaceholderLiteralString values
             (jeremyevans)</p>
             </li><li>
             <p>Deprecate :driver option in odbc adapter since it appears to be broken
@@ -2149,8 +2197,8 @@
             <p>Work around pragma bug on jdbc/sqlite when emulating alter table support
             (jeremyevans)</p>
             </li><li>
-            <p>Database#<< and Dataset#<< now return self so they can be safely chained
-            (jeremyevans)</p>
+            <p>Database#&lt;&lt; and Dataset#&lt;&lt; now return self so they can be
+            safely chained (jeremyevans)</p>
             </li><li>
             <p>Fully support using an aliased table name as the :join_table option for a
             many_to_many association (jeremyevans)</p>
@@ -4500,7 +4548,7 @@
             </li><li>
             <p>Deprecate Array#to_sql, String#to_sql, and String#split_sql (jeremyevans)</p>
             </li><li>
-            <p>Deprecate passing an array to Database#<< (jeremyevans)</p>
+            <p>Deprecate passing an array to Database#&lt;&lt; (jeremyevans)</p>
             </li><li>
             <p>Deprecate Range#interval (jeremyevans)</p>
             </li><li>
@@ -5953,8 +6001,8 @@
             <p>Renamed Dataset#clone_merge to Dataset#clone, works with or without options
             for merging (#148).</p>
             </li><li>
-            <p>Fixed MySQL::Database#<< method to always free the result in order to allow
-            multiple calls in a row (#149). Same also for PostgreSQL adapter.</p>
+            <p>Fixed MySQL::Database#&lt;&lt; method to always free the result in order to
+            allow multiple calls in a row (#149). Same also for PostgreSQL adapter.</p>
             </li></ul>
             
             <h3 id="label-1.0.7+%282008-02-05%29">1.0.7 (2008-02-05)</h3>
@@ -6461,8 +6509,8 @@
             </li><li>
             <p>Restored Model.has_hooks? implementation.</p>
             </li><li>
-            <p>Changed Database#<< to strip comments and whitespace only when an array is
-            given.</p>
+            <p>Changed Database#&lt;&lt; to strip comments and whitespace only when an
+            array is given.</p>
             </li><li>
             <p>Changed Schema::Generator#primary_key to accept calls with the type
             argument omitted.</p>
@@ -6981,8 +7029,8 @@
             </li><li>
             <p>Added Dataset#size as alias to Dataset#count.</p>
             </li><li>
-            <p>Changed Database#<< to call execute (instead of being an alias). Thus it
-            will work for descendants as well.</p>
+            <p>Changed Database#&lt;&lt; to call execute (instead of being an alias). Thus
+            it will work for descendants as well.</p>
             </li><li>
             <p>Fixed Sequel.open to accept variable arity.</p>
             </li><li>
@@ -7275,9 +7323,9 @@
             </li><li>
             <p>Added Dataset#insert_multiple for inserting multiple records.</p>
             </li><li>
-            <p>Added Dataset#<< as shorthand for inserting records.</p>
+            <p>Added Dataset#&lt;&lt; as shorthand for inserting records.</p>
             </li><li>
-            <p>Added Database#<< method for executing arbitrary SQL.</p>
+            <p>Added Database#&lt;&lt; method for executing arbitrary SQL.</p>
             </li><li>
             <p>Imported <a href="../classes/Sequel.html">Sequel</a> code.</p>
             </li></ul>

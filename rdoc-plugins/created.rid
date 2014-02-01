@@ -1,4 +1,4 @@
-Thu, 02 Jan 2014 12:24:54 -0800
+Sat, 01 Feb 2014 09:23:43 -0800
 lib/sequel/extensions/_pretty_table.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/blank.rb	Tue, 19 Jun 2012 10:06:46 -0700
@@ -58,7 +58,7 @@ lib/sequel/plugins/association_autoreloading.rb	Mon, 03 Jun 2013 16:35:29 -0700
 lib/sequel/plugins/association_dependencies.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/association_pks.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/association_proxies.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/plugins/auto_validations.rb	Mon, 03 Jun 2013 13:30:13 -0700
+lib/sequel/plugins/auto_validations.rb	Wed, 08 Jan 2014 15:06:43 -0800
 lib/sequel/plugins/blacklist_security.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/boolean_readers.rb	Sat, 06 Apr 2013 16:15:38 -0700
 lib/sequel/plugins/caching.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -74,7 +74,7 @@ lib/sequel/plugins/force_encoding.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/hook_class_methods.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/input_transformer.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/instance_filters.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/plugins/instance_hooks.rb	Thu, 19 Sep 2013 07:06:56 -0700
+lib/sequel/plugins/instance_hooks.rb	Wed, 15 Jan 2014 10:40:54 -0800
 lib/sequel/plugins/json_serializer.rb	Sat, 26 Oct 2013 06:54:00 -0700
 lib/sequel/plugins/lazy_attributes.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/list.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -83,7 +83,7 @@ lib/sequel/plugins/many_to_one_pk_lookup.rb	Mon, 03 Jun 2013 16:35:29 -0700
 lib/sequel/plugins/mssql_optimistic_locking.rb	Wed, 06 Nov 2013 11:51:32 -0800
 lib/sequel/plugins/nested_attributes.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/optimistic_locking.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/plugins/pg_array_associations.rb	Mon, 21 Oct 2013 09:49:08 -0700
+lib/sequel/plugins/pg_array_associations.rb	Wed, 15 Jan 2014 10:40:54 -0800
 lib/sequel/plugins/pg_row.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/pg_typecast_on_load.rb	Mon, 15 Jul 2013 08:40:45 -0700
 lib/sequel/plugins/prepared_statements.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -108,8 +108,9 @@ lib/sequel/plugins/touch.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/tree.rb	Tue, 15 Oct 2013 09:01:55 -0700
 lib/sequel/plugins/typecast_on_load.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/unlimited_update.rb	Tue, 05 Feb 2013 09:50:24 -0800
+lib/sequel/plugins/update_or_create.rb	Thu, 30 Jan 2014 13:58:40 -0800
 lib/sequel/plugins/update_primary_key.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/validation_class_methods.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/plugins/validation_helpers.rb	Thu, 19 Sep 2013 07:06:56 -0700
+lib/sequel/plugins/validation_helpers.rb	Wed, 08 Jan 2014 15:06:43 -0800
 lib/sequel/plugins/xml_serializer.rb	Thu, 19 Sep 2013 07:06:56 -0700
 doc/core_extensions.rdoc	Sun, 02 Jun 2013 13:49:43 -0700

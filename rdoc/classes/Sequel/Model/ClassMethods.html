@@ -208,8 +208,8 @@
                     <td class='context-item-desc'>
                       
                       <p>Whether to raise an error instead of returning nil on a failure to
-                      save/create/save_changes/etc due to a validation failure or a before_* hook
-                      returning false.</p>
+                      save/create/save_changes/update/destroy due to a validation failure or a
+                      before_* hook returning false (default: true).</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -262,7 +262,7 @@
                       <p>Should be the literal table name if this Model&#39;s dataset is a simple
                       table (no select, order, join, etc.), or nil otherwise.  This and <a
                       href="ClassMethods.html#attribute-i-simple_pk">#simple_pk</a> are used for
-                      an optimization in Model.[].</p>
+                      an optimization in <a href="../Model.html">Model</a>.[].</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -645,7 +645,8 @@
                 <div class='description'>
                   
                   <p>Finds a single record according to the supplied filter. You are encouraged
-                  to use Model.[] or Model.first instead of this method.</p>
+                  to use <a href="../Model.html">Model</a>.[] or Model.first instead of this
+                  method.</p>
                   
                   <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">find</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;Bob&#39;) LIMIT 1</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">find</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name &gt; &#39;M&#39;) LIMIT 1</span></pre>
                 </div>
