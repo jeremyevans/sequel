@@ -3,7 +3,7 @@
  title: Sequel 3.28.0 Released
 ---
 
-Sequel 3.28.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_28_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.28.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_28_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * DB2 support has been improved greatly.
 * Firebird support has been improved significantly.

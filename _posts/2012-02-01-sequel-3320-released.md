@@ -3,7 +3,7 @@
  title: Sequel 3.32.0 Released
 ---
 
-Sequel 3.32.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_32_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.32.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_32_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * Prepared statements nows support :map/:to_hash types.
 * NOT IN handling with an empty array has changed in regards to NULL values.

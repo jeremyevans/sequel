@@ -3,7 +3,7 @@
  title: Sequel 3.29.0 Released
 ---
 
-Sequel 3.29.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_29_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.29.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_29_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * Oracle support has been improved greatly.
 * Support has been added for the HSQLDB and Apache Derby Java databases.

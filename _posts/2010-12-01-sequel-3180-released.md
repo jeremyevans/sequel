@@ -3,7 +3,7 @@
  title: Sequel 3.18.0 Released
 ---
 
-Sequel 3.18.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_18_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.18.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_18_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * Reversible migration support was added, so simple migrations can be reversed automatically.
 * A to_dot extension was added, for easier creation of visualizations of dataset abstract syntax trees.

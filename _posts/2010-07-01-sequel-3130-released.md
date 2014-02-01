@@ -3,7 +3,7 @@
  title: Sequel 3.13.0 Released
 ---
 
-Sequel 3.13.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_13_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.13.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_13_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * Sequel now supports Ruby 1.9.2pre3.
 * Sequel now supports prepared transactions/2-phase commit.

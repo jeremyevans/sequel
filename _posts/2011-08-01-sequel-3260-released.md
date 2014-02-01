@@ -3,7 +3,7 @@
  title: Sequel 3.26.0 Released
 ---
 
-Sequel 3.26.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_26_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.26.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_26_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * Eager graph is 75% to 225% faster than before.
 * Dataset creation is 2.5x - 4.4x faster than before.

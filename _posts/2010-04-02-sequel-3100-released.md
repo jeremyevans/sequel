@@ -3,7 +3,7 @@
  title: Sequel 3.10.0 Released
 ---
 
-Sequel 3.10.0 was just released!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_10_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.10.0 was just released!  <a href="/rdoc/files/doc/release_notes/3_10_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * A real one_to_one association was added (using one_to_many with the :one_to_one option now raises an exception).
 * many_to_one and one_to_one associations now use before_set and after_set callbacks.

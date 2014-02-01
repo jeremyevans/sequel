@@ -51,6 +51,6 @@ Using Sequel's DSL syntax, the arguments are used directly in the query, resulti
 
 One important thing you should note there is that both of those string-with-placeholder calls are valid Sequel code as well as valid ActiveRecord code.  So it's not like Sequel forces you to use the DSL, it's just available as an option should you want to use it.
 
-If you are interested in more Sequel DSL examples, check out <a href="http://sequel.jeremyevans.net/rdoc/files/doc/cheat_sheet_rdoc.html">Sequel's cheat sheet</a>.
+If you are interested in more Sequel DSL examples, check out <a href="/rdoc/files/doc/cheat_sheet_rdoc.html">Sequel's cheat sheet</a>.
 
 I'm interested in other's thoughts on this, so please post in the comments if you've tried Sequel, and let me know whether you think Sequel's DSL is unfriendly, and what your first impressions of Sequel's DSL were.

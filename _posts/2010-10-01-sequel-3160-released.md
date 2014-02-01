@@ -3,7 +3,7 @@
  title: Sequel 3.16.0 Released
 ---
 
-Sequel 3.16.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_16_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.16.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_16_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * A swift adapter was added, offering an improvement in SELECT performance over the postgres adapter.
 * DateTime literalization on ruby 1.9 has been fixed.

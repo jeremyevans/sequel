@@ -5,10 +5,10 @@
 
 When I asked the Sequel mailing list a month ago about <a href="http://groups.google.com/group/sequel-talk/browse_thread/thread/b7850930a3aa93db">possible additions to Sequel</a>, the main response I got was the need for better documentation.  One of the reasons that this blog was dormant for about a month was I was very busy writing documentation.  I still have a lot of documentation I plan to write, but there have been a lot of positive changes made since then.  Some were done before 3.11.0 and are available on the Sequel website, such as:
 
-* <a href="http://sequel.jeremyevans.net/rdoc/files/doc/dataset_basics_rdoc.html">A new Dataset Basics guide</a>
-* <a href="http://sequel.jeremyevans.net/rdoc/files/doc/association_basics_rdoc.html">A new Association Basics guide</a>
-* <a href="http://sequel.jeremyevans.net/rdoc/files/doc/virtual_rows_rdoc.html">A revamped Virtual Rows guide</a>
-* <a href="http://sequel.jeremyevans.net/rdoc/classes/Sequel/Dataset.html">RDoc Section support for the Sequel::Dataset RDoc documentation</a>
+* <a href="/rdoc/files/doc/dataset_basics_rdoc.html">A new Dataset Basics guide</a>
+* <a href="/rdoc/files/doc/association_basics_rdoc.html">A new Association Basics guide</a>
+* <a href="/rdoc/files/doc/virtual_rows_rdoc.html">A revamped Virtual Rows guide</a>
+* <a href="/rdoc/classes/Sequel/Dataset.html">RDoc Section support for the Sequel::Dataset RDoc documentation</a>
 
 Since 3.11.0, there has been more documentation added:
 

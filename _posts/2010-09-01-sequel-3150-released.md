@@ -3,7 +3,7 @@
  title: Sequel 3.15.0 Released
 ---
 
-Sequel 3.15.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_15_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.15.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_15_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * A mysql2 adapter was added, which offers a large performance improvement over the mysql adapter.
 * Support for sequel_pg was added to the postgres adapter when pg is being used, for a large performance improvement.

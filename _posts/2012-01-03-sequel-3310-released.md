@@ -3,7 +3,7 @@
  title: Sequel 3.31.0 Released
 ---
 
-Sequel 3.31.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_31_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.31.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_31_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * The serialization plugin now accepts custom serialization formats.
 * Dataset #import/#multi_insert can now return an array of inserted primary key values.

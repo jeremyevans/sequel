@@ -3,7 +3,7 @@
  title: Sequel 3.24.0 Released
 ---
 
-Sequel 3.24.0 was released today, and it's the largest release in terms of features in over a year!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_24_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.24.0 was released today, and it's the largest release in terms of features in over a year!  <a href="/rdoc/files/doc/release_notes/3_24_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * A prepared_statements plugin was added for using prepared statements for creating, updating, deleting, and looking up models by primary key.
 * A prepared_statements_safe plugin was added for extra safety against denial of service attacks when using the prepared statement plugin.

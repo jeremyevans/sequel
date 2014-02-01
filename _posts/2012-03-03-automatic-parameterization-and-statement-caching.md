@@ -7,7 +7,7 @@ I recently committed some patches that add support for <a href="https://github.c
 
 ### Historical Behavior
 
-First, let's review Sequel's default behavior.  Unless you are <a href="http://sequel.jeremyevans.net/rdoc/files/doc/prepared_statements_rdoc.html">specifically choosing to use prepared statements</a>, Sequel by defaults literalizes all arguments directly into the SQL query string.  For example, this Sequel code:
+First, let's review Sequel's default behavior.  Unless you are <a href="/rdoc/files/doc/prepared_statements_rdoc.html">specifically choosing to use prepared statements</a>, Sequel by defaults literalizes all arguments directly into the SQL query string.  For example, this Sequel code:
 
     DB[:table].where(:a=>1, :b=>"c")
 

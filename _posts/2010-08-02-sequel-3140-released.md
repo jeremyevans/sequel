@@ -3,7 +3,7 @@
  title: Sequel 3.14.0 Released
 ---
 
-Sequel 3.14.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_14_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.14.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_14_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * Dataset#grep now supports :all_patterns, :all_columns, and :case_insensitive options.
 * Model#save can now take a :raise_on_failure option to override the raise_on_save_failure setting.

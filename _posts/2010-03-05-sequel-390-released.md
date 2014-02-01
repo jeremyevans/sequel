@@ -3,7 +3,7 @@
  title: Sequel 3.9.0 Released
 ---
 
-Sequel 3.9.0 was released yesterday!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_9_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.9.0 was released yesterday!  <a href="/rdoc/files/doc/release_notes/3_9_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * The connection pool classes were refactored for a 25-30% performance increase.
 * An optimistic locking plugin similar to ActiveRecord's optimistic locking was added.

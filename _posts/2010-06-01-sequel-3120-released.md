@@ -3,7 +3,7 @@
  title: Sequel 3.12.0 Released
 ---
 
-Sequel 3.12.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_12_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.12.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_12_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * A timestamp migrator was added, allowing more flexibility for migrations when working in teams.
 * A new migration DSL was added, simplifying the migration file format.

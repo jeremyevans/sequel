@@ -3,7 +3,7 @@
  title: Sequel 3.46.0 Released
 ---
 
-Sequel 3.46.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_46_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.46.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_46_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * Added Dataset#first!, like #first but raises a NoMatchingRow exception instead of returning nil.
 * Added Dataset#with_pk! for model datasets, similar to #first!.

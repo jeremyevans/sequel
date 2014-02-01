@@ -3,7 +3,7 @@
  title: Sequel 3.19.0 Released
 ---
 
-Sequel 3.19.0 was released today!  <a href="http://sequel.jeremyevans.net/rdoc/files/doc/release_notes/3_19_0_txt.html">Full release notes are available</a>, but here are some highlights:
+Sequel 3.19.0 was released today!  <a href="/rdoc/files/doc/release_notes/3_19_0_txt.html">Full release notes are available</a>, but here are some highlights:
 
 * Type conversion is up to 15% faster in some adapters.
 * The validation_class_methods plugin now uses reflectable validations.
