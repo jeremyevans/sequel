@@ -83,6 +83,12 @@ module Sequel
           true
         end
 
+        # Whether you are able to clone from the given association type to the current
+        # association type, true by default only if the types match.
+        def cloneable?(ref)
+          ref[:type] == self[:type]
+        end
+
         # Name symbol for the dataset association method
         def dataset_method
           :"#{self[:name]}_dataset"
@@ -479,6 +485,11 @@ module Sequel
           !self[:primary_keys].any?{|k| obj.send(k).nil?}
         end
 
+        # one_to_many associations can also be cloned from one_to_one associations
+        def cloneable?(ref)
+          super || ref[:type] == :one_to_one
+        end
+
         # Default foreign key name symbol for key in associated table that points to
         # current table's primary key.
         def default_key
@@ -551,6 +562,11 @@ module Sequel
       class OneToOneAssociationReflection < OneToManyAssociationReflection
         ASSOCIATION_TYPES[:one_to_one] = self
         
+        # one_to_one associations can also be cloned from one_to_many associations
+        def cloneable?(ref)
+          super || ref[:type] == :one_to_many
+        end
+
         # one_to_one associations don't use an eager limit strategy by default, but
         # support both DISTINCT ON and window functions as strategies.
         def eager_limit_strategy
@@ -1034,14 +1050,20 @@ module Sequel
 
           # dup early so we don't modify opts
           orig_opts = opts.dup
+
           if opts[:clone]
             cloned_assoc = association_reflection(opts[:clone])
-            raise(Error, "cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})") unless cloned_assoc[:type] == type || [cloned_assoc[:type], type].all?{|t| [:one_to_many, :one_to_one].include?(t)}
             orig_opts = cloned_assoc[:orig_opts].merge(orig_opts)
           end
+
           opts = orig_opts.merge(:type => type, :name => name, :cache=>{}, :model => self)
           opts[:block] = block if block
           opts = assoc_class.new.merge!(opts)
+
+          if opts[:clone] && !opts.cloneable?(cloned_assoc)
+            raise(Error, "cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})")
+          end
+
           opts[:eager_block] = opts[:block] unless opts.include?(:eager_block)
           if !opts.has_key?(:predicate_key) && opts.has_key?(:eager_loading_predicate_key)
             opts[:predicate_key] = opts[:eager_loading_predicate_key]
