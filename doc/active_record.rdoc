@@ -396,7 +396,7 @@ ActiveRecord option :: Sequel option
 <tt>:polymorphic</tt>, <tt>:as</tt>, <tt>:source_type</tt> :: The +sequel_polymorphic+ external plugin
 <tt>:include</tt> :: <tt>:eager</tt>, <tt>:eager_graph</tt>
 <tt>:readonly</tt> :: No equivalent, the Sequel <tt>:read_only</tt> option just means the modification methods are not created (it makes the association read only, not records retrieved through the association)
-<tt>:through</tt>, <tt>:source</tt> :: Use a +many_to_many+ association, or the +many_through_many+ plugin
+<tt>:through</tt>, <tt>:source</tt> :: Use a +many_to_many+ or +one_through_one+ association, or the +many_through_many+ plugin
 <tt>:touch</tt> :: The +touch+ plugin
 <tt>:autosave</tt> :: A +before_save+ or +after_save+ hook
 <tt>:finder_sql</tt> :: <tt>:dataset</tt> to set a custom dataset

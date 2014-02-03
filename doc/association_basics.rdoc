@@ -43,12 +43,15 @@ As is the code to add a related album to an artist:
 
 == The Types of Associations
 
-Sequel has four different association types built in:
+Sequel has five different association types built in:
 
 * many_to_one
 * one_to_many
 * one_to_one
 * many_to_many
+* one_through_one
+
+It ships with additional association types via plugins.
 
 === many_to_one
 
@@ -68,12 +71,18 @@ table for each row in the associated table.
     many_to_one :artist
   end
 
-=== one_to_many
+=== one_to_many and one_to_one
 
 The one_to_many association is used when the table for the associated class
 contains a foreign key that references the primary key in the table for the
 current class.  It is named because for each row in the current table there
 can be many rows in the associated table:
+
+The one_to_one association can be thought of as a subset of the one_to_many association,
+but where there can only be either 0 or 1 records in the associated table.  This is
+useful if there is a unique constraint on the foreign key field in the associated table.
+It's also useful if you want to impose an order on the association and just want the
+first record returned.
 
   # Database schema:
   #  artists            albums
@@ -84,33 +93,26 @@ can be many rows in the associated table:
   class Artist
     # Uses plural form of associated model name
     one_to_many :albums
-  end
 
-=== one_to_one
-
-The one_to_one association can be thought of as a subset of the one_to_many association,
-but where there can only be either 0 or 1 records in the associated table.
-It is the least frequently used of the four associations.  If you assume
-each artist cannot be associated with more than one album:
-
-  # Database schema:
-  #  artists            albums
-  #   :id   <----\       :id
-  #   :name       \----- :artist_id 
-  #                      :name
-
-  class Artist
     # Uses singular form of associated model name
     one_to_one :album
   end
-  
-=== many_to_many
+
+=== many_to_many and one_through_one
 
 The many_to_many association allows each row in the current table to be associated
 to many rows in the associated table, and each row in the associated table to
 many rows in the current table, by using a join table to associate the two tables.
 If you assume each artist can have multiple albums and each album can have multiple
 artists:
+
+The one_through_one association can be thought of as a subset of the many_to_many
+association, but where there can only be 0 or 1 records in the associated table.
+This is useful if there is a unique constraint on the foreign key in the join table
+that refrences the current table.  It's also useful if you want to impose an order
+on the association and just want the first record returned.  The one_through_one
+association is so named because it sets up a one-to-one association through a
+single join table.
 
   # Database schema:
   #  albums 
@@ -124,14 +126,15 @@ artists:
   class Artist
     # Uses plural form of associated model name
     many_to_many :albums
-  end
-  class Album
-    many_to_many :artists
+
+    # Uses plural form of associated model name
+    one_through_one :album
   end
 
 === Differences Between many_to_one and one_to_one
 
-If you want to setup a 1-1 relationship between two models, you have to use
+If you want to setup a 1-1 relationship between two models, where the
+foreign key in one table references the associated table directly, you have to use
 many_to_one in one model, and one_to_one in the other model.  How do you
 know which to use in which model?
 
@@ -293,6 +296,8 @@ Examples:
   @artist.remove_album(@album)
   @artist.remove_all_albums
 
+one_through_one associations do not have any modification methods added.
+
 == Caching
 
 Associations are cached after being retrieved:
@@ -334,7 +339,7 @@ ending in +_dataset+ that returns a dataset representing the objects in the asso
   @album.artist_id
   # 10
   @album.artist_dataset
-  # SELECT * FROM artists WHERE (id = 10)
+  # SELECT * FROM artists WHERE (id = 10) LIMIT 1
   
   @artist.id
   # 20
@@ -400,7 +405,7 @@ can combine the approaches:
   @artist.albums_dataset.where(:publisher=>@publisher)
 
 This doesn't just work for +many_to_one+ associations, it also works for
-+one_to_one+, +one_to_many+, and +many_to_many+ associations:
+the other associations:
 
   Album.one_to_one :album_info
   # The album related to that AlbumInfo instance
@@ -413,6 +418,10 @@ This doesn't just work for +many_to_one+ associations, it also works for
   Album.many_to_many :tags
   # All albums related to that Tag instance
   Album.where(:tags=>Tag[4])
+
+  Album.one_through_one :tag
+  # All albums related to that Tag instance
+  Album.where(:tag=>Tag[4])
 
 Note that for +one_to_many+ and +many_to_many+ associations, you still
 use the plural form even though only a single model object is given.
@@ -966,7 +975,7 @@ Use an array with two arguments for the value to specify a limit and an offset.
 This probably doesn't make a lot of sense for *_to_one associations, though you
 could use it to specify an offset.
 
-==== :join_table [+many_to_many+]
+==== :join_table [+many_to_many+, +one_through_one+]
 
 Name of table that includes the foreign keys to both the current model and the
 associated model, as a symbol.  Defaults to the name of current model and name
@@ -977,7 +986,7 @@ Here's an example of the defaults:
   Album.many_to_many :artists # :join_table=>:albums_artists
   Person.many_to_many :colleges # :join_table=>:colleges_people
 
-==== :left_key [+many_to_many+]
+==== :left_key [+many_to_many+, +one_through_one+]
 
 Foreign key in join table that points to current model's primary key, as a
 symbol.  Defaults to :"#{model_name.underscore}_id".
@@ -986,10 +995,11 @@ symbol.  Defaults to :"#{model_name.underscore}_id".
 
 Can use an array of symbols for a composite key association.
 
-==== :right_key [+many_to_many+]
+==== :right_key [+many_to_many+, +one_through_one+]
 
 Foreign key in join table that points to associated model's primary key, as a
-symbol.  Defaults to :"#{association_name.singularize}_id".
+symbol.  Defaults to :"#{association_name.singularize}_id" for +many_to_many+
+and :"#{association_name}_id" for +one_through_one+.
 
   Album.many_to_many :tags # :right_key=>:tag_id
   
@@ -1065,7 +1075,7 @@ A module or array of modules to extend the dataset with.  These are used to
 set up association extensions.  For more information , please see the
 {Advanced Associations page}[rdoc-ref:doc/advanced_associations.rdoc].
 
-==== :primary_key
+==== :primary_key [+many_to_one+, +one_to_one+, +one_to_many+]
 
 The column that the :key option references, as a symbol. For +many_to_one+
 associations, this column is in the associated table. For +one_to_one+ and
@@ -1077,7 +1087,7 @@ array of symbols for a composite key association.
   Artist.one_to_many :albums # :primary_key=>:arid
   Album.one_to_many :artist # :primary_key=>:arid
 
-==== :left_primary_key [+many_to_many+]
+==== :left_primary_key [+many_to_many+, +one_through_one+]
 
 Column in current table that :left_key option points to, as a symbol.
 Defaults to primary key of current table.
@@ -1087,7 +1097,7 @@ Defaults to primary key of current table.
 
 Can use an array of symbols for a composite key association.
 
-==== :right_primary_key [+many_to_many+]
+==== :right_primary_key [+many_to_many+, +one_through_one+]
 
 Column in associated table that :right_key points to, as a symbol.
 Defaults to primary key of the associated table.
@@ -1097,7 +1107,7 @@ Defaults to primary key of the associated table.
 
 Can use an array of symbols for a composite key association.
 
-==== :join_table_block [+many_to_many+]
+==== :join_table_block [+many_to_many+, +one_through_one+]
 
 A proc that can be used to modify the dataset used in the add/remove/remove_all
 methods.  It's separate from the association block, as that is called on a
@@ -1413,7 +1423,7 @@ Sequel has to do some guess work when attempting to add the association's
 order to an eager_graphed dataset.  In most cases it does so correctly, but
 if it has problems, you'll probably want to set this option to false.
 
-==== :graph_join_table_conditions [+many_to_many+]
+==== :graph_join_table_conditions [+many_to_many+, +one_through_one+]
 
 The additional conditions to use on the SQL join for the join table when
 eagerly loading the association via eager_graph. Should be a hash or an array
@@ -1428,7 +1438,7 @@ has received a specific degree:
     :join_table=>:degrees_received, 
     :graph_join_table_conditions=>{:degree=>'BS'}
 
-==== :graph_join_table_block [+many_to_many+]
+==== :graph_join_table_block [+many_to_many+, +one_through_one+]
 
 The block to pass to join_table for the join table when eagerly loading the
 association via eager_graph.  This is used for similar reasons as :graph_block,
@@ -1450,7 +1460,7 @@ has received a bachelor's degree (degree starting with B):
 This should be done when graphing the join table, instead of when graphing the
 final table, as :degree is a column of the join table.
 
-==== :graph_join_table_join_type [+many_to_many+]
+==== :graph_join_table_join_type [+many_to_many+, +one_through_one+]
 
 The type of SQL join to use for the join table when eagerly loading the
 association via eager_graph.  Defaults to the :graph_join_type option or
@@ -1458,7 +1468,7 @@ association via eager_graph.  Defaults to the :graph_join_type option or
 you want to use a different join type when JOINing to the join table then
 you want to use for JOINing to the final table
 
-==== :graph_join_table_only_conditions [+many_to_many+]
+==== :graph_join_table_only_conditions [+many_to_many+, +one_through_one+]
 
 The conditions to use on the SQL join for the join table when eagerly loading
 the association via eager_graph, instead of the default conditions specified
@@ -1525,12 +1535,12 @@ Like the :primary_key option, but :primary_key references the method name, while
 Like the :key option, but :key references the column
 name, while :key_method references the method name.
 
-==== :left_primary_key_column [+many_to_many+]
+==== :left_primary_key_column [+many_to_many+, +one_through_one+]
 
 Like the :left_primary_key option, but :left_primary_key references the method name, while
 :left_primary_key_column references the underlying column.
 
-==== :right_primary_key_method [+many_to_many+]
+==== :right_primary_key_method [+many_to_many+, +one_through_one+]
 
 Like the :right_primary_key option, but :right_primary_key references the column
 name, while :right_primary_key_method references the method name.
@@ -1678,7 +1688,7 @@ instances.
 ==== :cartesian_product_number 
 
 The number of joins completed by this association that could cause more
-than one row for each row in the current table (default: 0 for *_to_one
+than one row for each row in the current table (default: 0 for *_one
 associations, 1 for *_to_many associations).
 
 This should only be modified in specific cases.  For example, if you have

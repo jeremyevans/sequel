@@ -17,11 +17,11 @@ module Sequel
     #   #   WHERE ((id >= 1) AND (id <= 100))))
     # 
     # This works for all of the association types that ship with Sequel,
-    # including the many_through_many type.  Most association options that
+    # including ones implemented in other plugins.  Most association options that
     # are supported when eager loading are supported when using a
     # dataset association.  However, associations that use :limit or
-    # one_to_one associations that are really one_to_many relationships
-    # in the database will not work correctly, returning all associated
+    # one_* associations that are not not enforced with unique constraints
+    # in the database may not work correctly, returning all associated
     # objects.
     #
     # As the dataset methods return datasets, you can easily chain the
@@ -67,8 +67,8 @@ module Sequel
         # all objects returned by the current dataset.
         #
         # This supports most options that are supported when eager loading.  It doesn't
-        # support limits on the associations, or one_to_one associations that are really
-        # one_to_many and use an order to select the first matching object.  In both of
+        # support limits on the associations, or one_* associations that are not enforced
+        # with unique constraints in the database.  In both of
         # those cases, this will return an array of all matching objects.
         def associated(name)
           raise Error, "unrecognized association name: #{name.inspect}" unless r = model.association_reflection(name)
@@ -79,7 +79,7 @@ module Sequel
             ds.filter(r.qualified_primary_key=>sds.select(*Array(r[:qualified_key])))
           when :one_to_one, :one_to_many
             ds.filter(r.qualified_key=>sds.select(*Array(r.qualified_primary_key)))
-          when :many_to_many
+          when :many_to_many, :one_through_one
             ds.filter(r.qualified_right_primary_key=>sds.select(*Array(r.qualified_right_key)).
               join(r[:join_table], r[:left_keys].zip(r[:left_primary_keys]), :implicit_qualifier=>model.table_name))
           when :many_through_many

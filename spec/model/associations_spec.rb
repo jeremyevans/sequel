@@ -143,6 +143,13 @@ describe Sequel::Model, "associate" do
     proc{c.one_to_one :c2, :clone=>:cs}.should_not raise_error
   end
 
+  it "should allow cloning of many_to_many to one_through_one associations and vice-versa" do
+    c = Class.new(Sequel::Model(:c))
+    c.many_to_many :c
+    proc{c.one_through_one :cs, :clone=>:c}.should_not raise_error
+    proc{c.many_to_many :c2, :clone=>:cs}.should_not raise_error
+  end
+
   it "should clear associations cache when refreshing object manually" do
     c = Class.new(Sequel::Model(:c))
     c.many_to_one :c
@@ -1856,6 +1863,11 @@ describe Sequel::Model, "many_to_many" do
     @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
   
+  it "should use implicit key values and join table if omitted" do
+    @c2.one_through_one :attribute, :class => @c1 
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
+  end
+  
   it "should use implicit class if omitted" do
     begin
       class ::Tag < Sequel::Model; end
@@ -2615,6 +2627,241 @@ describe Sequel::Model, "many_to_many" do
     @c2.load(:id=>1).remove_attribute(2)
     DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1)) WHERE ((join_table_att = 3) AND (attributes.id = 2)) LIMIT 1",
       "DELETE FROM attributes_nodes WHERE ((node_id = 1) AND (attribute_id = 2))"] 
+  end
+end
+
+describe Sequel::Model, "one_through_one" do
+  before do
+    @c1 = Class.new(Sequel::Model(:attributes)) do
+      unrestrict_primary_key
+      attr_accessor :yyy
+      def self.name; 'Attribute'; end
+      def self.to_s; 'Attribute'; end
+      columns :id, :y, :z
+    end
+
+    @c2 = Class.new(Sequel::Model(:nodes)) do
+      unrestrict_primary_key
+      attr_accessor :xxx
+      
+      def self.name; 'Node'; end
+      def self.to_s; 'Node'; end
+      columns :id, :x
+    end
+    @dataset = @c2.dataset
+    @c1.dataset.autoid = 1
+
+    [@c1, @c2].each{|c| c.dataset._fetch = {}}
+    DB.reset
+  end
+
+  it "should use implicit key values and join table if omitted" do
+    @c2.one_through_one :attribute, :class => @c1 
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
+  end
+  
+  it "should respect :eager_loader_predicate_key when lazily loading" do
+    @c2.one_through_one :attribute, :class => @c1, :eager_loading_predicate_key=>Sequel.subscript(:attributes_nodes__node_id, 0)
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id[0] = 1234)) LIMIT 1'
+  end
+  
+  it "should use explicit key values and join table if given" do
+    @c2.one_through_one :attribute, :class => @c1, :left_key => :nodeid, :right_key => :attributeid, :join_table => :attribute2node
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON ((attribute2node.attributeid = attributes.id) AND (attribute2node.nodeid = 1234)) LIMIT 1'
+  end
+  
+  it "should support a conditions option" do
+    @c2.one_through_one :attribute, :class => @c1, :conditions => {:a=>32}
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (a = 32) LIMIT 1'
+
+    @c2.one_through_one :attribute, :class => @c1, :conditions => ['a = ?', 32]
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (a = 32) LIMIT 1'
+    @c2.new(:id => 1234).attribute.should == @c1.load({})
+  end
+  
+  it "should support an order option" do
+    @c2.one_through_one :attribute, :class => @c1, :order => :blah
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) ORDER BY blah LIMIT 1'
+  end
+  
+  it "should support an array for the order option" do
+    @c2.one_through_one :attribute, :class => @c1, :order => [:blah1, :blah2]
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) ORDER BY blah1, blah2 LIMIT 1'
+  end
+  
+  it "should support :left_primary_key and :right_primary_key options" do
+    @c2.one_through_one :attribute, :class => @c1, :left_primary_key=>:xxx, :right_primary_key=>:yyy
+    @c2.new(:id => 1234, :xxx=>5).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.yyy) AND (attributes_nodes.node_id = 5)) LIMIT 1'
+  end
+  
+  it "should support composite keys" do
+    @c2.one_through_one :attribute, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    @c2.load(:id => 1234, :x=>5).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.r1 = attributes.id) AND (attributes_nodes.r2 = attributes.y) AND (attributes_nodes.l1 = 1234) AND (attributes_nodes.l2 = 5)) LIMIT 1'
+  end
+  
+  it "should not issue query if not all keys have values" do
+    @c2.one_through_one :attribute, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    @c2.load(:id => 1234, :x=>nil).attribute.should == nil
+    DB.sqls.should == []
+  end
+  
+  it "should raise an Error unless same number of composite keys used" do
+    proc{@c2.one_through_one :attribute, :class => @c1, :left_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.one_through_one :attribute, :class => @c1, :left_primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.one_through_one :attribute, :class => @c1, :left_key=>[:node_id, :id], :left_primary_key=>:id}.should raise_error(Sequel::Error)
+    proc{@c2.one_through_one :attribute, :class => @c1, :left_key=>:id, :left_primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.one_through_one :attribute, :class => @c1, :left_key=>[:node_id, :id, :x], :left_primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
+    
+    proc{@c2.one_through_one :attribute, :class => @c1, :right_primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.one_through_one :attribute, :class => @c1, :right_key=>[:node_id, :id], :right_primary_key=>:id}.should raise_error(Sequel::Error)
+    proc{@c2.one_through_one :attribute, :class => @c1, :right_key=>:id, :left_primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.one_through_one :attribute, :class => @c1, :right_key=>[:node_id, :id, :x], :right_primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
+  end
+  
+  it "should support a select option" do
+    @c2.one_through_one :attribute, :class => @c1, :select => :blah
+
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT blah FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
+  end
+  
+  it "should support an array for the select option" do
+    @c2.one_through_one :attribute, :class => @c1, :select => [Sequel::SQL::ColumnAll.new(:attributes), :attribute_nodes__blah2]
+
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
+  end
+  
+  it "should accept a block" do
+    @c2.one_through_one :attribute, :class => @c1 do |ds|
+      ds.filter(:xxx => @xxx)
+    end
+
+    n = @c2.new(:id => 1234)
+    n.xxx = 555
+    n.attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555) LIMIT 1'
+  end
+
+  it "should allow the :order option while accepting a block" do
+    @c2.one_through_one :attribute, :class => @c1, :order=>[:blah1, :blah2] do |ds|
+      ds.filter(:xxx => @xxx)
+    end
+
+    n = @c2.new(:id => 1234)
+    n.xxx = 555
+    n.attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555) ORDER BY blah1, blah2 LIMIT 1'
+  end
+
+  it "should support a :dataset option that is used instead of the default" do
+    c1 = @c1
+    @c2.one_through_one :attribute, :class => @c1, :dataset=>proc{c1.join_table(:natural, :an).filter(:an__nodeid=>pk)}, :order=> :a, :select=>nil do |ds|
+      ds.filter(:xxx => @xxx)
+    end
+
+    n = @c2.new(:id => 1234)
+    n.xxx = 555
+    n.attribute_dataset.sql.should == 'SELECT * FROM attributes NATURAL JOIN an WHERE ((an.nodeid = 1234) AND (xxx = 555)) ORDER BY a LIMIT 1'
+    n.attribute.should == @c1.load({})
+    DB.sqls.should == ['SELECT * FROM attributes NATURAL JOIN an WHERE ((an.nodeid = 1234) AND (xxx = 555)) ORDER BY a LIMIT 1']
+  end
+
+  it "should support a :dataset option that accepts the reflection as an argument" do
+    @c2.one_through_one :attribute, :class => @c1, :dataset=>lambda{|opts| opts.associated_dataset.join_table(:natural, :an).filter(:an__nodeid=>pk)}, :order=> :a, :select=>nil do |ds|
+      ds.filter(:xxx => @xxx)
+    end
+
+    n = @c2.new(:id => 1234)
+    n.xxx = 555
+    n.attribute_dataset.sql.should == 'SELECT * FROM attributes NATURAL JOIN an WHERE ((an.nodeid = 1234) AND (xxx = 555)) ORDER BY a LIMIT 1'
+    n.attribute.should == @c1.load({})
+    DB.sqls.should == ['SELECT * FROM attributes NATURAL JOIN an WHERE ((an.nodeid = 1234) AND (xxx = 555)) ORDER BY a LIMIT 1']
+  end
+
+  it "should support a :limit option to specify an offset" do
+    @c2.one_through_one :attribute, :class => @c1 , :limit=>[nil, 10]
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1 OFFSET 10'
+  end
+
+  it "should have the :eager option affect the _dataset method" do
+    @c2.one_through_one :attribute, :class => @c2 , :eager=>:attribute
+    @c2.new(:id => 1234).attribute_dataset.opts[:eager].should == {:attribute=>nil}
+  end
+  
+  it "should handle an aliased join table" do
+    @c2.one_through_one :attribute, :class => @c1, :join_table => :attribute2node___attributes_nodes
+    n = @c2.load(:id => 1234)
+    a = @c1.load(:id => 2345)
+    n.attribute_dataset.sql.should == "SELECT attributes.* FROM attributes INNER JOIN attribute2node AS attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1"
+  end
+  
+  it "should raise an error if the model object doesn't have a valid primary key" do
+    @c2.one_through_one :attribute, :class => @c1 
+    a = @c2.new
+    n = @c1.load(:id=>123)
+    proc{a.attribute_dataset}.should raise_error(Sequel::Error)
+  end
+  
+  it "should provide an array with all members of the association" do
+    @c2.one_through_one :attribute, :class => @c1
+    
+    @c2.new(:id => 1234).attribute.should == @c1.load({})
+    DB.sqls.should == ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1']
+  end
+
+  it "should populate cache when accessed" do
+    @c2.one_through_one :attribute, :class => @c1
+
+    n = @c2.new(:id => 1234)
+    n.associations.include?(:attribute).should == false
+    atts = n.attribute
+    atts.should == n.associations[:attribute]
+  end
+
+  it "should use cache if available" do
+    @c2.one_through_one :attribute, :class => @c1
+
+    n = @c2.new(:id => 1234)
+    n.associations[:attribute] = 42
+    n.attribute.should == 42
+    DB.sqls.should == []
+  end
+
+  it "should not use cache if asked to reload" do
+    @c2.one_through_one :attribute, :class => @c1
+
+    n = @c2.new(:id => 1234)
+    n.associations[:attribute] = 42
+    n.attribute(true).should_not == 42
+    DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1"]
+  end
+
+  it "should not add associations methods directly to class" do
+    @c2.one_through_one :attribute, :class => @c1
+    im = @c2.instance_methods.collect{|x| x.to_s}
+    im.should(include('attribute'))
+    im.should(include('attribute_dataset'))
+    im2 = @c2.instance_methods(false).collect{|x| x.to_s}
+    im2.should_not(include('attribute'))
+    im2.should_not(include('attribute_dataset'))
+  end
+
+  it "should support after_load association callback" do
+    h = []
+    @c2.one_through_one :attribute, :class => @c1, :after_load=>[proc{|x,y| h << [x.pk, y.pk]}, :al]
+    @c2.class_eval do
+      self::Foo = h
+      def al(v)
+        model::Foo << v.pk
+      end
+    end
+    @c1.dataset._fetch = [{:id=>20}]
+    p = @c2.load(:id=>10, :parent_id=>20)
+    attribute = p.attribute
+    h.should == [[10, 20], 20]
+    attribute.pk.should == 20
+  end
+
+  it "should support a :distinct option that uses the DISTINCT clause" do
+    @c2.one_through_one :attribute, :class => @c1, :distinct=>true
+    @c2.load(:id=>10).attribute_dataset.sql.should == "SELECT DISTINCT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 10)) LIMIT 1"
   end
 end
 

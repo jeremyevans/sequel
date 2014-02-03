@@ -29,6 +29,7 @@ describe "Sequel::Plugins::DatasetAssociations" do
     @Artist.one_to_one :first_album, :class=>@Album
     @Album.many_to_one :artist, :class=>@Artist
     @Album.many_to_many :tags, :class=>@Tag
+    @Album.one_through_one :first_tag, :class=>@Tag, :right_key=>:tag_id
     @Tag.many_to_many :albums, :class=>@Album
     @Artist.pg_array_to_many :artist_tags, :class=>@Tag, :key=>:tag_ids
     @Tag.many_to_pg_array :artists, :class=>@Artist
@@ -58,6 +59,13 @@ describe "Sequel::Plugins::DatasetAssociations" do
 
   it "should work for many_to_many associations" do
     ds = @Album.tags
+    ds.should be_a_kind_of(Sequel::Dataset)
+    ds.model.should == @Tag
+    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM albums INNER JOIN albums_tags ON (albums_tags.album_id = albums.id)))"
+  end
+
+  it "should work for one_through_one associations" do
+    ds = @Album.first_tags
     ds.should be_a_kind_of(Sequel::Dataset)
     ds.model.should == @Tag
     ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM albums INNER JOIN albums_tags ON (albums_tags.album_id = albums.id)))"
@@ -187,6 +195,7 @@ describe "Sequel::Plugins::DatasetAssociations with composite keys" do
     @Artist.one_to_one :first_album, :class=>@Album, :key=>[:artist_id1, :artist_id2]
     @Album.many_to_one :artist, :class=>@Artist, :key=>[:artist_id1, :artist_id2]
     @Album.many_to_many :tags, :class=>@Tag, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2]
+    @Album.one_through_one :first_tag, :class=>@Tag, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2]
     @Tag.many_to_many :albums, :class=>@Album, :right_key=>[:album_id1, :album_id2], :left_key=>[:tag_id1, :tag_id2]
     @Artist.many_through_many :tags, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]], :class=>@Tag
   end
@@ -205,6 +214,10 @@ describe "Sequel::Plugins::DatasetAssociations with composite keys" do
 
   it "should work for many_to_many associations" do
     @Album.tags.sql.should == "SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM albums INNER JOIN albums_tags ON ((albums_tags.album_id1 = albums.id1) AND (albums_tags.album_id2 = albums.id2))))"
+  end
+
+  it "should work for one_through_one associations" do
+    @Album.first_tags.sql.should == "SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM albums INNER JOIN albums_tags ON ((albums_tags.album_id1 = albums.id1) AND (albums_tags.album_id2 = albums.id2))))"
   end
 
   it "should work for many_through_many associations" do

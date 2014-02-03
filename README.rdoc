@@ -639,12 +639,14 @@ SQL query.
 
 === Associations
 
-Associations are used in order to specify relationships between model classes that reflect relationships between tables in the database, which are usually specified using foreign keys.  You specify model associations via the +many_to_one+, +one_to_one+, +one_to_many+, and +many_to_many+ class methods:
+Associations are used in order to specify relationships between model classes that reflect relationships between tables in the database, which are usually specified using foreign keys.  You specify model associations via class methods:
 
   class Post < Sequel::Model
     many_to_one :author
     one_to_many :comments
+    one_to_one :first_comment, :class=>:Comment, :order=>:id
     many_to_many :tags
+    one_through_one :first_tag, :class=>:Tag, :order=>:name, :right_key=>:tag_id
   end
 
 +many_to_one+ and +one_to_one+ create a getter and setter for each model object:
