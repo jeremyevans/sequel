@@ -1225,7 +1225,7 @@ describe "Sequel::Model pg_array_to_many" do
     a.remove_tag(@tag)
     a.save
   end
-end if DB.database_type == :postgres && DB.adapter_scheme == :postgres && DB.server_version >= 90300
+end if DB.database_type == :postgres && [:postgres, :jdbc].include?(DB.adapter_scheme) && DB.server_version >= 90300
 
 describe "Sequel::Model many_to_pg_array" do
   before(:all) do
@@ -1304,7 +1304,7 @@ describe "Sequel::Model many_to_pg_array" do
     a.add_tag(@tag)
     a.remove_tag(@tag)
   end
-end if DB.database_type == :postgres && DB.adapter_scheme == :postgres && DB.server_version >= 90300
+end if DB.database_type == :postgres && [:postgres, :jdbc].include?(DB.adapter_scheme) && DB.server_version >= 90300
 
 describe "Sequel::Model Associations with clashing column names" do
   before(:all) do
