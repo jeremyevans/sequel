@@ -1,5 +1,7 @@
 === HEAD
 
+* Add one_through_many association to many_through_many plugin, for only returning a single record (jeremyevans)
+
 * Add :graph_order association option, useful when :order needs to contain qualified identifiers (jeremyevans)
 
 * Add one_through_one association, similar to many_to_many but only returning a single record (jeremyevans)

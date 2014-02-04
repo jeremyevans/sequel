@@ -34,6 +34,7 @@ describe "Sequel::Plugins::DatasetAssociations" do
     @Artist.pg_array_to_many :artist_tags, :class=>@Tag, :key=>:tag_ids
     @Tag.many_to_pg_array :artists, :class=>@Artist
     @Artist.many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :class=>@Tag
+    @Artist.one_through_many :otag, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :class=>@Tag
   end
 
   it "should work for many_to_one associations" do
@@ -73,6 +74,13 @@ describe "Sequel::Plugins::DatasetAssociations" do
 
   it "should work for many_through_many associations" do
     ds = @Artist.tags
+    ds.should be_a_kind_of(Sequel::Dataset)
+    ds.model.should == @Tag
+    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id)))"
+  end
+
+  it "should work for one_through_many associations" do
+    ds = @Artist.otags
     ds.should be_a_kind_of(Sequel::Dataset)
     ds.model.should == @Tag
     ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id)))"

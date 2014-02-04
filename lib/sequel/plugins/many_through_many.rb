@@ -1,6 +1,6 @@
 module Sequel
   module Plugins
-    # The many_through_many plugin allow you to create an association to multiple objects using multiple join tables.
+    # The many_through_many plugin allow you to create an association using multiple join tables.
     # For example, assume the following associations:
     #
     #    Artist.many_to_many :albums
@@ -65,10 +65,27 @@ module Sequel
     # 
     #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]],
     #    :distinct=>true
+    # 
+    # In addition to many_through_many, this plugin also adds one_through_many, for an association to a single object through multiple join tables.
+    # This is useful if there are unique constraints on the foreign keys in the join tables that reference back to the current table, or if you want
+    # to set an order on the association and just want the first record.
+    #
+    # Usage:
+    #
+    #   # Make all model subclasses support many_through_many associations
+    #   Sequel::Model.plugin :many_through_many
+    #
+    #   # Make the Album class support many_through_many associations
+    #   Album.plugin :many_through_many
     module ManyThroughMany
       # The AssociationReflection subclass for many_through_many associations.
       class ManyThroughManyAssociationReflection < Sequel::Model::Associations::ManyToManyAssociationReflection
         Sequel::Model::Associations::ASSOCIATION_TYPES[:many_through_many] = self
+
+        # many_through_many and one_through_many associations can be clones
+        def cloneable?(ref)
+          ref[:type] == :many_through_many || ref[:type] == :one_through_many
+        end
 
         # The default associated key alias(es) to use when eager loading
         # associations via eager.
@@ -147,6 +164,45 @@ module Sequel
         end
       end
 
+      class OneThroughManyAssociationReflection < ManyThroughManyAssociationReflection
+        Sequel::Model::Associations::ASSOCIATION_TYPES[:one_through_many] = self
+
+        # one_through_one associations don't use an eager limit strategy by default, but
+        # support window functions as strategies.
+        def eager_limit_strategy
+          cached_fetch(:_eager_limit_strategy) do
+            offset = limit_and_offset.last
+            case s = self.fetch(:eager_limit_strategy){(self[:model].default_eager_limit_strategy || :ruby) if offset}
+            when Symbol
+              s
+            when true
+              ds = associated_class.dataset
+              if ds.supports_window_functions?
+                :window_function
+              else
+                :ruby
+              end
+            else
+              nil
+            end
+          end
+        end
+
+        # The limit and offset for this association (returned as a two element array).
+        def limit_and_offset
+          if (v = self[:limit]).is_a?(Array)
+            v
+          else
+            [v, nil]
+          end
+        end
+
+        # one_through_many associations return a single object, not an array
+        def returns_array?
+          false
+        end
+      end
+
       module ClassMethods
         # Create a many_through_many association.  Arguments:
         # * name - Same as associate, the name of the association.
@@ -168,15 +224,21 @@ module Sequel
           associate(:many_through_many, name, opts.merge(through.is_a?(Hash) ? through : {:through=>through}), &block)
         end
 
+        # Creates a one_through_many association.  See many_through_many for arguments.
+        def one_through_many(name, through, opts=OPTS, &block)
+          associate(:one_through_many, name, opts.merge(through.is_a?(Hash) ? through : {:through=>through}), &block)
+        end
+
         private
 
         # Create the association methods and :eager_loader and :eager_grapher procs.
         def def_many_through_many(opts)
+          one_through_many = opts[:type] == :one_through_many
           name = opts[:name]
           model = self
           opts[:read_only] = true
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
-          opts[:cartesian_product_number] ||= 2
+          opts[:cartesian_product_number] ||= one_through_many ? 0 : 2
           opts[:through] = opts[:through].map do |e|
             case e
             when Array
@@ -210,17 +272,27 @@ module Sequel
           opts[:eager_loader] ||= lambda do |eo|
             h = eo[:id_map]
             rows = eo[:rows]
-            rows.each{|object| object.associations[name] = []}
+            assign_singular = true if one_through_many
             ds = opts.associated_class 
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
             ft = opts.final_reverse_edge
             ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.predicate_key, h.keys]], :table_alias=>ft[:alias], :qualify=>:deep)
             ds = model.eager_loading_dataset(opts, ds, nil, eo[:associations], eo)
-            if opts.eager_limit_strategy == :window_function
+            case opts.eager_limit_strategy
+            when :window_function
               delete_rn = true
               rn = ds.row_number_column
               ds = apply_window_function_eager_limit_strategy(ds, opts)
+            when :ruby
+              assign_singular = false if one_through_many && slice_range
             end
+
+            if assign_singular
+              rows.each{|object| object.associations[name] = nil}
+            else
+              rows.each{|object| object.associations[name] = []}
+            end
+
             ds.all do |assoc_record|
               assoc_record.values.delete(rn) if delete_rn
               hash_key = if uses_lcks
@@ -229,10 +301,24 @@ module Sequel
                 assoc_record.values.delete(left_key_alias)
               end
               next unless objects = h[hash_key]
-              objects.each{|object| object.associations[name].push(assoc_record)}
+              if assign_singular
+                objects.each do |object|
+                  object.associations[name] ||= assoc_record
+                end
+              else
+                objects.each do |object|
+                  object.associations[name].push(assoc_record)
+                end
+              end
             end
             if opts.eager_limit_strategy == :ruby
-              rows.each{|o| o.associations[name] = o.associations[name][slice_range] || []}
+              if one_through_many
+                if slice_range
+                  rows.each{|o| o.associations[name] = o.associations[name][slice_range.begin]}
+                end
+              else
+                rows.each{|o| o.associations[name] = o.associations[name][slice_range] || []}
+              end
             end
           end
 
@@ -254,6 +340,11 @@ module Sequel
           end
 
           def_association_dataset_methods(opts)
+        end
+
+        # Use def_many_through_many, since they share pretty much the same code.
+        def def_one_through_many(opts)
+          def_many_through_many(opts)
         end
       end
 
@@ -291,6 +382,7 @@ module Sequel
 
           association_filter_handle_inversion(op, expr, Array(lpks))
         end
+        alias one_through_many_association_filter_expression many_through_many_association_filter_expression
       end
     end
   end

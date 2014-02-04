@@ -11,7 +11,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationProxies.html">association_proxies</a>: Changes the *_to_many association method to return a proxy instead of an array of objects.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/DatasetAssociations.html">dataset_associations</a>: Adds association methods to datasets that return datasets of associated objects.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/EagerEach.html">eager_each</a>: Makes each on an eagerly loaded dataset do eager loading.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ManyThroughMany.html">many_through_many</a>: Allows you to create an association to multiple objects through multiple join tables.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/ManyThroughMany.html">many_through_many</a>: Allows you to create an association through multiple join tables.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/NestedAttributes.html">nested_attributes</a>: Allows you to modified associated objects directly through a model object, similar to ActiveRecord's Nested Attributes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PgArrayAssociations.html">pg_array_associations</a>: Adds associations types to handle the case where foreign keys are stored in a PostgreSQL array in one of the tables.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/RcteTree.html">rcte_tree</a>: Supports retrieving all ancestors and descendants for tree structured data using recursive common table expressions.</li>

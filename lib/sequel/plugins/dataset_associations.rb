@@ -82,7 +82,7 @@ module Sequel
           when :many_to_many, :one_through_one
             ds.filter(r.qualified_right_primary_key=>sds.select(*Array(r.qualified_right_key)).
               join(r[:join_table], r[:left_keys].zip(r[:left_primary_keys]), :implicit_qualifier=>model.table_name))
-          when :many_through_many
+          when :many_through_many, :one_through_many
             fre = r.reverse_edges.first
             fe, *edges = r.edges
             sds = sds.select(*Array(r.qualify(fre[:table], fre[:left]))).

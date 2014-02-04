@@ -496,9 +496,9 @@ module Sequel
           !self[:primary_keys].any?{|k| obj.send(k).nil?}
         end
 
-        # one_to_many associations can also be cloned from one_to_one associations
+        # one_to_many and one_to_one associations can be clones
         def cloneable?(ref)
-          super || ref[:type] == :one_to_one
+          ref[:type] == :one_to_many || ref[:type] == :one_to_one
         end
 
         # Default foreign key name symbol for key in associated table that points to
@@ -573,11 +573,6 @@ module Sequel
       class OneToOneAssociationReflection < OneToManyAssociationReflection
         ASSOCIATION_TYPES[:one_to_one] = self
         
-        # one_to_one associations can also be cloned from one_to_many associations
-        def cloneable?(ref)
-          super || ref[:type] == :one_to_many
-        end
-
         # one_to_one associations don't use an eager limit strategy by default, but
         # support both DISTINCT ON and window functions as strategies.
         def eager_limit_strategy
@@ -640,9 +635,9 @@ module Sequel
           !self[:left_primary_keys].any?{|k| obj.send(k).nil?}
         end
 
-        # many_to_many associations can also be cloned from one_through_one associations
+        # one_through_one and many_to_many associations can be clones
         def cloneable?(ref)
-          super || ref[:type] == :one_through_one
+          ref[:type] == :many_to_many || ref[:type] == :one_through_one
         end
 
         # The default associated key alias(es) to use when eager loading
@@ -771,11 +766,6 @@ module Sequel
       class OneThroughOneAssociationReflection < ManyToManyAssociationReflection
         ASSOCIATION_TYPES[:one_through_one] = self
         
-        # one_through_one associations can also be cloned from many_to_many associations
-        def cloneable?(ref)
-          super || ref[:type] == :many_to_many
-        end
-
         # one_through_one associations should not singularize the association name when
         # creating the foreign key.
         def default_right_key
