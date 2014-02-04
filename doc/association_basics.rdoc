@@ -1423,6 +1423,14 @@ Sequel has to do some guess work when attempting to add the association's
 order to an eager_graphed dataset.  In most cases it does so correctly, but
 if it has problems, you'll probably want to set this option to false.
 
+==== :graph_order
+
+Override the order added when using eager_graph, instead of using the one
+defined in :order.  This is useful if :order contains qualified identifiers,
+as the qualifiers may not match the aliases automatically used by eager_graph.
+This should contain unqualified identifiers, and eager_graph will automatically
+qualify them with the appropriate alias.
+
 ==== :graph_join_table_conditions [+many_to_many+, +one_through_one+]
 
 The additional conditions to use on the SQL join for the join table when

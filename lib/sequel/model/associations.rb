@@ -1016,6 +1016,10 @@ module Sequel
         # :graph_only_conditions :: The conditions to use on the SQL join when eagerly loading
         #                           the association via +eager_graph+, instead of the default conditions specified by the
         #                           foreign/primary keys.  This option causes the :graph_conditions option to be ignored.
+        # :graph_order :: Over the order to use when using eager_graph, instead of the default order.  This should be used
+        #                 in the case where :order contains an identifier qualified by the table's name, which may not match
+        #                 the alias used when eager graphing.  By setting this to the unqualified identifier, it will be
+        #                 automatically qualified when using eager_graph.
         # :graph_select :: A column or array of columns to select from the associated table
         #                  when eagerly loading the association via +eager_graph+. Defaults to all
         #                  columns in the associated table.
@@ -2155,7 +2159,9 @@ module Sequel
             end
           end
           ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>ta, :callback=>callback)
-          ds = ds.order_more(*qualified_expression(r[:order], assoc_table_alias)) if r[:order] and r[:order_eager_graph]
+          if r[:order_eager_graph] && (order = r.fetch(:graph_order, r[:order]))
+            ds = ds.order_more(*qualified_expression(order, assoc_table_alias))
+          end
           eager_graph = ds.opts[:eager_graph]
           eager_graph[:requirements][assoc_table_alias] = requirements.dup
           eager_graph[:reflections][assoc_table_alias] = r
