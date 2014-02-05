@@ -782,7 +782,9 @@ module Sequel
               s
             when true
               ds = associated_class.dataset
-              if ds.supports_window_functions?
+              if ds.supports_ordered_distinct_on? && offset.nil?
+                :distinct_on
+              elsif ds.supports_window_functions?
                 :window_function
               else
                 :ruby
@@ -1310,11 +1312,14 @@ module Sequel
             h = eo[:id_map]
             rows = eo[:rows]
             r = rcks.zip(opts.right_primary_keys)
-            l = [[opts.predicate_key, h.keys]]
+            filter_keys = opts.predicate_key
+            l = [[filter_keys, h.keys]]
             ds = model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l, :qualify=>:deep), nil, eo[:associations], eo)
             assign_singular = true if one_through_one 
 
             case opts.eager_limit_strategy
+            when :distinct_on
+              ds = ds.distinct(*filter_keys).order_prepend(*filter_keys)
             when :window_function
               delete_rn = true
               rn = ds.row_number_column

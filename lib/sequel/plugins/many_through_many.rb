@@ -177,7 +177,9 @@ module Sequel
               s
             when true
               ds = associated_class.dataset
-              if ds.supports_window_functions?
+              if ds.supports_ordered_distinct_on? && offset.nil?
+                :distinct_on
+              elsif ds.supports_window_functions?
                 :window_function
               else
                 :ruby
@@ -276,9 +278,12 @@ module Sequel
             ds = opts.associated_class 
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
             ft = opts.final_reverse_edge
-            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.predicate_key, h.keys]], :table_alias=>ft[:alias], :qualify=>:deep)
+            filter_keys = opts.predicate_key
+            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[filter_keys, h.keys]], :table_alias=>ft[:alias], :qualify=>:deep)
             ds = model.eager_loading_dataset(opts, ds, nil, eo[:associations], eo)
             case opts.eager_limit_strategy
+            when :distinct_on
+              ds = ds.distinct(*filter_keys).order_prepend(*filter_keys)
             when :window_function
               delete_rn = true
               rn = ds.row_number_column

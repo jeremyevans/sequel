@@ -233,6 +233,16 @@ describe Sequel::Model, "#eager" do
     DB.sqls.should == []
   end
   
+  it "should eagerly load a single one_through_one association using the :distinct_on strategy" do
+    def (EagerGenre.dataset).supports_distinct_on?() true end
+    EagerAlbum.one_through_one :genre, :clone=>:genre, :eager_limit_strategy=>true
+    a = EagerAlbum.eager(:genre).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.should == ['SELECT * FROM albums', "SELECT DISTINCT ON (ag.album_id) genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1))) ORDER BY ag.album_id"]
+    a.first.genre.should == EagerGenre.load(:id=>4)
+    DB.sqls.should == []
+  end
+  
   it "should eagerly load a single one_through_one association using the :window_function strategy" do
     def (EagerGenre.dataset).supports_window_functions?() true end
     EagerAlbum.one_through_one :genre, :clone=>:genre, :eager_limit_strategy=>true

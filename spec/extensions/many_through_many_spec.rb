@@ -1670,7 +1670,18 @@ describe "Sequel::Plugins::OneThroughMany eager loading methods" do
     DB.sqls.length.should == 0
   end
 
-  it "should respect the :limit option on a one_through_many association using a :window_function strategy" do
+  it "should eagerly load a single one_through_many association using the :distinct_on strategy" do
+    Tag.dataset.meta_def(:supports_distinct_on?){true}
+    @c1.one_through_many :second_tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :order=>:name, :eager_limit_strategy=>true
+    Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5}]
+    a = @c1.eager(:second_tag).all
+    a.should == [@c1.load(:id=>1)]
+    DB.sqls.should == ['SELECT * FROM artists', "SELECT DISTINCT ON (albums_artists.artist_id) tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id IN (1))) ORDER BY albums_artists.artist_id, name"]
+    a.first.second_tag.should == Tag.load(:id=>5)
+    DB.sqls.length.should == 0
+  end
+  
+  it "should eagerly load a single one_through_many association using the :window_function strategy" do
     Tag.dataset.meta_def(:supports_window_functions?){true}
     @c1.one_through_many :second_tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1], :order=>:name
     Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5}]

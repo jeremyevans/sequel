@@ -968,6 +968,8 @@ shared_examples_for "regular and composite key associations" do
       @els = {:eager_limit_strategy=>true}
     end
     it_should_behave_like "one_to_one eager limit strategies"
+    it_should_behave_like "one_through_one eager limit strategies"
+    it_should_behave_like "one_through_many eager limit strategies"
   end if DB.dataset.supports_ordered_distinct_on?
 
   describe "with :eager_limit_strategy=>:window_function" do
