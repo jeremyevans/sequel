@@ -76,6 +76,50 @@ module Sequel
           ds
         end
 
+        # Apply an eager limit strategy to the dataset, or return the dataset
+        # unmodified if it doesn't need an eager limit strategy.
+        def apply_eager_limit_strategy(ds)
+          case eager_limit_strategy
+          when :distinct_on
+            apply_distinct_on_eager_limit_strategy(ds)
+          when :window_function
+            apply_window_function_eager_limit_strategy(ds)
+          else
+            ds
+          end
+        end
+
+        # Use DISTINCT ON and ORDER BY clauses to limit the results to the first record with matching keys.
+        def apply_distinct_on_eager_limit_strategy(ds)
+          keys = predicate_key
+          ds.distinct(*keys).order_prepend(*keys)
+        end
+
+        # Use a window function to limit the results of the eager loading dataset.
+        def apply_window_function_eager_limit_strategy(ds)
+          rn = ds.row_number_column 
+          limit, offset = limit_and_offset
+          ds = ds.unordered.select_append{|o| o.row_number{}.over(:partition=>predicate_key, :order=>ds.opts[:order]).as(rn)}.from_self
+          ds = if !returns_array?
+            ds.where(rn => offset ? offset+1 : 1)
+          elsif offset
+            offset += 1
+            if limit
+              ds.where(rn => (offset...(offset+limit))) 
+            else
+              ds.where{SQL::Identifier.new(rn) >= offset} 
+            end
+          else
+            ds.where{SQL::Identifier.new(rn) <= limit} 
+          end
+        end
+
+        # Whether the associations cache should use an array when storing the
+        # associated records during eager loading.
+        def assign_singular?
+          !returns_array?
+        end
+
         # Whether this association can have associated objects, given the current
         # object.  Should be false if obj cannot have associated objects because
         # the necessary key columns are NULL.
@@ -99,6 +143,14 @@ module Sequel
           true
         end
     
+        # Return the symbol used for the row number column if the window function
+        # eager limit strategy is being used, or nil otherwise.
+        def delete_row_number_column(ds)
+          if eager_limit_strategy == :window_function
+            ds.row_number_column 
+          end
+        end
+
         # The eager limit strategy to use for this dataset.
         def eager_limit_strategy
           cached_fetch(:_eager_limit_strategy) do
@@ -165,10 +217,9 @@ module Sequel
         end
 
         # Initialize the associations cache for the current association for the given objects.
-        # If singular is true, initializes to nil, otherwise initializes to an empty array.
-        def initialize_association_cache(objects, singular)
+        def initialize_association_cache(objects)
           name = self[:name]
-          if singular
+          if assign_singular?
             objects.each{|object| object.associations[name] = nil}
           else
             objects.each{|object| object.associations[name] = []}
@@ -584,6 +635,13 @@ module Sequel
       # Methods that turn an association that returns multiple objects into an association that
       # returns a single object.
       module SingularAssociationReflection
+        # Singular associations do not assign singular if they are using the ruby eager limit strategy
+        # and have a slice range, since they need to store the array of associated objects in order to
+        # pick the correct one with an offset.
+        def assign_singular?
+          super && (eager_limit_strategy != :ruby || !slice_range)
+        end
+
         # Singular associations don't use an eager limit strategy by default unless they use an
         # offset.  They support both DISTINCT ON and window functions as strategies.
         def eager_limit_strategy
@@ -1194,25 +1252,6 @@ module Sequel
         
         private
       
-        # Use a window function to limit the results of the eager loading dataset.
-        def apply_window_function_eager_limit_strategy(ds, opts)
-          rn = ds.row_number_column 
-          limit, offset = opts.limit_and_offset
-          ds = ds.unordered.select_append{row_number{}.over(:partition=>opts.predicate_key, :order=>ds.opts[:order]).as(rn)}.from_self
-          ds = if !opts.returns_array?
-            ds.where(rn => offset ? offset+1 : 1)
-          elsif offset
-            offset += 1
-            if limit
-              ds.where(rn => (offset...(offset+limit))) 
-            else
-              ds.where{SQL::Identifier.new(rn) >= offset} 
-            end
-          else
-            ds.where{SQL::Identifier.new(rn) <= limit} 
-          end
-        end
-
         # The module to use for the association's methods.  Defaults to
         # the overridable_methods_module.
         def association_module(opts=OPTS)
@@ -1283,26 +1322,16 @@ module Sequel
             h = eo[:id_map]
             rows = eo[:rows]
             r = rcks.zip(opts.right_primary_keys)
-            filter_keys = opts.predicate_key
-            l = [[filter_keys, h.keys]]
+            l = [[opts.predicate_key, h.keys]]
+
             ds = model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l, :qualify=>:deep), nil, eo[:associations], eo)
-            assign_singular = true if one_through_one 
+            ds = opts.apply_eager_limit_strategy(ds)
+            opts.initialize_association_cache(rows)
 
-            case opts.eager_limit_strategy
-            when :distinct_on
-              ds = ds.distinct(*filter_keys).order_prepend(*filter_keys)
-            when :window_function
-              delete_rn = true
-              rn = ds.row_number_column
-              ds = apply_window_function_eager_limit_strategy(ds, opts)
-            when :ruby
-              assign_singular = false if one_through_one && slice_range
-            end
-
-            opts.initialize_association_cache(rows, assign_singular)
-
+            assign_singular = opts.assign_singular?
+            delete_rn = opts.delete_row_number_column(ds)
             ds.all do |assoc_record|
-              assoc_record.values.delete(rn) if delete_rn
+              assoc_record.values.delete(delete_rn) if delete_rn
               hash_key = if uses_lcks
                 left_key_alias.map{|k| assoc_record.values.delete(k)}
               else
@@ -1407,7 +1436,7 @@ module Sequel
             h = eo[:id_map]
             keys = h.keys
 
-            opts.initialize_association_cache(eo[:rows], true)
+            opts.initialize_association_cache(eo[:rows])
 
             # Skip eager loading if no objects have a foreign key for this association
             unless keys.empty?
@@ -1466,24 +1495,15 @@ module Sequel
             rows = eo[:rows]
             reciprocal = opts.reciprocal
             klass = opts.associated_class
-            filter_keys = opts.predicate_key
-            ds = model.eager_loading_dataset(opts, klass.where(filter_keys=>h.keys), nil, eo[:associations], eo)
-            assign_singular = true if one_to_one 
-            case opts.eager_limit_strategy
-            when :distinct_on
-              ds = ds.distinct(*filter_keys).order_prepend(*filter_keys)
-            when :window_function
-              delete_rn = true
-              rn = ds.row_number_column
-              ds = apply_window_function_eager_limit_strategy(ds, opts)
-            when :ruby
-              assign_singular = false if one_to_one && slice_range
-            end
 
-            opts.initialize_association_cache(rows, assign_singular)
+            ds = model.eager_loading_dataset(opts, klass.where(opts.predicate_key=>h.keys), nil, eo[:associations], eo)
+            ds = opts.apply_eager_limit_strategy(ds)
+            opts.initialize_association_cache(rows)
 
+            assign_singular = opts.assign_singular?
+            delete_rn = opts.delete_row_number_column(ds)
             ds.all do |assoc_record|
-              assoc_record.values.delete(rn) if delete_rn
+              assoc_record.values.delete(delete_rn) if delete_rn
               hash_key = uses_cks ? km.map{|k| assoc_record.send(k)} : assoc_record.send(km)
               next unless objects = h[hash_key]
               if assign_singular

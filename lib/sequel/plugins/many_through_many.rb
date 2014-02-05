@@ -238,28 +238,19 @@ module Sequel
           opts[:eager_loader] ||= lambda do |eo|
             h = eo[:id_map]
             rows = eo[:rows]
-            assign_singular = true if one_through_many
             ds = opts.associated_class 
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
             ft = opts.final_reverse_edge
-            filter_keys = opts.predicate_key
-            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[filter_keys, h.keys]], :table_alias=>ft[:alias], :qualify=>:deep)
+
+            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.predicate_key, h.keys]], :table_alias=>ft[:alias], :qualify=>:deep)
             ds = model.eager_loading_dataset(opts, ds, nil, eo[:associations], eo)
-            case opts.eager_limit_strategy
-            when :distinct_on
-              ds = ds.distinct(*filter_keys).order_prepend(*filter_keys)
-            when :window_function
-              delete_rn = true
-              rn = ds.row_number_column
-              ds = apply_window_function_eager_limit_strategy(ds, opts)
-            when :ruby
-              assign_singular = false if one_through_many && slice_range
-            end
+            ds = opts.apply_eager_limit_strategy(ds)
+            opts.initialize_association_cache(rows)
 
-            opts.initialize_association_cache(rows, assign_singular)
-
+            assign_singular = opts.assign_singular?
+            delete_rn = opts.delete_row_number_column(ds)
             ds.all do |assoc_record|
-              assoc_record.values.delete(rn) if delete_rn
+              assoc_record.values.delete(delete_rn) if delete_rn
               hash_key = if uses_lcks
                 left_key_alias.map{|k| assoc_record.values.delete(k)}
               else

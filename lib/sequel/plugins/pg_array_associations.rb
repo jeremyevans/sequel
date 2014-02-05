@@ -247,7 +247,7 @@ module Sequel
           opts[:eager_loader] ||= proc do |eo|
             id_map = eo[:id_map]
             rows = eo[:rows]
-            opts.initialize_association_cache(rows, false)
+            opts.initialize_association_cache(rows)
 
             klass = opts.associated_class
             ds = model.eager_loading_dataset(opts, klass.where(Sequel.pg_array_op(opts.predicate_key).overlaps(id_map.keys)), nil, eo[:associations], eo)
@@ -346,7 +346,7 @@ module Sequel
             rows = eo[:rows]
             id_map = {}
             pkm = opts.primary_key_method
-            opts.initialize_association_cache(rows, false)
+            opts.initialize_association_cache(rows)
 
             rows.each do |object|
               if associated_pks = object.send(key)
