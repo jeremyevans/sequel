@@ -256,11 +256,7 @@ module Sequel
               assign_singular = false if one_through_many && slice_range
             end
 
-            if assign_singular
-              rows.each{|object| object.associations[name] = nil}
-            else
-              rows.each{|object| object.associations[name] = []}
-            end
+            opts.initialize_association_cache(rows, assign_singular)
 
             ds.all do |assoc_record|
               assoc_record.values.delete(rn) if delete_rn

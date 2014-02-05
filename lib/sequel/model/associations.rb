@@ -164,6 +164,17 @@ module Sequel
           false
         end
 
+        # Initialize the associations cache for the current association for the given objects.
+        # If singular is true, initializes to nil, otherwise initializes to an empty array.
+        def initialize_association_cache(objects, singular)
+          name = self[:name]
+          if singular
+            objects.each{|object| object.associations[name] = nil}
+          else
+            objects.each{|object| object.associations[name] = []}
+          end
+        end
+
         # The limit and offset for this association (returned as a two element array).
         def limit_and_offset
           if (v = self[:limit]).is_a?(Array)
@@ -1288,11 +1299,7 @@ module Sequel
               assign_singular = false if one_through_one && slice_range
             end
 
-            if assign_singular
-              rows.each{|object| object.associations[name] = nil}
-            else
-              rows.each{|object| object.associations[name] = []}
-            end
+            opts.initialize_association_cache(rows, assign_singular)
 
             ds.all do |assoc_record|
               assoc_record.values.delete(rn) if delete_rn
@@ -1399,9 +1406,9 @@ module Sequel
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:id_map]
             keys = h.keys
-            # Default the cached association to nil, so any object that doesn't have it
-            # populated will have cached the negative lookup.
-            eo[:rows].each{|object| object.associations[name] = nil}
+
+            opts.initialize_association_cache(eo[:rows], true)
+
             # Skip eager loading if no objects have a foreign key for this association
             unless keys.empty?
               klass = opts.associated_class
@@ -1472,11 +1479,9 @@ module Sequel
             when :ruby
               assign_singular = false if one_to_one && slice_range
             end
-            if assign_singular
-              rows.each{|object| object.associations[name] = nil}
-            else
-              rows.each{|object| object.associations[name] = []}
-            end
+
+            opts.initialize_association_cache(rows, assign_singular)
+
             ds.all do |assoc_record|
               assoc_record.values.delete(rn) if delete_rn
               hash_key = uses_cks ? km.map{|k| assoc_record.send(k)} : assoc_record.send(km)
