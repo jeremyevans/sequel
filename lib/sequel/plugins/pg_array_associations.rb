@@ -261,9 +261,7 @@ module Sequel
                 end
               end
             end
-            if slice_range
-              rows.each{|o| o.associations[name] = o.associations[name][slice_range] || []}
-            end
+            opts.apply_ruby_eager_limit_strategy(rows)
           end
 
           join_type = opts[:graph_join_type]
@@ -365,9 +363,7 @@ module Sequel
                 end
               end
             end
-            if slice_range
-              rows.each{|o| o.associations[name] = o.associations[name][slice_range] || []}
-            end
+            opts.apply_ruby_eager_limit_strategy(rows)
           end
 
           join_type = opts[:graph_join_type]

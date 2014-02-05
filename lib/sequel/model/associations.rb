@@ -114,6 +114,21 @@ module Sequel
           end
         end
 
+        # If the ruby eager limit strategy is being used, slice the array using the slice
+        # range to return the object(s) at the correct offset/limit.
+        def apply_ruby_eager_limit_strategy(rows)
+          if eager_limit_strategy == :ruby
+            name = self[:name]
+            if returns_array?
+              range = slice_range
+              rows.each{|o| o.associations[name] = o.associations[name][range] || []}
+            elsif slice_range
+              offset = slice_range.begin
+              rows.each{|o| o.associations[name] = o.associations[name][offset]}
+            end
+          end
+        end
+
         # Whether the associations cache should use an array when storing the
         # associated records during eager loading.
         def assign_singular?
@@ -1348,15 +1363,7 @@ module Sequel
                 end
               end
             end
-            if opts.eager_limit_strategy == :ruby
-              if one_through_one
-                if slice_range
-                  rows.each{|o| o.associations[name] = o.associations[name][slice_range.begin]}
-                end
-              else
-                rows.each{|o| o.associations[name] = o.associations[name][slice_range] || []}
-              end
-            end
+            opts.apply_ruby_eager_limit_strategy(rows)
           end
           
           join_type = opts[:graph_join_type]
@@ -1520,15 +1527,7 @@ module Sequel
                 end
               end
             end
-            if opts.eager_limit_strategy == :ruby
-              if one_to_one
-                if slice_range
-                  rows.each{|o| o.associations[name] = o.associations[name][slice_range.begin]}
-                end
-              else
-                rows.each{|o| o.associations[name] = o.associations[name][slice_range] || []}
-              end
-            end
+            opts.apply_ruby_eager_limit_strategy(rows)
           end
           
           join_type = opts[:graph_join_type]

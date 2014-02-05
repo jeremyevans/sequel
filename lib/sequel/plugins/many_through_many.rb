@@ -267,15 +267,7 @@ module Sequel
                 end
               end
             end
-            if opts.eager_limit_strategy == :ruby
-              if one_through_many
-                if slice_range
-                  rows.each{|o| o.associations[name] = o.associations[name][slice_range.begin]}
-                end
-              else
-                rows.each{|o| o.associations[name] = o.associations[name][slice_range] || []}
-              end
-            end
+            opts.apply_ruby_eager_limit_strategy(rows)
           end
 
           join_type = opts[:graph_join_type]
