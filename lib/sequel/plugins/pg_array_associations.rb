@@ -95,6 +95,13 @@ module Sequel
           :"#{underscore(demodulize(self[:model].name))}_ids"
         end
         
+        # Always use the ruby eager limit strategy
+        def eager_limit_strategy
+          cached_fetch(:_eager_limit_strategy) do
+            :ruby if self[:limit]
+          end
+        end
+
         # Handle silent failure of add/remove methods if raise_on_save_failure is false.
         def handle_silent_modification_failure?
           self[:raise_on_save_failure] == false
@@ -164,6 +171,13 @@ module Sequel
         # that use *_id for single keys.
         def default_key
           :"#{singularize(self[:name])}_ids"
+        end
+
+        # Always use the ruby eager limit strategy
+        def eager_limit_strategy
+          cached_fetch(:_eager_limit_strategy) do
+            :ruby if self[:limit]
+          end
         end
 
         # Handle silent failure of add/remove methods if raise_on_save_failure is false
