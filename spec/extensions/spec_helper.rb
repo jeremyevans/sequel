@@ -31,7 +31,7 @@ rescue LoadError
 end
 
 Sequel.extension :meta_def
-Sequel.extension :core_refinements if RUBY_VERSION >= '2.0.0' && respond_to?(:using)
+Sequel.extension :core_refinements if RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby'
 
 def skip_warn(s)
   warn "Skipping test of #{s}" if ENV["SKIPPED_TEST_WARN"]
