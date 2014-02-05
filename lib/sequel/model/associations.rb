@@ -569,12 +569,12 @@ module Sequel
           :many_to_one
         end
       end
-      
-      class OneToOneAssociationReflection < OneToManyAssociationReflection
-        ASSOCIATION_TYPES[:one_to_one] = self
-        
-        # one_to_one associations don't use an eager limit strategy by default, but
-        # support both DISTINCT ON and window functions as strategies.
+
+      # Methods that turn an association that returns multiple objects into an association that
+      # returns a single object.
+      module SingularAssociationReflection
+        # Singular associations don't use an eager limit strategy by default unless they use an
+        # offset.  They support both DISTINCT ON and window functions as strategies.
         def eager_limit_strategy
           cached_fetch(:_eager_limit_strategy) do
             offset = limit_and_offset.last
@@ -596,19 +596,15 @@ module Sequel
           end
         end
 
-        # The limit and offset for this association (returned as a two element array).
-        def limit_and_offset
-          if (v = self[:limit]).is_a?(Array)
-            v
-          else
-            [v, nil]
-          end
-        end
-
-        # one_to_one associations return a single object, not an array
+        # Singular associations always return a single object, not an array.
         def returns_array?
           false
         end
+      end
+      
+      class OneToOneAssociationReflection < OneToManyAssociationReflection
+        ASSOCIATION_TYPES[:one_to_one] = self
+        include SingularAssociationReflection
       end
     
       class ManyToManyAssociationReflection < AssociationReflection
@@ -765,6 +761,7 @@ module Sequel
   
       class OneThroughOneAssociationReflection < ManyToManyAssociationReflection
         ASSOCIATION_TYPES[:one_through_one] = self
+        include SingularAssociationReflection
         
         # one_through_one associations should not singularize the association name when
         # creating the foreign key.
@@ -772,46 +769,9 @@ module Sequel
           :"#{self[:name]}_id"
         end
       
-        # one_through_one associations don't use an eager limit strategy by default, but
-        # support window functions as strategies.
-        def eager_limit_strategy
-          cached_fetch(:_eager_limit_strategy) do
-            offset = limit_and_offset.last
-            case s = self.fetch(:eager_limit_strategy){(self[:model].default_eager_limit_strategy || :ruby) if offset}
-            when Symbol
-              s
-            when true
-              ds = associated_class.dataset
-              if ds.supports_ordered_distinct_on? && offset.nil?
-                :distinct_on
-              elsif ds.supports_window_functions?
-                :window_function
-              else
-                :ruby
-              end
-            else
-              nil
-            end
-          end
-        end
-
-        # The limit and offset for this association (returned as a two element array).
-        def limit_and_offset
-          if (v = self[:limit]).is_a?(Array)
-            v
-          else
-            [v, nil]
-          end
-        end
-
         # one_through_one associations have no reciprocals
         def reciprocal
           nil
-        end
-
-        # one_through_one associations return a single object, not an array
-        def returns_array?
-          false
         end
       end
     

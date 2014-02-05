@@ -166,43 +166,7 @@ module Sequel
 
       class OneThroughManyAssociationReflection < ManyThroughManyAssociationReflection
         Sequel::Model::Associations::ASSOCIATION_TYPES[:one_through_many] = self
-
-        # one_through_one associations don't use an eager limit strategy by default, but
-        # support window functions as strategies.
-        def eager_limit_strategy
-          cached_fetch(:_eager_limit_strategy) do
-            offset = limit_and_offset.last
-            case s = self.fetch(:eager_limit_strategy){(self[:model].default_eager_limit_strategy || :ruby) if offset}
-            when Symbol
-              s
-            when true
-              ds = associated_class.dataset
-              if ds.supports_ordered_distinct_on? && offset.nil?
-                :distinct_on
-              elsif ds.supports_window_functions?
-                :window_function
-              else
-                :ruby
-              end
-            else
-              nil
-            end
-          end
-        end
-
-        # The limit and offset for this association (returned as a two element array).
-        def limit_and_offset
-          if (v = self[:limit]).is_a?(Array)
-            v
-          else
-            [v, nil]
-          end
-        end
-
-        # one_through_many associations return a single object, not an array
-        def returns_array?
-          false
-        end
+        include Sequel::Model::Associations::SingularAssociationReflection
       end
 
       module ClassMethods
