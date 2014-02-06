@@ -42,6 +42,8 @@
 #   ia.any             # ANY(int_array_column)
 #   ia.all             # ALL(int_array_column)
 #   ia.dims            # array_dims(int_array_column)
+#   ia.hstore          # hstore(int_array_column)
+#   ia.hstore(:a)      # hstore(int_array_column, a)
 #   ia.length          # array_length(int_array_column, 1)
 #   ia.length(2)       # array_length(int_array_column, 2)
 #   ia.lower           # array_lower(int_array_column, 1)
@@ -57,6 +59,10 @@
 # If you are also using the pg_array extension, you should load it before
 # loading this extension.  Doing so will allow you to use PGArray#op to get
 # an ArrayOp, allowing you to perform array operations on array literals.
+#
+# In order for #hstore to automatically wrap the returned value correctly in
+# an HStoreOp, you need to load the pg_hstore_ops extension.
+
 module Sequel
   module Postgres
     # The ArrayOp class is a simple container for a single object that

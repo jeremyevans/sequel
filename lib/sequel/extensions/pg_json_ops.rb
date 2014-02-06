@@ -49,6 +49,11 @@
 # loading this extension.  Doing so will allow you to use JSONHash#op and
 # JSONArray#op to get a JSONOp, allowing you to perform json operations
 # on json literals.
+#
+# In order to get the automatic conversion from a ruby array to a PostgreSQL array
+# (as shown in the #[] and #get_text examples above), you need to load the pg_array
+# extension.
+
 module Sequel
   module Postgres
     # The JSONOp class is a simple container for a single object that

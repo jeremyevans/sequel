@@ -58,6 +58,13 @@
 # If you are also using the pg_hstore extension, you should load it before
 # loading this extension.  Doing so will allow you to use HStore#op to get
 # an HStoreOp, allowing you to perform hstore operations on hstore literals.
+#
+# Some of these methods will accept ruby arrays and convert them automatically to
+# PostgreSQL arrays if you have the pg_array extension loaded.  Some of these methods
+# will accept ruby hashes and convert them automatically to PostgreSQL hstores if the
+# pg_hstore extension is loaded.  Methods representing expressions that return
+# PostgreSQL arrays will have the returned expression automatically wrapped in a
+# Postgres::ArrayOp if the pg_array_ops extension is loaded.
 
 module Sequel
   module Postgres
