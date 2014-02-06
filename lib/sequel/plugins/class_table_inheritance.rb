@@ -59,10 +59,18 @@ module Sequel
     #
     #   # Set up class table inheritance in the parent class
     #   # (Not in the subclasses)
-    #   Employee.plugin :class_table_inheritance
+    #   class Employee < Sequel::Model
+    #     plugin :class_table_inheritance
+    #   end
     #
-    #   # Set the +kind+ column to hold the class name, and
-    #   # set the subclass table to map to for each subclass 
+    #   # Have subclasses inherit from the appropriate class
+    #   class Staff < Employee; end
+    #   class Manager < Employee; end
+    #   class Executive < Manager; end
+    #
+    #   # You can also set options when loading the plugin:
+    #   # :kind :: column to hold the class name
+    #   # :table_map :: map of class name symbols to table name symbols
     #   Employee.plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
     module ClassTableInheritance
       # The class_table_inheritance plugin requires the lazy_attributes plugin

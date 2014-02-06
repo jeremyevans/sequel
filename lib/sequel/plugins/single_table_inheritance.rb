@@ -24,7 +24,15 @@ module Sequel
     #
     #   # Use the default of storing the class name in the sti_key
     #   # column (:kind in this case)
-    #   Employee.plugin :single_table_inheritance, :kind
+    #   class Employee < Sequel::Model
+    #     plugin :single_table_inheritance, :kind
+    #   end
+    #
+    #   # Have subclasses inherit from the appropriate class
+    #   class Staff < Employee; end
+    #   class Manager < Employee; end
+    #
+    #   # You can also use many different options to configure the plugin:
     #
     #   # Using integers to store the class type, with a :model_map hash
     #   # and an sti_key of :type
