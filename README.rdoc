@@ -747,6 +747,28 @@ You can dynamically customize eager loads for both +eager+ and +eager_graph+ whi
   # Eagerly load only replies containing 'foo', and the person and tags for those replies
   Post.eager(:replies=>{proc{|ds| ds.where(Sequel.like(text, '%foo%'))}=>[:person, :tags]}).all
 
+=== Joining with Associations
+
+You can use the association_join method to add a join to the model's dataset based on the assocation:
+
+  Post.association_join(:author)
+  # SELECT * FROM posts
+  # INNER JOIN authors AS author ON (author.id = posts.author_id)
+
+This comes with variants for different join types:
+
+  Post.association_left_join(:replies)
+  # SELECT * FROM posts
+  # LEFT JOIN replies ON (replies.post_id = posts.id)
+
+Similar to the eager loading methods, you can use multiple associations and nested associations:
+
+  Post.association_join(:author, :replies=>:person).all
+  # SELECT * FROM posts
+  # INNER JOIN authors AS author ON (author.id = posts.author_id)
+  # INNER JOIN replies ON (replies.post_id = posts.id)
+  # INNER JOIN people AS person ON (person.id = replies.person_id)
+
 === Extending the underlying dataset
 
 The recommended way to implement table-wide logic by defining methods on the dataset using +dataset_module+:

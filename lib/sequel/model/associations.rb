@@ -1263,7 +1263,7 @@ module Sequel
         end
 
         Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@autoreloading_associations=>:hash_dup, :@default_eager_limit_strategy=>nil)
-        Plugins.def_dataset_methods(self, [:eager, :eager_graph])
+        Plugins.def_dataset_methods(self, [:eager, :eager_graph, :association_join, :association_full_join, :association_inner_join, :association_left_join, :association_right_join])
         
         private
       
@@ -1378,8 +1378,8 @@ module Sequel
           jt_graph_block = opts[:graph_join_table_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
-            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>join_type, &graph_block)
+            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>ds.opts[:eager_graph][:join_type]||jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
+            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>ds.opts[:eager_graph][:join_type]||join_type, &graph_block)
           end
       
           def_association_dataset_methods(opts)
@@ -1465,7 +1465,7 @@ module Sequel
           graph_cks = opts[:graph_keys]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(graph_cks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(graph_cks) + conditions, eo.merge(:select=>select, :join_type=>ds.opts[:eager_graph][:join_type]||join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
           end
       
           def_association_dataset_methods(opts)
@@ -1539,7 +1539,7 @@ module Sequel
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : cks.zip(pkcs) + conditions, eo.merge(:select=>select, :join_type=>join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds = ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : cks.zip(pkcs) + conditions, eo.merge(:select=>select, :join_type=>ds.opts[:eager_graph][:join_type]||join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
             # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
             ds.opts[:eager_graph][:reciprocals][eo[:table_alias]] = opts.reciprocal
             ds
@@ -1961,6 +1961,26 @@ module Sequel
       #   Artist.eager(:albums => {proc{|ds| ds.where{year > 1990}}=>{:tracks => :genre}})
       module DatasetMethods
         Sequel::Dataset.def_mutation_method(:eager, :eager_graph, :module=>self)
+
+        %w'inner left right full'.each do |type|
+          class_eval <<END, __FILE__, __LINE__+1
+            def association_#{type}_join(*associations)
+              _association_join(:#{type}, associations)
+            end
+END
+        end
+
+        # Adds one or more INNER JOINs to the existing dataset using the keys and conditions
+        # specified by the given association.  The following methods also exist for specifying
+        # a different type of JOIN:
+        #
+        # association_full_join :: FULL JOIN
+        # association_inner_join :: INNER JOIN
+        # association_left_join :: LEFT JOIN
+        # association_right_join :: RIGHT JOIN
+        def association_join(*associations)
+          association_inner_join(*associations)
+        end
       
         # If the expression is in the form <tt>x = y</tt> where +y+ is a <tt>Sequel::Model</tt>
         # instance, array of <tt>Sequel::Model</tt> instances, or a <tt>Sequel::Model</tt> dataset,
@@ -2082,16 +2102,10 @@ module Sequel
             ds = clone(:eager_graph=>eg)
             ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations)
           else
-            # Each of the following have a symbol key for the table alias, with the following values: 
-            # :reciprocals - the reciprocal instance variable to use for this association
-            # :reflections - AssociationReflection instance related to this association
-            # :requirements - array of requirements for this association
-            ds = clone(:eager_graph=>{:requirements=>{}, :master=>alias_symbol(first_source), :reflections=>{}, :reciprocals=>{}, :cartesian_product_number=>0, :row_proc=>row_proc})
-            ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations).
-              naked
+            new_eager_graph(associations)
           end
         end
-        
+
         # Do not attempt to split the result set into associations,
         # just return results as simple objects.  This is useful if you
         # want to use eager_graph as a shortcut to have all of the joins
@@ -2182,7 +2196,24 @@ module Sequel
           hashes.replace(EagerGraphLoader.new(self).load(hashes))
         end
       
+        # Setup a new eager graph for the given associations and options
+        def new_eager_graph(associations, opts=OPTS)
+          # Each of the following have a symbol key for the table alias, with the following values: 
+          # :reciprocals - the reciprocal instance variable to use for this association
+          # :reflections - AssociationReflection instance related to this association
+          # :requirements - array of requirements for this association
+          opts = {:requirements=>{}, :master=>alias_symbol(first_source), :reflections=>{}, :reciprocals=>{}, :cartesian_product_number=>0, :row_proc=>row_proc}.merge(opts)
+          ds = clone(:eager_graph=>opts)
+          ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations).naked
+        end
+        
         private
+
+        # Return a new dataset with JOINs of the given type added, using the tables and
+        # conditions specified by the associations.
+        def _association_join(type, associations)
+          clone(:join=>clone(:graph_from_self=>false).new_eager_graph(associations, :join_type=>type).opts[:join])
+        end
 
         # If the association has conditions itself, then it requires additional filters be
         # added to the current dataset to ensure that the passed in object would also be

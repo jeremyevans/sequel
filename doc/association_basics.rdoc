@@ -41,6 +41,12 @@ As is the code to add a related album to an artist:
 
   @artist.add_album(:name=>'RF')
 
+It also makes it easier to creating queries that use joins based on the association:
+
+  Artist.association_join(:albums)
+  # SELECT * FROM artists
+  # INNER JOIN albums ON (albums.artist_id = artists.id)
+
 == The Types of Associations
 
 Sequel has five different association types built in:

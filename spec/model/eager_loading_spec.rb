@@ -1015,6 +1015,21 @@ describe Sequel::Model, "#eager_graph" do
     a.album.band.members.should == [GraphBandMember.load(:id => 5)]
   end
   
+  it "should set up correct inner joins when using association_join" do
+    GraphAlbum.association_join(:band).sql.should == 'SELECT * FROM albums INNER JOIN bands AS band ON (band.id = albums.band_id)'
+    GraphAlbum.association_join(:track).sql.should == 'SELECT * FROM albums INNER JOIN tracks AS track ON (track.album_id = albums.id)'
+    GraphAlbum.association_join(:tracks).sql.should == 'SELECT * FROM albums INNER JOIN tracks ON (tracks.album_id = albums.id)'
+    GraphAlbum.association_join(:genres).sql.should == 'SELECT * FROM albums INNER JOIN ag ON (ag.album_id = albums.id) INNER JOIN genres ON (genres.id = ag.genre_id)'
+    GraphAlbum.association_join(:genre).sql.should == 'SELECT * FROM albums INNER JOIN ag ON (ag.album_id = albums.id) INNER JOIN genres AS genre ON (genre.id = ag.genre_id)'
+  end
+  
+  it "should set up correct join types when using association_*_join" do
+    GraphAlbum.association_inner_join(:band).sql.should == 'SELECT * FROM albums INNER JOIN bands AS band ON (band.id = albums.band_id)'
+    GraphAlbum.association_left_join(:track).sql.should == 'SELECT * FROM albums LEFT JOIN tracks AS track ON (track.album_id = albums.id)'
+    GraphAlbum.association_right_join(:tracks).sql.should == 'SELECT * FROM albums RIGHT JOIN tracks ON (tracks.album_id = albums.id)'
+    GraphAlbum.association_full_join(:genres).sql.should == 'SELECT * FROM albums FULL JOIN ag ON (ag.album_id = albums.id) FULL JOIN genres ON (genres.id = ag.genre_id)'
+  end
+  
   it "should eagerly load a single many_to_one association" do
     ds = GraphAlbum.eager_graph(:band)
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
@@ -1062,7 +1077,7 @@ describe Sequel::Model, "#eager_graph" do
     a.first.genres.should == [GraphGenre.load(:id => 4)]
   end
 
-  it "should eagerly load a single many_to_many association" do
+  it "should eagerly load a single one_through_one association" do
     ds = GraphAlbum.eager_graph(:genre)
     ds.sql.should == 'SELECT albums.id, albums.band_id, genre.id AS genre_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genre ON (genre.id = ag.genre_id)'
     ds._fetch = {:id=>1, :band_id=>2, :genre_id=>4}
@@ -1086,6 +1101,10 @@ describe Sequel::Model, "#eager_graph" do
     c.eager_graph(:genres).sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS genres_0 ON (genres_0.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = genres_0.genre_id)'
   end
   
+  it "should handle multiple associations in a single call to association_join" do
+    GraphAlbum.association_join(:genres, :tracks, :band).sql.should == 'SELECT * FROM albums INNER JOIN ag ON (ag.album_id = albums.id) INNER JOIN genres ON (genres.id = ag.genre_id) INNER JOIN tracks ON (tracks.album_id = albums.id) INNER JOIN bands AS band ON (band.id = albums.band_id)'
+  end
+
   it "should eagerly load multiple associations in a single call" do 
     ds = GraphAlbum.eager_graph(:genres, :tracks, :band)
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id, tracks.id AS tracks_id, tracks.album_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
@@ -1098,6 +1117,10 @@ describe Sequel::Model, "#eager_graph" do
     a.genres.should == [GraphGenre.load(:id => 4)]
   end
 
+  it "should handle multiple associations in separate calls to association_join" do
+    GraphAlbum.association_join(:genres).association_join(:tracks).association_join(:band).sql.should == 'SELECT * FROM albums INNER JOIN ag ON (ag.album_id = albums.id) INNER JOIN genres ON (genres.id = ag.genre_id) INNER JOIN tracks ON (tracks.album_id = albums.id) INNER JOIN bands AS band ON (band.id = albums.band_id)'
+  end
+
   it "should eagerly load multiple associations in separate calls" do 
     ds = GraphAlbum.eager_graph(:genres).eager_graph(:tracks).eager_graph(:band)
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id, tracks.id AS tracks_id, tracks.album_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
@@ -1108,6 +1131,15 @@ describe Sequel::Model, "#eager_graph" do
     a.band.should == GraphBand.load(:id => 2, :vocalist_id=>6)
     a.tracks.should == [GraphTrack.load({:id => 3, :album_id=>1})]
     a.genres.should == [GraphGenre.load(:id => 4)]
+  end
+
+  it "should handle cascading associations in a single call to association_join" do
+    GraphTrack.association_join(:album=>{:band=>:members}).sql.should == 'SELECT * FROM tracks INNER JOIN albums AS album ON (album.id = tracks.album_id) INNER JOIN bands AS band ON (band.id = album.band_id) INNER JOIN bm ON (bm.band_id = band.id) INNER JOIN members ON (members.id = bm.member_id)'
+    GraphBand.association_join({:albums=>:tracks}, :members).sql.should == 'SELECT * FROM bands INNER JOIN albums ON (albums.band_id = bands.id) INNER JOIN tracks ON (tracks.album_id = albums.id) INNER JOIN bm ON (bm.band_id = bands.id) INNER JOIN members ON (members.id = bm.member_id)'
+  end
+
+  it "should handle matching association names for different models when using association_join" do
+    GraphAlbum.association_join(:genres).association_join(:band=>:genres).sql.should == 'SELECT * FROM albums INNER JOIN ag ON (ag.album_id = albums.id) INNER JOIN genres ON (genres.id = ag.genre_id) INNER JOIN bands AS band ON (band.id = albums.band_id) INNER JOIN bg ON (bg.band_id = band.id) INNER JOIN genres AS genres_0 ON (genres_0.id = bg.genre_id)'
   end
 
   it "should allow cascading of eager loading for associations of associated models" do

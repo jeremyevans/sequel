@@ -76,8 +76,8 @@ module Sequel
       # Only allow table aliases that haven't been used
       raise_alias_error.call if @opts[:graph] && @opts[:graph][:table_aliases] && @opts[:graph][:table_aliases].include?(table_alias)
       
-      # Use a from_self if this is already a joined table
-      ds = (!@opts[:graph] && (@opts[:from].length > 1 || @opts[:join])) ? from_self(:alias=>options[:from_self_alias] || first_source) : self
+      # Use a from_self if this is already a joined table (or from_self specifically disabled for graphs)
+      ds = (@opts[:graph_from_self] != false && !@opts[:graph] && (@opts[:from].length > 1 || @opts[:join])) ? from_self(:alias=>options[:from_self_alias] || first_source) : self
       
       # Join the table early in order to avoid cloning the dataset twice
       ds = ds.join_table(options[:join_type] || :left_outer, table, join_conditions, :table_alias=>table_alias, :implicit_qualifier=>options[:implicit_qualifier], :qualify=>options[:qualify], &block)

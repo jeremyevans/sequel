@@ -175,6 +175,84 @@ shared_examples_for "eager limit strategies" do
 end
 
 shared_examples_for "filtering/excluding by associations" do
+  specify "should handle association inner joins" do
+    @Artist.association_join(:albums).all.should == []
+    @Artist.association_join(:first_album).all.should == []
+    @Album.association_join(:artist).all.should == []
+    @Album.association_join(:tags).all.should == []
+    @Album.association_join(:alias_tags).all.should == []
+    @Tag.association_join(:albums).all.should == []
+    unless @no_many_through_many
+      @Artist.association_join(:tags).all.should == []
+      @Artist.association_join(:first_tag).all.should == []
+    end
+
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    
+    @Artist.association_join(:albums).select_all(:artists).all.should == [@artist]
+    @Artist.association_join(:first_album).select_all(:artists).all.should == [@artist]
+    @Album.association_join(:artist).select_all(:albums).all.should == [@album]
+    @Album.association_join(:tags).select_all(:albums).all.should == [@album]
+    @Album.association_join(:alias_tags).select_all(:albums).all.should == [@album]
+    @Tag.association_join(:albums).select_all(:tags).all.should == [@tag]
+    unless @no_many_through_many
+      @Artist.association_join(:tags).select_all(:artists).all.should == [@artist]
+      @Artist.association_join(:first_tag).select_all(:artists).all.should == [@artist]
+    end
+
+    @Artist.association_join(:albums).select_all(:albums).naked.all.should == [@album.values]
+    @Artist.association_join(:first_album).select_all(:first_album).naked.all.should == [@album.values]
+    @Album.association_join(:artist).select_all(:artist).naked.all.should == [@artist.values]
+    @Album.association_join(:tags).select_all(:tags).naked.all.should == [@tag.values]
+    @Album.association_join(:alias_tags).select_all(:alias_tags).naked.all.should == [@tag.values]
+    @Tag.association_join(:albums).select_all(:albums).naked.all.should == [@album.values]
+    unless @no_many_through_many
+      @Artist.association_join(:tags).select_all(:tags).naked.all.should == [@tag.values]
+      @Artist.association_join(:first_tag).select_all(:first_tag).naked.all.should == [@tag.values]
+    end
+  end
+
+  specify "should handle association left joins" do
+    @Artist.association_left_join(:albums).select_all(:artists).all.should == [@artist]
+    @Artist.association_left_join(:first_album).select_all(:artists).all.should == [@artist]
+    @Album.association_left_join(:artist).select_all(:albums).all.should == [@album]
+    @Album.association_left_join(:tags).select_all(:albums).all.should == [@album]
+    @Album.association_left_join(:alias_tags).select_all(:albums).all.should == [@album]
+    @Tag.association_left_join(:albums).select_all(:tags).all.should == [@tag]
+    unless @no_many_through_many
+      @Artist.association_left_join(:tags).select_all(:artists).all.should == [@artist]
+      @Artist.association_left_join(:first_tag).select_all(:artists).all.should == [@artist]
+    end
+
+    nil_hash = lambda{|obj| [obj.values.keys.inject({}){|h,k| h[k] = nil; h}]}
+    @Artist.association_left_join(:albums).select_all(:albums).naked.all.should == nil_hash[@album]
+    @Artist.association_left_join(:first_album).select_all(:first_album).naked.all.should == nil_hash[@album]
+    @Album.association_left_join(:artist).select_all(:artist).naked.all.should == nil_hash[@artist]
+    @Album.association_left_join(:tags).select_all(:tags).naked.all.should == nil_hash[@tag]
+    @Album.association_left_join(:alias_tags).select_all(:alias_tags).naked.all.should == nil_hash[@tag]
+    @Tag.association_left_join(:albums).select_all(:albums).naked.all.should == nil_hash[@album]
+    unless @no_many_through_many
+      @Artist.association_left_join(:tags).select_all(:tags).naked.all.should == nil_hash[@tag]
+      @Artist.association_left_join(:first_tag).select_all(:first_tag).naked.all.should == nil_hash[@tag]
+    end
+
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    
+
+    @Artist.association_left_join(:albums).select_all(:albums).naked.all.should == [@album.values]
+    @Artist.association_left_join(:first_album).select_all(:first_album).naked.all.should == [@album.values]
+    @Album.association_left_join(:artist).select_all(:artist).naked.all.should == [@artist.values]
+    @Album.association_left_join(:tags).select_all(:tags).naked.all.should == [@tag.values]
+    @Album.association_left_join(:alias_tags).select_all(:alias_tags).naked.all.should == [@tag.values]
+    @Tag.association_left_join(:albums).select_all(:albums).naked.all.should == [@album.values]
+    unless @no_many_through_many
+      @Artist.association_left_join(:tags).select_all(:tags).naked.all.should == [@tag.values]
+      @Artist.association_left_join(:first_tag).select_all(:first_tag).naked.all.should == [@tag.values]
+    end
+  end
+
   specify "should work correctly when filtering by associations" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
@@ -736,7 +814,6 @@ shared_examples_for "filtering/excluding by associations" do
       @Artist.exclude(:t_tag=>@Tag.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@artist, artist]
     end
   end
-
 end
 
 shared_examples_for "basic regular and composite key associations" do  
