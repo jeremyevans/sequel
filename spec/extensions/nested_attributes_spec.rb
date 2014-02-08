@@ -71,6 +71,30 @@ describe "NestedAttributes plugin" do
       ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
   end
   
+  it "should support creating new one_to_many and one_to_one objects with presence validations on the foreign key" do
+    @Album.class_eval do
+      plugin :validation_helpers
+      def validate
+        validates_presence :artist_id
+        super
+      end
+    end
+    a = @Artist.new({:name=>'Ar', :albums_attributes=>[{:name=>'Al'}]})
+    @db.sqls.should == []
+    a.save
+    check_sql_array("INSERT INTO artists (name) VALUES ('Ar')",
+      ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
+
+    a = @Artist.new(:name=>'Ar')
+    a.id = 1
+    a.first_album_attributes = {:name=>'Al'}
+    @db.sqls.should == []
+    a.save
+    check_sql_array(["INSERT INTO artists (name, id) VALUES ('Ar', 1)", "INSERT INTO artists (id, name) VALUES (1, 'Ar')"],
+      "UPDATE albums SET artist_id = NULL WHERE (artist_id = 1)",
+      ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
+  end
+  
   it "should support creating new many_to_many objects" do
     a = @Album.new({:name=>'Al', :tags_attributes=>[{:name=>'T'}]})
     @db.sqls.should == []

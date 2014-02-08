@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle presence validations on foreign keys in associated objects when creating new associated objects in the nested_attributes plugin (jeremyevans)
+
 * Respect offsets when eager graphing *_one associations (jeremyevans)
 
 * Add association_join to model datasets, for setting up joins based on associations (jeremyevans)
