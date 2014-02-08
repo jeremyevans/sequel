@@ -29,6 +29,39 @@ shared_examples_for "one_to_one eager limit strategies" do
     [@album, same_album].should include(a.first.first_album)
     a.last.first_album.should == nil
   end
+
+  specify "eager graphing one_to_one associations should work correctly" do
+    Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els) if @els
+    Artist.one_to_one  :last_album, {:clone=>:last_album}.merge(@els) if @els
+    Artist.one_to_one  :second_album, {:clone=>:second_album}.merge(@els) if @els
+    @album.update(:artist => @artist)
+    diff_album = @diff_album.call
+    ar = @pr.call[1]
+    
+    a = Artist.eager_graph(:first_album).order_prepend(:artists__name).all
+    a.should == [@artist, ar]
+    a.first.first_album.should == @album
+    a.last.first_album.should == nil
+    a.first.first_album.values.should == @album.values
+
+    a = Artist.eager_graph(:last_album).order_prepend(:artists__name).all
+    a.should == [@artist, ar]
+    a.first.last_album.should == diff_album
+    a.last.last_album.should == nil
+    a.first.last_album.values.should == diff_album.values
+
+    a = Artist.eager_graph(:second_album).order_prepend(:artists__name).all
+    a.should == [@artist, ar]
+    a.first.second_album.should == diff_album
+    a.last.second_album.should == nil
+    a.first.second_album.values.should == diff_album.values
+
+    same_album = @same_album.call
+    a = Artist.eager_graph(:first_album).order_prepend(:artists__name).all
+    a.should == [@artist, ar]
+    [@album, same_album].should include(a.first.first_album)
+    a.last.first_album.should == nil
+  end
 end
 
 shared_examples_for "one_to_many eager limit strategies" do
@@ -62,7 +95,7 @@ shared_examples_for "one_to_many eager limit strategies" do
 end
 
 shared_examples_for "one_through_one eager limit strategies" do
-  specify "should correctly handle limits and offsets when eager loading one_through_one associations" do
+  specify "should correctly handle offsets when eager loading one_through_one associations" do
     Album.one_through_one :first_tag, {:clone=>:first_tag}.merge(@els) if @els
     Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els) if @els
     Album.one_through_one :last_tag, {:clone=>:last_tag}.merge(@els) if @els
@@ -81,6 +114,32 @@ shared_examples_for "one_through_one eager limit strategies" do
     # Check that no extra columns got added by the eager loading
     als.first.first_tag.values.should == @tag.values
     als.first.second_tag.values.should == tu.values
+    als.first.last_tag.values.should == tv.values
+  end
+
+  specify "should correctly handle offsets when eager graphing one_through_one associations" do
+    Album.one_through_one :first_tag, {:clone=>:first_tag}.merge(@els) if @els
+    Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els) if @els
+    Album.one_through_one :last_tag, {:clone=>:last_tag}.merge(@els) if @els
+    tu, tv = @other_tags.call
+    al = @pr.call.first
+    
+    als = Album.eager_graph(:first_tag).order_prepend(:albums__name).all
+    als.should == [@album, al]
+    als.first.first_tag.should == @tag
+    als.last.first_tag.should == nil
+    als.first.first_tag.values.should == @tag.values
+
+    als = Album.eager_graph(:second_tag).order_prepend(:albums__name).all
+    als.should == [@album, al]
+    als.first.second_tag.should == tu
+    als.last.second_tag.should == nil
+    als.first.second_tag.values.should == tu.values
+
+    als = Album.eager_graph(:last_tag).order_prepend(:albums__name).all
+    als.should == [@album, al]
+    als.first.last_tag.should == tv
+    als.last.last_tag.should == nil
     als.first.last_tag.values.should == tv.values
   end
 end
@@ -141,7 +200,7 @@ shared_examples_for "many_through_many eager limit strategies" do
 end
 
 shared_examples_for "one_through_many eager limit strategies" do
-  specify "should correctly handle limits and offsets when eager loading one_through_many associations" do
+  specify "should correctly handle offsets when eager loading one_through_many associations" do
     Artist.one_through_many :first_tag, {:clone=>:first_tag}.merge(@els) if @els
     Artist.one_through_many :second_tag, {:clone=>:second_tag}.merge(@els) if @els
     Artist.one_through_many :last_tag, {:clone=>:last_tag}.merge(@els) if @els
@@ -161,6 +220,33 @@ shared_examples_for "one_through_many eager limit strategies" do
     # Check that no extra columns got added by the eager loading
     ars.first.first_tag.values.should == @tag.values
     ars.first.second_tag.values.should == tu.values
+    ars.first.last_tag.values.should == tv.values
+  end
+
+  specify "should correctly handle offsets when eager graphing one_through_many associations" do
+    Artist.one_through_many :first_tag, {:clone=>:first_tag}.merge(@els) if @els
+    Artist.one_through_many :second_tag, {:clone=>:second_tag}.merge(@els) if @els
+    Artist.one_through_many :last_tag, {:clone=>:last_tag}.merge(@els) if @els
+    @album.update(:artist => @artist)
+    tu, tv = @other_tags.call
+    ar = @pr.call[1]
+    
+    ars = Artist.eager_graph(:first_tag).order_prepend(:artists__name).all
+    ars.should == [@artist, ar]
+    ars.first.first_tag.should == @tag
+    ars.last.first_tag.should == nil
+    ars.first.first_tag.values.should == @tag.values
+
+    ars = Artist.eager_graph(:second_tag).order_prepend(:artists__name).all
+    ars.should == [@artist, ar]
+    ars.first.second_tag.should == tu
+    ars.last.second_tag.should == nil
+    ars.first.second_tag.values.should == tu.values
+
+    ars = Artist.eager_graph(:last_tag).order_prepend(:artists__name).all
+    ars.should == [@artist, ar]
+    ars.first.last_tag.should == tv
+    ars.last.last_tag.should == nil
     ars.first.last_tag.values.should == tv.values
   end
 end

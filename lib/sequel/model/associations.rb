@@ -2463,9 +2463,13 @@ END
           limit_map = @limit_map = {}
           reflection_map.each do |k, v|
             alias_map[k] = v[:name]
-            type_map[k] = v.returns_array?
             after_load_map[k] = v[:after_load] unless v[:after_load].empty?
-            limit_map[k] = v.limit_and_offset if v[:limit]
+            limit, offset = limit_map[k] = v.limit_and_offset if v[:limit]
+            type_map[k] = if v.returns_array?
+              true
+            elsif offset
+              :offset
+            end
           end
 
           # Make dependency map hash out of requirements array for each association.
@@ -2674,9 +2678,14 @@ END
                 if lo = limit_map[ta]
                   limit, offset = lo
                   offset ||= 0
-                  list.replace(list[(offset)..(limit ? (offset)+limit-1 : -1)])
+                  if type_map[ta] == :offset
+                    [record.associations[assoc_name] = list[offset]]
+                  else
+                    list.replace(list[(offset)..(limit ? (offset)+limit-1 : -1)])
+                  end
+                else
+                  list
                 end
-                list
               elsif list
                 [list]
               else
