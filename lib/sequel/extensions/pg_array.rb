@@ -185,7 +185,7 @@ module Sequel
 
         if soid = opts[:scalar_oid]
           raise Error, "can't provide both a converter and :scalar_oid option to register" if converter 
-          raise Error, "no conversion proc for :scalar_oid=>#{soid.inspect}" unless converter = type_procs[soid]
+          converter = type_procs[soid]
         end
 
         array_type = (opts[:array_type] || db_type).to_s.dup.freeze

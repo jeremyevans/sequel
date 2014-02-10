@@ -283,8 +283,10 @@ describe "pg_array extension" do
     @db.typecast_value(:foo15_array, ['t']).should == [true]
   end
 
-  it "should raise an error if using :scalar_oid option with unexisting scalar conversion proc" do
-    proc{Sequel::Postgres::PGArray.register('foo', :scalar_oid=>0)}.should raise_error(Sequel::Error)
+  it "should not raise an error if using :scalar_oid option with unexisting scalar conversion proc" do
+    h = {}
+    Sequel::Postgres::PGArray.register('foo', :oid=>1234, :scalar_oid=>0, :type_procs=>h)
+    h[1234].call('{t}').should == ["t"]
   end
 
   it "should raise an error if using :converter option and a block argument" do

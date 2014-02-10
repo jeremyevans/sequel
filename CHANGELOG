@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#register_array_type work without existing scalar conversion proc in the pg_array extension (jeremyevans)
+
 * Handle presence validations on foreign keys in associated objects when creating new associated objects in the nested_attributes plugin (jeremyevans)
 
 * Respect offsets when eager graphing *_one associations (jeremyevans)
