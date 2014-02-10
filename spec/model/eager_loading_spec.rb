@@ -1652,6 +1652,16 @@ describe Sequel::Model, "#eager_graph" do
     a.al_genres.should == [GraphGenre.load(:id=>7), GraphGenre.load(:id=>12)]
   end
 
+  it "should handle offsets on associations with no results when eager graphing" do
+    GraphAlbum.one_to_many :al_tracks, :class=>GraphTrack, :key=>:album_id, :limit=>[2, 1]
+    ds = GraphAlbum.eager_graph(:al_tracks)
+    ds.sql.should == "SELECT albums.id, albums.band_id, al_tracks.id AS al_tracks_id, al_tracks.album_id FROM albums LEFT OUTER JOIN tracks AS al_tracks ON (al_tracks.album_id = albums.id)"
+    ds._fetch = [{:id=>1, :band_id=>2, :al_tracks_id=>nil, :album_id=>nil}]
+    a = ds.all.first
+    a.should == GraphAlbum.load(:id => 1, :band_id => 2)
+    a.al_tracks.should == []
+  end
+
   it "should respect offsets on associations when eager graphing" do
     GraphAlbum.many_to_one :al_band, :class=>GraphBand, :key=>:band_id
     GraphAlbum.one_to_many :al_tracks, :class=>GraphTrack, :key=>:album_id, :limit=>[1, 1]

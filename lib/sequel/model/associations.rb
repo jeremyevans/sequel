@@ -2681,7 +2681,7 @@ END
                   if type_map[ta] == :offset
                     [record.associations[assoc_name] = list[offset]]
                   else
-                    list.replace(list[(offset)..(limit ? (offset)+limit-1 : -1)])
+                    list.replace(list[(offset)..(limit ? (offset)+limit-1 : -1)] || [])
                   end
                 else
                   list
