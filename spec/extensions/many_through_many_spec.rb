@@ -1689,7 +1689,7 @@ describe "Sequel::Plugins::OneThroughMany eager loading methods" do
 
   it "should eagerly load a single one_through_many association using the :distinct_on strategy" do
     Tag.dataset.meta_def(:supports_distinct_on?){true}
-    @c1.one_through_many :second_tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :order=>:name, :eager_limit_strategy=>true
+    @c1.one_through_many :second_tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :order=>:name
     Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5}]
     a = @c1.eager(:second_tag).all
     a.should == [@c1.load(:id=>1)]

@@ -169,10 +169,10 @@ describe Sequel::Model, "#eager" do
   
   it "should eagerly load a single one_to_one association using the :distinct_on strategy" do
     def (EagerTrack.dataset).supports_distinct_on?() true end
-    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>true
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:a
     a = EagerAlbum.eager(:track).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
-    DB.sqls.should == ['SELECT * FROM albums', 'SELECT DISTINCT ON (tracks.album_id) * FROM tracks WHERE (tracks.album_id IN (1)) ORDER BY tracks.album_id']
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT DISTINCT ON (tracks.album_id) * FROM tracks WHERE (tracks.album_id IN (1)) ORDER BY tracks.album_id, a']
     a.first.track.should == EagerTrack.load(:id => 3, :album_id=>1)
     DB.sqls.should == []
   end
@@ -235,10 +235,10 @@ describe Sequel::Model, "#eager" do
   
   it "should eagerly load a single one_through_one association using the :distinct_on strategy" do
     def (EagerGenre.dataset).supports_distinct_on?() true end
-    EagerAlbum.one_through_one :genre, :clone=>:genre, :eager_limit_strategy=>true
+    EagerAlbum.one_through_one :genre, :clone=>:genre, :order=>:a
     a = EagerAlbum.eager(:genre).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
-    DB.sqls.should == ['SELECT * FROM albums', "SELECT DISTINCT ON (ag.album_id) genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1))) ORDER BY ag.album_id"]
+    DB.sqls.should == ['SELECT * FROM albums', "SELECT DISTINCT ON (ag.album_id) genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1))) ORDER BY ag.album_id, a"]
     a.first.genre.should == EagerGenre.load(:id=>4)
     DB.sqls.should == []
   end

@@ -712,9 +712,9 @@ module Sequel
 
         private
 
-        # Only use a eager limit strategy by default if there is an offset.
+        # Only use a eager limit strategy by default if there is an offset or an order.
         def default_eager_limit_strategy
-          super unless !offset
+          super if self[:order] || offset
         end
 
         # Use the DISTINCT ON eager limit strategy for true if the database supports it.

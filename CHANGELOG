@@ -1,5 +1,7 @@
 === HEAD
 
+* Use an eager limit strategy by default for *_one associations with orders (jeremyevans)
+
 * Support :limit_strategy eager_graph option, for specifying strategy used for limited associations in that eager graph (jeremyevans)
 
 * Add eager_graph_with_options to model datasets, for specifying options specific to the eager_graph call (jeremyevans)
