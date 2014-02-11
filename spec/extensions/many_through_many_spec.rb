@@ -804,6 +804,19 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     DB.sqls.length.should == 0
   end
 
+  it "should eagerly graph a single many_through_many association using the :window_function strategy" do
+    def (Tag.dataset).supports_window_functions?() true end
+    def (Tag.dataset).columns() literal(opts[:select]) =~ /x_foreign_key_x/ ? [:id, :x_foreign_key_x] : [:id] end
+    @c1.many_through_many :tags, :clone=>:tags, :limit=>2
+    ds = @c1.eager_graph_with_options(:tags, :limit_strategy=>true)
+    ds._fetch = {:id=>1, :tags_id=>2}
+    a = ds.all
+    a.should == [@c1.load(:id=>1)]
+    DB.sqls.should == ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN (SELECT id, x_foreign_key_x FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x, row_number() OVER (PARTITION BY albums_artists.artist_id) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id)) AS t1 WHERE (x_sequel_row_number_x <= 2)) AS tags ON (tags.x_foreign_key_x = artists.id)']
+    a.first.tags.should == [Tag.load(:id=>2)]
+    DB.sqls.length.should == 0
+  end
+
   it "should eagerly graph multiple associations in a single call" do 
     a = @c1.eager_graph(:tags, :albums).all
     a.should == [@c1.load(:id=>1)]
@@ -1774,6 +1787,29 @@ describe "Sequel::Plugins::OneThroughMany eager loading methods" do
     a = @c1.eager_graph(:tag).all
     a.should == [@c1.load(:id=>1)]
     DB.sqls.should == ['SELECT artists.id, tag.id AS tag_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags AS tag ON (tag.id = albums_tags.tag_id)']
+    a.first.tag.should == Tag.load(:id=>2)
+    DB.sqls.length.should == 0
+  end
+
+  it "should eagerly graph a single one_through_many association using the :distinct_on strategy" do
+    def (Tag.dataset).supports_distinct_on?() true end
+    ds = @c1.eager_graph_with_options(:tag, :limit_strategy=>true)
+    ds._fetch = {:id=>1, :tag_id=>2}
+    a = ds.all
+    a.should == [@c1.load(:id=>1)]
+    DB.sqls.should == ['SELECT artists.id, tag.id AS tag_id FROM artists LEFT OUTER JOIN (SELECT DISTINCT ON (albums_artists.artist_id) tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) ORDER BY albums_artists.artist_id) AS tag ON (tag.x_foreign_key_x = artists.id)']
+    a.first.tag.should == Tag.load(:id=>2)
+    DB.sqls.length.should == 0
+  end
+  
+  it "should eagerly graph a single one_through_many association using the :window_function strategy" do
+    def (Tag.dataset).supports_window_functions?() true end
+    def (Tag.dataset).columns() literal(opts[:select]) =~ /x_foreign_key_x/ ? [:id, :x_foreign_key_x] : [:id] end
+    ds = @c1.eager_graph_with_options(:tag, :limit_strategy=>true)
+    ds._fetch = {:id=>1, :tag_id=>2}
+    a = ds.all
+    a.should == [@c1.load(:id=>1)]
+    DB.sqls.should == ['SELECT artists.id, tag.id AS tag_id FROM artists LEFT OUTER JOIN (SELECT id, x_foreign_key_x FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x, row_number() OVER (PARTITION BY albums_artists.artist_id) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id)) AS t1 WHERE (x_sequel_row_number_x = 1)) AS tag ON (tag.x_foreign_key_x = artists.id)']
     a.first.tag.should == Tag.load(:id=>2)
     DB.sqls.length.should == 0
   end

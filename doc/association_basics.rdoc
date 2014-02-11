@@ -1406,11 +1406,13 @@ If specified, should be a proc that accepts a single hash argument, which will c
 at least the following keys:
 
 :self :: The dataset that is doing the eager loading
-:table_alias :: An alias to use for the table to graph for this association.
-:implicit_qualifier :: The alias that was used for the current table (since you can cascade associations).
 :callback :: A callback proc used to dynamically modify the dataset to graph into the
              current dataset, before such graphing is done. This is nil if no callback
              proc is used.
+:implicit_qualifier :: The alias that was used for the current table (since you can cascade associations).
+:join_type :: Override the join type to use when graphing.
+:limit_strategy :: The limit strategy symbol to use when graphing (for limited associations only)
+:table_alias :: An alias to use for the table to graph for this association.
 
 Example:
 

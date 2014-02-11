@@ -1,5 +1,9 @@
 === HEAD
 
+* Support :limit_strategy eager_graph option, for specifying strategy used for limited associations in that eager graph (jeremyevans)
+
+* Add eager_graph_with_options to model datasets, for specifying options specific to the eager_graph call (jeremyevans)
+
 * Handle offsets on *_many associations when eager graphing when there are no associated results (jeremyevans)
 
 * Make Database#register_array_type work without existing scalar conversion proc in the pg_array extension (jeremyevans)

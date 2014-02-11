@@ -225,7 +225,7 @@ module Sequel
           opts[:eager_loader_key] = left_pk unless opts.has_key?(:eager_loader_key)
           left_pks = opts[:left_primary_keys] = Array(left_pk)
           lpkc = opts[:left_primary_key_column] ||= left_pk
-          opts[:left_primary_key_columns] ||= Array(lpkc)
+          lpkcs = opts[:left_primary_key_columns] ||= Array(lpkc)
           opts[:dataset] ||= lambda do
             ds = opts.associated_dataset
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
@@ -279,12 +279,25 @@ module Sequel
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
             iq = eo[:implicit_qualifier]
-            opts.edges.each do |t|
-              ds = ds.graph(t[:table], t.fetch(:only_conditions, (Array(t[:right]).zip(Array(t[:left])) + t[:conditions])), :select=>false, :table_alias=>ds.unused_table_alias(t[:table]), :join_type=>ds.opts[:eager_graph][:join_type]||t[:join_type], :qualify=>:deep, :implicit_qualifier=>iq, &t[:block])
-              iq = nil
+            egls = eo[:limit_strategy]
+            if egls && egls != :ruby
+              associated_key_array = opts.associated_key_array
+              orig_egds = egds = eager_graph_dataset(opts, eo)
+              opts.reverse_edges.each{|t| egds = egds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
+              ft = opts.final_reverse_edge
+              egds = egds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])), :table_alias=>ft[:alias], :qualify=>:deep).
+                select_all(egds.first_source).
+                select_append(*associated_key_array)
+              egds = opts.apply_eager_graph_limit_strategy(egls, egds)
+              ds.graph(egds, associated_key_array.map{|v| v.aliaz}.zip(Array(lpkcs)) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>iq, :join_type=>eo[:join_type]||join_type, :from_self_alias=>ds.opts[:eager_graph][:master], :select=>select||orig_egds.columns, &graph_block)
+            else
+              opts.edges.each do |t|
+                ds = ds.graph(t[:table], t.fetch(:only_conditions, (Array(t[:right]).zip(Array(t[:left])) + t[:conditions])), :select=>false, :table_alias=>ds.unused_table_alias(t[:table]), :join_type=>eo[:join_type]||t[:join_type], :qualify=>:deep, :implicit_qualifier=>iq, &t[:block])
+                iq = nil
+              end
+              fe = opts.final_edge
+              ds.graph(opts.associated_class, use_only_conditions ? only_conditions : (Array(opts.right_primary_key).zip(Array(fe[:left])) + conditions), :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>eo[:join_type]||join_type, &graph_block)
             end
-            fe = opts.final_edge
-            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : (Array(opts.right_primary_key).zip(Array(fe[:left])) + conditions), :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>ds.opts[:eager_graph][:join_type]||join_type, &graph_block)
           end
 
           def_association_dataset_methods(opts)

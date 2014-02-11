@@ -240,6 +240,97 @@ Using the :eager_loader proc, you should be able to eagerly load all association
 that can be eagerly loaded, even if Sequel doesn't natively support such eager
 loading.
 
+== Limited Associations
+
+Sequel supports specifying limits and/or offsets for associations:
+
+  Artist.one_to_many :first_10_albums, :class=>:Album, :order=>:release_date, :limit=>10
+
+For retrieving the associated objects for a single object, this just uses
+a LIMIT:
+
+  artist.first_10_albums
+  # SELECT * FROM albums WHERE (artist_id = 1) LIMIT 10
+
+=== Eager Loading via eager
+
+However, if you want to eagerly load an association, you must use a different
+approach.  Sequel has 3 separate strategies for dealing with such cases,
+depending on database support.
+
+On PostgreSQL, for *_one associations that don't use an offset, it will by
+default use the distinct on strategy, which uses a DISTINCT ON clause:
+
+  Artist.one_to_one :first_album, :class=>:Album, :order=>:release_date
+  Artist.where(:id=>[1,2]).eager(:first_album).all
+  # SELECT DISTINCT ON (albums.artist_id) *
+  # FROM albums
+  # WHERE (albums.artist_id IN (1, 2))
+  # ORDER BY albums.artist_id, release_date
+  
+Otherwise, if the database supports window functions, it will use a subquery
+with a window function:
+
+  Artist.where(:id=>[1,2]).eager(:first_10_albums).all
+  # SELECT * FROM (
+  #   SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY release_date) AS x_sequel_row_number_x
+  #   FROM tracks
+  #   WHERE (tracks.album_id IN (1, 2))
+  # ) AS t1
+  # WHERE (x_sequel_row_number_x <= 10)
+  
+If the database doesn't support window functions, it will fall back to
+retrieving all records, and then will slice the resulting array to get
+the first 10 after retrieval.
+
+=== Eager Loading via eager_graph_with_options
+
+When eager loading an association via eager_graph (which uses JOINs), the
+situation is similar.  Sequel can use a variant of the same 3 strategies,
+but by default it retrieves all records and then does the array slice
+in ruby.  As eager_graph does not support options, to use an eager_graph
+limit strategy you have to use the eager_graph_with_options method with
+the :limit_strategy option.
+
+The distinct on strategy uses DISTINCT ON in a subquery and JOINs that
+subquery:
+
+  Artist.eager_graph_with_options(:first_album, :limit_strategy=>true).all
+  # SELECT artists.id, artists.name, first_album.id AS first_album_id,
+  #        first_album.name AS first_album_name, first_album.artist_id,
+  #        first_album.release_date
+  # FROM artists 
+  # LEFT OUTER JOIN (
+  #   SELECT DISTINCT ON (albums.artist_id) *
+  #   FROM albums
+  #   ORDER BY albums.artist_id, release_date
+  # ) AS first_album ON (first_album.artist_id = artists.id)
+
+The window function approach JOINs to a nested subquery using a window
+function:
+
+  Artist.eager_graph_with_options(:first_10_albums, :limit_strategy=>true).all
+  # SELECT artists.id, artists.name, first_10_albums.id AS first_10_albums_id,
+  #        first_10_albums.name AS first_10_albums_name, first_10_albums.artist_id,
+  #        first_10_albums.release_date
+  # FROM artists 
+  # LEFT OUTER JOIN (
+  #   SELECT id, name, artist_id, release_date
+  #   FROM (
+  #     SELECT *, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x
+  #     FROM albums
+  #   ) AS t1 WHERE (x_sequel_row_number_x <= 10)
+  # ) AS first_10_albums ON (first_10_albums.artist_id = artists.id)'
+
+The reason that Sequel does not automatically use the distinct on or
+window function strategy for eager_graph is that it can perform much worse than the
+default of just doing the array slicing in ruby.  If you are only using eager_graph to
+return a few records, it may be cheaper to get all of their associated records and filter
+them in ruby as opposed to computing the set of limited associated records for all rows.
+
+It's recommended to only use an eager_graph limit strategy if you have benchmarked
+it against the default behavior and found it is faster for your use case.
+
 == ActiveRecord associations
 
 Sequel supports all of associations that ActiveRecord supports, though some

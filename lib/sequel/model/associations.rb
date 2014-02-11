@@ -76,6 +76,19 @@ module Sequel
           ds
         end
 
+        # Apply the eager graph limit strategy to the dataset to graph into the current dataset, or return
+        # the dataset unmodified if no SQL limit strategy is needed.
+        def apply_eager_graph_limit_strategy(strategy, ds)
+          case strategy
+          when :distinct_on
+            apply_distinct_on_eager_limit_strategy(ds.order_prepend(*self[:order]))
+          when :window_function
+            apply_window_function_eager_limit_strategy(ds.order_prepend(*self[:order])).select(*ds.columns)
+          else
+            ds
+          end
+        end
+
         # Apply an eager limit strategy to the dataset, or return the dataset
         # unmodified if it doesn't need an eager limit strategy.
         def apply_eager_limit_strategy(ds)
@@ -166,23 +179,33 @@ module Sequel
           end
         end
 
+        # The eager_graph limit strategy to use for this dataset
+        def eager_graph_limit_strategy(strategy)
+          if self[:limit] || !returns_array?
+            strategy = strategy[self[:name]] if strategy.is_a?(Hash)
+            case strategy
+            when true
+              true_eager_limit_strategy
+            when Symbol
+              strategy
+            else
+              if returns_array? || !limit_and_offset.last.nil?
+                :ruby
+              end
+            end
+          end
+        end
+        
         # The eager limit strategy to use for this dataset.
         def eager_limit_strategy
           cached_fetch(:_eager_limit_strategy) do
-            if self[:limit]
-              case s = cached_fetch(:eager_limit_strategy){self[:model].default_eager_limit_strategy || :ruby}
+            if self[:limit] || !returns_array?
+              case s = cached_fetch(:eager_limit_strategy){default_eager_limit_strategy}
               when true
-                ds = associated_class.dataset
-                if ds.supports_window_functions?
-                  :window_function
-                else
-                  :ruby
-                end
+                true_eager_limit_strategy
               else
                 s
               end
-            else
-              nil
             end
           end
         end
@@ -402,6 +425,11 @@ module Sequel
           end
         end
 
+        # The default eager limit strategy to use for this association
+        def default_eager_limit_strategy
+          self[:model].default_eager_limit_strategy || :ruby
+        end
+
         # The conditions to add to the filter by associations conditions
         # subquery to restrict it to to the object(s) that was used as the
         # filter value.
@@ -448,6 +476,16 @@ module Sequel
         def transform(s)
           s.is_a?(Array) ? s.map(&Proc.new) : (yield s)
         end
+
+        # The eager limit strategy used when true is given as the value, choosing the
+        # best strategy based on what the database supports.
+        def true_eager_limit_strategy
+          if associated_class.dataset.supports_window_functions?
+            :window_function
+          else
+            :ruby
+          end
+        end
       end
     
       class ManyToOneAssociationReflection < AssociationReflection
@@ -476,6 +514,11 @@ module Sequel
           self[:key].nil?
         end
     
+        # many_to_one associations don't need an eager_graph limit strategy
+        def eager_graph_limit_strategy(_)
+          nil
+        end
+
         # many_to_one associations don't need an eager limit strategy
         def eager_limit_strategy
           nil
@@ -657,32 +700,25 @@ module Sequel
           super && (eager_limit_strategy != :ruby || !slice_range)
         end
 
-        # Singular associations don't use an eager limit strategy by default unless they use an
-        # offset.  They support both DISTINCT ON and window functions as strategies.
-        def eager_limit_strategy
-          cached_fetch(:_eager_limit_strategy) do
-            offset = limit_and_offset.last
-            case s = self.fetch(:eager_limit_strategy){(self[:model].default_eager_limit_strategy || :ruby) if offset}
-            when Symbol
-              s
-            when true
-              ds = associated_class.dataset
-              if ds.supports_ordered_distinct_on? && offset.nil?
-                :distinct_on
-              elsif ds.supports_window_functions?
-                :window_function
-              else
-                :ruby
-              end
-            else
-              nil
-            end
-          end
-        end
-
         # Singular associations always return a single object, not an array.
         def returns_array?
           false
+        end
+
+        private
+
+        # Only use a eager limit strategy by default if there is an offset.
+        def default_eager_limit_strategy
+          super unless limit_and_offset.last.nil?
+        end
+
+        # Use the DISTINCT ON eager limit strategy for true if the database supports it.
+        def true_eager_limit_strategy
+          if associated_class.dataset.supports_ordered_distinct_on? && limit_and_offset.last.nil?
+            :distinct_on
+          else
+            super
+          end
         end
       end
       
@@ -697,6 +733,17 @@ module Sequel
         # The alias to use for the associated key when eagerly loading
         def associated_key_alias
           self[:left_key_alias]
+        end
+
+        # Array of associated keys used when eagerly loading.
+        def associated_key_array
+          cached_fetch(:associated_key_array) do
+            if self[:uses_left_composite_keys]
+              associated_key_alias.zip(predicate_keys).map{|a, k| SQL::AliasedExpression.new(k, a)}
+            else
+              [SQL::AliasedExpression.new(predicate_key, associated_key_alias)]
+            end
+          end
         end
 
         # The column to use for the associated key when eagerly loading
@@ -1228,11 +1275,7 @@ module Sequel
           ds = ds.eager(associations) unless Array(associations).empty?
           ds = eager_options[:eager_block].call(ds) if eager_options[:eager_block]
           if opts.eager_loading_use_associated_key?
-            ds = if opts[:uses_left_composite_keys]
-              ds.select_append(*opts.associated_key_alias.zip(opts.predicate_keys).map{|a, k| SQL::AliasedExpression.new(k, a)})
-            else
-              ds.select_append(SQL::AliasedExpression.new(opts.predicate_key, opts.associated_key_alias))
-            end
+            ds = ds.select_append(*opts.associated_key_array)
           end
           ds
         end
@@ -1263,7 +1306,7 @@ module Sequel
         end
 
         Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@autoreloading_associations=>:hash_dup, :@default_eager_limit_strategy=>nil)
-        Plugins.def_dataset_methods(self, [:eager, :eager_graph, :association_join, :association_full_join, :association_inner_join, :association_left_join, :association_right_join])
+        Plugins.def_dataset_methods(self, [:eager, :eager_graph, :eager_graph_with_options, :association_join, :association_full_join, :association_inner_join, :association_left_join, :association_right_join])
         
         private
       
@@ -1378,8 +1421,20 @@ module Sequel
           jt_graph_block = opts[:graph_join_table_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>ds.opts[:eager_graph][:join_type]||jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
-            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>ds.opts[:eager_graph][:join_type]||join_type, &graph_block)
+            egls = eo[:limit_strategy]
+            if egls && egls != :ruby
+              associated_key_array = opts.associated_key_array
+              orig_egds = egds = eager_graph_dataset(opts, eo)
+              egds = egds.
+                inner_join(join_table, rcks.zip(opts.right_primary_keys) + graph_jt_conds, :qualify=>:deep).
+                select_all(egds.first_source).
+                select_append(*associated_key_array)
+              egds = opts.apply_eager_graph_limit_strategy(egls, egds)
+              ds.graph(egds, associated_key_array.map{|v| v.aliaz}.zip(lpkcs) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>eo[:implicit_qualifier], :join_type=>eo[:join_type]||join_type, :from_self_alias=>ds.opts[:eager_graph][:master], :select=>select||orig_egds.columns, &graph_block)
+            else
+              ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>eo[:join_type]||jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
+              ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>eo[:join_type]||join_type, &graph_block)
+            end
           end
       
           def_association_dataset_methods(opts)
@@ -1465,7 +1520,7 @@ module Sequel
           graph_cks = opts[:graph_keys]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(graph_cks) + conditions, eo.merge(:select=>select, :join_type=>ds.opts[:eager_graph][:join_type]||join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(graph_cks) + conditions, eo.merge(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
           end
       
           def_association_dataset_methods(opts)
@@ -1539,7 +1594,7 @@ module Sequel
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : cks.zip(pkcs) + conditions, eo.merge(:select=>select, :join_type=>ds.opts[:eager_graph][:join_type]||join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds = ds.graph(opts.apply_eager_graph_limit_strategy(eo[:limit_strategy], eager_graph_dataset(opts, eo)), use_only_conditions ? only_conditions : cks.zip(pkcs) + conditions, eo.merge(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
             # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
             ds.opts[:eager_graph][:reciprocals][eo[:table_alias]] = opts.reciprocal
             ds
@@ -2096,13 +2151,45 @@ END
         # Like +eager+, you need to call +all+ on the dataset for the eager loading to work.  If you just
         # call +each+, it will yield plain hashes, each containing all columns from all the tables.
         def eager_graph(*associations)
+          eager_graph_with_options(associations)
+        end
+
+        # Run eager_graph with some options specific to just this call. Unlike eager_graph, this takes
+        # the associations as a single argument instead of multiple arguments.
+        #
+        # Options:
+        #
+        # :join_type :: Override the join type specified in the association
+        # :limit_strategy :: Use a strategy for handling limits on associations.
+        #                    Appropriate :limit_strategy values are:
+        #                    true :: Pick the most appropriate based on what the database supports
+        #                    :distinct_on :: Force use of DISTINCT ON stategy (*_one associations only)
+        #                    :window_function :: Force use of window function strategy
+        #                    :ruby :: Don't modify the SQL, implement limits/offsets with array slicing
+        #
+        #                    This can also be a hash with association name symbol keys and one of the above values,
+        #                    to use different strategies per association.
+        #
+        #                    The default is the :ruby strategy.  Choosing a different strategy can make your code
+        #                    significantly slower in some cases (perhaps even the majority of cases), so you should
+        #                    only use this if you have benchmarked that it is faster for your use cases.
+        def eager_graph_with_options(associations, opts=OPTS)
+          associations = [associations] unless associations.is_a?(Array)
           if eg = @opts[:eager_graph]
             eg = eg.dup
-            [:requirements, :reflections, :reciprocals].each{|k| eg[k] = eg[k].dup}
+            [:requirements, :reflections, :reciprocals, :limits].each{|k| eg[k] = eg[k].dup}
+            eg[:local] = opts
             ds = clone(:eager_graph=>eg)
             ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations)
           else
-            new_eager_graph(associations)
+            # Each of the following have a symbol key for the table alias, with the following values: 
+            # :reciprocals :: the reciprocal value to use for this association
+            # :reflections :: AssociationReflection instance related to this association
+            # :requirements :: array of requirements for this association
+            # :limits :: Any limit/offset array slicing that need to be handled in ruby land after loading
+            opts = {:requirements=>{}, :master=>alias_symbol(first_source), :reflections=>{}, :reciprocals=>{}, :limits=>{}, :local=>opts, :cartesian_product_number=>0, :row_proc=>row_proc}
+            ds = clone(:eager_graph=>opts)
+            ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations).naked
           end
         end
 
@@ -2151,13 +2238,19 @@ END
               associations = assoc.is_a?(Array) ? assoc : [assoc]
             end
           end
-          ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>ta, :callback=>callback)
+          orig_ds = ds
+          local_opts = ds.opts[:eager_graph][:local]
+          limit_strategy = r.eager_graph_limit_strategy(local_opts[:limit_strategy])
+          ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>ta, :callback=>callback, :join_type=>local_opts[:join_type], :limit_strategy=>limit_strategy)
           if r[:order_eager_graph] && (order = r.fetch(:graph_order, r[:order]))
             ds = ds.order_more(*qualified_expression(order, assoc_table_alias))
           end
           eager_graph = ds.opts[:eager_graph]
           eager_graph[:requirements][assoc_table_alias] = requirements.dup
           eager_graph[:reflections][assoc_table_alias] = r
+          if limit_strategy == :ruby
+            eager_graph[:limits][assoc_table_alias] = r.limit_and_offset 
+          end
           eager_graph[:cartesian_product_number] += r[:cartesian_product_number] || 2
           ds = ds.eager_graph_associations(ds, r.associated_class, assoc_table_alias, requirements + [assoc_table_alias], *associations) unless associations.empty?
           ds
@@ -2196,23 +2289,12 @@ END
           hashes.replace(EagerGraphLoader.new(self).load(hashes))
         end
       
-        # Setup a new eager graph for the given associations and options
-        def new_eager_graph(associations, opts=OPTS)
-          # Each of the following have a symbol key for the table alias, with the following values: 
-          # :reciprocals - the reciprocal instance variable to use for this association
-          # :reflections - AssociationReflection instance related to this association
-          # :requirements - array of requirements for this association
-          opts = {:requirements=>{}, :master=>alias_symbol(first_source), :reflections=>{}, :reciprocals=>{}, :cartesian_product_number=>0, :row_proc=>row_proc}.merge(opts)
-          ds = clone(:eager_graph=>opts)
-          ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations).naked
-        end
-        
         private
 
         # Return a new dataset with JOINs of the given type added, using the tables and
         # conditions specified by the associations.
         def _association_join(type, associations)
-          clone(:join=>clone(:graph_from_self=>false).new_eager_graph(associations, :join_type=>type).opts[:join])
+          clone(:join=>clone(:graph_from_self=>false).eager_graph_with_options(associations, :join_type=>type).opts[:join])
         end
 
         # If the association has conditions itself, then it requires additional filters be
@@ -2455,19 +2537,18 @@ END
           requirements = eager_graph[:requirements]
           reflection_map = @reflection_map = eager_graph[:reflections]
           reciprocal_map = @reciprocal_map = eager_graph[:reciprocals]
+          limit_map = @limit_map = eager_graph[:limits]
           @unique = eager_graph[:cartesian_product_number] > 1
       
           alias_map = @alias_map = {}
           type_map = @type_map = {}
           after_load_map = @after_load_map = {}
-          limit_map = @limit_map = {}
           reflection_map.each do |k, v|
             alias_map[k] = v[:name]
             after_load_map[k] = v[:after_load] unless v[:after_load].empty?
-            limit, offset = limit_map[k] = v.limit_and_offset if v[:limit]
             type_map[k] = if v.returns_array?
               true
-            elsif offset
+            elsif (limit_and_offset = limit_map[k]) && !limit_and_offset.last.nil?
               :offset
             end
           end

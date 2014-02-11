@@ -31,33 +31,34 @@ shared_examples_for "one_to_one eager limit strategies" do
   end
 
   specify "eager graphing one_to_one associations should work correctly" do
-    Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els) if @els
-    Artist.one_to_one  :last_album, {:clone=>:last_album}.merge(@els) if @els
-    Artist.one_to_one  :second_album, {:clone=>:second_album}.merge(@els) if @els
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
     ar = @pr.call[1]
+    ds = Artist.order(:artists__name)
+    limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
     
-    a = Artist.eager_graph(:first_album).order_prepend(:artists__name).all
+    a = ds.eager_graph_with_options(:first_album, limit_strategy).all
     a.should == [@artist, ar]
     a.first.first_album.should == @album
     a.last.first_album.should == nil
     a.first.first_album.values.should == @album.values
 
-    a = Artist.eager_graph(:last_album).order_prepend(:artists__name).all
+    a = ds.eager_graph_with_options(:last_album, limit_strategy).all
+    a = ds.eager_graph(:last_album).all
     a.should == [@artist, ar]
     a.first.last_album.should == diff_album
     a.last.last_album.should == nil
     a.first.last_album.values.should == diff_album.values
 
-    a = Artist.eager_graph(:second_album).order_prepend(:artists__name).all
+    a = ds.eager_graph_with_options(:second_album, limit_strategy).all
+    a = ds.eager_graph(:second_album).all
     a.should == [@artist, ar]
     a.first.second_album.should == diff_album
     a.last.second_album.should == nil
     a.first.second_album.values.should == diff_album.values
 
     same_album = @same_album.call
-    a = Artist.eager_graph(:first_album).order_prepend(:artists__name).all
+    a = ds.eager_graph_with_options(:first_album, limit_strategy).all
     a.should == [@artist, ar]
     [@album, same_album].should include(a.first.first_album)
     a.last.first_album.should == nil
@@ -92,6 +93,39 @@ shared_examples_for "one_to_many eager limit strategies" do
     ars.first.not_first_albums.map{|x| x.values}.should == [middle_album, diff_album].map{|x| x.values}
     ars.first.last_two_albums.map{|x| x.values}.should == [diff_album, middle_album].map{|x| x.values}
   end
+
+  specify "should correctly handle limits and offsets when eager graphing one_to_many associations" do
+    @album.update(:artist => @artist)
+    middle_album = @middle_album.call
+    diff_album = @diff_album.call
+    ar = @pr.call[1]
+    ds = Artist.order(:artists__name)
+    limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
+    
+    ars = ds.eager_graph_with_options(:first_two_albums, limit_strategy).all
+    ars.should == [@artist, ar]
+    ars.first.first_two_albums.should == [@album, middle_album]
+    ars.last.first_two_albums.should == []
+    ars.first.first_two_albums.map{|x| x.values}.should == [@album, middle_album].map{|x| x.values}
+
+    ars = ds.eager_graph_with_options(:second_two_albums, limit_strategy).all
+    ars.should == [@artist, ar]
+    ars.first.second_two_albums.should == [middle_album, diff_album]
+    ars.last.second_two_albums.should == []
+    ars.first.second_two_albums.map{|x| x.values}.should == [middle_album, diff_album].map{|x| x.values}
+
+    ars = ds.eager_graph_with_options(:not_first_albums, limit_strategy).all
+    ars.should == [@artist, ar]
+    ars.first.not_first_albums.should == [middle_album, diff_album]
+    ars.last.not_first_albums.should == []
+    ars.first.not_first_albums.map{|x| x.values}.should == [middle_album, diff_album].map{|x| x.values}
+
+    ars = ds.eager_graph_with_options(:last_two_albums, limit_strategy).all
+    ars.should == [@artist, ar]
+    ars.first.last_two_albums.should == [diff_album, middle_album]
+    ars.last.last_two_albums.should == []
+    ars.first.last_two_albums.map{|x| x.values}.should == [diff_album, middle_album].map{|x| x.values}
+  end
 end
 
 shared_examples_for "one_through_one eager limit strategies" do
@@ -118,25 +152,24 @@ shared_examples_for "one_through_one eager limit strategies" do
   end
 
   specify "should correctly handle offsets when eager graphing one_through_one associations" do
-    Album.one_through_one :first_tag, {:clone=>:first_tag}.merge(@els) if @els
-    Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els) if @els
-    Album.one_through_one :last_tag, {:clone=>:last_tag}.merge(@els) if @els
     tu, tv = @other_tags.call
     al = @pr.call.first
+    ds = Album.order(:albums__name)
+    limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
     
-    als = Album.eager_graph(:first_tag).order_prepend(:albums__name).all
+    als = ds.eager_graph_with_options(:first_tag, limit_strategy).all
     als.should == [@album, al]
     als.first.first_tag.should == @tag
     als.last.first_tag.should == nil
     als.first.first_tag.values.should == @tag.values
 
-    als = Album.eager_graph(:second_tag).order_prepend(:albums__name).all
+    als = ds.eager_graph_with_options(:second_tag, limit_strategy).all
     als.should == [@album, al]
     als.first.second_tag.should == tu
     als.last.second_tag.should == nil
     als.first.second_tag.values.should == tu.values
 
-    als = Album.eager_graph(:last_tag).order_prepend(:albums__name).all
+    als = ds.eager_graph_with_options(:last_tag, limit_strategy).all
     als.should == [@album, al]
     als.first.last_tag.should == tv
     als.last.last_tag.should == nil
@@ -169,6 +202,37 @@ shared_examples_for "many_to_many eager limit strategies" do
     als.first.not_first_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
     als.first.last_two_tags.map{|x| x.values}.should == [tv, tu].map{|x| x.values}
   end
+
+  specify "should correctly handle limits and offsets when eager loading many_to_many associations" do
+    tu, tv = @other_tags.call
+    al = @pr.call.first
+    ds = Album.order(:albums__name)
+    limit_strategy = {:limit_strategy=>(@els||{})[:eager_limit_strategy]}
+    
+    als = ds.eager_graph_with_options(:first_two_tags, limit_strategy).all
+    als.should == [@album, al]
+    als.first.first_two_tags.should == [@tag, tu]
+    als.last.first_two_tags.should == []
+    als.first.first_two_tags.map{|x| x.values}.should == [@tag, tu].map{|x| x.values}
+
+    als = ds.eager_graph_with_options(:second_two_tags, limit_strategy).all
+    als.should == [@album, al]
+    als.first.second_two_tags.should == [tu, tv]
+    als.last.second_two_tags.should == []
+    als.first.second_two_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
+
+    als = ds.eager_graph_with_options(:not_first_tags, limit_strategy).all
+    als.should == [@album, al]
+    als.first.not_first_tags.should == [tu, tv]
+    als.last.not_first_tags.should == []
+    als.first.not_first_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
+
+    als = ds.eager_graph_with_options(:last_two_tags, limit_strategy).all
+    als.should == [@album, al]
+    als.first.last_two_tags.should == [tv, tu]
+    als.last.last_two_tags.should == []
+    als.first.last_two_tags.map{|x| x.values}.should == [tv, tu].map{|x| x.values}
+  end
 end
 
 shared_examples_for "many_through_many eager limit strategies" do
@@ -195,6 +259,38 @@ shared_examples_for "many_through_many eager limit strategies" do
     ars.first.first_two_tags.map{|x| x.values}.should == [@tag, tu].map{|x| x.values}
     ars.first.second_two_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
     ars.first.not_first_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
+    ars.first.last_two_tags.map{|x| x.values}.should == [tv, tu].map{|x| x.values}
+  end
+
+  specify "should correctly handle limits and offsets when eager loading many_through_many associations" do
+    @album.update(:artist => @artist)
+    tu, tv = @other_tags.call
+    ar = @pr.call[1]
+    ds = Artist.order(:artists__name)
+    limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
+    
+    ars = ds.eager_graph_with_options(:first_two_tags, limit_strategy).all
+    ars.should == [@artist, ar]
+    ars.first.first_two_tags.should == [@tag, tu]
+    ars.last.first_two_tags.should == []
+    ars.first.first_two_tags.map{|x| x.values}.should == [@tag, tu].map{|x| x.values}
+
+    ars = ds.eager_graph_with_options(:second_two_tags, limit_strategy).all
+    ars.should == [@artist, ar]
+    ars.first.second_two_tags.should == [tu, tv]
+    ars.last.second_two_tags.should == []
+    ars.first.second_two_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
+
+    ars = ds.eager_graph_with_options(:not_first_tags, limit_strategy).all
+    ars.should == [@artist, ar]
+    ars.first.not_first_tags.should == [tu, tv]
+    ars.last.not_first_tags.should == []
+    ars.first.not_first_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
+
+    ars = ds.eager_graph_with_options(:last_two_tags, limit_strategy).all
+    ars.should == [@artist, ar]
+    ars.first.last_two_tags.should == [tv, tu]
+    ars.last.last_two_tags.should == []
     ars.first.last_two_tags.map{|x| x.values}.should == [tv, tu].map{|x| x.values}
   end
 end
@@ -224,26 +320,25 @@ shared_examples_for "one_through_many eager limit strategies" do
   end
 
   specify "should correctly handle offsets when eager graphing one_through_many associations" do
-    Artist.one_through_many :first_tag, {:clone=>:first_tag}.merge(@els) if @els
-    Artist.one_through_many :second_tag, {:clone=>:second_tag}.merge(@els) if @els
-    Artist.one_through_many :last_tag, {:clone=>:last_tag}.merge(@els) if @els
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
     ar = @pr.call[1]
+    ds = Artist.order(:artists__name)
+    limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
     
-    ars = Artist.eager_graph(:first_tag).order_prepend(:artists__name).all
+    ars = ds.eager_graph_with_options(:first_tag, limit_strategy).all
     ars.should == [@artist, ar]
     ars.first.first_tag.should == @tag
     ars.last.first_tag.should == nil
     ars.first.first_tag.values.should == @tag.values
 
-    ars = Artist.eager_graph(:second_tag).order_prepend(:artists__name).all
+    ars = ds.eager_graph_with_options(:second_tag, limit_strategy).all
     ars.should == [@artist, ar]
     ars.first.second_tag.should == tu
     ars.last.second_tag.should == nil
     ars.first.second_tag.values.should == tu.values
 
-    ars = Artist.eager_graph(:last_tag).order_prepend(:artists__name).all
+    ars = ds.eager_graph_with_options(:last_tag, limit_strategy).all
     ars.should == [@artist, ar]
     ars.first.last_tag.should == tv
     ars.last.last_tag.should == nil
@@ -1231,18 +1326,18 @@ describe "Sequel::Model Simple Associations" do
       one_to_one :first_album, :clone=>:albums
       one_to_one :second_album, :clone=>:albums, :limit=>[nil, 1]
       one_to_one :last_album, :class=>:Album, :order=>Sequel.desc(:name)
-      one_to_many :first_two_albums, :clone=>:albums, :limit=>2
-      one_to_many :second_two_albums, :clone=>:albums, :limit=>[2, 1]
-      one_to_many :not_first_albums, :clone=>:albums, :limit=>[nil, 1]
+      one_to_many :first_two_albums, :clone=>:albums, :limit=>2, :order=>:name
+      one_to_many :second_two_albums, :clone=>:albums, :limit=>[2, 1], :order=>:name
+      one_to_many :not_first_albums, :clone=>:albums, :limit=>[nil, 1], :order=>:name
       one_to_many :last_two_albums, :class=>:Album, :order=>Sequel.desc(:name), :limit=>2
       one_to_many :a_albums, :clone=>:albums, :conditions=>{:name=>'Al'}
       one_to_one :first_a_album, :clone=>:a_albums
       plugin :many_through_many
       many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]]
-      many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2
-      many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1]
-      many_through_many :not_first_tags, :clone=>:tags, :order=>:tags__name, :limit=>[nil, 1]
-      many_through_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:tags__name), :limit=>2
+      many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2, :graph_order=>:name
+      many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1], :graph_order=>:name
+      many_through_many :not_first_tags, :clone=>:tags, :order=>:tags__name, :limit=>[nil, 1], :graph_order=>:name
+      many_through_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:tags__name), :limit=>2, :graph_order=>Sequel.desc(:name)
       many_through_many :t_tags, :clone=>:tags, :conditions=>{:tags__name=>'T'}
       one_through_many :first_tag, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :order=>:tags__name, :graph_order=>:name, :class=>:Tag
       one_through_many :second_tag, :clone=>:first_tag, :limit=>[nil, 1]
@@ -1460,10 +1555,10 @@ describe "Sequel::Model Composite Key Associations" do
       one_to_one :first_a_album, :clone=>:a_albums
       plugin :many_through_many
       many_through_many :tags, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]]
-      many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2
-      many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1]
-      many_through_many :not_first_tags, :clone=>:tags, :order=>:tags__name, :limit=>[nil, 1]
-      many_through_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:tags__name), :limit=>2
+      many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2, :graph_order=>:name
+      many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1], :graph_order=>:name
+      many_through_many :not_first_tags, :clone=>:tags, :order=>:tags__name, :limit=>[nil, 1], :graph_order=>:name
+      many_through_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:tags__name), :limit=>2, :graph_order=>Sequel.desc(:name)
       many_through_many :t_tags, :clone=>:tags do |ds| ds.where(:tags__name=>'T') end
       one_through_many :first_tag, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]], :order=>:tags__name, :graph_order=>:name, :class=>:Tag
       one_through_many :second_tag, :clone=>:first_tag, :limit=>[nil, 1]

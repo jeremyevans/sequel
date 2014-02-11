@@ -95,6 +95,11 @@ module Sequel
           :"#{underscore(demodulize(self[:model].name))}_ids"
         end
         
+        # Always use the ruby eager_graph limit strategy if association is limited.
+        def eager_graph_limit_strategy(_)
+          :ruby if self[:limit]
+        end
+
         # Always use the ruby eager limit strategy
         def eager_limit_strategy
           cached_fetch(:_eager_limit_strategy) do
@@ -171,6 +176,11 @@ module Sequel
         # that use *_id for single keys.
         def default_key
           :"#{singularize(self[:name])}_ids"
+        end
+
+        # Always use the ruby eager_graph limit strategy if association is limited.
+        def eager_graph_limit_strategy(_)
+          :ruby if self[:limit]
         end
 
         # Always use the ruby eager limit strategy
@@ -302,7 +312,7 @@ module Sequel
 
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(eager_graph_dataset(opts, eo), conditions, eo.merge(:select=>select, :join_type=>ds.opts[:eager_graph][:join_type]||join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds = ds.graph(eager_graph_dataset(opts, eo), conditions, eo.merge(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
             ds
           end
 
@@ -404,7 +414,7 @@ module Sequel
 
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(eager_graph_dataset(opts, eo), conditions, eo.merge(:select=>select, :join_type=>ds.opts[:eager_graph][:join_type]||join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds = ds.graph(eager_graph_dataset(opts, eo), conditions, eo.merge(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
             ds
           end
 
