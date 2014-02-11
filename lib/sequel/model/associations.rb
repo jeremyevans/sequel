@@ -189,7 +189,7 @@ module Sequel
             when Symbol
               strategy
             else
-              if returns_array? || !limit_and_offset.last.nil?
+              if returns_array? || offset
                 :ruby
               end
             end
@@ -462,6 +462,11 @@ module Sequel
           !returns_array?
         end
         
+        # Any offset to use for this association (or nil if there is no offset).
+        def offset
+          limit_and_offset.last
+        end
+
         # Whether the given association reflection is possible reciprocal
         # association for the current association reflection.
         def reciprocal_association?(assoc_reflect)
@@ -709,12 +714,12 @@ module Sequel
 
         # Only use a eager limit strategy by default if there is an offset.
         def default_eager_limit_strategy
-          super unless limit_and_offset.last.nil?
+          super unless !offset
         end
 
         # Use the DISTINCT ON eager limit strategy for true if the database supports it.
         def true_eager_limit_strategy
-          if associated_class.dataset.supports_ordered_distinct_on? && limit_and_offset.last.nil?
+          if associated_class.dataset.supports_ordered_distinct_on? && !offset
             :distinct_on
           else
             super
