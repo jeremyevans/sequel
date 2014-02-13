@@ -185,6 +185,7 @@ shared_examples_for "many_to_many eager limit strategies" do
     Album.send @many_to_many_method||:many_to_many, :last_two_tags, {:clone=>:last_two_tags}.merge(@els) if @els
     tu, tv = @other_tags.call
     al = @pr.call.first
+    al.add_tag(tu)
     
     als = Album.eager(:first_two_tags, :second_two_tags, :not_first_tags, :last_two_tags).order(:name).all
     als.should == [@album, al]
@@ -192,9 +193,9 @@ shared_examples_for "many_to_many eager limit strategies" do
     als.first.second_two_tags.should == [tu, tv]
     als.first.not_first_tags.should == [tu, tv]
     als.first.last_two_tags.should == [tv, tu]
-    als.last.first_two_tags.should == []
+    als.last.first_two_tags.should == [tu]
     als.last.second_two_tags.should == []
-    als.last.last_two_tags.should == []
+    als.last.last_two_tags.should == [tu]
     
     # Check that no extra columns got added by the eager loading
     als.first.first_two_tags.map{|x| x.values}.should == [@tag, tu].map{|x| x.values}
@@ -206,13 +207,14 @@ shared_examples_for "many_to_many eager limit strategies" do
   specify "should correctly handle limits and offsets when eager loading many_to_many associations" do
     tu, tv = @other_tags.call
     al = @pr.call.first
+    al.add_tag(tu)
     ds = Album.order(:albums__name)
     limit_strategy = {:limit_strategy=>(@els||{})[:eager_limit_strategy]}
     
     als = ds.eager_graph_with_options(:first_two_tags, limit_strategy).all
     als.should == [@album, al]
     als.first.first_two_tags.should == [@tag, tu]
-    als.last.first_two_tags.should == []
+    als.last.first_two_tags.should == [tu]
     als.first.first_two_tags.map{|x| x.values}.should == [@tag, tu].map{|x| x.values}
 
     als = ds.eager_graph_with_options(:second_two_tags, limit_strategy).all
@@ -230,7 +232,7 @@ shared_examples_for "many_to_many eager limit strategies" do
     als = ds.eager_graph_with_options(:last_two_tags, limit_strategy).all
     als.should == [@album, al]
     als.first.last_two_tags.should == [tv, tu]
-    als.last.last_two_tags.should == []
+    als.last.last_two_tags.should == [tu]
     als.first.last_two_tags.map{|x| x.values}.should == [tv, tu].map{|x| x.values}
   end
 end
@@ -243,7 +245,9 @@ shared_examples_for "many_through_many eager limit strategies" do
     Artist.many_through_many :last_two_tags, {:clone=>:last_two_tags}.merge(@els) if @els
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
-    ar = @pr.call[1]
+    al, ar, _ = @pr.call
+    al.update(:artist=>ar)
+    al.add_tag(tu)
     
     ars = Artist.eager(:first_two_tags, :second_two_tags, :not_first_tags, :last_two_tags).order(:name).all
     ars.should == [@artist, ar]
@@ -251,9 +255,10 @@ shared_examples_for "many_through_many eager limit strategies" do
     ars.first.second_two_tags.should == [tu, tv]
     ars.first.not_first_tags.should == [tu, tv]
     ars.first.last_two_tags.should == [tv, tu]
-    ars.last.first_two_tags.should == []
+    ars.last.first_two_tags.should == [tu]
     ars.last.second_two_tags.should == []
-    ars.last.last_two_tags.should == []
+    ars.last.not_first_tags.should == []
+    ars.last.last_two_tags.should == [tu]
     
     # Check that no extra columns got added by the eager loading
     ars.first.first_two_tags.map{|x| x.values}.should == [@tag, tu].map{|x| x.values}
@@ -265,14 +270,16 @@ shared_examples_for "many_through_many eager limit strategies" do
   specify "should correctly handle limits and offsets when eager loading many_through_many associations" do
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
-    ar = @pr.call[1]
+    al, ar, _ = @pr.call
+    al.update(:artist=>ar)
+    al.add_tag(tu)
     ds = Artist.order(:artists__name)
     limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
     
     ars = ds.eager_graph_with_options(:first_two_tags, limit_strategy).all
     ars.should == [@artist, ar]
     ars.first.first_two_tags.should == [@tag, tu]
-    ars.last.first_two_tags.should == []
+    ars.last.first_two_tags.should == [tu]
     ars.first.first_two_tags.map{|x| x.values}.should == [@tag, tu].map{|x| x.values}
 
     ars = ds.eager_graph_with_options(:second_two_tags, limit_strategy).all
@@ -290,7 +297,7 @@ shared_examples_for "many_through_many eager limit strategies" do
     ars = ds.eager_graph_with_options(:last_two_tags, limit_strategy).all
     ars.should == [@artist, ar]
     ars.first.last_two_tags.should == [tv, tu]
-    ars.last.last_two_tags.should == []
+    ars.last.last_two_tags.should == [tu]
     ars.first.last_two_tags.map{|x| x.values}.should == [tv, tu].map{|x| x.values}
   end
 end
@@ -302,16 +309,18 @@ shared_examples_for "one_through_many eager limit strategies" do
     Artist.one_through_many :last_tag, {:clone=>:last_tag}.merge(@els) if @els
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
-    ar = @pr.call[1]
+    al, ar, _ = @pr.call
+    al.update(:artist=>ar)
+    al.add_tag(tu)
     
     ars = Artist.eager(:first_tag, :second_tag, :last_tag).order(:name).all
     ars.should == [@artist, ar]
     ars.first.first_tag.should == @tag
     ars.first.second_tag.should == tu
     ars.first.last_tag.should == tv
-    ars.last.first_tag.should == nil
+    ars.last.first_tag.should == tu
     ars.last.second_tag.should == nil
-    ars.last.last_tag.should == nil
+    ars.last.last_tag.should == tu
     
     # Check that no extra columns got added by the eager loading
     ars.first.first_tag.values.should == @tag.values
@@ -322,14 +331,16 @@ shared_examples_for "one_through_many eager limit strategies" do
   specify "should correctly handle offsets when eager graphing one_through_many associations" do
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
-    ar = @pr.call[1]
+    al, ar, _ = @pr.call
+    al.update(:artist=>ar)
+    al.add_tag(tu)
     ds = Artist.order(:artists__name)
     limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
     
     ars = ds.eager_graph_with_options(:first_tag, limit_strategy).all
     ars.should == [@artist, ar]
     ars.first.first_tag.should == @tag
-    ars.last.first_tag.should == nil
+    ars.last.first_tag.should == tu
     ars.first.first_tag.values.should == @tag.values
 
     ars = ds.eager_graph_with_options(:second_tag, limit_strategy).all
@@ -341,7 +352,7 @@ shared_examples_for "one_through_many eager limit strategies" do
     ars = ds.eager_graph_with_options(:last_tag, limit_strategy).all
     ars.should == [@artist, ar]
     ars.first.last_tag.should == tv
-    ars.last.last_tag.should == nil
+    ars.last.last_tag.should == tu
     ars.first.last_tag.values.should == tv.values
   end
 end
