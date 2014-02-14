@@ -1,5 +1,7 @@
 === HEAD
 
+* Simplify queries used for filtering by associations with conditions (jeremyevans)
+
 * Use an eager limit strategy by default for *_one associations with orders (jeremyevans)
 
 * Support :limit_strategy eager_graph option, for specifying strategy used for limited associations in that eager graph (jeremyevans)

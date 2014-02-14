@@ -159,8 +159,10 @@ module Sequel
         def filter_by_associations_add_conditions_dataset_filter(ds)
           reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
           ft = final_reverse_edge
+          k = qualify(ft[:alias], Array(self[:left_key]))
           ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])), :table_alias=>ft[:alias], :qualify=>:deep).
-            select(*qualify(ft[:alias], Array(self[:left_key])))
+            where(Sequel.negate(k.zip([]))).
+            select(*k)
         end
       end
 

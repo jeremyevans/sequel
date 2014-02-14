@@ -425,6 +425,15 @@ module Sequel
           end
         end
 
+        # The associated_dataset with the eager_block callback already applied.
+        def associated_eager_dataset
+          cached_fetch(:associated_eager_dataset) do
+            ds = associated_dataset
+            ds = self[:eager_block].call(ds) if self[:eager_block]
+            ds
+          end
+        end
+
         # The default eager limit strategy to use for this association
         def default_eager_limit_strategy
           self[:model].default_eager_limit_strategy || :ruby
@@ -450,9 +459,8 @@ module Sequel
         # values.
         def filter_by_associations_conditions_dataset
           cached_fetch(:filter_by_associations_conditions_dataset) do
-            ds = associated_dataset.unordered.unlimited
+            ds = associated_eager_dataset.unordered.unlimited
             ds = filter_by_associations_add_conditions_dataset_filter(ds)
-            ds = self[:eager_block].call(ds) if self[:eager_block]
             ds
           end
         end
@@ -869,7 +877,9 @@ module Sequel
         private
 
         def filter_by_associations_add_conditions_dataset_filter(ds)
-          ds.select(*qualify(join_table_alias, self[:left_keys])).
+          k = qualify(join_table_alias, self[:left_keys])
+          ds.select(*k).
+            where(Sequel.negate(k.zip([]))).
             inner_join(self[:join_table], Array(self[:right_keys]).zip(right_primary_keys), :qualify=>:deep)
         end
 
@@ -2306,7 +2316,7 @@ END
         # included by the association's conditions.
         def add_association_filter_conditions(ref, obj, expr)
           if expr != SQL::Constants::FALSE && ref.filter_by_associations_add_conditions?
-            Sequel.&(expr, ref.filter_by_associations_conditions_expression(obj))
+            Sequel.expr(ref.filter_by_associations_conditions_expression(obj))
           else
             expr
           end
