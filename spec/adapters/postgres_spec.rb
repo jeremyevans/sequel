@@ -850,6 +850,13 @@ describe "A PostgreSQL database" do
 
     @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
     @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
+
+    @db[:posts].insert(:title=>'jruby rubinius ruby maglev mri iron')
+    @db[:posts].insert(:title=>'ruby jruby maglev mri rubinius iron')
+    @db[:posts].full_text_search(:title, 'rubinius ruby', :phrase=>true).select_order_map(:title).should == ['jruby rubinius ruby maglev mri iron']
+    @db[:posts].full_text_search(:title, 'jruby maglev', :phrase=>true).select_order_map(:title).should == ['ruby jruby maglev mri rubinius iron']
+    @db[:posts].full_text_search(:title, 'rubinius ruby', :plain=>true).select_order_map(:title).should == ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
+    @db[:posts].full_text_search(:title, 'jruby maglev', :plain=>true).select_order_map(:title).should == ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
   end
 
   specify "should support spatial indexes" do

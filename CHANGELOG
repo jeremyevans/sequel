@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :plain and :phrase options to Dataset#full_text_search on PostgreSQL (jeremyevans)
+
 * Use limit strategy to correctly handle filtering by limited associations (jeremyevans)
 
 * Simplify queries used for filtering by associations with conditions (jeremyevans)

@@ -1193,12 +1193,28 @@ module Sequel
         lock_style(:share)
       end
 
-      # PostgreSQL specific full text search syntax, using tsearch2 (included
-      # in 8.3 by default, and available for earlier versions as an add-on).
+      # Run a full text search on PostgreSQL.  By default, searching for the inclusion
+      # of any of the terms in any of the cols.
+      #
+      # Options:
+      # :language :: The language to use for the search (default: 'simple')
+      # :plain :: Whether a plain search should be used (default: false).  In this case,
+      #           terms should be a single string, and it will do a search where cols
+      #           contains all of the words in terms.  This ignores search operators in terms.
+      # :phrase :: Similar to :plain, but also adding an ILIKE filter to ensure that
+      #            returned rows also include the exact phrase used.
       def full_text_search(cols, terms, opts = OPTS)
         lang = opts[:language] || 'simple'
         terms = terms.join(' | ') if terms.is_a?(Array)
-        filter("to_tsvector(?::regconfig, ?) @@ to_tsquery(?::regconfig, ?)", lang, full_text_string_join(cols), lang, terms)
+        to_tsquery = (opts[:phrase] || opts[:plain]) ? 'plainto_tsquery' : 'to_tsquery'
+
+        ds = where(Sequel.lit(["(to_tsvector(", "::regconfig, ", ") @@ #{to_tsquery}(", "::regconfig, ", "))"], lang, full_text_string_join(cols), lang, terms))
+
+        if opts[:phrase]
+          ds = ds.grep(cols, "%#{escape_like(terms)}%", :case_insensitive=>true)
+        end
+
+        ds
       end
 
       # Insert given values into the database.
