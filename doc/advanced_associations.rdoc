@@ -317,7 +317,7 @@ function:
   # LEFT OUTER JOIN (
   #   SELECT id, name, artist_id, release_date
   #   FROM (
-  #     SELECT *, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x
+  #     SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY release_date) AS x_sequel_row_number_x
   #     FROM albums
   #   ) AS t1 WHERE (x_sequel_row_number_x <= 10)
   # ) AS first_10_albums ON (first_10_albums.artist_id = artists.id)'
@@ -330,6 +330,54 @@ them in ruby as opposed to computing the set of limited associated records for a
 
 It's recommended to only use an eager_graph limit strategy if you have benchmarked
 it against the default behavior and found it is faster for your use case.
+
+=== Filtering By Associations
+
+In order to return correct results, Sequel automatically uses a limit strategy when
+using filtering by associations with limited associations, using a similar approach as
+when using eager to eagerly load.
+
+The distinct on strategy:
+
+  Artist.where(:first_album=>Album[1]).all
+  # SELECT *
+  # FROM artists
+  # WHERE (artists.id IN (
+  #   SELECT albums.artist_id
+  #   FROM albums
+  #   WHERE ((albums.artist_id IS NOT NULL) AND (albums.id IN (
+  #     SELECT DISTINCT ON (albums.artist_id) albums.id
+  #     FROM albums
+  #     ORDER BY albums.artist_id, release_date
+  #   )) AND (albums.id = 1))))
+
+The window function strategy:
+
+  Artist.where(:first_10_albums=>Album[1]).all
+  # SELECT *
+  # FROM artists
+  # WHERE (artists.id IN (
+  #   SELECT albums.artist_id
+  #   FROM albums
+  #   WHERE ((albums.artist_id IS NOT NULL) AND (albums.id IN (
+  #     SELECT id FROM (
+  #       SELECT albums.id, row_number() OVER (PARTITION BY albums.artist_id ORDER BY release_date) AS x_sequel_row_number_x
+  #       FROM albums
+  #     ) AS t1
+  #     WHERE (x_sequel_row_number_x <= 10)
+  #   )) AND (albums.id = 1))))
+
+Note that if the database does not support window functions, filtering by associations
+with limited associations will not work correctly, leading it to return results where
+associated object used as an argument is not within the limit of the association.
+
+== Additional Association Types
+
+While the above examples for limited associations showed one_to_many and one_to_one associations,
+it's just because those are the simplest examples.  Sequel supports all of the same features for
+many_to_many and one_through_one associations that are enabled by default, as well as the
+many_through_many and one_through_many associations that are added by the many_through_many
+plugin.
 
 == ActiveRecord associations
 

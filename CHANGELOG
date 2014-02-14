@@ -1,5 +1,7 @@
 === HEAD
 
+* Use limit strategy to correctly handle filtering by limited associations (jeremyevans)
+
 * Simplify queries used for filtering by associations with conditions (jeremyevans)
 
 * Use an eager limit strategy by default for *_one associations with orders (jeremyevans)

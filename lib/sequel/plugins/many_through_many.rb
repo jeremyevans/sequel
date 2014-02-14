@@ -164,6 +164,18 @@ module Sequel
             where(Sequel.negate(k.zip([]))).
             select(*k)
         end
+
+        def filter_by_associations_limit_key
+          fe = edges.first
+          Array(qualify(fe[:table], fe[:right])) + Array(qualify(associated_class.table_name, associated_class.primary_key))
+        end
+
+        def filter_by_associations_limit_subquery
+          subquery = associated_eager_dataset.unlimited
+          reverse_edges.each{|t| subquery = subquery.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
+          ft = final_reverse_edge
+          subquery.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])), :table_alias=>ft[:alias], :qualify=>:deep)
+        end
       end
 
       class OneThroughManyAssociationReflection < ManyThroughManyAssociationReflection

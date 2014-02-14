@@ -489,10 +489,7 @@ This will return all albums that whose popular tags would include
 at least one of those tags.
 
 Note that filtering by associations does not work for associations
-that use blocks with instance-specific code, or associations that
-have a limit or offset. This includes many_to_one/one_to_one
-associations that would return multiple values if they were not
-limited to a single value.
+that use blocks with instance-specific code.
 
 == Name Collisions
 

@@ -2867,11 +2867,16 @@ end
 
 describe "Filtering by associations" do
   before(:all) do
-    @Album = Class.new(Sequel::Model(:albums))
-    artist = @Artist = Class.new(Sequel::Model(:artists))
-    tag = @Tag = Class.new(Sequel::Model(:tags))
-    track = @Track = Class.new(Sequel::Model(:tracks))
-    album_info = @AlbumInfo = Class.new(Sequel::Model(:album_infos))
+    db = Sequel.mock
+    db.extend_datasets do
+      def supports_window_functions?; true; end
+      def supports_distinct_on?; true; end
+    end
+    @Album = Class.new(Sequel::Model(db[:albums]))
+    artist = @Artist = Class.new(Sequel::Model(db[:artists]))
+    tag = @Tag = Class.new(Sequel::Model(db[:tags]))
+    track = @Track = Class.new(Sequel::Model(db[:tracks]))
+    album_info = @AlbumInfo = Class.new(Sequel::Model(db[:album_infos]))
     @Artist.columns :id, :id1, :id2
     @Tag.columns :id, :tid1, :tid2
     @Track.columns :id, :album_id, :album_id1, :album_id2
@@ -2879,36 +2884,57 @@ describe "Filtering by associations" do
     @Album.class_eval do
       columns :id, :id1, :id2, :artist_id, :artist_id1, :artist_id2
       b = lambda{|ds| ds.where(:name=>'B')}
+      c = {:name=>'A'}
 
       many_to_one :artist, :class=>artist, :key=>:artist_id
       one_to_many :tracks, :class=>track, :key=>:album_id
       one_to_one :album_info, :class=>album_info, :key=>:album_id
       many_to_many :tags, :class=>tag, :left_key=>:album_id, :join_table=>:albums_tags, :right_key=>:tag_id
 
-      many_to_one :a_artist, :clone=>:artist, :conditions=>{:name=>'A'}
-      one_to_many :a_tracks, :clone=>:tracks, :conditions=>{:name=>'A'}
-      one_to_one :a_album_info, :clone=>:album_info, :conditions=>{:name=>'A'}
-      many_to_many :a_tags, :clone=>:tags, :conditions=>{:name=>'A'}
+      many_to_one :a_artist, :clone=>:artist, :conditions=>c
+      one_to_many :a_tracks, :clone=>:tracks, :conditions=>c
+      one_to_one :a_album_info, :clone=>:album_info, :conditions=>c
+      many_to_many :a_tags, :clone=>:tags, :conditions=>c
 
       many_to_one :b_artist, :clone=>:artist, &b
       one_to_many :b_tracks, :clone=>:tracks, &b
       one_to_one :b_album_info, :clone=>:album_info, &b
       many_to_many :b_tags, :clone=>:tags, &b
 
+      one_to_many :l_tracks, :clone=>:tracks, :limit=>10
+      one_to_one :l_track, :clone=>:tracks, :order=>:name
+      many_to_many :l_tags, :clone=>:tags, :limit=>10
+      one_through_one :l_tag, :clone=>:tags, :order=>:name
+
+      one_to_many :al_tracks, :clone=>:l_tracks, :conditions=>c
+      one_to_one :al_track, :clone=>:l_track, :conditions=>c
+      many_to_many :al_tags, :clone=>:l_tags, :conditions=>c
+      one_through_one :al_tag, :clone=>:l_tag, :conditions=>c
+
       many_to_one :cartist, :class=>artist, :key=>[:artist_id1, :artist_id2], :primary_key=>[:id1, :id2]
       one_to_many :ctracks, :class=>track, :key=>[:album_id1, :album_id2], :primary_key=>[:id1, :id2]
       one_to_one :calbum_info, :class=>album_info, :key=>[:album_id1, :album_id2], :primary_key=>[:id1, :id2]
       many_to_many :ctags, :class=>tag, :left_key=>[:album_id1, :album_id2], :left_primary_key=>[:id1, :id2], :right_key=>[:tag_id1, :tag_id2], :right_primary_key=>[:tid1, :tid2], :join_table=>:albums_tags
 
-      many_to_one :a_cartist, :clone=>:cartist, :conditions=>{:name=>'A'}
-      one_to_many :a_ctracks, :clone=>:ctracks, :conditions=>{:name=>'A'}
-      one_to_one :a_calbum_info, :clone=>:calbum_info, :conditions=>{:name=>'A'}
-      many_to_many :a_ctags, :clone=>:ctags, :conditions=>{:name=>'A'}
+      many_to_one :a_cartist, :clone=>:cartist, :conditions=>c
+      one_to_many :a_ctracks, :clone=>:ctracks, :conditions=>c
+      one_to_one :a_calbum_info, :clone=>:calbum_info, :conditions=>c
+      many_to_many :a_ctags, :clone=>:ctags, :conditions=>c
 
       many_to_one :b_cartist, :clone=>:cartist, &b
       one_to_many :b_ctracks, :clone=>:ctracks, &b
       one_to_one :b_calbum_info, :clone=>:calbum_info, &b
       many_to_many :b_ctags, :clone=>:ctags, &b
+
+      one_to_many :l_ctracks, :clone=>:ctracks, :limit=>10
+      one_to_one :l_ctrack, :clone=>:ctracks, :order=>:name
+      many_to_many :l_ctags, :clone=>:ctags, :limit=>10
+      one_through_one :l_ctag, :clone=>:ctags, :order=>:name
+
+      one_to_many :al_ctracks, :clone=>:l_ctracks, :conditions=>c
+      one_to_one :al_ctrack, :clone=>:l_ctrack, :conditions=>c
+      many_to_many :al_ctags, :clone=>:l_ctags, :conditions=>c
+      one_through_one :al_ctag, :clone=>:l_ctag, :conditions=>c
     end
   end
 
@@ -2960,6 +2986,38 @@ describe "Filtering by associations" do
     @Album.filter(:b_tags=>@Tag.load(:id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT albums_tags.album_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((name = 'B') AND (albums_tags.album_id IS NOT NULL) AND (tags.id = 3))))"
   end
 
+  it "should be able to filter on one_to_many associations with :limit" do
+    @Album.filter(:l_tracks=>@Track.load(:id=>5, :album_id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT tracks.album_id FROM tracks WHERE ((tracks.album_id IS NOT NULL) AND (tracks.id IN (SELECT id FROM (SELECT tracks.id, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x FROM tracks) AS t1 WHERE (x_sequel_row_number_x <= 10))) AND (tracks.id = 5))))"
+  end
+
+  it "should be able to filter on one_to_one associations with :order" do
+    @Album.filter(:l_track=>@Track.load(:id=>5, :album_id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT tracks.album_id FROM tracks WHERE ((tracks.album_id IS NOT NULL) AND (tracks.id IN (SELECT DISTINCT ON (tracks.album_id) tracks.id FROM tracks ORDER BY tracks.album_id, name)) AND (tracks.id = 5))))"
+  end
+
+  it "should be able to filter on many_to_many associations with :limit" do
+    @Album.filter(:l_tags=>@Tag.load(:id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT albums_tags.album_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((albums_tags.album_id IS NOT NULL) AND ((albums_tags.album_id, tags.id) IN (SELECT b, c FROM (SELECT albums_tags.album_id AS b, tags.id AS c, row_number() OVER (PARTITION BY albums_tags.album_id) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id)) AS t1 WHERE (x_sequel_row_number_x <= 10))) AND (tags.id = 3))))"
+  end
+
+  it "should be able to filter on one_through_one associations with :order" do
+    @Album.filter(:l_tag=>@Tag.load(:id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT albums_tags.album_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((albums_tags.album_id IS NOT NULL) AND ((albums_tags.album_id, tags.id) IN (SELECT DISTINCT ON (albums_tags.album_id) albums_tags.album_id, tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) ORDER BY albums_tags.album_id, name)) AND (tags.id = 3))))"
+  end
+
+  it "should be able to filter on one_to_many associations with :limit and :conditions" do
+    @Album.filter(:al_tracks=>@Track.load(:id=>5, :album_id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT tracks.album_id FROM tracks WHERE ((name = 'A') AND (tracks.album_id IS NOT NULL) AND (tracks.id IN (SELECT id FROM (SELECT tracks.id, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x FROM tracks WHERE (name = 'A')) AS t1 WHERE (x_sequel_row_number_x <= 10))) AND (tracks.id = 5))))"
+  end
+
+  it "should be able to filter on one_to_one associations with :order and :conditions" do
+    @Album.filter(:al_track=>@Track.load(:id=>5, :album_id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT tracks.album_id FROM tracks WHERE ((name = 'A') AND (tracks.album_id IS NOT NULL) AND (tracks.id IN (SELECT DISTINCT ON (tracks.album_id) tracks.id FROM tracks WHERE (name = 'A') ORDER BY tracks.album_id, name)) AND (tracks.id = 5))))"
+  end
+
+  it "should be able to filter on many_to_many associations with :limit and :conditions" do
+    @Album.filter(:al_tags=>@Tag.load(:id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT albums_tags.album_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((name = 'A') AND (albums_tags.album_id IS NOT NULL) AND ((albums_tags.album_id, tags.id) IN (SELECT b, c FROM (SELECT albums_tags.album_id AS b, tags.id AS c, row_number() OVER (PARTITION BY albums_tags.album_id) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (name = 'A')) AS t1 WHERE (x_sequel_row_number_x <= 10))) AND (tags.id = 3))))"
+  end
+
+  it "should be able to filter on one_through_one associations with :order and :conditions" do
+    @Album.filter(:al_tag=>@Tag.load(:id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT albums_tags.album_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((name = 'A') AND (albums_tags.album_id IS NOT NULL) AND ((albums_tags.album_id, tags.id) IN (SELECT DISTINCT ON (albums_tags.album_id) albums_tags.album_id, tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (name = 'A') ORDER BY albums_tags.album_id, name)) AND (tags.id = 3))))"
+  end
+
   it "should be able to filter on many_to_one associations with composite keys" do
     @Album.filter(:cartist=>@Artist.load(:id1=>3, :id2=>4)).sql.should == 'SELECT * FROM albums WHERE ((albums.artist_id1 = 3) AND (albums.artist_id2 = 4))'
   end
@@ -3006,6 +3064,38 @@ describe "Filtering by associations" do
 
   it "should be able to filter on many_to_many associations with block and composite keys" do
     @Album.filter(:b_ctags=>@Tag.load(:id=>5, :tid1=>3, :tid2=>4)).sql.should == "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums_tags.album_id1, albums_tags.album_id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) WHERE ((name = 'B') AND (albums_tags.album_id1 IS NOT NULL) AND (albums_tags.album_id2 IS NOT NULL) AND (tags.id = 5))))"
+  end
+
+  it "should be able to filter on one_to_many associations with :limit and composite keys" do
+    @Album.filter(:l_ctracks=>@Track.load(:id=>5, :album_id1=>3, :album_id2=>4)).sql.should == "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT tracks.album_id1, tracks.album_id2 FROM tracks WHERE ((tracks.album_id1 IS NOT NULL) AND (tracks.album_id2 IS NOT NULL) AND (tracks.id IN (SELECT id FROM (SELECT tracks.id, row_number() OVER (PARTITION BY tracks.album_id1, tracks.album_id2) AS x_sequel_row_number_x FROM tracks) AS t1 WHERE (x_sequel_row_number_x <= 10))) AND (tracks.id = 5))))"
+  end
+
+  it "should be able to filter on one_to_one associations with :order and composite keys" do
+    @Album.filter(:l_ctrack=>@Track.load(:id=>5, :album_id1=>3, :album_id2=>4)).sql.should == "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT tracks.album_id1, tracks.album_id2 FROM tracks WHERE ((tracks.album_id1 IS NOT NULL) AND (tracks.album_id2 IS NOT NULL) AND (tracks.id IN (SELECT DISTINCT ON (tracks.album_id1, tracks.album_id2) tracks.id FROM tracks ORDER BY tracks.album_id1, tracks.album_id2, name)) AND (tracks.id = 5))))"
+  end
+
+  it "should be able to filter on many_to_many associations with :limit and composite keys" do
+    @Album.filter(:l_ctags=>@Tag.load(:id=>5, :tid1=>3, :tid2=>4)).sql.should == "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums_tags.album_id1, albums_tags.album_id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) WHERE ((albums_tags.album_id1 IS NOT NULL) AND (albums_tags.album_id2 IS NOT NULL) AND ((albums_tags.album_id1, albums_tags.album_id2, tags.id) IN (SELECT b, c, d FROM (SELECT albums_tags.album_id1 AS b, albums_tags.album_id2 AS c, tags.id AS d, row_number() OVER (PARTITION BY albums_tags.album_id1, albums_tags.album_id2) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2))) AS t1 WHERE (x_sequel_row_number_x <= 10))) AND (tags.id = 5))))"
+  end
+
+  it "should be able to filter on one_through_one associations with :order and composite keys" do
+    @Album.filter(:l_ctag=>@Tag.load(:id=>5, :tid1=>3, :tid2=>4)).sql.should == "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums_tags.album_id1, albums_tags.album_id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) WHERE ((albums_tags.album_id1 IS NOT NULL) AND (albums_tags.album_id2 IS NOT NULL) AND ((albums_tags.album_id1, albums_tags.album_id2, tags.id) IN (SELECT DISTINCT ON (albums_tags.album_id1, albums_tags.album_id2) albums_tags.album_id1, albums_tags.album_id2, tags.id FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) ORDER BY albums_tags.album_id1, albums_tags.album_id2, name)) AND (tags.id = 5))))"
+  end
+
+  it "should be able to filter on one_to_many associations with :limit and :conditions and composite keys" do
+    @Album.filter(:al_ctracks=>@Track.load(:id=>5, :album_id1=>3, :album_id2=>4)).sql.should == "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT tracks.album_id1, tracks.album_id2 FROM tracks WHERE ((name = 'A') AND (tracks.album_id1 IS NOT NULL) AND (tracks.album_id2 IS NOT NULL) AND (tracks.id IN (SELECT id FROM (SELECT tracks.id, row_number() OVER (PARTITION BY tracks.album_id1, tracks.album_id2) AS x_sequel_row_number_x FROM tracks WHERE (name = 'A')) AS t1 WHERE (x_sequel_row_number_x <= 10))) AND (tracks.id = 5))))"
+  end
+
+  it "should be able to filter on one_to_one associations with :order and :conditions and composite keys" do
+    @Album.filter(:al_ctrack=>@Track.load(:id=>5, :album_id1=>3, :album_id2=>4)).sql.should == "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT tracks.album_id1, tracks.album_id2 FROM tracks WHERE ((name = 'A') AND (tracks.album_id1 IS NOT NULL) AND (tracks.album_id2 IS NOT NULL) AND (tracks.id IN (SELECT DISTINCT ON (tracks.album_id1, tracks.album_id2) tracks.id FROM tracks WHERE (name = 'A') ORDER BY tracks.album_id1, tracks.album_id2, name)) AND (tracks.id = 5))))"
+  end
+
+  it "should be able to filter on many_to_many associations with :limit and :conditions and composite keys" do
+    @Album.filter(:al_ctags=>@Tag.load(:id=>5, :tid1=>3, :tid2=>4)).sql.should == "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums_tags.album_id1, albums_tags.album_id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) WHERE ((name = 'A') AND (albums_tags.album_id1 IS NOT NULL) AND (albums_tags.album_id2 IS NOT NULL) AND ((albums_tags.album_id1, albums_tags.album_id2, tags.id) IN (SELECT b, c, d FROM (SELECT albums_tags.album_id1 AS b, albums_tags.album_id2 AS c, tags.id AS d, row_number() OVER (PARTITION BY albums_tags.album_id1, albums_tags.album_id2) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) WHERE (name = 'A')) AS t1 WHERE (x_sequel_row_number_x <= 10))) AND (tags.id = 5))))"
+  end
+
+  it "should be able to filter on one_through_one associations with :order and :conditions and composite keys" do
+    @Album.filter(:al_ctag=>@Tag.load(:id=>5, :tid1=>3, :tid2=>4)).sql.should == "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums_tags.album_id1, albums_tags.album_id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) WHERE ((name = 'A') AND (albums_tags.album_id1 IS NOT NULL) AND (albums_tags.album_id2 IS NOT NULL) AND ((albums_tags.album_id1, albums_tags.album_id2, tags.id) IN (SELECT DISTINCT ON (albums_tags.album_id1, albums_tags.album_id2) albums_tags.album_id1, albums_tags.album_id2, tags.id FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) WHERE (name = 'A') ORDER BY albums_tags.album_id1, albums_tags.album_id2, name)) AND (tags.id = 5))))"
   end
 
   it "should work inside a complex filter" do

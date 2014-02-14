@@ -236,7 +236,7 @@ module Sequel
         # Whether additional conditions should be added when using the filter
         # by associations support.
         def filter_by_associations_add_conditions?
-          self[:conditions] || self[:eager_block]
+          self[:conditions] || self[:eager_block] || self[:limit]
         end
 
         # The expression to use for the additional conditions to be added for
@@ -425,6 +425,34 @@ module Sequel
           end
         end
 
+        # Apply a limit strategy to the given dataset so that filter by
+        # associations works with a limited dataset.
+        def apply_filter_by_associations_limit_strategy(ds)
+          case eager_limit_strategy
+          when :distinct_on
+            apply_filter_by_associations_distinct_on_limit_strategy(ds)
+          when :window_function
+            apply_filter_by_associations_window_function_limit_strategy(ds)
+          else
+            ds
+          end
+        end
+
+        # Apply a distinct on eager limit strategy using IN with a subquery
+        # that uses DISTINCT ON to ensure only the first matching record for
+        # each key is included.
+        def apply_filter_by_associations_distinct_on_limit_strategy(ds)
+          k = filter_by_associations_limit_key 
+          ds.where(k=>apply_distinct_on_eager_limit_strategy(filter_by_associations_limit_subquery.select(*k)))
+        end
+
+        # Apply a distinct on eager limit strategy using IN with a subquery
+        # that uses a filter on the row_number window function to ensure
+        # that only rows inside the limit are returned.
+        def apply_filter_by_associations_window_function_limit_strategy(ds)
+          ds.where(filter_by_associations_limit_key=>apply_window_function_eager_limit_strategy(filter_by_associations_limit_subquery.select(*filter_by_associations_limit_alias_key)).select(*filter_by_associations_limit_aliases))
+        end
+
         # The associated_dataset with the eager_block callback already applied.
         def associated_eager_dataset
           cached_fetch(:associated_eager_dataset) do
@@ -461,8 +489,14 @@ module Sequel
           cached_fetch(:filter_by_associations_conditions_dataset) do
             ds = associated_eager_dataset.unordered.unlimited
             ds = filter_by_associations_add_conditions_dataset_filter(ds)
+            ds = apply_filter_by_associations_limit_strategy(ds)
             ds
           end
+        end
+
+        # The base subquery to use when filtering by limited associations
+        def filter_by_associations_limit_subquery
+          associated_eager_dataset.unlimited
         end
 
         # Whether to limit the associated dataset to a single row.
@@ -693,6 +727,18 @@ module Sequel
           qualify(self[:model].table_name, self[:primary_key_column])
         end
 
+        def filter_by_associations_limit_alias_key
+          Array(filter_by_associations_limit_key)
+        end
+
+        def filter_by_associations_limit_aliases
+          filter_by_associations_limit_alias_key.map{|v| v.column}
+        end
+
+        def filter_by_associations_limit_key
+          qualify(associated_class.table_name, associated_class.primary_key)
+        end
+
         def reciprocal_association?(assoc_reflect)
           super && self[:keys] == assoc_reflect[:keys] && primary_key == assoc_reflect.primary_key
         end
@@ -711,6 +757,12 @@ module Sequel
         # pick the correct one with an offset.
         def assign_singular?
           super && (eager_limit_strategy != :ruby || !slice_range)
+        end
+
+        # Add conditions when filtering by singular associations with orders, since the
+        # underlying relationship is probably not one-to-one.
+        def filter_by_associations_add_conditions?
+          super || self[:order]
         end
 
         # Singular associations always return a single object, not an array.
@@ -885,6 +937,23 @@ module Sequel
 
         def filter_by_associations_conditions_key
           qualify(self[:model].table_name, self[:left_primary_key_column])
+        end
+
+        def filter_by_associations_limit_alias_key
+          aliaz = 'a'
+          filter_by_associations_limit_key.map{|c| c.as(Sequel.identifier(aliaz = aliaz.next))}
+        end
+
+        def filter_by_associations_limit_aliases
+          filter_by_associations_limit_alias_key.map{|v| v.aliaz}
+        end
+
+        def filter_by_associations_limit_key
+          qualify(join_table_alias, self[:left_keys]) + Array(qualify(associated_class.table_name, associated_class.primary_key))
+        end
+
+        def filter_by_associations_limit_subquery
+          super.inner_join(self[:join_table], Array(self[:right_keys]).zip(right_primary_keys))
         end
 
         def reciprocal_association?(assoc_reflect)
