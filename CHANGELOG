@@ -1,5 +1,9 @@
 === HEAD
 
+* Use limit strategy to correct handle limited associations in the dataset_associations plugin (jeremyevans)
+
+* Handle issues in dataset_associations plugin when dataset uses unqualified identifiers for associations requiring joins (jeremyevans)
+
 * Handle fractional seconds in input timestamps in the odbc/mssql adapter (Ross Attrill, jeremyevans)
 
 * Return fractional seconds in timestamps in the odbc adapter (jeremyevans)

@@ -3,6 +3,10 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "Sequel::Plugins::DatasetAssociations" do
   before do
     @db = Sequel.mock
+    @db.extend_datasets do
+      def supports_window_functions?; true; end
+      def supports_distinct_on?; true; end
+    end
     @Base = Class.new(Sequel::Model)
     @Base.plugin :dataset_associations
 
@@ -62,28 +66,28 @@ describe "Sequel::Plugins::DatasetAssociations" do
     ds = @Album.tags
     ds.should be_a_kind_of(Sequel::Dataset)
     ds.model.should == @Tag
-    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM albums INNER JOIN albums_tags ON (albums_tags.album_id = albums.id)))"
+    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((albums_tags.album_id) IN (SELECT albums.id FROM albums))))"
   end
 
   it "should work for one_through_one associations" do
     ds = @Album.first_tags
     ds.should be_a_kind_of(Sequel::Dataset)
     ds.model.should == @Tag
-    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM albums INNER JOIN albums_tags ON (albums_tags.album_id = albums.id)))"
+    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((albums_tags.album_id) IN (SELECT albums.id FROM albums))))"
   end
 
   it "should work for many_through_many associations" do
     ds = @Artist.tags
     ds.should be_a_kind_of(Sequel::Dataset)
     ds.model.should == @Tag
-    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id)))"
+    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id) WHERE (albums.artist_id IN (SELECT artists.id FROM artists))))"
   end
 
   it "should work for one_through_many associations" do
     ds = @Artist.otags
     ds.should be_a_kind_of(Sequel::Dataset)
     ds.model.should == @Tag
-    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id)))"
+    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id) WHERE (albums.artist_id IN (SELECT artists.id FROM artists))))"
   end
 
   it "should work for pg_array_to_many associations" do
@@ -120,7 +124,7 @@ describe "Sequel::Plugins::DatasetAssociations" do
     ds = @Artist.albums.tags
     ds.should be_a_kind_of(Sequel::Dataset)
     ds.model.should == @Tag
-    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM albums INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) WHERE (albums.artist_id IN (SELECT artists.id FROM artists))))"
+    ds.sql.should == "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((albums_tags.album_id) IN (SELECT albums.id FROM albums WHERE (albums.artist_id IN (SELECT artists.id FROM artists))))))"
   end
 
   it "should deal correctly with filters before the association method" do
@@ -170,11 +174,45 @@ describe "Sequel::Plugins::DatasetAssociations" do
     @Artist.one_to_many :albums, :clone=>:albums, :select=>[:id, :name]
     @Artist.albums.sql.should == "SELECT id, name FROM albums WHERE (albums.artist_id IN (SELECT artists.id FROM artists))"
   end
+
+  it "should deal correctly with :order option for one_to_one associations" do
+    @Artist.one_to_one :first_album, :clone=>:first_album, :order=>:name
+    @Artist.first_albums.sql.should == 'SELECT * FROM albums WHERE ((albums.artist_id IN (SELECT artists.id FROM artists)) AND (albums.id IN (SELECT DISTINCT ON (albums.artist_id) albums.id FROM albums ORDER BY albums.artist_id, name))) ORDER BY name'
+  end
+
+  it "should deal correctly with :limit option for one_to_many associations" do
+    @Artist.one_to_many :albums, :clone=>:albums, :limit=>10, :order=>:name
+    @Artist.albums.sql.should == 'SELECT * FROM albums WHERE ((albums.artist_id IN (SELECT artists.id FROM artists)) AND (albums.id IN (SELECT id FROM (SELECT albums.id, row_number() OVER (PARTITION BY albums.artist_id ORDER BY name) AS x_sequel_row_number_x FROM albums) AS t1 WHERE (x_sequel_row_number_x <= 10)))) ORDER BY name'
+  end
+
+  it "should deal correctly with :order option for one_through_one associations" do
+    @Album.one_through_one :first_tag, :clone=>:first_tag, :order=>:tags__name
+    @Album.first_tags.sql.should == 'SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (((albums_tags.album_id) IN (SELECT albums.id FROM albums)) AND ((albums_tags.album_id, tags.id) IN (SELECT DISTINCT ON (albums_tags.album_id) albums_tags.album_id, tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) ORDER BY albums_tags.album_id, tags.name))))) ORDER BY tags.name'
+  end
+
+  it "should deal correctly with :limit option for many_to_many associations" do
+    @Album.many_to_many :tags, :clone=>:tags, :limit=>10, :order=>:tags__name
+    @Album.tags.sql.should == 'SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (((albums_tags.album_id) IN (SELECT albums.id FROM albums)) AND ((albums_tags.album_id, tags.id) IN (SELECT b, c FROM (SELECT albums_tags.album_id AS b, tags.id AS c, row_number() OVER (PARTITION BY albums_tags.album_id ORDER BY tags.name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id)) AS t1 WHERE (x_sequel_row_number_x <= 10)))))) ORDER BY tags.name'
+  end
+
+  it "should deal correctly with :order option for one_through_many associations" do
+    @Artist.one_through_many :otag, :clone=>:otag, :order=>:id, :order=>:tags__name
+    @Artist.otags.sql.should == 'SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id) WHERE ((albums.artist_id IN (SELECT artists.id FROM artists)) AND ((albums.artist_id, tags.id) IN (SELECT DISTINCT ON (albums.artist_id) albums.artist_id, tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) ORDER BY albums.artist_id, tags.name))))) ORDER BY tags.name'
+  end
+
+  it "should deal correctly with :limit option for many_through_many associations" do
+    @Artist.many_through_many :tags, :clone=>:tags, :limit=>10, :order=>:tags__name
+    @Artist.tags.sql.should == 'SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id) WHERE ((albums.artist_id IN (SELECT artists.id FROM artists)) AND ((albums.artist_id, tags.id) IN (SELECT b, c FROM (SELECT albums.artist_id AS b, tags.id AS c, row_number() OVER (PARTITION BY albums.artist_id ORDER BY tags.name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id)) AS t1 WHERE (x_sequel_row_number_x <= 10)))))) ORDER BY tags.name'
+  end
 end
 
 describe "Sequel::Plugins::DatasetAssociations with composite keys" do
   before do
     @db = Sequel.mock
+    @db.extend_datasets do
+      def supports_window_functions?; true; end
+      def supports_distinct_on?; true; end
+    end
     @Base = Class.new(Sequel::Model)
     @Base.plugin :dataset_associations
 
@@ -206,6 +244,7 @@ describe "Sequel::Plugins::DatasetAssociations with composite keys" do
     @Album.one_through_one :first_tag, :class=>@Tag, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2]
     @Tag.many_to_many :albums, :class=>@Album, :right_key=>[:album_id1, :album_id2], :left_key=>[:tag_id1, :tag_id2]
     @Artist.many_through_many :tags, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]], :class=>@Tag
+    @Artist.one_through_many :otag, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]], :class=>@Tag
   end
 
   it "should work for many_to_one associations" do
@@ -221,18 +260,52 @@ describe "Sequel::Plugins::DatasetAssociations with composite keys" do
   end
 
   it "should work for many_to_many associations" do
-    @Album.tags.sql.should == "SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM albums INNER JOIN albums_tags ON ((albums_tags.album_id1 = albums.id1) AND (albums_tags.album_id2 = albums.id2))))"
+    @Album.tags.sql.should == "SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.id1) AND (albums_tags.tag_id2 = tags.id2)) WHERE ((albums_tags.album_id1, albums_tags.album_id2) IN (SELECT albums.id1, albums.id2 FROM albums))))"
   end
 
   it "should work for one_through_one associations" do
-    @Album.first_tags.sql.should == "SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM albums INNER JOIN albums_tags ON ((albums_tags.album_id1 = albums.id1) AND (albums_tags.album_id2 = albums.id2))))"
+    @Album.first_tags.sql.should == "SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.id1) AND (albums_tags.tag_id2 = tags.id2)) WHERE ((albums_tags.album_id1, albums_tags.album_id2) IN (SELECT albums.id1, albums.id2 FROM albums))))"
   end
 
   it "should work for many_through_many associations" do
-    @Artist.tags.sql.should == "SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM artists INNER JOIN albums ON ((albums.artist_id1 = artists.id1) AND (albums.artist_id2 = artists.id2)) INNER JOIN albums_tags ON ((albums_tags.album_id1 = albums.id1) AND (albums_tags.album_id2 = albums.id2))))"
+    @Artist.tags.sql.should == "SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM artists INNER JOIN albums ON ((albums.artist_id1 = artists.id1) AND (albums.artist_id2 = artists.id2)) INNER JOIN albums_tags ON ((albums_tags.album_id1 = albums.id1) AND (albums_tags.album_id2 = albums.id2)) INNER JOIN tags ON ((tags.id1 = albums_tags.tag_id1) AND (tags.id2 = albums_tags.tag_id2)) WHERE ((albums.artist_id1, albums.artist_id2) IN (SELECT artists.id1, artists.id2 FROM artists))))"
+  end
+
+  it "should work for one_through_many associations" do
+    @Artist.otags.sql.should == "SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM artists INNER JOIN albums ON ((albums.artist_id1 = artists.id1) AND (albums.artist_id2 = artists.id2)) INNER JOIN albums_tags ON ((albums_tags.album_id1 = albums.id1) AND (albums_tags.album_id2 = albums.id2)) INNER JOIN tags ON ((tags.id1 = albums_tags.tag_id1) AND (tags.id2 = albums_tags.tag_id2)) WHERE ((albums.artist_id1, albums.artist_id2) IN (SELECT artists.id1, artists.id2 FROM artists))))"
   end
 
   it "should work correctly when chaining" do
-    @Artist.albums.tags.sql.should == "SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM albums INNER JOIN albums_tags ON ((albums_tags.album_id1 = albums.id1) AND (albums_tags.album_id2 = albums.id2)) WHERE ((albums.artist_id1, albums.artist_id2) IN (SELECT artists.id1, artists.id2 FROM artists))))"
+    @Artist.albums.tags.sql.should == "SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.id1) AND (albums_tags.tag_id2 = tags.id2)) WHERE ((albums_tags.album_id1, albums_tags.album_id2) IN (SELECT albums.id1, albums.id2 FROM albums WHERE ((albums.artist_id1, albums.artist_id2) IN (SELECT artists.id1, artists.id2 FROM artists))))))"
+  end
+
+  it "should deal correctly with :order option for one_to_one associations" do
+    @Artist.one_to_one :first_album, :clone=>:first_album, :order=>:name
+    @Artist.first_albums.sql.should == 'SELECT * FROM albums WHERE (((albums.artist_id1, albums.artist_id2) IN (SELECT artists.id1, artists.id2 FROM artists)) AND ((albums.id1, albums.id2) IN (SELECT DISTINCT ON (albums.artist_id1, albums.artist_id2) albums.id1, albums.id2 FROM albums ORDER BY albums.artist_id1, albums.artist_id2, name))) ORDER BY name'
+  end
+
+  it "should deal correctly with :limit option for one_to_many associations" do
+    @Artist.one_to_many :albums, :clone=>:albums, :limit=>10, :order=>:name
+    @Artist.albums.sql.should == 'SELECT * FROM albums WHERE (((albums.artist_id1, albums.artist_id2) IN (SELECT artists.id1, artists.id2 FROM artists)) AND ((albums.id1, albums.id2) IN (SELECT id1, id2 FROM (SELECT albums.id1, albums.id2, row_number() OVER (PARTITION BY albums.artist_id1, albums.artist_id2 ORDER BY name) AS x_sequel_row_number_x FROM albums) AS t1 WHERE (x_sequel_row_number_x <= 10)))) ORDER BY name'
+  end
+
+  it "should deal correctly with :order option for one_through_one associations" do
+    @Album.one_through_one :first_tag, :clone=>:first_tag, :order=>:tags__name
+    @Album.first_tags.sql.should == 'SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.id1) AND (albums_tags.tag_id2 = tags.id2)) WHERE (((albums_tags.album_id1, albums_tags.album_id2) IN (SELECT albums.id1, albums.id2 FROM albums)) AND ((albums_tags.album_id1, albums_tags.album_id2, tags.id1, tags.id2) IN (SELECT DISTINCT ON (albums_tags.album_id1, albums_tags.album_id2) albums_tags.album_id1, albums_tags.album_id2, tags.id1, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.id1) AND (albums_tags.tag_id2 = tags.id2)) ORDER BY albums_tags.album_id1, albums_tags.album_id2, tags.name))))) ORDER BY tags.name'
+  end
+
+  it "should deal correctly with :limit option for many_to_many associations" do
+    @Album.many_to_many :tags, :clone=>:tags, :limit=>10, :order=>:tags__name
+    @Album.tags.sql.should == 'SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.id1) AND (albums_tags.tag_id2 = tags.id2)) WHERE (((albums_tags.album_id1, albums_tags.album_id2) IN (SELECT albums.id1, albums.id2 FROM albums)) AND ((albums_tags.album_id1, albums_tags.album_id2, tags.id1, tags.id2) IN (SELECT b, c, d, e FROM (SELECT albums_tags.album_id1 AS b, albums_tags.album_id2 AS c, tags.id1 AS d, tags.id2 AS e, row_number() OVER (PARTITION BY albums_tags.album_id1, albums_tags.album_id2 ORDER BY tags.name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.id1) AND (albums_tags.tag_id2 = tags.id2))) AS t1 WHERE (x_sequel_row_number_x <= 10)))))) ORDER BY tags.name'
+  end
+
+  it "should deal correctly with :order option for one_through_many associations" do
+    @Artist.one_through_many :otag, :clone=>:otag, :order=>:tags__name
+    @Artist.otags.sql.should == 'SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM artists INNER JOIN albums ON ((albums.artist_id1 = artists.id1) AND (albums.artist_id2 = artists.id2)) INNER JOIN albums_tags ON ((albums_tags.album_id1 = albums.id1) AND (albums_tags.album_id2 = albums.id2)) INNER JOIN tags ON ((tags.id1 = albums_tags.tag_id1) AND (tags.id2 = albums_tags.tag_id2)) WHERE (((albums.artist_id1, albums.artist_id2) IN (SELECT artists.id1, artists.id2 FROM artists)) AND ((albums.artist_id1, albums.artist_id2, tags.id1, tags.id2) IN (SELECT DISTINCT ON (albums.artist_id1, albums.artist_id2) albums.artist_id1, albums.artist_id2, tags.id1, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.id1) AND (albums_tags.tag_id2 = tags.id2)) INNER JOIN albums ON ((albums.id1 = albums_tags.album_id1) AND (albums.id2 = albums_tags.album_id2)) ORDER BY albums.artist_id1, albums.artist_id2, tags.name))))) ORDER BY tags.name'
+  end
+
+  it "should deal correctly with :limit option for many_through_many associations" do
+    @Artist.many_through_many :tags, :clone=>:tags, :limit=>10, :order=>:tags__name
+    @Artist.tags.sql.should == 'SELECT tags.* FROM tags WHERE ((tags.id1, tags.id2) IN (SELECT albums_tags.tag_id1, albums_tags.tag_id2 FROM artists INNER JOIN albums ON ((albums.artist_id1 = artists.id1) AND (albums.artist_id2 = artists.id2)) INNER JOIN albums_tags ON ((albums_tags.album_id1 = albums.id1) AND (albums_tags.album_id2 = albums.id2)) INNER JOIN tags ON ((tags.id1 = albums_tags.tag_id1) AND (tags.id2 = albums_tags.tag_id2)) WHERE (((albums.artist_id1, albums.artist_id2) IN (SELECT artists.id1, artists.id2 FROM artists)) AND ((albums.artist_id1, albums.artist_id2, tags.id1, tags.id2) IN (SELECT b, c, d, e FROM (SELECT albums.artist_id1 AS b, albums.artist_id2 AS c, tags.id1 AS d, tags.id2 AS e, row_number() OVER (PARTITION BY albums.artist_id1, albums.artist_id2 ORDER BY tags.name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.id1) AND (albums_tags.tag_id2 = tags.id2)) INNER JOIN albums ON ((albums.id1 = albums_tags.album_id1) AND (albums.id2 = albums_tags.album_id2))) AS t1 WHERE (x_sequel_row_number_x <= 10)))))) ORDER BY tags.name'
   end
 end
