@@ -1,5 +1,7 @@
 === HEAD
 
+* Return fractional seconds in timestamps in the odbc adapter (jeremyevans)
+
 * Support :plain and :phrase options to Dataset#full_text_search on PostgreSQL (jeremyevans)
 
 * Use limit strategy to correctly handle filtering by limited associations (jeremyevans)

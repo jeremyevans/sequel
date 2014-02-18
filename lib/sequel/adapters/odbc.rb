@@ -127,7 +127,7 @@ module Sequel
         # ODBCColumn#mapSqlTypeToGenericType and Column#klass.
         case v
         when ::ODBC::TimeStamp
-          db.to_application_timestamp([v.year, v.month, v.day, v.hour, v.minute, v.second])
+          db.to_application_timestamp([v.year, v.month, v.day, v.hour, v.minute, v.second, v.fraction])
         when ::ODBC::Time
           Sequel::SQLTime.create(v.hour, v.minute, v.second)
         when ::ODBC::Date
