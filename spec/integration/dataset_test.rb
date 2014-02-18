@@ -266,7 +266,7 @@ describe "Simple dataset operations with nasty table names" do
     @db.quote_identifiers = @qi
   end
 
-  cspecify "should work correctly", :mssql, :oracle, :sqlanywhere do
+  cspecify "should work correctly", :oracle, :sqlanywhere, [:jdbc, :mssql] do
     @db.create_table!(@table) do
       primary_key :id
       Integer :number
@@ -752,14 +752,14 @@ if DB.dataset.supports_window_functions?
         [{:rank=>1, :id=>1}, {:rank=>2, :id=>2}, {:rank=>3, :id=>3}, {:rank=>4, :id=>4}, {:rank=>5, :id=>5}, {:rank=>6, :id=>6}]
     end
       
-    cspecify "should give correct results for aggregate window functions with orders", :mssql do
+    specify "should give correct results for aggregate window functions with orders" do
       @ds.select(:id){sum(:amount).over(:partition=>:group_id, :order=>:id).as(:sum)}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
       @ds.select(:id){sum(:amount).over(:order=>:id).as(:sum)}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
     end
     
-    cspecify "should give correct results for aggregate window functions with frames", :mssql do
+    specify "should give correct results for aggregate window functions with frames" do
       @ds.select(:id){sum(:amount).over(:partition=>:group_id, :order=>:id, :frame=>:all).as(:sum)}.all.should ==
         [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
       @ds.select(:id){sum(:amount).over(:order=>:id, :frame=>:all).as(:sum)}.all.should ==
@@ -793,7 +793,7 @@ describe Sequel::SQL::Constants do
     @db.drop_table?(:constants)
   end
   
-  cspecify "should have working CURRENT_DATE", [:odbc, :mssql], [:jdbc, :sqlite], :oracle do
+  cspecify "should have working CURRENT_DATE", [:jdbc, :sqlite], :oracle do
     @db.create_table!(:constants){Date :d}
     @ds.insert(:d=>Sequel::CURRENT_DATE)
     d = @c2[@ds.get(:d)]

@@ -283,7 +283,7 @@ describe "Bound Argument Types" do
     @db.drop_table?(:items)
   end
 
-  cspecify "should handle date type", [:do, :sqlite], :mssql, [:jdbc, :sqlite], :oracle do 
+  cspecify "should handle date type", [:do, :sqlite], [:tinytds], [:jdbc, :mssql], [:jdbc, :sqlite], :oracle do 
     @ds.filter(:d=>:$x).prepare(:first, :ps_date).call(:x=>@vs[:d])[:d].should == @vs[:d]
   end
 

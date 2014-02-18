@@ -73,7 +73,7 @@ describe "Supported types" do
     ds.all.should == [{:name=>'Test User'*100}]
   end
   
-  cspecify "should support generic date type", [:do, :sqlite], [:jdbc, :sqlite], :mssql, :oracle do
+  cspecify "should support generic date type", [:do, :sqlite], [:jdbc, :sqlite], [:tinytds], [:jdbc, :mssql], :oracle do
     ds = create_items_table_with_column(:dat, Date)
     d = Date.today
     ds.insert(:dat => d)
