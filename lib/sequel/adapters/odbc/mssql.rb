@@ -34,7 +34,7 @@ module Sequel
 
         # Use ODBC format, not Microsoft format, as the ODBC layer does
         # some translation.  MSSQL version is over-ridden to allow 3 millisecond decimal places        
-        TIMESTAMP_FORMAT="{ts '%Y-%m-%d %H:%M:%S.%3N'}".freeze
+        TIMESTAMP_FORMAT="{ts '%Y-%m-%d %H:%M:%S%N'}".freeze
 
         private
 

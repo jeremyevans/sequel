@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle fractional seconds in input timestamps in the odbc/mssql adapter (Ross Attrill, jeremyevans)
+
 * Return fractional seconds in timestamps in the odbc adapter (jeremyevans)
 
 * Support :plain and :phrase options to Dataset#full_text_search on PostgreSQL (jeremyevans)

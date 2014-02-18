@@ -16,12 +16,12 @@ describe "A MSSQL database" do
     @db = DB
   end
 
-  cspecify "should be able to read fractional part of timestamp", :odbc do
+  specify "should be able to read fractional part of timestamp" do
     rs = @db["select getutcdate() as full_date, cast(datepart(millisecond, getutcdate()) as int) as milliseconds"].first
     rs[:milliseconds].should == rs[:full_date].usec/1000
   end
 
-  cspecify "should be able to write fractional part of timestamp", :odbc do
+  specify "should be able to write fractional part of timestamp" do
     t = Time.utc(2001, 12, 31, 23, 59, 59, 997000)
     (t.usec/1000).should == @db["select cast(datepart(millisecond, ?) as int) as milliseconds", t].get
   end
