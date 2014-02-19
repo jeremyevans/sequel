@@ -332,10 +332,10 @@ module Sequel
       end
 
       DATABASE_ERROR_REGEXPS = {
-        /(is|are) not unique\z/ => UniqueConstraintViolation,
-        /foreign key constraint failed\z/ => ForeignKeyConstraintViolation,
+        /(is|are) not unique\z|UNIQUE constraint failed: .+\z/ => UniqueConstraintViolation,
+        /foreign key constraint failed\z|FOREIGN KEY constraint failed\z/ => ForeignKeyConstraintViolation,
         /\A(SQLITE ERROR 19 \(CONSTRAINT\) : )?constraint failed\z/ => ConstraintViolation,
-        /may not be NULL\z/ => NotNullConstraintViolation,
+        /may not be NULL\z|NOT NULL constraint failed: .+\z/ => NotNullConstraintViolation,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS
