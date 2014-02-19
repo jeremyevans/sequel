@@ -39,6 +39,7 @@ If you have any comments or suggestions please post to the Google group.
 == A Short Example
 
   require 'sequel'
+  require 'sqlite3'
   
   DB = Sequel.sqlite # memory database
   
@@ -105,6 +106,7 @@ Or getting results as a hash via +to_hash+, with one column as key and another a
 To connect to a database you simply provide <tt>Sequel.connect</tt> with a URL:
 
   require 'sequel'
+  require 'sqlite3'
   DB = Sequel.connect('sqlite://blog.db')
   
 The connection URL can also include such stuff as the user name, password, and port:
