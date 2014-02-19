@@ -39,6 +39,7 @@ If you have any comments or suggestions please post to the Google group.
 == A Short Example
 
   require 'sequel'
+  require 'sqlite3'
   
   DB = Sequel.sqlite # memory database
   
