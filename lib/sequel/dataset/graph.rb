@@ -54,7 +54,9 @@ module Sequel
       when Symbol
         table = dataset
         dataset = @db[dataset]
-        table_alias ||= table
+        # let alias be the same as the table name (sans any optional schema)
+        # unless alias explicitly given in the symbol using ___ notation
+        table_alias ||= split_symbol(table).compact.last.to_sym
       when ::Sequel::Dataset
         if dataset.simple_select_all?
           table = dataset.opts[:from].first

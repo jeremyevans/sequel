@@ -89,6 +89,16 @@ describe Sequel::Dataset, " graphing" do
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
   end
 
+  it "#graph should accept a schema qualified symbolic table name as the dataset" do
+    ds = @ds1.graph(:schema__lines, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN schema.lines AS lines ON (lines.x = points.id)'
+  end
+
+  it "#graph allows giving table alias in symbolic argument" do
+    ds = @ds1.graph(:lines___sketch, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, sketch.id AS sketch_id, sketch.x AS sketch_x, sketch.y AS sketch_y, sketch.graph_id FROM points LEFT OUTER JOIN lines AS sketch ON (sketch.x = points.id)'
+  end
+
   it "#graph should raise an error if a symbol, dataset, or model is not used" do
     proc{@ds1.graph(Object.new, :x=>:id)}.should raise_error(Sequel::Error)
   end
