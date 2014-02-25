@@ -1,8 +1,12 @@
 === HEAD
 
+* Handle SQL::Identifier, SQL::QualifiedIdentifier, and SQL::AliasedExpression objects as first argument to Dataset#graph (jeremyevans)
+
+* Respect qualification and aliases in symbols passed as first argument to Dataset#graph (dividedmind) (#769)
+
 * Recognize new constraint violation error messages in SQLite 3.8.2+ (itswindtw)
 
-* Use limit strategy to correct handle limited associations in the dataset_associations plugin (jeremyevans)
+* Use limit strategy to correctly handle limited associations in the dataset_associations plugin (jeremyevans)
 
 * Handle issues in dataset_associations plugin when dataset uses unqualified identifiers for associations requiring joins (jeremyevans)
 

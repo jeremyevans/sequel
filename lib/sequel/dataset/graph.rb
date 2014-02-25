@@ -26,7 +26,7 @@ module Sequel
     #
     # Arguments:
     # dataset :: Can be a symbol (specifying a table), another dataset,
-    #            or an object that responds to +dataset+ and returns a symbol or a dataset
+    #            or an SQL::Identifier, SQL::QualifiedIdentifier, or SQL::AliasedExpression.
     # join_conditions :: Any condition(s) allowed by +join_table+.
     # block :: A block that is passed to +join_table+.
     #
@@ -50,23 +50,35 @@ module Sequel
       # Allow the use of a dataset or symbol as the first argument
       # Find the table name/dataset based on the argument
       table_alias = options[:table_alias]
+      table = dataset
+      create_dataset = true
+
       case dataset
       when Symbol
-        table = dataset
-        dataset = @db[dataset]
         # let alias be the same as the table name (sans any optional schema)
         # unless alias explicitly given in the symbol using ___ notation
-        table_alias ||= split_symbol(table).compact.last.to_sym
-      when ::Sequel::Dataset
+        table_alias ||= split_symbol(table).compact.last
+      when Dataset
         if dataset.simple_select_all?
           table = dataset.opts[:from].first
           table_alias ||= table
         else
-          table = dataset
           table_alias ||= dataset_alias((@opts[:num_dataset_sources] || 0)+1)
         end
+        create_dataset = false
+      when SQL::Identifier
+        table_alias ||= table.value
+      when SQL::QualifiedIdentifier
+        table_alias ||= split_qualifiers(table).last
+      when SQL::AliasedExpression
+        return graph(table.expression, join_conditions, {:table_alias=>table.aliaz}.merge(options), &block)
       else
         raise Error, "The dataset argument should be a symbol or dataset"
+      end
+      table_alias = table_alias.to_sym
+
+      if create_dataset
+        dataset = db.from(table)
       end
 
       # Raise Sequel::Error with explanation that the table alias has been used

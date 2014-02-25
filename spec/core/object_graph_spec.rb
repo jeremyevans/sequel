@@ -6,7 +6,7 @@ describe Sequel::Dataset, "graphing" do
       case sql
       when /points/
         [:id, :x, :y]
-      when /lines/
+      when /lines|foo/
         [:id, :x, :y, :graph_id]
       else
         [:id, :name, :x, :y, :lines_x]
@@ -98,6 +98,37 @@ describe Sequel::Dataset, "graphing" do
     it "allows giving table alias in symbolic argument" do
       ds = @ds1.graph(:lines___sketch, :x=>:id)
       ds.sql.should == 'SELECT points.id, points.x, points.y, sketch.id AS sketch_id, sketch.x AS sketch_x, sketch.y AS sketch_y, sketch.graph_id FROM points LEFT OUTER JOIN lines AS sketch ON (sketch.x = points.id)'
+      ds = @ds1.graph(:schema__lines___sketch, :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, sketch.id AS sketch_id, sketch.x AS sketch_x, sketch.y AS sketch_y, sketch.graph_id FROM points LEFT OUTER JOIN schema.lines AS sketch ON (sketch.x = points.id)'
+    end
+
+    it "should accept a SQL::Identifier as the dataset" do
+      ds = @ds1.graph(Sequel.identifier(:lines), :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines AS lines ON (lines.x = points.id)'
+      ds = @ds1.graph(Sequel.identifier('lines'), :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines AS lines ON (lines.x = points.id)'
+    end
+
+    it "should accept a SQL::QualifiedIdentifier as the dataset" do
+      ds = @ds1.graph(Sequel.qualify(:schema, :lines), :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN schema.lines AS lines ON (lines.x = points.id)'
+      ds = @ds1.graph(Sequel.qualify('schema', 'lines'), :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN schema.lines AS lines ON (lines.x = points.id)'
+      ds = @ds1.graph(Sequel.qualify(Sequel.identifier(:schema), Sequel.identifier(:lines)), :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN schema.lines AS lines ON (lines.x = points.id)'
+      ds = @ds1.graph(Sequel.qualify(Sequel.identifier('schema'), Sequel.identifier('lines')), :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN schema.lines AS lines ON (lines.x = points.id)'
+    end
+
+    it "should accept a SQL::AliasedExpression as the dataset" do
+      ds = @ds1.graph(Sequel.as(:lines, :foo), :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, foo.id AS foo_id, foo.x AS foo_x, foo.y AS foo_y, foo.graph_id FROM points LEFT OUTER JOIN lines AS foo ON (foo.x = points.id)'
+      ds = @ds1.graph(Sequel.as(:schema__lines, :foo), :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, foo.id AS foo_id, foo.x AS foo_x, foo.y AS foo_y, foo.graph_id FROM points LEFT OUTER JOIN schema.lines AS foo ON (foo.x = points.id)'
+      ds = @ds1.graph(Sequel.as(Sequel.identifier(:lines), :foo), :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, foo.id AS foo_id, foo.x AS foo_x, foo.y AS foo_y, foo.graph_id FROM points LEFT OUTER JOIN lines AS foo ON (foo.x = points.id)'
+      ds = @ds1.graph(Sequel.as(Sequel.qualify(:schema, :lines), :foo), :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, foo.id AS foo_id, foo.x AS foo_x, foo.y AS foo_y, foo.graph_id FROM points LEFT OUTER JOIN schema.lines AS foo ON (foo.x = points.id)'
     end
 
     it "should raise an error if a symbol, dataset, or model is not used" do

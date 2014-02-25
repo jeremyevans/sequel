@@ -75,7 +75,14 @@ describe "Simple Dataset operations" do
   end
 
   specify "should graph correctly" do
-    @ds.graph(:items, {:id=>:id}, :table_alias=>:b).extension(:graph_each).all.should == [{:items=>{:id=>1, :number=>10}, :b=>{:id=>1, :number=>10}}]
+    a =  [{:items=>{:id=>1, :number=>10}, :b=>{:id=>1, :number=>10}}]
+    pr = proc{|t| @ds.graph(t, {:id=>:id}, :table_alias=>:b).extension(:graph_each).all.should == a}
+    pr[:items]
+    pr[:items___foo]
+    pr[Sequel.identifier(:items)]
+    pr[Sequel.identifier('items')]
+    pr[Sequel.as(:items, :foo)]
+    pr[Sequel.as(Sequel.identifier('items'), 'foo')]
   end
 
   specify "should graph correctly with a subselect" do
