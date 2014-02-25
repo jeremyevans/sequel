@@ -935,6 +935,7 @@ module Sequel
       # The alias to use for the expression, not +alias+ since that is
       # a keyword in ruby.
       attr_reader :aliaz
+      alias_method :alias, :aliaz
 
       # Create an object with the given expression and alias.
       def initialize(expression, aliaz)

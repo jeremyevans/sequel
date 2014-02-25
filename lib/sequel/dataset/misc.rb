@@ -97,7 +97,7 @@ module Sequel
       end
       case s = source.first
       when SQL::AliasedExpression
-        s.aliaz
+        s.alias
       when Symbol
         _, _, aliaz = split_symbol(s)
         aliaz ? aliaz.to_sym : s
@@ -178,7 +178,7 @@ module Sequel
         c_table, column, aliaz = split_symbol(c)
         [c_table ? SQL::QualifiedIdentifier.new(c_table, column.to_sym) : column.to_sym, aliaz]
       when SQL::AliasedExpression
-        [c.expression, c.aliaz]
+        [c.expression, c.alias]
       when SQL::JoinClause
         [c.table, c.table_alias]
       else

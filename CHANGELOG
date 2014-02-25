@@ -1,5 +1,7 @@
 === HEAD
 
+* Add SQL::AliasedExpression#alias alias for #aliaz (jeremyevans)
+
 * Handle SQL::Identifier, SQL::QualifiedIdentifier, and SQL::AliasedExpression objects as first argument to Dataset#graph (jeremyevans)
 
 * Respect qualification and aliases in symbols passed as first argument to Dataset#graph (dividedmind) (#769)

@@ -71,7 +71,7 @@ module Sequel
       when SQL::QualifiedIdentifier
         table_alias ||= split_qualifiers(table).last
       when SQL::AliasedExpression
-        return graph(table.expression, join_conditions, {:table_alias=>table.aliaz}.merge(options), &block)
+        return graph(table.expression, join_conditions, {:table_alias=>table.alias}.merge(options), &block)
       else
         raise Error, "The dataset argument should be a symbol or dataset"
       end
@@ -135,7 +135,7 @@ module Sequel
                 column = column.value if column.is_a?(SQL::Identifier)
                 column.to_sym
               when SQL::AliasedExpression
-                column = sel.aliaz
+                column = sel.alias
                 column = column.value if column.is_a?(SQL::Identifier)
                 column.to_sym
               else

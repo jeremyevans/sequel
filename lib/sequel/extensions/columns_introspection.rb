@@ -71,7 +71,7 @@ module Sequel
         col = c.column
         col.is_a?(SQL::Identifier) ? col.value.to_sym : col.to_sym
       when SQL::AliasedExpression
-        a = c.aliaz
+        a = c.alias
         a.is_a?(SQL::Identifier) ? a.value.to_sym : a.to_sym
       end
     end

@@ -33,7 +33,7 @@ module Sequel
       when SQL::OrderedExpression
         SQL::OrderedExpression.new(v(o.expression), o.descending, :nulls=>o.nulls)
       when SQL::AliasedExpression
-        SQL::AliasedExpression.new(v(o.expression), o.aliaz)
+        SQL::AliasedExpression.new(v(o.expression), o.alias)
       when SQL::CaseExpression
         args = [v(o.conditions), v(o.default)]
         args << v(o.expression) if o.expression?

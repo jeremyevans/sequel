@@ -825,7 +825,7 @@ module Sequel
       when SQL::QualifiedIdentifier
         _hash_key_symbol(s.column, true)
       when SQL::AliasedExpression
-        _hash_key_symbol(s.aliaz, true)
+        _hash_key_symbol(s.alias, true)
       when String
         s.to_sym if recursing
       end

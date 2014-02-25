@@ -91,7 +91,7 @@ module Sequel
       when SQL::AliasedExpression
         dot "AliasedExpression"
         v(e.expression, :expression)
-        v(e.aliaz, :alias)
+        v(e.alias, :alias)
       when SQL::CaseExpression
         dot "CaseExpression"
         v(e.expression, :expression) if e.expression

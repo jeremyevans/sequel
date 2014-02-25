@@ -298,7 +298,7 @@ module Sequel
     # SQL fragment for AliasedExpression
     def aliased_expression_sql_append(sql, ae)
       literal_append(sql, ae.expression)
-      as_sql_append(sql, ae.aliaz)
+      as_sql_append(sql, ae.alias)
     end
 
     # SQL fragment for Array
@@ -801,7 +801,7 @@ module Sequel
       when SQL::QualifiedIdentifier
         alias_symbol(sym.column)
       when SQL::AliasedExpression
-        alias_alias_symbol(sym.aliaz)
+        alias_alias_symbol(sym.alias)
       else
         raise Error, "Invalid alias for alias_symbol: #{sym.inspect}"
       end
@@ -1183,7 +1183,7 @@ module Sequel
             schema, table, t_alias = split_symbol(table)
             t_alias ||= Sequel::SQL::QualifiedIdentifier.new(schema, table) if schema
           when Sequel::SQL::AliasedExpression
-            t_alias = table.aliaz
+            t_alias = table.alias
           end
           c_table = t_alias || table
         end

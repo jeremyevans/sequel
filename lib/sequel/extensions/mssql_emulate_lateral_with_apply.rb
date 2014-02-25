@@ -58,7 +58,7 @@ module Sequel
         ds = from(*source)
         lateral.each do |l|
           l = if l.is_a?(Sequel::SQL::AliasedExpression)
-            l.expression.clone(:lateral=>nil).as(l.aliaz)
+            l.expression.clone(:lateral=>nil).as(l.alias)
           else
             l.clone(:lateral=>nil)
           end

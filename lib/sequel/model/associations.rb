@@ -945,7 +945,7 @@ module Sequel
         end
 
         def filter_by_associations_limit_aliases
-          filter_by_associations_limit_alias_key.map{|v| v.aliaz}
+          filter_by_associations_limit_alias_key.map{|v| v.alias}
         end
 
         def filter_by_associations_limit_key
@@ -1513,7 +1513,7 @@ module Sequel
                 select_all(egds.first_source).
                 select_append(*associated_key_array)
               egds = opts.apply_eager_graph_limit_strategy(egls, egds)
-              ds.graph(egds, associated_key_array.map{|v| v.aliaz}.zip(lpkcs) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>eo[:implicit_qualifier], :join_type=>eo[:join_type]||join_type, :from_self_alias=>eo[:from_self_alias], :select=>select||orig_egds.columns, &graph_block)
+              ds.graph(egds, associated_key_array.map{|v| v.alias}.zip(lpkcs) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>eo[:implicit_qualifier], :join_type=>eo[:join_type]||join_type, :from_self_alias=>eo[:from_self_alias], :select=>select||orig_egds.columns, &graph_block)
             else
               ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>eo[:join_type]||jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :qualify=>:deep, :from_self_alias=>eo[:from_self_alias], &jt_graph_block)
               ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>eo[:join_type]||join_type, &graph_block)
@@ -2305,7 +2305,7 @@ END
         # *associations :: any associations dependent on this one
         def eager_graph_association(ds, model, ta, requirements, r, *associations)
           if r.is_a?(SQL::AliasedExpression)
-            alias_base = r.aliaz
+            alias_base = r.alias
             r = r.expression
           else
             alias_base = r[:graph_alias_base]
@@ -2445,7 +2445,7 @@ END
         # per-call determining of the alias base.
         def eager_graph_check_association(model, association)
           if association.is_a?(SQL::AliasedExpression)
-            SQL::AliasedExpression.new(check_association(model, association.expression), association.aliaz)
+            SQL::AliasedExpression.new(check_association(model, association.expression), association.alias)
           else
             check_association(model, association)
           end
